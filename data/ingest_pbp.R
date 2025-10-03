@@ -21,7 +21,9 @@ dbExecute(con, "CREATE TABLE IF NOT EXISTS plays (
 
 # Idempotent load: truncate and refill (simple baseline)
 dbExecute(con, "TRUNCATE TABLE plays;")
+cat("Loading ALL play-by-play data from 1999-2024...\n")
 for (yr in 1999:2024) {
+  cat("Loading play-by-play data for", yr, "...\n")
   pbp <- nflfastR::load_pbp(yr) |>
     transmute(game_id, play_id, posteam, defteam,
               quarter = qtr, time_seconds = half_seconds_remaining,
@@ -29,5 +31,8 @@ for (yr in 1999:2024) {
               pass = as.logical(pass),
               rush = as.logical(rush))
   DBI::dbWriteTable(con, "plays", pbp, append = TRUE)
+  cat("  ->", nrow(pbp), "plays inserted (cumulative:", 
+      dbGetQuery(con, "SELECT COUNT(*) FROM plays")[[1]], ")\n")
 }
+cat("Play-by-play ingestion complete!\n")
 dbDisconnect(con)

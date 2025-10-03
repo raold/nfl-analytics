@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 API_BASE = "https://api.the-odds-api.com/v4"
 DEFAULT_SPORT_KEY = "americanfootball_nfl"
 DEFAULT_REGIONS = "us"
-DEFAULT_MARKETS = "spreads,totals"
+DEFAULT_MARKETS = "h2h,spreads,totals"  # All available historical markets
 
 
 def parse_args() -> argparse.Namespace:
@@ -236,7 +236,16 @@ def main() -> None:
                 bookmakers=args.bookmakers,
             )
             remaining = response.headers.get("x-requests-remaining")
-            rows = flatten_events(response.json(), snapshot_at)
+            json_data = response.json()
+            # Handle case where API returns error dict instead of data array
+            if isinstance(json_data, dict) and "data" in json_data:
+                events = json_data["data"]
+            elif isinstance(json_data, list):
+                events = json_data
+            else:
+                print(f"Unexpected API response format: {json_data}")
+                continue
+            rows = flatten_events(events, snapshot_at)
             inserted = upsert_rows(conn, rows)
             total_rows += inserted
             print(

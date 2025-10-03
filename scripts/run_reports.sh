@@ -14,11 +14,32 @@ has_python() {
   command -v python >/dev/null 2>&1 || command -v python3 >/dev/null 2>&1
 }
 
+has_rscript() {
+  command -v Rscript >/dev/null 2>&1
+}
+
 py() {
   if command -v python >/dev/null 2>&1; then python "$@"; else python3 "$@"; fi
 }
 
 note() { printf "[run_reports] %s\n" "$*"; }
+
+# 0) Optional R ingestion + features (DB must be up; uses POSTGRES_* env)
+if has_rscript; then
+  note "Running R ingestion + features (if DB reachable)"
+  set +e
+  Rscript --vanilla "${ROOT_DIR}/data/ingest_schedules.R" >/dev/null 2>&1 || note "schedules ingest skipped (R/DB issue)"
+  Rscript --vanilla "${ROOT_DIR}/data/ingest_pbp.R" >/dev/null 2>&1 || note "pbp ingest skipped (R/DB issue)"
+  Rscript --vanilla "${ROOT_DIR}/data/features_epa.R" >/dev/null 2>&1 || note "features_epa skipped (R/DB issue)"
+  set -e
+  # Try to refresh mart view if psql present and creds provided
+  if command -v psql >/dev/null 2>&1 && [[ -n "${POSTGRES_USER:-}" && -n "${POSTGRES_PASSWORD:-}" ]]; then
+    note "Refreshing mart.game_summary"
+    PGPASSWORD="${POSTGRES_PASSWORD}" psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5544}/${POSTGRES_DB:-devdb01}" -c "REFRESH MATERIALIZED VIEW mart.game_summary;" >/dev/null 2>&1 || note "refresh skipped (psql/DB issue)"
+  fi
+else
+  note "Skipping R ingestion (Rscript not found)"
+fi
 
 # 1) OPE grid (Chapter 5)
 DATASET="${ROOT_DIR}/data/rl_logged.csv"
@@ -123,4 +144,3 @@ latexmk -pdf -bibtex -interaction=nonstopmode main.tex >/dev/null 2>&1 || true
 latexmk -pdf -interaction=nonstopmode main.tex >/dev/null 2>&1 || true
 popd >/dev/null
 note "Done. Outputs in ${OUT_DIR} and analysis/dissertation/main/main.pdf"
-

@@ -18,14 +18,25 @@
 - `python py/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03` ingests historical odds (set `ODDS_API_KEY`, defaults to spreads/totals markets, and respect rate limits).
 - RL OPE (scaffold):
   - Build logged dataset: `python py/rl/dataset.py --output data/rl_logged.csv --season-start 2020 --season-end 2024`
-  - Evaluate grid: `python py/rl/ope_gate.py --dataset data/rl_logged.csv --output analysis/reports/ope_gate.json`
+  - Evaluate grid (emit TeX to figures/out):
+    - `python py/rl/ope_gate.py --dataset data/rl_logged.csv --policy policy.json --output analysis/reports/ope_gate.json --grid-clips 5,10,20 --grid-shrinks 0.0,0.1,0.2 --alpha 0.05 --tex analysis/dissertation/figures/out/ope_grid_table.tex`
 - Risk sizing (scaffold):
   - Generate scenarios: `python py/risk/generate_scenarios.py --bets data/bets.csv --output data/scenarios.csv --sims 20000`
-  - CVaR sizing: `python py/risk/cvar_lp.py --scenarios data/scenarios.csv --alpha 0.95 --output analysis/reports/cvar_stakes.json`
+  - CVaR sizing + report: `python py/risk/cvar_lp.py --scenarios data/scenarios.csv --alpha 0.95 --output analysis/reports/cvar_a95.json` and `python py/risk/cvar_report.py --json analysis/reports/cvar_a95.json --json analysis/reports/cvar_a90.json --tex analysis/dissertation/figures/out/cvar_benchmark_table.tex`
 - `docker compose down` stops services while preserving data in `pgdata/`.
 - `Rscript R/report_odds_coverage.R` regenerates `data/raw/odds_coverage_by_season.csv`; GitHub Actions (`.github/workflows/nightly-etl.yml`) runs this nightly.
 - Quarto notebooks (locally): run `quarto render` on `04_score_validation.qmd`, `05_copula_gof.qmd`, `12_risk_sizing.qmd`, and `80_rl_ablation.qmd` as needed for dissertation figures/tables.
 - `psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$POSTGRES_PORT/$POSTGRES_DB -c "REFRESH MATERIALIZED VIEW mart.game_summary;"` refreshes analytic marts after play ingests.
+
+### Quick end‑to‑end (preferred)
+- `bash scripts/run_reports.sh` emits OPE grid, acceptance, CVaR, and OOS tables into `analysis/dissertation/figures/out/` and builds the PDF.
+
+### R integration (optional in run_reports)
+- Set `POSTGRES_*` env vars. To include R steps in the pipeline, run:
+  - `Rscript --vanilla data/ingest_schedules.R`
+  - `Rscript --vanilla data/ingest_pbp.R`
+  - `Rscript --vanilla data/features_epa.R`
+  (These can be inserted into `scripts/run_reports.sh` if desired.)
 
 ## LaTeX Document Build & Hygiene
 - Build the dissertation with latexmk (two-pass with BibTeX):
@@ -45,7 +56,13 @@
 
 ### Common pitfalls
 - Stray `\iffalse`/`\fi` blocks can accidentally eat large sections; always close them in the same file. Avoid multi‑chapter guards.
-- Run latexmk with BibTeX; otherwise, citations remain undefined and cross‑refs noisy.
+- Run latexmk with BibTeX; otherwise, citations remain undefined and cross‑refs noisy. If warnings persist for keys like `fujimoto2018td3`, ensure `references.bib` contains those entries — the warnings are non‑fatal.
+
+## Context for next agent session (R/Python focus)
+- Prefer writing auto-included TeX artifacts to `analysis/dissertation/figures/out/`.
+- Keep DB DSN consistent via `POSTGRES_*` across R and Python.
+- OPE acceptance defaults in text: point estimate at `c=10, λ=0.1`; require stability over `c∈{5,10,20}`, `λ∈{0,0.1,0.2}`, per‑fold ESS≥0.2N and positive median DR.
+- For table compactness, use `\footnotesize`, `\setlength{\tabcolsep}{3pt}`, and `\renewcommand{\arraystretch}{1.1}` locally around wide tables.
 
 ## Coding Style & Naming Conventions
 - Prefer tidyverse style in R: snake_case objects, pipes for transformations, explicit `transmute`/`mutate`.

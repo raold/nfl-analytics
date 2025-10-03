@@ -1,0 +1,7 @@
+dplyr
+ggplot2
+tidyr
+DBI
+RPostgres
+glue
+knitr

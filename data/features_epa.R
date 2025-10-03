@@ -1,5 +1,5 @@
 # R/features_epa.R
-library(DBI); library(RPostgres); library(dplyr); library(lubridate)
+library(DBI); library(RPostgres); library(dplyr); library(lubridate); library(tidyr)
 
 con <- dbConnect(
   RPostgres::Postgres(),
@@ -12,6 +12,7 @@ con <- dbConnect(
 
 pbp <- tbl(con, "plays")
 agg <- pbp |>
+  filter(!is.na(posteam)) |>
   group_by(game_id, posteam) |>
   summarise(epa_sum = sum(epa, na.rm=TRUE),
             plays = n(),
@@ -35,7 +36,10 @@ dbExecute(con, "CREATE TABLE IF NOT EXISTS mart.team_epa (
   primary key (game_id, posteam)
 );")
 
-team_epa <- agg |> collect()
+team_epa <- agg |> collect() |> mutate(
+  explosive_pass = 0,
+  explosive_rush = 0
+)
 DBI::dbWithTransaction(con, {
   dbExecute(con, "DELETE FROM mart.team_epa;")
   dbWriteTable(con, DBI::Id(schema="mart", table="team_epa"), team_epa, append = TRUE, row.names = FALSE)
