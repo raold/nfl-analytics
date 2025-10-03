@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  3 OCT 2025 03:01
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  3 OCT 2025 10:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**analysis/dissertation/main/main.tex
-(./analysis/dissertation/main/main.tex
+**main.tex
+(./main.tex
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
 (/usr/local/texlive/2025/texmf-dist/tex/latex/base/report.cls
@@ -1035,7 +1035,20 @@ LaTeX Info: Redefining \Bbbk on input line 2194.
 LaTeX Info: Redefining \not on input line 2534.
 LaTeX Info: Redefining \textsquare on input line 2549.
 LaTeX Info: Redefining \openbox on input line 2551.
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/pgfplots/pgfplots.sty
+)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.
+meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowinset=\dimen340
+\pgfarrowlength=\dimen341
+\pgfarrowwidth=\dimen342
+\pgfarrowlinewidth=\dimen343
+)
+(/usr/local/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
+s/tikzlibrarycalc.code.tex
+File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/pgfplots/pgfplots.sty
 (/usr/local/texlive/2025/texmf-dist/tex/generic/pgfplots/pgfplots.revision.tex)
 Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
 (/usr/local/texlive/2025/texmf-dist/tex/generic/pgfplots/pgfplots.code.tex
@@ -1043,7 +1056,7 @@ Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
 \t@pgfplots@toka=\toks57
 \t@pgfplots@tokb=\toks58
 \t@pgfplots@tokc=\toks59
-\pgfplots@tmpa=\dimen340
+\pgfplots@tmpa=\dimen344
 \c@pgfplots@coordindex=\count370
 \c@pgfplots@scanlineindex=\count371
 
@@ -1121,14 +1134,14 @@ x)
 s/tikzlibrarydecorations.code.tex
 (/usr/local/texlive/2025/texmf-dist/tex/generic/pgf/modules/pgfmoduledecoration
 s.code.tex
-\pgfdecoratedcompleteddistance=\dimen341
-\pgfdecoratedremainingdistance=\dimen342
-\pgfdecoratedinputsegmentcompleteddistance=\dimen343
-\pgfdecoratedinputsegmentremainingdistance=\dimen344
-\pgf@decorate@distancetomove=\dimen345
+\pgfdecoratedcompleteddistance=\dimen345
+\pgfdecoratedremainingdistance=\dimen346
+\pgfdecoratedinputsegmentcompleteddistance=\dimen347
+\pgfdecoratedinputsegmentremainingdistance=\dimen348
+\pgf@decorate@distancetomove=\dimen349
 \pgf@decorate@repeatstate=\count375
-\pgfdecorationsegmentamplitude=\dimen346
-\pgfdecorationsegmentlength=\dimen347
+\pgfdecorationsegmentamplitude=\dimen350
+\pgfdecorationsegmentlength=\dimen351
 )
 \tikz@lib@dec@box=\box83
 )
@@ -1143,12 +1156,12 @@ brarydecorations.pathreplacing.code.tex))
 (/usr/local/texlive/2025/texmf-dist/tex/generic/pgfplots/libs/tikzlibrarypgfplo
 ts.contourlua.code.tex)
 \pgfplots@numplots=\count376
-\pgfplots@xmin@reg=\dimen348
-\pgfplots@xmax@reg=\dimen349
-\pgfplots@ymin@reg=\dimen350
-\pgfplots@ymax@reg=\dimen351
-\pgfplots@zmin@reg=\dimen352
-\pgfplots@zmax@reg=\dimen353
+\pgfplots@xmin@reg=\dimen352
+\pgfplots@xmax@reg=\dimen353
+\pgfplots@ymin@reg=\dimen354
+\pgfplots@ymax@reg=\dimen355
+\pgfplots@zmin@reg=\dimen356
+\pgfplots@zmax@reg=\dimen357
 )
 (/usr/local/texlive/2025/texmf-dist/tex/generic/pgf/frontendlayer/tikz/librarie
 s/tikzlibraryplotmarks.code.tex
@@ -1170,14 +1183,14 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@cnth=\count377
 \Gm@cntv=\count378
 \c@Gm@tempcnt=\count379
-\Gm@bindingoffset=\dimen354
-\Gm@wd@mp=\dimen355
-\Gm@odd@mp=\dimen356
-\Gm@even@mp=\dimen357
-\Gm@layoutwidth=\dimen358
-\Gm@layoutheight=\dimen359
-\Gm@layouthoffset=\dimen360
-\Gm@layoutvoffset=\dimen361
+\Gm@bindingoffset=\dimen358
+\Gm@wd@mp=\dimen359
+\Gm@odd@mp=\dimen360
+\Gm@even@mp=\dimen361
+\Gm@layoutwidth=\dimen362
+\Gm@layoutheight=\dimen363
+\Gm@layouthoffset=\dimen364
+\Gm@layoutvoffset=\dimen365
 \Gm@dimlist=\toks64
 )
 \c@theorem=\count380
@@ -1209,7 +1222,7 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
 )
 )
-\@linkdim=\dimen362
+\@linkdim=\dimen366
 \Hy@linkcounter=\count382
 \Hy@pagecounter=\count383
 
@@ -1241,7 +1254,7 @@ Package hyperref Info: Bookmarks ON on input line 4424.
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4763.
-\XeTeXLinkMargin=\dimen363
+\XeTeXLinkMargin=\dimen367
 
 (/usr/local/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -1251,8 +1264,8 @@ Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
 \Fld@menulength=\count386
-\Field@Width=\dimen364
-\Fld@charsize=\dimen365
+\Field@Width=\dimen368
+\Fld@charsize=\dimen369
 Package hyperref Info: Hyper figures OFF on input line 6042.
 Package hyperref Info: Link nesting OFF on input line 6047.
 Package hyperref Info: Hyper index ON on input line 6050.
@@ -1293,7 +1306,7 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip85
 )
-Package hyperref Info: Option `hypertexnames' set `false' on input line 109.
+Package hyperref Info: Option `hypertexnames' set `false' on input line 122.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/cleveref/cleveref.sty
 Package: cleveref 2018/03/27 v0.21.4 Intelligent cross-referencing
 Package cleveref Info: `hyperref' support loaded on input line 2370.
@@ -1315,68 +1328,74 @@ Package cleveref Info: include cross-reference names in hyperlinks on input lin
 e 7852.
 )
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 173.
+(Font)              scaled to size 12.0pt on input line 186.
 
-(analysis/dissertation/main/main.aux)
+(./main.aux
+
+LaTeX Warning: Label `tab:cvar-benchmark' multiply defined.
+
+
+LaTeX Warning: Label `tab:cvar-benchmark@cref' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/npxmi/m/it on input line 173.
+LaTeX Font Info:    Checking defaults for OML/npxmi/m/it on input line 186.
 LaTeX Font Info:    Trying to load font information for OML+npxmi on input line
- 173.
-
-(/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/omlnpxmi.fd
+ 186.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/omlnpxmi.fd
 File: omlnpxmi.fd 2013/03/21 Fontinst v1.933 font definitions for OML/npxmi.
 )
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for U/npxexa/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for U/npxexa/m/n on input line 186.
 LaTeX Font Info:    Trying to load font information for U+npxexa on input line 
-173.
+186.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/unpxexa.fd
 File: unpxexa.fd 2013/03/24 Fontinst v1.933 font definitions for U/npxexa.
 )
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for LMS/npxsy/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for LMS/npxsy/m/n on input line 186.
 LaTeX Font Info:    Trying to load font information for LMS+npxsy on input line
- 173.
+ 186.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/lmsnpxsy.fd
 File: lmsnpxsy.fd 2016/07/04 Fontinst v1.933 font definitions for LMS/npxsy.
 )
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for LMX/npxexx/m/n on input line 173.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for LMX/npxexx/m/n on input line 186.
 LaTeX Font Info:    Trying to load font information for LMX+npxexx on input lin
-e 173.
+e 186.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/lmxnpxexx.fd
 File: lmxnpxexx.fd 2016/07/04 Fontinst v1.933 font definitions for LMX/npxexx.
 )
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 173.
-LaTeX Font Info:    ... okay on input line 173.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 186.
+LaTeX Font Info:    ... okay on input line 186.
 
 (/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count392
-\scratchdimen=\dimen366
+\scratchdimen=\dimen370
 \scratchbox=\box84
 \nofMPsegments=\count393
 \nofMParguments=\count394
 \everyMPshowfont=\toks65
 \MPscratchCnt=\count395
-\MPscratchDim=\dimen367
+\MPscratchDim=\dimen371
 \MPnumerator=\count396
 \makeMPintoPDFobject=\count397
 \everyMPtoPDFconversion=\toks66
@@ -1397,28 +1416,28 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Info: Command `\dddot' is already robust on input line 173.
-LaTeX Info: Command `\ddddot' is already robust on input line 173.
+LaTeX Info: Command `\dddot' is already robust on input line 186.
+LaTeX Info: Command `\ddddot' is already robust on input line 186.
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package microtype Info: Patching varwidth to enable character protrusion.
-\MT@vwid@leftmargin=\dimen368
-\MT@vwid@rightmargin=\dimen369
-LaTeX Info: Redefining \microtypecontext on input line 173.
-Package microtype Info: Applying patch `item' on input line 173.
-Package microtype Info: Applying patch `toc' on input line 173.
-Package microtype Info: Applying patch `eqnum' on input line 173.
-Package microtype Info: Applying patch `footnote' on input line 173.
-Package microtype Info: Applying patch `verbatim' on input line 173.
-LaTeX Info: Redefining \microtypesetup on input line 173.
+\MT@vwid@leftmargin=\dimen372
+\MT@vwid@rightmargin=\dimen373
+LaTeX Info: Redefining \microtypecontext on input line 186.
+Package microtype Info: Applying patch `item' on input line 186.
+Package microtype Info: Applying patch `toc' on input line 186.
+Package microtype Info: Applying patch `eqnum' on input line 186.
+Package microtype Info: Applying patch `footnote' on input line 186.
+Package microtype Info: Applying patch `verbatim' on input line 186.
+LaTeX Info: Redefining \microtypesetup on input line 186.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 173.
+LaTeX Info: Redefining \showhyphens on input line 186.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -1466,33 +1485,33 @@ s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 173.
-(analysis/dissertation/main/main.out) (analysis/dissertation/main/main.out)
+Package hyperref Info: Link coloring ON on input line 186.
+(./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
 
-Package hyperref Info: Option `pageanchor' set `false' on input line 184.
+Package hyperref Info: Option `pageanchor' set `false' on input line 197.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 20.74pt on input line 186.
+(Font)              scaled to size 20.74pt on input line 199.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 14.4pt on input line 186.
+(Font)              scaled to size 14.4pt on input line 199.
 LaTeX Font Info:    Trying to load font information for OT1+minzpl on input lin
-e 186.
+e 199.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/ot1minzpl.fd
 File: ot1minzpl.fd 2021/05/25 v1.0 font definition file for OT1/minzpl/TLF
 )
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 14.4pt on input line 186.
+(Font)              scaled to size 14.4pt on input line 199.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `minzpl' (encoding: OT1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 10.5pt on input line 186.
+(Font)              scaled to size 10.5pt on input line 199.
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 7.9pt on input line 186.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 186
+(Font)              scaled to size 7.9pt on input line 199.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 199
 .
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
@@ -1501,7 +1520,7 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 186
+LaTeX Font Info:    Trying to load font information for U+msb on input line 199
 .
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
@@ -1511,19 +1530,19 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    Trying to load font information for U+npxmia on input line 
-186.
+199.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/unpxmia.fd
 File: unpxmia.fd 2013/03/24 Fontinst v1.933 font definitions for U/npxmia.
 )
 LaTeX Font Info:    Trying to load font information for U+npxsym on input line 
-186.
+199.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/unpxsym.fd
 File: unpxsym.fd 2023/08/16 Fontinst v1.933 font definitions for U/npxsym.
 )
 LaTeX Font Info:    Trying to load font information for U+npxsyc on input line 
-186.
+199.
 
 (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/unpxsyc.fd
 File: unpxsyc.fd 2013/03/24 Fontinst v1.933 font definitions for U/npxsyc.
@@ -1534,224 +1553,196 @@ File: unpxsyc.fd 2013/03/24 Fontinst v1.933 font definitions for U/npxsyc.
 {/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ec-tlf.enc}]
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 24.88pt on input line 189.
+(Font)              scaled to size 24.88pt on input line 202.
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 24.88pt on input line 189.
+(Font)              scaled to size 24.88pt on input line 202.
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 12.0pt on input line 192.
+(Font)              scaled to size 12.0pt on input line 205.
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 8.8pt on input line 192.
+(Font)              scaled to size 8.8pt on input line 205.
 LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 6.6pt on input line 192.
+(Font)              scaled to size 6.6pt on input line 205.
 
 
 [1
 
-] (analysis/dissertation/main/main.toc
-LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
-(Font)              scaled to size 12.0pt on input line 1.
-
-Overfull \hbox (1.35594pt too wide) detected at line 8
- []\T1/zpltlf/m/n/12 xvii
- []
-
-
-Overfull \hbox (1.35594pt too wide) detected at line 9
- []\T1/zpltlf/m/n/12 xvii
- []
-
-
-Overfull \hbox (1.35594pt too wide) detected at line 10
- []\T1/zpltlf/m/n/12 xvii
- []
-
-
-Overfull \hbox (4.84795pt too wide) detected at line 11
- []\T1/zpltlf/m/n/12 xviii
- []
-
-
-Overfull \hbox (4.84795pt too wide) detected at line 12
- []\T1/zpltlf/m/n/12 xviii
- []
-
-
-Overfull \hbox (4.84795pt too wide) detected at line 13
- []\T1/zpltlf/m/n/12 xviii
- []
-
-
-Overfull \hbox (4.84795pt too wide) detected at line 14
- []\T1/zpltlf/m/n/12 xviii
- []
-
-
-Overfull \hbox (0.76794pt too wide) detected at line 20
- []\T1/zpltlf/m/n/12 xxii
- []
-
-
-Overfull \hbox (0.76794pt too wide) detected at line 21
- []\T1/zpltlf/m/n/12 xxii
- []
-
-
-Overfull \hbox (0.76794pt too wide) detected at line 22
- []\T1/zpltlf/m/n/12 xxii
- []
-
-
-Overfull \hbox (0.76794pt too wide) detected at line 23
- []\T1/zpltlf/m/n/12 xxii
- []
-
-
-Overfull \hbox (4.25995pt too wide) detected at line 24
- []\T1/zpltlf/m/n/12 xxiii
- []
-
-
-Overfull \hbox (4.25995pt too wide) detected at line 25
- []\T1/zpltlf/m/n/12 xxiii
- []
-
-
-Overfull \hbox (4.25995pt too wide) detected at line 26
- []\T1/zpltlf/m/n/12 xxiii
- []
+] (./main.toc)
+\tf@toc=\write6
+\openout6 = `main.toc'.
 
 
 
 [2
 
 
-]
-
-[3]
-
-[4]
-
-[5]
-
-[6]
-LaTeX Font Info:    Trying to load font information for TS1+zpltlf on input lin
-e 237.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/ts1zpltlf.fd
-File: ts1zpltlf.fd 2021/11/24 v1.0 fd file for TS1/zpltlf
-)
-LaTeX Font Info:    Font shape `TS1/zpltlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 237.
-
-
-[7{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/zpl_TOsF.enc}])
-\tf@toc=\write6
-\openout6 = `main.toc'.
-
-
-
-[8] (analysis/dissertation/main/main.lof
-LaTeX Font Info:    Trying to load font information for T1+npxtt on input line 
-10.
-
-(/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/t1npxtt.fd
-File: t1npxtt.fd 2000/12/14 v1.0
-)
-LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
-(Font)              scaled to size 12.0pt on input line 10.
-Package microtype Info: Loading generic protrusion settings for font family
-(microtype)             `npxtt' (encoding: T1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-)
+] (./main.lof)
 \tf@lof=\write7
 \openout7 = `main.lof'.
 
 
 
-[9
+[3
 
 
-{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}{/usr
-/local/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}]
-(analysis/dissertation/main/main.lot)
+] (./main.lot)
 \tf@lot=\write8
 \openout8 = `main.lot'.
 
 
 
-[10
+[4
 
 
-] (analysis/dissertation/main/../appendix/master_todos.tex
+] (../appendix/acronyms.tex
+LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
+(Font)              scaled to size 12.0pt on input line 6.
+
+
+LaTeX Warning: Reference `chap:results' on page v undefined on input line 19.
+
+
+
+[5
+
+
+]) (../appendix/master_todos.tex
+
+[6]
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 17.28pt on input line 18.
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
 (Font)              scaled to size 17.28pt on input line 18.
 LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
 (Font)              scaled to size 14.4pt on input line 20.
+LaTeX Font Info:    Trying to load font information for TS1+zpltlf on input lin
+e 22.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/ts1zpltlf.fd
+File: ts1zpltlf.fd 2021/11/24 v1.0 fd file for TS1/zpltlf
+)
+LaTeX Font Info:    Font shape `TS1/zpltlf/m/n' will be
+(Font)              scaled to size 12.0pt on input line 22.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/it' will be
 (Font)              scaled to size 12.0pt on input line 31.
+LaTeX Font Info:    Trying to load font information for T1+npxtt on input line 
+31.
+
+(/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/t1npxtt.fd
+File: t1npxtt.fd 2000/12/14 v1.0
+)
+LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
+(Font)              scaled to size 12.0pt on input line 31.
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `npxtt' (encoding: T1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 8.8pt on input line 31.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 6.6pt on input line 31.
 
 
-[11
+[7
 
+{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/zpl_TOsF.enc}]
 
-]
+[8]
+
+[9{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc}]
+
+[10]
+
+[11]) (../appendix/systems_blueprint.tex
 
 [12]
+Chapter 1.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 10.95pt on input line 10.
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 11.
+LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
+(Font)              scaled to size 10.95pt on input line 14.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 10.95pt on input line 14.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 8.0pt on input line 14.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 6.1pt on input line 14.
+LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
+(Font)              scaled to size 10.95pt on input line 15.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 10.0pt on input line 16.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 19.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 6.1pt on input line 19.
 
-[13]
 
-[14]) (analysis/dissertation/main/../appendix/systems_blueprint.tex
+[13
+
+{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/newtx/ntx-ot1-tlf.enc}]
+
+[14]
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 10.95pt on input line 88.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 8.0pt on input line 88.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 6.1pt on input line 88.
+) (../appendix/productionization_guide.tex
 
 [15]
-Chapter 1.
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 8.
-
-Underfull \hbox (badness 10000) in paragraph at lines 12--13
-[]\T1/zpltlf/m/n/12 (+20) upserts into \T1/npxtt/m/n/12 odds_history(game_id, b
-ook, market, quoted_at,
- []
-
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 10.0pt on input line 13.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 8.8pt on input line 16.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 6.6pt on input line 16.
+Chapter 2.
 
 
 [16
 
 ]
+LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
+(Font)              scaled to size 10.0pt on input line 38.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 10.0pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 7.3pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 5.5pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 10.0pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 7.3pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 5.5pt on input line 40.
+LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
+(Font)              scaled to size 6.0pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
+(Font)              scaled to size 6.5pt on input line 40.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 6.5pt on input line 40.
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 6.0pt on input line 40.
+
 
 [17]
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 12.0pt on input line 82.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 8.8pt on input line 82.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 6.6pt on input line 82.
 
-
-[18]) (analysis/dissertation/main/../appendix/productionization_guide.tex
+[18]
 
 [19]
-Chapter 2.
 
-
-[20
-
-]
+[20]
 
 [21]
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 12.0pt on input line 206.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 8.8pt on input line 206.
+LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
+(Font)              scaled to size 6.6pt on input line 206.
+
 
 [22])
-Package hyperref Info: Option `pageanchor' set `true' on input line 226.
+Package hyperref Info: Option `pageanchor' set `true' on input line 247.
 
 
-[23] (analysis/dissertation/main/../chapter_1_intro/chapter_1_intro.tex
+[23] (../chapter_1_intro/chapter_1_intro.tex
 Chapter 3.
 
 
@@ -1762,8 +1753,7 @@ Chapter 3.
 
 [2]
 
-[3])
-(analysis/dissertation/main/../chapter_2_lit_review/chapter_2_lit_review.tex
+[3]) (../chapter_2_lit_review/chapter_2_lit_review.tex
 
 [4]
 Chapter 4.
@@ -1777,7 +1767,33 @@ Chapter 4.
 
 [7]
 
+Package natbib Warning: Citation `skellam1946' on page 8 undefined on input lin
+e 80.
+
+
+Package natbib Warning: Citation `maher1982' on page 8 undefined on input line 
+80.
+
+
+Package natbib Warning: Citation `dixon1997' on page 8 undefined on input line 
+80.
+
+
+Package natbib Warning: Citation `karlis2003' on page 8 undefined on input line
+ 80.
+
+
+Package natbib Warning: Citation `koopman2015' on page 8 undefined on input lin
+e 80.
+
+
+
 [8]
+
+Package natbib Warning: Citation `stern1991' on page 9 undefined on input line 
+123.
+
+
 
 [9]
 Underfull \hbox (badness 8094) in paragraph at lines 142--145
@@ -1788,88 +1804,159 @@ Underfull \hbox (badness 8094) in paragraph at lines 142--145
 
 
 [10]
-LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
-(Font)              scaled to size 10.0pt on input line 170.
-LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 10.0pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 7.3pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 5.5pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 10.0pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 7.3pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 5.5pt on input line 182.
-LaTeX Font Info:    Font shape `T1/npxtt/m/n' will be
-(Font)              scaled to size 6.0pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/m/n' will be
-(Font)              scaled to size 6.5pt on input line 182.
-LaTeX Font Info:    Font shape `OT1/minzpl/b/n' will be
-(Font)              scaled to size 6.5pt on input line 182.
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 6.0pt on input line 182.
-
 
 [11]
 
 [12]
 
+Package natbib Warning: Citation `bradleyterry1952' on page 13 undefined on inp
+ut line 232.
+
+
+Package natbib Warning: Citation `elo1978' on page 13 undefined on input line 2
+32.
+
+
+Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
+ine 232.
+
+
+Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
+ine 232.
+
+
+Package natbib Warning: Citation `nelsen2006' on page 13 undefined on input lin
+e 244.
+
+
+
 [13]
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 7.3pt on input line 252.
-<../figures/joint_exceedance_vs_rho.png, id=1679, 469.755pt x 289.08pt>
-File: ../figures/joint_exceedance_vs_rho.png Graphic file (type png)
-<use ../figures/joint_exceedance_vs_rho.png>
-Package pdftex.def Info: ../figures/joint_exceedance_vs_rho.png  used on input 
-line 290.
-(pdftex.def)             Requested size: 390.25536pt x 240.15688pt.
+(Font)              scaled to size 7.3pt on input line 255.
+LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
+(Font)              scaled to size 10.0pt on input line 255.
+
+
+Package natbib Warning: Citation `joe1997' on page 14 undefined on input line 2
+55.
+
 
 
 [14]
+<../figures/joint_exceedance_vs_rho.png, id=1133, 469.755pt x 289.08pt>
+File: ../figures/joint_exceedance_vs_rho.png Graphic file (type png)
+<use ../figures/joint_exceedance_vs_rho.png>
+Package pdftex.def Info: ../figures/joint_exceedance_vs_rho.png  used on input 
+line 295.
+(pdftex.def)             Requested size: 390.25536pt x 240.15688pt.
+
 
 [15]
 
-[16 <analysis/dissertation/main/../figures/joint_exceedance_vs_rho.png>]
-<../figures/reliability_diagram.png, id=1733, 469.755pt x 469.755pt>
+Package natbib Warning: Citation `daniels1954' on page 16 undefined on input li
+ne 312.
+
+
+Package natbib Warning: Citation `karlis2003' on page 16 undefined on input lin
+e 324.
+
+
+
+[16 <../figures/joint_exceedance_vs_rho.png>]
+<../figures/reliability_diagram.png, id=1173, 469.755pt x 469.755pt>
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
- 352.
+ 357.
 (pdftex.def)             Requested size: 390.25536pt x 390.25494pt.
 
 
 [17]
 
-[18 <analysis/dissertation/main/../figures/reliability_diagram.png>]
+[18 <../figures/reliability_diagram.png>]
 
 [19]
 
 [20]
-Underfull \hbox (badness 1975) in paragraph at lines 462--463
+
+[21]
+Underfull \hbox (badness 1975) in paragraph at lines 468--470
 \T1/zpltlf/m/n/12 (+20) Game[]theoretic fric-tions pre-dict pock-ets of in-ef-f
 i-ciency where (i) in-ven-
  []
 
 
+Package natbib Warning: Citation `sauer1998' on page 22 undefined on input line
+ 475.
 
-[21]
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 10.95pt on input line 499.
-<../figures/key_number_pmf.png, id=1769, 505.89pt x 289.08pt>
+
+Package natbib Warning: Citation `levitt2004' on page 22 undefined on input lin
+e 476.
+
+
+
+[22]
+<../figures/key_number_pmf.png, id=1210, 505.89pt x 289.08pt>
 File: ../figures/key_number_pmf.png Graphic file (type png)
 <use ../figures/key_number_pmf.png>
-Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 539.
+Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 546.
 
 (pdftex.def)             Requested size: 433.62001pt x 247.7879pt.
 
 
-[22]
+Package natbib Warning: Citation `harville1980' on page 23 undefined on input l
+ine 554.
 
-[23]
 
-[24 <analysis/dissertation/main/../figures/key_number_pmf.png>]
+Package natbib Warning: Citation `glickman1998' on page 23 undefined on input l
+ine 555.
+
+
+Package natbib Warning: Citation `stern1991' on page 23 undefined on input line
+ 556.
+
+
+
+[23 <../figures/key_number_pmf.png>]
+
+[24]
+
+Package natbib Warning: Citation `dixon1997' on page 25 undefined on input line
+ 557.
+
+
+Package natbib Warning: Citation `karlis2003' on page 25 undefined on input lin
+e 558.
+
+
+Package natbib Warning: Citation `koopman2015' on page 25 undefined on input li
+ne 559.
+
+
+Package natbib Warning: Citation `lock2014' on page 25 undefined on input line 
+560.
+
+
+Package natbib Warning: Citation `sauer1998' on page 25 undefined on input line
+ 561.
+
+
+Package natbib Warning: Citation `levitt2004' on page 25 undefined on input lin
+e 562.
+
+
+Package natbib Warning: Citation `szalkowski2012' on page 25 undefined on input
+ line 563.
+
+
+Package natbib Warning: Citation `nichols2014' on page 25 undefined on input li
+ne 564.
+
+
+Package natbib Warning: Citation `baio2010' on page 25 undefined on input line 
+565.
+
+
 
 [25]
 
@@ -1877,9 +1964,7 @@ Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 539.
 
 [27]
 
-[28])
-(analysis/dissertation/main/../chapter_3_data_foundation/chapter_3_data_foundat
-ion.tex
+[28]) (../chapter_3_data_foundation/chapter_3_data_foundation.tex
 
 [29]
 Chapter 5.
@@ -1903,7 +1988,7 @@ LaTeX Info: Symbol \textrightarrow not provided by
 [31]
 
 [32]
-<../figures/feature_importance.png, id=1869, 1405.25pt x 903.375pt>
+<../figures/feature_importance.png, id=1279, 1405.25pt x 903.375pt>
 File: ../figures/feature_importance.png Graphic file (type png)
 <use ../figures/feature_importance.png>
 Package pdftex.def Info: ../figures/feature_importance.png  used on input line 
@@ -1913,24 +1998,21 @@ Package pdftex.def Info: ../figures/feature_importance.png  used on input line
 
 [33]
 
-[34 <analysis/dissertation/main/../figures/feature_importance.png>]
-<../figures/out/time_decay_weights.png, id=1881, 1003.75pt x 562.1pt>
+[34 <../figures/feature_importance.png>]
+<../figures/out/time_decay_weights.png, id=1294, 1003.75pt x 562.1pt>
 File: ../figures/out/time_decay_weights.png Graphic file (type png)
 <use ../figures/out/time_decay_weights.png>
 Package pdftex.def Info: ../figures/out/time_decay_weights.png  used on input l
 ine 189.
 (pdftex.def)             Requested size: 433.62001pt x 242.83044pt.
-
-(analysis/dissertation/main/../figures/out/ess_table.tex)
+ (../figures/out/ess_table.tex)
 LaTeX Font Info:    Font shape `T1/zpltlf/m/it' will be
 (Font)              scaled to size 10.0pt on input line 232.
 
 
-[35])
-(analysis/dissertation/main/../chapter_4_baseline_modeling/chapter_4_baseline_m
-odeling.tex
+[35]) (../chapter_4_baseline_modeling/chapter_4_baseline_modeling.tex
 
-[36 <analysis/dissertation/main/../figures/out/time_decay_weights.png>]
+[36 <../figures/out/time_decay_weights.png>]
 
 [37]
 Chapter 6.
@@ -1938,128 +2020,583 @@ Chapter 6.
 
 [38
 
-] (analysis/dissertation/main/../figures/out/dm_test_table.tex)
+] (../figures/out/dm_test_table.tex)
 
 [39]
 
 [40]
 
-[41] (analysis/dissertation/main/../figures/out/keymass_chisq_table.tex)
-(analysis/dissertation/main/../figures/out/teaser_ev_oos_table.tex)
-(analysis/dissertation/main/../figures/out/reweighting_ablation_table.tex)
+Package natbib Warning: Citation `glickman1998' on page 41 undefined on input l
+ine 109.
+
+
+Package natbib Warning: Citation `harville1980' on page 41 undefined on input l
+ine 109.
+
+
+
+[41] (../figures/out/keymass_chisq_table.tex)
+(../figures/out/teaser_ev_oos_table.tex)
+(../figures/out/reweighting_ablation_table.tex)
 
 [42]
+
+Package natbib Warning: Citation `brier1950' on page 43 undefined on input line
+ 181.
+
+
+Package natbib Warning: Citation `gneiting2007' on page 43 undefined on input l
+ine 181.
+
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
  187.
 (pdftex.def)             Requested size: 303.53267pt x 303.53082pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 209--209
+
+[43]
+Underfull \hbox (badness 10000) in paragraph at lines 210--210
 []|\T1/zpltlf/m/n/10.95 (+20) impacts fa-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 209--209
+Underfull \hbox (badness 10000) in paragraph at lines 210--210
 []|\T1/zpltlf/m/n/10.95 (+20) larger af-ter
  []
 
-(analysis/dissertation/main/../figures/out/copula_gof_table.tex)
-(analysis/dissertation/main/../figures/out/tail_dependence_table.tex)
+(../figures/out/copula_gof_table.tex) (../figures/out/tail_dependence_table.tex
+)
 
-[43])
-(analysis/dissertation/main/../chapter_5_rl_design/chapter_5_rl_design.tex
-
-[44]
+[44]) (../chapter_5_rl_design/chapter_5_rl_design.tex
 
 [45]
 Chapter 7.
+
+Package natbib Warning: Citation `fujimoto2021td3bc' on page 46 undefined on in
+put line 6.
+
+
+Package natbib Warning: Citation `nair2020awac' on page 46 undefined on input l
+ine 6.
+
+
+Package natbib Warning: Citation `mnih2015' on page 46 undefined on input line 
+11.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 46 undefined on input
+ line 11.
+
+
+Package natbib Warning: Citation `wang2016dueling' on page 46 undefined on inpu
+t line 11.
+
+
+Package natbib Warning: Citation `schaul2016per' on page 46 undefined on input 
+line 11.
+
+
+Package natbib Warning: Citation `schulman2015trpo' on page 46 undefined on inp
+ut line 12.
+
+
+Package natbib Warning: Citation `schulman2016gae' on page 46 undefined on inpu
+t line 12.
+
+
+Package natbib Warning: Citation `schulman2017ppo' on page 46 undefined on inpu
+t line 12.
+
+
+Package natbib Warning: Citation `fujimoto2018td3' on page 46 undefined on inpu
+t line 13.
+
+
+Package natbib Warning: Citation `haarnoja2018sac' on page 46 undefined on inpu
+t line 13.
+
+
+Package natbib Warning: Citation `bellemare2017distributional' on page 46 undef
+ined on input line 14.
+
+
+Package natbib Warning: Citation `dabney2018quantile' on page 46 undefined on i
+nput line 14.
+
+
+Package natbib Warning: Citation `fujimoto2019' on page 46 undefined on input l
+ine 15.
+
+
+Package natbib Warning: Citation `wu2019brac' on page 46 undefined on input lin
+e 15.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 46 undefined on input 
+line 15.
+
+
+Package natbib Warning: Citation `kumar2020' on page 46 undefined on input line
+ 15.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 46 undefined on inp
+ut line 15.
+
+
+Package natbib Warning: Citation `agarwal2020offline' on page 46 undefined on i
+nput line 15.
+
+
+Package natbib Warning: Citation `levine2020' on page 46 undefined on input lin
+e 15.
+
 
 
 [46
 
 ]
 
+Package natbib Warning: Citation `sutton2018' on page 47 undefined on input lin
+e 35.
+
+
+Package natbib Warning: Citation `mnih2015' on page 47 undefined on input line 
+35.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 47 undefined on input
+ line 35.
+
+
+
 [47]
+
+Package natbib Warning: Citation `dudik2014' on page 48 undefined on input line
+ 48.
+
+
+Package natbib Warning: Citation `jiang2016' on page 48 undefined on input line
+ 48.
+
+
+Package natbib Warning: Citation `thomas2015' on page 48 undefined on input lin
+e 48.
+
+(../figures/out/ope_grid_table.tex
+Underfull \hbox (badness 10000) in alignment at lines 21--21
+[][][][][] 
+ []
+
+)
 
 [48]
 
+Package natbib Warning: Citation `schulman2016gae' on page 49 undefined on inpu
+t line 71.
+
+
+Package natbib Warning: Citation `schulman2017ppo' on page 49 undefined on inpu
+t line 71.
+
+
+Package natbib Warning: Citation `schulman2015trpo' on page 49 undefined on inp
+ut line 71.
+
+
+Package natbib Warning: Citation `achiam2017cpo' on page 49 undefined on input 
+line 71.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 49 undefined on input
+ line 74.
+
+
+Package natbib Warning: Citation `wang2016dueling' on page 49 undefined on inpu
+t line 74.
+
+
+Package natbib Warning: Citation `schaul2016per' on page 49 undefined on input 
+line 74.
+
+
+Package natbib Warning: Citation `fujimoto2018td3' on page 49 undefined on inpu
+t line 74.
+
+
+Package natbib Warning: Citation `haarnoja2018sac' on page 49 undefined on inpu
+t line 74.
+
+
+Package natbib Warning: Citation `bellemare2017distributional' on page 49 undef
+ined on input line 74.
+
+
+Package natbib Warning: Citation `dabney2018quantile' on page 49 undefined on i
+nput line 74.
+
+
+Package natbib Warning: Citation `fujimoto2019' on page 49 undefined on input l
+ine 84.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 49 undefined on input 
+line 84.
+
+
+Package natbib Warning: Citation `kumar2020' on page 49 undefined on input line
+ 84.
+
+
+Package natbib Warning: Citation `wu2019brac' on page 49 undefined on input lin
+e 84.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 49 undefined on inp
+ut line 84.
+
+
+Package natbib Warning: Citation `levine2020' on page 49 undefined on input lin
+e 84.
+
+
+Package natbib Warning: Citation `agarwal2020offline' on page 49 undefined on i
+nput line 84.
+
+
+
 [49]
 
+Package natbib Warning: Citation `achiam2017cpo' on page 50 undefined on input 
+line 105.
+
+
+Package natbib Warning: Citation `tamar2015cvar' on page 50 undefined on input 
+line 105.
+
+
+Package natbib Warning: Citation `thomas2015' on page 50 undefined on input lin
+e 108.
+
+
+
 [50]
-<../figures/rl_learning_curves.png, id=2136, 1405.25pt x 903.375pt>
+
+Package natbib Warning: Citation `dudik2014' on page 51 undefined on input line
+ 118.
+
+
+Package natbib Warning: Citation `jiang2016' on page 51 undefined on input line
+ 118.
+
+<../figures/rl_learning_curves.png, id=1429, 1405.25pt x 903.375pt>
 File: ../figures/rl_learning_curves.png Graphic file (type png)
 <use ../figures/rl_learning_curves.png>
 Package pdftex.def Info: ../figures/rl_learning_curves.png  used on input line 
-135.
+142.
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
-<../figures/hparam_sensitivity.png, id=2137, 1405.25pt x 903.375pt>
+<../figures/hparam_sensitivity.png, id=1430, 1405.25pt x 903.375pt>
 File: ../figures/hparam_sensitivity.png Graphic file (type png)
 <use ../figures/hparam_sensitivity.png>
 Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line 
-142.
+149.
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
 
 
 [51]
 
-[52 <analysis/dissertation/main/../figures/rl_learning_curves.png>]
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 178.
+[52 <../figures/rl_learning_curves.png>]
 
+[53 <../figures/hparam_sensitivity.png>]
+LaTeX Font Info:    Font shape `T1/zpltlf/b/n' will be
+(Font)              scaled to size 8.0pt on input line 217.
 
-[53 <analysis/dissertation/main/../figures/hparam_sensitivity.png>]
 
 [54]
 
-[55] (analysis/dissertation/main/../figures/out/rl_vs_baseline_table.tex)
-(analysis/dissertation/main/../figures/out/utilization_adjusted_sharpe_table.te
-x) (analysis/dissertation/main/../figures/out/cvar_benchmark_table.tex)
+Package natbib Warning: Citation `fujimoto2019' undefined on input line 293.
 
-[56])
-(analysis/dissertation/main/../chapter_6_uncertainty_risk_betting/chapter_6_unc
-ertainty_risk_betting.tex
+
+Package natbib Warning: Citation `wu2019brac' undefined on input line 293.
+
+
+Package natbib Warning: Citation `kumar2019bear' undefined on input line 293.
+
+
+Package natbib Warning: Citation `kumar2020' undefined on input line 293.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' undefined on input line 293
+.
+
+
+Package natbib Warning: Citation `fujimoto2021td3bc' undefined on input line 29
+3.
+
+
+Package natbib Warning: Citation `nair2020awac' undefined on input line 293.
+
+
+
+[55] (../figures/out/rl_vs_baseline_table.tex)
+
+[56] (../figures/out/utilization_adjusted_sharpe_table.tex)
+(../figures/out/cvar_benchmark_table.tex
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+
+Underfull \hbox (badness 10000) in alignment at lines 14--14
+[][][][][] 
+ []
+
+)
 
 [57]
 
+Package natbib Warning: Citation `fujimoto2019' on page 58 undefined on input l
+ine 389.
+
+
+Package natbib Warning: Citation `wu2019brac' on page 58 undefined on input lin
+e 390.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 58 undefined on input 
+line 391.
+
+
+Package natbib Warning: Citation `kumar2020' on page 58 undefined on input line
+ 392.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 58 undefined on inp
+ut line 393.
+
+
+Package natbib Warning: Citation `fujimoto2021td3bc' on page 58 undefined on in
+put line 394.
+
+
+Package natbib Warning: Citation `nair2020awac' on page 58 undefined on input l
+ine 395.
+
+) (../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
+
+
 [58]
+
+[59]
 Chapter 8.
 
+Package natbib Warning: Citation `kelly1956' on page 60 undefined on input line
+ 7.
 
-[59
 
-]
 
-[60]
+[60
+
+] (../figures/out/cvar_benchmark_table.tex
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+
+Underfull \hbox (badness 10000) in alignment at lines 14--14
+[][][][][] 
+ []
+
+)
+
+Package natbib Warning: Citation `rockafellar2000' on page 61 undefined on inpu
+t line 52.
+
+
 
 [61]
-<../figures/bankroll_hist.png, id=2253, 469.755pt x 289.08pt>
+
+[62]
+<../figures/bankroll_hist.png, id=1544, 469.755pt x 289.08pt>
 File: ../figures/bankroll_hist.png Graphic file (type png)
 <use ../figures/bankroll_hist.png>
-Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 81.
+Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 84.
 (pdftex.def)             Requested size: 390.25536pt x 240.15688pt.
 
 
-[62 <analysis/dissertation/main/../figures/bankroll_hist.png>]
-<../figures/bankroll_trajectories.png, id=2260, 505.89pt x 289.08pt>
+[63 <../figures/bankroll_hist.png>]
+<../figures/bankroll_trajectories.png, id=1552, 505.89pt x 289.08pt>
 File: ../figures/bankroll_trajectories.png Graphic file (type png)
 <use ../figures/bankroll_trajectories.png>
 Package pdftex.def Info: ../figures/bankroll_trajectories.png  used on input li
-ne 105.
+ne 108.
 (pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
 )
-(analysis/dissertation/main/../chapter_7_simulation/chapter_7_simulation.tex
+(../chapter_7_simulation/chapter_7_simulation.tex
 
-[63]
+[64]
 
-[64 <analysis/dissertation/main/../figures/bankroll_trajectories.png>]
+[65 <../figures/bankroll_trajectories.png>]
 Chapter 9.
 
+Package natbib Warning: Citation `glasserman2003' on page 66 undefined on input
+ line 12.
 
-[65
+
+Package natbib Warning: Citation `wong2001sharp' on page 66 undefined on input 
+line 27.
+
+
+
+[66
 
 ]
-<../figures/teaser_ev_heatmap.png, id=2295, 451.6875pt x 379.4175pt>
+<../figures/teaser_ev_heatmap.png, id=1583, 451.6875pt x 379.4175pt>
 File: ../figures/teaser_ev_heatmap.png Graphic file (type png)
 <use ../figures/teaser_ev_heatmap.png>
 Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 3
@@ -2067,125 +2604,243 @@ Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 3
 (pdftex.def)             Requested size: 390.25536pt x 327.83267pt.
 
 
-[66 <analysis/dissertation/main/../figures/teaser_ev_heatmap.png>]
-
-[67]
+[67 <../figures/teaser_ev_heatmap.png>]
 
 [68]
 
 [69]
-Underfull \hbox (badness 10000) in alignment at lines 156--156
-[][][][][][][][] 
+
+LaTeX Warning: Reference `chap:results' on page 70 undefined on input line 103.
+
+
+
+
+[70]
+LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
+(Font)              scaled to size 5.5pt on input line 159.
+ (../figures/out/sim_acceptance_table.tex
+Underfull \hbox (badness 10000) in alignment at lines 17--17
+[][][][] 
  []
 
-LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
-(Font)              scaled to size 5.5pt on input line 158.
-(analysis/dissertation/main/../figures/out/sim_fail_deviation_table.tex)
+) (../figures/out/sim_fail_deviation_table.tex)
 
-[70])
-(analysis/dissertation/main/../chapter_8_results_discussion/chapter_8_results_d
-iscussion.tex
+[71]) (../chapter_8_results_discussion/chapter_8_results_discussion.tex
 
-[71]
+[72]
 Chapter 10.
-(analysis/dissertation/main/../results/oos_record_table.tex
-Underfull \hbox (badness 10000) in paragraph at lines 21--21
-[]|\T1/zpltlf/m/n/10.95 (+20) Offline RL
+(../figures/out/oos_record_table.tex
+Underfull \hbox (badness 1173) in paragraph at lines 23--24
+[]\T1/zpltlf/m/n/10 (+20) CLV mea-sured in ba-sis points vs clos-ing; pos-i-tiv
+e is bet-ter. Re-port paired tests across 
+ []
+
+
+Overfull \hbox (6.60623pt too wide) in paragraph at lines 6--26
+ [] 
  []
 
 )
 
-[72
+[73
 
-] (analysis/dissertation/main/../results/zero_weeks_table.tex)
+]
 
-[73]
-LaTeX Font Info:    Font shape `TS1/zpltlf/b/n' will be
-(Font)              scaled to size 14.4pt on input line 93.
- (analysis/dissertation/main/../results/core_ablation_table.tex)
+LaTeX Warning: Reference `tab:zero-weeks' on page 74 undefined on input line 21
+.
+
+(../results/zero_weeks_table.tex)
 
 [74]
+LaTeX Font Info:    Font shape `TS1/zpltlf/b/n' will be
+(Font)              scaled to size 14.4pt on input line 42.
 
-[75]
 
-[76])
-(analysis/dissertation/main/../chapter_9_conclusion/chapter_9_conclusion.tex
+[75] (../results/core_ablation_table.tex)
 
-[77]
+[76]
+
+[77]) (../chapter_9_conclusion/chapter_9_conclusion.tex
+
+[78]
 Chapter 11.
 
+LaTeX Warning: Reference `chap:results' on page 79 undefined on input line 20.
 
-[78
+
+
+[79
 
 ])
 
-[79]
+[80]
 Appendix A.
 
 
-[80
+[81
 
-] (analysis/dissertation/main/../figures/out/rl_vs_baseline_table.tex)
-(analysis/dissertation/main/../figures/out/ope_grid_table.tex)
-(analysis/dissertation/main/../figures/out/utilization_adjusted_sharpe_table.te
-x) (analysis/dissertation/main/../figures/out/cvar_benchmark_table.tex)
+] (../figures/out/rl_vs_baseline_table.tex)
+(../figures/out/ope_grid_table.tex
+Underfull \hbox (badness 10000) in alignment at lines 21--21
+[][][][][] 
+ []
 
-[81]
+) (../figures/out/utilization_adjusted_sharpe_table.tex)
+(../figures/out/cvar_benchmark_table.tex
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.14     \end{tabularx}
+                       
+I've inserted something that you may have forgotten.
+(See the <inserted text> above.)
+With luck, this will get me unwedged. But if you
+really didn't forget anything, try typing `2' now; then
+my insertion and my current dilemma will both disappear.
+
+
+Underfull \hbox (badness 10000) in alignment at lines 14--14
+[][][][][] 
+ []
+
+)
 
 [82]
 
 [83]
 
 [84]
+
+[85]
 Appendix B.
 
 
-[85
+[86
 
 ]
-
-[86]
-
-[87]
 Appendix C.
+
+
+[87
+
+]
+Appendix D.
 
 
 [88
 
 ]
-
-[89]
-
-[90]
-
-[91] (analysis/dissertation/main/main.bbl
-
-[92
+Appendix E.
 
 
+[89
+
+]
+Appendix F.
+
+
+[90
 
 ]
 
-[93]
+[91] (./main.bbl)
 
-[94])
+Package natbib Warning: There were undefined citations.
 
-[95] (analysis/dissertation/main/main.aux)
+(./main.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2020/03/25>
  ***********
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 29BE1AC4320C2EB41881606DCA399E9C;52072.
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: 92157C8B6A1A17C43848E32410CECC23;42987
+(rerunfilecheck)             After:  3E9A1693739C83C75DE3C0E953FE8CE2;53812.
  ) 
 Here is how much of TeX's memory you used:
- 46817 strings out of 473190
- 1016172 string characters out of 5715801
- 1491460 words of memory out of 5000000
- 68145 multiletter control sequences out of 15000+600000
- 724210 words of font info for 426 fonts, out of 8000000 for 9000
- 1146 hyphenation exceptions out of 8191
- 103i,16n,117p,1028b,835s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 47232 strings out of 473190
+ 1025364 string characters out of 5715801
+ 1499982 words of memory out of 5000000
+ 68606 multiletter control sequences out of 15000+600000
+ 748163 words of font info for 471 fonts, out of 8000000 for 9000
+ 1151 hyphenation exceptions out of 8191
+ 103i,16n,117p,1001b,980s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/newpx/NewPXBMI_gnu.pfb
 ></usr/local/texlive/2025/texmf-dist/fonts/type1/public/newpx/NewPXMI.pfb></usr
 /local/texlive/2025/texmf-dist/fonts/type1/public/newpx/NewPXMI_gnu.pfb></usr/l
@@ -2198,11 +2853,10 @@ nts/type1/public/newtx/txsym.pfb></usr/local/texlive/2025/texmf-dist/fonts/type
 1/public/newpx/zplb.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/
 newpx/zplr.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/newpx/zpl
 ri.pfb>
-Output written on analysis/dissertation/main/main.pdf (119 pages, 1328280 bytes
-).
+Output written on main.pdf (115 pages, 1285890 bytes).
 PDF statistics:
- 2743 PDF objects out of 2984 (max. 8388607)
- 2545 compressed objects within 26 object streams
- 704 named destinations out of 1000 (max. 500000)
- 63519 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 2008 PDF objects out of 2073 (max. 8388607)
+ 1821 compressed objects within 19 object streams
+ 648 named destinations out of 1000 (max. 500000)
+ 69783 words of extra memory for PDF output out of 74296 (max. 10000000)
 
