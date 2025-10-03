@@ -46,6 +46,9 @@ program
 \end{align}
 limits tail risk while allowing Kelly-like growth on the interior. We include exposure/market caps in $\mathcal{F}$.
 
+% Auto-included CVaR benchmark table if present
+\IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}
+
 \begin{theorem}[Convexity of Rockafellar--Uryasev CVaR program \citep{rockafellar2000}]
 The optimization problem \eqref{eq:cvar-prog} is convex in $(\vect f, t, \xi)$ since the objective is linear and constraints are affine, ensuring global optimality and tractability.
 \end{theorem}
@@ -79,7 +82,7 @@ We estimate expected maximum drawdown under the posterior predictive distributio
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{../figures/bankroll_hist.png}
-  \caption{Distribution of final bankroll outcomes under the drawdown-screened policy. Each bar aggregates Monte Carlo runs after applying fractional Kelly caps and CVaR gating.}
+  \caption[Final bankroll distribution]{Distribution of final bankroll outcomes under the drawdown-screened policy. Each bar aggregates Monte Carlo runs after applying fractional Kelly caps and CVaR gating.}
   \label{fig:bankroll-hist}
 \end{figure}
 
@@ -103,7 +106,7 @@ We include worked examples with varying edge, odds, and variance to illustrate f
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{../figures/bankroll_trajectories.png}
-  \caption{Simulated bankroll trajectories under fractional Kelly multipliers. Lines show median paths with 50\% and 90\% credible envelopes, highlighting the growth versus drawdown trade-off.}
+  \caption[Fractional Kelly bankroll trajectories]{Simulated bankroll trajectories under fractional Kelly multipliers. Lines show median paths with 50\% and 90\% credible envelopes, highlighting the growth versus drawdown trade-off.}
   \label{fig:bankroll-trajectories}
 \end{figure}
 

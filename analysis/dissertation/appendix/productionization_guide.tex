@@ -1,4 +1,4 @@
-\chapter{Productionization Guide: Architecture \& Runbook}
+\chapter[Productionization Guide]{Productionization Guide: Architecture \& Runbook}
 \label{app:prod-guide}
 
 This appendix provides a concrete, engineering-focused blueprint to deploy the dissertation as a reliable, auditable, and scalable production system. It details architecture, infrastructure options, data contracts, languages, build/deploy pipelines, monitoring, security, and runbooks.
@@ -10,7 +10,8 @@ This appendix provides a concrete, engineering-focused blueprint to deploy the d
   \item \textbf{Control plane:} Orchestrator (Airflow/Prefect), artifact registry (object storage + index), configuration/feature manifests, CI/CD, observability, governance.
 \end{itemize}
 
-\section{Reference Infrastructure (Cloud-Agnostic with AWS Example)}
+\section{Reference Infrastructure}
+\subsection{Cloud Architecture (AWS example)}
 \begin{itemize}
   \item \textbf{Compute:} Containerized workers (Docker) on Kubernetes (EKS/GKE/AKS) or ECS; small CPU pools for ETL and model runs; optional GPU node group for RL sweeps.
   \item \textbf{Database:} Postgres 14+ with TimescaleDB extension for \texttt{odds\_history}, \texttt{plays}, marts. Options: (i) self-managed TimescaleDB on EC2; (ii) Timescale Cloud; (iii) Aurora Postgres (without Timescale features) if hypertables are not critical.
@@ -21,6 +22,101 @@ This appendix provides a concrete, engineering-focused blueprint to deploy the d
   \item \textbf{CI/CD:} GitHub Actions with environments and required reviews; build and scan images, run tests, deploy via helm/terraform.
   \item \textbf{Networking:} Private subnets for DB and workers, public egress via NAT; API calls to data providers via egress allowlist and rate limiting.
 \end{itemize}
+
+\subsubsection*{Infra bring-up (Terraform/Helm skeleton)}
+\paragraph{Terraform (modules).}
+\begin{itemize}
+  \item \texttt{vpc}: private/public subnets, NAT, route tables.
+  \item \texttt{eks}: cluster, node groups (cpu, gpu), IRSA.
+  \item \texttt{rds\_pg}: Postgres/TimescaleDB (or Timescale Cloud data source block).
+  \item \texttt{iam}: roles/policies for workers, CI, read-only dashboards.
+  \item \texttt{s3}: buckets for raw, artifacts, logs; lifecycle rules.
+  \item \texttt{ecr}: container registry for ETL/model images.
+  \item \texttt{secrets}: AWS Secrets Manager entries (ODDS\_API\_KEY, DB creds).
+\end{itemize}
+\paragraph{Terraform (scaffold).}
+\begin{verbatim}
+terraform {
+  backend "s3" { bucket = "nfl-analytics-tf" key = "envs/prod.tfstate" region = "us-east-1" }
+  required_providers { aws = { source = "hashicorp/aws" version = "~> 5.0" } }
+}
+provider "aws" { region = var.region }
+module "vpc" { source = "./modules/vpc" ... }
+module "eks" { source = "./modules/eks" vpc_id = module.vpc.id ... }
+module "rds_pg" { source = "./modules/rds_pg" vpc_id = module.vpc.id ... }
+module "s3_raw" { source = "./modules/s3" name = "nfl-raw" ... }
+\end{verbatim}
+
+\paragraph{Helm (charts to install).}
+\begin{itemize}
+  \item \textbf{kube-prometheus-stack}: cluster metrics and Grafana dashboards.
+  \item \textbf{ingress-nginx} (or ALB Ingress Controller) for HTTP ingress.
+  \item \textbf{airflow} or \textbf{prefect} for orchestration.
+  \item \textbf{app-workers}: this repo's ETL/model image as a chart (Deployment + CronJobs).
+  \item \textbf{timescaledb} (optional, if running in-cluster for dev/staging).
+\end{itemize}
+\paragraph{Helm (scaffold).}
+\begin{verbatim}
+helm repo add grafana https://grafana.github.io/helm-charts
+helm upgrade --install monitoring grafana/kube-prometheus-stack -n monitoring --create-namespace
+helm upgrade --install airflow apache-airflow/airflow -n airflow --create-namespace -f values/airflow.yaml
+helm upgrade --install app-workers charts/app-workers -n nfl --create-namespace -f values/app-workers.yaml
+\end{verbatim}
+
+\subsection{Local Development Setup}
+\paragraph{Prerequisites.} Docker \& docker compose; R (4.x); Python (3.10+); optional Quarto.
+\paragraph{Environment.} Database defaults to \texttt{localhost:5544} with DB \texttt{devdb01}, user \texttt{dro}. Secrets live in \texttt{.env} (e.g., \texttt{ODDS\_API\_KEY}).
+\paragraph{Steps.}
+\begin{enumerate}
+  \item \textbf{Start DB and apply schema}
+  \begin{verbatim}
+  bash scripts/init_dev.sh
+  \end{verbatim}
+  This boots TimescaleDB (compose service \texttt{pg}), waits for readiness, and applies \texttt{db/001\_init.sql} + \texttt{db/002\_timescale.sql}.
+
+  \item \textbf{Install dependencies}
+  \begin{verbatim}
+  # Python
+  pip install -r requirements.txt
+  # R (or use renv::restore() if lockfile is present)
+  Rscript setup_packages.R
+  \end{verbatim}
+
+  \item \textbf{Load schedules (idempotent)}
+  \begin{verbatim}
+  Rscript --vanilla data/ingest_schedules.R
+  \end{verbatim}
+
+  \item \textbf{(Optional) Ingest odds history}
+  \begin{verbatim}
+  export ODDS_API_KEY=...
+  python py/ingest_odds_history.py \
+    --start-date 2023-09-01 --end-date 2023-09-03
+  \end{verbatim}
+  Respect provider rate limits; markets default to spreads/totals.
+
+  \item \textbf{Refresh marts}
+  \begin{verbatim}
+  psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+    -c "REFRESH MATERIALIZED VIEW mart.game_summary;"
+  \end{verbatim}
+
+  \item \textbf{Run integration test}
+  \begin{verbatim}
+  pytest tests/integration/test_ingestion.py -q
+  \end{verbatim}
+
+  \item \textbf{Render figures (optional)}
+  \begin{verbatim}
+  quarto render notebooks/00_timeframe_ablation.qmd
+  \end{verbatim}
+
+  \item \textbf{Stop services}
+  \begin{verbatim}
+  docker compose down
+  \end{verbatim}
+\end{enumerate}
+\paragraph{Troubleshooting.} If port \texttt{5544} is busy, adjust compose port mapping; ensure TimescaleDB extension is installed; verify DSN via \texttt{pg\_isready}.
 
 \section{Languages, Runtimes, and Packaging}
 \begin{itemize}
@@ -74,6 +170,40 @@ This appendix provides a concrete, engineering-focused blueprint to deploy the d
   \item \textbf{Regime shifts:} widen priors, cap Kelly multiplier, and require re-acceptance before promotion.
   \item \textbf{Incident} (data outage or DB failure): drain workers; fail closed on promotions; enable read replicas; restore from snapshot.
 \end{itemize}
+
+\subsection*{First-Day Checklist (Ops/On-Call)}
+\begin{enumerate}
+  \item \textbf{Access}: GitHub org, CI/CD, cloud account (read + least-privilege write), dashboards.
+  \item \textbf{Secrets}: confirm access to ODDS\_API\_KEY, DB creds via Secrets Manager; never store locally.
+  \item \textbf{Local bootstrap}: run \texttt{bash scripts/init\_dev.sh}; load schedules; refresh marts; run integration tests.
+  \item \textbf{Dashboards}: verify calibration/CLV/OPE/acceptance panels load; confirm alerts route to the right channel.
+  \item \textbf{Dry-run DAGs}: kick Nightly ETL in staging; confirm QA counts and hypertable policies.
+  \item \textbf{Recovery drill}: restore a fresh staging DB from snapshot; document steps and timings.
+  \item \textbf{Promotion drill}: run OPE on a toy candidate and observe gate outcomes (no prod writes).
+\end{enumerate}
+
+\subsection*{Promote / Rollback CLI Sketch}
+We expose a thin CLI over the promotion contract to avoid ad-hoc manual changes. Commands operate on an \emph{immutable bundle id}.
+\begin{verbatim}
+# Evaluate candidates with OPE across clip/shrink grid
+nflctl ope --dataset s3://nfl-artifacts/logged.parquet \
+  --candidate runs/IQL_2024Wk18 \
+  --out s3://nfl-artifacts/ope/IQL_2024Wk18.json
+
+# Simulator acceptance under pessimistic frictions
+nflctl simulate --bundle runs/IQL_2024Wk18 \
+  --frictions conf/frictions/pessimistic.yaml \
+  --out s3://nfl-artifacts/sim/IQL_2024Wk18.json
+
+# Promote (if OPE lower bound > 0 and acceptance == pass)
+nflctl promote --bundle runs/IQL_2024Wk18 \
+  --registry postgres://.../artifact_registry \
+  --note "IQL Wk18 passed OPE + acceptance"
+
+# Roll back to last good bundle (atomically update pointer)
+nflctl rollback --target last-good --reason "OPE drift alarm"
+\end{verbatim}
+\paragraph{Contract (summary).} A bundle is promoted iff: (i) OPE lower bound $>0$ across a neighborhood of clip/shrink; (ii) simulator acceptance passes (CVaR/drawdown\slash{}dependence); (iii) artifacts are reproducible (hashes match); and (iv) governance checks (sign-off) are satisfied. Rollback re-points the live pointer; no mutable edits to an existing bundle.
 
 \section{Handover: SE Tasks \& Milestones}
 \begin{enumerate}

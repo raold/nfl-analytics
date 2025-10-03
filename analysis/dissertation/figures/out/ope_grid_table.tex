@@ -1,16 +1,23 @@
+% Auto-generated (placeholder) — replace via py/rl/ope_gate.py --tex
 \begin{table}[t]
   \centering
   \small
-  \caption{OPE grid (mock): DR/HCOPE across clip and shrinkage.}
-  \begin{tabular}{lrrrrr}
-    \toprule
-    Estimator & Clip $c$ & Shrink $\lambda$ & ESS/\(N\) & Bias (bps) & RMSE \\
-    \midrule
-    DR       & 5   & 0.0  & 0.28 & +6  & 0.248 \\
-    DR       & 10  & 0.1  & 0.41 & +3  & 0.244 \\
-    DR       & 20  & 0.2  & 0.55 & +2  & 0.243 \\
-    HCOPE    & 10  & 0.0  & 0.36 & +4  & 0.245 \\
-    HCOPE    & 20  & 0.1  & 0.50 & +1  & 0.242 \\
-    \bottomrule
-  \end{tabular}
+  \begin{threeparttable}
+    \caption[OPE grid (SNIS/DR/ESS)]{Off-policy evaluation grid: SNIS and DR values with effective sample sizes (ESS). Accept=\textbf{Yes}, median DR=0.0123.}
+    \label{tab:ope-grid}
+    \begin{tabularx}{\linewidth}{@{} r r r r r @{} }
+      \toprule
+      Clip & Shrink & SNIS & DR & ESS \\ \midrule
+      5  & 0.00 & 0.0100 & 0.0095 & 85.0 \\
+      5  & 0.10 & 0.0096 & 0.0108 & 92.3 \\
+      5  & 0.20 & 0.0093 & 0.0110 & 98.1 \\
+      10 & 0.00 & 0.0115 & 0.0118 & 120.4 \\
+      10 & 0.10 & 0.0112 & 0.0121 & 130.2 \\
+      10 & 0.20 & 0.0110 & 0.0123 & 138.8 \\
+      20 & 0.00 & 0.0121 & 0.0120 & 140.7 \\
+      20 & 0.10 & 0.0120 & 0.0122 & 148.9 \\
+      20 & 0.20 & 0.0120 & 0.0124 & 155.0 \\
+      \bottomrule
+    \end{tabularx}
+  \end{threeparttable}
 \end{table}

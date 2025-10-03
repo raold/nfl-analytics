@@ -32,15 +32,16 @@
   \item \prio{P0} Baseline \textbf{hardware profiles}: (A) MacBook Air M4 (MPS), (B) dual RTX 5090 workstation (CUDA). Document expected batch sizes / epoch times.
 \end{itemize}
 
-\milestone{Data Foundations (2015–2025 core; optional 1999–2014; selective priors pre-1999)}
+\milestone{Data Foundations (1999–2024 core; extend 2025+; selective priors pre-1999)}
 \block{Acquisition \& Storage}
 \begin{itemize}
-  \item \prio{P0} Ingest \textbf{nflfastR} play-by-play 2015–2025; option flags for 1999–2014.
-  \item \prio{P1} Odds snapshots via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_snapshots} (book, timestamp, market, price, rule hints).
+  \item \prio{P0} Ingest \textbf{nflfastR/nflverse} play-by-play 1999–2024; extend to 2025 when available.
+  \item \prio{P1} Odds history via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_history} (book, timestamp, market, price, rule hints).
   \item \prio{P1} Weather joins (Open-Meteo/NOAA), stadium roof/surface map, geocoded stadium coords.
   \item \prio{P1} Schedule context: rest days, travel distance (Haversine), time zones crossed, primetime flags.
   \item \prio{P1} Injury integration: QB-out binary, team AGL index, cumulative starters out; weekly status (out/doubtful/questionable) encoder.
   \item \prio{P2} Referee crew assignments; pace/penalty tendencies.
+  \item \prio{P0} DSN normalization across ingestors (R/Python) via \texttt{POSTGRES\_*}. \done
 \end{itemize}
 
 \block{Feature Engineering (team-week / game-week grain)}
@@ -50,14 +51,16 @@
   \item \prio{P1} Trench proxies: pressure allowed/created, quick-pressure\%, adjusted line yards proxy, stuff rate.
   \item \prio{P1} Role stability: target share, aDOT, YPRR (derive routes if available), WR/TE room deltas on injury.
   \item \prio{P1} Turnover luck: fumble recovery \%, dropped INT proxy; mean-reversion flag.
-  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots).
+  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots). \wip\ (moment-preserving reweight implemented)
   \item \prio{P2} Market microstructure features: hold, cross-book CBV, line-move velocity (dLine/dt), implied vs model deltas.
+  \item \prio{P0} As-of snapshot builder (team-game rows) enforcing $t\le$ cutoff; weather/odds joins. \done
 \end{itemize}
 
 \block{Data Quality \& Testing}
 \begin{itemize}
   \item \prio{P0} Schema contracts; NOT NULLs; FK constraints; de-dupe policies for odds.
   \item \prio{P0} Validation suite (basic): row counts per week, join rates, missingness dashboards.
+  \item \prio{P0} Analytic marts: auto-create \texttt{mart.team\_epa} and \texttt{mart.game\_summary} (materialized view); include refresh step post-ingest. \done
   \item \prio{P1} Statistical validation (Great-Expectations-style): value ranges, distribution drift monitors (weekly).
   \item \prio{P1} Era handling: weighting schedule, \texttt{era} feature; strike years/OT rule changes guards.
 \end{itemize}
@@ -83,7 +86,8 @@
 \begin{itemize}
   \item \prio{P0} DQN baseline: state (priors, features, market), actions (bet/no-bet or discrete stake buckets), reward (PnL; CLV-shaped variant).
   \item \prio{P1} PPO actor-critic for richer actions (alt-lines/teasers/staking); entropy reg; clipping.
-  \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes.
+  \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes. \done\ (dataset builder; notes pending)
+  \item \prio{P0} OPE gate grid: SNIS/DR grid + ESS; JSON + TeX emitter. \done
 \end{itemize}
 
 \block{Training \& Scaling}
@@ -103,15 +107,16 @@
 \milestone{Uncertainty \& Risk}
 \begin{itemize}
   \item \prio{P0} Posterior distributions (state-space, Poisson); bootstrap ensembles for GLM.
-  \item \prio{P0} Fractional Kelly module; bankroll simulator; risk-of-ruin \& max drawdown analytics.
+  \item \prio{P0} Fractional Kelly module; bankroll simulator; risk-of-ruin \& max drawdown analytics. \wip\ (CVaR LP implemented; TeX report emitter added)
   \item \prio{P1} Uncertainty-aware policy: downweight bets under wide posterior intervals.
 \end{itemize}
 
 \milestone{Simulation-Based Strategy Testing}
 \begin{itemize}
-  \item \prio{P0} Monte Carlo engine: simulate margins via fitted discrete distro; correlate with totals.
+  \item \prio{P0} Monte Carlo engine: simulate margins via fitted discrete distro; correlate with totals. \wip
   \item \prio{P0} Price teasers/alt-spreads via integer-crossing sums; EV curves vs book pricing.
   \item \prio{P1} Middle detection thresholds; multi-book arbitrage scan (if legal venue assumed).
+  \item \prio{P0} Acceptance checks: JSON report + TeX table for margins/keys/dependence/frictions. \done
 \end{itemize}
 
 \milestone{Narrative \& Explainability}
@@ -124,7 +129,7 @@
 \milestone{Evaluation \& Calibration (Dissertation Chapter)}
 \begin{itemize}
   \item \prio{P0} Define metrics: Brier, LogLoss, AUC, Accuracy, ROI, Kelly growth, Sharpe.
-  \item \prio{P0} Reliability diagrams; PIT histograms; CLV sparklines (margin figures).
+  \item \prio{P0} Reliability diagrams; PIT histograms; CLV sparklines (margin figures). \wip
   \item \prio{P1} Vegas baseline tables; head-to-head model comparisons.
 \end{itemize}
 

@@ -7,35 +7,9 @@ We synthesize empirical findings from baseline models, ML ensembles, and RL poli
 Baseline models establish strong calibration but limited upside. ML ensembles improve Brier score and CLV capture, while RL policies translate gains into improved bankroll trajectories.
 
 \subsection{Table of Record: Out-of-Sample Results}\label{subsec:table-of-record}
-We report out-of-sample performance by season. If a pre-rendered table is present, we include it; otherwise we fall back to an inline table with placeholder rows.
-\IfFileExists{../results/oos_record_table.tex}{\input{../results/oos_record_table.tex}}{%
-\begin{table}[t]
-  \centering
-  \small
-  \begin{adjustbox}{max width=\linewidth}
-  \begin{threeparttable}
-    \caption{Out-of-sample results by season (table of record).}
-    \label{tab:oos-record}
-    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
-    \begin{tabularx}{\linewidth}{@{} c X r r r r r r r @{} }
-      \toprule
-      \textbf{Season} & \textbf{Model} & \textbf{CLV bp}\tnote{a} & \textbf{Brier} & \textbf{ECE} & \textbf{ROI\%} & \textbf{MAR} & \textbf{Max DD\%} & \textbf{N bets} \\
-      \midrule
-      2021 & Baseline (GLM)      & -- & --    & --    & --   & --   & --    & -- \\
-      2021 & Offline RL (IQL)    & -- & --    & --    & --   & --   & --    & -- \\
-      2022 & Baseline (Skellam)  & -- & --    & --    & --   & --   & --    & -- \\
-      2022 & Offline RL (CQL)    & -- & --    & --    & --   & --   & --    & -- \\
-      2023 & Ensemble            & -- & --    & --    & --   & --   & --    & -- \\
-      2023 & Offline RL (TD3+BC) & -- & --    & --    & --   & --   & --    & -- \\
-      2024 & Offline RL (IQL)    & -- & --    & --    & --   & --   & --    & -- \\
-      \bottomrule
-    \end{tabularx}
-    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
-      \item[a] CLV measured in basis points vs closing; positive is better. Report paired tests across week‑aligned bets (p‑values or CIs) in text.
-    \end{tablenotes}
-  \end{threeparttable}
-  \end{adjustbox}
-\end{table}}
+We report out-of-sample performance by season. The table below is included from a pre-rendered artifact for stability and easy updates.
+% Prefer auto-generated table under figures/out if present, else fallback to results/
+\IfFileExists{../figures/out/oos_record_table.tex}{\input{../figures/out/oos_record_table.tex}}{\input{../results/oos_record_table.tex}}
 
 \section{Economic Value and Risk}
 We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.
@@ -45,32 +19,7 @@ Transparent failure analysis clarifies when the system declines to act and why l
 
 \subsection{Zero-bet weeks}
 We define a zero-bet week as one in which the promoted policy’s final stake vector is identically zero across covered markets after OPE gating and simulator acceptance. Table~\ref{tab:zero-weeks} summarizes the share of zero-bet weeks by season and primary gate that caused the stop.
-\IfFileExists{../results/zero_weeks_table.tex}{\input{../results/zero_weeks_table.tex}}{%
-\begin{table}[t]
-  \centering
-  \small
-  \begin{adjustbox}{max width=\linewidth}
-  \begin{threeparttable}
-    \caption{Share of zero-bet weeks by season and primary gate}
-    \label{tab:zero-weeks}
-    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
-    \begin{tabularx}{\linewidth}{@{} c r r r r >{\RaggedRight\arraybackslash}X @{} }
-      \toprule
-      \textbf{Season} & \textbf{Weeks} & \textbf{Zero weeks\%} & \textbf{OPE gate\%}\tnote{a} & \textbf{Acceptance\%}\tnote{b} & \textbf{Notes} \\
-      \midrule
-      2021 & 23 & 9  & 7  & 2  & Early season low support; clip instability \\
-      2022 & 23 & 4  & 3  & 1  & High slippage weeks; acceptance breach \\
-      2023 & 23 & 6  & 5  & 1  & DR lower bound < 0 across clip grid \\
-      2024 & 23 & 5  & 4  & 1  & Liquidity caps bound EV; CVaR gate \\
-      \bottomrule
-    \end{tabularx}
-    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
-      \item[a] Primary cause: OPE instability or low ESS after clipping/shrinkage (Section~\ref{sec:ope}).
-      \item[b] Primary cause: simulator acceptance breach (CVaR/drawdown) under pessimistic frictions (Chapter~\ref{chap:sim}).
-    \end{tablenotes}
-  \end{threeparttable}
-  \end{adjustbox}
-\end{table}}
+\input{../results/zero_weeks_table.tex}
 
 \subsection{When the system is wrong}
 We tag each realized trade with a top-coded cause from diagnostics and report frequencies. Typical categories and example shares:
@@ -92,6 +41,17 @@ Feature-drop and model-component ablations reveal the marginal value of injuries
 
 \subsection{Core Ablations (2×4 Grid)}
 We report core ablations requested by reviewers. Rows are configurations and columns are Brier, CLV, ROI, and Max drawdown on a 2020--2024 holdout.
+\subsection{Multiplicity control and pre‑specification}\label{sec:multiplicity}
+\begin{sloppypar}
+Our modeling space is large: multiple model families (GLM/\slash{}state‑space/\slash{}Skellam/\slash{}bivariate‑Poisson/\slash{}copulas), multiple RL algorithms (IQL/\slash{}CQL/\slash{}TD3+BC/\slash{}AWAC), hyperparameter grids, feature families, and friction regimes. To control data‑snooping risk we:
+\begin{itemize}
+  \item Pre‑specify the primary metrics (Brier, CLV in bps, ROI\%) and the promotion decision rule (\S\ref{sec:parsimonious-choice}).
+  \item Use rolling‑origin validation and a 2024/2025 holdout to separate model selection from final reporting.
+  \item Report the number of model comparisons and apply Holm–Bonferroni corrections where appropriate; ablations are summarized but not used for promotion.
+  \item Release the evaluation script and experiment registry hashes so external readers can recompute all comparisons.
+\end{itemize}
+We explicitly call out the ``degrees of freedom'' in the registry and treat RL as optional: when evidence is mixed, the simpler Kelly‑LCB baseline is preferred.
+\end{sloppypar}
 % Prefer pre-rendered full table include; else inline placeholder
 \IfFileExists{../results/core_ablation_table.tex}{\input{../results/core_ablation_table.tex}}{%
 \begin{table}[t]
@@ -99,8 +59,7 @@ We report core ablations requested by reviewers. Rows are configurations and col
   \small
   \begin{adjustbox}{max width=\linewidth}
   \begin{threeparttable}
-    \caption{Core ablation grid (placeholder unless included): baseline vs RL; reweighting on/off; microstructure features on/off; Gaussian vs $t$‑copula.}
-    \label{tab:core-ablations}
+    \caption[Core ablation grid]{Core ablation grid (placeholder unless included): baseline vs RL; reweighting on/off; microstructure features on/off; Gaussian vs $t$‑copula.}
     \setlength{\tabcolsep}{3.0pt}\renewcommand{\arraystretch}{1.12}
     \begin{tabularx}{\linewidth}{@{} Y r r r r @{} }
       \toprule

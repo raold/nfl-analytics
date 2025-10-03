@@ -47,6 +47,9 @@ The doubly robust (DR) estimator augments IPS with a learned $Q_{\hat\omega}$:
 \]
 which is unbiased if either the model or the ratios are correct \citep{dudik2014,jiang2016,thomas2015}.
 
+% Auto-included OPE grid table if present
+\IfFileExists{../figures/out/ope_grid_table.tex}{\input{../figures/out/ope_grid_table.tex}}{}
+
 \paragraph{Clipping and shrinkage settings (used).} We use per-decision, self-normalized ratios with clipping and shrinkage:
 \begin{itemize}
   \item Per-decision ratios are clipped at $c\in\{5,10,20\}$. Reported point estimates use $c=10$; promotion requires rankings to be stable across $c\in[5,20]$.
@@ -54,6 +57,10 @@ which is unbiased if either the model or the ratios are correct \citep{dudik2014
   \item For DR, we apply weight shrinkage $\tilde \rho=\rho/(1+\lambda\rho)$ with $\lambda\in\{0,0.1,0.2\}$; $\lambda=0.1$ is the default.
 \end{itemize}
 This makes the variance–bias tradeoff explicit; sensitivity curves (bound vs. $c,\lambda$) are part of the promotion gate.
+
+\paragraph{Acceptance rule (concise).} We accept a candidate when the \emph{median} DR across the $(c,\lambda)$ grid is positive, DR’s sign is stable for $c\in\{5,10,20\}$ and $\lambda\in\{0,0.1,0.2\}$, and per‑fold $\mathrm{ESS}\ge0.2N$. Otherwise, it is rejected or deferred until more data are available.
+
+\paragraph{Reporting defaults.} Unless noted, we report point estimates at $c{=}10$ with shrinkage $\lambda{=}0.1$ and require stability for $c\in\{5,10,20\}$ and $\lambda\in\{0,0.1,0.2\}$. Promotion decisions use 5\,×\,CV with a per‑fold effective sample size threshold of $\mathrm{ESS}\ge 0.2N$ and a non‑negative median DR across the grid.
 
 \subsection{Policy Gradient and Actor--Critic}\label{subsec:pgt}
 For differentiable policy $\pi_\theta$, the performance $J(\theta)=\E_\theta[\sum_t \gamma^t r_t]$
@@ -172,18 +179,71 @@ Target network smoothing, gradient clipping, prioritized replay, and conservativ
 \section{Offline RL Workflow (Schematic)}
 \begin{figure}[t]
   \centering
-  \setlength{\tabcolsep}{8pt}
-  \renewcommand{\arraystretch}{1.2}
-  \begin{tabular}{c}
-    \fbox{\parbox{0.88\linewidth}{\centering Logged seasons (states, actions, rewards, prices) \\ \scriptsize de-duplicated, as-of features, friction labels}} \\[4pt]
-    $\Downarrow$ \scriptsize dataset diagnostics (coverage, behavior policy drift) \\[4pt]
-    \fbox{\parbox{0.88\linewidth}{\centering Offline RL algorithm (BCQ/BRAC/BEAR/CQL/IQL/TD3+BC) \\ \scriptsize pessimism/behavior regularization + hyperparameter sweeps}} \\[4pt]
-    $\Downarrow$ \scriptsize off-policy evaluation (PD-IS, SNIS, DR, HCOPE) \\[4pt]
-    \fbox{\parbox{0.88\linewidth}{\centering Promotion gate: DR lower bound $>\tau$ and sensitivity stable \\ \scriptsize nested CV; clipping/shrinkage sweeps}} \\[4pt]
-    $\Downarrow$ \scriptsize policy frozen; no parameter changes \\[4pt]
-    \fbox{\parbox{0.88\linewidth}{\centering Simulator (frictions, dependence, correlated legs) \\ \scriptsize bankroll, CVaR, drawdown envelopes}} \\[4pt]
-    $\Downarrow$ \scriptsize accept/reject \& rollout
-  \end{tabular}
+  % Cleaner flowchart using TikZ (accent color + compact width + minimal icons)
+  \begin{tikzpicture}[>=Stealth, node distance=8mm, every node/.style={align=center}]
+    % Accent color (colorblind-safe blue)
+    \definecolor{accent}{RGB}{31,119,180}
+    % Styles
+    \tikzstyle{flowbox}=[draw=accent!60, rounded corners, line width=0.6pt,
+      fill=accent!3, text width=0.84\linewidth, inner ysep=6pt, inner xsep=8pt]
+    % Readable callouts: black text, white background, subtle border
+    \tikzstyle{note}=[font=\scriptsize, text=black, fill=white,
+      draw=accent!25, rounded corners=2pt, inner xsep=2pt, inner ysep=1pt,
+      align=center]
+
+    % Nodes
+    \node[flowbox] (logged)
+      {\textbf{Logged seasons (states, actions, rewards, prices)}\\
+       \scriptsize de-duplicated, as-of features, friction labels};
+
+    \node[flowbox, below=of logged] (algo)
+      {\textbf{Offline RL algorithm (BCQ/BRAC/BEAR/CQL/IQL/TD3+BC)}\\
+       \scriptsize pessimism/behavior regularization + hyperparameter sweeps};
+
+    \node[flowbox, below=of algo] (gate)
+      {\textbf{Promotion gate: DR lower bound $>\tau$ and sensitivity stable}\\
+       \scriptsize nested CV; clipping/shrinkage sweeps};
+
+    \node[flowbox, below=of gate] (sim)
+      {\textbf{Simulator (frictions, dependence, correlated legs)}\\
+       \scriptsize bankroll, CVaR, drawdown envelopes};
+
+    % Minimal icon helper (small accent circles with letters)
+    \newcommand{\rlicon}[2]{%%
+      \node[draw=none, circle, fill=accent!25, minimum size=13pt, inner sep=0pt]
+        at ([xshift=-4mm]#1.west) {\scriptsize \textbf{#2}};}
+
+    % Icons
+    \rlicon{logged}{DS}
+    \rlicon{algo}{RL}
+    \rlicon{gate}{PG}
+    \rlicon{sim}{SM}
+
+    % Arrow 1: logged -> algo, with side-rail callout on the right
+    \coordinate (m1) at ($(logged.south)!0.5!(algo.north)$);
+    \draw[->, line width=0.6pt, color=accent] (logged.south) -- (algo.north);
+    \node[note, right=12mm of m1] (n1)
+      {dataset diagnostics\\(coverage, logging policy drift)};
+    \draw[-, line width=0.4pt, color=accent!60] (m1) -- (n1.west);
+
+    % Arrow 2: algo -> gate, with side-rail callout
+    \coordinate (m2) at ($(algo.south)!0.5!(gate.north)$);
+    \draw[->, line width=0.6pt, color=accent] (algo.south) -- (gate.north);
+    \node[note, right=12mm of m2] (n2)
+      {off-policy evaluation\\(PD-IS, SNIS, DR, HCOPE)};
+    \draw[-, line width=0.4pt, color=accent!60] (m2) -- (n2.west);
+
+    % Arrow 3: gate -> sim, with side-rail callout
+    \coordinate (m3) at ($(gate.south)!0.5!(sim.north)$);
+    \draw[->, line width=0.6pt, color=accent] (gate.south) -- (sim.north);
+    \node[note, right=12mm of m3] (n3)
+      {policy frozen;\\no parameter changes};
+    \draw[-, line width=0.4pt, color=accent!60] (m3) -- (n3.west);
+
+    % Final arrow straight down into terminal decision box (inline with flow)
+    \node[note] (n4) at ($(sim.south)+(0,-10mm)$) {accept/reject \& rollout};
+    \draw[->, line width=0.6pt, color=accent] (sim.south) -- (n4.north);
+  \end{tikzpicture}
   \caption{End-to-end offline RL workflow from data to promotion.}
   \label{fig:rl-workflow}
 \end{figure}
@@ -207,8 +267,9 @@ The schematic in \Cref{fig:rl-workflow} is the promotion gate we use week‑to�
   \begin{threeparttable}
     \caption{NFL constraints and the resulting design choices.}
     \label{tab:rl-mapping-nfl}
-    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
-    \begin{tabularx}{\linewidth}{@{} p{0.33\linewidth} X @{} }
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.18}
+    % Left-justify both columns for readability
+    \begin{tabularx}{\linewidth}{@{} >{\RaggedRight\arraybackslash}p{0.33\linewidth} >{\RaggedRight\arraybackslash}X @{} }
       \toprule
       \textbf{NFL challenge} & \textbf{RL/analytics design} \\
       \midrule
@@ -263,6 +324,19 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
 
 \paragraph{Pessimism sensitivity.} Equation~8.1.2 uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.
 
+\subsection{Parsimony: when to prefer stateless rules}\label{sec:parsimonious-choice}
+Pre‑game NFL betting has limited sequential structure relative to genuinely sequential control problems: weekly decisions are nearly independent, and exposure resets quickly. Consequently, a parsimonious decision rule can be competitive with offline RL.
+
+We adopt a simple decision policy for deployment:
+\begin{enumerate}
+  \item Train RL candidates (IQL/CQL/TD3+BC) and the stateless Kelly‑LCB baseline using the same features and frictions.
+  \item Gate all candidates with OPE bounds and simulator acceptance (Sections~\ref{sec:ope}, \ref{sec:sim-acceptance-outcomes}).
+  \item \textbf{Promote the simplest policy that clears gates and} (i) has a strictly better DR lower bound on the 2024/2025 holdout or (ii) matches the baseline within a pre‑specified equivalence margin. Otherwise, prefer the stateless baseline.
+\end{enumerate}
+This rule aligns claims with evidence: RL is used only when it provides reliable improvement after accounting for uncertainty and frictions.
+
+\paragraph{ESS diagnostics.} Low effective sample size (ESS) often drives OPE instability. We report the distribution of ESS/\,$N$ by week and the fraction of weeks with ESS$<0.2N$; promotion is automatically blocked below this level. A weekly ESS panel is included when present (optional include under \texttt{figures/out/}).
+
 \IfFileExists{../figures/out/alpha_sensitivity_panel.png}{%
   \begin{figure}[t]
     \centering
@@ -299,7 +373,7 @@ Chapter~\ref{chap:risk} quantifies uncertainty and translates it into stake sizi
     \caption{Common offline RL algorithms and their trade-offs for betting-style decision problems.}
     \label{tab:offline-rl-glance}
     \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
-    \begin{tabularx}{\linewidth}{@{} p{0.20\linewidth} X X X @{} }
+    \begin{tabularx}{\linewidth}{@{} >{\RaggedRight\arraybackslash}p{0.20\linewidth} >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X @{} }
       \toprule
       \textbf{Method} & \textbf{Core idea/objective} & \textbf{Regularization/safety} & \textbf{Pros / Cons} \\
       \midrule

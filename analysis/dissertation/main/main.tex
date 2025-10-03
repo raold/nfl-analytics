@@ -36,14 +36,24 @@
 \usepackage{enumitem}          % Control layout of itemize/enumerate
 \usepackage{natbib}            % Natbib for citations (author-year support)
 \usepackage{xcolor}            % Colors (required by todonotes)
+% Global accent palette (colorblind-safe blue)
+\definecolor{accentBlue}{RGB}{31,119,180}
 \usepackage[disable]{todonotes} % Disable todo notes for clean builds
 \usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization
 \usepackage{alphalph}          % Multi-letter counters (e.g., AA, AB) for many appendices
 \usepackage{setspace}          % Line spacing control (single/onehalf/double)
 \usepackage[protrusion=true,expansion=true]{microtype} % Better typography
 \usepackage{newpxtext,newpxmath} % Palatino-like text and math for readability
+\usepackage{tikz}                % TikZ for diagrams/flowcharts
+\usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{pgfplots}            % Vector plots for inline charts (e.g., feature importance)
 \pgfplotsset{compat=1.18}
+% Default, slightly smaller pgfplots text for figures
+\pgfplotsset{every axis/.append style={
+  label style={font=\footnotesize},
+  tick label style={font=\scriptsize},
+  title style={font=\footnotesize}
+}}
 \usepackage{xparse}            % For robust macro definitions with optional args
 \usepackage{needspace}         % Prevent headings stranded at page bottoms
 \usepackage{etoolbox}          % Patch commands (preto for section guards)
@@ -70,7 +80,9 @@
 \preto\subsection{\Needspace{5\baselineskip}}
 \preto\subsubsection{\Needspace{4\baselineskip}}
 % Helpful hyphenation hints for long words used throughout
-\hyphenation{miss-speci-fication micro-struc-ture multi-leg mar-gin-par re-weight-ing}
+\hyphenation{miss-speci-fication micro-struc-ture multi-leg mar-gin-par re-weight-ing
+  de-pen-dence-cal-i-bra-tion sys-tem-of-sys-tems off-line-RL
+  mar-ket-mi-cro-struc-ture ma-te-ri-al-ized}
 
 % ---------------------------------------------------
 % Table helpers and caption styling
@@ -81,6 +93,7 @@
 \newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
 % Slightly smaller table captions and content by default
 \captionsetup[table]{font=small}
+\captionsetup[figure]{font=small}
 
 % ---------------------------------------------------
 % Theorem style with margin headings (slick variant)
@@ -199,24 +212,32 @@ Across rolling out‑of‑sample seasons, the stack delivers improved probabilit
 % Table of Contents, List of Figures, and List of Tables
 \cleardoublepage
 \phantomsection
+% Use sloppy typesetting locally to reduce Overfull \hbox warnings in ToC/LoF/LoT
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
 \tableofcontents
+\endgroup
 
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{List of Figures}
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
 \listoffigures
+\endgroup
 
 \cleardoublepage
 \phantomsection
 \addcontentsline{toc}{chapter}{List of Tables}
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
 \listoftables
+\endgroup
 
 % Insert master TODOs after lists (front matter), integrated styling
 \cleardoublepage
 \phantomsection
-\input{../appendix/master_todos.tex}
-\input{../appendix/systems_blueprint.tex}
-\input{../appendix/productionization_guide.tex}
+\IfFileExists{../appendix/acronyms.tex}{\input{../appendix/acronyms.tex}}{}
+\IfFileExists{../appendix/master_todos.tex}{\input{../appendix/master_todos.tex}}{}
+\IfFileExists{../appendix/systems_blueprint.tex}{\input{../appendix/systems_blueprint.tex}}{}
+\IfFileExists{../appendix/productionization_guide.tex}{\input{../appendix/productionization_guide.tex}}{}
 % \listoftodos
 
 % ---------------------------------------------------
@@ -286,7 +307,7 @@ Additional tables and figures provide per-team, per-season breakdowns of calibra
   \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{../figures/out/alpha_sensitivity_panel.png}
-    \caption{Alpha sensitivity for OPE bounds (placeholder if not generated).}
+    \caption[OPE alpha sensitivity]{Alpha sensitivity for OPE bounds (placeholder if not generated).}
   \end{figure}
 }{}
 \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
@@ -348,6 +369,7 @@ Performance metrics as a function of feature family inclusion, regularization st
 This appendix collects extended derivations and lemmas referenced in the main text, including variance bounds for portfolio aggregation under correlation uncertainty and properties of CRPS under mixture distributions.
 
 \section{Variance Bounds}
+\fi
 We derive simple upper bounds on portfolio variance under worst-case correlation assumptions and discuss practical approximations from historical co-movements.
 
 \section{CRPS for Skellam Mixtures}
@@ -416,6 +438,17 @@ We summarize archetypal team profiles used for sensitivity analysis. These profi
   \item[Team 31:] Tight end–centric offense; red-zone efficiency high.
   \item[Team 32:] Hybrid; policy treats as baseline comparator.
 \end{description}
+
+% ---------------------------------------------------
+% Bibliography
+% ---------------------------------------------------
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{plainnat}
+\bibliography{../references}
+
+\end{document}
 
 \chapter{Experiment Registry Index}
 Canonical experiments referenced in the text. Each entry lists dataset range, feature catalog, model family, and evaluation protocol.
@@ -847,6 +880,7 @@ end for
 Q(s,a) = V(s) + (A(s,a) - mean_a A(s,a))
 optimize TD loss with target network and prioritized replay
 \end{verbatim}
+\fi
 
 \chapter{Additional Proof Sketches}
 We include proof sketches for properties of Poisson mixtures, Skellam reweighting, and CRPS consistency. These notes are intended to support reproducibility of the mathematical claims in the main text.
@@ -1131,8 +1165,7 @@ We monitor marginal distributions and key ratios (EPA, success rate, implied pro
 
 \section{Reproducibility}
 Artefacts include dataset hashes, model versions, and environment manifests. Rebuilds on clean machines reproduce metrics within small tolerances; discrepancies open issues with attached diffs and logs.
-\fi
-
+%
 
 % ---------------------------------------------------
 % Back Matter and References
