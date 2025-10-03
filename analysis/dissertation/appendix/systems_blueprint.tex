@@ -1,10 +1,13 @@
-\chapter{Systems Blueprint: From Research to Production}
+\chapter[Systems Blueprint]{Systems Blueprint: From Research to Production}
 \label{app:systems-blueprint}
+
+% Local typesetting relaxation to reduce Underfull \hbox warnings in prose below
+\begingroup\sloppy
 
 This appendix outlines concrete algorithms, interfaces, and deployment flows to implement the dissertation as a production system. Pseudocode favors simple, testable components and mirrors the repository layout.
 
 \section{Nightly ETL: Idempotent Ingestion}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{Idempotent Odds Ingestion (per book/market/date)}
   \label{alg:ingest-odds}
   \begin{algorithmic}[1]
@@ -21,10 +24,13 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
   \end{algorithmic}
 \end{algorithm}
 
+% End local \sloppy group
+\endgroup
+
 \paragraph{Implementation notes.} Use \texttt{py/ingest\_odds\_history.py} with chunked requests, exponential backoff, and database COPY for bulk upserts. Mirror the pattern for schedules and injuries in R with \texttt{data/ingest\_schedules.R}.
 
 \section{As-Of Feature Snapshot}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{As-Of Feature Build (expanded)}
   \label{alg:asof-build}
   \begin{algorithmic}[1]
@@ -39,7 +45,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 \end{algorithm}
 
 \section{Key-Number Reweighting (KL-Tilting)}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{KL-Tilted Integer-Margin Reweighting}
   \label{alg:kl-tilt}
   \begin{algorithmic}[1]
@@ -55,7 +61,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 \end{algorithm}
 
 \section{OPE Gate and Promotion}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{Offline Policy Evaluation Gate (Appendix)}
   \label{alg:ope-gate-appendix}
   \begin{algorithmic}[1]
@@ -72,7 +78,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 \end{algorithm}
 
 \section{Stake Sizing: Kelly LCB + CVaR}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{Weekly Stake Sizing}
   \label{alg:stake-sizing}
   \begin{algorithmic}[1]
@@ -85,7 +91,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 \end{algorithm}
 
 \section{Simulator Acceptance Tests}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{Acceptance Under Dependence and Frictions (Appendix)}
   \label{alg:sim-accept-appendix}
   \begin{algorithmic}[1]
@@ -99,7 +105,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 \end{algorithm}
 
 \section{Monitoring and Rollback}
-\begin{algorithm}[H]
+\begin{algorithm}[H]\small
   \caption{Production Monitoring and Safe Rollback}
   \label{alg:monitoring}
   \begin{algorithmic}[1]

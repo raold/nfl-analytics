@@ -144,8 +144,9 @@ optionally with book‑specific random effects and heteroskedastic errors with v
   \begin{threeparttable}
     \caption{Slippage model summary by book (illustrative).}
     \label{tab:friction-summary}
-    \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}
-    \begin{tabularx}{\linewidth}{@{} l r r r r r r r @{} }
+    % Moderate width using tabular* to distribute spacing; readable padding
+    \setlength{\tabcolsep}{6pt}\renewcommand{\arraystretch}{1.14}
+    \begin{tabular*}{0.85\linewidth}{@{}l @{\extracolsep{\fill}} r r r r r r r @{} }
       \toprule
       \textbf{Book} & $\hat\beta_0$ & $\hat\beta_1$ & $\hat\beta_2$ & $\hat\beta_3$ & RMSE & $R^2$ & N \\
       \midrule
@@ -153,7 +154,7 @@ optionally with book‑specific random effects and heteroskedastic errors with v
       Book B & 0.1 & 1.2 & 0.5 & 0.8 & 2.8 & 0.39 & 16{,}110 \\
       Book C & 0.3 & 1.7 & 0.6 & 0.5 & 3.6 & 0.44 & 20{,}005 \\
       \bottomrule
-    \end{tabularx}
+    \end{tabular*}
     \begin{tablenotes}[flushleft]\footnotesize
       \item Coefficients summarize $\E[\Delta p\mid q,\tau,\text{book}]$ in pre‑kickoff windows; units correspond to price ticks. Replace with weekly estimates from order logs.
     \end{tablenotes}
@@ -162,6 +163,9 @@ optionally with book‑specific random effects and heteroskedastic errors with v
 
 \section{Simulator Acceptance Tests: Outcomes}\label{sec:sim-acceptance-outcomes}
 Algorithm~9.14 defines acceptance tests on margins and key‑mass calibration (tolerances $\tau_{\mathrm{marg}},\tau_{\mathrm{key}}$), and dependence checks vs. historical co‑movements. Here we report pass/fail rates, typical deviations when failing, and whether failures predict poor live performance.
+
+% Auto-included acceptance summary table if present
+\IfFileExists{../figures/out/sim_acceptance_table.tex}{\input{../figures/out/sim_acceptance_table.tex}}{}
 
 \IfFileExists{../figures/out/sim_acceptance_rates.png}{%
   \begin{figure}[t]

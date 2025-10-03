@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
-# Simple state-space style team ratings (stub)
+# State-space team ratings (EWMA/RLS/DLM)
 #
-# Provides a minimal, reproducible scaffold that estimates time-varying team
-# strengths from game margins with exponential smoothing. Replace the smoother
-# with a Kalman filter (e.g., dlm) for full state-space treatment as described
-# in the dissertation (Chapter 4).
+# Minimal, reproducible scaffold with three methods:
+#  - ewma: exponential smoothing of team-specific margins (fast baseline)
+#  - rls: recursive least squares with forgetting factor (Kalman-style)
+#  - dlm: local-level Kalman filter per team (requires dlm)
 
 suppressPackageStartupMessages({
   library(dplyr)
@@ -86,8 +86,8 @@ run_state_space <- function(write_to_mart = FALSE, method = c("ewma", "rls", "dl
     )
     on.exit(dbDisconnect(con), add = TRUE)
     dbExecute(con, "CREATE SCHEMA IF NOT EXISTS mart;")
+    # Persist to mart.team_ratings (separate from mart.team_epa)
     dbExecute(con, "CREATE TABLE IF NOT EXISTS mart.team_ratings (game_id text, posteam text, method text, rating double precision, PRIMARY KEY(game_id, posteam, method))")
-    # Upsert by clearing current method and inserting
     dbExecute(con, "DELETE FROM mart.team_ratings WHERE method = $1", params = list(method))
     to_write <- ratings |>
       transmute(game_id, posteam = team, method = method, rating = strength)

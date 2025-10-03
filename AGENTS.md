@@ -27,6 +27,26 @@
 - Quarto notebooks (locally): run `quarto render` on `04_score_validation.qmd`, `05_copula_gof.qmd`, `12_risk_sizing.qmd`, and `80_rl_ablation.qmd` as needed for dissertation figures/tables.
 - `psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$POSTGRES_PORT/$POSTGRES_DB -c "REFRESH MATERIALIZED VIEW mart.game_summary;"` refreshes analytic marts after play ingests.
 
+## LaTeX Document Build & Hygiene
+- Build the dissertation with latexmk (two-pass with BibTeX):
+  - `cd analysis/dissertation/main`
+  - `latexmk -C && latexmk -pdf -bibtex -interaction=nonstopmode main.tex && latexmk -pdf -interaction=nonstopmode main.tex`
+- VS Code LaTeX Workshop: run “Clean up auxiliary files”, then “Build LaTeX project” twice.
+- Avoid long-running Problems panel noise:
+  - ToC/LoF/LoT are wrapped in a local `\begingroup\sloppy` block in `main.tex` to reduce Overfull/Underfull warnings.
+  - Use `\IfFileExists{<path>}{\input{<path>}}{}` for optional includes in the front matter; this prevents hard failures when editor CWDs differ.
+  - Prefer `tabular*` with a target width or `adjustbox{width=...}` for tables. For very wide tables, consider `tabularx` with ragged-right `X` columns.
+  - For localized layout issues, wrap only the problem environment with `\begingroup\sloppy ... \endgroup` instead of making global changes.
+  - Keep a short hyphenation list in the preamble for recurring problematic tokens (see `main.tex`).
+
+### TikZ figure pattern (flow diagrams)
+- Load `tikz` with `arrows.meta, positioning, calc` in the preamble.
+- Use rounded, light boxes, an accent color for borders, and side‑rail arrow callouts for readability. Place terminal decision boxes inline at the end of the arrow.
+
+### Common pitfalls
+- Stray `\iffalse`/`\fi` blocks can accidentally eat large sections; always close them in the same file. Avoid multi‑chapter guards.
+- Run latexmk with BibTeX; otherwise, citations remain undefined and cross‑refs noisy.
+
 ## Coding Style & Naming Conventions
 - Prefer tidyverse style in R: snake_case objects, pipes for transformations, explicit `transmute`/`mutate`.
 - Python code should follow PEP 8 with 4-space indents; module names in snake_case, classes in PascalCase.

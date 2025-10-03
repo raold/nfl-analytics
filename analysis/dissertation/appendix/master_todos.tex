@@ -28,15 +28,15 @@
 \milestone{Committee Review Fix-it (prioritized)}
 \block{Evidence \& Claims}
 \begin{itemize}
-  \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines.
-  \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid.
-  \item \prio{P0} \textbf{Acceptance tests}. Report simulator acceptance metrics vs. historical (margins, key mass, dependence, friction). Block diagrams already exist; need numbers. \emph{Where:} Ch.~\texttt{7}.
+  \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines. \done\ (rows emitter present; wire from registry)
+  \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid. \wip\ (grid scaffolded; populate from runs)
+  \item \prio{P0} \textbf{Acceptance tests}. Report simulator acceptance metrics vs. historical (margins, key mass, dependence, friction). \emph{Where:} Ch.~\texttt{7}. \done\ (JSON + TeX emitter; tune tolerances, add tail panel)
 \end{itemize}
 
 \block{Evaluation \& Datasets}
 \begin{itemize}
-  \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}.
-  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot.
+  \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}. \wip
+  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \wip
 \end{itemize}
 
 \block{Modeling Specifics}
@@ -47,7 +47,7 @@
 
 \block{OPE \& Promotion Gate}
 \begin{itemize}
-  \item \prio{P0} \textbf{Numerical thresholds}. State exact clip ranges, shrinkage choices, and DR/HCOPE lower bound thresholds; show sensitivity bands. \emph{Where:} Ch.~\texttt{5}.
+  \item \prio{P0} \textbf{Numerical thresholds}. State exact clip ranges, shrinkage choices, and DR/HCOPE lower bound thresholds; show sensitivity bands. \emph{Where:} Ch.~\texttt{5}. \done\ (OPE grid JSON+TeX emitter; finalize thresholds)
   \item \prio{P1} \textbf{Failure modes (expand)}. Add concrete examples and rejection thresholds; link to simulator acceptance tests. \emph{Where:} Ch.~\texttt{5}/\texttt{7}.
 \end{itemize}
 
@@ -59,8 +59,8 @@
 
 \block{Reproducibility \& Artefacts}
 \begin{itemize}
-  \item \prio{P0} \textbf{End-to-end script}. One make/CLI entry to rebuild marts, train baselines, run OPE, and render figures. Publish artefact hashes. \emph{Where:} repo root + appendix.
-  \item \prio{P1} \textbf{Env pinning}. Verify \texttt{renv.lock} and \texttt{requirements.txt} reproduce figures on clean machine; document any differences. \emph{Where:} appendix.
+  \item \prio{P0} \textbf{End-to-end script}. One make/CLI entry to rebuild marts, train baselines, run OPE, and render figures. Publish artefact hashes. \emph{Where:} repo root + appendix. \wip\ (init/dev scripts in place; add latexmk target)
+  \item \prio{P1} \textbf{Env pinning}. Verify \texttt{renv.lock} and \texttt{requirements.txt} reproduce figures on clean machine; document any differences. \emph{Where:} appendix. \wip
 \end{itemize}
 
 \block{Writing \& Cohesion}
@@ -69,15 +69,16 @@
   \item \prio{P1} \textbf{Figure polish}. Uniform caption style, consistent color palette, and readable axis labels; ensure all tables use \texttt{threeparttable} notes.
 \end{itemize}
 
-\milestone{Data Foundations (2015–2025 core; optional 1999–2014; selective priors pre-1999)}
+\milestone{Data Foundations (1999–2024 core; extend 2025+; selective priors pre-1999)}
 \block{Acquisition \& Storage}
 \begin{itemize}
-  \item \prio{P0} Ingest \textbf{nflfastR} play-by-play 2015–2025; option flags for 1999–2014.
-  \item \prio{P1} Odds snapshots via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_snapshots} (book, timestamp, market, price, rule hints).
+  \item \prio{P0} Ingest \textbf{nflfastR/nflverse} play-by-play 1999–2024; extend to 2025 when available.
+  \item \prio{P1} Odds history via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_history} (book, timestamp, market, price, rule hints).
   \item \prio{P1} Weather joins (Open-Meteo/NOAA), stadium roof/surface map, geocoded stadium coords.
   \item \prio{P1} Schedule context: rest days, travel distance (Haversine), time zones crossed, primetime flags.
   \item \prio{P1} Injury integration: QB-out binary, team AGL index, cumulative starters out; weekly status (out/doubtful/questionable) encoder.
   \item \prio{P2} Referee crew assignments; pace/penalty tendencies.
+  \item \prio{P0} DSN normalization across ingestors (R/Python) via \texttt{POSTGRES\_*}. \done
 \end{itemize}
 
 \block{Feature Engineering (team-week / game-week grain)}
@@ -87,14 +88,16 @@
   \item \prio{P1} Trench proxies: pressure allowed/created, quick-pressure\%, adjusted line yards proxy, stuff rate.
   \item \prio{P1} Role stability: target share, aDOT, YPRR (derive routes if available), WR/TE room deltas on injury.
   \item \prio{P1} Turnover luck: fumble recovery \%, dropped INT proxy; mean-reversion flag.
-  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots).
+  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots). \wip\ (moment-preserving reweight implemented)
   \item \prio{P2} Market microstructure features: hold, cross-book CBV, line-move velocity (dLine/dt), implied vs model deltas.
+  \item \prio{P0} As-of snapshot builder (team-game rows) enforcing $t\le$ cutoff; weather/odds joins. \done
 \end{itemize}
 
 \block{Data Quality \& Testing}
 \begin{itemize}
   \item \prio{P0} Schema contracts; NOT NULLs; FK constraints; de-dupe policies for odds.
   \item \prio{P0} Validation suite (basic): row counts per week, join rates, missingness dashboards.
+  \item \prio{P0} Analytic marts: auto-create \texttt{mart.team\_epa} and \texttt{mart.game\_summary} (materialized view); include refresh step post-ingest. \done
   \item \prio{P1} Statistical validation (Great-Expectations-style): value ranges, distribution drift monitors (weekly).
   \item \prio{P1} Era handling: weighting schedule, \texttt{era} feature; strike years/OT rule changes guards.
 \end{itemize}
@@ -156,7 +159,7 @@
 
 \milestone{Evaluation \& Calibration (Dissertation Chapter)}
 \begin{itemize}
-  \item \prio{P0} PIT histograms; CLV sparklines (margin figures); per-season reliability panels.
+  \item \prio{P0} PIT histograms; CLV sparklines (margin figures); per-season reliability panels. \wip\ (CLV + reliability present; PIT pending)
   \item \prio{P1} Vegas baseline tables; head-to-head model comparisons.
 \end{itemize}
 
@@ -177,7 +180,8 @@
 
 \milestone{Bibliography \& Citations}
 \begin{itemize}
-  \item \prio{P0} Maintain single \texttt{references.bib}; keep keys stable; add DOIs/URLs where missing.
+  \item \prio{P0} Maintain single \texttt{references.bib}; keep keys stable; add DOIs/URLs where missing. \done\ (deduped keys; DOIs added for core cites)
+  \item \prio{P0} \textbf{LaTeX hygiene}. Guard optional includes; add figure/table style patterns; document two‑pass build. \done
   \item \prio{P0} Audit all \texttt{\textbackslash cite\{\}} have corresponding entries; compile warnings = 0.
 \end{itemize}
 
@@ -185,7 +189,7 @@
 \begin{itemize}
   \item Repro pass: deterministic runs (seeded), environment pinned, same metrics across machines.
   \item Validity pass: calibration in tolerance; Vegas comparison documented.
-  \item Docs pass: figures captioned; equations referenced; todos burned down or deferred.
+  \item Docs pass: figures captioned; equations referenced; todos burned down or deferred; no fatal LaTeX errors under clean two‑pass build.
 \end{itemize}
 
 \endgroup

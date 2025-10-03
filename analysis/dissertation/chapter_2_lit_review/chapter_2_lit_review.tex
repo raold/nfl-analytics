@@ -158,9 +158,12 @@ pmf matching empirical key masses $\{m_k\}_{k\in\mathcal{K}}$:
 \sum_d d\,w_d q(d)=\mu_D,\quad
 \sum_d (d-\mu_D)^2 w_d q(d)=\sigma_D^2. \nonumber
 \end{align}
+\paragraph{Feasibility and fallback.} The moment constraints imply a feasibility region for the target masses $\{m_k\}$. When empirical masses are extreme (e.g., unusually high mass at 3), \eqref{eq:reweight-ls} can be infeasible. We therefore (i) project $\{m_k\}$ onto the nearest feasible set and (ii) fall back to KL‑tilting (\Cref{alg:kl-tilt}) when needed. This guards the pipeline against pathological weeks while preserving the intent of matching key integers.
 The last two constraints preserve mean/variance so reweighting changes shape, not location/scale.
 In matrix form, \eqref{eq:reweight-ls} is a small convex QP; if only normalization and key masses
 are imposed it has a closed form via Lagrange multipliers. We use $\tilde q$ for teaser/middle pricing in Chapter~\ref{chap:sim}.
+
+\paragraph{Practical effect.} In practice, this means the model assigns more realistic probability mass to key margins. For example, if the baseline puts only 12\% on a 3‑point margin, the reweighted $\tilde q$ may allocate 18\% based on observed pushes. This directly improves expected value for teaser bets that cross 3 (and 7), because pricing reflects the higher chance of landing on those integers.
 
 \paragraph{Convergence and complexity.} For the projected‑update routine (\Cref{alg:key-reweight}), the objective $\sum_{k\in\mathcal K}(w_k q(k)-m_k)^2$ is convex in $w$, and the projection onto linear moment constraints is nonexpansive; with a fixed step size $\eta\in(0,2/L)$ where $L=\max_k 2 q(k)^2$, the sequence of objective values decreases monotonically and converges to the minimum over the feasible set. Each iteration costs $O(|\mathcal K|+|\mathrm{supp}(q)|)$ to update gradients and solve the $3\times3$ projection system; with a banded support (e.g., $d\in[-40,40]$) this is $O(1)$ per iteration in practice.
 
@@ -251,6 +254,8 @@ with density $c_\rho$. For Gaussian copulas, Kendall’s $\tau$ and $\rho$ relat
 \]
 where $t_{\nu+1}$ is the $t$ CDF. We use Gaussian copulas for calibration and $t$-copulas in stress tests to bound teaser/SGP risk under stronger tail co-movement.\footnote{See \citet{joe1997} for dependence measures and tail behavior; $t$-copulas are widely used for stress scenarios (e.g., Demarta--McNeil, 2005).}
 
+\paragraph{Design choice.} We default to the Gaussian copula because it is simple, fast to estimate (rank‑based $\tau\,\leftrightarrow\,\rho$ mapping), and typically well‑calibrated for central mass. When tail diagnostics (e.g., nonzero empirical tail dependence or GOF failures near extremes) trigger, we switch to---or at least bound with---a $t$‑copula, which better captures joint tail co‑movement. This keeps the baseline interpretable while making heavy tails an explicit, testable escalation.
+
 \paragraph{Estimation.} We estimate $\tau$ (or Spearman’s $\rho_S$) on historical $(M,T)$, map to $\rho$, and evaluate $\Prob(A\cap B)$ by quasi-Monte Carlo. Marginal CDFs $F_M,F_T$ are taken from the fitted Skellam/bivariate-Poisson layers (with key-number reweighting; \Cref{subsec:key-reweight}).
 
 \paragraph{Goodness-of-fit and tail diagnostics.}\label{subsec:copula-gof}
@@ -288,7 +293,7 @@ estimated empirically by high/low quantile counts. Gaussian copulas imply $\lamb
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{../figures/joint_exceedance_vs_rho.png}
-  \caption{Gaussian-copula joint exceedance at symmetric thresholds ($z_1=z_2=0$) as a function of correlation $\rho$. The analytic curve $\Prob(Z_1>0,Z_2>0)=\tfrac14+\tfrac{1}{2\pi}\arcsin(\rho)$ provides a calibration check for dependence modeling (\Cref{subsec:copula-st}).}
+  \caption[Gaussian copula joint exceedance]{Gaussian-copula joint exceedance at symmetric thresholds ($z_1=z_2=0$) as a function of correlation $\rho$. The analytic curve $\Prob(Z_1>0,Z_2>0)=\tfrac14+\tfrac{1}{2\pi}\arcsin(\rho)$ provides a calibration check for dependence modeling (\Cref{subsec:copula-st}).}
   \label{fig:copula-joint}
 \end{figure}
 
@@ -350,7 +355,7 @@ We evaluate models by:
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.9\linewidth]{../figures/reliability_diagram.png}
-  \caption{Reliability diagram with 95\% binomial confidence intervals. Points show empirical frequencies by predicted-probability bin; the diagonal indicates perfect calibration. We report these alongside Brier/log-loss and ECE.}
+  \caption[Reliability diagram (95\% CIs)]{Reliability diagram with 95\% binomial confidence intervals. Points show empirical frequencies by predicted-probability bin; the diagonal indicates perfect calibration. We report these alongside Brier/log-loss and ECE.}
   \label{fig:reliability}
 \end{figure}
 
@@ -437,6 +442,7 @@ Before deploying a learned policy, we estimate its value via inverse-propensity 
 \section{Game-Theoretic Foundations}
 \label{sec:game-theory}
 \subsection{Why game theory here?}
+\begingroup\sloppy
 Bookmakers and bettors form a strategic ecosystem with asymmetric information, inventory constraints, and repeated interaction. Pre‑game pricing is well approximated by a Stackelberg game: the bookmaker (leader) posts odds and limits anticipating heterogeneous follower responses; many small bettors act approximately as price‑takers.
 
 \subsection{Mathematical framing}
@@ -460,6 +466,7 @@ Two simple primitives illuminate the trade‑offs:
 
 \subsection{Testable implications}
 Game‑theoretic frictions predict pockets of inefficiency where (i) inventory/rounding bites (key numbers), (ii) information latency is high (late injury/weather), or (iii) demand is biased (favorites/popular teams). Our ablations target exactly these loci: key‑number reweighting, microstructure features, and copula choice.
+\endgroup
 
 \section{Betting Market Theory \& Microstructure}
 \label{sec:market}
@@ -493,7 +500,7 @@ We define **Comparative Book Value (CBV)** as the difference between our fair pr
   \begin{adjustwidth}{-0.35in}{-0.35in}
   \begin{threeparttable}
   \captionsetup{justification=centering}
-  \caption{Modeling families at a glance. Uncertainty, scalability, interpretability, and notes for deployment.}
+  \caption[Modeling families at a glance]{Modeling families at a glance. Uncertainty, scalability, interpretability, and notes for deployment.}
   \label{tab:model-compare}
   \begingroup
    \small
@@ -537,7 +544,7 @@ From the literature, our design principles are:
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{../figures/key_number_pmf.png}
-  \caption{Integer-margin pmf comparison. Baseline (e.g., Skellam/discretized Gaussian) vs key-number reweighted distribution matching empirical masses at 3, 6, 7, and 10 while preserving location/scale (\Cref{subsec:key-reweight}).}
+  \caption[Integer‑margin pmf comparison]{Integer-margin pmf comparison. Baseline (e.g., Skellam/discretized Gaussian) vs key-number reweighted distribution matching empirical masses at 3, 6, 7, and 10 while preserving location/scale (\Cref{subsec:key-reweight}).}
   \label{fig:key-pmf}
 \end{figure}
 

@@ -89,6 +89,125 @@ def reweight_key_masses(pmf: Dict[int, float], targets: Dict[int, float]) -> Dic
     return {k: v / s for k, v in adj.items()}
 
 
+def reweight_with_moments(
+    pmf: Dict[int, float],
+    targets: Dict[int, float],
+    mu: float,
+    var: float,
+    *,
+    iters: int = 200,
+    eta: float = 1e-3,
+    tol: float = 1e-6,
+) -> Dict[int, float]:
+    """Moment-preserving reweighting to match key masses.
+
+    Minimizes squared error on key masses with nonnegativity, while projecting
+    onto the affine set that preserves normalization, mean, and variance.
+
+    Args:
+        pmf: baseline integer pmf (margin -> prob)
+        targets: desired masses at keys (e.g., {3:0.09,6:0.06,7:0.07,10:0.05})
+        mu, var: target mean and variance to preserve
+        iters: max iterations
+        eta: gradient step size
+        tol: convergence tolerance on key-mass deltas
+
+    Returns: adjusted pmf dict
+    """
+    # Support and baseline arrays
+    ks = sorted(pmf.keys())
+    q = {k: max(0.0, float(pmf[k])) for k in ks}
+    # Initialize weights
+    w = {k: 1.0 for k in ks}
+
+    # Precompute q-weighted sums for projection basis
+    def _moments_under_q() -> Dict[str, float]:
+        s0 = sum(q.values())
+        s1 = sum(k * q[k] for k in ks)
+        s2 = sum((k**2) * q[k] for k in ks)
+        c2 = sum(((k - mu) ** 2) * q[k] for k in ks)
+        d_c2 = sum(k * ((k - mu) ** 2) * q[k] for k in ks)
+        c4 = sum(((k - mu) ** 4) * q[k] for k in ks)
+        return {"s0": s0, "s1": s1, "s2": s2, "c2": c2, "d_c2": d_c2, "c4": c4}
+
+    const = _moments_under_q()
+
+    def _project_weights() -> None:
+        # Current p and moments
+        p = {k: q[k] * w[k] for k in ks}
+        S0 = sum(p.values())
+        S1 = sum(k * p[k] for k in ks)
+        S2 = sum(((k - mu) ** 2) * p[k] for k in ks)
+        # Desired deltas
+        d0 = 1.0 - S0
+        d1 = mu - S1
+        d2 = var - S2
+        # Solve 3x3 for (alpha, beta, gamma)
+        # Matrix M using precomputed q-weighted sums
+        # Row order corresponds to constraints on (sum, mean, variance)
+        import numpy as _np  # optional local import; falls back if unavailable
+
+        M = [
+            [const["s0"], const["s1"], const["c2"]],
+            [const["s1"], const["s2"], const["d_c2"]],
+            [const["c2"], const["d_c2"], const["c4"]],
+        ]
+        b = [d0, d1, d2]
+        # Small ridge for numerical stability
+        lam = 1e-10
+        for i in range(3):
+            M[i][i] += lam
+        # Manual 3x3 solve (no numpy hard dependency)
+        A = [M[0] + [b[0]], M[1] + [b[1]], M[2] + [b[2]]]
+        n = 3
+        for i in range(n):
+            piv = i
+            for r in range(i + 1, n):
+                if abs(A[r][i]) > abs(A[piv][i]):
+                    piv = r
+            A[i], A[piv] = A[piv], A[i]
+            if abs(A[i][i]) < 1e-18:
+                continue
+            fac = A[i][i]
+            for c in range(i, n + 1):
+                A[i][c] /= fac
+            for r in range(n):
+                if r == i:
+                    continue
+                fac = A[r][i]
+                for c in range(i, n + 1):
+                    A[r][c] -= fac * A[i][c]
+        alpha, beta, gamma = (A[0][n], A[1][n], A[2][n])
+        # Apply affine adjustment in weight space: w <- w + a + b*d + c*(d-mu)^2
+        for k in ks:
+            w[k] = max(0.0, w[k] + alpha + beta * k + gamma * ((k - mu) ** 2))
+
+    # Iterative projected updates
+    for _ in range(max(1, iters)):
+        # Gradient step on key masses
+        max_err = 0.0
+        for k, t in targets.items():
+            if k not in q:
+                continue
+            cur = q[k] * w[k]
+            err = (cur - t)
+            max_err = max(max_err, abs(err))
+            # d/dw_k (cur - t)^2 = 2*(cur - t)*q_k
+            grad = 2.0 * err * q[k]
+            w[k] = max(0.0, w[k] - eta * grad)
+        # Project to match normalization/mean/variance
+        _project_weights()
+        if max_err < tol:
+            break
+
+    # Build adjusted pmf and normalize for safety
+    out = {k: q[k] * max(0.0, w[k]) for k in ks}
+    s = sum(out.values())
+    if s > 0:
+        out = {k: v / s for k, v in out.items()}
+    return out
+
+
 def cover_push_probs(pmf: Dict[int, float], spread: float) -> Tuple[float, float, float]:
     """Compute (cover, push, fail) for home vs given spread.
 
@@ -131,4 +250,3 @@ __all__ = [
     "cover_push_probs",
     "total_over_prob",
 ]
-
