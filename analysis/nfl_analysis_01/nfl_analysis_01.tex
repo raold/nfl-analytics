@@ -1,0 +1,165 @@
+% JAMS-style LaTeX article synthesizing discrete-margin modeling, point-buy valuation, ML vs -2 choice,
+% and middling math for Seahawks @ Cardinals (TNF, 2025-09-25), with sources in BibTeX.
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{siunitx}
+\usepackage{enumitem}  
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=magenta]{hyperref}
+
+\title[Discrete-Margin Pricing at the Two]{Discrete-Margin Pricing at the Two: \\ Fair Point-Buy Valuation, ML vs.\ Spread, and Middling around $2$}
+\author[Richard Oldham]{Richard Oldham}
+\date{\today}
+
+\begin{document}
+
+\begin{abstract}
+We present a first-principles, integer-margin model for pricing NFL point spreads in the neighborhood of the two-point line and apply it to the \emph{Seattle Seahawks @ Arizona Cardinals} game on Thursday, Sept.\ 25, 2025 (Week 4). Using a push-aware discrete framework, we (i) convert DraftKings market odds to implied probabilities with vig normalization, (ii) estimate the mass function of the final margin near $\{1,2\}$ from historical distributions, (iii) compute fair prices for buying points at $2$ (moves $-2\!\to\!-1.5$ and $-2.5\!\to\!-2$), (iv) derive an explicit moneyline-versus-$-2$ decision rule and compare expected values numerically, and (v) quantify the break-even threshold for a classic $-1.5/+2.5$ middle. The analysis is fully push-adjusted and algebraically explicit, suitable as a building block for a backtestable betting dashboard. We include practical guidance for calibration, line-shopping, and bankroll sizing (Kelly).
+\end{abstract}
+
+\maketitle
+
+\section{Market snapshot and notation}
+For the Week 4 TNF matchup on 2025-09-25, multiple outlets reporting DraftKings lines list
+\[
+\text{SEA }-1.5,\quad \text{ML: SEA }-125,\ \text{ARI }+105,\quad \text{Total }43.5,
+\]
+see e.g.\ \cite{DKN-BestBets-SEA-ARI-2025,Action-SEA-ARI-Preview-2025,Sportshandle-SEA-ARI-2025,Oddsshark-SEA-ARI-2025}.%
+\footnote{Throughout, we use the DraftKings snapshot reported across reputable aggregators on the day of game. Small intra-day ticks do not materially affect the algebra; the numerics below can be updated mechanically if the inputs change.}
+
+\subsection*{Integer-margin model}
+Let the final \emph{margin} be the integer-valued random variable
+\[
+M \in \mathbb{Z},\qquad M=\text{(favorite score)}-\text{(underdog score)}.
+\]
+For a book line $s\in\mathbb{Z}$, the favorite $-s$ ticket: wins if $M>s$, pushes if $M=s$, loses if $M<s$; the dog $+s$ is complementary.
+
+Write $p_k:=\Pr[M=k]$ and define the tail and atom at the line
+\[
+P_{>s}:=\Pr[M>s]=\sum_{k\ge s+1}p_k,\qquad P_{=s}:=p_s,\qquad P_{<s}:=1-P_{>s}-P_{=s}.
+\]
+A tractable parametric baseline is a \emph{discretized normal} centered at the spread,
+\begin{equation}\label{eq:disc-normal}
+p_k \approx \Phi\!\left(\frac{k+0.5-\mu}{\sigma}\right)-\Phi\!\left(\frac{k-0.5-\mu}{\sigma}\right),\qquad \mu\approx s,
+\end{equation}
+augmented by a small ``endgame'' mixture that inflates mass at small positive margins (e.g.\ $\{2,3,4,5\}$), reflecting late fouling/clock dynamics.\footnote{Empirically, NFL margins concentrate at key numbers; $\Pr(|M|=3)$ is $\sim 15\%$ over long samples, with $1$ and $2$ each at $\sim 3$--$4\%$; see \S\ref{sec:hist} and \cite{Boyds-KeyNumbers,Action-KeyNumbers-2024,Inpredictable-Distribution}. Post-2015 XP changes slightly reshaped the lattice frequencies.}
+
+\section{Implied probabilities from American odds}
+For American odds $-a$ (favorite) or $+b$ (dog), the \emph{implied} win probabilities (with book vig) are
+\[
+\pi(-a)=\frac{a}{a+100},\qquad \pi(+b)=\frac{100}{b+100}.
+\]
+For SEA ML $-125$ and ARI ML $+105$,
+\[
+\pi_{\text{SEA,ML}}=0.556,\qquad \pi_{\text{ARI,ML}}=0.488.
+\]
+Removing vig by normalization ($\widetilde\pi_i=\pi_i/(\pi_{\text{SEA}}+\pi_{\text{ARI}})$) gives the \emph{fair} moneyline win probabilities
+\begin{equation}\label{eq:fair-ml}
+P(\text{SEA wins})\approx 0.532,\qquad P(\text{ARI wins})\approx 0.468.
+\end{equation}
+We denote $p_{\mathrm{ML}}:=0.532$ for SEA.
+
+\section{Near-line mass at $1$ and $2$ from history}\label{sec:hist}
+Long-horizon NFL studies find (unconditional) margin-of-victory frequencies roughly
+\[
+\Pr(|M|=3)\approx 15\%,\quad \Pr(|M|=7)\approx 8\text{--}9\%,\quad \Pr(|M|=1)\approx 4\%,\quad \Pr(|M|=2)\approx 4\%,
+\]
+with modest regime shifts after the 2015 XP rule\footnote{Recent seasons exhibit slightly higher mass at $\{5,6\}$ and modest changes around $\{4,10\}$; cf.\ \cite{Action-KeyNumbers-2024}.} \cite{Boyds-KeyNumbers,Action-KeyNumbers-2024,CleanupHitter-CommonScores,Inpredictable-Distribution}.
+Conditioning on SEA as a slight favorite, a neutral split allocates approximately half of the $\{1,2\}$ outcomes to the favorite. We therefore adopt calibrated atoms
+\[
+p_1:=\Pr(M=1)\approx 0.020,\qquad p_2:=\Pr(M=2)\approx 0.020,
+\]
+for \emph{SEA-by-1} and \emph{SEA-by-2} respectively.\footnote{These are conservative, dashboard-friendly priors. If you prefer empirical, spread-conditional atoms (e.g.\ conditioning on closing spread in $[1,2]$), simply replace $p_1,p_2$ below and recompute; the algebra is unchanged. Tools like \cite{Inpredictable-Distribution} or your own historical bins can supply $p_k$.}
+
+\section{Cover, push, and loss probabilities at $s=2$}
+From \eqref{eq:fair-ml} and the atoms above,
+\[
+P_{>2}=\Pr(M\ge 3)=p_{\mathrm{ML}}-p_1-p_2=0.492,\qquad P_{=2}=p_2=0.020,\qquad P_{<2}=1-0.492-0.020=0.488.
+\]
+Thus a favorite $-2$ ticket has $\Pr(\text{cover})\approx 49.2\%$, $\Pr(\text{push})\approx2.0\%$, $\Pr(\text{lose})\approx48.8\%$.
+
+\section{Fair pricing and point-buy valuation at the two}
+Let a unit stake pay net $b$ on win (so $b=100/110\approx 0.909$ at $-110$). The push has zero net.
+
+\subsection*{Fair odds for $-2$}
+Fair payoff $b^\star$ solves $b^\star P_{>2}=P_{<2}$, i.e.
+\[
+b^\star=\frac{P_{<2}}{P_{>2}}=\frac{0.488}{0.492}=0.992\quad\Longrightarrow\quad \text{American odds} \approx -101.
+\]
+Hence an \emph{even-money} quote for $-2$ is essentially fair given $p_1=p_2=0.02$ and $p_{\mathrm{ML}}=0.532$.
+
+\subsection*{Value of buying on/off $2$ (clean formulas)}
+Let $p_2=\Pr(M=2)$. Only the $M=2$ cell flips when you move across $2$:
+\begin{align*}
+-2 \to -1.5&:\ \text{push}\to\text{win},\quad \Delta \text{EV}=b\,p_2;\\
+-2.5 \to -2&:\ \text{loss}\to\text{push},\quad \Delta \text{EV}=1\cdot p_2.
+\end{align*}
+Thus the full key move $-2.5\to -1.5$ is worth $(1+b)p_2$. Numerically, with $b=0.909$ and $p_2=0.02$:
+\[
+\underbrace{b\,p_2}_{-2\to-1.5}\!=\!0.0182\ (\text{per \$1 staked}),\quad 
+\underbrace{1\cdot p_2}_{-2.5\to-2}\!=\!0.0200,\quad 
+\underbrace{(1{+}b)p_2}_{-2.5\to-1.5}\!=\!0.0382.
+\]
+Interpret each as the \emph{fair premium} (in units of stake) for the move.\footnote{At $-110$, a ``ten-cent'' surcharge corresponds to $\approx 4.5\%$ of stake in EV terms for near-even events; see also empirical pricing discussions in \cite{Boyds-KeyNumbers,Inpredictable-Distribution}.}
+
+\section{Moneyline versus $-2$: an EV comparison}
+Write $b_{\mathrm{ML}}=100/125=0.8$. A unit-stake expected value is
+\[
+\mathrm{EV}(-2;\,b)=b\,P_{>2}-P_{<2},\qquad \mathrm{EV}(\mathrm{ML};\,b_{\mathrm{ML}})=b_{\mathrm{ML}}\,p_{\mathrm{ML}}-(1-p_{\mathrm{ML}}).
+\]
+With the inputs above,
+\[
+\mathrm{EV}(-2;\,-110)=0.909\cdot 0.492-0.488=-0.0407\ (\!-4.07\%\!),\qquad \mathrm{EV}(\mathrm{ML};\,-125)=0.8\cdot 0.532-0.468=-0.0424.
+\]
+Both wagers, at listed juice, are $\sim\!{-}4\%$ EV---as expected---with a negligible $0.17\%$ edge to the spread in this snapshot. The \emph{analytic} ML-vs-spread difference is
+\[
+\Delta\mathrm{EV}=(1+b_{\mathrm{ML}})\underbrace{(p_1+p_2)}_{\text{ML captures}}-\Big((1+b)-(1+b_{\mathrm{ML}})\Big)P_{>2}-p_2,
+\]
+which, upon substitution, reproduces the numeric gap above. Intuition: ML pays for the $\{1,2\}$ band that a $-2$ spread does not (it either pushes at $2$ or loses at $1$), but ML also carries different juice and forgoes push equity.
+
+\section{Middling around two (the $-1.5/+2.5$ middle)}
+Stake one unit each on Favorite $-1.5$ at $-a_1$ ($b_1=100/a_1$) and Dog $+2.5$ at $-a_2$ ($b_2=100/a_2$). Outcomes:
+\begin{itemize}[leftmargin=2em]
+\item If $M=2$: \emph{both win} $\Rightarrow$ profit $b_1+b_2$.
+\item Otherwise exactly one wins $\Rightarrow$ net loss $\ell:=\min\{1-b_1,1-b_2\}$ (with symmetric $-110/-110$, $\ell=0.0909$).
+\end{itemize}
+Hence
+\[
+\mathrm{EV}=(b_1+b_2)\,p_2-(1-p_2)\,\ell,\qquad 
+p_2^{\star}=\frac{\ell}{b_1+b_2+\ell}.
+\]
+At $-110/-110$, $b_1=b_2=0.909$, $\ell=0.0909\Rightarrow p_2^{\star}\approx 0.0476$. Thus if $\Pr(M=2)\gtrsim 4.8\%$, the middle is +EV; with sharper \mbox{$-105/-105$}, the threshold falls further.
+
+\section{Calibration and backtesting guidance}
+\begin{enumerate}[leftmargin=2em,label=\arabic*.]
+\item \textbf{Baseline fit:} Estimate $(\mu,\sigma)$ of a continuous margin model conditional on closing spreads in a window around $2$, then discretize as in \eqref{eq:disc-normal}.
+\item \textbf{Endgame mixture:} Add a light component that inflates $\{2,3,4,5\}$ proportional to situational features (pace, timeout inventory, coaching tendencies, two-point conversion rates).
+\item \textbf{Posterior update:} Incorporate any private edge $\delta$ by setting $\mu=s+\delta$ and re-discretizing.
+\item \textbf{Validation:} Backtest ML vs.\ small spreads, bought points around $2$, and middles; compare realized frequencies of $M\in\{1,2\}$ to model-implied.%
+\footnote{Public summaries of key numbers and their temporal drift are useful sanity checks \cite{Boyds-KeyNumbers,Action-KeyNumbers-2024}.}
+\item \textbf{Dashboard implementation:} Given a live book snapshot, compute (i) vig-removed $p_{\mathrm{ML}}$, (ii) spread-conditional $p_1,p_2$, (iii) fair $-2$ odds and point-buy premia, (iv) ML vs.\ $-2$ EV comparison, (v) middle thresholds; highlight mispricings across books.
+\end{enumerate}
+
+\section*{Bankroll sizing (Kelly)}
+For net win $b$, loss $1$, with push probability $r$ and win/loss probabilities $(q,\ell)$ satisfying $q+\ell+r=1$, the edge is $bq-\ell$ and the (fractional) Kelly stake is
+\[
+f^\star=\frac{bq-\ell}{b}.
+\]
+Apply to a spread (take $q=P_{>2},\ \ell=P_{<2},\ r=P_{=2}$) or to a middle by viewing the pair as a single two-point outcome instrument (double-win vs.\ split).
+
+\section*{Conclusions}
+Around the two-point line, (i) the favorite’s fair $-2$ price is essentially even money if $p_1$ and $p_2$ are each near $2\%$, (ii) the fair value of $-2\!\to\!-1.5$ is $b\,p_2$ and of $-2.5\!\to\!-2$ is $p_2$, and (iii) a canonical $-1.5/+2.5$ middle requires $p_2\gtrsim 4.8\%$ at $-110/-110$. With DK’s Week 4 snapshot, ML and spread both carry $\sim\!{-}4\%$ EV at posted juice; choice should be driven by your calibrated $\{1,2\}$ mass, price differences across books, and portfolio considerations. The discrete, push-aware algebra here slots directly into a backtestable, production dashboard.
+
+\bigskip
+
+% References
+\bibliographystyle{abbrv}
+\bibliography{analysis/nfl_analysis_01/refs}
+
+\end{document}

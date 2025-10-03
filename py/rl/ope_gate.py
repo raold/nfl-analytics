@@ -1,0 +1,108 @@
+"""
+Offline RL promotion gate.
+
+Reads a one-step logged dataset CSV and computes SNIS and DR estimates across
+grids of clipping and shrinkage. Emits a JSON report with stability checks and
+an accept/reject decision.
+
+Dataset CSV must include columns: action, r, b_prob, pi_prob; optional: edge
+
+Usage:
+  python py/rl/ope_gate.py --dataset data/rl_logged.csv --output reports/ope_gate.json \
+      --grid-clips 5,10,20 --grid-shrinks 0.0,0.1,0.2 --alpha 0.05
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import os
+from dataclasses import dataclass, asdict
+from typing import List, Tuple, Dict
+
+import pandas as pd
+
+try:
+    from .ope import snis, dr
+except Exception:  # allow running as a script without packages
+    import importlib.util
+    from pathlib import Path
+    OPE_PATH = Path(__file__).resolve().parent / "ope.py"
+    spec = importlib.util.spec_from_file_location("ope", str(OPE_PATH))
+    _mod = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(_mod)
+    snis, dr = _mod.snis, _mod.dr
+
+
+@dataclass
+class GateConfig:
+    clips: List[float]
+    shrinks: List[float]
+    alpha: float = 0.05
+
+
+@dataclass
+class GateResult:
+    accept: bool
+    median_dr: float
+    stable: bool
+    grid: Dict[str, Dict[str, float]]
+    note: str
+
+
+def parse_args() -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="Offline RL OPE promotion gate (stub)")
+    ap.add_argument("--dataset", required=True, help="Path to logged dataset (stub)")
+    ap.add_argument("--policy", required=True, help="Path to candidate policy artifact (stub)")
+    ap.add_argument("--output", required=True, help="Path to JSON report output")
+    ap.add_argument("--grid-clips", default="5,10,20", help="Comma-separated clip thresholds")
+    ap.add_argument("--grid-shrinks", default="0.5,0.8,1.0", help="Comma-separated shrink scales")
+    ap.add_argument("--alpha", type=float, default=0.05, help="Lower-bound level")
+    return ap.parse_args()
+
+
+def _grid(values: str) -> List[float]:
+    return [float(x.strip()) for x in values.split(",") if x.strip()]
+
+
+def evaluate_grid(df: pd.DataFrame, clips: List[float], shrinks: List[float]) -> Tuple[float, Dict[str, Dict[str, float]], bool]:
+    grid: Dict[str, Dict[str, float]] = {}
+    dr_vals: List[float] = []
+    for c in clips:
+        for s in shrinks:
+            key = f"c{int(c)}_s{str(s).replace('.', '')}"
+            sn = snis(df, clip=c, shrink=s)
+            de = dr(df, clip=c, shrink=s)
+            grid[key] = {"snis": sn["value"], "dr": de["value"], "ess": sn["ess"]}
+            dr_vals.append(de["value"])
+    dr_vals_sorted = sorted(dr_vals)
+    median_dr = dr_vals_sorted[len(dr_vals_sorted) // 2]
+    # Stability: require all DR values around the top quartile to share sign
+    top = [v for v in dr_vals_sorted[int(0.75 * len(dr_vals_sorted)) :]] or dr_vals_sorted
+    signs = [v > 0.0 for v in top]
+    stable = all(signs) or not any(signs)
+    return median_dr, grid, stable
+
+
+def run_gate(df: pd.DataFrame, cfg: GateConfig) -> GateResult:
+    median_dr, grid, stable = evaluate_grid(df, cfg.clips, cfg.shrinks)
+    # Simple accept: median DR > 0 and stability holds
+    accept = stable and (median_dr > 0.0)
+    note = "SNIS/DR grid with clipping/shrinkage; accept requires stability and positive median DR"
+    return GateResult(accept=accept, median_dr=median_dr, stable=stable, grid=grid, note=note)
+
+
+def main() -> None:
+    args = parse_args()
+    cfg = GateConfig(clips=_grid(args.grid_clips), shrinks=_grid(args.grid_shrinks), alpha=args.alpha)
+    df = pd.read_csv(args.dataset)
+    res = run_gate(df, cfg)
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    with open(args.output, "w", encoding="utf-8") as f:
+        json.dump(asdict(res), f, indent=2)
+    print(f"[gate] accept={res.accept} median_dr={res.median_dr:.4f} stable={res.stable} -> {args.output}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,15 @@
+{
+  "hash": "777d38f8b557966a04295b8b3b4311e3",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"12 – Risk Sizing via CVaR\"\nformat:\n  html:\n    code-fold: true\nexecute-dir: project\nexecute:\n  echo: true\n  warning: false\n  message: false\nparams:\n  sims: 20000\n  alpha: 0.95\n  output_dir: \"analysis/dissertation/figures/out\"\n---\n\n\n\n## Goal\nDemonstrate converting per-bet inputs into scenario returns and solving a CVaR sizing LP.\n\n## 1. Prepare example bets\n\n\n::: {.cell}\n\n```{.r .cell-code}\ndir.create(\"data\", showWarnings = FALSE)\nbets_path <- file.path(\"data\", \"bets.csv\")\nreadr::write_csv(\n  tibble::tibble(\n    game_id = c(\"G1\",\"G2\",\"G3\"),\n    mu_home = c(24, 23, 21),\n    mu_away = c(21, 20, 22),\n    spread = c(-3, -2.5, +1.5),\n    side = c(+1, +1, -1),\n    price_decimal = c(1.91, 1.86, 1.91)\n  ),\n  bets_path\n)\nbets_path\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n[1] \"data/bets.csv\"\n```\n\n\n:::\n:::\n\n\n\n## 2. Generate scenarios and solve CVaR LP\n\n\n::: {.cell}\n\n```{.r .cell-code}\nscenarios_path <- file.path(\"data\", \"scenarios.csv\")\njson_out <- file.path(\"analysis\", \"reports\", \"cvar_stakes.json\")\ndir.create(dirname(json_out), recursive = TRUE, showWarnings = FALSE)\n\nok1 <- try(system2(\"python\", c(\"py/risk/generate_scenarios.py\", \"--bets\", bets_path, \"--output\", scenarios_path, \"--sims\", params$sims)), silent = TRUE)\nok2 <- try(system2(\"python\", c(\"py/risk/cvar_lp.py\", \"--scenarios\", scenarios_path, \"--alpha\", params$alpha, \"--output\", json_out)), silent = TRUE)\nif (file.exists(json_out)) {\n  res <- jsonlite::fromJSON(json_out)\n  print(res)\n}\n```\n:::\n\n\n\n## 3. Notes\n- For production runs, replace example bets with model outputs and expand to full slates.\n- If `cvxpy` is available, wire `py/risk/cvar_lp.py` to use it; otherwise the stub falls back to a simple heuristic.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

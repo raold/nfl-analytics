@@ -1,0 +1,54 @@
+---
+title: "12 – Risk Sizing via CVaR"
+format:
+  html:
+    code-fold: true
+execute-dir: project
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  sims: 20000
+  alpha: 0.95
+  output_dir: "analysis/dissertation/figures/out"
+---
+
+## Goal
+Demonstrate converting per-bet inputs into scenario returns and solving a CVaR sizing LP.
+
+## 1. Prepare example bets
+```{r}
+dir.create("data", showWarnings = FALSE)
+bets_path <- file.path("data", "bets.csv")
+readr::write_csv(
+  tibble::tibble(
+    game_id = c("G1","G2","G3"),
+    mu_home = c(24, 23, 21),
+    mu_away = c(21, 20, 22),
+    spread = c(-3, -2.5, +1.5),
+    side = c(+1, +1, -1),
+    price_decimal = c(1.91, 1.86, 1.91)
+  ),
+  bets_path
+)
+bets_path
+```
+
+## 2. Generate scenarios and solve CVaR LP
+```{r}
+scenarios_path <- file.path("data", "scenarios.csv")
+json_out <- file.path("analysis", "reports", "cvar_stakes.json")
+dir.create(dirname(json_out), recursive = TRUE, showWarnings = FALSE)
+
+ok1 <- try(system2("python", c("py/risk/generate_scenarios.py", "--bets", bets_path, "--output", scenarios_path, "--sims", params$sims)), silent = TRUE)
+ok2 <- try(system2("python", c("py/risk/cvar_lp.py", "--scenarios", scenarios_path, "--alpha", params$alpha, "--output", json_out)), silent = TRUE)
+if (file.exists(json_out)) {
+  res <- jsonlite::fromJSON(json_out)
+  print(res)
+}
+```
+
+## 3. Notes
+- For production runs, replace example bets with model outputs and expand to full slates.
+- If `cvxpy` is available, wire `py/risk/cvar_lp.py` to use it; otherwise the stub falls back to a simple heuristic.

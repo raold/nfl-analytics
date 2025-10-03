@@ -1,0 +1,164 @@
+%------------------------------------------------------------
+%  Tufte-style handout layout for readable measure + margin notes
+%  Compile with: pdflatex -> bibtex (if using .bib) -> pdflatex -> pdflatex
+%------------------------------------------------------------
+\PassOptionsToPackage{numbers,sort&compress}{natbib}
+\documentclass[letterpaper,sfsidenotes]{tufte-handout}
+
+% Font & micro-typography (you can switch to XeLaTeX/LuaLaTeX if you prefer)
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+
+% Math & tables
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+
+% Graphics (supports margin figures)
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+
+% Hyperlinks
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
+% If you prefer BibTeX + natbib, uncomment these lines and use \citet/\citep
+% \usepackage[numbers,sort&compress]{natbib}
+% \bibliographystyle{plainnat}
+
+% --- Quality-of-life macros for margin notes & structure ---
+% Convenience: margin-exposition blocks (bold label + text)
+\newcommand{\marginexplain}[2][]{%
+  \marginpar[\footnotesize \textbf{#1}~#2]{\footnotesize \textbf{#1}~#2}
+}
+
+% A “new thought” drop lead (Tufte style)
+% Provided by `tufte-handout`; ensured here in case derivative classes unset it.
+\providecommand{\newthought}[1]{\textsc{#1}}
+
+% Full-width floats (for wide tables/figures)
+% Wrap large tables/figures with \begin{fullwidth} ... \end{fullwidth}
+
+% Title
+\title{Discrete Margin Modeling and Beyond:\\
+A Readable, Margin-Note Edition for Football Betting Analysis}
+\author{Richard Oldham}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% Optional: a brief note in the margin about line length / readability
+\marginexplain[Readable line length]{Traditional research layouts often run
+  90–100+ characters per line. This handout keeps the main text near
+  60–75 characters per line (a widely-cited ergonomic range), improving
+  scanning speed and reducing eye strain.}
+
+% Abstract in main column; quick context in the margin
+\begin{abstract}
+We present a Tufte-style edition of the paper to improve readability via a narrow
+main text block and rich margin notes for exposition, references, and context.
+All technical content (discrete margin modeling, teaser/alt-line pricing, ML pipelines,
+Bayesian hierarchical modeling, and the ensembling framework) is unchanged;
+the presentation is optimized for human factors.
+\end{abstract}
+
+\section{How to Use This Layout}
+\newthought{Sidenotes vs.\ footnotes.}
+All footnotes are now margin \emph{sidenotes}.
+Write \verb|\footnote{...}| as usual; it will render in the outer margin with ample room
+for exposition, derivations, or further reading.
+\marginexplain[Tip]{Use the margin to carry intuition, examples, and short proofs so the main
+argument flows. Keep main text tight; let the margin teach.}
+
+\subsection{Margin figures and tables}
+Use \verb|\begin{marginfigure}...\end{marginfigure}| for small figures in the margin,
+and \verb|\begin{fullwidth}...\end{fullwidth}| for wide tables/figures that need extra space.
+
+\begin{marginfigure}
+  \includegraphics{example-image-a}%
+  \caption{A margin figure (e.g., a key-number histogram for NFL margins).
+  Use small, high-contrast visuals here.}
+\end{marginfigure}
+
+\begin{fullwidth}
+\begin{table}
+  \centering
+  \caption{Example full-width table for alt-line ladders or teaser payout menus.}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    Market & Offered Odds & Fair Odds & EV \\
+    \midrule
+    Two-leg 6-pt Teaser & $-120$ & $-112$ & $+3.6\%$ \\
+    Alt-Spread Parlay   & $-125$ & $-118$ & $+3.0\%$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{fullwidth}
+
+\subsection{Recommended packages and compile path}
+This template uses \texttt{tufte-handout}. It works with pdf\LaTeX.
+If you switch to Xe\LaTeX/Lua\LaTeX you can load system fonts (e.g., \texttt{fontspec})—
+but keep microtypography (\texttt{microtype}) on for best spacing.
+
+\section{Drop-in Replacement for Your Paper}
+Replace your previous \verb|article| document with this one by copying your content
+into the sections below. All math, theorems, and figures work unchanged. Your bibliography
+can remain as \verb|thebibliography| or you may switch to BibTeX/biblatex.
+
+% ----------- BEGIN YOUR PAPER CONTENT -----------
+\section{Introduction}
+% Paste your original Introduction here.
+% Example margin context:
+\sidenote{Key-number intuition: NFL margins cluster at 3 and 7; the value of crossing
+these thresholds drives teaser/alt-line EV.}
+Point-spread betting in American football often revolves around key numbers (3, 7).
+% ... (rest of your original text)
+
+\section{Alternative Strategies Similar to Wong Teasers}
+% Paste your Section 2 here
+% Add margin commentary as exposition:
+\marginexplain[Market microstructure]{Modern books dynamically price teasers.
+Replicate teaser moves with alt-lines when the ladder is softer than the teaser menu.}
+% ... (rest of your original text)
+
+\section{Machine-Learning Pipelines to Simulate NFL and NCAA Outcomes}
+% Paste your Section 3 here
+% ... (rest of your original text)
+
+\section{Bayesian Hierarchical Modeling for Dynamic Team Strength}
+% Paste your Section 4 here
+% ... (rest of your original text)
+
+\section{Ensembling Heterogeneous Predictive Models for NFL Betting Decisions}
+% Paste the new ensembling section here (the one we just wrote).
+% Margin note example:
+\sidenote{Blend at the \emph{probability} level via linear pools, BMA, or
+log-score-optimal stacking; gate weights by context (totals/weather/season stage).}
+% ... (rest of your ensembling text)
+
+\section{Integrated Workflow and Strategy Deployment}
+% Paste your Section 6 (was 5 before adding ensembles)
+% ... (rest of your original text)
+
+\section{Conclusion}
+% Paste your conclusion
+% ... (rest of your original text)
+% ----------- END YOUR PAPER CONTENT -----------
+
+% Bibliography: either your existing thebibliography or BibTeX
+% (A) Keep your manual bibliography:
+\begin{thebibliography}{99}
+\bibitem{Wong2001} Wong, Stanford. \emph{Sharp Sports Betting}. Pi Yee Press, 2001.
+% ... (paste the rest of your entries)
+\end{thebibliography}
+
+% (B) Or switch to BibTeX + natbib:
+% \bibliography{refs}
+
+\end{document}

@@ -1,0 +1,11 @@
+project:
+  type: default
+
+execute:
+  freeze: auto
+  cache: true
+
+metadata:
+  params:
+    start_season: 1999
+    end_season: 2024

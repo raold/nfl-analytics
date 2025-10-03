@@ -1,0 +1,330 @@
+\chapter{Reinforcement Learning Framework}
+\label{chap:rl}
+
+We articulate the reinforcement-learning (RL) architecture that converts predictive edges into sequential betting policies. Emphasis is placed on safe offline training, interpretability, and integration with classical baselines.
+
+\paragraph{Acronym hygiene.} We spell out acronyms on first use and then keep them concise: off‑policy evaluation (OPE), conservative Q‑learning (CQL), implicit Q‑learning (IQL), TD3 with behavior cloning (TD3+BC) \citep{fujimoto2021td3bc}, and advantage‑weighted actor–critic (AWAC) \citep{nair2020awac}. Where tables list many methods, captions expand names and footnotes include citations.
+
+\section{State of the Art (At a Glance)}
+Practical RL for pre-game betting draws on a small set of robust families. We summarize where each fits this problem:
+\begin{itemize}
+  \item \textbf{Value-based (DQN/Double DQN, Dueling, PER):} discrete actions, data efficiency via replay; good for stake buckets when action spaces are small \citep{mnih2015,vanhasselt2016,wang2016dueling,schaul2016per}.
+  \item \textbf{Actor--critic (TRPO/PPO/GAE):} stable on-policy updates with variance reduction; safer promotion when online interaction is allowed (e.g., paper trading) \citep{schulman2015trpo,schulman2016gae,schulman2017ppo}.
+  \item \textbf{Deterministic/entropy-regularized control (TD3/SAC):} continuous actions with strong sample efficiency and stability; useful for continuous stake sizing \citep{fujimoto2018td3,haarnoja2018sac}.
+  \item \textbf{Distributional critics (C51/QR-DQN/IQN):} model return distributions, often improving stability and calibration of value targets \citep{bellemare2017distributional,dabney2018quantile}.
+  \item \textbf{Offline RL (BCQ/BRAC/BEAR/CQL/IQL/TD3+BC):} learn solely from logged data; essential for betting where unsafe exploration is disallowed \citep{fujimoto2019,wu2019brac,kumar2019bear,kumar2020,kostrikov2021iql,agarwal2020offline,levine2020}.
+\end{itemize}
+For NFL betting we operate primarily in the \emph{offline} regime with conservative promotion gates; when continuous stakes are needed we embed TD3/SAC backbones under offline regularizers, otherwise we use bucketed actions with double/dueling critics and pessimistic objectives.
+
+\subsection*{Why IQL (in practice)}
+We use implicit Q-learning (IQL) as the default offline learner because it:
+\begin{itemize}
+  \item avoids explicit behavior-policy density ratios (robust when logging propensities are noisy),
+  \item emphasizes high-advantage actions via expectile regression, reducing extrapolation error,
+  \item trains stably with minimal tuning and integrates cleanly with conservative sizing and promotion gates.
+\end{itemize}
+We compare against CQL and TD3+BC in ablations and promote the most stable model under OPE bounds.
+
+% --- Mathematical reasoning: RL and OPE ---
+\section{Foundations: MDPs, Value Functions, and Contractions}\label{sec:bellman-math}
+We model betting as a discounted Markov decision process (MDP) $(\mathcal S,\mathcal A, P, r, \gamma)$ where $s\in\mathcal S$ encodes market and team context, $a\in\mathcal A$ encodes a stake decision subject to exposure limits, $P$ governs state transitions across the calendar, $r$ encodes realized log-wealth increments net of frictions, and $\gamma\in(0,1)$ discounts over weeks.
+The action-value and state-value functions are
+\[
+Q^\pi(s,a)=\E\!\left[\sum_{t\ge0}\gamma^t r_{t}\,\middle|\,s_0=s, a_0=a,\pi\right],\quad V^\pi(s)=\E\_{a\sim\pi(\cdot\mid s)}[Q^\pi(s,a)].
+\]
+The Bellman optimality operator $(\mathcal{T}Q)(s,a)=\E\![r+\gamma\max\_{a'}Q(s',a')\mid s,a]$ is a $\gamma$-contraction in $\|\cdot\|_\infty$, so value iteration converges to $Q^\star$; in practice we stabilize bootstrapping with target networks and replay buffers \citep{sutton2018,mnih2015,vanhasselt2016}.
+
+\section{Off-Policy Evaluation (OPE)}\label{sec:ope}
+With behavior $\pi_b$, target $\pi$, and trajectories $\{(s_t,a_t,r_t)\}$, importance ratios
+$\rho_t=\pi(a_t\mid s_t)/\pi_b(a_t\mid s_t)$ yield the self-normalized estimator
+\[
+\hat V_{\text{SNIS}}=\frac{\sum_i \rho_i R_i}{\sum_i \rho_i},\qquad R_i=\sum_t r_{i,t}.
+\]
+The doubly robust (DR) estimator augments IPS with a learned $Q_{\hat\omega}$:
+\[
+\hat V_{\text{DR}}=\frac{1}{N}\sum_{i,t}\Big[ Q_{\hat\omega}(s_{i,t},\pi(s_{i,t}))
++ \rho_{i,t}\big(r_{i,t}+\gamma V_{\hat\omega}(s_{i,t+1})-Q_{\hat\omega}(s_{i,t},a_{i,t})\big)\Big],
+\]
+which is unbiased if either the model or the ratios are correct \citep{dudik2014,jiang2016,thomas2015}.
+
+\paragraph{Clipping and shrinkage settings (used).} We use per-decision, self-normalized ratios with clipping and shrinkage:
+\begin{itemize}
+  \item Per-decision ratios are clipped at $c\in\{5,10,20\}$. Reported point estimates use $c=10$; promotion requires rankings to be stable across $c\in[5,20]$.
+  \item We also adaptively set $c$ to the smallest value that achieves an effective sample size $\mathrm{ESS}=\tfrac{(\sum w)^2}{\sum w^2}\ge 0.2N$ within each fold.
+  \item For DR, we apply weight shrinkage $\tilde \rho=\rho/(1+\lambda\rho)$ with $\lambda\in\{0,0.1,0.2\}$; $\lambda=0.1$ is the default.
+\end{itemize}
+This makes the variance–bias tradeoff explicit; sensitivity curves (bound vs. $c,\lambda$) are part of the promotion gate.
+
+\subsection{Policy Gradient and Actor--Critic}\label{subsec:pgt}
+For differentiable policy $\pi_\theta$, the performance $J(\theta)=\E_\theta[\sum_t \gamma^t r_t]$
+has gradient
+\[
+\nabla_\theta J(\theta) = \E_\theta\!\left[\sum_t \nabla_\theta \log \pi_\theta(a_t\mid s_t)\,Q^{\pi_\theta}(s_t,a_t)\right].
+\]
+Using advantage $A^{\pi_\theta}=Q^{\pi_\theta}-V^{\pi_\theta}$ reduces variance. We employ generalized advantage estimation and entropy regularization; PPO optimizes the clipped surrogate for stability \citep{schulman2016gae,schulman2017ppo}. Trust-region and constrained variants enforce small policy updates or satisfaction of budget constraints \citep{schulman2015trpo,achiam2017cpo}.
+
+\subsection{Value-Based Methods and Offline RL}\label{subsec:cql}
+Deep Q-learning with target networks and replay learns $Q_\theta$ from TD errors; Double Q-learning mitigates overestimation bias, dueling networks separate value and advantage streams, and prioritized replay focuses on informative transitions \citep{vanhasselt2016,wang2016dueling,schaul2016per}. For continuous actions we use TD3/SAC-style actors with entropy regularization \citep{fujimoto2018td3,haarnoja2018sac}. Distributional critics (IQN) can improve stability and calibration of value targets \citep{bellemare2017distributional,dabney2018quantile}.
+
+In the offline setting with dataset $\mathcal D$, distributional shift leads to extrapolation error. Behavior regularization and batch constraints restrict actions to the data support (BCQ/BRAC/IQL), while pessimistic objectives downweight unsupported actions; CQL optimizes
+Let $\mathcal{D}$ be an offline dataset, $\hat Q_\theta$ a Q-network. CQL optimizes
+\begin{equation*}
+\resizebox{0.96\linewidth}{!}{$
+\min_\theta\ \alpha\,\E_s\!\left[\log\!\sum_a \exp\hat Q_\theta(s,a) - \E_{a\sim\mathcal{D}} \hat Q_\theta(s,a)\right]
++ \E_{(s,a,r,s')\sim\mathcal{D}}\!\Big[\big(r+\gamma \max_{a'}\hat Q_{\bar\theta}(s',a')-\hat Q_\theta(s,a)\big)^2\Big]
+$}
+\end{equation*}
+which penalizes over-estimation on actions outside the dataset support \citep{fujimoto2019,kumar2019bear,kumar2020,wu2019brac,kostrikov2021iql,levine2020,agarwal2020offline}.
+
+\section{Problem Formulation for NFL Betting}
+Each episode represents a season segmented by bettable events. The state vector includes model probabilities, market prices, bankroll allocation, and contextual covariates (weather, rest, injuries). Actions specify bet size, market selection, or deferral, while rewards capture bankroll growth adjusted for transaction costs.
+
+\subsection{Reward Shaping and Constraints}
+Raw profit-and-loss is sparse and noisy. We augment with shaped rewards that credit CLV improvements and penalize variance beyond a risk budget. Constraint penalties enforce exposure limits per market and per week, reflecting real liquidity constraints.
+
+\section{Offline RL Pipeline and Datasets}
+Historical seasons provide logged trajectories. We apply conservative batch RL algorithms (CQL, BCQ) to mitigate distributional shift and use importance-sampling diagnostics to ensure coverage. Hyperparameter sweeps run on GPU-backed instances with reproducible seeds.
+
+\subsection{Action Space and Policy Class}
+We study discrete stake buckets (no bet, small, medium, large) and structured actions that allow combinations across markets subject to exposure caps. Policies include dueling DQN for discrete actions and an actor--critic variant for continuous stakes, with entropy regularization to encourage exploration during training.
+
+\section{Risk-Sensitive Objectives and Controls}
+To prevent catastrophic drawdowns, we introduce:
+\begin{itemize}
+  \item Posterior-variance gating using ensemble predictive intervals.
+  \item CVaR-constrained policy optimization, limiting tail risk exposure.
+  \item Rule-based overrides (e.g.\ pause bets after consecutive losses exceeding threshold).
+\end{itemize}
+CVaR objectives can be handled via convex approximations (Chapter~\ref{chap:risk}); constrained policy optimization keeps budgets and drawdown limits satisfied \citep{achiam2017cpo,tamar2015cvar}.
+
+\section{Off-Policy Evaluation Details}
+We implement per-decision IS, self-normalized IS, and DR estimators with clipping/shrinkage; for small-sample safety we compute HCOPE-style lower confidence bounds \citep{thomas2015}. Nested CV reduces optimism by separating reward-model fitting from evaluation. These diagnostics gate model promotion to simulation and paper-trading phases.
+
+\begin{example}[Worked DR OPE on a toy trajectory]
+Two-step bandit. Logged propensities: $\pi_b(a_0\mid s_0)=0.6$, $\pi_b(a_1\mid s_1)=0.5$; target propensities: $\pi(a_0\mid s_0)=0.8$, $\pi(a_1\mid s_1)=0.4$. Rewards: $r_0=0.02$, $r_1=-0.01$, $\gamma=1$. Per-decision ratios: $\rho_0=0.8/0.6\approx1.333$, $\rho_1=0.4/0.5=0.8$. Cumulative weights are $w_0=\rho_0$, $w_1=\rho_0\rho_1\approx1.333\times0.8=1.0664$. The self-normalized per-decision IPS is
+\[\hat V_{\text{SNIS}}=\frac{w_0 r_0 + w_1 r_1}{w_0+w_1}=\frac{1.333\cdot0.02 + 1.0664\cdot(-0.01)}{1.333+1.0664}\approx 0.0067.\]
+With a critic $Q(s_0,a_0)=0.015$, $V(s_1)=0.004$, $Q(s_1,a_1)=0.003$, the DR correction term is
+\[\begin{aligned}
+&\rho_0\,[r_0+V(s_1)-Q(s_0,a_0)] + \rho_1\,[r_1+0-Q(s_1,a_1)]\\
+&\quad\approx 1.333\,(0.02+0.004-0.015) + 0.8\,(-0.01-0.003) \approx 0.0016.
+\end{aligned}\]
+The DR estimate equals $Q(s_0,\pi(s_0))$ plus this correction; if $Q(s_0,\pi(s_0))\!=\!0.014$, then $\hat V_{\text{DR}}\approx 0.0156$, illustrating variance reduction when the model is reasonable \citep{dudik2014,jiang2016}.
+\end{example}
+
+\begin{algorithm}[t]
+  \caption{Offline RL Promotion Gate (DR/HCOPE + Sensitivity)}
+  \label{alg:ope-gate}
+  \begin{algorithmic}[1]
+    \Require dataset $\mathcal D$; candidate policy $\pi$; behavior policy estimate $\hat\pi_b$; critic $Q_{\hat\omega}$; clip grid $\mathcal C$; shrink grid $\mathcal S$; lower‑bound level $\alpha$
+    \Ensure decision Accept/Reject with report (point estimates, CIs, sensitivity)
+    \State Compute per‑decision ratios $\rho_t\leftarrow\pi(a_t\mid s_t)/\hat\pi_b(a_t\mid s_t)$
+    \ForAll{$(c,s)\in\mathcal C\times\mathcal S$}
+      \State Form clipped/shrunk ratios $\tilde\rho_t(c,s)$
+      \State Compute SNIS and DR estimates using $Q_{\hat\omega}$ and $\tilde\rho_t(c,s)$
+      \State Bootstrap sequences (block by week) to get CI and HCOPE lower bound $L_{\alpha}(c,s)$
+    \EndFor
+    \State Sensitivity pass: require $L_{\alpha}(c,s)>0$ for a neighborhood of $(c,s)$; flag instability if sign flips
+    \State \textbf{Accept} if stability holds and median DR $>0$ with sufficient magnitude; otherwise \textbf{Reject}
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Learning curves and hyperparameter sensitivity}
+We report training curves (return vs. gradient steps) with shaded interquartile bands and study sensitivity to key hyperparameters (entropy scale, target smoothing, clipping). Figure~\ref{fig:rl-curves} shows typical convergence; Figure~\ref{fig:hparam-sens} shows EV under a grid.
+\begin{figure}[t]
+  \centering
+  \IfFileExists{../figures/rl_learning_curves.png}{\includegraphics[width=0.85\linewidth]{../figures/rl_learning_curves.png}}{\fbox{\parbox{0.8\linewidth}{\centering Learning curves placeholder}}}
+  \caption{Offline RL learning curves (median and IQR across seeds).}
+  \label{fig:rl-curves}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \IfFileExists{../figures/hparam_sensitivity.png}{\includegraphics[width=0.85\linewidth]{../figures/hparam_sensitivity.png}}{\fbox{\parbox{0.8\linewidth}{\centering Hyperparameter sensitivity grid placeholder}}}
+  \caption{Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}
+  \label{fig:hparam-sens}
+\end{figure}
+
+\section{Interpretability and Monitoring}
+Policy rationales are logged via counterfactual action-value explanations and feature attributions derived from SHAP on the value network inputs. Production monitoring compares live performance to counterfactual baselines and flags deviations beyond control limits.
+
+\section{MDP Specification Details (NFL)}
+State vectors include calibrated probabilities, CBV, volatility proxies, bankroll state, and time context. Actions are stake buckets per market subject to exposure caps. Rewards combine realized PnL, CLV improvements, and risk penalties for variance/drawdowns.
+We treat correlated markets (spread, total, correlated parlays) via multi-action compositions with portfolio variance penalties; partial observability (injuries/weather) is mitigated by including nowcasts and uncertainty measures in the state.
+
+\section{Conservative Q-Learning (CQL) Objective}
+We adopt a pessimistic objective that downweights unsupported actions by penalizing Q‑values on unseen transitions. This reduces overestimation in offline settings and stabilizes policy learning under dataset shift.
+
+\section{Batch-Constrained Policies}
+Policies are constrained to remain close to the behavior policy inferred from logged data. This prevents out‑of‑distribution actions with unreliable value estimates, especially critical when liquidity regimes differ between training and deployment.
+
+\section{Hyperparameters and Stability}
+Target network smoothing, gradient clipping, prioritized replay, and conservative entropy schedules are used to stabilize training. We monitor TD error distributions and Q‑value ranges to detect divergence.
+
+\section{NFL-Specific Design Patterns}
+\begin{itemize}
+  \item \textbf{State}: model probabilities, CBV, line velocity, cross-book deltas, roster/nowcast uncertainty, bankroll and weekly risk budget.
+  \item \textbf{Actions}: stake buckets per market with exposure caps; composite actions for correlated legs are regularized by portfolio variance.
+  \item \textbf{Reward}: log-wealth increments net vig/slippage; shaping terms for CLV improvements; penalties for budget breaches.
+  \item \textbf{Offline training}: conservative algorithms (BCQ/CQL/TD3+BC) with action constraints; dataset diagnostics for coverage and logging policy drift.
+  \item \textbf{OPE gating}: DR lower bounds and sensitivity to clipping; promotion requires bounds above threshold and stable variance.
+\end{itemize}
+
+\section{Offline RL Workflow (Schematic)}
+\begin{figure}[t]
+  \centering
+  \setlength{\tabcolsep}{8pt}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{c}
+    \fbox{\parbox{0.88\linewidth}{\centering Logged seasons (states, actions, rewards, prices) \\ \scriptsize de-duplicated, as-of features, friction labels}} \\[4pt]
+    $\Downarrow$ \scriptsize dataset diagnostics (coverage, behavior policy drift) \\[4pt]
+    \fbox{\parbox{0.88\linewidth}{\centering Offline RL algorithm (BCQ/BRAC/BEAR/CQL/IQL/TD3+BC) \\ \scriptsize pessimism/behavior regularization + hyperparameter sweeps}} \\[4pt]
+    $\Downarrow$ \scriptsize off-policy evaluation (PD-IS, SNIS, DR, HCOPE) \\[4pt]
+    \fbox{\parbox{0.88\linewidth}{\centering Promotion gate: DR lower bound $>\tau$ and sensitivity stable \\ \scriptsize nested CV; clipping/shrinkage sweeps}} \\[4pt]
+    $\Downarrow$ \scriptsize policy frozen; no parameter changes \\[4pt]
+    \fbox{\parbox{0.88\linewidth}{\centering Simulator (frictions, dependence, correlated legs) \\ \scriptsize bankroll, CVaR, drawdown envelopes}} \\[4pt]
+    $\Downarrow$ \scriptsize accept/reject \& rollout
+  \end{tabular}
+  \caption{End-to-end offline RL workflow from data to promotion.}
+  \label{fig:rl-workflow}
+\end{figure}
+
+The schematic in \Cref{fig:rl-workflow} is the promotion gate we use week‑to‑week. In prose:
+\begin{enumerate}
+  \item \textbf{Build logged dataset.} Construct as‑of features and labels (edge, prices, frictions). Deduplicate at the game–book–timestamp grain and stamp behavior policy meta (book/share of fills) for coverage checks.
+  \item \textbf{Audit coverage and drift.} Report action‑space support (per bucket), covariate shift w.r.t. prior cohorts, and logging‑policy drift. If support is thin for any high‑stake bucket, down‑weight or collapse it.
+  \item \textbf{Train conservative offline RL.} Fit IQL/CQL/TD3+BC/AWAC with pessimism/behavior regularization. Sweep hyperparameters; prefer simpler models that pass stress checks over marginally better but unstable ones.
+  \item \textbf{Off‑policy evaluation (OPE).} Estimate value using SNIS and DR with clipping/shrinkage, plus high‑confidence bounds. We inspect sensitivity curves (bound vs. clipping) and reject models whose rank is unstable.
+  \item \textbf{Promotion decision.} Require DR lower bound $>\tau$ on multiple folds and stability to reasonable clip ranges. Freeze artefacts; no parameter edits post‑gate.
+  \item \textbf{Simulator acceptance tests.} Before capital, run the frozen policy in the simulator with historical‑calibrated margins, copula dependence, and friction regimes. Reject on drawdown/variance rule breaches.
+  \item \textbf{Rollout and monitor.} Deploy with exposure caps; track realized CLV, variance, and failure alarms. Fall back to last known‑good policy on anomaly.
+\end{enumerate}
+
+\section{Design Choices for NFL Constraints}
+\begin{table}[t]
+  \centering
+  \small
+  \begingroup\hbadness=10000\hfuzz=1pt
+  \begin{threeparttable}
+    \caption{NFL constraints and the resulting design choices.}
+    \label{tab:rl-mapping-nfl}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} p{0.33\linewidth} X @{} }
+      \toprule
+      \textbf{NFL challenge} & \textbf{RL/analytics design} \\
+      \midrule
+      Correlated legs (spread+total/SGP) & Composite actions with portfolio variance penalty; dependence via copula in simulator; OPE gating for multi-leg exposure \\
+      Slippage and vig & Reward uses log-wealth net frictions; friction-aware Kelly; pessimistic OPE to avoid illusory edge \\
+      Partial observability (injury/weather nowcasts) & Include uncertainty features in state; conservative sizing under wider predictive intervals (variance gates) \\
+      Limited liquidity/exposure caps & Constrained updates (CPO-style), explicit exposure caps in action space; budget penalties \\
+      Distribution shift across seasons & Offline RL with behavior regularization or pessimism (BRAC/BEAR/CQL/IQL); dataset coverage diagnostics \\
+      Safety/promotion & DR/HCOPE bounds; nested CV; sensitivity to clipping and shrinkage; stop if unstable \\
+      Key-number effects & Score-distribution layer + reweighting; simulator-aware pricing for teasers/middles \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight\sloppy
+      \item Abbreviations: CPO = Constrained Policy Optimization; OPE = Off-Policy Evaluation; DR = Doubly Robust.
+      \item HCOPE = High-Confidence OPE; SGP = Same-Game Parlay.
+    \end{tablenotes}
+  \end{threeparttable}
+  \endgroup
+\end{table}
+% Ensure BibTeX retains these citations even if table notes are reflowed or filtered
+\nocite{fujimoto2019,wu2019brac,kumar2019bear,kumar2020,kostrikov2021iql,fujimoto2021td3bc,nair2020awac}
+
+The table above captures the design rationale; here we expand on each choice:
+\begin{itemize}
+  \item \textbf{Correlated legs.} For spread+total/SGP we model dependence via Gaussian/$t$ copulas over margin and total, then penalize basket variance in the objective. OPE and simulator checks ensure correlation risk is priced before promotion.
+  \item \textbf{Slippage and vig.} Rewards are net of frictions; Kelly sizing uses effective odds $b'$. Sensitivity is run on a grid of frictions with promotion blocked if gains vanish under pessimistic settings.
+  \item \textbf{Partial observability.} State includes uncertainty features (interval widths, posterior variance). We down‑weight actions when predictive dispersion widens and restrict to safer buckets late‑breaking weeks.
+  \item \textbf{Liquidity/exposure caps.} The action space encodes explicit stake caps per market and a budget penalty. CPO‑style constrained updates and post‑promotion exposure rules prevent concentration risk.
+  \item \textbf{Distribution shift.} We prefer behavior‑regularized or pessimistic objectives (BRAC/BEAR/CQL/IQL) and run coverage diagnostics; unsupported actions are de‑emphasized or removed.
+  \item \textbf{Safety/promotion.} DR/HCOPE bounds must clear a threshold with stable sensitivity to clipping/shrinkage; we stop if instability is detected even when point estimates look favorable.
+  \item \textbf{Key‑number effects.} The score‑distribution layer with key‑number reweighting supplies coherent prices and risk for teasers/middles; policies consult these prices before composing multi‑leg actions.
+\end{itemize}
+
+\section{Ablation: RL vs. Stateless Kelly‑LCB}\label{sec:rl-vs-baseline}
+We compare the RL policy to a stateless baseline: place a bet when comparative book value (CBV) exceeds a threshold $\tau$ and size stakes as $\kappa\cdot$Kelly using a lower‑confidence bound (LCB) for $p$. This tests whether RL exploits sequential dependencies (e.g., budget, exposure, and calendar effects) beyond what a well‑tuned stateless rule achieves.
+
+\paragraph{Metrics and setup.} On 2020--2024 we report Brier/CLV/ROI/Max drawdown and a utilization‑adjusted Sharpe that accounts for idle weeks. Policies are frozen on validation and evaluated on holdout weeks.
+
+\IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{%
+  \begin{table}[t]
+    \centering
+    \caption{Core ablation (placeholder): RL vs stateless baseline across seasons; columns are Brier, CLV (bps), ROI (\%), Max DD (\%).}
+    \begin{tabular}{lrrrr}
+      \toprule
+      Policy & Brier $\downarrow$ & CLV (bps) $\uparrow$ & ROI (\%) $\uparrow$ & Max DD (\%) $\downarrow$ \\
+      \midrule
+      Kelly‑LCB (CBV\,$>\,\tau$) & -- & -- & -- & -- \\
+      RL (IQL/CQL/TD3+BC) & -- & -- & -- & -- \\
+      \bottomrule
+    \end{tabular}
+  \end{table}}
+
+\paragraph{Pessimism sensitivity.} Equation~8.1.2 uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.
+
+\IfFileExists{../figures/out/alpha_sensitivity_panel.png}{%
+  \begin{figure}[t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{../figures/out/alpha_sensitivity_panel.png}
+    \caption{Sensitivity of growth/drawdown to pessimism level $\alpha$ in Kelly‑LCB and the RL policy’s calibration to $p$ uncertainty.}
+    \label{fig:alpha-sensitivity}
+  \end{figure}
+}{\begin{center}\textit{[Alpha sensitivity panel will be generated by notebooks/80\_rl\_ablation.qmd]}\end{center}}
+
+\paragraph{Utilization‑adjusted Sharpe.} If a system is deployed 52 weeks but bets only $W$ weeks, we report
+\[\mathrm{Sharpe}_{\mathrm{util}} = \mathrm{Sharpe}_{\mathrm{active}}\times\sqrt{\frac{W}{52}},\]
+to reflect annualized performance accounting for idle periods (cf. Table~10.2 zero‑bet weeks). We include this in the core ablation table.
+
+\paragraph{CVaR sizing complexity.} For portfolio sizing with CVaR constraints (\S\ref{chap:risk}), typical instances solve in sub‑second wall‑clock time on a laptop. As a concrete benchmark: $n=\,$100 bets, $B=\,$10{,}000 scenarios, solver=OSQP, time$\approx\,$0.4 s.\footnote{Typical benchmark on an M2 laptop: $n=100$, $B=10{,}000$, OSQP 0.6, warm‑started. Replace with your local run; a table \texttt{cvar\_benchmark\_table.tex} is included if present.}
+
+\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
+\IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}
+
+\subsection{RL vs Strategic Responses (Bridge)}
+We treat the policy as a small, price‑taking agent: odds are exogenous and our actions do not move markets. This matches the offline RL setting and typical pre‑game stake sizes. If stakes were large enough to affect prices or limits, a Stackelberg model would be required with the bookmaker as leader and the policy as follower; training and OPE would then incorporate price‑impact and inventory dynamics (left as future work).
+
+\chaptersummary{
+We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance.
+}{
+Chapter~\ref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
+}
+
+\section{Offline RL Methods at a Glance}
+\begin{table}[t]
+  \centering
+  \small
+  \begingroup\hbadness=10000\hfuzz=1pt
+  \begin{threeparttable}
+    \caption{Common offline RL algorithms and their trade-offs for betting-style decision problems.}
+    \label{tab:offline-rl-glance}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} p{0.20\linewidth} X X X @{} }
+      \toprule
+      \textbf{Method} & \textbf{Core idea/objective} & \textbf{Regularization/safety} & \textbf{Pros / Cons} \\
+      \midrule
+      BCQ\tnote{1} & Constrain actions to a generative model of dataset support; pessimistic Q backup & Action support constraint via VAE + perturbation & + Avoids OOD actions; – May under-explore profitable rare actions \\
+      BRAC\tnote{2} & Penalize deviation from behavior distribution in policy improvement & KL/\(f\)-divergence to behavior policy & + Simple; – Tuning regularizer critical \\
+      BEAR\tnote{3} & Match action distributions with MMD; conservative targets & MMD penalty between policy and behavior & + Strong stability; – Kernel choice/sensitivity \\
+      CQL\tnote{4} & Pessimistically lower Q on unseen actions via log-sum-exp regularizer & Implicit pessimism on unsupported actions & + Robust under shift; – Can be overly conservative \\
+      IQL\tnote{5} & Value/advantage expectiles; in-sample advantage-weighted actor & In-sample learning (no explicit behavior model) & + Simple, scalable; – Hyperparameters affect bias \\
+      TD3+BC\tnote{6} / AWAC\tnote{7} & Augment actor loss with behavior cloning or advantage weights & Behavior cloning / advantage weighting & + Easy retrofit to TD3; – May revert to imitation \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight\sloppy
+      \item[1] \citet{fujimoto2019}.
+      \item[2] \citet{wu2019brac}.
+      \item[3] \citet{kumar2019bear}.
+      \item[4] \citet{kumar2020}.
+      \item[5] \citet{kostrikov2021iql}.
+      \item[6] \citet{fujimoto2021td3bc}.
+      \item[7] \citet{nair2020awac}.
+    \end{tablenotes}
+  \end{threeparttable}
+  \endgroup
+\end{table}
+\chaptersummary{
+We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
+}{
+Chapter~\ref{chap:risk} formalizes stake sizing and portfolio risk controls; Chapter~\ref{chap:sim} validates policies under dependence and frictions before promotion.
+}

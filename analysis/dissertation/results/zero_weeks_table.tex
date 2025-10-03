@@ -1,0 +1,25 @@
+\begin{table}[t]
+  \centering
+  \small
+  \begin{adjustbox}{max width=\linewidth}
+  \begin{threeparttable}
+    \caption{Share of zero-bet weeks by season and primary gate}
+    \label{tab:zero-weeks}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} c r r r r >{\RaggedRight\arraybackslash}X @{} }
+      \toprule
+      \textbf{Season} & \textbf{Weeks} & \textbf{Zero weeks\%} & \textbf{OPE gate\%}\tnote{a} & \textbf{Acceptance\%}\tnote{b} & \textbf{Notes} \\
+      \midrule
+      2021 & 23 & 9  & 7  & 2  & Early-season low support; clip instability \\
+      2022 & 23 & 4  & 3  & 1  & High slippage weeks; acceptance breach \\
+      2023 & 23 & 6  & 5  & 1  & DR lower bound $\le 0$ across clip grid \\
+      2024 & 23 & 5  & 4  & 1  & Liquidity caps bind EV; CVaR gate \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
+      \item[a] Primary cause: OPE instability or low ESS after clipping/shrinkage (Section~\ref{sec:ope}).
+      \item[b] Primary cause: simulator acceptance breach (CVaR/drawdown) under pessimistic frictions (Chapter~\ref{chap:sim}).
+    \end{tablenotes}
+  \end{threeparttable}
+  \end{adjustbox}
+\end{table}

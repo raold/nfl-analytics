@@ -1,0 +1,232 @@
+---
+title: "04 – Score Model Validation: Key Numbers"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  train_range: [2015, 2023]
+  test_range: [2020, 2024]
+  output_dir: "analysis/dissertation/figures/out"
+---
+
+## Goal
+Validate key-number reweighting by testing integer-margin frequencies out-of-sample and reporting teaser EV deltas. Outputs feed Chapter 4.
+
+## 1. Data and helpers
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(DBI)
+library(RPostgres)
+library(glue)
+library(knitr)
+
+dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
+
+get_games <- function(min_season, max_season) {
+  con <- tryCatch({
+    dbConnect(
+      Postgres(),
+      dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+      host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+      port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+      user     = Sys.getenv("POSTGRES_USER", "dro"),
+      password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+    )
+  }, error = function(e) NULL)
+  on.exit({ if (!is.null(con)) try(dbDisconnect(con), silent = TRUE) }, add = TRUE)
+  if (is.null(con)) return(NULL)
+  # Detect if total_close exists
+  has_total <- tryCatch({
+    q <- dbGetQuery(con, "SELECT column_name FROM information_schema.columns WHERE table_name = 'games' AND column_name = 'total_close'")
+    nrow(q) > 0
+  }, error = function(e) FALSE)
+  sel <- if (has_total) {
+    "SELECT season, week, game_id, home_score, away_score, spread_close, total_close FROM games WHERE season BETWEEN $1 AND $2"
+  } else {
+    "SELECT season, week, game_id, home_score, away_score, spread_close FROM games WHERE season BETWEEN $1 AND $2"
+  }
+  df <- tryCatch(dbGetQuery(con, sel, params = list(min_season, max_season)), error = function(e) NULL)
+  df
+}
+
+skellam_pmf <- function(d, lambda, mu) {
+  # Skellam pmf using Bessel I_k; fallback to approx if needed
+  b <- suppressWarnings(besselI(2*sqrt(lambda*mu), abs(d)))
+  exp(-(lambda + mu)) * (lambda / mu)^(d/2) * b
+}
+
+reweight_key <- function(pmf, support, keys, targets, moment_preserve = TRUE, iters = 200) {
+  # Iterative proportional fitting to match key targets on an aggregated pmf.
+  # Returns a global weight vector w_d applied to any game's pmf over the same support.
+  w <- rep(1, length(pmf))
+  idx <- match(keys, support, nomatch = 0)
+  base <- pmf / sum(pmf)
+  for (it in seq_len(iters)) {
+    p <- base * w; p <- p / sum(p)
+    for (j in seq_along(keys)) {
+      k <- idx[j]
+      if (k > 0 && p[k] > 0) {
+        ratio <- targets[j] / p[k]
+        w[k] <- w[k] * ratio
+      }
+    }
+    w <- pmax(w, 1e-8)
+    if (moment_preserve) {
+      p <- base * w; p <- p / sum(p)
+      m <- sum(support * p); s2 <- sum((support - m)^2 * p)
+      m0 <- sum(support * base); s20 <- sum((support - m0)^2 * base)
+      # small blend toward baseline moments
+      alpha <- 0.2
+      target_m <- (1 - alpha) * m0 + alpha * m
+      target_s2 <- (1 - alpha) * s20 + alpha * s2
+      # Correct first moment by distributing mass linearly near center
+      delta_m <- target_m - m
+      w <- w * (1 + 0.0005 * (support - m) * sign(delta_m))
+      # Correct variance by gently widening/narrowing
+      delta_s <- target_s2 - s2
+      w <- w * (1 + 0.0005 * ((support - m)^2) * sign(delta_s))
+    }
+  }
+  w / sum(base * w)  # normalize so that sum(base * w) = 1
+}
+```
+
+## 2. Fit baseline Skellam on train; evaluate on test
+```{r}
+games <- get_games(min(params$train_range), max(params$test_range))
+
+if (is.null(games) || nrow(games) == 0) {
+  message("No DB; writing placeholder tables/figures.")
+  # Placeholder chi-square table
+  ks <- data.frame(Model = c("Skellam (baseline)", "Skellam + reweight"), Chisq = NA_real_, p_value = NA_real_)
+  writeLines(knitr::kable(ks, format = "latex", booktabs = TRUE, caption = "Chi-square at key margins (placeholder).", col.names = c("Model", "$\\chi^2$", "p-value")),
+             con = file.path(params$output_dir, "keymass_chisq_table.tex"))
+  # Placeholder teaser EV table
+  tev <- data.frame(Model = c("Skellam (baseline)", "Skellam + reweight"), Mean_EV_bps = NA_real_, ROI = NA_real_)
+  writeLines(knitr::kable(tev, format = "latex", booktabs = TRUE, caption = "Teaser EV/ROI (placeholder)."),
+             con = file.path(params$output_dir, "teaser_ev_oos_table.tex"))
+  # Placeholder ablation table
+  abl <- data.frame(Config = c("without reweighting", "with reweighting"), Brier = NA_real_, ATS_acc = NA_real_)
+  writeLines(knitr::kable(abl, format = "latex", booktabs = TRUE, caption = "With/without reweighting ablation (placeholder)."),
+             con = file.path(params$output_dir, "reweighting_ablation_table.tex"))
+  # Placeholder figure
+  png(file.path(params$output_dir, "integer_margin_calibration.png"), width = 900, height = 500)
+  plot.new(); text(0.5, 0.5, "Placeholder: integer-margin calibration")
+  dev.off()
+} else {
+  games <- games |> mutate(margin = home_score - away_score,
+                           total_obs = home_score + away_score)
+  train <- games |> filter(season >= params$train_range[1], season <= params$train_range[2])
+  test  <- games |> filter(season >= params$test_range[1],  season <= params$test_range[2])
+
+  # Use total_close if available; otherwise use season-average observed total from train
+  season_total_mean <- train |>
+    group_by(season) |>
+    summarise(total_mean = mean(total_obs, na.rm = TRUE), .groups = "drop")
+  test <- test |>
+    left_join(season_total_mean, by = "season") |>
+    mutate(total_close = ifelse(!is.na(total_close), total_close, total_mean))
+
+  # Per-game Skellam parameters using spread and total
+  # margin mean = lambda - mu = spread_close; total mean = lambda + mu = total_close
+  # solve: lambda = (total + spread)/2, mu = (total - spread)/2
+  test <- test |>
+    mutate(lambda = pmax((total_close + spread_close)/2, 1e-6),
+           mu     = pmax((total_close - spread_close)/2, 1e-6))
+
+  support <- -40:40
+
+  # Aggregate baseline pmf over train (league-level) for reweighting targets
+  # Compute empirical key targets from train
+  keys <- c(3,6,7,10)
+  key_targets <- sapply(keys, function(k) mean(train$margin == k))
+
+  # Baseline aggregate pmf from train using season-level lambdas as proxy
+  lam_tr <- mean(train$home_score); mu_tr <- mean(train$away_score)
+  pmf_train_base <- skellam_pmf(support, lam_tr, mu_tr); pmf_train_base <- pmf_train_base / sum(pmf_train_base)
+
+  # Compute global key weights w_d from train
+  w_d <- reweight_key(pmf_train_base, support, keys, key_targets)
+
+  # Per-game predicted pmfs on test
+  pmf_mat_base <- sapply(1:nrow(test), function(i) {
+    p <- skellam_pmf(support, test$lambda[i], test$mu[i]); p / sum(p)
+  })
+  pmf_mat_rw <- (pmf_mat_base * w_d) # broadcast w_d across columns
+  pmf_mat_rw <- sweep(pmf_mat_rw, 2, colSums(pmf_mat_rw), FUN = "/")
+
+  # Aggregate predicted probabilities at keys (expected counts)
+  idx_keys <- match(keys, support)
+  exp_counts_base <- colSums(matrix(pmf_mat_base[idx_keys, , drop = FALSE], nrow = length(keys)))
+  exp_counts_base <- sum(pmf_mat_base[idx_keys, ])  # sum over all games -> expected count across dataset
+  exp_counts_rw   <- sum(pmf_mat_rw[idx_keys, ])
+  # Observed counts at keys
+  obs_counts <- sapply(keys, function(k) sum(test$margin == k))
+  obs_total_keys <- sum(obs_counts)
+
+  # Chi-square using game-wise expected counts at keys
+  # Compute expected counts per key separately
+  exp_counts_base_vec <- sapply(1:length(keys), function(j) sum(pmf_mat_base[idx_keys[j], ]))
+  exp_counts_rw_vec   <- sapply(1:length(keys), function(j) sum(pmf_mat_rw[idx_keys[j], ]))
+
+  chisq_stat <- function(obs, exp) {
+    exp <- pmax(exp, 1e-6)
+    sum((obs - exp)^2 / exp)
+  }
+  cs_base <- chisq_stat(obs_counts, exp_counts_base_vec)
+  cs_rw   <- chisq_stat(obs_counts, exp_counts_rw_vec)
+  p_base <- pchisq(cs_base, df = length(keys) - 1, lower.tail = FALSE)
+  p_rw   <- pchisq(cs_rw,   df = length(keys) - 1, lower.tail = FALSE)
+
+  ks <- tibble(Model = c("Skellam (baseline)", "Skellam + reweight"), `\\(\\chi^2\\)` = c(round(cs_base,2), round(cs_rw,2)), `p-value` = c(round(p_base,3), round(p_rw,3)))
+  writeLines(knitr::kable(ks, format = "latex", booktabs = TRUE, caption = "Chi-square at key margins (holdout)."),
+             con = file.path(params$output_dir, "keymass_chisq_table.tex"))
+
+  # Integer-margin calibration figure (aggregated)
+  agg_base <- rowMeans(pmf_mat_base)
+  agg_rw   <- rowMeans(pmf_mat_rw)
+  obs_tbl <- as.data.frame(table(factor(test$margin, levels = support))) |>
+    rename(d = Var1, n = Freq) |>
+    mutate(d = as.integer(as.character(d)), obs = n / sum(n))
+  df_plot <- tibble(d = support, baseline = agg_base, reweighted = agg_rw) |>
+    filter(d >= -20 & d <= 20) |>
+    pivot_longer(-d, names_to = "model", values_to = "p")
+  p <- ggplot(df_plot, aes(x = d, y = p, color = model)) +
+    geom_line() + geom_point(data = obs_tbl |> filter(d >= -20 & d <= 20), aes(x = d, y = obs), inherit.aes = FALSE, color = "black", size = 1) +
+    geom_vline(xintercept = keys, linetype = "dashed", alpha = 0.2) +
+    labs(x = "Margin d", y = "Probability", title = "Integer-margin calibration (holdout)") +
+    theme_minimal(base_size = 12)
+  ggsave(file.path(params$output_dir, "integer_margin_calibration.png"), p, width = 9, height = 5, dpi = 200)
+
+  # ATS/Brier using pmfs
+  p_cover_base <- colSums(sapply(1:nrow(test), function(i) as.numeric(support + test$spread_close[i] > 0) * pmf_mat_base[, i]))
+  p_cover_rw   <- colSums(sapply(1:nrow(test), function(i) as.numeric(support + test$spread_close[i] > 0) * pmf_mat_rw[, i]))
+  y_cover      <- as.integer(test$margin + test$spread_close > 0)
+  brier <- function(p,y) mean((p - y)^2)
+  ats_acc <- function(p,y) mean(ifelse(p >= 0.5, 1, 0) == y)
+  abl <- tibble(
+    Config = c("without reweighting", "with reweighting"),
+    Brier = c(round(brier(p_cover_base, y_cover), 4), round(brier(p_cover_rw, y_cover), 4)),
+    ATS_acc = c(round(ats_acc(p_cover_base, y_cover), 3), round(ats_acc(p_cover_rw, y_cover), 3))
+  )
+  writeLines(knitr::kable(abl, format = "latex", booktabs = TRUE, caption = "With/without reweighting ablation (ATS/Brier on holdout)."),
+             con = file.path(params$output_dir, "reweighting_ablation_table.tex"))
+
+  # Teaser EV (independence approximation): 2-leg, 6-point, d = 1.8
+  d_pay <- 1.8
+  s_tease <- test$spread_close + 6  # tease home side favorably
+  q_base <- colSums(sapply(1:nrow(test), function(i) as.numeric(support + s_tease[i] > 0) * pmf_mat_base[, i]))
+  q_rw   <- colSums(sapply(1:nrow(test), function(i) as.numeric(support + s_tease[i] > 0) * pmf_mat_rw[, i]))
+  ev2_base <- d_pay * mean(q_base^2) - 1
+  ev2_rw   <- d_pay * mean(q_rw^2) - 1
+  tev <- tibble(Model = c("Skellam (baseline)", "Skellam + reweight"), `Mean EV (bps)` = round(c(ev2_base, ev2_rw) * 10000, 1), ROI = NA_real_)
+  writeLines(knitr::kable(tev, format = "latex", booktabs = TRUE, caption = "Two-leg teaser EV (independence approx.) on holdout."),
+             con = file.path(params$output_dir, "teaser_ev_oos_table.tex"))
+}
+```

@@ -1,0 +1,41 @@
+services:
+  pg:
+    # use a valid TimescaleDB image tag—this one tracks the latest PG16 build
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: dro
+      POSTGRES_PASSWORD: sicillionbillions
+      POSTGRES_DB: devdb01
+    ports:
+      - "5544:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h localhost -p 5432",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+      args:
+        - QUARTO_VERSION=1.6.35
+    environment:
+      POSTGRES_HOST: pg
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: devdb01
+      POSTGRES_USER: dro
+      POSTGRES_PASSWORD: sicillionbillions
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    depends_on:
+      pg:
+        condition: service_healthy
+    command: bash -lc "sleep infinity"

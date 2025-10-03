@@ -1,0 +1,308 @@
+---
+title: "00 – Timeframe Ablation"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  eval_season: 2024
+  half_lives: [3, 4, 5]
+  recent_start: 2015
+  full_start: 1999
+  train_end: 2023
+  output_dir: "analysis/dissertation/figures/out"
+---
+
+## Overview
+This notebook produces the exhibits used to justify the analysis timeframe and era‑weighting strategy:
+
+- Weight vs season curve for half‑lives `H ∈ {3,4,5}` and an ESS table.
+- Rolling out‑of‑sample (blocked TSCV) performance comparing recent‑only vs decayed‑full training.
+- 2024 head‑to‑head Diebold–Mariano‑style comparison and reliability curves.
+
+It assumes a local TimescaleDB with a `games` table containing final scores and closing spreads. If the connection fails, the notebook will still render the weighting/ESS figures and write placeholder tables.
+
+## 1. Decay Weights and ESS
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(readr)
+library(purrr)
+library(knitr)
+library(glue)
+
+dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
+
+exp_weight <- function(s, t, H) 0.5 ^ ((t - s) / H)
+
+seasons <- seq(params$full_start, params$eval_season)
+
+weights_df <- expand_grid(season = seasons, H = params$half_lives) |>
+  mutate(weight = exp_weight(season, params$eval_season, H))
+
+p <- ggplot(weights_df, aes(x = season, y = weight, color = factor(H))) +
+  geom_line(linewidth = 1) +
+  geom_point(data = subset(weights_df, season %in% c(min(seasons), params$eval_season)), size = 2) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 0.1)) +
+  scale_color_brewer(palette = "Set1", name = "Half-life (H)") +
+  labs(x = "Season", y = "Relative weight vs eval season",
+       title = glue("Exponential decay weights centered on {params$eval_season}")) +
+  theme_minimal(base_size = 12)
+
+ggsave(filename = file.path(params$output_dir, "time_decay_weights.png"), plot = p,
+       width = 8, height = 4.5, dpi = 200)
+
+# ESS in season-units (assumes 1 equal-mass observation per season)
+ess_tbl <- weights_df |>
+  group_by(H) |>
+  summarise(
+    sum_w = sum(weight),
+    sum_w2 = sum(weight^2),
+    ess = (sum_w^2) / sum_w2,
+    .groups = "drop"
+  ) |>
+  mutate(ess = round(ess, 1))
+
+ess_tbl
+
+# Write a LaTeX table that the dissertation includes conditionally
+ess_tex <- knitr::kable(
+  ess_tbl,
+  format = "latex",
+  booktabs = TRUE,
+  caption = "Effective sample size (season units) under exponential decay centered on the evaluation season.",
+  col.names = c("Half-life H", "$\\sum w$", "$\\sum w^2$", "ESS (seasons)")
+)
+writeLines(ess_tex, con = file.path(params$output_dir, "ess_table.tex"))
+```
+
+## 2. Assemble Data (scores and spreads)
+```{r}
+library(DBI)
+library(RPostgres)
+
+get_games <- function() {
+  con <- tryCatch({
+    dbConnect(
+      Postgres(),
+      dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+      host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+      port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+      user     = Sys.getenv("POSTGRES_USER", "dro"),
+      password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+    )
+  }, error = function(e) NULL)
+
+  on.exit({ if (!is.null(con)) try(dbDisconnect(con), silent = TRUE) }, add = TRUE)
+
+  if (is.null(con)) return(NULL)
+
+  sql <- "SELECT season, week, game_id, home_team, away_team, home_score, away_score, spread_close
+          FROM games
+          WHERE season BETWEEN $1 AND $2"
+  res <- tryCatch(dbGetQuery(con, sql, params = list(params$full_start, params$eval_season)), error = function(e) NULL)
+  res
+}
+
+games <- get_games()
+
+if (is.null(games) || nrow(games) == 0) {
+  message("No DB connection or empty result. Proceeding with placeholders for modeling figures.")
+} else {
+  games <- games |>
+    mutate(
+      margin = home_score - away_score,
+      spread_target = if_else(!is.na(spread_close), as.integer(margin + spread_close > 0), NA_integer_)
+    ) |>
+    filter(!is.na(spread_target), !is.na(spread_close))
+}
+```
+
+## 3. Rolling TSCV: recent-only vs decayed-full
+```{r}
+library(broom)
+
+calc_ece <- function(y, p, bins = 10) {
+  df <- tibble(y = y, p = p) |>
+    mutate(bin = cut(p, breaks = seq(0, 1, length.out = bins + 1), include.lowest = TRUE)) |>
+    group_by(bin) |>
+    summarise(
+      n = n(),
+      p_hat = mean(p),
+      y_bar = mean(y),
+      .groups = "drop"
+    ) |>
+    filter(n > 0)
+  # Expected Calibration Error (ECE)
+  sum((df$n / sum(df$n)) * abs(df$p_hat - df$y_bar))
+}
+
+train_glm_weighted <- function(df, train_years, t_eval, H = NULL, recent_only_start = NULL) {
+  dtr <- df |>
+    filter(season %in% train_years)
+  if (!is.null(recent_only_start)) {
+    dtr <- dtr |>
+      filter(season >= recent_only_start)
+  }
+  if (nrow(dtr) == 0) return(NULL)
+  if (is.null(H)) {
+    dtr$sw <- 1
+  } else {
+    dtr$sw <- exp_weight(dtr$season, t_eval, H)
+  }
+  suppressWarnings(glm(spread_target ~ spread_close, data = dtr, family = binomial(), weights = sw))
+}
+
+predict_metrics <- function(mod, dte) {
+  if (is.null(mod) || is.null(dte) || nrow(dte) == 0) return(NULL)
+  p <- as.numeric(predict(mod, dte, type = "response"))
+  y <- dte$spread_target
+  ll <- - (y * log(p + 1e-15) + (1 - y) * log(1 - p + 1e-15))
+  tibble(p = p, y = y, ll = ll)
+}
+
+windows <- list(
+  list(train = 1999:2010, test = 2011:2014),
+  list(train = 2011:2014, test = 2015:2018),
+  list(train = 2015:2018, test = 2019:2021),
+  list(train = 2019:2021, test = 2022:2024)
+)
+
+rolling_metrics <- NULL
+
+if (!is.null(games) && nrow(games) > 0) {
+  rolling_metrics <- purrr::map_dfr(windows, function(w) {
+    tr_years <- w$train
+    te_years <- w$test
+    t_eval <- max(te_years)
+    dte <- games |> filter(season %in% te_years)
+
+    mod_rec <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = NULL, recent_only_start = params$recent_start)
+    mod_dec3 <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = 3)
+    mod_dec4 <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = 4)
+    mod_dec5 <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = 5)
+
+    m_rec <- predict_metrics(mod_rec, dte)
+    m_dec3 <- predict_metrics(mod_dec3, dte)
+    m_dec4 <- predict_metrics(mod_dec4, dte)
+    m_dec5 <- predict_metrics(mod_dec5, dte)
+
+    tibble(
+      block = glue("{min(te_years)}–{max(te_years)}"),
+      model = c("recent", "decH3", "decH4", "decH5"),
+      logloss = c(mean(m_rec$ll), mean(m_dec3$ll), mean(m_dec4$ll), mean(m_dec5$ll)),
+      ece = c(calc_ece(m_rec$y, m_rec$p), calc_ece(m_dec3$y, m_dec3$p), calc_ece(m_dec4$y, m_dec4$p), calc_ece(m_dec5$y, m_dec5$p))
+    )
+  })
+
+  # Plot rolling log loss
+  p_ll <- ggplot(rolling_metrics, aes(x = block, y = logloss, color = model, group = model)) +
+    geom_line(linewidth = 1) + geom_point() +
+    labs(x = "Evaluation block", y = "Log loss (mean)", color = "Model") +
+    theme_minimal(base_size = 12)
+  ggsave(file.path(params$output_dir, "rolling_oos_logloss.png"), p_ll, width = 8, height = 4.5, dpi = 200)
+
+  # Plot rolling ECE
+  p_ece <- ggplot(rolling_metrics, aes(x = block, y = ece, color = model, group = model)) +
+    geom_line(linewidth = 1) + geom_point() +
+    labs(x = "Evaluation block", y = "ECE (10 bins)", color = "Model") +
+    theme_minimal(base_size = 12)
+  ggsave(file.path(params$output_dir, "rolling_oos_ece.png"), p_ece, width = 8, height = 4.5, dpi = 200)
+}
+```
+
+## 4. 2024 Head-to-Head and Reliability
+```{r}
+dm_t_test <- function(loss_recent, loss_decayed) {
+  d <- loss_recent - loss_decayed
+  tt <- t.test(d, alternative = "two.sided")
+  tibble(delta_mean = mean(d), p_value = tt$p.value)
+}
+
+dm_results <- NULL
+
+if (!is.null(games) && nrow(games) > 0) {
+  holdout <- games |> filter(season == params$eval_season)
+  tr_years <- params$full_start:params$train_end
+
+  mod_rec <- train_glm_weighted(games, train_years = tr_years, t_eval = params$eval_season, H = NULL, recent_only_start = params$recent_start)
+  mod_dec <- lapply(params$half_lives, function(H) train_glm_weighted(games, train_years = tr_years, t_eval = params$eval_season, H = H))
+  names(mod_dec) <- paste0("H", params$half_lives)
+
+  m_rec <- predict_metrics(mod_rec, holdout)
+  m_list <- lapply(mod_dec, predict_metrics, dte = holdout)
+
+  dm_results <- purrr::imap_dfr(m_list, function(m, name) {
+    out <- dm_t_test(m_rec$ll, m$ll)
+    out$model <- paste0("decayed-", name)
+    out
+  }) |>
+    relocate(model)
+
+  # Reliability curves
+  rel_df <- bind_rows(
+    m_rec |> mutate(model = "recent"),
+    purrr::imap_dfr(m_list, ~ .x |> mutate(model = paste0("decayed-", .y)))
+  ) |>
+    mutate(bin = cut(p, breaks = seq(0, 1, length.out = 11), include.lowest = TRUE)) |>
+    group_by(model, bin) |>
+    summarise(p_hat = mean(p), y_bar = mean(y), n = n(), .groups = "drop")
+
+  p_rel <- ggplot(rel_df, aes(x = p_hat, y = y_bar, color = model)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50") +
+    geom_line() + geom_point() +
+    labs(x = "Predicted probability", y = "Observed frequency",
+         title = glue("Reliability on {params$eval_season} holdout")) +
+    coord_equal(xlim = c(0,1), ylim = c(0,1)) +
+    theme_minimal(base_size = 12)
+  ggsave(file.path(params$output_dir, "reliability_curves_timeframe.png"), p_rel, width = 6.5, height = 5, dpi = 200)
+
+  # DM table -> LaTeX
+  dm_tex <- knitr::kable(dm_results, format = "latex", booktabs = TRUE,
+                         caption = glue("Paired comparison vs recent-only on {params$eval_season} (t-test on per-game log loss differences)."),
+                         col.names = c("Model", "Mean loss delta (recent − decayed)", "p-value"))
+  writeLines(dm_tex, con = file.path(params$output_dir, "dm_test_table.tex"))
+} else {
+  # Placeholder DM table
+  dm_placeholder <- tibble(model = c("decayed-H3", "decayed-H4", "decayed-H5"), delta_mean = NA_real_, p_value = NA_real_)
+  dm_tex <- knitr::kable(dm_placeholder, format = "latex", booktabs = TRUE,
+                         caption = "Paired comparison vs recent-only on 2024 (placeholder; populate by connecting to DB).",
+                         col.names = c("Model", "Mean loss delta (recent − decayed)", "p-value"))
+  writeLines(dm_tex, con = file.path(params$output_dir, "dm_test_table.tex"))
+}
+```
+
+## 5. Optional: Cross-era generalization
+```{r}
+if (!is.null(games) && nrow(games) > 0) {
+  # Train old → test modern
+  tr_old <- 1999:2010; te_modern <- 2020:params$eval_season
+  mod_old <- train_glm_weighted(games, train_years = tr_old, t_eval = max(te_modern), H = NULL)
+  m_old <- predict_metrics(mod_old, games |> filter(season %in% te_modern))
+
+  # Train modern → test old
+  tr_mod <- 2015:2019; te_old <- 2005:2010
+  mod_mod <- train_glm_weighted(games, train_years = tr_mod, t_eval = max(te_old), H = NULL)
+  m_mod <- predict_metrics(mod_mod, games |> filter(season %in% te_old))
+
+  ce_tbl <- tibble(
+    experiment = c("train 1999–2010 → test 2020+", "train 2015–2019 → test 2005–2010"),
+    test_window = c(glue("{min(te_modern)}–{max(te_modern)}"), glue("{min(te_old)}–{max(te_old)}")),
+    mean_logloss = c(mean(m_old$ll), mean(m_mod$ll))
+  )
+
+  ce_tex <- knitr::kable(ce_tbl, format = "latex", booktabs = TRUE,
+                         caption = "Cross-era generalization: training on old vs modern eras.",
+                         col.names = c("Experiment", "Test window", "Mean log loss"))
+  writeLines(ce_tex, con = file.path(params$output_dir, "cross_era_generalization.tex"))
+}
+```
+
+## Notes
+- The modeling here uses a minimal logistic regression on `spread_close` to create a reproducible scaffold. In the dissertation, substitute your full feature set and model of record.
+- By default, the recent‑only model trains on `2015–2023`; the decayed‑full model trains on `1999–2023` with `H ∈ {3,4,5}` and centers weights on the evaluation season.
+- All figures and LaTeX tables are written under `analysis/dissertation/figures/out/` for inclusion by the chapters.
