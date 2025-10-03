@@ -48,27 +48,48 @@ def snis(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str,
 
 
 def _select_numeric_features(df: pd.DataFrame, drop: Sequence[str]) -> np.ndarray:
+    """Return numeric feature matrix with drops applied and NaNs filled to 0.
+
+    We prefer a simple, stable mapping for OPE diagnostics over exact modeling;
+    fill any NaNs/Infs with zeros to avoid numerical blow-ups.
+    """
     num_df = df.select_dtypes(include=[np.number]).copy()
     for col in drop:
         if col in num_df.columns:
             num_df.drop(columns=[col], inplace=True)
-    return num_df.to_numpy(dtype=float)
+    arr = num_df.to_numpy(dtype=float)
+    # Replace non-finite with zeros to be robust
+    arr = np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
+    return arr
 
 
 def _fit_outcome(df: pd.DataFrame) -> Dict[str, np.ndarray]:
-    """Ridge regression model for E[r | s, a=1] using available numeric features."""
-    mask = df["action"].to_numpy(dtype=bool)
-    if mask.sum() == 0:
+    """Stable ridge regression for E[r | s, a=1].
+
+    - Drops non-finite rows
+    - Uses small ridge and linear solve; falls back to zeros if ill-posed
+    """
+    mask_a1 = df["action"].to_numpy(dtype=bool)
+    if mask_a1.sum() < 5:
         return {"coef": np.zeros(1), "intercept": np.array([0.0])}
     X_full = _select_numeric_features(df, drop=["action", "r", "b_prob", "pi_prob"])
-    X = X_full[mask]
-    y = df.loc[mask, "r"].to_numpy(dtype=float)
-    # Add intercept
+    X = X_full[mask_a1]
+    y = df.loc[mask_a1, "r"].to_numpy(dtype=float)
+    # Keep only finite rows
+    finite = np.isfinite(y) & np.isfinite(X).all(axis=1)
+    X = X[finite]
+    y = y[finite]
+    if X.shape[0] < 5:
+        return {"coef": np.zeros(1), "intercept": np.array([0.0])}
+    # Add intercept and solve ridge
     Xd = np.hstack([np.ones((X.shape[0], 1)), X])
-    lam = 1e-3
+    lam = 1e-2
     XtX = Xd.T @ Xd + lam * np.eye(Xd.shape[1])
     Xty = Xd.T @ y
-    beta = np.linalg.solve(XtX, Xty)
+    try:
+        beta = np.linalg.solve(XtX, Xty)
+    except Exception:
+        return {"coef": np.zeros(1), "intercept": np.array([0.0])}
     return {"coef": beta[1:], "intercept": np.array([beta[0]])}
 
 
@@ -81,6 +102,7 @@ def dr(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str, f
     pars = _fit_outcome(df)
     X_full = _select_numeric_features(df, drop=["action", "r", "b_prob", "pi_prob"])
     q1 = (pars["intercept"][0] + (X_full @ pars["coef"]))
+    q1 = np.nan_to_num(q1, nan=0.0, posinf=0.0, neginf=0.0)
     # Policy value under model: E[Q(s,π(s))] ≈ E[p*q1 + (1-p)*0]
     v_model = np.mean(p * q1)
     # Importance term

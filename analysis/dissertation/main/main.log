@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  3 OCT 2025 10:41
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  3 OCT 2025 11:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1330,20 +1330,25 @@ e 7852.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 12.0pt on input line 186.
 
-(./main.aux
+(./main.aux)
+Runaway argument?
+{\contentsline {table}{\numberline {7.3}{\ignorespaces RL vs stateles\ETC.
+! File ended while scanning use of \@writefile.
+<inserted text> 
+                \par 
+l.186 \begin{document}
+                      
+I suspect you have forgotten a `}', causing me
+to read past where you wanted me to stop.
+I'll try to recover; but if the error is serious,
+you'd better type `E' or `X' now and fix your file.
 
-LaTeX Warning: Label `tab:cvar-benchmark' multiply defined.
-
-
-LaTeX Warning: Label `tab:cvar-benchmark@cref' multiply defined.
-
-)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/npxmi/m/it on input line 186.
 LaTeX Font Info:    Trying to load font information for OML+npxmi on input line
  186.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/omlnpxmi.fd
+(/usr/local/texlive/2025/texmf-dist/tex/latex/newpx/omlnpxmi.fd
 File: omlnpxmi.fd 2013/03/21 Fontinst v1.933 font definitions for OML/npxmi.
 )
 LaTeX Font Info:    ... okay on input line 186.
@@ -1751,12 +1756,22 @@ Chapter 3.
 
 ]
 
+LaTeX Warning: Reference `chap:risk' on page 2 undefined on input line 49.
+
+
+LaTeX Warning: Reference `chap:sim' on page 2 undefined on input line 49.
+
+
+
 [2]
 
 [3]) (../chapter_2_lit_review/chapter_2_lit_review.tex
 
 [4]
 Chapter 4.
+
+LaTeX Warning: Reference `chap:risk' on page 5 undefined on input line 5.
+
 
 
 [5
@@ -1766,6 +1781,9 @@ Chapter 4.
 [6]
 
 [7]
+
+LaTeX Warning: Reference `chap:risk' on page 8 undefined on input line 75.
+
 
 Package natbib Warning: Citation `skellam1946' on page 8 undefined on input lin
 e 80.
@@ -1800,6 +1818,9 @@ Underfull \hbox (badness 8094) in paragraph at lines 142--145
 [][]\T1/zpltlf/m/n/12 (+20) Section 4.1.5[][] in-tro-duces a small-score weight
 -ing to cor-rect de-pen-
  []
+
+
+LaTeX Warning: Reference `chap:sim' on page 10 undefined on input line 164.
 
 
 
@@ -1843,7 +1864,7 @@ Package natbib Warning: Citation `joe1997' on page 14 undefined on input line 2
 
 
 [14]
-<../figures/joint_exceedance_vs_rho.png, id=1133, 469.755pt x 289.08pt>
+<../figures/joint_exceedance_vs_rho.png, id=927, 469.755pt x 289.08pt>
 File: ../figures/joint_exceedance_vs_rho.png Graphic file (type png)
 <use ../figures/joint_exceedance_vs_rho.png>
 Package pdftex.def Info: ../figures/joint_exceedance_vs_rho.png  used on input 
@@ -1863,7 +1884,10 @@ e 324.
 
 
 [16 <../figures/joint_exceedance_vs_rho.png>]
-<../figures/reliability_diagram.png, id=1173, 469.755pt x 469.755pt>
+
+LaTeX Warning: Reference `chap:sim' on page 17 undefined on input line 341.
+
+<../figures/reliability_diagram.png, id=966, 469.755pt x 469.755pt>
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
@@ -1878,6 +1902,10 @@ Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
 [19]
 
 [20]
+
+LaTeX Warning: Reference `chap:risk' on page 21 undefined on input line 456.
+
+
 
 [21]
 Underfull \hbox (badness 1975) in paragraph at lines 468--470
@@ -1896,7 +1924,7 @@ e 476.
 
 
 [22]
-<../figures/key_number_pmf.png, id=1210, 505.89pt x 289.08pt>
+<../figures/key_number_pmf.png, id=1001, 505.89pt x 289.08pt>
 File: ../figures/key_number_pmf.png Graphic file (type png)
 <use ../figures/key_number_pmf.png>
 Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 546.
@@ -1919,52 +1947,60 @@ Package natbib Warning: Citation `stern1991' on page 23 undefined on input line
 
 [23 <../figures/key_number_pmf.png>]
 
-[24]
-
-Package natbib Warning: Citation `dixon1997' on page 25 undefined on input line
+Package natbib Warning: Citation `dixon1997' on page 24 undefined on input line
  557.
 
 
-Package natbib Warning: Citation `karlis2003' on page 25 undefined on input lin
+Package natbib Warning: Citation `karlis2003' on page 24 undefined on input lin
 e 558.
 
 
-Package natbib Warning: Citation `koopman2015' on page 25 undefined on input li
+Package natbib Warning: Citation `koopman2015' on page 24 undefined on input li
 ne 559.
 
 
-Package natbib Warning: Citation `lock2014' on page 25 undefined on input line 
+Package natbib Warning: Citation `lock2014' on page 24 undefined on input line 
 560.
 
 
-Package natbib Warning: Citation `sauer1998' on page 25 undefined on input line
+Package natbib Warning: Citation `sauer1998' on page 24 undefined on input line
  561.
 
 
-Package natbib Warning: Citation `levitt2004' on page 25 undefined on input lin
+Package natbib Warning: Citation `levitt2004' on page 24 undefined on input lin
 e 562.
 
 
-Package natbib Warning: Citation `szalkowski2012' on page 25 undefined on input
+Package natbib Warning: Citation `szalkowski2012' on page 24 undefined on input
  line 563.
 
 
-Package natbib Warning: Citation `nichols2014' on page 25 undefined on input li
+Package natbib Warning: Citation `nichols2014' on page 24 undefined on input li
 ne 564.
 
 
-Package natbib Warning: Citation `baio2010' on page 25 undefined on input line 
+Package natbib Warning: Citation `baio2010' on page 24 undefined on input line 
 565.
 
 
+
+[24]
 
 [25]
 
 [26]
 
-[27]
+LaTeX Warning: Reference `chap:sim' on page 27 undefined on input line 622.
 
-[28]) (../chapter_3_data_foundation/chapter_3_data_foundation.tex
+
+LaTeX Warning: Reference `fig:sim-teaser-surface' on page 1 undefined on input 
+line 622.
+
+
+
+[27]) (../chapter_3_data_foundation/chapter_3_data_foundation.tex
+
+[28]
 
 [29]
 Chapter 5.
@@ -1988,7 +2024,7 @@ LaTeX Info: Symbol \textrightarrow not provided by
 [31]
 
 [32]
-<../figures/feature_importance.png, id=1279, 1405.25pt x 903.375pt>
+<../figures/feature_importance.png, id=1068, 1405.25pt x 903.375pt>
 File: ../figures/feature_importance.png Graphic file (type png)
 <use ../figures/feature_importance.png>
 Package pdftex.def Info: ../figures/feature_importance.png  used on input line 
@@ -1999,15 +2035,24 @@ Package pdftex.def Info: ../figures/feature_importance.png  used on input line
 [33]
 
 [34 <../figures/feature_importance.png>]
-<../figures/out/time_decay_weights.png, id=1294, 1003.75pt x 562.1pt>
+<../figures/out/time_decay_weights.png, id=1082, 1003.75pt x 562.1pt>
 File: ../figures/out/time_decay_weights.png Graphic file (type png)
 <use ../figures/out/time_decay_weights.png>
 Package pdftex.def Info: ../figures/out/time_decay_weights.png  used on input l
 ine 189.
 (pdftex.def)             Requested size: 433.62001pt x 242.83044pt.
  (../figures/out/ess_table.tex)
+Overfull \hbox (2.31589pt too wide) in paragraph at lines 233--233
+ []|\T1/zpltlf/b/n/10 (-20) Books| 
+ []
+
+
+Overfull \hbox (13.2804pt too wide) in paragraph at lines 233--233
+ []|\T1/zpltlf/m/n/10 (-20) spread/total/ML| 
+ []
+
 LaTeX Font Info:    Font shape `T1/zpltlf/m/it' will be
-(Font)              scaled to size 10.0pt on input line 232.
+(Font)              scaled to size 10.0pt on input line 236.
 
 
 [35]) (../chapter_4_baseline_modeling/chapter_4_baseline_modeling.tex
@@ -2185,7 +2230,7 @@ Package natbib Warning: Citation `thomas2015' on page 48 undefined on input lin
 e 48.
 
 (../figures/out/ope_grid_table.tex
-Underfull \hbox (badness 10000) in alignment at lines 21--21
+Underfull \hbox (badness 10000) in alignment at lines 20--20
 [][][][][] 
  []
 
@@ -2268,6 +2313,9 @@ nput line 84.
 
 [49]
 
+LaTeX Warning: Reference `chap:risk' on page 50 undefined on input line 105.
+
+
 Package natbib Warning: Citation `achiam2017cpo' on page 50 undefined on input 
 line 105.
 
@@ -2290,13 +2338,13 @@ Package natbib Warning: Citation `dudik2014' on page 51 undefined on input line
 Package natbib Warning: Citation `jiang2016' on page 51 undefined on input line
  118.
 
-<../figures/rl_learning_curves.png, id=1429, 1405.25pt x 903.375pt>
+<../figures/rl_learning_curves.png, id=1217, 1405.25pt x 903.375pt>
 File: ../figures/rl_learning_curves.png Graphic file (type png)
 <use ../figures/rl_learning_curves.png>
 Package pdftex.def Info: ../figures/rl_learning_curves.png  used on input line 
 142.
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
-<../figures/hparam_sensitivity.png, id=1430, 1405.25pt x 903.375pt>
+<../figures/hparam_sensitivity.png, id=1218, 1405.25pt x 903.375pt>
 File: ../figures/hparam_sensitivity.png Graphic file (type png)
 <use ../figures/hparam_sensitivity.png>
 Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line 
@@ -2341,21 +2389,30 @@ Package natbib Warning: Citation `nair2020awac' undefined on input line 293.
 
 [55] (../figures/out/rl_vs_baseline_table.tex)
 
-[56] (../figures/out/utilization_adjusted_sharpe_table.tex)
+LaTeX Warning: Reference `sec:sim-acceptance-outcomes' on page 56 undefined on 
+input line 333.
+
+
+
+[56]
+
+LaTeX Warning: Reference `chap:risk' on page 57 undefined on input line 353.
+
+(../figures/out/utilization_adjusted_sharpe_table.tex)
 (../figures/out/cvar_benchmark_table.tex
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2365,16 +2422,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2384,16 +2441,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2403,16 +2460,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2420,13 +2477,16 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Underfull \hbox (badness 10000) in alignment at lines 14--14
+Underfull \hbox (badness 10000) in alignment at lines 12--12
 [][][][][] 
  []
 
 )
 
 [57]
+
+LaTeX Warning: Reference `chap:risk' on page 58 undefined on input line 365.
+
 
 Package natbib Warning: Citation `fujimoto2019' on page 58 undefined on input l
 ine 389.
@@ -2455,6 +2515,12 @@ put line 394.
 Package natbib Warning: Citation `nair2020awac' on page 58 undefined on input l
 ine 395.
 
+
+LaTeX Warning: Reference `chap:risk' on page 58 undefined on input line 404.
+
+
+LaTeX Warning: Reference `chap:sim' on page 58 undefined on input line 404.
+
 ) (../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
 
 
@@ -2463,8 +2529,18 @@ ine 395.
 [59]
 Chapter 8.
 
+LaTeX Warning: Reference `sec:kelly-math' on page 60 undefined on input line 3.
+
+
+
+LaTeX Warning: Reference `sec:cvar-math' on page 60 undefined on input line 3.
+
+
 Package natbib Warning: Citation `kelly1956' on page 60 undefined on input line
  7.
+
+
+LaTeX Warning: Reference `eq:kelly-opt' on page 60 undefined on input line 18.
 
 
 
@@ -2474,16 +2550,16 @@ Package natbib Warning: Citation `kelly1956' on page 60 undefined on input line
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2493,16 +2569,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2512,16 +2588,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2531,16 +2607,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2548,7 +2624,7 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Underfull \hbox (badness 10000) in alignment at lines 14--14
+Underfull \hbox (badness 10000) in alignment at lines 12--12
 [][][][][] 
  []
 
@@ -2558,11 +2634,21 @@ Package natbib Warning: Citation `rockafellar2000' on page 61 undefined on inpu
 t line 52.
 
 
+LaTeX Warning: Reference `eq:cvar-prog' on page 61 undefined on input line 53.
+
+
 
 [61]
 
+LaTeX Warning: Reference `eq:cvar-prog' on page 62 undefined on input line 59.
+
+
+LaTeX Warning: Reference `eq:cvar-prog' on page 62 undefined on input line 61.
+
+
+
 [62]
-<../figures/bankroll_hist.png, id=1544, 469.755pt x 289.08pt>
+<../figures/bankroll_hist.png, id=1345, 469.755pt x 289.08pt>
 File: ../figures/bankroll_hist.png Graphic file (type png)
 <use ../figures/bankroll_hist.png>
 Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 84.
@@ -2570,14 +2656,16 @@ Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 84.
 
 
 [63 <../figures/bankroll_hist.png>]
-<../figures/bankroll_trajectories.png, id=1552, 505.89pt x 289.08pt>
+
+LaTeX Warning: Reference `chap:sim' on page 64 undefined on input line 96.
+
+<../figures/bankroll_trajectories.png, id=1355, 505.89pt x 289.08pt>
 File: ../figures/bankroll_trajectories.png Graphic file (type png)
 <use ../figures/bankroll_trajectories.png>
 Package pdftex.def Info: ../figures/bankroll_trajectories.png  used on input li
 ne 108.
 (pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
-)
-(../chapter_7_simulation/chapter_7_simulation.tex
+) (../chapter_7_simulation/chapter_7_simulation.tex
 
 [64]
 
@@ -2588,6 +2676,9 @@ Package natbib Warning: Citation `glasserman2003' on page 66 undefined on input
  line 12.
 
 
+LaTeX Warning: Reference `subsec:vr' on page 66 undefined on input line 12.
+
+
 Package natbib Warning: Citation `wong2001sharp' on page 66 undefined on input 
 line 27.
 
@@ -2596,7 +2687,7 @@ line 27.
 [66
 
 ]
-<../figures/teaser_ev_heatmap.png, id=1583, 451.6875pt x 379.4175pt>
+<../figures/teaser_ev_heatmap.png, id=1392, 451.6875pt x 379.4175pt>
 File: ../figures/teaser_ev_heatmap.png Graphic file (type png)
 <use ../figures/teaser_ev_heatmap.png>
 Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 3
@@ -2604,7 +2695,20 @@ Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 3
 (pdftex.def)             Requested size: 390.25536pt x 327.83267pt.
 
 
+LaTeX Warning: Reference `sec:teaser-math' on page 1 undefined on input line 40
+.
+
+
+LaTeX Warning: Reference `sec:teaser-math' on page 1 undefined on input line 40
+.
+
+
+
 [67 <../figures/teaser_ev_heatmap.png>]
+
+LaTeX Warning: Reference `chap:risk' on page 68 undefined on input line 60.
+
+
 
 [68]
 
@@ -2619,7 +2723,83 @@ LaTeX Warning: Reference `chap:results' on page 70 undefined on input line 103.
 LaTeX Font Info:    Font shape `T1/zpltlf/m/n' will be
 (Font)              scaled to size 5.5pt on input line 159.
  (../figures/out/sim_acceptance_table.tex
-Underfull \hbox (badness 10000) in alignment at lines 17--17
+! LaTeX Error: Unicode character Δ (U+0394)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+! LaTeX Error: Unicode character τ (U+03C4)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+! LaTeX Error: Unicode character Δ (U+0394)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character Δ (U+0394)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character τ (U+03C4)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character Δ (U+0394)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.15 \bottomrule\end{tabularx}
+                              
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Underfull \hbox (badness 10000) in alignment at lines 15--15
 [][][][] 
  []
 
@@ -2629,18 +2809,10 @@ Underfull \hbox (badness 10000) in alignment at lines 17--17
 
 [72]
 Chapter 10.
-(../figures/out/oos_record_table.tex
-Underfull \hbox (badness 1173) in paragraph at lines 23--24
-[]\T1/zpltlf/m/n/10 (+20) CLV mea-sured in ba-sis points vs clos-ing; pos-i-tiv
-e is bet-ter. Re-port paired tests across 
- []
 
+LaTeX Warning: Reference `chap:risk' on page 73 undefined on input line 4.
 
-Overfull \hbox (6.60623pt too wide) in paragraph at lines 6--26
- [] 
- []
-
-)
+(../figures/out/oos_record_table.tex)
 
 [73
 
@@ -2649,21 +2821,41 @@ Overfull \hbox (6.60623pt too wide) in paragraph at lines 6--26
 LaTeX Warning: Reference `tab:zero-weeks' on page 74 undefined on input line 21
 .
 
-(../results/zero_weeks_table.tex)
+(../results/zero_weeks_table.tex
+
+LaTeX Warning: Reference `chap:sim' on page 74 undefined on input line 21.
+
+)
 
 [74]
 LaTeX Font Info:    Font shape `TS1/zpltlf/b/n' will be
 (Font)              scaled to size 14.4pt on input line 42.
 
 
+LaTeX Warning: Reference `sec:parsimonious-choice' on page 75 undefined on inpu
+t line 48.
+
+
+
 [75] (../results/core_ablation_table.tex)
 
 [76]
+
+LaTeX Warning: Reference `sec:cvar-math' on page 77 undefined on input line 99.
+
+
+
 
 [77]) (../chapter_9_conclusion/chapter_9_conclusion.tex
 
 [78]
 Chapter 11.
+
+LaTeX Warning: Reference `chap:risk' on page 79 undefined on input line 20.
+
+
+LaTeX Warning: Reference `chap:sim' on page 79 undefined on input line 20.
+
 
 LaTeX Warning: Reference `chap:results' on page 79 undefined on input line 20.
 
@@ -2681,7 +2873,7 @@ Appendix A.
 
 ] (../figures/out/rl_vs_baseline_table.tex)
 (../figures/out/ope_grid_table.tex
-Underfull \hbox (badness 10000) in alignment at lines 21--21
+Underfull \hbox (badness 10000) in alignment at lines 20--20
 [][][][][] 
  []
 
@@ -2690,16 +2882,16 @@ Underfull \hbox (badness 10000) in alignment at lines 21--21
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2709,16 +2901,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2728,16 +2920,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2747,16 +2939,16 @@ my insertion and my current dilemma will both disappear.
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Missing $ inserted.
 <inserted text> 
                 $
-l.14     \end{tabularx}
-                       
+l.12 \bottomrule\end{tabularx}
+                              
 I've inserted something that you may have forgotten.
 (See the <inserted text> above.)
 With luck, this will get me unwedged. But if you
@@ -2764,7 +2956,7 @@ really didn't forget anything, try typing `2' now; then
 my insertion and my current dilemma will both disappear.
 
 
-Underfull \hbox (badness 10000) in alignment at lines 14--14
+Underfull \hbox (badness 10000) in alignment at lines 12--12
 [][][][][] 
  []
 
@@ -2808,7 +3000,219 @@ Appendix F.
 
 ]
 
-[91] (./main.bbl)
+[91]
+Appendix G.
+
+
+[92
+
+]
+
+[93]
+Appendix H.
+
+
+[94
+
+]
+Appendix I.
+
+
+[95
+
+]
+Appendix J.
+
+
+[96
+
+]
+Appendix K.
+
+
+[97
+
+]
+
+[98]
+
+[99]
+
+[100]
+Appendix L.
+
+
+[101
+
+]
+Appendix M.
+
+
+[102
+
+]
+
+[103]
+
+[104]
+Appendix N.
+
+
+[105
+
+]
+
+[106]
+! Extra \fi.
+l.714 \fi
+         
+I'm ignoring this; it doesn't match any \if.
+
+
+
+[107]
+Appendix O.
+
+
+[108
+
+]
+
+[109]
+
+[110]
+Appendix P.
+
+
+[111
+
+]
+
+[112]
+
+[113]
+
+[114]
+Appendix Q.
+
+
+[115
+
+]
+Appendix R.
+
+
+[116
+
+]
+
+[117]
+Appendix S.
+
+
+[118
+
+]
+Appendix T.
+
+
+[119
+
+]
+Appendix U.
+
+
+[120
+
+]
+
+[121]
+Appendix V.
+
+
+[122
+
+]
+
+[123]
+Appendix W.
+
+
+[124
+
+]
+Appendix X.
+
+
+[125
+
+]
+Appendix Y.
+
+
+[126
+
+]
+Appendix Z.
+
+
+[127
+
+]
+
+[128]
+Appendix AA.
+
+
+[129
+
+]
+Appendix AB.
+
+
+[130
+
+]
+Appendix AC.
+
+
+[131
+
+]
+Appendix AD.
+
+
+[132
+
+]
+Appendix AE.
+
+
+[133
+
+]
+Appendix AF.
+
+
+[134
+
+]
+
+[135]
+Appendix AG.
+
+
+[136
+
+]
+
+[137]
+Appendix AH.
+
+
+[138
+
+] (./main.bbl)
 
 Package natbib Warning: There were undefined citations.
 
@@ -2822,7 +3226,7 @@ L3 programming layer <2020/03/25>
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 
 Package rerunfilecheck Warning: File `main.out' has changed.
@@ -2830,15 +3234,15 @@ Package rerunfilecheck Warning: File `main.out' has changed.
 (rerunfilecheck)                or use package `bookmark'.
 
 Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: 92157C8B6A1A17C43848E32410CECC23;42987
-(rerunfilecheck)             After:  3E9A1693739C83C75DE3C0E953FE8CE2;53812.
+(rerunfilecheck)             Before: 78B7D639607718C9B9FD4EE9D07B2976;32768
+(rerunfilecheck)             After:  43F28D60B81ACD937615AA20FD6A3FBB;73292.
  ) 
 Here is how much of TeX's memory you used:
- 47232 strings out of 473190
- 1025364 string characters out of 5715801
- 1499982 words of memory out of 5000000
- 68606 multiletter control sequences out of 15000+600000
- 748163 words of font info for 471 fonts, out of 8000000 for 9000
+ 47446 strings out of 473190
+ 1027664 string characters out of 5715801
+ 1528982 words of memory out of 5000000
+ 68566 multiletter control sequences out of 15000+600000
+ 749082 words of font info for 481 fonts, out of 8000000 for 9000
  1151 hyphenation exceptions out of 8191
  103i,16n,117p,1001b,980s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/newpx/NewPXBMI_gnu.pfb
@@ -2853,10 +3257,10 @@ nts/type1/public/newtx/txsym.pfb></usr/local/texlive/2025/texmf-dist/fonts/type
 1/public/newpx/zplb.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/
 newpx/zplr.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/newpx/zpl
 ri.pfb>
-Output written on main.pdf (115 pages, 1285890 bytes).
+Output written on main.pdf (162 pages, 1350521 bytes).
 PDF statistics:
- 2008 PDF objects out of 2073 (max. 8388607)
- 1821 compressed objects within 19 object streams
- 648 named destinations out of 1000 (max. 500000)
- 69783 words of extra memory for PDF output out of 74296 (max. 10000000)
+ 2259 PDF objects out of 2487 (max. 8388607)
+ 2024 compressed objects within 21 object streams
+ 882 named destinations out of 1000 (max. 500000)
+ 69383 words of extra memory for PDF output out of 74296 (max. 10000000)
 

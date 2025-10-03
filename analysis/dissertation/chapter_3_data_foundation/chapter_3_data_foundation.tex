@@ -216,9 +216,13 @@ To make evaluation reproducible, we enumerate dataset cohorts, splits, coverage,
     \caption{Dataset cohorts, splits, coverage, and lineage guards.}
     \label{tab:dataset-cohorts}
     \begingroup
-    \setlength{\tabcolsep}{4pt}
-    \renewcommand{\arraystretch}{1.15}
-    \begin{tabularx}{\linewidth}{@{} l c c c c c >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X @{} }
+    % Compact, narrow first six columns to free space for the text-heavy last two.
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.12}
+    \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+    \newcolumntype{S}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+    % Cohort stays natural width (l); next five are fixed and tight; last two expand (X)
+    \begin{tabularx}{\linewidth}{@{} l C{2.0cm} C{1.6cm} C{1.9cm} C{0.9cm} C{2.2cm} >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X @{} }
       \toprule
       \textbf{Cohort} & \textbf{Train} & \textbf{Val} & \textbf{Test} & \textbf{Books} & \textbf{Markets} & \textbf{Features as-of} & \textbf{Leakage checks} \\
       \midrule
