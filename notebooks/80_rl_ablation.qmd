@@ -1,0 +1,103 @@
+---
+title: "80 – RL vs Stateless Baseline Ablation"
+format:
+  html:
+    code-fold: true
+execute-dir: project
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  seasons: [2020, 2021, 2022, 2023, 2024]
+  output_dir: "analysis/dissertation/figures/out"
+---
+
+## Goal
+Compare RL policy against a stateless Kelly-LCB baseline; report Brier/CLV/ROI/Max DD and utilization-adjusted Sharpe. Also provide sensitivity to pessimism level alpha.
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Try to read evaluation logs; else write placeholders.
+read_if_exists <- function(path) {
+  if (file.exists(path)) readr::read_csv(path, show_col_types = FALSE) else NULL
+}
+
+rl_log  <- read_if_exists("analysis/results/rl_eval.csv")
+bl_log  <- read_if_exists("analysis/results/baseline_eval.csv")
+
+if (!is.null(rl_log) && !is.null(bl_log)) {
+  # Expect columns: season, week, brier, clv_bps, roi_pct, ret_weekly, active
+  agg <- function(df, name) {
+    df |>
+      filter(season %in% params$seasons) |>
+      summarise(
+        Policy = name,
+        Brier = mean(brier, na.rm = TRUE),
+        CLV_bps = mean(clv_bps, na.rm = TRUE),
+        ROI_pct = 100 * mean(roi_pct/100, na.rm = TRUE),
+        Max_DD_pct = 100 * max(cummax(pmax(0, -cummin(coalesce(ret_weekly, 0)))), na.rm = TRUE)
+      )
+  }
+  out <- dplyr::bind_rows(agg(bl_log, "Kelly-LCB (CBV>tau)"), agg(rl_log, "RL (IQL)"))
+  writeLines(knitr::kable(out, format = "latex", booktabs = TRUE,
+                          caption = "RL vs stateless baseline (2020–2024).",
+                          col.names = c("Policy", "Brier", "CLV (\\%)", "ROI (\\%)", "Max DD (\\%)")),
+             con = file.path(params$output_dir, "rl_vs_baseline_table.tex"))
+} else {
+  rl_vs <- data.frame(
+    Policy = c("Kelly-LCB (CBV>tau)", "RL (IQL)"),
+    Brier = NA_real_, CLV_bps = NA_real_, ROI_pct = NA_real_, Max_DD_pct = NA_real_
+  )
+  writeLines(knitr::kable(rl_vs, format = "latex", booktabs = TRUE,
+                          caption = "RL vs stateless baseline (placeholder).",
+                          col.names = c("Policy", "Brier", "CLV (bps)", "ROI (\\%)", "Max DD (\\%)")),
+             con = file.path(params$output_dir, "rl_vs_baseline_table.tex"))
+}
+
+# Alpha sensitivity panel placeholder (replace with real plot if available)
+png(file.path(params$output_dir, "alpha_sensitivity_panel.png"), width = 900, height = 450)
+plot.new(); text(0.5, 0.5, "Placeholder: Alpha sensitivity (0.05 vs 0.10)")
+dev.off()
+
+# Utilization-adjusted Sharpe placeholder (compute when weekly returns and active weeks are available)
+util <- data.frame(Policy = c("Kelly-LCB", "RL"), Sharpe_active = NA_real_, Weeks_active = NA_real_, Sharpe_util = NA_real_)
+writeLines(knitr::kable(util, format = "latex", booktabs = TRUE,
+                        caption = "Utilization-adjusted Sharpe (placeholder)."),
+           con = file.path(params$output_dir, "utilization_adjusted_sharpe_table.tex"))
+
+# CVaR benchmark placeholder (replace with actual benchmark table if present)
+cvar <- data.frame(n = 100, B = 10000, solver = "OSQP", time_sec = NA_real_)
+writeLines(knitr::kable(cvar, format = "latex", booktabs = TRUE,
+                        caption = "CVaR sizing benchmark (placeholder)."),
+           con = file.path(params$output_dir, "cvar_benchmark_table.tex"))
+```
+
+## OPE Gate (SNIS/DR) — scaffold
+```{r}
+suppressWarnings({ has_jsonlite <- requireNamespace("jsonlite", quietly = TRUE) })
+if (has_jsonlite) {
+  # Build minimal logged dataset and run OPE gate
+  csv_path <- file.path("data", "rl_logged.csv")
+  json_path <- file.path("analysis", "reports", "ope_gate.json")
+  dir.create(dirname(json_path), recursive = TRUE, showWarnings = FALSE)
+  # Attempt to build dataset and run gate via Python scripts
+  try(system2("python", c("py/rl/dataset.py", "--output", csv_path, "--season-start", min(params$seasons), "--season-end", max(params$seasons))), silent = TRUE)
+  try(system2("python", c("py/rl/ope_gate.py", "--dataset", csv_path, "--output", json_path)), silent = TRUE)
+  if (file.exists(json_path)) {
+    res <- jsonlite::fromJSON(json_path)
+    grid <- do.call(rbind, lapply(names(res$grid), function(k) data.frame(key = k, t(res$grid[[k]]))))
+    names(grid) <- c("Key", "SNIS", "DR", "ESS")
+    grid$SNIS <- round(grid$SNIS, 4)
+    grid$DR   <- round(grid$DR, 4)
+    grid$ESS  <- round(grid$ESS, 1)
+    writeLines(knitr::kable(grid, format = "latex", booktabs = TRUE,
+                            caption = sprintf("OPE grid (median DR=%.3f, stable=%s)", res$median_dr, res$stable)),
+               con = file.path(params$output_dir, "ope_grid_table.tex"))
+  }
+}
+```

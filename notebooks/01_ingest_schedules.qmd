@@ -1,0 +1,112 @@
+---
+title: "01 – Ingest Schedules"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  start_season: 1999
+  end_season: 2024
+  seasons_override: null
+  snapshot_path: "data/raw/nflverse_schedules_1999_2024.rds"
+  truncate_games: true
+---
+
+## Purpose
+Document the end-to-end process that refreshes the `games` table with nflverse schedules and embedded odds fields (moneylines, spread odds, totals) for 1999-2024 seasons.
+
+## Prerequisites
+- `docker compose up -d pg`
+- R libraries from `renv.lock` (`nflreadr`, `dplyr`, `DBI`, `RPostgres`, `lubridate`)
+- Environment variables from `.env` (if overriding database credentials)
+
+## 1. Load Schedules Snapshot
+```{r}
+library(nflreadr)
+library(dplyr)
+
+sched_years <- if (!is.null(params$seasons_override)) params$seasons_override else params$start_season:params$end_season
+
+schedules <- load_schedules(sched_years)
+count_schedules <- schedules |> count(season)
+count_schedules
+```
+
+## 2. Persist Raw Snapshot
+```{r}
+readr::write_rds(schedules, params$snapshot_path)
+```
+
+## 3. Transform For Warehouse
+```{r}
+library(lubridate)
+
+games_table <- schedules |>
+  transmute(
+    game_id,
+    season,
+    week,
+    home_team,
+    away_team,
+    kickoff      = ymd(gameday),
+    spread_close = spread_line,
+    total_close  = total_line,
+    home_score,
+    away_score,
+    home_moneyline,
+    away_moneyline,
+    home_spread_odds,
+    away_spread_odds,
+    over_odds,
+    under_odds
+  )
+
+nrow(games_table)
+```
+
+## 4. Load Into Postgres
+```{r}
+library(DBI)
+library(RPostgres)
+
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+dbWithTransaction(con, {
+  if (isTRUE(params$truncate_games)) {
+    dbExecute(con, "TRUNCATE TABLE games;")
+  }
+  dbWriteTable(con, "games", games_table, append = TRUE, row.names = FALSE)
+})
+
+dbDisconnect(con)
+```
+
+## 5. Sanity Checks
+```{r}
+library(DBI)
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+dbGetQuery(con, "SELECT season, COUNT(*) AS games FROM games GROUP BY season ORDER BY season LIMIT 10;")
+
+dbDisconnect(con)
+```
+
+## TODO
+- Extend loader to incorporate alternative data sources for pre-1999 seasons if secured.

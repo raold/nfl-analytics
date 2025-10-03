@@ -1,0 +1,52 @@
+{
+    "python.pythonPath": "./venv/bin/python",
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk (pdf)",
+            "command": "latexmk",
+            "args": [
+                "-pdf",
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "latexmk (pdf, force)",
+            "command": "latexmk",
+            "args": [
+                "-pdf",
+                "-f",
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "latexmk -C",
+            "command": "latexmk",
+            "args": [
+                "-C",
+                "%DOC%"
+            ]
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "latexmk ➜ pdf",
+            "tools": ["latexmk (pdf)"]
+        },
+        {
+            "name": "Clean build",
+            "tools": ["latexmk -C", "latexmk (pdf)"]
+        },
+        {
+            "name": "Clean build (force)",
+            "tools": ["latexmk -C", "latexmk (pdf, force)"]
+        }
+    ],
+    "latex-workshop.latex.recipe.default": "Clean build"
+}

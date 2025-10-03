@@ -1,0 +1,115 @@
+---
+title: "11 – Monte Carlo Skellam"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  season_filter: 2024
+  sims: 50000
+  seed: 42
+  export_summary: false
+  summary_path: "models/skellam_summary.parquet"
+---
+
+## Purpose
+Simulate market-implied score distributions using Skellam assumptions and compare against closing lines/odds. Parameters allow season and simulation controls.
+
+## Prerequisites
+- Postgres `games` data with spreads and totals populated.
+- R packages: `dplyr`, `DBI`, `RPostgres`, `purrr`, `ggplot2`, `arrow`, `glue`.
+
+## 1. Retrieve Market Lines
+```{r}
+library(DBI)
+library(RPostgres)
+library(dplyr)
+library(glue)
+
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+season_clause <- if (is.null(params$season_filter)) "" else glue("WHERE season = {as.integer(params$season_filter)}")
+lines <- dbGetQuery(con, glue("SELECT game_id, season, week, home_team, away_team, spread_close, total_close FROM games {season_clause}"))
+
+dbDisconnect(con)
+```
+
+## 2. Derive Team Means From Spread/Total
+```{r}
+lines <- lines |>
+  mutate(
+    lambda_home = (total_close / 2) - (spread_close / 2),
+    lambda_away = (total_close / 2) + (spread_close / 2)
+  )
+```
+
+## 3. Monte Carlo Simulation
+```{r}
+library(purrr)
+library(tidyr)
+library(dplyr)
+set.seed(params$seed)
+
+simulate_game <- function(game_row, sims) {
+  home_scores <- rpois(sims, game_row$lambda_home)
+  away_scores <- rpois(sims, game_row$lambda_away)
+  tibble::tibble(
+    game_id = game_row$game_id,
+    home_scores = home_scores,
+    away_scores = away_scores,
+    margin = home_scores - away_scores
+  )
+}
+
+sim_results <- map_dfr(split(lines, lines$game_id), simulate_game, sims = params$sims)
+```
+
+## 4. Probability Estimates
+```{r}
+probabilities <- sim_results |>
+  left_join(lines |> select(game_id, spread_close, total_close), by = "game_id") |>
+  group_by(game_id, spread_close, total_close) |>
+  summarise(
+    cover_prob = mean(margin > -spread_close),
+    push_prob  = mean(margin == -spread_close),
+    total_over = mean(home_scores + away_scores > total_close),
+    .groups = "drop"
+  )
+
+probabilities
+```
+
+## 5. Visualize Distributions
+```{r}
+if (nrow(sim_results) > 0) {
+  example_game <- sim_results |> filter(game_id == sample(unique(game_id), 1)) |>
+    left_join(lines |> select(game_id, spread_close), by = "game_id")
+
+  ggplot(example_game, aes(x = margin)) +
+    geom_histogram(binwidth = 1, fill = "steelblue", color = "white") +
+    geom_vline(xintercept = -unique(example_game$spread_close), color = "red", linetype = "dashed") +
+    labs(title = "Simulated Margin Distribution", x = "Home Margin", y = "Frequency")
+}
+```
+
+## 6. Optional Export
+```{r}
+if (isTRUE(params$export_summary)) {
+  arrow::write_parquet(probabilities, params$summary_path)
+}
+```
+
+## TODO
+- Incorporate team-specific scoring rates (EPA-derived lambdas) instead of pure market averages.
+- Compare simulated probabilities vs. actual outcomes to quantify edge.
+- Surface distributions via dashboards (Quarto/Plotly).

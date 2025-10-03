@@ -1,0 +1,119 @@
+\chapter{Systems Blueprint: From Research to Production}
+\label{app:systems-blueprint}
+
+This appendix outlines concrete algorithms, interfaces, and deployment flows to implement the dissertation as a production system. Pseudocode favors simple, testable components and mirrors the repository layout.
+
+\section{Nightly ETL: Idempotent Ingestion}
+\begin{algorithm}[H]
+  \caption{Idempotent Odds Ingestion (per book/market/date)}
+  \label{alg:ingest-odds}
+  \begin{algorithmic}[1]
+    \Require source endpoint, book, markets, time window $[t_0,t_1]$, rate limit $R$, DB conn
+    \Ensure upserts into \texttt{odds\_history(game\_id, book, market, quoted\_at, price, ...)}
+    \For{window $W \subseteq [t_0,t_1]$ sliced by API limits}
+      \State sleep to respect $R$; fetch JSON page(s)
+      \For{each quote $q$}
+        \State compute key $k=(q.game\_id,q.book,q.market,q.quoted\_at)$
+        \State \textbf{UPSERT} into \texttt{odds\_history} on $k$ with dedupe; \textbf{skip} if unchanged
+      \EndFor
+    \EndFor
+    \State emit metrics: {fetched, upserts, skips, errors} by book/market; log last cursor for resume
+  \end{algorithmic}
+\end{algorithm}
+
+\paragraph{Implementation notes.} Use \texttt{py/ingest\_odds\_history.py} with chunked requests, exponential backoff, and database COPY for bulk upserts. Mirror the pattern for schedules and injuries in R with \texttt{data/ingest\_schedules.R}.
+
+\section{As-Of Feature Snapshot}
+\begin{algorithm}[H]
+  \caption{As-Of Feature Build (expanded)}
+  \label{alg:asof-build}
+  \begin{algorithmic}[1]
+    \Require cutoff time $t$, marts (plays, odds, weather, injuries), lineage rules
+    \Ensure one row per team/game with as-of features
+    \State pull only records with timestamp $\le t$; drop post-decision fields
+    \State join on natural keys with validity intervals; enforce FKs
+    \State compute rolling windows truncated at $t$; opponent-adjust via ridge
+    \State validate leakage rules; \textbf{fail} build on any violation
+    \State write snapshot with schema hash and counts; push QA metrics
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Key-Number Reweighting (KL-Tilting)}
+\begin{algorithm}[H]
+  \caption{KL-Tilted Integer-Margin Reweighting}
+  \label{alg:kl-tilt}
+  \begin{algorithmic}[1]
+    \Require baseline pmf $q(d)$, keys $\mathcal K$, targets $m_k$, target $(\mu,\sigma^2)$
+    \Ensure $\tilde q(d) \propto q(d)\exp\{\alpha_0+\alpha_1 d+\alpha_2 (d-\mu)^2+\sum_{k\in\mathcal K}\delta_k\,\mathbb{1}\{d=k\}\}$
+    \State initialize multipliers $\alpha,\delta \leftarrow 0$
+    \Repeat
+      \State compute $\tilde q$; evaluate constraint residuals (norm, mean, variance, key masses)
+      \State take Newton/gradient step on the dual; backtrack to ensure residual decrease
+    \Until residuals $< \varepsilon$ or max iters
+    \State return normalized $\tilde q$
+  \end{algorithmic}
+\end{algorithm}
+
+\section{OPE Gate and Promotion}
+\begin{algorithm}[H]
+  \caption{Offline Policy Evaluation Gate (Appendix)}
+  \label{alg:ope-gate-appendix}
+  \begin{algorithmic}[1]
+    \Require dataset $\mathcal D$, candidates $\{\pi_j\}$, behavior estimate $\hat\pi_b$, critic $Q_{\hat\omega}$, clip grid $\mathcal C=\{5,10,20\}$, shrink $\Lambda=\{0,0.1,0.2\}$, folds
+    \For{each candidate $\pi$}
+      \For{each fold}
+        \State compute per-decision ratios; self-normalize; clip at $c\in \mathcal C$; shrink by $\lambda\in\Lambda$
+        \State estimate SNIS and DR values with CIs; compute ESS and variance
+      \EndFor
+      \State aggregate across folds; check stability across $c,\lambda$; compute lower-bound
+    \EndFor
+    \State \textbf{Promote} argmax lower-bound subject to stability and min-ESS; \textbf{reject} otherwise
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Stake Sizing: Kelly LCB + CVaR}
+\begin{algorithm}[H]
+  \caption{Weekly Stake Sizing}
+  \label{alg:stake-sizing}
+  \begin{algorithmic}[1]
+    \Require offers $\{(d_i, \hat p_i, \Var_i)\}$, level $\alpha$, frac $\kappa$, scenarios $\{R^{(b)}\}$, feasible set $\mathcal F$
+    \State compute $p_{i,\text{LCB}} = \text{Quantile}_{\alpha}(p_i)$; base Kelly $f_i^\star = \big((d_i\,p_{i,\text{LCB}}-1)/(d_i-1)\big)_{[0,1]}$
+    \State set $\tilde f_i = \kappa f_i^\star$; form scenario returns with frictions and dependence
+    \State solve CVaR LP (Rockafellar–Uryasev) over $\vect f\in\mathcal F$ with warm-start from $\tilde f$
+    \State return $\vect f$ and CVaR; log constraints and duals for monitoring
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Simulator Acceptance Tests}
+\begin{algorithm}[H]
+  \caption{Acceptance Under Dependence and Frictions (Appendix)}
+  \label{alg:sim-accept-appendix}
+  \begin{algorithmic}[1]
+    \Require frozen policy $\pi$, calibrated $\tilde q$, copula params, friction regimes, seeds
+    \For{regime in \{optimistic, base, pessimistic\}}
+      \State simulate bankroll with CRNs; compute ROI, MAR, max drawdown, CVaR
+      \State \textbf{Reject} if any metric breaches governance thresholds
+    \EndFor
+    \State \textbf{Approve} and schedule rollout if all pass; otherwise fall back
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Monitoring and Rollback}
+\begin{algorithm}[H]
+  \caption{Production Monitoring and Safe Rollback}
+  \label{alg:monitoring}
+  \begin{algorithmic}[1]
+    \Require live fills, realized CLV, variance, drawdown alarms; last-known-good $\pi_{\text{LKG}}$
+    \State track CLV vs. model; alert if deviation $>k\sigma$ for $m$ weeks
+    \State halt promotion if DR/HCOPE instability reappears on rolling windows
+    \State \textbf{Rollback} to $\pi_{\text{LKG}}$ on breach; widen priors; reduce stake caps; re-run acceptance
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Interfaces and Artifacts}
+\begin{itemize}
+  \item \textbf{Data contracts:} \texttt{mart.game\_summary}, \texttt{odds\_history} schemas; version via migrations.
+  \item \textbf{Model artifacts:} serialized calibrators, margin pmfs, copula params, RL checkpoints; all immutable with hashes.
+  \item \textbf{Configs:} YAML for clip/shrink grids, risk budgets, book lists, and friction regimes.
+  \item \textbf{CLI:} \texttt{etl}, \texttt{train}, \texttt{evaluate}, \texttt{simulate}, \texttt{promote} subcommands for orchestration.
+\end{itemize}

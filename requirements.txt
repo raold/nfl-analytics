@@ -1,0 +1,13 @@
+pandas
+polars
+pyarrow
+numpy
+scipy
+scikit-learn
+xgboost
+meteostat
+SQLAlchemy
+psycopg[binary]
+python-dotenv
+requests
+pytest

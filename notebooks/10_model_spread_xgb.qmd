@@ -1,0 +1,146 @@
+---
+title: "10 – Spread Model (XGBoost)"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  train_seasons: [2014, 2015, 2016, 2017, 2018, 2019, 2020]
+  test_seasons: [2021, 2022, 2023]
+  mart_schema: "mart"
+  team_epa_table: "team_epa"
+  outcome: "spread_target"
+  trees: 500
+  grid_size: 20
+  export_metrics: false
+  metrics_path: "models/spread_xgb_metrics.csv"
+---
+
+## Goal
+Train and evaluate a gradient boosted model that predicts against-the-spread outcomes using enriched schedule, odds, and play-derived features. Seasons and model hyperparameters are configurable via parameters.
+
+## Prerequisites
+- Materialised EPA features stored in `{params$mart_schema}.{params$team_epa_table}`.
+- R packages: `tidymodels`, `DBI`, `RPostgres`, `dplyr`, `glue`, `skimr`, `arrow` (optional for exports).
+
+## 1. Assemble Training Data
+```{r}
+library(DBI)
+library(RPostgres)
+library(dplyr)
+library(glue)
+
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+team_table <- Id(schema = params$mart_schema, table = params$team_epa_table)
+
+sql <- glue(""
+SELECT
+  g.season,
+  g.week,
+  g.game_id,
+  g.home_team,
+  g.away_team,
+  g.home_score,
+  g.away_score,
+  g.spread_close,
+  g.home_moneyline,
+  g.away_moneyline,
+  hepa.epa_mean AS home_epa_mean,
+  aepa.epa_mean AS away_epa_mean
+FROM games g
+LEFT JOIN {DBI::dbQuoteIdentifier(con, params$mart_schema)}.{DBI::dbQuoteIdentifier(con, params$team_epa_table)} hepa
+  ON g.game_id = hepa.game_id AND g.home_team = hepa.posteam
+LEFT JOIN {DBI::dbQuoteIdentifier(con, params$mart_schema)}.{DBI::dbQuoteIdentifier(con, params$team_epa_table)} aepa
+  ON g.game_id = aepa.game_id AND g.away_team = aepa.posteam
+WHERE g.season BETWEEN {min(c(params$train_seasons, params$test_seasons))} AND {max(c(params$train_seasons, params$test_seasons))}
+""")
+
+df <- dbGetQuery(con, sql)
+
+dbDisconnect(con)
+```
+
+## 2. Feature Engineering
+```{r}
+library(tidyr)
+library(skimr)
+
+df <- df |>
+  mutate(
+    margin = home_score - away_score,
+    spread_target = if_else(margin + spread_close > 0, 1, 0)
+  ) |>
+  drop_na(spread_target)
+
+skim(df)
+```
+
+## 3. Train/Test Split
+```{r}
+library(tidymodels)
+
+train_df <- df |> filter(season %in% params$train_seasons)
+test_df  <- df |> filter(season %in% params$test_seasons)
+
+rec <- recipe(spread_target ~ spread_close + home_epa_mean + away_epa_mean + home_moneyline + away_moneyline, data = train_df) |>
+  step_impute_knn(all_predictors()) |>
+  step_normalize(all_predictors())
+
+xgb_spec <- boost_tree(
+  trees = params$trees,
+  learn_rate = tune(),
+  tree_depth = tune(),
+  min_n = tune()
+) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+wf <- workflow() |> add_recipe(rec) |> add_model(xgb_spec)
+```
+
+## 4. Hyperparameter Tuning
+```{r}
+set.seed(42)
+res <- wf |> tune_grid(
+  resamples = vfold_cv(train_df, v = 5, strata = spread_target),
+  grid = params$grid_size,
+  metrics = metric_set(roc_auc, accuracy)
+)
+
+show_best(res, metric = "roc_auc")
+```
+
+## 5. Final Fit and Evaluation
+```{r}
+best_params <- select_best(res, metric = "roc_auc")
+final_wf <- finalize_workflow(wf, best_params)
+
+final_fit <- final_wf |> fit(train_df)
+
+test_preds <- predict(final_fit, test_df, type = "prob") |>
+  bind_cols(test_df)
+
+metrics <- yardstick::metric_set(roc_auc, accuracy)(test_preds, truth = spread_target, .pred_1)
+metrics
+
+if (isTRUE(params$export_metrics)) {
+  fs::dir_create(dirname(params$metrics_path))
+  readr::write_csv(metrics, params$metrics_path)
+}
+```
+
+## TODO
+- Log feature importances and calibration diagnostics per model run.
+- Compare against baseline heuristics (e.g., spread-only logistic regression).
+- Persist fitted model objects for downstream deployment.

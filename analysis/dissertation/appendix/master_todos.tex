@@ -1,0 +1,191 @@
+% Master TODOs (front-matter insert). No preamble here; this file is \input from main.tex
+\chapter*{Master TODOs}
+\addcontentsline{toc}{chapter}{Master TODOs}
+
+% Local helpers (kept lightweight to avoid conflicts)
+\newcommand{\block}[1]{\par\noindent\textbf{#1}\par\vspace{0.25em}}
+\newcommand{\milestone}[1]{\vspace{0.5em}\noindent\textbf{\large #1}\par\vspace{0.25em}\hrule\vspace{0.5em}}
+\newcommand{\done}{\textcolor{green!60!black}{\(\checkmark\)}}
+\newcommand{\wip}{\textcolor{orange!80!black}{(WIP)}}
+\newcommand{\prio}[1]{\textcolor{blue!70!black}{[#1]}}
+
+% Tighter lists in this section only
+\begingroup
+\RaggedRight\sloppy\hbadness=10000
+\setlist[itemize]{topsep=2pt,itemsep=2pt,parsep=0pt}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt,parsep=0pt}
+
+\section*{NFL Dissertation + System-of-Systems — Master TODOs}
+
+\subsection*{Global Coordination}
+\begin{itemize}
+  \item \prio{P0} Freeze \textbf{scope} and \textbf{chapter list} (incl.\ Evaluation \& Calibration; Uncertainty \& Risk; Simulation-Based Strategy Testing; SoS Governance).
+  \item \prio{P0} Create \textbf{project calendar} with weekly deliverables (chapters, models, figures, ablations).
+  \item \prio{P0} Establish \textbf{reproducibility contract}: seed control, data snapshots, environment pins, CPU/GPU parity notes.
+  \item \prio{P0} Baseline \textbf{hardware profiles}: (A) MacBook Air M4 (MPS), (B) dual RTX 5090 workstation (CUDA). Document expected batch sizes / epoch times.
+\end{itemize}
+
+\milestone{Committee Review Fix-it (prioritized)}
+\block{Evidence \& Claims}
+\begin{itemize}
+  \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines.
+  \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid.
+  \item \prio{P0} \textbf{Acceptance tests}. Report simulator acceptance metrics vs. historical (margins, key mass, dependence, friction). Block diagrams already exist; need numbers. \emph{Where:} Ch.~\texttt{7}.
+\end{itemize}
+
+\block{Evaluation \& Datasets}
+\begin{itemize}
+  \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}.
+  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot.
+\end{itemize}
+
+\block{Modeling Specifics}
+\begin{itemize}
+  \item \prio{P1} \textbf{Dependence calibration}. Empirical Kendall’s $\tau$/tail dependence across eras vs Gaussian/$t$-copulas; stress bounds. \emph{Where:} Ch.~\texttt{2}/\texttt{7}.
+  \item \prio{P1} \textbf{RL details}. Report hyperparameters, dataset coverage by action bucket, and learning curves (with variability). \emph{Where:} Ch.~\texttt{5} appendix table.
+\end{itemize}
+
+\block{OPE \& Promotion Gate}
+\begin{itemize}
+  \item \prio{P0} \textbf{Numerical thresholds}. State exact clip ranges, shrinkage choices, and DR/HCOPE lower bound thresholds; show sensitivity bands. \emph{Where:} Ch.~\texttt{5}.
+  \item \prio{P1} \textbf{Failure modes (expand)}. Add concrete examples and rejection thresholds; link to simulator acceptance tests. \emph{Where:} Ch.~\texttt{5}/\texttt{7}.
+\end{itemize}
+
+\block{Risk \& Governance}
+\begin{itemize}
+  \item \prio{P0} \textbf{Budgets and caps}. Put concrete weekly risk budgets, market caps, and exposure rules in one table; tie to CVaR/Kelly math. \emph{Where:} Ch.~\texttt{6}.
+  \item \prio{P1} \textbf{Monitoring runbook}. Add an ops checklist for rollout, alarms, and rollback, with example dashboards. \emph{Where:} Ch.~\texttt{6} appendix.
+\end{itemize}
+
+\block{Reproducibility \& Artefacts}
+\begin{itemize}
+  \item \prio{P0} \textbf{End-to-end script}. One make/CLI entry to rebuild marts, train baselines, run OPE, and render figures. Publish artefact hashes. \emph{Where:} repo root + appendix.
+  \item \prio{P1} \textbf{Env pinning}. Verify \texttt{renv.lock} and \texttt{requirements.txt} reproduce figures on clean machine; document any differences. \emph{Where:} appendix.
+\end{itemize}
+
+\block{Writing \& Cohesion}
+\begin{itemize}
+  \item \prio{P0} \textbf{Contributions box}. Add a boxed list of contributions in Ch.~\texttt{1} and echo in Ch.~\texttt{9}. Map each to evidence.
+  \item \prio{P1} \textbf{Figure polish}. Uniform caption style, consistent color palette, and readable axis labels; ensure all tables use \texttt{threeparttable} notes.
+\end{itemize}
+
+\milestone{Data Foundations (2015–2025 core; optional 1999–2014; selective priors pre-1999)}
+\block{Acquisition \& Storage}
+\begin{itemize}
+  \item \prio{P0} Ingest \textbf{nflfastR} play-by-play 2015–2025; option flags for 1999–2014.
+  \item \prio{P1} Odds snapshots via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_snapshots} (book, timestamp, market, price, rule hints).
+  \item \prio{P1} Weather joins (Open-Meteo/NOAA), stadium roof/surface map, geocoded stadium coords.
+  \item \prio{P1} Schedule context: rest days, travel distance (Haversine), time zones crossed, primetime flags.
+  \item \prio{P1} Injury integration: QB-out binary, team AGL index, cumulative starters out; weekly status (out/doubtful/questionable) encoder.
+  \item \prio{P2} Referee crew assignments; pace/penalty tendencies.
+\end{itemize}
+
+\block{Feature Engineering (team-week / game-week grain)}
+\begin{itemize}
+  \item \prio{P0} EPA/play (team \& splits), Success Rate; opponent-adjusted via ridge; exponential decay (weekly half-life 0.6).
+  \item \prio{P0} PROE (pass rate over expected), neutral pace (sec/play), red-zone finishing (regressed).
+  \item \prio{P1} Trench proxies: pressure allowed/created, quick-pressure\%, adjusted line yards proxy, stuff rate.
+  \item \prio{P1} Role stability: target share, aDOT, YPRR (derive routes if available), WR/TE room deltas on injury.
+  \item \prio{P1} Turnover luck: fumble recovery \%, dropped INT proxy; mean-reversion flag.
+  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots).
+  \item \prio{P2} Market microstructure features: hold, cross-book CBV, line-move velocity (dLine/dt), implied vs model deltas.
+\end{itemize}
+
+\block{Data Quality \& Testing}
+\begin{itemize}
+  \item \prio{P0} Schema contracts; NOT NULLs; FK constraints; de-dupe policies for odds.
+  \item \prio{P0} Validation suite (basic): row counts per week, join rates, missingness dashboards.
+  \item \prio{P1} Statistical validation (Great-Expectations-style): value ranges, distribution drift monitors (weekly).
+  \item \prio{P1} Era handling: weighting schedule, \texttt{era} feature; strike years/OT rule changes guards.
+\end{itemize}
+
+\milestone{Baseline Models (Classical)}
+\block{Implementations}
+\begin{itemize}
+  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions.
+  \item \prio{P0} \textbf{Stern (1991)} normal mapping sanity checks; calibrate $\sigma$ seasonally.
+  \item \prio{P1} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors.
+  \item \prio{P1} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.).
+  \item \prio{P1} \textbf{In-play RF} (Lock--Nettleton) scaffolding for live WP (optional, keep modular).
+\end{itemize}
+
+\block{Calibration \& Outputs}
+\begin{itemize}
+  \item \prio{P0} Brier \& LogLoss vs.\ holdout; reliability diagrams; PIT for score distro.
+  \item \prio{P0} Vegas comparison: error vs closing spread; ATS/ML hit rates; CLV differentials.
+\end{itemize}
+
+\milestone{RL Capstone}
+\block{Agent Design}
+\begin{itemize}
+  \item \prio{P0} DQN baseline: state (priors, features, market), actions (bet/no-bet or discrete stake buckets), reward (PnL; CLV-shaped variant).
+  \item \prio{P1} PPO actor-critic for richer actions (alt-lines/teasers/staking); entropy reg; clipping.
+  \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes.
+\end{itemize}
+
+\block{Training \& Scaling}
+\begin{itemize}
+  \item \prio{P0} Mac MPS config; CUDA config; batch/episode knobs for scale-up/down.
+  \item \prio{P1} Experience replay buffers; target networks (DQN); advantage normalization (PPO).
+  \item \prio{P1} Evaluation protocols: fixed-season rolling windows; no leakage; ATS/ROI metrics.
+\end{itemize}
+
+\milestone{Ensembles \& Comparative Backtesting}
+\begin{itemize}
+  \item \prio{P0} Unified backtest harness: run GLM / Poisson / State-space / RL; collect metrics (Brier, LogLoss, ROI, Kelly growth, Sharpe).
+  \item \prio{P1} Simple ensembles (avg / logistic stack); Bayesian model averaging (optional).
+  \item \prio{P1} Ablations: remove feature families (injury/weather/trenches) to quantify marginal lift.
+\end{itemize}
+
+\milestone{Uncertainty \& Risk}
+\begin{itemize}
+  \item \prio{P1} Uncertainty-aware policy: downweight bets under wide posterior intervals.
+\end{itemize}
+
+\milestone{Simulation-Based Strategy Testing}
+\begin{itemize}
+  \item \prio{P1} Middle detection thresholds; multi-book arbitrage scan (if legal venue assumed).
+\end{itemize}
+
+\milestone{Narrative \& Explainability}
+\begin{itemize}
+  \item \prio{P1} SHAP for GLM/trees; factor attributions for game-level predictions.
+  \item \prio{P1} Rule miner: situational tags (short rest + cross-timezone + TNF).
+  \item \prio{P1} Insight generator: plain-language rationales (margin notes / appendix snippets).
+\end{itemize}
+
+\milestone{Evaluation \& Calibration (Dissertation Chapter)}
+\begin{itemize}
+  \item \prio{P0} PIT histograms; CLV sparklines (margin figures); per-season reliability panels.
+  \item \prio{P1} Vegas baseline tables; head-to-head model comparisons.
+\end{itemize}
+
+\milestone{System-of-Systems Governance}
+\begin{itemize}
+  \item \prio{P0} Experiment tracking (MLflow or Postgres schema: runs, params, metrics, artifacts).
+  \item \prio{P0} Model registry \& promotion policy; semantic versioning; rollback plan.
+  \item \prio{P1} Pipeline DAG diagram; data lineage; environment manifests (Docker + native).
+\end{itemize}
+
+\milestone{Writing \& Figures}
+\begin{itemize}
+  \item \prio{P0} Tufte-style layout: decide margin-note density; figure sizing guidelines; sparkline examples.
+  \item \prio{P0} “How we chose the timeframe” section with era weighting rationale.
+  \item \prio{P0} Literature integration chapter (top-10 models) + benchmark scripts references.
+  \item \prio{P1} Appendix: full visual gallery (key-number histos, teaser EV heatmaps, calibration plots).
+\end{itemize}
+
+\milestone{Bibliography \& Citations}
+\begin{itemize}
+  \item \prio{P0} Maintain single \texttt{references.bib}; keep keys stable; add DOIs/URLs where missing.
+  \item \prio{P0} Audit all \texttt{\textbackslash cite\{\}} have corresponding entries; compile warnings = 0.
+\end{itemize}
+
+\subsection*{Quality Gates (per milestone)}
+\begin{itemize}
+  \item Repro pass: deterministic runs (seeded), environment pinned, same metrics across machines.
+  \item Validity pass: calibration in tolerance; Vegas comparison documented.
+  \item Docs pass: figures captioned; equations referenced; todos burned down or deferred.
+\end{itemize}
+
+\endgroup

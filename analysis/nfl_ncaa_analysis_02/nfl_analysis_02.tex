@@ -1,0 +1,228 @@
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=magenta]{hyperref}
+
+\title[Generalizing Key-Number Pricing and Teasers]{Generalizing Football Key-Number Pricing and Teasers: \\ A Discrete-Margin Framework for NFL \& NCAA}
+\author{Richard Oldham}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We develop a unified, push-aware, \emph{discrete-margin} framework for valuing point-spread moves and teaser mechanics at \emph{any} integer $n$, with particular attention to the football key numbers $3,6,7$. Leveraging historical margin-of-victory frequencies for the NFL and NCAA, we (i) derive closed-form expressions for the fair price of buying/selling half points across $n$, (ii) generalize to multi-point moves (including standard $t$-point teasers) as sums of integer-atom probabilities, (iii) compute teaser break-even thresholds as functions of book pricing and leg count, and (iv) contrast NFL vs.\ NCAA where key-number mass differs meaningfully. The formulas are model-agnostic (they require only a calibrated discrete PMF over margins) and are plug-and-play for dashboards and backtests. We include league-specific guidance (when to buy the hook, when teasers are viable), and we reconcile our mathematics with empirical push charts and published studies.
+\end{abstract}
+
+\section{Setup: integer margins and notation}
+Let $M\in\mathbb{Z}$ denote the final \emph{favorite-minus-underdog} margin and $p_k=\Pr[M=k]$ its probability mass. For a spread $s$ quoted to the half-point,
+\[
+\text{favorite }-s\ \text{covers}\iff 
+\begin{cases}
+M\ge \lceil s+1\rceil & \text{if $s\in\mathbb{Z}+\tfrac12$},\\[2pt]
+M\ge s+1 & \text{if $s\in\mathbb{Z}$},
+\end{cases}
+\]
+with a \emph{push} at integer $M=s$ when $s\in\mathbb{Z}$. Define the push atom at integer $n$ by $p_n=\Pr[M=n]$; empirically in the NFL,
+\[
+p_3\approx 0.145\text{--}0.150,\qquad p_7\approx 0.090\text{--}0.099,\qquad p_6\approx 0.060\text{--}0.073,
+\]
+while in NCAA FBS,
+\[
+p_3\approx 0.092,\qquad p_7\approx 0.078,\qquad p_6\approx 0.030,
+\]
+based on large-sample tabulations.\footnote{See \cite{Action-KeyNumbers-2024,Covers-KeyNumbers-2025,Boyds-KeyNumbers} for NFL key-number ranges; leaguewide tables from \cite{CleanupHitter-NFL} (NFL, 2000--2025) and \cite{CleanupHitter-CFB} (FBS vs.\ FBS, 2005--2025) give exact counts.\label{fn:data}}
+
+Throughout, let a unit stake pay net $b$ on a win (e.g.\ $b=100/110\approx0.909$ at $-110$) and $0$ on a push.
+
+\section{Half-point valuation at a general integer $n$}
+Consider moves that cross a single integer $n$.
+
+\subsection*{Favorite side}
+\begin{align*}
+\textbf{(A) }&-n \to -(n-\tfrac12): \quad \text{push}\to\text{win at }M=n, \quad \Delta \mathrm{EV}=b\,p_n.\\
+\textbf{(B) }&-(n+\tfrac12) \to -n: \quad \text{loss}\to\text{push at }M=n,\quad \Delta \mathrm{EV}=1\cdot p_n.
+\end{align*}
+Thus the full key move $-(n+\tfrac12)\to -(n-\tfrac12)$ is worth $(1+b)\,p_n$ per unit staked.
+
+\subsection*{Underdog side}
+By symmetry:
+\begin{align*}
+\textbf{(C) }&+(n-\tfrac12)\to +n:\quad \text{loss}\to\text{push at }M=n,\quad \Delta \mathrm{EV}=1\cdot p_n.\\
+\textbf{(D) }&+n\to +(n+\tfrac12):\quad \text{push}\to\text{win at }M=n,\quad \Delta \mathrm{EV}=b\,p_n.
+\end{align*}
+
+\paragraph{Implications.}
+At NFL key numbers, $p_3$ is so large (\S\ref{fn:data}) that buying the hook on/ off $3$ commands the greatest fair premium:\footnote{Rule-of-thumb conversions align with journalism and sharp market studies: converting $-3$ to $-2.5$ often prices near $\sim\,$20--35 cents in fair odds, and converting $+3$ to $+3.5$ similarly \cite{WaPo-Greenberg-Keys,Action-KeyNumbers-2024}. Books frequently \emph{overcharge} relative to fairness; use a push chart or calculator to avoid paying above $b\,p_3$ (favorite) or $p_3$ (dog).}
+\[
+\text{fair half-point value at $n$} \ \propto\ p_n,\quad \text{so}\quad n\in\{3,7\} \text{ dominate NFL; NCAA values are smaller}.
+\]
+
+\section{Multi-point moves as sums of atoms}
+Any move that shifts the \emph{cover threshold} by $t>0$ points can be decomposed into half-point steps across the integers it traverses; only the \emph{integers crossed} affect EV. For a favorite,
+\[
+\text{cover set changes from } \{M\ge T_1\}\ \text{ to }\ \{M\ge T_2\},\quad T_2<T_1.
+\]
+The win-probability increase equals
+\[
+\Delta P_{\text{win}}=\Pr\big(T_2\le M< T_1\big)=\sum_{k=\lceil T_2\rceil}^{\lfloor T_1\rfloor-1} p_k,
+\]
+i.e.\ the mass between the old and new thresholds. The EV change (per unit stake) follows:
+\[
+\Delta \mathrm{EV}= b\cdot \underbrace{\sum_{\substack{\text{integers $k$ where}\\ \text{push}\to\text{win}}} p_k}_{\text{Case (A),(D)}}\ +\ 1\cdot\underbrace{\sum_{\substack{\text{integers $k$ where}\\ \text{loss}\to\text{push}}} p_k}_{\text{Case (B),(C)}}.
+\]
+\textbf{Example (NFL, crossing $7$ and $3$).} $-7.5\to-1.5$ increases $P(\text{win})$ by $\sum_{k=2}^{7}p_k$; with typical NFL atoms, this is dominated by $p_3+p_7$ (plus $p_6$), explaining why 6-point \emph{teaser} legs that cross both $7$ and $3$ are uniquely powerful.
+
+\section{Fair pricing: spreads and point-buys}
+For a favorite at integer $n$ with $(P_{>n},P_{=n},P_{<n})=(\Pr[M\ge n{+}1],p_n,\Pr[M\le n{-}1])$, the no-vig fair net payoff $b^\star$ at $-n$ solves
+\[
+0=b^\star P_{>n}-P_{<n}\quad\Longrightarrow\quad b^\star=\frac{P_{<n}}{P_{>n}}.
+\]
+A half-point buy $-n\to -(n-\tfrac12)$ has \emph{fair} surcharge $\Delta b_{\text{fair}}=b\,p_n$ (Case A). Conversely, selling the hook $-n\to -(n+\tfrac12)$ requires a \emph{rebate} matching the value lost, $\approx b\,p_n$ in EV terms. These statements hold verbatim for dogs via (C)--(D).
+
+\section{Teasers: general $t$-point, $k$-leg mechanics}
+A $t$-point teaser shifts each leg’s threshold by $t$, converting the leg’s cover probability from $q$ to $q_t=q+\sum p_k$ across the integers traversed. If a $k$-leg teaser pays decimal odds $O_k$, the \emph{break-even} per-leg win probability is\footnote{Assuming independence and the house rule that a push reduces leg count (the industry standard for NFL; always verify rules). If pushes \emph{lose}, adjust $q_t$ downward by the push mass.}
+\[
+q_{\text{req}}(k,O_k)=\big(O_k^{-1}\big)^{1/k}.
+\]
+For two-leg NFL teasers at $-110$ ($O_2\!=\!1.909$), $q_{\text{req}}\approx 0.724$; at $-120$ ($O_2\!=\!1.833$), $q_{\text{req}}\approx 0.738$.\footnote{Classic references give the same $\sim\!72.5\%$ rule-of-thumb per leg for two-team, 6-point teasers priced near $-110$; see \cite{Wizard-Teaser,Dox-Wong,SBO-Wong}. Empirical hit rates for \emph{Wong} legs (crossing $3$ and $7$) are historically in the low-/mid-70s\% per leg \cite{Wizard-TeaserPage}.}
+
+\subsection*{Wong strategy (NFL) vs.\ NCAA}
+NFL: teasing favorites from $-7.5$ to $-1.5$ and dogs from $+1.5$ to $+7.5$ traverses $\{2,3,4,5,6,7\}$, capturing $p_3+p_7$ and typically achieving $q_t\gtrsim 0.72$ in low-total games---hence \emph{potentially} +EV at $-110$ but marginal at $-120$.\footnote{Totals matter: lower totals concentrate distributions, increasing the value of $t$ points; most practitioners filter Wong legs by total (e.g.\ $\le 49$). Books reacted by repricing to $-120$ or worse and by limiting teaser eligibility, eroding edge \cite{Wizard-Teaser,Wizard-TeaserPage}.}
+NCAA: because $p_3,p_7$ are materially smaller (\S\ref{fn:data}), $q_t$ gains less; multiple studies find college teasers broadly -EV even under low totals, with only small, noisy pockets near pick’em spreads showing near-breakeven legs \cite{TheLines-CFB-TeaserStudy,TheLines-CFB-Guide}. \emph{Default guidance: do not tease college sides.}
+
+\section{Strategy playbook (league-specific)}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{NFL --- buy/sell the right hooks.} Pay for $3$ (and to a lesser extent $7$) if the price $\le$ fair value: buy (favorite) $-3\to-2.5$ if the extra juice $\lesssim b\,p_3$; buy (dog) $+3\to+3.5$ if $\lesssim p_3$.\footnote{Empirical push rates at 3 near $9$--$10\%$ on the \emph{favorite’s} side imply $\sim$20--35 cent fair moves in common markets; media primers concur \cite{WaPo-Greenberg-Keys,Action-KeyNumbers-2024}.}
+Avoid paying for non-key numbers (e.g.\ $4,5,8$) where $p_n$ is small.
+\item \textbf{NFL --- teasers only if they cross $7$ \emph{and} $3$ and are fairly priced.} Two-leg, 6-pt at $-110$ can be viable; at $-120$ the margin is thin or negative unless legs are very strong (low totals, efficient spreads).\footnote{Wizard-of-Odds’ long-horizon estimates show basic-strategy teasers roughly breakeven at contemporary pricing without additional filters \cite{Wizard-TeaserPage}.}
+\item \textbf{NCAA --- rarely buy, almost never tease.} Lower key-number masses ($p_3,p_7$) and higher scoring variance shrink $t$-point value; buying hooks is only justified at unusually cheap prices, and teasers are generally -EV \cite{TheLines-CFB-TeaserStudy}.
+\item \textbf{Line shopping.} Because value scales with $p_n$, a \emph{free} hook (rogue $\pm3.5$ or $\mp2.5$ at standard juice) is worth substantially more than the same hook on $5$; aggregate multiple books and prefer alternate lines that cross $\{3,7\}$ at modest juice \cite{WaPo-Greenberg-Keys}.
+\end{enumerate}
+
+\section{Implementation in dashboards/backtests}
+\begin{enumerate}[leftmargin=2em,label=\arabic*.]
+\item \textbf{Calibrate $p_k$ by league, era, and (optionally) total.} Start from league tables \cite{CleanupHitter-NFL,CleanupHitter-CFB}; optionally condition on total bins (low totals $\Rightarrow$ higher $p_3$).
+\item \textbf{Compute fair moves as additive over integers crossed.} Use (A)--(D) and sum of $p_k$ across intervals to convert spreads $\leftrightarrow$ alternate lines \& teasers.
+\item \textbf{Teaser logic.} Given book teaser price $O_k$, require $q_t\ge q_{\text{req}}(k,O_k)$ for \emph{each} leg; prefer legs that cross both $7$ and $3$, and filter by total.
+\item \textbf{Kelly sizing.} With push probability $r$ and win/loss $(q,\ell)$ (so $q+\ell+r=1$), fractional Kelly is $f^\star=(bq-\ell)/b$; set $q=q_t$ for teased legs or adjusted spreads.
+\end{enumerate}
+
+\section*{Conclusion}
+Key-number pricing is nothing more than \emph{counting lattice mass}: the fair value of a point (or teaser) move equals the sum of the $p_k$ it captures, with push vs.\ win weights $(1,b)$. Because $p_3$ (and $p_7$) are large in the NFL and smaller in NCAA, the same hook or teaser has very different economics across leagues. The discrete framework here turns that insight into one-line computations suited for live decisioning, auditing sportsbook prices, and principled bankroll deployment.
+
+\bigskip
+
+% ---------------------------
+% Embedded bibliography
+% ---------------------------
+\begin{filecontents*}{refs.bib}
+@misc{Boyds-KeyNumbers,
+  author = {{Boyd's Bets}},
+  title  = {NFL Key Numbers: When to Buy Points to Get On or Off the Most Common Margins of Victory},
+  year   = {2023},
+  url    = {https://www.boydsbets.com/nfl-key-numbers/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{Action-KeyNumbers-2024,
+  author = {{Action Network}},
+  title  = {Key Numbers in NFL Betting, Explained},
+  year   = {2024},
+  url    = {https://www.actionnetwork.com/nfl/nfl-key-betting-numbers-spread-margins-of-victory-line-value},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{Covers-KeyNumbers-2025,
+  author = {{Covers}},
+  title  = {Examining NFL Key Numbers for the 2025--26 Season},
+  year   = {2025},
+  url    = {https://www.covers.com/nfl/key-numbers},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{CleanupHitter-NFL,
+  author = {{Cleanup Hitter}},
+  title  = {Frequency of NFL Regular-Season Scores (2000--2025)},
+  year   = {2025},
+  url    = {https://cleanuphitter.com/nfl/stats/nfl_common_scores.php},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{CleanupHitter-CFB,
+  author = {{Cleanup Hitter}},
+  title  = {Frequency of CFB Scores (FBS vs.\ FBS, 2005--2025)},
+  year   = {2025},
+  url    = {https://cleanuphitter.com/cfb/stats/cfb_common_scores.php},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{WaPo-Greenberg-Keys,
+  author = {Greenberg, Neil},
+  title  = {The key numbers for NFL betting --- and how to use them to your advantage},
+  year   = {2022},
+  url    = {https://www.washingtonpost.com/sports/2022/09/20/nfl-margin-victory-point-spreads/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{Wizard-Teaser,
+  author = {Shackleford, Michael},
+  title  = {NFL Teasers (analysis and returns)},
+  year   = {2025},
+  url    = {https://wizardofodds.com/games/sports-betting/nfl-teaser/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{Wizard-TeaserPage,
+  author = {Shackleford, Michael},
+  title  = {NFL Teaser Bets --- Appendix and Data},
+  year   = {2025},
+  url    = {https://wizardofodds.com/games/sports-betting/appendix/10/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{Dox-Wong,
+  author = {{DocSports}},
+  title  = {Wong Teasers --- Basic Strategy Teasers},
+  year   = {2009},
+  url    = {https://www.docsports.com/current/wong-teasers-basic-strategy-teasers.html},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{SBO-Wong,
+  author = {{SBO.net}},
+  title  = {NFL Wong Teasers --- How Basic Strategy Teasers Work},
+  year   = {2021},
+  url    = {https://www.sbo.net/strategy/wong-teasers/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{TheLines-CFB-TeaserStudy,
+  author = {{TheLines}},
+  title  = {College Football Teasers: 166-Game Study Shows Buying Points Rarely Pays},
+  year   = {2024},
+  url    = {https://www.thelines.com/college-football-teasers-study-2021/},
+  note   = {Accessed 2025-09-25}
+}
+
+@misc{TheLines-CFB-Guide,
+  author = {{TheLines}},
+  title  = {College Football Odds Guide (Teasers Section)},
+  year   = {2025},
+  url    = {https://www.thelines.com/betting/college-football/},
+  note   = {Accessed 2025-09-25}
+}
+\end{filecontents*}
+
+\bibliographystyle{amsplain}
+\bibliography{refs}
+
+\end{document}

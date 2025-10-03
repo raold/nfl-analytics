@@ -1,0 +1,123 @@
+---
+title: "03 – Odds & Weather Join"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  season_filter: 2024
+  station_mapping_path: null
+  default_station: null
+  hours_window: 3
+  write_weather: false
+---
+
+## Purpose
+Blend schedule odds with historical weather observations to populate the `weather` table and support market context analysis. Parameters keep the notebook reusable across seasons.
+
+## Prerequisites
+- Postgres running with `weather` table (see `db/001_init.sql`).
+- R packages: `dplyr`, `DBI`, `RPostgres`, `meteostat`, `lubridate`, `purrr`, `readr`, `glue`.
+- Optional station mapping CSV with columns `stadium`, `station`.
+
+## 1. Pull Game Metadata
+```{r}
+library(DBI)
+library(RPostgres)
+library(dplyr)
+library(glue)
+
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+season_clause <- if (is.null(params$season_filter)) "" else glue("WHERE season = {as.integer(params$season_filter)}")
+query <- glue("SELECT game_id, season, kickoff, stadium FROM games {season_clause} ORDER BY kickoff")
+
+games <- dbGetQuery(con, query)
+head(games)
+```
+
+## 2. Load Stadium → Station Mapping
+```{r}
+library(purrr)
+library(readr)
+
+if (!is.null(params$station_mapping_path) && file.exists(params$station_mapping_path)) {
+  station_lookup <- read_csv(params$station_mapping_path, show_col_types = FALSE)
+} else {
+  station_lookup <- tibble::tibble(stadium = character(), station = character())
+}
+
+games_weather <- games |>
+  left_join(station_lookup, by = "stadium")
+
+if (!is.null(params$default_station)) {
+  games_weather <- games_weather |>
+    mutate(station = if_else(is.na(station), params$default_station, station))
+}
+
+games_weather <- games_weather |> filter(!is.na(station))
+```
+
+## 3. Fetch Weather Observations
+```{r}
+library(lubridate)
+library(meteostat)
+
+fetch_window <- function(station, kickoff, window_hours = 3) {
+  start <- kickoff - hours(window_hours)
+  end   <- kickoff + hours(window_hours)
+  hourly(
+    station = station,
+    start   = start,
+    end     = end
+  ) |>
+    summarise(
+      temp_c = mean(temp, na.rm = TRUE),
+      rh = mean(rhum, na.rm = TRUE),
+      wind_kph = mean(wspd, na.rm = TRUE) * 3.6,
+      pressure_hpa = mean(pres, na.rm = TRUE),
+      precip_mm = sum(prcp, na.rm = TRUE)
+    )
+}
+
+weather_obs <- map_dfr(seq_len(nrow(games_weather)), function(i) {
+  row <- games_weather[i, ]
+  fetch_window(row$station, row$kickoff, params$hours_window) |>
+    mutate(
+      game_id = row$game_id,
+      season = row$season,
+      station = row$station
+    )
+})
+```
+
+## 4. Persist Weather Table
+```{r}
+if (isTRUE(params$write_weather) && nrow(weather_obs) > 0) {
+  dbWriteTable(con, "weather", weather_obs, append = TRUE, row.names = FALSE)
+}
+```
+
+## 5. Close Connection & Preview
+```{r}
+if (nrow(weather_obs) > 0) {
+  head(weather_obs)
+}
+
+dbDisconnect(con)
+```
+
+## TODO
+- Maintain an authoritative stadium → station mapping table (CSV or database).
+- Add QA checks comparing saved weather vs. official box score summaries.
+- Join odds and weather to analyse line movement vs. conditions.

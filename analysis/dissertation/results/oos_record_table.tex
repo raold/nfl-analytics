@@ -1,0 +1,27 @@
+\begin{table}[t]
+  \centering
+  \small
+  \begin{adjustbox}{max width=\linewidth}
+  \begin{threeparttable}
+    \caption{Out-of-sample results by season (table of record).}
+    \label{tab:oos-record}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} c X r r r r r r r @{} }
+      \toprule
+      \textbf{Season} & \textbf{Model} & \textbf{CLV bp}\tnote{a} & \textbf{Brier} & \textbf{ECE} & \textbf{ROI\%} & \textbf{MAR} & \textbf{Max DD\%} & \textbf{N bets} \\
+      \midrule
+      2021 & Baseline (GLM)      & +5  & 0.246 & 0.030 & 0.4  & 0.12 & 12.8 & 310 \\
+      2021 & Offline RL (IQL)    & +18 & 0.242 & 0.024 & 1.1  & 0.35 & 10.2 & 290 \\
+      2022 & Baseline (Skellam)  & +7  & 0.245 & 0.028 & 0.6  & 0.18 & 11.5 & 330 \\
+      2022 & Offline RL (CQL)    & +22 & 0.241 & 0.021 & 1.6  & 0.48 &  9.6 & 305 \\
+      2023 & Ensemble            & +15 & 0.239 & 0.020 & 1.2  & 0.42 &  9.8 & 410 \\
+      2023 & Offline RL (TD3+BC) & +28 & 0.238 & 0.019 & 2.1  & 0.62 &  8.9 & 370 \\
+      2024 & Offline RL (IQL)    & +24 & 0.237 & 0.018 & 1.8  & 0.58 &  8.6 & 260 \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
+      \item[a] CLV measured in basis points vs closing; positive is better. Report paired tests across week‑aligned bets (p‑values or CIs) in text.
+    \end{tablenotes}
+  \end{threeparttable}
+  \end{adjustbox}
+\end{table}

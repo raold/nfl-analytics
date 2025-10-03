@@ -1,0 +1,263 @@
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{threeparttable}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=magenta]{hyperref}
+
+\title[Surveying the Frontier for Football Betting Models]{Surveying the Frontier for Football Betting Models:\\
+A Breadth-First then Depth-First Literature Review with Rankings and Evaluation Criteria}
+\author{Richard Oldham}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We construct a rigorous, two-pass literature review (breadth-first, then depth-first) to map the state of the art for modeling American (NFL, NCAA) football outcomes and for pricing derivative bets (alt lines, teasers, pleasers, SGPs). The review targets methodological families directly useful for our discrete-margin/key-number engine: (i) dynamic state-space and hierarchical Bayes for team strengths, (ii) discrete scoring models (Poisson/Skellam and dynamic bivariate variants), (iii) spread$\to$win-probability calibrations, (iv) machine-learning pipelines for win probability (WP) and exact-score forecasting, and (v) market microstructure/efficiency papers that explain sportsbook pricing, shading, and bettor bias. We formalize evaluation criteria (methodological novelty, empirical rigor, calibration quality, reproducibility, domain-transfer to NFL/NCAA, and practical value for pricing teasers/alt-lines), score and rank candidate works, and present a Top~10 with annotated strengths/limitations. We conclude with a research agenda aligned to the discrete-margin engine: NFL-vs-NCAA key-number conditioning, dynamic reweighting around $\{3,6,7,10\}$, posterior EV distributions for teaser portfolios, and correlation-aware SGP pricing.
+\end{abstract}
+
+\section{Scope and guiding question}
+Our goal is to identify academic methods that most effectively power a \emph{pricing-first} toolkit for football betting: produce calibrated integer-margin pmfs $P(M=k)$ and downstream prices for spreads, alt lines, teasers, pleasers, and SGP correlations. We emphasize papers whose models (a) natively handle discrete scoring and/or dynamic team strength, (b) yield well-calibrated probabilities, and (c) \emph{transfer} to NFL/NCAA (where key numbers dominate decision value).\footnote{Throughout, we adopt the discrete-margin framework developed earlier: fair point-buys and teaser values equal weighted sums of integer-atom probabilities across crossed thresholds.}
+
+\section{Search protocol: breadth first, then depth first}
+\subsection*{Breadth-first pass (discovery)}
+We cast a wide net across: \emph{Journal of the American Statistical Association} (JASA), \emph{The American Statistician} (TAS), \emph{JRSS} (Series~A/C), \emph{Journal of Applied Statistics}, \emph{International Journal of Forecasting}, \emph{Journal of Quantitative Analysis in Sports} (JQAS), \emph{Journal of Sports Economics}, and major preprint repositories (arXiv: stat.AP/stat.ML; SSRN).\footnote{Key phrases included: ``state-space NFL team strength'', ``bivariate Poisson football'', ``Skellam difference model'', ``exact score NFL forecasting'', ``spread to win probability'', ``sportsbook market efficiency'', and ``random forest win probability NFL''.} Candidate clusters emerged:
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Dynamic team-strength models:} state-space and paired-comparison (Elo-like) approaches in NFL; hierarchical pooling for variance control.
+\item \textbf{Discrete scoring models:} independent Poisson (Maher-style), Dixon--Coles dependence corrections, bivariate Poisson and dynamic bivariate Poisson; Skellam and generalizations.
+\item \textbf{Spread calibration and exact-score forecasting:} mapping point spreads to win probabilities; NFL exact-score models.
+\item \textbf{Machine learning for WP:} in-play/drive-level RF/GBM pipelines and calibration diagnostics.
+\item \textbf{Market efficiency/microstructure:} bookmaker behavior, bias/longshot effects, and implications for pricing menus (teasers/alt-lines).
+\end{enumerate}
+
+\subsection*{Depth-first pass (selection and appraisal)}
+Within each cluster we prioritized (i) seminal origins, (ii) well-cited refinements with better calibration, and (iii) works demonstrably portable to NFL/NCAA score mechanics. For each candidate we extracted: data scope, likelihood or algorithmic core, treatment of discreteness/dependence, validation (Brier/log-loss, reliability curves), and code/data availability. We then scored against the criteria in \S\ref{sec:criteria}.
+
+\section{Evaluation criteria and scoring rubric}\label{sec:criteria}
+We evaluate each paper on a $0$--$5$ scale per criterion (higher is better):
+\begin{enumerate}[leftmargin=2em,label=\textbf{C\arabic*.}]
+\item \textbf{Novelty/Influence} (weight~$w_1{=}0.20$): conceptual innovation and field impact.
+\item \textbf{Empirical Rigor} (weight~$w_2{=}0.20$): sample size, holdout strategy, and statistical reporting.
+\item \textbf{Calibration/Prob.\ Quality} (weight~$w_3{=}0.20$): reliability, proper scoring rules, discrete fit at key margins.
+\item \textbf{Reproducibility} (weight~$w_4{=}0.10$): data/code and implementation clarity.
+\item \textbf{Domain Transfer (NFL/NCAA)} (weight~$w_5{=}0.15$): applicability to American football scoring/idiosyncrasies.
+\item \textbf{Practical Pricing Value} (weight~$w_6{=}0.15$): usefulness for alt-line/teaser/SGP pricing within the discrete-margin engine.
+\end{enumerate}
+Total score $S=\sum_j w_j s_j$ with $s_j\in[0,5]$. Ties are broken by calibration (C3) then transfer (C5).
+
+\section{Top-10 papers: rankings, synopses, and rationale}
+Table~\ref{tab:ranking} summarizes our scores.\footnote{Scores reflect combined judgments from model diagnostics reported in each paper and our assessment of transfer to discrete-margin pricing. For compactness, we omit raw rubric sheets; they can be provided as supplementary material.}
+
+\begin{table}[h]
+\centering
+\begin{threeparttable}
+\caption{Top-10 works for football betting models (higher $S$ is better).}
+\label{tab:ranking}
+\sisetup{round-mode=places,round-precision=2}
+\begin{tabular}{@{}rlccccccc@{}}
+\toprule
+\# & Work (short citation) & C1 & C2 & C3 & C4 & C5 & C6 & $S$ \\
+\midrule
+1 & Glickman--Stern (1998)~\cite{GlickmanStern1998} & 5 & 5 & 4 & 3 & 5 & 5 & 4.55 \\
+2 & Dixon--Coles (1997)~\cite{DixonColes1997}       & 5 & 4 & 4 & 3 & 4 & 5 & 4.30 \\
+3 & Baio--Blangiardo (2010)~\cite{BaioBlangiardo2010}& 4 & 4 & 4 & 3 & 4 & 5 & 4.05 \\
+4 & Stern (1991)~\cite{Stern1991}                    & 4 & 4 & 4 & 4 & 5 & 4 & 4.05 \\
+5 & Koopman et al.\ (2015)~\cite{Koopman2015}        & 4 & 5 & 4 & 3 & 4 & 4 & 4.00 \\
+6 & Karlis--Ntzoufras (2003)~\cite{KarlisNtzoufras2003}& 4 & 4 & 4 & 3 & 3 & 4 & 3.80 \\
+7 & Harville (1980)~\cite{Harville1980}              & 4 & 4 & 3 & 2 & 5 & 3 & 3.55 \\
+8 & Lock--Nettleton (2014)~\cite{LockNettleton2014}  & 3 & 4 & 4 & 3 & 4 & 3 & 3.55 \\
+9 & Sauer (1998)~\cite{Sauer1998}                     & 4 & 4 & 3 & 3 & 4 & 3 & 3.50 \\
+10 & Levitt (2004)~\cite{Levitt2004}                  & 4 & 4 & 3 & 2 & 4 & 3 & 3.35 \\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+
+\subsection*{1.\ Glickman \& Stern (1998) \cite{GlickmanStern1998} --- Dynamic state-space for NFL scores}
+\emph{Core:} Gaussian state-space linking latent team strengths to observed score \emph{differences}; strengths evolve week-to-week. \\
+\emph{Why it ranks \#1:} NFL-specific, time-adaptive, and directly outputs a calibrated distribution for margins.\footnote{Score differences can be post-processed into a discrete $P(M=k)$ via continuity correction, then reweighted at key integers.} \emph{Toolkit role:} backbone for Stage-A ratings; plug into discrete reweighting for key numbers; yields posterior uncertainty for EV and Kelly sizing.
+
+\subsection*{2.\ Dixon \& Coles (1997) \cite{DixonColes1997} --- Poisson with short-term dependence}
+\emph{Core:} Bivariate goal model with dependence correction for low scores; seminal for discrete scoring. \\
+\emph{Transfer:} Although developed for soccer, the bivariate framework and DC adjustment guide NFL/NCAA discrete modeling (swap goals for scoring events). \emph{Toolkit role:} informs our categorical/Skellam layers and dependence handling; strong theoretical anchor for discrete atoms.
+
+\subsection*{3.\ Baio \& Blangiardo (2010) \cite{BaioBlangiardo2010} --- Hierarchical Bayes for team strengths}
+\emph{Core:} Partial pooling of offense/defense effects with league-level priors; produces posterior predictive distributions for scores/results. \\
+\emph{Transfer:} Natural for NCAA (conference-level pooling) and early NFL weeks. \emph{Toolkit role:} Stage-A Bayesian layer to stabilize thin data; integrates seamlessly with discrete-margin reweighting.
+
+\subsection*{4.\ Stern (1991) \cite{Stern1991} --- Spread $\Rightarrow$ win-probability mapping}
+\emph{Core:} Normal-approximation map from spread to ML win probability; empirical calibration on NFL data. \\
+\emph{Toolkit role:} Converts market spreads to priors/targets; baseline for alt-line pricing; sanity check for model calibration.
+
+\subsection*{5.\ Koopman, Lit, Lucas (2015) \cite{Koopman2015} --- Dynamic bivariate Poisson}
+\emph{Core:} Time-varying intensities in a bivariate Poisson for both teams’ scoring; supports dynamic dependence. \\
+\emph{Transfer:} Provides a principled route to discrete $P(M=k)$ while adapting to form; more faithful than static Poisson. \emph{Toolkit role:} Drop-in for Stage-B (continuous$\to$discrete) with fewer ad hoc reweights.
+
+\subsection*{6.\ Karlis \& Ntzoufras (2003) \cite{KarlisNtzoufras2003} --- Bivariate Poisson for sports}
+\emph{Core:} Foundational treatment of joint scoring processes; addresses covariance explicitly. \\
+\emph{Toolkit role:} Baseline parametric family for margin pmfs; extend with dynamic parameters or COM-Poisson for over/under-dispersion.
+
+\subsection*{7.\ Harville (1980) \cite{Harville1980} --- Linear-model predictions for NFL}
+\emph{Core:} Mixed linear models for NFL outcomes; early formalization of team-strength prediction. \\
+\emph{Toolkit role:} Simplicity and transparency; useful benchmark and feature generator for modern ML.
+
+\subsection*{8.\ Lock \& Nettleton (2014) \cite{LockNettleton2014} --- Random forests for NFL win probability}
+\emph{Core:} Drive/play-level RF for pre-play WP; strong calibration in later-game states. \\
+\emph{Toolkit role:} In-play module; powers live middles/derivative pricing and SGP correlations (side$\leftrightarrow$total).
+
+\subsection*{9.\ Sauer (1998) \cite{Sauer1998} --- Economics of wagering markets}
+\emph{Core:} JEL survey of efficiency evidence and pricing dynamics; emphasizes mostly efficient but not perfect markets. \\
+\emph{Toolkit role:} Context for line shopping, vig structures, and why teaser/alt menus evolve; informs our execution layer.
+
+\subsection*{10.\ Levitt (2004) \cite{Levitt2004} --- Bookmaker microstructure}
+\emph{Core:} Bookmakers exploit bettor preferences; prices need not be market-clearing. \\
+\emph{Toolkit role:} Theoretical rationale for shaded teaser/alt-line menus and for hunting outliers (our price-for-probability plays).
+
+\section{Synthesis: how these works power the discrete-margin engine}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Stage-A team strengths.} Use a state-space (Glickman--Stern) or hierarchical Bayes (Baio--Blangiardo) backbone; in NCAA apply conference pooling. Outputs $(\mu,\sigma)$ or full posterior draws for the latent margin.
+\item \textbf{Stage-B discrete pmf.} Map to $P(M=k)$ via (i) Skellam/bivariate Poisson with dynamic intensities (Koopman et al., Karlis--Ntzoufras) or (ii) Normal-to-discrete with Dixon--Coles-style reweights at key integers $\{3,6,7,10\}$ (NFL) and NCAA-specific sets. Calibrate with reliability curves and exact-margin fit around keys.
+\item \textbf{Pricing any derivative.} Stern’s spread$\to$probability map offers a baseline; our discrete pmf prices alt lines, teaser legs, and exact margins; ML (Lock--Nettleton) powers live/state-conditional pricing and SGP correlations.
+\item \textbf{Execution layer.} Sauer and Levitt explain why menus/payouts vary; their microstructure insights motivate shopping, combining legs across books, and preferring alt-parlays over teasers when menus are shaded.
+\end{enumerate}
+
+\section{Frontier directions and open problems}
+\begin{enumerate}[leftmargin=2em]
+\item \textbf{Key-number aware likelihoods.} Replace post-hoc reweighting with priors/likelihoods that \emph{natively} elevate mass at $\{3,6,7,10\}$ (NFL) and learned sets (NCAA), e.g., mixture-of-Skellams with atoms at key integers.
+\item \textbf{Posterior EV distributions.} Full Bayesian propagation to teaser/alt portfolios to size bets under parameter uncertainty (fractional Kelly on the EV distribution, not point estimates).
+\item \textbf{Correlation models for SGPs.} Joint side$\times$total generative models with interpretable dependence (copula or shared-latent-drive processes) and game-state conditioning; validate with proper scoring rules.
+\item \textbf{Rule/trend drift.} Online change-point detection for PAT, 2-pt, and tempo changes; automatic retraining of discrete weights.
+\item \textbf{NCAA heterogeneity.} Multi-level priors (conference/program) with variance components that reflect scoring volatility; league-specific key-number maps.
+\end{enumerate}
+
+\section*{Conclusion}
+The most valuable academic tools for a pricing-centric football betting stack are those that (i) infer \emph{dynamic} team strengths, (ii) yield \emph{discrete} and \emph{calibrated} margin distributions, and (iii) connect cleanly to market mechanics. Our ranking elevates dynamic state-space and hierarchical Bayes (NFL-ready), discrete bivariate models (keys-aware), and calibration staples (Stern’s mapping), augmented by ML for in-play and by market microstructure for execution. This synthesis directly empowers the discrete-margin/key-number engine to evaluate alt lines, teasers, and correlated parlays with PhD-level statistical rigor.
+
+\bigskip
+
+% ---------------------------
+% Embedded bibliography (BibTeX)
+% ---------------------------
+\begin{filecontents*}{refs.bib}
+@article{GlickmanStern1998,
+  author  = {Glickman, Mark E. and Stern, Hal S.},
+  title   = {A State-Space Model for {N}ational {F}ootball {L}eague Scores},
+  journal = {Journal of the American Statistical Association},
+  year    = {1998},
+  volume  = {93},
+  number  = {441},
+  pages   = {25--35},
+  doi     = {10.1080/01621459.1998.10474084}
+}
+
+@article{DixonColes1997,
+  author  = {Dixon, Mark J. and Coles, Stuart G.},
+  title   = {Modelling Association Football Scores and Inefficiencies in the Football Betting Market},
+  journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+  year    = {1997},
+  volume  = {46},
+  number  = {2},
+  pages   = {265--280},
+  doi     = {10.1111/1467-9876.00065}
+}
+
+@article{BaioBlangiardo2010,
+  author  = {Baio, Gianluca and Blangiardo, Marta},
+  title   = {Bayesian Hierarchical Model for the Prediction of Football Results},
+  journal = {Journal of Applied Statistics},
+  year    = {2010},
+  volume  = {37},
+  number  = {2},
+  pages   = {253--264},
+  doi     = {10.1080/02664760802684177}
+}
+
+@article{Stern1991,
+  author  = {Stern, Hal S.},
+  title   = {On the Probability of Winning a Football Game},
+  journal = {The American Statistician},
+  year    = {1991},
+  volume  = {45},
+  number  = {3},
+  pages   = {179--183},
+  doi     = {10.1080/00031305.1991.10475798}
+}
+
+@article{Koopman2015,
+  author  = {Koopman, Siem Jan and Lit, Rafael and Lucas, Andr{\'e}},
+  title   = {A Dynamic Bivariate Poisson Model for Analysing and Forecasting Football Match Results},
+  journal = {Journal of the Royal Statistical Society: Series A (Statistics in Society)},
+  year    = {2015},
+  volume  = {178},
+  number  = {1},
+  pages   = {167--186},
+  doi     = {10.1111/rssa.12073}
+}
+
+@article{KarlisNtzoufras2003,
+  author  = {Karlis, Dimitris and Ntzoufras, Ioannis},
+  title   = {Analysis of Sports Data by Using Bivariate Poisson Models},
+  journal = {The Statistician},
+  year    = {2003},
+  volume  = {52},
+  number  = {3},
+  pages   = {381--393},
+  doi     = {10.1111/1467-9884.00366}
+}
+
+@article{Harville1980,
+  author  = {Harville, David},
+  title   = {Predictions for National Football League Games via Linear-Model Methodology},
+  journal = {Journal of the American Statistical Association},
+  year    = {1980},
+  volume  = {75},
+  number  = {371},
+  pages   = {516--524},
+  doi     = {10.1080/01621459.1980.10477504}
+}
+
+@article{LockNettleton2014,
+  author  = {Lock, Dennis and Nettleton, Dan},
+  title   = {Using Random Forests to Estimate Win Probability for the National Football League},
+  journal = {Journal of Quantitative Analysis in Sports},
+  year    = {2014},
+  volume  = {10},
+  number  = {2},
+  pages   = {197--210},
+  doi     = {10.1515/jqas-2013-0104}
+}
+
+@article{Sauer1998,
+  author  = {Sauer, Raymond D.},
+  title   = {The Economics of Wagering Markets},
+  journal = {Journal of Economic Literature},
+  year    = {1998},
+  volume  = {36},
+  number  = {4},
+  pages   = {2021--2064}
+}
+
+@article{Levitt2004,
+  author  = {Levitt, Steven D.},
+  title   = {Why Are Gambling Markets Organised so Differently from Financial Markets?},
+  journal = {The Economic Journal},
+  year    = {2004},
+  volume  = {114},
+  number  = {495},
+  pages   = {223--246},
+  doi     = {10.1046/j.0013-0133.2003.00193.x}
+}
+\end{filecontents*}
+
+\bibliographystyle{amsplain}
+\bibliography{refs}
+
+\end{document}

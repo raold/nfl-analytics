@@ -1,0 +1,92 @@
+\chapter{Productionization Guide: Architecture \& Runbook}
+\label{app:prod-guide}
+
+This appendix provides a concrete, engineering-focused blueprint to deploy the dissertation as a reliable, auditable, and scalable production system. It details architecture, infrastructure options, data contracts, languages, build/deploy pipelines, monitoring, security, and runbooks.
+
+\section{Architecture Overview}
+\begin{itemize}
+  \item \textbf{Data plane:} Ingestion (schedules, odds, weather), staging/core marts in TimescaleDB (or Postgres+Timescale), materialized marts for analytics.
+  \item \textbf{Model plane:} Baselines (GLM/state-space), score distributions (Skellam/BP + reweighting), dependence (copula), offline RL, OPE gate, simulator acceptance, risk sizing (Kelly LCB + CVaR).
+  \item \textbf{Control plane:} Orchestrator (Airflow/Prefect), artifact registry (object storage + index), configuration/feature manifests, CI/CD, observability, governance.
+\end{itemize}
+
+\section{Reference Infrastructure (Cloud-Agnostic with AWS Example)}
+\begin{itemize}
+  \item \textbf{Compute:} Containerized workers (Docker) on Kubernetes (EKS/GKE/AKS) or ECS; small CPU pools for ETL and model runs; optional GPU node group for RL sweeps.
+  \item \textbf{Database:} Postgres 14+ with TimescaleDB extension for \texttt{odds\_history}, \texttt{plays}, marts. Options: (i) self-managed TimescaleDB on EC2; (ii) Timescale Cloud; (iii) Aurora Postgres (without Timescale features) if hypertables are not critical.
+  \item \textbf{Object storage:} S3-compatible bucket for raw pulls, snapshots, artifacts (calibrators, pmfs, copulas, RL checkpoints), simulator logs.
+  \item \textbf{Orchestration:} Airflow (KubernetesExecutor) or Prefect; DAGs: nightly ETL, weekly training, OPE gate, simulator acceptance, promotion.
+  \item \textbf{Secrets:} Vault, AWS Secrets Manager, or GCP Secret Manager; mount via IRSA or workload identity.
+  \item \textbf{Observability:} Prometheus + Grafana for metrics; OpenSearch\slash{}CloudWatch\slash{}Stackdriver for logs; Sentry for alerts.
+  \item \textbf{CI/CD:} GitHub Actions with environments and required reviews; build and scan images, run tests, deploy via helm/terraform.
+  \item \textbf{Networking:} Private subnets for DB and workers, public egress via NAT; API calls to data providers via egress allowlist and rate limiting.
+\end{itemize}
+
+\section{Languages, Runtimes, and Packaging}
+\begin{itemize}
+  \item \textbf{Python (primary):} ETL, feature snapshots, models, OPE, risk, simulator (PEP 8; uv/poetry for packaging; pytest for tests).
+  \item \textbf{R (secondary):} Existing ingest for schedules; keep stable and containerize with \texttt{renv} lock.
+  \item \textbf{SQL:} Migrations under \texttt{db/} (Timescale/Postgres); numbered files with idempotent DDL and indexes.
+  \item \textbf{Artifacts:} MLflow or lightweight YAML+hash index; standardize serialization (joblib/JSON/Parquet) for calibrators and pmfs.
+\end{itemize}
+
+\section{Data Contracts \& Schemas}
+\begin{itemize}
+  \item \textbf{Raw pulls:} JSON responses versioned with provider metadata (book, market, cursor); stored in S3 under \texttt{raw/provider/YYYY/WW/...}.
+  \item \textbf{Core tables:} \texttt{games}, \texttt{plays}, \texttt{teams}, \texttt{odds\_history(game\_id, book, market, quoted\_at, price,...)} with composite PKs and covering indexes.
+  \item \textbf{Marts:} \texttt{mart.team\_epa}, \texttt{mart.game\_summary} materialized views; refresh strategy post-ingest.
+  \item \textbf{Snapshots:} As-of feature tables keyed by season/week/game with schema hashes; lineage manifests in YAML.
+\end{itemize}
+
+\section{Pipelines \& Scheduling}
+\begin{description}
+  \item[Nightly ETL] Odds and schedules ingest (Alg.~\ref{alg:ingest-odds}); refresh marts; QA counts and index checks.
+  \item[Weekly Training] Fit/update calibrators, reweight pmfs, copulas; run baselines and candidate RL policies.
+  \item[OPE Gate] Clip/shrink sweeps with ESS checks; emit DR/HCOPE lower bounds and sensitivity plots (Alg.~\ref{alg:ope-gate-appendix}).
+  \item[Simulator Acceptance] Dependence + frictions; CVaR/drawdown thresholds (Alg.~\ref{alg:sim-accept-appendix}).
+  \item[Promotion] Freeze artifacts; publish bundle manifest; no parameter edits post-gate.
+\end{description}
+
+\section{Artifacts \& Registry}
+\begin{itemize}
+  \item \textbf{Bundle contents:} model binaries, reweighted pmfs, copula params, feature schema hash, config snapshot, seeds, commit SHA.
+  \item \textbf{Index:} append-only table with bundle id, creation time, components, checksums, and acceptance verdict.
+\end{itemize}
+
+\section{Monitoring \& SLOs}
+\begin{itemize}
+  \item \textbf{Data freshness:} raw pulls < 24h lag; marts refreshed nightly.
+  \item \textbf{Model health:} calibration slope/intercept bands, PIT/CRPS; OPE drift alarms; ESS thresholds.
+  \item \textbf{Execution:} realized CLV vs. modeled; fills and slippage by book; drawdown monitors; alerting/rollback (Appendix~\ref{app:systems-blueprint}).
+\end{itemize}
+
+\section{Security \& Governance}
+\begin{itemize}
+  \item \textbf{Secrets} never in code; short-lived credentials; least-privilege roles for DB and buckets.
+  \item \textbf{Compliance} via audit logs on promotions, config changes, and data corrections; reproducible runs from bundles.
+  \item \textbf{Cost control} by right-sizing workers, autoscaling, and archiving.
+\end{itemize}
+
+\section{Runbooks}
+\begin{itemize}
+  \item \textbf{Backfill} new seasons: freeze ingest versions; run ETL with back-pressure; recompute marts.
+  \item \textbf{Add a book/market:} add to config; dry-run ETL; expand schemas; include in OPE coverage checks.
+  \item \textbf{Regime shifts:} widen priors, cap Kelly multiplier, and require re-acceptance before promotion.
+  \item \textbf{Incident} (data outage or DB failure): drain workers; fail closed on promotions; enable read replicas; restore from snapshot.
+\end{itemize}
+
+\section{Handover: SE Tasks \& Milestones}
+\begin{enumerate}
+  \item \textbf{Bootstrap infra} (DB, object storage, CI/CD, secrets, observability) with IaC.
+  \item \textbf{Containerize} ETL and modeling images; publish to registry.
+  \item \textbf{Implement} ETL DAGs and snapshot builder; add QA checks.
+  \item \textbf{Codify} OPE gate and simulator acceptance with promotion API.
+  \item \textbf{Wire} artifact registry and immutable bundles; create rollback command.
+  \item \textbf{Add} dashboards (calibration, OPE stability, acceptance metrics, CLV), alerts, and runbooks.
+\end{enumerate}
+
+\section{Developer Experience}
+\begin{itemize}
+  \item \textbf{CLI} entrypoints: \texttt{etl}, \texttt{snapshot}, \texttt{train}, \texttt{ope}, \texttt{simulate}, \texttt{promote}, \texttt{rollback}.
+  \item \textbf{Local dev} via docker compose (DB) and make targets for quick cycles; seeds and small fixtures for tests.
+\end{itemize}

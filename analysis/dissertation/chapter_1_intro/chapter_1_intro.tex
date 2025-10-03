@@ -1,0 +1,95 @@
+% chapter_1_intro.tex  
+\chapter{Introduction and Motivation}
+\label{chap:intro}
+
+\section{Why Focus on the NFL}
+
+The **National Football League (NFL)** is an ideal testbed for quantitative decision systems because it combines: (i) deep liquid betting markets; (ii) abundant, granular data; and (iii) inherently sequential strategic decisions. These properties support rigorous modeling and credible evaluation of edge.
+
+\begingroup\RaggedRight\sloppy\hbadness=10000
+\begin{itemize}
+  \item \textbf{Liquidity.} Many books and large volumes enable precise price comparisons and operationally meaningful CLV measurement.
+  \item \textbf{Data richness.} Public play-by-play, injury reports, and weather feeds support feature engineering and validation at weekly cadence.
+  \item \textbf{Sequential decisions.} Weekly cycles and interdependent markets (spread/total/SGP) invite RL-style policies with risk controls.
+\end{itemize}
+\endgroup
+
+\section{Research Questions and Objectives}
+
+We pursue four questions:
+\begin{enumerate}
+  \item \textbf{Architecture.} How to combine classical models, modern ML, and RL coherently for NFL markets?
+  \item \textbf{Uncertainty \& risk.} How to quantify uncertainty and translate it into safe stake sizing?
+  \item \textbf{Value of information.} What is the marginal lift from feature families (injury, rest, weather, microstructure)?
+  \item \textbf{Evaluation.} How to simulate and measure policies credibly under realistic frictions and dependence?
+\end{enumerate}
+
+\noindent Deliverables include a unified modeling stack, a risk-aware staking module, a simulator for strategy evaluation, and a reproducible system-of-systems.
+
+% (Contributions merged into Research Questions; no separate section)
+
+\section{Scope and Boundaries}
+We target pre-game markets (spread/total/moneyline) from 1999 onward. Player props and live in-game are out of scope. Only public data are used. All evaluation is out-of-sample with rolling-origin splits and clear decision-time information.
+
+\section{Thesis Statement and Hypotheses}
+\textbf{Thesis.} A hybrid stack with explicit uncertainty and governance transforms edge into reliable bankroll growth in NFL markets.
+
+\textbf{Hypotheses.}
+\begin{enumerate}
+  \item State-space priors improve temporal stability and calibration relative to purely discriminative baselines.
+  \item Structured score distributions (Skellam and bivariate Poisson) enable superior pricing of spreads/totals and better teaser/middle planning than direct margin regression.
+  \item Market microstructure features (line velocity, cross-book discrepancies) contribute unique signal beyond team-performance covariates.
+  \item RL policies trained offline with conservative constraints and posterior-variance gating convert modeling edge into drawdown-aware bankroll growth, supporting the thesis.
+\end{enumerate}
+
+\section{Reproducibility and Ethics}
+Pipelines are containerized and deterministic. Seeds, dataset manifests, and artefacts are versioned. We adopt responsible-gambling principles with exposure caps, volatility limits, and stop-losses; results are presented with uncertainty, not as guarantees.
+
+\section{Chapter Summary}
+This chapter motivated the NFL as a fertile ground for rigorous decision analytics and laid out the claims and scope of the work. The remainder of the dissertation builds from data foundations (Chapter~\ref{chap:data}) through baselines (Chapter~\ref{chap:methods}), risk management (Chapter~\ref{chap:risk}), and simulation (Chapter~\ref{chap:sim}) to a deployable policy.
+
+\section{Dissertation Structure}
+
+Below is a brief road map of this dissertation:
+
+\begin{itemize}
+  \item \textbf{Chapter~2: Literature Review} — survey of classical and modern models in sports prediction, betting markets, RL in game domains.
+  \item \textbf{Chapter~3: Data Foundations and Feature Engineering} — discussion of NFL data sources, structure, preprocessing, feature catalogs, era handling.
+  \item \textbf{Chapter~4: Baseline Models} — implementation and calibration of GLM, state-space, Poisson, and classical benchmarks.
+  \item \textbf{Chapter~5: Reinforcement Learning Framework} — state/action/reward specification, offline RL design, training pipelines.
+  \item \textbf{Chapter~6: Uncertainty \& Risk Management} — posterior distributions, risk-aware betting, Kelly strategies, drawdown analysis.
+  \item \textbf{Chapter~7: Simulation \& Strategy Testing} — Monte Carlo engines, teasing, parlays, correlated outcomes, strategy performance.
+  \item \textbf{Chapter~8: System Architecture \& Governance} — modular pipeline, experiment tracking, deployment strategy, version control.
+  \item \textbf{Chapter~9: Results, Ablations, Discussion} — comparative performance, feature ablations, robustness, error analysis.
+  \item \textbf{Chapter~10: Conclusion and Future Work} — summary of findings, limitations, and opportunities ahead.
+  \item \textbf{Appendices} — extended figures, proofs, code reference, glossaries.
+\end{itemize}
+
+\section{Technical Approach Overview}
+
+At a high level, the system will operate in layers:
+
+\begin{itemize}
+  \item A data ingestion and feature pipeline — building situational, team-level, market-level features.
+  \item Classical and benchmark models (GLM, Poisson, state-space) to form priors and baselines.
+  \item An RL agent (e.g.\ DQN, PPO) that takes feature + market state to decide bets or allocations.
+  \item Uncertainty propagation (posterior distributions, bootstrap ensembles) to inform risk control.
+  \item A simulation engine that translates distributions into actionable betting strategies.
+  \item An evaluation and governance layer to compare models, version them, log experiments, and deploy.
+\end{itemize}
+
+
+
+\section{Glossary of Key Terms}
+
+Here are some terms you’ll see frequently:
+\begin{description}
+  \item[CLV:] Closing Line Value — difference between market-implied and model-implied edge.
+  \item[Kelly Fraction:] Optimal fraction of bankroll to stake given edge and odds.
+  \item[Posterior Uncertainty:] Bayesian credible intervals on model predictions.
+  \item[Middling / Teasers:] Betting strategies that exploit distributions across markets.
+  \item[Feature ‹class›:] A group of inputs, e.g.\ injuries, rest, market signals.
+  \item[Ensemble:] A weighted combination of predictions from multiple models.
+\end{description}
+
+% (Removed Writing and Style Notes)

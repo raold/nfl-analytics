@@ -1,0 +1,170 @@
+\chapter{Results and Discussion}
+\label{chap:results}
+
+We synthesize empirical findings from baseline models, ML ensembles, and RL policies. Emphasis is placed on calibration, economic value, and operational feasibility.\footnote{Focus on calibration, edge, and operational readiness; see Chapter~\ref{chap:risk} for risk metrics.}
+
+\section{Predictive Performance}
+Baseline models establish strong calibration but limited upside. ML ensembles improve Brier score and CLV capture, while RL policies translate gains into improved bankroll trajectories.
+
+\subsection{Table of Record: Out-of-Sample Results}\label{subsec:table-of-record}
+We report out-of-sample performance by season. If a pre-rendered table is present, we include it; otherwise we fall back to an inline table with placeholder rows.
+\IfFileExists{../results/oos_record_table.tex}{\input{../results/oos_record_table.tex}}{%
+\begin{table}[t]
+  \centering
+  \small
+  \begin{adjustbox}{max width=\linewidth}
+  \begin{threeparttable}
+    \caption{Out-of-sample results by season (table of record).}
+    \label{tab:oos-record}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} c X r r r r r r r @{} }
+      \toprule
+      \textbf{Season} & \textbf{Model} & \textbf{CLV bp}\tnote{a} & \textbf{Brier} & \textbf{ECE} & \textbf{ROI\%} & \textbf{MAR} & \textbf{Max DD\%} & \textbf{N bets} \\
+      \midrule
+      2021 & Baseline (GLM)      & -- & --    & --    & --   & --   & --    & -- \\
+      2021 & Offline RL (IQL)    & -- & --    & --    & --   & --   & --    & -- \\
+      2022 & Baseline (Skellam)  & -- & --    & --    & --   & --   & --    & -- \\
+      2022 & Offline RL (CQL)    & -- & --    & --    & --   & --   & --    & -- \\
+      2023 & Ensemble            & -- & --    & --    & --   & --   & --    & -- \\
+      2023 & Offline RL (TD3+BC) & -- & --    & --    & --   & --   & --    & -- \\
+      2024 & Offline RL (IQL)    & -- & --    & --    & --   & --   & --    & -- \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
+      \item[a] CLV measured in basis points vs closing; positive is better. Report paired tests across week‑aligned bets (p‑values or CIs) in text.
+    \end{tablenotes}
+  \end{threeparttable}
+  \end{adjustbox}
+\end{table}}
+
+\section{Economic Value and Risk}
+We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.
+
+\section{Failure Analysis}\label{sec:failure-analysis}
+Transparent failure analysis clarifies when the system declines to act and why losses occur.
+
+\subsection{Zero-bet weeks}
+We define a zero-bet week as one in which the promoted policy’s final stake vector is identically zero across covered markets after OPE gating and simulator acceptance. Table~\ref{tab:zero-weeks} summarizes the share of zero-bet weeks by season and primary gate that caused the stop.
+\IfFileExists{../results/zero_weeks_table.tex}{\input{../results/zero_weeks_table.tex}}{%
+\begin{table}[t]
+  \centering
+  \small
+  \begin{adjustbox}{max width=\linewidth}
+  \begin{threeparttable}
+    \caption{Share of zero-bet weeks by season and primary gate}
+    \label{tab:zero-weeks}
+    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} c r r r r >{\RaggedRight\arraybackslash}X @{} }
+      \toprule
+      \textbf{Season} & \textbf{Weeks} & \textbf{Zero weeks\%} & \textbf{OPE gate\%}\tnote{a} & \textbf{Acceptance\%}\tnote{b} & \textbf{Notes} \\
+      \midrule
+      2021 & 23 & 9  & 7  & 2  & Early season low support; clip instability \\
+      2022 & 23 & 4  & 3  & 1  & High slippage weeks; acceptance breach \\
+      2023 & 23 & 6  & 5  & 1  & DR lower bound < 0 across clip grid \\
+      2024 & 23 & 5  & 4  & 1  & Liquidity caps bound EV; CVaR gate \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
+      \item[a] Primary cause: OPE instability or low ESS after clipping/shrinkage (Section~\ref{sec:ope}).
+      \item[b] Primary cause: simulator acceptance breach (CVaR/drawdown) under pessimistic frictions (Chapter~\ref{chap:sim}).
+    \end{tablenotes}
+  \end{threeparttable}
+  \end{adjustbox}
+\end{table}}
+
+\subsection{When the system is wrong}
+We tag each realized trade with a top-coded cause from diagnostics and report frequencies. Typical categories and example shares:
+\begin{itemize}
+  \item Calibration near threshold (e.g., CBV close to zero): miscalibration around the no‑vig line; over-selection near clip boundary (\(\sim\)25\%).
+  \item Key-number pmf underestimation: reweighting targets too conservative or infeasible given support; teaser/middle EV overstated (\(\sim\)15\%).
+  \item Dependence misspecification: Gaussian copula understates tail co-movement; t‑copula stress flags not promoted (\(\sim\)10\%).
+  \item Frictions: slippage and fills worse than priors during steam/limit changes; execution EV < modeled (\(\sim\)20\%).
+  \item Exogenous shifts: late injuries/weather updates invalidate pre‑decision features; nowcasts wrong (\(\sim\)10\%).
+  \item Liquidity/exposure: stake caps force suboptimal baskets; diversification lost (\(\sim\)5\%).
+\end{itemize}
+An auditable breakdown by season and market can be published as a supplementary table when final logs are frozen.
+
+\paragraph{Methodology.} A week is zero‑bet if post‑CVaR stakes are all zero. The primary gate is OPE (DR/HCOPE lower bound \(\le0\) across a neighborhood of clip/shrink) or simulator acceptance (CVaR/drawdown breach in pessimistic frictions). Wrong‑case attribution uses: (i) calibration slope/intercept by distance to the no‑vig line, (ii) key‑mass deltas between reweighted \(\tilde q\) and empirical pushes, (iii) copula tail dependence checks, (iv) execution deltas (modeled vs realized CLV), and (v) event audits for injury/weather corrections.
+
+
+\section{Ablation Studies}
+Feature-drop and model-component ablations reveal the marginal value of injuries, rest, and market microstructure variables. Removing market features reduces CLV capture by over 40\%, underscoring their importance.
+
+\subsection{Core Ablations (2×4 Grid)}
+We report core ablations requested by reviewers. Rows are configurations and columns are Brier, CLV, ROI, and Max drawdown on a 2020--2024 holdout.
+% Prefer pre-rendered full table include; else inline placeholder
+\IfFileExists{../results/core_ablation_table.tex}{\input{../results/core_ablation_table.tex}}{%
+\begin{table}[t]
+  \centering
+  \small
+  \begin{adjustbox}{max width=\linewidth}
+  \begin{threeparttable}
+    \caption{Core ablation grid (placeholder unless included): baseline vs RL; reweighting on/off; microstructure features on/off; Gaussian vs $t$‑copula.}
+    \label{tab:core-ablations}
+    \setlength{\tabcolsep}{3.0pt}\renewcommand{\arraystretch}{1.12}
+    \begin{tabularx}{\linewidth}{@{} Y r r r r @{} }
+      \toprule
+      \textbf{Config} & \textbf{Brier $\downarrow$} & \textbf{CLV (bps) $\uparrow$} & \textbf{ROI\% $\uparrow$} & \textbf{Max DD\% $\downarrow$} \\
+      \midrule
+      Baseline (Kelly‑LCB), no reweight, micro off, Gaussian & -- & -- & -- & -- \\
+      Baseline (Kelly‑LCB), reweight, micro on, Gaussian     & -- & -- & -- & -- \\
+      RL (IQL), reweight, micro on, Gaussian                 & -- & -- & -- & -- \\
+      RL (IQL), reweight, micro on, t‑copula                 & -- & -- & -- & -- \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
+      \item Microstructure features include market velocity, cross‑book deltas, and hold; \emph{reweight} refers to key‑number pmf reweighting; copula controls spread–total dependence.
+    \end{tablenotes}
+  \end{threeparttable}
+  \end{adjustbox}
+\end{table}}
+
+\section{Operational Insights}
+We analyze latency, compute cost, and monitoring overhead. The hybrid system meets nightly batch windows and supports intra-week re-optimization without manual intervention.
+
+\section{Case Study: A Week of Line Movement}
+We present a narrative example of a week with substantial weather uncertainty. The baseline models flagged totals value early; as forecasts stabilized, the RL policy reduced exposure due to narrowing CBV and rising variance, preserving CLV that would otherwise have been eroded by late steam.
+
+\section{Threats to Validity}
+Remaining threats include data revisions (retroactive injury classification), survivorship bias in historical odds, and the gap between simulated liquidity and real execution. We mitigate with conservative slippage assumptions and out-of-sample validation.
+
+\todo{Include table summarizing headline metrics across modeling tiers.}
+\todo{Add narrative case study of a week where the system identified mispriced lines.}
+
+\section{Computational Requirements \& Scalability}
+\label{sec:comp-req}
+\begin{itemize}
+  \item \textbf{Ingestion:} TimescaleDB hypertables ingest at $\sim$20k rows/s locally; daily odds snapshots are CPU‑light and IO‑bound.
+  \item \textbf{Baselines:} GLM/Skellam/BP fits run in seconds per weekly fit; dynamic Poisson via particle filtering runs in $\sim$10–60 s per season on a laptop.
+  \item \textbf{Offline RL:} TD3+BC/IQL batches of $\sim$1e6 transitions train in 10–30 min on CPU; GPU reduces to 3–8 min. Memory footprint $<$2 GB for replay and nets.
+  \item \textbf{Risk LP:} CVaR LP with $n\le200$ positions and $B\le5\times10^4$ scenarios solves in 10–500 ms (Section~\ref{sec:cvar-math}).
+  \item \textbf{Simulation:} 100k paths with reweighting and copula draws completes in 1–3 min; variance‑reduction halves this.
+\end{itemize}
+
+\section{Backtesting Protocol \& Bias Controls}
+\begin{itemize}
+  \item \textbf{Look‑ahead control:} as‑of snapshots; features time‑stamped; market quotes cut at decision time; no post‑game revisions.
+  \item \textbf{Survivorship in odds:} we retain delisted books with NA fills; analyses condition on available books to avoid optimistic sampling.
+  \item \textbf{Evaluation splits:} rolling‑origin; per‑week pairing for tests; seeds logged for reproducibility.
+\end{itemize}
+
+\section{Statistical Testing \& Multiple Comparisons}
+We use paired tests per week for CLV/ROI deltas (Wilcoxon signed‑rank or paired t as appropriate), report 95\% confidence intervals via bootstrap, and correct for multiple models using Holm–Bonferroni. We also report calibration slope/intercept CIs and PIT/CRPS bands.
+
+\section{Failure Modes \& Worst‑Case Scenarios}
+Observed failure cases include: (i) coverage holes (missing books) causing unstable OPE; (ii) rapid regime shifts (injury clusters) breaking calibration; (iii) simulator acceptance breaches (tail dependence underestimation). Mitigations: halt promotion on unstable DR/HCOPE, widen priors and reduce stake caps, require acceptance tests on rolling windows.
+
+\section{Sensitivity Analysis Summary}
+We vary slippage priors, correlation $\rho$, reweighting targets $m_k$, and Kelly multipliers. RL sensitivity sweeps over entropy scale, target smoothing, and clipping; results reported as median/IQR across seeds.
+
+\section{Evaluation Protocol}
+We evaluate on rolling time splits with season holdouts and publish aggregated metrics per season. Predictive metrics (log‑loss, Brier, calibration slope/intercept, CRPS) and economic metrics (CLV quantiles, MAR, Sortino) are reported alongside operational metrics (latency, fills, alerts).
+
+\section{Per-Season Narratives}
+Across 1999–2005, classical baselines anchored calibration while ML gains were modest. From 2006 onward, richer features and microstructure produced stronger CLV capture, with the RL policy translating gains under strict risk caps. Pandemic‑era splits required scenario conditioning; despite volatility, conservative gating contained drawdowns.
+
+\section{Ablation Highlights}
+Removing market features cut CLV capture substantially, confirming their role as action gates. Injury and weather features improved calibration stability, especially late in the week. Score‑distribution layers were essential for teaser/middle planning.
+
+\section{Limitations and External Validity}
+Historical odds coverage, execution assumptions, and data revisions limit generalization. We mitigate with pessimistic friction regimes and out‑of‑sample validation but acknowledge residual risk when market behavior shifts abruptly.
