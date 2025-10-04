@@ -1,0 +1,194 @@
+# Research to ETL Feature Request Template
+
+date: YYYY-MM-DD
+from: Research Agent
+to: ETL Agent
+trigger: new_feature_requirement
+status: pending  # pending | acknowledged | designing | implementing | testing | completed
+
+## Feature Overview
+feature_name: ""
+feature_category: ""  # team_performance | matchup | personnel | context | advanced
+priority: ""  # critical | high | medium | low
+requested_for: ""  # dissertation | experiment | production_model
+
+## Motivation
+research_hypothesis: |
+  What hypothesis does this feature test?
+
+expected_impact:
+  model_performance: ""
+  research_contribution: ""
+  
+related_literature: []
+  # - citation: paper_reference
+  #   finding: what_they_found
+
+## Feature Definition
+description: |
+  Detailed description of what this feature represents
+
+calculation: |
+  Mathematical or logical definition
+  Example: opponent_defensive_epa_l5 = AVG(opponent EPA allowed per play, last 5 games)
+
+example_values:
+  typical_range: ""
+  example_good: ""
+  example_bad: ""
+
+## Data Requirements
+source_tables: []
+  # - table_name: reason_needed
+
+join_logic: |
+  How to join data sources
+
+temporal_requirements:
+  as_of_constraint: ""  # Must be calculable as-of game time
+  lookback_window: ""   # How far back to look
+  minimum_sample_size: ""
+
+edge_cases:
+  - scenario: "Early season (< 5 games played)"
+    handling: ""
+  - scenario: "Team bye week"
+    handling: ""
+  - scenario: "Missing data"
+    handling: ""
+
+## Output Specification
+column_name: ""
+data_type: ""  # NUMERIC(X,Y) | INTEGER | BOOLEAN | VARCHAR
+nullable: false
+default_value: ""
+
+value_constraints:
+  minimum: ""
+  maximum: ""
+  expected_distribution: ""
+
+## Validation Requirements
+validation_checks:
+  - check: "No future data leakage"
+    method: "Verify feature_date <= game_date"
+  - check: "Reasonable value range"
+    method: "Check min/max within expected bounds"
+  - check: "No excessive nulls"
+    method: "Null rate < 5%"
+
+test_cases:
+  - game_id: ""
+    expected_value: ""
+    reasoning: ""
+
+## Integration Requirements
+add_to_datasets:
+  - mart.asof_team_features
+  - analysis/features/asof_team_features.csv
+
+update_documentation:
+  - etl/config/schemas.yaml
+  - data dictionary
+  - feature engineering README
+
+## Timeline
+needed_by: ""
+flexibility: ""  # hard_deadline | preferred_date | flexible
+
+estimated_complexity: ""  # simple | moderate | complex
+estimated_time: ""  # hours or days
+
+## Implementation Guidance
+suggested_approach: |
+  Research's suggestion for how to calculate this
+
+sql_sketch: |
+  -- Optional SQL pseudocode
+  SELECT 
+    game_id,
+    -- calculation here
+  FROM source_tables
+
+alternative_approaches: []
+  # - approach: description
+  #   pros: []
+  #   cons: []
+
+## Dependencies
+blocks_work: false
+blocked_by: []
+  # - dependency: what_needs_to_happen_first
+
+related_features: []
+  # - feature: existing_or_requested
+  #   relationship: similar | derived_from | replaces
+
+## Success Criteria
+definition_of_done:
+  - [ ] Feature calculated correctly
+  - [ ] No data leakage
+  - [ ] Validation checks pass
+  - [ ] Added to target datasets
+  - [ ] Documentation updated
+  - [ ] Test cases verified
+
+acceptance_test: |
+  How Research will validate the feature is correct
+
+## Post-Implementation
+analysis_plan: |
+  What Research will do with this feature once available
+
+fallback_plan: |
+  What if feature doesn't improve model performance?
+
+## Handoff Tracking
+created_at: ""
+sent_at: ""
+acknowledged_by: ""
+acknowledged_at: ""
+design_reviewed_at: ""
+implementation_started_at: ""
+testing_started_at: ""
+delivered_at: ""
+
+## Implementation Notes
+etl_notes: |
+  ETL fills this in during implementation
+  - Actual approach taken
+  - Challenges encountered
+  - Deviations from request
+
+performance_notes:
+  calculation_time: ""
+  database_impact: ""
+  optimization_applied: ""
+
+## Validation Results
+validation_summary: |
+  ETL fills this in after testing
+  - All checks passed?
+  - Test case results
+  - Any anomalies found
+
+quality_metrics:
+  null_rate: 0.0
+  value_range: ""
+  correlation_with_target: 0.0
+
+## Research Feedback
+feature_effectiveness: |
+  Research fills this in after using the feature
+  - Does it improve model?
+  - Insights gained
+  - Recommendations for refinement
+  
+model_impact:
+  feature_importance_rank: 0
+  coefficient_sign: ""  # positive | negative
+  statistical_significance: ""
+  
+keep_feature: true  # true | false
+reasoning: |
+  Why keeping or removing this feature

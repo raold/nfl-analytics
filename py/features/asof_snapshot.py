@@ -13,11 +13,11 @@ Environment (defaults shown):
   POSTGRES_HOST=localhost POSTGRES_PORT=5544 POSTGRES_DB=devdb01
   POSTGRES_USER=dro POSTGRES_PASSWORD=sicillionbillions
 """
+
 from __future__ import annotations
 
 import argparse
 import os
-from typing import Optional
 
 import pandas as pd
 import psycopg
@@ -40,7 +40,7 @@ def get_connection() -> psycopg.Connection:
 
 
 def build_snapshot(conn: psycopg.Connection, cutoff_iso: str) -> pd.DataFrame:
-    sql = f"""
+    sql = """
     with odds_ranked as (
       select
         home_team,
@@ -151,4 +151,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

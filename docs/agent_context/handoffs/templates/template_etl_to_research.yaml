@@ -1,0 +1,93 @@
+# Data to Research Handoff Template
+
+date: YYYY-MM-DD
+from: ETL Agent
+to: Research Agent
+trigger: features_dataset_updated
+status: pending  # pending | acknowledged | in_progress | completed
+
+## Context
+dataset_name: ""
+location: ""
+also_in_db: ""
+update_type: ""  # weekly_refresh | backfill | new_features | bug_fix
+date_range: ""
+row_count: 0
+previous_row_count: 0
+
+## Changes
+new_features_added: []
+  # - feature_name: description
+  
+features_modified: []
+  # - feature_name: what_changed
+  
+features_removed: []
+  # - feature_name: reason
+
+breaking_changes: false
+breaking_change_details: |
+  If true, describe what breaks and migration path
+
+## Validation Status
+completeness: ""  # percentage or description
+accuracy: ""
+freshness: ""
+validation_report_location: ""
+
+data_quality_checks:
+  - check: "No missing values in key columns"
+    status: pass  # pass | fail | warning
+  - check: "No duplicates on game_id"
+    status: pass
+  - check: "Date ranges align"
+    status: pass
+  - check: "Feature distributions normal"
+    status: pass
+
+known_issues: []
+  # - issue: description
+  #   severity: low | medium | high
+  #   workaround: what_to_do
+
+## Action Required
+actions:
+  - ""
+  
+models_affected: []
+backtests_need_rerun: false
+feature_engineering_changes_needed: false
+
+## Impact Assessment
+impact_on_research:
+  modeling: ""
+  backtesting: ""
+  reporting: ""
+  dissertation: ""
+
+## Timeline
+next_refresh: ""
+refresh_frequency: ""  # weekly | bi-weekly | monthly | as-needed
+
+## Additional Context
+notes: |
+  Any additional context, links to issues, etc.
+
+related_handoffs: []
+  # - handoff_file: link_to_related_handoff
+
+## Handoff Tracking
+created_at: ""
+sent_at: ""
+acknowledged_by: ""
+acknowledged_at: ""
+completed_by: ""
+completed_at: ""
+archived_at: ""
+
+## Feedback
+research_feedback: |
+  Research agent fills this in after using the data
+  - What worked well
+  - What could be improved
+  - Any issues discovered

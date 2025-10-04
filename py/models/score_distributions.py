@@ -14,10 +14,10 @@ Notes
 References
 - Skellam (1946) distribution for score differences
 """
+
 from __future__ import annotations
 
 import math
-from typing import Dict, Iterable, List, Tuple
 
 
 def _bessel_i(k: int, x: float) -> float:
@@ -48,10 +48,14 @@ def skellam_pmf(mu_home: float, mu_away: float, k: int) -> float:
     if mu_home < 0 or mu_away < 0:
         return 0.0
     lam = 2.0 * math.sqrt(mu_home * mu_away)
-    return math.exp(-(mu_home + mu_away)) * ((mu_home / mu_away) ** (k / 2.0)) * _bessel_i(abs(k), lam)
+    return (
+        math.exp(-(mu_home + mu_away)) * ((mu_home / mu_away) ** (k / 2.0)) * _bessel_i(abs(k), lam)
+    )
 
 
-def skellam_pmf_range(mu_home: float, mu_away: float, k_min: int = -80, k_max: int = 80) -> Dict[int, float]:
+def skellam_pmf_range(
+    mu_home: float, mu_away: float, k_min: int = -80, k_max: int = 80
+) -> dict[int, float]:
     """Compute Skellam pmf over integer margins in [k_min, k_max]."""
     pmf = {k: skellam_pmf(mu_home, mu_away, k) for k in range(k_min, k_max + 1)}
     # Normalize to mitigate truncation error
@@ -61,7 +65,7 @@ def skellam_pmf_range(mu_home: float, mu_away: float, k_min: int = -80, k_max: i
     return {k: v / s for k, v in pmf.items()}
 
 
-def reweight_key_masses(pmf: Dict[int, float], targets: Dict[int, float]) -> Dict[int, float]:
+def reweight_key_masses(pmf: dict[int, float], targets: dict[int, float]) -> dict[int, float]:
     """Multiply probabilities at key margins by factors so masses match targets.
 
     Args:
@@ -90,15 +94,15 @@ def reweight_key_masses(pmf: Dict[int, float], targets: Dict[int, float]) -> Dic
 
 
 def reweight_with_moments(
-    pmf: Dict[int, float],
-    targets: Dict[int, float],
+    pmf: dict[int, float],
+    targets: dict[int, float],
     mu: float,
     var: float,
     *,
     iters: int = 200,
     eta: float = 1e-3,
     tol: float = 1e-6,
-) -> Dict[int, float]:
+) -> dict[int, float]:
     """Moment-preserving reweighting to match key masses.
 
     Minimizes squared error on key masses with nonnegativity, while projecting
@@ -121,7 +125,7 @@ def reweight_with_moments(
     w = {k: 1.0 for k in ks}
 
     # Precompute q-weighted sums for projection basis
-    def _moments_under_q() -> Dict[str, float]:
+    def _moments_under_q() -> dict[str, float]:
         s0 = sum(q.values())
         s1 = sum(k * q[k] for k in ks)
         s2 = sum((k**2) * q[k] for k in ks)
@@ -145,7 +149,6 @@ def reweight_with_moments(
         # Solve 3x3 for (alpha, beta, gamma)
         # Matrix M using precomputed q-weighted sums
         # Row order corresponds to constraints on (sum, mean, variance)
-        import numpy as _np  # optional local import; falls back if unavailable
 
         M = [
             [const["s0"], const["s1"], const["c2"]],
@@ -190,7 +193,7 @@ def reweight_with_moments(
             if k not in q:
                 continue
             cur = q[k] * w[k]
-            err = (cur - t)
+            err = cur - t
             max_err = max(max_err, abs(err))
             # d/dw_k (cur - t)^2 = 2*(cur - t)*q_k
             grad = 2.0 * err * q[k]
@@ -208,7 +211,7 @@ def reweight_with_moments(
     return out
 
 
-def cover_push_probs(pmf: Dict[int, float], spread: float) -> Tuple[float, float, float]:
+def cover_push_probs(pmf: dict[int, float], spread: float) -> tuple[float, float, float]:
     """Compute (cover, push, fail) for home vs given spread.
 
     For half-point spreads, push mass is zero. For integer spreads, push is mass
@@ -225,7 +228,7 @@ def cover_push_probs(pmf: Dict[int, float], spread: float) -> Tuple[float, float
     return cover, push, max(0.0, fail)
 
 
-def total_over_prob(pmf_home: Dict[int, float], pmf_away: Dict[int, float], total: float) -> float:
+def total_over_prob(pmf_home: dict[int, float], pmf_away: dict[int, float], total: float) -> float:
     """Approximate P(total points > total) via independent Poisson marginals.
 
     This helper assumes separate Poisson scoring for home and away. For broader

@@ -30,6 +30,7 @@ try:
     from py.features import asof_features as base
 except Exception:
     import importlib
+
     base = importlib.import_module("features.asof_features")
 
 
@@ -179,7 +180,6 @@ TEAM_FEATURE_COLUMNS_ENHANCED = base.TEAM_FEATURE_COLUMNS + [
     "prior_turnovers_opp_avg",
     "prior_penalties_avg",
     "prior_penalty_yards_avg",
-    
     # Play-level efficiency (from plays table)
     "prior_success_rate",
     "success_rate_last3",
@@ -217,46 +217,50 @@ def fetch_team_game_features(conn: psycopg.Connection) -> pd.DataFrame:
 
 def compute_team_history_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     """Extend base history computation with new features."""
-    
+
     # Start with base computation (handles all original features)
     team_df = base.compute_team_history(df)
-    
+
     # Now add new rolling features
     team_df["turnovers"] = team_df["turnovers"].fillna(0.0)
     team_df["turnovers_opp"] = team_df["turnovers_opp"].fillna(0.0)
     team_df["penalties"] = team_df["penalties"].fillna(0.0)
     team_df["penalty_yards"] = team_df["penalty_yards"].fillna(0.0)
-    
+
     team_group = team_df.groupby("team", group_keys=False)
-    
+
     # Turnover/penalty priors
     team_df["prior_turnovers_sum"] = team_group["turnovers"].cumsum() - team_df["turnovers"]
-    team_df["prior_turnovers_opp_sum"] = team_group["turnovers_opp"].cumsum() - team_df["turnovers_opp"]
+    team_df["prior_turnovers_opp_sum"] = (
+        team_group["turnovers_opp"].cumsum() - team_df["turnovers_opp"]
+    )
     team_df["prior_penalties_sum"] = team_group["penalties"].cumsum() - team_df["penalties"]
-    team_df["prior_penalty_yards_sum"] = team_group["penalty_yards"].cumsum() - team_df["penalty_yards"]
-    
+    team_df["prior_penalty_yards_sum"] = (
+        team_group["penalty_yards"].cumsum() - team_df["penalty_yards"]
+    )
+
     with np.errstate(divide="ignore", invalid="ignore"):
         team_df["prior_turnovers_avg"] = np.where(
             team_df["prior_games"] > 0,
             team_df["prior_turnovers_sum"] / team_df["prior_games"],
-            np.nan
+            np.nan,
         )
         team_df["prior_turnovers_opp_avg"] = np.where(
             team_df["prior_games"] > 0,
             team_df["prior_turnovers_opp_sum"] / team_df["prior_games"],
-            np.nan
+            np.nan,
         )
         team_df["prior_penalties_avg"] = np.where(
             team_df["prior_games"] > 0,
             team_df["prior_penalties_sum"] / team_df["prior_games"],
-            np.nan
+            np.nan,
         )
         team_df["prior_penalty_yards_avg"] = np.where(
             team_df["prior_games"] > 0,
             team_df["prior_penalty_yards_sum"] / team_df["prior_games"],
-            np.nan
+            np.nan,
         )
-    
+
     # Play-level efficiency priors (success rate, air yards, etc.)
     team_df["success_rate"] = team_df["success_rate"].fillna(0.0)
     team_df["air_yards_mean"] = team_df["air_yards_mean"].fillna(0.0)
@@ -266,7 +270,7 @@ def compute_team_history_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     team_df["wp_q4_mean"] = team_df["wp_q4_mean"].fillna(0.5)
     team_df["shotgun_rate"] = team_df["shotgun_rate"].fillna(0.0)
     team_df["no_huddle_rate"] = team_df["no_huddle_rate"].fillna(0.0)
-    
+
     # Rolling averages for new metrics
     team_df["prior_success_rate"] = team_group["success_rate"].transform(
         lambda s: s.shift(1).expanding().mean()
@@ -277,13 +281,11 @@ def compute_team_history_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     team_df["success_rate_last5"] = team_group["success_rate"].transform(
         lambda s: s.shift(1).rolling(window=5, min_periods=1).mean()
     )
-    
+
     team_df["prior_air_yards"] = team_group["air_yards_mean"].transform(
         lambda s: s.shift(1).expanding().mean()
     )
-    team_df["prior_yac"] = team_group["yac_mean"].transform(
-        lambda s: s.shift(1).expanding().mean()
-    )
+    team_df["prior_yac"] = team_group["yac_mean"].transform(lambda s: s.shift(1).expanding().mean())
     team_df["prior_cpoe"] = team_group["cpoe_mean"].transform(
         lambda s: s.shift(1).expanding().mean()
     )
@@ -299,30 +301,26 @@ def compute_team_history_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     team_df["prior_no_huddle_rate"] = team_group["no_huddle_rate"].transform(
         lambda s: s.shift(1).expanding().mean()
     )
-    
+
     # Explosive play rates
     team_df["explosive_pass"] = team_df["explosive_pass"].fillna(0.0)
     team_df["explosive_rush"] = team_df["explosive_rush"].fillna(0.0)
-    
+
     with np.errstate(divide="ignore", invalid="ignore"):
         team_df["explosive_pass_rate"] = np.where(
-            team_df["plays"] > 0,
-            team_df["explosive_pass"] / team_df["plays"],
-            0.0
+            team_df["plays"] > 0, team_df["explosive_pass"] / team_df["plays"], 0.0
         )
         team_df["explosive_rush_rate"] = np.where(
-            team_df["plays"] > 0,
-            team_df["explosive_rush"] / team_df["plays"],
-            0.0
+            team_df["plays"] > 0, team_df["explosive_rush"] / team_df["plays"], 0.0
         )
-    
+
     team_df["prior_explosive_pass_rate"] = team_group["explosive_pass_rate"].transform(
         lambda s: s.shift(1).expanding().mean()
     )
     team_df["prior_explosive_rush_rate"] = team_group["explosive_rush_rate"].transform(
         lambda s: s.shift(1).expanding().mean()
     )
-    
+
     return team_df
 
 
@@ -391,7 +389,9 @@ def pivot_to_games_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     merged["home_margin"] = merged["home_score"] - merged["away_score"]
     merged["home_win"] = (merged["home_margin"] > 0).astype(float)
     merged["home_cover"] = (merged["home_margin"] + merged["spread_close"] > 0).astype(float)
-    merged["over_hit"] = ((merged["home_score"] + merged["away_score"]) > merged["total_close"]).astype(float)
+    merged["over_hit"] = (
+        (merged["home_score"] + merged["away_score"]) > merged["total_close"]
+    ).astype(float)
     merged["is_push"] = merged["home_cover"].isna()
 
     merged.sort_values(["season", "week", "game_id"], inplace=True)
@@ -401,16 +401,16 @@ def pivot_to_games_enhanced(df: pd.DataFrame) -> pd.DataFrame:
 def main():
     parser = argparse.ArgumentParser(description="Generate enhanced as-of team features")
     parser.add_argument(
-        "--output", 
+        "--output",
         default="data/processed/features/asof_team_features_enhanced.csv",
-        help="Output CSV path"
+        help="Output CSV path",
     )
     parser.add_argument("--season-start", type=int, default=2003, help="First season to include")
     parser.add_argument("--validate", action="store_true", help="Run validation checks")
     args = parser.parse_args()
 
     print("=== Enhanced As-Of Feature Generation ===")
-    print(f"Connecting to database...")
+    print("Connecting to database...")
     conn = base.get_connection()
 
     print("Fetching team-game data with enhanced metrics...")
@@ -419,7 +419,7 @@ def main():
 
     print("Computing team history with enhanced features...")
     team_history = compute_team_history_enhanced(team_df)
-    
+
     if args.validate:
         print("Validating team history...")
         base.validate_team_history(team_history)
@@ -427,7 +427,7 @@ def main():
 
     print("Pivoting to game-level format...")
     games_wide = pivot_to_games_enhanced(team_history)
-    
+
     # Filter to requested seasons
     games_wide = games_wide[games_wide["season"] >= args.season_start].copy()
     print(f"Filtered to {len(games_wide)} games (seasons >= {args.season_start})")
@@ -436,12 +436,27 @@ def main():
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     games_wide.to_csv(args.output, index=False)
 
-    print(f"✓ Feature generation complete: {games_wide.shape[0]} games, {games_wide.shape[1]} columns")
-    
+    print(
+        f"✓ Feature generation complete: {games_wide.shape[0]} games, {games_wide.shape[1]} columns"
+    )
+
     # Print summary of new features
-    new_features = [c for c in games_wide.columns if any(
-        x in c for x in ["success_rate", "air_yards", "cpoe", "turnover", "penalty", "shotgun", "explosive"]
-    )]
+    new_features = [
+        c
+        for c in games_wide.columns
+        if any(
+            x in c
+            for x in [
+                "success_rate",
+                "air_yards",
+                "cpoe",
+                "turnover",
+                "penalty",
+                "shotgun",
+                "explosive",
+            ]
+        )
+    ]
     print(f"\nNew enhanced features ({len(new_features)}):")
     for feat in sorted(new_features)[:20]:  # Show first 20
         print(f"  - {feat}")

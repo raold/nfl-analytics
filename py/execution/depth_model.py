@@ -12,17 +12,17 @@ price (e.g., ticks). We also estimate a residual rmse per bucket.
 This module contains pure-Python least-squares without external deps and is
 intended as a scaffold. Replace with your preferred regression library.
 """
+
 from __future__ import annotations
 
-import csv
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Tuple
 
 
 @dataclass
 class DepthParams:
-    beta: Tuple[float, float, float, float]
+    beta: tuple[float, float, float, float]
     rmse: float
 
 
@@ -39,9 +39,8 @@ def tau_bucket(tau_min: float) -> str:
     return "<15"
 
 
-def _normal_eq(X: List[List[float]], y: List[float]) -> Tuple[float, float, float, float]:
+def _normal_eq(X: list[list[float]], y: list[float]) -> tuple[float, float, float, float]:
     # Solve (X'X)β = X'y for 4-dim β using closed-form 4x4 solver (Gaussian elim)
-    import math
 
     # Build XtX and Xty
     XtX = [[0.0] * 4 for _ in range(4)]
@@ -79,8 +78,8 @@ def _normal_eq(X: List[List[float]], y: List[float]) -> Tuple[float, float, floa
     return beta  # type: ignore
 
 
-def fit_depth(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], DepthParams]:
-    buckets: Dict[Tuple[str, str, str], List[Tuple[List[float], float]]] = defaultdict(list)
+def fit_depth(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], DepthParams]:
+    buckets: dict[tuple[str, str, str], list[tuple[list[float], float]]] = defaultdict(list)
     for r in rows:
         try:
             book = r.get("book", "unknown")
@@ -96,7 +95,7 @@ def fit_depth(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], Dept
             buckets[(book, market, tau)].append((Xrow, dp))
         except Exception:
             continue
-    out: Dict[Tuple[str, str, str], DepthParams] = {}
+    out: dict[tuple[str, str, str], DepthParams] = {}
     for key, pairs in buckets.items():
         if len(pairs) < 4:
             out[key] = DepthParams((0.0, 0.0, 0.0, 0.0), 0.0)
@@ -116,8 +115,7 @@ def fit_depth(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], Dept
     return out
 
 
-def sample_depth(beta: Tuple[float, float, float, float], q: float, velocity: float) -> float:
+def sample_depth(beta: tuple[float, float, float, float], q: float, velocity: float) -> float:
     sign_v = 1.0 if velocity >= 0 else -1.0
     b0, b1, b2, b3 = beta
     return b0 + b1 * q + b2 * q * q + b3 * sign_v * q
-

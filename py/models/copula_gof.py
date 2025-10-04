@@ -16,17 +16,17 @@ Example:
     --tex-gof analysis/dissertation/figures/out/copula_gof_table.tex \
     --tex-tail analysis/dissertation/figures/out/tail_dependence_table.tex
 """
+
 from __future__ import annotations
 
 import argparse
 import os
 from dataclasses import dataclass
-from typing import Tuple, List
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm, t
 from scipy.special import gammaln
+from scipy.stats import norm, t
 
 
 def parse_args() -> argparse.Namespace:
@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 
-def load_pairs(path: str, start: int, end: int) -> Tuple[np.ndarray, np.ndarray]:
+def load_pairs(path: str, start: int, end: int) -> tuple[np.ndarray, np.ndarray]:
     df = pd.read_csv(path)
     df = df[(df["season"] >= start) & (df["season"] <= end)].copy()
     df = df[["spread_close", "total_close"]].dropna()
@@ -122,7 +122,9 @@ def t_copula_loglik(u: np.ndarray, v: np.ndarray, rho: float, nu: int) -> float:
         return -np.inf
     inv = (1.0 / det) * np.array([[1.0, -rho], [-rho, 1.0]])
     # Quadratic form for each observation
-    a = inv[0, 0]; b = inv[0, 1]; c = inv[1, 1]
+    a = inv[0, 0]
+    b = inv[0, 1]
+    c = inv[1, 1]
     quad = a * (x * x) + 2.0 * b * (x * y) + c * (y * y)
     # log joint t density in 2D
     d = 2
@@ -150,13 +152,15 @@ def t_copula_loglik(u: np.ndarray, v: np.ndarray, rho: float, nu: int) -> float:
     return ll
 
 
-def sim_gaussian(n: int, rho: float, rng: np.random.Generator) -> Tuple[np.ndarray, np.ndarray]:
+def sim_gaussian(n: int, rho: float, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
     z1 = rng.standard_normal(n)
     z2 = rho * z1 + np.sqrt(max(1e-12, 1.0 - rho * rho)) * rng.standard_normal(n)
     return norm.cdf(z1), norm.cdf(z2)
 
 
-def sim_t_copula(n: int, rho: float, nu: int, rng: np.random.Generator) -> Tuple[np.ndarray, np.ndarray]:
+def sim_t_copula(
+    n: int, rho: float, nu: int, rng: np.random.Generator
+) -> tuple[np.ndarray, np.ndarray]:
     # Draw bivariate normal with corr rho
     z1 = rng.standard_normal(n)
     z2 = rho * z1 + np.sqrt(max(1e-12, 1.0 - rho * rho)) * rng.standard_normal(n)
@@ -167,11 +171,21 @@ def sim_t_copula(n: int, rho: float, nu: int, rng: np.random.Generator) -> Tuple
     return t.cdf(x1, df=nu), t.cdf(x2, df=nu)
 
 
-def tail_gof_stat(u: np.ndarray, v: np.ndarray, model: str, rho: float, nu: int | None, nsim: int, rng: np.random.Generator) -> Tuple[float, float]:
+def tail_gof_stat(
+    u: np.ndarray,
+    v: np.ndarray,
+    model: str,
+    rho: float,
+    nu: int | None,
+    nsim: int,
+    rng: np.random.Generator,
+) -> tuple[float, float]:
     # Empirical tail exceedance at thresholds
     ths = np.array([0.80, 0.90, 0.95])
+
     def emp_tail(th: float) -> float:
         return float(np.mean((u > th) & (v > th)))
+
     emp = np.array([emp_tail(t0) for t0 in ths])
     # Model tail via simulation
     if model == "gaussian":
@@ -198,13 +212,18 @@ def tail_gof_stat(u: np.ndarray, v: np.ndarray, model: str, rho: float, nu: int 
     return sse, pval
 
 
-def tail_dependence(u: np.ndarray, v: np.ndarray, nboot: int, rng: np.random.Generator) -> Tuple[Tuple[float, float, float], Tuple[float, float, float]]:
+def tail_dependence(
+    u: np.ndarray, v: np.ndarray, nboot: int, rng: np.random.Generator
+) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
     # Empirical lambda_U/L using threshold t=0.95
     t0 = 0.95
+
     def lam_u(a: np.ndarray, b: np.ndarray) -> float:
         return float(np.mean((a > t0) & (b > t0)) / (1.0 - t0))
+
     def lam_l(a: np.ndarray, b: np.ndarray) -> float:
         return float(np.mean((a <= (1.0 - t0)) & (b <= (1.0 - t0))) / (1.0 - t0))
+
     lu = lam_u(u, v)
     ll = lam_l(u, v)
     nus = u.size
@@ -212,7 +231,8 @@ def tail_dependence(u: np.ndarray, v: np.ndarray, nboot: int, rng: np.random.Gen
     bl = []
     for _ in range(nboot):
         idx = rng.integers(0, nus, size=nus)
-        uu = u[idx]; vv = v[idx]
+        uu = u[idx]
+        vv = v[idx]
         bu.append(lam_u(uu, vv))
         bl.append(lam_l(uu, vv))
     lo_u, hi_u = float(np.percentile(bu, 2.5)), float(np.percentile(bu, 97.5))
@@ -220,7 +240,16 @@ def tail_dependence(u: np.ndarray, v: np.ndarray, nboot: int, rng: np.random.Gen
     return (lu, lo_u, hi_u), (ll, lo_l, hi_l)
 
 
-def write_tex_gof(path: str, sse_gauss: float, p_gauss: float, sse_t: float, p_t: float, rho_g: float, rho_t: float, nu_t: int) -> None:
+def write_tex_gof(
+    path: str,
+    sse_gauss: float,
+    p_gauss: float,
+    sse_t: float,
+    p_t: float,
+    rho_g: float,
+    rho_t: float,
+    nu_t: int,
+) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tex = (
         "\\begin{table}[t]\n"
@@ -241,7 +270,9 @@ def write_tex_gof(path: str, sse_gauss: float, p_gauss: float, sse_t: float, p_t
         f.write(tex)
 
 
-def write_tex_tail(path: str, upper: Tuple[float, float, float], lower: Tuple[float, float, float]) -> None:
+def write_tex_tail(
+    path: str, upper: tuple[float, float, float], lower: tuple[float, float, float]
+) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     lu, lu_lo, lu_hi = upper
     ll, ll_lo, ll_hi = lower

@@ -14,15 +14,15 @@ Usage:
   python py/execution/fit_execution_priors.py --logs data/orders.csv \
       --out analysis/dissertation/results/execution_priors.json
 """
+
 from __future__ import annotations
 
 import argparse
 import csv
 import json
-from collections import defaultdict
-from typing import Dict, Any, Tuple
+from typing import Any
 
-from .depth_model import fit_depth, tau_bucket
+from .depth_model import fit_depth
 from .fill_model import fit_fill
 from .latency_model import fit_latency
 
@@ -41,7 +41,7 @@ def main() -> None:
     depth = fit_depth(reader)
     fill = fit_fill(reader)
     lat = fit_latency(reader)
-    out: Dict[str, Any] = {}
+    out: dict[str, Any] = {}
     for key in set(list(depth.keys()) + list(fill.keys()) + list(lat.keys())):
         book, market, tau = key
         kstr = f"{book}::{market}::{tau}"
@@ -68,4 +68,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

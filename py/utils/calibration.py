@@ -1,10 +1,11 @@
 """
 Calibration utilities: reliability curves, ECE, Brier score, log loss.
 """
+
 from __future__ import annotations
 
 import math
-from typing import Iterable, List, Tuple
+from collections.abc import Iterable
 
 
 def brier_score(y_true: Iterable[int], p_hat: Iterable[float]) -> float:
@@ -26,7 +27,9 @@ def log_loss(y_true: Iterable[int], p_hat: Iterable[float], eps: float = 1e-12) 
     return s / max(1, n)
 
 
-def reliability_curve(y_true: List[int], p_hat: List[float], bins: int = 10) -> List[Tuple[float, float, int]]:
+def reliability_curve(
+    y_true: list[int], p_hat: list[float], bins: int = 10
+) -> list[tuple[float, float, int]]:
     """Return list of (bin_center, observed_rate, count)."""
     assert len(y_true) == len(p_hat)
     n = len(y_true)
@@ -40,7 +43,7 @@ def reliability_curve(y_true: List[int], p_hat: List[float], bins: int = 10) -> 
         k = min(bins - 1, max(0, int(p * bins)))
         sums[k] += y
         counts[k] += 1
-    out: List[Tuple[float, float, int]] = []
+    out: list[tuple[float, float, int]] = []
     for k in range(bins):
         c = counts[k]
         rate = (sums[k] / c) if c > 0 else 0.0
@@ -49,7 +52,7 @@ def reliability_curve(y_true: List[int], p_hat: List[float], bins: int = 10) -> 
     return out
 
 
-def expected_calibration_error(y_true: List[int], p_hat: List[float], bins: int = 10) -> float:
+def expected_calibration_error(y_true: list[int], p_hat: list[float], bins: int = 10) -> float:
     curve = reliability_curve(y_true, p_hat, bins)
     n = len(y_true)
     ece = 0.0
@@ -61,4 +64,3 @@ def expected_calibration_error(y_true: List[int], p_hat: List[float], bins: int 
 
 
 __all__ = ["brier_score", "log_loss", "reliability_curve", "expected_calibration_error"]
-

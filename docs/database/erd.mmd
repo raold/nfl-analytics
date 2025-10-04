@@ -1,0 +1,184 @@
+erDiagram
+    PUBLIC_GAMES ||--o{ PUBLIC_PLAYS : game_id
+    PUBLIC_GAMES ||--o| PUBLIC_WEATHER : game_id
+    PUBLIC_GAMES ||--o{ PUBLIC_INJURIES : game_id
+    PUBLIC_GAMES ||--o{ MART_TEAM_EPA : game_id
+    PUBLIC_GAMES ||--o{ MART_TEAM_4TH_DOWN : game_id
+
+    %% Marts and views
+    PUBLIC_GAMES ||--o{ MART_GAME_SUMMARY : feeds
+    MART_TEAM_EPA ||--o{ MART_GAME_SUMMARY : feeds
+    PUBLIC_WEATHER ||--o{ MART_GAME_SUMMARY : feeds
+
+    PUBLIC_GAMES ||--o{ MART_GAME_WEATHER : feeds
+    PUBLIC_WEATHER ||--o{ MART_GAME_WEATHER : feeds
+
+    PUBLIC_GAMES ||--o{ MART_GAME_FEATURES_ENH : feeds
+    MART_TEAM_EPA ||--o{ MART_GAME_FEATURES_ENH : feeds
+    MART_GAME_WEATHER ||--o{ MART_GAME_FEATURES_ENH : feeds
+    MART_TEAM_4TH_DOWN ||--o{ MART_GAME_FEATURES_ENH : feeds
+    MART_TEAM_PLAYOFF_CTX ||--o{ MART_GAME_FEATURES_ENH : feeds
+    MART_TEAM_INJURY_LOAD ||--o{ MART_GAME_FEATURES_ENH : feeds
+
+    PUBLIC_GAMES {
+        string game_id PK
+        int season
+        int week
+        string home_team
+        string away_team
+        datetime kickoff
+        float spread_close
+        float total_close
+        float home_moneyline
+        float away_moneyline
+        string stadium
+        string surface
+    }
+
+    PUBLIC_PLAYS {
+        string game_id FK
+        int play_id PK
+        string posteam
+        string defteam
+        int quarter
+        int time_seconds
+        int down
+        int ydstogo
+        float epa
+        bool pass
+        bool rush
+    }
+
+    PUBLIC_WEATHER {
+        string game_id PK
+        string station
+        float temp_c
+        float rh
+        float wind_kph
+        float pressure_hpa
+        float precip_mm
+    }
+
+    PUBLIC_INJURIES {
+        string game_id FK
+        string team
+        string player_id
+        string status
+    }
+
+    PUBLIC_ODDS_HISTORY {
+        string event_id PK
+        string bookmaker_key PK
+        string market_key PK
+        string outcome_name PK
+        datetime snapshot_at PK
+        datetime commence_time
+        datetime market_last_update
+        float outcome_price
+        float outcome_point
+        datetime fetched_at
+    }
+
+    MART_TEAM_EPA {
+        string game_id PK
+        string posteam PK
+        int plays
+        float epa_sum
+        float epa_mean
+        float explosive_pass
+        float explosive_rush
+    }
+
+    MART_TEAM_4TH_DOWN {
+        string game_id PK
+        string team PK
+        int fourth_downs
+        float went_for_it_rate
+        float fourth_down_epa
+        int bad_decisions
+        float avg_go_boost
+        float avg_fg_boost
+    }
+
+    MART_TEAM_PLAYOFF_CTX {
+        string team PK
+        int season PK
+        int week PK
+        float playoff_prob
+        float div_winner_prob
+        float first_seed_prob
+        bool eliminated
+        bool locked_in
+        bool desperate
+    }
+
+    MART_TEAM_INJURY_LOAD {
+        int season PK
+        int week PK
+        string team PK
+        int total_injuries
+        int players_out
+        int players_questionable
+        int players_doubtful
+        bool key_position_out
+        bool qb_out
+        int oline_injuries
+        float injury_severity_index
+    }
+
+    MART_GAME_SUMMARY {
+        string game_id
+        int season
+        int week
+        string home_team
+        string away_team
+        int home_score
+        int away_score
+        float spread_close
+        float total_close
+        float home_moneyline
+        float away_moneyline
+        float home_epa_mean
+        float away_epa_mean
+        string stadium
+        string roof
+        string surface
+        float temp_c
+        float wind_kph
+    }
+
+    MART_GAME_WEATHER {
+        string game_id
+        int season
+        int week
+        string home_team
+        string away_team
+        float temp_c
+        float humidity
+        float wind_kph
+        float pressure_hpa
+        float precip_mm
+        float temp_extreme
+        float wind_penalty
+        bool has_precip
+        bool is_dome
+    }
+
+    MART_GAME_FEATURES_ENH {
+        string game_id
+        int season
+        int week
+        string home_team
+        string away_team
+        float home_epa_mean
+        float away_epa_mean
+        float temperature
+        float wind_speed
+        float precipitation
+        float home_4th_epa
+        float away_4th_epa
+        float home_injury_severity
+        float away_injury_severity
+        float home_playoff_prob
+        float away_playoff_prob
+    }

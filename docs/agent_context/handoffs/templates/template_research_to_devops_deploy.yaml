@@ -1,0 +1,192 @@
+# Research to DevOps Deployment Handoff Template
+
+date: YYYY-MM-DD
+from: Research Agent
+to: DevOps Agent
+trigger: model_deployment_request
+status: pending  # pending | acknowledged | staging | production | rollback
+
+## Model Information
+model_name: ""
+model_version: ""
+model_location: ""  # Path in repository
+model_file: ""  # Specific file (e.g., model.pkl)
+trained_on: ""  # Date
+training_duration: ""
+model_type: ""  # xgboost | glm | neural_network | ensemble
+
+## Performance Metrics
+validation_metrics:
+  auc: 0.0
+  accuracy: 0.0
+  precision: 0.0
+  recall: 0.0
+  f1: 0.0
+  log_loss: 0.0
+  brier_score: 0.0
+
+betting_metrics:
+  roi: 0.0
+  win_rate: 0.0
+  sharpe_ratio: 0.0
+  max_drawdown: 0.0
+  kelly_percentage: 0.0
+
+calibration_metrics:
+  calibration_error: 0.0
+  calibration_method: ""  # platt | isotonic | none
+
+comparison_to_baseline:
+  baseline_model: ""
+  improvement: ""
+  statistical_significance: ""
+
+test_period: ""
+test_games: 0
+
+## Deployment Requirements
+dependencies:
+  python_version: ""
+  packages: []
+    # - package==version
+
+system_requirements:
+  memory_gb: 0
+  cpu_cores: 0
+  gpu_required: false
+  disk_space_gb: 0
+
+## Input/Output Configuration
+input_source:
+  type: ""  # database_view | csv | api
+  location: ""
+  columns_required: []
+  preprocessing: ""
+
+output_destination:
+  type: ""  # database_table | file | api
+  location: ""
+  schema: ""
+
+## Inference Configuration
+inference_schedule:
+  frequency: ""  # daily | weekly | on_demand
+  time: ""  # HH:MM TZ
+  conditions: ""  # when to run
+
+batch_size: 0
+timeout_seconds: 0
+retry_policy: ""
+
+## Monitoring Requirements
+metrics_to_track:
+  - ""
+
+alert_thresholds:
+  prediction_distribution_shift: 0.0
+  extreme_probability_threshold: 0.0
+  error_rate_threshold: 0.0
+  latency_threshold_ms: 0
+
+dashboard_requirements: |
+  What to show on monitoring dashboard
+
+comparison_baseline:
+  model: ""
+  alert_if_underperforms_by: 0.0
+
+## Logging Requirements
+log_predictions: true
+log_features: true
+log_probabilities: true
+log_model_version: true
+retention_days: 90
+
+## Rollback Plan
+rollback_to_model: ""
+rollback_conditions: []
+  # - condition: description
+  #   threshold: value
+
+rollback_procedure: |
+  Step-by-step rollback instructions
+
+## Testing Checklist
+pre_deployment_tests:
+  - [ ] Smoke test on sample data
+  - [ ] Latency test (should be < X ms)
+  - [ ] Edge case handling
+  - [ ] Error handling validation
+  - [ ] Output schema validation
+  - [ ] Resource usage check
+
+staging_validation:
+  - [ ] Deploy to staging environment
+  - [ ] Run test predictions
+  - [ ] Compare outputs to training results
+  - [ ] Validate monitoring setup
+  - [ ] Test rollback procedure
+
+production_readiness:
+  - [ ] All tests passed
+  - [ ] Documentation complete
+  - [ ] Monitoring configured
+  - [ ] Alerts set up
+  - [ ] Rollback tested
+
+## Approval
+approved_by: "Research Agent"
+approval_reason: |
+  Why this model is ready for production
+
+risk_assessment:
+  risks: []
+    # - risk: description
+    #   mitigation: action
+  
+acceptance_criteria: |
+  What defines success in production
+
+## Documentation
+model_documentation: ""  # Link to detailed model docs
+methodology_paper: ""  # Link to methodology
+code_repository: ""  # Specific commit hash
+
+training_data:
+  date_range: ""
+  row_count: 0
+  features_used: []
+
+## Timeline
+requested_deployment_date: ""
+staging_deadline: ""
+production_deadline: ""
+first_predictions_needed_by: ""
+
+## Handoff Tracking
+created_at: ""
+sent_at: ""
+acknowledged_by: ""
+acknowledged_at: ""
+deployed_to_staging_at: ""
+staging_validated_at: ""
+deployed_to_production_at: ""
+first_production_prediction_at: ""
+
+## Production Notes
+deployment_notes: |
+  DevOps fills this in during deployment
+  - Actual deployment steps taken
+  - Any deviations from plan
+  - Issues encountered and resolved
+
+production_location: ""
+production_endpoint: ""
+production_monitoring_url: ""
+
+## Post-Deployment Review
+performance_summary: |
+  Research fills this in after 1-2 weeks
+  - Meeting expectations?
+  - Any adjustments needed?
+  - Lessons learned

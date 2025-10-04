@@ -17,27 +17,25 @@ Usage
     --tex analysis/dissertation/figures/out/teaser_ev_oos_table.tex \
     --png analysis/dissertation/figures/out/teaser_pricing_copula_delta.png
 """
+
 from __future__ import annotations
 
 import argparse
 import os
-from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
-
-import math
 import random
+from collections.abc import Sequence
+from dataclasses import dataclass
 
 import numpy as np
 import psycopg
 
-from ..models.score_distributions import (
-    skellam_pmf_range,
-    reweight_key_masses,
-    cover_push_probs,
-)
-from ..models.copulas import joint_success_prob_gaussian
 from ..models.copula_gof import sim_t_copula
-
+from ..models.copulas import joint_success_prob_gaussian
+from ..models.score_distributions import (
+    cover_push_probs,
+    reweight_key_masses,
+    skellam_pmf_range,
+)
 
 # -------------------------
 # Utility conversions
@@ -68,7 +66,9 @@ def get_connection() -> psycopg.Connection:
     return psycopg.connect(host=host, port=port, dbname=dbname, user=user, password=password)
 
 
-def fetch_games(conn: psycopg.Connection, start_season: int, end_season: int) -> List[Dict[str, object]]:
+def fetch_games(
+    conn: psycopg.Connection, start_season: int, end_season: int
+) -> list[dict[str, object]]:
     sql = """
         select season, week, home_team, away_team, spread_close, total_close, home_score, away_score
         from mart.game_summary
@@ -83,7 +83,9 @@ def fetch_games(conn: psycopg.Connection, start_season: int, end_season: int) ->
     return rows
 
 
-def fetch_key_targets(conn: psycopg.Connection, start_season: int, end_season: int) -> Dict[int, float]:
+def fetch_key_targets(
+    conn: psycopg.Connection, start_season: int, end_season: int
+) -> dict[int, float]:
     """Empirical key-number masses from realized margins in a training window.
 
     Returns: dict like {3: p3, 6: p6, 7: p7, 10: p10}
@@ -98,7 +100,7 @@ def fetch_key_targets(conn: psycopg.Connection, start_season: int, end_season: i
     with conn.cursor() as cur:
         cur.execute(sql, (start_season, end_season))
         rows = cur.fetchall()
-    counts: Dict[int, int] = {}
+    counts: dict[int, int] = {}
     total = 0
     for m, n in rows:
         if m is None:
@@ -117,7 +119,9 @@ def fetch_key_targets(conn: psycopg.Connection, start_season: int, end_season: i
 # -------------------------
 
 
-def pmf_from_spread_total(total_close: float, spread_close: float, k_min: int = -80, k_max: int = 80) -> Dict[int, float]:
+def pmf_from_spread_total(
+    total_close: float, spread_close: float, k_min: int = -80, k_max: int = 80
+) -> dict[int, float]:
     """Construct integer-margin PMF via Skellam using (total, spread).
 
     Conventions
@@ -148,21 +152,23 @@ def crosses_keys(th0: float, th1: float) -> bool:
 class Leg:
     game_idx: int
     side: str  # 'home' or 'away'
-    spread: float  # closing spread for that side (home spread if side=='home', away spread if 'away')
+    spread: (
+        float  # closing spread for that side (home spread if side=='home', away spread if 'away')
+    )
     teased_spread: float
     q: float  # success probability under model
 
 
 def leg_success_probs_for_game(
-    pmf_margin: Dict[int, float], spread_home: float, teaser: float
-) -> List[Tuple[str, float, float, float]]:
+    pmf_margin: dict[int, float], spread_home: float, teaser: float
+) -> list[tuple[str, float, float, float]]:
     """Return eligible legs with success probs: [(side, spread_side, teased, q)].
 
     Basic-strategy filter:
       - Home favorite teased down: include if home spread < 0 and crosses 3 & 7
       - Away underdog teased up: include if away spread > 0 and crosses 3 & 7
     """
-    legs: List[Tuple[str, float, float, float]] = []
+    legs: list[tuple[str, float, float, float]] = []
 
     # Home side
     s_home = float(spread_home)
@@ -210,7 +216,7 @@ def joint_success(
     rho: float = 0.0,
     nu: int = 5,
     nsim: int = 20000,
-    rng: Optional[np.random.Generator] = None,
+    rng: np.random.Generator | None = None,
 ) -> float:
     """P(both legs succeed) under selected dependence model.
 
@@ -240,10 +246,10 @@ def pairwise_ev(
     dep_model: str = "indep",
     rho: float = 0.0,
     nu: int = 5,
-) -> Tuple[List[float], List[Tuple[Leg, Leg]]]:
+) -> tuple[list[float], list[tuple[Leg, Leg]]]:
     """Pair legs sequentially and compute EV per pair. Drops the last if odd."""
-    pairs: List[Tuple[Leg, Leg]] = []
-    evs: List[float] = []
+    pairs: list[tuple[Leg, Leg]] = []
+    evs: list[float] = []
     n = len(legs)
     for i in range(0, n - 1, 2):
         a = legs[i]
@@ -260,7 +266,7 @@ def pairwise_ev(
 # -------------------------
 
 
-def write_tex_table(path: str, rows: List[Tuple[str, float, float]]) -> None:
+def write_tex_table(path: str, rows: list[tuple[str, float, float]]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     lines = [
         "% !TEX root = ../../main/main.tex",
@@ -274,7 +280,7 @@ def write_tex_table(path: str, rows: List[Tuple[str, float, float]]) -> None:
         "    \\midrule",
     ]
     for label, mean_ev, roi in rows:
-        lines.append("    {} & {:.1f} & {:.2f} \\\\".format(label, mean_ev, roi))
+        lines.append(f"    {label} & {mean_ev:.1f} & {roi:.2f} \\\\")
     lines += [
         "    \\bottomrule",
         "  \\end{tabular}",
@@ -284,7 +290,9 @@ def write_tex_table(path: str, rows: List[Tuple[str, float, float]]) -> None:
         f.write("\n".join(lines) + "\n")
 
 
-def write_copula_delta_png(path: str, price_american: float, rho: float = 0.1, model: str = "gaussian") -> None:
+def write_copula_delta_png(
+    path: str, price_american: float, rho: float = 0.1, model: str = "gaussian"
+) -> None:
     import matplotlib.pyplot as plt
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -328,8 +336,8 @@ def write_tex_sensitivity(
     path: str,
     indep_bps: float,
     indep_roi: float,
-    gauss_rows: List[Tuple[float, float, float]],
-    t_rows: List[Tuple[float, int, float, float]],
+    gauss_rows: list[tuple[float, float, float]],
+    t_rows: list[tuple[float, int, float, float]],
 ):
     """Write a sensitivity table covering indep baseline, Gaussian rho grid, and t-copula (rho, nu)."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -343,16 +351,16 @@ def write_tex_sensitivity(
         "    \\toprule",
         r"    Model & Param(s) & Mean EV (bps) & ROI (\%) \\",
         "    \\midrule",
-        "    Independence & -- & {:.1f} & {:.2f} \\\\".format(indep_bps, indep_roi),
+        f"    Independence & -- & {indep_bps:.1f} & {indep_roi:.2f} \\\\",
         "    \\midrule",
     ]
     # Gaussian rows
     for rho, bps, roi in gauss_rows:
-        lines.append("    Gaussian & $\\rho={:+.2f}$ & {:.1f} & {:.2f} \\\\".format(rho, bps, roi))
+        lines.append(f"    Gaussian & $\\rho={rho:+.2f}$ & {bps:.1f} & {roi:.2f} \\\\")
     lines.append("    \\midrule")
     # t-copula rows
     for rho, nu, bps, roi in t_rows:
-        lines.append("    $t$ & $\\rho={:+.2f},\\,\\nu={:d}$ & {:.1f} & {:.2f} \\\\".format(rho, nu, bps, roi))
+        lines.append(f"    $t$ & $\\rho={rho:+.2f},\\,\\nu={nu:d}$ & {bps:.1f} & {roi:.2f} \\\\")
     lines += [
         "    \\bottomrule",
         "  \\end{tabular}",
@@ -368,21 +376,43 @@ def write_tex_sensitivity(
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Two-leg teaser EV estimator (OOS table + copula delta figure)")
+    ap = argparse.ArgumentParser(
+        description="Two-leg teaser EV estimator (OOS table + copula delta figure)"
+    )
     ap.add_argument("--start", type=int, default=2020, help="Start season (inclusive)")
     ap.add_argument("--end", type=int, default=2024, help="End season (inclusive)")
     ap.add_argument("--train-start", type=int, default=1999, help="Training start for key masses")
     ap.add_argument("--train-end", type=int, default=2019, help="Training end for key masses")
     ap.add_argument("--teaser", type=float, default=6.0, help="Teaser points")
     ap.add_argument("--price", type=float, default=-120.0, help="American odds for 2-leg teaser")
-    ap.add_argument("--dep", type=str, default="indep", choices=["indep", "gaussian", "t"], help="Dependence model for pairing")
+    ap.add_argument(
+        "--dep",
+        type=str,
+        default="indep",
+        choices=["indep", "gaussian", "t"],
+        help="Dependence model for pairing",
+    )
     ap.add_argument("--rho", type=float, default=0.0, help="Correlation for copula models")
     ap.add_argument("--nu", type=int, default=5, help="DoF for t copula")
-    ap.add_argument("--tex", type=str, default="analysis/dissertation/figures/out/teaser_ev_oos_table.tex")
-    ap.add_argument("--png", type=str, default="analysis/dissertation/figures/out/teaser_pricing_copula_delta.png")
-    ap.add_argument("--sensitivity", action="store_true", help="Also emit sensitivity table over rho/nu grids")
-    ap.add_argument("--rho-grid", default="-0.30,-0.20,-0.10,0.00,0.10,0.20,0.30", help="Comma-separated rho values for sensitivity")
-    ap.add_argument("--nu-grid", default="3,5,10,30", help="Comma-separated nu values for t-copula sensitivity")
+    ap.add_argument(
+        "--tex", type=str, default="analysis/dissertation/figures/out/teaser_ev_oos_table.tex"
+    )
+    ap.add_argument(
+        "--png",
+        type=str,
+        default="analysis/dissertation/figures/out/teaser_pricing_copula_delta.png",
+    )
+    ap.add_argument(
+        "--sensitivity", action="store_true", help="Also emit sensitivity table over rho/nu grids"
+    )
+    ap.add_argument(
+        "--rho-grid",
+        default="-0.30,-0.20,-0.10,0.00,0.10,0.20,0.30",
+        help="Comma-separated rho values for sensitivity",
+    )
+    ap.add_argument(
+        "--nu-grid", default="3,5,10,30", help="Comma-separated nu values for t-copula sensitivity"
+    )
     ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
 
@@ -396,8 +426,8 @@ def main() -> None:
         targets = fetch_key_targets(conn, args.train_start, args.train_end)
         games = fetch_games(conn, args.start, args.end)
 
-    legs_base: List[Leg] = []
-    legs_rw: List[Leg] = []
+    legs_base: list[Leg] = []
+    legs_rw: list[Leg] = []
 
     for idx, g in enumerate(games):
         s = float(g["spread_close"])  # home spread
@@ -408,9 +438,11 @@ def main() -> None:
         elig = leg_success_probs_for_game(pmf, s, args.teaser)
         elig_rw = leg_success_probs_for_game(pmf_rw, s, args.teaser)
 
-        for (side, s_side, s_tease, q) in elig:
-            legs_base.append(Leg(game_idx=idx, side=side, spread=s_side, teased_spread=s_tease, q=q))
-        for (side, s_side, s_tease, q) in elig_rw:
+        for side, s_side, s_tease, q in elig:
+            legs_base.append(
+                Leg(game_idx=idx, side=side, spread=s_side, teased_spread=s_tease, q=q)
+            )
+        for side, s_side, s_tease, q in elig_rw:
             legs_rw.append(Leg(game_idx=idx, side=side, spread=s_side, teased_spread=s_tease, q=q))
 
     # Stable ordering; then pair sequentially
@@ -420,7 +452,7 @@ def main() -> None:
     evs_base, pairs_base = pairwise_ev(legs_base, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
     evs_rw, pairs_rw = pairwise_ev(legs_rw, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
 
-    def summarize(evs: Sequence[float]) -> Tuple[float, float]:
+    def summarize(evs: Sequence[float]) -> tuple[float, float]:
         if not evs:
             return (0.0, 0.0)
         mean_ev = float(np.mean(evs))
@@ -432,7 +464,7 @@ def main() -> None:
     bps_rw, roi_rw = summarize(evs_rw)
 
     # Main table: add dependence model row(s)
-    main_rows: List[Tuple[str, float, float]] = [
+    main_rows: list[tuple[str, float, float]] = [
         ("Skellam (baseline)", bps_base, roi_base),
         ("Skellam + reweight", bps_rw, roi_rw),
     ]
@@ -442,12 +474,16 @@ def main() -> None:
         main_rows.append((f"Gaussian (rho={args.rho:+.2f})", 10000.0 * mean_ev, 100.0 * mean_ev))
     elif args.dep == "t":
         mean_ev = float(np.mean([ev for ev in evs_base])) if evs_base else 0.0
-        main_rows.append((f"t (rho={args.rho:+.2f}, nu={int(args.nu)})", 10000.0 * mean_ev, 100.0 * mean_ev))
+        main_rows.append(
+            (f"t (rho={args.rho:+.2f}, nu={int(args.nu)})", 10000.0 * mean_ev, 100.0 * mean_ev)
+        )
     write_tex_table(args.tex, rows=main_rows)
 
     # Copula delta heatmap figure (gaussian by default)
     model_for_png = "gaussian" if args.dep == "indep" else args.dep
-    write_copula_delta_png(args.png, price_american=args.price, rho=args.rho or 0.1, model=model_for_png)
+    write_copula_delta_png(
+        args.png, price_american=args.price, rho=args.rho or 0.1, model=model_for_png
+    )
 
     # Optional sensitivity table
     if args.sensitivity:
@@ -458,14 +494,14 @@ def main() -> None:
         indep_roi = 100.0 * indep_ev
         # Gaussian grid
         rho_vals = [float(x) for x in args.rho_grid.split(",") if x.strip()]
-        gauss_rows: List[Tuple[float, float, float]] = []
+        gauss_rows: list[tuple[float, float, float]] = []
         for r in rho_vals:
             evs_g, _ = pairwise_ev(legs_base, d, dep_model="gaussian", rho=r, nu=args.nu)
             m = float(np.mean(evs_g)) if evs_g else 0.0
             gauss_rows.append((r, 10000.0 * m, 100.0 * m))
         # t grid (cartesian of rho and nu)
         nu_vals = [int(float(x)) for x in args.nu_grid.split(",") if x.strip()]
-        t_rows: List[Tuple[float, int, float, float]] = []
+        t_rows: list[tuple[float, int, float, float]] = []
         for r in rho_vals:
             for nu in nu_vals:
                 evs_t, _ = pairwise_ev(legs_base, d, dep_model="t", rho=r, nu=nu)

@@ -20,18 +20,16 @@ from __future__ import annotations
 
 import argparse
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Sequence, Union
 
 import numpy as np
 import pandas as pd
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
-from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.calibration import CalibratedClassifierCV
-from typing import Optional
-
+from sklearn.preprocessing import StandardScaler
 
 DECIMAL_PAYOUT_DEFAULT = 1.9091  # Approx -110 vig
 
@@ -83,7 +81,7 @@ DEFAULT_FEATURE_COLUMNS = [
 
 @dataclass
 class Metrics:
-    season: Union[int, str]
+    season: int | str
     games: int
     pushes: int
     brier: float
@@ -132,10 +130,12 @@ def fit_model(
 ) -> ModelBundle:
     X = train[list(feature_columns)].to_numpy(dtype=float)
     y = train["home_cover_train"].to_numpy(dtype=int)
-    base = Pipeline([
-        ("scaler", StandardScaler()),
-        ("logit", LogisticRegression(max_iter=2000, solver="lbfgs")),
-    ])
+    base = Pipeline(
+        [
+            ("scaler", StandardScaler()),
+            ("logit", LogisticRegression(max_iter=2000, solver="lbfgs")),
+        ]
+    )
     if calibration and calibration.lower() != "none":
         method = "sigmoid" if calibration.lower() in {"platt", "sigmoid"} else "isotonic"
         try:
@@ -162,7 +162,7 @@ def evaluate_model(
 
 
 def compute_metrics(
-    season: Union[int, str],
+    season: int | str,
     pred_df: pd.DataFrame,
     threshold: float,
     decimal_payout: float,
@@ -216,19 +216,21 @@ def run_backtest(
         pred_df = evaluate_model(bundle, test, threshold)
         metrics = compute_metrics(season, pred_df, threshold, decimal_payout)
         results.append(metrics)
-        pred_enriched = pred_df[[
-            "game_id",
-            "season",
-            "week",
-            "kickoff",
-            "home_team",
-            "away_team",
-            "spread_close",
-            "total_close",
-            "home_cover",
-            "pred_cover_prob",
-            "bet_home",
-        ]].copy()
+        pred_enriched = pred_df[
+            [
+                "game_id",
+                "season",
+                "week",
+                "kickoff",
+                "home_team",
+                "away_team",
+                "spread_close",
+                "total_close",
+                "home_cover",
+                "pred_cover_prob",
+                "bet_home",
+            ]
+        ].copy()
         pred_enriched["season_eval"] = season
         predictions.append(pred_enriched)
     combined_preds = pd.concat(predictions, ignore_index=True) if predictions else pd.DataFrame()
@@ -281,7 +283,7 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
         else:
             season_fmt = str(season_val)
         line = (
-            "      {season} & {games:d} & {pushes:d} & {brier} & {log_loss} & {hit_rate} & {roi} \\\\" 
+            "      {season} & {games:d} & {pushes:d} & {brier} & {log_loss} & {hit_rate} & {roi} \\\\"
         ).format(
             season=season_fmt,
             games=int(row["games"]),
@@ -292,11 +294,13 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
             roi=format_metric(row["roi"]),
         )
         lines.append(line)
-    lines.extend([
-        "    \\bottomrule",
-        "  \\end{tabular}",
-        "\\end{table}",
-    ])
+    lines.extend(
+        [
+            "    \\bottomrule",
+            "  \\end{tabular}",
+            "\\end{table}",
+        ]
+    )
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -327,7 +331,9 @@ def reliability_curve(
         include_groups=False,
     ).reset_index()
     out["bin_low"] = out["bin"].apply(lambda iv: float(iv.left) if hasattr(iv, "left") else np.nan)
-    out["bin_high"] = out["bin"].apply(lambda iv: float(iv.right) if hasattr(iv, "right") else np.nan)
+    out["bin_high"] = out["bin"].apply(
+        lambda iv: float(iv.right) if hasattr(iv, "right") else np.nan
+    )
     return out[["bin", "bin_low", "bin_high", "count", "pred_mean", "obs_rate"]]
 
 
@@ -374,12 +380,38 @@ def parse_args() -> argparse.Namespace:
         default="analysis/features/asof_team_features.csv",
         help="CSV containing as-of features",
     )
-    ap.add_argument("--start-season", type=int, default=2003, help="First season to evaluate (train uses seasons < start)")
+    ap.add_argument(
+        "--start-season",
+        type=int,
+        default=2003,
+        help="First season to evaluate (train uses seasons < start)",
+    )
     ap.add_argument("--end-season", type=int, default=2024, help="Last season to include")
-    ap.add_argument("--min-season", dest="min_season", type=int, default=2001, help="Earliest season to load from dataset")
-    ap.add_argument("--decision-threshold", type=float, default=0.5, help="Probability threshold for betting home (else away)")
-    ap.add_argument("--decimal-payout", type=float, default=DECIMAL_PAYOUT_DEFAULT, help="Decimal payout used for ROI (-110 -> 1.9091)")
-    ap.add_argument("--calibration", choices=["none", "platt", "isotonic"], default="none", help="Optional probability calibration")
+    ap.add_argument(
+        "--min-season",
+        dest="min_season",
+        type=int,
+        default=2001,
+        help="Earliest season to load from dataset",
+    )
+    ap.add_argument(
+        "--decision-threshold",
+        type=float,
+        default=0.5,
+        help="Probability threshold for betting home (else away)",
+    )
+    ap.add_argument(
+        "--decimal-payout",
+        type=float,
+        default=DECIMAL_PAYOUT_DEFAULT,
+        help="Decimal payout used for ROI (-110 -> 1.9091)",
+    )
+    ap.add_argument(
+        "--calibration",
+        choices=["none", "platt", "isotonic"],
+        default="none",
+        help="Optional probability calibration",
+    )
     ap.add_argument("--cv-folds", type=int, default=5, help="CV folds for calibration")
     ap.add_argument("--cal-bins", type=int, default=10, help="Bins for reliability curve")
     ap.add_argument("--output-csv", help="Optional CSV output path for per-season metrics")
@@ -412,7 +444,9 @@ def main() -> None:
 
     metrics_df = metrics_to_df(metrics_list)
     if not preds_df.empty:
-        overall_metrics = compute_metrics("Overall", preds_df, args.decision_threshold, args.decimal_payout)
+        overall_metrics = compute_metrics(
+            "Overall", preds_df, args.decision_threshold, args.decimal_payout
+        )
         metrics_df = append_overall_row(metrics_df, overall_metrics)
         # Reliability outputs
         rel = reliability_curve(preds_df, n_bins=args.cal_bins)

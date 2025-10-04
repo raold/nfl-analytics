@@ -13,14 +13,14 @@ Output CSV columns (one-step per game):
 Usage:
   python py/rl/dataset.py --output data/rl_logged.csv --season-start 2019 --season-end 2024
 """
+
 from __future__ import annotations
 
 import argparse
+import math
 import os
-from typing import Any, List
 
 import numpy as np
-import math
 import pandas as pd
 import psycopg
 from sklearn.linear_model import LogisticRegression
@@ -31,8 +31,12 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--output", required=True, help="Output CSV path")
     ap.add_argument("--season-start", type=int, default=2019)
     ap.add_argument("--season-end", type=int, default=2024)
-    ap.add_argument("--b-propensity", type=float, default=0.2, help="Behavior propensity for action=1")
-    ap.add_argument("--price-decimal", type=float, default=1.91, help="Decimal odds for spread (-110≈1.91)")
+    ap.add_argument(
+        "--b-propensity", type=float, default=0.2, help="Behavior propensity for action=1"
+    )
+    ap.add_argument(
+        "--price-decimal", type=float, default=1.91, help="Decimal odds for spread (-110≈1.91)"
+    )
     return ap.parse_args()
 
 
@@ -92,7 +96,9 @@ def _market_prob(row: pd.Series) -> float:
     return 0.5 * (1.0 + math.erf(sp / (sigma * math.sqrt(2))))
 
 
-def build_logged_dataset(df: pd.DataFrame, b_propensity: float, price_decimal: float) -> pd.DataFrame:
+def build_logged_dataset(
+    df: pd.DataFrame, b_propensity: float, price_decimal: float
+) -> pd.DataFrame:
     b = price_decimal - 1.0  # net odds used for reward
 
     # Features and target for a quick logistic baseline
@@ -101,14 +107,22 @@ def build_logged_dataset(df: pd.DataFrame, b_propensity: float, price_decimal: f
         df_feat["home_epa_mean"] = np.nan
     if "away_epa_mean" not in df_feat.columns:
         df_feat["away_epa_mean"] = np.nan
-    df_feat["epa_gap"] = df_feat["home_epa_mean"].astype(float).fillna(0.0) - df_feat["away_epa_mean"].astype(float).fillna(0.0)
+    df_feat["epa_gap"] = df_feat["home_epa_mean"].astype(float).fillna(0.0) - df_feat[
+        "away_epa_mean"
+    ].astype(float).fillna(0.0)
     # Target: home win
     y = (df_feat["home_score"] > df_feat["away_score"]).astype(int)
-    X = pd.DataFrame({
-        "spread_close": df_feat["spread_close"].fillna(0.0).astype(float),
-        "total_close": df_feat["total_close"].fillna(df_feat["total_close"].median() if df_feat["total_close"].notna().any() else 44.0).astype(float),
-        "epa_gap": df_feat["epa_gap"].astype(float),
-    })
+    X = pd.DataFrame(
+        {
+            "spread_close": df_feat["spread_close"].fillna(0.0).astype(float),
+            "total_close": df_feat["total_close"]
+            .fillna(
+                df_feat["total_close"].median() if df_feat["total_close"].notna().any() else 44.0
+            )
+            .astype(float),
+            "epa_gap": df_feat["epa_gap"].astype(float),
+        }
+    )
     # Train simple logistic (fit on all rows with outcomes available)
     mask_fit = y.notna() & X.notna().all(axis=1)
     clf = LogisticRegression(max_iter=1000)
@@ -144,10 +158,19 @@ def build_logged_dataset(df: pd.DataFrame, b_propensity: float, price_decimal: f
     cover = (margin > -df_feat["spread_close"].astype(float)).astype(int)
     r = action * (cover * b + (1 - cover) * (-1.0))
 
-    out = df_feat[[
-        "game_id", "season", "week", "spread_close", "total_close",
-        "home_score", "away_score", "home_epa_mean", "away_epa_mean"
-    ]].copy()
+    out = df_feat[
+        [
+            "game_id",
+            "season",
+            "week",
+            "spread_close",
+            "total_close",
+            "home_score",
+            "away_score",
+            "home_epa_mean",
+            "away_epa_mean",
+        ]
+    ].copy()
     out["epa_gap"] = X["epa_gap"].to_numpy()
     out["market_prob"] = market_prob
     out["p_hat"] = p_hat

@@ -5,11 +5,11 @@ Loads execution priors JSON and provides a simulate_order() function that
 returns filled fraction and executed price given requested q, book, market,
 time-to-kickoff, velocity, and side.
 """
+
 from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Dict, Tuple
 
 from ..execution.depth_model import sample_depth, tau_bucket
 from ..execution.fill_model import prob_fill
@@ -18,18 +18,18 @@ from ..execution.latency_model import sample_latency
 
 @dataclass
 class BucketParams:
-    beta: Tuple[float, float, float, float]
+    beta: tuple[float, float, float, float]
     rmse: float
-    theta: Tuple[float, float, float, float, float]
+    theta: tuple[float, float, float, float, float]
     mu_log: float
     sigma_log: float
 
 
 class ExecutionEngine:
     def __init__(self, priors_path: str):
-        with open(priors_path, "r", encoding="utf-8") as f:
+        with open(priors_path, encoding="utf-8") as f:
             raw = json.load(f)
-        self.params: Dict[Tuple[str, str, str], BucketParams] = {}
+        self.params: dict[tuple[str, str, str], BucketParams] = {}
         for k, v in raw.items():
             book, market, tau = k.split("::")
             beta = tuple(v.get("depth", {}).get("beta", [0, 0, 0, 0]))  # type: ignore
@@ -48,7 +48,7 @@ class ExecutionEngine:
         quoted_price: float,
         velocity: float,
         side: float,
-    ) -> Tuple[float, float, Dict[str, float]]:
+    ) -> tuple[float, float, dict[str, float]]:
         tau = tau_bucket(tau_min)
         p = self.params.get((book, market, tau))
         if not p:
@@ -64,4 +64,3 @@ class ExecutionEngine:
         executed_price = quoted_price + impact
         stats = {"fill_prob": pfill, "latency": ell, "impact": impact}
         return q_filled, executed_price, stats
-

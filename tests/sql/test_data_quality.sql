@@ -174,7 +174,7 @@ BEGIN
     ELSE
         SELECT COUNT(*) INTO extreme_epa
         FROM mart.team_epa
-        WHERE total_epa < -1000 OR total_epa > 1000;
+        WHERE epa_sum < -1000 OR epa_sum > 1000;
         
         IF extreme_epa > 0 THEN
             RAISE WARNING 'Found % teams with extreme total EPA', extreme_epa;

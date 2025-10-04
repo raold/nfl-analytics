@@ -33,15 +33,14 @@ Usage:
   # Evaluate policy
   python py/rl/dqn_agent.py --dataset data/rl_logged_test.csv --load models/dqn_model.pth --evaluate --device mps
 """
+
 from __future__ import annotations
 
 import argparse
 import json
-import os
 import random
 from collections import deque
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -49,12 +48,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-
 
 # ============================================================================
 # Utilities
 # ============================================================================
+
 
 def set_seed(seed: int = 42):
     """Set random seeds for reproducibility."""
@@ -83,18 +81,20 @@ def get_device(device_arg: str = "auto") -> torch.device:
 # Q-Network Architecture
 # ============================================================================
 
+
 class QNetwork(nn.Module):
     """
     Simple MLP for Q(s, a) estimation.
-    
+
     Architecture: state_dim -> 128 -> 64 -> 32 -> n_actions
     Uses LayerNorm for stability (important for MPS).
     """
-    def __init__(self, state_dim: int, n_actions: int, hidden_dims: List[int] = None):
+
+    def __init__(self, state_dim: int, n_actions: int, hidden_dims: list[int] = None):
         super().__init__()
         if hidden_dims is None:
             hidden_dims = [128, 64, 32]
-        
+
         layers = []
         in_dim = state_dim
         for h_dim in hidden_dims:
@@ -103,9 +103,9 @@ class QNetwork(nn.Module):
             layers.append(nn.ReLU())
             in_dim = h_dim
         layers.append(nn.Linear(in_dim, n_actions))
-        
+
         self.network = nn.Sequential(*layers)
-    
+
     def forward(self, state: torch.Tensor) -> torch.Tensor:
         """Return Q-values for all actions given state batch."""
         return self.network(state)
@@ -115,20 +115,23 @@ class QNetwork(nn.Module):
 # Experience Replay Buffer
 # ============================================================================
 
+
 class ReplayBuffer:
     """
     Fixed-size buffer for offline RL. Stores (s, a, r, s', done) tuples.
     For one-step betting, s' and done are unused (episodic = 1 step).
     """
+
     def __init__(self, capacity: int = 100000):
         self.buffer = deque(maxlen=capacity)
-    
-    def push(self, state: np.ndarray, action: int, reward: float, 
-             next_state: np.ndarray, done: bool):
+
+    def push(
+        self, state: np.ndarray, action: int, reward: float, next_state: np.ndarray, done: bool
+    ):
         """Add experience tuple to buffer."""
         self.buffer.append((state, action, reward, next_state, done))
-    
-    def sample(self, batch_size: int) -> Tuple[torch.Tensor, ...]:
+
+    def sample(self, batch_size: int) -> tuple[torch.Tensor, ...]:
         """Sample random batch of experiences."""
         batch = random.sample(self.buffer, min(batch_size, len(self.buffer)))
         states, actions, rewards, next_states, dones = zip(*batch)
@@ -137,9 +140,9 @@ class ReplayBuffer:
             torch.LongTensor(actions),
             torch.FloatTensor(rewards),
             torch.FloatTensor(np.array(next_states)),
-            torch.FloatTensor(dones)
+            torch.FloatTensor(dones),
         )
-    
+
     def __len__(self) -> int:
         return len(self.buffer)
 
@@ -148,10 +151,11 @@ class ReplayBuffer:
 # DQN Agent
 # ============================================================================
 
+
 class DQNAgent:
     """
     DQN agent with target network and experience replay.
-    
+
     Hyperparameters:
     - gamma: discount factor (0.99 default, but one-step betting → less relevant)
     - lr: learning rate (1e-4 default)
@@ -159,6 +163,7 @@ class DQNAgent:
     - target_update_freq: sync target network every N steps (1000 default)
     - epsilon: exploration rate (for online RL; offline uses logged actions)
     """
+
     def __init__(
         self,
         state_dim: int,
@@ -169,7 +174,7 @@ class DQNAgent:
         batch_size: int = 128,
         target_update_freq: int = 1000,
         buffer_capacity: int = 100000,
-        hidden_dims: List[int] = None
+        hidden_dims: list[int] = None,
     ):
         self.state_dim = state_dim
         self.n_actions = n_actions
@@ -177,45 +182,45 @@ class DQNAgent:
         self.gamma = gamma
         self.batch_size = batch_size
         self.target_update_freq = target_update_freq
-        
+
         # Q-networks
         self.q_network = QNetwork(state_dim, n_actions, hidden_dims).to(device)
         self.target_network = QNetwork(state_dim, n_actions, hidden_dims).to(device)
         self.target_network.load_state_dict(self.q_network.state_dict())
         self.target_network.eval()
-        
+
         # Optimizer
         self.optimizer = optim.Adam(self.q_network.parameters(), lr=lr)
-        
+
         # Replay buffer
         self.replay_buffer = ReplayBuffer(capacity=buffer_capacity)
-        
+
         # Training step counter
         self.train_step = 0
-    
+
     def select_action(self, state: np.ndarray, epsilon: float = 0.0) -> int:
         """
         Select action using epsilon-greedy policy.
-        
+
         For offline RL, epsilon=0 (greedy). For online RL, decay epsilon over time.
         """
         if random.random() < epsilon:
             return random.randint(0, self.n_actions - 1)
-        
+
         with torch.no_grad():
             state_t = torch.FloatTensor(state).unsqueeze(0).to(self.device)
             q_values = self.q_network(state_t)
             return q_values.argmax(dim=1).item()
-    
-    def update(self) -> Dict[str, float]:
+
+    def update(self) -> dict[str, float]:
         """
         Perform one gradient step on a mini-batch.
-        
+
         Returns dict with loss and other diagnostics.
         """
         if len(self.replay_buffer) < self.batch_size:
             return {"loss": 0.0, "q_mean": 0.0}
-        
+
         # Sample batch
         states, actions, rewards, next_states, dones = self.replay_buffer.sample(self.batch_size)
         states = states.to(self.device)
@@ -223,48 +228,51 @@ class DQNAgent:
         rewards = rewards.to(self.device)
         next_states = next_states.to(self.device)
         dones = dones.to(self.device)
-        
+
         # Current Q-values: Q(s, a)
         q_values = self.q_network(states)
         q_current = q_values.gather(1, actions.unsqueeze(1)).squeeze(1)
-        
+
         # Target Q-values: r + gamma * max_a' Q_target(s', a') * (1 - done)
         with torch.no_grad():
             q_next = self.target_network(next_states).max(dim=1)[0]
             q_target = rewards + self.gamma * q_next * (1 - dones)
-        
+
         # Huber loss (more stable than MSE for outliers)
         loss = F.smooth_l1_loss(q_current, q_target)
-        
+
         # Backprop
         self.optimizer.zero_grad()
         loss.backward()
         # Gradient clipping for stability
         torch.nn.utils.clip_grad_norm_(self.q_network.parameters(), max_norm=10.0)
         self.optimizer.step()
-        
+
         # Update target network periodically
         self.train_step += 1
         if self.train_step % self.target_update_freq == 0:
             self.target_network.load_state_dict(self.q_network.state_dict())
-        
+
         return {
             "loss": loss.item(),
             "q_mean": q_current.mean().item(),
-            "q_target_mean": q_target.mean().item()
+            "q_target_mean": q_target.mean().item(),
         }
-    
+
     def save(self, path: str):
         """Save model checkpoint."""
-        torch.save({
-            "q_network": self.q_network.state_dict(),
-            "target_network": self.target_network.state_dict(),
-            "optimizer": self.optimizer.state_dict(),
-            "train_step": self.train_step,
-            "state_dim": self.state_dim,
-            "n_actions": self.n_actions
-        }, path)
-    
+        torch.save(
+            {
+                "q_network": self.q_network.state_dict(),
+                "target_network": self.target_network.state_dict(),
+                "optimizer": self.optimizer.state_dict(),
+                "train_step": self.train_step,
+                "state_dim": self.state_dim,
+                "n_actions": self.n_actions,
+            },
+            path,
+        )
+
     def load(self, path: str):
         """Load model checkpoint."""
         checkpoint = torch.load(path, map_location=self.device)
@@ -278,23 +286,24 @@ class DQNAgent:
 # Data Loading
 # ============================================================================
 
-def load_dataset(csv_path: str, state_cols: List[str]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+
+def load_dataset(csv_path: str, state_cols: list[str]) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Load offline RL dataset from CSV.
-    
+
     Returns:
         states: (N, state_dim) array
         actions: (N,) array (binary: 0=no-bet, 1=bet; will map to 4-action space)
         rewards: (N,) array
     """
     df = pd.read_csv(csv_path)
-    
+
     # Filter out rows with NaN in critical columns
     df = df.dropna(subset=state_cols + ["action", "r"])
-    
+
     # Extract state features
     states = df[state_cols].to_numpy(dtype=np.float32)
-    
+
     # Map binary actions to 4-action space based on edge magnitude
     # Simple heuristic: no-bet=0, small=1 (edge 0-0.03), medium=2 (0.03-0.06), large=3 (>0.06)
     actions_binary = df["action"].to_numpy(dtype=int)
@@ -311,21 +320,18 @@ def load_dataset(csv_path: str, state_cols: List[str]) -> Tuple[np.ndarray, np.n
                 actions[i] = 2  # medium bet
             else:
                 actions[i] = 3  # large bet
-    
+
     rewards = df["r"].to_numpy(dtype=np.float32)
-    
+
     return states, actions, rewards
 
 
 def populate_replay_buffer(
-    agent: DQNAgent, 
-    states: np.ndarray, 
-    actions: np.ndarray, 
-    rewards: np.ndarray
+    agent: DQNAgent, states: np.ndarray, actions: np.ndarray, rewards: np.ndarray
 ):
     """
     Populate replay buffer with offline dataset.
-    
+
     For one-step betting, next_state = state (unused), done = True.
     """
     for i in range(len(states)):
@@ -334,13 +340,14 @@ def populate_replay_buffer(
             action=actions[i],
             reward=rewards[i],
             next_state=states[i],  # one-step, so next_state unused
-            done=True  # episodic
+            done=True,  # episodic
         )
 
 
 # ============================================================================
 # Training Loop
 # ============================================================================
+
 
 def train_dqn(
     agent: DQNAgent,
@@ -349,44 +356,42 @@ def train_dqn(
     rewards: np.ndarray,
     epochs: int = 200,
     batch_size: int = 128,
-    log_freq: int = 10
-) -> List[Dict[str, float]]:
+    log_freq: int = 10,
+) -> list[dict[str, float]]:
     """
     Train DQN agent on offline dataset.
-    
+
     Returns list of training metrics per epoch.
     """
     # Populate replay buffer once
     populate_replay_buffer(agent, states, actions, rewards)
-    
+
     print(f"Training DQN for {epochs} epochs on {len(states)} samples...")
-    print(f"Device: {agent.device}, Batch size: {batch_size}, Buffer size: {len(agent.replay_buffer)}")
-    
+    print(
+        f"Device: {agent.device}, Batch size: {batch_size}, Buffer size: {len(agent.replay_buffer)}"
+    )
+
     metrics_log = []
-    
+
     for epoch in range(epochs):
         # Multiple gradient steps per epoch (simulate batch training)
         n_updates = max(1, len(agent.replay_buffer) // batch_size)
         epoch_losses = []
         epoch_q_means = []
-        
+
         for _ in range(n_updates):
             metrics = agent.update()
             epoch_losses.append(metrics["loss"])
             epoch_q_means.append(metrics["q_mean"])
-        
+
         avg_loss = np.mean(epoch_losses)
         avg_q = np.mean(epoch_q_means)
-        
-        metrics_log.append({
-            "epoch": epoch + 1,
-            "loss": avg_loss,
-            "q_mean": avg_q
-        })
-        
+
+        metrics_log.append({"epoch": epoch + 1, "loss": avg_loss, "q_mean": avg_q})
+
         if (epoch + 1) % log_freq == 0 or epoch == 0:
             print(f"Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | Q_mean: {avg_q:.4f}")
-    
+
     return metrics_log
 
 
@@ -394,15 +399,13 @@ def train_dqn(
 # Evaluation
 # ============================================================================
 
+
 def evaluate_policy(
-    agent: DQNAgent,
-    states: np.ndarray,
-    actions: np.ndarray,
-    rewards: np.ndarray
-) -> Dict[str, float]:
+    agent: DQNAgent, states: np.ndarray, actions: np.ndarray, rewards: np.ndarray
+) -> dict[str, float]:
     """
     Evaluate learned policy on dataset.
-    
+
     Metrics:
     - Average Q-value
     - Policy match rate (% agreement with logged actions)
@@ -410,10 +413,10 @@ def evaluate_policy(
     - Action distribution
     """
     agent.q_network.eval()
-    
+
     predicted_actions = []
     q_values_list = []
-    
+
     with torch.no_grad():
         for state in states:
             state_t = torch.FloatTensor(state).unsqueeze(0).to(agent.device)
@@ -421,33 +424,35 @@ def evaluate_policy(
             q_values_list.append(q_vals.cpu().numpy()[0])
             pred_action = q_vals.argmax(dim=1).item()
             predicted_actions.append(pred_action)
-    
+
     predicted_actions = np.array(predicted_actions)
     q_values_array = np.array(q_values_list)
-    
+
     # Match rate
     match_rate = (predicted_actions == actions).mean()
-    
+
     # Action distribution
     action_dist = pd.Series(predicted_actions).value_counts(normalize=True).to_dict()
-    
+
     # Estimate reward under greedy policy (conservative: assume same reward for same state)
     # This is approximate since true counterfactual is unknown
-    policy_reward = np.mean([rewards[i] if predicted_actions[i] == actions[i] else 0.0 
-                             for i in range(len(rewards))])
-    
+    policy_reward = np.mean(
+        [rewards[i] if predicted_actions[i] == actions[i] else 0.0 for i in range(len(rewards))]
+    )
+
     return {
         "match_rate": float(match_rate),
         "avg_q_value": float(q_values_array.mean()),
         "action_distribution": action_dist,
         "estimated_policy_reward": float(policy_reward),
-        "logged_avg_reward": float(rewards.mean())
+        "logged_avg_reward": float(rewards.mean()),
     }
 
 
 # ============================================================================
 # CLI
 # ============================================================================
+
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="DQN agent for NFL betting")
@@ -461,11 +466,15 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--gamma", type=float, default=0.99, help="Discount factor")
     ap.add_argument("--device", default="auto", help="Device: auto/cpu/cuda/mps")
     ap.add_argument("--seed", type=int, default=42, help="Random seed")
-    ap.add_argument("--hidden-dims", nargs="+", type=int, default=[128, 64, 32], 
-                    help="Hidden layer dimensions")
-    ap.add_argument("--state-cols", nargs="+", 
-                    default=["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"],
-                    help="State feature columns")
+    ap.add_argument(
+        "--hidden-dims", nargs="+", type=int, default=[128, 64, 32], help="Hidden layer dimensions"
+    )
+    ap.add_argument(
+        "--state-cols",
+        nargs="+",
+        default=["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"],
+        help="State feature columns",
+    )
     return ap.parse_args()
 
 
@@ -473,19 +482,19 @@ def main():
     args = parse_args()
     set_seed(args.seed)
     device = get_device(args.device)
-    
+
     print(f"Device: {device}")
     print(f"Loading dataset from {args.dataset}...")
-    
+
     # Load data
     states, actions, rewards = load_dataset(args.dataset, args.state_cols)
     state_dim = states.shape[1]
     n_actions = 4  # {no-bet, small, medium, large}
-    
+
     print(f"Dataset: {len(states)} samples, state_dim={state_dim}, n_actions={n_actions}")
     print(f"Action distribution: {pd.Series(actions).value_counts(normalize=True).to_dict()}")
     print(f"Mean reward: {rewards.mean():.4f}, Std reward: {rewards.std():.4f}")
-    
+
     # Initialize agent
     agent = DQNAgent(
         state_dim=state_dim,
@@ -494,20 +503,20 @@ def main():
         gamma=args.gamma,
         lr=args.lr,
         batch_size=args.batch_size,
-        hidden_dims=args.hidden_dims
+        hidden_dims=args.hidden_dims,
     )
-    
+
     # Load checkpoint if provided
     if args.load:
         print(f"Loading checkpoint from {args.load}...")
         agent.load(args.load)
-    
+
     if args.evaluate:
         # Evaluation mode
         print("\n=== Evaluation ===")
         eval_metrics = evaluate_policy(agent, states, actions, rewards)
         print(json.dumps(eval_metrics, indent=2))
-        
+
         # Save evaluation report
         eval_path = Path(args.output).parent / "dqn_eval.json"
         with open(eval_path, "w") as f:
@@ -522,20 +531,20 @@ def main():
             actions=actions,
             rewards=rewards,
             epochs=args.epochs,
-            batch_size=args.batch_size
+            batch_size=args.batch_size,
         )
-        
+
         # Save model
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
         agent.save(args.output)
         print(f"\nModel saved to {args.output}")
-        
+
         # Save training log
         log_path = Path(args.output).parent / "dqn_training_log.json"
         with open(log_path, "w") as f:
             json.dump(metrics_log, f, indent=2)
         print(f"Training log saved to {log_path}")
-        
+
         # Run quick evaluation
         print("\n=== Post-Training Evaluation ===")
         eval_metrics = evaluate_policy(agent, states, actions, rewards)

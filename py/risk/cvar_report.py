@@ -14,23 +14,26 @@ Usage:
     --json analysis/reports/cvar_a90.json \
     --tex analysis/dissertation/results/cvar_benchmark_table.tex
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 import os
-from typing import List, Dict, Any
+from typing import Any
 
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Emit CVaR benchmark TeX table from JSONs")
-    ap.add_argument("--json", action="append", required=True, help="Path to cvar_lp JSON (repeatable)")
+    ap.add_argument(
+        "--json", action="append", required=True, help="Path to cvar_lp JSON (repeatable)"
+    )
     ap.add_argument("--tex", required=True, help="Output TeX table path")
     return ap.parse_args()
 
 
-def load_json(path: str) -> Dict[str, Any]:
-    with open(path, "r", encoding="utf-8") as f:
+def load_json(path: str) -> dict[str, Any]:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -55,7 +58,9 @@ def main() -> None:
         f.write("% !TEX root = ../../main/main.tex\n")
         f.write("\\providecommand{\\cvarBenchmarkLabel}{\\label{tab:cvar-benchmark}}\n")
         f.write("\\begin{table}[t]\n  \\centering\n  \\small\n")
-        f.write("  \\caption[CVaR benchmark]{CVaR benchmark summary by run: level $\\alpha$, CVaR, budget use (sum of stakes), and number of positions.}\n")
+        f.write(
+            "  \\caption[CVaR benchmark]{CVaR benchmark summary by run: level $\\alpha$, CVaR, budget use (sum of stakes), and number of positions.}\n"
+        )
         f.write("  \\cvarBenchmarkLabel\n")
         f.write("  \\setlength{\\tabcolsep}{3pt}\\renewcommand{\\arraystretch}{1.1}\n")
         f.write("  \\begin{tabularx}{\\linewidth}{@{} r r r r l @{} }\n")

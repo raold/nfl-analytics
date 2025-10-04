@@ -32,10 +32,10 @@ END $$;
 DO $$
 DECLARE
     expected_columns TEXT[] := ARRAY[
-        'game_id', 'season', 'week', 'gameday', 'kickoff',
+        'game_id', 'season', 'week', 'kickoff',
         'home_team', 'away_team', 'home_score', 'away_score',
-        'spread_line', 'spread_close', 'total_line', 'total_close',
-        'home_moneyline', 'away_moneyline', 'result'
+        'spread_close', 'total_close',
+        'home_moneyline', 'away_moneyline'
     ];
     actual_columns TEXT[];
 BEGIN
@@ -58,7 +58,7 @@ DO $$
 DECLARE
     required_columns TEXT[] := ARRAY[
         'game_id', 'play_id', 'posteam', 'defteam',
-        'desc', 'epa', 'wpa', 'down', 'ydstogo', 'yardline_100', 'play_type'
+        'epa', 'wp', 'wpa', 'down', 'ydstogo', 'yardline_100', 'play_type'
     ];
     actual_columns TEXT[];
 BEGIN

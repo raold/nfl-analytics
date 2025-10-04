@@ -12,22 +12,22 @@ Usage:
       --grid-clips 5,10,20 --grid-shrinks 0.0,0.2,0.5 --alpha 0.05 \
       --tex analysis/dissertation/results/ope_grid_table.tex
 """
+
 from __future__ import annotations
 
 import argparse
 import json
-import math
 import os
-from dataclasses import dataclass, asdict
-from typing import List, Tuple, Dict
+from dataclasses import asdict, dataclass
 
 import pandas as pd
 
 try:
-    from .ope import snis, dr
+    from .ope import dr, snis
 except Exception:  # allow running as a script without packages
     import importlib.util
     from pathlib import Path
+
     OPE_PATH = Path(__file__).resolve().parent / "ope.py"
     spec = importlib.util.spec_from_file_location("ope", str(OPE_PATH))
     _mod = importlib.util.module_from_spec(spec)
@@ -38,8 +38,8 @@ except Exception:  # allow running as a script without packages
 
 @dataclass
 class GateConfig:
-    clips: List[float]
-    shrinks: List[float]
+    clips: list[float]
+    shrinks: list[float]
     alpha: float = 0.05
 
 
@@ -48,7 +48,7 @@ class GateResult:
     accept: bool
     median_dr: float
     stable: bool
-    grid: Dict[str, Dict[str, float]]
+    grid: dict[str, dict[str, float]]
     note: str
 
 
@@ -64,13 +64,15 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 
-def _grid(values: str) -> List[float]:
+def _grid(values: str) -> list[float]:
     return [float(x.strip()) for x in values.split(",") if x.strip()]
 
 
-def evaluate_grid(df: pd.DataFrame, clips: List[float], shrinks: List[float]) -> Tuple[float, Dict[str, Dict[str, float]], bool]:
-    grid: Dict[str, Dict[str, float]] = {}
-    dr_vals: List[float] = []
+def evaluate_grid(
+    df: pd.DataFrame, clips: list[float], shrinks: list[float]
+) -> tuple[float, dict[str, dict[str, float]], bool]:
+    grid: dict[str, dict[str, float]] = {}
+    dr_vals: list[float] = []
     for c in clips:
         for s in shrinks:
             key = f"c{int(c)}_s{str(s).replace('.', '')}"
@@ -97,6 +99,7 @@ def run_gate(df: pd.DataFrame, cfg: GateConfig) -> GateResult:
 
 def _write_tex_table(path: str, res: GateResult, cfg: GateConfig) -> None:
     import os
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
     rows = []
     for c in cfg.clips:
@@ -128,7 +131,9 @@ def _write_tex_table(path: str, res: GateResult, cfg: GateConfig) -> None:
 
 def main() -> None:
     args = parse_args()
-    cfg = GateConfig(clips=_grid(args.grid_clips), shrinks=_grid(args.grid_shrinks), alpha=args.alpha)
+    cfg = GateConfig(
+        clips=_grid(args.grid_clips), shrinks=_grid(args.grid_shrinks), alpha=args.alpha
+    )
     df = pd.read_csv(args.dataset)
     res = run_gate(df, cfg)
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
