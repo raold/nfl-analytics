@@ -1,2 +1,1 @@
 """Risk sizing utilities package."""
-

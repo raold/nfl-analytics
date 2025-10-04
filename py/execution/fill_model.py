@@ -6,20 +6,20 @@ regression per (book, market, tau_bucket). This is a lightweight Newton solver
 over features [1, q, q^2, |velocity|, same_sign], where same_sign indicates
 velocity moving against our side.
 """
+
 from __future__ import annotations
 
-import csv
 import math
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Tuple
 
 from .depth_model import tau_bucket
 
 
 @dataclass
 class FillParams:
-    theta: Tuple[float, float, float, float, float]
+    theta: tuple[float, float, float, float, float]
 
 
 def _sigmoid(x: float) -> float:
@@ -30,7 +30,7 @@ def _sigmoid(x: float) -> float:
     return z / (1.0 + z)
 
 
-def _logistic_fit(X: List[List[float]], y: List[int], iters: int = 10) -> Tuple[float, ...]:
+def _logistic_fit(X: list[list[float]], y: list[int], iters: int = 10) -> tuple[float, ...]:
     p = len(X[0])
     theta = [0.0] * p
     for _ in range(iters):
@@ -73,8 +73,10 @@ def _logistic_fit(X: List[List[float]], y: List[int], iters: int = 10) -> Tuple[
     return tuple(theta)
 
 
-def fit_fill(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], FillParams]:
-    groups: Dict[Tuple[str, str, str], Tuple[List[List[float]], List[int]]] = defaultdict(lambda: ([], []))
+def fit_fill(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], FillParams]:
+    groups: dict[tuple[str, str, str], tuple[list[list[float]], list[int]]] = defaultdict(
+        lambda: ([], [])
+    )
     for r in rows:
         try:
             book = r.get("book", "unknown")
@@ -92,7 +94,7 @@ def fit_fill(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], FillP
             Y.append(y)
         except Exception:
             continue
-    out: Dict[Tuple[str, str, str], FillParams] = {}
+    out: dict[tuple[str, str, str], FillParams] = {}
     for key, (X, Y) in groups.items():
         if not X:
             out[key] = FillParams((0, 0, 0, 0, 0))
@@ -102,8 +104,9 @@ def fit_fill(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], FillP
     return out
 
 
-def prob_fill(theta: Tuple[float, float, float, float, float], q: float, vel: float, side: float) -> float:
+def prob_fill(
+    theta: tuple[float, float, float, float, float], q: float, vel: float, side: float
+) -> float:
     same_sign = 1.0 if vel * side > 0 else 0.0
     z = theta[0] + theta[1] * q + theta[2] * (q * q) + theta[3] * abs(vel) + theta[4] * same_sign
     return _sigmoid(z)
-

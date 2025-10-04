@@ -10,12 +10,12 @@ Writes a CSV matrix of shape B x N (B scenarios, N bets) suitable for CVaR LP.
 Usage:
   python py/risk/generate_scenarios.py --bets data/bets.csv --output data/scenarios.csv --sims 20000
 """
+
 from __future__ import annotations
 
 import argparse
 import csv
 import os
-from typing import List
 
 import numpy as np
 
@@ -24,22 +24,26 @@ from ..models.score_distributions import skellam_pmf_range
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Generate scenario returns for CVaR sizing")
-    ap.add_argument("--bets", required=True, help="CSV of bets (game_id, mu_home, mu_away, spread, side, price_decimal)")
+    ap.add_argument(
+        "--bets",
+        required=True,
+        help="CSV of bets (game_id, mu_home, mu_away, spread, side, price_decimal)",
+    )
     ap.add_argument("--output", required=True, help="Output CSV (B x N matrix)")
     ap.add_argument("--sims", type=int, default=20000, help="Number of Monte Carlo scenarios")
     return ap.parse_args()
 
 
-def load_bets(path: str) -> List[dict]:
+def load_bets(path: str) -> list[dict]:
     with open(path, newline="", encoding="utf-8") as f:
         rdr = csv.DictReader(f)
         return list(rdr)
 
 
-def simulate_returns(bets: List[dict], sims: int) -> np.ndarray:
+def simulate_returns(bets: list[dict], sims: int) -> np.ndarray:
     # Precompute pmfs and sample margins
     rng = np.random.default_rng(42)
-    margins_samples: List[np.ndarray] = []
+    margins_samples: list[np.ndarray] = []
     for b in bets:
         mu_h = float(b["mu_home"])
         mu_a = float(b["mu_away"])
@@ -81,4 +85,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

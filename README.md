@@ -1,6 +1,6 @@
 # NFL Analytics – Local Dev Quickstart
 
-This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history). See **AGENTS.md** and **CLAUDE.md** for detailed guidance. Below is a minimal local bootstrap.
+This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**. See **AGENTS.md** and **CLAUDE.md** for detailed guidance. Below is a minimal local bootstrap.
 
 ## Prerequisites
 - Docker and docker compose
@@ -109,6 +109,55 @@ python py/backtest/harness.py \
 
 This writes per‑season and overall reliability CSVs/plots under `analysis/results/calibration/` and emits an overall comparison table with ECE/MCE alongside Brier/LogLoss.
 
+### 6. Statistical Testing & Analysis
+
+**Run formal statistical significance tests**:
+```bash
+# Compare models with statistical testing
+python -c "
+from py.compute.statistics.statistical_tests import PermutationTest
+from py.compute.statistics.effect_size import EffectSizeCalculator
+
+# Example: Compare two model performances
+perm_test = PermutationTest(n_permutations=5000)
+effect_calc = EffectSizeCalculator()
+
+# Your model comparison code here
+print('Statistical testing framework ready!')
+"
+```
+
+**Generate automated reports with statistical analysis**:
+```bash
+# Create Quarto reports with LaTeX integration
+python py/compute/statistics/reporting/quarto_generator.py \
+  --title "NFL Model Performance Analysis" \
+  --output analysis/reports/statistical_analysis.qmd
+```
+
+### 7. Distributed Compute System
+
+**Initialize and run the distributed compute system** for model training and optimization:
+```bash
+# Initialize compute queue with standard tasks
+python run_compute.py --init
+
+# Start adaptive compute with bandit optimization
+python run_compute.py --intensity medium
+
+# Check performance scoreboard
+python run_compute.py --scoreboard
+
+# Web dashboard with live monitoring
+python run_compute.py --dashboard
+```
+
+Available compute tasks:
+- **RL Training**: DQN/PPO with 500-1000 epochs across multiple seeds
+- **State-Space Models**: Parameter sweeps with Kalman smoothing
+- **Monte Carlo**: Large-scale simulations (100K-1M scenarios)
+- **Statistical Testing**: Automated A/B testing and significance analysis
+
 ## Testing
 
 This project includes comprehensive unit tests, integration tests, and CI/CD workflows.
@@ -189,6 +238,22 @@ uv pip install -r requirements.txt
 ```
 nfl-analytics/
 ├── py/                     # Python modules (features, models, pricing)
+│   ├── compute/            # 🆕 Distributed compute system
+│   │   ├── statistics/     # Statistical testing framework
+│   │   │   ├── statistical_tests.py      # Permutation & bootstrap tests
+│   │   │   ├── effect_size.py           # Cohen's d, Cliff's delta
+│   │   │   ├── multiple_comparisons.py  # FDR/FWER correction
+│   │   │   ├── power_analysis.py        # Sample size & power
+│   │   │   ├── experimental_design/     # A/B testing framework
+│   │   │   └── reporting/               # Quarto/LaTeX integration
+│   │   ├── task_queue.py            # Priority-based task management
+│   │   ├── adaptive_scheduler.py    # Multi-armed bandit optimization
+│   │   ├── performance_tracker.py   # Statistical performance tracking
+│   │   └── compute_worker.py        # Distributed worker system
+│   ├── features/           # Feature engineering
+│   ├── models/             # ML models
+│   ├── pricing/            # Pricing & risk management
+│   └── rl/                 # Reinforcement learning
 ├── R/                      # R utilities
 ├── data/                   # Data ingestion scripts
 ├── db/                     # SQL schema and migrations
@@ -205,11 +270,13 @@ nfl-analytics/
 
 - **CLAUDE.md**: Comprehensive project documentation for AI assistants
 - **AGENTS.md**: Repository guidelines and patterns
+- **COMPUTE_SYSTEM.md**: 🆕 Distributed compute system documentation
 - **requirements.txt**: Python dependencies
 - **requirements-dev.txt**: Testing and development tools
 - **renv.lock**: R package versions
 - **pytest.ini**: Test configuration
 - **.pre-commit-config.yaml**: Pre-commit hook configuration
+- **run_compute.py**: 🆕 Main compute system entry point
 
 ## Database
 
@@ -235,6 +302,7 @@ nfl-analytics/
   - `mart.game_features_enhanced` (materialized view) – composite modeling features
 
 Full documentation and lineage: `docs/database/schema.md`.
+ER diagram: `docs/database/erd.md` (PNG: `docs/database/erd.png`).
 
 **Current Data**:
 - Games: 6,991 rows (1999-2024)

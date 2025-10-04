@@ -14,13 +14,12 @@ from __future__ import annotations
 
 import argparse
 import os
+from collections.abc import Iterable
 from io import StringIO
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
 import psycopg
-
 
 SQL_TEAM_BASE = """
 WITH team_games AS (
@@ -193,13 +192,16 @@ def fetch_team_game_features(conn: psycopg.Connection) -> pd.DataFrame:
 def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df = df.copy()
     team_df["kickoff"] = pd.to_datetime(team_df["kickoff"], errors="coerce")
-    team_df.sort_values([
-        "team",
-        "season",
-        "week",
-        "kickoff",
-        "game_id",
-    ], inplace=True)
+    team_df.sort_values(
+        [
+            "team",
+            "season",
+            "week",
+            "kickoff",
+            "game_id",
+        ],
+        inplace=True,
+    )
 
     team_df["epa_sum"] = team_df["epa_sum"].astype(float)
     team_df["plays"] = team_df["plays"].astype(float)
@@ -212,11 +214,17 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df["surface"] = team_df["surface"].fillna("").str.lower()
     team_df["roof"] = team_df["roof"].fillna("").str.lower()
 
-    team_df["epa_per_play"] = np.where(team_df["plays"] > 0, team_df["epa_sum"] / team_df["plays"], np.nan)
+    team_df["epa_per_play"] = np.where(
+        team_df["plays"] > 0, team_df["epa_sum"] / team_df["plays"], np.nan
+    )
     team_df["points_total"] = team_df["points_for"] + team_df["points_against"]
 
-    result_values = np.where(team_df["margin"] > 0, 1.0, np.where(team_df["margin"] < 0, 0.0, np.nan))
-    result_values = np.where(np.isnan(result_values) & team_df["margin"].notna(), 0.5, result_values)
+    result_values = np.where(
+        team_df["margin"] > 0, 1.0, np.where(team_df["margin"] < 0, 0.0, np.nan)
+    )
+    result_values = np.where(
+        np.isnan(result_values) & team_df["margin"].notna(), 0.5, result_values
+    )
     team_df["result_value"] = result_values
 
     team_df["_points_for_f"] = team_df["points_for"].fillna(0.0)
@@ -229,16 +237,30 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df["prior_epa_sum"] = team_group["epa_sum"].cumsum() - team_df["epa_sum"]
     team_df["prior_plays"] = team_group["plays"].cumsum() - team_df["plays"]
     team_df["prior_points_for"] = team_group["_points_for_f"].cumsum() - team_df["_points_for_f"]
-    team_df["prior_points_against"] = team_group["_points_against_f"].cumsum() - team_df["_points_against_f"]
+    team_df["prior_points_against"] = (
+        team_group["_points_against_f"].cumsum() - team_df["_points_against_f"]
+    )
     team_df["prior_margin_sum"] = team_group["_margin_f"].cumsum() - team_df["_margin_f"]
     team_df["prior_wins"] = team_group["_result_f"].cumsum() - team_df["_result_f"]
 
     with np.errstate(divide="ignore", invalid="ignore"):
-        team_df["prior_epa_mean"] = np.where(team_df["prior_plays"] > 0, team_df["prior_epa_sum"] / team_df["prior_plays"], np.nan)
-        team_df["prior_margin_avg"] = np.where(team_df["prior_games"] > 0, team_df["prior_margin_sum"] / team_df["prior_games"], np.nan)
-        team_df["prior_points_for_avg"] = np.where(team_df["prior_games"] > 0, team_df["prior_points_for"] / team_df["prior_games"], np.nan)
-        team_df["prior_points_against_avg"] = np.where(team_df["prior_games"] > 0, team_df["prior_points_against"] / team_df["prior_games"], np.nan)
-        team_df["prior_win_pct"] = np.where(team_df["prior_games"] > 0, team_df["prior_wins"] / team_df["prior_games"], np.nan)
+        team_df["prior_epa_mean"] = np.where(
+            team_df["prior_plays"] > 0, team_df["prior_epa_sum"] / team_df["prior_plays"], np.nan
+        )
+        team_df["prior_margin_avg"] = np.where(
+            team_df["prior_games"] > 0, team_df["prior_margin_sum"] / team_df["prior_games"], np.nan
+        )
+        team_df["prior_points_for_avg"] = np.where(
+            team_df["prior_games"] > 0, team_df["prior_points_for"] / team_df["prior_games"], np.nan
+        )
+        team_df["prior_points_against_avg"] = np.where(
+            team_df["prior_games"] > 0,
+            team_df["prior_points_against"] / team_df["prior_games"],
+            np.nan,
+        )
+        team_df["prior_win_pct"] = np.where(
+            team_df["prior_games"] > 0, team_df["prior_wins"] / team_df["prior_games"], np.nan
+        )
 
     season_group = team_df.groupby(["team", "season"], group_keys=False)
     team_df["season_games_prior"] = season_group.cumcount()
@@ -256,16 +278,32 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
             np.nan,
         )
 
-    team_df["epa_pp_last3"] = team_group["epa_per_play"].transform(lambda s: s.shift(1).rolling(window=3, min_periods=1).mean())
-    team_df["epa_pp_last5"] = team_group["epa_per_play"].transform(lambda s: s.shift(1).rolling(window=5, min_periods=1).mean())
-    team_df["margin_last3"] = team_group["_margin_f"].transform(lambda s: s.shift(1).rolling(window=3, min_periods=1).mean())
-    team_df["margin_last5"] = team_group["_margin_f"].transform(lambda s: s.shift(1).rolling(window=5, min_periods=1).mean())
-    team_df["points_for_last3"] = team_group["points_for"].transform(lambda s: s.shift(1).rolling(window=3, min_periods=1).mean())
-    team_df["points_against_last3"] = team_group["points_against"].transform(lambda s: s.shift(1).rolling(window=3, min_periods=1).mean())
-    team_df["win_pct_last5"] = team_group["_result_f"].transform(lambda s: s.shift(1).rolling(window=5, min_periods=1).mean())
+    team_df["epa_pp_last3"] = team_group["epa_per_play"].transform(
+        lambda s: s.shift(1).rolling(window=3, min_periods=1).mean()
+    )
+    team_df["epa_pp_last5"] = team_group["epa_per_play"].transform(
+        lambda s: s.shift(1).rolling(window=5, min_periods=1).mean()
+    )
+    team_df["margin_last3"] = team_group["_margin_f"].transform(
+        lambda s: s.shift(1).rolling(window=3, min_periods=1).mean()
+    )
+    team_df["margin_last5"] = team_group["_margin_f"].transform(
+        lambda s: s.shift(1).rolling(window=5, min_periods=1).mean()
+    )
+    team_df["points_for_last3"] = team_group["points_for"].transform(
+        lambda s: s.shift(1).rolling(window=3, min_periods=1).mean()
+    )
+    team_df["points_against_last3"] = team_group["points_against"].transform(
+        lambda s: s.shift(1).rolling(window=3, min_periods=1).mean()
+    )
+    team_df["win_pct_last5"] = team_group["_result_f"].transform(
+        lambda s: s.shift(1).rolling(window=5, min_periods=1).mean()
+    )
 
     team_df["prev_kickoff"] = team_group["kickoff"].shift(1)
-    team_df["rest_days"] = (team_df["kickoff"] - team_df["prev_kickoff"]).dt.total_seconds() / (24 * 3600)
+    team_df["rest_days"] = (team_df["kickoff"] - team_df["prev_kickoff"]).dt.total_seconds() / (
+        24 * 3600
+    )
     team_df["rest_days"] = team_df["rest_days"].fillna(7.0)
     team_df["rest_lt_6"] = (team_df["rest_days"] < 6).astype(float)
     team_df["rest_gt_13"] = (team_df["rest_days"] > 13).astype(float)
@@ -277,15 +315,21 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df["prev_spread_close"] = team_group["spread_close"].shift(1)
 
     prev_is_home = team_group["is_home"].shift(1)
-    team_df["travel_change"] = np.where(team_df["prior_games"] > 0, (prev_is_home != team_df["is_home"]).astype(float), 0.0)
+    team_df["travel_change"] = np.where(
+        team_df["prior_games"] > 0, (prev_is_home != team_df["is_home"]).astype(float), 0.0
+    )
 
     prev_qb = team_group["qb_id"].shift(1)
-    team_df["qb_change"] = np.where(team_df["prior_games"] > 0, (prev_qb != team_df["qb_id"]).astype(float), 0.0)
+    team_df["qb_change"] = np.where(
+        team_df["prior_games"] > 0, (prev_qb != team_df["qb_id"]).astype(float), 0.0
+    )
     team_df["qb_team_games"] = team_df.groupby(["team", "qb_id"]).cumcount().astype(float)
     team_df["qb_total_games"] = team_df.groupby("qb_id").cumcount().astype(float)
 
     prev_coach = team_group["coach_name"].shift(1)
-    team_df["coach_change"] = np.where(team_df["prior_games"] > 0, (prev_coach != team_df["coach_name"]).astype(float), 0.0)
+    team_df["coach_change"] = np.where(
+        team_df["prior_games"] > 0, (prev_coach != team_df["coach_name"]).astype(float), 0.0
+    )
     team_df["coach_team_games"] = team_df.groupby(["team", "coach_name"]).cumcount().astype(float)
     team_df["coach_total_games"] = team_df.groupby("coach_name").cumcount().astype(float)
 
@@ -346,8 +390,12 @@ def pivot_to_games(df: pd.DataFrame) -> pd.DataFrame:
     home = df[df["is_home"]].copy()
     away = df[~df["is_home"]].copy()
 
-    home = home[common_cols + TEAM_FEATURE_COLUMNS].rename(columns=rename_with_prefix(TEAM_FEATURE_COLUMNS, "home"))
-    away = away[common_cols + TEAM_FEATURE_COLUMNS].rename(columns=rename_with_prefix(TEAM_FEATURE_COLUMNS, "away"))
+    home = home[common_cols + TEAM_FEATURE_COLUMNS].rename(
+        columns=rename_with_prefix(TEAM_FEATURE_COLUMNS, "home")
+    )
+    away = away[common_cols + TEAM_FEATURE_COLUMNS].rename(
+        columns=rename_with_prefix(TEAM_FEATURE_COLUMNS, "away")
+    )
 
     merged = pd.merge(home, away, on=common_cols, how="inner", validate="one_to_one")
 
@@ -433,7 +481,9 @@ def write_table(conn: psycopg.Connection, df: pd.DataFrame, table_name: str) -> 
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Generate as-of team/game features")
-    ap.add_argument("--output", default="analysis/features/asof_team_features.csv", help="CSV output path")
+    ap.add_argument(
+        "--output", default="analysis/features/asof_team_features.csv", help="CSV output path"
+    )
     ap.add_argument("--write-table", help="Optional schema.table to write results (overwrites)")
     ap.add_argument("--season-start", type=int, help="Earliest season to retain")
     ap.add_argument("--season-end", type=int, help="Latest season to retain")
@@ -441,7 +491,9 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 
-def maybe_filter_season(df: pd.DataFrame, season_start: int | None, season_end: int | None) -> pd.DataFrame:
+def maybe_filter_season(
+    df: pd.DataFrame, season_start: int | None, season_end: int | None
+) -> pd.DataFrame:
     filtered = df
     if season_start is not None:
         filtered = filtered[filtered["season"] >= season_start]

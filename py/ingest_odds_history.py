@@ -7,7 +7,8 @@ import datetime as dt
 import os
 import sys
 import time
-from typing import Any, Dict, Iterable, List, Optional
+from collections.abc import Iterable
+from typing import Any
 
 import psycopg
 import requests
@@ -24,38 +25,29 @@ def parse_args() -> argparse.Namespace:
         description="Ingest historical odds snapshots into TimescaleDB"
     )
     parser.add_argument(
-        "--start-date",
-        required=True,
-        help="UTC date (YYYY-MM-DD) for the first snapshot."
+        "--start-date", required=True, help="UTC date (YYYY-MM-DD) for the first snapshot."
     )
     parser.add_argument(
-        "--end-date",
-        help="UTC date (YYYY-MM-DD) for the last snapshot. Defaults to start-date."
+        "--end-date", help="UTC date (YYYY-MM-DD) for the last snapshot. Defaults to start-date."
     )
     parser.add_argument(
         "--sport-key",
         default=DEFAULT_SPORT_KEY,
-        help="The Odds API sport key (default: americanfootball_nfl)."
+        help="The Odds API sport key (default: americanfootball_nfl).",
     )
     parser.add_argument(
-        "--regions",
-        default=DEFAULT_REGIONS,
-        help="Comma separated region codes (default: us)."
+        "--regions", default=DEFAULT_REGIONS, help="Comma separated region codes (default: us)."
     )
     parser.add_argument(
         "--markets",
         default=DEFAULT_MARKETS,
-        help="Comma separated market keys (default: spreads,totals,moneyline)."
+        help="Comma separated market keys (default: spreads,totals,moneyline).",
     )
     parser.add_argument(
-        "--bookmakers",
-        help="Optional comma separated list of bookmaker keys to filter."
+        "--bookmakers", help="Optional comma separated list of bookmaker keys to filter."
     )
     parser.add_argument(
-        "--sleep",
-        type=float,
-        default=1.5,
-        help="Seconds to wait between API calls (default: 1.5)."
+        "--sleep", type=float, default=1.5, help="Seconds to wait between API calls (default: 1.5)."
     )
     return parser.parse_args()
 
@@ -72,10 +64,10 @@ def parse_date(value: str) -> dt.date:
         raise argparse.ArgumentTypeError(f"Invalid date: {value}") from exc
 
 
-def parse_iso(value: Optional[str]) -> Optional[dt.datetime]:
+def parse_iso(value: str | None) -> dt.datetime | None:
     if not value:
         return None
-    return dt.datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(dt.timezone.utc)
+    return dt.datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(dt.UTC)
 
 
 def build_request(
@@ -85,10 +77,10 @@ def build_request(
     snapshot_at: dt.datetime,
     regions: str,
     markets: str,
-    bookmakers: Optional[str],
+    bookmakers: str | None,
 ) -> requests.Response:
     url = f"{API_BASE}/historical/sports/{sport_key}/odds"
-    params: Dict[str, Any] = {
+    params: dict[str, Any] = {
         "apiKey": api_key,
         "regions": regions,
         "markets": markets,
@@ -100,8 +92,7 @@ def build_request(
     if response.status_code == 429:
         reset = response.headers.get("x-requests-reset")
         raise RuntimeError(
-            "Hit The Odds API rate limit. Reset at UTC epoch "
-            f"{reset or 'unknown'}."
+            "Hit The Odds API rate limit. Reset at UTC epoch " f"{reset or 'unknown'}."
         )
     try:
         response.raise_for_status()
@@ -112,8 +103,8 @@ def build_request(
     return response
 
 
-def flatten_events(events: List[Dict[str, Any]], snapshot_at: dt.datetime) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+def flatten_events(events: list[dict[str, Any]], snapshot_at: dt.datetime) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
     for event in events:
         event_id = event.get("id")
         commence_time = parse_iso(event.get("commence_time"))
@@ -150,7 +141,7 @@ def flatten_events(events: List[Dict[str, Any]], snapshot_at: dt.datetime) -> Li
     return rows
 
 
-def upsert_rows(conn: psycopg.Connection, rows: List[Dict[str, Any]]) -> int:
+def upsert_rows(conn: psycopg.Connection, rows: list[dict[str, Any]]) -> int:
     if not rows:
         return 0
     insert_sql = """
@@ -226,7 +217,7 @@ def main() -> None:
     try:
         total_rows = 0
         for day in daterange(start_date, end_date):
-            snapshot_at = dt.datetime.combine(day, dt.time(0, 0, tzinfo=dt.timezone.utc))
+            snapshot_at = dt.datetime.combine(day, dt.time(0, 0, tzinfo=dt.UTC))
             response = build_request(
                 api_key=api_key,
                 sport_key=args.sport_key,

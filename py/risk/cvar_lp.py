@@ -8,6 +8,7 @@ Usage:
   python py/risk/cvar_lp.py --scenarios data/returns.csv --alpha 0.95 \
       --cap 0.02 --output reports/cvar_stakes.json
 """
+
 from __future__ import annotations
 
 import argparse
@@ -15,26 +16,27 @@ import csv
 import json
 import math
 import os
-from typing import List
 
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="CVaR stake sizing (stub)")
     ap.add_argument("--scenarios", required=True, help="CSV matrix BxN of scenario returns")
     ap.add_argument("--alpha", type=float, default=0.95, help="CVaR level")
-    ap.add_argument("--cap", type=float, default=0.02, help="Per-position cap (Kelly fraction approx)")
+    ap.add_argument(
+        "--cap", type=float, default=0.02, help="Per-position cap (Kelly fraction approx)"
+    )
     ap.add_argument("--output", required=True, help="JSON output path for stakes + CVaR")
     return ap.parse_args()
 
 
-def load_matrix(path: str) -> List[List[float]]:
+def load_matrix(path: str) -> list[list[float]]:
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
         mat = [[float(x) for x in row] for row in reader if row]
     return mat
 
 
-def heuristic_stakes(mat: List[List[float]], cap: float) -> List[float]:
+def heuristic_stakes(mat: list[list[float]], cap: float) -> list[float]:
     # Mean return per column
     if not mat:
         return []
@@ -48,7 +50,7 @@ def heuristic_stakes(mat: List[List[float]], cap: float) -> List[float]:
     return frac
 
 
-def cvar_of_stakes(mat: List[List[float]], f: List[float], alpha: float) -> float:
+def cvar_of_stakes(mat: list[list[float]], f: list[float], alpha: float) -> float:
     pnl = [sum(f[j] * mat[b][j] for j in range(len(f))) for b in range(len(mat))]
     pnl_sorted = sorted(pnl)
     k = max(1, int(math.floor(alpha * len(pnl_sorted))))
@@ -69,4 +71,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

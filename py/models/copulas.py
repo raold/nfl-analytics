@@ -4,10 +4,11 @@ Copula utilities for dependence modeling between spread and total (or other legs
 Implements minimal Gaussian copula fit and sampling on pseudo-observations.
 For production use, consider statsmodels or scipy; here we avoid heavy deps.
 """
+
 from __future__ import annotations
 
 import math
-from typing import Iterable, List, Tuple
+from collections.abc import Iterable
 
 
 def _phi(x: float) -> float:
@@ -50,9 +51,8 @@ def _Phi_inv(u: float) -> float:
     phigh = 1 - plow
     if u < plow:
         q = math.sqrt(-2 * math.log(u))
-        return (
-            (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5])
-            / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1)
+        return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / (
+            (((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1
         )
     if phigh < u:
         q = math.sqrt(-2 * math.log(1 - u))
@@ -62,9 +62,7 @@ def _Phi_inv(u: float) -> float:
         )
     q = u - 0.5
     r = q * q
-    return (
-        (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q
-    ) / (
+    return ((((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q) / (
         ((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1
     )
 
@@ -107,4 +105,3 @@ def joint_success_prob_gaussian(u1_thresh: float, u2_thresh: float, rho: float) 
 
 
 __all__ = ["fit_gaussian_copula", "joint_success_prob_gaussian"]
-

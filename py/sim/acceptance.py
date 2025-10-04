@@ -15,12 +15,13 @@ Usage:
     --output analysis/reports/sim_accept.json \
     --tex analysis/dissertation/results/sim_acceptance_table.tex
 """
+
 from __future__ import annotations
 
 import argparse
 import json
 import os
-from typing import Dict, Any, List, Tuple
+from typing import Any
 
 
 def parse_args() -> argparse.Namespace:
@@ -31,17 +32,19 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--tau-marg", type=float, default=0.05, help="Tolerance for EMD(margin)")
     ap.add_argument("--tau-key", type=float, default=0.01, help="Tolerance for max |Δ key mass|")
     ap.add_argument("--tau-fric", type=float, default=0.5, help="Tolerance for slippage RMSE")
-    ap.add_argument("--tau-fillshort", type=float, default=0.1, help="Tolerance for fill shortfall (fraction)")
+    ap.add_argument(
+        "--tau-fillshort", type=float, default=0.1, help="Tolerance for fill shortfall (fraction)"
+    )
     ap.add_argument("--tex", help="Optional TeX table output path")
     return ap.parse_args()
 
 
-def load_json(path: str) -> Dict[str, Any]:
-    with open(path, "r", encoding="utf-8") as f:
+def load_json(path: str) -> dict[str, Any]:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
-def _mk_pmf(data: Dict[str, Any], lo: int = -80, hi: int = 80) -> Dict[int, float]:
+def _mk_pmf(data: dict[str, Any], lo: int = -80, hi: int = 80) -> dict[int, float]:
     # Accept either explicit pmf or raw margins
     if "margin_pmf" in data and isinstance(data["margin_pmf"], dict):
         pmf = {int(k): float(v) for k, v in data["margin_pmf"].items()}
@@ -49,7 +52,7 @@ def _mk_pmf(data: Dict[str, Any], lo: int = -80, hi: int = 80) -> Dict[int, floa
         return {k: (v / s if s > 0 else 0.0) for k, v in pmf.items()}
     margins = data.get("margins") or []
     # Build counts on integer lattice
-    counts: Dict[int, int] = {k: 0 for k in range(lo, hi + 1)}
+    counts: dict[int, int] = {k: 0 for k in range(lo, hi + 1)}
     for m in margins:
         k = int(round(float(m)))
         if lo <= k <= hi:
@@ -58,7 +61,7 @@ def _mk_pmf(data: Dict[str, Any], lo: int = -80, hi: int = 80) -> Dict[int, floa
     return {k: (counts[k] / total if total else 0.0) for k in range(lo, hi + 1)}
 
 
-def _emd_1d(p: Dict[int, float], q: Dict[int, float]) -> float:
+def _emd_1d(p: dict[int, float], q: dict[int, float]) -> float:
     # Earth Mover's Distance for 1D histograms on shared support
     supp = sorted(set(p.keys()) | set(q.keys()))
     cumsum = 0.0
@@ -69,11 +72,11 @@ def _emd_1d(p: Dict[int, float], q: Dict[int, float]) -> float:
     return emd
 
 
-def _key_mass_delta(p: Dict[int, float], q: Dict[int, float], keys: List[int]) -> float:
+def _key_mass_delta(p: dict[int, float], q: dict[int, float], keys: list[int]) -> float:
     return max(abs(p.get(k, 0.0) - q.get(k, 0.0)) for k in keys) if keys else 0.0
 
 
-def _kendall_tau(x: List[float], y: List[float]) -> float:
+def _kendall_tau(x: list[float], y: list[float]) -> float:
     n = min(len(x), len(y))
     if n <= 1:
         return 0.0
@@ -96,7 +99,7 @@ def _kendall_tau(x: List[float], y: List[float]) -> float:
     return (conc - disc) / denom if denom > 0 else 0.0
 
 
-def _dependence_metric(hist: Dict[str, Any], sim: Dict[str, Any]) -> Tuple[str, float]:
+def _dependence_metric(hist: dict[str, Any], sim: dict[str, Any]) -> tuple[str, float]:
     # Prefer Kendall's tau if paired arrays present; else compute joint upper-tail rate gap
     hx = hist.get("x") or hist.get("u1") or hist.get("spread_prob")
     hy = hist.get("y") or hist.get("u2") or hist.get("total_prob")
@@ -109,6 +112,7 @@ def _dependence_metric(hist: Dict[str, Any], sim: Dict[str, Any]) -> Tuple[str, 
     # Upper-tail (u>0.9) joint exceedance rate
     hu = hist.get("u_pairs")
     su = sim.get("u_pairs")
+
     def _tail_rate(pairs) -> float:
         if not isinstance(pairs, list):
             return 0.0
@@ -122,10 +126,11 @@ def _dependence_metric(hist: Dict[str, Any], sim: Dict[str, Any]) -> Tuple[str, 
             except Exception:
                 continue
         return c / n if n else 0.0
+
     return ("joint_tail_delta", abs(_tail_rate(hu) - _tail_rate(su)))
 
 
-def compare(hist: Dict[str, Any], sim: Dict[str, Any], args: argparse.Namespace) -> Dict[str, Any]:
+def compare(hist: dict[str, Any], sim: dict[str, Any], args: argparse.Namespace) -> dict[str, Any]:
     # Margins
     pmf_h = _mk_pmf(hist)
     pmf_s = _mk_pmf(sim)
@@ -136,8 +141,9 @@ def compare(hist: Dict[str, Any], sim: Dict[str, Any], args: argparse.Namespace)
     dep_name, dep_delta = _dependence_metric(hist, sim)
 
     # Friction RMSE
-    def _rmse(a: List[float], b: List[float]) -> float:
+    def _rmse(a: list[float], b: list[float]) -> float:
         import math
+
         n = min(len(a), len(b))
         if n == 0:
             return float(sim.get("slippage_rmse", 0.0))
@@ -158,18 +164,35 @@ def compare(hist: Dict[str, Any], sim: Dict[str, Any], args: argparse.Namespace)
         fill_short = max(0.0, 1.0 - (fl / rq))
 
     checks = {
-        "emd_margin": {"value": emd_margin, "tau": args.tau_marg, "ok": emd_margin <= args.tau_marg},
-        "key_mass_max_delta": {"value": key_delta, "tau": args.tau_key, "ok": key_delta <= args.tau_key},
+        "emd_margin": {
+            "value": emd_margin,
+            "tau": args.tau_marg,
+            "ok": emd_margin <= args.tau_marg,
+        },
+        "key_mass_max_delta": {
+            "value": key_delta,
+            "tau": args.tau_key,
+            "ok": key_delta <= args.tau_key,
+        },
         dep_name: {"value": dep_delta, "tau": args.tau_key, "ok": dep_delta <= args.tau_key},
-        "slippage_rmse": {"value": fric_rmse, "tau": args.tau_fric, "ok": fric_rmse <= args.tau_fric},
-        "fill_shortfall": {"value": fill_short, "tau": args.tau_fillshort, "ok": fill_short <= args.tau_fillshort},
+        "slippage_rmse": {
+            "value": fric_rmse,
+            "tau": args.tau_fric,
+            "ok": fric_rmse <= args.tau_fric,
+        },
+        "fill_shortfall": {
+            "value": fill_short,
+            "tau": args.tau_fillshort,
+            "ok": fill_short <= args.tau_fillshort,
+        },
     }
     passed = all(v["ok"] for v in checks.values())
     return {"pass": passed, "checks": checks}
 
 
-def _write_tex(path: str, rep: Dict[str, Any]) -> None:
+def _write_tex(path: str, rep: dict[str, Any]) -> None:
     import os
+
     os.makedirs(os.path.dirname(path), exist_ok=True)
     order = [
         ("emd_margin", "EMD (margin)"),
@@ -189,7 +212,10 @@ def _write_tex(path: str, rep: Dict[str, Any]) -> None:
         f.write("% Auto-generated by py/sim/acceptance.py\n")
         f.write("\\begin{table}[t]\n  \\centering\n  \\footnotesize\n  ")
         f.write("\\begin{threeparttable}\n    ")
-        f.write("\\caption[Simulator acceptance checks]{Simulator acceptance metrics vs tolerances. Pass=\\textbf{%s}.}\n" % ("Yes" if rep.get("pass") else "No"))
+        f.write(
+            "\\caption[Simulator acceptance checks]{Simulator acceptance metrics vs tolerances. Pass=\\textbf{%s}.}\n"
+            % ("Yes" if rep.get("pass") else "No")
+        )
         f.write("\\label{tab:sim-accept}\n    ")
         f.write("\\setlength{\\tabcolsep}{3pt}\\renewcommand{\\arraystretch}{1.1}\n")
         f.write("\\begin{tabularx}{\\linewidth}{@{} l r r c @{} }\n    \\toprule\n")

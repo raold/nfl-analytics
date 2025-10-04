@@ -8,7 +8,7 @@ This extends the default harness configs to include features from the backfilled
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 
@@ -44,31 +44,24 @@ ENHANCED_CONFIG = Config(
         "epa_pp_last3_diff",
         "prior_margin_avg_diff",
         "season_point_diff_avg_diff",
-        
         # Rest and situational
         "rest_diff",
-        
         # NEW: Success rate and efficiency
         "prior_success_rate_diff",
         "success_rate_last3_diff",
-        
         # NEW: Passing efficiency
         "prior_air_yards_diff",
         "prior_cpoe_diff",
         "prior_completion_pct_diff",
-        
         # NEW: Turnovers and penalties
         "prior_turnovers_avg_diff",
         "prior_penalties_avg_diff",
-        
         # NEW: Play-calling tendencies
         "prior_shotgun_rate_diff",
         "prior_explosive_pass_rate_diff",
-        
         # QB and coaching stability
         "qb_change_diff",
         "coach_change_diff",
-        
         # Venue
         "surface_grass_diff",
         "roof_dome_diff",
@@ -88,7 +81,6 @@ ENHANCED_SELECT_CONFIG = Config(
         "prior_margin_avg_diff",
         "season_point_diff_avg_diff",
         "rest_diff",
-        
         # NEW: Top 5 most impactful features (based on expected importance)
         "prior_success_rate_diff",
         "success_rate_last3_diff",

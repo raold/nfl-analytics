@@ -1,0 +1,222 @@
+# Data Quality Issue Report Template
+
+date: YYYY-MM-DD
+reported_by: ""  # DevOps | ETL | Research
+assigned_to: ETL Agent
+issue_id: DQ-YYYY-NNN
+status: reported  # reported | investigating | fixing | testing | resolved | wont_fix
+
+## Issue Summary
+title: ""
+severity: ""  # critical | high | medium | low
+discovered_how: ""  # automated_check | manual_review | model_anomaly | user_report
+
+## Affected Data
+tables_affected: []
+  # - table_name
+
+columns_affected: []
+  # - column_name
+
+games_affected: []
+  # - game_id
+
+date_range_affected: ""
+estimated_rows_affected: 0
+percentage_of_data: 0.0
+
+## Issue Description
+symptom: |
+  What was observed that indicated a problem?
+
+expected_behavior: |
+  What should the data look like?
+
+actual_behavior: |
+  What does the data actually look like?
+
+examples:
+  - game_id: ""
+    column: ""
+    expected: ""
+    actual: ""
+    difference: ""
+
+## Impact Assessment
+data_quality_dimensions:
+  completeness: ""  # not_affected | degraded | critical
+  accuracy: ""
+  consistency: ""
+  timeliness: ""
+  validity: ""
+
+impact_on_downstream:
+  etl_pipelines:
+    affected: false
+    description: ""
+  
+  models:
+    affected: false
+    models_list: []
+    description: ""
+  
+  reports:
+    affected: false
+    reports_list: []
+    description: ""
+  
+  dissertation:
+    affected: false
+    description: ""
+
+business_impact: |
+  How does this affect research or operations?
+
+urgency_justification: |
+  Why this severity level?
+
+## Root Cause Investigation
+suspected_cause: |
+  Initial hypothesis about what went wrong
+
+investigation_steps:
+  - step: ""
+    finding: ""
+    
+source_of_issue:
+  data_source: ""  # API | database | manual_entry | calculation
+  pipeline_stage: ""  # extraction | transformation | loading | validation
+  introduced_when: ""
+
+root_cause: |
+  ETL fills this in after investigation
+
+## Workaround
+workaround_available: false
+workaround_description: |
+  Temporary solution while fix is developed
+
+workaround_limitations: |
+  What doesn't the workaround address?
+
+agents_using_workaround: []
+
+## Fix Plan
+proposed_fix: |
+  Description of the permanent solution
+
+fix_approach:
+  - step: ""
+    responsible: ""
+    estimated_time: ""
+
+fix_complexity: ""  # simple | moderate | complex
+
+fix_risks:
+  - risk: ""
+    mitigation: ""
+
+## Testing Plan
+test_scenarios:
+  - scenario: ""
+    test_method: ""
+    pass_criteria: ""
+
+validation_approach: |
+  How to confirm the fix works
+
+regression_testing: |
+  Ensure fix doesn't break other things
+
+## Prevention
+preventive_measures:
+  - measure: ""
+    implementation: ""
+
+monitoring_enhancement: |
+  What monitoring to add to catch this earlier?
+
+process_improvement: |
+  What process changes to prevent recurrence?
+
+documentation_updates:
+  - document: ""
+    change: ""
+
+## Data Correction
+historical_data_affected: false
+backfill_required: false
+backfill_plan: |
+  How to correct historical data if needed
+
+backfill_complexity:
+  games_to_reprocess: 0
+  estimated_time: ""
+  risk_level: ""
+
+data_migration_script: ""  # Path to correction script
+
+## Timeline
+reported_at: ""
+investigation_started_at: ""
+root_cause_identified_at: ""
+fix_implemented_at: ""
+fix_tested_at: ""
+fix_deployed_at: ""
+backfill_completed_at: ""
+issue_closed_at: ""
+
+target_resolution_date: ""
+
+## Communication
+stakeholders_notified: []
+  # - agent_name: notification_date
+
+notification_message: |
+  What was communicated to affected parties?
+
+updates_provided:
+  - date: ""
+    update: ""
+
+## Resolution
+resolution_summary: |
+  Final summary of what was done
+
+fix_verification:
+  - check: ""
+    result: pass  # pass | fail
+
+metrics_after_fix:
+  rows_corrected: 0
+  data_quality_score: 0.0
+  validation_pass_rate: 0.0
+
+## Lessons Learned
+what_went_well: []
+what_could_improve: []
+key_takeaways: []
+
+similar_issues_to_check: []
+  # - potential_issue: where_to_check
+
+## Follow-up Actions
+action_items:
+  - [ ] action
+    assigned_to: ""
+    due_date: ""
+
+monitoring_additions:
+  - check: ""
+    frequency: ""
+    owner: ""
+
+## Documentation
+incident_report: ""  # Link to detailed incident report
+related_issues: []  # Links to related issue reports
+postmortem: ""  # Link to postmortem if warranted
+
+## Metadata
+category: ""  # data_source | pipeline | calculation | schema | other
+tags: []
+related_handoffs: []

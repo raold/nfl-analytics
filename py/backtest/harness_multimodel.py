@@ -23,16 +23,16 @@ Usage example
     --predictions-csv analysis/results/multimodel_predictions.csv \
     --diagnostics-dir analysis/results/multimodel_diagnostics
 """
+
 from __future__ import annotations
 
 import argparse
 import itertools
 import json
 import math
-import os
 import sys
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -49,21 +49,20 @@ if str(ROOT) not in sys.path:
 from backtest.baseline_glm import DEFAULT_FEATURE_COLUMNS as GLM_FEATURES
 from models.state_space import StateSpaceRatings
 
-
 # ----------------------------------------------------------------------------
 # Utility helpers
 # ----------------------------------------------------------------------------
 
 
-def parse_seasons(spec: str) -> List[int]:
+def parse_seasons(spec: str) -> list[int]:
     """Parse seasons argument supporting comma lists or ranges (e.g., "2003-2024")."""
-    seasons: List[int] = []
-    for token in spec.split(','):
+    seasons: list[int] = []
+    for token in spec.split(","):
         token = token.strip()
         if not token:
             continue
-        if '-' in token:
-            start, end = token.split('-', 1)
+        if "-" in token:
+            start, end = token.split("-", 1)
             seasons.extend(range(int(start), int(end) + 1))
         else:
             seasons.append(int(token))
@@ -109,10 +108,12 @@ class GLMModel(BaseModel):
 
     def __init__(self, feature_cols: Sequence[str]):
         self.feature_cols = list(feature_cols)
-        self.pipeline = Pipeline([
-            ("scaler", StandardScaler()),
-            ("logit", LogisticRegression(max_iter=2000, solver="lbfgs")),
-        ])
+        self.pipeline = Pipeline(
+            [
+                ("scaler", StandardScaler()),
+                ("logit", LogisticRegression(max_iter=2000, solver="lbfgs")),
+            ]
+        )
 
     def fit(self, train_df: pd.DataFrame) -> None:
         X = train_df[self.feature_cols].fillna(0.0)
@@ -179,14 +180,16 @@ class StateSpaceModel(BaseModel):
 
     def fit(self, train_df: pd.DataFrame) -> None:
         self.model = StateSpaceRatings(q=self.q, r=self.r)
-        minimal = train_df[[
-            "season",
-            "week",
-            "home_team",
-            "away_team",
-            "home_score",
-            "away_score",
-        ]].copy()
+        minimal = train_df[
+            [
+                "season",
+                "week",
+                "home_team",
+                "away_team",
+                "home_score",
+                "away_score",
+            ]
+        ].copy()
         minimal["margin"] = minimal["home_score"] - minimal["away_score"]
         self.model.fit(minimal)
 
@@ -217,11 +220,11 @@ MODEL_FACTORIES = {
 
 def walk_forward_predictions(
     df: pd.DataFrame,
-    base_models: List[str],
+    base_models: list[str],
     feature_cols: Sequence[str],
 ) -> pd.DataFrame:
     seasons = sorted(df["season"].unique())
-    records: List[Dict[str, object]] = []
+    records: list[dict[str, object]] = []
 
     for idx in range(1, len(seasons)):
         season = seasons[idx]
@@ -245,10 +248,12 @@ def walk_forward_predictions(
             model = factory(feature_cols)
             model.fit(train_df)
             probs = model.predict_proba(test_df)
-            for (game_id, prob) in zip(test_df["game_id"], probs):
+            for game_id, prob in zip(test_df["game_id"], probs):
                 season_records[game_id][model_key] = float(prob)
 
-        records.extend(rec for rec in season_records.values() if isinstance(rec, dict) and rec.get("game_id"))
+        records.extend(
+            rec for rec in season_records.values() if isinstance(rec, dict) and rec.get("game_id")
+        )
 
     return pd.DataFrame(records)
 
@@ -258,19 +263,19 @@ def walk_forward_predictions(
 # ----------------------------------------------------------------------------
 
 
-def all_combinations(items: Sequence[str]) -> Iterable[Tuple[str, ...]]:
+def all_combinations(items: Sequence[str]) -> Iterable[tuple[str, ...]]:
     for r in range(2, len(items) + 1):
         for combo in itertools.combinations(items, r):
             yield combo
 
 
-def add_equal_weight_ensembles(pred_df: pd.DataFrame, base_models: List[str]) -> None:
+def add_equal_weight_ensembles(pred_df: pd.DataFrame, base_models: list[str]) -> None:
     for combo in all_combinations(base_models):
         label = f"ens_mean_{'_'.join(combo)}"
         pred_df[label] = pred_df[list(combo)].mean(axis=1)
 
 
-def add_stack_ensembles(pred_df: pd.DataFrame, base_models: List[str]) -> None:
+def add_stack_ensembles(pred_df: pd.DataFrame, base_models: list[str]) -> None:
     seasons = sorted(pred_df["season"].unique())
     for combo in all_combinations(base_models):
         label = f"ens_stack_{'_'.join(combo)}"
@@ -297,7 +302,9 @@ def add_stack_ensembles(pred_df: pd.DataFrame, base_models: List[str]) -> None:
 # ----------------------------------------------------------------------------
 
 
-def compute_roi(probs: np.ndarray, actuals: np.ndarray, threshold: float, decimal_payout: float) -> float:
+def compute_roi(
+    probs: np.ndarray, actuals: np.ndarray, threshold: float, decimal_payout: float
+) -> float:
     mask = probs >= threshold
     if mask.sum() == 0:
         return 0.0
@@ -307,7 +314,9 @@ def compute_roi(probs: np.ndarray, actuals: np.ndarray, threshold: float, decima
     return float(profit / mask.sum())
 
 
-def overall_metrics(pred_df: pd.DataFrame, model_cols: List[str], threshold: float, decimal_payout: float) -> pd.DataFrame:
+def overall_metrics(
+    pred_df: pd.DataFrame, model_cols: list[str], threshold: float, decimal_payout: float
+) -> pd.DataFrame:
     rows = []
     actual = pred_df["actual"].to_numpy()
     for col in model_cols:
@@ -327,7 +336,9 @@ def overall_metrics(pred_df: pd.DataFrame, model_cols: List[str], threshold: flo
     return pd.DataFrame(rows)
 
 
-def per_season_metrics(pred_df: pd.DataFrame, model_cols: List[str], threshold: float, decimal_payout: float) -> pd.DataFrame:
+def per_season_metrics(
+    pred_df: pd.DataFrame, model_cols: list[str], threshold: float, decimal_payout: float
+) -> pd.DataFrame:
     rows = []
     for season, group in pred_df.groupby("season"):
         actual = group["actual"].to_numpy()
@@ -351,15 +362,15 @@ def per_season_metrics(pred_df: pd.DataFrame, model_cols: List[str], threshold: 
 
 def bootstrap_confidence_intervals(
     pred_df: pd.DataFrame,
-    model_cols: List[str],
+    model_cols: list[str],
     threshold: float,
     decimal_payout: float,
     n_bootstrap: int,
     seed: int = 42,
-) -> Dict[str, Dict[str, Tuple[float, float]]]:
+) -> dict[str, dict[str, tuple[float, float]]]:
     rng = np.random.default_rng(seed)
     seasons = pred_df["season"].unique()
-    results: Dict[str, Dict[str, Tuple[float, float]]] = {}
+    results: dict[str, dict[str, tuple[float, float]]] = {}
 
     metrics = {"brier", "logloss", "accuracy", "roi"}
     for model in model_cols:
@@ -384,11 +395,14 @@ def bootstrap_confidence_intervals(
         for metric in metrics:
             samples = metric_samples[model][metric]
             if samples:
-                results[model][metric] = (float(np.percentile(samples, 2.5)), float(np.percentile(samples, 97.5)))
+                results[model][metric] = (
+                    float(np.percentile(samples, 2.5)),
+                    float(np.percentile(samples, 97.5)),
+                )
     return results
 
 
-def prediction_covariance(pred_df: pd.DataFrame, model_cols: List[str]) -> pd.DataFrame:
+def prediction_covariance(pred_df: pd.DataFrame, model_cols: list[str]) -> pd.DataFrame:
     residuals = {col: pred_df[col] - pred_df["actual"] for col in model_cols}
     res_df = pd.DataFrame(residuals)
     cov = res_df.corr()
@@ -402,23 +416,39 @@ def prediction_covariance(pred_df: pd.DataFrame, model_cols: List[str]) -> pd.Da
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Multi-model backtest and diagnostics harness")
-    ap.add_argument("--features-csv", default="analysis/features/asof_team_features.csv", help="Prepared features CSV")
-    ap.add_argument("--seasons", required=True, help="Seasons (comma or dash syntax, e.g., 2003-2024)")
+    ap.add_argument(
+        "--features-csv",
+        default="analysis/features/asof_team_features.csv",
+        help="Prepared features CSV",
+    )
+    ap.add_argument(
+        "--seasons", required=True, help="Seasons (comma or dash syntax, e.g., 2003-2024)"
+    )
     ap.add_argument("--base-models", default="glm,xgb,state", help="Comma-separated base models")
     ap.add_argument("--threshold", type=float, default=0.55, help="Decision threshold for ROI")
-    ap.add_argument("--decimal-payout", type=float, default=1.91, help="Decimal payout (e.g., 1.91 for -110)")
-    ap.add_argument("--output-csv", default="analysis/results/multimodel_comparison.csv", help="Overall metrics CSV")
+    ap.add_argument(
+        "--decimal-payout", type=float, default=1.91, help="Decimal payout (e.g., 1.91 for -110)"
+    )
+    ap.add_argument(
+        "--output-csv",
+        default="analysis/results/multimodel_comparison.csv",
+        help="Overall metrics CSV",
+    )
     ap.add_argument("--per-season-csv", default=None, help="Optional per-season metrics CSV")
     ap.add_argument("--predictions-csv", default=None, help="Optional per-game predictions CSV")
-    ap.add_argument("--diagnostics-dir", default=None, help="Directory for diagnostics artefacts (JSON/CSV)")
-    ap.add_argument("--bootstrap-samples", type=int, default=500, help="Bootstrap iterations for CIs")
+    ap.add_argument(
+        "--diagnostics-dir", default=None, help="Directory for diagnostics artefacts (JSON/CSV)"
+    )
+    ap.add_argument(
+        "--bootstrap-samples", type=int, default=500, help="Bootstrap iterations for CIs"
+    )
     return ap.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     seasons = parse_seasons(args.seasons)
-    base_models = [m.strip() for m in args.base_models.split(',') if m.strip()]
+    base_models = [m.strip() for m in args.base_models.split(",") if m.strip()]
     unknown = [m for m in base_models if m not in MODEL_FACTORIES]
     if unknown:
         raise ValueError(f"Unknown base models: {unknown}")
@@ -434,7 +464,9 @@ def main() -> None:
     add_equal_weight_ensembles(predictions, base_models)
     add_stack_ensembles(predictions, base_models)
 
-    model_columns = [col for col in predictions.columns if col not in {"game_id", "season", "week", "actual"}]
+    model_columns = [
+        col for col in predictions.columns if col not in {"game_id", "season", "week", "actual"}
+    ]
 
     overall = overall_metrics(predictions, model_columns, args.threshold, args.decimal_payout)
     ensure_dir(Path(args.output_csv))
@@ -444,7 +476,9 @@ def main() -> None:
 
     per_season_csv = args.per_season_csv
     if per_season_csv:
-        per_season_df = per_season_metrics(predictions, model_columns, args.threshold, args.decimal_payout)
+        per_season_df = per_season_metrics(
+            predictions, model_columns, args.threshold, args.decimal_payout
+        )
         ensure_dir(Path(per_season_csv))
         per_season_df.to_csv(per_season_csv, index=False)
         print(f"Per-season metrics -> {per_season_csv}")

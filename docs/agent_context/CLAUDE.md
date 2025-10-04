@@ -26,6 +26,9 @@ This is an **enterprise-grade NFL analytics platform** for sports betting resear
 5. Reinforcement learning for bet sizing (OPE/IPS framework)
 6. Copula-based score simulation with key-number reweighting
 7. **Production ETL pipelines** with automated data quality monitoring
+8. 🆕 **Distributed compute optimization** with multi-armed bandit algorithms
+9. 🆕 **Statistical testing framework** for rigorous model validation
+10. 🆕 **Automated A/B testing** with sequential analysis and effect sizes
 
 ---
 
@@ -77,6 +80,23 @@ nfl-analytics/
 │       └── logging.py           # Structured logging
 │
 ├── py/                          # Python package
+│   ├── compute/                 # 🆕 Distributed compute system & statistical framework
+│   │   ├── statistics/          # Formal statistical testing framework
+│   │   │   ├── statistical_tests.py      # Permutation & bootstrap tests
+│   │   │   ├── effect_size.py           # Cohen's d, Cliff's delta
+│   │   │   ├── multiple_comparisons.py  # FDR/FWER correction
+│   │   │   ├── power_analysis.py        # Sample size & power calculations
+│   │   │   ├── experimental_design/     # A/B testing framework
+│   │   │   │   ├── ab_testing.py        # Sequential testing, Bayesian analysis
+│   │   │   │   └── sequential_testing.py # Adaptive allocation
+│   │   │   └── reporting/               # Automated report generation
+│   │   │       ├── quarto_generator.py  # Quarto/LaTeX integration
+│   │   │       ├── latex_tables.py      # Statistical tables
+│   │   │       └── methodology_documenter.py # Methods documentation
+│   │   ├── task_queue.py            # Priority-based task management
+│   │   ├── adaptive_scheduler.py    # Multi-armed bandit optimization
+│   │   ├── performance_tracker.py   # Statistical performance tracking
+│   │   └── compute_worker.py        # Distributed worker system
 │   ├── features/                # Feature engineering
 │   │   ├── asof_features_enhanced.py  # 157-column enhanced features
 │   │   └── base.py

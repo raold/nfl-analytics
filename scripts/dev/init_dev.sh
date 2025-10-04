@@ -43,12 +43,21 @@ echo "[init] Database is ready"
 
 echo "[init] Applying schema migrations"
 if command -v psql >/dev/null 2>&1; then
-  PGPASSWORD="$POSTGRES_PASSWORD" psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -v ON_ERROR_STOP=1 -f db/001_init.sql
-  PGPASSWORD="$POSTGRES_PASSWORD" psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -v ON_ERROR_STOP=1 -f db/002_timescale.sql
+  # Apply all migrations in order
+  for migration in db/migrations/*.sql; do
+    if [ -f "$migration" ]; then
+      echo "[init] Applying $(basename $migration)"
+      PGPASSWORD="$POSTGRES_PASSWORD" psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -v ON_ERROR_STOP=1 -f "$migration"
+    fi
+  done
 else
   # Apply schema via container psql if host psql is unavailable
-  docker compose exec -T pg psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f /dev/stdin < db/001_init.sql
-  docker compose exec -T pg psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f /dev/stdin < db/002_timescale.sql
+  for migration in db/migrations/*.sql; do
+    if [ -f "$migration" ]; then
+      echo "[init] Applying $(basename $migration) via container"
+      docker compose exec -T pg psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f /dev/stdin < "$migration"
+    fi
+  done
 fi
 
 echo "[init] Done. Next steps:"

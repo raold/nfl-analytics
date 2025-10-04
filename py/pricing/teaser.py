@@ -4,14 +4,13 @@ Teaser and middle pricing utilities.
 Uses per-leg success probabilities and a dependence model (Gaussian copula)
 to compute basket success and expected value under given payouts.
 """
-from __future__ import annotations
 
-from typing import Tuple
+from __future__ import annotations
 
 from ..models.copulas import joint_success_prob_gaussian
 
 
-def teaser_ev(q1: float, q2: float, payout_decimal: float, rho: float = 0.0) -> Tuple[float, float]:
+def teaser_ev(q1: float, q2: float, payout_decimal: float, rho: float = 0.0) -> tuple[float, float]:
     """Expected value and joint success for a 2-leg teaser.
 
     Args:
@@ -45,4 +44,3 @@ def middle_breakeven(required_mass: float, pmf_margin: dict[int, float], n: int)
 
 
 __all__ = ["teaser_ev", "middle_breakeven"]
-

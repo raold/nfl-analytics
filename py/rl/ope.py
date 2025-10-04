@@ -9,9 +9,10 @@ Input DataFrame columns expected:
 Optional feature columns for DR: any numeric covariates (e.g., spread_close,
 total_close, epa_gap, market_prob, edge); non-numeric columns are ignored.
 """
+
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence
+from collections.abc import Sequence
 
 import numpy as np
 import pandas as pd
@@ -29,7 +30,7 @@ def _shrink(w: np.ndarray, lam: float) -> np.ndarray:
     return w / (1.0 + lam * w)
 
 
-def snis(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str, float]:
+def snis(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> dict[str, float]:
     a = df["action"].to_numpy(dtype=float)
     r = df["r"].to_numpy(dtype=float)
     b = df["b_prob"].to_numpy(dtype=float)
@@ -63,7 +64,7 @@ def _select_numeric_features(df: pd.DataFrame, drop: Sequence[str]) -> np.ndarra
     return arr
 
 
-def _fit_outcome(df: pd.DataFrame) -> Dict[str, np.ndarray]:
+def _fit_outcome(df: pd.DataFrame) -> dict[str, np.ndarray]:
     """Stable ridge regression for E[r | s, a=1].
 
     - Drops non-finite rows
@@ -93,7 +94,7 @@ def _fit_outcome(df: pd.DataFrame) -> Dict[str, np.ndarray]:
     return {"coef": beta[1:], "intercept": np.array([beta[0]])}
 
 
-def dr(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str, float]:
+def dr(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> dict[str, float]:
     a = df["action"].to_numpy(dtype=float)
     r = df["r"].to_numpy(dtype=float)
     b = df["b_prob"].to_numpy(dtype=float)
@@ -101,7 +102,7 @@ def dr(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str, f
     # Outcome model for a=1
     pars = _fit_outcome(df)
     X_full = _select_numeric_features(df, drop=["action", "r", "b_prob", "pi_prob"])
-    q1 = (pars["intercept"][0] + (X_full @ pars["coef"]))
+    q1 = pars["intercept"][0] + (X_full @ pars["coef"])
     q1 = np.nan_to_num(q1, nan=0.0, posinf=0.0, neginf=0.0)
     # Policy value under model: E[Q(s,π(s))] ≈ E[p*q1 + (1-p)*0]
     v_model = np.mean(p * q1)
@@ -117,7 +118,13 @@ def dr(df: pd.DataFrame, clip: float = 10.0, shrink: float = 0.0) -> Dict[str, f
     val = float(v_model + corr)
     alpha = float(pars["intercept"][0])
     beta0 = float(pars["coef"][0]) if pars["coef"].size > 0 else 0.0
-    return {"value": val, "intercept": alpha, "coef": pars["coef"].tolist(), "alpha": alpha, "beta": beta0}
+    return {
+        "value": val,
+        "intercept": alpha,
+        "coef": pars["coef"].tolist(),
+        "alpha": alpha,
+        "beta": beta0,
+    }
 
 
 __all__ = ["snis", "dr"]

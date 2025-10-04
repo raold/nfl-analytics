@@ -2,6 +2,10 @@
 
 This document summarizes the operational database used by the pipelines in this repository. It covers base (public) tables, marts, materialized views, indexing, and lineage from ingestion to feature-ready views.
 
+## ER Diagram
+
+See the ERD for high-level relationships: `docs/database/erd.md` (PNG: `docs/database/erd.png`).
+
 ## Schemas
 
 - public: Raw and lightly normalized entities used as sources for marts.
@@ -115,4 +119,3 @@ See scripts/dev/init_dev.sh for an example of applying the initial schema steps.
 
 - A set of enriched columns (QB names, coaches, referee, rest, turnovers, penalties, etc.) are populated by backfill scripts and may not appear in 001_init.sql. Downstream marts reference these when available.
 - Weather duplication has been removed from games; always source meteorology from public.weather for analytics and reporting.
-

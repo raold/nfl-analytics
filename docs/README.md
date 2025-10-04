@@ -13,7 +13,8 @@ Welcome to the NFL Analytics project documentation. This directory contains all 
 
 ### Architecture
 - **[Data Pipeline Architecture](architecture/data_pipeline.md)** - ETL framework and data flow
-- **[Database Schema](architecture/database_schema.md)** - Table definitions and relationships
+- **[Database Schema](database/schema.md)** - Table definitions and relationships
+- **[Database ERD](database/erd.md)** - Entity-relationship diagram
 - **[Feature Engineering](architecture/feature_engineering.md)** - Feature generation methodology
 
 ### Operations

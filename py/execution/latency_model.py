@@ -5,13 +5,13 @@ Fits a lognormal to observed latency ℓ = executed_time - signal_time (seconds)
 per (book, market, tau_bucket). Assumes timestamps are either seconds since
 epoch or ISO-8601 parseable; this stub prefers seconds.
 """
+
 from __future__ import annotations
 
-import csv
 import math
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Tuple
 
 from .depth_model import tau_bucket
 
@@ -29,8 +29,8 @@ def _to_seconds(v: str) -> float:
         return 0.0
 
 
-def fit_latency(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], LatencyParams]:
-    groups: Dict[Tuple[str, str, str], List[float]] = defaultdict(list)
+def fit_latency(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], LatencyParams]:
+    groups: dict[tuple[str, str, str], list[float]] = defaultdict(list)
     for r in rows:
         try:
             book = r.get("book", "unknown")
@@ -42,7 +42,7 @@ def fit_latency(rows: Iterable[Dict[str, str]]) -> Dict[Tuple[str, str, str], La
             groups[(book, market, tau)].append(ell)
         except Exception:
             continue
-    out: Dict[Tuple[str, str, str], LatencyParams] = {}
+    out: dict[tuple[str, str, str], LatencyParams] = {}
     for key, vals in groups.items():
         if not vals:
             out[key] = LatencyParams(0.0, 0.0)
@@ -61,4 +61,3 @@ def sample_latency(mu_log: float, sigma_log: float) -> float:
     u1, u2 = random.random(), random.random()
     z = math.sqrt(-2.0 * math.log(max(u1, 1e-12))) * math.cos(2.0 * math.pi * u2)
     return math.exp(mu_log + sigma_log * z)
-
