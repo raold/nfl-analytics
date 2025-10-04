@@ -1,0 +1,67 @@
+Device: mps
+Loading dataset from data/rl_logged.csv...
+Dataset: 1408 samples, state_dim=6, n_actions=4
+Action distribution: {0: 0.6356534090909091, 1: 0.2450284090909091, 2: 0.11363636363636363, 3: 0.005681818181818182}
+Mean reward: 0.1471, Std reward: 0.5447
+
+=== Training ===
+Training DQN for 400 epochs on 1408 samples...
+Device: mps, Batch size: 128, Buffer size: 1408
+Epoch 1/400 | Loss: 0.1587 | Q_mean: 0.0892
+Epoch 10/400 | Loss: 0.1087 | Q_mean: 0.1706
+Epoch 20/400 | Loss: 0.1284 | Q_mean: 0.2063
+Epoch 30/400 | Loss: 0.1249 | Q_mean: 0.1865
+Epoch 40/400 | Loss: 0.1300 | Q_mean: 0.1833
+Epoch 50/400 | Loss: 0.1089 | Q_mean: 0.2115
+Epoch 60/400 | Loss: 0.0976 | Q_mean: 0.1780
+Epoch 70/400 | Loss: 0.1169 | Q_mean: 0.1690
+Epoch 80/400 | Loss: 0.1062 | Q_mean: 0.1863
+Epoch 90/400 | Loss: 0.1101 | Q_mean: 0.1745
+Epoch 100/400 | Loss: 0.1077 | Q_mean: 0.1845
+Epoch 110/400 | Loss: 0.1038 | Q_mean: 0.2153
+Epoch 120/400 | Loss: 0.1062 | Q_mean: 0.1622
+Epoch 130/400 | Loss: 0.1044 | Q_mean: 0.1964
+Epoch 140/400 | Loss: 0.1022 | Q_mean: 0.1814
+Epoch 150/400 | Loss: 0.1179 | Q_mean: 0.1661
+Epoch 160/400 | Loss: 0.1151 | Q_mean: 0.1952
+Epoch 170/400 | Loss: 0.1051 | Q_mean: 0.1789
+Epoch 180/400 | Loss: 0.1141 | Q_mean: 0.1861
+Epoch 190/400 | Loss: 0.1067 | Q_mean: 0.1950
+Epoch 200/400 | Loss: 0.0971 | Q_mean: 0.1863
+Epoch 210/400 | Loss: 0.1021 | Q_mean: 0.1821
+Epoch 220/400 | Loss: 0.1065 | Q_mean: 0.2019
+Epoch 230/400 | Loss: 0.1096 | Q_mean: 0.1837
+Epoch 240/400 | Loss: 0.1018 | Q_mean: 0.1547
+Epoch 250/400 | Loss: 0.0995 | Q_mean: 0.1569
+Epoch 260/400 | Loss: 0.1059 | Q_mean: 0.1976
+Epoch 270/400 | Loss: 0.1034 | Q_mean: 0.1799
+Epoch 280/400 | Loss: 0.1035 | Q_mean: 0.2047
+Epoch 290/400 | Loss: 0.1065 | Q_mean: 0.1877
+Epoch 300/400 | Loss: 0.1024 | Q_mean: 0.1639
+Epoch 310/400 | Loss: 0.0968 | Q_mean: 0.1848
+Epoch 320/400 | Loss: 0.1023 | Q_mean: 0.2120
+Epoch 330/400 | Loss: 0.0995 | Q_mean: 0.1926
+Epoch 340/400 | Loss: 0.0986 | Q_mean: 0.1738
+Epoch 350/400 | Loss: 0.0958 | Q_mean: 0.1862
+Epoch 360/400 | Loss: 0.1002 | Q_mean: 0.1838
+Epoch 370/400 | Loss: 0.0989 | Q_mean: 0.1812
+Epoch 380/400 | Loss: 0.1017 | Q_mean: 0.2007
+Epoch 390/400 | Loss: 0.1062 | Q_mean: 0.1687
+Epoch 400/400 | Loss: 0.1005 | Q_mean: 0.1539
+
+Model saved to models/dqn_model_400ep.pth
+Training log saved to models/dqn_training_log.json
+
+=== Post-Training Evaluation ===
+{
+  "match_rate": 0.5838068181818182,
+  "avg_q_value": -0.2802399694919586,
+  "action_distribution": {
+    "0": 0.44105113636363635,
+    "2": 0.22798295454545456,
+    "1": 0.1953125,
+    "3": 0.1356534090909091
+  },
+  "estimated_policy_reward": 0.06681108284233646,
+  "logged_avg_reward": 0.14706677198410034
+}

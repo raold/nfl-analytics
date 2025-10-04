@@ -3,6 +3,7 @@ pgdata
 venv
 __pycache__
 .pytest_cache
+.env
 .Rhistory
 .Rproj.user
 .ruff_cache

@@ -1,0 +1,55 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+=== NFL Game Metadata Backfill ===
+
+Adding metadata columns to games table...
+✓ Added/verified 27 columns
+
+Loading schedules from nflreadr...
+Loaded 6991 games
+
+Updating games with stadium and venue metadata...
+
+1999 : Updated 259 games
+2000 : Updated 259 games
+2001 : Updated 259 games
+2002 : Updated 267 games
+2003 : Updated 267 games
+2004 : Updated 267 games
+2005 : Updated 267 games
+2006 : Updated 267 games
+2007 : Updated 267 games
+2008 : Updated 267 games
+2009 : Updated 267 games
+2010 : Updated 267 games
+2011 : Updated 267 games
+2012 : Updated 267 games
+2013 : Updated 267 games
+2014 : Updated 267 games
+2015 : Updated 267 games
+2016 : Updated 267 games
+2017 : Updated 267 games
+2018 : Updated 267 games
+2019 : Updated 267 games
+2020 : Updated 269 games
+2021 : Updated 285 games
+2022 : Updated 284 games
+2023 : Updated 285 games
+2024 : Updated 285 games
+
+
+Calculating game-level statistics from plays...
+  Calculating turnovers...
+Error: Failed to prepare query : ERROR:  column reference "game_id" is ambiguous
+LINE 13:     SELECT game_id, turnovers as home_turnovers
+                    ^
+Execution halted

@@ -6,8 +6,13 @@ scipy
 scikit-learn
 xgboost
 meteostat
+matplotlib
 SQLAlchemy
 psycopg[binary]
 python-dotenv
 requests
 pytest
+# PyTorch for DQN agent - install separately based on platform:
+# Apple Silicon (MPS):  pip install torch torchvision torchaudio
+# CUDA (Linux/Windows): pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# CPU only:             pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu

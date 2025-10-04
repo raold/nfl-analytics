@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\caption{DQN vs PPO Agent Comparison (400 epochs)}
+\label{tab:rl_agent_comparison}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{DQN} & \textbf{PPO} \\
+\midrule
+Initial Performance & 0.0892 & 0.0853 \\
+Final Performance & 0.1539 & 0.1324 \\
+Peak Performance & 0.2323 & 0.1451 \\
+Peak Epoch & 149 & 314 \\
+Training Variance & 0.000315 & 0.000149 \\
+Final 50 Epoch Std & 0.015750 & 0.004131 \\
+\midrule
+\textbf{Winner} & \multicolumn{2}{c}{\textbf{PPO (higher reward)}} \\
+\bottomrule
+\end{tabular}
+\end{table}

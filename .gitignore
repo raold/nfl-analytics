@@ -1,3 +1,5 @@
 # Ignore nested repo
 /data/nflverse-data/
 pgdata/
+.env
+.tmp.driveupload/

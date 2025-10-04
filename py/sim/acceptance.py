@@ -173,9 +173,9 @@ def _write_tex(path: str, rep: Dict[str, Any]) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     order = [
         ("emd_margin", "EMD (margin)"),
-        ("key_mass_max_delta", "Max |Δ key mass|"),
-        ("kendall_tau_delta", "Kendall's τ Δ"),
-        ("joint_tail_delta", "Joint tail Δ"),
+        ("key_mass_max_delta", "Max |$\\Delta$ key mass|"),
+        ("kendall_tau_delta", "Kendall's $\\tau$ $\\Delta$"),
+        ("joint_tail_delta", "Joint tail $\\Delta$"),
         ("slippage_rmse", "Slippage RMSE"),
         ("fill_shortfall", "Fill shortfall"),
     ]
@@ -192,11 +192,12 @@ def _write_tex(path: str, rep: Dict[str, Any]) -> None:
         f.write("\\caption[Simulator acceptance checks]{Simulator acceptance metrics vs tolerances. Pass=\\textbf{%s}.}\n" % ("Yes" if rep.get("pass") else "No"))
         f.write("\\label{tab:sim-accept}\n    ")
         f.write("\\setlength{\\tabcolsep}{3pt}\\renewcommand{\\arraystretch}{1.1}\n")
-        f.write("\\begin{tabularx}{\\linewidth}{@{} l r r c @{} }\\toprule\n")
-        f.write("Metric & Value & Tolerance & Pass \\\\ \\midrule\n")
+        f.write("\\begin{tabularx}{\\linewidth}{@{} l r r c @{} }\n    \\toprule\n")
+        f.write("    Metric & Value & Tolerance & Pass \\\\ \n    \\midrule\n")
         for label, val, tau, ok in rows:
             f.write(f"{label} & {val:.4f} & {tau:.4f} & {ok} \\\\ \n")
-        f.write("\\bottomrule\\end{tabularx}\n  ")
+        f.write("    \\bottomrule\n")
+        f.write("  \\end{tabularx}\n")
         f.write("\\end{threeparttable}\n\\end{table}\n")
 
 

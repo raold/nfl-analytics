@@ -1,3 +1,4 @@
+% !TEX root = ../main/main.tex
 \chapter{Reinforcement Learning Framework}
 \label{chap:rl}
 
@@ -91,6 +92,24 @@ Raw profit-and-loss is sparse and noisy. We augment with shaped rewards that cre
 
 \section{Offline RL Pipeline and Datasets}
 Historical seasons provide logged trajectories. We apply conservative batch RL algorithms (CQL, BCQ) to mitigate distributional shift and use importance-sampling diagnostics to ensure coverage. Hyperparameter sweeps run on GPU-backed instances with reproducible seeds.
+
+\subsection{DQN and PPO Implementation}\label{subsec:dqn-ppo-impl}
+I implement two baseline agents for NFL betting: a Deep Q-Network (DQN) with discrete actions and a Proximal Policy Optimization (PPO) actor-critic with continuous action space. Both agents are trained offline on 1,408 games (2020--2025) using logged rewards and bet probabilities.
+
+\paragraph{DQN architecture.} The DQN uses a three-layer feed-forward network (128–64–32 units, ReLU activations) mapping state features (spread, total, EPA, market prices) to Q-values for four discrete actions: skip bet, small stake (0.5\% bankroll), medium stake (1.0\%), and large stake (2.0\%). Training employs experience replay with 10,000 samples, target network updates every 10 episodes, $\varepsilon$-greedy exploration ($\varepsilon\in[0.9,0.1]$ over 200 episodes), discount $\gamma=0.99$, and Adam optimizer (lr=0.001). After 400 epochs on MPS (Apple Silicon GPU), the final Q-value converged to 0.1539 with peak performance at epoch 149 (Q=0.2323).
+
+\paragraph{PPO architecture.} The PPO agent uses separate actor and critic networks (64–32 units, Tanh activations) outputting a continuous action $a\in[0,1]$ representing stake fraction via a Beta distribution for bounded support. Training uses generalized advantage estimation (GAE, $\lambda=0.95$), clipped surrogate objective (clip=$0.2$), entropy regularization ($\beta=0.01$), and Adam optimizer (lr=3e-4). PPO was trained for 400 epochs on CPU (Beta distribution sampling unsupported on MPS), achieving final reward 0.1324 with peak at epoch 314 (reward=0.1451).
+
+\paragraph{Training stability comparison.} \Cref{tab:rl_agent_comparison} summarizes key metrics. PPO exhibits 3.8$\times$ lower final-50-epoch standard deviation (0.004 vs.\ 0.016) and 2.1$\times$ lower training variance (0.00015 vs.\ 0.00032), indicating more stable convergence. DQN achieves 16.2\% higher final performance but with more loss spikes (14 vs.\ 7 exceeding 2$\sigma$). Both agents converge by epoch 250, with minimal gains beyond 200 epochs, suggesting 200--250 epochs is sufficient for this problem.
+
+\paragraph{Action space analysis.} DQN's discrete action space (4 buckets) enforces interpretable stake levels but lacks granularity. PPO's continuous Beta distribution allows finer-grained sizing, with final average action 0.5773 (medium stake). DQN shows 100\% bet rate (never skips), while PPO is more conservative (57.7\% average action). This suggests PPO's continuous parameterization provides more flexible risk control, though at the cost of 16.2\% lower final reward.
+
+\paragraph{Device compatibility.} DQN successfully uses MPS acceleration (5-minute training for 400 epochs), while PPO requires CPU due to \texttt{torch.distributions.Beta} not supporting MPS sampling (12-minute training). This hardware limitation favors DQN for rapid iteration on Apple Silicon but does not affect final performance.
+
+\paragraph{Recommendation.} For deployment, I prefer PPO due to its superior stability (3.8$\times$ lower variance) and continuous action space, despite the 16.2\% reward trade-off. In risk-sensitive betting, consistent performance is more valuable than occasional peaks, and PPO's lower variance reduces the risk of catastrophic drawdowns. The comparison is documented in \texttt{py/analysis/rl\_agent\_comparison.py} and \texttt{models/\{dqn,ppo\}\_training\_log.json}.
+
+% Include the comparison table if it exists
+\IfFileExists{../figures/out/rl_agent_comparison_table.tex}{\input{../figures/out/rl_agent_comparison_table.tex}}{}
 
 \subsection{Action Space and Policy Class}
 We study discrete stake buckets (no bet, small, medium, large) and structured actions that allow combinations across markets subject to exposure caps. Policies include dueling DQN for discrete actions and an actor--critic variant for continuous stakes, with entropy regularization to encourage exploration during training.
@@ -353,7 +372,9 @@ to reflect annualized performance accounting for idle periods (cf. Table~10.2 ze
 \paragraph{CVaR sizing complexity.} For portfolio sizing with CVaR constraints (\S\ref{chap:risk}), typical instances solve in sub‑second wall‑clock time on a laptop. As a concrete benchmark: $n=\,$100 bets, $B=\,$10{,}000 scenarios, solver=OSQP, time$\approx\,$0.4 s.\footnote{Typical benchmark on an M2 laptop: $n=100$, $B=10{,}000$, OSQP 0.6, warm‑started. Replace with your local run; a table \texttt{cvar\_benchmark\_table.tex} is included if present.}
 
 \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
-\IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}
+\IfFileExists{../figures/out/cvar_benchmark_table.tex}{%
+  {\def\cvarBenchmarkLabel{}\input{../figures/out/cvar_benchmark_table.tex}}%
+}{}
 
 \subsection{RL vs Strategic Responses (Bridge)}
 We treat the policy as a small, price‑taking agent: odds are exogenous and our actions do not move markets. This matches the offline RL setting and typical pre‑game stake sizes. If stakes were large enough to affect prices or limits, a Stackelberg model would be required with the bookmaker as leader and the policy as follower; training and OPE would then incorporate price‑impact and inventory dynamics (left as future work).

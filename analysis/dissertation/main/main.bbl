@@ -1,0 +1,328 @@
+\begin{thebibliography}{51}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Achiam et~al.(2017)Achiam, Held, Tamar, and Abbeel]{achiam2017cpo}
+Joshua Achiam, David Held, Aviv Tamar, and Pieter Abbeel.
+\newblock Constrained policy optimization.
+\newblock \emph{arXiv preprint arXiv:1705.10528}, 2017.
+
+\bibitem[Agarwal et~al.(2020)Agarwal, Jiang, Kakade, and
+  Sun]{agarwal2020offline}
+Alekh Agarwal, Nan Jiang, Sham Kakade, and Wen Sun.
+\newblock An optimistic perspective on offline reinforcement learning.
+\newblock In \emph{Proceedings of the 37th International Conference on Machine
+  Learning}, volume 119 of \emph{Proceedings of Machine Learning Research},
+  pages 104--114. PMLR, 2020.
+
+\bibitem[Baio and Blangiardo(2010)]{baio2010}
+Gianluca Baio and Marta Blangiardo.
+\newblock Bayesian hierarchical model for the prediction of football results.
+\newblock \emph{Journal of Applied Statistics}, 37\penalty0 (2):\penalty0
+  253--264, 2010.
+
+\bibitem[Bellemare et~al.(2017)Bellemare, Dabney, and
+  Munos]{bellemare2017distributional}
+Marc~G. Bellemare, Will Dabney, and R{\'e}mi Munos.
+\newblock A distributional perspective on reinforcement learning.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning}, volume~70 of \emph{Proceedings of Machine Learning Research},
+  pages 449--458. PMLR, 2017.
+
+\bibitem[Bradley and Terry(1952)]{bradleyterry1952}
+Ralph~A. Bradley and Milton~E. Terry.
+\newblock Rank analysis of incomplete block designs i. the method of paired
+  comparisons.
+\newblock \emph{Biometrika}, 1952.
+
+\bibitem[Brier(1950)]{brier1950}
+Glenn~W. Brier.
+\newblock Verification of forecasts expressed in terms of probability.
+\newblock \emph{Monthly Weather Review}, 78\penalty0 (1):\penalty0 1--3, 1950.
+\newblock \doi{10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}.
+
+\bibitem[Dabney et~al.(2018)Dabney, Rowland, Bellemare, and
+  Munos]{dabney2018quantile}
+Will Dabney, Mark Rowland, Marc~G. Bellemare, and R{\'e}mi Munos.
+\newblock Implicit quantile networks for distributional reinforcement learning.
+\newblock In \emph{Proceedings of the 35th International Conference on Machine
+  Learning}, volume~80 of \emph{Proceedings of Machine Learning Research},
+  pages 1096--1105. PMLR, 2018.
+
+\bibitem[Daniels(1954)]{daniels1954}
+Henry~E. Daniels.
+\newblock Saddlepoint approximations in statistics.
+\newblock \emph{The Annals of Mathematical Statistics}, 1954.
+
+\bibitem[Dixon and Coles(1997)]{dixon1997}
+Mark~J Dixon and Stuart~G Coles.
+\newblock Modelling association football scores and inefficiencies in the
+  football betting market.
+\newblock \emph{Applied Statistics}, 46\penalty0 (2):\penalty0 265--280, 1997.
+
+\bibitem[Dud{\'\i}k et~al.(2014)Dud{\'\i}k, Langford, and Li]{dudik2014}
+Miroslav Dud{\'\i}k, John Langford, and Lihong Li.
+\newblock Doubly robust policy evaluation and learning.
+\newblock \emph{Statistical Science}, 2014.
+
+\bibitem[Elo(1978)]{elo1978}
+Arpad~E. Elo.
+\newblock \emph{The Rating of Chessplayers, Past and Present}.
+\newblock Arco Publishing, 1978.
+
+\bibitem[Fujimoto and Gu(2021)]{fujimoto2021td3bc}
+Scott Fujimoto and Shixiang~Shane Gu.
+\newblock A minimalist approach to offline reinforcement learning.
+\newblock \emph{Advances in Neural Information Processing Systems}, 2021.
+\newblock TD3+BC.
+
+\bibitem[Fujimoto et~al.(2018)Fujimoto, van Hoof, and Meger]{fujimoto2018td3}
+Scott Fujimoto, Herke van Hoof, and David Meger.
+\newblock Addressing function approximation error in actor-critic methods.
+\newblock In \emph{Proceedings of the 35th International Conference on Machine
+  Learning}, volume~80 of \emph{Proceedings of Machine Learning Research},
+  pages 1582--1591. PMLR, 2018.
+
+\bibitem[Fujimoto et~al.(2019)Fujimoto, Meger, and Precup]{fujimoto2019}
+Scott Fujimoto, David Meger, and Doina Precup.
+\newblock Off-policy deep reinforcement learning without exploration.
+\newblock In \emph{Proceedings of the 36th International Conference on Machine
+  Learning}, volume~97 of \emph{Proceedings of Machine Learning Research},
+  pages 2052--2062. PMLR, 2019.
+
+\bibitem[Glasserman(2003)]{glasserman2003}
+Paul Glasserman.
+\newblock \emph{Monte Carlo Methods in Financial Engineering}.
+\newblock Stochastic Modelling and Applied Probability. Springer, 2003.
+\newblock \doi{10.1007/978-0-387-21617-1}.
+
+\bibitem[Glickman and Stern(1998)]{glickman1998}
+Mark~E Glickman and Hal~S Stern.
+\newblock A state-space model for national football league scores.
+\newblock \emph{Journal of the American Statistical Association}, 93\penalty0
+  (441):\penalty0 25--35, 1998.
+
+\bibitem[Gneiting and Raftery(2007)]{gneiting2007}
+Tilmann Gneiting and Adrian~E. Raftery.
+\newblock Strictly proper scoring rules, prediction, and estimation.
+\newblock \emph{Journal of the American Statistical Association}, 102\penalty0
+  (477):\penalty0 359--378, 2007.
+\newblock \doi{10.1198/016214506000001437}.
+
+\bibitem[Haarnoja et~al.(2018)Haarnoja, Zhou, Abbeel, and
+  Levine]{haarnoja2018sac}
+Tuomas Haarnoja, Aurick Zhou, Pieter Abbeel, and Sergey Levine.
+\newblock Soft actor-critic: Off-policy maximum entropy deep reinforcement
+  learning with a stochastic actor.
+\newblock In \emph{Proceedings of the 35th International Conference on Machine
+  Learning}, volume~80 of \emph{Proceedings of Machine Learning Research},
+  pages 1861--1870. PMLR, 2018.
+
+\bibitem[Harville(1980)]{harville1980}
+David~A Harville.
+\newblock Predictions for national football league games via linear-model
+  methodology.
+\newblock \emph{Journal of the American Statistical Association}, 75\penalty0
+  (372):\penalty0 516--524, 1980.
+
+\bibitem[Jiang and Li(2016)]{jiang2016}
+Nan Jiang and Lihong Li.
+\newblock Doubly robust off-policy value evaluation for reinforcement learning.
+\newblock In \emph{Proceedings of the 33rd International Conference on Machine
+  Learning}, volume~48 of \emph{Proceedings of Machine Learning Research},
+  pages 652--661. PMLR, 2016.
+
+\bibitem[Joe(1997)]{joe1997}
+Harry Joe.
+\newblock \emph{Multivariate Models and Multivariate Dependence Concepts}.
+\newblock Chapman and Hall/CRC, 1997.
+\newblock \doi{10.1201/9780367803896}.
+
+\bibitem[Karlis and Ntzoufras(2003)]{karlis2003}
+Dimitris Karlis and Ioannis Ntzoufras.
+\newblock Analysis of sports data by using bivariate poisson models.
+\newblock \emph{Journal of the Royal Statistical Society: Series D (The
+  Statistician)}, 52\penalty0 (3):\penalty0 381--393, 2003.
+
+\bibitem[Kelly(1956)]{kelly1956}
+J.~L. Kelly.
+\newblock A new interpretation of information rate.
+\newblock \emph{Bell System Technical Journal}, 35\penalty0 (4):\penalty0
+  917--926, 1956.
+\newblock \doi{10.1002/j.1538-7305.1956.tb03809.x}.
+
+\bibitem[Koopman et~al.(2015)Koopman, Lit, and Lucas]{koopman2015}
+Siem~Jan Koopman, Roman Lit, and André Lucas.
+\newblock Dynamic bivariate poisson models for analysing and forecasting match
+  results in the english premier league.
+\newblock \emph{Journal of the Royal Statistical Society: Series A},
+  178\penalty0 (1):\penalty0 167--186, 2015.
+
+\bibitem[Kostrikov et~al.(2021)Kostrikov, Nair, and Levine]{kostrikov2021iql}
+Ilya Kostrikov, Ashvin Nair, and Sergey Levine.
+\newblock Offline reinforcement learning with implicit q-learning.
+\newblock \emph{arXiv preprint arXiv:2110.06169}, 2021.
+
+\bibitem[Kumar et~al.(2019)Kumar, Fu, Soh, Tucker, and Levine]{kumar2019bear}
+Aviral Kumar, Justin Fu, George Soh, George Tucker, and Sergey Levine.
+\newblock Stabilizing off-policy q-learning via bootstrapping error reduction.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~32, 2019.
+
+\bibitem[Kumar et~al.(2020)Kumar, Zhou, Tucker, and Levine]{kumar2020}
+Aviral Kumar, Aurick Zhou, George Tucker, and Sergey Levine.
+\newblock Conservative q-learning for offline reinforcement learning.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~33, 2020.
+
+\bibitem[Levine et~al.(2020)Levine, Kumar, Tucker, and Fu]{levine2020}
+Sergey Levine, Aviral Kumar, George Tucker, and Justin Fu.
+\newblock Offline reinforcement learning: Tutorial, review, and perspectives on
+  open problems.
+\newblock \emph{arXiv preprint arXiv:2005.01643}, 2020.
+
+\bibitem[Levitt(2004)]{levitt2004}
+Steven~D Levitt.
+\newblock Why are gambling markets organised so differently from financial
+  markets?
+\newblock \emph{The Economic Journal}, 114\penalty0 (495):\penalty0 223--246,
+  2004.
+
+\bibitem[Lock and Nettleton(2014)]{lock2014}
+Eric Lock and Dan Nettleton.
+\newblock Using random forests to estimate win probability before each play of
+  an nfl game.
+\newblock \emph{Journal of Quantitative Analysis in Sports}, 10\penalty0
+  (2):\penalty0 197--205, 2014.
+
+\bibitem[Maher(1982)]{maher1982}
+M.~J. Maher.
+\newblock Modelling association football scores.
+\newblock \emph{Applied Statistics}, 1982.
+
+\bibitem[Mnih et~al.(2015)Mnih, Kavukcuoglu, Silver, et~al.]{mnih2015}
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et~al.
+\newblock Human-level control through deep reinforcement learning.
+\newblock \emph{Nature}, 518\penalty0 (7540):\penalty0 529--533, 2015.
+\newblock \doi{10.1038/nature14236}.
+
+\bibitem[Nair et~al.(2020)Nair, Dalal, Gupta, and Levine]{nair2020awac}
+Ashvin Nair, Murtaza Dalal, Abhishek Gupta, and Sergey Levine.
+\newblock Awac: Accelerating online reinforcement learning with offline
+  datasets.
+\newblock \emph{arXiv preprint arXiv:2006.09359}, 2020.
+
+\bibitem[Nelsen(2006)]{nelsen2006}
+Roger~B. Nelsen.
+\newblock \emph{An Introduction to Copulas}.
+\newblock Springer, 2 edition, 2006.
+\newblock \doi{10.1007/0-387-28678-0}.
+
+\bibitem[Nichols(2014)]{nichols2014}
+Mark~W Nichols.
+\newblock Time zones and team performance in the nfl, 2014.
+\newblock URL \url{https://doi.org/10.1177/1527002513516905}.
+\newblock Shows west-to-east travel reduces win probability.
+
+\bibitem[Rockafellar and Uryasev(2000)]{rockafellar2000}
+R.~Tyrrell Rockafellar and Stanislav Uryasev.
+\newblock Optimization of conditional value-at-risk.
+\newblock \emph{Journal of Banking and Finance}, 24\penalty0 (7):\penalty0
+  1443--1471, 2000.
+\newblock \doi{10.1016/S0378-4266(00)00071-8}.
+
+\bibitem[Sauer(1998)]{sauer1998}
+Raymond~D Sauer.
+\newblock The economics of wagering markets.
+\newblock \emph{Journal of Economic Literature}, 36\penalty0 (4):\penalty0
+  2021--2064, 1998.
+
+\bibitem[Schaul et~al.(2016)Schaul, Quan, Antonoglou, and
+  Silver]{schaul2016per}
+Tom Schaul, John Quan, Ioannis Antonoglou, and David Silver.
+\newblock Prioritized experience replay.
+\newblock \emph{arXiv preprint arXiv:1511.05952}, 2016.
+
+\bibitem[Schulman et~al.(2015)Schulman, Levine, Moritz, Jordan, and
+  Abbeel]{schulman2015trpo}
+John Schulman, Sergey Levine, Philipp Moritz, Michael~I. Jordan, and Pieter
+  Abbeel.
+\newblock Trust region policy optimization.
+\newblock \emph{arXiv preprint arXiv:1502.05477}, 2015.
+
+\bibitem[Schulman et~al.(2016)Schulman, Moritz, Levine, Jordan, and
+  Abbeel]{schulman2016gae}
+John Schulman, Philipp Moritz, Sergey Levine, Michael~I. Jordan, and Pieter
+  Abbeel.
+\newblock High-dimensional continuous control using generalized advantage
+  estimation.
+\newblock \emph{arXiv preprint arXiv:1506.02438}, 2016.
+
+\bibitem[Schulman et~al.(2017)Schulman, Wolski, Dhariwal, Radford, and
+  Klimov]{schulman2017ppo}
+John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov.
+\newblock Proximal policy optimization algorithms.
+\newblock \emph{arXiv preprint arXiv:1707.06347}, 2017.
+
+\bibitem[Skellam(1946)]{skellam1946}
+J.~G. Skellam.
+\newblock The frequency distribution of the difference between two poisson
+  variates.
+\newblock \emph{Journal of the Royal Statistical Society}, 1946.
+
+\bibitem[Stern(1991)]{stern1991}
+Hal~S Stern.
+\newblock On the probability of winning a football game.
+\newblock \emph{The American Statistician}, 45\penalty0 (3):\penalty0 179--183,
+  1991.
+
+\bibitem[Sutton and Barto(2018)]{sutton2018}
+Richard~S. Sutton and Andrew~G. Barto.
+\newblock \emph{Reinforcement Learning: An Introduction}.
+\newblock MIT Press, 2 edition, 2018.
+
+\bibitem[Szalkowski and Nelson(2012)]{szalkowski2012}
+Anna Szalkowski and Jordan Nelson.
+\newblock The collective wisdom of nfl betting lines.
+\newblock \emph{arXiv preprint arXiv:1201.0309}, 2012.
+
+\bibitem[Tamar et~al.(2015)Tamar, Glassner, and Mannor]{tamar2015cvar}
+Aviv Tamar, Yonatan Glassner, and Shie Mannor.
+\newblock Policy gradients with variance related risk criteria.
+\newblock In \emph{Proceedings of the 30th Conference on Neural Information
+  Processing Systems}, pages 1651--1659, 2015.
+
+\bibitem[Thomas et~al.(2015)Thomas, Theocharous, and Ghavamzadeh]{thomas2015}
+Philip Thomas, Georgios Theocharous, and Mohammad Ghavamzadeh.
+\newblock High-confidence off-policy evaluation.
+\newblock \emph{Proceedings of the AAAI Conference on Artificial Intelligence},
+  29\penalty0 (1), 2015.
+\newblock \doi{10.1609/aaai.v29i1.9541}.
+
+\bibitem[van Hasselt et~al.(2016)van Hasselt, Guez, and Silver]{vanhasselt2016}
+Hado van Hasselt, Arthur Guez, and David Silver.
+\newblock Deep reinforcement learning with double q-learning.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, 2016.
+
+\bibitem[Wang et~al.(2016)Wang, Schaul, Hessel, Van~Hasselt, Lanctot, and
+  De~Freitas]{wang2016dueling}
+Ziyu Wang, Tom Schaul, Matteo Hessel, Hado Van~Hasselt, Marc Lanctot, and Nando
+  De~Freitas.
+\newblock Dueling network architectures for deep reinforcement learning.
+\newblock \emph{arXiv preprint arXiv:1511.06581}, 2016.
+
+\bibitem[Wong(2001)]{wong2001sharp}
+Stanford Wong.
+\newblock \emph{Sharp Sports Betting}.
+\newblock Pi Yee Press, 2001.
+
+\bibitem[Wu et~al.(2019)Wu, Tucker, and Nachum]{wu2019brac}
+Yifan Wu, George Tucker, and Ofir Nachum.
+\newblock Behavior regularized actor-critic.
+\newblock \emph{arXiv preprint arXiv:1910.01708}, 2019.
+
+\end{thebibliography}

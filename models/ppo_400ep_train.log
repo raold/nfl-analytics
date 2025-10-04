@@ -1,0 +1,50 @@
+Loading dataset from data/rl_logged.csv...
+Loaded 1408 samples
+Training PPO agent for 400 epochs on cpu...
+Epoch 10/400 | Reward: 0.1031 | Action: 0.6867
+Epoch 20/400 | Reward: 0.1038 | Action: 0.6884
+Epoch 30/400 | Reward: 0.1158 | Action: 0.7558
+Epoch 40/400 | Reward: 0.1175 | Action: 0.7872
+Epoch 50/400 | Reward: 0.1212 | Action: 0.8174
+Epoch 60/400 | Reward: 0.1190 | Action: 0.7722
+Epoch 70/400 | Reward: 0.1159 | Action: 0.7238
+Epoch 80/400 | Reward: 0.1240 | Action: 0.7801
+Epoch 90/400 | Reward: 0.1275 | Action: 0.7939
+Epoch 100/400 | Reward: 0.1328 | Action: 0.7805
+Epoch 110/400 | Reward: 0.1282 | Action: 0.6835
+Epoch 120/400 | Reward: 0.1327 | Action: 0.7019
+Epoch 130/400 | Reward: 0.1379 | Action: 0.8263
+Epoch 140/400 | Reward: 0.1365 | Action: 0.8133
+Epoch 150/400 | Reward: 0.1367 | Action: 0.8219
+Epoch 160/400 | Reward: 0.1371 | Action: 0.8240
+Epoch 170/400 | Reward: 0.1356 | Action: 0.8009
+Epoch 180/400 | Reward: 0.1336 | Action: 0.8341
+Epoch 190/400 | Reward: 0.1296 | Action: 0.7337
+Epoch 200/400 | Reward: 0.1301 | Action: 0.7307
+Epoch 210/400 | Reward: 0.1351 | Action: 0.7317
+Epoch 220/400 | Reward: 0.1316 | Action: 0.7304
+Epoch 230/400 | Reward: 0.1220 | Action: 0.6684
+Epoch 240/400 | Reward: 0.1279 | Action: 0.7104
+Epoch 250/400 | Reward: 0.1372 | Action: 0.7846
+Epoch 260/400 | Reward: 0.1378 | Action: 0.7904
+Epoch 270/400 | Reward: 0.1405 | Action: 0.8311
+Epoch 280/400 | Reward: 0.1388 | Action: 0.6970
+Epoch 290/400 | Reward: 0.1382 | Action: 0.6495
+Epoch 300/400 | Reward: 0.1410 | Action: 0.6600
+Epoch 310/400 | Reward: 0.1410 | Action: 0.6628
+Epoch 320/400 | Reward: 0.1404 | Action: 0.7297
+Epoch 330/400 | Reward: 0.1391 | Action: 0.7679
+Epoch 340/400 | Reward: 0.1380 | Action: 0.7476
+Epoch 350/400 | Reward: 0.1438 | Action: 0.6943
+Epoch 360/400 | Reward: 0.1426 | Action: 0.7084
+Epoch 370/400 | Reward: 0.1420 | Action: 0.6282
+Epoch 380/400 | Reward: 0.1420 | Action: 0.6481
+Epoch 390/400 | Reward: 0.1367 | Action: 0.6366
+Epoch 400/400 | Reward: 0.1324 | Action: 0.5773
+
+Saving model to models/ppo_model_400ep.pth...
+Training log saved to models/ppo_training_log.json
+
+Training complete!
+  Final avg reward: 0.1324
+  Final avg action: 0.5773
