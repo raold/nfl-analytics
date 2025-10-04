@@ -13,10 +13,13 @@ import math
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 import numpy as np
 from performance_tracker import PerformanceTracker
+from hardware.task_router import task_router
 from scipy import stats
+from sync.machine_manager import get_machine_id
 from task_queue import TaskPriority, TaskQueue
 
 logging.basicConfig(level=logging.INFO)
@@ -345,14 +348,17 @@ class AdaptiveScheduler:
         self.bandit.total_pulls = row["total"] if row and row["total"] else 0
 
     def get_next_task_bandit(self) -> dict | None:
-        """Get next task using multi-armed bandit optimization."""
+        """Get next task using multi-armed bandit optimization with hardware-aware routing."""
+        current_machine_id = get_machine_id()
 
-        # Get all pending tasks
+        # Get all pending tasks, excluding deferred ones for this machine
         cursor = self.queue.conn.execute(
             """
             SELECT * FROM tasks
             WHERE status = 'pending'
-        """
+            AND (deferred = FALSE OR machine_id != ? OR machine_id IS NULL)
+        """,
+            (current_machine_id,),
         )
 
         pending_tasks = []
@@ -364,43 +370,162 @@ class AdaptiveScheduler:
         if not pending_tasks:
             return None
 
-        # Create bandit arms for each pending task
+        # Filter tasks based on hardware suitability and update hardware scores
+        suitable_tasks = []
+        for task in pending_tasks:
+            # Get hardware score for this task
+            hardware_score = task_router.score_machine_for_task(task["type"], task["config"])
+            defer_info = task_router.should_defer_task(task["type"], task["config"])
+
+            # Update task with hardware information
+            self.queue.conn.execute(
+                """
+                UPDATE tasks
+                SET hardware_score = ?, preferred_hardware = ?
+                WHERE id = ?
+            """,
+                (
+                    hardware_score.total_score,
+                    defer_info.get("preferred_hardware"),
+                    task["id"],
+                ),
+            )
+
+            # Defer task if hardware is inadequate
+            if defer_info["should_defer"]:
+                self.queue.conn.execute(
+                    """
+                    UPDATE tasks
+                    SET deferred = TRUE, machine_id = ?
+                    WHERE id = ?
+                """,
+                    (current_machine_id, task["id"]),
+                )
+                logger.info(f"Deferred task {task['name']} - {defer_info['defer_reason']}")
+                continue
+
+            # Optimize task configuration for current hardware
+            optimized_config = task_router.optimize_task_config(task["type"], task["config"])
+            if optimized_config != task["config"]:
+                self.queue.conn.execute(
+                    """
+                    UPDATE tasks
+                    SET config = ?
+                    WHERE id = ?
+                """,
+                    (json.dumps(optimized_config), task["id"]),
+                )
+                task["config"] = optimized_config
+
+            task["hardware_score"] = hardware_score.total_score
+            suitable_tasks.append(task)
+
+        self.queue.conn.commit()
+
+        if not suitable_tasks:
+            logger.info("No suitable tasks for current hardware")
+            return None
+
+        # Create bandit arms for suitable tasks, weighted by hardware score
         available_arms = []
         task_arm_mapping = {}
 
-        for task in pending_tasks:
+        for task in suitable_tasks:
             arm = self.bandit.get_or_create_arm(task["type"], task["config"])
+            # Boost arm selection probability based on hardware score
+            arm._hardware_boost = task["hardware_score"]
             available_arms.append(arm)
             task_arm_mapping[arm.arm_id] = task
 
-        # Select arm using bandit strategy
-        selected_arm = self.bandit.select_arm(available_arms)
+        # Select arm using bandit strategy (with hardware boost)
+        selected_arm = self._select_hardware_aware_arm(available_arms)
         selected_task = task_arm_mapping[selected_arm.arm_id]
 
         # Log selection reasoning
+        hardware_score = selected_task.get("hardware_score", 0.5)
         logger.info(
             f"""
-        Bandit Task Selection ({self.bandit_strategy.value}):
+        Hardware-Aware Bandit Selection ({self.bandit_strategy.value}):
           Task: {selected_task['name']}
           Arm ID: {selected_arm.arm_id}
           Mean Reward: {selected_arm.mean_reward:.3f}
+          Hardware Score: {hardware_score:.3f}
           Pulls: {selected_arm.n_pulls}
           Total Pulls: {self.bandit.total_pulls}
         """
         )
 
-        # Mark task as running
+        # Mark task as running with machine identification
         self.queue.conn.execute(
             """
             UPDATE tasks
-            SET status = 'running', started_at = CURRENT_TIMESTAMP
+            SET status = 'running', started_at = CURRENT_TIMESTAMP, machine_id = ?
             WHERE id = ?
         """,
-            (selected_task["id"],),
+            (current_machine_id, selected_task["id"]),
         )
         self.queue.conn.commit()
 
         return selected_task
+
+    def _select_hardware_aware_arm(self, arms: list[BanditArm]) -> BanditArm:
+        """Select arm with hardware score boost applied to bandit algorithm."""
+        if not arms:
+            raise ValueError("No available arms")
+
+        # Apply hardware boost to UCB1 or other strategies
+        if self.bandit.strategy == BanditStrategy.UCB1:
+
+            def hardware_boosted_ucb_value(arm: BanditArm) -> float:
+                if arm.n_pulls == 0:
+                    # Boost unplayed arms by hardware score
+                    hardware_boost = getattr(arm, "_hardware_boost", 0.5)
+                    return float("inf") * hardware_boost
+
+                confidence_bonus = self.bandit.c * math.sqrt(
+                    math.log(max(self.bandit.total_pulls, 1)) / arm.n_pulls
+                )
+                hardware_boost = getattr(arm, "_hardware_boost", 0.5)
+
+                # Boost base reward by hardware suitability
+                boosted_reward = arm.mean_reward * (0.7 + 0.3 * hardware_boost)
+                return boosted_reward + confidence_bonus
+
+            return max(arms, key=hardware_boosted_ucb_value)
+
+        elif self.bandit.strategy == BanditStrategy.EPSILON_GREEDY:
+            if np.random.random() < self.bandit.epsilon:
+                # Even in exploration, bias toward hardware-suitable tasks
+                weights = [getattr(arm, "_hardware_boost", 0.5) for arm in arms]
+                weights = np.array(weights) / sum(weights)
+                return np.random.choice(arms, p=weights)
+            else:
+                # Exploit with hardware boost
+                def boosted_reward(arm: BanditArm) -> float:
+                    hardware_boost = getattr(arm, "_hardware_boost", 0.5)
+                    return arm.mean_reward * (0.8 + 0.2 * hardware_boost)
+
+                return max(arms, key=boosted_reward)
+
+        elif self.bandit.strategy == BanditStrategy.THOMPSON_SAMPLING:
+            # Sample with hardware score influence
+            def hardware_influenced_sample(arm: BanditArm) -> float:
+                if arm.n_pulls == 0:
+                    hardware_boost = getattr(arm, "_hardware_boost", 0.5)
+                    return np.random.beta(1 + hardware_boost, 1)
+
+                # Adjust prior based on hardware score
+                hardware_boost = getattr(arm, "_hardware_boost", 0.5)
+                successes = max(1, arm.total_reward + hardware_boost)
+                failures = max(1, arm.n_pulls - arm.total_reward + (1 - hardware_boost))
+                return np.random.beta(successes, failures)
+
+            samples = [(arm, hardware_influenced_sample(arm)) for arm in arms]
+            return max(samples, key=lambda x: x[1])[0]
+
+        else:
+            # Fallback to original bandit selection
+            return self.bandit.select_arm(arms)
 
     def report_task_completion(
         self, task_id: str, performance_metrics: dict[str, float], compute_hours: float
@@ -583,7 +708,7 @@ class AdaptiveScheduler:
             for arm_id, rewards in historical_data.items():
                 if ":" in arm_id:
                     task_type, config_hash = arm_id.split(":", 1)
-                    arm = sim_bandit.get_or_create_arm(task_type, {"hash": config_hash})
+                    sim_bandit.get_or_create_arm(task_type, {"hash": config_hash})
 
             total_reward = 0
             total_regret = 0

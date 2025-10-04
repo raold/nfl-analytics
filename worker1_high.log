@@ -1,0 +1,60 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+INFO:worker:Apple Silicon MPS available
+INFO:worker:Worker initialized with device: mps, intensity: high
+INFO:redis_worker:🫀 Initialized Redis compute worker for machine worker_1_high
+INFO:redis_worker:🚀 Starting Redis compute worker
+INFO:redis_task_queue:✅ Connected to Redis at localhost:6379
+INFO:redis_task_queue:🖥️ Registered machine worker_1_high with profile: Standard GPU
+INFO:redis_worker:✅ Connected to Redis and registered machine capabilities
+INFO:redis_worker:   Machine ID: be8b0d1a5be3
+INFO:redis_worker:   CPU: 10 cores
+INFO:redis_worker:   Memory: 32.0 GB
+INFO:redis_worker:   GPU: Standard GPU (8.0 GB)
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_541eb276 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering
+INFO:redis_worker:Engineering features for 40,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_541eb276 on machine worker_1_high
+INFO:redis_worker:✅ Completed task feature_engineering_541eb276
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_e7e96750 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Test CPU Task (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Test CPU Task
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_e7e96750 on machine worker_1_high
+INFO:redis_worker:✅ Completed task feature_engineering_e7e96750
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_459e8d33 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Test CPU Task (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Test CPU Task
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_459e8d33 on machine worker_1_high
+INFO:redis_worker:✅ Completed task feature_engineering_459e8d33
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_ad0ebc3b from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo Simulation (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo Simulation
+INFO:redis_worker:Running 10,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_ad0ebc3b on machine worker_1_high
+INFO:redis_worker:✅ Completed task monte_carlo_ad0ebc3b
+INFO:redis_task_queue:🎯 Claimed task matrix_computation_046a7f10 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Matrix Computation (type: matrix_computation)
+INFO:redis_worker:🔥 Processing task: Matrix Computation
+INFO:redis_worker:Computing 2000x2000 matrix operations...
+INFO:redis_task_queue:✅ Completed task matrix_computation_046a7f10 on machine worker_1_high
+INFO:redis_worker:✅ Completed task matrix_computation_046a7f10
+INFO:redis_task_queue:🎯 Claimed task optimization_ca791511 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Optimization Task (type: optimization)
+INFO:redis_worker:🔥 Processing task: Optimization Task
+INFO:redis_worker:Optimizing 100-dimensional function...
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:388: RuntimeWarning: overflow encountered in scalar multiply
+  grad[i] += -400 * x[i] * (x[i+1] - x[i]**2) - 2 * (1 - x[i])
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:388: RuntimeWarning: overflow encountered in scalar power
+  grad[i] += -400 * x[i] * (x[i+1] - x[i]**2) - 2 * (1 - x[i])
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:388: RuntimeWarning: invalid value encountered in scalar subtract
+  grad[i] += -400 * x[i] * (x[i+1] - x[i]**2) - 2 * (1 - x[i])
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:389: RuntimeWarning: overflow encountered in scalar power
+  grad[i+1] += 200 * (x[i+1] - x[i]**2)
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:389: RuntimeWarning: invalid value encountered in scalar subtract
+  grad[i+1] += 200 * (x[i+1] - x[i]**2)
+/Users/dro/rice/nfl-analytics/py/compute/redis_worker.py:388: RuntimeWarning: invalid value encountered in scalar add
+  grad[i] += -400 * x[i] * (x[i+1] - x[i]**2) - 2 * (1 - x[i])
+INFO:redis_task_queue:✅ Completed task optimization_ca791511 on machine worker_1_high
+INFO:redis_worker:✅ Completed task optimization_ca791511

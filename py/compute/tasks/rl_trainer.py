@@ -18,7 +18,7 @@ import torch.nn as nn
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from rl.dqn_agent import DQN
+from rl.dqn_agent import DQNAgent, QNetwork
 
 
 class RLTrainer:
@@ -64,10 +64,10 @@ class RLTrainer:
         # Initialize DQN
         state_dim = 6  # p_hat, market_prob, spread, total, epa_gap, edge
         action_dim = 4  # no-bet, small, medium, large
-        hidden_dim = config.get("hidden_dim", 128)
+        hidden_dims = config.get("hidden_dims", [128, 64, 32])  # List of hidden layer dimensions
 
-        model = DQN(state_dim, action_dim, hidden_dim).to(self.device)
-        target_model = DQN(state_dim, action_dim, hidden_dim).to(self.device)
+        model = QNetwork(state_dim, action_dim, hidden_dims).to(self.device)
+        target_model = QNetwork(state_dim, action_dim, hidden_dims).to(self.device)
         target_model.load_state_dict(model.state_dict())
 
         optimizer = torch.optim.Adam(model.parameters(), lr=config.get("lr", 1e-4))

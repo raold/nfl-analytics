@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  nfl-analytics:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: worker
+    container_name: nfl-analytics-worker
+    volumes:
+      # Mount Google Drive synced data directory
+      - ../data:/data
+      # Mount configuration
+      - ./config:/app/config
+      # Mount source code for development
+      - ../py:/app/py
+      - ../run_compute.py:/app/run_compute.py
+    environment:
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - MACHINE_ID=${MACHINE_ID:-auto}
+      - HARDWARE_PROFILE=${HARDWARE_PROFILE:-auto}
+      - PYTHONPATH=/app:/app/py:/app/py/compute
+      - NFL_ANALYTICS_ENV=${NFL_ANALYTICS_ENV:-development}
+    restart: unless-stopped
+    network_mode: host
+    # Enable GPU access if available
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Ensure data directory exists
+    depends_on:
+      - data-init
+
+  data-init:
+    image: alpine:latest
+    container_name: nfl-analytics-data-init
+    volumes:
+      - ../data:/data
+    command: >
+      sh -c "
+        mkdir -p /data/redis /data/results /data/checkpoints /data/logs /data/config &&
+        chown -R 1000:1000 /data &&
+        echo 'Data directories initialized'
+      "
+
+networks:
+  default:
+    name: nfl-analytics

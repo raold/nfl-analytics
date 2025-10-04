@@ -12,7 +12,6 @@ import platform
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 import psutil
 
@@ -28,8 +27,8 @@ class MachineInfo:
     cpu_count: int
     total_memory_gb: float
     has_gpu: bool
-    gpu_info: Optional[dict] = None
-    cpu_brand: Optional[str] = None
+    gpu_info: dict | None = None
+    cpu_brand: str | None = None
     is_macos_m_series: bool = False
     is_windows_nvidia: bool = False
 
@@ -39,7 +38,7 @@ class MachineManager:
 
     def __init__(self, cache_file: str = "machine_info.json"):
         self.cache_file = Path(cache_file)
-        self._machine_info: Optional[MachineInfo] = None
+        self._machine_info: MachineInfo | None = None
 
     def get_machine_info(self, force_refresh: bool = False) -> MachineInfo:
         """Get machine information, cached unless force_refresh=True."""
@@ -49,7 +48,7 @@ class MachineManager:
         # Try to load from cache first
         if not force_refresh and self.cache_file.exists():
             try:
-                with open(self.cache_file, "r") as f:
+                with open(self.cache_file) as f:
                     cached_data = json.load(f)
                     self._machine_info = MachineInfo(**cached_data)
                     return self._machine_info
@@ -95,7 +94,7 @@ class MachineManager:
 
         return MachineInfo(**system_info)
 
-    def _detect_gpu(self) -> Optional[dict]:
+    def _detect_gpu(self) -> dict | None:
         """Detect GPU information."""
         gpu_info = None
 
@@ -138,7 +137,7 @@ class MachineManager:
 
         return gpu_info
 
-    def _get_cpu_brand(self) -> Optional[str]:
+    def _get_cpu_brand(self) -> str | None:
         """Get CPU brand information."""
         try:
             if platform.system() == "Darwin":
@@ -163,7 +162,7 @@ class MachineManager:
                             return line.split("=", 1)[1].strip()
             else:
                 # Linux
-                with open("/proc/cpuinfo", "r") as f:
+                with open("/proc/cpuinfo") as f:
                     for line in f:
                         if line.startswith("model name"):
                             return line.split(":", 1)[1].strip()
@@ -176,7 +175,7 @@ class MachineManager:
         """Check if running on macOS with M-series chip."""
         return platform.system() == "Darwin" and platform.machine() in ["arm64", "arm"]
 
-    def _is_windows_nvidia(self, gpu_info: Optional[dict]) -> bool:
+    def _is_windows_nvidia(self, gpu_info: dict | None) -> bool:
         """Check if running on Windows with NVIDIA GPU."""
         return (
             platform.system() == "Windows"

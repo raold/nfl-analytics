@@ -9,6 +9,7 @@ state tracking, and progress monitoring.
 import json
 import logging
 import sqlite3
+import time
 import uuid
 from enum import Enum
 from pathlib import Path
@@ -47,9 +48,24 @@ class TaskQueue:
         self.conn.execute("PRAGMA synchronous=NORMAL")
         self.conn.execute("PRAGMA cache_size=10000")
         self.conn.execute("PRAGMA temp_store=memory")
+        self.conn.execute("PRAGMA busy_timeout=30000")  # 30 second timeout
         self.conn.commit()
 
         self._init_db()
+
+    def _execute_with_retry(self, operation, *args, max_retries=3, **kwargs):
+        """Execute database operation with retry logic for handling locks."""
+        for attempt in range(max_retries):
+            try:
+                return operation(*args, **kwargs)
+            except sqlite3.OperationalError as e:
+                if "database is locked" in str(e) and attempt < max_retries - 1:
+                    wait_time = (2 ** attempt) * 0.1  # Exponential backoff
+                    logger.warning(f"Database locked, retrying in {wait_time}s (attempt {attempt + 1}/{max_retries})")
+                    time.sleep(wait_time)
+                    continue
+                else:
+                    raise
 
     def _init_db(self):
         """Initialize database schema."""
@@ -71,7 +87,11 @@ class TaskQueue:
                 checkpoint_path TEXT,
                 estimated_hours REAL,
                 cpu_hours REAL DEFAULT 0.0,
-                gpu_hours REAL DEFAULT 0.0
+                gpu_hours REAL DEFAULT 0.0,
+                machine_id TEXT,
+                hardware_score REAL DEFAULT 0.5,
+                deferred BOOLEAN DEFAULT FALSE,
+                preferred_hardware TEXT
             );
 
             CREATE INDEX IF NOT EXISTS idx_status_priority
@@ -143,82 +163,97 @@ class TaskQueue:
 
     def get_next_task(self) -> dict[str, Any] | None:
         """Get the next available task based on priority and dependencies."""
-        # Find tasks that are ready to run (no pending dependencies)
-        cursor = self.conn.execute(
-            """
-            SELECT t.* FROM tasks t
-            WHERE t.status = ?
-            AND NOT EXISTS (
-                SELECT 1 FROM task_dependencies td
-                JOIN tasks dep ON td.depends_on = dep.id
-                WHERE td.task_id = t.id
-                AND dep.status != ?
-            )
-            ORDER BY t.priority ASC, t.created_at ASC
-            LIMIT 1
-        """,
-            (TaskStatus.PENDING.value, TaskStatus.COMPLETED.value),
-        )
-
-        row = cursor.fetchone()
-        if row:
-            task = dict(row)
-            task["config"] = json.loads(task["config"])
-
-            # Mark as running
-            self.conn.execute(
+        def _get_next_operation():
+            # Find tasks that are ready to run (no pending dependencies)
+            cursor = self.conn.execute(
                 """
-                UPDATE tasks
-                SET status = ?, started_at = CURRENT_TIMESTAMP
-                WHERE id = ?
+                SELECT t.* FROM tasks t
+                WHERE t.status = ?
+                AND NOT EXISTS (
+                    SELECT 1 FROM task_dependencies td
+                    JOIN tasks dep ON td.depends_on = dep.id
+                    WHERE td.task_id = t.id
+                    AND dep.status != ?
+                )
+                ORDER BY t.priority ASC, t.created_at ASC
+                LIMIT 1
             """,
-                (TaskStatus.RUNNING.value, task["id"]),
+                (TaskStatus.PENDING.value, TaskStatus.COMPLETED.value),
             )
-            self.conn.commit()
 
-            logger.info(f"Starting task: {task['name']} ({task['id']})")
-            return task
-        return None
+            row = cursor.fetchone()
+            if row:
+                task = dict(row)
+                task["config"] = json.loads(task["config"])
+
+                # Mark as running
+                self.conn.execute(
+                    """
+                    UPDATE tasks
+                    SET status = ?, started_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                """,
+                    (TaskStatus.RUNNING.value, task["id"]),
+                )
+                self.conn.commit()
+
+                logger.info(f"Starting task: {task['name']} ({task['id']})")
+                return task
+            return None
+
+        return self._execute_with_retry(_get_next_operation)
 
     def update_progress(self, task_id: str, progress: float, checkpoint_path: str | None = None):
         """Update task progress and optional checkpoint."""
-        self.conn.execute(
-            """
-            UPDATE tasks
-            SET progress = ?, checkpoint_path = ?
-            WHERE id = ?
-        """,
-            (progress, checkpoint_path, task_id),
-        )
-        self.conn.commit()
+        def _update_operation():
+            self.conn.execute(
+                """
+                UPDATE tasks
+                SET progress = ?, checkpoint_path = ?
+                WHERE id = ?
+            """,
+                (progress, checkpoint_path, task_id),
+            )
+            self.conn.commit()
+
+        self._execute_with_retry(_update_operation)
 
     def complete_task(
         self, task_id: str, result: dict[str, Any], cpu_hours: float = 0, gpu_hours: float = 0
     ):
         """Mark task as completed with results."""
-        self.conn.execute(
-            """
-            UPDATE tasks
-            SET status = ?, result = ?, completed_at = CURRENT_TIMESTAMP,
-                progress = 1.0, cpu_hours = ?, gpu_hours = ?
-            WHERE id = ?
-        """,
-            (TaskStatus.COMPLETED.value, json.dumps(result), cpu_hours, gpu_hours, task_id),
-        )
-        self.conn.commit()
+        # Convert any non-JSON serializable types in result
+        serializable_result = self._make_json_serializable(result)
+
+        def _complete_operation():
+            self.conn.execute(
+                """
+                UPDATE tasks
+                SET status = ?, result = ?, completed_at = CURRENT_TIMESTAMP,
+                    progress = 1.0, cpu_hours = ?, gpu_hours = ?
+                WHERE id = ?
+            """,
+                (TaskStatus.COMPLETED.value, json.dumps(serializable_result), cpu_hours, gpu_hours, task_id),
+            )
+            self.conn.commit()
+
+        self._execute_with_retry(_complete_operation)
         logger.info(f"Completed task {task_id}")
 
     def fail_task(self, task_id: str, error_msg: str):
         """Mark task as failed with error message."""
-        self.conn.execute(
-            """
-            UPDATE tasks
-            SET status = ?, error_msg = ?, completed_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        """,
-            (TaskStatus.FAILED.value, error_msg, task_id),
-        )
-        self.conn.commit()
+        def _fail_operation():
+            self.conn.execute(
+                """
+                UPDATE tasks
+                SET status = ?, error_msg = ?, completed_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """,
+                (TaskStatus.FAILED.value, error_msg, task_id),
+            )
+            self.conn.commit()
+
+        self._execute_with_retry(_fail_operation)
         logger.error(f"Task {task_id} failed: {error_msg}")
 
     def get_queue_status(self) -> dict[str, Any]:
@@ -299,6 +334,20 @@ class TaskQueue:
             (cpu_usage, gpu_usage, memory_usage, temperature, active),
         )
         self.conn.commit()
+
+    def _make_json_serializable(self, obj: Any) -> Any:
+        """Convert object to JSON serializable format."""
+        if isinstance(obj, dict):
+            return {k: self._make_json_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self._make_json_serializable(item) for item in obj]
+        elif isinstance(obj, tuple):
+            return [self._make_json_serializable(item) for item in obj]
+        elif isinstance(obj, (bool, int, float, str, type(None))):
+            return obj
+        else:
+            # Convert other types to string
+            return str(obj)
 
     def close(self):
         """Close database connection."""

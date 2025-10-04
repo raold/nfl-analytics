@@ -12,6 +12,12 @@ psycopg[binary]
 python-dotenv
 requests
 pytest
+
+# Redis-based distributed computing
+redis>=4.5.0
+aioredis>=2.0.0
+psutil>=5.9.0
+
 # PyTorch for DQN agent - install separately based on platform:
 # Apple Silicon (MPS):  pip install torch torchvision torchaudio
 # CUDA (Linux/Windows): pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

@@ -24,6 +24,9 @@ dependencies = [
     "click>=8.1.0",
     "rich>=13.7.0",
     "tqdm>=4.66.0",
+    "redis>=4.5.0",
+    "aioredis>=2.0.0",
+    "psutil>=5.9.0",
 ]
 
 [project.optional-dependencies]
@@ -52,6 +55,9 @@ research = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["py", "R"]
 
 [tool.uv]
 dev-dependencies = []

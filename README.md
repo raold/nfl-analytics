@@ -135,9 +135,30 @@ python py/compute/statistics/reporting/quarto_generator.py \
   --output analysis/reports/statistical_analysis.qmd
 ```
 
-### 7. Distributed Compute System
+### 7. Distributed Compute System (Google Drive Sync)
 
-**Initialize and run the distributed compute system** for model training and optimization:
+**🆕 SETI@home-style distributed computing** across your MacBook M4 and Windows 4090 desktop via Google Drive synchronization:
+
+#### Setup Google Drive Sync
+1. **Move project to Google Drive**: Place `nfl-analytics/` folder in your Google Drive
+2. **Install Google Drive on both machines**: Ensure sync is enabled for the project folder
+3. **Verify sync**: Check that database files (`*.db`) sync between machines
+
+#### Hardware-Aware Task Routing
+The system automatically optimizes task assignment based on your hardware:
+
+**MacBook M4** (CPU-optimized):
+- Monte Carlo simulations (CPU-intensive)
+- State-space parameter sweeps
+- Statistical analysis tasks
+- Unified memory advantages
+
+**Windows 4090** (GPU-optimized):
+- RL training (DQN/PPO with CUDA)
+- XGBoost GPU training
+- Large batch processing
+
+#### Initialize and Run
 ```bash
 # Initialize compute queue with standard tasks
 python run_compute.py --init
@@ -145,18 +166,47 @@ python run_compute.py --init
 # Start adaptive compute with bandit optimization
 python run_compute.py --intensity medium
 
-# Check performance scoreboard
+# Check performance scoreboard and machine status
 python run_compute.py --scoreboard
 
 # Web dashboard with live monitoring
 python run_compute.py --dashboard
+
+# View hardware routing report
+python -c "from py.compute.hardware.task_router import task_router; print(task_router.get_routing_report())"
 ```
 
-Available compute tasks:
-- **RL Training**: DQN/PPO with 500-1000 epochs across multiple seeds
-- **State-Space Models**: Parameter sweeps with Kalman smoothing
-- **Monte Carlo**: Large-scale simulations (100K-1M scenarios)
+#### Sync Safety Features
+- **SQLite WAL mode**: Prevents database corruption during sync
+- **Automatic conflict resolution**: Detects and merges Google Drive conflicts
+- **Machine identification**: Tracks which device completed each task
+- **File locking**: Cross-platform locks prevent concurrent access issues
+
+#### Available Compute Tasks
+- **RL Training**: DQN/PPO with 500-1000 epochs (auto-routed to 4090)
+- **State-Space Models**: Parameter sweeps with Kalman smoothing (auto-routed to M4)
+- **Monte Carlo**: Large-scale simulations 100K-1M scenarios (auto-routed to M4)
 - **Statistical Testing**: Automated A/B testing and significance analysis
+- **OPE Gates**: Off-policy evaluation with robustness grids
+- **GLM Calibration**: Cross-validated probability calibration
+
+#### Monitoring Distributed State
+```bash
+# Check task distribution across machines
+python -c "
+from py.compute.task_queue import TaskQueue
+queue = TaskQueue()
+stats = queue.get_queue_status()
+print('Task distribution:', stats)
+"
+
+# Check for sync conflicts
+python -c "
+from py.compute.sync.conflict_resolver import conflict_resolver
+conflicts = conflict_resolver.detect_database_conflicts('compute_queue.db')
+print('Sync conflicts:', conflicts)
+"
+```
 
 ## Testing
 
@@ -246,8 +296,14 @@ nfl-analytics/
 │   │   │   ├── power_analysis.py        # Sample size & power
 │   │   │   ├── experimental_design/     # A/B testing framework
 │   │   │   └── reporting/               # Quarto/LaTeX integration
-│   │   ├── task_queue.py            # Priority-based task management
-│   │   ├── adaptive_scheduler.py    # Multi-armed bandit optimization
+│   │   ├── sync/               # 🆕 Google Drive sync infrastructure
+│   │   │   ├── machine_manager.py       # Hardware detection & fingerprinting
+│   │   │   ├── file_locks.py           # Cross-platform file locking
+│   │   │   └── conflict_resolver.py     # Sync conflict resolution
+│   │   ├── hardware/           # 🆕 Hardware-aware task routing
+│   │   │   └── task_router.py          # M4 vs 4090 task optimization
+│   │   ├── task_queue.py            # Priority-based task management (WAL mode)
+│   │   ├── adaptive_scheduler.py    # Multi-armed bandit + hardware routing
 │   │   ├── performance_tracker.py   # Statistical performance tracking
 │   │   └── compute_worker.py        # Distributed worker system
 │   ├── features/           # Feature engineering
