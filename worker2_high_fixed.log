@@ -1,0 +1,10 @@
+INFO:worker:Apple Silicon MPS available
+INFO:worker:Worker initialized with device: mps, intensity: high
+INFO:redis_worker:🫀 Initialized Redis compute worker for machine None
+INFO:redis_worker:🚀 Starting Redis compute worker
+INFO:redis_task_queue:✅ Connected to Redis at localhost:6379
+INFO:redis_task_queue:🖥️ Registered machine adb3ee115200 with profile: CPU
+INFO:redis_worker:✅ Connected to Redis and registered machine capabilities
+INFO:redis_worker:   Machine ID: adb3ee115200
+INFO:redis_worker:   CPU: 10 cores
+INFO:redis_worker:   Memory: 32.0 GB

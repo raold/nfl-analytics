@@ -1,0 +1,12 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+INFO:worker:Apple Silicon MPS available
+INFO:worker:Worker initialized with device: mps, intensity: high
+INFO:redis_worker:🫀 Initialized Redis compute worker for machine worker_2_high
+INFO:redis_worker:🚀 Starting Redis compute worker
+INFO:redis_task_queue:✅ Connected to Redis at localhost:6379
+INFO:redis_task_queue:🖥️ Registered machine worker_2_high with profile: Standard GPU
+INFO:redis_worker:✅ Connected to Redis and registered machine capabilities
+INFO:redis_worker:   Machine ID: be8b0d1a5be3
+INFO:redis_worker:   CPU: 10 cores
+INFO:redis_worker:   Memory: 32.0 GB
+INFO:redis_worker:   GPU: Standard GPU (8.0 GB)

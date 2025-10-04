@@ -26,9 +26,10 @@ This is an **enterprise-grade NFL analytics platform** for sports betting resear
 5. Reinforcement learning for bet sizing (OPE/IPS framework)
 6. Copula-based score simulation with key-number reweighting
 7. **Production ETL pipelines** with automated data quality monitoring
-8. 🆕 **Distributed compute optimization** with multi-armed bandit algorithms
-9. 🆕 **Statistical testing framework** for rigorous model validation
-10. 🆕 **Automated A/B testing** with sequential analysis and effect sizes
+8. 🆕 **Google Drive distributed computing** (SETI@home-style across M4+4090)
+9. 🆕 **Hardware-aware task routing** with multi-armed bandit optimization
+10. 🆕 **Statistical testing framework** with rigorous model validation
+11. 🆕 **Automated sync conflict resolution** for seamless multi-machine workflows
 
 ---
 

@@ -1,0 +1,50 @@
+INFO:worker:Apple Silicon MPS available
+INFO:worker:Worker initialized with device: mps, intensity: high
+INFO:redis_worker:🫀 Initialized Redis compute worker for machine None
+INFO:redis_worker:🚀 Starting Redis compute worker
+INFO:redis_task_queue:✅ Connected to Redis at localhost:6379
+INFO:redis_task_queue:🖥️ Registered machine adb3ee115200 with profile: CPU
+INFO:redis_worker:✅ Connected to Redis and registered machine capabilities
+INFO:redis_worker:   Machine ID: adb3ee115200
+INFO:redis_worker:   CPU: 10 cores
+INFO:redis_worker:   Memory: 32.0 GB
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_9c410ac1 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (2071 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (2071 features)
+INFO:redis_worker:Engineering features for 41,420 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_9c410ac1 on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_9c410ac1
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_d64489d9 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (8198 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (8198 features)
+INFO:redis_worker:Engineering features for 50,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_d64489d9 on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_d64489d9
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_1b535588 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (6514 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (6514 features)
+INFO:redis_worker:Engineering features for 50,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_1b535588 on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_1b535588
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_3781e525 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (8308 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (8308 features)
+INFO:redis_worker:Engineering features for 50,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_3781e525 on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_3781e525
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_0da36a1b from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (2067 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (2067 features)
+INFO:redis_worker:Engineering features for 41,359 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_0da36a1b on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_0da36a1b
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_e2e34c33 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Engineering (3395 features) (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Engineering (3395 features)
+INFO:redis_worker:Engineering features for 50,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_e2e34c33 on machine adb3ee115200
+INFO:redis_worker:✅ Completed task feature_engineering_e2e34c33
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_b7e085e7 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo Simulation (24M scenarios) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo Simulation (24M scenarios)
+INFO:redis_worker:Running 10,000,000 Monte Carlo scenarios...
