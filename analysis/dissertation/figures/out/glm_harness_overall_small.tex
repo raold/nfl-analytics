@@ -1,0 +1,21 @@
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \begin{threeparttable}
+    \caption[GLM overall comparison]{Overall metrics by config and threshold.}
+    \label{tab:glm-harness-overall}
+    \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{} l l r r r r r r r @{} }\toprule
+      Config & Cal & Thr & ECE & MCE & Brier & LogLoss & HitRate & ROI \\ \midrule
+      core_form & none & 0.45 & 0.0333 & 0.1099 & 0.2523 & 0.6978 & 0.4845 & -0.0750 \
+      core_form & none & 0.50 & 0.0333 & 0.1099 & 0.2523 & 0.6978 & 0.4871 & -0.0701 \
+      core_form & platt & 0.45 & 0.0189 & 0.0258 & 0.2502 & 0.6936 & 0.4884 & -0.0676 \
+      core_form & platt & 0.50 & 0.0189 & 0.0258 & 0.2502 & 0.6936 & 0.4910 & -0.0627 \
+      core_plus_recent & none & 0.45 & 0.0560 & 0.2665 & 0.2546 & 0.7024 & 0.4871 & -0.0701 \
+      core_plus_recent & none & 0.50 & 0.0560 & 0.2665 & 0.2546 & 0.7024 & 0.4794 & -0.0848 \
+      core_plus_recent & platt & 0.45 & 0.0195 & 0.0290 & 0.2504 & 0.6940 & 0.4884 & -0.0676 \
+      core_plus_recent & platt & 0.50 & 0.0195 & 0.0290 & 0.2504 & 0.6940 & 0.4897 & -0.0651 \
+      \bottomrule
+    \end{tabular}
+  \end{threeparttable}
+\end{table}

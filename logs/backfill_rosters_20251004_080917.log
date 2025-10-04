@@ -1,0 +1,33 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+=== NFL Roster & Player Data Backfill ===
+
+Creating players table...
+[1] 0
+[1] 0
+[1] 0
+Creating rosters table...
+[1] 0
+Loading rosters from nflreadr for seasons 1999 to 2024 ...
+Loaded 63343 roster-week entries
+
+Extracting unique players...
+Found 15225 unique players
+Writing players to database...
+✓ Wrote 15225 players
+
+Processing rosters by season...
+
+Error: COPY returned error : ERROR:  null value in column "week" of relation "rosters" violates not-null constraint
+DETAIL:  Failing row contains (1999, null, CLE, 00-0000003, RB, RB, 27, ACT, Abdul-Karim al-Jabbar, null).
+CONTEXT:  COPY rosters, line 1: "1999	\N	CLE	00-0000003	RB	RB	27	ACT	Abdul-Karim al-Jabbar	\N"
+Execution halted

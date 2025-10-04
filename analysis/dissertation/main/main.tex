@@ -302,7 +302,9 @@ Additional tables and figures provide per-team, per-season breakdowns of calibra
 
 % Auto-include generated artefacts if present
 \IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{}
-\IfFileExists{../figures/out/ope_grid_table.tex}{\input{../figures/out/ope_grid_table.tex}}{}
+\IfFileExists{../figures/out/ope_grid_table.tex}{%
+  {\def\opeGridLabel{}\input{../figures/out/ope_grid_table.tex}}%
+}{}
 \IfFileExists{../figures/out/alpha_sensitivity_panel.png}{%
   \begin{figure}[t]
     \centering
@@ -311,7 +313,9 @@ Additional tables and figures provide per-team, per-season breakdowns of calibra
   \end{figure}
 }{}
 \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
-\IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}
+\IfFileExists{../figures/out/cvar_benchmark_table.tex}{%
+  {\def\cvarBenchmarkLabel{}\input{../figures/out/cvar_benchmark_table.tex}}%
+}{}
 
 \section{Acronyms and Abbreviations}
 We list recurring abbreviations such as EPA (expected points added), CLV (closing line value), CBV (comparative book value), PROE (pass rate over expected), and RL (reinforcement learning), along with brief definitions.
@@ -369,7 +373,6 @@ Performance metrics as a function of feature family inclusion, regularization st
 This appendix collects extended derivations and lemmas referenced in the main text, including variance bounds for portfolio aggregation under correlation uncertainty and properties of CRPS under mixture distributions.
 
 \section{Variance Bounds}
-\fi
 We derive simple upper bounds on portfolio variance under worst-case correlation assumptions and discuss practical approximations from historical co-movements.
 
 \section{CRPS for Skellam Mixtures}
@@ -711,7 +714,9 @@ We compute reliability diagrams with bootstrapped confidence bands, PIT histogra
 \subsection*{Operational Learnings}
 Execution timing drives a significant fraction of realized CLV. Latency‑aware routing and patience near close improved fills and reduced slippage, particularly in seasons with high line velocity.
 
+% End of trimmed appendix content
 \fi
+
 \chapter{Season Summaries (1999--2024)}\label{app:season-summaries}
 For each season we summarize calibration, CLV capture, and notable regime shifts. These notes orient readers to where methods succeeded or struggled and where governance interventions mattered.
 
@@ -869,10 +874,12 @@ end for
 Q(s,a) = V(s) + (A(s,a) - mean_a A(s,a))
 optimize TD loss with target network and prioritized replay
 \end{verbatim}
-\fi
 
 \chapter{Additional Proof Sketches}
 We include proof sketches for properties of Poisson mixtures, Skellam reweighting, and CRPS consistency. These notes are intended to support reproducibility of the mathematical claims in the main text.
+
+% End of trimmed extended appendix content
+\fi
 
 \section{Skellam Mixture Moments}
 Let $X\sim\text{Pois}(\lambda)$, $Y\sim\text{Pois}(\mu)$, and $D=X-Y$. For a reweighted mixture on key integers, we show how first and second moments shift under multiplicative weights and how to renormalize the PMF.

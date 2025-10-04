@@ -1,7 +1,9 @@
 """Baseline logistic backtest for spread (ATS) modeling.
 
 Uses the as-of feature dataset to run a walk-forward (leave-one-season-out)
-logistic regression, reporting per-season metrics plus an overall summary.
+logistic regression. Supports optional probability calibration (Platt sigmoid
+or isotonic) via cross-validated calibration on the training fold. Reports
+per-season metrics plus an overall summary.
 Optionally writes season metrics, predictions, and a TeX table for inclusion in
 analysis/dissertation.
 
@@ -26,12 +28,14 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.calibration import CalibratedClassifierCV
+from typing import Optional
 
 
 DECIMAL_PAYOUT_DEFAULT = 1.9091  # Approx -110 vig
 
 DEFAULT_FEATURE_COLUMNS = [
-    "spread_close",
     "epa_diff_prior",
     "plays_diff_prior",
     "prior_epa_mean_diff",
@@ -48,6 +52,32 @@ DEFAULT_FEATURE_COLUMNS = [
     "away_travel_change",
     "home_prev_result",
     "away_prev_result",
+    "qb_change_diff",
+    "home_qb_change",
+    "away_qb_change",
+    "qb_team_games_diff",
+    "home_qb_team_games",
+    "away_qb_team_games",
+    "qb_total_games_diff",
+    "home_qb_total_games",
+    "away_qb_total_games",
+    "coach_change_diff",
+    "home_coach_change",
+    "away_coach_change",
+    "coach_team_games_diff",
+    "home_coach_team_games",
+    "away_coach_team_games",
+    "coach_total_games_diff",
+    "home_coach_total_games",
+    "away_coach_total_games",
+    "home_surface_grass",
+    "home_surface_artificial",
+    "home_roof_dome",
+    "home_roof_outdoors",
+    "surface_grass_diff",
+    "surface_artificial_diff",
+    "roof_dome_diff",
+    "roof_outdoors_diff",
 ]
 
 
@@ -64,8 +94,7 @@ class Metrics:
 
 @dataclass
 class ModelBundle:
-    model: LogisticRegression
-    scaler: StandardScaler
+    estimator: object  # sklearn estimator with predict_proba
     feature_columns: Sequence[str]
 
 
@@ -76,7 +105,7 @@ def parse_feature_list(raw: str | None) -> list[str]:
 
 
 def load_features(csv_path: str, start: int, end: int) -> pd.DataFrame:
-    df = pd.read_csv(csv_path, parse_dates=["kickoff"], infer_datetime_format=True)
+    df = pd.read_csv(csv_path, parse_dates=["kickoff"])
     df = df[(df["season"] >= start) & (df["season"] <= end)].copy()
     return df
 
@@ -95,14 +124,28 @@ def prepare_dataset(df: pd.DataFrame, feature_columns: Sequence[str]) -> pd.Data
     return df
 
 
-def fit_logit(train: pd.DataFrame, feature_columns: Sequence[str]) -> ModelBundle:
+def fit_model(
+    train: pd.DataFrame,
+    feature_columns: Sequence[str],
+    calibration: str = "none",
+    cv_folds: int = 5,
+) -> ModelBundle:
     X = train[list(feature_columns)].to_numpy(dtype=float)
     y = train["home_cover_train"].to_numpy(dtype=int)
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    model = LogisticRegression(max_iter=2000, solver="lbfgs")
-    model.fit(X_scaled, y)
-    return ModelBundle(model=model, scaler=scaler, feature_columns=feature_columns)
+    base = Pipeline([
+        ("scaler", StandardScaler()),
+        ("logit", LogisticRegression(max_iter=2000, solver="lbfgs")),
+    ])
+    if calibration and calibration.lower() != "none":
+        method = "sigmoid" if calibration.lower() in {"platt", "sigmoid"} else "isotonic"
+        try:
+            est = CalibratedClassifierCV(estimator=base, method=method, cv=cv_folds)
+        except TypeError:
+            est = CalibratedClassifierCV(base_estimator=base, method=method, cv=cv_folds)
+        est.fit(X, y)
+    else:
+        est = base.fit(X, y)
+    return ModelBundle(estimator=est, feature_columns=feature_columns)
 
 
 def evaluate_model(
@@ -111,8 +154,7 @@ def evaluate_model(
     threshold: float,
 ) -> pd.DataFrame:
     X_test = test[list(bundle.feature_columns)].to_numpy(dtype=float)
-    X_scaled = bundle.scaler.transform(X_test)
-    preds = bundle.model.predict_proba(X_scaled)[:, 1]
+    preds = bundle.estimator.predict_proba(X_test)[:, 1]
     out = test.copy()
     out["pred_cover_prob"] = preds
     out["bet_home"] = out["pred_cover_prob"] >= threshold
@@ -164,7 +206,13 @@ def run_backtest(
         test = df[df["season"] == season]
         if season < start_season or train.empty or test.empty:
             continue
-        bundle = fit_logit(train, feature_columns)
+        # Fit model (with optional calibration handled inside)
+        bundle = fit_model(
+            train,
+            feature_columns,
+            calibration=globals().get("_CAL_METHOD", "none"),
+            cv_folds=globals().get("_CAL_FOLDS", 5),
+        )
         pred_df = evaluate_model(bundle, test, threshold)
         metrics = compute_metrics(season, pred_df, threshold, decimal_payout)
         results.append(metrics)
@@ -214,15 +262,17 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     cols = ["season", "games", "pushes", "brier", "log_loss", "hit_rate", "roi"]
     lines = [
+        "% !TEX root = ../../main/main.tex",
         "\\begin{table}[t]",
         "  \\centering",
         "  \\footnotesize",
-        "  \\begin{threeparttable}",
-        "    \\caption[Baseline GLM backtest]{Baseline GLM backtest metrics by season.}",
-        "    \\label{tab:glm-baseline}",
-        "    \\setlength{\\tabcolsep}{3pt}\\renewcommand{\\arraystretch}{1.1}",
-        "    \\begin{tabular}{@{} l r r r r r r @{} }\\toprule",
-        "      Season & Games & Pushes & Brier & LogLoss & HitRate & ROI \\\\ \\midrule",
+        "  \\caption[Baseline GLM backtest]{Baseline GLM backtest metrics by season.}",
+        "  \\label{tab:glm-baseline}",
+        "  \\setlength{\\tabcolsep}{3pt}\\renewcommand{\\arraystretch}{1.1}",
+        "  \\begin{tabular}{@{} l r r r r r r @{} }",
+        "    \\toprule",
+        "    Season & Games & Pushes & Brier & LogLoss & HitRate & ROI \\\\ ",
+        "    \\midrule",
     ]
     for _, row in df[cols].iterrows():
         season_val = row["season"]
@@ -231,7 +281,7 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
         else:
             season_fmt = str(season_val)
         line = (
-            '      {season} & {games:d} & {pushes:d} & {brier} & {log_loss} & {hit_rate} & {roi} \\\'
+            "      {season} & {games:d} & {pushes:d} & {brier} & {log_loss} & {hit_rate} & {roi} \\\\" 
         ).format(
             season=season_fmt,
             games=int(row["games"]),
@@ -242,14 +292,11 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
             roi=format_metric(row["roi"]),
         )
         lines.append(line)
-    lines.extend(
-        [
-            "      \\bottomrule",
-            "    \\end{tabular}",
-            "  \\end{threeparttable}",
-            "\\end{table}",
-        ]
-    )
+    lines.extend([
+        "    \\bottomrule",
+        "  \\end{tabular}",
+        "\\end{table}",
+    ])
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 
@@ -257,6 +304,61 @@ def write_tex(df: pd.DataFrame, path: str) -> None:
 def write_predictions(df: pd.DataFrame, path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     df.to_csv(path, index=False)
+
+
+def reliability_curve(
+    pred_df: pd.DataFrame,
+    n_bins: int = 10,
+) -> pd.DataFrame:
+    df = pred_df.copy()
+    df = df.dropna(subset=["home_cover", "pred_cover_prob"]).copy()
+    df["home_cover"] = df["home_cover"].astype(int)
+    bins = np.linspace(0.0, 1.0, n_bins + 1)
+    df["bin"] = pd.cut(df["pred_cover_prob"], bins=bins, include_lowest=True, right=True)
+    grp = df.groupby("bin", observed=True)
+    out = grp.apply(
+        lambda g: pd.Series(
+            {
+                "count": len(g),
+                "pred_mean": g["pred_cover_prob"].mean(),
+                "obs_rate": g["home_cover"].mean(),
+            }
+        ),
+        include_groups=False,
+    ).reset_index()
+    out["bin_low"] = out["bin"].apply(lambda iv: float(iv.left) if hasattr(iv, "left") else np.nan)
+    out["bin_high"] = out["bin"].apply(lambda iv: float(iv.right) if hasattr(iv, "right") else np.nan)
+    return out[["bin", "bin_low", "bin_high", "count", "pred_mean", "obs_rate"]]
+
+
+def write_reliability_csv(df: pd.DataFrame, path: str) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    df.to_csv(path, index=False)
+
+
+def write_reliability_plot(df: pd.DataFrame, path: str) -> None:
+    try:
+        import matplotlib.pyplot as plt  # type: ignore
+    except Exception:
+        print("matplotlib not installed; skipping reliability plot.")
+        return
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    # Use bin midpoints for x
+    x = (df["bin_low"].to_numpy(dtype=float) + df["bin_high"].to_numpy(dtype=float)) / 2.0
+    y = df["obs_rate"].to_numpy(dtype=float)
+    w = df["count"].to_numpy(dtype=float)
+    plt.figure(figsize=(4.5, 4.0), dpi=150)
+    plt.plot([0, 1], [0, 1], linestyle="--", color="#999999", label="Ideal")
+    plt.scatter(x, y, s=np.clip(w, 10, 120), alpha=0.8, color="#2a6fbb", label="Observed")
+    plt.xlabel("Predicted probability")
+    plt.ylabel("Observed rate")
+    plt.title("Reliability Curve (Overall)")
+    plt.xlim(0, 1)
+    plt.ylim(0, 1)
+    plt.legend(loc="upper left")
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
 
 
 def parse_args() -> argparse.Namespace:
@@ -277,9 +379,14 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--min-season", dest="min_season", type=int, default=2001, help="Earliest season to load from dataset")
     ap.add_argument("--decision-threshold", type=float, default=0.5, help="Probability threshold for betting home (else away)")
     ap.add_argument("--decimal-payout", type=float, default=DECIMAL_PAYOUT_DEFAULT, help="Decimal payout used for ROI (-110 -> 1.9091)")
+    ap.add_argument("--calibration", choices=["none", "platt", "isotonic"], default="none", help="Optional probability calibration")
+    ap.add_argument("--cv-folds", type=int, default=5, help="CV folds for calibration")
+    ap.add_argument("--cal-bins", type=int, default=10, help="Bins for reliability curve")
     ap.add_argument("--output-csv", help="Optional CSV output path for per-season metrics")
     ap.add_argument("--preds-csv", help="Optional CSV output path for per-game predictions")
     ap.add_argument("--tex", help="Optional TeX table output path")
+    ap.add_argument("--cal-csv", help="Optional CSV path for reliability curve (overall)")
+    ap.add_argument("--cal-plot", help="Optional PNG path for reliability curve (overall)")
     return ap.parse_args()
 
 
@@ -288,6 +395,10 @@ def main() -> None:
     feature_columns = parse_feature_list(args.features)
     df = load_features(args.features_csv, args.min_season, args.end_season)
     df = prepare_dataset(df, feature_columns)
+    # Store calibration settings in module globals for run_backtest to pick up
+    global _CAL_METHOD, _CAL_FOLDS
+    _CAL_METHOD = args.calibration
+    _CAL_FOLDS = args.cv_folds
     metrics_list, preds_df = run_backtest(
         df,
         start_season=args.start_season,
@@ -303,6 +414,12 @@ def main() -> None:
     if not preds_df.empty:
         overall_metrics = compute_metrics("Overall", preds_df, args.decision_threshold, args.decimal_payout)
         metrics_df = append_overall_row(metrics_df, overall_metrics)
+        # Reliability outputs
+        rel = reliability_curve(preds_df, n_bins=args.cal_bins)
+        if args.cal_csv:
+            write_reliability_csv(rel, args.cal_csv)
+        if args.cal_plot:
+            write_reliability_plot(rel, args.cal_plot)
     print("Features used:", feature_columns)
     print(metrics_df)
 

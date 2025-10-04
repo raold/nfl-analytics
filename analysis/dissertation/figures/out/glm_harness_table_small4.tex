@@ -1,0 +1,29 @@
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \begin{threeparttable}
+    \caption[GLM variants (harness)]{Baseline GLM variants by season.}
+    \label{tab:glm-harness}
+    \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{} l l r r r r r r r @{} }\toprule
+      Config & Cal & Season & Games & ECE & Brier & LogLoss & HitRate & ROI \\ \midrule
+      core_form & none & 2003 & 258 & 0.0578 & 0.2557 & 0.7046 & 0.4767 & -0.0898 \
+      core_form & none & 2004 & 261 & 0.0396 & 0.2507 & 0.6946 & 0.5019 & -0.0418 \
+      core_form & none & 2005 & 257 & 0.0307 & 0.2506 & 0.6944 & 0.4825 & -0.0789 \
+      core_form & none & Overall & 776 & 0.0339 & 0.2523 & 0.6978 & 0.4871 & -0.0701 \
+      core_form & platt & 2003 & 258 & 0.0042 & 0.2496 & 0.6924 & 0.5039 & -0.0381 \
+      core_form & platt & 2004 & 261 & 0.0504 & 0.2511 & 0.6953 & 0.4636 & -0.1149 \
+      core_form & platt & 2005 & 257 & 0.0029 & 0.2500 & 0.6931 & 0.5058 & -0.0343 \
+      core_form & platt & Overall & 776 & 0.0189 & 0.2502 & 0.6936 & 0.4910 & -0.0627 \
+      core_plus_recent & none & 2003 & 258 & 0.0862 & 0.2588 & 0.7110 & 0.4651 & -0.1120 \
+      core_plus_recent & none & 2004 & 261 & 0.0381 & 0.2515 & 0.6961 & 0.4981 & -0.0491 \
+      core_plus_recent & none & 2005 & 257 & 0.0502 & 0.2535 & 0.7001 & 0.4747 & -0.0937 \
+      core_plus_recent & none & Overall & 776 & 0.0560 & 0.2546 & 0.7024 & 0.4794 & -0.0848 \
+      core_plus_recent & platt & 2003 & 258 & 0.0246 & 0.2508 & 0.6947 & 0.4884 & -0.0676 \
+      core_plus_recent & platt & 2004 & 261 & 0.0394 & 0.2507 & 0.6945 & 0.4828 & -0.0784 \
+      core_plus_recent & platt & 2005 & 257 & 0.0074 & 0.2498 & 0.6928 & 0.4981 & -0.0492 \
+      core_plus_recent & platt & Overall & 776 & 0.0195 & 0.2504 & 0.6940 & 0.4897 & -0.0651 \
+      \bottomrule
+    \end{tabular}
+  \end{threeparttable}
+\end{table}

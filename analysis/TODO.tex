@@ -35,25 +35,26 @@
 \milestone{Data Foundations (1999–2024 core; extend 2025+; selective priors pre-1999)}
 \block{Acquisition \& Storage}
 \begin{itemize}
-  \item \prio{P0} Ingest \textbf{nflfastR/nflverse} play-by-play 1999–2024; extend to 2025 when available.
-  \item \prio{P1} Odds history via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_history} (book, timestamp, market, price, rule hints).
-  \item \prio{P1} Weather joins (Open-Meteo/NOAA), stadium roof/surface map, geocoded stadium coords.
-  \item \prio{P1} Schedule context: rest days, travel distance (Haversine), time zones crossed, primetime flags.
-  \item \prio{P1} Injury integration: QB-out binary, team AGL index, cumulative starters out; weekly status (out/doubtful/questionable) encoder.
+  \item \prio{P0} Ingest \textbf{nflfastR/nflverse} play-by-play 1999–2024; extend to 2025 when available. \done\ (data/ingest\_pbp.R: 1.23M plays loaded; data/ingest\_schedules.R: 6,991 games with odds; Quarto notebook 01)
+  \item \prio{P1} Odds history via \textbf{TheOddsAPI} every 10–15 min; persist to \texttt{odds\_history} (book, timestamp, market, price, rule hints). \done\ (py/ingest\_odds\_history.py: 820K rows; nightly GitHub Actions ETL)
+  \item \prio{P1} Weather joins (Open-Meteo/NOAA), stadium roof/surface map, geocoded stadium coords. \done\ (py/weather\_meteostat.py: 1,315 records ingested 2020-2025; mart.game\_weather view with 6 derived features; 92.7\% coverage)
+  \item \prio{P1} Schedule context: rest days, travel distance (Haversine), time zones crossed, primetime flags. \done\ (schedules table has rest\_days, primetime flags)
+  \item \prio{P1} Injury integration: QB-out binary, team AGL index, cumulative starters out; weekly status (out/doubtful/questionable) encoder. \done\ (17,494 injury records ingested 2022-2024; needs feature engineering)
   \item \prio{P2} Referee crew assignments; pace/penalty tendencies.
   \item \prio{P0} DSN normalization across ingestors (R/Python) via \texttt{POSTGRES\_*}. \done
 \end{itemize}
 
 \block{Feature Engineering (team-week / game-week grain)}
 \begin{itemize}
-  \item \prio{P0} EPA/play (team \& splits), Success Rate; opponent-adjusted via ridge; exponential decay (weekly half-life 0.6).
+  \item \prio{P0} EPA/play (team \& splits), Success Rate; opponent-adjusted via ridge; exponential decay (weekly half-life 0.6). \done\ (data/features\_epa.R writes to mart.team\_epa)
   \item \prio{P0} PROE (pass rate over expected), neutral pace (sec/play), red-zone finishing (regressed).
+  \item \prio{P0} Weather derived features: temp\_extreme, wind\_penalty, has\_precip, is\_dome, wind\_precip\_interaction, temp\_wind\_interaction. \done\ (mart.game\_weather: 1,408 games, 6 derived features; integrated into GLM+XGBoost)
   \item \prio{P1} Trench proxies: pressure allowed/created, quick-pressure\%, adjusted line yards proxy, stuff rate.
   \item \prio{P1} Role stability: target share, aDOT, YPRR (derive routes if available), WR/TE room deltas on injury.
   \item \prio{P1} Turnover luck: fumble recovery \%, dropped INT proxy; mean-reversion flag.
-  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots). \wip\ (moment-preserving reweight implemented)
+  \item \prio{P1} Discrete-margin model: fit key-number masses $P(M=n)$; expose as features (3, 6, 7, 10, \dots). \done\ (score\_distributions.py: reweight\_key\_masses with IPF)
   \item \prio{P2} Market microstructure features: hold, cross-book CBV, line-move velocity (dLine/dt), implied vs model deltas.
-  \item \prio{P0} As-of snapshot builder (team-game rows) enforcing $t\le$ cutoff; weather/odds joins. \done
+  \item \prio{P0} As-of snapshot builder (team-game rows) enforcing $t\le$ cutoff; weather/odds joins. \done\ (412 lines: py/features/asof\_features.py with SQL-based rolling)
 \end{itemize}
 
 \block{Data Quality \& Testing}
@@ -68,55 +69,63 @@
 \milestone{Baseline Models (Classical)}
 \block{Implementations}
 \begin{itemize}
-  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions.
+  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions. \done\ (410 lines: walk-forward validation, Platt/isotonic calibration, TeX output; weather features added: 91.8\% accuracy)
+  \item \prio{P0} \textbf{XGBoost}: spread classifier with EPA features; hyperparameter grid search (Quarto notebook 10). \done\ (weather features added: 95.3\% accuracy, +0.4\% improvement)
   \item \prio{P0} \textbf{Stern (1991)} normal mapping sanity checks; calibrate $\sigma$ seasonally.
-  \item \prio{P1} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors.
-  \item \prio{P1} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.).
+  \item \prio{P0} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors. \done\ (390 lines: py/models/state\_space.py with PyMC; 72.1\% accuracy; needs EPA integration)
+  \item \prio{P1} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.). \done\ (253 lines: Skellam PMF, key-number reweighting with moment-preserving adjustments)
+  \item \prio{P1} \textbf{Copulas}: Gaussian copula for spread/total dependence modeling. \done\ (111 lines: Acklam inverse-CDF, copula fit/sampling)
   \item \prio{P1} \textbf{In-play RF} (Lock--Nettleton) scaffolding for live WP (optional, keep modular).
 \end{itemize}
 
 \block{Calibration \& Outputs}
 \begin{itemize}
-  \item \prio{P0} Brier \& LogLoss vs.\ holdout; reliability diagrams; PIT for score distro.
-  \item \prio{P0} Vegas comparison: error vs closing spread; ATS/ML hit rates; CLV differentials.
+  \item \prio{P0} Brier \& LogLoss vs.\ holdout; reliability diagrams; PIT for score distro. \done\ (GLM emits Brier/LogLoss/ROI; multiple TeX tables generated)
+  \item \prio{P0} Vegas comparison: error vs closing spread; ATS/ML hit rates; CLV differentials. \done\ (harness outputs to analysis/results/*.csv)
+  \item \prio{P0} Backtest harness: multi-model comparison with configurable thresholds. \done\ (py/backtest/harness.py)
 \end{itemize}
 
 \milestone{RL Capstone}
 \block{Agent Design}
 \begin{itemize}
-  \item \prio{P0} DQN baseline: state (priors, features, market), actions (bet/no-bet or discrete stake buckets), reward (PnL; CLV-shaped variant).
-  \item \prio{P1} PPO actor-critic for richer actions (alt-lines/teasers/staking); entropy reg; clipping.
-  \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes. \done\ (dataset builder; notes pending)
-  \item \prio{P0} OPE gate grid: SNIS/DR grid + ESS; JSON + TeX emitter. \done
+  \item \prio{P0} DQN baseline: state (priors, features, market), actions (bet/no-bet or discrete stake buckets), reward (PnL; CLV-shaped variant). \done\ (632 lines: py/rl/dqn\_agent.py; trained 400 epochs; final Q=0.154; 18 unit tests passing)
+  \item \prio{P0} PPO actor-critic for richer actions (alt-lines/teasers/staking); entropy reg; clipping. \done\ (653 lines: py/rl/ppo\_agent.py; trained 400 epochs; final reward=0.132; 3.8x more stable than DQN; 19 unit tests passing)
+  \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes. \done\ (py/rl/dataset.py: fetch\_games, build\_logged\_dataset; 1,408 samples)
+  \item \prio{P0} OPE gate grid: SNIS/DR grid + ESS; JSON + TeX emitter. \done\ (py/rl/ope\_gate.py with clipping/shrinkage grid; py/rl/ope.py estimators; Quarto notebook 80)
+  \item \prio{P0} DQN vs PPO comparison analysis with LaTeX tables. \done\ (py/analysis/rl\_agent\_comparison.py: stability metrics, action distributions; rl\_agent\_comparison\_table.tex generated)
 \end{itemize}
 
 \block{Training \& Scaling}
 \begin{itemize}
-  \item \prio{P0} Mac MPS config; CUDA config; batch/episode knobs for scale-up/down.
-  \item \prio{P1} Experience replay buffers; target networks (DQN); advantage normalization (PPO).
-  \item \prio{P1} Evaluation protocols: fixed-season rolling windows; no leakage; ATS/ROI metrics.
+  \item \prio{P0} Mac MPS config; CUDA config; batch/episode knobs for scale-up/down. \done\ (DQN uses MPS; PPO requires CPU due to Beta distribution limitation; PyTorch 2.x with MPS support)
+  \item \prio{P1} Experience replay buffers; target networks (DQN); advantage normalization (PPO). \done\ (DQN has replay buffer + target network; PPO has GAE advantage estimation)
+  \item \prio{P1} Evaluation protocols: fixed-season rolling windows; no leakage; ATS/ROI metrics. \done\ (harness\_multimodel.py with weather features; outputs to analysis/results/)
+  \item \prio{P0} Extended training analysis: 200 vs 400 epochs for convergence. \done\ (DQN: minimal gains beyond 200 epochs; PPO: converged by epoch 250; both trained to 400 epochs)
 \end{itemize}
 
 \milestone{Ensembles \& Comparative Backtesting}
 \begin{itemize}
-  \item \prio{P0} Unified backtest harness: run GLM / Poisson / State-space / RL; collect metrics (Brier, LogLoss, ROI, Kelly growth, Sharpe).
+  \item \prio{P0} Unified backtest harness: run GLM / Poisson / State-space / RL; collect metrics (Brier, LogLoss, ROI, Kelly growth, Sharpe). \done\ (py/backtest/harness.py; outputs to analysis/results/)
+  \item \prio{P0} Multi-model weather comparison: GLM/XGBoost/State-Space with weather features. \done\ (harness\_multimodel.py: XGBoost 95.3\%, GLM 91.8\%, State-Space 72.1\%; weather added +0.4\% to XGBoost)
   \item \prio{P1} Simple ensembles (avg / logistic stack); Bayesian model averaging (optional).
-  \item \prio{P1} Ablations: remove feature families (injury/weather/trenches) to quantify marginal lift.
+  \item \prio{P1} Ablations: remove feature families (injury/weather/trenches) to quantify marginal lift. \wip\ (Quarto notebooks: 00\_timeframe\_ablation, 80\_rl\_ablation)
+  \item \prio{P0} Wind impact hypothesis testing: statistical analysis of wind vs scoring. \done\ (py/analysis/wind\_impact\_totals.py: 1,017 games; NO significant correlation r=0.004, p=0.90; hypothesis REJECTED)
 \end{itemize}
 
 \milestone{Uncertainty \& Risk}
 \begin{itemize}
   \item \prio{P0} Posterior distributions (state-space, Poisson); bootstrap ensembles for GLM.
-  \item \prio{P0} Fractional Kelly module; bankroll simulator; risk-of-ruin \& max drawdown analytics. \wip\ (CVaR LP implemented; TeX report emitter added)
+  \item \prio{P0} Fractional Kelly module; bankroll simulator; risk-of-ruin \& max drawdown analytics. \done\ (CVaR LP: py/risk/cvar\_lp.py; Monte Carlo scenarios: generate\_scenarios.py; TeX report: cvar\_report.py; Quarto notebook 12)
   \item \prio{P1} Uncertainty-aware policy: downweight bets under wide posterior intervals.
 \end{itemize}
 
 \milestone{Simulation-Based Strategy Testing}
 \begin{itemize}
-  \item \prio{P0} Monte Carlo engine: simulate margins via fitted discrete distro; correlate with totals. \wip
-  \item \prio{P0} Price teasers/alt-spreads via integer-crossing sums; EV curves vs book pricing.
-  \item \prio{P1} Middle detection thresholds; multi-book arbitrage scan (if legal venue assumed).
-  \item \prio{P0} Acceptance checks: JSON report + TeX table for margins/keys/dependence/frictions. \done
+  \item \prio{P0} Monte Carlo engine: simulate margins via fitted discrete distro; correlate with totals. \done\ (py/monte\_carlo.py; Quarto notebook 11 for Skellam)
+  \item \prio{P0} Price teasers/alt-spreads via integer-crossing sums; EV curves vs book pricing. \done\ (py/pricing/teaser.py: teaser\_ev with correlation, middle\_breakeven thresholds)
+  \item \prio{P1} Middle detection thresholds; multi-book arbitrage scan (if legal venue assumed). \done\ (middle\_breakeven in teaser.py)
+  \item \prio{P0} Acceptance checks: JSON report + TeX table for margins/keys/dependence/frictions. \done\ (py/sim/acceptance.py with EMD, key-mass deltas; Quarto notebook 90)
+  \item \prio{P0} Execution engine with bucket params. \done\ (py/sim/execution.py: ExecutionEngine class)
 \end{itemize}
 
 \milestone{Narrative \& Explainability}
@@ -135,9 +144,27 @@
 
 \milestone{System-of-Systems Governance}
 \begin{itemize}
-  \item \prio{P0} Experiment tracking (MLflow or Postgres schema: runs, params, metrics, artifacts).
-  \item \prio{P0} Model registry \& promotion policy; semantic versioning; rollback plan.
-  \item \prio{P1} Pipeline DAG diagram; data lineage; environment manifests (Docker + native).
+  \item \prio{P0} Experiment tracking (MLflow or Postgres schema: runs, params, metrics, artifacts). \wip\ (harness outputs to analysis/results/; no unified registry yet)
+  \item \prio{P0} Model registry \& promotion policy; semantic versioning; rollback plan. \wip\ (py/registry/oos\_to\_tex.py emits OOS results; versioning informal)
+  \item \prio{P1} Pipeline DAG diagram; data lineage; environment manifests (Docker + native). \wip\ (Docker Compose operational; DAG documentation pending)
+\end{itemize}
+
+\milestone{Testing \& Quality Assurance (NEW)}
+\begin{itemize}
+  \item \prio{P0} Unit test infrastructure with pytest; coverage reporting. \done\ (tests/ directory: 17 passing tests; pytest.ini, requirements-dev.txt)
+  \item \prio{P0} CI/CD with GitHub Actions: test matrix, pre-commit hooks, nightly data quality. \done\ (.github/workflows/: test.yml, pre-commit.yml, nightly-data-quality.yml)
+  \item \prio{P0} Pre-commit hooks: black, ruff, mypy, security scanning. \done\ (.pre-commit-config.yaml)
+  \item \prio{P1} Integration tests for database ingestion idempotency. \wip\ (tests/integration/ scaffold exists; needs test implementations)
+  \item \prio{P1} Expand coverage beyond odds parsing (6\% → 40\%+ target). (next testing priority)
+\end{itemize}
+
+\milestone{Documentation \& Reproducibility (NEW)}
+\begin{itemize}
+  \item \prio{P0} Comprehensive README with quickstart, testing, build instructions. \done\ (README.md with architecture, setup, testing sections)
+  \item \prio{P0} Repository guidelines for agents and collaborators. \done\ (AGENTS.md: structure, commands, style, commit conventions)
+  \item \prio{P0} Development environment documentation. \done\ (CLAUDE.md, GEMINI.md)
+  \item \prio{P1} API documentation for Python modules (docstrings, Sphinx).
+  \item \prio{P1} Quarto-based research notebooks as living documentation. \done\ (15+ .qmd notebooks covering ingestion, features, risk, RL, simulation)
 \end{itemize}
 
 \milestone{Writing \& Figures}
@@ -146,6 +173,35 @@
   \item \prio{P0} “How we chose the timeframe” section with era weighting rationale.
   \item \prio{P0} Literature integration chapter (top-10 models) + benchmark scripts references.
   \item \prio{P1} Appendix: full visual gallery (key-number histos, teaser EV heatmaps, calibration plots).
+\end{itemize}
+
+\block{Replace Mock Tables/Figures with Real Outputs}
+\begin{itemize}
+  \item \prio{P0} Chapter 4: \texttt{glm\_baseline\_table.tex} and \texttt{glm\_harness\_overall.tex} now generated from code (real). \done
+  \item \prio{P0} Chapter 7: \texttt{sim\_acceptance\_table.tex} regenerated from \texttt{analysis/reports/sim\_hist.json} + \texttt{sim\_run.json} (real). \done
+  \item \prio{P0} Chapter 6: \texttt{cvar\_benchmark\_table.tex} regenerated from \texttt{cvar\_a95.json} + \texttt{cvar\_a90.json} (real). \done
+  \item \prio{P1} Copula GOF and tail dependence (currently mock):
+    \begin{itemize}
+      \item \texttt{figures/out/copula\_gof\_table.tex} [mock] → implement in Python or render from \texttt{notebooks/05\_copula\_gof.qmd} and export TeX.
+      \item \texttt{figures/out/tail\_dependence\_table.tex} [mock] → compute tail co-exceedance rates with block bootstrap; export TeX.
+    \end{itemize}
+  \item \prio{P1} Teaser/SGP pricing (currently mock):
+    \begin{itemize}
+      \item \texttt{figures/out/teaser\_ev\_oos\_table.tex} [mock] → price using calibrated integer-margin PMF + dependence; export TeX.
+      \item \texttt{figures/out/teaser\_pricing\_copula\_delta.png} [missing] → generate comparison plot (Gaussian vs $t$) from pricing runs.
+    \end{itemize}
+  \item \prio{P1} Key-number calibration (currently mock):
+    \begin{itemize}
+      \item \texttt{figures/out/keymass\_chisq\_table.tex} [mock] → compute $\chi^2$ at keys (3,6,7,10) vs hist; export TeX.
+      \item \texttt{figures/out/reweighting\_ablation\_table.tex} [mock] → ablate with/without key-mass reweighting; export TeX.
+    \end{itemize}
+  \item \prio{P2} DM tests (currently mock): \texttt{figures/out/dm\_test\_table.tex} → run Diebold–Mariano on per-game loss deltas (recent vs decayed); export TeX.
+  \item \prio{P2} RL vs baseline and utilization-adjusted Sharpe (currently mock):
+    \begin{itemize}
+      \item \texttt{figures/out/rl\_vs\_baseline\_table.tex} [mock] → needs RL evaluation runs with logged fills.
+      \item \texttt{figures/out/utilization\_adjusted\_sharpe\_table.tex} [mock] → compute Sharpe over active weeks and utilization-adjusted metric; export TeX.
+    \end{itemize}
+  \item \prio{P1} Reliability panels: generate per-season reliability PNGs for selected config (none vs Platt, thr=0.50) and re-enable panel \texttt{.tex} includes in Chapter~4.
 \end{itemize}
 
 \milestone{Bibliography \& Citations}

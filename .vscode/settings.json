@@ -48,5 +48,6 @@
             "tools": ["latexmk -C", "latexmk (pdf, force)"]
         }
     ],
-    "latex-workshop.latex.recipe.default": "Clean build"
+    "latex-workshop.latex.recipe.default": "Clean build",
+    "git.ignoreLimitWarning": true
 }

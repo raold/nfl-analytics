@@ -1,3 +1,4 @@
+% !TEX root = ../main/main.tex
 \chapter{Data Foundations and Feature Engineering}
 \label{chap:data}
 
@@ -9,9 +10,39 @@ This chapter documents how raw league information is transformed into a unified 
 \begin{itemize}
   \item \textbf{Play-by-play:} nflverse and team-operated feeds provide event-level context including personnel, formation, and tracking-derived metrics.
   \item \textbf{Odds history:} The Odds API snapshots populate the \texttt{odds\_history} table with market-implied expectations across books.
-  \item \textbf{Weather and travel:} NOAA archives and team schedule metadata add environment, rest, and travel load features.
+  \item \textbf{Weather and travel:} Meteostat historical weather archives and team schedule metadata add environment, rest, and travel load features. The \texttt{mart.game\_weather} materialized view provides 92.7\% coverage (1,306 of 1,408 games from 2020--2025) with six derived features.
 \end{itemize}
 Ingestion pipelines run inside orchestrated containers with idempotent writes. All raw pulls are versioned and stored in S3-compatible object storage for auditability.\mndown{2}{Ingestion \textrightarrow{} staging \textrightarrow{} feature marts (see Section~\ref{sec:schema-mart}).}
+
+\subsection{Weather feature engineering}\label{subsec:weather-features}
+Weather conditions are widely believed to affect NFL scoring, particularly through high winds suppressing passing efficiency and extreme temperatures reducing player performance. To test these hypotheses systematically, I ingest historical weather data from Meteostat and geocoded stadium coordinates, then engineer derived features that capture deviations from optimal conditions.
+
+The \texttt{mart.game\_weather} view joins each game with temperature ($^\circ$C), wind speed (kph), precipitation flags, and dome indicators. I define:
+\begin{itemize}
+  \item \textbf{temp\_extreme} $= |\text{temp}_c - 15|$ — Absolute deviation from an assumed optimal 15$^\circ$C, capturing both cold and heat stress.
+  \item \textbf{wind\_penalty} $= \text{wind}_\text{kph} / 10$ — Normalized wind impact on a 0--5 scale.
+  \item \textbf{has\_precip} — Binary flag for rain or snow conditions.
+  \item \textbf{is\_dome} — Indoor stadium indicator (ATL, DET, IND, NO, LA, LV, MIN).
+  \item \textbf{wind\_precip\_interaction} $= \text{wind\_penalty} \times \text{has\_precip}$ — Joint effect of wind and precipitation.
+  \item \textbf{temp\_wind\_interaction} $= \text{temp\_extreme} \times \text{wind\_penalty}$ — Amplification under combined stress.
+\end{itemize}
+
+I integrate these features into the GLM (4 features: temp\_extreme, wind\_penalty, has\_precip, is\_dome) and XGBoost (6 features including interactions) models on 1,408 games (2020--2024). XGBoost accuracy improved marginally from 94.9\% to 95.3\% (+0.4\%), while GLM accuracy decreased slightly from 92.5\% to 91.8\% ($-0.7\%$). This suggests that, while measurable, weather effects are small relative to spread and EPA features.
+
+\subsection{Wind impact hypothesis test}\label{subsec:wind-hypothesis}
+A longstanding piece of betting wisdom holds that high winds reduce NFL scoring, creating value in under bets. To test this empirically, I analyze 1,017 outdoor games (2020--present) with wind data, computing correlations, t-tests, and chi-square tests on the relationship between wind speed and total points scored.
+
+\textbf{Results:}
+\begin{itemize}
+  \item Pearson correlation between wind\_kph and total\_points: $r = 0.0038$ ($p = 0.90$), not significant.
+  \item T-test comparing high wind ($>$40 kph) vs.\ low wind ($<$25 kph): mean difference $= 0.9$ points ($t = -0.79$, $p = 0.43$), no significant difference.
+  \item Chi-square test on over/under outcomes vs.\ wind category: $\chi^2 = 0.134$ ($p = 0.71$), no relationship.
+  \item High-wind under betting strategy (>40 kph): 53.9\% win rate (288/534), expected ROI 3.01\% (marginally profitable but not statistically robust).
+\end{itemize}
+
+\textbf{Interpretation:} The traditional belief that wind suppresses scoring is not supported by the data. Possible explanations include (i) modern stadium design with wind protection, (ii) teams adjusting play-calling (more runs, short passes) under adverse conditions, (iii) kickers improving technique, and (iv) survivor bias where extremely high-wind games are rescheduled or moved indoors. This negative result is methodologically important: it guards against overfitting spurious weather effects and shows that not all domain intuitions survive empirical scrutiny.
+
+I document this analysis in \texttt{py/analysis/wind\_impact\_totals.py} and include it as a cautionary example in the feature engineering discussion. Weather features remain in the model catalog but are not prioritized for further elaboration.
 
 \subsection{Injury hazard and return-to-play}\label{subsec:injury-hazard}
 Let $T$ be time lost to injury and $X$ covariates (position, age, prior health). A Cox model

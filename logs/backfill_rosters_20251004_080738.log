@@ -1,0 +1,29 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+=== NFL Roster & Player Data Backfill ===
+
+Creating players table...
+NOTICE:  drop cascades to constraint rosters_player_id_fkey on table rosters
+
+[1] 0
+[1] 0
+Creating rosters table...
+[1] 0
+[1] 0
+Loading rosters from nflreadr for seasons 1999 to 2024 ...
+Loaded 63343 roster-week entries
+
+Extracting unique players...
+Found 15225 unique players
+Writing players to database...
+Error: Table players exists in database, and both overwrite and append are FALSE
+Execution halted

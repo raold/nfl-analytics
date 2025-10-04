@@ -37,7 +37,13 @@ WITH team_games AS (
            g.spread_close,
            g.total_close,
            g.home_score AS points_for,
-           g.away_score AS points_against
+           g.away_score AS points_against,
+           g.stadium,
+           g.roof,
+           g.surface,
+           g.home_qb_id AS qb_id,
+           g.home_qb_name AS qb_name,
+           g.home_coach AS coach_name
     FROM games g
     UNION ALL
     SELECT g.game_id,
@@ -53,7 +59,13 @@ WITH team_games AS (
            g.spread_close,
            g.total_close,
            g.away_score AS points_for,
-           g.home_score AS points_against
+           g.home_score AS points_against,
+           g.stadium,
+           g.roof,
+           g.surface,
+           g.away_qb_id AS qb_id,
+           g.away_qb_name AS qb_name,
+           g.away_coach AS coach_name
     FROM games g
 ),
 team_stats AS (
@@ -79,6 +91,12 @@ SELECT tg.game_id,
        tg.total_close,
        tg.points_for,
        tg.points_against,
+       tg.stadium,
+       tg.roof,
+       tg.surface,
+       tg.qb_id,
+       tg.qb_name,
+       tg.coach_name,
        tg.points_for - tg.points_against AS margin,
        COALESCE(ts.epa_sum, 0) AS epa_sum,
        COALESCE(ts.plays, 0) AS plays
@@ -116,6 +134,16 @@ TEAM_FEATURE_COLUMNS = [
     "prev_points_for",
     "prev_points_against",
     "prev_spread_close",
+    "qb_change",
+    "qb_team_games",
+    "qb_total_games",
+    "coach_change",
+    "coach_team_games",
+    "coach_total_games",
+    "surface_grass",
+    "surface_artificial",
+    "roof_dome",
+    "roof_outdoors",
 ]
 
 
@@ -136,6 +164,16 @@ DIFF_FEATURE_COLUMNS = [
     "season_win_pct",
     "season_point_diff_avg",
     "rest_days",
+    "qb_change",
+    "qb_team_games",
+    "qb_total_games",
+    "coach_change",
+    "coach_team_games",
+    "coach_total_games",
+    "surface_grass",
+    "surface_artificial",
+    "roof_dome",
+    "roof_outdoors",
 ]
 
 
@@ -168,6 +206,11 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df["points_for"] = team_df["points_for"].astype(float)
     team_df["points_against"] = team_df["points_against"].astype(float)
     team_df["margin"] = team_df["margin"].astype(float)
+
+    team_df["qb_id"] = team_df["qb_id"].fillna("UNKNOWN")
+    team_df["coach_name"] = team_df["coach_name"].fillna("UNKNOWN")
+    team_df["surface"] = team_df["surface"].fillna("").str.lower()
+    team_df["roof"] = team_df["roof"].fillna("").str.lower()
 
     team_df["epa_per_play"] = np.where(team_df["plays"] > 0, team_df["epa_sum"] / team_df["plays"], np.nan)
     team_df["points_total"] = team_df["points_for"] + team_df["points_against"]
@@ -235,6 +278,24 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
 
     prev_is_home = team_group["is_home"].shift(1)
     team_df["travel_change"] = np.where(team_df["prior_games"] > 0, (prev_is_home != team_df["is_home"]).astype(float), 0.0)
+
+    prev_qb = team_group["qb_id"].shift(1)
+    team_df["qb_change"] = np.where(team_df["prior_games"] > 0, (prev_qb != team_df["qb_id"]).astype(float), 0.0)
+    team_df["qb_team_games"] = team_df.groupby(["team", "qb_id"]).cumcount().astype(float)
+    team_df["qb_total_games"] = team_df.groupby("qb_id").cumcount().astype(float)
+
+    prev_coach = team_group["coach_name"].shift(1)
+    team_df["coach_change"] = np.where(team_df["prior_games"] > 0, (prev_coach != team_df["coach_name"]).astype(float), 0.0)
+    team_df["coach_team_games"] = team_df.groupby(["team", "coach_name"]).cumcount().astype(float)
+    team_df["coach_total_games"] = team_df.groupby("coach_name").cumcount().astype(float)
+
+    surface_lower = team_df["surface"]
+    team_df["surface_grass"] = surface_lower.str.contains("grass").astype(float)
+    team_df["surface_artificial"] = surface_lower.str.contains("turf").astype(float)
+
+    roof_lower = team_df["roof"]
+    team_df["roof_dome"] = roof_lower.isin(["dome", "closed"]).astype(float)
+    team_df["roof_outdoors"] = roof_lower.isin(["outdoors", "open", "retractable"]).astype(float)
 
     helper_cols = [
         "_points_for_f",
@@ -313,9 +374,9 @@ def pivot_to_games(df: pd.DataFrame) -> pd.DataFrame:
 
     merged["home_margin"] = merged["home_score"] - merged["away_score"]
     merged["home_cover"] = np.where(
-        merged["home_margin"] + merged["spread_close"] > 0,
+        merged["home_margin"] - merged["spread_close"] > 0,
         1,
-        np.where(merged["home_margin"] + merged["spread_close"] < 0, 0, np.nan),
+        np.where(merged["home_margin"] - merged["spread_close"] < 0, 0, np.nan),
     )
     merged["is_push"] = merged["home_cover"].isna()
 

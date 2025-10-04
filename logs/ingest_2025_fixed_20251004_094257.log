@@ -1,0 +1,24 @@
+Installing missing CRAN packages...
+Installing missing GitHub packages...
+Package installation complete!
+Core packages loaded!
+=== 2025 NFL Season Data Ingestion ===
+Started: 2025-10-04 09:42:58 
+
+1. Loading 2025 schedules...
+   Found 272 games
+   Completed games: 65 
+   Upserting 272 games...
+[1] 272
+   ✓ Games ingested
+
+2. Loading 2025 play-by-play...
+   Found 11239 plays from 65 games
+   Upserting 11239 plays...
+[1] 0
+   ✓ Plays ingested
+
+3. Loading 2025 rosters...
+   Found 3076 roster entries
+Error: object 'gsis_id' not found
+Execution halted

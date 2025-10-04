@@ -1,0 +1,41 @@
+# Development & Testing Dependencies
+# Install with: pip install -r requirements-dev.txt
+
+# Testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0           # Coverage reporting
+pytest-mock>=3.11.1          # Mocking utilities
+pytest-timeout>=2.1.0        # Timeout protection
+pytest-xdist>=3.3.1          # Parallel test execution
+
+# HTTP/API mocking
+responses>=0.23.0            # Mock HTTP requests
+requests-mock>=1.11.0        # Alternative HTTP mocking
+
+# Time mocking
+freezegun>=1.2.2             # Mock datetime
+
+# Database testing
+testing.postgresql>=1.3.0    # Disposable Postgres instances
+
+# Code formatting
+black>=23.7.0                # Python formatter
+ruff>=0.0.286                # Fast Python linter
+
+# Type checking
+mypy>=1.5.0                  # Static type checker
+types-requests>=2.31.0       # Type stubs for requests
+
+# Pre-commit hooks
+pre-commit>=3.3.3            # Git hook framework
+
+# Property-based testing
+hypothesis>=6.82.0           # Generative testing
+
+# Code quality
+pylint>=2.17.5               # Additional linting
+bandit>=1.7.5                # Security linting
+
+# Documentation
+sphinx>=7.1.0                # Documentation generator
+sphinx-rtd-theme>=1.3.0      # ReadTheDocs theme
