@@ -19,7 +19,13 @@ Summarize simulator acceptance test outcomes: pass/fail rates, typical deviation
 library(dplyr)
 library(ggplot2)
 library(knitr)
-dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
+
+# Ensure output_dir is absolute path
+output_dir <- params$output_dir
+if (!grepl("^/", output_dir)) {
+  output_dir <- file.path(dirname(dirname(getwd())), output_dir)
+}
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 # This notebook expects an acceptance log (per week/season/test) and live metrics per week.
 # If absent, write placeholders; otherwise compute real figures.

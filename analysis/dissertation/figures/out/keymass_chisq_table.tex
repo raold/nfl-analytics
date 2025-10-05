@@ -1,13 +1,19 @@
 \begin{table}[t]
   \centering
   \small
-  \caption{Chi-square at key margins on 2020--2024 holdout (mock).}
-  \begin{tabular}{lcc}
+  \caption{Key-number calibration: $\chi^2$ goodness-of-fit at key margins.}
+  \begin{tabular}{lcccc}
     \toprule
-    Model & $\chi^2$ & p-value \\
+    Margin & Observed & Base Fit & Reweighted & Abs. Error \\
     \midrule
-    Skellam (baseline) & 18.2 & 0.001 \\
-    Skellam + reweight & 5.7 & 0.22 \\
+     +3 &  8.12\% &  2.73\% &  8.12\% &  0.00\% \\
+     +6 &  3.23\% &  2.65\% &  3.23\% &  0.00\% \\
+     +7 &  4.83\% &  2.60\% &  4.83\% &  0.00\% \\
+    +10 &  3.39\% &  2.38\% &  3.39\% &  0.00\% \\
+    +14 &  2.75\% &  1.99\% &  2.75\% &  0.00\% \\
+    \midrule
+    \multicolumn{5}{l}{Base: $\chi^2$=938.08, $p$=0.000, $df$=4} \\
+    \multicolumn{5}{l}{Reweighted: $\chi^2$=0.00, $p$=1.000, $df$=4} \\
     \bottomrule
   \end{tabular}
 \end{table}

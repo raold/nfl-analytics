@@ -258,7 +258,7 @@ To make evaluation reproducible, we enumerate dataset cohorts, splits, coverage,
       \textbf{Cohort} & \textbf{Train} & \textbf{Val} & \textbf{Test} & \textbf{Books} & \textbf{Markets} & \textbf{Features as-of} & \textbf{Leakage checks} \\
       \midrule
       Era A & 2015--2019 & 2020 & 2021 & 5 & spread/total & Weekly snapshot; cut at decision time & As-of lineage; future-join guard \\
-      Era B & 2019--2022 & 2023 H1 & 2023 H2 & 7 & spread/total/ML & Rolling; late-week nowcasts allowed & Anti-leak tests; feature manifest \\
+      Era B & 2019--2022 & 2023 H1 & 2023 H2 & 7 & spread/total/\newline ML & Rolling; late-week nowcasts allowed & Anti-leak tests; feature manifest \\
       Holdout & 2024 W1--W18 & -- & 2025 W1--W4 & 8 & spread/total & As-of; lagged market velocity & Canary checks; drift alarms \\
       \bottomrule
     \end{tabularx}

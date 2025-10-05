@@ -224,8 +224,15 @@ class PerformanceTracker:
 
         if baseline and primary_metric:
             baseline_value = baseline.get("metrics", {}).get(primary_metric, 0)
+            # Extract scalar value from metric (handle both dict and scalar)
+            current_value = metrics[primary_metric]
+            if isinstance(current_value, dict):
+                current_value = current_value.get("mean", current_value.get("value", 0))
+            if isinstance(baseline_value, dict):
+                baseline_value = baseline_value.get("mean", baseline_value.get("value", 0))
+
             if baseline_value:
-                performance_delta = (metrics[primary_metric] - baseline_value) / baseline_value
+                performance_delta = (current_value - baseline_value) / baseline_value
 
         # Insert performance record
         is_baseline = baseline is None
@@ -832,11 +839,16 @@ class PerformanceTracker:
         primary_metric = self._get_primary_metric(model_id, metrics)
         if primary_metric:
             current_best = self._get_best_performance(model_id, primary_metric)
-            if not current_best or metrics[primary_metric] > current_best:
+            # Extract scalar value from metric (handle both dict and scalar)
+            metric_value = metrics[primary_metric]
+            if isinstance(metric_value, dict):
+                metric_value = metric_value.get("mean", metric_value.get("value", 0))
+
+            if not current_best or metric_value > current_best:
                 self._record_milestone(
                     model_id,
                     "new_best",
-                    f"New best {primary_metric}: {metrics[primary_metric]:.4f}",
+                    f"New best {primary_metric}: {metric_value:.4f}",
                 )
                 milestones.append("⭐ NEW BEST")
 

@@ -35,6 +35,10 @@ library(purrr)
 library(knitr)
 library(glue)
 
+# Ensure output_dir is absolute path
+if (!grepl("^/", params$output_dir)) {
+  params$output_dir <- file.path(dirname(dirname(getwd())), params$output_dir)
+}
 dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
 
 exp_weight <- function(s, t, H) 0.5 ^ ((t - s) / H)
@@ -143,10 +147,13 @@ calc_ece <- function(y, p, bins = 10) {
 
 train_glm_weighted <- function(df, train_years, t_eval, H = NULL, recent_only_start = NULL) {
   dtr <- df |>
-    filter(season %in% train_years)
+    dplyr::filter(season %in% train_years)
   if (!is.null(recent_only_start)) {
-    dtr <- dtr |>
-      filter(season >= recent_only_start)
+    # Only apply recent_only filter if we have overlap with train years
+    if (max(train_years) >= recent_only_start) {
+      dtr <- dtr |>
+        dplyr::filter(season >= recent_only_start)
+    }
   }
   if (nrow(dtr) == 0) return(NULL)
   if (is.null(H)) {
@@ -175,11 +182,21 @@ windows <- list(
 rolling_metrics <- NULL
 
 if (!is.null(games) && nrow(games) > 0) {
+  cat("Starting rolling TSCV with", nrow(games), "games\n")
+
   rolling_metrics <- purrr::map_dfr(windows, function(w) {
     tr_years <- w$train
     te_years <- w$test
     t_eval <- max(te_years)
-    dte <- games |> filter(season %in% te_years)
+    dte <- games |> dplyr::filter(season %in% te_years)
+
+    cat("Window:", min(tr_years), "-", max(tr_years), "→", min(te_years), "-", max(te_years), "| Test games:", nrow(dte), "\n")
+
+    # Skip if no test data
+    if (nrow(dte) == 0) {
+      cat("  Skipping: no test data\n")
+      return(NULL)
+    }
 
     mod_rec <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = NULL, recent_only_start = params$recent_start)
     mod_dec3 <- train_glm_weighted(games, train_years = tr_years, t_eval = t_eval, H = 3)
@@ -191,6 +208,12 @@ if (!is.null(games) && nrow(games) > 0) {
     m_dec4 <- predict_metrics(mod_dec4, dte)
     m_dec5 <- predict_metrics(mod_dec5, dte)
 
+    # Skip if any predictions failed
+    if (is.null(m_rec) || is.null(m_dec3) || is.null(m_dec4) || is.null(m_dec5)) {
+      cat("  Skipping: model predictions failed\n")
+      return(NULL)
+    }
+
     tibble(
       block = glue("{min(te_years)}–{max(te_years)}"),
       model = c("recent", "decH3", "decH4", "decH5"),
@@ -199,19 +222,30 @@ if (!is.null(games) && nrow(games) > 0) {
     )
   })
 
-  # Plot rolling log loss
-  p_ll <- ggplot(rolling_metrics, aes(x = block, y = logloss, color = model, group = model)) +
-    geom_line(linewidth = 1) + geom_point() +
-    labs(x = "Evaluation block", y = "Log loss (mean)", color = "Model") +
-    theme_minimal(base_size = 12)
-  ggsave(file.path(params$output_dir, "rolling_oos_logloss.png"), p_ll, width = 8, height = 4.5, dpi = 200)
+  cat("\n=== Rolling metrics result ===\n")
+  print(rolling_metrics)
+  cat("Dimensions:", if(!is.null(rolling_metrics)) nrow(rolling_metrics) else 0, "rows\n\n")
 
-  # Plot rolling ECE
-  p_ece <- ggplot(rolling_metrics, aes(x = block, y = ece, color = model, group = model)) +
-    geom_line(linewidth = 1) + geom_point() +
-    labs(x = "Evaluation block", y = "ECE (10 bins)", color = "Model") +
-    theme_minimal(base_size = 12)
-  ggsave(file.path(params$output_dir, "rolling_oos_ece.png"), p_ece, width = 8, height = 4.5, dpi = 200)
+  # Only plot if we have data
+  if (!is.null(rolling_metrics) && nrow(rolling_metrics) > 0) {
+    # Plot rolling log loss
+    p_ll <- ggplot(rolling_metrics, aes(x = block, y = logloss, color = model, group = model)) +
+      geom_line(linewidth = 1) + geom_point() +
+      labs(x = "Evaluation block", y = "Log loss (mean)", color = "Model") +
+      theme_minimal(base_size = 12)
+    ggsave(file.path(params$output_dir, "rolling_oos_logloss.png"), p_ll, width = 8, height = 4.5, dpi = 200)
+    cat("Saved rolling_oos_logloss.png\n")
+
+    # Plot rolling ECE
+    p_ece <- ggplot(rolling_metrics, aes(x = block, y = ece, color = model, group = model)) +
+      geom_line(linewidth = 1) + geom_point() +
+      labs(x = "Evaluation block", y = "ECE (10 bins)", color = "Model") +
+      theme_minimal(base_size = 12)
+    ggsave(file.path(params$output_dir, "rolling_oos_ece.png"), p_ece, width = 8, height = 4.5, dpi = 200)
+    cat("Saved rolling_oos_ece.png\n")
+  } else {
+    cat("WARNING: rolling_metrics is NULL or empty - skipping plots\n")
+  }
 }
 ```
 

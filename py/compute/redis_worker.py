@@ -15,6 +15,7 @@ from typing import Dict, Any, Optional
 from worker import ComputeWorker
 from redis_task_queue import RedisTaskQueue, HardwareProfile
 from sync_manager import GoogleDriveSyncManager
+from compute_odometer import ComputeOdometer
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,12 @@ class RedisComputeWorker(ComputeWorker):
 
         # Redis task queue
         self.redis_queue = None
+
+        # Compute odometer for lifetime tracking
+        self.odometer = ComputeOdometer(
+            redis_host=redis_host,
+            redis_port=redis_port
+        )
 
         # Performance tracking
         self.tasks_completed = 0
@@ -102,6 +109,26 @@ class RedisComputeWorker(ComputeWorker):
             platform=platform.system(),
             capabilities=capabilities
         )
+
+    def _get_hardware_type(self) -> str:
+        """
+        Get hardware type string for odometer tracking.
+
+        Returns one of: 'apple_m4', 'rtx_4090', 'default'
+        """
+        import platform
+
+        # Detect Apple Silicon
+        if platform.system() == "Darwin" and platform.machine() == "arm64":
+            # Check for M4 (or assume M-series)
+            return "apple_m4"
+
+        # Detect NVIDIA RTX 4090
+        if self.hardware_profile.gpu_name and "4090" in self.hardware_profile.gpu_name:
+            return "rtx_4090"
+
+        # Default for other hardware
+        return "default"
 
     def _detect_hardware_profile(self) -> HardwareProfile:
         """Auto-detect hardware capabilities."""
@@ -209,10 +236,24 @@ class RedisComputeWorker(ComputeWorker):
             logger.error(f"❌ Failed to get next task: {e}")
             return None
 
-    def complete_task(self, task_id: str, result: Dict[str, Any],
-                     cpu_hours: float = 0, gpu_hours: float = 0):
-        """Mark task as completed in Redis."""
+    def complete_task(self, task_id: str, task_type: str, result: Dict[str, Any],
+                     cpu_hours: float = 0, gpu_hours: float = 0, expected_value: float = 0.0):
+        """Mark task as completed in Redis and record in odometer."""
         try:
+            # Get hardware type for accurate normalization
+            hardware_type = self._get_hardware_type()
+
+            # Record in odometer first
+            self.odometer.record_task_completion(
+                task_id=task_id,
+                task_type=task_type,
+                cpu_hours=cpu_hours,
+                gpu_hours=gpu_hours,
+                expected_value=expected_value,
+                hardware_type=hardware_type
+            )
+
+            # Complete in Redis
             self.redis_queue.complete_task(task_id, result, cpu_hours, gpu_hours)
             self.tasks_completed += 1
             logger.info(f"✅ Completed task {task_id}")
@@ -273,6 +314,7 @@ class RedisComputeWorker(ComputeWorker):
         task_name = task["name"]
         task_type = task["task_type"]
         config = task["config"]
+        expected_value = task.get("expected_value", 0.0)
 
         start_time = time.time()
 
@@ -288,7 +330,7 @@ class RedisComputeWorker(ComputeWorker):
             gpu_hours = cpu_hours if self.hardware_profile.gpu_memory > 0 and task.get("requires_gpu") else 0
 
             # Complete task
-            self.complete_task(task_id, result, cpu_hours, gpu_hours)
+            self.complete_task(task_id, task_type, result, cpu_hours, gpu_hours, expected_value)
 
         except Exception as e:
             error_message = f"Task execution failed: {str(e)}"

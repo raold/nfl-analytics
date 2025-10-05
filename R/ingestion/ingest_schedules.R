@@ -76,8 +76,14 @@ sched <- schedules_raw |>
 sched <- as.data.frame(sched)
 
 # replace existing contents so reruns stay idempotent
+# SAFE: Only delete seasons being loaded, not all historical data
 dbWithTransaction(con, {
-  dbExecute(con, "TRUNCATE TABLE games;")
+  seasons_in_data <- unique(sched$season)
+  seasons_list <- paste(seasons_in_data, collapse = ",")
+  delete_sql <- sprintf("DELETE FROM games WHERE season IN (%s);", seasons_list)
+  dbExecute(con, delete_sql)
+  cat("Deleted existing data for seasons:", seasons_list, "\n")
   dbWriteTable(con, "games", sched, append = TRUE, row.names = FALSE)
+  cat("Inserted", nrow(sched), "games\n")
 })
 dbDisconnect(con)

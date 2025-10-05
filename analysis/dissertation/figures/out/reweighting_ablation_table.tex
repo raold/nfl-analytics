@@ -1,13 +1,15 @@
 \begin{table}[t]
   \centering
   \small
-  \caption{With/without reweighting ablation on 2024 (mock).}
-  \begin{tabular}{lrr}
+  \caption{Reweighting ablation: impact of key-mass adjustment.}
+  \begin{tabular}{lccc}
     \toprule
-    Config & Brier & ATS acc \\
+    Method & $\chi^2$ (full) & $p$-value & MAE at keys \\
     \midrule
-    without reweighting & 0.246 & 0.520 \\
-    with reweighting    & 0.241 & 0.533 \\
+    Base (no reweight) & 2558.45 & 0.000 & 139.48 \\
+    IPF reweighted & 1735.76 & 0.000 & 0.00 \\
+    \midrule
+    Improvement & +822.69 & +0.000 & +139.48 \\
     \bottomrule
   \end{tabular}
 \end{table}
