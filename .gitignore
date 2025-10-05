@@ -14,3 +14,76 @@ dump.rdb
 # Compute databases
 compute_queue.db*
 machine_info.json
+
+# macOS system files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor/IDE settings
+.idea/
+.vscode/
+*.code-workspace
+
+# Python caches and coverage
+__pycache__/
+*.py[cod]
+*.so
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ipynb_checkpoints/
+.cache/
+
+# R and renv artifacts
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+renv/library/
+renv/staging/
+
+# Notebook/Quarto/knitr caches
+**/*_cache/
+**/*_files/
+**/_freeze/
+
+# Generic local databases
+*.sqlite3
+*.db
+*.db-shm
+*.db-wal
+
+# Build artifacts
+dist/
+build/
+.eggs/
+*.egg-info/
+pip-wheel-metadata/
+
+# Virtual environments
+.venv/
+venv/
+env/
+.direnv/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.run.xml
+*.xdv
