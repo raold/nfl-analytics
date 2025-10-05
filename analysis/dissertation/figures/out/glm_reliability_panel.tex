@@ -1,31 +1,30 @@
-\begin{figure}[t]
+% First page: 2015-2019 (5 seasons, 3 rows)
+\begin{figure}[p]
   \centering
-  \caption[Per-season reliability: core_form, none, thr=0.50]{Per-season reliability: core_form, none, thr=0.50}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2003.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2004.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2005.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2006.png}
-  \par\vspace{2pt}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2007.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2008.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2009.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2010.png}
-  \par\vspace{2pt}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2011.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2012.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2013.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2014.png}
-  \par\vspace{2pt}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2015.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2016.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2017.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2018.png}
-  \par\vspace{2pt}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2019.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2020.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2021.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2022.png}
-  \par\vspace{2pt}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2023.png}
-  \includegraphics[width=0.22\linewidth]{../../../../../analysis/reports/calibration/rel_core_form_none_thr0.50_s2024.png}
+  \caption[Per-season reliability: GLM baseline (2015--2019)]{Per-season reliability curves for GLM baseline (2015--2019). Each panel shows predicted probability vs.\ observed rate with 10 bins. Continued in Figure~\ref{fig:reliability-panels-b}.}
+  \label{fig:reliability-panels}
+  % Paths are relative to chapter_4_baseline_modeling/ where this file is \input
+  % 2 columns per row, 3 rows for first page
+  \IfFileExists{../figures/out/reliability_diagram_s2015.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2015.png}}{\fbox{\scriptsize 2015}}
+  \IfFileExists{../figures/out/reliability_diagram_s2016.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2016.png}}{\fbox{\scriptsize 2016}}
+  \par\vspace{6pt}
+  \IfFileExists{../figures/out/reliability_diagram_s2017.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2017.png}}{\fbox{\scriptsize 2017}}
+  \IfFileExists{../figures/out/reliability_diagram_s2018.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2018.png}}{\fbox{\scriptsize 2018}}
+  \par\vspace{6pt}
+  \IfFileExists{../figures/out/reliability_diagram_s2019.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2019.png}}{\fbox{\scriptsize 2019}}
+\end{figure}
+
+% Second page: 2020-2024 (5 seasons, 3 rows)
+\begin{figure}[p]
+  \centering
+  \caption[Per-season reliability: GLM baseline (2020--2024)]{Per-season reliability curves for GLM baseline (2020--2024), continued from Figure~\ref{fig:reliability-panels}. Each panel shows predicted probability vs.\ observed rate with 10 bins.}
+  \label{fig:reliability-panels-b}
+  % 2 columns per row, 3 rows for second page
+  \IfFileExists{../figures/out/reliability_diagram_s2020.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2020.png}}{\fbox{\scriptsize 2020}}
+  \IfFileExists{../figures/out/reliability_diagram_s2021.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2021.png}}{\fbox{\scriptsize 2021}}
+  \par\vspace{6pt}
+  \IfFileExists{../figures/out/reliability_diagram_s2022.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2022.png}}{\fbox{\scriptsize 2022}}
+  \IfFileExists{../figures/out/reliability_diagram_s2023.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2023.png}}{\fbox{\scriptsize 2023}}
+  \par\vspace{6pt}
+  \IfFileExists{../figures/out/reliability_diagram_s2024.png}{\includegraphics[width=0.48\linewidth]{../figures/out/reliability_diagram_s2024.png}}{\fbox{\scriptsize 2024}}
 \end{figure}

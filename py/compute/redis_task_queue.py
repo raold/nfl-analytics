@@ -55,6 +55,7 @@ class TaskDefinition:
     min_gpu_memory: int = 0
     min_cpu_cores: int = 1
     min_memory: int = 1024 * 1024 * 1024  # 1GB default
+    expected_value: float = 0.0  # Expected value in dollars
     created_at: Optional[datetime] = None
     schema_version: str = "v2"
 
@@ -77,6 +78,7 @@ class TaskResult:
     machine_id: str = ""
     cpu_hours: float = 0.0
     gpu_hours: float = 0.0
+    hardware_type: str = "apple_m4"  # Default to Apple M4, options: apple_m4, rtx_4090, default
 
     def __post_init__(self):
         if self.result is None:
@@ -195,7 +197,8 @@ class RedisTaskQueue:
                  depends_on: Optional[List[str]] = None,
                  estimated_hours: float = 1.0,
                  requires_gpu: bool = False,
-                 min_gpu_memory: int = 0) -> str:
+                 min_gpu_memory: int = 0,
+                 expected_value: float = 0.0) -> str:
         """Add task to appropriate queue based on requirements."""
 
         task_id = f"{task_type}_{uuid.uuid4().hex[:8]}"
@@ -206,6 +209,7 @@ class RedisTaskQueue:
             task_type=task_type,
             config=config,
             priority=priority,
+            expected_value=expected_value,
             depends_on=depends_on or [],
             estimated_hours=estimated_hours,
             requires_gpu=requires_gpu,

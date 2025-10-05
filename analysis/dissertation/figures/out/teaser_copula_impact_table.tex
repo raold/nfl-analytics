@@ -1,0 +1,17 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Copula pricing impact summary.}
+  \begin{tabular}{lcc}
+    \toprule
+    Metric & Gaussian & $t$-copula \\
+    \midrule
+    Mean $\Delta$ EV & -0.0385 & -0.0381 \\
+    Max $|\Delta|$ EV & -0.0613 & -0.0610 \\
+    \midrule
+    \multicolumn{3}{l}{Interpretation: Ignoring dependence} \\
+    \multicolumn{3}{l}{overestimates EV by $\sim$3.8\% on average.} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:copula_impact_summary}
+\end{table}

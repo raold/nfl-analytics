@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Fetch historical odds from The Odds API and upsert into postgres."""
+"""
+Fetch historical odds from The Odds API and upsert into postgres.
+
+⚠️ DEPRECATED: This script is kept for backward compatibility.
+For new code, use: etl.extract.odds_api.OddsAPIExtractor
+See: etl/extract/odds_api.py for the new implementation.
+
+This legacy script will be maintained but not enhanced.
+"""
 from __future__ import annotations
 
 import argparse

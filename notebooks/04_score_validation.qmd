@@ -26,7 +26,12 @@ library(RPostgres)
 library(glue)
 library(knitr)
 
-dir.create(params$output_dir, recursive = TRUE, showWarnings = FALSE)
+# Ensure output_dir is absolute path
+output_dir <- params$output_dir
+if (!grepl("^/", output_dir)) {
+  output_dir <- file.path(dirname(dirname(getwd())), output_dir)
+}
+dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
 get_games <- function(min_season, max_season) {
   con <- tryCatch({
@@ -106,17 +111,17 @@ if (is.null(games) || nrow(games) == 0) {
   # Placeholder chi-square table
   ks <- data.frame(Model = c("Skellam (baseline)", "Skellam + reweight"), Chisq = NA_real_, p_value = NA_real_)
   writeLines(knitr::kable(ks, format = "latex", booktabs = TRUE, caption = "Chi-square at key margins (placeholder).", col.names = c("Model", "$\\chi^2$", "p-value")),
-             con = file.path(params$output_dir, "keymass_chisq_table.tex"))
+             con = file.path(output_dir, "keymass_chisq_table.tex"))
   # Placeholder teaser EV table
   tev <- data.frame(Model = c("Skellam (baseline)", "Skellam + reweight"), Mean_EV_bps = NA_real_, ROI = NA_real_)
   writeLines(knitr::kable(tev, format = "latex", booktabs = TRUE, caption = "Teaser EV/ROI (placeholder)."),
-             con = file.path(params$output_dir, "teaser_ev_oos_table.tex"))
+             con = file.path(output_dir, "teaser_ev_oos_table.tex"))
   # Placeholder ablation table
   abl <- data.frame(Config = c("without reweighting", "with reweighting"), Brier = NA_real_, ATS_acc = NA_real_)
   writeLines(knitr::kable(abl, format = "latex", booktabs = TRUE, caption = "With/without reweighting ablation (placeholder)."),
-             con = file.path(params$output_dir, "reweighting_ablation_table.tex"))
+             con = file.path(output_dir, "reweighting_ablation_table.tex"))
   # Placeholder figure
-  png(file.path(params$output_dir, "integer_margin_calibration.png"), width = 900, height = 500)
+  png(file.path(output_dir, "integer_margin_calibration.png"), width = 900, height = 500)
   plot.new(); text(0.5, 0.5, "Placeholder: integer-margin calibration")
   dev.off()
 } else {
@@ -186,7 +191,7 @@ if (is.null(games) || nrow(games) == 0) {
 
   ks <- tibble(Model = c("Skellam (baseline)", "Skellam + reweight"), `\\(\\chi^2\\)` = c(round(cs_base,2), round(cs_rw,2)), `p-value` = c(round(p_base,3), round(p_rw,3)))
   writeLines(knitr::kable(ks, format = "latex", booktabs = TRUE, caption = "Chi-square at key margins (holdout)."),
-             con = file.path(params$output_dir, "keymass_chisq_table.tex"))
+             con = file.path(output_dir, "keymass_chisq_table.tex"))
 
   # Integer-margin calibration figure (aggregated)
   agg_base <- rowMeans(pmf_mat_base)
@@ -202,7 +207,7 @@ if (is.null(games) || nrow(games) == 0) {
     geom_vline(xintercept = keys, linetype = "dashed", alpha = 0.2) +
     labs(x = "Margin d", y = "Probability", title = "Integer-margin calibration (holdout)") +
     theme_minimal(base_size = 12)
-  ggsave(file.path(params$output_dir, "integer_margin_calibration.png"), p, width = 9, height = 5, dpi = 200)
+  ggsave(file.path(output_dir, "integer_margin_calibration.png"), p, width = 9, height = 5, dpi = 200)
 
   # ATS/Brier using pmfs
   p_cover_base <- colSums(sapply(1:nrow(test), function(i) as.numeric(support + test$spread_close[i] > 0) * pmf_mat_base[, i]))
@@ -216,7 +221,7 @@ if (is.null(games) || nrow(games) == 0) {
     ATS_acc = c(round(ats_acc(p_cover_base, y_cover), 3), round(ats_acc(p_cover_rw, y_cover), 3))
   )
   writeLines(knitr::kable(abl, format = "latex", booktabs = TRUE, caption = "With/without reweighting ablation (ATS/Brier on holdout)."),
-             con = file.path(params$output_dir, "reweighting_ablation_table.tex"))
+             con = file.path(output_dir, "reweighting_ablation_table.tex"))
 
   # Teaser EV (independence approximation): 2-leg, 6-point, d = 1.8
   d_pay <- 1.8
@@ -226,7 +231,7 @@ if (is.null(games) || nrow(games) == 0) {
   ev2_base <- d_pay * mean(q_base^2) - 1
   ev2_rw   <- d_pay * mean(q_rw^2) - 1
   tev <- tibble(Model = c("Skellam (baseline)", "Skellam + reweight"), `Mean EV (bps)` = round(c(ev2_base, ev2_rw) * 10000, 1), ROI = NA_real_)
-  writeLines(knitr::kable(tev, format = "latex", booktabs = TRUE, caption = "Two-leg teaser EV (independence approx.) on holdout."),
-             con = file.path(params$output_dir, "teaser_ev_oos_table.tex"))
+  writeLines(knitr::kable(tev, format = "latex", booktabs = TRUE, caption = "Two-leg teaser EV (independence approx.) on holdout)."),
+             con = file.path(output_dir, "teaser_ev_oos_table.tex"))
 }
 ```

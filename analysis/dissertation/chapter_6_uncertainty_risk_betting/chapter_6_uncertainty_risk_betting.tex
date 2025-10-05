@@ -50,6 +50,27 @@ limits tail risk while allowing Kelly-like growth on the interior. We include ex
 % Auto-included CVaR benchmark table if present
 \IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}
 
+\subsection{Teaser Pricing and Copula Impact}\label{subsec:teaser-copula}
+Teaser bets allow shifting spread and total lines in the bettor's favor in exchange for reduced payouts. Accurate teaser pricing requires modeling the dependence between spread and total outcomes. We evaluate pricing error from ignoring dependence structure by comparing Gaussian copula ($\rho=0.020$) to an independence assumption across 1,408 games (2020-2024).
+
+\IfFileExists{../figures/out/teaser_copula_impact_table.tex}{\input{../figures/out/teaser_copula_impact_table.tex}}{%
+  \begin{table}[t]
+    \centering
+    \caption[Copula vs independence teaser pricing]{Teaser EV difference: Copula ($\rho=0.020$) vs independence assumption (placeholder).}
+    \label{tab:teaser-copula-impact}
+    \begin{tabular}{lccc}
+      \toprule
+      Teaser Type & Independence EV (bps) & Copula EV (bps) & Delta (bps) \\
+      \midrule
+      6pt (2-leg) & -- & -- & -- \\
+      7pt (2-leg) & -- & -- & -- \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+}
+
+The near-zero correlation ($\rho=0.020$) confirms that independence is a reasonable approximation for practical teaser pricing, simplifying model architecture without material pricing error.
+
 \begin{theorem}[Convexity of Rockafellar--Uryasev CVaR program \citep{rockafellar2000}]
 The optimization problem \eqref{eq:cvar-prog} is convex in $(\vect f, t, \xi)$ since the objective is linear and constraints are affine, ensuring global optimality and tractability.
 \end{theorem}

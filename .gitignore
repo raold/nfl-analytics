@@ -3,3 +3,14 @@
 pgdata/
 .env
 .tmp.driveupload/
+
+# Worker logs
+*.log
+!archive/**/*.log
+
+# Redis data
+dump.rdb
+
+# Compute databases
+compute_queue.db*
+machine_info.json

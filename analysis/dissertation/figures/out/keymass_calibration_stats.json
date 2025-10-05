@@ -1,0 +1,27 @@
+{
+  "season_range": [
+    1999,
+    2024
+  ],
+  "key_numbers": [
+    3,
+    6,
+    7,
+    10,
+    14
+  ],
+  "n_games": 6991,
+  "calibration": {
+    "chi2_base": 938.0836047736963,
+    "p_base": 0.0,
+    "df_base": 4,
+    "chi2_reweighted": 3.5743078183465306e-30,
+    "p_reweighted": 1.0,
+    "df_reweighted": 4
+  },
+  "ablation": {
+    "mae_improvement": 139.47657602140475,
+    "chi2_improvement": 822.6946359987635,
+    "p_value_improvement": 0.0
+  }
+}

@@ -9,39 +9,41 @@
 \contentsline {table}{\numberline {5.3}{\ignorespaces Dataset cohorts, splits, coverage, and lineage guards.}}{38}{table.caption.290}%
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {6.1}{\ignorespaces Paired comparison vs recent-only on 2024 (mock).}}{40}{table.caption.302}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Chi-square at key margins on 2020--2024 holdout (mock).}}{43}{table.caption.318}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Two-leg teaser EV on holdout.}}{43}{table.caption.319}%
-\contentsline {table}{\numberline {6.4}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{47}{table.caption.320}%
-\contentsline {table}{\numberline {6.5}{\ignorespaces With/without reweighting ablation on 2024 (mock).}}{47}{table.caption.321}%
-\contentsline {table}{\numberline {6.6}{\ignorespaces Ablation deltas by family}}{48}{table.caption.327}%
-\contentsline {table}{\numberline {6.7}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{48}{table.caption.334}%
-\contentsline {table}{\numberline {6.8}{\ignorespaces Tail dependence estimates with 95\% CIs.}}{48}{table.caption.335}%
-\contentsline {table}{\numberline {6.9}{\ignorespaces Baseline GLM backtest}}{49}{table.caption.338}%
-\contentsline {table}{\numberline {6.10}{\ignorespaces GLM overall comparison}}{49}{table.caption.339}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Key-number calibration: $\chi ^2$ goodness-of-fit at key margins.}}{44}{table.caption.318}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Teaser pricing: EV comparison under independence vs copula dependence.}}{44}{table.caption.319}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{49}{table.caption.320}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Reweighting ablation: impact of key-mass adjustment.}}{50}{table.caption.321}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Ablation deltas by family}}{50}{table.caption.327}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{50}{table.caption.334}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Tail dependence estimates with 95\% CIs.}}{50}{table.caption.335}%
+\contentsline {table}{\numberline {6.9}{\ignorespaces Baseline GLM backtest}}{51}{table.caption.339}%
+\contentsline {table}{\numberline {6.10}{\ignorespaces GLM overall comparison}}{51}{table.caption.340}%
+\contentsline {table}{\numberline {6.11}{\ignorespaces Multi-Model Backtest Comparison}}{52}{table.caption.345}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{52}{table.caption.348}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces DQN vs PPO Agent Comparison (400 epochs)}}{55}{table.caption.364}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces NFL constraints and the resulting design choices.}}{60}{table.caption.397}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{62}{table.caption.400}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{63}{table.caption.410}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces CVaR benchmark}}{63}{table.caption.411}%
-\contentsline {table}{\numberline {7.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{64}{table.caption.416}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{55}{table.caption.354}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces DQN vs PPO Agent Comparison (400 epochs)}}{58}{table.caption.370}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces NFL constraints and the resulting design choices.}}{64}{table.caption.403}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{65}{table.caption.406}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{66}{table.caption.416}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces CVaR benchmark}}{66}{table.caption.417}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{68}{table.caption.422}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {8.1}{\ignorespaces CVaR benchmark}}{66}{table.caption.430}%
+\contentsline {table}{\numberline {8.1}{\ignorespaces CVaR benchmark}}{70}{table.caption.436}%
+\contentsline {table}{\numberline {8.2}{\ignorespaces Copula pricing impact summary.}}{71}{table.caption.438}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {9.1}{\ignorespaces Slippage model summary by book (illustrative).}}{76}{table.caption.487}%
-\contentsline {table}{\numberline {9.2}{\ignorespaces Simulator acceptance checks}}{77}{table.caption.490}%
-\contentsline {table}{\numberline {9.3}{\ignorespaces Typical deviations when acceptance tests fail (mock).}}{77}{table.caption.491}%
+\contentsline {table}{\numberline {9.1}{\ignorespaces Slippage model summary by book (illustrative).}}{81}{table.caption.495}%
+\contentsline {table}{\numberline {9.2}{\ignorespaces Simulator acceptance checks}}{82}{table.caption.498}%
+\contentsline {table}{\numberline {9.3}{\ignorespaces Typical deviations when acceptance tests fail (mock).}}{82}{table.caption.499}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {10.1}{\ignorespaces Out-of-sample results by season}}{79}{table.caption.497}%
-\contentsline {table}{\numberline {10.2}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{79}{table.caption.502}%
-\contentsline {table}{\numberline {10.3}{\ignorespaces Core ablation grid (mock).}}{81}{table.caption.509}%
+\contentsline {table}{\numberline {10.1}{\ignorespaces Out-of-sample results by season}}{84}{table.caption.505}%
+\contentsline {table}{\numberline {10.2}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{84}{table.caption.510}%
+\contentsline {table}{\numberline {10.3}{\ignorespaces Core ablation grid (mock).}}{86}{table.caption.517}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{87}{table.caption.540}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{88}{table.caption.542}%
-\contentsline {table}{\numberline {A.3}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{88}{table.caption.543}%
-\contentsline {table}{\numberline {A.4}{\ignorespaces CVaR benchmark}}{89}{table.caption.544}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{92}{table.caption.548}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{93}{table.caption.550}%
+\contentsline {table}{\numberline {A.3}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{93}{table.caption.551}%
+\contentsline {table}{\numberline {A.4}{\ignorespaces CVaR benchmark}}{94}{table.caption.552}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

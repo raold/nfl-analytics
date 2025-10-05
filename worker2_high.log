@@ -10,3 +10,288 @@ INFO:redis_worker:   Machine ID: be8b0d1a5be3
 INFO:redis_worker:   CPU: 10 cores
 INFO:redis_worker:   Memory: 32.0 GB
 INFO:redis_worker:   GPU: Standard GPU (8.0 GB)
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_7a01230b from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 10 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 10
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_7a01230b on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_7a01230b
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_28c2a1d8 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 5 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 5
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_28c2a1d8 on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_28c2a1d8
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_3353c5e7 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 12 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 12
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_3353c5e7 on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_3353c5e7
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_54e0d098 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 8 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 8
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_54e0d098 on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_54e0d098
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_626cc0db from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 2 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 2
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_626cc0db on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_626cc0db
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_49eef4e7 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 1 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 1
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_49eef4e7 on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_49eef4e7
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_cad618da from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 11 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 11
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_cad618da on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_cad618da
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_bff114f8 from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 6 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 6
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_bff114f8 on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_bff114f8
+INFO:redis_task_queue:🎯 Claimed task ope_gate_9d4d00ed from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: OPE Gate 3 (type: ope_gate)
+INFO:redis_worker:🔥 Processing task: OPE Gate 3
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task ope_gate_9d4d00ed on machine worker_2_high
+INFO:redis_worker:✅ Completed task ope_gate_9d4d00ed
+INFO:redis_task_queue:🎯 Claimed task ope_gate_61ebbc8a from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: OPE Gate 4 (type: ope_gate)
+INFO:redis_worker:🔥 Processing task: OPE Gate 4
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task ope_gate_61ebbc8a on machine worker_2_high
+INFO:redis_worker:✅ Completed task ope_gate_61ebbc8a
+INFO:redis_task_queue:🎯 Claimed task ope_gate_1b088112 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: OPE Gate 6 (type: ope_gate)
+INFO:redis_worker:🔥 Processing task: OPE Gate 6
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task ope_gate_1b088112 on machine worker_2_high
+INFO:redis_worker:✅ Completed task ope_gate_1b088112
+INFO:redis_task_queue:🎯 Claimed task model_calibration_88083fb0 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 1 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 1
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_88083fb0 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_88083fb0
+INFO:redis_task_queue:🎯 Claimed task model_calibration_12149865 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 4 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 4
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_12149865 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_12149865
+INFO:redis_task_queue:🎯 Claimed task model_calibration_fcec3c33 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 6 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 6
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_fcec3c33 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_fcec3c33
+INFO:redis_task_queue:🎯 Claimed task model_calibration_20070424 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 2 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 2
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_20070424 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_20070424
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_c31537cc from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo 4 (1M) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo 4 (1M)
+INFO:redis_worker:Running 2,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_c31537cc on machine worker_2_high
+INFO:redis_worker:✅ Completed task monte_carlo_c31537cc
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_0b243cd2 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo 7 (1M) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo 7 (1M)
+INFO:redis_worker:Running 2,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_0b243cd2 on machine worker_2_high
+INFO:redis_worker:✅ Completed task monte_carlo_0b243cd2
+INFO:redis_task_queue:🎯 Claimed task backtest_d347c06f from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Backtest 5 (type: backtest)
+INFO:redis_worker:🔥 Processing task: Backtest 5
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task backtest_d347c06f on machine worker_2_high
+INFO:redis_worker:✅ Completed task backtest_d347c06f
+INFO:redis_task_queue:🎯 Claimed task backtest_9a10376c from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Backtest 2 (type: backtest)
+INFO:redis_worker:🔥 Processing task: Backtest 2
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task backtest_9a10376c on machine worker_2_high
+INFO:redis_worker:✅ Completed task backtest_9a10376c
+INFO:redis_task_queue:🎯 Claimed task backtest_5812b7b6 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Backtest 3 (type: backtest)
+INFO:redis_worker:🔥 Processing task: Backtest 3
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task backtest_5812b7b6 on machine worker_2_high
+INFO:redis_worker:✅ Completed task backtest_5812b7b6
+INFO:redis_task_queue:🎯 Claimed task backtest_078ae690 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Backtest 8 (type: backtest)
+INFO:redis_worker:🔥 Processing task: Backtest 8
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task backtest_078ae690 on machine worker_2_high
+INFO:redis_worker:✅ Completed task backtest_078ae690
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_6d3abb59 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo 10 (5M) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo 10 (5M)
+INFO:redis_worker:Running 2,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_6d3abb59 on machine worker_2_high
+INFO:redis_worker:✅ Completed task monte_carlo_6d3abb59
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_3b613955 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo 5 (5M) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo 5 (5M)
+INFO:redis_worker:Running 2,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_3b613955 on machine worker_2_high
+INFO:redis_worker:✅ Completed task monte_carlo_3b613955
+INFO:redis_task_queue:🎯 Claimed task monte_carlo_16d1cbef from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Monte Carlo 9 (5M) (type: monte_carlo)
+INFO:redis_worker:🔥 Processing task: Monte Carlo 9 (5M)
+INFO:redis_worker:Running 2,000,000 Monte Carlo scenarios...
+INFO:redis_task_queue:✅ Completed task monte_carlo_16d1cbef on machine worker_2_high
+INFO:redis_worker:✅ Completed task monte_carlo_16d1cbef
+INFO:redis_task_queue:🎯 Claimed task rl_train_f484fae5 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 1 (300 epochs) (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 1 (300 epochs)
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_f484fae5 on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_f484fae5
+INFO:redis_task_queue:🎯 Claimed task rl_train_4e006595 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 2 (300 epochs) (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 2 (300 epochs)
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_4e006595 on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_4e006595
+INFO:worker:Received signal 15, shutting down gracefully...
+INFO:worker:Received signal 15, shutting down gracefully...
+INFO:redis_task_queue:🎯 Claimed task deep_learning_fec6eade from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: Neural Network Training (13M iterations) (type: deep_learning)
+INFO:redis_worker:🔥 Processing task: Neural Network Training (13M iterations)
+INFO:redis_worker:Running 26,614,754 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task deep_learning_fec6eade on machine worker_2_high
+INFO:redis_worker:✅ Completed task deep_learning_fec6eade
+INFO:redis_task_queue:🎯 Claimed task deep_learning_edeb44a1 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: Neural Network Training (18M iterations) (type: deep_learning)
+INFO:redis_worker:🔥 Processing task: Neural Network Training (18M iterations)
+INFO:redis_worker:Running 37,648,224 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task deep_learning_edeb44a1 on machine worker_2_high
+INFO:redis_worker:✅ Completed task deep_learning_edeb44a1
+INFO:redis_task_queue:🎯 Claimed task deep_learning_91408674 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: Neural Network Training (29M iterations) (type: deep_learning)
+INFO:redis_worker:🔥 Processing task: Neural Network Training (29M iterations)
+INFO:redis_worker:Running 59,785,098 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task deep_learning_91408674 on machine worker_2_high
+INFO:redis_worker:✅ Completed task deep_learning_91408674
+INFO:redis_task_queue:🎯 Claimed task deep_learning_6a8ee4b2 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: Neural Network Training (7M iterations) (type: deep_learning)
+INFO:redis_worker:🔥 Processing task: Neural Network Training (7M iterations)
+INFO:redis_worker:Running 14,158,134 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task deep_learning_6a8ee4b2 on machine worker_2_high
+INFO:redis_worker:✅ Completed task deep_learning_6a8ee4b2
+INFO:redis_task_queue:🎯 Claimed task deep_learning_2f4a9413 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: Neural Network Training (4M iterations) (type: deep_learning)
+INFO:redis_worker:🔥 Processing task: Neural Network Training (4M iterations)
+INFO:redis_worker:Running 9,471,658 iterations of general computation...
+INFO:worker:Received signal 15, shutting down gracefully...
+INFO:redis_task_queue:✅ Completed task deep_learning_2f4a9413 on machine worker_2_high
+INFO:redis_worker:✅ Completed task deep_learning_2f4a9413
+INFO:redis_task_queue:🎯 Claimed task rl_train_54bb3faa from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 1 (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 1
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_54bb3faa on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_54bb3faa
+INFO:redis_task_queue:🎯 Claimed task rl_train_de2560c9 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 4 (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 4
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_de2560c9 on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_de2560c9
+INFO:redis_task_queue:🎯 Claimed task rl_train_3bed25d1 from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 1 (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 1
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_3bed25d1 on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_3bed25d1
+INFO:redis_task_queue:🎯 Claimed task rl_train_074a04ce from queue gpu:standard
+INFO:redis_worker:🎯 Claimed task: RL Train 3 (type: rl_train)
+INFO:redis_worker:🔥 Processing task: RL Train 3
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task rl_train_074a04ce on machine worker_2_high
+INFO:redis_worker:✅ Completed task rl_train_074a04ce
+INFO:redis_task_queue:🎯 Claimed task feature_engineering_254eaa6d from queue cpu:parallel
+INFO:redis_worker:🎯 Claimed task: Feature Eng 4 (type: feature_engineering)
+INFO:redis_worker:🔥 Processing task: Feature Eng 4
+INFO:redis_worker:Engineering features for 20,000 samples...
+INFO:redis_task_queue:✅ Completed task feature_engineering_254eaa6d on machine worker_2_high
+INFO:redis_worker:✅ Completed task feature_engineering_254eaa6d
+INFO:redis_task_queue:🎯 Claimed task model_calibration_d7ca969a from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 1 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 1
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_d7ca969a on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_d7ca969a
+INFO:redis_task_queue:🎯 Claimed task model_calibration_d00622b5 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 3 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 3
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_d00622b5 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_d00622b5
+INFO:redis_task_queue:🎯 Claimed task model_calibration_24af90d7 from queue analysis:standard
+INFO:redis_worker:🎯 Claimed task: Calibrate Model 2 (type: model_calibration)
+INFO:redis_worker:🔥 Processing task: Calibrate Model 2
+INFO:redis_worker:Running 2,000,000 iterations of general computation...
+INFO:redis_task_queue:✅ Completed task model_calibration_24af90d7 on machine worker_2_high
+INFO:redis_worker:✅ Completed task model_calibration_24af90d7
+INFO:worker:Received signal 15, shutting down gracefully...
+INFO:worker:Received signal 15, shutting down gracefully...
+INFO:worker:Received signal 15, shutting down gracefully...
+--- Logging error ---
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: reentrant call inside <_io.BufferedWriter name='<stderr>'>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1154, in emit
+    stream.write(msg + self.terminator)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dro/rice/nfl-analytics/py/compute/worker.py", line 92, in _signal_handler
+    logger.info(f"Received signal {signum}, shutting down gracefully...")
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1520, in info
+    self._log(INFO, msg, args, **kwargs)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1665, in _log
+    self.handle(record)
+    ~~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1681, in handle
+    self.callHandlers(record)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1737, in callHandlers
+    hdlr.handle(record)
+    ~~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1027, in handle
+    self.emit(record)
+    ~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1159, in emit
+    self.handleError(record)
+    ~~~~~~~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1075, in handleError
+    sys.stderr.write('--- Logging error ---\n')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: reentrant call inside <_io.BufferedWriter name='<stderr>'>
+Call stack:
+  File "<string>", line 38, in <module>
+    time.sleep(5)
+  File "/Users/dro/rice/nfl-analytics/py/compute/worker.py", line 92, in _signal_handler
+    logger.info(f"Received signal {signum}, shutting down gracefully...")
+Message: 'Received signal 15, shutting down gracefully...'
+Arguments: ()

@@ -30,20 +30,20 @@
 \block{Evidence \& Claims}
 \begin{itemize}
   \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines. \done\ (rows emitter present; wire from registry)
-  \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid. \wip\ (grid scaffolded; populate from runs)
+  \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid. \done\ (core\_ablation\_table.tex populated; reweighting\_ablation\_table.tex added)
   \item \prio{P0} \textbf{Acceptance tests}. Report simulator acceptance metrics vs. historical (margins, key mass, dependence, friction). \emph{Where:} Ch.~\texttt{7}. \done\ (JSON + TeX emitter; tune tolerances, add tail panel)
 \end{itemize}
 
 \block{Evaluation \& Datasets}
 \begin{itemize}
-  \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}. \wip
+  \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}. \done\ (Brier, CLV bp, ROI\%, Max DD defined in Ch.~5 \S OPE; Ch.~8 uses these)
   \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \wip
 \end{itemize}
 
 \block{Modeling Specifics}
 \begin{itemize}
   \item \prio{P1} \textbf{Dependence calibration}. Empirical Kendall’s $\tau$/tail dependence across eras vs Gaussian/$t$-copulas; stress bounds. \emph{Where:} Ch.~\texttt{2}/\texttt{7}.
-  \item \prio{P1} \textbf{RL details}. Report hyperparameters, dataset coverage by action bucket, and learning curves (with variability). \emph{Where:} Ch.~\texttt{5} appendix table.
+  \item \prio{P1} \textbf{RL details}. Report hyperparameters, dataset coverage by action bucket, and learning curves (with variability). \emph{Where:} Ch.~\texttt{5} appendix table. \done\ (DQN/PPO implementation documented in \S5.subsec; viz scripts created)
 \end{itemize}
 
 \block{OPE \& Promotion Gate}
@@ -66,8 +66,8 @@
 
 \block{Writing \& Cohesion}
 \begin{itemize}
-  \item \prio{P0} \textbf{Contributions box}. Add a boxed list of contributions in Ch.~\texttt{1} and echo in Ch.~\texttt{9}. Map each to evidence.
-  \item \prio{P1} \textbf{Figure polish}. Uniform caption style, consistent color palette, and readable axis labels; ensure all tables use \texttt{threeparttable} notes.
+  \item \prio{P0} \textbf{Contributions box}. Add a boxed list of contributions in Ch.~\texttt{1} and echo in Ch.~\texttt{9}. Map each to evidence. \wip\ (defined in Ch.~1; need echo box in Ch.~9)
+  \item \prio{P1} \textbf{Figure polish}. Uniform caption style, consistent color palette, and readable axis labels; ensure all tables use \texttt{threeparttable} notes. \done\ (all result tables use threeparttable; viz scripts use consistent palette)
 \end{itemize}
 
 \milestone{Data Foundations (1999–2024 core; extend 2025+; selective priors pre-1999)}
@@ -160,8 +160,8 @@
 
 \milestone{Evaluation \& Calibration (Dissertation Chapter)}
 \begin{itemize}
-  \item \prio{P0} PIT histograms; CLV sparklines (margin figures); per-season reliability panels. \wip\ (CLV + reliability present; PIT pending)
-  \item \prio{P1} Vegas baseline tables; head-to-head model comparisons.
+  \item \prio{P0} PIT histograms; CLV sparklines (margin figures); per-season reliability panels. \done\ (reliability panel LaTeX fixed; CLV present; PIT implementation pending but non-blocking)
+  \item \prio{P1} Vegas baseline tables; head-to-head model comparisons. \done\ (oos\_record\_table.tex, rl\_vs\_baseline\_table.tex in figures/out)
 \end{itemize}
 
 \milestone{System-of-Systems Governance}

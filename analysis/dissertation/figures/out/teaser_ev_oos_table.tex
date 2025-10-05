@@ -1,14 +1,18 @@
 \begin{table}[t]
   \centering
   \small
-  \caption{Two-leg teaser EV on holdout.}
-  \begin{tabular}{lrr}
+  \caption{Teaser pricing: EV comparison under independence vs copula dependence.}
+  \begin{tabular}{llcccc}
     \toprule
-    Model & Mean EV (bps) & ROI (\%) \\
+    Scenario & Pts & Indep. & Gaussian & $t$-copula & $\Delta$ (G vs I) \\
     \midrule
-    Skellam (baseline) & 2300.9 & 23.01 \\
-    Skellam + reweight & 2575.3 & 25.75 \\
-    Gaussian (rho=+0.10) & 2300.9 & 23.01 \\
+    Dog +3, U44.5 & 6 & -0.790 & -0.831 & -0.830 & -0.041 \\
+    Dog +3, U44.5 & 7 & -0.801 & -0.846 & -0.846 & -0.045 \\
+    Fav -7, U47 & 6 & -0.503 & -0.509 & -0.509 & -0.007 \\
+    Fav -7, U47 & 7 & -0.515 & -0.533 & -0.533 & -0.018 \\
+    Dog +6.5, O41.5 & 6 & -0.820 & -0.881 & -0.881 & -0.061 \\
+    Dog +6.5, O41.5 & 7 & -0.835 & -0.894 & -0.894 & -0.059 \\
     \bottomrule
   \end{tabular}
+  \label{tab:teaser_ev_copula}
 \end{table}

@@ -16,7 +16,7 @@ pytest
 # Redis-based distributed computing
 redis>=4.5.0
 aioredis>=2.0.0
-psutil>=5.9.0
+psutil
 
 # PyTorch for DQN agent - install separately based on platform:
 # Apple Silicon (MPS):  pip install torch torchvision torchaudio

@@ -71,6 +71,7 @@ cat("Loaded", nrow(all_rosters), "roster-week entries\n\n")
 # Extract unique players
 cat("Extracting unique players...\n")
 players <- all_rosters %>%
+  dplyr::filter(!is.na(gsis_id)) %>%  # Filter before grouping - use dplyr:: to avoid stats::filter
   group_by(gsis_id) %>%
   slice(1) %>%  # Take first occurrence of each player
   ungroup() %>%
@@ -89,8 +90,7 @@ players <- all_rosters %>%
     status = status,
     entry_year = entry_year,
     years_exp = years_exp
-  ) %>%
-  filter(!is.na(player_id))
+  )
 
 cat("Found", nrow(players), "unique players\n")
 
@@ -104,7 +104,7 @@ cat("✓ Wrote", nrow(players), "players\n\n")
 cat("Processing rosters by season...\n\n")
 for (season in SEASONS) {
   season_rosters <- all_rosters %>%
-    filter(season == !!season) %>%
+    dplyr::filter(season == !!season, !is.na(gsis_id), !is.na(week)) %>%  # Filter before transmute - use dplyr::
     transmute(
       season = season,
       week = week,
@@ -117,7 +117,6 @@ for (season in SEASONS) {
       full_name = full_name,
       football_name = football_name
     ) %>%
-    filter(!is.na(player_id), !is.na(week)) %>%  # Filter out NULL weeks
     distinct(season, week, team, player_id, .keep_all = TRUE)  # Remove duplicates
   
   if (nrow(season_rosters) == 0) {
