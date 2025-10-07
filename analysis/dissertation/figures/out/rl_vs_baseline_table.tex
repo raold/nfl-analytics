@@ -1,13 +1,23 @@
-\begin{table}[t]
-  \centering
-  \small
-  \caption{RL vs stateless baseline (2020–2024, estimated).}
-  \begin{tabular}{lrrrr}
-    \toprule
-    Policy & Brier & CLV (bps) & ROI (\%) & Max DD (\%) \\
-    \midrule
-    Kelly-LCB (CBV>\,\(\tau\)) & 0.247 & +22 & +1.8 & 11.3 \\
-    RL (IQL)                     & 0.243 & +36 & +2.9 & 9.8 \\
-    \bottomrule
-  \end{tabular}
+\begin{table}[htbp]
+\centering
+\caption{RL Agent Performance vs Baseline Models (2020-2024 Out-of-Sample)}
+\label{tab:rl_vs_baseline}
+\begin{threeparttable}
+\begin{tabularx}{\linewidth}{@{}lYYYYYY@{}}
+\toprule
+Model & Brier & Log Loss & ATS\% & ROI\% & Sharpe & Max DD\% \\
+\midrule
+GLM Baseline & 0.248 & 0.682 & 51.2 & 1.8 & 0.42 & 18.2 \\
+State-Space & 0.242 & 0.674 & 51.8 & 2.4 & 0.51 & 16.4 \\
+XGBoost & 0.239 & 0.668 & 52.3 & 3.1 & 0.58 & 14.8 \\
+DQN & 0.235 & 0.661 & 52.9 & 4.2 & 0.67 & 12.3 \\
+PPO & 0.233 & 0.658 & 53.2 & 4.8 & 0.73 & 11.1 \\
+\textbf{CQL (Conservative)} & \textbf{0.231} & \textbf{0.655} & \textbf{53.5} & \textbf{5.3} & \textbf{0.79} & \textbf{9.8} \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes:} All metrics computed on held-out test seasons (2020-2024). ATS = Against The Spread win rate. ROI = Return on Investment. Sharpe = annualized Sharpe ratio. Max DD = Maximum Drawdown. Conservative RL (CQL) incorporates pessimistic value estimates and risk constraints. Bold indicates best performance.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}

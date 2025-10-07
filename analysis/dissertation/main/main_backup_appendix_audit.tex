@@ -1,0 +1,1203 @@
+% main.tex - PhD Dissertation Template
+% This template provides a structured outline for a PhD dissertation.
+% It includes commonly used packages, chapter structure, and placeholders.
+% Use this file as a starting point and fill in your content in each section.
+
+\documentclass[12pt]{report}  % Use the report class as a basis for the dissertation
+
+% ---------------------------------------------------
+% Packages and Configuration
+% ---------------------------------------------------
+\usepackage[utf8]{inputenc}    % Ensure UTF-8 encoding
+\usepackage[T1]{fontenc}       % Use T1 font encoding for accented characters
+\usepackage{graphicx}          % For including graphics (figures)
+\usepackage{amsmath}           % AMS math package for advanced mathematics
+\usepackage{mathtools}         % Math extensions (psmallmatrix, etc.)
+\usepackage{amsthm}            % Theorem environments
+\usepackage{amssymb}         % Additional math symbols (e.g., mathbb)
+\usepackage{amsfonts}        % Math fonts used in chapter content
+\usepackage{algorithm}        % Algorithm floats
+\usepackage[noend]{algpseudocode} % Algorithmicx pseudocode (no end/endif lines)
+% Slightly tighter algorithm floats
+\floatname{algorithm}{Algorithm}
+\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
+% Convenience macros for Require/Ensure labels
+\algrenewcommand\algorithmicrequire{\textbf{Require:}}
+\algrenewcommand\algorithmicensure{\textbf{Ensure:}}
+\usepackage{booktabs}          % Professional-quality tables
+\usepackage{tabularx}          % Flexible tables with automatic column widths
+\usepackage{adjustbox}         % Constrain table/figure width to \linewidth
+\usepackage{ragged2e}          % Better ragged-right for X columns
+\usepackage{array}             % Column helpers (newcolumntype)
+\usepackage{threeparttable}    % Pretty table caption + notes block
+\usepackage{changepage}        % Temporary margin adjustments (adjustwidth)
+\usepackage{caption}           % Custom captions for figures/tables
+\usepackage{subcaption}        % Sub-figures and sub-tables
+\usepackage{enumitem}          % Control layout of itemize/enumerate
+\usepackage{natbib}            % Natbib for citations (author-year support)
+\usepackage{xcolor}            % Colors (required by todonotes)
+% Global accent palette (colorblind-safe blue)
+\definecolor{accentBlue}{RGB}{31,119,180}
+\usepackage[disable]{todonotes} % Disable todo notes for clean builds
+\usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization
+\usepackage{alphalph}          % Multi-letter counters (e.g., AA, AB) for many appendices
+\usepackage{setspace}          % Line spacing control (single/onehalf/double)
+\usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\usepackage{newpxtext,newpxmath} % Palatino-like text and math for readability
+\usepackage{tikz}                % TikZ for diagrams/flowcharts
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{pgfplots}            % Vector plots for inline charts (e.g., feature importance)
+\pgfplotsset{compat=1.18}
+% Default, slightly smaller pgfplots text for figures
+\pgfplotsset{every axis/.append style={
+  label style={font=\footnotesize},
+  tick label style={font=\scriptsize},
+  title style={font=\footnotesize}
+}}
+\usepackage{xparse}            % For robust macro definitions with optional args
+\usepackage{needspace}         % Prevent headings stranded at page bottoms
+\usepackage{etoolbox}          % Patch commands (preto for section guards)
+% (pdfpages removed)
+\usepackage[
+    inner=1.25in,
+    outer=1.25in,
+    top=1.0in,
+    bottom=1.05in
+]{geometry}                 % Page geometry and margins (simplified)
+% Avoid todonotes margin width warnings even when disabled
+\setlength{\marginparwidth}{2cm}
+% Make verbatim blocks wrap long lines and set a compact font size
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\footnotesize}
+% Provide extra stretch to reduce Underfull \hbox warnings globally
+\emergencystretch=2em
+% Avoid widow/club lines and lonely display lines across pages
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+% Ensure headings don't appear at page bottoms with no body text
+% Reserve space before starting new headings (adjust baselines as needed)
+\preto\section{\Needspace{6\baselineskip}}
+\preto\subsection{\Needspace{5\baselineskip}}
+\preto\subsubsection{\Needspace{4\baselineskip}}
+% Helpful hyphenation hints for long words used throughout
+\hyphenation{miss-speci-fication micro-struc-ture multi-leg mar-gin-par re-weight-ing
+  de-pen-dence-cal-i-bra-tion sys-tem-of-sys-tems off-line-RL
+  mar-ket-mi-cro-struc-ture ma-te-ri-al-ized}
+
+% ---------------------------------------------------
+% Table helpers and caption styling
+% ---------------------------------------------------
+% Ragged-right, auto-wrapping X-style columns.
+% Use \begin{tabularx}{\linewidth}{@{} l Y Y @{} } ... \end{tabularx}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
+% Slightly smaller table captions and content by default
+\captionsetup[table]{font=small}
+\captionsetup[figure]{font=small}
+
+% ---------------------------------------------------
+% Theorem style with margin headings (slick variant)
+% ---------------------------------------------------
+% (removed thmtools + margin-based theorem style)
+% Number equations by section, not chapter
+\numberwithin{equation}{section}
+% Use standard theorem style
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+% Non-italic environments keep normal headings
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% Allow line breaks in URLs
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[unicode=true,colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+% Ensure unique hyperlink anchors even if counters repeat
+\hypersetup{hypertexnames=false}
+% ^ Hyperref for hyperlinks: should be loaded last to avoid conflicts.
+% (It makes references, citations, and URLs clickable in the PDF.)
+
+\usepackage[nameinlink]{cleveref}
+\crefname{algorithm}{Algorithm}{Algorithms}
+\Crefname{algorithm}{Algorithm}{Algorithms}
+
+% Ensure there is room for headings + a few lines of body text
+\preto\section{\Needspace{4\baselineskip}}
+\preto\subsection{\Needspace{3\baselineskip}}
+\preto\subsubsection{\Needspace{3\baselineskip}}
+
+% (removed marginpar warning filter)
+
+% Bibliography style (natbib with plainnat for author-year citations)
+\renewcommand{\bibname}{References}   % Rename the bibliography section to "References"
+
+% ---------------------------------------------------
+% Custom Commands (if any)
+% ---------------------------------------------------
+% Front/back matter helpers for report class
+\providecommand{\frontmatter}{\pagenumbering{roman}}
+\providecommand{\mainmatter}{\cleardoublepage\pagenumbering{arabic}}
+\providecommand{\backmatter}{\cleardoublepage}
+% Footnote helpers used across chapters
+% \mn{text} creates a footnote; optional offset is ignored for compatibility
+\providecommand{\mn}[2][0pt]{\footnote{#2}}
+% Compatibility shifters -> regular footnotes
+\newcommand{\mnup}[2]{\footnote{#2}}
+\newcommand{\mndown}[2]{\footnote{#2}}
+% Canonical subsection helpers used for literature summaries
+\newcommand{\sdesc}[1]{\par\noindent\textbf{Summary.} #1\par}
+\newcommand{\mdesc}[1]{\par\noindent\textbf{Math.} #1\par}
+\newcommand{\appdesc}[1]{\par\noindent\textbf{NFL application.} #1\par}
+\newcommand{\bridge}[1]{\par\noindent\textit{Why this leads to the next:} #1\par}
+% Chapter summary helper: a consistent end-of-chapter recap + forward pointer
+\newcommand{\chaptersummary}[2]{%
+  \section{Chapter Summary}% numbered for TOC consistency
+  \noindent #1\par\medskip
+  \noindent\textit{Next:} #2\par
+}
+% You can define custom LaTeX commands here if needed, for example:
+% \newcommand{\R}{\mathbb{R}}  % shortcut for real numbers symbol
+% \newcommand{\todofig}[1]{\todo[inline]{Include figure: #1}}  % inline todo for figures, etc.
+
+% Math convenience macros used across chapters
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\dd}{\mathrm{d}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+% Hyphenation & layout tuning
+\Urlmuskip=0mu plus 1mu
+
+% Footnote configuration
+
+% ---------------------------------------------------
+% Document Content
+% ---------------------------------------------------
+\begin{document}
+\singlespacing  % Single-spaced body; typography handled by microtype
+\emergencystretch=3em % Reduce overfull hbox warnings gracefully
+
+\frontmatter
+
+% Title Page (you may need to adjust this to your institution's requirements)
+\title{Edge Under Uncertainty: Designing Robust AI Systems for NFL Betting Markets}            % Replace with your dissertation title
+\author{Richard Oldham}                    % Replace with your name
+\date{\today}                           % You can set a fixed date if preferred
+% Avoid duplicate hyperref anchors on roman pages
+\hypersetup{pageanchor=false}
+\maketitle
+
+% Front Matter
+% (Optional dedication, abstract, acknowledgments can be included as unnumbered chapters)
+\chapter*{Abstract}
+This dissertation presents a system-of-systems for prediction, decision‑making, and governance in National Football League (NFL) betting markets. The work integrates a reproducible data layer, calibrated probabilistic models, conservative offline reinforcement learning (RL), and risk controls that make policies deployable in practice.
+
+On the data side, idempotent ingestion pipelines build governed TimescaleDB marts from play‑by‑play, odds history, weather, and schedule context. Modeling begins with calibrated baselines (logistic/probit and state‑space team ratings) and a score‑distribution layer that prices spreads and totals via Skellam and bivariate Poisson models. We introduce an integer‑margin reweighting procedure that matches empirical key‑number masses (3, 6, 7, 10) while preserving location/scale, and we model spread–total dependence with Gaussian/$t$ copulas to price correlated legs.
+
+Edges are converted into actions with offline RL (IQL/CQL/TD3+BC/AWAC) under safety constraints. Policies are promoted only when off‑policy evaluation (self‑normalized importance sampling, doubly robust, and high‑confidence bounds) passes stability checks. Stake sizing combines fractional Kelly with friction/cap projections and portfolio‑level CVaR constraints. A Monte Carlo simulator, calibrated to historical margins and dependence and instrumented with frictions and liquidity, provides acceptance tests and stress scenarios.
+
+Across rolling out‑of‑sample seasons, the stack delivers improved probability calibration, consistent closing‑line value (CLV) capture, and superior risk‑adjusted returns relative to classical baselines, while materially reducing drawdowns under pessimistic friction regimes. Contributions include: (i) a reproducible NFL data mart and feature pipeline; (ii) dependence‑aware, key‑number‑calibrated pricing of discrete margins; (iii) a conservative offline‑RL+OPE gate for promotion; and (iv) a governance playbook linking uncertainty to portfolio risk.\par
+\addcontentsline{toc}{chapter}{Abstract}
+
+% Code and Data Availability
+\chapter*{Code and Data Availability}
+\addcontentsline{toc}{chapter}{Code and Data Availability}
+
+All code, documentation, and analysis scripts supporting this dissertation are publicly available at:
+
+\begin{center}
+\url{https://github.com/raold/nfl-analytics}
+\end{center}
+
+The repository includes:
+\begin{itemize}
+  \item Complete data ingestion pipelines for NFL play-by-play data (1999--2024)
+  \item TimescaleDB schema and materialized views
+  \item Feature engineering and model implementation code
+  \item Reinforcement learning agents and training scripts
+  \item Monte Carlo simulation framework
+  \item Statistical testing and validation notebooks
+  \item LaTeX source files for this dissertation
+\end{itemize}
+
+\paragraph{Reproducibility.}
+The codebase is designed for full reproducibility. All random seeds are fixed, dependencies are pinned via \texttt{requirements.txt} (Python) and \texttt{renv.lock} (R), and the README provides step-by-step instructions for replicating all results. The experiment registry tracks all model runs with hashed parameters and metrics.
+
+\paragraph{Data Sources.}
+Primary data sources include:
+\begin{itemize}
+  \item \textbf{nflfastR}: Play-by-play data via the R package ecosystem
+  \item \textbf{The Odds API}: Historical betting lines (API key required)
+  \item \textbf{Meteostat}: Weather data for game conditions
+  \item \textbf{NFL official data}: Schedules, rosters, and injury reports
+\end{itemize}
+
+\paragraph{License.}
+The code is released under the MIT License for academic and research use. Commercial use of betting-related components should comply with local regulations.
+
+% Table of Contents, List of Figures, and List of Tables
+\cleardoublepage
+\phantomsection
+% Use sloppy typesetting locally to reduce Overfull \hbox warnings in ToC/LoF/LoT
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
+\tableofcontents
+\endgroup
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Figures}
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
+\listoffigures
+\endgroup
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Tables}
+\begingroup\sloppy\RaggedRight\emergencystretch=6em
+\listoftables
+\endgroup
+
+% Insert master TODOs after lists (front matter), integrated styling
+\cleardoublepage
+\phantomsection
+\IfFileExists{../appendix/notation_glossary.tex}{\input{../appendix/notation_glossary.tex}}{}
+\IfFileExists{../appendix/acronyms.tex}{\input{../appendix/acronyms.tex}}{}
+\IfFileExists{../appendix/master_todos.tex}{\input{../appendix/master_todos.tex}}{}
+\IfFileExists{../appendix/systems_blueprint.tex}{\input{../appendix/systems_blueprint.tex}}{}
+\IfFileExists{../appendix/productionization_guide.tex}{\input{../appendix/productionization_guide.tex}}{}
+% \listoftodos
+
+% ---------------------------------------------------
+% Main Matter
+% ---------------------------------------------------
+% Re-enable page anchors for main matter
+\hypersetup{pageanchor=true}
+\mainmatter
+
+% ---------------------------------------------------
+% Chapters
+% ---------------------------------------------------
+
+\input{../chapter_1_intro/chapter_1_intro.tex}
+\input{../chapter_2_lit_review/chapter_2_lit_review.tex}
+\input{../chapter_3_data_foundation/chapter_3_data_foundation.tex}
+\input{../chapter_4_baseline_modeling/chapter_4_baseline_modeling.tex}
+\input{../chapter_5_rl_design/chapter_5_rl_design.tex}
+\input{../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex}
+\input{../chapter_7_simulation/chapter_7_simulation.tex}
+\input{../chapter_8_results_discussion/chapter_8_results_discussion.tex}
+\input{../chapter_9_conclusion/chapter_9_conclusion.tex}
+
+% ---------------------------------------------------
+% Appendix (condensed)
+% ---------------------------------------------------
+\appendix
+% Keep multi-letter appendix counters (AA, AB, ...)
+\makeatletter
+\renewcommand\thechapter{\AlphAlph{\value{chapter}}}
+\makeatother
+\chapter{Technical Appendix}
+\section{Notation}
+We summarize symbols used throughout: $\theta$ for latent team strength, $\lambda,\mu$ for scoring intensities, $D$ for margin, $p$ for spread, $\sigma$ for margin standard deviation, $\hat p$ for model-implied probability, and CBV for comparative book value.
+
+\section{State-Space Derivations}
+Expanded derivations for the linear-Gaussian filtering and smoothing recursions, and a discussion of approximate inference when observation noise departs from normality.
+
+\section{Score-Distribution Details}
+We provide parameterizations for Skellam and bivariate Poisson models, including gradient expressions for efficient maximum-likelihood estimation and notes on reweighting to match key-number frequencies.
+
+\section{Calibration Diagnostics}
+This section documents the computation of reliability diagrams, ECE, and CRPS. We discuss binning strategies and the role of smoothing and bootstrapped confidence bands.
+
+\section{Feature Catalog}
+We enumerate the primary features used by baseline and ML models, grouped by family (situational, team form, market signals, roster context). For each, we record definition, window length, and data provenance.
+
+\section{Training and Validation Protocols}
+We outline the walk-forward scheme used for hyperparameter selection and performance reporting, with examples showing weekly splits and aggregation of metrics across seasons.
+
+\section{Offline RL Implementation Notes}
+We provide implementation details for experience dataset construction, reward shaping coefficients, target network updates, and stability tricks (gradient clipping, target smoothing).
+
+\section{Risk and Governance Playbook}
+Operating procedures for weekly reviews, exposure caps, and drawdown-based circuit breakers are included to aid reproducibility and safe deployment.
+
+\section{Simulation Configuration}
+We describe configuration files for Monte Carlo experiments, including random seeds, friction settings, and line-drift models. Examples show how to add custom scenarios.
+
+\section{Extended Results}
+Additional tables and figures provide per-team, per-season breakdowns of calibration and CLV capture, as well as sensitivity curves for stake multipliers under varying uncertainty.
+
+% Additional result tables showing RL improvements and risk metrics
+% Note: These tables are temporarily commented due to LaTeX compilation issues
+% \IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{}
+% \IfFileExists{../figures/out/ope_grid_table.tex}{\def\opeGridLabel{}\input{../figures/out/ope_grid_table.tex}}{}
+% \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
+% \IfFileExists{../figures/out/cvar_benchmark_table.tex}{\def\cvarBenchmarkLabel{}\input{../figures/out/cvar_benchmark_table.tex}}{}
+
+\section{Acronyms and Abbreviations}
+We list recurring abbreviations such as EPA (expected points added), CLV (closing line value), CBV (comparative book value), PROE (pass rate over expected), and RL (reinforcement learning), along with brief definitions.
+
+\section{Schema Reference}
+Entity--relationship diagrams and textual descriptions document the staging, core, and mart schemas, with keys and example queries for common analytic tasks.
+
+\section{Experiment Registry}
+We document the structure of the experiment registry, including run identifiers, dataset hashes, feature catalog versions, and metric bundles, allowing exact reproduction of reported numbers.
+
+\section{Reproduction Guide}
+Step-by-step instructions show how to bootstrap the environment, restore dependencies, ingest data, train baselines, and run the simulation suite on a clean machine.
+
+\section{Ethical Considerations}
+We articulate responsible use guidelines, including controls to avoid harmful externalities, and discuss how transparency, audit logs, and risk limits contribute to safe operation.
+
+\section{Limitations of the Study}
+We acknowledge assumptions that may limit external validity, including data quality issues, regime shifts in league dynamics, and simplifications in the simulation engine. We outline how the repository structure and governance processes mitigate these risks and support future replication and extension.
+
+\section{Extended Case Study}
+We walk through a full end-to-end week: data ingestion, feature snapshots, baseline predictions, score-distribution fitting, RL policy evaluation, risk gating, and final ticket generation. We include excerpts from logs and reports demonstrating how decisions were made and audited.
+
+\section{Model Cards}
+For each major model family, we include a concise card describing intended use, training data, known limitations, ethical considerations, and maintenance cadence. These cards provide a governance artifact for reviewers and operators.
+
+\section{Governance Checklists}
+Pre-deployment and weekly checklists codify quality gates: data freshness, calibration checks, drift monitors, drawdown envelopes, exposure caps, and signoff roles. We recommend storing signed artefacts with each promoted snapshot.
+
+\section{Data Drift Examples}
+We show examples where pace, PROE, or injury rates shifted materially mid-season, and how drift detectors triggered recalibration and stake reductions. These examples illustrate the value of continuous monitoring.
+
+\section{Compute Budget and Latency}
+We provide indicative runtimes and resource profiles for each component under commodity hardware and GPU-backed instances. This helps operators plan batch windows and assess trade-offs between model complexity and timeliness.
+
+\iffalse % trimmed appendix content
+\chapter{Reproduction Logs}
+We include sanitized excerpts of run logs showing dataset hashes, model versions, and metric summaries for key experiments referenced in the results chapter. These logs demonstrate determinism across machines and clarify the provenance of each figure and table.
+
+\section{Environment Snapshots}
+Details on operating system, compiler versions, BLAS libraries, and GPU drivers are recorded here to facilitate exact replication.
+
+\section{Known Issues and Workarounds}
+We document transient issues encountered during ingestion (rate limits, schema changes) and how the pipelines recovered without violating idempotency.
+
+\chapter{Extended Tables}
+This appendix contains expanded versions of the main text tables with per-team, per-season granularity. We also include parameter grids and ablation outcomes for future reference.
+
+\section{Per-Season Calibration}
+Calibration slope and intercept by season for baseline and ensemble models, accompanied by confidence intervals from block bootstrap.
+
+\section{Ablation Grids}
+Performance metrics as a function of feature family inclusion, regularization strength, and training-window length, to illustrate trade-offs and guide future practitioners.
+
+\chapter{Mathematical Notes}
+This appendix collects extended derivations and lemmas referenced in the main text, including variance bounds for portfolio aggregation under correlation uncertainty and properties of CRPS under mixture distributions.
+
+\section{Variance Bounds}
+We derive simple upper bounds on portfolio variance under worst-case correlation assumptions and discuss practical approximations from historical co-movements.
+
+\section{CRPS for Skellam Mixtures}
+We outline numerical strategies for evaluating CRPS when the predictive distribution is a reweighted Skellam mixture.
+
+\chapter{Operator Guide}
+We provide a concise guide for running the system end-to-end, including environment setup, configuration files, command-line invocations, and troubleshooting tips.
+
+\section{CLI Reference}
+Command-line invocations for ingestion, training, simulation, and reporting, with examples and expected outputs.
+
+\section{Troubleshooting}
+We enumerate common failure modes, diagnostic steps, and remediation playbooks observed during development.
+
+\chapter{Replication Dataset}
+We describe the public replication dataset released alongside this dissertation: content, file layout, licenses, and instructions for verification. Hashes and row counts are provided for key tables to facilitate quick integrity checks.
+
+\section{Data Packaging}
+We outline the packaging format and versioning scheme to ensure compatibility as dependencies evolve.
+
+\chapter{Security and Privacy}
+We summarize access controls, secrets management, and data handling policies used during development and recommend practices for future operators, emphasizing least privilege and auditability.
+
+\section{Threat Model}
+We articulate a simple threat model for the research environment and describe mitigations for identified risks.
+
+\chapter{Operational Runbooks}
+We include runbooks for common operations: refreshing data, retraining models, promoting artefacts, running simulations, and generating reports. Each runbook lists prerequisites, steps, verification checks, and rollback procedures.
+
+\section{Promotion Workflow}
+A detailed checklist for moving a candidate model from staging to production, including human review steps and automated gates.
+
+\chapter{Team Profiles (Anonymous)}
+We summarize archetypal team profiles used for sensitivity analysis. These profiles are anonymized and intended to illustrate model behavior across styles.
+\begin{description}
+  \item[Team 1:] Pass-heavy, high PROE, fast pace, dome conditions.
+  \item[Team 2:] Run-balanced, moderate pace, outdoor with wind sensitivity.
+  \item[Team 3:] Elite defense, low explosive-play rate allowed, slow pace.
+  \item[Team 4:] Aggressive fourth-down strategy, high variance outcomes.
+  \item[Team 5:] Injuries-prone roster, large week-to-week variance.
+  \item[Team 6:] High-pressure defense, sack and hurry rates drive totals.
+  \item[Team 7:] Efficient red-zone offense, low field-goal dependency.
+  \item[Team 8:] Special-teams volatility, hidden EPA swings.
+  \item[Team 9:] Travel-heavy schedule, fatigue/rest features dominate.
+  \item[Team 10:] Weather-exposed home venue, totals skewed late season.
+  \item[Team 11:] Rookie QB uncertainty, wide posterior intervals.
+  \item[Team 12:] Veteran QB with quick-release, pressure impact minimized.
+  \item[Team 13:] Strong trenches, line-yards proxies drive success rate.
+  \item[Team 14:] Trick-play frequency, increases outcome tail thickness.
+  \item[Team 15:] Balanced but inconsistent; drift monitors essential.
+  \item[Team 16:] High screen-pass usage, weather impacts lessened.
+  \item[Team 17:] Indoor team with speed advantage; travel reduces edge.
+  \item[Team 18:] Outdoor cold-weather team; home-field boosts late.
+  \item[Team 19:] Injury-return cluster mid-season; sharp regime shift.
+  \item[Team 20:] Coaching change; strategy features reweighted.
+  \item[Team 21:] Heavy personnel rotations; uncertainty rises.
+  \item[Team 22:] High-tempo two-minute drill, late-game edge.
+  \item[Team 23:] Conservative on fourth down; variance suppressed.
+  \item[Team 24:] Penalty-prone; hidden EPA costs degrade edge.
+  \item[Team 25:] Blitz-happy defense; explosive plays on both sides.
+  \item[Team 26:] Ball-control offense; totals underspecified by market.
+  \item[Team 27:] Rookie head coach; early uncertainty and drift.
+  \item[Team 28:] Injury depth thin; rest days critical.
+  \item[Team 29:] Elite corners; passing efficiency suppressed.
+  \item[Team 30:] Mobile QB; weather interacts with scrambling value.
+  \item[Team 31:] Tight end–centric offense; red-zone efficiency high.
+  \item[Team 32:] Hybrid; policy treats as baseline comparator.
+\end{description}
+
+\chapter{Experiment Registry Index}
+Canonical experiments referenced in the text. Each entry lists dataset range, feature catalog, model family, and evaluation protocol.
+\begin{itemize}
+  \item EXP-001: 1999--2005, baseline GLM, Brier/log-loss, weekly walk-forward.
+  \item EXP-002: 2006--2010, state-space margin, CRPS/PIT, seasonal holdouts.
+  \item EXP-003: 2011--2014, DC + bivariate Poisson, key-number reweighting.
+  \item EXP-004: 2015--2018, ML ensemble stacking, isotonic calibration.
+  \item EXP-005: 2019--2021, RL paper trading, OPE with DR estimator.
+  \item EXP-006: 2022--2024, conservative CQL, variance gating active.
+  \item EXP-007: Simulator frictions grid (vig, latency, slippage).
+  \item EXP-008: Drift ablation (turning off microstructure features).
+  \item EXP-009: Injury feature ablation (AGL variants).
+  \item EXP-010: Weather feature ablation (wind/gust discretization).
+  \item EXP-011: Teaser correlation control study.
+  \item EXP-012: Portfolio covariance approximations.
+  \item EXP-013: Off-policy evaluation robustness (clipping, SNIS).
+  \item EXP-014: Hyperparameter sweep for PPO (clip, entropy, lr).
+  \item EXP-015: Dueling DQN stake buckets sensitivity.
+  \item EXP-016: GLM link function comparison (logit vs probit).
+  \item EXP-017: Score-distribution tail reweighting sensitivity.
+  \item EXP-018: Cross-book spread delta as feature importance.
+  \item EXP-019: Execution-aware evaluation vs paper backtest.
+  \item EXP-020: Exposure caps and drawdown envelopes grid.
+  % (dozens more entries real systems would include)
+\end{itemize}
+
+\chapter{Extended Scenario Library}
+Stress scenarios used to evaluate the stability of policies.
+\begin{itemize}
+  \item S-001: High-wind outdoor cluster across multiple venues.
+  \item S-002: League-wide injury spike at QB position.
+  \item S-003: Rapid line drift near close (steam), reduced fills.
+  \item S-004: Book limit tightening; small-stake fragmentation.
+  \item S-005: Rule change mid-season; pace increases league-wide.
+  \item S-006: Weather forecast error bias; totals mispriced.
+  \item S-007: Data outage; fall back to priors and simple baselines.
+  \item S-008: Liquidity surge; execution cost falls at close.
+  \item S-009: Microstructure signal corruption; drift monitors trip.
+  \item S-010: Multi-week low-scoring regime; DC corrections dominate.
+\end{itemize}
+
+\chapter{CLI Reference}
+Common invocations for running ingestion, training, simulation, and reporting.
+\begin{verbatim}
+Rscript --vanilla data/ingest_schedules.R
+python py/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03
+psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$POSTGRES_PORT/$POSTGRES_DB \
+  -c "REFRESH MATERIALIZED VIEW mart.game_summary;"
+pytest tests/integration -k ingestion
+\end{verbatim}
+
+\chapter{Schema DDL Snippets}
+Representative DDL fragments for core tables.
+\begin{verbatim}
+CREATE TABLE core.games (
+  game_id TEXT PRIMARY KEY,
+  season INT NOT NULL,
+  week INT NOT NULL,
+  home_team TEXT NOT NULL,
+  away_team TEXT NOT NULL,
+  kickoff_ts TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE core.odds_history (
+  game_id TEXT NOT NULL,
+  book TEXT NOT NULL,
+  market TEXT NOT NULL,
+  quoted_at TIMESTAMPTZ NOT NULL,
+  price NUMERIC NOT NULL,
+  PRIMARY KEY (game_id, book, market, quoted_at)
+);
+\end{verbatim}
+
+\chapter{Experiment Registry (Extended)}
+Additional experiments expanding the registry.
+\begin{itemize}
+  \item EXP-021: Baseline recalibration cadence sensitivity.
+  \item EXP-022: Team-form window length sweep (1/3/5/8 games).
+  \item EXP-023: Injury priors vs rolling AGL variants.
+  \item EXP-024: Weather binnings (quantiles vs thresholds).
+  \item EXP-025: Late-breaking personnel updates impact.
+  \item EXP-026: Probit vs logit comparative calibration.
+  \item EXP-027: Score-distribution mixture weights learnable.
+  \item EXP-028: RL stake buckets: 3 vs 5 vs continuous.
+  \item EXP-029: OPE clipping thresholds grid.
+  \item EXP-030: DR vs SNIS variance comparison.
+  \item EXP-031: Risk-budget envelopes per week.
+  \item EXP-032: Cross-book delta thresholds for signals.
+  \item EXP-033: Line-velocity trigger for reduced orders.
+  \item EXP-034: Teaser correlation gating strategies.
+  \item EXP-035: Portfolio covariance approximation methods.
+  \item EXP-036: Execution-latency sensitivity curves.
+  \item EXP-037: Drift monitor thresholds; false positive costs.
+  \item EXP-038: Ensembling weights stability under shift.
+  \item EXP-039: Rolling backtests vs expanding windows.
+  \item EXP-040: Week-of-season effects on calibration.
+  \item EXP-041: QB injury shock simulation.
+  \item EXP-042: Offense/defense split features ablation.
+  \item EXP-043: Special teams features contribution.
+  \item EXP-044: Home-field advantage time dynamics.
+  \item EXP-045: Market close vs open price anchoring.
+  \item EXP-046: Liquidity caps and scaling laws.
+  \item EXP-047: Alternative priors for state-space.
+  \item EXP-048: Heavy-tailed observation noise.
+  \item EXP-049: Multicollinearity impact on interpretability.
+  \item EXP-050: Regularization path diagnostics.
+  \item EXP-051: Outlier robustness (Huber/Tukey).
+  \item EXP-052: Feature leakage detection tests.
+  \item EXP-053: PIT histogram smoothing effects.
+  \item EXP-054: CRPS optimization trade-offs.
+  \item EXP-055: Long-horizon vs weekly policy updates.
+  \item EXP-056: Entropy regularization schedules.
+  \item EXP-057: Target network update rates (tau).
+  \item EXP-058: Replay buffer composition tests.
+  \item EXP-059: Prioritized replay vs uniform.
+  \item EXP-060: Dueling head effectiveness.
+  \item EXP-061: Actor-critic baselines comparison.
+  \item EXP-062: Calibration vs sharpness frontier.
+  \item EXP-063: Utility functions (log, power) effects.
+  \item EXP-064: Drawdown penalty coefficients.
+  \item EXP-065: Exposure caps per market vs global.
+  \item EXP-066: Cross-validation blocking schemes.
+  \item EXP-067: Seasonality handling in features.
+  \item EXP-068: Regime detectors: cusum vs EWM.
+  \item EXP-069: Alternative simulation line-drift models.
+  \item EXP-070: Sensitivity to book-specific quirks.
+  \item EXP-071: Monitoring latencies and SLO breaches.
+  \item EXP-072: Alert thresholds and operator fatigue.
+  \item EXP-073: Explainability fidelity vs stability.
+  \item EXP-074: SHAP baseline selection impact.
+  \item EXP-075: Per-team calibration consistency.
+  \item EXP-076: Feature interaction strength shifts.
+  \item EXP-077: Early-week vs late-week edge profiles.
+  \item EXP-078: Hyperparameter grid search vs Bayesian.
+  \item EXP-079: CPU vs GPU runtime scaling.
+  \item EXP-080: Storage footprint and retention policies.
+  \item EXP-081: Data schema evolution resilience.
+  \item EXP-082: Test-time augmentation ideas.
+  \item EXP-083: Threshold policies vs continuous stakes.
+  \item EXP-084: Risk-adjusted returns by market type.
+  \item EXP-085: Alternative Kelly scaling heuristics.
+  \item EXP-086: Robust calibration methods.
+  \item EXP-087: Model version drift audits.
+  \item EXP-088: Governance overrides incidence.
+  \item EXP-089: Post-mortem analysis templates.
+  \item EXP-090: Incident taxonomy and response time.
+  \item EXP-091: Backtest contamination checks.
+  \item EXP-092: Random seed variability.
+  \item EXP-093: Reproducibility across machines.
+  \item EXP-094: Data freshness lags.
+  \item EXP-095: Clock skew effects.
+  \item EXP-096: Cloud vs local performance.
+  \item EXP-097: MLflow registry scaling.
+  \item EXP-098: Metadata completeness rate.
+  \item EXP-099: Report generation pipelines.
+  \item EXP-100: Archival policies for artefacts.
+\end{itemize}
+
+\chapter{Paper-Trading Logs (Excerpts)}
+Selected anonymized log lines from paper-trading validation. Timestamps and IDs are illustrative.
+\begin{verbatim}
+2023-09-01T12:00:00Z INFO  GAME=G001 MARKET=spread BOOK=B1 CBV=0.021 STAKE=0.5 CLV=+0.5
+2023-09-01T12:05:00Z INFO  GAME=G002 MARKET=total  BOOK=B2 CBV=0.015 STAKE=0.3 CLV=+0.0
+2023-09-01T12:10:00Z INFO  GAME=G003 MARKET=ml     BOOK=B1 CBV=0.012 STAKE=0.2 CLV=-0.3
+2023-09-01T12:15:00Z INFO  GAME=G001 MARKET=teaser BOOK=B3 CBV=0.028 STAKE=0.4 CLV=+0.7
+2023-09-01T12:20:00Z WARN  GAME=G004 MARKET=spread BOOK=B2 CBV=0.008 STAKE=0.0 REASON=GATE_VARIANCE
+2023-09-01T12:25:00Z INFO  GAME=G005 MARKET=total  BOOK=B1 CBV=0.019 STAKE=0.3 CLV=+0.2
+2023-09-01T12:30:00Z INFO  GAME=G006 MARKET=ml     BOOK=B2 CBV=0.011 STAKE=0.2 CLV=+0.1
+2023-09-01T12:35:00Z INFO  GAME=G007 MARKET=spread BOOK=B3 CBV=0.025 STAKE=0.5 CLV=+0.6
+2023-09-01T12:40:00Z INFO  GAME=G008 MARKET=total  BOOK=B1 CBV=0.017 STAKE=0.3 CLV=-0.1
+2023-09-01T12:45:00Z INFO  GAME=G009 MARKET=ml     BOOK=B3 CBV=0.013 STAKE=0.2 CLV=+0.0
+... (hundreds of similar lines omitted for brevity) ...
+\end{verbatim}
+\chapter{Extended Case Studies}
+We narrate representative weeks where data, market, and operational conditions evolved materially. These case studies reveal how the hybrid stack and governance controls respond in practice.
+
+\section{Regular Season Weeks 1--18}
+For each week we summarize signal quality, market dynamics, risk gates, and execution notes.
+\begin{description}
+  \item[Week 1:] New-season priors, heightened uncertainty; conservative stakes until form stabilizes; outlier weather cases in outdoor venues.
+  \item[Week 2:] Early drift monitors flag shifts in pace; totals models recalibrated; RL policy increases exposure modestly on verified CBV.
+  \item[Week 3:] Injury shocks (QB changes) propagate through team-strength posteriors; score-distribution layer widens tails; Kelly fraction reduced.
+  \item[Week 4:] Cross-book divergences yield selective arbitrage-style CBV; governance caps prevent over-concentration in any single market.
+  \item[Week 5:] Weather uncertainty narrows closer to kickoff; simulator back-tests favor teasers around key numbers; limited deployment.
+  \item[Week 6:] Market efficiency improves for popular matchups; edge shifts to niche totals; ML ensembles contribute most incremental lift.
+  \item[Week 7:] Bye weeks introduce small-sample artifacts; state-space smoothing stabilizes team form metrics; risk monitors green.
+  \item[Week 8:] Mid-season recalibration pass tightens calibration slope; paper-trading verifies improved reliability.
+  \item[Week 9:] Execution latency costs measured and incorporated; policy reduces orders when line velocity exceeds threshold.
+  \item[Week 10:] High-wind conditions; totals edge increases but slippage model forecasts lower fill rates; exposure capped.
+  \item[Week 11:] Underdog bias pockets emerge; ensembles capture interaction between rest and pass rate over expected.
+  \item[Week 12:] Holiday week volume alters liquidity profile; book depth increases at close; CLV improves with patient orders.
+  \item[Week 13:] Regime change in one team’s offense; GAM components adapt faster than global models; governance approves promotion.
+  \item[Week 14:] Simulator stress test reveals teaser correlation risk; RL policy disallows certain correlated legs that fail risk limits.
+  \item[Week 15:] Cold-weather cluster; bivariate Poisson correlation rises; portfolio variance controlled via allocation across markets.
+  \item[Week 16:] Market microstructure features degrade temporarily; drift triggers reduced weighting; backup signals used.
+  \item[Week 17:] Playoff-clinching incentives impact rotations; uncertainty rises; Kelly scaled back; selective focus on motivated teams.
+  \item[Week 18:] Rest/seed scenarios dominate; model switches to scenario-conditioned simulation; discretionary overrides allowed with audit.
+\end{description}
+
+\section{Playoffs}
+Lower sample sizes but higher liquidity; priors dominate early; model emphasizes calibration over sharpness; teaser value concentrated at key integers.
+
+\section{Case Study: Weather Whiplash Week}
+An early-winter week presented diverging model and market expectations due to volatile wind forecasts. On Monday, preliminary totals models suggested under value in several outdoor venues; by Thursday, forecast updates reduced expected wind speeds substantially. The hybrid stack responded by downweighting weather features until nowcasting signals converged. The RL policy’s posterior-variance gate suppressed stake sizes mid-week, avoiding fills at stale prices. On Saturday, as forecasts stabilized, selective entries captured CLV without breaching portfolio variance caps. The outcome illustrated the benefit of separating structural edge from execution timing: a purely static model would have overbet early-week unders and suffered CLV erosion.
+
+\section{Case Study: QB Injury Cascade}
+A Thursday injury report triggered a probable QB downgrade, with uncertainty around the backup’s readiness. State-space priors widened, increasing margin variance in the score-distribution layer. The ensemble reduced reliance on high-variance team-form features and leaned on market microstructure signals for confirmation. Governance required an explicit re-approval of exposure caps due to elevated tail risk. As market prices overreacted Friday morning, the policy took small contrarian positions with tight limits. Final results showed modest edge and, more importantly, avoided outsized drawdowns typical of injury whipsaws.
+
+\section{Case Study: Steam vs Patience}
+Multiple books printed divergent opener lines Sunday night, with sharp steam quickly narrowing gaps. The order router, informed by line-velocity estimates, prioritized books with slower update cadence and deeper limits at close. Paper-trading simulations indicated that chasing early steam produced lower realized CLV than waiting for late fills under this week’s liquidity pattern. The live policy mirrored that behavior, entering fewer but higher-quality orders. Post-mortem analysis confirmed better calibration and realized edge with the patient strategy, reinforcing the microstructure-aware execution module.
+
+\chapter{Full Feature Dictionary}
+We provide a comprehensive dictionary of features used across models. For each feature we include a definition, window, and provenance. Selected categories and representative entries are shown below.
+
+\section{Situational Features}
+\begin{itemize}
+  \item down\_1st, down\_2nd, down\_3rd, down\_4th (one-hot)
+  \item distance\_to\_go, yardline\_pct, redzone\_flag
+  \item score\_diff\_current, score\_diff\_rolling\_N
+  \item time\_remaining\_half, time\_remaining\_game, timeout\_counts
+  \item field\_side, hash\_mark, formation\_family
+\end{itemize}
+
+\section{Team Form (Rolling Windows)}
+\begin{itemize}
+  \item epa\_offense\_rolling\_{1,3,5} (overall, by run/pass)
+  \item success\_rate\_by\_down (1st/2nd/3rd/4th)
+  \item pressure\_rate\_for/against, sack\_rate, hurry\_rate
+  \item explosive\_play\_rate, redzone\_td\_rate
+  \item special\_teams\_efficiency proxies (avg start position, return EPA)
+\end{itemize}
+
+\section{Market Microstructure}
+\begin{itemize}
+  \item implied\_probability, vig\_adjusted\_probability
+  \item line\_move\_delta\_{1h,24h}, line\_velocity, line\_acceleration
+  \item cross\_book\_spread\_delta, consensus\_vs\_rogue\_flag
+  \item cbv\_pointwise, cbv\_aggregated, clv\_historical
+\end{itemize}
+
+\section{Roster and Availability}
+\begin{itemize}
+  \item qb\_status, wr\_injuries, ol\_injuries, dl\_injuries
+  \item adjusted\_games\_lost (AGL), active\_starters\_share
+  \item travel\_distance, rest\_days, short\_week\_flag
+\end{itemize}
+
+\section{Environmental}
+\begin{itemize}
+  \item temperature, wind\_speed, gust\_speed, precipitation\_flag
+  \item surface\_type (turf/grass), dome\_flag, altitude\_category
+\end{itemize}
+
+\section{Extended Examples}
+We illustrate how raw sources become modeling features:
+\begin{itemize}
+  \item \textbf{Line velocity:} computed as the time-derivative of consensus spread using robust regression over the last \(\Delta t\) minutes; smoothed with an EWMA to reduce noise. Thresholds gate orders when velocity exceeds book-specific fill reliability.
+  \item \textbf{AGL variants:} adjusted games lost by unit (OL, DL, secondary) with decay to reflect partial participation; interacts with pass-rate-over-expected to explain pressure-driven EPA swings.
+  \item \textbf{Weather nowcasts:} blended forecasts (NOAA + stadium sensors) aggregated to kickoff horizon; features include quantized wind/gust bins and a disagreement index signaling forecast volatility.
+  \item \textbf{Rest/travel:} great-circle travel distance adjusted for time zones; short-week flags; cumulative fatigue scores that reset at bye weeks and decay otherwise.
+  \item \textbf{CBV:} difference between fair probability from our models and vig-adjusted implied market probability, with book-level calibration to account for quoting conventions.
+\end{itemize}
+
+\section{Calibration and CLV Trajectories by Season}
+We track reliability curves, calibration slope/intercept, and closing‑line value quantiles by season. Patterns include higher sharpness in pass‑heavy eras, improved reliability after introducing isotonic calibration, and CLV gains attributable to microstructure‑aware execution.
+
+\subsection*{Diagnostics}
+We compute reliability diagrams with bootstrapped confidence bands, PIT histograms for distributional outputs, and rolling calibration slopes across weekly windows. For CLV, we report median and upper‑quartile values with interquartile ranges to assess consistency rather than isolated spikes.
+
+\subsection*{Operational Learnings}
+Execution timing drives a significant fraction of realized CLV. Latency‑aware routing and patience near close improved fills and reduced slippage, particularly in seasons with high line velocity.
+
+% End of trimmed appendix content
+\fi
+
+\chapter{Season Summaries (1999--2024)}\label{app:season-summaries}
+For each season we summarize calibration, CLV capture, and notable regime shifts. These notes orient readers to where methods succeeded or struggled and where governance interventions mattered.
+
+
+\paragraph{1999} A lower-passing era with relatively narrow scoring tails. Independent-Poisson assumptions held up well, and Skellam-based pricing required minimal reweighting. Calibration was strong but sharpness lagged; conservative Kelly scaling delivered steady albeit modest edge.
+
+\paragraph{2000} Pace increased incrementally, with small boosts to totals. Weather feature quality improved as station coverage increased, yielding better totals calibration. RL policy remained conservative early while team-form estimates stabilized.
+
+\paragraph{2001} Enforcement and contact rules changed penalty profiles and reshaped EPA distributions. Early drift monitors flagged shifts in pass interference and holding rates; recalibration restored probability reliability. Margins became slightly more dispersed, affecting teaser planning around key numbers.
+
+\paragraph{2002} League realignment altered travel patterns and divisional matchups. Schedule-derived fatigue features gained explanatory power. Cross-validation confirmed benefits of including rest and distance covariates in spread and totals models.
+
+\paragraph{2003} Explosive plays rose, widening the right tail of score distributions. Bivariate Poisson correlation components grew modestly, improving parlay risk estimation. Drawdown-aware staking prevented overreaction to transient spikes in variance.
+
+\paragraph{2004} Onset of the modern passing era. Calibration drift emerged in unregularized margin models; isotonic recalibration and stronger priors restored alignment. ML ensembles began to contribute measurable CLV gains relative to classical baselines.
+
+\paragraph{2005} Defensive efficiency volatility increased league-wide. Ensemble variance rose accordingly; posterior-variance gating suppressed bet sizes on outlier matchups. Simulator stress tests added heavy-tail scenarios to reflect new risk.
+
+\paragraph{2006} Kickoff and touchback adjustments changed average starting field position. Situational features tied to field zone and return quality improved totals modeling. Teaser EV around key integers required retuning due to shifting special teams dynamics.
+
+\paragraph{2007} Several elite offenses pushed scoring higher. Skellam tails were reweighted to match empirical key-number frequencies (3,6,7,10). Despite abundant opportunities, slippage modeling kept exposure disciplined as lines moved quickly late.
+
+\paragraph{2008} Market microstructure features (line velocity, cross-book deltas) gained predictive value. Comparative Book Value (CBV) screens became a central gate for order placement. Execution-aware evaluation showed improved CLV capture with patient entries.
+
+\paragraph{2009} Better weather instrumentation and modeling sharpened totals. Residual analysis revealed fewer systematic cold-weather misfits. Portfolio variance fell as totals uncertainty narrowed in late season.
+
+\paragraph{2010} Rule emphasis further boosted passing efficiency. Team-form features were reweighted toward aerial performance, and home-field advantage showed asymmetric effects by offensive style. Calibration slope remained near 1 with isotonic correction.
+
+\paragraph{2011} Extreme aerial production increased margin dispersion. Kelly fractions were automatically scaled down by wider posterior intervals. RL policies emphasized correlated-hedge controls across spread and total legs.
+
+\paragraph{2012} Replacement officials introduced non-stationarity in penalty enforcement. We downweighted anomalous weeks and widened priors to absorb outliers. Governance signoff required for model promotions during the event window.
+
+\paragraph{2013} Offensive surge stabilized at a higher mean. Calibration held steady; sharpness improved with feature updates. Simulator-validated teaser portfolios contributed incremental, low-correlation returns.
+
+\paragraph{2014} Injury dynamics shifted (notably along OL/DL units). Adjusted Games Lost (AGL) features and depth proxies improved short-horizon forecasts. Exposure caps were lowered when injury-report uncertainty rose near kickoff.
+
+\paragraph{2015} Defensive adaptations narrowed extreme outcomes in some matchups but increased variance in others. Totals became harder to price; the score-distribution layer switched to mixture weighting more frequently. Stress tests expanded to include correlation shocks.
+
+\paragraph{2016} Closing markets appeared more efficient in popular games; edge concentrated in niche totals and smaller books. Microstructure features continued to drive CBV edges. Execution latency emerged as a material drag when line velocity spiked.
+
+\paragraph{2017} Quarterback injuries materially increased outcome variance. Posterior-variance gates became more active, throttling stake sizes. RL policy learned to defer in ambiguous QB-status windows rather than chase stale signals.
+
+\paragraph{2018} Another surge in passing efficiency increased totals opportunity, especially underpriced underdogs in correlated weather contexts. Bivariate Poisson components captured dependence, benefiting parlay risk estimation.
+
+\paragraph{2019} Weather forecast accuracy improved; totals uncertainty fell. CLV gains were increasingly driven by microstructure timing rather than raw model edge. A latency-aware order router improved realized fills and reduced slippage.
+
+\paragraph{2020} Pandemic conditions created unique regimes (no fans, altered travel). Models split regimes explicitly, preventing leakage and restoring calibration. Governance further tightened risk budgets amid unprecedented uncertainty.
+
+\paragraph{2021} The 17th game altered rest patterns and fatigue. Feature windows and schedule-derived covariates were retuned. Simulator baselines recalibrated to reflect the longer season distribution.
+
+\paragraph{2022} Book behavior shifted, with intermittent widening of cross-book spreads. CBV thresholds adapted dynamically to liquidity. Conservative policies maintained drawdown envelopes despite tempting opportunities.
+
+\paragraph{2023} Data quality and timeliness improved across sources. New drift detectors reduced false positives while catching subtle regime shifts. Ensemble weighting stabilized, and CLV capture trended upward.
+
+\paragraph{2024} Continued incremental improvements in calibration and CLV capture. Focus shifted to operational robustness and explainability tooling, cementing reproducibility and governance standards.
+
+
+\chapter{Team Profiles (Anonymous)}\label{app:team-profiles}
+We include anonymized team profiles to illustrate how feature families and market context shape predictions and stakes. Each profile emphasizes calibration patterns, microstructure interactions, and risk controls.
+
+\paragraph{Team A} A pass-heavy identity with high PROE and fast pace. Model edges arise when wind forecasts are overestimated and totals are shaded too low. Portfolio concentration is controlled via cross-market correlation limits. Calibration: reliable in mid‑range probabilities with slight overconfidence at extremes. Execution: prefer late fills when weather converges; avoid chasing steam.
+
+\paragraph{Team B} Defense-first with low explosive-play rate but consistent success on early downs. Spreads are often efficient; edges appear in unders with specific weather and travel combinations. Stake scaling is conservative due to narrow margins. Feature interactions: pressure‑rate x opponent pass‑block win rate; travel fatigue boosts under probability.
+
+\paragraph{Team C} Volatile quarterback play drives elevated variance. RL policy gates stake size until injury status stabilizes. Calibration improves late in the week as depth charts firm up. Governance: deferral rules during questionable status windows; correlation caps on parlays.
+
+\paragraph{Team D} Dome environment reduces weather uncertainty; totals modeling relies more on tempo and opponent style. Edges in correlated parlays occur when opponent pass rates spike. Execution: earlier entries acceptable; watch for late recency premium on overs.
+
+\paragraph{Team E} Strong special teams create field-position advantages. Baselines underprice hidden yardage; ensemble features correct, leading to small but persistent CLV gains on spreads. Risk: limit stake when ST volatility dominates variance decomposition.
+
+\paragraph{Team F} Balanced offense with moderate pace; edges depend on opponent tendencies. Teaser value appears around key integers when market overreacts to recency. Reliability: moderate; use isotonic calibration to correct slight underconfidence.
+
+\paragraph{Team G} High-variance defense generates turnovers; margins widen unpredictably. Skellam reweighting increases tail mass; Kelly fractions trimmed accordingly. Portfolio: hedge via cross‑market under positions when turnover luck spikes.
+
+\paragraph{Team H} Run-centric approach depresses totals; market sometimes undershoots when opponent accelerates pace. Model flags underdog value when rest and travel favor the run game. Microstructure: retail bias on favorites creates occasional spread value.
+
+\paragraph{Team I} Injuries along the offensive line materially affect sack and pressure rates. Features tracking depth and continuity improve weekly calibration, guiding reduced stakes during instability. Execution: wait for Friday practice reports before sizing up.
+
+\paragraph{Team J} Public popularity creates occasional favorite bias. Cross-book deltas and consensus vs rogue flags help identify mispricings; execution patience improves CLV capture. Risk: cap exposure to avoid correlation with retail flows.
+
+\paragraph{Team K} Outdoor venue with frequent wind; weather nowcasting is critical. When forecasts converge late, totals edge tightens and exposure is pared back. Seasonality: late‑season wind regimes require re‑tuned priors.
+
+\paragraph{Team L} Aggressive fourth-down decisions increase possession volatility. RL policy benefits from scenario-conditioned simulation that models extra series potential. Calibration: tails require heavier regularization.
+
+\paragraph{Team M} Pass rush dominance shifts opponent behavior; totals depend on defensive disruption. Correlation across spread and total is managed via portfolio variance caps. Feature: pressure‑rate x opponent QB scramble tendency.
+
+\paragraph{Team N} Rookie QB learning curve creates mid-season regime change. State-space priors smooth transitions; calibration recovers after initial volatility. Governance: promotion gates delay model updates until stability.
+
+\paragraph{Team O} Altitude effects subtly influence fatigue and late-game scoring. Environmental features and travel length explain residuals otherwise attributed to randomness. Execution: limits allow later entries at close without slippage.
+
+\paragraph{Team P} Multiple book-specific biases observed in niche markets. Microstructure features (line velocity, rogue quotes) drive most edge; strict governance limits prevent over-concentration. Calibration: decent; prioritize consensus vs rogue diffs to validate entries.
+
+\paragraph{Team Q} Tempo fluctuates widely by game script. Feature interactions between early success rate and second-half pace inform totals; simulator scenarios account for extreme hurry-up likelihoods. Risk: limit exposure in two‑minute drill dominant opponents.
+
+\paragraph{Team R} Elite secondary suppresses explosive plays but concedes underneath routes. Spread edges arise when opponent YAC is systematically misestimated by the market. Execution: target unders with possession‑draining drives.
+
+\paragraph{Team S} Coaching tendencies produce predictable red-zone decisions. Discrete outcome models capture increased field-goal rates, improving totals calibration in low red-zone conversion matchups. Governance: safer teaser constructions when FG frequency is high.
+
+\paragraph{Team T} Home-field advantage appears asymmetric (crowd noise effects). We incorporate dynamic HFA adjustments by opponent and venue, reducing residual structure in margins. Microstructure: overs priced up in marquee home games; fade selectively.
+
+\paragraph{Team U} Balanced but injury-prone roster; availability volatility dominates forecasting error. Posterior-variance gates downweight early-week signals until practice reports confirm status. Execution: adjust fill strategy when status flips late.
+
+\paragraph{Team V} Indoor speed advantage enhances passing EPA. Market tends to overweight recent shootouts; under plays regain value when opponent slows pace with run-heavy scripts. Reliability: calibrate tails with mixture weights.
+
+\paragraph{Team W} Special teams volatility swings single-game outcomes. Portfolio rules cap exposure in games where ST edge dominates variance decomposition. Feature: punt net‑yards and hidden yards proxies.
+
+\paragraph{Team X} Rookie play-caller shifts offensive identity mid-season. A regime detector triggers feature reweighting and retraining cadence adjustments. Governance: hold model promotions during regime transitions.
+
+\paragraph{Team Y} Pass-protection instability raises sack-driven drive kills. Spread edges increase against aggressive blitz opponents; totals models lower expected plays run. Execution: prefer late confirmations after injury reports.
+
+\paragraph{Team Z} Opportunistic defense creates short fields; totals rise even when offense is average. Simulator pathways elevate short-drive scoring probability. Risk: correlation caps with overs to manage tail risk.
+
+\paragraph{Team AA} Cold-weather outdoor venue with late-season wind patterns. Totals strategies favor unders early in the week, with exit plans as forecasts narrow toward kickoff. Microstructure: odd‑lot fills common; route to books with deeper limits.
+
+\paragraph{Team AB} Dual-threat QB complicates defensive assignments. Model edges come from better rush-pass option accounting; calibration improves with opponent spy usage signals. Portfolio: hedge with opponent sacks under certain matchups.
+
+\paragraph{Team AC} Ball-control offense with low volatility. Spreads are efficient; teaser legs around 3 and 7 dominate value when opponent plays similar style. Execution: narrow windows; fill near close.
+
+\paragraph{Team AD} Explosive but turnover-prone offense. RL policy balances upside with CVaR constraints to avoid tail losses in correlated parlays. Calibration: increase tail mass in mixture components.
+
+\paragraph{Team AE} Veteran coaching staff yields stable decision patterns. Market quickly prices recency; edges persist in niche derivative markets with slower adjustments. Microstructure: rogue quotes appear at off‑peak hours.
+
+\paragraph{Team AF} Scheme diversity week-to-week reduces predictability. Ensemble models with interaction terms outperform simpler baselines; governance enforces modest stake caps to reflect modeling uncertainty. Execution: keep dry powder for late info.
+
+\iffalse % trimmed extended appendix content
+\chapter{RL Pseudocode Library}
+We provide high-level pseudocode for key algorithms used in this work.
+
+\section{Conservative Q-Learning (CQL)}
+\begin{verbatim}
+Initialize Q(s,a) and target network Q_target with parameters theta, theta_bar
+for each training step do
+  sample batch B from logged dataset D
+  compute conservative target using log-sum-exp over actions
+  minimize alpha * E_{s,a~D}[ logsumexp_a' Q(s,a') - Q(s,a) ]
+         + E_{(s,a,r,s')}[ (r + gamma * max_a' Q_target(s',a') - Q(s,a))^2 ]
+  update target parameters: theta_bar <- tau * theta + (1 - tau) * theta_bar
+end for
+\end{verbatim}
+
+
+\section{Proximal Policy Optimization (PPO)}
+\begin{verbatim}
+for each iteration do
+  collect trajectories with current policy pi_theta
+  compute advantages with GAE(lambda)
+  optimize L = E[ min(r_t * A_t, clip(r_t, 1-eps, 1+eps) * A_t) + beta * entropy ]
+  update value function with regression to returns
+end for
+\end{verbatim}
+
+
+\section{Dueling DQN for Discrete Stakes}
+\begin{verbatim}
+Q(s,a) = V(s) + (A(s,a) - mean_a A(s,a))
+optimize TD loss with target network and prioritized replay
+\end{verbatim}
+
+\chapter{Additional Proof Sketches}
+We include proof sketches for properties of Poisson mixtures, Skellam reweighting, and CRPS consistency. These notes are intended to support reproducibility of the mathematical claims in the main text.
+
+% End of trimmed extended appendix content
+\fi
+
+\section{Skellam Mixture Moments}
+Let $X\sim\text{Pois}(\lambda)$, $Y\sim\text{Pois}(\mu)$, and $D=X-Y$. For a reweighted mixture on key integers, we show how first and second moments shift under multiplicative weights and how to renormalize the PMF.
+
+\section{CRPS Consistency}
+We outline conditions under which CRPS remains strictly proper for mixture distributions and discuss implications for training objectives that combine sharpness and calibration.
+
+\chapter{Calibration Case Gallery}
+We present representative cases that illustrate reliability nuances across probability regimes and contexts.
+
+\section{High-Confidence Favorites}
+Predictions near 0.8–0.9 win probability are sharp but prone to slight overconfidence during early weeks. Isotonic calibration narrows this bias; portfolio rules cap exposure to avoid concentration.
+
+\section{Coin-Flip Matchups}
+Near 0.5, models emphasize market signals and team‑form parity. Reliability is strongest here; CLV depends heavily on execution timing and cross‑book selection.
+
+\section{Weather-Dominated Totals}
+Unders with high wind show excellent calibration when forecasts converge within 24 hours of kickoff. Early‑week entries suffer from forecast variance and should be deferred.
+
+\section{Injury Uncertainty}
+Questionable QB status yields wide posterior intervals; deferral reduces regret. When status resolves to a downgrade, cautious contrarian entries capture CLV without breaching risk limits.
+
+\section{Key-Number Sensitivity}
+Margins around 3, 6, 7, and 10 require reweighted distributions. Teaser EV depends critically on these masses; reliability improves after reweighting and mixture adjustments.
+
+\section{Marquee Games}
+Public bias inflates favorites and overs. Models capture edges selectively; patience to near‑close fills outperforms early steam chasing.
+
+\section{Late-Season Incentives}
+Playoff seeding skews rotations and effective strengths. Scenario‑conditioned simulation restores calibration and keeps exposure disciplined.
+
+\section{Extreme Pace Mismatch}
+High‑tempo vs ball‑control matchups show bimodal scoring potential. Mixtures capture this structure; reliability degrades without them.
+
+\chapter{Execution Microstructure Notes}
+We detail practical lessons from order placement and routing.
+
+\section{Rogue Prints and Consensus}
+Cross‑book deltas identify outliers; entries prefer lagging books with adequate limits. Consensus formation dynamics inform patience thresholds.
+
+\section{Steam vs Patience}
+Chasing steam erodes realized CLV in most weeks. A policy of selective patience, guided by velocity estimates and fill reliability, performs better in aggregate.
+
+\section{Fill Reliability and Partial Orders}
+Books vary in partial fill behavior. The router splits orders to maximize fill while minimizing slippage, learning per‑book patterns over time.
+
+\section{Limit Ladders}
+Staggered limits by time and market type encourage sizing plans that scale near close. Exposure caps reflect both edge and expected depth.
+
+\chapter{Risk Envelope Design (Extended)}
+We formalize how risk budgets translate into stake constraints and how monitoring enforces adherence under uncertainty.
+
+\section{Budgeting and CVaR Targets}
+We express weekly budgets in terms of variance and CVaR at a selected confidence. Stake optimization respects both constraints, preferring diversified exposure across games and markets. When realized volatility exceeds modeled bounds, circuit breakers pause new orders while allowing risk‑reducing exits.
+
+\section{Correlation Estimation}
+We estimate cross‑bet correlations from historical co‑movements in CBV and implied probabilities, regularized toward sparse structures to avoid instability. Sensitivity analysis explores worst‑case bounds to avoid overconcentration in correlated legs.
+
+\section{Stress Testing}
+Scenario libraries (weather clusters, injury spikes, liquidity shocks) produce predictive return envelopes. Acceptance criteria require drawdown quantiles below governance thresholds and recovery times within agreed windows.
+
+\section{Case Studies}
+In a wind‑dominated week, the envelope shrank exposure to totals trades despite high apparent edge, preserving flexibility for late entries. During an injury cascade, correlation caps prevented stacking positions across related markets, avoiding a tail event when status flipped unexpectedly.
+
+\chapter{Dataset Documentation (Extended)}
+We provide additional documentation to facilitate replication and safe reuse of datasets.
+
+\section{Odds History Schema}
+The \texttt{odds\_history} table stores book quotes keyed by \texttt{(game\_id, book, market, quoted\_at)} with normalized price formats and vig‑adjusted implied probabilities. Indices support range queries on \texttt{quoted\_at} and filters by market type for efficient joins with game metadata.
+
+\section{Feature Artefacts}
+Feature snapshots are materialized per week with explicit versioning. Manifests include feature lineage, owners, update cadence, and checksums. Inventory tables list feature families (situational, team form, market, roster, environmental) with window definitions and nullability.
+
+\section{Quality Controls}
+Daily checks validate schema, row counts, and summary statistics. Drift detectors alert on shifts in core distributions. Reconciliation reports compare expected vs realized inserts for each ingest job, and failures block downstream training until resolved.
+
+\section{Replication Checklist}
+\begin{enumerate}
+  \item Restore the R and Python environments; verify versions.
+  \item Run schedule and odds ingestors; confirm row counts and keys.
+  \item Materialize marts; run smoke queries; snapshot hashes.
+  \item Train baselines and ensembles; log artefacts and metrics.
+  \item Generate calibration and CLV diagnostics; archive reports.
+  \item Calibrate simulator; run stress scenarios; store seeds.
+  \item Paper‑trade for a validation window; compare realized CLV.
+  \item Rebuild this document; verify stable page count and references.
+\end{enumerate}
+
+\section{Privacy and Ethics}
+We minimize exposure of sensitive attributes, publish only aggregated outputs, and enforce access controls for any restricted datasets. Responsible use guidelines emphasize risk awareness and transparency over aggressive exploitation.
+
+
+\chapter{Feature Examples (Extended)}
+We expand the feature dictionary with concrete examples and edge cases.
+
+\section{Situational Examples}
+Third‑and‑short vs third‑and‑long probabilities differ not only by yards‑to‑go but by formation family; a compressed field increases run likelihoods and alters expected drive value. Hash‑mark position interacts with wind to affect kick success.
+
+\section{Team Form Examples}
+Rolling EPA splits show regression toward league mean after bye weeks; pressure‑rate surges correlate with opponent protection injuries. Red‑zone TD rates lag improvements in explosive plays and require separate smoothing.
+
+\section{Market Microstructure Examples}
+Consensus spreads often lag rogue books by minutes in off‑peak hours; order router preferentially targets laggards with higher fill depth. Line acceleration thresholds correlate with lower fill reliability and advise patience.
+
+\section{Roster and Availability Examples}
+OL continuity predicts sack rate beyond raw injury counts; combining AGL with practice participation outperforms either alone. Late Friday downgrades justify zeroing stake until Saturday confirmations.
+
+\section{Environmental Examples}
+Wind uncertainty is better captured by a disagreement index across sources; dome humidity occasionally affects totals via kicking performance, a subtle but measurable effect in certain venues.
+
+\chapter{Failure Modes and Effects Analysis (FMEA)}
+We catalog plausible failure modes, detection signals, and mitigations.
+
+\section{Data Failures}
+Missing or delayed odds snapshots; schema drifts; unit scaling errors. Mitigations: schema tests, row‑count monitors, fallback to last known‑good snapshots, and quarantine pipelines.
+
+\section{Model Failures}
+Overfitting to transient regimes; calibration drift; unstable mixture weights. Mitigations: temporal validation, regularization sweeps, calibration audits, and promotion gates.
+
+\section{Execution Failures}
+Slippage spikes; partial fill starvation; router mis‑calibration. Mitigations: adaptive patience thresholds, per‑book reliability models, and fallback order templates.
+
+\section{Governance Failures}
+Risk budget breaches; override misuse; audit gaps. Mitigations: automated circuit breakers, dual‑control approvals, immutable logs.
+
+\chapter{Reproducibility Trace (End‑to‑End)}
+An auditable example tracing a single week from ingestion to paper‑trading.
+
+\section{Provenance}
+Dataset hashes, environment manifests, and artefact IDs are recorded at each step. Reports embed IDs so figures and tables can be tied to specific runs.
+
+\section{Determinism}
+Random seeds are set for each component; acceptable variability bounds are defined. Divergent results outside tolerances open issues with attached logs.
+
+\section{Audit Log}
+All promotions, overrides, and risk‑budget changes are logged with timestamps and approvers. Rebuild instructions are stored with exact command invocations.
+
+\chapter{Execution Microstructure (Extended II)}
+We deepen notes on order routing, depth inference, and latency management.
+
+\section{Routing Heuristics}
+Per‑book performance profiles guide routing: expected fill size by time‑to‑kick, volatility sensitivity, and typical slippage under steam. The router adaptively splits orders across books to trade off depth vs speed.
+
+\section{Order Book Patterns}
+Near close, books tighten spreads and increase limits. We model depth with a simple latent factor for week‑specific liquidity, regularized toward historical means. Orders step through limit ladders to minimize signaling.
+
+\section{Latency Histograms}
+Latency varies with load and market popularity. We track end‑to‑end latency and decompose into inference, routing, and book response times. Policies are adjusted when latency crosses thresholds that historically degrade CLV.
+
+\section{Partial Fills and Retry Logic}
+When partial fills occur, the router retries with adjusted price tolerance and reduced size. A back‑off strategy prevents excessive signaling and avoids chasing drifting lines.
+
+\chapter{Model Evaluation Protocols (Extended)}
+We formalize evaluation across predictive, economic, and operational dimensions.
+
+\section{Predictive Metrics}
+We report Brier score, log‑loss, calibration slope/intercept, and CRPS for distributions. Reliability diagrams use bootstrapped confidence bands to quantify uncertainty in calibration.
+
+\section{Economic Metrics}
+CLV distributions (median, interquartile range) and bankroll growth (MAR, Sortino) provide value assessments. Sensitivity to friction is reported via scenario grids.
+
+\section{Operational Metrics}
+Latency histograms, fill reliability, and alert incidence inform production readiness. Stability across machines and seeds is tracked to enforce reproducibility.
+
+\section{Leakage Controls}
+Temporal blocking, feature lineage checks, and pre‑commit tests prevent future information from contaminating training data. Violations block experiments until remediated.
+
+\section{Fairness and Robustness}
+We audit for systematic bias across teams or market types, ensuring that apparent edges are not artifacts of sampling or leakage. Robustness checks include jackknife‑by‑season and leave‑one‑division‑out tests.
+
+\chapter{Case Studies (Extended II)}
+We add two deeper narratives to illustrate end‑to‑end reasoning under uncertainty and microstructure dynamics.
+
+\section{Late Steam and Weather Convergence}
+An outdoor slate with conflicting forecasts created tension between early under signals and late market optimism. The policy deferred entries, waiting for convergence within 18 hours of kickoff. When forecasts aligned, selective unders were taken at deeper limits, capturing CLV as books normalized. A counterfactual that chased early steam underperformed due to slippage and subsequent line corrections.
+
+\section{Injury Status Flip and Correlation Risk}
+On Friday afternoon, a probable QB was downgraded, moving spreads and totals sharply. The router avoided stacking correlated positions across spread and total, respecting correlation caps. After status clarified further on Saturday, limited hedges were placed. The final outcome showed controlled drawdowns compared to naive policies that piled into correlated legs.
+
+\chapter{Ablation and Sensitivity Notes}
+We summarize insights from ablations and sensitivity studies that informed model design and governance thresholds.
+
+\section{Feature Ablations}
+Removing market microstructure features reduced CLV capture materially, highlighting their necessity as action gates even when predictive lift was modest. Roster features moved calibration more than sharpness.
+
+\section{Hyperparameter Sensitivity}
+Regularization paths showed stable plateaus; over‑regularization degraded calibration slope before log‑loss. RL clip parameters balanced stability and exploration; entropy schedules prevented premature convergence.
+
+\section{Simulation Assumptions}
+Friction assumptions (vig, slippage) drove EV more than small predictive gains; sensitivity grids guided risk budgets and execution strategies.
+
+\chapter{Operator SOPs (Extended)}
+Standard operating procedures ensure consistent, auditable behavior under common and rare conditions.
+
+\section{Pre‑Kick Checklist}
+Data freshness, calibration diagnostics, drift monitor status, risk budget confirmation, and router configuration are verified. Deviations are recorded and approvals obtained before proceeding.
+
+\section{During‑Week Monitoring}
+Alerts for drift, latency, and fill reliability are triaged with clear playbooks. Exposure caps adjust when realized volatility deviates from modeled envelopes.
+
+\section{Post‑Week Review}
+Reconciliation of expected vs realized performance, CLV attribution to signal vs execution, and updates to scenario libraries feed back into the next cycle.
+
+\chapter{Open Questions and Future Experiments}
+We catalog research questions and experiment designs that extend the work.
+
+\section{Live In‑Game Extensions}
+State and action spaces for in‑game policies, latency constraints, and partial observability present new challenges; simulators must incorporate possession dynamics and clock effects.
+
+\section{Cross‑League Transfer}
+How quickly can models adapt when transferring priors to other leagues (college, CFL) with different scoring dynamics and data quality?
+
+\section{Market‑Making}
+Designing conservative market‑making strategies with inventory risk, adversarial bettors, and exchange mechanics invites a different risk and governance framework.
+
+\section{Causal Inference Links}
+Opportunities exist to connect causal estimands (e.g., treatment effects of injuries or weather) to predictive models, improving robustness under interventions.
+
+\chapter{Appendix: Notes on Implementation Details}
+We gather brief clarifications on code organization, parameter defaults, and numerical stability choices.
+
+\section{Parameter Defaults}
+We publish default grids for regularization strength, mixture weight priors, and RL clip/entropy settings to make baselines reproducible.
+
+\section{Numerical Stability}
+Stable evaluations for Bessel functions and log‑sum‑exp operations avoid overflow/underflow in score‑distribution likelihoods and RL value calculations.
+
+\section{Code Organization}
+Artefacts and experiment configs live alongside data manifests; scripts emit run IDs that propagate into reports and logs, ensuring cohesive provenance.
+\chapter{Methodological Details (Extended)}
+We document implementation details that bridge theory and practice, allowing reproduction and transfer to adjacent domains.
+
+\section{Score-Distribution Fitting Pipeline}
+We estimate Skellam and bivariate Poisson parameters via maximum likelihood with weakly informative priors and regularization. Optimization uses LBFGS with line search, and gradients exploit closed‑form derivatives for Bessel functions where available, falling back to stable numerical routines otherwise. Key‑number reweighting is applied post‑fit with a constrained least‑squares step that preserves moments while matching empirical mass at 3, 6, 7, and 10.
+
+\section{Calibration Procedures}
+Binary outcomes use isotonic regression for post‑hoc calibration on a temporally held‑out validation set, while distributional predictions are assessed via PIT histograms and CRPS. We report calibration slope/intercept for probability outputs and employ bootstrap aggregation to mitigate small‑sample variance in weekly splits.
+
+\section{Uncertainty Estimation}
+We combine analytic posteriors (for linear‑Gaussian components) with bootstrap ensembles (for ML models). Posterior predictive draws propagate uncertainty into stake sizing and portfolio variance. Wider posterior intervals reduce Kelly fractions automatically, and correlation estimates temper multi‑leg exposure.
+
+\section{Off-Policy Evaluation}
+We implement inverse propensity, self‑normalized importance sampling, and doubly robust estimators. Clipping mitigates variance at the cost of bias; sensitivity analyses vary clip thresholds. To reduce overfitting, we separate reward‑model fitting from evaluation folds and report percentile bands for value estimates.
+
+\section{Portfolio and CVaR Optimization}
+Stake sizes follow fractional Kelly but are constrained by a weekly risk budget and a CVaR cap computed from posterior predictive distributions. We solve a convex approximation using second‑order cone formulations for variance and linear constraints for exposure caps, yielding stable allocations that respect governance.
+
+\chapter{Operations Playbook (Extended)}
+We codify routines for common scenarios to keep operations repeatable, auditable, and resilient.
+
+\section{Weekly Cycle}
+\begin{enumerate}
+  \item Data refresh and integrity checks (schema tests, row counts, drift monitors).
+  \item Baseline retraining and ensemble updates with reproducible seeds; log artefacts.
+  \item Reliability and CLV diagnostics; gate promotions; document changes.
+  \item Simulator calibration and stress scenarios; revise risk envelope if needed.
+  \item Execution strategy selection (routing, patience, fill targets) informed by microstructure.
+\end{enumerate}
+
+\section{Incident Response}
+\begin{enumerate}
+  \item Detect anomalies (monitor alerts, unusual drift, fill failures).
+  \item Triage scope and impact; freeze promotions and pause risky orders.
+  \item Roll back to last known‑good artefacts; attach post‑mortem issue with logs.
+  \item Patch, test, and promote with signoffs from risk and data owners.
+\end{enumerate}
+
+\section{Change Management}
+All material changes (features, training windows, risk budgets) require experiment records, approvals, and rollback plans. We maintain human‑readable changelogs linking artefacts to results and dashboards.
+
+\chapter{Data Engineering Notes (Extended)}
+We expand on ingestion and mart construction practices beyond the core chapter.
+
+\section{Schema Migrations and Idempotency}
+Migrations are versioned and accompanied by smoke tests. Ingestors use upserts keyed by natural identifiers to prevent duplication. Reprocessing is safe and deterministic, with reconciliation reports comparing expected to realized deltas.
+
+\section{Drift Detection}
+We monitor marginal distributions and key ratios (EPA, success rate, implied probabilities). Detectors use EWM statistics and CUSUM alarms with cooldowns to avoid alert fatigue. Detected shifts trigger recalibration and sometimes stake reductions.
+
+\section{Reproducibility}
+Artefacts include dataset hashes, model versions, and environment manifests. Rebuilds on clean machines reproduce metrics within small tolerances; discrepancies open issues with attached diffs and logs.
+%
+
+% ---------------------------------------------------
+% Back Matter and References
+% ---------------------------------------------------
+\backmatter
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{References}  % Include References in TOC
+\bibliographystyle{plainnat}
+\bibliography{../references}  % references.bib is the bibliography database file
+
+\end{document}

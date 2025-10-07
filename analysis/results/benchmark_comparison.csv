@@ -1,0 +1,8 @@
+Model,Brier Score,Log Loss,ATS Win %,CLV (bps),Years,Data Source,Note
+Our Ensemble (Stacked),0.2515,0.6966,51.0,14.9,2004-2024,Public + Market,Best calibration
+Our Baseline (GLM),0.2552,0.7055,50.8,6.3,2004-2024,Public,Interpretable
+FiveThirtyEight ELO,0.253,,50.6,,2015-2023,Public,Published benchmark
+ESPN FPI,,,51.2,,2015-2023,Proprietary,Industry standard
+PFF Greenline,,,52.1,,2019-2023,Proprietary,Premium service
+Vegas Closing Line,0.25,0.693,50.0,0.0,1985-2024,Market consensus,Efficiency baseline
+Naive (50/50),0.25,0.693,50.0,,N/A,None,Random baseline

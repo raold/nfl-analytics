@@ -1,0 +1,308 @@
+% ---------------------------------------------------
+% CONSOLIDATED APPENDICES
+% Reduced from 34 appendices to 10 focused appendices
+% ---------------------------------------------------
+
+% ==================================================
+% APPENDIX A: Technical Reference
+% ==================================================
+\chapter{Technical Reference}
+
+\section{Notation}
+We summarize symbols used throughout: $\theta$ for latent team strength, $\lambda,\mu$ for scoring intensities, $D$ for margin, $p$ for spread, $\sigma$ for margin standard deviation, $\hat p$ for model-implied probability, and CBV for comparative book value.
+
+\section{Mathematical Derivations}
+Expanded derivations for the linear-Gaussian filtering and smoothing recursions, and a discussion of approximate inference when observation noise departs from normality.
+
+\subsection{State-Space Models}
+Complete derivations of Kalman filtering equations and extensions to non-Gaussian observations.
+
+\subsection{Score Distribution Models}
+Properties of Poisson mixtures, Skellam reweighting, and CRPS consistency proofs.
+
+\subsection{Portfolio Optimization}
+Variance bounds for portfolio aggregation under correlation uncertainty and CVaR constraints.
+
+\section{Algorithm Pseudocode}
+High-level pseudocode for key algorithms including CQL, TD3+BC, and risk-aware portfolio optimization.
+
+% ==================================================
+% APPENDIX B: Feature Documentation
+% ==================================================
+\chapter{Feature Documentation}
+
+\section{Feature Dictionary}
+Comprehensive listing of all features used across models, organized by category:
+
+\subsection{Situational Features}
+\begin{itemize}
+  \item down\_1st, down\_2nd, down\_3rd, down\_4th (one-hot)
+  \item distance\_to\_go, yardline\_pct, redzone\_flag
+  \item time\_remaining, quarter, half
+  \item score\_differential, possession\_indicator
+\end{itemize}
+
+\subsection{EPA-based Features}
+\begin{itemize}
+  \item epa\_per\_play\_4wk, epa\_per\_play\_season
+  \item pass\_epa\_4wk, rush\_epa\_4wk
+  \item success\_rate\_4wk, explosive\_rate\_4wk
+\end{itemize}
+
+\subsection{Market Microstructure Features}
+\begin{itemize}
+  \item line\_velocity, consensus\_delta, rogue\_flag
+  \item book\_depth, time\_to\_kickoff
+  \item cbv\_estimate, implied\_probability
+\end{itemize}
+
+\subsection{Environmental Features}
+\begin{itemize}
+  \item temperature, wind\_speed, precipitation
+  \item dome\_flag, altitude, travel\_distance
+  \item rest\_days, timezone\_change
+\end{itemize}
+
+\section{Feature Engineering Examples}
+Concrete examples of feature transformations and interaction terms with edge cases.
+
+% ==================================================
+% APPENDIX C: Reproducibility Guide
+% ==================================================
+\chapter{Reproducibility Guide}
+
+\section{Dataset Documentation}
+Public replication dataset structure, licenses, and verification hashes.
+
+\subsection{Data Sources}
+\begin{itemize}
+  \item nflverse: Play-by-play, EPA metrics
+  \item nflfastR: Roster and injury data
+  \item Market data: Anonymized odds snapshots
+  \item Weather: Meteostat API coverage
+\end{itemize}
+
+\subsection{File Structure}
+\begin{verbatim}
+data/
+  raw/           # Original downloads
+  processed/     # Cleaned datasets
+  features/      # Feature matrices
+  manifests/     # Hash verification
+\end{verbatim}
+
+\section{Reproduction Logs}
+Sanitized excerpts showing dataset hashes, model versions, and metric summaries for key experiments.
+
+\section{Environment Setup}
+Requirements, dependencies, and configuration for reproducible builds:
+
+\begin{verbatim}
+# Python environment
+python >= 3.10
+requirements.txt with pinned versions
+
+# R environment
+R >= 4.2
+renv.lock for package management
+
+# PostgreSQL/TimescaleDB
+Version specifications and schema DDL
+\end{verbatim}
+
+% ==================================================
+% APPENDIX D: Operations Manual
+% ==================================================
+\chapter{Operations Manual}
+
+\section{Standard Operating Procedures}
+Consolidated procedures for system operation and maintenance.
+
+\subsection{Daily Operations}
+\begin{enumerate}
+  \item Data ingestion pipeline (6 AM ET)
+  \item Feature computation (7 AM ET)
+  \item Model inference (8 AM ET)
+  \item Risk assessment (9 AM ET)
+  \item Paper trading validation (10 AM ET)
+\end{enumerate}
+
+\subsection{Weekly Maintenance}
+\begin{enumerate}
+  \item Model retraining trigger evaluation
+  \item Calibration drift monitoring
+  \item Performance report generation
+  \item Governance review meeting
+\end{enumerate}
+
+\section{CLI Reference}
+Common command-line invocations:
+
+\begin{verbatim}
+# Data pipeline
+python -m etl.pipeline --date 2024-01-01
+
+# Model training
+python -m train.ensemble --config prod.yaml
+
+# Simulation
+python -m simulate.monte_carlo --weeks 1-18
+
+# Reporting
+python -m reports.weekly --output pdf
+\end{verbatim}
+
+\section{Troubleshooting Guide}
+Common issues and resolution steps with rollback procedures.
+
+% ==================================================
+% APPENDIX E: Risk Analysis
+% ==================================================
+\chapter{Risk Analysis}
+
+\section{Failure Modes and Effects Analysis}
+Comprehensive FMEA covering data, model, and operational risks.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llcc}
+\toprule
+\textbf{Failure Mode} & \textbf{Detection} & \textbf{Severity} & \textbf{Mitigation} \\
+\midrule
+Data feed outage & Monitoring alerts & High & Fallback sources \\
+Model drift & Calibration tests & Medium & Auto-retrain \\
+Execution latency & SLO breach & Medium & Circuit breaker \\
+Correlation break & Portfolio variance & High & Exposure caps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sensitivity Analysis}
+Impact of key assumptions on model performance and risk metrics.
+
+\section{Governance Framework}
+Risk limits, approval gates, and audit requirements.
+
+% ==================================================
+% APPENDIX F: Implementation Details
+% ==================================================
+\chapter{Implementation Details}
+
+\section{System Architecture}
+Technical architecture and data flow diagrams.
+
+\section{Database Schema}
+Core table definitions for TimescaleDB:
+
+\begin{verbatim}
+CREATE TABLE odds_snapshots (
+  game_id TEXT,
+  timestamp TIMESTAMPTZ,
+  book TEXT,
+  market TEXT,
+  line FLOAT,
+  odds FLOAT,
+  PRIMARY KEY (game_id, timestamp, book, market)
+);
+\end{verbatim}
+
+\section{Code Organization}
+Module structure and design patterns:
+
+\begin{verbatim}
+py/
+  etl/          # Data ingestion
+  features/     # Feature engineering
+  models/       # Model implementations
+  rl/           # Reinforcement learning
+  simulate/     # Monte Carlo simulation
+  risk/         # Risk management
+  reports/      # Report generation
+\end{verbatim}
+
+% ==================================================
+% APPENDIX G: Case Studies
+% ==================================================
+\chapter{Representative Case Studies}
+
+\section{Weather Volatility Week}
+Detailed analysis of system response to uncertain weather forecasts, demonstrating adaptive stake sizing and timing optimization.
+
+\section{Injury Cascade Response}
+How the system handled multiple quarterback injuries, showing risk gate activation and portfolio rebalancing.
+
+\section{Market Efficiency Evolution}
+Tracking of edge degradation over time and model adaptation strategies.
+
+% ==================================================
+% APPENDIX H: Experiment Registry
+% ==================================================
+\chapter{Experiment Registry}
+
+\section{Core Experiments}
+Key experiments with full specifications:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{ID} & \textbf{Description} & \textbf{Dataset} & \textbf{Result} \\
+\midrule
+EXP-001 & Baseline GLM & 2020-2024 & Brier 0.255 \\
+EXP-010 & XGBoost ensemble & 2020-2024 & Brier 0.251 \\
+EXP-025 & RL policy TD3+BC & 2020-2024 & CLV +18 bps \\
+EXP-040 & Weather features & 2020-2024 & No improvement \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Ablation Studies}
+Systematic feature and component removal experiments with impact analysis.
+
+% ==================================================
+% APPENDIX I: Team Analysis
+% ==================================================
+\chapter{Team Analysis}
+
+\section{Anonymized Team Profiles}
+Representative team characteristics affecting model performance:
+
+\paragraph{Pass-Heavy Teams} High PROE, vulnerable to wind, edges in calm conditions.
+
+\paragraph{Defense-First Teams} Low scoring variance, unders value, conservative stakes.
+
+\paragraph{High-Variance Teams} QB volatility, wider confidence intervals, reduced Kelly fractions.
+
+\paragraph{Dome Teams} Weather-independent, earlier entry timing acceptable.
+
+\section{Calibration Patterns}
+Team-specific calibration adjustments and reliability metrics.
+
+% ==================================================
+% APPENDIX J: Future Work
+% ==================================================
+\chapter{Open Questions and Future Work}
+
+\section{Research Directions}
+\begin{itemize}
+  \item Graph neural networks for team matchup modeling
+  \item Online learning with non-stationary environments
+  \item Multi-sport portfolio optimization
+  \item Real-time execution optimization
+\end{itemize}
+
+\section{Engineering Improvements}
+\begin{itemize}
+  \item Distributed training infrastructure
+  \item Real-time streaming architecture
+  \item Automated report generation
+  \item Enhanced monitoring and alerting
+\end{itemize}
+
+\section{Theoretical Extensions}
+\begin{itemize}
+  \item Robust optimization under model uncertainty
+  \item Causal inference for feature importance
+  \item Adaptive risk budgeting
+  \item Market microstructure theory applications
+\end{itemize}

@@ -3,7 +3,7 @@
 \chapter{Literature Review and Methodological Foundations}
 \label{chap:litreview}
 
-\paragraph{Methodology roadmap.} We organize this review by methodology rather than chronology: (i) canonical foundations for margins and spreads (Harville, Stern, state space); (ii) score and margin distributions (Poisson/Skellam, bivariate and dynamic Poisson); (iii) evaluation and calibration (proper scores, reliability); (iv) dependence modeling (copulas) with goodness‑of‑fit and tail checks; and (v) mapping predictive metrics to decision value. Staking theory appears later in Chapter~\ref{chap:risk} to keep Chapter~2 focused on modeling and evaluation.
+\paragraph{Methodology roadmap.} We organize this review by methodology rather than chronology: (i) canonical foundations for margins and spreads (Harville, Stern, state space); (ii) score and margin distributions (Poisson/Skellam, bivariate and dynamic Poisson); (iii) evaluation and calibration (proper scores, reliability); (iv) dependence modeling (copulas) with goodness‑of‑fit and tail checks; and (v) mapping predictive metrics to decision value. Staking theory appears later in \Cref{chap:risk} to keep Chapter~2 focused on modeling and evaluation.
 
 \section{Canonical Foundations}
 We first situate the dissertation with ten canonical works that anchor the modeling, evaluation, and decision layers. For each, we summarize the contribution, give the mathematical core, and note the application to NFL betting markets.
@@ -38,7 +38,7 @@ with standard Kalman recursions for posterior means/variances.
 \subsection{Maher (1982): Poisson Goals Model} \label{subsec:maher1982}
 \sdesc{Independent Poisson scoring intensities by team/venue; a building block for low-scoring sports.}
 \mdesc{$X\sim\mathrm{Pois}(\lambda)$, $Y\sim\mathrm{Pois}(\mu)$ with log-links $\log\lambda = \alpha_i+\beta_j+v_{\text{home}}$, $\log\mu=\alpha'_j+\beta'_i$.}
-\appdesc{Although NFL is higher-scoring, the resulting Skellam margin (Section~\ref{subsec:skellam-mom}) remains useful for integer margins, teaser/middle pricing, and key-number analysis.}
+\appdesc{Although NFL is higher-scoring, the resulting Skellam margin (\Cref{subsec:skellam-mom}) remains useful for integer margins, teaser/middle pricing, and key-number analysis.}
 \bridge{Independent Poisson can misfit low scores; Dixon--Coles shows how to correct dependence near small counts.}
 
 \subsection{Dixon \& Coles (1997): Dependence and Low-Score Adjustments} \label{subsec:dixon1997}
@@ -73,7 +73,7 @@ with standard Kalman recursions for posterior means/variances.
 \end{equation}
 strictly proper for continuous targets.  
 \appdesc{Used for margin/total distributions; we report CRPS and reliability alongside CLV.}
-\bridge{Calibrated probabilities and uncertainties ultimately inform actions; we defer staking theory to Chapter~\ref{chap:risk} and proceed to score/margin models next.}
+\bridge{Calibrated probabilities and uncertainties ultimately inform actions; we defer staking theory to \Cref{chap:risk} and proceed to score/margin models next.}
 
 \section{Score and Margin Distributions}
 % --- Detailed mathematical exposition: score/margin foundations ---
@@ -162,7 +162,7 @@ pmf matching empirical key masses $\{m_k\}_{k\in\mathcal{K}}$:
 \paragraph{Feasibility and fallback.} The moment constraints imply a feasibility region for the target masses $\{m_k\}$. When empirical masses are extreme (e.g., unusually high mass at 3), \eqref{eq:reweight-ls} can be infeasible. We therefore (i) project $\{m_k\}$ onto the nearest feasible set and (ii) fall back to KL‑tilting (\Cref{alg:kl-tilt}) when needed. This guards the pipeline against pathological weeks while preserving the intent of matching key integers.
 The last two constraints preserve mean/variance so reweighting changes shape, not location/scale.
 In matrix form, \eqref{eq:reweight-ls} is a small convex QP; if only normalization and key masses
-are imposed it has a closed form via Lagrange multipliers. We use $\tilde q$ for teaser/middle pricing in Chapter~\ref{chap:sim}.
+are imposed it has a closed form via Lagrange multipliers. We use $\tilde q$ for teaser/middle pricing in \Cref{chap:sim}.
 
 \paragraph{Practical effect.} In practice, this means the model assigns more realistic probability mass to key margins. For example, if the baseline puts only 12\% on a 3‑point margin, the reweighted $\tilde q$ may allocate 18\% based on observed pushes. This directly improves expected value for teaser bets that cross 3 (and 7), because pricing reflects the higher chance of landing on those integers.
 
@@ -339,7 +339,7 @@ onto the feasible set $\{(\lambda,\mu): \sum_{d\in\mathbb{Z}} w_d(\lambda,\mu)q(
   \item \textbf{Zero-inflated/hurdle variants:} used rarely for extreme low-scoring eras; orthogonal to integer-margin reweighting.
 \end{itemize}
 
-These components are the building blocks for simulation and pricing in Chapter~\ref{chap:sim}; we do not restate formulas here.
+These components are the building blocks for simulation and pricing in \Cref{chap:sim}; we do not restate formulas here.
 
 \section{Calibration, Scoring \& Uncertainty}
 \label{sec:calib}
@@ -454,7 +454,7 @@ Two simple primitives illuminate the trade‑offs:
   \max_{\pi}\; \E_\theta[\Pi(\pi;\theta)]\,-\,\lambda\,\Var_\theta[\Pi(\pi;\theta)]\,-\,\gamma\,\|Q(\pi)\|_2^2,
   \]
   where $\lambda,\gamma\ge 0$ encode risk and inventory costs. First‑order conditions imply \emph{price shading} against imbalanced flow, increasing with outcome variance and demand inelasticity (bias), helping explain vig width and line tilts.
-  \item \textbf{Kelly bettor as log‑utility agent.} For decimal odds $d$ and success probability $p$, the stake fraction $f$ that maximizes $\E[\log(1+fR)]$ with $R\in\{d-1,-1\}$ is $f^\star=\tfrac{dp-1}{d-1}$ when $dp>1$, else $0$. Under uncertainty, replacing $p$ by a lower confidence bound yields the Kelly‑LCB rule used as a baseline and connects to CVaR sizing (Chapter~\ref{chap:risk}).
+  \item \textbf{Kelly bettor as log‑utility agent.} For decimal odds $d$ and success probability $p$, the stake fraction $f$ that maximizes $\E[\log(1+fR)]$ with $R\in\{d-1,-1\}$ is $f^\star=\tfrac{dp-1}{d-1}$ when $dp>1$, else $0$. Under uncertainty, replacing $p$ by a lower confidence bound yields the Kelly‑LCB rule used as a baseline and connects to CVaR sizing (\Cref{chap:risk}).
 \end{itemize}
 
 \subsection{NFL market applications}
@@ -523,7 +523,7 @@ We define **Comparative Book Value (CBV)** as the difference between our fair pr
    \end{tabularx}
   \endgroup
   \begin{tablenotes}[flushleft]\footnotesize
-    \item Notes: qualitative ratings; see \Cref{subsec:harville1980,subsec:glickman1998,subsec:maher1982,subsec:dixon1997,subsec:karlis2003,subsec:koopman2015} for derivations and Chapter~\ref{chap:rl} for policy design.
+    \item Notes: qualitative ratings; see \Cref{subsec:harville1980,subsec:glickman1998,subsec:maher1982,subsec:dixon1997,subsec:karlis2003,subsec:koopman2015} for derivations and \Cref{chap:rl} for policy design.
   \end{tablenotes}
   \end{threeparttable}
   \end{adjustwidth}
@@ -569,7 +569,7 @@ We provide brief annotations of representative works that inform the hybrid desi
 \section{Canonical Works Integrated}
 \label{sec:canon}
 We explicitly compare and implement: Harville (1980), Glickman–Stern (1998), Stern spread mapping (1991), Dixon–Coles (1997), Karlis–Ntzoufras (2003), Koopman dynamic Poisson (2015), Lock \& Nettleton (2014), Sauer (1998), Levitt (2004).  
-Implementation, ablation, and critique will occur in Chapter~\ref{chap:methods}.
+Implementation, ablation, and critique will occur in \Cref{chap:methods}.
 
 \section{Classical vs Modern: A Comparative Synthesis}
 Classical models provide structure, interpretability, and tractable uncertainty, while modern ML models absorb nonlinear interactions and idiosyncrasies that generative assumptions miss. The hybrid approach leverages classical models for priors and calibration discipline, layering ML for residual structure and using RL to translate edges into actions under explicit constraints. This division of labor prevents ML from overfitting low‑signal regimes and keeps decision‑making grounded in uncertainty.
@@ -620,7 +620,7 @@ Modeling performance cannot be divorced from execution. Liquidity varies by book
 \section{Teasers and Parlays}
 Teasers (point adjustments for changed odds) and parlays (multiple legs) are common strategy components. We interpret them through joint distributions and correlation risk. A teaser can be attractive when key-number probabilities are underpriced; correlated parlays can be rational when the joint distribution assigns high mass to specific co-movements (e.g., low totals and underdogs). We caution that naive independence assumptions can be severely misleading.
 
-For the full EV geometry and simulator context, see the teaser surface in Chapter~\ref{chap:sim} (\Cref{fig:sim-teaser-surface}).
+For the full EV geometry and simulator context, see the teaser surface in \Cref{chap:sim} (\Cref{fig:sim-teaser-surface}).
 \subsection{CRPS on lattices: propriety sketch}\label{subsec:crps-lattice}
 For integer margins we work with a lattice distribution $F$ on $\mathbb Z$. The CRPS can be written as
 \begin{equation}
@@ -633,5 +633,5 @@ since $\mathbb E\,\mathbb 1\{m\ge Y\}=1-F^\star(m-1)$. Hence the unique minimize
 \chaptersummary{
 This chapter connected classical models (Harville, Stern, Poisson/Skellam, bivariate/dynamic Poisson) to the practical needs of NFL betting: calibrated probabilities, realistic integer margins, and coherent dependence for multi‑leg bets. We established evaluation tools (CRPS, reliability) and introduced key‑number reweighting and copula‑based dependence as recurring motifs. Together these elements form the modeling pillar of the thesis that a hybrid stack with explicit uncertainty and governance transforms edge into reliable bankroll growth.
 }{
-Next we operationalize the data layer that feeds these models: reproducible ingestion, TimescaleDB marts, and feature catalogs (situational, team form, market, roster) in Chapter~\ref{chap:data}.
+Next we operationalize the data layer that feeds these models: reproducible ingestion, TimescaleDB marts, and feature catalogs (situational, team form, market, roster) in \Cref{chap:data}.
 }

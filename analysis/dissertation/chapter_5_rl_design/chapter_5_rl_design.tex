@@ -121,7 +121,7 @@ To prevent catastrophic drawdowns, we introduce:
   \item CVaR-constrained policy optimization, limiting tail risk exposure.
   \item Rule-based overrides (e.g.\ pause bets after consecutive losses exceeding threshold).
 \end{itemize}
-CVaR objectives can be handled via convex approximations (Chapter~\ref{chap:risk}); constrained policy optimization keeps budgets and drawdown limits satisfied \citep{achiam2017cpo,tamar2015cvar}.
+CVaR objectives can be handled via convex approximations (\Cref{chap:risk}); constrained policy optimization keeps budgets and drawdown limits satisfied \citep{achiam2017cpo,tamar2015cvar}.
 
 \section{Off-Policy Evaluation Details}
 We implement per-decision IS, self-normalized IS, and DR estimators with clipping/shrinkage; for small-sample safety we compute HCOPE-style lower confidence bounds \citep{thomas2015}. Nested CV reduces optimism by separating reward-model fitting from evaluation. These diagnostics gate model promotion to simulation and paper-trading phases.
@@ -155,7 +155,7 @@ The DR estimate equals $Q(s_0,\pi(s_0))$ plus this correction; if $Q(s_0,\pi(s_0
 \end{algorithm}
 
 \section{Learning curves and hyperparameter sensitivity}
-We report training curves (return vs. gradient steps) with shaded interquartile bands and study sensitivity to key hyperparameters (entropy scale, target smoothing, clipping). Figure~\ref{fig:rl-curves} shows typical convergence; Figure~\ref{fig:hparam-sens} shows EV under a grid.
+We report training curves (return vs. gradient steps) with shaded interquartile bands and study sensitivity to key hyperparameters (entropy scale, target smoothing, clipping). \Cref{fig:rl-curves} shows typical convergence; \Cref{fig:hparam-sens} shows EV under a grid.
 \begin{figure}[t]
   \centering
   \IfFileExists{../figures/rl_learning_curves.png}{\includegraphics[width=0.85\linewidth]{../figures/rl_learning_curves.png}}{\fbox{\parbox{0.8\linewidth}{\centering Learning curves placeholder}}}
@@ -382,7 +382,7 @@ We treat the policy as a small, price‑taking agent: odds are exogenous and our
 \chaptersummary{
 We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance.
 }{
-Chapter~\ref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
+\Cref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
 }
 
 \section{Offline RL Methods at a Glance}
@@ -421,5 +421,5 @@ Chapter~\ref{chap:risk} quantifies uncertainty and translates it into stake sizi
 \chaptersummary{
 We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
 }{
-Chapter~\ref{chap:risk} formalizes stake sizing and portfolio risk controls; Chapter~\ref{chap:sim} validates policies under dependence and frictions before promotion.
+\Cref{chap:risk} formalizes stake sizing and portfolio risk controls; \Cref{chap:sim} validates policies under dependence and frictions before promotion.
 }

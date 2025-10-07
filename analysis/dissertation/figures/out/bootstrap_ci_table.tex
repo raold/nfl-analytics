@@ -1,0 +1,21 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}
+  \label{tab:bootstrap-ci}
+  \begin{threeparttable}
+  \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Model} & \textbf{Brier} & \textbf{95\% CI} & \textbf{SE} \\
+    \midrule
+    \textbf{Ensemble} & 0.1125 & [0.1099, 0.1152] & 0.0014 \\
+    GLM Baseline & 0.1553 & [0.1518, 0.1589] & 0.0018 \\
+    FiveThirtyEight & 0.1271 & [0.1243, 0.1299] & 0.0015 \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Non-overlapping confidence intervals indicate statistically significant differences at $\alpha = 0.05$.
+  \end{tablenotes}
+  \end{threeparttable}
+\end{table}

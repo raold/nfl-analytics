@@ -1,0 +1,21 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Multi-Model Backtest Comparison]{Multi-model backtest comparison (2004--2024, $N$=5,529 games). Models ranked by Brier score.}
+  \label{tab:multimodel-comparison}
+  \setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{} l r r r r r @{} }
+    \toprule
+    \textbf{Model} & \textbf{Games} & \textbf{Brier $\downarrow$} & \textbf{LogLoss $\downarrow$} & \textbf{Accuracy} & \textbf{ROI\%} \\
+    \midrule
+    Stack(GLM+XGB+State) & 5,529 & 0.2515 & 0.6966 & 51.1\% & -13.5\% \\
+    Stack(GLM+XGB) & 5,529 & 0.2517 & 0.6973 & 51.2\% & -11.5\% \\
+    Stack(GLM+State) & 5,529 & 0.2517 & 0.6971 & 51.2\% & -7.9\% \\
+    Stack(XGB+State) & 5,529 & 0.2519 & 0.6976 & 51.0\% & -17.2\% \\
+    GLM (baseline) & 5,529 & 0.2552 & 0.7055 & 51.0\% & -6.3\% \\
+    Mean(GLM+XGB) & 5,529 & 0.2567 & 0.7078 & 51.3\% & -4.5\% \\
+    Mean(GLM+XGB+State) & 5,529 & 0.2615 & 0.7176 & 49.7\% & -8.3\% \\
+    XGBoost & 5,529 & 0.2643 & 0.7260 & 51.4\% & -4.2\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}

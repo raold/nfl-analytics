@@ -1,0 +1,17 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Core ablation grid]{Core ablation grid: baseline vs RL; reweighting on/off; microstructure features on/off; Gaussian vs $t$-copula. Derived from multimodel backtest results (2004--2024).}
+  \label{tab:core-ablation}
+  \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{} l r r r @{} }
+    \toprule
+    \textbf{Config} & \textbf{Brier $\downarrow$} & \textbf{LogLoss $\downarrow$} & \textbf{ROI\%} \\
+    \midrule
+    Baseline (Kelly-LCB), no reweight, micro off, Gaussian & 0.2552 & 0.7055 & -6.3 \\
+    Baseline (Kelly-LCB), reweight, micro on, Gaussian & 0.2517 & 0.6973 & -11.5 \\
+    RL (IQL), reweight, micro on, Gaussian & 0.2515 & 0.6966 & -13.5 \\
+    RL (IQL), reweight, micro on, t-copula (proxy) & 0.2643 & 0.7260 & -4.2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

@@ -1,26 +1,52 @@
-% Auto-generated wrapper — reads rows from oos_record_rows.tex
 \begin{table}[t]
   \centering
   \small
-  \begin{threeparttable}
-    \caption[Out-of-sample results by season]{Out-of-sample results by season (table of record).}
-    \label{tab:oos-record}
-    \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
-    \begin{tabularx}{\linewidth}{@{} c Y r r r r r r r @{} }
-      \toprule
-      \textbf{Season} & \textbf{Model} & \textbf{CLV bp}\tnote{a} & \textbf{Brier} & \textbf{ECE} & \textbf{ROI\%} & \textbf{MAR} & \textbf{Max DD\%} & \textbf{N bets} \\
-      \midrule
-      2021 & Baseline (GLM)      & +5  & 0.246 & 0.030 & 0.4  & 0.12 & 12.8 & 310 \\
-      2021 & Offline RL (IQL)    & +18 & 0.242 & 0.024 & 1.1  & 0.35 & 10.2 & 290 \\
-      2022 & Baseline (Skellam)  & +7  & 0.245 & 0.028 & 0.6  & 0.18 & 11.5 & 330 \\
-      2022 & Offline RL (CQL)    & +22 & 0.241 & 0.021 & 1.6  & 0.48 &  9.6 & 305 \\
-      2023 & Ensemble            & +15 & 0.239 & 0.020 & 1.2  & 0.42 &  9.8 & 410 \\
-      2023 & Offline RL (TD3+BC) & +28 & 0.238 & 0.019 & 2.1  & 0.62 &  8.9 & 370 \\
-      2024 & Offline RL (IQL)    & +24 & 0.237 & 0.018 & 1.8  & 0.58 &  8.6 & 260 \\
-      \bottomrule
-    \end{tabularx}
-    \begin{tablenotes}[flushleft]\footnotesize\RaggedRight
-      \item[a] CLV measured in basis points vs closing; positive is better. Report paired tests across week‑aligned bets (p‑values or CIs) in text.
-    \end{tablenotes}
-  \end{threeparttable}
+  \caption[Out-of-sample results by season]{Out-of-sample performance by season: GLM baseline, stacked ensemble, and XGBoost (2015--2024).}
+  \label{tab:oos-record}
+  \setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{1.08}
+  \begin{tabular}{@{} c l r r r r @{} }
+    \toprule
+    \textbf{Season} & \textbf{Model} & \textbf{N} & \textbf{Brier $\downarrow$} & \textbf{Accuracy} & \textbf{ROI \%} \\
+    \midrule
+    2015 & GLM & 257 & 0.2539 & 53.3\% & -4.5\% \\
+     & XGBoost & 257 & 0.2639 & 51.0\% & -14.7\% \\
+     & Stack(All) & 257 & 0.2491 & 53.3\% & +0.0\% \\
+    \midrule
+    2016 & GLM & 262 & 0.2459 & 54.2\% & +29.4\% \\
+     & XGBoost & 262 & 0.2550 & 51.5\% & +3.5\% \\
+     & Stack(All) & 262 & 0.2498 & 50.0\% & +0.0\% \\
+    \midrule
+    2017 & GLM & 259 & 0.2530 & 50.2\% & +3.5\% \\
+     & XGBoost & 259 & 0.2585 & 53.7\% & +14.6\% \\
+     & Stack(All) & 259 & 0.2503 & 48.6\% & +0.0\% \\
+    \midrule
+    2018 & GLM & 258 & 0.2552 & 50.4\% & -22.4\% \\
+     & XGBoost & 258 & 0.2586 & 51.6\% & -9.4\% \\
+     & Stack(All) & 258 & 0.2498 & 52.7\% & +0.0\% \\
+    \midrule
+    2019 & GLM & 257 & 0.2508 & 53.7\% & -25.0\% \\
+     & XGBoost & 257 & 0.2534 & 54.5\% & -14.1\% \\
+     & Stack(All) & 257 & 0.2486 & 56.0\% & +0.0\% \\
+    \midrule
+    2020 & GLM & 269 & 0.2554 & 50.9\% & +0.0\% \\
+     & XGBoost & 269 & 0.2636 & 49.4\% & -11.5\% \\
+     & Stack(All) & 269 & 0.2504 & 50.6\% & +0.0\% \\
+    \midrule
+    2021 & GLM & 281 & 0.2502 & 49.8\% & -22.2\% \\
+     & XGBoost & 281 & 0.2529 & 55.9\% & +20.4\% \\
+     & Stack(All) & 281 & 0.2499 & 51.6\% & +0.0\% \\
+    \midrule
+    2022 & GLM & 274 & 0.2537 & 50.4\% & -7.6\% \\
+     & XGBoost & 274 & 0.2546 & 52.2\% & +4.6\% \\
+     & Stack(All) & 274 & 0.2503 & 50.7\% & +0.0\% \\
+    \midrule
+    2023 & GLM & 271 & 0.2539 & 49.1\% & -19.6\% \\
+     & XGBoost & 271 & 0.2537 & 50.6\% & -2.4\% \\
+     & Stack(All) & 271 & 0.2505 & 50.2\% & +0.0\% \\
+    \midrule
+    2024 & GLM & 281 & 0.2546 & 48.0\% & -4.5\% \\
+     & XGBoost & 281 & 0.2602 & 49.8\% & +5.2\% \\
+     & Stack(All) & 281 & 0.2511 & 48.0\% & +0.0\% \\
+    \bottomrule
+  \end{tabular}
 \end{table}

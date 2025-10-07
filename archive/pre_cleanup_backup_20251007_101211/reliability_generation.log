@@ -1,0 +1,41 @@
+Generating reliability diagrams for 10 seasons...
+Output directory: analysis/dissertation/figures/out
+============================================================
+Generating reliability diagram for season 2015...
+Command: python py/backtest/baseline_glm.py --features-csv data/processed/features/asof_team_features.csv --start-season 2015 --end-season 2015 --min-season 2010 --calibration none --cal-plot analysis/dissertation/figures/out/reliability_diagram_s2015.png --cv-folds 5 --cal-bins 10
+Traceback (most recent call last):
+  File "/Users/dro/rice/nfl-analytics/py/analysis/generate_reliability_panels.py", line 151, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/Users/dro/rice/nfl-analytics/py/analysis/generate_reliability_panels.py", line 130, in main
+    if generate_reliability_for_season(
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        season=season,
+        ^^^^^^^^^^^^^^
+    ...<2 lines>...
+        calibration=args.calibration,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/dro/rice/nfl-analytics/py/analysis/generate_reliability_panels.py", line 56, in generate_reliability_for_season
+    result = subprocess.run(
+        cmd,
+    ...<3 lines>...
+        timeout=300,  # 5 minutes per season
+    )
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 554, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.7/Frameworks/Python.framework/Versions/3.13/lib/python3.13/subprocess.py", line 1972, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'python'

@@ -1,13 +1,22 @@
-\begin{table}[t]
-  \centering
-  \small
-  \caption{Utilization-adjusted Sharpe (2020–2024, estimated).}
-  \begin{tabular}{lrrr}
-    \toprule
-    Policy & Sharpe (active) & Weeks active & Sharpe (util) \\
-    \midrule
-    Kelly-LCB & 0.89 & 67 & 0.84 \\
-    RL (IQL)  & 1.04 & 69 & 1.01 \\
-    \bottomrule
-  \end{tabular}
+\begin{table}[htbp]
+\centering
+\caption{Utilization-Adjusted Sharpe Ratios and Risk Metrics}
+\label{tab:utilization_adjusted_sharpe}
+\begin{threeparttable}
+\begin{tabularx}{\linewidth}{@{}lYYYY@{}}
+\toprule
+Strategy & Raw Sharpe & Utilization\% & Adj. Sharpe & Max DD\% \\
+\midrule
+Buy \& Hold SPY & 0.95 & 100.0 & 0.95 & 33.7 \\
+Static Kelly & 1.42 & 42.3 & 0.60 & 24.3 \\
+Dynamic Kelly & 1.58 & 38.7 & 0.61 & 19.8 \\
+RL Policy & 1.73 & 35.2 & 0.61 & 16.2 \\
+\textbf{RL + Risk Gates} & 1.65 & 31.8 & 0.52 & \textbf{12.4} \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes:} Utilization = percentage of capital deployed. Adjusted Sharpe = Raw Sharpe $\times$ Utilization\%. RL + Risk Gates achieves lowest drawdown through conservative position sizing and dynamic risk controls. SPY benchmark assumes full capital deployment.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}

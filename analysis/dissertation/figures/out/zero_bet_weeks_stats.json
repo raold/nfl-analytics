@@ -1,0 +1,51 @@
+{
+  "by_season": [
+    {
+      "season": 2020,
+      "total_weeks": 18,
+      "zero_bet_ope": 5,
+      "zero_bet_sim": 3,
+      "total_zero_bet": 5,
+      "zero_bet_rate": 0.2777777777777778
+    },
+    {
+      "season": 2021,
+      "total_weeks": 18,
+      "zero_bet_ope": 4,
+      "zero_bet_sim": 2,
+      "total_zero_bet": 4,
+      "zero_bet_rate": 0.2222222222222222
+    },
+    {
+      "season": 2022,
+      "total_weeks": 18,
+      "zero_bet_ope": 3,
+      "zero_bet_sim": 2,
+      "total_zero_bet": 3,
+      "zero_bet_rate": 0.16666666666666666
+    },
+    {
+      "season": 2023,
+      "total_weeks": 18,
+      "zero_bet_ope": 4,
+      "zero_bet_sim": 2,
+      "total_zero_bet": 4,
+      "zero_bet_rate": 0.2222222222222222
+    },
+    {
+      "season": 2024,
+      "total_weeks": 18,
+      "zero_bet_ope": 3,
+      "zero_bet_sim": 1,
+      "total_zero_bet": 3,
+      "zero_bet_rate": 0.16666666666666666
+    }
+  ],
+  "total": {
+    "total_weeks": 90,
+    "zero_bet_ope": 19,
+    "zero_bet_sim": 10,
+    "total_zero_bet": 19,
+    "overall_zero_bet_rate": 0.2111111111111111
+  }
+}

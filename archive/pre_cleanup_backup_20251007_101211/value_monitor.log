@@ -1,0 +1,16 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+2025-10-04 16:20:04,688 - INFO - 🧮 Value-based scheduler initialized
+
+📊 Task Value Estimates:
+Task                      EV           CPU_h      EV/h         Score       
+----------------------------------------------------------------------
+rl_train_task             $64.00       4.00       $16.00       24.00       
+model_calibration_task    $76.80       0.50       $153.60      153.60      
+monte_carlo_task          $50.00       1.50       $33.33       33.33       
+feature_engineering_tas   $10.24       1.00       $10.24       15.36       
+
+🏆 Ranked by Value Score:
+1. model_calibration_task (Score: 153.60)
+2. monte_carlo_task (Score: 33.33)
+3. rl_train_task (Score: 24.00)
+4. feature_engineering_task (Score: 15.36)

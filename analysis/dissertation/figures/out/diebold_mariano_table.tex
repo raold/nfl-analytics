@@ -1,0 +1,20 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}
+  \label{tab:diebold-mariano}
+  \begin{threeparttable}
+  \begin{tabular}{lcccc}
+    \toprule
+    \textbf{Comparison} & \textbf{DM Stat} & \textbf{P-value} & \textbf{Mean Diff} & \textbf{Sig?} \\
+    \midrule
+    Ensemble vs GLM & -18.836 & 0.0000 & -0.04282 & Yes \\
+    Ensemble vs FTE & -7.391 & 0.0000 & -0.01460 & Yes \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Negative mean difference indicates first model has lower (better) loss. Two-sided tests with $\alpha = 0.05$.
+  \end{tablenotes}
+  \end{threeparttable}
+\end{table}

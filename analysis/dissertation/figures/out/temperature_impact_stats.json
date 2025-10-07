@@ -1,0 +1,16 @@
+{
+  "n_games": 1021,
+  "temp_range": [
+    -20.6,
+    43.0
+  ],
+  "temp_mean": 14.344172380019588,
+  "corr_temp_total": 0.05479477443316295,
+  "corr_temp_extreme_total": -0.0045208754135862405,
+  "p_value": 0.7357382645578208,
+  "extreme_games": 99,
+  "freezing_games": 71,
+  "extreme_heat_games": 28,
+  "r_squared_quadratic": 0.0030187890891979485,
+  "optimal_temp": 97.62256888436931
+}

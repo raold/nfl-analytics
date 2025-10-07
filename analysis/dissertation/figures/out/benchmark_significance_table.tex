@@ -1,0 +1,21 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Statistical significance of calibration improvements (Brier score differences).}
+  \label{tab:benchmark-significance}
+  \begin{threeparttable}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Benchmark} & \textbf{Brier Difference} & \textbf{P-value} & \textbf{Significant?} \\
+    \midrule
+    FiveThirtyEight ELO & -0.0015 & 0.855 & No \\
+    Vegas Closing Line & 0.0015 & 0.855 & No \\
+    Naive (50/50) & 0.0015 & 0.855 & No \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item \textit{Note:} Negative differences indicate our model has better (lower) Brier score. P-values from paired comparison tests on 5,529 games. Significance threshold $\alpha = 0.05$.
+  \end{tablenotes}
+  \end{threeparttable}
+\end{table}

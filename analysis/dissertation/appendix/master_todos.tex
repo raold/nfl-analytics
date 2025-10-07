@@ -27,6 +27,21 @@
 \end{itemize}
 
 \milestone{Committee Review Fix-it (prioritized)}
+
+\block{Reviewer Feedback Implementation - NEW}
+\begin{itemize}
+  \item \prio{P0} \done\ Add benchmark comparisons to published models (FiveThirtyEight ELO, ESPN FPI, PFF, Vegas closing)
+  \item \prio{P0} \done\ Add comprehensive statistical significance testing (Diebold-Mariano, bootstrap CIs, multiple testing corrections)
+  \item \prio{P0} \done\ Add model explainability section (SHAP values, LIME, feature importance, failure mode analysis)
+  \item \prio{P0} \done\ Add code availability and repository links (\url{https://github.com/raold/nfl-analytics})
+  \item \prio{P0} \done\ Fix commented-out tables in main.tex (rl\_vs\_baseline, ope\_grid, utilization\_sharpe, cvar\_benchmark)
+  \item \prio{P1} \wip\ Document advanced feature engineering (Graph Neural Networks for matchups, changepoint detection for regime shifts)
+  \item \prio{P1} Expand simulation validation section with Monte Carlo convergence metrics
+  \item \prio{P1} Add discussion of dynamic correlation models beyond static copulas
+  \item \prio{P2} Create comprehensive notation glossary appendix
+  \item \prio{P2} Reorganize appendices hierarchically (Mathematical Proofs, Implementation, Results, Reference)
+\end{itemize}
+
 \block{Evidence \& Claims}
 \begin{itemize}
   \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines. \done\ (rows emitter present; wire from registry)

@@ -2,29 +2,128 @@
 \chapter{Conclusion and Future Work}
 \label{chap:conclusion}
 
-We conclude by reflecting on contributions, limitations, and opportunities to extend the system beyond this dissertation.
+This dissertation began with an ambitious hypothesis: rigorous statistical methods and machine learning could extract sustainable profits from NFL betting markets using publicly available data. After 5,529 games, 21 seasons, and 11 model configurations, we arrive at a more nuanced conclusion.
 
-\section{Summary of Contributions}
-At the outset we claimed: a hybrid stack with explicit uncertainty and governance transforms edge into reliable bankroll growth in NFL markets. The contributions below map directly to that thesis:
+\section{What We Learned}
+
+\subsection{The Central Lesson: Market Efficiency}
+
+Our models achieve strong calibration (Brier score = 0.2515) and beat closing lines on average (CLV = +14.9 basis points). Yet they lose money (ROI = $-7.5\%$, Sharpe ratio = $-1.22$). This is not a failure of implementation—it is a demonstration of \textit{semi-strong form market efficiency}.
+
+NFL betting markets efficiently incorporate public information: play-by-play data, injury reports, weather forecasts, historical performance. Our sophisticated ensemble methods (GLM + XGBoost + state-space models) extract marginal gains, but these gains fall short of the 4.5\% hurdle imposed by vigorish at standard $-110$ odds. To profit at these odds requires a 52.4\% win rate; we achieve 51.0\%.
+
+\textbf{The implication}: Systematic betting profits require either (1) private information not available in public datasets, or (2) structural advantages such as lower-vig exchanges, market-making rebates, or access to mispriced derivative markets (player props, same-game parlays).
+
+\subsection{Methodological Contributions}
+
+Despite unprofitability, this dissertation makes four methodological contributions:
+
+\paragraph{1. Rigorous Negative Results.}
+We transparently document three significant null findings:
 \begin{itemize}
-  \item Integrated classical, ML, and RL models into a coherent NFL betting architecture (edge generation and aggregation).
-  \item Quantified uncertainty and embedded risk controls (governance) that turn raw edge into controlled exposure and stable bankroll trajectories.
-  \item Demonstrated simulation-driven evaluation with acceptance tests and friction models, linking calibrated predictions to executable value under constraints.
+  \item \textbf{Weather has no predictive value}: Comprehensive analysis of 1,021 outdoor games shows wind ($r=0.004$, $p=0.90$) and temperature ($r=0.055$, $p=0.08$) have no significant correlation with scoring. Modern NFL teams neutralize weather effects through preparation, and betting markets efficiently price residual impacts.
+  \item \textbf{Calibration does not imply profitability}: Brier=0.2515 and CLV=+14.9bps are insufficient to overcome vig. This clarifies the gap between statistical performance and economic viability.
+  \item \textbf{RL provides marginal gains}: Reinforcement learning improved Sharpe by $\sim$0.1--0.2 over Kelly baselines but required 10--40 hours of compute per training run. Given modest gains, simpler Kelly-LCB baselines are preferred for production.
 \end{itemize}
 
-\section{Limitations}
-Key limitations include limited access to proprietary tracking data, potential regime shifts in betting markets, and the challenge of modeling injury uncertainty at scale.
+These negative results prevent future researchers from wasting effort on low-value features and overstated RL claims.
+
+\paragraph{2. Complete Betting System Architecture.}
+We demonstrate a full pipeline from data ingestion (TimescaleDB) to model training (GLM/XGBoost/state-space) to risk management (CVaR LP, Kelly sizing) to evaluation (OPE, simulator acceptance). This infrastructure can be reused for alternative domains (player props, portfolio optimization) even if NFL profitability remains elusive.
+
+\paragraph{3. Dependence-Aware Evaluation.}
+Our copula-based approach to same-game parlays and teasers (\Cref{chap:risk}) demonstrates how to model correlated outcomes properly. Ignoring dependence overstates teaser EV by 2--5 percentage points—a critical correction for multi-leg betting strategies.
+
+\paragraph{4. Transparent Failure Analysis.}
+We document when and why the system fails: 21\% of weeks produce zero bets due to OPE gating (conservative lower bounds $\le 0$) or simulator rejection (CVaR/drawdown breach). This transparency prevents overfitting to lucky backtests and enforces operational discipline.
+
+\section{Limitations and Threats to Validity}
+
+\subsection{Data Limitations}
+\begin{itemize}
+  \item \textbf{No proprietary tracking data}: Our models use publicly available play-by-play, injuries, and weather. Access to player tracking (Next Gen Stats), formation data, or insider injury intel would improve edge.
+  \item \textbf{Historical odds survivorship}: Delisted sportsbooks create potential selection bias. We retain NA fills but cannot fully mitigate this.
+  \item \textbf{Retrospective injury revisions}: Official injury reports sometimes update retroactively, creating look-ahead bias. We use as-of snapshots but acknowledge residual risk.
+\end{itemize}
+
+\subsection{Model Limitations}
+\begin{itemize}
+  \item \textbf{Linear correlation assumptions}: Gaussian and t-copulas capture tail dependence but may miss complex non-linear dependencies in extreme scenarios.
+  \item \textbf{State-space over-smoothing}: Bayesian state-space models excel at temporal stability but may lag rapid regime shifts (coaching changes, injury clusters).
+  \item \textbf{RL sample efficiency}: Offline RL struggles with small sample sizes. NFL's 272 games/season limits training data compared to high-frequency domains.
+\end{itemize}
+
+\subsection{External Validity}
+\begin{itemize}
+  \item \textbf{Market regime shifts}: Results generalize across 2004--2024 but may not hold if betting markets fundamentally change (regulation shifts, algorithm-driven pricing).
+  \item \textbf{Execution assumptions}: We assume fill rates and slippage based on historical patterns. Live execution may deviate during volatile periods (line steam, limit reductions).
+  \item \textbf{Simulated liquidity}: Acceptance tests use pessimistic friction regimes but cannot perfectly replicate real-world market conditions.
+\end{itemize}
 
 \section{Future Directions}
-Future work explores live in-game RL policies, multi-league transfer learning, and automated market-making strategies. Extending governance frameworks to incorporate ethical considerations and responsible gambling guidelines remains essential.
 
-\vspace{0.5em}\noindent\textit{Thesis linkage.} Calibrated models (Ch.~\ref{chap:litreview}, \ref{chap:methods}) supply edge; risk gates (Ch.~\ref{chap:risk}) and dependence-aware simulation (Ch.~\ref{chap:sim}) enforce governance; results (Ch.~\ref{chap:results}) show reliable growth consistent with the thesis.
+Despite current unprofitability, this work opens several research directions:
 
-\section{Closing Reflection}
-The research questions in Chapter~\ref{chap:intro} motivated a system-of-systems that begins with calibrated predictions, proceeds through risk-aware policy design, and validates with dependence-aware simulation. This sequence operationalizes the thesis: uncertainty + governance are the mechanisms that convert edge into reliable bankroll growth.
+\subsection{Alternative Markets}
+\begin{itemize}
+  \item \textbf{Lower-vig exchanges}: Test methods on betting exchanges (Betfair, Pinnacle) where vig is 1--2\% instead of 4.5\%. Our CLV=+14.9bps may suffice at lower friction.
+  \item \textbf{Player props and derivatives}: Apply copula methods to correlated player performance (QB passing yards + receiver yards). These markets may be less efficient than game-level spreads.
+  \item \textbf{Live in-game betting}: Extend RL to dynamic in-game markets where information arrives continuously (score updates, injury substitutions).
+\end{itemize}
 
-\section{Final Remarks}
-The methods developed here emphasize clarity and restraint over opacity and overfitting. We hope the released artefacts and governance templates lower the barrier for researchers seeking to study complex market-facing systems under an academic lens.
+\subsection{Methodological Extensions}
+\begin{itemize}
+  \item \textbf{Multi-league transfer learning}: Train models on NBA/MLB data and transfer features to NFL. Cross-league learning may improve sample efficiency.
+  \item \textbf{Causal inference}: Use propensity score matching or synthetic controls to estimate causal effects of injuries, rest, weather beyond correlation.
+  \item \textbf{Probabilistic programming}: Implement full Bayesian models (Stan, Pyro) for better uncertainty quantification and prior elicitation.
+\end{itemize}
 
-\section{Broader Implications}
-This work illustrates a path for deploying AI systems in markets with explicit calibration, risk, and governance as first‑class design goals. The broader implication is that rigorous, auditable decision systems can coexist with operational demands without sacrificing transparency.
+\subsection{Operational Improvements}
+\begin{itemize}
+  \item \textbf{Private information}: Integrate injury monitoring (social media scraping, team beat reporters) to capture non-public intel before line moves.
+  \item \textbf{Market microstructure arbitrage}: Exploit cross-book discrepancies in derivative markets (teaser pricing inconsistencies, correlated SGP legs).
+  \item \textbf{Responsible gambling integration}: Build bankroll caps, session limits, and addiction detection into the system architecture.
+\end{itemize}
+
+\section{Broader Implications for Sports Analytics}
+
+This dissertation clarifies the boundary between achievable and aspirational goals in sports betting:
+
+\paragraph{Achievable:}
+\begin{itemize}
+  \item Strong calibration (Brier $<$ 0.26 for NFL spreads)
+  \item Positive CLV (beating closing lines on average)
+  \item Conservative risk management (zero-bet weeks when OPE fails)
+  \item Transparent methodology (reproducible pipelines, open-source code)
+\end{itemize}
+
+\paragraph{Aspirational (with public data alone):}
+\begin{itemize}
+  \item Systematic profitability at $-110$ odds (requires 52.4\% win rate, we achieve 51.0\%)
+  \item Consistent Sharpe ratios $>$ 1.0 (we achieve $-1.22$)
+  \item Long-term bankroll growth without private information or structural advantages
+\end{itemize}
+
+\textbf{The lesson for practitioners}: Do not confuse model quality with betting viability. A well-calibrated model is a necessary but insufficient condition for profit. Market efficiency, vigorish, and execution frictions create a gap that sophisticated methods alone cannot bridge.
+
+\section{Final Reflection}
+
+We began with optimism: perhaps rigorous methods could unlock NFL betting profits. We end with clarity: public data and statistical rigor yield strong models but not profitable betting systems under standard market conditions.
+
+This is not a negative outcome—it is \textit{knowledge}. We now understand:
+\begin{itemize}
+  \item Where models succeed (calibration, CLV capture, temporal stability)
+  \item Where they fail (insufficient edge vs vig)
+  \item What would be required to close the gap (private info, lower friction, structural advantages)
+\end{itemize}
+
+Future researchers can build on this foundation without repeating our weather analysis, overstating RL benefits, or assuming calibration equals profitability. The methods developed here—ensemble stacking, copula-based dependence modeling, CVaR risk gates, OPE validation—remain valuable for domains beyond NFL betting: portfolio optimization, resource allocation, and decision-making under uncertainty.
+
+\vspace{1em}
+\noindent \textbf{In summary}: This dissertation demonstrates that rigorous methods produce rigorous understanding. Sometimes that understanding is ``the market is too efficient for systematic profit with public data alone.'' That conclusion, honestly reported, is a contribution in itself.
+
+\section{Closing Statement}
+
+The methods developed here emphasize clarity and restraint over opacity and overfitting. We release code, evaluation scripts, and governance templates to lower barriers for future researchers studying market-facing systems under academic rigor.
+
+The broader implication: AI systems deployed in efficient markets require explicit calibration, risk management, and transparent failure modes as first-class design goals. This work provides a template for such systems—even when the ultimate outcome is ``the market wins.''

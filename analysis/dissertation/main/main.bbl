@@ -9,6 +9,7 @@
 Joshua Achiam, David Held, Aviv Tamar, and Pieter Abbeel.
 \newblock Constrained policy optimization.
 \newblock \emph{arXiv preprint arXiv:1705.10528}, 2017.
+\newblock \doi{10.48550/arXiv.1705.10528}.
 
 \bibitem[Agarwal et~al.(2020)Agarwal, Jiang, Kakade, and
   Sun]{agarwal2020offline}
@@ -23,6 +24,7 @@ Gianluca Baio and Marta Blangiardo.
 \newblock Bayesian hierarchical model for the prediction of football results.
 \newblock \emph{Journal of Applied Statistics}, 37\penalty0 (2):\penalty0
   253--264, 2010.
+\newblock \doi{10.1080/02664760802684177}.
 
 \bibitem[Bellemare et~al.(2017)Bellemare, Dabney, and
   Munos]{bellemare2017distributional}
@@ -37,6 +39,7 @@ Ralph~A. Bradley and Milton~E. Terry.
 \newblock Rank analysis of incomplete block designs i. the method of paired
   comparisons.
 \newblock \emph{Biometrika}, 1952.
+\newblock \doi{10.1093/biomet/39.3-4.324}.
 
 \bibitem[Brier(1950)]{brier1950}
 Glenn~W. Brier.
@@ -56,17 +59,20 @@ Will Dabney, Mark Rowland, Marc~G. Bellemare, and R{\'e}mi Munos.
 Henry~E. Daniels.
 \newblock Saddlepoint approximations in statistics.
 \newblock \emph{The Annals of Mathematical Statistics}, 1954.
+\newblock \doi{10.1214/aoms/1177728652}.
 
 \bibitem[Dixon and Coles(1997)]{dixon1997}
 Mark~J Dixon and Stuart~G Coles.
 \newblock Modelling association football scores and inefficiencies in the
   football betting market.
 \newblock \emph{Applied Statistics}, 46\penalty0 (2):\penalty0 265--280, 1997.
+\newblock \doi{10.2307/2986290}.
 
 \bibitem[Dud{\'\i}k et~al.(2014)Dud{\'\i}k, Langford, and Li]{dudik2014}
 Miroslav Dud{\'\i}k, John Langford, and Lihong Li.
 \newblock Doubly robust policy evaluation and learning.
 \newblock \emph{Statistical Science}, 2014.
+\newblock \doi{10.1214/14-STS500}.
 
 \bibitem[Elo(1978)]{elo1978}
 Arpad~E. Elo.
@@ -77,6 +83,8 @@ Arpad~E. Elo.
 Scott Fujimoto and Shixiang~Shane Gu.
 \newblock A minimalist approach to offline reinforcement learning.
 \newblock \emph{Advances in Neural Information Processing Systems}, 2021.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper/2021/hash/a8166da05c5a094f7dc03724b41886e5-Abstract.html}.
 \newblock TD3+BC.
 
 \bibitem[Fujimoto et~al.(2018)Fujimoto, van Hoof, and Meger]{fujimoto2018td3}
@@ -104,6 +112,7 @@ Mark~E Glickman and Hal~S Stern.
 \newblock A state-space model for national football league scores.
 \newblock \emph{Journal of the American Statistical Association}, 93\penalty0
   (441):\penalty0 25--35, 1998.
+\newblock \doi{10.1080/01621459.1998.10474084}.
 
 \bibitem[Gneiting and Raftery(2007)]{gneiting2007}
 Tilmann Gneiting and Adrian~E. Raftery.
@@ -127,6 +136,7 @@ David~A Harville.
   methodology.
 \newblock \emph{Journal of the American Statistical Association}, 75\penalty0
   (372):\penalty0 516--524, 1980.
+\newblock \doi{10.1080/01621459.1980.10477504}.
 
 \bibitem[Jiang and Li(2016)]{jiang2016}
 Nan Jiang and Lihong Li.
@@ -146,6 +156,7 @@ Dimitris Karlis and Ioannis Ntzoufras.
 \newblock Analysis of sports data by using bivariate poisson models.
 \newblock \emph{Journal of the Royal Statistical Society: Series D (The
   Statistician)}, 52\penalty0 (3):\penalty0 381--393, 2003.
+\newblock \doi{10.1111/1467-9884.00366}.
 
 \bibitem[Kelly(1956)]{kelly1956}
 J.~L. Kelly.
@@ -160,11 +171,13 @@ Siem~Jan Koopman, Roman Lit, and André Lucas.
   results in the english premier league.
 \newblock \emph{Journal of the Royal Statistical Society: Series A},
   178\penalty0 (1):\penalty0 167--186, 2015.
+\newblock \doi{10.1111/rssa.12042}.
 
 \bibitem[Kostrikov et~al.(2021)Kostrikov, Nair, and Levine]{kostrikov2021iql}
 Ilya Kostrikov, Ashvin Nair, and Sergey Levine.
 \newblock Offline reinforcement learning with implicit q-learning.
 \newblock \emph{arXiv preprint arXiv:2110.06169}, 2021.
+\newblock \doi{10.48550/arXiv.2110.06169}.
 
 \bibitem[Kumar et~al.(2019)Kumar, Fu, Soh, Tucker, and Levine]{kumar2019bear}
 Aviral Kumar, Justin Fu, George Soh, George Tucker, and Sergey Levine.
@@ -183,6 +196,7 @@ Sergey Levine, Aviral Kumar, George Tucker, and Justin Fu.
 \newblock Offline reinforcement learning: Tutorial, review, and perspectives on
   open problems.
 \newblock \emph{arXiv preprint arXiv:2005.01643}, 2020.
+\newblock \doi{10.48550/arXiv.2005.01643}.
 
 \bibitem[Levitt(2004)]{levitt2004}
 Steven~D Levitt.
@@ -190,6 +204,7 @@ Steven~D Levitt.
   markets?
 \newblock \emph{The Economic Journal}, 114\penalty0 (495):\penalty0 223--246,
   2004.
+\newblock \doi{10.1111/j.0013-0133.2004.00207.x}.
 
 \bibitem[Lock and Nettleton(2014)]{lock2014}
 Eric Lock and Dan Nettleton.
@@ -197,11 +212,13 @@ Eric Lock and Dan Nettleton.
   an nfl game.
 \newblock \emph{Journal of Quantitative Analysis in Sports}, 10\penalty0
   (2):\penalty0 197--205, 2014.
+\newblock \doi{10.1515/jqas-2013-0100}.
 
 \bibitem[Maher(1982)]{maher1982}
 M.~J. Maher.
 \newblock Modelling association football scores.
 \newblock \emph{Applied Statistics}, 1982.
+\newblock \doi{10.2307/2347625}.
 
 \bibitem[Mnih et~al.(2015)Mnih, Kavukcuoglu, Silver, et~al.]{mnih2015}
 Volodymyr Mnih, Koray Kavukcuoglu, David Silver, et~al.
@@ -214,6 +231,7 @@ Ashvin Nair, Murtaza Dalal, Abhishek Gupta, and Sergey Levine.
 \newblock Awac: Accelerating online reinforcement learning with offline
   datasets.
 \newblock \emph{arXiv preprint arXiv:2006.09359}, 2020.
+\newblock \doi{10.48550/arXiv.2006.09359}.
 
 \bibitem[Nelsen(2006)]{nelsen2006}
 Roger~B. Nelsen.
@@ -239,12 +257,14 @@ Raymond~D Sauer.
 \newblock The economics of wagering markets.
 \newblock \emph{Journal of Economic Literature}, 36\penalty0 (4):\penalty0
   2021--2064, 1998.
+\newblock URL \url{https://www.jstor.org/stable/2565043}.
 
 \bibitem[Schaul et~al.(2016)Schaul, Quan, Antonoglou, and
   Silver]{schaul2016per}
 Tom Schaul, John Quan, Ioannis Antonoglou, and David Silver.
 \newblock Prioritized experience replay.
 \newblock \emph{arXiv preprint arXiv:1511.05952}, 2016.
+\newblock \doi{10.48550/arXiv.1511.05952}.
 
 \bibitem[Schulman et~al.(2015)Schulman, Levine, Moritz, Jordan, and
   Abbeel]{schulman2015trpo}
@@ -252,6 +272,7 @@ John Schulman, Sergey Levine, Philipp Moritz, Michael~I. Jordan, and Pieter
   Abbeel.
 \newblock Trust region policy optimization.
 \newblock \emph{arXiv preprint arXiv:1502.05477}, 2015.
+\newblock \doi{10.48550/arXiv.1502.05477}.
 
 \bibitem[Schulman et~al.(2016)Schulman, Moritz, Levine, Jordan, and
   Abbeel]{schulman2016gae}
@@ -260,24 +281,28 @@ John Schulman, Philipp Moritz, Sergey Levine, Michael~I. Jordan, and Pieter
 \newblock High-dimensional continuous control using generalized advantage
   estimation.
 \newblock \emph{arXiv preprint arXiv:1506.02438}, 2016.
+\newblock \doi{10.48550/arXiv.1506.02438}.
 
 \bibitem[Schulman et~al.(2017)Schulman, Wolski, Dhariwal, Radford, and
   Klimov]{schulman2017ppo}
 John Schulman, Filip Wolski, Prafulla Dhariwal, Alec Radford, and Oleg Klimov.
 \newblock Proximal policy optimization algorithms.
 \newblock \emph{arXiv preprint arXiv:1707.06347}, 2017.
+\newblock \doi{10.48550/arXiv.1707.06347}.
 
 \bibitem[Skellam(1946)]{skellam1946}
 J.~G. Skellam.
 \newblock The frequency distribution of the difference between two poisson
   variates.
 \newblock \emph{Journal of the Royal Statistical Society}, 1946.
+\newblock \doi{10.2307/2981372}.
 
 \bibitem[Stern(1991)]{stern1991}
 Hal~S Stern.
 \newblock On the probability of winning a football game.
 \newblock \emph{The American Statistician}, 45\penalty0 (3):\penalty0 179--183,
   1991.
+\newblock \doi{10.1080/00031305.1991.10475812}.
 
 \bibitem[Sutton and Barto(2018)]{sutton2018}
 Richard~S. Sutton and Andrew~G. Barto.
@@ -288,6 +313,7 @@ Richard~S. Sutton and Andrew~G. Barto.
 Anna Szalkowski and Jordan Nelson.
 \newblock The collective wisdom of nfl betting lines.
 \newblock \emph{arXiv preprint arXiv:1201.0309}, 2012.
+\newblock \doi{10.48550/arXiv.1201.0309}.
 
 \bibitem[Tamar et~al.(2015)Tamar, Glassner, and Mannor]{tamar2015cvar}
 Aviv Tamar, Yonatan Glassner, and Shie Mannor.
@@ -307,6 +333,7 @@ Hado van Hasselt, Arthur Guez, and David Silver.
 \newblock Deep reinforcement learning with double q-learning.
 \newblock In \emph{Proceedings of the AAAI Conference on Artificial
   Intelligence}, 2016.
+\newblock \doi{10.1609/aaai.v30i1.10295}.
 
 \bibitem[Wang et~al.(2016)Wang, Schaul, Hessel, Van~Hasselt, Lanctot, and
   De~Freitas]{wang2016dueling}
@@ -314,6 +341,7 @@ Ziyu Wang, Tom Schaul, Matteo Hessel, Hado Van~Hasselt, Marc Lanctot, and Nando
   De~Freitas.
 \newblock Dueling network architectures for deep reinforcement learning.
 \newblock \emph{arXiv preprint arXiv:1511.06581}, 2016.
+\newblock \doi{10.48550/arXiv.1511.06581}.
 
 \bibitem[Wong(2001)]{wong2001sharp}
 Stanford Wong.
@@ -324,5 +352,6 @@ Stanford Wong.
 Yifan Wu, George Tucker, and Ofir Nachum.
 \newblock Behavior regularized actor-critic.
 \newblock \emph{arXiv preprint arXiv:1910.01708}, 2019.
+\newblock \doi{10.48550/arXiv.1910.01708}.
 
 \end{thebibliography}

@@ -1,0 +1,18 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption[CLV distribution by model]{Closing line value (CLV) distribution by model (basis points, 2004--2024).}
+  \label{tab:clv-distribution}
+  \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{} l r r r @{} }
+    \toprule
+    \textbf{Model} & \textbf{Mean CLV (bps)} & \textbf{Median CLV (bps)} & \textbf{Std CLV (bps)} \\
+    \midrule
+    GLM & +14.9 & +8.1 & 820.6 \\
+    MEAN(GLM+XGB) & +8.7 & -9.1 & 867.7 \\
+    XGB & +2.5 & +2.5 & 1208.4 \\
+    GLM+XGB & +4.3 & +20.9 & 456.5 \\
+    GLM+STATE & +3.6 & +27.4 & 453.9 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
