@@ -12,7 +12,7 @@ This chapter documents how raw league information is transformed into a unified 
   \item \textbf{Odds history:} The Odds API snapshots populate the \texttt{odds\_history} table with market-implied expectations across books.
   \item \textbf{Weather and travel:} Meteostat historical weather archives and team schedule metadata add environment, rest, and travel load features. The \texttt{mart.game\_weather} materialized view provides 92.7\% coverage (1,306 of 1,408 games from 2020--2025) with six derived features.
 \end{itemize}
-Ingestion pipelines run inside orchestrated containers with idempotent writes. All raw pulls are versioned and stored in S3-compatible object storage for auditability.\mndown{2}{Ingestion \textrightarrow{} staging \textrightarrow{} feature marts (see Section~\ref{sec:schema-mart}).}
+Ingestion pipelines run inside orchestrated containers with idempotent writes. All raw pulls are versioned and stored in S3-compatible object storage for auditability.\mndown{2}{Ingestion \textrightarrow{} staging \textrightarrow{} feature marts (see \Cref{sec:schema-mart}).}
 
 \subsection{Weather feature engineering}\label{subsec:weather-features}
 Weather conditions are widely believed to affect NFL scoring, particularly through high winds suppressing passing efficiency and extreme temperatures reducing player performance. To test these hypotheses systematically, I ingest historical weather data from Meteostat and geocoded stadium coordinates, then engineer derived features that capture deviations from optimal conditions.
@@ -110,7 +110,7 @@ Quality gates execute on every run:
 Alerts integrate with Slack and PagerDuty so ingest issues trigger rapid triage. An audit notebook renders daily health dashboards for analysts.
 
 \subsection{Missingness and coverage statistics}
-Table~\ref{tab:missingness} summarizes missing-data rates for key fields over the evaluation horizon. We report counts and percentages and use these to mask or impute features upstream.
+\Cref{tab:missingness} summarizes missing-data rates for key fields over the evaluation horizon. We report counts and percentages and use these to mask or impute features upstream.
 \begin{table}[t]
   \centering
   \small
@@ -135,7 +135,7 @@ Table~\ref{tab:missingness} summarizes missing-data rates for key fields over th
 \end{table}
 
 \subsection{Feature importance snapshots}
-We track model-agnostic importances (permutation) and model-native scores (gain/split counts for tree models). Figure~\ref{fig:feat-imp} displays a representative snapshot.
+We track model-agnostic importances (permutation) and model-native scores (gain/split counts for tree models). \Cref{fig:feat-imp} displays a representative snapshot.
 \begin{figure}[t]
   \centering
   \IfFileExists{../figures/feature_importance.png}{\includegraphics[width=0.9\linewidth]{../figures/feature_importance.png}}{
@@ -273,13 +273,12 @@ To make evaluation reproducible, we enumerate dataset cohorts, splits, coverage,
 \chaptersummary{
 We implemented reproducible ingestion (play‑by‑play, odds history, weather), a governed TimescaleDB schema (staging, core, mart), and feature catalogs with strict as‑of semantics and drift monitoring. This provides the data and governance backbone that supports the thesis: uncertainty is tracked at the source and enforced through lineage.
 }{
-With the data layer in place, Chapter~\ref{chap:methods} builds calibrated baseline models (GLM/probit, state‑space ratings, Skellam/bivariate Poisson with key‑number reweighting) and diagnostics that we carry through to policy design.
+With the data layer in place, \Cref{chap:methods} builds calibrated baseline models (GLM/probit, state‑space ratings, Skellam/bivariate Poisson with key‑number reweighting) and diagnostics that we carry through to policy design.
 }
 
 \begin{center}
   \textit{[ER diagram: staging, core, and mart layers to be inserted here once the latest schema export is rendered.]}
 \end{center}
-\todo{Document anonymization strategy for any restricted tracking data.}
 \begin{algorithm}[t]
   \caption{As‑of Feature Snapshot Build}
   \label{alg:asof-snapshot}

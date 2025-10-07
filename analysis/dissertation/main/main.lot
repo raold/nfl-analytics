@@ -2,48 +2,70 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Modeling families at a glance}}{29}{table.caption.231}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Modeling families at a glance}}{30}{table.caption.253}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Selected missingness/coverage statistics by field (illustrative).}}{35}{table.caption.277}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Effective sample size (season units) under exponential decay centered on 2024 (mock).}}{37}{table.caption.287}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Dataset cohorts, splits, coverage, and lineage guards.}}{38}{table.caption.290}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Selected missingness/coverage statistics by field (illustrative).}}{36}{table.caption.299}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Effective sample size (season units) under exponential decay centered on 2024 (illustrative).}}{38}{table.caption.309}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Dataset cohorts, splits, coverage, and lineage guards.}}{39}{table.caption.312}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Paired comparison vs recent-only on 2024 (mock).}}{40}{table.caption.302}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Key-number calibration: $\chi ^2$ goodness-of-fit at key margins.}}{44}{table.caption.318}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Teaser pricing: EV comparison under independence vs copula dependence.}}{44}{table.caption.319}%
-\contentsline {table}{\numberline {6.4}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{49}{table.caption.320}%
-\contentsline {table}{\numberline {6.5}{\ignorespaces Reweighting ablation: impact of key-mass adjustment.}}{50}{table.caption.321}%
-\contentsline {table}{\numberline {6.6}{\ignorespaces Ablation deltas by family}}{50}{table.caption.327}%
-\contentsline {table}{\numberline {6.7}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{50}{table.caption.334}%
-\contentsline {table}{\numberline {6.8}{\ignorespaces Tail dependence estimates with 95\% CIs.}}{50}{table.caption.335}%
-\contentsline {table}{\numberline {6.9}{\ignorespaces Baseline GLM backtest}}{51}{table.caption.339}%
-\contentsline {table}{\numberline {6.10}{\ignorespaces GLM overall comparison}}{51}{table.caption.340}%
-\contentsline {table}{\numberline {6.11}{\ignorespaces Multi-Model Backtest Comparison}}{52}{table.caption.345}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Paired comparison of temporal weighting schemes on 2024 holdout (Diebold-Mariano test).}}{41}{table.caption.327}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Advanced features cost-benefit analysis.}}{49}{table.caption.370}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Key-number calibration: $\chi ^2$ goodness-of-fit at key margins.}}{50}{table.caption.371}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Teaser pricing: EV comparison under independence vs copula dependence.}}{50}{table.caption.372}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{56}{table.caption.373}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Reweighting ablation: impact of key-mass adjustment.}}{57}{table.caption.374}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Ablation deltas by family}}{57}{table.caption.380}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{57}{table.caption.387}%
+\contentsline {table}{\numberline {6.9}{\ignorespaces Tail dependence estimates with 95\% CIs.}}{57}{table.caption.388}%
+\contentsline {table}{\numberline {6.10}{\ignorespaces Baseline GLM backtest}}{58}{table.caption.392}%
+\contentsline {table}{\numberline {6.11}{\ignorespaces GLM overall comparison}}{58}{table.caption.393}%
+\contentsline {table}{\numberline {6.12}{\ignorespaces Multi-Model Backtest Comparison}}{59}{table.caption.398}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{55}{table.caption.354}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces DQN vs PPO Agent Comparison (400 epochs)}}{58}{table.caption.370}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces NFL constraints and the resulting design choices.}}{64}{table.caption.403}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{65}{table.caption.406}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{66}{table.caption.416}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces CVaR benchmark}}{66}{table.caption.417}%
-\contentsline {table}{\numberline {7.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{68}{table.caption.422}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces Off-Policy Evaluation Estimates by Method and Clipping}}{62}{table.caption.406}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces DQN vs PPO Agent Comparison}}{65}{table.caption.423}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces NFL constraints and the resulting design choices.}}{71}{table.caption.456}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces RL Agent Performance vs Baseline Models (2020-2024 Out-of-Sample)}}{72}{table.caption.459}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Utilization-Adjusted Sharpe Ratios and Risk Metrics}}{74}{table.caption.470}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{74}{table.caption.472}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{76}{table.caption.478}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {8.1}{\ignorespaces CVaR benchmark}}{70}{table.caption.436}%
-\contentsline {table}{\numberline {8.2}{\ignorespaces Copula pricing impact summary.}}{71}{table.caption.438}%
+\contentsline {table}{\numberline {8.1}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{79}{table.caption.492}%
+\contentsline {table}{\numberline {8.2}{\ignorespaces Copula pricing impact summary.}}{79}{table.caption.495}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {9.1}{\ignorespaces Slippage model summary by book (illustrative).}}{81}{table.caption.495}%
-\contentsline {table}{\numberline {9.2}{\ignorespaces Simulator acceptance checks}}{82}{table.caption.498}%
-\contentsline {table}{\numberline {9.3}{\ignorespaces Typical deviations when acceptance tests fail (mock).}}{82}{table.caption.499}%
+\contentsline {table}{\numberline {9.1}{\ignorespaces Monte Carlo convergence diagnostics by sample size.}}{88}{table.caption.540}%
+\contentsline {table}{\numberline {9.2}{\ignorespaces Simulation calibration metrics vs historical data (2015--2024 average).}}{90}{table.caption.552}%
+\contentsline {table}{\numberline {9.3}{\ignorespaces Slippage model parameters by sportsbook (2019--2024 NFL seasons).}}{92}{table.caption.570}%
+\contentsline {table}{\numberline {9.4}{\ignorespaces Simulator acceptance test results across 10 seasons (2014--2024).}}{92}{table.caption.573}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {10.1}{\ignorespaces Out-of-sample results by season}}{84}{table.caption.505}%
-\contentsline {table}{\numberline {10.2}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{84}{table.caption.510}%
-\contentsline {table}{\numberline {10.3}{\ignorespaces Core ablation grid (mock).}}{86}{table.caption.517}%
+\contentsline {table}{\numberline {10.1}{\ignorespaces Multi-Model Backtest Comparison}}{94}{table.caption.578}%
+\contentsline {table}{\numberline {10.2}{\ignorespaces Model performance comparison against published benchmarks. Our stacked ensemble achieves best-in-class calibration (Brier = 0.2515) but fails to overcome market efficiency for profitability (51.0\% ATS vs 52.4\% breakeven).}}{95}{table.caption.581}%
+\contentsline {table}{\numberline {10.3}{\ignorespaces Statistical significance of calibration improvements (Brier score differences).}}{95}{table.caption.583}%
+\contentsline {table}{\numberline {10.4}{\ignorespaces Betting performance metrics}}{96}{table.caption.592}%
+\contentsline {table}{\numberline {10.5}{\ignorespaces Out-of-sample results by season}}{101}{table.caption.594}%
+\contentsline {table}{\numberline {10.6}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{102}{table.caption.598}%
+\contentsline {table}{\numberline {10.7}{\ignorespaces Weather effects on scoring}}{102}{table.caption.620}%
+\contentsline {table}{\numberline {10.8}{\ignorespaces Extreme weather conditions}}{104}{table.caption.621}%
+\contentsline {table}{\numberline {10.9}{\ignorespaces Core ablation grid}}{105}{table.caption.627}%
+\contentsline {table}{\numberline {10.10}{\ignorespaces Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}}{107}{table.caption.636}%
+\contentsline {table}{\numberline {10.11}{\ignorespaces Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}}{108}{table.caption.639}%
+\contentsline {table}{\numberline {10.12}{\ignorespaces Multiple testing corrections for key hypothesis tests.}}{109}{table.caption.642}%
+\contentsline {table}{\numberline {10.13}{\ignorespaces Per-season performance (top 3 models)}}{111}{table.caption.648}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces RL vs stateless baseline (2020–2024, estimated).}}{92}{table.caption.548}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{93}{table.caption.550}%
-\contentsline {table}{\numberline {A.3}{\ignorespaces Utilization-adjusted Sharpe (2020–2024, estimated).}}{93}{table.caption.551}%
-\contentsline {table}{\numberline {A.4}{\ignorespaces CVaR benchmark}}{94}{table.caption.552}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces RL Agent Performance vs Baseline Models (2020-2024 Out-of-Sample)}}{120}{table.caption.683}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Off-Policy Evaluation Estimates by Method and Clipping}}{120}{table.caption.685}%
+\contentsline {table}{\numberline {A.3}{\ignorespaces Utilization-Adjusted Sharpe Ratios and Risk Metrics}}{120}{table.caption.687}%
+\contentsline {table}{\numberline {A.4}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{121}{table.caption.689}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

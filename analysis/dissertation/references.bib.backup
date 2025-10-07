@@ -1,0 +1,647 @@
+@article{glickman1998,
+  title={A state-space model for National Football League scores},
+  author={Glickman, Mark E and Stern, Hal S},
+  journal={Journal of the American Statistical Association},
+  volume={93},
+  number={441},
+  pages={25--35},
+  year={1998},
+  publisher={Taylor \& Francis}
+}
+
+@article{dixon1997,
+  title={Modelling Association Football Scores and Inefficiencies in the Football Betting Market},
+  author={Dixon, Mark J and Coles, Stuart G},
+  journal={Applied Statistics},
+  volume={46},
+  number={2},
+  pages={265--280},
+  year={1997},
+  publisher={Royal Statistical Society}
+}
+
+@article{baio2010,
+  title={Bayesian hierarchical model for the prediction of football results},
+  author={Baio, Gianluca and Blangiardo, Marta},
+  journal={Journal of Applied Statistics},
+  volume={37},
+  number={2},
+  pages={253--264},
+  year={2010},
+  publisher={Taylor \& Francis}
+}
+
+@article{stern1991,
+  title={On the probability of winning a football game},
+  author={Stern, Hal S},
+  journal={The American Statistician},
+  volume={45},
+  number={3},
+  pages={179--183},
+  year={1991},
+  publisher={Taylor \& Francis}
+}
+
+@article{koopman2015,
+  title={Dynamic bivariate Poisson models for analysing and forecasting match results in the English Premier League},
+  author={Koopman, Siem Jan and Lit, Roman and Lucas, André},
+  journal={Journal of the Royal Statistical Society: Series A},
+  volume={178},
+  number={1},
+  pages={167--186},
+  year={2015},
+  publisher={Wiley}
+}
+
+@article{karlis2003,
+  title={Analysis of sports data by using bivariate Poisson models},
+  author={Karlis, Dimitris and Ntzoufras, Ioannis},
+  journal={Journal of the Royal Statistical Society: Series D (The Statistician)},
+  volume={52},
+  number={3},
+  pages={381--393},
+  year={2003},
+  publisher={Wiley}
+}
+
+@article{harville1980,
+  title={Predictions for National Football League games via linear-model methodology},
+  author={Harville, David A},
+  journal={Journal of the American Statistical Association},
+  volume={75},
+  number={372},
+  pages={516--524},
+  year={1980},
+  publisher={Taylor \& Francis}
+}
+
+@book{wong2001sharp,
+  title={Sharp Sports Betting},
+  author={Wong, Stanford},
+  year={2001},
+  publisher={Pi Yee Press}
+}
+
+@article{lock2014,
+  title={Using random forests to estimate win probability before each play of an NFL game},
+  author={Lock, Eric and Nettleton, Dan},
+  journal={Journal of Quantitative Analysis in Sports},
+  volume={10},
+  number={2},
+  pages={197--205},
+  year={2014},
+  publisher={De Gruyter}
+}
+
+@article{sauer1998,
+  title={The economics of wagering markets},
+  author={Sauer, Raymond D},
+  journal={Journal of Economic Literature},
+  volume={36},
+  number={4},
+  pages={2021--2064},
+  year={1998},
+  publisher={American Economic Association}
+}
+
+@article{levitt2004,
+  title={Why are gambling markets organised so differently from financial markets?},
+  author={Levitt, Steven D},
+  journal={The Economic Journal},
+  volume={114},
+  number={495},
+  pages={223--246},
+  year={2004},
+  publisher={Wiley}
+}
+
+@article{skellam1946,
+  title={The frequency distribution of the difference between two Poisson variates},
+  author={Skellam, J. G.},
+  journal={Journal of the Royal Statistical Society},
+  year={1946}
+}
+
+@article{maher1982,
+  title={Modelling association football scores},
+  author={Maher, M. J.},
+  journal={Applied Statistics},
+  year={1982}
+}
+
+@book{elo1978,
+  title={The Rating of Chessplayers, Past and Present},
+  author={Elo, Arpad E.},
+  publisher={Arco Publishing},
+  year={1978}
+}
+
+@article{rue2000,
+  title={Prediction and retrospective analysis of soccer matches},
+  author={Rue, Havard and Salvesen, Oyvind},
+  journal={Journal of the Royal Statistical Society: Series D (The Statistician)},
+  year={2000}
+}
+
+% Removed duplicate minimal Kelly entry; keep canonical detailed entry below
+
+% Keep Banking & Finance version as canonical; J. Risk variant can be added with a unique key if needed
+
+% Removed duplicate minimal Nelsen entry; keep detailed edition/DOI later
+
+@article{bradleyterry1952,
+  title={Rank Analysis of Incomplete Block Designs I. The Method of Paired Comparisons},
+  author={Bradley, Ralph A. and Terry, Milton E.},
+  journal={Biometrika},
+  year={1952}
+}
+
+@misc{litSurvey01,
+  title={lit\_survey\_01.tex},
+  author={Oldham, Richard},
+  year={2025},
+  note={Uploaded dissertation literature survey draft}
+}
+
+@misc{nflAnalysis01,
+  title={nfl\_analysis\_01.tex},
+  author={Oldham, Richard},
+  year={2025},
+  note={NFL analysis draft}
+}
+
+@misc{nflAnalysis02,
+  title={nfl\_analysis\_02.tex},
+  author={Oldham, Richard},
+  year={2025},
+  note={NFL analysis draft}
+}
+
+@misc{nflAnalysis03,
+  title={nfl\_analysis\_03.tex},
+  author={Oldham, Richard},
+  year={2025},
+  note={NFL analysis draft}
+}
+
+@misc{nflAnalysis04,
+  title={nfl\_analysis\_04.tex},
+  author={Oldham, Richard},
+  year={2025},
+  note={NFL analysis draft}
+}
+
+@misc{sportsInsights2019,
+  title={NFL Player Point Spread Values},
+  author={Sports Insights},
+  year={2019},
+  note={Article on positional value to point spread},
+  url={https://www.sportsinsights.com/blog/nfl-player-point-spread-values/}
+}
+
+@article{menon2021,
+  title={The Interesting Case of Adjusted Games Lost (AGL)},
+  author={Menon, Rohan},
+  journal={Michigan Sports Analytics},
+  year={2021},
+  note={Correlation between injuries and wins in the NFL},
+  url={https://sbnation.com/nfl-adjusted-games-lost}
+}
+
+@misc{nfelo2023,
+  title={Home Field Advantage Tracker},
+  author={nfelo},
+  year={2023},
+  note={Shows modern HFA closer to 1.5 than 3 points},
+  url={https://nfeloapp.com/blog/home-field-advantage/}
+}
+
+@article{lopez2024,
+  title={Evaluating Rest Differential in the NFL},
+  author={Lopez, Michael and Bliss, Adam},
+  journal={Frontiers in Behavioral Economics},
+  year={2024},
+  note={Bye week advantage ~+2.2 pts pre-2011, negligible after},
+  url={https://www.frontiersin.org/articles/10.3389/frbhe.2024.00012}
+}
+
+@misc{sharpFootballWeather,
+  title={Weather Effects on NFL Scoring and Betting},
+  author={Sharp Football Analysis},
+  year={2021},
+  note={Summarizes precipitation, wind, temp effects on totals},
+  url={https://www.sharpfootballanalysis.com}
+}
+
+@misc{warner2010,
+  title={Machine Learning vs the Vegas Line},
+  author={Warner, Craig},
+  year={2010},
+  note={Cornell CS6780 project, model ~2\% higher error than Vegas},
+  url={https://people.orie.cornell.edu/davidr/orie6780papers2010/warner.pdf}
+}
+
+@article{szalkowski2012,
+  title={The collective wisdom of NFL betting lines},
+  author={Szalkowski, Anna and Nelson, Jordan},
+  journal={arXiv preprint arXiv:1201.0309},
+  year={2012}
+}
+
+@misc{nichols2014,
+  title={Time zones and team performance in the NFL},
+  author={Nichols, Mark W},
+  journal={Journal of Sports Economics},
+  year={2014},
+  note={Shows west-to-east travel reduces win probability},
+  url={https://doi.org/10.1177/1527002513516905}
+}
+@article{brier1950,
+  title={Verification of Forecasts Expressed in Terms of Probability},
+  author={Brier, Glenn W.},
+  journal={Monthly Weather Review},
+  volume={78},
+  number={1},
+  pages={1--3},
+  year={1950},
+  publisher={American Meteorological Society},
+  doi={10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}
+}
+
+@article{gneiting2007,
+  title={Strictly proper scoring rules, prediction, and estimation},
+  author={Gneiting, Tilmann and Raftery, Adrian E.},
+  journal={Journal of the American Statistical Association},
+  volume={102},
+  number={477},
+  pages={359--378},
+  year={2007},
+  publisher={Taylor \& Francis},
+  doi={10.1198/016214506000001437}
+}
+
+@incollection{platt1999,
+  title={Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods},
+  author={Platt, John},
+  booktitle={Advances in Large Margin Classifiers},
+  pages={61--74},
+  year={1999},
+  publisher={MIT Press}
+}
+
+@inproceedings{zadrozny2002,
+  title={Transforming classifier scores into accurate multiclass probability estimates},
+  author={Zadrozny, Bianca and Elkan, Charles},
+  booktitle={Proceedings of the Eighth ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  pages={694--699},
+  year={2002},
+  organization={ACM}
+}
+
+@inproceedings{guo2017,
+  title={On calibration of modern neural networks},
+  author={Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q.},
+  booktitle={Proceedings of the 34th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={70},
+  pages={1321--1330},
+  year={2017},
+  publisher={PMLR}
+}
+
+@book{joe1997,
+  title={Multivariate Models and Multivariate Dependence Concepts},
+  author={Joe, Harry},
+  year={1997},
+  publisher={Chapman and Hall/CRC},
+  doi={10.1201/9780367803896}
+}
+
+@book{glasserman2003,
+  title={Monte Carlo Methods in Financial Engineering},
+  author={Glasserman, Paul},
+  year={2003},
+  publisher={Springer},
+  series={Stochastic Modelling and Applied Probability},
+  doi={10.1007/978-0-387-21617-1}
+}
+
+@book{durbin2012,
+  title={Time Series Analysis by State Space Methods},
+  author={Durbin, James and Koopman, Siem Jan},
+  edition={2},
+  year={2012},
+  publisher={Oxford University Press}
+}
+
+@article{karlis2009,
+  title={Bayesian modelling of football outcomes: Using bivariate Poisson distributions},
+  author={Karlis, Dimitris and Ntzoufras, Ioannis},
+  journal={Journal of the Royal Statistical Society: Series A},
+  year={2009}
+}
+
+@article{mnih2015,
+  title={Human-level control through deep reinforcement learning},
+  author={Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and others},
+  journal={Nature},
+  volume={518},
+  number={7540},
+  pages={529--533},
+  year={2015},
+  doi={10.1038/nature14236}
+}
+
+@article{thomas2015,
+  title={High-Confidence Off-Policy Evaluation},
+  author={Thomas, Philip and Theocharous, Georgios and Ghavamzadeh, Mohammad},
+  journal={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={29},
+  number={1},
+  year={2015},
+  doi={10.1609/aaai.v29i1.9541}
+}
+
+@inproceedings{jiang2016,
+  title={Doubly Robust Off-policy Value Evaluation for Reinforcement Learning},
+  author={Jiang, Nan and Li, Lihong},
+  booktitle={Proceedings of the 33rd International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={48},
+  pages={652--661},
+  year={2016},
+  publisher={PMLR}
+}
+
+@inproceedings{fujimoto2019,
+  title={Off-Policy Deep Reinforcement Learning without Exploration},
+  author={Fujimoto, Scott and Meger, David and Precup, Doina},
+  booktitle={Proceedings of the 36th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={97},
+  pages={2052--2062},
+  year={2019},
+  publisher={PMLR}
+}
+
+@inproceedings{kumar2020,
+  title={Conservative Q-Learning for Offline Reinforcement Learning},
+  author={Kumar, Aviral and Zhou, Aurick and Tucker, George and Levine, Sergey},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={33},
+  year={2020}
+}
+
+@article{levine2020,
+  title={Offline Reinforcement Learning: Tutorial, Review, and Perspectives on Open Problems},
+  author={Levine, Sergey and Kumar, Aviral and Tucker, George and Fu, Justin},
+  journal={arXiv preprint arXiv:2005.01643},
+  year={2020}
+}
+
+@book{barlow1972,
+  title={Statistical Inference under Order Restrictions},
+  author={Barlow, Richard E. and Bartholomew, David J. and Bremner, J. M. and Brunk, Hugh D.},
+  year={1972},
+  publisher={Wiley}
+}
+% duplicate removed; see earlier sutton2018 entry
+
+@article{schulman2017ppo,
+  title={Proximal Policy Optimization Algorithms},
+  author={Schulman, John and Wolski, Filip and Dhariwal, Prafulla and Radford, Alec and Klimov, Oleg},
+  journal={arXiv preprint arXiv:1707.06347},
+  year={2017}
+}
+
+@article{wang2016dueling,
+  title={Dueling Network Architectures for Deep Reinforcement Learning},
+  author={Wang, Ziyu and Schaul, Tom and Hessel, Matteo and Van Hasselt, Hado and Lanctot, Marc and De Freitas, Nando},
+  journal={arXiv preprint arXiv:1511.06581},
+  year={2016}
+}
+
+@article{schaul2016per,
+  title={Prioritized Experience Replay},
+  author={Schaul, Tom and Quan, John and Antonoglou, Ioannis and Silver, David},
+  journal={arXiv preprint arXiv:1511.05952},
+  year={2016}
+}
+
+@inproceedings{haarnoja2018sac,
+  title={Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning with a Stochastic Actor},
+  author={Haarnoja, Tuomas and Zhou, Aurick and Abbeel, Pieter and Levine, Sergey},
+  booktitle={Proceedings of the 35th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={80},
+  pages={1861--1870},
+  year={2018},
+  publisher={PMLR}
+}
+
+@article{achiam2017cpo,
+  title={Constrained Policy Optimization},
+  author={Achiam, Joshua and Held, David and Tamar, Aviv and Abbeel, Pieter},
+  journal={arXiv preprint arXiv:1705.10528},
+  year={2017}
+}
+
+@inproceedings{tamar2015cvar,
+  title={Policy Gradients with Variance Related Risk Criteria},
+  author={Tamar, Aviv and Glassner, Yonatan and Mannor, Shie},
+  booktitle={Proceedings of the 30th Conference on Neural Information Processing Systems},
+  pages={1651--1659},
+  year={2015}
+}
+@article{schulman2015trpo,
+  title={Trust Region Policy Optimization},
+  author={Schulman, John and Levine, Sergey and Moritz, Philipp and Jordan, Michael I. and Abbeel, Pieter},
+  journal={arXiv preprint arXiv:1502.05477},
+  year={2015}
+}
+
+@inproceedings{fujimoto2018td3,
+  title={Addressing Function Approximation Error in Actor-Critic Methods},
+  author={Fujimoto, Scott and van Hoof, Herke and Meger, David},
+  booktitle={Proceedings of the 35th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={80},
+  pages={1582--1591},
+  year={2018},
+  publisher={PMLR}
+}
+
+@article{schulman2016gae,
+  title={High-Dimensional Continuous Control Using Generalized Advantage Estimation},
+  author={Schulman, John and Moritz, Philipp and Levine, Sergey and Jordan, Michael I. and Abbeel, Pieter},
+  journal={arXiv preprint arXiv:1506.02438},
+  year={2016}
+}
+
+@inproceedings{bellemare2017distributional,
+  title={A Distributional Perspective on Reinforcement Learning},
+  author={Bellemare, Marc G. and Dabney, Will and Munos, R{\'e}mi},
+  booktitle={Proceedings of the 34th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={70},
+  pages={449--458},
+  year={2017},
+  publisher={PMLR}
+}
+
+@article{wu2019brac,
+  title={Behavior Regularized Actor-Critic},
+  author={Wu, Yifan and Tucker, George and Nachum, Ofir},
+  journal={arXiv preprint arXiv:1910.01708},
+  year={2019}
+}
+
+@article{kostrikov2021iql,
+  title={Offline Reinforcement Learning with Implicit Q-Learning},
+  author={Kostrikov, Ilya and Nair, Ashvin and Levine, Sergey},
+  journal={arXiv preprint arXiv:2110.06169},
+  year={2021}
+}
+
+@article{le2019fqe,
+  title={Batch Policy Evaluation Under the Discounted Setting},
+  author={Le, Hoang M. and Voloshin, Cameron and Yue, Yisong},
+  journal={arXiv preprint arXiv:1910.02140},
+  year={2019}
+}
+
+@inproceedings{swaminathan2015crm,
+  title={Counterfactual Risk Minimization: Learning from Logged Bandit Feedback},
+  author={Swaminathan, Adith and Joachims, Thorsten},
+  booktitle={Proceedings of the 32nd International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={37},
+  pages={814--823},
+  year={2015},
+  publisher={PMLR}
+}
+
+@inproceedings{kumar2019bear,
+  title={Stabilizing Off-Policy Q-Learning via Bootstrapping Error Reduction},
+  author={Kumar, Aviral and Fu, Justin and Soh, George and Tucker, George and Levine, Sergey},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={32},
+  year={2019}
+}
+
+@article{engstrom2020implementation,
+  title={Implementation Matters in Deep RL: A Case Study on PPO and TRPO},
+  author={Engstrom, Logan and Ilyas, Andrew and Santurkar, Shibani and Tsipras, Dimitris and Janoos, Firdaus and Rudolph, Larry and Madry, Aleksander},
+  journal={arXiv preprint arXiv:2005.12729},
+  year={2020}
+}
+
+@inproceedings{dabney2018quantile,
+  title={Implicit Quantile Networks for Distributional Reinforcement Learning},
+  author={Dabney, Will and Rowland, Mark and Bellemare, Marc G. and Munos, R{\'e}mi},
+  booktitle={Proceedings of the 35th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={80},
+  pages={1096--1105},
+  year={2018},
+  publisher={PMLR}
+}
+
+@inproceedings{agarwal2020offline,
+  title={An Optimistic Perspective on Offline Reinforcement Learning},
+  author={Agarwal, Alekh and Jiang, Nan and Kakade, Sham and Sun, Wen},
+  booktitle={Proceedings of the 37th International Conference on Machine Learning},
+  series={Proceedings of Machine Learning Research},
+  volume={119},
+  pages={104--114},
+  year={2020},
+  publisher={PMLR}
+}
+@article{daniels1954,
+  title={Saddlepoint approximations in statistics},
+  author={Daniels, Henry E.},
+  journal={The Annals of Mathematical Statistics},
+  year={1954}
+}
+@article{demarta2005,
+  title={The t copula and related copulas},
+  author={Demarta, Stefano and McNeil, Alexander J.},
+  journal={International Statistical Review},
+  year={2005}
+}
+@inproceedings{vanhasselt2016,
+  title={Deep Reinforcement Learning with Double Q-learning},
+  author={van Hasselt, Hado and Guez, Arthur and Silver, David},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  year={2016}
+}
+
+@article{dudik2014,
+  title={Doubly Robust Policy Evaluation and Learning},
+  author={Dud{\'\i}k, Miroslav and Langford, John and Li, Lihong},
+  journal={Statistical Science},
+  year={2014}
+}
+@article{fujimoto2021td3bc,
+  title={A Minimalist Approach to Offline Reinforcement Learning},
+  author={Fujimoto, Scott and Gu, Shixiang Shane},
+  journal={Advances in Neural Information Processing Systems},
+  year={2021},
+  note={TD3+BC}
+}
+
+@article{nair2020awac,
+  title={AWAC: Accelerating Online Reinforcement Learning with Offline Datasets},
+  author={Nair, Ashvin and Dalal, Murtaza and Gupta, Abhishek and Levine, Sergey},
+  journal={arXiv preprint arXiv:2006.09359},
+  year={2020}
+}
+@book{sutton2018,
+  title={Reinforcement Learning: An Introduction},
+  author={Sutton, Richard S. and Barto, Andrew G.},
+  edition={2},
+  year={2018},
+  publisher={MIT Press}
+}
+
+@article{kelly1956,
+  title={A New Interpretation of Information Rate},
+  author={Kelly, J. L.},
+  journal={Bell System Technical Journal},
+  volume={35},
+  number={4},
+  pages={917--926},
+  year={1956},
+  doi={10.1002/j.1538-7305.1956.tb03809.x}
+}
+
+@article{rockafellar2000,
+  title={Optimization of Conditional Value-at-Risk},
+  author={Rockafellar, R. Tyrrell and Uryasev, Stanislav},
+  journal={Journal of Banking and Finance},
+  volume={24},
+  number={7},
+  pages={1443--1471},
+  year={2000},
+  doi={10.1016/S0378-4266(00)00071-8}
+}
+
+@article{diebold1995,
+  title={Comparing Predictive Accuracy},
+  author={Diebold, Francis X. and Mariano, Roberto S.},
+  journal={Journal of Business  Economic Statistics},
+  volume={13},
+  number={3},
+  pages={253--263},
+  year={1995},
+  doi={10.1080/07350015.1995.10524599}
+}
+
+@book{nelsen2006,
+  title={An Introduction to Copulas},
+  author={Nelsen, Roger B.},
+  edition={2},
+  publisher={Springer},
+  year={2006},
+  doi={10.1007/0-387-28678-0}
+}

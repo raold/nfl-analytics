@@ -1,0 +1,18 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption[Betting performance metrics]{Betting performance metrics for top 5 models by Sharpe ratio (2004--2024). Assumes -110 odds, bets placed when model prob $>$ 52.4\%.}
+  \label{tab:betting-performance}
+  \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{} l r r r r r @{} }
+    \toprule
+    \textbf{Model} & \textbf{N Bets} & \textbf{Win Rate} & \textbf{ROI \%} & \textbf{Sharpe} & \textbf{Sortino} \\
+    \midrule
+    GLM & 3,826 & 51.0\% & -7.45\% & -1.22 & 0.00 \\
+    MEAN(GLM+XGB) & 3,963 & 50.7\% & -8.00\% & -1.31 & 0.00 \\
+    XGB & 4,419 & 50.1\% & -9.39\% & -1.54 & 0.00 \\
+    GLM+XGB & 1,139 & 50.0\% & -9.41\% & -1.54 & 0.00 \\
+    GLM+STATE & 1,100 & 50.0\% & -9.50\% & -1.56 & 0.00 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

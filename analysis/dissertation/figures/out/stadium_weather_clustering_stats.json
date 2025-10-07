@@ -1,0 +1,44 @@
+{
+  "climate_summary": {
+    "n_games": {
+      "cold": 265,
+      "moderate": 398,
+      "warm": 185
+    },
+    "home_win_rate": {
+      "cold": 0.619,
+      "moderate": 0.538,
+      "warm": 0.541
+    },
+    "home_ats_rate": {
+      "cold": 0.642,
+      "moderate": 0.56,
+      "warm": 0.562
+    },
+    "avg_temp_c": {
+      "cold": 8.942,
+      "moderate": 13.251,
+      "warm": 23.258
+    },
+    "avg_wind_kph": {
+      "cold": 46.462,
+      "moderate": 41.673,
+      "warm": 40.773
+    }
+  },
+  "cold_weather_edge": {
+    "extreme_cold_games": 43,
+    "extreme_cold_win_rate": 0.6976744186046512,
+    "normal_win_rate": 0.6036036036036037
+  },
+  "warm_weather_edge": {
+    "extreme_heat_games": 17,
+    "extreme_heat_win_rate": 0.35294117647058826,
+    "normal_win_rate": 0.5595238095238095
+  },
+  "climate_mismatch": {
+    "n_games": 4,
+    "home_win_rate": 0.75,
+    "edge": 0.1428571428571429
+  }
+}

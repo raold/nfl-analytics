@@ -1,0 +1,189 @@
+% !TEX root = ../main/main.tex
+\chapter*{Notation Glossary}
+\addcontentsline{toc}{chapter}{Notation Glossary}
+
+This glossary provides a comprehensive reference for mathematical notation used throughout the dissertation.
+
+\section*{Probability and Statistics}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\mathbb{E}[X]$ & Expected value of random variable $X$ \\
+$\mathbb{P}(A)$ & Probability of event $A$ \\
+$\Var(X)$ & Variance of random variable $X$ \\
+$\Cov(X,Y)$ & Covariance between $X$ and $Y$ \\
+$\mathcal{N}(\mu, \sigma^2)$ & Normal distribution with mean $\mu$ and variance $\sigma^2$ \\
+$\Phi(\cdot)$ & Standard normal cumulative distribution function \\
+$\phi(\cdot)$ & Standard normal probability density function \\
+$\text{Pois}(\lambda)$ & Poisson distribution with rate $\lambda$ \\
+$\text{Skellam}(\lambda, \mu)$ & Skellam distribution (difference of Poissons) \\
+$\sim$ & Distributed as \\
+$\overset{d}{=}$ & Equal in distribution \\
+$\overset{p}{\to}$ & Convergence in probability \\
+$\overset{a.s.}{\to}$ & Almost sure convergence \\
+$\Rightarrow$ & Convergence in distribution \\
+\bottomrule
+\end{tabular}
+
+\section*{Game Variables}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$D$ & Game margin (home score minus away score) \\
+$M_t$ & Observed margin at time/game $t$ \\
+$p$ & Point spread \\
+$o$ & Total (over/under) line \\
+$X$ & Home team score \\
+$Y$ & Away team score \\
+$(h(t), a(t))$ & Home and away teams for game $t$ \\
+$Y \in \{0,1\}$ & Binary outcome (win/cover) \\
+$\mathcal{K}$ & Set of key numbers $\{3, 6, 7, 10\}$ \\
+\bottomrule
+\end{tabular}
+
+\section*{Model Parameters}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\theta_{i,t}$ & Team $i$ strength at time $t$ \\
+$\lambda$ & Home team scoring rate (Poisson) \\
+$\mu$ & Away team scoring rate (Poisson) \\
+$\beta$ & Regression coefficients vector \\
+$\sigma$ & Standard deviation of margin distribution \\
+$\tau$ & Process noise standard deviation (state-space) \\
+$\gamma$ & Home field advantage parameter \\
+$\rho$ & Correlation parameter (copula) \\
+$\nu$ & Degrees of freedom (t-distribution/copula) \\
+$H$ & Half-life for exponential decay weighting \\
+$\alpha$ & Significance level for hypothesis tests \\
+\bottomrule
+\end{tabular}
+
+\section*{Reinforcement Learning}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$s \in \mathcal{S}$ & State from state space \\
+$a \in \mathcal{A}$ & Action from action space \\
+$r$ & Reward signal \\
+$\pi(a|s)$ & Policy (action probability given state) \\
+$\pi_b$ & Behavior policy (data-generating policy) \\
+$\pi_e$ & Evaluation policy (target policy) \\
+$Q(s,a)$ & Action-value function \\
+$V(s)$ & State-value function \\
+$\mathcal{D}$ & Offline dataset of transitions \\
+$\tau$ & Trajectory $(s_0, a_0, r_0, s_1, ...)$ \\
+$\gamma$ & Discount factor \\
+$\eta$ & Learning rate \\
+\bottomrule
+\end{tabular}
+
+\section*{Market and Betting}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+CBV & Comparative Book Value \\
+CLV & Closing Line Value \\
+EV & Expected Value \\
+$\pi$ & Market-implied probability \\
+$\hat{\pi}$ & Model-predicted probability \\
+$d$ & Decimal odds \\
+$o$ & American odds \\
+$H$ & Hold (vigorish) percentage \\
+$f^*$ & Kelly fraction (optimal bet size) \\
+$b$ & Bankroll \\
+ROI & Return on Investment \\
+ATS & Against The Spread \\
+\bottomrule
+\end{tabular}
+
+\section*{Statistical Measures}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+BS & Brier Score \\
+LL & Log Loss \\
+ECE & Expected Calibration Error \\
+RMSE & Root Mean Squared Error \\
+MAE & Mean Absolute Error \\
+$\tau$ & Kendall's tau (rank correlation) \\
+$\lambda_U$ & Upper tail dependence coefficient \\
+$\lambda_L$ & Lower tail dependence coefficient \\
+CI & Confidence Interval \\
+SE & Standard Error \\
+\bottomrule
+\end{tabular}
+
+\section*{Mathematical Operators}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\nabla$ & Gradient operator \\
+$\partial$ & Partial derivative \\
+$\sum$ & Summation \\
+$\prod$ & Product \\
+$\int$ & Integral \\
+$\arg\max$ & Argument of the maximum \\
+$\arg\min$ & Argument of the minimum \\
+$\sup$ & Supremum (least upper bound) \\
+$\inf$ & Infimum (greatest lower bound) \\
+$|\cdot|$ & Absolute value \\
+$\|\cdot\|$ & Norm \\
+$\langle \cdot, \cdot \rangle$ & Inner product \\
+$\otimes$ & Tensor/Kronecker product \\
+\bottomrule
+\end{tabular}
+
+\section*{Sets and Spaces}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\mathbb{R}$ & Real numbers \\
+$\mathbb{R}^n$ & $n$-dimensional Euclidean space \\
+$\mathbb{Z}$ & Integers \\
+$\mathbb{N}$ & Natural numbers \\
+$\mathcal{H}$ & Hypothesis space \\
+$\mathcal{F}$ & Feature space \\
+$\mathcal{S}$ & State space \\
+$\mathcal{A}$ & Action space \\
+$\in$ & Element of \\
+$\subseteq$ & Subset or equal \\
+$\cup$ & Union \\
+$\cap$ & Intersection \\
+$\emptyset$ & Empty set \\
+\bottomrule
+\end{tabular}
+
+\section*{Indexing Conventions}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$i$ & Team index $(i = 1, ..., 32)$ \\
+$t$ & Time/game index \\
+$k$ & Feature/component index \\
+$n$ & Sample size \\
+$m$ & Number of features/dimensions \\
+$B$ & Number of bootstrap/simulation samples \\
+$T$ & Terminal time/horizon \\
+$w$ & Week index \\
+$s$ & Season index \\
+\bottomrule
+\end{tabular}
