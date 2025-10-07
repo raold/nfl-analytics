@@ -190,12 +190,7 @@ def leg_success_probs_for_game(
         # P(D < s_away_tease) = 1 - P(D > s_away_tease) - P(D == s_away_tease)
         # Reuse cover/push with spread = -s_away_tease for home > threshold mapping
         cover_home, push_home, _ = cover_push_probs(pmf_margin, -s_away_tease)
-        p_equal = 0.0
-        if float(s_away_tease).is_integer():
-            p_equal = pmf_margin.get(int(s_away_tease), 0.0)
-        q_away = 1.0 - cover_home - p_equal - 0.5 * p_equal
-        # The above simplifies to: q = P(D < s) + 0.5*P(D==s) numerically
-        # Compute directly for clarity
+        # Success prob: P(D < s_away_tease) + 0.5*P(D == s_away_tease)
         q_away = sum(p for m, p in pmf_margin.items() if m < s_away_tease)
         if float(s_away_tease).is_integer():
             q_away += 0.5 * pmf_margin.get(int(s_away_tease), 0.0)
@@ -449,8 +444,14 @@ def main() -> None:
     legs_base.sort(key=lambda x: (x.game_idx, x.side))
     legs_rw.sort(key=lambda x: (x.game_idx, x.side))
 
-    evs_base, pairs_base = pairwise_ev(legs_base, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
-    evs_rw, pairs_rw = pairwise_ev(legs_rw, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
+    # Compute EVs under independence baseline first
+    evs_base_indep, pairs_base = pairwise_ev(legs_base, d, dep_model="indep", rho=0.0, nu=args.nu)
+    evs_rw_indep, pairs_rw = pairwise_ev(legs_rw, d, dep_model="indep", rho=0.0, nu=args.nu)
+
+    # If a dependence model is specified, compute EVs under that model
+    evs_base_dep, pairs_base_dep = None, None
+    if args.dep != "indep":
+        evs_base_dep, pairs_base_dep = pairwise_ev(legs_base, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
 
     def summarize(evs: Sequence[float]) -> tuple[float, float]:
         if not evs:
@@ -460,23 +461,22 @@ def main() -> None:
         bps = 10000.0 * mean_ev
         return bps, roi_pct
 
-    bps_base, roi_base = summarize(evs_base)
-    bps_rw, roi_rw = summarize(evs_rw)
+    bps_base_indep, roi_base_indep = summarize(evs_base_indep)
+    bps_rw_indep, roi_rw_indep = summarize(evs_rw_indep)
 
-    # Main table: add dependence model row(s)
+    # Main table: always include independence baseline
     main_rows: list[tuple[str, float, float]] = [
-        ("Skellam (baseline)", bps_base, roi_base),
-        ("Skellam + reweight", bps_rw, roi_rw),
+        ("Independence", bps_base_indep, roi_base_indep),
+        ("Independence + reweight", bps_rw_indep, roi_rw_indep),
     ]
-    if args.dep == "gaussian":
-        # Use provided rho
-        mean_ev = float(np.mean([ev for ev in evs_base])) if evs_base else 0.0
-        main_rows.append((f"Gaussian (rho={args.rho:+.2f})", 10000.0 * mean_ev, 100.0 * mean_ev))
-    elif args.dep == "t":
-        mean_ev = float(np.mean([ev for ev in evs_base])) if evs_base else 0.0
-        main_rows.append(
-            (f"t (rho={args.rho:+.2f}, nu={int(args.nu)})", 10000.0 * mean_ev, 100.0 * mean_ev)
-        )
+
+    # Add dependence model row if specified
+    if args.dep == "gaussian" and evs_base_dep is not None:
+        bps_dep, roi_dep = summarize(evs_base_dep)
+        main_rows.append((f"Gaussian (rho={args.rho:+.2f})", bps_dep, roi_dep))
+    elif args.dep == "t" and evs_base_dep is not None:
+        bps_dep, roi_dep = summarize(evs_base_dep)
+        main_rows.append((f"t (rho={args.rho:+.2f}, nu={int(args.nu)})", bps_dep, roi_dep))
     write_tex_table(args.tex, rows=main_rows)
 
     # Copula delta heatmap figure (gaussian by default)
