@@ -250,6 +250,7 @@ __all__ = [
     "skellam_pmf",
     "skellam_pmf_range",
     "reweight_key_masses",
+    "reweight_with_moments",
     "cover_push_probs",
     "total_over_prob",
 ]

@@ -336,9 +336,35 @@ def main():
         print("\n=== Evaluation Mode ===")
         print(f"Loading ratings from {args.load}...")
 
-        # For evaluation, we need to reconstruct the model state from history
-        # Simple approach: fit on prior seasons, then evaluate on target seasons
-        raise NotImplementedError("Evaluation mode requires training on prior seasons first")
+        # Load pre-trained ratings from CSV
+        ratings_df = pd.read_csv(args.load)
+        print(f"Loaded {len(ratings_df)} team ratings from {args.load}")
+
+        # Reconstruct model state
+        model = StateSpaceRatings(
+            q=args.q, r=args.r, init_variance=args.init_variance, hfa_init=args.hfa_init
+        )
+
+        # Restore ratings from CSV
+        for _, row in ratings_df.iterrows():
+            team = row["team"]
+            rating = row["rating"]
+            variance = row.get("variance", args.init_variance)  # Default if not in CSV
+            model.ratings[team] = rating
+            model.variances[team] = variance
+
+        print(f"Restored ratings for {len(model.ratings)} teams")
+
+        # Evaluate on provided seasons (typically held-out test set)
+        print(f"\nEvaluating on seasons {seasons}...")
+        metrics = evaluate_model(model, df)
+
+        # Save metrics to JSON
+        metrics_file = args.load.replace(".csv", "_metrics.json")
+        with open(metrics_file, "w") as f:
+            json.dump(metrics, f, indent=2)
+        print(f"\nMetrics saved to: {metrics_file}")
+        print(json.dumps(metrics, indent=2))
 
     else:
         # Training mode

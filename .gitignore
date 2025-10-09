@@ -87,3 +87,11 @@ env/
 *.synctex.gz
 *.run.xml
 *.xdv
+
+# Model checkpoints (large files)
+checkpoints/
+sweeps/
+
+# Large model files (keep only metadata)
+models/cql/*/best_checkpoint.pth
+models/cql/*/optimizer_state.pth

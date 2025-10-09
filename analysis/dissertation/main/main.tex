@@ -339,11 +339,12 @@ We describe configuration files for Monte Carlo experiments, including random se
 Additional tables and figures provide per-team, per-season breakdowns of calibration and CLV capture, as well as sensitivity curves for stake multipliers under varying uncertainty.
 
 % Additional result tables showing RL improvements and risk metrics
-% Note: These tables are temporarily commented due to LaTeX compilation issues
-\IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{}
-\IfFileExists{../figures/out/ope_grid_table.tex}{\def\opeGridLabel{}\input{../figures/out/ope_grid_table.tex}}{}
-\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
-\IfFileExists{../figures/out/cvar_benchmark_table.tex}{\def\cvarBenchmarkLabel{}\input{../figures/out/cvar_benchmark_table.tex}}{}
+% Note: These tables are included within their respective chapters to avoid multiply-defined labels
+% Commented out to prevent duplication
+% \IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{}
+% \IfFileExists{../figures/out/ope_grid_table.tex}{\def\opeGridLabel{}\input{../figures/out/ope_grid_table.tex}}{}
+% \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
+% \IfFileExists{../figures/out/cvar_benchmark_table.tex}{\def\cvarBenchmarkLabel{}\input{../figures/out/cvar_benchmark_table.tex}}{}
 
 \section{Acronyms and Abbreviations}
 We list recurring abbreviations such as EPA (expected points added), CLV (closing line value), CBV (comparative book value), PROE (pass rate over expected), and RL (reinforcement learning), along with brief definitions.

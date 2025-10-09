@@ -1,18 +1,15 @@
+% !TEX root = ../../main/main.tex
 \begin{table}[t]
   \centering
   \small
-  \caption{Teaser pricing: EV comparison under independence vs copula dependence.}
-  \label{tab:teaser-ev-oos}
-  \begin{tabular}{llcccc}
+  \caption{Two-leg teaser EV on holdout.}
+  \begin{tabular}{lrr}
     \toprule
-    Scenario & Pts & Indep. & Gaussian & $t$-copula & $\Delta$ (G vs I) \\
+    Model & Mean EV (bps) & ROI (\%) \\
     \midrule
-    Dog +3, U44.5 & 6 & -0.790 & -0.831 & -0.830 & -0.041 \\
-    Dog +3, U44.5 & 7 & -0.801 & -0.846 & -0.846 & -0.045 \\
-    Fav -7, U47 & 6 & -0.503 & -0.509 & -0.509 & -0.007 \\
-    Fav -7, U47 & 7 & -0.515 & -0.533 & -0.533 & -0.018 \\
-    Dog +6.5, O41.5 & 6 & -0.820 & -0.881 & -0.881 & -0.061 \\
-    Dog +6.5, O41.5 & 7 & -0.835 & -0.894 & -0.894 & -0.059 \\
+    Independence & 2170.3 & 21.70 \\
+    Independence + reweight & 2171.2 & 21.71 \\
+    Gaussian (rho=+0.15) & -1095.0 & -10.95 \\
     \bottomrule
   \end{tabular}
 \end{table}

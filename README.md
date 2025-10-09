@@ -1,6 +1,16 @@
 # NFL Analytics – Local Dev Quickstart
 
-This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**. See **AGENTS.md** and **CLAUDE.md** for detailed guidance. Below is a minimal local bootstrap.
+This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**.
+
+## 📚 Documentation
+
+- **[Guides](docs/guides/)**: Deployment guide, compute quickstart
+- **[Milestones](docs/milestones/)**: Project completion summaries
+  - [Simulator Acceptance Tests Complete](docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md)
+  - [CQL Training Complete](docs/milestones/CQL_COMPLETE_SUMMARY.md)
+  - [Dissertation Compilation Success](docs/milestones/COMPILATION_SUCCESS.md)
+
+Below is a minimal local bootstrap.
 
 ## Prerequisites
 - Docker and docker compose

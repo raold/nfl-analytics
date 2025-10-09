@@ -16,9 +16,26 @@ NFL betting markets efficiently incorporate public information: play-by-play dat
 
 \subsection{Methodological Contributions}
 
-Despite unprofitability, this dissertation makes four methodological contributions:
+Despite unprofitability, this dissertation makes four methodological contributions echoing the reframed contributions from \Cref{chap:intro}:
 
-\paragraph{1. Rigorous Negative Results.}
+\begin{center}
+\fbox{\begin{minipage}{0.95\textwidth}
+\vspace{6pt}
+\textbf{Core Contributions (echoed from Chapter 1)}
+\begin{enumerate}
+  \item \textbf{Rigorous negative results}: Weather has no predictive value; calibration does not imply profitability; RL provides marginal gains over simpler Kelly baselines (\Cref{chap:results}, Table~\ref{tab:weather-effects}, Table~\ref{tab:rl_vs_baseline}).
+
+  \item \textbf{Complete system architecture}: A full pipeline from ingestion to evaluation (\Cref{chap:data}, \Cref{chap:sim}), reusable for alternative domains (player props, lower-vig exchanges).
+
+  \item \textbf{Dependence-aware evaluation}: Copula-based methods for correlated outcomes (\Cref{chap:risk}, \S\ref{subsec:teaser-copula}) demonstrate proper modeling of same-game parlays and teasers.
+
+  \item \textbf{Transparent failure analysis}: Documentation of when and why the system declines to act (\Cref{chap:results}, Table~\ref{tab:zero-weeks}, 21\% zero-bet weeks) prevents overfitting to lucky backtests.
+\end{enumerate}
+\vspace{6pt}
+\end{minipage}}
+\end{center}
+
+\paragraph{1. Rigorous Negative Results (Expanded).}
 We transparently document three significant null findings:
 \begin{itemize}
   \item \textbf{Weather has no predictive value}: Comprehensive analysis of 1,021 outdoor games shows wind ($r=0.004$, $p=0.90$) and temperature ($r=0.055$, $p=0.08$) have no significant correlation with scoring. Modern NFL teams neutralize weather effects through preparation, and betting markets efficiently price residual impacts.

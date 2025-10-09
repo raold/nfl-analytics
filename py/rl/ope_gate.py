@@ -41,6 +41,8 @@ class GateConfig:
     clips: list[float]
     shrinks: list[float]
     alpha: float = 0.05
+    ess_threshold: float = 30.0  # Minimum ESS for acceptance
+    n_bootstrap: int = 1000  # Bootstrap iterations for CI
 
 
 @dataclass
@@ -50,6 +52,10 @@ class GateResult:
     stable: bool
     grid: dict[str, dict[str, float]]
     note: str
+    dr_lower_ci: float  # Lower confidence bound on DR
+    dr_upper_ci: float  # Upper confidence bound on DR
+    min_ess: float  # Minimum ESS across grid
+    reason_codes: list[str]  # Rejection reasons if not accepted
 
 
 def parse_args() -> argparse.Namespace:
@@ -68,11 +74,42 @@ def _grid(values: str) -> list[float]:
     return [float(x.strip()) for x in values.split(",") if x.strip()]
 
 
+def _bootstrap_dr_ci(
+    df: pd.DataFrame, clip: float, shrink: float, n_boot: int, alpha: float
+) -> tuple[float, float]:
+    """Compute bootstrap confidence interval for DR estimate."""
+    import numpy as np
+
+    boot_vals = []
+    n = len(df)
+    for _ in range(n_boot):
+        # Resample with replacement
+        boot_idx = np.random.choice(n, size=n, replace=True)
+        df_boot = df.iloc[boot_idx].copy()
+        de = dr(df_boot, clip=clip, shrink=shrink)
+        boot_vals.append(de["value"])
+
+    # Percentile method
+    lower = float(np.percentile(boot_vals, 100 * alpha / 2))
+    upper = float(np.percentile(boot_vals, 100 * (1 - alpha / 2)))
+    return lower, upper
+
+
 def evaluate_grid(
-    df: pd.DataFrame, clips: list[float], shrinks: list[float]
-) -> tuple[float, dict[str, dict[str, float]], bool]:
+    df: pd.DataFrame, clips: list[float], shrinks: list[float], cfg: GateConfig
+) -> tuple[float, dict[str, dict[str, float]], bool, float, float, float]:
+    """Evaluate OPE grid with bootstrap CIs and ESS checks.
+
+    Returns: (median_dr, grid, stable, dr_lower, dr_upper, min_ess)
+    """
     grid: dict[str, dict[str, float]] = {}
     dr_vals: list[float] = []
+    ess_vals: list[float] = []
+
+    # Find best (clip, shrink) by median DR
+    best_clip, best_shrink = clips[len(clips) // 2], shrinks[len(shrinks) // 2]
+    best_dr = float("-inf")
+
     for c in clips:
         for s in shrinks:
             key = f"c{int(c)}_s{str(s).replace('.', '')}"
@@ -80,21 +117,69 @@ def evaluate_grid(
             de = dr(df, clip=c, shrink=s)
             grid[key] = {"snis": sn["value"], "dr": de["value"], "ess": sn["ess"]}
             dr_vals.append(de["value"])
+            ess_vals.append(sn["ess"])
+
+            # Track best hyperparameters
+            if de["value"] > best_dr:
+                best_dr = de["value"]
+                best_clip, best_shrink = c, s
+
     dr_vals_sorted = sorted(dr_vals)
     median_dr = dr_vals_sorted[len(dr_vals_sorted) // 2]
+    min_ess = min(ess_vals) if ess_vals else 0.0
+
     # Stability: require all DR values around the top quartile to share sign
     top = [v for v in dr_vals_sorted[int(0.75 * len(dr_vals_sorted)) :]] or dr_vals_sorted
     signs = [v > 0.0 for v in top]
     stable = all(signs) or not any(signs)
-    return median_dr, grid, stable
+
+    # Bootstrap CI on best hyperparameters
+    dr_lower, dr_upper = _bootstrap_dr_ci(df, best_clip, best_shrink, cfg.n_bootstrap, cfg.alpha)
+
+    return median_dr, grid, stable, dr_lower, dr_upper, min_ess
 
 
 def run_gate(df: pd.DataFrame, cfg: GateConfig) -> GateResult:
-    median_dr, grid, stable = evaluate_grid(df, cfg.clips, cfg.shrinks)
-    # Simple accept: median DR > 0 and stability holds
-    accept = stable and (median_dr > 0.0)
-    note = "SNIS/DR grid with clipping/shrinkage; accept requires stability and positive median DR"
-    return GateResult(accept=accept, median_dr=median_dr, stable=stable, grid=grid, note=note)
+    median_dr, grid, stable, dr_lower, dr_upper, min_ess = evaluate_grid(
+        df, cfg.clips, cfg.shrinks, cfg
+    )
+
+    # Acceptance criteria with reason codes
+    reason_codes = []
+    accept = True
+
+    if not stable:
+        accept = False
+        reason_codes.append("unstable_grid")
+
+    if min_ess < cfg.ess_threshold:
+        accept = False
+        reason_codes.append(f"low_ess_{min_ess:.1f}")
+
+    if dr_lower <= 0.0:
+        accept = False
+        reason_codes.append(f"negative_lcb_{dr_lower:.4f}")
+
+    if median_dr <= 0.0:
+        accept = False
+        reason_codes.append(f"negative_median_{median_dr:.4f}")
+
+    note = (
+        f"OPE gate with bootstrap CI (alpha={cfg.alpha}), ESS threshold={cfg.ess_threshold}. "
+        f"Accept requires: stable grid, ESS >= threshold, LCB > 0, median > 0."
+    )
+
+    return GateResult(
+        accept=accept,
+        median_dr=median_dr,
+        stable=stable,
+        grid=grid,
+        note=note,
+        dr_lower_ci=dr_lower,
+        dr_upper_ci=dr_upper,
+        min_ess=min_ess,
+        reason_codes=reason_codes if not accept else [],
+    )
 
 
 def _write_tex_table(path: str, res: GateResult, cfg: GateConfig) -> None:
@@ -115,7 +200,9 @@ def _write_tex_table(path: str, res: GateResult, cfg: GateConfig) -> None:
         f.write("\\begin{threeparttable}\n    ")
         caption = (
             "Off-policy evaluation grid: SNIS and DR values with effective sample sizes (ESS). "
-            f"Accept=\\textbf{{{'Yes' if res.accept else 'No'}}}, median DR={res.median_dr:.4f}."
+            f"Accept=\\textbf{{{'Yes' if res.accept else 'No'}}}, "
+            f"median DR={res.median_dr:.4f} [{res.dr_lower_ci:.4f}, {res.dr_upper_ci:.4f}], "
+            f"min ESS={res.min_ess:.1f}."
         )
         f.write("\\caption[OPE grid (SNIS/DR/ESS)]{" + caption + "}\n")
         f.write("\\opeGridLabel\n    ")
@@ -142,9 +229,13 @@ def main() -> None:
     if args.tex:
         _write_tex_table(args.tex, res, cfg)
     print(
-        f"[gate] accept={res.accept} median_dr={res.median_dr:.4f} stable={res.stable} -> {args.output}"
-        + (f"; tex -> {args.tex}" if args.tex else "")
+        f"[gate] accept={res.accept} median_dr={res.median_dr:.4f} "
+        f"CI=[{res.dr_lower_ci:.4f}, {res.dr_upper_ci:.4f}] "
+        f"min_ess={res.min_ess:.1f} stable={res.stable}"
     )
+    if not res.accept:
+        print(f"  Rejection reasons: {', '.join(res.reason_codes)}")
+    print(f"  Output: {args.output}" + (f", tex: {args.tex}" if args.tex else ""))
 
 
 if __name__ == "__main__":

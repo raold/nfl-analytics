@@ -1,8 +1,24 @@
 % !TEX root = ../main/main.tex
-\chapter*{Notation Glossary}
-\addcontentsline{toc}{chapter}{Notation Glossary}
+\chapter{Notation Glossary} \label{app:notation}
 
-This glossary provides a comprehensive reference for mathematical notation used throughout the dissertation.
+This glossary provides a comprehensive reference for mathematical notation, symbols, and conventions used throughout the dissertation. Symbols are organized by topic area for ease of reference.
+
+\section*{General Conventions}
+
+\begin{itemize}[nosep]
+  \item \textbf{Scalars}: lowercase Roman or Greek letters ($x$, $\alpha$, $\theta$)
+  \item \textbf{Vectors}: bold lowercase ($\mathbf{x}$, $\boldsymbol{\theta}$, $\mathbf{w}$)
+  \item \textbf{Matrices}: bold uppercase ($\mathbf{X}$, $\mathbf{P}$, $\mathbf{H}$)
+  \item \textbf{Random variables}: uppercase Roman ($X$, $Y$, $M$)
+  \item \textbf{Sets}: calligraphic uppercase ($\mathcal{D}$, $\mathcal{T}$, $\mathcal{S}$)
+  \item \textbf{Probability distributions}: $P(\cdot)$ for probability, $p(\cdot)$ for PMF/PDF
+  \item \textbf{Expectation}: $\mathbb{E}[\cdot]$; \textbf{Variance}: $\operatorname{Var}(\cdot)$
+  \item \textbf{Time subscripts}: $t$ for week/period; $s$ for season
+  \item \textbf{Team subscripts}: $i$, $j$ for team indices; $h$, $a$ for home/away
+  \item \textbf{Estimators}: hat notation ($\hat{\theta}$, $\hat{V}$)
+  \item \textbf{Adjusted values}: tilde notation ($\tilde{p}$, $\tilde{w}$)
+  \item \textbf{Sample means}: bar notation ($\bar{x}$, $\bar{B}$)
+\end{itemize}
 
 \section*{Probability and Statistics}
 
@@ -185,5 +201,85 @@ $B$ & Number of bootstrap/simulation samples \\
 $T$ & Terminal time/horizon \\
 $w$ & Week index \\
 $s$ & Season index \\
+\bottomrule
+\end{tabular}
+
+\section*{Dixon-Coles Bivariate Poisson}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\alpha_i$ & Attack strength parameter for team $i$ \\
+$\delta_i$ & Defense strength parameter for team $i$ \\
+$\gamma$ & Home-field advantage (log scale) \\
+$\rho$ & Low-score correlation parameter (typically $\in [-0.2, 0]$) \\
+$\tau(x,y;\lambda_h,\lambda_a,\rho)$ & Dixon-Coles adjustment factor for scores $(x,y)$ \\
+$\lambda_h$ & Expected home score: $\exp(\alpha_h - \delta_a + \gamma)$ \\
+$\lambda_a$ & Expected away score: $\exp(\alpha_a - \delta_h)$ \\
+\bottomrule
+\end{tabular}
+
+\section*{Teaser Pricing and Copulas}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\Delta$ & Teaser shift (e.g., 6.0 points for 6-point teaser) \\
+$\ell_{\text{tease}}$ & Teased spread: $\ell + \Delta$ \\
+$q_1, q_2$ & Single-leg win probabilities \\
+$q_{12}$ & Joint success probability: $P(\text{both legs win})$ \\
+$C_{\rho}(u,v)$ & Gaussian copula CDF with correlation $\rho$ \\
+$C_{\rho,\nu}^t(u,v)$ & Student-$t$ copula with correlation $\rho$, df $\nu$ \\
+$\kappa$ & Kendall's tau (copula rank correlation) \\
+$\lambda_U, \lambda_L$ & Upper/lower tail dependence coefficients \\
+\bottomrule
+\end{tabular}
+
+\section*{Off-Policy Evaluation (OPE)}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\hat{V}^{\text{IS}}$ & Importance sampling estimator \\
+$\hat{V}^{\text{SNIS}}$ & Self-normalized importance sampling estimator \\
+$\hat{V}^{\text{DR}}$ & Doubly-robust estimator \\
+$w_t$ & Importance weight: $\pi_e(a_t|s_t) / \pi_b(a_t|s_t)$ \\
+$c$ & Clipping threshold for importance weights \\
+$\eta$ & Shrinkage factor for importance weights \\
+ESS & Effective sample size: $(\sum w_i)^2 / \sum w_i^2$ \\
+LCB & Lower confidence bound (for promotion gate) \\
+\bottomrule
+\end{tabular}
+
+\section*{Risk and Portfolio Management}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$f^*$ & Full Kelly fraction: edge / variance \\
+$B_t$ & Bankroll at time $t$ \\
+CVaR$_\alpha$ & Conditional value-at-risk at level $\alpha$ \\
+VaR$_\alpha$ & Value-at-risk at level $\alpha$ \\
+DD$_{\max}$ & Maximum drawdown (peak-to-trough) \\
+$U$ & Utilization (fraction of weeks with active bets) \\
+Sharpe$_U$ & Utilization-adjusted Sharpe ratio \\
+\bottomrule
+\end{tabular}
+
+\section*{Convergence and Diagnostics}
+
+\begin{tabular}{ll}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$\hat{R}$ & Gelman-Rubin convergence diagnostic \\
+$n_{\text{eff}}$ & Effective sample size (MCMC) \\
+$\chi^2$ & Chi-square test statistic \\
+$p$-value & Probability of observing test statistic under null \\
+DM & Diebold-Mariano test statistic (forecast comparison) \\
 \bottomrule
 \end{tabular}
