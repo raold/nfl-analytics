@@ -1,0 +1,9 @@
+test,metric,value,threshold,pass
+margin_emd,Earth Mover's Distance,3.6316386363636375,2.0,False
+total_emd,Earth Mover's Distance,4.675581818181825,3.0,False
+key_mass_3pt,3-point mass delta,0.06799659090909091,0.05,False
+key_mass_6pt,6-point mass delta,0.0005534090909090905,0.05,True
+key_mass_7pt,7-point mass delta,0.011373863636363626,0.05,True
+key_mass_10pt,10-point mass delta,0.005036363636363637,0.05,True
+kendall_tau_delta,Kendall's tau delta,0.09781314202355067,0.1,True
+home_win_rate_delta,Home win rate delta,0.04129886363636359,0.1,True

@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\caption{Local SHAP Explanations for Example Games}
+\label{tab:shap-local-examples}
+\begin{threeparttable}
+\begin{tabularx}{\linewidth}{@{}lYYY@{}}
+\toprule
+Example & Top Feature & SHAP Value & Pred Prob \\
+\midrule
+Highest Confidence & \texttt{away\_epa\_pp\_last3} & -0.018 & 52.8% \\
+Lowest Confidence & \texttt{away\_epa\_pp\_last3} & -0.018 & 46.5% \\
+Median & \texttt{away\_epa\_pp\_last3} & -0.018 & 48.5% \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes:} Local SHAP values explain individual predictions. Positive values increase predicted home win probability; negative decrease it. Examples selected by predicted probability distribution (min, median, max).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

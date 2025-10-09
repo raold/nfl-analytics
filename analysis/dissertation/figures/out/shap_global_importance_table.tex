@@ -1,0 +1,32 @@
+\begin{table}[htbp]
+\centering
+\caption{Top 15 Features by Mean |SHAP| (XGBoost Model)}
+\label{tab:shap-global-importance}
+\begin{threeparttable}
+\begin{tabularx}{\linewidth}{@{}rXY@{}}
+\toprule
+Rank & Feature & Mean |SHAP| \\
+\midrule
+5 & \texttt{away\_epa\_pp\_last3} & 0.0177 \\
+11 & \texttt{away\_rest\_days} & 0.0055 \\
+17 & \texttt{away\_prev\_result} & 0.0032 \\
+12 & \texttt{rest\_days\_diff} & 0.0031 \\
+8 & \texttt{away\_prior\_margin\_avg} & 0.0030 \\
+3 & \texttt{prior\_epa\_mean\_diff} & 0.0025 \\
+4 & \texttt{home\_epa\_pp\_last3} & 0.0023 \\
+1 & \texttt{home\_prior\_epa\_mean} & 0.0022 \\
+7 & \texttt{home\_prior\_margin\_avg} & 0.0019 \\
+15 & \texttt{qb\_change\_diff} & 0.0013 \\
+10 & \texttt{home\_rest\_days} & 0.0012 \\
+13 & \texttt{home\_qb\_change} & 0.0010 \\
+9 & \texttt{prior\_margin\_avg\_diff} & 0.0009 \\
+6 & \texttt{epa\_pp\_last3\_diff} & 0.0009 \\
+16 & \texttt{home\_prev\_result} & 0.0007 \\
+\bottomrule
+\end{tabularx}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item \textit{Notes:} SHAP (SHapley Additive exPlanations) values measure each feature's contribution to predictions. Mean |SHAP| aggregates absolute contributions across all test games. Higher values indicate more influential features. EPA = Expected Points Added (advanced play-by-play metric).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

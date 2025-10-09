@@ -1,0 +1,53 @@
+{
+  "dataset": "data/rl_logged.csv",
+  "test_split": 0.2,
+  "test_samples": 335,
+  "policies": {
+    "random": {
+      "win_rate": 0.4107142857142857,
+      "roi_pct": 34.398809523809526,
+      "sharpe": 0.6838136816926981,
+      "max_dd_pct": 100.0,
+      "total_bets": 168,
+      "total_staked": 168.0,
+      "total_return": 57.79
+    },
+    "market": {
+      "win_rate": 0.455,
+      "roi_pct": 41.405,
+      "sharpe": 0.9114209090176147,
+      "max_dd_pct": 0.0,
+      "total_bets": 200,
+      "total_staked": 200.0,
+      "total_return": 82.81
+    },
+    "kelly_lcb": {
+      "win_rate": 0.7769784172661871,
+      "roi_pct": 66.38848920863309,
+      "sharpe": 1.3341365846064919,
+      "max_dd_pct": 9.749999999664047,
+      "total_bets": 139,
+      "total_staked": 6.949999999999999,
+      "total_return": 4.614
+    },
+    "cql_single": {
+      "win_rate": 0.9310344827586207,
+      "roi_pct": 79.73227206946456,
+      "sharpe": 1.7268525263264984,
+      "max_dd_pct": 5.643624999891641,
+      "total_bets": 145,
+      "total_staked": 6.909999999999998,
+      "total_return": 5.5095
+    },
+    "cql_ensemble": {
+      "win_rate": 1.0,
+      "roi_pct": 91.0,
+      "sharpe": 6517135231335029.0,
+      "max_dd_pct": 0.0,
+      "total_bets": 82,
+      "total_staked": 4.1,
+      "total_return": 3.731
+    }
+  },
+  "ensemble_size": 20
+}

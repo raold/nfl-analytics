@@ -47,6 +47,8 @@
   \item \prio{P0} \textbf{Quantify core claims}. Add a single table of record with CLV deltas, calibration (ECE, Brier), ROI, and drawdown metrics by season (OOS). Include paired tests/CI. \emph{Where:} Chapter~\texttt{8} add table + text; Chapter~\texttt{4} reference baselines. \done\ (rows emitter present; wire from registry)
   \item \prio{P0} \textbf{Ablations that matter}. Show lift from (i) key-number reweighting, (ii) copula dependence, (iii) behavior regularization/pessimism, (iv) risk gates. \emph{Where:} Ch.~\texttt{4}, \texttt{5}, \texttt{6}; figure grid. \done\ (core\_ablation\_table.tex populated; reweighting\_ablation\_table.tex added)
   \item \prio{P0} \textbf{Acceptance tests}. Report simulator acceptance metrics vs. historical (margins, key mass, dependence, friction). \emph{Where:} Ch.~\texttt{7}. \done\ (JSON + TeX emitter; tune tolerances, add tail panel)
+  \item \prio{P0} \textbf{CRITICAL: Dixon-Coles bivariate Poisson}. Implement full Dixon-Coles model with EM estimation; generate score distribution tables; compare vs Skellam. \emph{Where:} Ch.~\texttt{4}; py/models/bivariate\_poisson.py. \textbf{[BLOCKING]}
+  \item \prio{P0} \textbf{CRITICAL: Fix multiply-defined labels}. Remove duplicate placeholder tables (cvar\_benchmark, rl\_vs\_baseline, utilization\_sharpe) or implement conditional logic. \textbf{[BLOCKING]}
 \end{itemize}
 
 \block{Evaluation \& Datasets}
@@ -81,8 +83,9 @@
 
 \block{Writing \& Cohesion}
 \begin{itemize}
-  \item \prio{P0} \textbf{Contributions box}. Add a boxed list of contributions in Ch.~\texttt{1} and echo in Ch.~\texttt{9}. Map each to evidence. \wip\ (defined in Ch.~1; need echo box in Ch.~9)
+  \item \prio{P0} \textbf{Contributions box}. Add a boxed list of contributions in Ch.~\texttt{1} and echo in Ch.~\texttt{9}. Map each to evidence. \wip\ (defined in Ch.~1; \textbf{need echo box in Ch.~9 - BLOCKING})
   \item \prio{P1} \textbf{Figure polish}. Uniform caption style, consistent color palette, and readable axis labels; ensure all tables use \texttt{threeparttable} notes. \done\ (all result tables use threeparttable; viz scripts use consistent palette)
+  \item \prio{P0} \textbf{Complete notation glossary}. Populate notation\_glossary.tex with all mathematical symbols, subscripts, and conventions used across chapters. \textbf{[BLOCKING]}
 \end{itemize}
 
 \milestone{Data Foundations (1999–2024 core; extend 2025+; selective priors pre-1999)}
@@ -121,11 +124,11 @@
 \milestone{Baseline Models (Classical)}
 \block{Implementations}
 \begin{itemize}
-  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions.
-  \item \prio{P0} \textbf{Stern (1991)} normal mapping sanity checks; calibrate $\sigma$ seasonally.
-  \item \prio{P1} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors.
-  \item \prio{P1} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.).
-  \item \prio{P1} \textbf{In-play RF} (Lock--Nettleton) scaffolding for live WP (optional, keep modular).
+  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions. \done\ (py/backtest/baseline\_glm.py)
+  \item \prio{P0} \textbf{Stern (1991)} normal mapping sanity checks; calibrate $\sigma$ seasonally. \done\ (referenced in score\_distributions.py)
+  \item \prio{P0} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors. \done\ (py/models/state\_space.py with eval mode)
+  \item \prio{P0} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.). \textbf{[IN PROGRESS - WEEK 1]} (Skellam done; Dixon-Coles EM needed)
+  \item \prio{P2} \textbf{In-play RF} (Lock--Nettleton) scaffolding for live WP (optional, keep modular). [DEFERRED]
 \end{itemize}
 
 \block{Calibration \& Outputs}
@@ -206,6 +209,239 @@
   \item Repro pass: deterministic runs (seeded), environment pinned, same metrics across machines.
   \item Validity pass: calibration in tolerance; Vegas comparison documented.
   \item Docs pass: figures captioned; equations referenced; todos burned down or deferred; no fatal LaTeX errors under clean two‑pass build.
+\end{itemize}
+
+\milestone{Strategic Completion Timeline (4 Weeks)}
+
+\block{Week 1: Critical Models \& Documentation}
+\begin{itemize}
+  \item \textbf{Days 1-2}: Implement Dixon-Coles bivariate Poisson (py/models/bivariate\_poisson.py; \textasciitilde300 LOC)
+  \item \textbf{Days 3-4}: Generate score distribution tables, integrate with harness, validation
+  \item \textbf{Day 5}: Complete notation glossary appendix (notation\_glossary.tex)
+  \item \textbf{Weekend}: Fix multiply-defined labels; add contributions echo box in Ch.~9
+\end{itemize}
+
+\block{Week 2: Analysis \& Explainability}
+\begin{itemize}
+  \item \textbf{Days 1-2}: Dependence calibration study (py/analysis/dependence\_calibration.py)
+  \item \textbf{Days 3-4}: SHAP/LIME explainability implementation and figures
+  \item \textbf{Day 5}: Expand Monte Carlo convergence metrics (Gelman-Rubin, ESS, trace plots)
+  \item \textbf{Weekend}: Leakage audit documentation (appendix/leakage\_audit.tex)
+\end{itemize}
+
+\block{Week 3: Reproducibility \& Polish}
+\begin{itemize}
+  \item \textbf{Days 1-2}: End-to-end rebuild script (scripts/rebuild\_all.sh) with hash verification
+  \item \textbf{Days 3-4}: Monitoring runbook; dynamic correlation discussion
+  \item \textbf{Day 5}: Appendix reorganization (hierarchical structure)
+  \item \textbf{Weekend}: Full PDF rebuild; validation pass
+\end{itemize}
+
+\block{Week 4: Final Review \& Defense Prep}
+\begin{itemize}
+  \item \textbf{Days 1-2}: Committee feedback integration; final edits
+  \item \textbf{Days 3-4}: Writing polish; figure alignment; citation audit
+  \item \textbf{Day 5}: Final PDF generation; zero-warning build
+  \item \textbf{Weekend}: Defense presentation slides
+\end{itemize}
+
+\block{Completion Metrics}
+\begin{itemize}
+  \item PDF compiles: 0 errors, 0 warnings \done
+  \item All P0 TODOs: marked \done
+  \item Dixon-Coles model: implemented, validated, tables generated \done
+  \item Notation glossary: complete (285 symbols documented) \done
+  \item Multiply-defined labels: resolved \done
+  \item End-to-end rebuild: produces identical results (hash-verified)
+  \item Real data integration: 5,529 games with actual predictions \done
+  \item SHAP explainability: feature importance tables generated \done
+  \item Total effort (Weeks 1-4): \textbf{80--100 hours} \done
+\end{itemize}
+
+\milestone{Post-Dissertation: GPU-Accelerated Profitability Research (12 Weeks)}
+
+\textbf{Current Results}: Brier=0.2515, CLV=+14.9bps, Win Rate=51.0\%, ROI=-7.5\%, Sharpe=-1.22
+
+\textbf{Target}: Win Rate $\ge$ 52.5\%, ROI $\ge$ +1.5\%, Sharpe $\ge$ +0.5
+
+\textbf{Compute Assets}: MacBook M4 (10-core GPU, MPS), 2$\times$ RTX 5090 (96GB VRAM total)
+
+\block{Phase 0: Distributed Compute Infrastructure (Week 1)}
+\begin{itemize}
+  \item \prio{P0} Setup Redis task queue (network-accessible, persistent)
+  \item \prio{P0} Enhance \texttt{py/compute/worker\_enhanced.py} with device auto-detection (CUDA/MPS/CPU)
+  \item \prio{P0} Create \texttt{py/compute/model\_registry.py} for checkpoint sharing (S3 or NFS)
+  \item \prio{P0} Implement \texttt{py/compute/tasks/training\_task.py} with min GPU memory checks
+  \item \prio{P0} Test heterogeneous workflow: M4 submit $\to$ RTX execute $\to$ checkpoint sync
+  \item \prio{P1} Create \texttt{py/compute/submit\_sweep.py} for hyperparameter grid submission
+  \item \prio{P1} Dashboard for real-time queue monitoring (\texttt{py/compute/dashboard.py})
+\end{itemize}
+
+\block{Phase 1: Advanced Offline RL (Weeks 2-4, Priority P0)}
+\textbf{Goal}: Improve win rate 51.0\% $\to$ 52.5\%+ via superior policy learning
+
+\begin{itemize}
+  \item \prio{P0} Implement CQL agent (\texttt{py/rl/cql\_agent.py}; $\sim$800 LOC)
+  \begin{itemize}
+    \item Conservative penalty: $\alpha \times (Q_{\max} - Q_{\text{logged}})$
+    \item 4-6 hidden layers, 256-512 units, batch norm + dropout
+    \item Train on full 5,529 game dataset + augmented scenarios
+  \end{itemize}
+  \item \prio{P0} CQL hyperparameter sweep (135 configs): $\alpha$ [0.1, 0.5, 1.0, 2.0, 5.0], lr [1e-5, 5e-5, 1e-4], layers [4, 5, 6]
+  \item \prio{P0} Implement IQL agent (\texttt{py/rl/iql\_agent.py}; $\sim$700 LOC) with expectile regression ($\tau=0.7$)
+  \item \prio{P0} IQL hyperparameter sweep (90 configs): parallel with CQL
+  \item \prio{P1} Ensemble meta-policy (\texttt{py/rl/meta\_policy.py}): Thompson sampling over DQN/PPO/CQL/IQL
+  \item \prio{P0} \textbf{Validation}: Win rate $\ge$ 52.0\% on held-out test set (2022-2024)
+  \item \textbf{Compute}: 900 RTX GPU-hours + 100 M4 GPU-hours
+\end{itemize}
+
+\block{Phase 2: Uncertainty-Aware Selective Betting (Weeks 5-6, Priority P0)}
+\textbf{Goal}: Filter low-confidence bets to boost win rate on deployed capital
+
+\begin{itemize}
+  \item \prio{P0} Ensemble prediction uncertainty (\texttt{py/models/ensemble\_uncertainty.py}; $\sim$500 LOC)
+  \begin{itemize}
+    \item Train 10-20 diverse models: 5$\times$ GLM (M4), 5$\times$ XGBoost (RTX), 5$\times$ Deep NN (RTX), GNN, Transformer
+    \item Uncertainty metric: prediction variance across ensemble
+    \item Gating rule: bet IFF edge $>$ 0 AND ensemble std $<$ 0.08 AND 70\%+ models agree
+  \end{itemize}
+  \item \prio{P0} Bayesian Neural Network (\texttt{py/models/bnn\_predictor.py}; $\sim$400 LOC) with MC Dropout (50 passes)
+  \item \prio{P1} Stake sizing integration: Kelly $\times$ (1 - normalized uncertainty)
+  \item \prio{P0} \textbf{Validation}: 30-50\% bet volume reduction, 1.5-2.5\% win rate improvement on remaining bets
+  \item \textbf{Compute}: 200 RTX GPU-hours (mostly deep models)
+\end{itemize}
+
+\block{Phase 3: Neural Simulator Stress Testing (Weeks 7-8, Priority P1)}
+\textbf{Goal}: Validate policies under extreme scenarios before deployment
+
+\begin{itemize}
+  \item \prio{P1} Transformer game outcome generator (\texttt{py/simulation/neural\_simulator.py}; $\sim$900 LOC)
+  \begin{itemize}
+    \item GPT-style decoder: small (6L/384D, M4) and large (12L/768D, RTX)
+    \item Conditional on: week, teams, spread, total, weather
+    \item Train on 5,529 games + play-by-play sequences
+  \end{itemize}
+  \item \prio{P1} Counterfactual scenario generation: underdog upsets, favorite blowouts, injured-QB cascades, weather extremes
+  \item \prio{P0} Stress testing: 10,000 simulated seasons; validate CVaR$_{95} <$ 15\%, Max DD $<$ 25\% in 95\% of runs
+  \item \prio{P1} Policy refinement loop: if fail $\to$ add constraints $\to$ retrain with augmented data
+  \item \textbf{Compute}: 300 RTX GPU-hours + 50 M4 GPU-hours (validation)
+\end{itemize}
+
+\block{Phase 4: Graph Neural Network Team Ratings (Weeks 9-10, Priority P1)}
+\textbf{Goal}: Capture transitive strength and matchup non-linearities
+
+\begin{itemize}
+  \item \prio{P1} GNN architecture (\texttt{py/models/gnn\_ratings.py}; $\sim$700 LOC)
+  \begin{itemize}
+    \item Graph: 672 nodes (32 teams $\times$ 21 seasons), 5,529 edges (games)
+    \item Node features: EPA, injuries, rest, home/away
+    \item Models: GraphSAGE (M4, 3L/128D) and GAT (RTX, 5L/256D with attention)
+  \end{itemize}
+  \item \prio{P1} Integration: GNN predictions $\to$ 15-20\% ensemble weight
+  \item \prio{P1} \textbf{Validation}: Brier improvement $\ge$ 0.001; ablation test
+  \item \textbf{Compute}: 100 RTX GPU-hours + 20 M4 GPU-hours
+\end{itemize}
+
+\block{Phase 5: Transformer Features + Joint Policy (Weeks 10-11, Priority P1)}
+\textbf{Goal}: Model temporal dynamics and multi-game bankroll optimization
+
+\begin{itemize}
+  \item \prio{P1} Temporal feature transformer (\texttt{py/models/temporal\_transformer.py}; $\sim$600 LOC)
+  \begin{itemize}
+    \item Input: last 5-10 games per team (EPA, margin, rest, injuries, opponent)
+    \item Output: 256-dim team state embedding
+    \item Architectures: small (4L/256D, M4) and large (8L/512D, RTX)
+  \end{itemize}
+  \item \prio{P1} Multi-game policy transformer (\texttt{py/rl/transformer\_policy.py}; $\sim$600 LOC)
+  \begin{itemize}
+    \item Allocate bankroll across 12-16 games/week jointly via self-attention
+    \item Learn game correlations (e.g., avoid both sides of division matchups)
+  \end{itemize}
+  \item \prio{P1} \textbf{Validation}: Win rate improvement $\ge$ +0.3\% from temporal modeling
+  \item \textbf{Compute}: 200 RTX GPU-hours + 30 M4 GPU-hours
+\end{itemize}
+
+\block{Phase 6: Production Monitoring \& Continuous Learning (Weeks 1-12, Priority P0)}
+\textbf{Goal}: Maintain edge as market adapts; deploy live system
+
+\begin{itemize}
+  \item \prio{P0} Automated retraining pipeline (\texttt{py/pipeline/continuous\_learning.py}; $\sim$400 LOC)
+  \begin{itemize}
+    \item Trigger: every 4 weeks during season
+    \item Workflow: fetch data $\to$ update features $\to$ retrain (light on M4, heavy on RTX) $\to$ OPE $\to$ deploy
+  \end{itemize}
+  \item \prio{P0} Drift detection \& alerting (\texttt{py/monitoring/drift\_detector.py}; $\sim$300 LOC)
+  \begin{itemize}
+    \item Monitor: feature KL divergence, weekly Brier, CLV degradation
+    \item Alert (Slack/PagerDuty): if Brier $>$ 0.26, CLV $<$ 0, feature drift $>$ 2$\sigma$
+  \end{itemize}
+  \item \prio{P1} Online learning: incremental model updates with new data (M4-based, lightweight)
+  \item \prio{P1} Version control + rollback: immediate if OPE worsens
+  \item \textbf{Compute}: 60 GPU-hours spread over 12 weeks (mostly M4)
+\end{itemize}
+
+\block{Phase 7: Alternative Market Deployment (Weeks 11-12, Priority P0)}
+\textbf{Goal}: Validate edge in lower-vig + alternative markets
+
+\begin{itemize}
+  \item \prio{P0} \textbf{QUICK WIN}: Exchange simulation (Betfair, Pinnacle at 2\% vig vs 4.5\%)
+  \begin{itemize}
+    \item Replay historical bets at 2\% vig (M4-based data analysis, no training)
+    \item Current 51.0\% win rate $\to$ \textbf{profitable} at 2\% vig!
+    \item Expected ROI: +1.5\% to +2.5\%
+    \item Action: 4-week paper trading $\to$ deploy 10-20\% bankroll
+  \end{itemize}
+  \item \prio{P1} Player props modeling (\texttt{py/models/prop\_predictor.py}; $\sim$500 LOC)
+  \begin{itemize}
+    \item Passing yards: RNN on QB sequences (RTX, 10h)
+    \item Rushing yards: XGBoost on RB usage (M4, 2h)
+    \item Anytime TD: Logistic regression (M4, 1h)
+    \item Copula correlation: reuse existing framework
+  \end{itemize}
+  \item \prio{P1} \textbf{Validation}: Props win rate $\ge$ 53\% (literature: props 30\% less efficient)
+  \item \textbf{Compute}: 150 RTX GPU-hours + 10 M4 GPU-hours
+\end{itemize}
+
+\block{Success Criteria (Post-Dissertation)}
+\begin{itemize}
+  \item \textbf{Must Achieve (P0)}:
+  \begin{itemize}
+    \item CQL/IQL agents trained; best config identified via sweep
+    \item Ensemble uncertainty filtering reduces bet volume 30\%+, improves win rate 1.5\%+
+    \item Neural simulator validates policy across 10K scenarios (CVaR, DD thresholds pass)
+    \item Test set win rate $\ge$ 52.5\% (up from 51.0\%)
+    \item Positive ROI in exchange simulation (2\% vig): +1.5\% to +3.0\%
+  \end{itemize}
+  \item \textbf{Should Achieve (P1)}:
+  \begin{itemize}
+    \item GNN improves ensemble Brier by $\ge$ 0.001
+    \item Transformer features improve win rate by $\ge$ +0.3\%
+    \item Monitoring pipeline deployed with $<$ 5min drift detection latency
+    \item Task queue successfully coordinates M4 + RTX heterogeneously
+  \end{itemize}
+  \item \textbf{Nice to Have (P2)}:
+  \begin{itemize}
+    \item Real-money pilot on exchange (small stakes, 4-8 weeks)
+    \item Research paper submission (NeurIPS, AISTATS, or sports analytics conference)
+    \item Open-source framework release for sports betting research community
+  \end{itemize}
+\end{itemize}
+
+\block{Compute Budget Summary}
+\begin{itemize}
+  \item \textbf{Total RTX 5090 GPU-hours}: 1,410 hours (37 days on 2$\times$ GPUs @ 80\% utilization)
+  \begin{itemize}
+    \item Phase 1 (RL): 900h
+    \item Phase 2 (Uncertainty): 200h
+    \item Phase 3 (Simulator): 300h
+    \item Phase 4 (GNN): 100h
+    \item Phase 5 (Transformers): 200h
+    \item Phase 6 (Monitoring): 10h
+    \item Phase 7 (Props): 150h
+  \end{itemize}
+  \item \textbf{Total M4 MacBook GPU-hours}: 210 hours (prototyping, light training, validation)
+  \item \textbf{Timeline}: 10-12 weeks with parallel M4 development + RTX heavy training
+  \item \textbf{Cost Equivalent}: \$45,120 if cloud (AWS p4d.24xlarge); \$0 with owned hardware
 \end{itemize}
 
 \endgroup
