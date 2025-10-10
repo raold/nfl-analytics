@@ -53,10 +53,10 @@ def fetch_games(season_start: int, season_end: int) -> pd.DataFrame:
     sql = """
         SELECT g.game_id, g.season, g.week, g.home_team, g.away_team,
                g.spread_close, g.total_close, g.home_score, g.away_score,
-               ms.home_epa_mean, ms.away_epa_mean
+               g.home_moneyline, g.away_moneyline
         FROM games g
-        LEFT JOIN mart.game_summary ms ON ms.game_id = g.game_id
         WHERE g.season BETWEEN %s AND %s
+          AND g.home_score IS NOT NULL
     """
     with get_connection() as conn:
         df = pd.read_sql(sql, conn, params=(season_start, season_end))

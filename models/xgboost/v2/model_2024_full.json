@@ -1,0 +1,25 @@
+{
+  "accuracy": 0.7417654808959157,
+  "brier": 0.17952808946604495,
+  "logloss": 0.5399962171770716,
+  "auc": 0.8042736628745165,
+  "best_iteration": 37,
+  "num_features": 13,
+  "train_samples": 3034,
+  "val_samples": 759,
+  "test_accuracy": 0.7368421052631579,
+  "test_brier": 0.16405680583106683,
+  "test_logloss": 0.49124434992387855,
+  "test_auc": 0.8398873579402595,
+  "test_samples": 285,
+  "params": {
+    "max_depth": 7,
+    "learning_rate": 0.1,
+    "num_boost_round": 500,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "objective": "binary:logistic",
+    "eval_metric": "logloss",
+    "early_stopping_rounds": 50
+  }
+}

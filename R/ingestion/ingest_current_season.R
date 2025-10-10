@@ -325,10 +325,17 @@ safe_db_operation(
 
         log_message(sprintf("Found %d roster entries", nrow(rosters)), level = "INFO")
 
+        # Filter out NULL gsis_id entries (primary key constraint)
+        null_count <- sum(is.na(rosters$gsis_id))
+        if (null_count > 0) {
+          log_message(sprintf("Filtering %d roster entries with NULL gsis_id", null_count), level = "WARNING")
+          rosters <- rosters[!is.na(rosters$gsis_id), ]
+        }
+
         # Validate rosters
         validate_data(
           data = rosters,
-          expected_cols = c("season", "week", "team", "player_id"),
+          expected_cols = c("season", "week", "team", "gsis_id"),
           min_rows = 100  # Should have many roster entries
         )
 
@@ -429,22 +436,29 @@ safe_db_operation(
     ", CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON))
 
     log_message(sprintf("=== Season %d Ingestion Complete ===", CURRENT_SEASON), level = "INFO")
-    log_message(sprintf("Games: %d (Completed: %d)",
-                       summary$games_count, summary$completed_games),
+    log_message(sprintf("Games: %s (Completed: %s)",
+                       format(as.integer(summary$games_count), big.mark = ","),
+                       format(as.integer(summary$completed_games), big.mark = ",")),
                level = "INFO")
-    log_message(sprintf("Plays: %d", summary$plays_count), level = "INFO")
-    log_message(sprintf("Roster entries: %d", summary$roster_count), level = "INFO")
+    log_message(sprintf("Plays: %s", format(as.integer(summary$plays_count), big.mark = ",")), level = "INFO")
+    log_message(sprintf("Roster entries: %s", format(as.integer(summary$roster_count), big.mark = ",")), level = "INFO")
 
-    # Check for alerts
-    if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
-      alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
-      unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
-      if (unread_alerts > 0) {
-        log_message(sprintf("⚠️  %d unread alerts in %s",
-                           unread_alerts,
-                           file.path(LOG_DIR, "alerts.json")),
-                   level = "WARNING")
+    # Check for alerts (non-critical, wrap in tryCatch)
+    tryCatch({
+      if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
+        alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
+        if (is.list(alerts) && length(alerts) > 0) {
+          unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
+          if (unread_alerts > 0) {
+            log_message(sprintf("⚠️  %d unread alerts in %s",
+                               unread_alerts,
+                               file.path(LOG_DIR, "alerts.json")),
+                       level = "WARNING")
+          }
+        }
       }
-    }
+    }, error = function(e) {
+      # Silently ignore alert checking errors
+    })
   })
 )
