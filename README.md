@@ -30,12 +30,19 @@ bash scripts/dev/init_dev.sh
 ```bash
 # Create virtual environment
 python -m venv .venv
-source .venv/bin/activate  # On macOS/Linux
+
+# Activate (choose your platform)
+source .venv/bin/activate              # macOS/Linux
+.venv\Scripts\activate                 # Windows (CMD)
+.venv/Scripts/Activate.ps1             # Windows (PowerShell)
 
 # Install dependencies
 pip install -r requirements.txt
-pip install -r requirements-dev.txt  # For testing
+pip install -r requirements-dev.txt    # For testing (optional)
 ```
+
+**Windows 11 + RTX 4090**: PyTorch CUDA support automatically included in requirements.txt
+**Mac M4**: PyTorch MPS support automatically included
 
 ### 3. Setup R Environment
 ```bash
@@ -217,6 +224,52 @@ conflicts = conflict_resolver.detect_database_conflicts('compute_queue.db')
 print('Sync conflicts:', conflicts)
 "
 ```
+
+### 8. Conservative Q-Learning (CQL) Training
+
+**🆕 CQL Model Training Complete (Oct 9, 2025)** - Windows 11 RTX 4090
+
+Train CQL agent for offline RL betting strategy:
+
+```bash
+# Generate enhanced features (157 columns with 29 advanced metrics)
+.venv/Scripts/python.exe py/features/asof_features_enhanced.py \
+  --output data/processed/features/asof_team_features_enhanced.csv
+
+# Create RL logged dataset (5,146 games, 2006-2024)
+.venv/Scripts/python.exe py/rl/dataset.py \
+  --output data/rl_logged_2006_2024.csv \
+  --season-start 2006 \
+  --season-end 2024
+
+# Train CQL model (2000 epochs, CUDA acceleration)
+.venv/Scripts/python.exe py/rl/cql_agent.py \
+  --dataset data/rl_logged_2006_2024.csv \
+  --output models/cql/best_model.pth \
+  --alpha 0.3 \
+  --lr 0.0001 \
+  --hidden-dims 128 64 32 \
+  --epochs 2000 \
+  --device cuda \
+  --log-freq 100
+```
+
+**Training Results (RTX 4090)**:
+- Training Time: ~9 minutes (2000 epochs on CUDA)
+- Match Rate: 98.5% (policy matches logged behavior)
+- Estimated Policy Reward: 1.75% (vs 1.41% baseline = **24% improvement**)
+- Final Loss: 0.1070 (75% reduction from initial)
+- Model: `models/cql/best_model.pth` (207KB)
+- Training Log: `models/cql/cql_training_log.json` (2000 epochs)
+
+**Platform Support**:
+- **Windows 11 + RTX 4090**: CUDA 12.9, PyTorch 2.8.0+cu129 (recommended for training)
+- **Mac M4**: MPS backend, PyTorch 2.8.0 (CPU fallback for inference)
+- **Cross-platform**: Auto-detects CUDA > MPS > CPU
+
+See **[CQL Complete Summary](docs/milestones/CQL_COMPLETE_SUMMARY.md)** for full details.
+
+---
 
 ## Testing
 

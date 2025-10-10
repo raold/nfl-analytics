@@ -308,18 +308,18 @@ validate_data <- function(data, expected_cols = NULL, min_rows = 1, max_rows = I
 #' @param validate_fn Validation function to run on result (optional)
 run_pipeline_step <- function(step_name, expr, conn = NULL, validate_fn = NULL) {
   log_message(sprintf("Starting pipeline step: %s", step_name), level = "INFO")
-  start_time <- Sys.time()
+  step_start_time <- Sys.time()
 
   result <- safe_execute(
     expr = expr,
     conn = conn,
     error_message = sprintf("Pipeline step '%s' failed", step_name),
-    finally_expr = quote({
-      elapsed <- difftime(Sys.time(), start_time, units = "secs")
+    finally_expr = substitute({
+      elapsed <- difftime(Sys.time(), step_start_time, units = "secs")
       log_message(sprintf("Pipeline step '%s' completed in %.2f seconds",
                           step_name, elapsed),
                   level = "INFO")
-    })
+    }, list(step_start_time = step_start_time, step_name = step_name))
   )
 
   # Run validation if provided
