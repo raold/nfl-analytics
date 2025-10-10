@@ -1,0 +1,22 @@
+{
+  "dataset": "data/rl_logged.csv",
+  "epochs": 200,
+  "batch_size": 128,
+  "gamma": 0.99,
+  "seed": 42,
+  "state_cols": [
+    "spread_close",
+    "total_close",
+    "epa_gap",
+    "market_prob",
+    "p_hat",
+    "edge"
+  ],
+  "alpha": 0.3,
+  "lr": "5e-5",
+  "hidden_dims": [
+    256,
+    128,
+    64
+  ]
+}
