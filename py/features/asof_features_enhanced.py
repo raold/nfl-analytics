@@ -99,11 +99,11 @@ team_stats AS (
            -- Success rate (EPA > 0)
            COALESCE(AVG(CASE WHEN success = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS success_rate,
            
-           -- Passing efficiency
-           COALESCE(AVG(CASE WHEN pass THEN air_yards END), 0) AS air_yards_mean,
-           COALESCE(AVG(CASE WHEN pass THEN yards_after_catch END), 0) AS yac_mean,
-           COALESCE(AVG(CASE WHEN pass THEN cpoe END), 0) AS cpoe_mean,
-           COALESCE(AVG(CASE WHEN pass AND complete_pass = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS completion_pct,
+           -- Passing efficiency (pass and rush are INTEGER 0/1, not BOOLEAN)
+           COALESCE(AVG(CASE WHEN pass = 1 THEN air_yards END), 0) AS air_yards_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 THEN yards_after_catch END), 0) AS yac_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 THEN cpoe END), 0) AS cpoe_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 AND complete_pass = 1 THEN 1.0 ELSE 0.0 END), 0) AS completion_pct,
            
            -- Win probability
            COALESCE(MAX(wp), 0.5) AS wp_max,
@@ -114,9 +114,9 @@ team_stats AS (
            COALESCE(AVG(CASE WHEN shotgun = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS shotgun_rate,
            COALESCE(AVG(CASE WHEN no_huddle = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS no_huddle_rate,
            
-           -- Explosive plays
-           COUNT(CASE WHEN pass AND yards_gained >= 20 THEN 1 END) AS explosive_pass,
-           COUNT(CASE WHEN rush AND yards_gained >= 10 THEN 1 END) AS explosive_rush
+           -- Explosive plays (pass and rush are INTEGER 0/1, not BOOLEAN)
+           COUNT(CASE WHEN pass = 1 AND yards_gained >= 20 THEN 1 END) AS explosive_pass,
+           COUNT(CASE WHEN rush = 1 AND yards_gained >= 10 THEN 1 END) AS explosive_rush
            
     FROM plays
     WHERE posteam IS NOT NULL
@@ -423,7 +423,7 @@ def main():
     if args.validate:
         print("Validating team history...")
         base.validate_team_history(team_history)
-        print("✓ Validation passed")
+        print("[PASS] Validation passed")
 
     print("Pivoting to game-level format...")
     games_wide = pivot_to_games_enhanced(team_history)
@@ -437,7 +437,7 @@ def main():
     games_wide.to_csv(args.output, index=False)
 
     print(
-        f"✓ Feature generation complete: {games_wide.shape[0]} games, {games_wide.shape[1]} columns"
+        f"[SUCCESS] Feature generation complete: {games_wide.shape[0]} games, {games_wide.shape[1]} columns"
     )
 
     # Print summary of new features

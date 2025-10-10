@@ -1,0 +1,3749 @@
+{
+  "n_games": 269,
+  "n_bets": 217,
+  "bet_rate": 0.8066914498141264,
+  "total_return": 1.2410000000000003,
+  "roi": 0.5718894009216592,
+  "win_rate": 59.44700460829493,
+  "sharpe_ratio": 0.1717919109269344,
+  "max_drawdown": 0.26349999999999985,
+  "thompson_sampling_stats": {
+    "xgboost": {
+      "selections": 112,
+      "wins": 64,
+      "losses": 42,
+      "win_rate": 0.5714285714285714,
+      "posterior_mean": 0.6018518518518519,
+      "credible_interval": [
+        0.5099530238065979,
+        0.6937506798971058
+      ],
+      "alpha": 65.0,
+      "beta": 43.0
+    },
+    "cql": {
+      "selections": 92,
+      "wins": 27,
+      "losses": 20,
+      "win_rate": 0.29347826086956524,
+      "posterior_mean": 0.5714285714285714,
+      "credible_interval": [
+        0.43425714583271346,
+        0.7085999970244293
+      ],
+      "alpha": 28.0,
+      "beta": 21.0
+    },
+    "iql": {
+      "selections": 65,
+      "wins": 38,
+      "losses": 26,
+      "win_rate": 0.5846153846153846,
+      "posterior_mean": 0.5909090909090909,
+      "credible_interval": [
+        0.4731786094536806,
+        0.7086395723645013
+      ],
+      "alpha": 39.0,
+      "beta": 27.0
+    }
+  },
+  "model_selection_distribution": {
+    "xgboost": 0.5161290322580645,
+    "cql": 0.423963133640553,
+    "iql": 0.2995391705069124
+  },
+  "bets_detail": [
+    {
+      "game_idx": 0,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.7019015550613403,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 1,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.16677305102348328,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 2,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6537216305732727,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 3,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5650687217712402,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 4,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7868063449859619,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 5,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.6896986365318298,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 6,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.10470429062843323,
+      "market_prob": 0.3148148148148148
+    },
+    {
+      "game_idx": 7,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.842902660369873,
+      "market_prob": 0.46296296296296297
+    },
+    {
+      "game_idx": 8,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.4983104467391968,
+      "market_prob": 0.8333333333333333
+    },
+    {
+      "game_idx": 9,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.12027941644191742,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 10,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.17874783277511597,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 11,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.3394991457462311,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 13,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5071194767951965,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 14,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8366021513938904,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 15,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.47699663043022156,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 16,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.8215307593345642,
+      "market_prob": 0.4444444444444444
+    },
+    {
+      "game_idx": 17,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.5436606407165527,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 18,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.63383948802948,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 20,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.259444922208786,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 21,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6711540222167969,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 22,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8891178965568542,
+      "market_prob": 0.42592592592592593
+    },
+    {
+      "game_idx": 23,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9341812133789062,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 24,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.2175968587398529,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 25,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.6346782445907593,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 26,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.9577341079711914,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 27,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.6582323908805847,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 28,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.5526694655418396,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 29,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.8225026726722717,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 31,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.24005748331546783,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 32,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.6635990738868713,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 34,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.6880143284797668,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 35,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5372554063796997,
+      "market_prob": 0.2962962962962963
+    },
+    {
+      "game_idx": 36,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.37706753611564636,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 37,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7445523738861084,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 38,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.11050321161746979,
+      "market_prob": 0.2222222222222222
+    },
+    {
+      "game_idx": 39,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5312368869781494,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 40,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.47224676609039307,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 42,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5638261437416077,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 43,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.7486212849617004,
+      "market_prob": 0.46296296296296297
+    },
+    {
+      "game_idx": 44,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.3112543821334839,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 45,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7579327821731567,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 46,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.2611851096153259,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 47,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.2384907752275467,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 48,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.768905520439148,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 49,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.31141844391822815,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 51,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.7176827788352966,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 52,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9136176705360413,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 53,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.38068151473999023,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 54,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.42363932728767395,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 55,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.47679656744003296,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 56,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.5386814475059509,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 58,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.7008403539657593,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 59,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.8163080215454102,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 60,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8126882314682007,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 61,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.23166222870349884,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 62,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8664233684539795,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 63,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.18796968460083008,
+      "market_prob": 0.2777777777777778
+    },
+    {
+      "game_idx": 65,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.21945877373218536,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 67,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.16125060617923737,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 68,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6219439506530762,
+      "market_prob": 0.2592592592592593
+    },
+    {
+      "game_idx": 69,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.4831075370311737,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 70,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.7535787224769592,
+      "market_prob": 0.4444444444444444
+    },
+    {
+      "game_idx": 71,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.8415580987930298,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 72,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.1639396697282791,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 73,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7804687023162842,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 74,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.43668776750564575,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 75,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5922783017158508,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 76,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.25430727005004883,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 77,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.9194915890693665,
+      "market_prob": 0.8703703703703703
+    },
+    {
+      "game_idx": 79,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.20919641852378845,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 80,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.8282616138458252,
+      "market_prob": 0.537037037037037
+    },
+    {
+      "game_idx": 81,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.6411430835723877,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 82,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.3289366364479065,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 83,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.2569279670715332,
+      "market_prob": 0.46296296296296297
+    },
+    {
+      "game_idx": 84,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6582269668579102,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 85,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8351184725761414,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 86,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7714571356773376,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 87,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8780398964881897,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 89,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.6938027143478394,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 90,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.748600423336029,
+      "market_prob": 0.8518518518518519
+    },
+    {
+      "game_idx": 91,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.5089228749275208,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 92,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6182309985160828,
+      "market_prob": 0.4444444444444444
+    },
+    {
+      "game_idx": 95,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.942177951335907,
+      "market_prob": 0.9814814814814814
+    },
+    {
+      "game_idx": 96,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.4494929313659668,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 97,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.4689180552959442,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 98,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.45324766635894775,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 99,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5646865367889404,
+      "market_prob": 0.6851851851851851
+    },
+    {
+      "game_idx": 100,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.11699583381414413,
+      "market_prob": 0.16666666666666669
+    },
+    {
+      "game_idx": 101,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.5171582698822021,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 102,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8985158801078796,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 103,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.9111573100090027,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 105,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.43239909410476685,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 107,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.609204113483429,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 108,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.9434143304824829,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 109,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8701555132865906,
+      "market_prob": 0.8333333333333333
+    },
+    {
+      "game_idx": 111,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.3116470277309418,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 112,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.6709311604499817,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 113,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.41464927792549133,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 114,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.3611966669559479,
+      "market_prob": 0.42592592592592593
+    },
+    {
+      "game_idx": 115,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6624062657356262,
+      "market_prob": 0.4444444444444444
+    },
+    {
+      "game_idx": 116,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8158167004585266,
+      "market_prob": 0.7962962962962963
+    },
+    {
+      "game_idx": 117,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8342581987380981,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 118,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.18151132762432098,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 119,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.7270614504814148,
+      "market_prob": 0.24074074074074076
+    },
+    {
+      "game_idx": 120,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.764918863773346,
+      "market_prob": 0.8333333333333333
+    },
+    {
+      "game_idx": 121,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.2815091013908386,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 122,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.6477049589157104,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 124,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8855528235435486,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 125,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8245431780815125,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 126,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.2429920881986618,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 127,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.3527044653892517,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 128,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.657669723033905,
+      "market_prob": 0.24074074074074076
+    },
+    {
+      "game_idx": 129,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.24738360941410065,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 131,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9236850142478943,
+      "market_prob": 0.42592592592592593
+    },
+    {
+      "game_idx": 132,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.17911449074745178,
+      "market_prob": 0.2222222222222222
+    },
+    {
+      "game_idx": 133,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.3882271349430084,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 135,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.8465571999549866,
+      "market_prob": 0.7962962962962963
+    },
+    {
+      "game_idx": 136,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7528661489486694,
+      "market_prob": 0.5740740740740741
+    },
+    {
+      "game_idx": 138,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.8774207234382629,
+      "market_prob": 0.537037037037037
+    },
+    {
+      "game_idx": 139,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9636542201042175,
+      "market_prob": 0.46296296296296297
+    },
+    {
+      "game_idx": 142,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.3208713233470917,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 144,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.6358603239059448,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 146,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.774118959903717,
+      "market_prob": 0.7962962962962963
+    },
+    {
+      "game_idx": 148,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.6464126110076904,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 149,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7615416049957275,
+      "market_prob": 0.6666666666666666
+    },
+    {
+      "game_idx": 151,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.43003392219543457,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 153,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.4255344867706299,
+      "market_prob": 0.2592592592592593
+    },
+    {
+      "game_idx": 156,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.1033671423792839,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 157,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6519544720649719,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 158,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.31942111253738403,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 159,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.5428099632263184,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 160,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7965191006660461,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 162,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.7467417120933533,
+      "market_prob": 0.7962962962962963
+    },
+    {
+      "game_idx": 163,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.7896418571472168,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 165,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8761416673660278,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 168,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.19681259989738464,
+      "market_prob": 0.46296296296296297
+    },
+    {
+      "game_idx": 171,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8655007481575012,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 172,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.46685507893562317,
+      "market_prob": 0.6666666666666666
+    },
+    {
+      "game_idx": 173,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.15898270905017853,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 174,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.5867347121238708,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 176,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7968610525131226,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 178,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6578375101089478,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 179,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.9199088215827942,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 181,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.8451550006866455,
+      "market_prob": 0.99
+    },
+    {
+      "game_idx": 182,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.603012204170227,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 184,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9347561001777649,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 185,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.4816986620426178,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 186,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.3428456485271454,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 187,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7120203971862793,
+      "market_prob": 0.6851851851851851
+    },
+    {
+      "game_idx": 188,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8971688151359558,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 189,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.1875806599855423,
+      "market_prob": 0.2962962962962963
+    },
+    {
+      "game_idx": 190,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6557129621505737,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 191,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.3447139263153076,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 192,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6659642457962036,
+      "market_prob": 0.2592592592592593
+    },
+    {
+      "game_idx": 195,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.7291153073310852,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 198,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7266035079956055,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 199,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.8713704943656921,
+      "market_prob": 0.6666666666666666
+    },
+    {
+      "game_idx": 200,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.24878549575805664,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 201,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6436786651611328,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 202,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.43333449959754944,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 203,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.6304613351821899,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 204,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7023664116859436,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 205,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7386533617973328,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 206,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.16623403131961823,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 207,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.587562084197998,
+      "market_prob": 0.2222222222222222
+    },
+    {
+      "game_idx": 208,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.3714715838432312,
+      "market_prob": 0.2962962962962963
+    },
+    {
+      "game_idx": 209,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6698540449142456,
+      "market_prob": 0.8703703703703703
+    },
+    {
+      "game_idx": 210,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.49015364050865173,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 211,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.4413396418094635,
+      "market_prob": 0.24074074074074076
+    },
+    {
+      "game_idx": 212,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5521294474601746,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 213,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.5653766393661499,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 214,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.08363521844148636,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 215,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.3160562515258789,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 216,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.517578125,
+      "market_prob": 0.99
+    },
+    {
+      "game_idx": 218,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.8193541765213013,
+      "market_prob": 0.8518518518518519
+    },
+    {
+      "game_idx": 220,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6965348124504089,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 222,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.6956331133842468,
+      "market_prob": 0.33333333333333337
+    },
+    {
+      "game_idx": 223,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.46195340156555176,
+      "market_prob": 0.6481481481481481
+    },
+    {
+      "game_idx": 224,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.815481424331665,
+      "market_prob": 0.7407407407407407
+    },
+    {
+      "game_idx": 225,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.6606807708740234,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 226,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.1430669128894806,
+      "market_prob": 0.2962962962962963
+    },
+    {
+      "game_idx": 227,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.9589067101478577,
+      "market_prob": 0.8518518518518519
+    },
+    {
+      "game_idx": 228,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.6467334628105164,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 229,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.3034754693508148,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 230,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0091,
+      "model_prob": 0.30308854579925537,
+      "market_prob": 0.35185185185185186
+    },
+    {
+      "game_idx": 232,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.4794138967990875,
+      "market_prob": 0.2222222222222222
+    },
+    {
+      "game_idx": 233,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.3379378914833069,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 235,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.6347206830978394,
+      "market_prob": 0.42592592592592593
+    },
+    {
+      "game_idx": 236,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.19919811189174652,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 237,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.02,
+      "model_prob": 0.8065527081489563,
+      "market_prob": 0.8703703703703703
+    },
+    {
+      "game_idx": 238,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.22051551938056946,
+      "market_prob": 0.37037037037037035
+    },
+    {
+      "game_idx": 240,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.667666494846344,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 241,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.43030092120170593,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 243,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.0182,
+      "model_prob": 0.35197362303733826,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 244,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7927209734916687,
+      "market_prob": 0.99
+    },
+    {
+      "game_idx": 245,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.3773386776447296,
+      "market_prob": 0.5925925925925926
+    },
+    {
+      "game_idx": 246,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.10832290351390839,
+      "market_prob": 0.6296296296296297
+    },
+    {
+      "game_idx": 247,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5988281965255737,
+      "market_prob": 0.8888888888888888
+    },
+    {
+      "game_idx": 248,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5216838717460632,
+      "market_prob": 0.24074074074074076
+    },
+    {
+      "game_idx": 249,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.12232901155948639,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 250,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.8035428524017334,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 251,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.8456023931503296,
+      "market_prob": 0.99
+    },
+    {
+      "game_idx": 252,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7888955473899841,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 253,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.5775220394134521,
+      "market_prob": 0.2222222222222222
+    },
+    {
+      "game_idx": 255,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": true,
+      "return": 0.045500000000000006,
+      "model_prob": 0.21724405884742737,
+      "market_prob": 0.24074074074074076
+    },
+    {
+      "game_idx": 256,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0091,
+      "model_prob": 0.7926833033561707,
+      "market_prob": 0.7777777777777778
+    },
+    {
+      "game_idx": 257,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.4912334680557251,
+      "market_prob": 0.7037037037037037
+    },
+    {
+      "game_idx": 258,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.6686795353889465,
+      "market_prob": 0.3888888888888889
+    },
+    {
+      "game_idx": 259,
+      "selected_model": "iql",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.045500000000000006,
+      "model_prob": 0.7437190413475037,
+      "market_prob": 0.40740740740740744
+    },
+    {
+      "game_idx": 260,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.7295053005218506,
+      "market_prob": 0.8518518518518519
+    },
+    {
+      "game_idx": 261,
+      "selected_model": "iql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.7046346664428711,
+      "market_prob": 0.6111111111111112
+    },
+    {
+      "game_idx": 262,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.31040656566619873,
+      "market_prob": 0.4444444444444444
+    },
+    {
+      "game_idx": 264,
+      "selected_model": "xgboost",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.7094933390617371,
+      "market_prob": 0.7592592592592593
+    },
+    {
+      "game_idx": 265,
+      "selected_model": "cql",
+      "action": 1.0,
+      "bet_size": 0.01,
+      "bet_home": 1.0,
+      "bet_won": false,
+      "return": -0.01,
+      "model_prob": 0.8797353506088257,
+      "market_prob": 0.8148148148148149
+    },
+    {
+      "game_idx": 266,
+      "selected_model": "iql",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.8291466236114502,
+      "market_prob": 0.5555555555555556
+    },
+    {
+      "game_idx": 267,
+      "selected_model": "xgboost",
+      "action": 2.0,
+      "bet_size": 0.02,
+      "bet_home": 1.0,
+      "bet_won": 1.0,
+      "return": 0.0182,
+      "model_prob": 0.7835492491722107,
+      "market_prob": 0.7222222222222222
+    },
+    {
+      "game_idx": 268,
+      "selected_model": "xgboost",
+      "action": 3.0,
+      "bet_size": 0.05,
+      "bet_home": 0.0,
+      "bet_won": false,
+      "return": -0.05,
+      "model_prob": 0.33055225014686584,
+      "market_prob": 0.4444444444444444
+    }
+  ],
+  "posterior_history": [
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 2.0,
+      "beta": 1.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 3.0,
+      "beta": 1.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 3.0,
+      "beta": 2.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 3.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 1.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 2.0,
+      "beta": 2.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 4.0,
+      "beta": 3.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 5.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 3.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 4.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 4.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 5.0,
+      "beta": 3.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 5.0,
+      "beta": 4.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 6.0,
+      "beta": 4.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 6.0,
+      "beta": 3.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 6.0,
+      "beta": 5.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 7.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 8.0,
+      "beta": 3.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 7.0,
+      "beta": 5.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 1.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 9.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 10.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 11.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 12.0,
+      "beta": 3.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 2.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 12.0,
+      "beta": 4.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 13.0,
+      "beta": 4.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 13.0,
+      "beta": 5.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 8.0,
+      "beta": 5.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 3.0,
+      "beta": 2.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 14.0,
+      "beta": 5.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 14.0,
+      "beta": 6.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 15.0,
+      "beta": 6.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 9.0,
+      "beta": 5.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 10.0,
+      "beta": 5.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 3.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 16.0,
+      "beta": 6.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 16.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 17.0,
+      "beta": 7.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 10.0,
+      "beta": 6.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 4.0,
+      "beta": 3.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 18.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 19.0,
+      "beta": 7.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 4.0,
+      "beta": 4.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 20.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 21.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 22.0,
+      "beta": 7.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 5.0,
+      "beta": 4.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 22.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 22.0,
+      "beta": 9.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 22.0,
+      "beta": 10.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 5.0,
+      "beta": 5.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 10.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 23.0,
+      "beta": 10.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 23.0,
+      "beta": 11.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 6.0,
+      "beta": 5.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 11.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 24.0,
+      "beta": 11.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 12.0,
+      "beta": 7.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 24.0,
+      "beta": 12.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 25.0,
+      "beta": 12.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 26.0,
+      "beta": 12.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 12.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 27.0,
+      "beta": 12.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 13.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 14.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 15.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 13.0,
+      "beta": 8.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 14.0,
+      "beta": 8.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 15.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 28.0,
+      "beta": 16.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 7.0,
+      "beta": 5.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 15.0,
+      "beta": 9.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 15.0,
+      "beta": 10.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 29.0,
+      "beta": 16.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 16.0,
+      "beta": 10.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 30.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 17.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 16.0,
+      "beta": 11.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 17.0,
+      "beta": 11.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 18.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 17.0,
+      "beta": 12.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 7.0,
+      "beta": 6.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 17.0,
+      "beta": 13.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 19.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 7.0,
+      "beta": 7.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 18.0,
+      "beta": 13.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 19.0,
+      "beta": 13.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 8.0,
+      "beta": 7.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 9.0,
+      "beta": 7.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 10.0,
+      "beta": 7.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 20.0,
+      "beta": 13.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 11.0,
+      "beta": 7.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 21.0,
+      "beta": 13.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 21.0,
+      "beta": 14.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 20.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 11.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 31.0,
+      "beta": 20.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 31.0,
+      "beta": 21.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 22.0,
+      "beta": 14.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 23.0,
+      "beta": 14.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 23.0,
+      "beta": 15.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 32.0,
+      "beta": 21.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 32.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 33.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 34.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 35.0,
+      "beta": 22.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 12.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 36.0,
+      "beta": 22.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 24.0,
+      "beta": 15.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 24.0,
+      "beta": 16.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 13.0,
+      "beta": 8.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 25.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 37.0,
+      "beta": 22.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 14.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 38.0,
+      "beta": 22.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 15.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 39.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 40.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 41.0,
+      "beta": 22.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 16.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 41.0,
+      "beta": 23.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 42.0,
+      "beta": 23.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 26.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 42.0,
+      "beta": 24.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 42.0,
+      "beta": 25.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 27.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 42.0,
+      "beta": 26.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 28.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 43.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 17.0,
+      "beta": 8.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 29.0,
+      "beta": 16.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 44.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 18.0,
+      "beta": 8.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 45.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 19.0,
+      "beta": 8.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 29.0,
+      "beta": 17.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 46.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 20.0,
+      "beta": 8.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 21.0,
+      "beta": 8.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 21.0,
+      "beta": 9.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 22.0,
+      "beta": 9.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 29.0,
+      "beta": 18.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 22.0,
+      "beta": 10.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 47.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 22.0,
+      "beta": 11.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 48.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 23.0,
+      "beta": 11.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 24.0,
+      "beta": 11.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 49.0,
+      "beta": 26.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 24.0,
+      "beta": 12.0
+    },
+    {
+      "model": "cql",
+      "won": true,
+      "alpha": 25.0,
+      "beta": 12.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 49.0,
+      "beta": 27.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 25.0,
+      "beta": 13.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 49.0,
+      "beta": 28.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 26.0,
+      "beta": 13.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 30.0,
+      "beta": 18.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 26.0,
+      "beta": 14.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 19.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 49.0,
+      "beta": 29.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 20.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 50.0,
+      "beta": 29.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 51.0,
+      "beta": 29.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 51.0,
+      "beta": 30.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 52.0,
+      "beta": 30.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 52.0,
+      "beta": 31.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 30.0,
+      "beta": 21.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 52.0,
+      "beta": 32.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 26.0,
+      "beta": 15.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 26.0,
+      "beta": 16.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 31.0,
+      "beta": 21.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 32.0,
+      "beta": 21.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 52.0,
+      "beta": 33.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 32.0,
+      "beta": 22.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 26.0,
+      "beta": 17.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 53.0,
+      "beta": 33.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 26.0,
+      "beta": 18.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 27.0,
+      "beta": 18.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 33.0,
+      "beta": 22.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 34.0,
+      "beta": 22.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 54.0,
+      "beta": 33.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 19.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 34.0,
+      "beta": 23.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 55.0,
+      "beta": 33.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 56.0,
+      "beta": 33.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 57.0,
+      "beta": 33.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 34.0,
+      "beta": 24.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 58.0,
+      "beta": 33.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 58.0,
+      "beta": 34.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 59.0,
+      "beta": 34.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 60.0,
+      "beta": 34.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 61.0,
+      "beta": 34.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 62.0,
+      "beta": 34.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 62.0,
+      "beta": 35.0
+    },
+    {
+      "model": "xgboost",
+      "won": true,
+      "alpha": 63.0,
+      "beta": 35.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 63.0,
+      "beta": 36.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 63.0,
+      "beta": 37.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 34.0,
+      "beta": 25.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 27.0,
+      "beta": 20.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 35.0,
+      "beta": 25.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 63.0,
+      "beta": 38.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 36.0,
+      "beta": 25.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 63.0,
+      "beta": 39.0
+    },
+    {
+      "model": "iql",
+      "won": true,
+      "alpha": 37.0,
+      "beta": 25.0
+    },
+    {
+      "model": "cql",
+      "won": 1.0,
+      "alpha": 28.0,
+      "beta": 20.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 37.0,
+      "beta": 26.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 64.0,
+      "beta": 39.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 38.0,
+      "beta": 26.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 64.0,
+      "beta": 40.0
+    },
+    {
+      "model": "iql",
+      "won": false,
+      "alpha": 38.0,
+      "beta": 27.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 64.0,
+      "beta": 41.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 64.0,
+      "beta": 42.0
+    },
+    {
+      "model": "cql",
+      "won": false,
+      "alpha": 28.0,
+      "beta": 21.0
+    },
+    {
+      "model": "iql",
+      "won": 1.0,
+      "alpha": 39.0,
+      "beta": 27.0
+    },
+    {
+      "model": "xgboost",
+      "won": 1.0,
+      "alpha": 65.0,
+      "beta": 42.0
+    },
+    {
+      "model": "xgboost",
+      "won": false,
+      "alpha": 65.0,
+      "beta": 43.0
+    }
+  ]
+}
