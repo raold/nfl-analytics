@@ -93,9 +93,16 @@ results/
 predictions/
 logs/r_etl/
 
+# Allow README files in ignored dirs
+!results/README.md
+!predictions/README.md
+
 # Processed datasets
 data/processed/
 data/rl_logged_*.csv
+
+# Allow README in data/processed
+!data/processed/README.md
 
 # Model binaries and sweep outputs (use Git LFS for binaries)
 models/**/*.pth

@@ -34,6 +34,7 @@ from ..models.copulas import joint_success_prob_gaussian
 from ..models.score_distributions import (
     cover_push_probs,
     reweight_key_masses,
+    reweight_with_moments,
     skellam_pmf_range,
 )
 
@@ -428,7 +429,11 @@ def main() -> None:
         s = float(g["spread_close"])  # home spread
         tclose = float(g["total_close"])
         pmf = pmf_from_spread_total(tclose, s)
-        pmf_rw = reweight_key_masses(pmf, targets)
+        # Skellam parameters: mu_h = (total - spread)/2, mu_a = (total + spread)/2
+        # E[D] = mu_h - mu_a = -spread, Var[D] = mu_h + mu_a = total
+        mu_margin = -s
+        var_margin = max(0.1, tclose)  # Skellam variance = sum of Poisson means
+        pmf_rw = reweight_with_moments(pmf, targets, mu_margin, var_margin)
         # Eligible legs
         elig = leg_success_probs_for_game(pmf, s, args.teaser)
         elig_rw = leg_success_probs_for_game(pmf_rw, s, args.teaser)

@@ -1,0 +1,43 @@
+{
+  "model_type": "cql",
+  "run_id": "88c895db",
+  "latest_epoch": 1000,
+  "latest_checkpoint": "models/cql/88c895db/checkpoint_epoch_1000.pth",
+  "latest_metrics": {
+    "loss": 0.03604949065125906,
+    "td_loss": 0.01620615517290739,
+    "cql_loss": 0.06614444834681657,
+    "q_mean": 0.3007322515432651
+  },
+  "config": {
+    "dataset": "data/rl_logged.csv",
+    "epochs": 1000,
+    "batch_size": 128,
+    "gamma": 0.99,
+    "alpha": 0.3,
+    "lr": 0.0001,
+    "hidden_dims": [
+      256,
+      128,
+      64
+    ],
+    "state_cols": [
+      "spread_close",
+      "total_close",
+      "epa_gap",
+      "market_prob",
+      "p_hat",
+      "edge"
+    ],
+    "seed": 47
+  },
+  "device_info": {
+    "device_type": "mps",
+    "device_name": "Apple Silicon (MPS)",
+    "device_memory_gb": 16,
+    "device_str": "mps",
+    "cpu_count": 10,
+    "total_ram_gb": 32.0
+  },
+  "updated_at": "2025-10-08T17:40:28.226233"
+}
