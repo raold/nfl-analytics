@@ -88,6 +88,20 @@ env/
 *.run.xml
 *.xdv
 
+# Large/generated artifacts
+results/
+predictions/
+logs/r_etl/
+
+# Processed datasets
+data/processed/
+data/rl_logged_*.csv
+
+# Model binaries and sweep outputs (use Git LFS for binaries)
+models/**/*.pth
+models/**/*.ubj
+models/**/sweep/*.csv
+
 # Model checkpoints (large files)
 checkpoints/
 sweeps/
