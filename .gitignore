@@ -21,10 +21,17 @@ machine_info.json
 .Spotlight-V100
 .Trashes
 
+# Local temp downloads
+.tmp.drivedownload/
+
 # Editor/IDE settings
 .idea/
 .vscode/
 *.code-workspace
+
+# Claude local context
+.claude/
+.claude_context
 
 # Python caches and coverage
 __pycache__/
@@ -53,6 +60,8 @@ renv/staging/
 **/*_cache/
 **/*_files/
 **/_freeze/
+# Compiled notebook HTML (keep sources under notebooks/)
+notebooks/**/*.html
 
 # Generic local databases
 *.sqlite3
@@ -66,6 +75,8 @@ build/
 .eggs/
 *.egg-info/
 pip-wheel-metadata/
+# Analysis temporary CSVs
+analysis/results/*_tmp.csv
 
 # Virtual environments
 .venv/
@@ -108,6 +119,10 @@ data/rl_logged_*.csv
 models/**/*.pth
 models/**/*.ubj
 models/**/sweep/*.csv
+# Model run logs/metadata (derived)
+models/**/metrics_history*.jsonl
+models/**/*_training_log.json
+models/**/sweep/*.json
 
 # Model checkpoints (large files)
 checkpoints/
