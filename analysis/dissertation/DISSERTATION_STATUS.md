@@ -1,8 +1,43 @@
 # Dissertation Finalization Status
 
-**Last Updated**: 2025-10-05 11:00 AM
+**Last Updated**: 2025-10-09 1:30 PM
 **PDF Status**: ✅ Compiles successfully (161 pages, 1.4 MB)
-**Session 2 Status**: ✅ COMPLETE - All visualization scripts created, tables verified, Master TODO updated
+**Session 3 Status**: ✅ CQL TRAINING COMPLETE - Windows 11 RTX 4090 environment ready
+**Environment**: Windows 11, RTX 4090 (24GB VRAM, CUDA 12.9), PostgreSQL 16.10 + TimescaleDB 2.22.1
+**Database**: 1.2M plays, 6,991 games (1999-2025), 5 performance indexes optimized
+
+---
+
+## ✅ NEW: CQL Training Completed (Session 3 - Oct 9, 2025)
+
+### Conservative Q-Learning (CQL) Model Training
+**Status**: ✅ **COMPLETE**
+**Environment**: Windows 11, RTX 4090 (CUDA 12.9), PyTorch 2.8.0+cu129
+**Training Time**: ~9 minutes (2000 epochs on CUDA)
+
+#### Training Results
+- **Dataset**: 5,146 games (2006-2024 seasons)
+- **State Dimension**: 6 features (spread, total, EPA gap, market prob, p_hat, edge)
+- **Actions**: 4 discrete actions (no bet, bet home, bet away, pass)
+- **Hyperparameters**: alpha=0.3, lr=0.0001, hidden=[128,64,32]
+
+#### Performance Metrics
+- **Match Rate**: 98.5% (agent matches logged behavior)
+- **Estimated Policy Reward**: 1.75% (vs 1.41% logged = **24% improvement**)
+- **Final Loss**: 0.1070 (from 0.4374 = 75.5% reduction)
+- **TD Error**: 0.0866 (from 0.1069)
+- **CQL Penalty**: 0.0680 (from 1.1016)
+
+#### Model Artifacts
+- `models/cql/best_model.pth` (207KB)
+- `models/cql/cql_training_log.json` (343KB, 2000 epoch logs)
+
+#### Next Steps for Dissertation Integration
+1. Add CQL implementation details to Chapter 5 (RL Design)
+2. Add performance table to Chapter 8 (Results)
+3. Generate `figures/out/cql_performance_table.tex`
+4. Generate `figures/out/cql_training_curves.png`
+5. Compare CQL vs DQN/PPO in results section
 
 ---
 
@@ -73,6 +108,36 @@ python py/viz/hparam_sensitivity_grid.py \
 ---
 
 ## ⏳ Pending Tasks (Priority Order)
+
+### Priority 0: CQL Integration (NEW - Oct 9)
+
+#### Task 0.1: Generate CQL Performance Table
+**Script**: `py/viz/cql_performance_table.py` (needs creation)
+**Input**: `models/cql/cql_training_log.json`
+**Output**: `figures/out/cql_performance_table.tex`
+**Status**: PENDING
+**Est. Time**: 30 min
+
+#### Task 0.2: Generate CQL Training Curves
+**Script**: `py/viz/plot_cql_curves.py` (needs creation)
+**Input**: `models/cql/cql_training_log.json`
+**Output**: `figures/out/cql_training_curves.png`
+**Status**: PENDING
+**Est. Time**: 30 min
+
+#### Task 0.3: Update Chapter 5 (RL Design)
+**Location**: `chapter_5_rl_design/chapter_5_rl_design.tex`
+**Action**: Add CQL algorithm description, hyperparameters table
+**Status**: PENDING
+**Est. Time**: 1 hour
+
+#### Task 0.4: Update Chapter 8 (Results)
+**Location**: `chapter_8_results/chapter_8_results.tex`
+**Action**: Add CQL performance section, compare vs DQN/PPO
+**Status**: PENDING
+**Est. Time**: 1 hour
+
+---
 
 ### Priority 1: Generate Missing Figures (REQUIRED FOR CLEAN PDF)
 
@@ -254,8 +319,14 @@ pip install matplotlib numpy pandas scipy sklearn psycopg
 
 | Task | Time | Priority |
 |------|------|----------|
-| Generate 22 reliability panels | 2-3h | P0 |
-| Create RL learning curves | 0.5h | P1 |
+| **CQL Integration Tasks** | | |
+| Generate CQL performance table | 0.5h | P0 |
+| Generate CQL training curves | 0.5h | P0 |
+| Update Chapter 5 (RL Design) | 1h | P0 |
+| Update Chapter 8 (Results) | 1h | P0 |
+| **Original Tasks** | | |
+| Generate 22 reliability panels | 2-3h | P1 |
+| Create RL learning curves (DQN/PPO) | 0.5h | P1 |
 | Create hparam sensitivity grid | 1h | P1 |
 | Finalize results tables (9.1-9.3) | 2h | P1 |
 | Create Table 6.1 | 1.5h | P1 |
@@ -263,17 +334,23 @@ pip install matplotlib numpy pandas scipy sklearn psycopg
 | Update Master TODO | 1h | P2 |
 | Remove "illustrative" tags | 0.5h | P2 |
 | Final polish & validation | 1h | P2 |
-| **TOTAL** | **11-12h** | |
+| **TOTAL** | **14-15h** | |
 
 ---
 
 ## 💡 Next Session Recommendations
 
-1. **Start long-running tasks first**: Reliability panel generation (can run overnight)
-2. **Create visualization scripts**: RL curves + hparam grid (reusable)
-3. **Verify existing table outputs**: Check `results/` directory
-4. **Update TODO list**: Mark completions, defer low-priority
-5. **Final compilation**: Ensure 0 errors, all figures render
+**PRIORITY**: CQL Integration (NEW - Oct 9)
+1. **Generate CQL visualizations**: Performance table + training curves (1 hour)
+2. **Update dissertation chapters**: Add CQL to Ch.5 + Ch.8 (2 hours)
+3. **Create agent comparison table**: CQL vs DQN vs PPO (30 min)
+
+**ONGOING TASKS**:
+4. **Start long-running tasks**: Reliability panel generation (can run overnight on Windows 11)
+5. **Create visualization scripts**: DQN/PPO curves + hparam grid (reusable)
+6. **Verify existing table outputs**: Check `results/` directory
+7. **Update TODO list**: Mark completions, defer low-priority
+8. **Final compilation**: Ensure 0 errors, all figures render
 
 ---
 

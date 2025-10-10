@@ -1,0 +1,21 @@
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Feature Ablation Study: Quantifying v2 Model Improvements}
+  \begin{tabular}{llcccc}
+    \toprule
+    Configuration & Features & Test Brier & Test AUC & Brier $\Delta$ & AUC $\Delta$ \\
+    \midrule
+    Baseline & 9 & 0.2181 & 0.7055 & +0.0\% & +0.0\% \\
+    Baseline + 4th Down & 11 & 0.1817 & 0.8023 & +16.7\% & +13.7\% \\
+    Baseline + Injury & 11 & 0.2215 & 0.6956 & -1.6\% & -1.4\% \\
+    Full v2 & 13 & 0.1806 & 0.8048 & +17.2\% & +14.1\% \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:feature_ablation}
+  \footnotesize
+  \vspace{0.5em}
+  Note: Brier $\Delta$ and AUC $\Delta$ are relative to Baseline. 
+  Negative Brier $\Delta$ indicates improvement (lower is better). 
+  Positive AUC $\Delta$ indicates improvement.
+\end{table}

@@ -1,0 +1,42 @@
+\begin{table}[htbp]
+\centering
+\caption{Conservative Q-Learning (CQL) Training Performance}
+\label{tab:cql_performance}
+\begin{threeparttable}
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+\multicolumn{2}{l}{\textit{Training Configuration}} \\
+Dataset Size & 5,146 games \\
+State Dimension & 6 \\
+Action Space & 4 actions \\
+Training Epochs & 2,000 \\
+Learning Rate & 0.00010 \\
+CQL Alpha & 0.30 \\
+Hidden Layers & 128, 64, 32 \\
+\midrule
+\multicolumn{2}{l}{\textit{Training Metrics (Final Epoch)}} \\
+Total Loss & 0.1070 \\
+TD Error & 0.0866 \\
+CQL Penalty & 0.0680 \\
+Mean Q-Value & 0.0146 \\
+\midrule
+\multicolumn{2}{l}{\textit{Evaluation Metrics}} \\
+Policy Match Rate & 98.5\% \\
+Estimated Policy Reward & 1.75\% \\
+Logged Avg Reward & 1.41\% \\
+Policy Improvement & 23.9\% \\
+\midrule
+\multicolumn{2}{l}{\textit{Hardware \& Runtime}} \\
+Device & cuda \\
+Training Time & ~9 minutes\tnote{a} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item[a] Approximate training time on NVIDIA RTX 4090 (24GB VRAM).
+\item Policy improvement calculated as: $\frac{\text{Est. Policy Reward} - \text{Logged Reward}}{\text{Logged Reward}} \times 100\%$
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
