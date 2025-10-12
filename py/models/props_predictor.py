@@ -125,60 +125,129 @@ class PropsPredictor:
     }
 
     # Feature columns by prop type
+    # NOTE: Column names match actual generated features from player_features.py
     FEATURE_SETS = {
         "passing_yards": [
-            "pass_yards_last3",
-            "pass_yards_last5",
-            "pass_yards_season",
+            "passing_yards_last3",
+            "passing_yards_last5",
+            "passing_yards_season",
             "pass_attempts_last3",
-            "completion_pct_last3",
+            "pass_attempts_last5",
+            "completions_last3",
+            "completions_last5",
+            "passing_tds_last3",
+            "interceptions_last3",
+            "sacks_last3",
             "opponent_pass_yards_allowed_avg",
-            "opponent_pass_def_rank",
             "implied_team_total",
             "spread",
             "is_home",
             "weather_wind_mph",
             "weather_temp",
             "days_rest",
+            "is_dome",
+            "is_outdoors",
         ],
         "passing_tds": [
-            "pass_tds_last3",
-            "pass_tds_last5",
-            "pass_tds_season",
+            "passing_tds_last3",
+            "passing_tds_last5",
+            "passing_tds_season",
             "pass_attempts_last3",
+            "pass_attempts_last5",
             "red_zone_attempts_last3",
-            "opponent_pass_tds_allowed_avg",
-            "opponent_red_zone_def_rank",
+            "red_zone_attempts_last5",
+            "passing_yards_last3",
+            "completions_last3",
+            "opponent_pass_yards_allowed_avg",
             "implied_team_total",
             "spread",
             "is_home",
+        ],
+        "interceptions": [
+            "interceptions_last3",
+            "interceptions_last5",
+            "interceptions_season",
+            "pass_attempts_last3",
+            "pass_attempts_last5",
+            "passing_yards_last3",
+            "sacks_last3",
+            "opponent_pass_yards_allowed_avg",
+            "implied_team_total",
+            "spread",
+            "is_home",
+            "weather_wind_mph",
         ],
         "rushing_yards": [
-            "rush_yards_last3",
-            "rush_yards_last5",
-            "rush_yards_season",
+            "rushing_yards_last3",
+            "rushing_yards_last5",
+            "rushing_yards_season",
             "rush_attempts_last3",
-            "yards_per_carry_last3",
-            "opponent_rush_yards_allowed_avg",
-            "opponent_rush_def_rank",
+            "rush_attempts_last5",
+            "rushing_tds_last3",
+            "red_zone_carries_last3",
+            "opponent_pass_yards_allowed_avg",  # Using as proxy for defensive strength
             "implied_team_total",
             "spread",
             "is_home",
-            "carry_share_last3",
+            "is_turf",
+        ],
+        "rushing_tds": [
+            "rushing_tds_last3",
+            "rushing_tds_last5",
+            "rushing_tds_season",
+            "rush_attempts_last3",
+            "red_zone_carries_last3",
+            "red_zone_carries_last5",
+            "rushing_yards_last3",
+            "opponent_pass_yards_allowed_avg",
+            "implied_team_total",
+            "spread",
+            "is_home",
         ],
         "receiving_yards": [
-            "rec_yards_last3",
-            "rec_yards_last5",
-            "rec_yards_season",
+            "receiving_yards_last3",
+            "receiving_yards_last5",
+            "receiving_yards_season",
             "targets_last3",
+            "targets_last5",
             "receptions_last3",
-            "yards_per_reception_last3",
+            "receptions_last5",
+            "receiving_tds_last3",
+            "red_zone_targets_last3",
             "opponent_pass_yards_allowed_avg",
-            "opponent_pass_def_rank",
             "implied_team_total",
             "spread",
             "is_home",
-            "target_share_last3",
+            "weather_wind_mph",
+            "weather_temp",
+            "is_dome",
+        ],
+        "receptions": [
+            "receptions_last3",
+            "receptions_last5",
+            "receptions_season",
+            "targets_last3",
+            "targets_last5",
+            "receiving_yards_last3",
+            "red_zone_targets_last3",
+            "opponent_pass_yards_allowed_avg",
+            "implied_team_total",
+            "spread",
+            "is_home",
+        ],
+        "receiving_tds": [
+            "receiving_tds_last3",
+            "receiving_tds_last5",
+            "receiving_tds_season",
+            "targets_last3",
+            "receptions_last3",
+            "red_zone_targets_last3",
+            "red_zone_targets_last5",
+            "receiving_yards_last3",
+            "opponent_pass_yards_allowed_avg",
+            "implied_team_total",
+            "spread",
+            "is_home",
         ],
     }
 
@@ -208,7 +277,6 @@ class PropsPredictor:
         # Default XGBoost params for regression
         self.xgb_params = xgb_params or {
             "objective": "reg:squarederror",
-            "eval_metric": "rmse",
             "max_depth": 6,
             "learning_rate": 0.05,
             "n_estimators": 500,
@@ -218,8 +286,9 @@ class PropsPredictor:
             "gamma": 0.1,
             "reg_alpha": 0.1,
             "reg_lambda": 1.0,
-            "tree_method": "hist",
-            "device": "cuda",
+            "tree_method": "auto",  # Changed from "hist" to "auto" for compatibility
+            "device": "cpu",  # Changed from "cuda" to "cpu" for compatibility
+            "random_state": 42,
         }
 
         self.model: Optional[xgb.XGBRegressor] = None
@@ -311,12 +380,16 @@ class PropsPredictor:
         X_val_scaled = (X_val.values - self.scaler_mean) / self.scaler_std
 
         # Train model
-        self.model = xgb.XGBRegressor(**self.xgb_params)
+        # Note: early_stopping_rounds is now set in XGBRegressor constructor
+        xgb_params_with_early_stopping = self.xgb_params.copy()
+        xgb_params_with_early_stopping["early_stopping_rounds"] = early_stopping_rounds
+        xgb_params_with_early_stopping["eval_metric"] = "rmse"
+
+        self.model = xgb.XGBRegressor(**xgb_params_with_early_stopping)
         self.model.fit(
             X_train_scaled,
             y_train,
             eval_set=[(X_val_scaled, y_val)],
-            early_stopping_rounds=early_stopping_rounds,
             verbose=False,
         )
 
@@ -763,6 +836,28 @@ def main():
 
     # Load data
     df = pd.read_csv(args.features)
+
+    # Filter by position based on prop type
+    prop_to_positions = {
+        "passing_yards": ["QB"],
+        "passing_tds": ["QB"],
+        "interceptions": ["QB"],
+        "rushing_yards": ["RB"],
+        "rushing_tds": ["RB"],
+        "receiving_yards": ["WR", "TE"],
+        "receptions": ["WR", "TE"],
+        "receiving_tds": ["WR", "TE"],
+    }
+
+    valid_positions = prop_to_positions.get(args.prop_type, [])
+    if valid_positions and "position" in df.columns:
+        df = df[df["position"].isin(valid_positions)]
+        logger.info(f"Filtered to {len(df)} samples for positions: {valid_positions}")
+
+    # Drop rows where target is NaN
+    if args.prop_type in df.columns:
+        df = df.dropna(subset=[args.prop_type])
+        logger.info(f"After dropping NaN targets: {len(df)} samples")
 
     # Filter seasons
     if args.train_seasons:

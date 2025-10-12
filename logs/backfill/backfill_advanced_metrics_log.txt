@@ -1,0 +1,699 @@
+[2025-10-10 10:00:00] [INFO] [backfill_advanced_metrics.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 10:00:00] [INFO] [backfill_advanced_metrics.R] === Advanced Metrics Backfill Starting === 
+[2025-10-10 10:00:00] [INFO] [backfill_advanced_metrics.R] Database connection established 
+[2025-10-10 10:00:00] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load ESPN QBR 
+[2025-10-10 10:00:00] [INFO] [backfill_advanced_metrics.R] Fetching ESPN QBR from nflverse (2006-2025)... 
+[2025-10-10 10:00:01] [INFO] [backfill_advanced_metrics.R] Loaded 1505 QBR records 
+[2025-10-10 10:00:01] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load ESPN QBR' completed in 0.38 seconds 
+[2025-10-10 10:00:01] [ERROR] [backfill_advanced_metrics.R] Database operation failed: Data validation failed: Too few rows (1505 < 5000) 
+[2025-10-10 10:00:01] [WARNING] [backfill_advanced_metrics.R] Transaction rolled back 
+Error in validate_data(data = data, expected_cols = c("player_id", "season",  : 
+  Data validation failed: Too few rows (1505 < 5000)
+Calls: safe_db_operation ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       qbr_data <- run_pipeline_step(step_name = "Load ESPN QBR", 
+           expr = {
+               log_message("Fetching ESPN QBR from nflverse (2006-2025)...", 
+                   level = "INFO")
+               qbr <- retry_operation(expr = load_espn_qbr(seasons = 2006:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load ESPN QBR from nflverse")
+               log_message(sprintf("Loaded %d QBR records", nrow(qbr)), 
+                   level = "INFO")
+               qbr
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_id", 
+                   "season", "game_week"), min_rows = 5000)
+           })
+       run_pipeline_step(step_name = "Upsert ESPN QBR", expr = {
+           qbr_clean <- qbr_data %>% select(player_id, season, game_week, 
+               season_type, name_display, team_abb, qbr_total, qbr_raw, 
+               rank, qualified, pts_added, epa_total, qb_plays, 
+               pass, run, sack, penalty, exp_sack) %>% filter(!is.na(player_id), 
+               !is.na(season), !is.na(game_week))
+           dbExecute(conn, "CREATE TEMP TABLE qbr_staging AS SELECT * FROM espn_qbr LIMIT 0")
+           dbWriteTable(conn, "qbr_staging", qbr_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO espn_qbr\n          SELECT * FROM qbr_staging\n          ON CONFLICT (player_id, season, game_week, season_type)\n          DO UPDATE SET\n            name_display = EXCLUDED.name_display,\n            team_abb = EXCLUDED.team_abb,\n            qbr_total = EXCLUDED.qbr_total,\n            qbr_raw = EXCLUDED.qbr_raw,\n            rank = EXCLUDED.rank,\n            qualified = EXCLUDED.qualified,\n            pts_added = EXCLUDED.pts_added,\n            epa_total = EXCLUDED.epa_total,\n            qb_plays = EXCLUDED.qb_plays,\n            pass = EXCLUDED.pass,\n            run = EXCLUDED.run,\n            sack = EXCLUDED.sack,\n            penalty = EXCLUDED.penalty,\n            exp_sack = EXCLUDED.exp_sack,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS qbr_staging")
+           log_message(sprintf("Upserted %d QBR records", rows_updated), 
+               level = "INFO")
+           TRUE
+       }, conn = conn)
+       pfr_defense_data <- run_pipeline_step(step_name = "Load PFR Defense Stats", 
+           expr = {
+               log_message("Fetching PFR defense stats from nflverse (2018-2025)...", 
+                   level = "INFO")
+               pfr_def <- retry_operation(expr = load_pfr_advstats(seasons = 2018:2025, 
+                   stat_type = "def"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load PFR defense stats from nflverse")
+               log_message(sprintf("Loaded %d PFR defense records", 
+                   nrow(pfr_def)), level = "INFO")
+               pfr_def
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 5000)
+           })
+       run_pipeline_step(step_name = "Upsert PFR Defense Stats", 
+           expr = {
+               pfr_clean <- pfr_defense_data %>% select(pfr_player_id, 
+                   game_id, season, week, game_type, pfr_player_name, 
+                   team, opponent, def_targets, def_completions_allowed, 
+                   def_completion_pct, def_yards_allowed, def_yards_allowed_per_cmp, 
+                   def_yards_allowed_per_tgt, def_receiving_td_allowed, 
+                   def_passer_rating_allowed, def_adot, def_air_yards_completed, 
+                   def_yards_after_catch, def_times_blitzed, def_times_hurried, 
+                   def_times_hitqb, def_sacks, def_pressures, def_tackles_combined, 
+                   def_missed_tackles, def_missed_tackle_pct, def_ints) %>% 
+                   filter(!is.na(pfr_player_id), !is.na(game_id))
+               dbExecute(conn, "CREATE TEMP TABLE pfr_defense_staging AS SELECT * FROM pfr_defense LIMIT 0")
+               dbWriteTable(conn, "pfr_defense_staging", pfr_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO pfr_defense\n          SELECT * FROM pfr_defense_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            pfr_player_name = EXCLUDED.pfr_player_name,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            def_targets = EXCLUDED.def_targets,\n            def_completions_allowed = EXCLUDED.def_completions_allowed,\n            def_completion_pct = EXCLUDED.def_completion_pct,\n            def_yards_allowed = EXCLUDED.def_yards_allowed,\n            def_yards_allowed_per_cmp = EXCLUDED.def_yards_allowed_per_cmp,\n            def_yards_allowed_per_tgt = EXCLUDED.def_yards_allowed_per_tgt,\n            def_receiving_td_allowed = EXCLUDED.def_receiving_td_allowed,\n            def_passer_rating_allowed = EXCLUDED.def_passer_rating_allowed,\n            def_adot = EXCLUDED.def_adot,\n            def_air_yards_completed = EXCLUDED.def_air_yards_completed,\n            def_yards_after_catch = EXCLUDED.def_yards_after_catch,\n            def_times_blitzed = EXCLUDED.def_times_blitzed,\n            def_times_hurried = EXCLUDED.def_times_hurried,\n            def_times_hitqb = EXCLUDED.def_times_hitqb,\n            def_sacks = EXCLUDED.def_sacks,\n            def_pressures = EXCLUDED.def_pressures,\n            def_tackles_combined = EXCLUDED.def_tackles_combined,\n            def_missed_tackles = EXCLUDED.def_missed_tackles,\n            def_missed_tackle_pct = EXCLUDED.def_missed_tackle_pct,\n            def_ints = EXCLUDED.def_ints,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS pfr_defense_staging")
+               log_message(sprintf("Upserted %d PFR defense records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       snap_counts_data <- run_pipeline_step(step_name = "Load Snap Counts", 
+           expr = {
+               log_message("Fetching snap counts from nflverse (2012-2025)...", 
+                   level = "INFO")
+               snaps <- retry_operation(expr = load_snap_counts(seasons = 2012:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load snap counts from nflverse")
+               log_message(sprintf("Loaded %d snap count records", 
+                   nrow(snaps)), level = "INFO")
+               snaps
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Snap Counts", expr = {
+           snaps_clean <- snap_counts_data %>% select(pfr_player_id, 
+               game_id, season, week, game_type, player, position, 
+               team, opponent, offense_snaps, offense_pct, defense_snaps, 
+               defense_pct, st_snaps, st_pct) %>% filter(!is.na(pfr_player_id), 
+               !is.na(game_id))
+           dbExecute(conn, "CREATE TEMP TABLE snaps_staging AS SELECT * FROM snap_counts LIMIT 0")
+           dbWriteTable(conn, "snaps_staging", snaps_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO snap_counts\n          SELECT * FROM snaps_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            player = EXCLUDED.player,\n            position = EXCLUDED.position,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            offense_snaps = EXCLUDED.offense_snaps,\n            offense_pct = EXCLUDED.offense_pct,\n            defense_snaps = EXCLUDED.defense_snaps,\n            defense_pct = EXCLUDED.defense_pct,\n            st_snaps = EXCLUDED.st_snaps,\n            st_pct = EXCLUDED.st_pct,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS snaps_staging")
+           log_message(sprintf("Upserted %d snap count records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       depth_charts_data <- run_pipeline_step(step_name = "Load Depth Charts", 
+           expr = {
+               log_message("Fetching depth charts from nflverse (2001-2025)...", 
+                   level = "INFO")
+               depth <- retry_operation(expr = load_depth_charts(seasons = 2001:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load depth charts from nflverse")
+               log_message(sprintf("Loaded %d depth chart records", 
+                   nrow(depth)), level = "INFO")
+               depth
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("gsis_id", 
+                   "club_code", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Depth Charts", expr = {
+           depth_clean <- depth_charts_data %>% select(season, season_type, 
+               week, club_code, gsis_id, position, depth_team, jersey_number, 
+               last_name, first_name, full_name, formation, depth_position) %>% 
+               filter(!is.na(gsis_id), !is.na(club_code), !is.na(season))
+           dbExecute(conn, "CREATE TEMP TABLE depth_staging AS SELECT * FROM depth_charts LIMIT 0")
+           dbWriteTable(conn, "depth_staging", depth_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO depth_charts\n          SELECT * FROM depth_staging\n          ON CONFLICT (gsis_id, club_code, season, season_type, week, depth_team, formation, position)\n          DO UPDATE SET\n            jersey_number = EXCLUDED.jersey_number,\n            last_name = EXCLUDED.last_name,\n            first_name = EXCLUDED.first_name,\n            full_name = EXCLUDED.full_name,\n            depth_position = EXCLUDED.depth_position,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS depth_staging")
+           log_message(sprintf("Upserted %d depth chart records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       run_pipeline_step(step_name = "Verify advanced metrics backfill", 
+           expr = {
+               qbr_summary <- dbGetQuery(conn, "\n          SELECT\n            season,\n            COUNT(DISTINCT player_id) as unique_qbs,\n            COUNT(*) as total_records,\n            ROUND(CAST(AVG(qbr_total) AS numeric), 2) as avg_qbr\n          FROM espn_qbr\n          WHERE qbr_total IS NOT NULL\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(qbr_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f", 
+                     qbr_summary$season[i], qbr_summary$unique_qbs[i], 
+                     qbr_summary$total_records[i], qbr_summary$avg_qbr[i]), 
+                     level = "INFO")
+               }
+               def_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_defenders, COUNT(*) as total_records\n          FROM pfr_defense\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(def_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f defenders, %.0f records", 
+                     def_summary$season[i], def_summary$unique_defenders[i], 
+                     def_summary$total_records[i]), level = "INFO")
+               }
+               snaps_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_players, COUNT(*) as total_records\n          FROM snap_counts\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Snap Counts Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(snaps_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f players, %.0f records", 
+                     snaps_summary$season[i], snaps_summary$unique_players[i], 
+                     snaps_summary$total_records[i]), level = "INFO")
+               }
+               depth_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT gsis_id) as unique_players, COUNT(*) as total_records\n          FROM depth_charts\n          WHERE depth_position = 1\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(depth_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f starters, %.0f records", 
+                     depth_summary$season[i], depth_summary$unique_players[i], 
+                     depth_summary$total_records[i]), level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       log_message("=== Advanced Metrics Backfill Complete ===", 
+           level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Integrate metrics into py/features/asof_features_enhanced.py", 
+           level = "INFO")
+       log_message("  2. Create team-level aggregates (avg QBR, pressure rates, etc.)", 
+           level = "INFO")
+       log_message("  3. Retrain models with enhanced features", 
+           level = "INFO")
+   }))
+[2025-10-10 10:00:01] [INFO] [backfill_advanced_metrics.R] Database connection closed 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] === Advanced Metrics Backfill Starting === 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Database connection established 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load ESPN QBR 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Fetching ESPN QBR from nflverse (2006-2025)... 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Loaded 1505 QBR records 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load ESPN QBR' completed in 0.28 seconds 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Data validation passed: 1505 rows, 23 columns 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Upsert ESPN QBR 
+[2025-10-10 10:00:19] [ERROR] [backfill_advanced_metrics.R] Pipeline step 'Upsert ESPN QBR' failed: COPY returned error : ERROR:  invalid input syntax for type integer: "Season Total"
+CONTEXT:  COPY qbr_staging, line 1, column game_week: "Season Total"
+ 
+[2025-10-10 10:00:19] [WARNING] [backfill_advanced_metrics.R] Database transaction rolled back 
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Upsert ESPN QBR' completed in 0.04 seconds 
+[2025-10-10 10:00:19] [ERROR] [backfill_advanced_metrics.R] Database operation failed: COPY returned error : ERROR:  invalid input syntax for type integer: "Season Total"
+CONTEXT:  COPY qbr_staging, line 1, column game_week: "Season Total"
+ 
+[2025-10-10 10:00:19] [CRITICAL] [backfill_advanced_metrics.R] Rollback failed: Call dbBegin() to start a transaction. 
+Error: COPY returned error : ERROR:  invalid input syntax for type integer: "Season Total"
+CONTEXT:  COPY qbr_staging, line 1, column game_week: "Season Total"
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       qbr_data <- run_pipeline_step(step_name = "Load ESPN QBR", 
+           expr = {
+               log_message("Fetching ESPN QBR from nflverse (2006-2025)...", 
+                   level = "INFO")
+               qbr <- retry_operation(expr = load_espn_qbr(seasons = 2006:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load ESPN QBR from nflverse")
+               log_message(sprintf("Loaded %d QBR records", nrow(qbr)), 
+                   level = "INFO")
+               qbr
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_id", 
+                   "season", "game_week"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert ESPN QBR", expr = {
+           qbr_clean <- qbr_data %>% select(player_id, season, game_week, 
+               season_type, name_display, team_abb, qbr_total, qbr_raw, 
+               rank, qualified, pts_added, epa_total, qb_plays, 
+               pass, run, sack, penalty, exp_sack) %>% filter(!is.na(player_id), 
+               !is.na(season), !is.na(game_week))
+           dbExecute(conn, "CREATE TEMP TABLE qbr_staging AS SELECT * FROM espn_qbr LIMIT 0")
+           dbWriteTable(conn, "qbr_staging", qbr_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO espn_qbr\n          SELECT * FROM qbr_staging\n          ON CONFLICT (player_id, season, game_week, season_type)\n          DO UPDATE SET\n            name_display = EXCLUDED.name_display,\n            team_abb = EXCLUDED.team_abb,\n            qbr_total = EXCLUDED.qbr_total,\n            qbr_raw = EXCLUDED.qbr_raw,\n            rank = EXCLUDED.rank,\n            qualified = EXCLUDED.qualified,\n            pts_added = EXCLUDED.pts_added,\n            epa_total = EXCLUDED.epa_total,\n            qb_plays = EXCLUDED.qb_plays,\n            pass = EXCLUDED.pass,\n            run = EXCLUDED.run,\n            sack = EXCLUDED.sack,\n            penalty = EXCLUDED.penalty,\n            exp_sack = EXCLUDED.exp_sack,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS qbr_staging")
+           log_message(sprintf("Upserted %d QBR records", rows_updated), 
+               level = "INFO")
+           TRUE
+       }, conn = conn)
+       pfr_defense_data <- run_pipeline_step(step_name = "Load PFR Defense Stats", 
+           expr = {
+               log_message("Fetching PFR defense stats from nflverse (2018-2025)...", 
+                   level = "INFO")
+               pfr_def <- retry_operation(expr = load_pfr_advstats(seasons = 2018:2025, 
+                   stat_type = "def"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load PFR defense stats from nflverse")
+               log_message(sprintf("Loaded %d PFR defense records", 
+                   nrow(pfr_def)), level = "INFO")
+               pfr_def
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert PFR Defense Stats", 
+           expr = {
+               pfr_clean <- pfr_defense_data %>% select(pfr_player_id, 
+                   game_id, season, week, game_type, pfr_player_name, 
+                   team, opponent, def_targets, def_completions_allowed, 
+                   def_completion_pct, def_yards_allowed, def_yards_allowed_per_cmp, 
+                   def_yards_allowed_per_tgt, def_receiving_td_allowed, 
+                   def_passer_rating_allowed, def_adot, def_air_yards_completed, 
+                   def_yards_after_catch, def_times_blitzed, def_times_hurried, 
+                   def_times_hitqb, def_sacks, def_pressures, def_tackles_combined, 
+                   def_missed_tackles, def_missed_tackle_pct, def_ints) %>% 
+                   filter(!is.na(pfr_player_id), !is.na(game_id))
+               dbExecute(conn, "CREATE TEMP TABLE pfr_defense_staging AS SELECT * FROM pfr_defense LIMIT 0")
+               dbWriteTable(conn, "pfr_defense_staging", pfr_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO pfr_defense\n          SELECT * FROM pfr_defense_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            pfr_player_name = EXCLUDED.pfr_player_name,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            def_targets = EXCLUDED.def_targets,\n            def_completions_allowed = EXCLUDED.def_completions_allowed,\n            def_completion_pct = EXCLUDED.def_completion_pct,\n            def_yards_allowed = EXCLUDED.def_yards_allowed,\n            def_yards_allowed_per_cmp = EXCLUDED.def_yards_allowed_per_cmp,\n            def_yards_allowed_per_tgt = EXCLUDED.def_yards_allowed_per_tgt,\n            def_receiving_td_allowed = EXCLUDED.def_receiving_td_allowed,\n            def_passer_rating_allowed = EXCLUDED.def_passer_rating_allowed,\n            def_adot = EXCLUDED.def_adot,\n            def_air_yards_completed = EXCLUDED.def_air_yards_completed,\n            def_yards_after_catch = EXCLUDED.def_yards_after_catch,\n            def_times_blitzed = EXCLUDED.def_times_blitzed,\n            def_times_hurried = EXCLUDED.def_times_hurried,\n            def_times_hitqb = EXCLUDED.def_times_hitqb,\n            def_sacks = EXCLUDED.def_sacks,\n            def_pressures = EXCLUDED.def_pressures,\n            def_tackles_combined = EXCLUDED.def_tackles_combined,\n            def_missed_tackles = EXCLUDED.def_missed_tackles,\n            def_missed_tackle_pct = EXCLUDED.def_missed_tackle_pct,\n            def_ints = EXCLUDED.def_ints,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS pfr_defense_staging")
+               log_message(sprintf("Upserted %d PFR defense records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       snap_counts_data <- run_pipeline_step(step_name = "Load Snap Counts", 
+           expr = {
+               log_message("Fetching snap counts from nflverse (2012-2025)...", 
+                   level = "INFO")
+               snaps <- retry_operation(expr = load_snap_counts(seasons = 2012:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load snap counts from nflverse")
+               log_message(sprintf("Loaded %d snap count records", 
+                   nrow(snaps)), level = "INFO")
+               snaps
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Snap Counts", expr = {
+           snaps_clean <- snap_counts_data %>% select(pfr_player_id, 
+               game_id, season, week, game_type, player, position, 
+               team, opponent, offense_snaps, offense_pct, defense_snaps, 
+               defense_pct, st_snaps, st_pct) %>% filter(!is.na(pfr_player_id), 
+               !is.na(game_id))
+           dbExecute(conn, "CREATE TEMP TABLE snaps_staging AS SELECT * FROM snap_counts LIMIT 0")
+           dbWriteTable(conn, "snaps_staging", snaps_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO snap_counts\n          SELECT * FROM snaps_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            player = EXCLUDED.player,\n            position = EXCLUDED.position,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            offense_snaps = EXCLUDED.offense_snaps,\n            offense_pct = EXCLUDED.offense_pct,\n            defense_snaps = EXCLUDED.defense_snaps,\n            defense_pct = EXCLUDED.defense_pct,\n            st_snaps = EXCLUDED.st_snaps,\n            st_pct = EXCLUDED.st_pct,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS snaps_staging")
+           log_message(sprintf("Upserted %d snap count records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       depth_charts_data <- run_pipeline_step(step_name = "Load Depth Charts", 
+           expr = {
+               log_message("Fetching depth charts from nflverse (2001-2025)...", 
+                   level = "INFO")
+               depth <- retry_operation(expr = load_depth_charts(seasons = 2001:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load depth charts from nflverse")
+               log_message(sprintf("Loaded %d depth chart records", 
+                   nrow(depth)), level = "INFO")
+               depth
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("gsis_id", 
+                   "club_code", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Depth Charts", expr = {
+           depth_clean <- depth_charts_data %>% select(season, season_type, 
+               week, club_code, gsis_id, position, depth_team, jersey_number, 
+               last_name, first_name, full_name, formation, depth_position) %>% 
+               filter(!is.na(gsis_id), !is.na(club_code), !is.na(season))
+           dbExecute(conn, "CREATE TEMP TABLE depth_staging AS SELECT * FROM depth_charts LIMIT 0")
+           dbWriteTable(conn, "depth_staging", depth_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO depth_charts\n          SELECT * FROM depth_staging\n          ON CONFLICT (gsis_id, club_code, season, season_type, week, depth_team, formation, position)\n          DO UPDATE SET\n            jersey_number = EXCLUDED.jersey_number,\n            last_name = EXCLUDED.last_name,\n            first_name = EXCLUDED.first_name,\n            full_name = EXCLUDED.full_name,\n            depth_position = EXCLUDED.depth_position,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS depth_staging")
+           log_message(sprintf("Upserted %d depth chart records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       run_pipeline_step(step_name = "Verify advanced metrics backfill", 
+           expr = {
+               qbr_summary <- dbGetQuery(conn, "\n          SELECT\n            season,\n            COUNT(DISTINCT player_id) as unique_qbs,\n            COUNT(*) as total_records,\n            ROUND(CAST(AVG(qbr_total) AS numeric), 2) as avg_qbr\n          FROM espn_qbr\n          WHERE qbr_total IS NOT NULL\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(qbr_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f", 
+                     qbr_summary$season[i], qbr_summary$unique_qbs[i], 
+                     qbr_summary$total_records[i], qbr_summary$avg_qbr[i]), 
+                     level = "INFO")
+               }
+               def_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_defenders, COUNT(*) as total_records\n          FROM pfr_defense\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(def_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f defenders, %.0f records", 
+                     def_summary$season[i], def_summary$unique_defenders[i], 
+                     def_summary$total_records[i]), level = "INFO")
+               }
+               snaps_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_players, COUNT(*) as total_records\n          FROM snap_counts\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Snap Counts Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(snaps_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f players, %.0f records", 
+                     snaps_summary$season[i], snaps_summary$unique_players[i], 
+                     snaps_summary$total_records[i]), level = "INFO")
+               }
+               depth_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT gsis_id) as unique_players, COUNT(*) as total_records\n          FROM depth_charts\n          WHERE depth_position = 1\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(depth_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f starters, %.0f records", 
+                     depth_summary$season[i], depth_summary$unique_players[i], 
+                     depth_summary$total_records[i]), level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       log_message("=== Advanced Metrics Backfill Complete ===", 
+           level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Integrate metrics into py/features/asof_features_enhanced.py", 
+           level = "INFO")
+       log_message("  2. Create team-level aggregates (avg QBR, pressure rates, etc.)", 
+           level = "INFO")
+       log_message("  3. Retrain models with enhanced features", 
+           level = "INFO")
+   }))
+[2025-10-10 10:00:19] [INFO] [backfill_advanced_metrics.R] Database connection closed 
+[2025-10-10 10:00:39] [INFO] [backfill_advanced_metrics.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 10:00:39] [INFO] [backfill_advanced_metrics.R] === Advanced Metrics Backfill Starting === 
+[2025-10-10 10:00:39] [INFO] [backfill_advanced_metrics.R] Database connection established 
+[2025-10-10 10:00:39] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load ESPN QBR 
+[2025-10-10 10:00:39] [INFO] [backfill_advanced_metrics.R] Fetching ESPN QBR from nflverse (2006-2025)... 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Loaded 1505 QBR records 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load ESPN QBR' completed in 0.38 seconds 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Data validation passed: 1505 rows, 23 columns 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Upsert ESPN QBR 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Upserted 0 QBR records 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Upsert ESPN QBR' completed in 0.03 seconds 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load PFR Defense Stats 
+[2025-10-10 10:00:40] [INFO] [backfill_advanced_metrics.R] Fetching PFR defense stats from nflverse (2018-2025)... 
+[2025-10-10 10:00:44] [INFO] [backfill_advanced_metrics.R] Loaded 56620 PFR defense records 
+[2025-10-10 10:00:44] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load PFR Defense Stats' completed in 3.92 seconds 
+[2025-10-10 10:00:44] [INFO] [backfill_advanced_metrics.R] Data validation passed: 56620 rows, 29 columns 
+[2025-10-10 10:00:44] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Upsert PFR Defense Stats 
+[2025-10-10 10:00:45] [INFO] [backfill_advanced_metrics.R] Upserted 56620 PFR defense records 
+[2025-10-10 10:00:45] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Upsert PFR Defense Stats' completed in 1.04 seconds 
+[2025-10-10 10:00:45] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load Snap Counts 
+[2025-10-10 10:00:45] [INFO] [backfill_advanced_metrics.R] Fetching snap counts from nflverse (2012-2025)... 
+[2025-10-10 10:00:50] [INFO] [backfill_advanced_metrics.R] Loaded 305373 snap count records 
+[2025-10-10 10:00:50] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load Snap Counts' completed in 5.57 seconds 
+[2025-10-10 10:00:50] [INFO] [backfill_advanced_metrics.R] Data validation passed: 305373 rows, 16 columns 
+[2025-10-10 10:00:50] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Upsert Snap Counts 
+[2025-10-10 10:00:55] [INFO] [backfill_advanced_metrics.R] Upserted 305373 snap count records 
+[2025-10-10 10:00:55] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Upsert Snap Counts' completed in 4.38 seconds 
+[2025-10-10 10:00:55] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Load Depth Charts 
+[2025-10-10 10:00:55] [INFO] [backfill_advanced_metrics.R] Fetching depth charts from nflverse (2001-2025)... 
+[2025-10-10 10:01:10] [INFO] [backfill_advanced_metrics.R] Loaded 1041119 depth chart records 
+[2025-10-10 10:01:10] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Load Depth Charts' completed in 15.72 seconds 
+[2025-10-10 10:01:11] [INFO] [backfill_advanced_metrics.R] Data validation passed: 1041119 rows, 26 columns 
+[2025-10-10 10:01:11] [INFO] [backfill_advanced_metrics.R] Starting pipeline step: Upsert Depth Charts 
+[2025-10-10 10:01:11] [ERROR] [backfill_advanced_metrics.R] Pipeline step 'Upsert Depth Charts' failed:  
+[2025-10-10 10:01:11] [WARNING] [backfill_advanced_metrics.R] Database transaction rolled back 
+[2025-10-10 10:01:11] [INFO] [backfill_advanced_metrics.R] Pipeline step 'Upsert Depth Charts' completed in 0.02 seconds 
+[2025-10-10 10:01:11] [ERROR] [backfill_advanced_metrics.R] Database operation failed:  
+[2025-10-10 10:01:11] [CRITICAL] [backfill_advanced_metrics.R] Rollback failed: Call dbBegin() to start a transaction. 
+Error in select(., season, season_type, week, club_code, gsis_id, position,  : 
+  Can't select columns that don't exist.
+✖ Column `season_type` doesn't exist.
+Calls: safe_db_operation ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       qbr_data <- run_pipeline_step(step_name = "Load ESPN QBR", 
+           expr = {
+               log_message("Fetching ESPN QBR from nflverse (2006-2025)...", 
+                   level = "INFO")
+               qbr <- retry_operation(expr = load_espn_qbr(seasons = 2006:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load ESPN QBR from nflverse")
+               log_message(sprintf("Loaded %d QBR records", nrow(qbr)), 
+                   level = "INFO")
+               qbr
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_id", 
+                   "season", "game_week"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert ESPN QBR", expr = {
+           qbr_clean <- qbr_data %>% filter(game_week != "Season Total") %>% 
+               select(player_id, season, game_week, season_type, 
+                   name_display, team_abb, qbr_total, qbr_raw, rank, 
+                   qualified, pts_added, epa_total, qb_plays, pass, 
+                   run, sack, penalty, exp_sack) %>% filter(!is.na(player_id), 
+               !is.na(season), !is.na(game_week))
+           dbExecute(conn, "CREATE TEMP TABLE qbr_staging AS SELECT * FROM espn_qbr LIMIT 0")
+           dbWriteTable(conn, "qbr_staging", qbr_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO espn_qbr\n          SELECT * FROM qbr_staging\n          ON CONFLICT (player_id, season, game_week, season_type)\n          DO UPDATE SET\n            name_display = EXCLUDED.name_display,\n            team_abb = EXCLUDED.team_abb,\n            qbr_total = EXCLUDED.qbr_total,\n            qbr_raw = EXCLUDED.qbr_raw,\n            rank = EXCLUDED.rank,\n            qualified = EXCLUDED.qualified,\n            pts_added = EXCLUDED.pts_added,\n            epa_total = EXCLUDED.epa_total,\n            qb_plays = EXCLUDED.qb_plays,\n            pass = EXCLUDED.pass,\n            run = EXCLUDED.run,\n            sack = EXCLUDED.sack,\n            penalty = EXCLUDED.penalty,\n            exp_sack = EXCLUDED.exp_sack,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS qbr_staging")
+           log_message(sprintf("Upserted %d QBR records", rows_updated), 
+               level = "INFO")
+           TRUE
+       }, conn = conn)
+       pfr_defense_data <- run_pipeline_step(step_name = "Load PFR Defense Stats", 
+           expr = {
+               log_message("Fetching PFR defense stats from nflverse (2018-2025)...", 
+                   level = "INFO")
+               pfr_def <- retry_operation(expr = load_pfr_advstats(seasons = 2018:2025, 
+                   stat_type = "def"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load PFR defense stats from nflverse")
+               log_message(sprintf("Loaded %d PFR defense records", 
+                   nrow(pfr_def)), level = "INFO")
+               pfr_def
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert PFR Defense Stats", 
+           expr = {
+               pfr_clean <- pfr_defense_data %>% select(pfr_player_id, 
+                   game_id, season, week, game_type, pfr_player_name, 
+                   team, opponent, def_targets, def_completions_allowed, 
+                   def_completion_pct, def_yards_allowed, def_yards_allowed_per_cmp, 
+                   def_yards_allowed_per_tgt, def_receiving_td_allowed, 
+                   def_passer_rating_allowed, def_adot, def_air_yards_completed, 
+                   def_yards_after_catch, def_times_blitzed, def_times_hurried, 
+                   def_times_hitqb, def_sacks, def_pressures, def_tackles_combined, 
+                   def_missed_tackles, def_missed_tackle_pct, def_ints) %>% 
+                   filter(!is.na(pfr_player_id), !is.na(game_id))
+               dbExecute(conn, "CREATE TEMP TABLE pfr_defense_staging AS SELECT * FROM pfr_defense LIMIT 0")
+               dbWriteTable(conn, "pfr_defense_staging", pfr_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO pfr_defense\n          SELECT * FROM pfr_defense_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            pfr_player_name = EXCLUDED.pfr_player_name,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            def_targets = EXCLUDED.def_targets,\n            def_completions_allowed = EXCLUDED.def_completions_allowed,\n            def_completion_pct = EXCLUDED.def_completion_pct,\n            def_yards_allowed = EXCLUDED.def_yards_allowed,\n            def_yards_allowed_per_cmp = EXCLUDED.def_yards_allowed_per_cmp,\n            def_yards_allowed_per_tgt = EXCLUDED.def_yards_allowed_per_tgt,\n            def_receiving_td_allowed = EXCLUDED.def_receiving_td_allowed,\n            def_passer_rating_allowed = EXCLUDED.def_passer_rating_allowed,\n            def_adot = EXCLUDED.def_adot,\n            def_air_yards_completed = EXCLUDED.def_air_yards_completed,\n            def_yards_after_catch = EXCLUDED.def_yards_after_catch,\n            def_times_blitzed = EXCLUDED.def_times_blitzed,\n            def_times_hurried = EXCLUDED.def_times_hurried,\n            def_times_hitqb = EXCLUDED.def_times_hitqb,\n            def_sacks = EXCLUDED.def_sacks,\n            def_pressures = EXCLUDED.def_pressures,\n            def_tackles_combined = EXCLUDED.def_tackles_combined,\n            def_missed_tackles = EXCLUDED.def_missed_tackles,\n            def_missed_tackle_pct = EXCLUDED.def_missed_tackle_pct,\n            def_ints = EXCLUDED.def_ints,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS pfr_defense_staging")
+               log_message(sprintf("Upserted %d PFR defense records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       snap_counts_data <- run_pipeline_step(step_name = "Load Snap Counts", 
+           expr = {
+               log_message("Fetching snap counts from nflverse (2012-2025)...", 
+                   level = "INFO")
+               snaps <- retry_operation(expr = load_snap_counts(seasons = 2012:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load snap counts from nflverse")
+               log_message(sprintf("Loaded %d snap count records", 
+                   nrow(snaps)), level = "INFO")
+               snaps
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("pfr_player_id", 
+                   "game_id", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Snap Counts", expr = {
+           snaps_clean <- snap_counts_data %>% select(pfr_player_id, 
+               game_id, season, week, game_type, player, position, 
+               team, opponent, offense_snaps, offense_pct, defense_snaps, 
+               defense_pct, st_snaps, st_pct) %>% filter(!is.na(pfr_player_id), 
+               !is.na(game_id))
+           dbExecute(conn, "CREATE TEMP TABLE snaps_staging AS SELECT * FROM snap_counts LIMIT 0")
+           dbWriteTable(conn, "snaps_staging", snaps_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO snap_counts\n          SELECT * FROM snaps_staging\n          ON CONFLICT (pfr_player_id, game_id)\n          DO UPDATE SET\n            player = EXCLUDED.player,\n            position = EXCLUDED.position,\n            team = EXCLUDED.team,\n            opponent = EXCLUDED.opponent,\n            offense_snaps = EXCLUDED.offense_snaps,\n            offense_pct = EXCLUDED.offense_pct,\n            defense_snaps = EXCLUDED.defense_snaps,\n            defense_pct = EXCLUDED.defense_pct,\n            st_snaps = EXCLUDED.st_snaps,\n            st_pct = EXCLUDED.st_pct,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS snaps_staging")
+           log_message(sprintf("Upserted %d snap count records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       depth_charts_data <- run_pipeline_step(step_name = "Load Depth Charts", 
+           expr = {
+               log_message("Fetching depth charts from nflverse (2001-2025)...", 
+                   level = "INFO")
+               depth <- retry_operation(expr = load_depth_charts(seasons = 2001:2025), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load depth charts from nflverse")
+               log_message(sprintf("Loaded %d depth chart records", 
+                   nrow(depth)), level = "INFO")
+               depth
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("gsis_id", 
+                   "club_code", "season"), min_rows = 10000)
+           })
+       run_pipeline_step(step_name = "Upsert Depth Charts", expr = {
+           depth_clean <- depth_charts_data %>% select(season, season_type, 
+               week, club_code, gsis_id, position, depth_team, jersey_number, 
+               last_name, first_name, full_name, formation, depth_position) %>% 
+               filter(!is.na(gsis_id), !is.na(club_code), !is.na(season))
+           dbExecute(conn, "CREATE TEMP TABLE depth_staging AS SELECT * FROM depth_charts LIMIT 0")
+           dbWriteTable(conn, "depth_staging", depth_clean, append = TRUE, 
+               row.names = FALSE)
+           rows_updated <- dbExecute(conn, "\n          INSERT INTO depth_charts\n          SELECT * FROM depth_staging\n          ON CONFLICT (gsis_id, club_code, season, season_type, week, depth_team, formation, position)\n          DO UPDATE SET\n            jersey_number = EXCLUDED.jersey_number,\n            last_name = EXCLUDED.last_name,\n            first_name = EXCLUDED.first_name,\n            full_name = EXCLUDED.full_name,\n            depth_position = EXCLUDED.depth_position,\n            updated_at = NOW()\n        ")
+           dbExecute(conn, "DROP TABLE IF EXISTS depth_staging")
+           log_message(sprintf("Upserted %d depth chart records", 
+               rows_updated), level = "INFO")
+           TRUE
+       }, conn = conn)
+       run_pipeline_step(step_name = "Verify advanced metrics backfill", 
+           expr = {
+               qbr_summary <- dbGetQuery(conn, "\n          SELECT\n            season,\n            COUNT(DISTINCT player_id) as unique_qbs,\n            COUNT(*) as total_records,\n            ROUND(CAST(AVG(qbr_total) AS numeric), 2) as avg_qbr\n          FROM espn_qbr\n          WHERE qbr_total IS NOT NULL\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(qbr_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f", 
+                     qbr_summary$season[i], qbr_summary$unique_qbs[i], 
+                     qbr_summary$total_records[i], qbr_summary$avg_qbr[i]), 
+                     level = "INFO")
+               }
+               def_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_defenders, COUNT(*) as total_records\n          FROM pfr_defense\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(def_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f defenders, %.0f records", 
+                     def_summary$season[i], def_summary$unique_defenders[i], 
+                     def_summary$total_records[i]), level = "INFO")
+               }
+               snaps_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT pfr_player_id) as unique_players, COUNT(*) as total_records\n          FROM snap_counts\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Snap Counts Summary (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(snaps_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f players, %.0f records", 
+                     snaps_summary$season[i], snaps_summary$unique_players[i], 
+                     snaps_summary$total_records[i]), level = "INFO")
+               }
+               depth_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT gsis_id) as unique_players, COUNT(*) as total_records\n          FROM depth_charts\n          WHERE depth_position = 1\n          GROUP BY season\n          ORDER BY season DESC\n          LIMIT 5\n        ")
+               log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", 
+                   level = "INFO")
+               for (i in 1:nrow(depth_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f starters, %.0f records", 
+                     depth_summary$season[i], depth_summary$unique_players[i], 
+                     depth_summary$total_records[i]), level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       log_message("=== Advanced Metrics Backfill Complete ===", 
+           level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Integrate metrics into py/features/asof_features_enhanced.py", 
+           level = "INFO")
+       log_message("  2. Create team-level aggregates (avg QBR, pressure rates, etc.)", 
+           level = "INFO")
+       log_message("  3. Retrain models with enhanced features", 
+           level = "INFO")
+   }))
+[2025-10-10 10:01:11] [INFO] [backfill_advanced_metrics.R] Database connection closed 

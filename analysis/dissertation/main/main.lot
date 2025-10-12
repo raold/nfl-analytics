@@ -2,60 +2,77 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Modeling families at a glance}}{30}{table.caption.265}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Modeling families at a glance}}{30}{table.caption.259}%
+\contentsline {table}{\numberline {5.1}{\ignorespaces Selected missingness/coverage statistics by field (illustrative).}}{37}{table.caption.319}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Effective sample size (season units) under exponential decay centered on 2024 (illustrative).}}{40}{table.caption.329}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Dataset cohorts, splits, coverage, and lineage guards.}}{41}{table.caption.332}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {6.1}{\ignorespaces Selected missingness/coverage statistics by field (illustrative).}}{36}{table.caption.305}%
-\contentsline {table}{\numberline {6.2}{\ignorespaces Effective sample size (season units) under exponential decay centered on 2024 (illustrative).}}{38}{table.caption.315}%
-\contentsline {table}{\numberline {6.3}{\ignorespaces Dataset cohorts, splits, coverage, and lineage guards.}}{39}{table.caption.318}%
+\contentsline {table}{\numberline {6.1}{\ignorespaces Paired comparison of temporal weighting schemes on 2024 holdout (Diebold-Mariano test).}}{43}{table.caption.347}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Bayesian model comparison}}{50}{table.caption.380}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Bayesian predictive performance (2024)}}{51}{table.caption.383}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Ensemble performance (simulated)}}{52}{table.caption.387}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Rating system comparison}}{53}{table.caption.392}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Advanced features cost-benefit analysis.}}{58}{table.caption.428}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Key-number calibration: $\chi ^2$ goodness-of-fit at key margins.}}{59}{table.caption.429}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Two-leg teaser EV on holdout.}}{59}{table.caption.430}%
+\contentsline {table}{\numberline {6.9}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{67}{table.caption.431}%
+\contentsline {table}{\numberline {6.10}{\ignorespaces Reweighting ablation: impact of key-mass adjustment.}}{68}{table.caption.432}%
+\contentsline {table}{\numberline {6.11}{\ignorespaces Ablation deltas by family}}{68}{table.caption.438}%
+\contentsline {table}{\numberline {6.12}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{68}{table.caption.445}%
+\contentsline {table}{\numberline {6.13}{\ignorespaces Tail Dependence Coefficients by Era: Empirical vs Theoretical}}{68}{table.caption.446}%
+\contentsline {table}{\numberline {6.14}{\ignorespaces Position-based injury impacts}}{69}{table.caption.452}%
+\contentsline {table}{\numberline {6.15}{\ignorespaces In-game WP features}}{69}{table.caption.463}%
+\contentsline {table}{\numberline {6.16}{\ignorespaces In-game WP performance}}{69}{table.caption.465}%
+\contentsline {table}{\numberline {6.17}{\ignorespaces Baseline GLM backtest}}{70}{table.caption.471}%
+\contentsline {table}{\numberline {6.18}{\ignorespaces GLM overall comparison}}{70}{table.caption.472}%
+\contentsline {table}{\numberline {6.19}{\ignorespaces Multi-Model Backtest Comparison}}{71}{table.caption.477}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {7.1}{\ignorespaces Paired comparison of temporal weighting schemes on 2024 holdout (Diebold-Mariano test).}}{41}{table.caption.333}%
-\contentsline {table}{\numberline {7.2}{\ignorespaces Advanced features cost-benefit analysis.}}{49}{table.caption.376}%
-\contentsline {table}{\numberline {7.3}{\ignorespaces Key-number calibration: $\chi ^2$ goodness-of-fit at key margins.}}{50}{table.caption.377}%
-\contentsline {table}{\numberline {7.4}{\ignorespaces Two-leg teaser EV on holdout.}}{50}{table.caption.378}%
-\contentsline {table}{\numberline {7.5}{\ignorespaces Two-leg teaser EV sensitivity to dependence (Gaussian and t copulas).}}{56}{table.caption.379}%
-\contentsline {table}{\numberline {7.6}{\ignorespaces Reweighting ablation: impact of key-mass adjustment.}}{57}{table.caption.380}%
-\contentsline {table}{\numberline {7.7}{\ignorespaces Ablation deltas by family}}{57}{table.caption.386}%
-\contentsline {table}{\numberline {7.8}{\ignorespaces Copula GOF (tail CvM; thresholds 0.80/0.90/0.95).}}{57}{table.caption.393}%
-\contentsline {table}{\numberline {7.9}{\ignorespaces Tail Dependence Coefficients by Era: Empirical vs Theoretical}}{57}{table.caption.394}%
-\contentsline {table}{\numberline {7.10}{\ignorespaces Baseline GLM backtest}}{58}{table.caption.399}%
-\contentsline {table}{\numberline {7.11}{\ignorespaces GLM overall comparison}}{58}{table.caption.400}%
-\contentsline {table}{\numberline {7.12}{\ignorespaces Multi-Model Backtest Comparison}}{59}{table.caption.405}%
+\contentsline {table}{\numberline {7.1}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{74}{table.caption.485}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces DQN vs PPO Agent Comparison (400 epochs)}}{77}{table.caption.502}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces NFL constraints and the resulting design choices.}}{83}{table.caption.535}%
+\contentsline {table}{\numberline {7.4}{\ignorespaces RL Agent Performance vs Baseline Models (2020-2024 Out-of-Sample)}}{84}{table.caption.538}%
+\contentsline {table}{\numberline {7.5}{\ignorespaces Utilization-Adjusted Sharpe Ratios and Risk Metrics}}{85}{table.caption.549}%
+\contentsline {table}{\numberline {7.6}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{86}{table.caption.551}%
+\contentsline {table}{\numberline {7.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{87}{table.caption.556}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {8.1}{\ignorespaces OPE grid (SNIS/DR/ESS)}}{62}{table.caption.414}%
-\contentsline {table}{\numberline {8.2}{\ignorespaces DQN vs PPO Agent Comparison (400 epochs)}}{65}{table.caption.430}%
-\contentsline {table}{\numberline {8.3}{\ignorespaces NFL constraints and the resulting design choices.}}{71}{table.caption.463}%
-\contentsline {table}{\numberline {8.4}{\ignorespaces RL Agent Performance vs Baseline Models (2020-2024 Out-of-Sample)}}{72}{table.caption.466}%
-\contentsline {table}{\numberline {8.5}{\ignorespaces Utilization-Adjusted Sharpe Ratios and Risk Metrics}}{73}{table.caption.477}%
-\contentsline {table}{\numberline {8.6}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{74}{table.caption.479}%
-\contentsline {table}{\numberline {8.7}{\ignorespaces Common offline RL algorithms and their trade-offs for betting-style decision problems.}}{75}{table.caption.485}%
+\contentsline {table}{\numberline {8.1}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{90}{table.caption.571}%
+\contentsline {table}{\numberline {8.2}{\ignorespaces Copula pricing impact summary.}}{90}{table.caption.574}%
+\contentsline {table}{\numberline {8.3}{\ignorespaces Weekly risk budgets and exposure rules}}{95}{table.caption.584}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {9.1}{\ignorespaces Portfolio Performance Under Different Risk Objectives}}{78}{table.caption.499}%
-\contentsline {table}{\numberline {9.2}{\ignorespaces Copula pricing impact summary.}}{78}{table.caption.502}%
+\contentsline {table}{\numberline {9.1}{\ignorespaces Monte Carlo convergence diagnostics by sample size.}}{100}{table.caption.621}%
+\contentsline {table}{\numberline {9.2}{\ignorespaces Simulation calibration metrics vs historical data (2015--2024 average).}}{101}{table.caption.633}%
+\contentsline {table}{\numberline {9.3}{\ignorespaces Slippage model parameters by sportsbook (2019--2024 NFL seasons).}}{103}{table.caption.650}%
+\contentsline {table}{\numberline {9.4}{\ignorespaces Simulator acceptance test results across 10 seasons (2014--2024).}}{104}{table.caption.653}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {10.1}{\ignorespaces Monte Carlo convergence diagnostics by sample size.}}{87}{table.caption.547}%
-\contentsline {table}{\numberline {10.2}{\ignorespaces Simulation calibration metrics vs historical data (2015--2024 average).}}{88}{table.caption.559}%
-\contentsline {table}{\numberline {10.3}{\ignorespaces Slippage model parameters by sportsbook (2019--2024 NFL seasons).}}{91}{table.caption.577}%
-\contentsline {table}{\numberline {10.4}{\ignorespaces Simulator acceptance test results across 10 seasons (2014--2024).}}{91}{table.caption.580}%
-\addvspace {10\p@ }
-\contentsline {table}{\numberline {11.1}{\ignorespaces Multi-Model Backtest Comparison}}{93}{table.caption.585}%
-\contentsline {table}{\numberline {11.2}{\ignorespaces Model performance comparison against published benchmarks. Our stacked ensemble achieves best-in-class calibration (Brier = 0.2515) but fails to overcome market efficiency for profitability (51.0\% ATS vs 52.4\% breakeven).}}{94}{table.caption.588}%
-\contentsline {table}{\numberline {11.3}{\ignorespaces Statistical significance of calibration improvements (Brier score differences).}}{94}{table.caption.589}%
-\contentsline {table}{\numberline {11.4}{\ignorespaces Betting performance metrics}}{95}{table.caption.597}%
-\contentsline {table}{\numberline {11.5}{\ignorespaces Out-of-sample results by season}}{100}{table.caption.599}%
-\contentsline {table}{\numberline {11.6}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{101}{table.caption.603}%
-\contentsline {table}{\numberline {11.7}{\ignorespaces Weather effects on scoring}}{101}{table.caption.625}%
-\contentsline {table}{\numberline {11.8}{\ignorespaces Extreme weather conditions}}{103}{table.caption.626}%
-\contentsline {table}{\numberline {11.9}{\ignorespaces Core ablation grid (mock)}}{104}{table.caption.632}%
-\contentsline {table}{\numberline {11.10}{\ignorespaces Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}}{106}{table.caption.641}%
-\contentsline {table}{\numberline {11.11}{\ignorespaces Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}}{107}{table.caption.643}%
-\contentsline {table}{\numberline {11.12}{\ignorespaces Multiple testing corrections for key hypothesis tests.}}{108}{table.caption.645}%
-\contentsline {table}{\numberline {11.13}{\ignorespaces Per-season performance (top 3 models)}}{110}{table.caption.650}%
+\contentsline {table}{\numberline {10.1}{\ignorespaces Multi-Model Backtest Comparison}}{107}{table.caption.661}%
+\contentsline {table}{\numberline {10.2}{\ignorespaces Model performance comparison against published benchmarks. Our stacked ensemble achieves best-in-class calibration (Brier = 0.2515) but fails to overcome market efficiency for profitability (51.0\% ATS vs 52.4\% breakeven).}}{108}{table.caption.664}%
+\contentsline {table}{\numberline {10.3}{\ignorespaces Statistical significance of calibration improvements (Brier score differences).}}{108}{table.caption.665}%
+\contentsline {table}{\numberline {10.4}{\ignorespaces Betting performance metrics}}{109}{table.caption.673}%
+\contentsline {table}{\numberline {10.5}{\ignorespaces Out-of-sample results by season}}{114}{table.caption.675}%
+\contentsline {table}{\numberline {10.6}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{115}{table.caption.679}%
+\contentsline {table}{\numberline {10.7}{\ignorespaces Weather effects on scoring}}{115}{table.caption.701}%
+\contentsline {table}{\numberline {10.8}{\ignorespaces Extreme weather conditions}}{117}{table.caption.702}%
+\contentsline {table}{\numberline {10.9}{\ignorespaces Core ablation grid (mock)}}{118}{table.caption.708}%
+\contentsline {table}{\numberline {10.10}{\ignorespaces Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}}{120}{table.caption.717}%
+\contentsline {table}{\numberline {10.11}{\ignorespaces Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}}{121}{table.caption.719}%
+\contentsline {table}{\numberline {10.12}{\ignorespaces Multiple testing corrections for key hypothesis tests.}}{122}{table.caption.721}%
+\contentsline {table}{\numberline {10.13}{\ignorespaces Per-season performance (top 3 models)}}{124}{table.caption.726}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {12.1}{\ignorespaces Player Props Models: Training and Validation Performance}}{160}{table.caption.866}%
+\contentsline {table}{\numberline {12.2}{\ignorespaces Weather-Based Totals Model: Performance and Top Features}}{162}{table.caption.874}%
+\contentsline {table}{\numberline {12.3}{\ignorespaces 10-Lane ROI Boost: Expected Performance by Lane}}{164}{table.caption.885}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {A.1}{\ignorespaces Conservative Q-Learning (CQL) Training Performance}}{150}{table.caption.796}%
-\contentsline {table}{\numberline {A.2}{\ignorespaces Bootstrap Stress Test Results: Worst Case Scenario}}{152}{table.caption.803}%
+\contentsline {table}{\numberline {13.1}{\ignorespaces CLV Percentile Performance Analysis}}{168}{table.caption.904}%
+\contentsline {table}{\numberline {13.2}{\ignorespaces Regime-Based Sizing Multipliers}}{171}{table.caption.936}%
+\contentsline {table}{\numberline {13.3}{\ignorespaces Strategy Parameters by Confidence Segment}}{173}{table.caption.951}%
+\contentsline {table}{\numberline {13.4}{\ignorespaces Performance Comparison: Before vs After Optimization}}{174}{table.caption.956}%
+\contentsline {table}{\numberline {13.5}{\ignorespaces ROI Impact by Component}}{174}{table.caption.958}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {A.1}{\ignorespaces Conservative Q-Learning (CQL) Training Performance}}{186}{table.caption.1011}%
+\contentsline {table}{\numberline {A.2}{\ignorespaces Bootstrap Stress Test Results: Worst Case Scenario}}{188}{table.caption.1018}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

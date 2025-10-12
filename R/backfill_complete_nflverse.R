@@ -1,0 +1,869 @@
+#!/usr/bin/env Rscript
+# COMPLETE NFLVERSE DATA BACKFILL - All Remaining Sources
+# Loads: injuries, officials, participation, contracts, combine, drafts, trades, rosters, FTN, PFR passing
+
+source("R/utils/error_handling.R")
+
+safe_execute(
+  expr = {
+    suppressPackageStartupMessages({
+      library(nflreadr)
+      library(dplyr)
+      library(DBI)
+      library(RPostgres)
+    })
+  },
+  error_message = "Failed to load required R packages"
+)
+
+log_message("=== COMPLETE NFLVERSE DATA BACKFILL STARTING ===", level = "INFO")
+
+db_params <- list(
+  host = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port = as.integer(Sys.getenv("POSTGRES_PORT", "5544")),
+  dbname = Sys.getenv("POSTGRES_DB", "devdb01"),
+  user = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+# Main pipeline
+safe_db_operation(
+  db_params = db_params,
+  expr = quote({
+
+    # ============================================================
+    # 1. INJURIES (2009-2025)
+    # ============================================================
+
+    injuries_data <- run_pipeline_step(
+      step_name = "Load Injuries",
+      expr = {
+        log_message("Fetching injuries from nflverse (2009-2025)...", level = "INFO")
+
+        injuries <- retry_operation(
+          expr = load_injuries(seasons = 2009:2025),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load injuries from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d injury records", nrow(injuries)), level = "INFO")
+        injuries
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("season", "week", "gsis_id"),
+          min_rows = 1000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Injuries",
+      expr = {
+        # Deduplicate - source data has exact duplicates (like depth charts)
+        injuries_clean <- injuries_data %>%
+          select(
+            season, game_type, team, week, gsis_id, position,
+            full_name, first_name, last_name,
+            report_primary_injury, report_secondary_injury, report_status,
+            practice_primary_injury, practice_secondary_injury, practice_status,
+            date_modified
+          ) %>%
+          filter(!is.na(season), !is.na(week), !is.na(gsis_id), !is.na(team)) %>%
+          distinct()  # Remove exact duplicates from source data
+
+        dbExecute(conn, "CREATE TEMP TABLE injuries_staging AS SELECT * FROM injuries LIMIT 0")
+        dbWriteTable(conn, "injuries_staging", injuries_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO injuries
+          SELECT DISTINCT ON (season, game_type, team, week, gsis_id) * FROM injuries_staging
+          ON CONFLICT (season, game_type, team, week, gsis_id)
+          DO UPDATE SET
+            position = EXCLUDED.position,
+            full_name = EXCLUDED.full_name,
+            first_name = EXCLUDED.first_name,
+            last_name = EXCLUDED.last_name,
+            report_primary_injury = EXCLUDED.report_primary_injury,
+            report_secondary_injury = EXCLUDED.report_secondary_injury,
+            report_status = EXCLUDED.report_status,
+            practice_primary_injury = EXCLUDED.practice_primary_injury,
+            practice_secondary_injury = EXCLUDED.practice_secondary_injury,
+            practice_status = EXCLUDED.practice_status,
+            date_modified = EXCLUDED.date_modified,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS injuries_staging")
+        log_message(sprintf("Upserted %d injury records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 2. OFFICIALS (2006-2025)
+    # ============================================================
+
+    officials_data <- run_pipeline_step(
+      step_name = "Load Officials",
+      expr = {
+        log_message("Fetching officials from nflverse (2015-2025)...", level = "INFO")
+
+        officials <- retry_operation(
+          expr = load_officials(seasons = 2015:2025),  # Officials data only available from 2015+
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load officials from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d official records", nrow(officials)), level = "INFO")
+        officials
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("game_id", "official_name", "position"),
+          min_rows = 1000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Officials",
+      expr = {
+        officials_clean <- officials_data %>%
+          mutate(
+            jersey_number = as.integer(jersey_number)
+          ) %>%
+          select(
+            game_id, game_key, official_name, position, jersey_number,
+            official_id, season, season_type, week
+          ) %>%
+          filter(!is.na(game_id), !is.na(official_name), !is.na(position)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE officials_staging AS SELECT * FROM officials LIMIT 0")
+        dbWriteTable(conn, "officials_staging", officials_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO officials
+          SELECT DISTINCT ON (game_id, official_name, position) * FROM officials_staging
+          ON CONFLICT (game_id, official_name, position)
+          DO UPDATE SET
+            game_key = EXCLUDED.game_key,
+            jersey_number = EXCLUDED.jersey_number,
+            official_id = EXCLUDED.official_id,
+            season = EXCLUDED.season,
+            season_type = EXCLUDED.season_type,
+            week = EXCLUDED.week,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS officials_staging")
+        log_message(sprintf("Upserted %d official records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 3. PARTICIPATION (2016-2025)
+    # ============================================================
+
+    participation_data <- run_pipeline_step(
+      step_name = "Load Participation",
+      expr = {
+        log_message("Fetching participation from nflverse (2016-2025)...", level = "INFO")
+
+        participation <- retry_operation(
+          expr = load_participation(seasons = 2016:2025, include_pbp = FALSE),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load participation from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d participation records", nrow(participation)), level = "INFO")
+        participation
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("nflverse_game_id", "play_id"),
+          min_rows = 10000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Participation",
+      expr = {
+        participation_clean <- participation_data %>%
+          select(
+            nflverse_game_id, old_game_id, play_id, possession_team,
+            offense_formation, offense_personnel, defenders_in_box,
+            defense_personnel, number_of_pass_rushers, players_on_play,
+            offense_players, defense_players, n_offense, n_defense,
+            ngs_air_yards, time_to_throw, was_pressure, route,
+            defense_man_zone_type, defense_coverage_type,
+            offense_names, defense_names, offense_positions, defense_positions,
+            offense_numbers, defense_numbers
+          ) %>%
+          filter(!is.na(nflverse_game_id), !is.na(play_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE participation_staging AS SELECT * FROM participation LIMIT 0")
+        dbWriteTable(conn, "participation_staging", participation_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO participation
+          SELECT DISTINCT ON (nflverse_game_id, play_id) * FROM participation_staging
+          ON CONFLICT (nflverse_game_id, play_id)
+          DO UPDATE SET
+            possession_team = EXCLUDED.possession_team,
+            offense_formation = EXCLUDED.offense_formation,
+            offense_personnel = EXCLUDED.offense_personnel,
+            defenders_in_box = EXCLUDED.defenders_in_box,
+            defense_personnel = EXCLUDED.defense_personnel,
+            number_of_pass_rushers = EXCLUDED.number_of_pass_rushers,
+            players_on_play = EXCLUDED.players_on_play,
+            offense_players = EXCLUDED.offense_players,
+            defense_players = EXCLUDED.defense_players,
+            n_offense = EXCLUDED.n_offense,
+            n_defense = EXCLUDED.n_defense,
+            ngs_air_yards = EXCLUDED.ngs_air_yards,
+            time_to_throw = EXCLUDED.time_to_throw,
+            was_pressure = EXCLUDED.was_pressure,
+            route = EXCLUDED.route,
+            defense_man_zone_type = EXCLUDED.defense_man_zone_type,
+            defense_coverage_type = EXCLUDED.defense_coverage_type,
+            offense_names = EXCLUDED.offense_names,
+            defense_names = EXCLUDED.defense_names,
+            offense_positions = EXCLUDED.offense_positions,
+            defense_positions = EXCLUDED.defense_positions,
+            offense_numbers = EXCLUDED.offense_numbers,
+            defense_numbers = EXCLUDED.defense_numbers,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS participation_staging")
+        log_message(sprintf("Upserted %d participation records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 4. CONTRACTS (Current contract data)
+    # ============================================================
+
+    contracts_data <- run_pipeline_step(
+      step_name = "Load Contracts",
+      expr = {
+        log_message("Fetching contracts from nflverse...", level = "INFO")
+
+        contracts <- retry_operation(
+          expr = load_contracts(),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load contracts from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d contract records", nrow(contracts)), level = "INFO")
+        contracts
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("otc_id", "player"),
+          min_rows = 1000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Contracts",
+      expr = {
+        contracts_clean <- contracts_data %>%
+          mutate(
+            # Convert financial columns to proper integers (rounding any decimals)
+            value = as.integer(round(as.numeric(value), 0)),
+            apy = as.integer(round(as.numeric(apy), 0)),
+            guaranteed = as.integer(round(as.numeric(guaranteed), 0)),
+            inflated_value = as.integer(round(as.numeric(inflated_value), 0)),
+            inflated_apy = as.integer(round(as.numeric(inflated_apy), 0)),
+            inflated_guaranteed = as.integer(round(as.numeric(inflated_guaranteed), 0)),
+            # Handle invalid dates - set to NULL if can't parse or if year < 1900
+            date_of_birth = suppressWarnings({
+              parsed_date <- as.Date(date_of_birth, format = "%B %d, %Y")
+              # Check if parsed successfully and year is reasonable (>= 1900)
+              ifelse(is.na(parsed_date) | as.integer(format(parsed_date, "%Y")) < 1900,
+                     NA,
+                     as.character(parsed_date))
+            })
+          ) %>%
+          select(
+            otc_id, player, position, team, is_active, year_signed, years,
+            value, apy, guaranteed, apy_cap_pct, inflated_value, inflated_apy,
+            inflated_guaranteed, player_page, gsis_id, date_of_birth,
+            height, weight, college, draft_year, draft_round, draft_overall, draft_team
+          ) %>%
+          filter(!is.na(otc_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE contracts_staging AS SELECT * FROM contracts LIMIT 0")
+        dbWriteTable(conn, "contracts_staging", contracts_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO contracts
+          SELECT DISTINCT ON (otc_id) * FROM contracts_staging
+          ON CONFLICT (otc_id)
+          DO UPDATE SET
+            player = EXCLUDED.player,
+            position = EXCLUDED.position,
+            team = EXCLUDED.team,
+            is_active = EXCLUDED.is_active,
+            year_signed = EXCLUDED.year_signed,
+            years = EXCLUDED.years,
+            value = EXCLUDED.value,
+            apy = EXCLUDED.apy,
+            guaranteed = EXCLUDED.guaranteed,
+            apy_cap_pct = EXCLUDED.apy_cap_pct,
+            inflated_value = EXCLUDED.inflated_value,
+            inflated_apy = EXCLUDED.inflated_apy,
+            inflated_guaranteed = EXCLUDED.inflated_guaranteed,
+            player_page = EXCLUDED.player_page,
+            gsis_id = EXCLUDED.gsis_id,
+            date_of_birth = EXCLUDED.date_of_birth,
+            height = EXCLUDED.height,
+            weight = EXCLUDED.weight,
+            college = EXCLUDED.college,
+            draft_year = EXCLUDED.draft_year,
+            draft_round = EXCLUDED.draft_round,
+            draft_overall = EXCLUDED.draft_overall,
+            draft_team = EXCLUDED.draft_team,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS contracts_staging")
+        log_message(sprintf("Upserted %d contract records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 5. COMBINE (2000-2025)
+    # ============================================================
+
+    combine_data <- run_pipeline_step(
+      step_name = "Load Combine",
+      expr = {
+        log_message("Fetching combine from nflverse (2000-2025)...", level = "INFO")
+
+        combine <- retry_operation(
+          expr = load_combine(seasons = 2000:2025),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load combine from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d combine records", nrow(combine)), level = "INFO")
+        combine
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("season", "pfr_id", "player_name"),
+          min_rows = 100
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Combine",
+      expr = {
+        combine_clean <- combine_data %>%
+          select(
+            season, pfr_id, player_name, pos, school,
+            draft_year, draft_team, draft_round, draft_ovr, cfb_id,
+            ht, wt, forty, bench, vertical, broad_jump, cone, shuttle
+          ) %>%
+          filter(!is.na(season), !is.na(pfr_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE combine_staging AS SELECT * FROM combine LIMIT 0")
+        dbWriteTable(conn, "combine_staging", combine_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO combine
+          SELECT DISTINCT ON (season, pfr_id) * FROM combine_staging
+          ON CONFLICT (season, pfr_id)
+          DO UPDATE SET
+            player_name = EXCLUDED.player_name,
+            pos = EXCLUDED.pos,
+            school = EXCLUDED.school,
+            draft_year = EXCLUDED.draft_year,
+            draft_team = EXCLUDED.draft_team,
+            draft_round = EXCLUDED.draft_round,
+            draft_ovr = EXCLUDED.draft_ovr,
+            cfb_id = EXCLUDED.cfb_id,
+            ht = EXCLUDED.ht,
+            wt = EXCLUDED.wt,
+            forty = EXCLUDED.forty,
+            bench = EXCLUDED.bench,
+            vertical = EXCLUDED.vertical,
+            broad_jump = EXCLUDED.broad_jump,
+            cone = EXCLUDED.cone,
+            shuttle = EXCLUDED.shuttle,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS combine_staging")
+        log_message(sprintf("Upserted %d combine records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 6. DRAFT PICKS (1970-2025)
+    # ============================================================
+
+    drafts_data <- run_pipeline_step(
+      step_name = "Load Draft Picks",
+      expr = {
+        log_message("Fetching draft picks from nflverse (1970-2025)...", level = "INFO")
+
+        drafts <- retry_operation(
+          expr = load_draft_picks(seasons = 1970:2025),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load draft picks from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d draft pick records", nrow(drafts)), level = "INFO")
+        drafts
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("season", "round", "pick"),
+          min_rows = 1000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Draft Picks",
+      expr = {
+        drafts_clean <- drafts_data %>%
+          rename(to_season = to) %>%  # 'to' is reserved word in SQL
+          select(
+            season, round, pick, team, gsis_id, pfr_player_id, cfb_player_id,
+            pfr_player_name, hof, position, category, side, college, age, to_season,
+            allpro, probowls, seasons_started, w_av, car_av, dr_av, games,
+            pass_completions, pass_attempts, pass_yards, pass_tds, pass_ints,
+            rush_atts, rush_yards, rush_tds, receptions, rec_yards, rec_tds,
+            def_solo_tackles, def_ints, def_sacks
+          ) %>%
+          filter(!is.na(season), !is.na(round), !is.na(pick)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE drafts_staging AS SELECT * FROM draft_picks LIMIT 0")
+        dbWriteTable(conn, "drafts_staging", drafts_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO draft_picks
+          SELECT DISTINCT ON (season, round, pick) * FROM drafts_staging
+          ON CONFLICT (season, round, pick)
+          DO UPDATE SET
+            team = EXCLUDED.team,
+            gsis_id = EXCLUDED.gsis_id,
+            pfr_player_id = EXCLUDED.pfr_player_id,
+            cfb_player_id = EXCLUDED.cfb_player_id,
+            pfr_player_name = EXCLUDED.pfr_player_name,
+            hof = EXCLUDED.hof,
+            position = EXCLUDED.position,
+            category = EXCLUDED.category,
+            side = EXCLUDED.side,
+            college = EXCLUDED.college,
+            age = EXCLUDED.age,
+            to_season = EXCLUDED.to_season,
+            allpro = EXCLUDED.allpro,
+            probowls = EXCLUDED.probowls,
+            seasons_started = EXCLUDED.seasons_started,
+            w_av = EXCLUDED.w_av,
+            car_av = EXCLUDED.car_av,
+            dr_av = EXCLUDED.dr_av,
+            games = EXCLUDED.games,
+            pass_completions = EXCLUDED.pass_completions,
+            pass_attempts = EXCLUDED.pass_attempts,
+            pass_yards = EXCLUDED.pass_yards,
+            pass_tds = EXCLUDED.pass_tds,
+            pass_ints = EXCLUDED.pass_ints,
+            rush_atts = EXCLUDED.rush_atts,
+            rush_yards = EXCLUDED.rush_yards,
+            rush_tds = EXCLUDED.rush_tds,
+            receptions = EXCLUDED.receptions,
+            rec_yards = EXCLUDED.rec_yards,
+            rec_tds = EXCLUDED.rec_tds,
+            def_solo_tackles = EXCLUDED.def_solo_tackles,
+            def_ints = EXCLUDED.def_ints,
+            def_sacks = EXCLUDED.def_sacks,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS drafts_staging")
+        log_message(sprintf("Upserted %d draft pick records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 7. TRADES (1970-present)
+    # ============================================================
+
+    trades_data <- run_pipeline_step(
+      step_name = "Load Trades",
+      expr = {
+        log_message("Fetching trades from nflverse...", level = "INFO")
+
+        trades <- retry_operation(
+          expr = load_trades(),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load trades from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d trade records", nrow(trades)), level = "INFO")
+        trades
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("trade_id", "gave", "received"),
+          min_rows = 100
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Trades",
+      expr = {
+        trades_clean <- trades_data %>%
+          select(
+            trade_id, season, trade_date, gave, received,
+            pick_season, pick_round, pick_number, conditional,
+            pfr_id, pfr_name
+          ) %>%
+          filter(!is.na(trade_id), !is.na(gave), !is.na(received)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE trades_staging AS SELECT * FROM trades LIMIT 0")
+        dbWriteTable(conn, "trades_staging", trades_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO trades
+          SELECT DISTINCT ON (trade_id, gave, received) * FROM trades_staging
+          ON CONFLICT (trade_id, gave, received)
+          DO UPDATE SET
+            season = EXCLUDED.season,
+            trade_date = EXCLUDED.trade_date,
+            pick_season = EXCLUDED.pick_season,
+            pick_round = EXCLUDED.pick_round,
+            pick_number = EXCLUDED.pick_number,
+            conditional = EXCLUDED.conditional,
+            pfr_id = EXCLUDED.pfr_id,
+            pfr_name = EXCLUDED.pfr_name,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS trades_staging")
+        log_message(sprintf("Upserted %d trade records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 8. ROSTERS WEEKLY (2002-2025)
+    # ============================================================
+
+    rosters_data <- run_pipeline_step(
+      step_name = "Load Rosters Weekly",
+      expr = {
+        log_message("Fetching weekly rosters from nflverse (2002-2025)...", level = "INFO")
+
+        rosters <- retry_operation(
+          expr = load_rosters_weekly(seasons = 2002:2025),
+          max_attempts = 3,
+          delay = 10,
+          error_message = "Failed to load rosters from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d roster records", nrow(rosters)), level = "INFO")
+        rosters
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("season", "week", "team", "gsis_id"),
+          min_rows = 10000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert Rosters Weekly",
+      expr = {
+        rosters_clean <- rosters_data %>%
+          mutate(
+            # Clean jersey_number - extract numeric part only, set to NULL for non-numeric
+            jersey_number = suppressWarnings(as.integer(gsub("[^0-9]", "", as.character(jersey_number))))
+          ) %>%
+          select(
+            season, week, game_type, team, gsis_id, position, depth_chart_position,
+            jersey_number, status, full_name, first_name, last_name, birth_date,
+            height, weight, college, espn_id, sportradar_id, yahoo_id, rotowire_id,
+            pff_id, pfr_id, fantasy_data_id, sleeper_id, years_exp, headshot_url,
+            ngs_position, status_description_abbr, football_name, esb_id, gsis_it_id,
+            smart_id, entry_year, rookie_year, draft_club, draft_number
+          ) %>%
+          filter(!is.na(season), !is.na(week), !is.na(team), !is.na(gsis_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE rosters_staging AS SELECT * FROM rosters_weekly LIMIT 0")
+        dbWriteTable(conn, "rosters_staging", rosters_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO rosters_weekly
+          SELECT DISTINCT ON (season, week, game_type, team, gsis_id) * FROM rosters_staging
+          ON CONFLICT (season, week, game_type, team, gsis_id)
+          DO UPDATE SET
+            position = EXCLUDED.position,
+            depth_chart_position = EXCLUDED.depth_chart_position,
+            jersey_number = EXCLUDED.jersey_number,
+            status = EXCLUDED.status,
+            full_name = EXCLUDED.full_name,
+            first_name = EXCLUDED.first_name,
+            last_name = EXCLUDED.last_name,
+            birth_date = EXCLUDED.birth_date,
+            height = EXCLUDED.height,
+            weight = EXCLUDED.weight,
+            college = EXCLUDED.college,
+            espn_id = EXCLUDED.espn_id,
+            sportradar_id = EXCLUDED.sportradar_id,
+            yahoo_id = EXCLUDED.yahoo_id,
+            rotowire_id = EXCLUDED.rotowire_id,
+            pff_id = EXCLUDED.pff_id,
+            pfr_id = EXCLUDED.pfr_id,
+            fantasy_data_id = EXCLUDED.fantasy_data_id,
+            sleeper_id = EXCLUDED.sleeper_id,
+            years_exp = EXCLUDED.years_exp,
+            headshot_url = EXCLUDED.headshot_url,
+            ngs_position = EXCLUDED.ngs_position,
+            status_description_abbr = EXCLUDED.status_description_abbr,
+            football_name = EXCLUDED.football_name,
+            esb_id = EXCLUDED.esb_id,
+            gsis_it_id = EXCLUDED.gsis_it_id,
+            smart_id = EXCLUDED.smart_id,
+            entry_year = EXCLUDED.entry_year,
+            rookie_year = EXCLUDED.rookie_year,
+            draft_club = EXCLUDED.draft_club,
+            draft_number = EXCLUDED.draft_number,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS rosters_staging")
+        log_message(sprintf("Upserted %d roster records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 9. FTN CHARTING (2022-2025)
+    # ============================================================
+
+    ftn_data <- run_pipeline_step(
+      step_name = "Load FTN Charting",
+      expr = {
+        log_message("Fetching FTN charting from nflverse (2022-2025)...", level = "INFO")
+
+        ftn <- retry_operation(
+          expr = load_ftn_charting(seasons = 2022:2025),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load FTN charting from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d FTN charting records", nrow(ftn)), level = "INFO")
+        ftn
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("nflverse_game_id", "nflverse_play_id"),
+          min_rows = 10000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert FTN Charting",
+      expr = {
+        ftn_clean <- ftn_data %>%
+          select(
+            nflverse_game_id, nflverse_play_id, ftn_game_id, season, week, ftn_play_id,
+            starting_hash, qb_location, n_offense_backfield, n_defense_box,
+            is_no_huddle, is_motion, is_play_action, is_screen_pass, is_rpo,
+            is_trick_play, is_qb_out_of_pocket, is_interception_worthy, is_throw_away,
+            read_thrown, is_catchable_ball, is_contested_ball, is_created_reception,
+            is_drop, is_qb_sneak, n_blitzers, n_pass_rushers, is_qb_fault_sack,
+            date_pulled
+          ) %>%
+          filter(!is.na(nflverse_game_id), !is.na(nflverse_play_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE ftn_staging AS SELECT * FROM ftn_charting LIMIT 0")
+        dbWriteTable(conn, "ftn_staging", ftn_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO ftn_charting
+          SELECT DISTINCT ON (nflverse_game_id, nflverse_play_id) * FROM ftn_staging
+          ON CONFLICT (nflverse_game_id, nflverse_play_id)
+          DO UPDATE SET
+            ftn_game_id = EXCLUDED.ftn_game_id,
+            season = EXCLUDED.season,
+            week = EXCLUDED.week,
+            ftn_play_id = EXCLUDED.ftn_play_id,
+            starting_hash = EXCLUDED.starting_hash,
+            qb_location = EXCLUDED.qb_location,
+            n_offense_backfield = EXCLUDED.n_offense_backfield,
+            n_defense_box = EXCLUDED.n_defense_box,
+            is_no_huddle = EXCLUDED.is_no_huddle,
+            is_motion = EXCLUDED.is_motion,
+            is_play_action = EXCLUDED.is_play_action,
+            is_screen_pass = EXCLUDED.is_screen_pass,
+            is_rpo = EXCLUDED.is_rpo,
+            is_trick_play = EXCLUDED.is_trick_play,
+            is_qb_out_of_pocket = EXCLUDED.is_qb_out_of_pocket,
+            is_interception_worthy = EXCLUDED.is_interception_worthy,
+            is_throw_away = EXCLUDED.is_throw_away,
+            read_thrown = EXCLUDED.read_thrown,
+            is_catchable_ball = EXCLUDED.is_catchable_ball,
+            is_contested_ball = EXCLUDED.is_contested_ball,
+            is_created_reception = EXCLUDED.is_created_reception,
+            is_drop = EXCLUDED.is_drop,
+            is_qb_sneak = EXCLUDED.is_qb_sneak,
+            n_blitzers = EXCLUDED.n_blitzers,
+            n_pass_rushers = EXCLUDED.n_pass_rushers,
+            is_qb_fault_sack = EXCLUDED.is_qb_fault_sack,
+            date_pulled = EXCLUDED.date_pulled,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS ftn_staging")
+        log_message(sprintf("Upserted %d FTN charting records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    # ============================================================
+    # 10. PFR PASSING (2018-2025)
+    # ============================================================
+
+    pfr_passing_data <- run_pipeline_step(
+      step_name = "Load PFR Passing",
+      expr = {
+        log_message("Fetching PFR passing stats from nflverse (2018-2025)...", level = "INFO")
+
+        pfr_pass <- retry_operation(
+          expr = load_pfr_advstats(seasons = 2018:2025, stat_type = "pass"),
+          max_attempts = 3,
+          delay = 5,
+          error_message = "Failed to load PFR passing from nflverse"
+        )
+
+        log_message(sprintf("Loaded %d PFR passing records", nrow(pfr_pass)), level = "INFO")
+        pfr_pass
+      },
+      conn = conn,
+      validate_fn = function(data) {
+        validate_data(
+          data = data,
+          expected_cols = c("pfr_player_id", "game_id"),
+          min_rows = 1000
+        )
+      }
+    )
+
+    run_pipeline_step(
+      step_name = "Upsert PFR Passing",
+      expr = {
+        pfr_passing_clean <- pfr_passing_data %>%
+          select(
+            pfr_player_id, game_id, season, week, game_type, pfr_game_id,
+            team, opponent, pfr_player_name,
+            passing_drops, passing_drop_pct, receiving_drop, receiving_drop_pct,
+            passing_bad_throws, passing_bad_throw_pct, times_sacked, times_blitzed,
+            times_hurried, times_hit, times_pressured, times_pressured_pct
+          ) %>%
+          filter(!is.na(pfr_player_id), !is.na(game_id)) %>%
+          distinct()
+
+        dbExecute(conn, "CREATE TEMP TABLE pfr_passing_staging AS SELECT * FROM pfr_passing LIMIT 0")
+        dbWriteTable(conn, "pfr_passing_staging", pfr_passing_clean, append = TRUE, row.names = FALSE)
+
+        rows_updated <- dbExecute(conn, "
+          INSERT INTO pfr_passing
+          SELECT DISTINCT ON (pfr_player_id, game_id) * FROM pfr_passing_staging
+          ON CONFLICT (pfr_player_id, game_id)
+          DO UPDATE SET
+            season = EXCLUDED.season,
+            week = EXCLUDED.week,
+            game_type = EXCLUDED.game_type,
+            pfr_game_id = EXCLUDED.pfr_game_id,
+            team = EXCLUDED.team,
+            opponent = EXCLUDED.opponent,
+            pfr_player_name = EXCLUDED.pfr_player_name,
+            passing_drops = EXCLUDED.passing_drops,
+            passing_drop_pct = EXCLUDED.passing_drop_pct,
+            receiving_drop = EXCLUDED.receiving_drop,
+            receiving_drop_pct = EXCLUDED.receiving_drop_pct,
+            passing_bad_throws = EXCLUDED.passing_bad_throws,
+            passing_bad_throw_pct = EXCLUDED.passing_bad_throw_pct,
+            times_sacked = EXCLUDED.times_sacked,
+            times_blitzed = EXCLUDED.times_blitzed,
+            times_hurried = EXCLUDED.times_hurried,
+            times_hit = EXCLUDED.times_hit,
+            times_pressured = EXCLUDED.times_pressured,
+            times_pressured_pct = EXCLUDED.times_pressured_pct,
+            updated_at = NOW()
+        ")
+
+        dbExecute(conn, "DROP TABLE IF EXISTS pfr_passing_staging")
+        log_message(sprintf("Upserted %d PFR passing records", rows_updated), level = "INFO")
+        TRUE
+      },
+      conn = conn
+    )
+
+    log_message("=== COMPLETE NFLVERSE DATA BACKFILL COMPLETE ===", level = "INFO")
+    log_message("All 10 remaining data sources loaded successfully", level = "INFO")
+  })
+)

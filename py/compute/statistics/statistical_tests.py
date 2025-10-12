@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Core Statistical Testing Module.
 
@@ -44,9 +45,8 @@ class StatisticalResult:
     n_bootstrap: int | None = None
     interpretation: str = ""
 
-    @property
     def is_significant(self, alpha: float = 0.05) -> bool:
-        """Check if result is statistically significant."""
+        """Return True if result is statistically significant at level alpha."""
         return self.p_value < alpha
 
     def __str__(self) -> str:

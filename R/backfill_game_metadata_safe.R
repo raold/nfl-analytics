@@ -101,7 +101,7 @@ safe_db_operation(
       expr = {
         # Load schedules with retry for network issues
         schedules <- retry_operation(
-          expr = load_schedules(seasons = 1999:2024),
+          expr = load_schedules(seasons = 1999:2025),
           max_attempts = 3,
           delay = 5,
           error_message = "Failed to load schedules from nflverse"
@@ -196,7 +196,7 @@ safe_db_operation(
         ")
 
         for (i in 1:nrow(season_summary)) {
-          log_message(sprintf("Season %d: %d games with metadata",
+          log_message(sprintf("Season %.0f: %.0f games with metadata",
                              season_summary$season[i],
                              season_summary$games_with_stadium[i]),
                      level = "INFO")
@@ -337,7 +337,7 @@ safe_db_operation(
 
         log_message("=== Roof Type Distribution ===", level = "INFO")
         for (i in 1:nrow(roof_summary)) {
-          log_message(sprintf("  %s: %d games (%.1f%%)",
+          log_message(sprintf("  %s: %.0f games (%.1f%%)",
                              roof_summary$roof[i],
                              roof_summary$games[i],
                              roof_summary$pct[i]),
@@ -358,7 +358,7 @@ safe_db_operation(
 
         log_message("=== Top 5 Surface Types ===", level = "INFO")
         for (i in 1:nrow(surface_summary)) {
-          log_message(sprintf("  %s: %d games",
+          log_message(sprintf("  %s: %.0f games",
                              surface_summary$surface[i],
                              surface_summary$games[i]),
                      level = "INFO")
@@ -375,7 +375,7 @@ safe_db_operation(
           FROM games
         ")
 
-        log_message(sprintf("QB Coverage: %.1f%% home, %.1f%% away (of %d games)",
+        log_message(sprintf("QB Coverage: %.1f%% home, %.1f%% away (of %.0f games)",
                            qb_summary$home_qb_pct,
                            qb_summary$away_qb_pct,
                            qb_summary$total_games),
@@ -421,7 +421,7 @@ safe_db_operation(
 
     # Check for alerts
     if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
-      alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
+      alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"), simplifyDataFrame = FALSE)
       unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
       if (unread_alerts > 0) {
         log_message(sprintf("⚠️  %d unread alerts in %s",

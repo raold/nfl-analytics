@@ -36,6 +36,32 @@ services:
     depends_on:
       - data-init
 
+  dashboard:
+    build:
+      context: ../dashboard
+      dockerfile: Dockerfile
+    container_name: nfl-analytics-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5544
+      - DB_NAME=devdb01
+      - DB_USER=dro
+      - DB_PASSWORD=sicillionbillions
+    restart: unless-stopped
+    networks:
+      - default
+    extra_hosts:
+      # Allow container to access host database
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8501/_stcore/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   data-init:
     image: alpine:latest
     container_name: nfl-analytics-data-init
