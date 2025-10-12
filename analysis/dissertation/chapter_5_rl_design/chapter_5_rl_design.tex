@@ -379,12 +379,6 @@ to reflect annualized performance accounting for idle periods (cf. Table~10.2 ze
 \subsection{RL vs Strategic Responses (Bridge)}
 We treat the policy as a small, price‑taking agent: odds are exogenous and our actions do not move markets. This matches the offline RL setting and typical pre‑game stake sizes. If stakes were large enough to affect prices or limits, a Stackelberg model would be required with the bookmaker as leader and the policy as follower; training and OPE would then incorporate price‑impact and inventory dynamics (left as future work).
 
-\chaptersummary{
-We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance.
-}{
-\Cref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
-}
-
 \section{Offline RL Methods at a Glance}
 \begin{table}[t]
   \centering
@@ -422,4 +416,10 @@ We mapped NFL challenges to RL design choices, summarized robust offline RL algo
 We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
 }{
 \Cref{chap:risk} formalizes stake sizing and portfolio risk controls; \Cref{chap:sim} validates policies under dependence and frictions before promotion.
+}
+
+\chaptersummary{
+We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance.
+}{
+\Cref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
 }

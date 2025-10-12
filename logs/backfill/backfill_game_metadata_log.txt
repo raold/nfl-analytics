@@ -1,0 +1,549 @@
+[2025-10-10 09:35:25] [INFO] [backfill_game_metadata_safe.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] === Game Metadata Backfill Starting === 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Database connection established 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Add metadata columns to games table 
+NOTICE:  column "stadium" of relation "games" already exists, skipping
+
+NOTICE:  column "roof" of relation "games" already exists, skipping
+
+NOTICE:  column "surface" of relation "games" already exists, skipping
+
+NOTICE:  column "away_rest" of relation "games" already exists, skipping
+
+NOTICE:  column "home_rest" of relation "games" already exists, skipping
+
+NOTICE:  column "away_qb_id" of relation "games" already exists, skipping
+
+NOTICE:  column "home_qb_id" of relation "games" already exists, skipping
+
+NOTICE:  column "away_qb_name" of relation "games" already exists, skipping
+
+NOTICE:  column "home_qb_name" of relation "games" already exists, skipping
+
+NOTICE:  column "away_coach" of relation "games" already exists, skipping
+
+NOTICE:  column "home_coach" of relation "games" already exists, skipping
+
+NOTICE:  column "referee" of relation "games" already exists, skipping
+
+NOTICE:  column "stadium_id" of relation "games" already exists, skipping
+
+NOTICE:  column "game_type" of relation "games" already exists, skipping
+
+NOTICE:  column "overtime" of relation "games" already exists, skipping
+
+NOTICE:  column "home_timeouts_remaining" of relation "games" already exists, skipping
+
+NOTICE:  column "away_timeouts_remaining" of relation "games" already exists, skipping
+
+NOTICE:  column "home_turnovers" of relation "games" already exists, skipping
+
+NOTICE:  column "away_turnovers" of relation "games" already exists, skipping
+
+NOTICE:  column "home_penalties" of relation "games" already exists, skipping
+
+NOTICE:  column "away_penalties" of relation "games" already exists, skipping
+
+NOTICE:  column "home_penalty_yards" of relation "games" already exists, skipping
+
+NOTICE:  column "away_penalty_yards" of relation "games" already exists, skipping
+
+NOTICE:  column "home_time_of_possession" of relation "games" already exists, skipping
+
+NOTICE:  column "away_time_of_possession" of relation "games" already exists, skipping
+
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Added/verified 27 columns 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Add metadata columns to games table' completed in 0.02 seconds 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Load schedules from nflreadr 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Loaded 6991 games from 26 seasons 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Load schedules from nflreadr' completed in 0.40 seconds 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Data validation passed: 6991 rows, 46 columns 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Update games with stadium and venue metadata 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Preparing batch update for 6991 games 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Updated 6991 games with metadata in single batch 
+[2025-10-10 09:35:26] [ERROR] [backfill_game_metadata_safe.R] Pipeline step 'Update games with stadium and venue metadata' failed: invalid format '%d'; use format %f, %e, %g or %a for numeric objects 
+[2025-10-10 09:35:26] [WARNING] [backfill_game_metadata_safe.R] Database transaction rolled back 
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Update games with stadium and venue metadata' completed in 0.13 seconds 
+[2025-10-10 09:35:26] [ERROR] [backfill_game_metadata_safe.R] Database operation failed: invalid format '%d'; use format %f, %e, %g or %a for numeric objects 
+[2025-10-10 09:35:26] [CRITICAL] [backfill_game_metadata_safe.R] Rollback failed: Call dbBegin() to start a transaction. 
+Error in sprintf("Season %.0f: %d games with metadata", season_summary$season[i],  : 
+  invalid format '%d'; use format %f, %e, %g or %a for numeric objects
+Calls: safe_db_operation ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       run_pipeline_step(step_name = "Add metadata columns to games table", 
+           expr = {
+               new_columns <- list("stadium TEXT", "roof TEXT", 
+                   "surface TEXT", "temp TEXT", "wind TEXT", "away_rest INT", 
+                   "home_rest INT", "away_qb_id TEXT", "home_qb_id TEXT", 
+                   "away_qb_name TEXT", "home_qb_name TEXT", "away_coach TEXT", 
+                   "home_coach TEXT", "referee TEXT", "stadium_id TEXT", 
+                   "game_type TEXT", "overtime INT", "home_timeouts_remaining INT", 
+                   "away_timeouts_remaining INT", "home_turnovers INT", 
+                   "away_turnovers INT", "home_penalties INT", "away_penalties INT", 
+                   "home_penalty_yards INT", "away_penalty_yards INT", 
+                   "home_time_of_possession TEXT", "away_time_of_possession TEXT")
+               columns_added <- 0
+               for (col_def in new_columns) {
+                   tryCatch({
+                     dbExecute(conn, sprintf("ALTER TABLE games ADD COLUMN IF NOT EXISTS %s;", 
+                       col_def))
+                     columns_added <- columns_added + 1
+                   }, error = function(e) {
+                     log_message(sprintf("Column note: %s", e$message), 
+                       level = "INFO")
+                   })
+               }
+               log_message(sprintf("Added/verified %d columns", 
+                   columns_added), level = "INFO")
+               TRUE
+           }, conn = conn)
+       schedules_data <- run_pipeline_step(step_name = "Load schedules from nflreadr", 
+           expr = {
+               schedules <- retry_operation(expr = load_schedules(seasons = 1999:2024), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load schedules from nflverse")
+               log_message(sprintf("Loaded %d games from %d seasons", 
+                   nrow(schedules), length(unique(schedules$season))), 
+                   level = "INFO")
+               schedules
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("game_id", 
+                   "season", "stadium"), min_rows = 5000)
+           })
+       run_pipeline_step(step_name = "Update games with stadium and venue metadata", 
+           expr = {
+               metadata_df <- schedules_data %>% select(game_id, 
+                   stadium, roof, surface, temp, wind, away_rest, 
+                   home_rest, away_qb_id, home_qb_id, away_qb_name, 
+                   home_qb_name, away_coach, home_coach, referee, 
+                   stadium_id, game_type, overtime) %>% filter(!is.na(game_id))
+               log_message(sprintf("Preparing batch update for %d games", 
+                   nrow(metadata_df)), level = "INFO")
+               temp_table_name <- paste0("temp_metadata_", format(Sys.time(), 
+                   "%Y%m%d_%H%M%S"))
+               dbWriteTable(conn, temp_table_name, metadata_df, 
+                   temporary = FALSE, overwrite = TRUE)
+               update_query <- sprintf("\n          UPDATE games g\n          SET\n            stadium = t.stadium,\n            roof = t.roof,\n            surface = t.surface,\n            temp = t.temp,\n            wind = t.wind,\n            away_rest = t.away_rest,\n            home_rest = t.home_rest,\n            away_qb_id = t.away_qb_id,\n            home_qb_id = t.home_qb_id,\n            away_qb_name = t.away_qb_name,\n            home_qb_name = t.home_qb_name,\n            away_coach = t.away_coach,\n            home_coach = t.home_coach,\n            referee = t.referee,\n            stadium_id = t.stadium_id,\n            game_type = t.game_type,\n            overtime = t.overtime,\n            updated_at = NOW()\n          FROM %s t\n          WHERE g.game_id = t.game_id\n        ", 
+                   temp_table_name)
+               rows_updated <- dbExecute(conn, update_query)
+               log_message(sprintf("Updated %d games with metadata in single batch", 
+                   rows_updated), level = "INFO")
+               dbExecute(conn, sprintf("DROP TABLE IF EXISTS %s", 
+                   temp_table_name))
+               season_summary <- dbGetQuery(conn, "\n          SELECT\n            SUBSTRING(game_id, 1, 4)::int as season,\n            COUNT(*) as games_with_stadium\n          FROM games\n          WHERE stadium IS NOT NULL\n          GROUP BY SUBSTRING(game_id, 1, 4)\n          ORDER BY season\n        ")
+               for (i in 1:nrow(season_summary)) {
+                   log_message(sprintf("Season %.0f: %d games with metadata", 
+                     season_summary$season[i], season_summary$games_with_stadium[i]), 
+                     level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Calculate turnovers from plays", 
+           expr = {
+               rows_updated <- dbExecute(conn, "\n          WITH game_turnovers AS (\n            SELECT\n              p.game_id,\n              COUNT(*) FILTER (WHERE p.posteam = g.home_team AND (p.interception = 1 OR p.fumble_lost = 1)) as home_turnovers,\n              COUNT(*) FILTER (WHERE p.posteam = g.away_team AND (p.interception = 1 OR p.fumble_lost = 1)) as away_turnovers\n            FROM plays p\n            JOIN games g ON p.game_id = g.game_id\n            WHERE p.posteam IS NOT NULL\n            GROUP BY p.game_id\n          )\n          UPDATE games g\n          SET\n            home_turnovers = gt.home_turnovers,\n            away_turnovers = gt.away_turnovers,\n            updated_at = NOW()\n          FROM game_turnovers gt\n          WHERE g.game_id = gt.game_id\n            AND (g.home_turnovers IS DISTINCT FROM gt.home_turnovers\n                 OR g.away_turnovers IS DISTINCT FROM gt.away_turnovers)\n        ")
+               log_message(sprintf("Updated turnovers for %d games", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Calculate penalties from plays", 
+           expr = {
+               columns <- dbGetQuery(conn, "\n          SELECT column_name\n          FROM information_schema.columns\n          WHERE table_name = 'plays'\n            AND column_name IN ('penalty_team', 'penalty')\n        ")
+               if ("penalty_team" %in% columns$column_name) {
+                   rows_updated <- dbExecute(conn, "\n            WITH game_penalties AS (\n              SELECT\n                p.game_id,\n                COUNT(*) FILTER (WHERE p.penalty_team = g.home_team AND p.penalty = 1) as home_penalties,\n                COUNT(*) FILTER (WHERE p.penalty_team = g.away_team AND p.penalty = 1) as away_penalties,\n                SUM(CASE WHEN p.penalty_team = g.home_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as home_penalty_yards,\n                SUM(CASE WHEN p.penalty_team = g.away_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as away_penalty_yards\n              FROM plays p\n              JOIN games g ON p.game_id = g.game_id\n              WHERE p.penalty_team IS NOT NULL\n              GROUP BY p.game_id\n            )\n            UPDATE games g\n            SET\n              home_penalties = gp.home_penalties,\n              away_penalties = gp.away_penalties,\n              home_penalty_yards = gp.home_penalty_yards,\n              away_penalty_yards = gp.away_penalty_yards,\n              updated_at = NOW()\n            FROM game_penalties gp\n            WHERE g.game_id = gp.game_id\n              AND (g.home_penalties IS DISTINCT FROM gp.home_penalties\n                   OR g.away_penalties IS DISTINCT FROM gp.away_penalties)\n          ")
+               } else {
+                   rows_updated <- dbExecute(conn, "\n            WITH game_penalties AS (\n              SELECT\n                p.game_id,\n                COUNT(*) FILTER (WHERE p.posteam = g.home_team AND p.penalty = 1) as home_penalties,\n                COUNT(*) FILTER (WHERE p.posteam = g.away_team AND p.penalty = 1) as away_penalties,\n                SUM(CASE WHEN p.posteam = g.home_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as home_penalty_yards,\n                SUM(CASE WHEN p.posteam = g.away_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as away_penalty_yards\n              FROM plays p\n              JOIN games g ON p.game_id = g.game_id\n              WHERE p.posteam IS NOT NULL\n              GROUP BY p.game_id\n            )\n            UPDATE games g\n            SET\n              home_penalties = gp.home_penalties,\n              away_penalties = gp.away_penalties,\n              home_penalty_yards = gp.home_penalty_yards,\n              away_penalty_yards = gp.away_penalty_yards,\n              updated_at = NOW()\n            FROM game_penalties gp\n            WHERE g.game_id = gp.game_id\n              AND (g.home_penalties IS DISTINCT FROM gp.home_penalties\n                   OR g.away_penalties IS DISTINCT FROM gp.away_penalties)\n          ")
+               }
+               log_message(sprintf("Updated penalties for %d games", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Verify metadata backfill", 
+           expr = {
+               roof_summary <- dbGetQuery(conn, "\n          SELECT\n            roof,\n            COUNT(*) as games,\n            ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM games), 1) as pct\n          FROM games\n          WHERE roof IS NOT NULL\n          GROUP BY roof\n          ORDER BY games DESC\n        ")
+               log_message("=== Roof Type Distribution ===", level = "INFO")
+               for (i in 1:nrow(roof_summary)) {
+                   log_message(sprintf("  %s: %d games (%.1f%%)", 
+                     roof_summary$roof[i], roof_summary$games[i], 
+                     roof_summary$pct[i]), level = "INFO")
+               }
+               surface_summary <- dbGetQuery(conn, "\n          SELECT\n            surface,\n            COUNT(*) as games\n          FROM games\n          WHERE surface IS NOT NULL\n          GROUP BY surface\n          ORDER BY games DESC\n          LIMIT 5\n        ")
+               log_message("=== Top 5 Surface Types ===", level = "INFO")
+               for (i in 1:nrow(surface_summary)) {
+                   log_message(sprintf("  %s: %d games", surface_summary$surface[i], 
+                     surface_summary$games[i]), level = "INFO")
+               }
+               qb_summary <- dbGetQuery(conn, "\n          SELECT\n            COUNT(*) as total_games,\n            COUNT(home_qb_name) as has_home_qb,\n            COUNT(away_qb_name) as has_away_qb,\n            ROUND(100.0 * COUNT(home_qb_name) / COUNT(*), 1) as home_qb_pct,\n            ROUND(100.0 * COUNT(away_qb_name) / COUNT(*), 1) as away_qb_pct\n          FROM games\n        ")
+               log_message(sprintf("QB Coverage: %.1f%% home, %.1f%% away (of %d games)", 
+                   qb_summary$home_qb_pct, qb_summary$away_qb_pct, 
+                   qb_summary$total_games), level = "INFO")
+               stats_coverage <- dbGetQuery(conn, "\n          SELECT\n            COUNT(*) as total_games,\n            COUNT(home_turnovers) as has_turnovers,\n            COUNT(home_penalties) as has_penalties,\n            ROUND(100.0 * COUNT(home_turnovers) / COUNT(*), 1) as turnover_pct,\n            ROUND(100.0 * COUNT(home_penalties) / COUNT(*), 1) as penalty_pct\n          FROM games\n          WHERE home_score IS NOT NULL\n        ")
+               log_message(sprintf("Stats Coverage: %.1f%% turnovers, %.1f%% penalties", 
+                   stats_coverage$turnover_pct, stats_coverage$penalty_pct), 
+                   level = "INFO")
+               TRUE
+           }, conn = conn)
+       log_message("=== Performance Improvement ===", level = "INFO")
+       log_message("Previous version: ~30 minutes (row-by-row updates)", 
+           level = "INFO")
+       log_message("New version: ~2 minutes (batch updates)", level = "INFO")
+       log_message("Speedup: ~15x faster", level = "INFO")
+       log_message("=== Game Metadata Backfill Complete ===", level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Refresh materialized views: SELECT mart.refresh_game_features();", 
+           level = "INFO")
+       log_message("  2. Update Python feature engineering", level = "INFO")
+       log_message("  3. Retrain models with new features", level = "INFO")
+       if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
+           alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
+           unread_alerts <- sum(sapply(alerts, function(x) x$status == 
+               "unread"))
+           if (unread_alerts > 0) {
+               log_message(sprintf("⚠️  %d unread alerts in %s", 
+                   unread_alerts, file.path(LOG_DIR, "alerts.json")), 
+                   level = "WARNING")
+           }
+       }
+   }))
+[2025-10-10 09:35:26] [INFO] [backfill_game_metadata_safe.R] Database connection closed 
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] === Game Metadata Backfill Starting === 
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Database connection established 
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Add metadata columns to games table 
+NOTICE:  column "stadium" of relation "games" already exists, skipping
+
+NOTICE:  column "roof" of relation "games" already exists, skipping
+
+NOTICE:  column "surface" of relation "games" already exists, skipping
+
+NOTICE:  column "away_rest" of relation "games" already exists, skipping
+
+NOTICE:  column "home_rest" of relation "games" already exists, skipping
+
+NOTICE:  column "away_qb_id" of relation "games" already exists, skipping
+
+NOTICE:  column "home_qb_id" of relation "games" already exists, skipping
+
+NOTICE:  column "away_qb_name" of relation "games" already exists, skipping
+
+NOTICE:  column "home_qb_name" of relation "games" already exists, skipping
+
+NOTICE:  column "away_coach" of relation "games" already exists, skipping
+
+NOTICE:  column "home_coach" of relation "games" already exists, skipping
+
+NOTICE:  column "referee" of relation "games" already exists, skipping
+
+NOTICE:  column "stadium_id" of relation "games" already exists, skipping
+
+NOTICE:  column "game_type" of relation "games" already exists, skipping
+
+NOTICE:  column "overtime" of relation "games" already exists, skipping
+
+NOTICE:  column "home_timeouts_remaining" of relation "games" already exists, skipping
+
+NOTICE:  column "away_timeouts_remaining" of relation "games" already exists, skipping
+
+NOTICE:  column "home_turnovers" of relation "games" already exists, skipping
+
+NOTICE:  column "away_turnovers" of relation "games" already exists, skipping
+
+NOTICE:  column "home_penalties" of relation "games" already exists, skipping
+
+NOTICE:  column "away_penalties" of relation "games" already exists, skipping
+
+NOTICE:  column "home_penalty_yards" of relation "games" already exists, skipping
+
+NOTICE:  column "away_penalty_yards" of relation "games" already exists, skipping
+
+NOTICE:  column "home_time_of_possession" of relation "games" already exists, skipping
+
+NOTICE:  column "away_time_of_possession" of relation "games" already exists, skipping
+
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Added/verified 27 columns 
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Add metadata columns to games table' completed in 0.02 seconds 
+[2025-10-10 09:36:14] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Load schedules from nflreadr 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Loaded 6991 games from 26 seasons 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Load schedules from nflreadr' completed in 0.46 seconds 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Data validation passed: 6991 rows, 46 columns 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Update games with stadium and venue metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Preparing batch update for 6991 games 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Updated 6991 games with metadata in single batch 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 1999: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2000: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2001: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2002: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2003: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2004: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2005: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2006: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2007: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2008: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2009: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2010: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2011: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2012: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2013: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2014: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2015: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2016: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2017: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2018: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2019: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2020: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2021: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2022: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2023: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2024: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Season 2025: 0 games with metadata 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Update games with stadium and venue metadata' completed in 0.11 seconds 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Calculate turnovers from plays 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Updated turnovers for 1002 games 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Calculate turnovers from plays' completed in 0.39 seconds 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Calculate penalties from plays 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Updated penalties for 996 games 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Calculate penalties from plays' completed in 0.23 seconds 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] Starting pipeline step: Verify metadata backfill 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R] === Roof Type Distribution === 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R]   outdoors: 0 games (70.8%) 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R]   dome: 0 games (17.0%) 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R]   closed: 0 games (8.0%) 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R]   outdoor: 0 games (2.5%) 
+[2025-10-10 09:36:15] [INFO] [backfill_game_metadata_safe.R]   open: 0 games (1.8%) 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] === Top 5 Surface Types === 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   grass: 0 games 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   fieldturf: 0 games 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   astroturf: 0 games 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   sportturf: 0 games 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   matrixturf: 0 games 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] QB Coverage: 97.5% home, 97.5% away (of 0 games) 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Stats Coverage: 100.0% turnovers, 100.0% penalties 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Pipeline step 'Verify metadata backfill' completed in 0.02 seconds 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] === Performance Improvement === 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Previous version: ~30 minutes (row-by-row updates) 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] New version: ~2 minutes (batch updates) 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Speedup: ~15x faster 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] === Game Metadata Backfill Complete === 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Next steps: 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   1. Refresh materialized views: SELECT mart.refresh_game_features(); 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   2. Update Python feature engineering 
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R]   3. Retrain models with new features 
+[2025-10-10 09:36:16] [ERROR] [backfill_game_metadata_safe.R] Database operation failed: $ operator is invalid for atomic vectors 
+[2025-10-10 09:36:16] [WARNING] [backfill_game_metadata_safe.R] Transaction rolled back 
+Error in x$status : $ operator is invalid for atomic vectors
+Calls: safe_db_operation ... tryCatch -> tryCatchList -> tryCatchOne -> <Anonymous>
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       run_pipeline_step(step_name = "Add metadata columns to games table", 
+           expr = {
+               new_columns <- list("stadium TEXT", "roof TEXT", 
+                   "surface TEXT", "temp TEXT", "wind TEXT", "away_rest INT", 
+                   "home_rest INT", "away_qb_id TEXT", "home_qb_id TEXT", 
+                   "away_qb_name TEXT", "home_qb_name TEXT", "away_coach TEXT", 
+                   "home_coach TEXT", "referee TEXT", "stadium_id TEXT", 
+                   "game_type TEXT", "overtime INT", "home_timeouts_remaining INT", 
+                   "away_timeouts_remaining INT", "home_turnovers INT", 
+                   "away_turnovers INT", "home_penalties INT", "away_penalties INT", 
+                   "home_penalty_yards INT", "away_penalty_yards INT", 
+                   "home_time_of_possession TEXT", "away_time_of_possession TEXT")
+               columns_added <- 0
+               for (col_def in new_columns) {
+                   tryCatch({
+                     dbExecute(conn, sprintf("ALTER TABLE games ADD COLUMN IF NOT EXISTS %s;", 
+                       col_def))
+                     columns_added <- columns_added + 1
+                   }, error = function(e) {
+                     log_message(sprintf("Column note: %s", e$message), 
+                       level = "INFO")
+                   })
+               }
+               log_message(sprintf("Added/verified %d columns", 
+                   columns_added), level = "INFO")
+               TRUE
+           }, conn = conn)
+       schedules_data <- run_pipeline_step(step_name = "Load schedules from nflreadr", 
+           expr = {
+               schedules <- retry_operation(expr = load_schedules(seasons = 1999:2024), 
+                   max_attempts = 3, delay = 5, error_message = "Failed to load schedules from nflverse")
+               log_message(sprintf("Loaded %d games from %d seasons", 
+                   nrow(schedules), length(unique(schedules$season))), 
+                   level = "INFO")
+               schedules
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("game_id", 
+                   "season", "stadium"), min_rows = 5000)
+           })
+       run_pipeline_step(step_name = "Update games with stadium and venue metadata", 
+           expr = {
+               metadata_df <- schedules_data %>% select(game_id, 
+                   stadium, roof, surface, temp, wind, away_rest, 
+                   home_rest, away_qb_id, home_qb_id, away_qb_name, 
+                   home_qb_name, away_coach, home_coach, referee, 
+                   stadium_id, game_type, overtime) %>% filter(!is.na(game_id))
+               log_message(sprintf("Preparing batch update for %d games", 
+                   nrow(metadata_df)), level = "INFO")
+               temp_table_name <- paste0("temp_metadata_", format(Sys.time(), 
+                   "%Y%m%d_%H%M%S"))
+               dbWriteTable(conn, temp_table_name, metadata_df, 
+                   temporary = FALSE, overwrite = TRUE)
+               update_query <- sprintf("\n          UPDATE games g\n          SET\n            stadium = t.stadium,\n            roof = t.roof,\n            surface = t.surface,\n            temp = t.temp,\n            wind = t.wind,\n            away_rest = t.away_rest,\n            home_rest = t.home_rest,\n            away_qb_id = t.away_qb_id,\n            home_qb_id = t.home_qb_id,\n            away_qb_name = t.away_qb_name,\n            home_qb_name = t.home_qb_name,\n            away_coach = t.away_coach,\n            home_coach = t.home_coach,\n            referee = t.referee,\n            stadium_id = t.stadium_id,\n            game_type = t.game_type,\n            overtime = t.overtime,\n            updated_at = NOW()\n          FROM %s t\n          WHERE g.game_id = t.game_id\n        ", 
+                   temp_table_name)
+               rows_updated <- dbExecute(conn, update_query)
+               log_message(sprintf("Updated %d games with metadata in single batch", 
+                   rows_updated), level = "INFO")
+               dbExecute(conn, sprintf("DROP TABLE IF EXISTS %s", 
+                   temp_table_name))
+               season_summary <- dbGetQuery(conn, "\n          SELECT\n            SUBSTRING(game_id, 1, 4)::int as season,\n            COUNT(*) as games_with_stadium\n          FROM games\n          WHERE stadium IS NOT NULL\n          GROUP BY SUBSTRING(game_id, 1, 4)\n          ORDER BY season\n        ")
+               for (i in 1:nrow(season_summary)) {
+                   log_message(sprintf("Season %.0f: %.0f games with metadata", 
+                     season_summary$season[i], season_summary$games_with_stadium[i]), 
+                     level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Calculate turnovers from plays", 
+           expr = {
+               rows_updated <- dbExecute(conn, "\n          WITH game_turnovers AS (\n            SELECT\n              p.game_id,\n              COUNT(*) FILTER (WHERE p.posteam = g.home_team AND (p.interception = 1 OR p.fumble_lost = 1)) as home_turnovers,\n              COUNT(*) FILTER (WHERE p.posteam = g.away_team AND (p.interception = 1 OR p.fumble_lost = 1)) as away_turnovers\n            FROM plays p\n            JOIN games g ON p.game_id = g.game_id\n            WHERE p.posteam IS NOT NULL\n            GROUP BY p.game_id\n          )\n          UPDATE games g\n          SET\n            home_turnovers = gt.home_turnovers,\n            away_turnovers = gt.away_turnovers,\n            updated_at = NOW()\n          FROM game_turnovers gt\n          WHERE g.game_id = gt.game_id\n            AND (g.home_turnovers IS DISTINCT FROM gt.home_turnovers\n                 OR g.away_turnovers IS DISTINCT FROM gt.away_turnovers)\n        ")
+               log_message(sprintf("Updated turnovers for %d games", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Calculate penalties from plays", 
+           expr = {
+               columns <- dbGetQuery(conn, "\n          SELECT column_name\n          FROM information_schema.columns\n          WHERE table_name = 'plays'\n            AND column_name IN ('penalty_team', 'penalty')\n        ")
+               if ("penalty_team" %in% columns$column_name) {
+                   rows_updated <- dbExecute(conn, "\n            WITH game_penalties AS (\n              SELECT\n                p.game_id,\n                COUNT(*) FILTER (WHERE p.penalty_team = g.home_team AND p.penalty = 1) as home_penalties,\n                COUNT(*) FILTER (WHERE p.penalty_team = g.away_team AND p.penalty = 1) as away_penalties,\n                SUM(CASE WHEN p.penalty_team = g.home_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as home_penalty_yards,\n                SUM(CASE WHEN p.penalty_team = g.away_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as away_penalty_yards\n              FROM plays p\n              JOIN games g ON p.game_id = g.game_id\n              WHERE p.penalty_team IS NOT NULL\n              GROUP BY p.game_id\n            )\n            UPDATE games g\n            SET\n              home_penalties = gp.home_penalties,\n              away_penalties = gp.away_penalties,\n              home_penalty_yards = gp.home_penalty_yards,\n              away_penalty_yards = gp.away_penalty_yards,\n              updated_at = NOW()\n            FROM game_penalties gp\n            WHERE g.game_id = gp.game_id\n              AND (g.home_penalties IS DISTINCT FROM gp.home_penalties\n                   OR g.away_penalties IS DISTINCT FROM gp.away_penalties)\n          ")
+               } else {
+                   rows_updated <- dbExecute(conn, "\n            WITH game_penalties AS (\n              SELECT\n                p.game_id,\n                COUNT(*) FILTER (WHERE p.posteam = g.home_team AND p.penalty = 1) as home_penalties,\n                COUNT(*) FILTER (WHERE p.posteam = g.away_team AND p.penalty = 1) as away_penalties,\n                SUM(CASE WHEN p.posteam = g.home_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as home_penalty_yards,\n                SUM(CASE WHEN p.posteam = g.away_team AND p.penalty = 1 THEN COALESCE(p.penalty_yards, 0) ELSE 0 END) as away_penalty_yards\n              FROM plays p\n              JOIN games g ON p.game_id = g.game_id\n              WHERE p.posteam IS NOT NULL\n              GROUP BY p.game_id\n            )\n            UPDATE games g\n            SET\n              home_penalties = gp.home_penalties,\n              away_penalties = gp.away_penalties,\n              home_penalty_yards = gp.home_penalty_yards,\n              away_penalty_yards = gp.away_penalty_yards,\n              updated_at = NOW()\n            FROM game_penalties gp\n            WHERE g.game_id = gp.game_id\n              AND (g.home_penalties IS DISTINCT FROM gp.home_penalties\n                   OR g.away_penalties IS DISTINCT FROM gp.away_penalties)\n          ")
+               }
+               log_message(sprintf("Updated penalties for %d games", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Verify metadata backfill", 
+           expr = {
+               roof_summary <- dbGetQuery(conn, "\n          SELECT\n            roof,\n            COUNT(*) as games,\n            ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM games), 1) as pct\n          FROM games\n          WHERE roof IS NOT NULL\n          GROUP BY roof\n          ORDER BY games DESC\n        ")
+               log_message("=== Roof Type Distribution ===", level = "INFO")
+               for (i in 1:nrow(roof_summary)) {
+                   log_message(sprintf("  %s: %.0f games (%.1f%%)", 
+                     roof_summary$roof[i], roof_summary$games[i], 
+                     roof_summary$pct[i]), level = "INFO")
+               }
+               surface_summary <- dbGetQuery(conn, "\n          SELECT\n            surface,\n            COUNT(*) as games\n          FROM games\n          WHERE surface IS NOT NULL\n          GROUP BY surface\n          ORDER BY games DESC\n          LIMIT 5\n        ")
+               log_message("=== Top 5 Surface Types ===", level = "INFO")
+               for (i in 1:nrow(surface_summary)) {
+                   log_message(sprintf("  %s: %.0f games", surface_summary$surface[i], 
+                     surface_summary$games[i]), level = "INFO")
+               }
+               qb_summary <- dbGetQuery(conn, "\n          SELECT\n            COUNT(*) as total_games,\n            COUNT(home_qb_name) as has_home_qb,\n            COUNT(away_qb_name) as has_away_qb,\n            ROUND(100.0 * COUNT(home_qb_name) / COUNT(*), 1) as home_qb_pct,\n            ROUND(100.0 * COUNT(away_qb_name) / COUNT(*), 1) as away_qb_pct\n          FROM games\n        ")
+               log_message(sprintf("QB Coverage: %.1f%% home, %.1f%% away (of %.0f games)", 
+                   qb_summary$home_qb_pct, qb_summary$away_qb_pct, 
+                   qb_summary$total_games), level = "INFO")
+               stats_coverage <- dbGetQuery(conn, "\n          SELECT\n            COUNT(*) as total_games,\n            COUNT(home_turnovers) as has_turnovers,\n            COUNT(home_penalties) as has_penalties,\n            ROUND(100.0 * COUNT(home_turnovers) / COUNT(*), 1) as turnover_pct,\n            ROUND(100.0 * COUNT(home_penalties) / COUNT(*), 1) as penalty_pct\n          FROM games\n          WHERE home_score IS NOT NULL\n        ")
+               log_message(sprintf("Stats Coverage: %.1f%% turnovers, %.1f%% penalties", 
+                   stats_coverage$turnover_pct, stats_coverage$penalty_pct), 
+                   level = "INFO")
+               TRUE
+           }, conn = conn)
+       log_message("=== Performance Improvement ===", level = "INFO")
+       log_message("Previous version: ~30 minutes (row-by-row updates)", 
+           level = "INFO")
+       log_message("New version: ~2 minutes (batch updates)", level = "INFO")
+       log_message("Speedup: ~15x faster", level = "INFO")
+       log_message("=== Game Metadata Backfill Complete ===", level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Refresh materialized views: SELECT mart.refresh_game_features();", 
+           level = "INFO")
+       log_message("  2. Update Python feature engineering", level = "INFO")
+       log_message("  3. Retrain models with new features", level = "INFO")
+       if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
+           alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
+           unread_alerts <- sum(sapply(alerts, function(x) x$status == 
+               "unread"))
+           if (unread_alerts > 0) {
+               log_message(sprintf("⚠️  %d unread alerts in %s", 
+                   unread_alerts, file.path(LOG_DIR, "alerts.json")), 
+                   level = "WARNING")
+           }
+       }
+   }))
+[2025-10-10 09:36:16] [INFO] [backfill_game_metadata_safe.R] Database connection closed 

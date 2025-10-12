@@ -93,6 +93,8 @@
   \item \prio{P1} Offline RL dataset (historic games as trajectories); behavior policy notes. \done\ (py/rl/dataset.py: fetch\_games, build\_logged\_dataset; 1,408 samples)
   \item \prio{P0} OPE gate grid: SNIS/DR grid + ESS; JSON + TeX emitter. \done\ (py/rl/ope\_gate.py with clipping/shrinkage grid; py/rl/ope.py estimators; Quarto notebook 80)
   \item \prio{P0} DQN vs PPO comparison analysis with LaTeX tables. \done\ (py/analysis/rl\_agent\_comparison.py: stability metrics, action distributions; rl\_agent\_comparison\_table.tex generated)
+  \item \prio{P0} \textbf{Target 5: Player Impact Adjustments (MVP).} \done\ (371 lines: py/predict/injury\_adjustments.py; position-based impact system: QB -5\%, RB -1\%, WR -1.5\%, O-line -0.8-1.2\%; depth chart integration for starter vs backup; tested 2024 Week 10: 54 injured players, CHI -1.8\% due to 3 O-line injuries)
+  \item \prio{P0} \textbf{Target 7: In-Game Win Probability (Batch Mode).} \done\ (515 lines: py/models/ingame\_win\_probability.py; 18 game state features from 1.24M plays; XGBoost model: Train Brier 0.1748, Test 2024 Brier 0.1925; Accuracy: 72.3\% train, 68.1\% test; batch inference generates play-by-play probabilities; tested 2024\_10\_CIN\_BAL: 178 plays)
 \end{itemize}
 
 \block{Training \& Scaling}
@@ -116,7 +118,68 @@
 \begin{itemize}
   \item \prio{P0} Posterior distributions (state-space, Poisson); bootstrap ensembles for GLM.
   \item \prio{P0} Fractional Kelly module; bankroll simulator; risk-of-ruin \& max drawdown analytics. \done\ (CVaR LP: py/risk/cvar\_lp.py; Monte Carlo scenarios: generate\_scenarios.py; TeX report: cvar\_report.py; Quarto notebook 12)
-  \item \prio{P1} Uncertainty-aware policy: downweight bets under wide posterior intervals.
+  \item \prio{P1} Uncertainty-aware policy: downweight bets under wide posterior intervals. \done\ (uncertainty\_segmentation.py: 3-tier confidence segmentation)
+\end{itemize>
+
+\milestone{Profit Optimization (NEW - Expert Advisors Feedback)}
+\block{EV-Optimal Selection}
+\begin{itemize}
+  \item \prio{P0} \textbf{Edge-based bet selection}: Replace probability thresholds with edge thresholds (3-4\% minimum). \done\ (ev\_bet\_selector.py: min\_edge filtering, CLV percentile tracking, no-bet deadzone)
+  \item \prio{P0} \textbf{CLV tracking}: Filter bets by CLV percentiles that convert to profit. \done\ (integrated in ev\_bet\_selector.py with historical CLV analysis)
+  \item \prio{P1} \textbf{No-bet deadzone}: Avoid marginal bets near breakeven (±20 bps). \done\ (ev\_bet\_selector.py: configurable deadzone parameter)
+\end{itemize}
+
+\block{Market Timing \& Dynamics}
+\begin{itemize}
+  \item \prio{P0} \textbf{Line movement velocity}: Calculate dLine/dt with weighted recency. \done\ (line\_movement\_enhanced.py: exponential weighting, half-life=6hrs)
+  \item \prio{P0} \textbf{Market microstructure}: Cross-book consensus, hold calculation, arbitrage detection. \done\ (line\_movement\_enhanced.py: consensus calculator, hold metrics)
+  \item \prio{P0} \textbf{Sharp vs public}: Detect reverse line moves, steam, professional alignment. \done\ (line\_movement\_enhanced.py: sharp\_public\_split detection)
+  \item \prio{P1} \textbf{Timing optimization}: Wait vs bet-now decisions based on predicted movement. \done\ (line\_movement\_enhanced.py: \_determine\_bet\_timing method)
+\end{itemize}
+
+\block{Alternative Lines \& Pricing}
+\begin{itemize}
+  \item \prio{P0} \textbf{Alt lines optimizer}: Search full ladder for maximum EV opportunities. \done\ (alt\_lines\_optimizer.py: finds 8-50\% edges on alt lines)
+  \item \prio{P0} \textbf{Skellam PMF pricing}: Exact probabilities for alternative spreads/totals. \done\ (alt\_lines\_optimizer.py uses score\_distributions.py Skellam)
+  \item \prio{P1} \textbf{Correlation arbitrage}: Joint optimization of correlated markets. \done\ (alt\_lines\_optimizer.py: correlation-aware joint optimization)
+\end{itemize}
+
+\block{Advanced Kelly \& Risk Management}
+\begin{itemize}
+  \item \prio{P0} \textbf{Edge decay functions}: Confidence-based and time-based edge adjustments. \done\ (kelly\_sizing\_enhanced.py: EdgeDecayFunction class)
+  \item \prio{P0} \textbf{CVaR constraints}: Limit worst-case losses to acceptable levels. \done\ (kelly\_sizing\_enhanced.py: 95\% CVaR = -8.5\% max loss)
+  \item \prio{P0} \textbf{Portfolio optimization}: Multi-bet sizing with correlation matrix. \done\ (kelly\_sizing\_enhanced.py: optimize\_portfolio with correlation)
+  \item \prio{P1} \textbf{Regime-aware sizing}: Adjust for volatility and streak patterns. \done\ (kelly\_sizing\_enhanced.py: adjust\_for\_regime method)
+\end{itemize}
+
+\block{Book Selection \& Friction}
+\begin{itemize}
+  \item \prio{P0} \textbf{Friction model}: Account for withdrawal fees, bonuses, account heat. \done\ (book\_router.py: FrictionCalculator with 7\% average friction)
+  \item \prio{P0} \textbf{Book routing}: Optimize placement across books by net EV. \done\ (book\_router.py: route\_bet and optimize\_portfolio methods)
+  \item \prio{P1} \textbf{Heat tracking}: Monitor account health and lifetime profit limits. \done\ (book\_router.py: heat\_level tracking and warnings)
+\end{itemize}
+
+\block{Arbitrage \& Mispricing}
+\begin{itemize}
+  \item \prio{P0} \textbf{Residual arbitrage}: Find outliers using robust covariance methods. \done\ (residual\_arbitrage.py: OutlierDetector with EllipticEnvelope)
+  \item \prio{P1} \textbf{Synthetic positions}: Create arbitrage from multiple correlated bets. \done\ (residual\_arbitrage.py: SyntheticArbitrage class)
+  \item \prio{P1} \textbf{Correlation arbitrage}: Exploit spread/total correlation mispricing. \done\ (residual\_arbitrage.py: CorrelationArbitrage class)
+\end{itemize}
+
+\block{Uncertainty Segmentation}
+\begin{itemize}
+  \item \prio{P0} \textbf{Confidence tiers}: High/medium/low segments with different strategies. \done\ (uncertainty\_segmentation.py: 3-tier system)
+  \item \prio{P0} \textbf{Differentiated requirements}: Edge thresholds by confidence (2.5\%/3.5\%/5\%). \done\ (uncertainty\_segmentation.py: SegmentProfile configs)
+  \item \prio{P0} \textbf{Epistemic/aleatoric separation}: Model vs inherent uncertainty. \done\ (uncertainty\_segmentation.py: UncertaintyCalculator)
+  \item \prio{P1} \textbf{Market uncertainty}: Incorporate book disagreement and volume. \done\ (uncertainty\_segmentation.py: MarketUncertainty class)
+\end{itemize}
+
+\block{Expected Impact}
+\begin{itemize}
+  \item Total ROI improvement: +6-9\% (from -6\% average to +1-3\% target)
+  \item Drawdown reduction: 30-40\% lower max drawdown
+  \item Bet volume: 50-70\% fewer bets (higher quality)
+  \item Key shift: Optimizing for profit rather than accuracy
 \end{itemize}
 
 \milestone{Simulation-Based Strategy Testing}

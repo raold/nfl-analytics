@@ -1,0 +1,22 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:bayesian-model-comparison}Bayesian hierarchical model comparison for NFL team ratings (2015-2024, n=2743 games). LOO-CV ELPD = Leave-One-Out Cross-Validation Expected Log Predictive Density (higher is better). Model 2 (Time-Varying) has the best predictive performance.}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\fontsize{10}{12}\selectfont
+\begin{threeparttable}
+\begin{tabular}[t]{l>{\raggedright\arraybackslash}p{6cm}rll>{\raggedright\arraybackslash}p{3cm}}
+\toprule
+Model & Formula & LOO-CV ELPD & Parameters & Training Time & Key Feature\\
+\midrule
+Basic Hierarchical & Margin $\sim$ Home + $(1|\text{Home})$ + $(1|\text{Away})$ & -11075 & 66 (32 teams × 2 + 2 fixed) & 5.2s & Simple pooling\\
+Time-Varying & Margin $\sim$ Home + $(1+t|\text{Home})$ + $(1+t|\text{Away})$ & -11039 & 130 (32 teams × 4 + 2 fixed) & 14.8s & Temporal dynamics\\
+Full Attack/Defense & Score $\sim$ Home + $(1|\text{Team})$ + $(1|\text{Opp})$ & -20252 & 68 (32 teams × 2 + 2 fixed) & 11.9s & Explicit attack/defense\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item \textit{Note: } 
+\item All models used brms/Stan with 4 chains, 2000 iterations, adapt\_delta=0.95.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

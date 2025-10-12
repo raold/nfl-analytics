@@ -161,7 +161,8 @@
 \newcommand{\bridge}[1]{\par\noindent\textit{Why this leads to the next:} #1\par}
 % Chapter summary helper: a consistent end-of-chapter recap + forward pointer
 \newcommand{\chaptersummary}[2]{%
-  \section{Chapter Summary}% numbered for TOC consistency
+  \section*{Chapter Summary}% unnumbered but visually distinct
+  \addcontentsline{toc}{section}{Chapter Summary}% add to TOC
   \noindent #1\par\medskip
   \noindent\textit{Next:} #2\par
 }
@@ -301,6 +302,8 @@ The code is released under the MIT License for academic and research use. Commer
 \input{../chapter_7_simulation/chapter_7_simulation.tex}
 \input{../chapter_8_results_discussion/chapter_8_results_discussion.tex}
 \input{../chapter_9_production_deployment/chapter_9_production_deployment.tex}
+\input{../chapter_11_market_optimization/chapter_11_market_optimization.tex}
+\input{../chapter_12_profit_optimization/chapter_12_profit_optimization.tex}
 \input{../chapter_10_conclusion/chapter_10_conclusion.tex}
 
 % ---------------------------------------------------

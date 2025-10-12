@@ -1,0 +1,297 @@
+[2025-10-10 09:53:00] [INFO] [backfill_nextgen_stats.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 09:53:00] [INFO] [backfill_nextgen_stats.R] === NFL Next Gen Stats Backfill Starting === 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Database connection established 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Passing Stats 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen passing stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Loaded 5521 NGS passing records 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Passing Stats' completed in 0.36 seconds 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Data validation passed: 5521 rows, 29 columns 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Passing Stats 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Upserted 5521 passing records 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Passing Stats' completed in 0.21 seconds 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Rushing Stats 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen rushing stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Loaded 5613 NGS rushing records 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Rushing Stats' completed in 0.32 seconds 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Data validation passed: 5613 rows, 22 columns 
+[2025-10-10 09:53:01] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Rushing Stats 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Upserted 5613 rushing records 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Rushing Stats' completed in 0.15 seconds 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Receiving Stats 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen receiving stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Loaded 13816 NGS receiving records 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Receiving Stats' completed in 0.83 seconds 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Data validation passed: 13816 rows, 23 columns 
+[2025-10-10 09:53:02] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Receiving Stats 
+[2025-10-10 09:53:03] [INFO] [backfill_nextgen_stats.R] Upserted 13816 receiving records 
+[2025-10-10 09:53:03] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Receiving Stats' completed in 0.37 seconds 
+[2025-10-10 09:53:03] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Verify Next Gen Stats backfill 
+[2025-10-10 09:53:03] [ERROR] [backfill_nextgen_stats.R] Pipeline step 'Verify Next Gen Stats backfill' failed: Failed to prepare query : ERROR:  function round(double precision, integer) does not exist
+LINE 6:             ROUND(AVG(completion_percentage_above_expectatio...
+                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+ 
+[2025-10-10 09:53:03] [WARNING] [backfill_nextgen_stats.R] Database transaction rolled back 
+[2025-10-10 09:53:03] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Verify Next Gen Stats backfill' completed in 0.01 seconds 
+[2025-10-10 09:53:03] [ERROR] [backfill_nextgen_stats.R] Database operation failed: Failed to prepare query : ERROR:  function round(double precision, integer) does not exist
+LINE 6:             ROUND(AVG(completion_percentage_above_expectatio...
+                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+ 
+[2025-10-10 09:53:03] [CRITICAL] [backfill_nextgen_stats.R] Rollback failed: Call dbBegin() to start a transaction. 
+Error: Failed to prepare query : ERROR:  function round(double precision, integer) does not exist
+LINE 6:             ROUND(AVG(completion_percentage_above_expectatio...
+                    ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: stop(e)
+5: value[[3L]](cond)
+4: tryCatchOne(expr, names, parentenv, handlers[[1L]])
+3: tryCatchList(expr, classes, parentenv, handlers)
+2: tryCatch({
+       conn <- do.call(DBI::dbConnect, c(list(RPostgres::Postgres()), 
+           db_params))
+       log_message("Database connection established", level = "INFO")
+       dbBegin(conn)
+       result <- eval(expr)
+       dbCommit(conn)
+       log_message("Database transaction committed", level = "INFO")
+       result
+   }, error = function(e) {
+       log_message(sprintf("Database operation failed: %s", e$message), 
+           level = "ERROR")
+       if (!is.null(conn) && dbIsValid(conn)) {
+           tryCatch({
+               dbRollback(conn)
+               log_message("Transaction rolled back", level = "WARNING")
+           }, error = function(rollback_err) {
+               log_message(sprintf("Rollback failed: %s", rollback_err$message), 
+                   level = "CRITICAL")
+           })
+       }
+       stop(e)
+   }, finally = {
+       if (!is.null(conn) && dbIsValid(conn)) {
+           dbDisconnect(conn)
+           log_message("Database connection closed", level = "INFO")
+       }
+   })
+1: safe_db_operation(db_params = db_params, expr = quote({
+       passing_data <- run_pipeline_step(step_name = "Load Next Gen Passing Stats", 
+           expr = {
+               log_message("Fetching Next Gen passing stats from nflverse (2016-2024)...", 
+                   level = "INFO")
+               passing <- retry_operation(expr = load_nextgen_stats(seasons = 2016:2025, 
+                   stat_type = "passing"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load NGS passing stats from nflverse")
+               log_message(sprintf("Loaded %d NGS passing records", 
+                   nrow(passing)), level = "INFO")
+               passing
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_gsis_id", 
+                   "season", "week"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert Next Gen Passing Stats", 
+           expr = {
+               passing_clean <- passing_data %>% select(player_id = player_gsis_id, 
+                   player_display_name, player_position, season, 
+                   week, attempts, pass_yards, pass_touchdowns, 
+                   interceptions, passer_rating, completions, completion_percentage, 
+                   avg_time_to_throw, avg_completed_air_yards, avg_intended_air_yards, 
+                   avg_air_yards_differential, aggressiveness, max_completed_air_distance, 
+                   avg_air_yards_to_sticks, completion_percentage_above_expectation, 
+                   expected_completion_percentage) %>% filter(!is.na(player_id), 
+                   !is.na(season), !is.na(week))
+               rows_upserted <- dbExecute(conn, "\n          CREATE TEMP TABLE passing_staging AS\n          SELECT * FROM nextgen_passing LIMIT 0\n        ")
+               dbWriteTable(conn, "passing_staging", passing_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO nextgen_passing\n          SELECT * FROM passing_staging\n          ON CONFLICT (player_id, season, week)\n          DO UPDATE SET\n            player_display_name = EXCLUDED.player_display_name,\n            player_position = EXCLUDED.player_position,\n            attempts = EXCLUDED.attempts,\n            pass_yards = EXCLUDED.pass_yards,\n            pass_touchdowns = EXCLUDED.pass_touchdowns,\n            interceptions = EXCLUDED.interceptions,\n            passer_rating = EXCLUDED.passer_rating,\n            completions = EXCLUDED.completions,\n            completion_percentage = EXCLUDED.completion_percentage,\n            avg_time_to_throw = EXCLUDED.avg_time_to_throw,\n            avg_completed_air_yards = EXCLUDED.avg_completed_air_yards,\n            avg_intended_air_yards = EXCLUDED.avg_intended_air_yards,\n            avg_air_yards_differential = EXCLUDED.avg_air_yards_differential,\n            aggressiveness = EXCLUDED.aggressiveness,\n            max_completed_air_distance = EXCLUDED.max_completed_air_distance,\n            avg_air_yards_to_sticks = EXCLUDED.avg_air_yards_to_sticks,\n            completion_percentage_above_expectation = EXCLUDED.completion_percentage_above_expectation,\n            expected_completion_percentage = EXCLUDED.expected_completion_percentage,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS passing_staging")
+               log_message(sprintf("Upserted %d passing records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       rushing_data <- run_pipeline_step(step_name = "Load Next Gen Rushing Stats", 
+           expr = {
+               log_message("Fetching Next Gen rushing stats from nflverse (2016-2024)...", 
+                   level = "INFO")
+               rushing <- retry_operation(expr = load_nextgen_stats(seasons = 2016:2025, 
+                   stat_type = "rushing"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load NGS rushing stats from nflverse")
+               log_message(sprintf("Loaded %d NGS rushing records", 
+                   nrow(rushing)), level = "INFO")
+               rushing
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_gsis_id", 
+                   "season", "week"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert Next Gen Rushing Stats", 
+           expr = {
+               rushing_clean <- rushing_data %>% select(player_id = player_gsis_id, 
+                   player_display_name, player_position, season, 
+                   week, carries = rush_attempts, rush_yards, rush_touchdowns, 
+                   efficiency, percent_attempts_gte_eight_defenders, 
+                   avg_time_to_los, rush_yards_over_expected, avg_rush_yards, 
+                   rush_yards_over_expected_per_att, rush_pct_over_expected) %>% 
+                   filter(!is.na(player_id), !is.na(season), !is.na(week))
+               dbExecute(conn, "CREATE TEMP TABLE rushing_staging AS SELECT * FROM nextgen_rushing LIMIT 0")
+               dbWriteTable(conn, "rushing_staging", rushing_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO nextgen_rushing\n          SELECT * FROM rushing_staging\n          ON CONFLICT (player_id, season, week)\n          DO UPDATE SET\n            player_display_name = EXCLUDED.player_display_name,\n            player_position = EXCLUDED.player_position,\n            carries = EXCLUDED.carries,\n            rush_yards = EXCLUDED.rush_yards,\n            rush_touchdowns = EXCLUDED.rush_touchdowns,\n            efficiency = EXCLUDED.efficiency,\n            percent_attempts_gte_eight_defenders = EXCLUDED.percent_attempts_gte_eight_defenders,\n            avg_time_to_los = EXCLUDED.avg_time_to_los,\n            rush_yards_over_expected = EXCLUDED.rush_yards_over_expected,\n            avg_rush_yards = EXCLUDED.avg_rush_yards,\n            rush_yards_over_expected_per_att = EXCLUDED.rush_yards_over_expected_per_att,\n            rush_pct_over_expected = EXCLUDED.rush_pct_over_expected,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS rushing_staging")
+               log_message(sprintf("Upserted %d rushing records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       receiving_data <- run_pipeline_step(step_name = "Load Next Gen Receiving Stats", 
+           expr = {
+               log_message("Fetching Next Gen receiving stats from nflverse (2016-2024)...", 
+                   level = "INFO")
+               receiving <- retry_operation(expr = load_nextgen_stats(seasons = 2016:2025, 
+                   stat_type = "receiving"), max_attempts = 3, delay = 5, 
+                   error_message = "Failed to load NGS receiving stats from nflverse")
+               log_message(sprintf("Loaded %d NGS receiving records", 
+                   nrow(receiving)), level = "INFO")
+               receiving
+           }, conn = conn, validate_fn = function(data) {
+               validate_data(data = data, expected_cols = c("player_gsis_id", 
+                   "season", "week"), min_rows = 1000)
+           })
+       run_pipeline_step(step_name = "Upsert Next Gen Receiving Stats", 
+           expr = {
+               receiving_clean <- receiving_data %>% select(player_id = player_gsis_id, 
+                   player_display_name, player_position, season, 
+                   week, targets, receptions, receiving_yards = yards, 
+                   receiving_touchdowns = rec_touchdowns, avg_cushion, 
+                   avg_separation, avg_intended_air_yards, percent_share_of_intended_air_yards, 
+                   catch_percentage, avg_yac, avg_expected_yac, 
+                   avg_yac_above_expectation) %>% filter(!is.na(player_id), 
+                   !is.na(season), !is.na(week))
+               dbExecute(conn, "CREATE TEMP TABLE receiving_staging AS SELECT * FROM nextgen_receiving LIMIT 0")
+               dbWriteTable(conn, "receiving_staging", receiving_clean, 
+                   append = TRUE, row.names = FALSE)
+               rows_updated <- dbExecute(conn, "\n          INSERT INTO nextgen_receiving\n          SELECT * FROM receiving_staging\n          ON CONFLICT (player_id, season, week)\n          DO UPDATE SET\n            player_display_name = EXCLUDED.player_display_name,\n            player_position = EXCLUDED.player_position,\n            targets = EXCLUDED.targets,\n            receptions = EXCLUDED.receptions,\n            receiving_yards = EXCLUDED.receiving_yards,\n            receiving_touchdowns = EXCLUDED.receiving_touchdowns,\n            avg_cushion = EXCLUDED.avg_cushion,\n            avg_separation = EXCLUDED.avg_separation,\n            avg_intended_air_yards = EXCLUDED.avg_intended_air_yards,\n            percent_share_of_intended_air_yards = EXCLUDED.percent_share_of_intended_air_yards,\n            catch_percentage = EXCLUDED.catch_percentage,\n            avg_yac = EXCLUDED.avg_yac,\n            avg_expected_yac = EXCLUDED.avg_expected_yac,\n            avg_yac_above_expectation = EXCLUDED.avg_yac_above_expectation,\n            updated_at = NOW()\n        ")
+               dbExecute(conn, "DROP TABLE IF EXISTS receiving_staging")
+               log_message(sprintf("Upserted %d receiving records", 
+                   rows_updated), level = "INFO")
+               TRUE
+           }, conn = conn)
+       run_pipeline_step(step_name = "Verify Next Gen Stats backfill", 
+           expr = {
+               passing_summary <- dbGetQuery(conn, "\n          SELECT\n            season,\n            COUNT(DISTINCT player_id) as unique_qbs,\n            COUNT(*) as total_records,\n            ROUND(AVG(completion_percentage_above_expectation), 2) as avg_cpoe\n          FROM nextgen_passing\n          WHERE attempts >= 10\n          GROUP BY season\n          ORDER BY season\n        ")
+               log_message("=== Next Gen Passing Stats Summary ===", 
+                   level = "INFO")
+               for (i in 1:nrow(passing_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg CPOE: %.2f", 
+                     passing_summary$season[i], passing_summary$unique_qbs[i], 
+                     passing_summary$total_records[i], passing_summary$avg_cpoe[i]), 
+                     level = "INFO")
+               }
+               rushing_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT player_id) as unique_rushers, COUNT(*) as total_records\n          FROM nextgen_rushing\n          WHERE carries >= 5\n          GROUP BY season\n          ORDER BY season\n        ")
+               log_message("=== Next Gen Rushing Stats Summary ===", 
+                   level = "INFO")
+               for (i in 1:nrow(rushing_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f rushers, %.0f records", 
+                     rushing_summary$season[i], rushing_summary$unique_rushers[i], 
+                     rushing_summary$total_records[i]), level = "INFO")
+               }
+               receiving_summary <- dbGetQuery(conn, "\n          SELECT season, COUNT(DISTINCT player_id) as unique_receivers, COUNT(*) as total_records\n          FROM nextgen_receiving\n          WHERE targets >= 3\n          GROUP BY season\n          ORDER BY season\n        ")
+               log_message("=== Next Gen Receiving Stats Summary ===", 
+                   level = "INFO")
+               for (i in 1:nrow(receiving_summary)) {
+                   log_message(sprintf("  Season %.0f: %.0f receivers, %.0f records", 
+                     receiving_summary$season[i], receiving_summary$unique_receivers[i], 
+                     receiving_summary$total_records[i]), level = "INFO")
+               }
+               TRUE
+           }, conn = conn)
+       log_message("=== Next Gen Stats Backfill Complete ===", level = "INFO")
+       log_message("Next steps:", level = "INFO")
+       log_message("  1. Integrate NGS features into py/features/asof_features_enhanced.py", 
+           level = "INFO")
+       log_message("  2. Test team-level NGS aggregates (avg CPOE, avg separation, etc.)", 
+           level = "INFO")
+       log_message("  3. Retrain models with new NGS features", 
+           level = "INFO")
+   }))
+[2025-10-10 09:53:03] [INFO] [backfill_nextgen_stats.R] Database connection closed 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Error handling utilities loaded successfully 
+ [1] "RPostgres" "dplyr"     "nflreadr"  "jsonlite"  "DBI"       "stats"     "graphics"  "grDevices" "utils"    
+[10] "datasets"  "methods"   "base"     
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] === NFL Next Gen Stats Backfill Starting === 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Database connection established 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Passing Stats 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen passing stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Loaded 5521 NGS passing records 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Passing Stats' completed in 0.35 seconds 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Data validation passed: 5521 rows, 29 columns 
+[2025-10-10 09:53:24] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Passing Stats 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Upserted 5521 passing records 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Passing Stats' completed in 0.19 seconds 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Rushing Stats 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen rushing stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Loaded 5613 NGS rushing records 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Rushing Stats' completed in 0.30 seconds 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Data validation passed: 5613 rows, 22 columns 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Rushing Stats 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Upserted 5613 rushing records 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Rushing Stats' completed in 0.17 seconds 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Load Next Gen Receiving Stats 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Fetching Next Gen receiving stats from nflverse (2016-2024)... 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Loaded 13816 NGS receiving records 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Load Next Gen Receiving Stats' completed in 0.31 seconds 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Data validation passed: 13816 rows, 23 columns 
+[2025-10-10 09:53:25] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Upsert Next Gen Receiving Stats 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Upserted 13816 receiving records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Upsert Next Gen Receiving Stats' completed in 0.35 seconds 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Starting pipeline step: Verify Next Gen Stats backfill 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] === Next Gen Passing Stats Summary === 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2016: 0 QBs, 0 records, Avg CPOE: 2.63 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2017: 0 QBs, 0 records, Avg CPOE: -1.38 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2018: 0 QBs, 0 records, Avg CPOE: 0.22 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2019: 0 QBs, 0 records, Avg CPOE: -0.19 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2020: 0 QBs, 0 records, Avg CPOE: 0.72 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2021: 0 QBs, 0 records, Avg CPOE: -0.71 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2022: 0 QBs, 0 records, Avg CPOE: -0.73 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2023: 0 QBs, 0 records, Avg CPOE: 0.03 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2024: 0 QBs, 0 records, Avg CPOE: 0.60 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2025: 0 QBs, 0 records, Avg CPOE: 1.34 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] === Next Gen Rushing Stats Summary === 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2016: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2017: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2018: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2019: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2020: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2021: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2022: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2023: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2024: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2025: 0 rushers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] === Next Gen Receiving Stats Summary === 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2016: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2017: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2018: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2019: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2020: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2021: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2022: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2023: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2024: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   Season 2025: 0 receivers, 0 records 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Verify Next Gen Stats backfill' completed in 0.01 seconds 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] === Next Gen Stats Backfill Complete === 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Next steps: 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   1. Integrate NGS features into py/features/asof_features_enhanced.py 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   2. Test team-level NGS aggregates (avg CPOE, avg separation, etc.) 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   3. Retrain models with new NGS features 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Database transaction committed 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Database connection closed 
+NULL

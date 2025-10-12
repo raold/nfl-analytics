@@ -109,14 +109,11 @@ We estimate expected maximum drawdown under the posterior predictive distributio
 \end{figure}
 
 \section{Governance and Reporting}
-A risk committee reviews weekly dashboards summarizing realized vs expected variance, tail losses, and limit breaches. Automated alerts trigger when realized drawdown surpasses modeled expectations, pausing RL policy execution until manual review.
 
-\chaptersummary{
-We connected predictive uncertainty to decision‑making via fractional Kelly with friction/caps, CVaR‑constrained stake sizing, and portfolio‑aware exposure limits. Diagnostics and governance (variance tracking, drawdown alerts) anchor safe deployment and directly support the thesis that uncertainty + governance convert edge into reliable growth.
-}{
-\Cref{chap:sim} uses these risk‑aware policies in a Monte Carlo simulator that prices teasers/middles, models frictions and dependence, and evaluates robustness before risking capital.
-}
+% Auto-include budgets and caps table
+\IfFileExists{../figures/out/budgets_caps_table.tex}{\input{../figures/out/budgets_caps_table.tex}}{}
 
+A risk committee reviews weekly dashboards summarizing realized vs expected variance, tail losses, and limit breaches. Automated alerts trigger when realized drawdown surpasses modeled expectations, pausing RL policy execution until manual review. \Cref{tab:budgets-caps} consolidates all weekly risk budgets, market caps, and exposure rules tied directly to the CVaR/Kelly mathematics developed above.
 
 \section{Correlation Estimation}
 We estimate pairwise correlations from historical co‑movements in CBV and implied probabilities and regularize using shrinkage toward sparse structures. Sensitivity to correlation misspecification is evaluated by worst‑case bounds that inform exposure caps.
@@ -148,3 +145,9 @@ We compute CVaR via posterior predictive draws on weekly returns. Policies are a
     \State Return $\vect f$ and CVaR $t+\frac{1}{(1-\alpha)B}\sum_b \xi_b$
   \end{algorithmic}
 \end{algorithm}
+
+\chaptersummary{
+We connected predictive uncertainty to decision‑making via fractional Kelly with friction/caps, CVaR‑constrained stake sizing, and portfolio‑aware exposure limits. Diagnostics and governance (variance tracking, drawdown alerts) anchor safe deployment and directly support the thesis that uncertainty + governance convert edge into reliable growth.
+}{
+\Cref{chap:sim} uses these risk‑aware policies in a Monte Carlo simulator that prices teasers/middles, models frictions and dependence, and evaluates robustness before risking capital.
+}

@@ -1,0 +1,331 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+=== NFL Play-by-Play Advanced Features Backfill ===
+
+Will attempt to add 57 columns to plays table
+
+Existing plays table has 67 columns
+Columns: game_id, play_id, posteam, defteam, quarter, time_seconds, down, ydstogo, epa, pass, rush, wp, wpa, vegas_wp, vegas_wpa, success, yards_gained, first_down, first_down_pass, first_down_rush, air_yards, yards_after_catch, comp_air_epa, comp_yac_epa, cpoe, complete_pass, incomplete_pass, interception, pass_length, pass_location, qb_hit, qb_scramble, run_location, run_gap, passer_player_id, passer_player_name, rusher_player_id, rusher_player_name, receiver_player_id, receiver_player_name, goal_to_go, shotgun, no_huddle, qb_dropback, qb_kneel, qb_spike, touchdown, td_team, two_point_attempt, extra_point_result, field_goal_result, kick_distance, sack, fumble, fumble_lost, penalty, penalty_yards, penalty_team, posteam_score, defteam_score, score_differential, posteam_score_post, defteam_score_post, drive, fixed_drive, fixed_drive_result, updated_at 
+
+
+=== Processing 1999 season ===
+Loaded 46136 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46136 existing plays for 1999 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46136 plays
+Updated 46136 plays with new feature values
+Completed 1999 
+
+=== Processing 2000 season ===
+Loaded 45491 plays from nflfastR
+Found 55 of 57 target columns
+Database has 45491 existing plays for 2000 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 45491 plays
+Updated 45491 plays with new feature values
+Completed 2000 
+
+=== Processing 2001 season ===
+Loaded 44969 plays from nflfastR
+Found 55 of 57 target columns
+Database has 44969 existing plays for 2001 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 44969 plays
+Updated 44969 plays with new feature values
+Completed 2001 
+
+=== Processing 2002 season ===
+Loaded 47355 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47355 existing plays for 2002 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47355 plays
+Updated 47355 plays with new feature values
+Completed 2002 
+
+=== Processing 2003 season ===
+Loaded 46811 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46811 existing plays for 2003 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46811 plays
+Updated 46811 plays with new feature values
+Completed 2003 
+
+=== Processing 2004 season ===
+Loaded 46705 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46705 existing plays for 2004 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46705 plays
+Updated 46705 plays with new feature values
+Completed 2004 
+
+=== Processing 2005 season ===
+Loaded 46823 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46823 existing plays for 2005 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46823 plays
+Updated 46823 plays with new feature values
+Completed 2005 
+
+=== Processing 2006 season ===
+Loaded 46299 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46299 existing plays for 2006 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46299 plays
+Updated 46299 plays with new feature values
+Completed 2006 
+
+=== Processing 2007 season ===
+Loaded 46266 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46266 existing plays for 2007 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46266 plays
+Updated 46266 plays with new feature values
+Completed 2007 
+
+=== Processing 2008 season ===
+Loaded 45917 plays from nflfastR
+Found 55 of 57 target columns
+Database has 45917 existing plays for 2008 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 45917 plays
+Updated 45917 plays with new feature values
+Completed 2008 
+
+=== Processing 2009 season ===
+Loaded 46519 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46519 existing plays for 2009 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46519 plays
+Updated 46519 plays with new feature values
+Completed 2009 
+
+=== Processing 2010 season ===
+Loaded 46892 plays from nflfastR
+Found 55 of 57 target columns
+Database has 46892 existing plays for 2010 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 46892 plays
+Updated 46892 plays with new feature values
+Completed 2010 
+
+=== Processing 2011 season ===
+Loaded 47448 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47448 existing plays for 2011 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47448 plays
+Updated 47448 plays with new feature values
+Completed 2011 
+
+=== Processing 2012 season ===
+Loaded 47834 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47834 existing plays for 2012 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47834 plays
+Updated 47834 plays with new feature values
+Completed 2012 
+
+=== Processing 2013 season ===
+Loaded 48158 plays from nflfastR
+Found 55 of 57 target columns
+Database has 48158 existing plays for 2013 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 48158 plays
+Updated 48158 plays with new feature values
+Completed 2013 
+
+=== Processing 2014 season ===
+Loaded 47629 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47629 existing plays for 2014 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47629 plays
+Updated 47629 plays with new feature values
+Completed 2014 
+
+=== Processing 2015 season ===
+Loaded 48122 plays from nflfastR
+Found 55 of 57 target columns
+Database has 48122 existing plays for 2015 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 48122 plays
+Updated 48122 plays with new feature values
+Completed 2015 
+
+=== Processing 2016 season ===
+Loaded 47651 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47651 existing plays for 2016 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47651 plays
+Updated 47651 plays with new feature values
+Completed 2016 
+
+=== Processing 2017 season ===
+Loaded 47245 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47245 existing plays for 2017 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47245 plays
+Updated 47245 plays with new feature values
+Completed 2017 
+
+=== Processing 2018 season ===
+Loaded 47109 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47109 existing plays for 2018 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47109 plays
+Updated 47109 plays with new feature values
+Completed 2018 
+
+=== Processing 2019 season ===
+Loaded 47260 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47260 existing plays for 2019 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47260 plays
+Updated 47260 plays with new feature values
+Completed 2019 
+
+=== Processing 2020 season ===
+Loaded 47705 plays from nflfastR
+Found 55 of 57 target columns
+Database has 47705 existing plays for 2020 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 47705 plays
+Updated 47705 plays with new feature values
+Completed 2020 
+
+=== Processing 2021 season ===
+Loaded 49922 plays from nflfastR
+Found 55 of 57 target columns
+Database has 49922 existing plays for 2021 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 49922 plays
+Updated 49922 plays with new feature values
+Completed 2021 
+
+=== Processing 2022 season ===
+Loaded 49434 plays from nflfastR
+Found 55 of 57 target columns
+Database has 49434 existing plays for 2022 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 49434 plays
+Updated 49434 plays with new feature values
+Completed 2022 
+
+=== Processing 2023 season ===
+Loaded 49665 plays from nflfastR
+Found 55 of 57 target columns
+Database has 49665 existing plays for 2023 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 49665 plays
+Updated 49665 plays with new feature values
+Completed 2023 
+
+=== Processing 2024 season ===
+Loaded 49492 plays from nflfastR
+Found 55 of 57 target columns
+Database has 49492 existing plays for 2024 
+NOTICE:  table "plays_staging" does not exist, skipping
+
+Created staging table with 49492 plays
+Updated 49492 plays with new feature values
+Completed 2024 
+
+
+=== Verification ===
+   season total_plays has_wp has_success has_air_yards has_passer_id has_yards_gained
+1    1999       46136  45877       45618             0         18746            44397
+2    2000       45491  45221       44968             0         18214            43586
+3    2001       44969  44697       44438             0         18218            43567
+4    2002       47355  47081       46815             0         19417            45866
+5    2003       46811  46536       46272             0         18438            45356
+6    2004       46705  46431       46164             0         18388            45227
+7    2005       46823  46548       46281             0         18421            45356
+8    2006       46299  46024       45757         17109         18386            44862
+9    2007       46266  45990       45724         17725         18967            44819
+10   2008       45917  45642       45375         17273         18420            44477
+11   2009       46519  46244       45977         17771         18968            45058
+12   2010       46892  46618       46349         18005         19235            45424
+13   2011       47448  47174       46907         18243         19524            45997
+14   2012       47834  47559       47291         18570         19827            46378
+15   2013       48158  47882       47616         18854         20257            46700
+16   2014       47629  47357       47088         18663         19973            46150
+17   2015       48122  47847       47580         19100         20432            46657
+18   2016       47651  47376       47109         19111         20370            46212
+19   2017       47245  46972       46706         18330         19646            45814
+20   2018       47109  46834       46567         18486         19911            45650
+21   2019       47260  46985       46715         18555         19985            45794
+22   2020       47705  47436       47167         18967         20271            46297
+23   2021       49922  49637       49352         19640         21086            48420
+24   2022       49434  49150       48866         18998         20458            47941
+25   2023       49665  49380       49095         19250         20797            48177
+26   2024       49492  49207       48922         18580         20082            47975
+27   2025       11239  11174       11109          4240          4553            10888
+
+
+Sample of enhanced play data (2023 season):
+          game_id play_id posteam quarter down ydstogo    wp success yards_gained air_yards passer_player_name
+1 2023_01_ARI_WAS      55     WAS       1    1      10 0.546       0            3        NA               <NA>
+2 2023_01_ARI_WAS    3285     WAS       3    1      10 0.370       0            4        NA               <NA>
+3 2023_01_JAX_IND    3027     IND       3    4       1 0.443       0           -2        NA               <NA>
+4  2023_01_LA_SEA    3663      LA       4    3       5 0.981       0            0        33         M.Stafford
+5 2023_02_BAL_CIN     292     BAL       1    1      10 0.560       1            6        NA               <NA>
+  rusher_player_name
+1         B.Robinson
+2         B.Robinson
+3          D.Jackson
+4               <NA>
+5             J.Hill
+
+✅ Advanced PBP backfill complete!
+Next steps:
+  1. Run: Rscript R/backfill_rosters.R
+  2. Run: Rscript R/backfill_game_metadata.R
+  3. Refresh materialized views
+  4. Update Python harness with new features

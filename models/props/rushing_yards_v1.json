@@ -1,0 +1,62 @@
+{
+  "prop_type": "rushing_yards",
+  "feature_cols": [
+    "rushing_yards_last3",
+    "rushing_yards_last5",
+    "rushing_yards_season",
+    "rush_attempts_last3",
+    "rush_attempts_last5",
+    "rushing_tds_last3",
+    "red_zone_carries_last3",
+    "opponent_pass_yards_allowed_avg",
+    "implied_team_total",
+    "spread",
+    "is_home",
+    "is_turf"
+  ],
+  "scaler_mean": [
+    29.63022960341229,
+    29.683673654596607,
+    187.64701878573374,
+    6.48772574643797,
+    6.499441873128232,
+    0.2232507487067792,
+    0.4907886378074235,
+    242.3581427534259,
+    22.977028314729104,
+    0.11829567111353118,
+    0.5017696705690171,
+    0.42744350667029674
+  ],
+  "scaler_std": [
+    25.98654072553976,
+    24.586880348493704,
+    232.7640191228384,
+    5.3835876849231985,
+    5.203432000166635,
+    0.3475811237699249,
+    0.6311013794434087,
+    40.455397642735015,
+    3.999996794003311,
+    6.611696239682773,
+    0.5000309136443661,
+    0.49474123053537955
+  ],
+  "xgb_params": {
+    "objective": "reg:squarederror",
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "n_estimators": 500,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 3,
+    "gamma": 0.1,
+    "reg_alpha": 0.1,
+    "reg_lambda": 1.0,
+    "tree_method": "auto",
+    "device": "cpu",
+    "random_state": 42
+  },
+  "min_edge": 0.03,
+  "kelly_fraction": 0.25
+}

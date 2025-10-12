@@ -88,46 +88,48 @@ class PlayerFeatureEngineer:
 
         query = f"""
             SELECT
-                game_id,
-                season,
-                week,
-                game_date,
-                posteam,
-                defteam,
-                passer_player_id,
-                passer_player_name,
-                rusher_player_id,
-                rusher_player_name,
-                receiver_player_id,
-                receiver_player_name,
-                kicker_player_id,
-                kicker_player_name,
-                passing_yards,
-                rushing_yards,
-                receiving_yards,
-                pass_touchdown,
-                rush_touchdown,
-                return_touchdown,
-                field_goal_result,
-                extra_point_result,
-                complete_pass,
-                incomplete_pass,
-                interception,
-                fumble_lost,
-                sack,
-                qb_hit,
-                tackled_for_loss,
-                red_zone,
-                goal_to_go,
-                play_type,
-                down,
-                ydstogo,
-                yards_gained
-            FROM plays
-            WHERE season >= {start_season}
-                AND season <= {end_season}
-                AND (pass = 1 OR rush = 1)
-            ORDER BY game_date, game_id, play_id
+                p.game_id,
+                g.season,
+                g.week,
+                g.kickoff,
+                p.posteam,
+                p.defteam,
+                p.passer_player_id,
+                p.passer_player_name,
+                p.rusher_player_id,
+                p.rusher_player_name,
+                p.receiver_player_id,
+                p.receiver_player_name,
+                p.yards_gained as passing_yards,
+                p.yards_gained as rushing_yards,
+                p.yards_gained as receiving_yards,
+                CASE WHEN p.touchdown = 1 AND p.td_team = p.posteam THEN 1 ELSE 0 END as pass_touchdown,
+                CASE WHEN p.touchdown = 1 AND p.td_team = p.posteam THEN 1 ELSE 0 END as rush_touchdown,
+                p.field_goal_result,
+                p.extra_point_result,
+                p.complete_pass,
+                p.incomplete_pass,
+                p.interception,
+                p.fumble_lost,
+                p.sack,
+                p.qb_hit,
+                CASE WHEN p.yards_gained < 0 THEN 1 ELSE 0 END as tackled_for_loss,
+                CASE WHEN p.goal_to_go > 0 THEN 1 ELSE 0 END as red_zone,
+                p.goal_to_go,
+                CASE
+                    WHEN p.pass = true THEN 'pass'
+                    WHEN p.rush = true THEN 'run'
+                    ELSE 'other'
+                END as play_type,
+                p.down,
+                p.ydstogo,
+                p.yards_gained
+            FROM plays p
+            JOIN games g ON p.game_id = g.game_id
+            WHERE g.season >= {start_season}
+                AND g.season <= {end_season}
+                AND (p.pass = true OR p.rush = true)
+            ORDER BY g.kickoff, p.game_id, p.play_id
         """
 
         pbp = pd.read_sql(query, self.engine)
@@ -152,6 +154,7 @@ class PlayerFeatureEngineer:
             SELECT
                 season,
                 week,
+                game_type,
                 team,
                 gsis_id,
                 position,
@@ -159,7 +162,7 @@ class PlayerFeatureEngineer:
                 depth_chart_position,
                 jersey_number,
                 status
-            FROM rosters
+            FROM rosters_weekly
             WHERE season >= {start_season}
                 AND season <= {end_season}
             ORDER BY season, week, team
@@ -188,22 +191,23 @@ class PlayerFeatureEngineer:
                 game_id,
                 season,
                 week,
-                game_date,
+                kickoff,
                 home_team,
                 away_team,
                 home_score,
                 away_score,
-                spread_line,
-                total_line,
-                weather_temperature,
-                weather_wind_mph,
-                weather_humidity,
+                spread_close,
+                total_close,
+                temp,
+                wind,
                 roof,
-                surface
+                surface,
+                home_rest,
+                away_rest
             FROM games
             WHERE season >= {start_season}
                 AND season <= {end_season}
-            ORDER BY game_date, game_id
+            ORDER BY kickoff, game_id
         """
 
         games = pd.read_sql(query, self.engine)
@@ -400,7 +404,7 @@ class PlayerFeatureEngineer:
 
         # Example: opponent pass defense (yards allowed per game)
         opponent_pass_def = (
-            pbp[pbp["pass"] == 1]
+            pbp[pbp["play_type"] == "pass"]
             .groupby(["season", "week", "defteam"])
             .agg(
                 pass_yards_allowed=("passing_yards", "sum"),
@@ -447,10 +451,10 @@ class PlayerFeatureEngineer:
 
         # Calculate implied team totals
         games["implied_home_total"] = (
-            games["total_line"] / 2 - games["spread_line"] / 2
+            games["total_close"] / 2 - games["spread_close"] / 2
         )
         games["implied_away_total"] = (
-            games["total_line"] / 2 + games["spread_line"] / 2
+            games["total_close"] / 2 + games["spread_close"] / 2
         )
 
         # Merge for home teams
@@ -459,9 +463,10 @@ class PlayerFeatureEngineer:
                 [
                     "game_id",
                     "home_team",
-                    "spread_line",
-                    "total_line",
+                    "spread_close",
+                    "total_close",
                     "implied_home_total",
+                    "home_rest",
                 ]
             ],
             left_on=["game_id", "team"],
@@ -475,9 +480,10 @@ class PlayerFeatureEngineer:
                 [
                     "game_id",
                     "away_team",
-                    "spread_line",
-                    "total_line",
+                    "spread_close",
+                    "total_close",
                     "implied_away_total",
+                    "away_rest",
                 ]
             ],
             left_on=["game_id", "team"],
@@ -490,9 +496,12 @@ class PlayerFeatureEngineer:
         stats["implied_team_total"] = stats["implied_home_total"].fillna(
             stats["implied_away_total"]
         )
-        stats["spread"] = stats["spread_line"].fillna(
-            -stats["spread_line_away"]
+        stats["spread"] = stats["spread_close"].fillna(
+            -stats["spread_close_away"]
         )  # Invert for away
+
+        # Days rest
+        stats["days_rest"] = stats["home_rest"].fillna(stats["away_rest"])
 
         # Is home game
         stats["is_home"] = stats["home_team"].notna().astype(int)
@@ -502,12 +511,14 @@ class PlayerFeatureEngineer:
             columns=[
                 "home_team",
                 "away_team",
-                "spread_line",
-                "spread_line_away",
-                "total_line",
-                "total_line_away",
+                "spread_close",
+                "spread_close_away",
+                "total_close",
+                "total_close_away",
                 "implied_home_total",
                 "implied_away_total",
+                "home_rest",
+                "away_rest",
             ],
             errors="ignore",
         )
@@ -533,9 +544,8 @@ class PlayerFeatureEngineer:
             games[
                 [
                     "game_id",
-                    "weather_temperature",
-                    "weather_wind_mph",
-                    "weather_humidity",
+                    "temp",
+                    "wind",
                     "roof",
                     "surface",
                 ]
@@ -544,16 +554,17 @@ class PlayerFeatureEngineer:
             how="left",
         )
 
-        # Fill missing weather (indoor games)
-        stats["weather_temperature"] = stats["weather_temperature"].fillna(70)
-        stats["weather_wind_mph"] = stats["weather_wind_mph"].fillna(0)
-        stats["weather_humidity"] = stats["weather_humidity"].fillna(50)
+        # Convert weather from TEXT to numeric (handle missing/invalid values)
+        stats["weather_temp"] = pd.to_numeric(stats["temp"], errors='coerce').fillna(70)
+        stats["weather_wind_mph"] = pd.to_numeric(stats["wind"], errors='coerce').fillna(0)
 
         # Encode roof/surface
         stats["is_dome"] = (stats["roof"] == "dome").astype(int)
+        stats["is_outdoors"] = (stats["roof"] == "outdoors").astype(int)
+        stats["is_closed"] = (stats["roof"] == "closed").astype(int)
         stats["is_turf"] = (stats["surface"].str.contains("turf", case=False, na=False)).astype(int)
 
-        stats = stats.drop(columns=["roof", "surface"], errors="ignore")
+        stats = stats.drop(columns=["temp", "wind", "roof", "surface"], errors="ignore")
 
         return stats
 
