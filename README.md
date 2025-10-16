@@ -480,39 +480,39 @@ uv pip install -r requirements.txt
 
 ```
 nfl-analytics/
-├── py/                     # Python modules (features, models, pricing)
-│   ├── compute/            # 🆕 Distributed compute system
-│   │   ├── statistics/     # Statistical testing framework
-│   │   │   ├── statistical_tests.py      # Permutation & bootstrap tests
-│   │   │   ├── effect_size.py           # Cohen's d, Cliff's delta
-│   │   │   ├── multiple_comparisons.py  # FDR/FWER correction
-│   │   │   ├── power_analysis.py        # Sample size & power
-│   │   │   ├── experimental_design/     # A/B testing framework
-│   │   │   └── reporting/               # Quarto/LaTeX integration
-│   │   ├── sync/               # 🆕 Google Drive sync infrastructure
-│   │   │   ├── machine_manager.py       # Hardware detection & fingerprinting
-│   │   │   ├── file_locks.py           # Cross-platform file locking
-│   │   │   └── conflict_resolver.py     # Sync conflict resolution
-│   │   ├── hardware/           # 🆕 Hardware-aware task routing
-│   │   │   └── task_router.py          # M4 vs 4090 task optimization
-│   │   ├── task_queue.py            # Priority-based task management (WAL mode)
-│   │   ├── adaptive_scheduler.py    # Multi-armed bandit + hardware routing
-│   │   ├── performance_tracker.py   # Statistical performance tracking
-│   │   └── compute_worker.py        # Distributed worker system
-│   ├── features/           # Feature engineering
-│   ├── models/             # ML models
-│   ├── pricing/            # Pricing & risk management
-│   └── rl/                 # Reinforcement learning
-├── R/                      # R utilities
-├── data/                   # Data ingestion scripts
-├── db/                     # SQL schema and migrations
-├── notebooks/              # Quarto analysis notebooks
-├── tests/                  # Test suite (unit, integration, e2e)
-├── scripts/                # Automation scripts
-├── analysis/               # Outputs, reports, dissertation
-├── docker/                 # Docker configuration
-├── .github/workflows/      # CI/CD workflows
-└── pgdata/                 # PostgreSQL data volume (do not edit)
+├── py/                                        # Python modules (features, models, pricing)
+│   ├── compute/                               # 🆕 Distributed compute system
+│   │   ├── statistics/                        # Statistical testing framework
+│   │   │   ├── statistical_tests.py           # Permutation & bootstrap tests
+│   │   │   ├── effect_size.py                 # Cohen's d, Cliff's delta
+│   │   │   ├── multiple_comparisons.py        # FDR/FWER correction
+│   │   │   ├── power_analysis.py              # Sample size & power
+│   │   │   ├── experimental_design/           # A/B testing framework
+│   │   │   └── reporting/                     # Quarto/LaTeX integration
+│   │   ├── sync/                              # 🆕 Google Drive sync infrastructure
+│   │   │   ├── machine_manager.py             # Hardware detection & fingerprinting
+│   │   │   ├── file_locks.py                  # Cross-platform file locking
+│   │   │   └── conflict_resolver.py           # Sync conflict resolution
+│   │   ├── hardware/                          # 🆕 Hardware-aware task routing
+│   │   │   └── task_router.py                 # M4 vs 4090 task optimization
+│   │   ├── task_queue.py                      # Priority-based task management (WAL mode)
+│   │   ├── adaptive_scheduler.py              # Multi-armed bandit + hardware routing
+│   │   ├── performance_tracker.py             # Statistical performance tracking
+│   │   └── compute_worker.py                  # Distributed worker system
+│   ├── features/                              # Feature engineering
+│   ├── models/                                # ML models
+│   ├── pricing/                               # Pricing & risk management
+│   └── rl/                                    # Reinforcement learning
+├── R/                                         # R utilities
+├── data/                                      # Data ingestion scripts
+├── db/                                        # SQL schema and migrations
+├── notebooks/                                 # Quarto analysis notebooks
+├── tests/                                     # Test suite (unit, integration, e2e)
+├── scripts/                                   # Automation scripts
+├── analysis/                                  # Outputs, reports, dissertation
+├── docker/                                    # Docker configuration
+├── .github/workflows/                         # CI/CD workflows
+└── pgdata/                                    # PostgreSQL data volume (do not edit)
 ```
 
 ## Key Files
