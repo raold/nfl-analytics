@@ -2,7 +2,7 @@
   <img src="docs/images/logo.png" alt="NFL Analytics" width="520" />
 </p>
 
-# NFL Analytics – Local Dev Quickstart
+<h1 align="center">NFL Analytics</h1>
 
 This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**.
 
