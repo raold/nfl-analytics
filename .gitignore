@@ -2,6 +2,7 @@
 /data/nflverse-data/
 pgdata/
 .env
+.env.example
 .tmp.driveupload/
 
 # Worker logs
@@ -28,6 +29,13 @@ machine_info.json
 .idea/
 .vscode/
 *.code-workspace
+
+# Docker and git config files
+.dockerignore
+.gitattributes
+
+# GitHub workflows (sensitive automation)
+.github/workflows/
 
 # Claude local context
 .claude/
