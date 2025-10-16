@@ -1,0 +1,7 @@
+{
+  "hidden_dim": 16,
+  "activation": "relu",
+  "prior_std": 0.5,
+  "n_players": 177,
+  "timestamp": "2025-10-13T21:53:17.408278"
+}

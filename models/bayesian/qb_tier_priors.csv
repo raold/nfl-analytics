@@ -1,0 +1,6 @@
+tier,description,prior_mean_adjustment,examples
+elite,Consistent top-5 QB,0.15,"Mahomes, Allen, Brady (historically)"
+good,Top-15 QB,0.05,"Stafford, Cousins"
+average,Starter but not elite,0,"Baker, Tannehill"
+below_avg,Backup/struggling starter,-0.1,"Backups, rookies"
+unknown,Insufficient data,0,New players

@@ -1,0 +1,38 @@
+{
+  "model_version": "v2_with_migration_019",
+  "train_seasons": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "validate_season": 2025,
+  "validate_week": 6,
+  "features_csv": "data/processed/features/asof_team_features_v2.csv",
+  "n_features": 156,
+  "n_train_samples": 1408,
+  "n_test_samples": 74,
+  "test_metrics": {
+    "accuracy": 0.7027027027027027,
+    "log_loss": 0.5651940711991004,
+    "auc": 0.7681818181818182,
+    "brier_score": 0.1933259982546669,
+    "n_samples": 74
+  },
+  "validate_metrics": {
+    "accuracy": 0.5555555555555556,
+    "log_loss": 0.6820956619980518,
+    "auc": 0.6,
+    "brier_score": 0.24137475853213886,
+    "n_samples": 9
+  },
+  "v2_features": [
+    "is_division_game",
+    "is_thursday_night",
+    "is_short_week",
+    "weather_*",
+    "def_epa_last_4_diff",
+    "high_tie_prob"
+  ]
+}

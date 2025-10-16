@@ -1,0 +1,26 @@
+{
+  "hierarchical_v1.0": {
+    "total_bets": 582,
+    "win_rate": 51.890034364261176,
+    "roi": -3.752242344870691,
+    "sharpe_ratio": -1.0752841336741423,
+    "max_drawdown": -83.49597730933658,
+    "final_bankroll": 4101.436533865293
+  },
+  "informative_priors_v2.5": {
+    "total_bets": 0,
+    "win_rate": 0,
+    "roi": 0,
+    "sharpe_ratio": 0,
+    "max_drawdown": 0,
+    "final_bankroll": 10000.0
+  },
+  "ensemble_v3.0": {
+    "total_bets": 0,
+    "win_rate": 0,
+    "roi": 0,
+    "sharpe_ratio": 0,
+    "max_drawdown": 0,
+    "final_bankroll": 10000.0
+  }
+}

@@ -1,0 +1,935 @@
+              section              
+-----------------------------------
+ ======== SCHEMA OVERVIEW ========
+(1 row)
+
+   schema_name   | table_count 
+-----------------+-------------
+ mart            |          10
+ monitoring      |           4
+ pg_temp_6       |           0
+ pg_temp_9       |           0
+ pg_toast        |           0
+ pg_toast_temp_6 |           0
+ pg_toast_temp_9 |           0
+ predictions     |           6
+ public          |          31
+ reference       |           3
+(10 rows)
+
+              section              
+-----------------------------------
+ ======== TABLE INVENTORY ========
+(1 row)
+
+psql:/Users/dro/rice/nfl-analytics/db/audit/comprehensive_dba_audit.sql:36: ERROR:  column "tablename" does not exist
+LINE 4:         tablename,
+                ^
+                    section                    
+-----------------------------------------------
+ ======== TABLES WITHOUT PRIMARY KEYS ========
+(1 row)
+
+ schemaname |       tablename       
+------------+-----------------------
+ mart       | bayesian_team_ratings
+ mart       | rolling_features
+(2 rows)
+
+                   section                   
+---------------------------------------------
+ ======== FOREIGN KEY RELATIONSHIPS ========
+(1 row)
+
+     table_schema     |                    table_name                    |       column_name        | foreign_table_schema |     foreign_table_name      | foreign_column_name 
+----------------------+--------------------------------------------------+--------------------------+----------------------+-----------------------------+---------------------
+ _timescaledb_catalog | chunk                                            | compressed_chunk_id      | _timescaledb_catalog | chunk                       | id
+ _timescaledb_catalog | chunk                                            | hypertable_id            | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | chunk_column_stats                               | chunk_id                 | _timescaledb_catalog | chunk                       | id
+ _timescaledb_catalog | chunk_column_stats                               | hypertable_id            | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | chunk_constraint                                 | chunk_id                 | _timescaledb_catalog | chunk                       | id
+ _timescaledb_catalog | chunk_constraint                                 | dimension_slice_id       | _timescaledb_catalog | dimension_slice             | id
+ _timescaledb_catalog | compression_chunk_size                           | chunk_id                 | _timescaledb_catalog | chunk                       | id
+ _timescaledb_catalog | compression_chunk_size                           | compressed_chunk_id      | _timescaledb_catalog | chunk                       | id
+ _timescaledb_catalog | continuous_agg                                   | mat_hypertable_id        | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | continuous_agg                                   | raw_hypertable_id        | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | continuous_agg                                   | parent_mat_hypertable_id | _timescaledb_catalog | continuous_agg              | mat_hypertable_id
+ _timescaledb_catalog | continuous_agg_migrate_plan_step                 | mat_hypertable_id        | _timescaledb_catalog | continuous_agg_migrate_plan | mat_hypertable_id
+ _timescaledb_catalog | continuous_aggs_bucket_function                  | mat_hypertable_id        | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | continuous_aggs_invalidation_threshold           | hypertable_id            | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | continuous_aggs_materialization_invalidation_log | materialization_id       | _timescaledb_catalog | continuous_agg              | mat_hypertable_id
+ _timescaledb_catalog | continuous_aggs_materialization_ranges           | materialization_id       | _timescaledb_catalog | continuous_agg              | mat_hypertable_id
+ _timescaledb_catalog | continuous_aggs_watermark                        | mat_hypertable_id        | _timescaledb_catalog | continuous_agg              | mat_hypertable_id
+ _timescaledb_catalog | dimension                                        | hypertable_id            | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | dimension_slice                                  | dimension_id             | _timescaledb_catalog | dimension                   | id
+ _timescaledb_catalog | hypertable                                       | compressed_hypertable_id | _timescaledb_catalog | hypertable                  | id
+ _timescaledb_catalog | tablespace                                       | hypertable_id            | _timescaledb_catalog | hypertable                  | id
+ predictions          | prediction_versions                              | prediction_id            | predictions          | game_predictions            | prediction_id
+ public               | plays                                            | game_id                  | public               | games                       | game_id
+ public               | rosters                                          | player_id                | public               | players                     | player_id
+ reference            | stadiums                                         | team_abbr                | reference            | teams                       | canonical_abbr
+(25 rows)
+
+                      section                      
+---------------------------------------------------
+ ======== PLAYER ID COLUMNS ACROSS TABLES ========
+(1 row)
+
+ table_schema |         table_name          |  column_name  |     data_type     | character_maximum_length 
+--------------+-----------------------------+---------------+-------------------+--------------------------
+ public       | player_id_mapping           | espn_id       | text              |                         
+ public       | rosters_weekly              | espn_id       | text              |                         
+ public       | contracts                   | gsis_id       | text              |                         
+ public       | depth_charts                | gsis_id       | text              |                         
+ public       | draft_picks                 | gsis_id       | text              |                         
+ public       | injuries                    | gsis_id       | character varying |                       20
+ public       | player_id_mapping           | gsis_id       | text              |                         
+ public       | rosters_weekly              | gsis_id       | text              |                         
+ public       | contracts                   | otc_id        | text              |                         
+ public       | combine                     | pfr_id        | text              |                         
+ public       | player_id_mapping           | pfr_id        | text              |                         
+ public       | rosters_weekly              | pfr_id        | text              |                         
+ public       | trades                      | pfr_id        | text              |                         
+ public       | draft_picks                 | pfr_player_id | text              |                         
+ public       | pfr_defense                 | pfr_player_id | text              |                         
+ public       | pfr_passing                 | pfr_player_id | text              |                         
+ public       | snap_counts                 | pfr_player_id | text              |                         
+ mart         | bayesian_player_ratings     | player_id     | character varying |                       50
+ predictions  | bayesian_edges              | player_id     | text              |                         
+ predictions  | bayesian_prop_predictions   | player_id     | text              |                         
+ predictions  | bayesian_props_current_week | player_id     | text              |                         
+ predictions  | current_week_props          | player_id     | text              |                         
+ predictions  | prop_predictions            | player_id     | text              |                         
+ predictions  | props_with_lines            | player_id     | text              |                         
+ public       | best_prop_lines             | player_id     | text              |                         
+ public       | espn_qbr                    | player_id     | text              |                         
+ public       | latest_prop_lines           | player_id     | text              |                         
+ public       | nextgen_passing             | player_id     | text              |                         
+ public       | nextgen_receiving           | player_id     | text              |                         
+ public       | nextgen_rushing             | player_id     | text              |                         
+ public       | player_id_mapping           | player_id     | text              |                         
+ public       | players                     | player_id     | text              |                         
+ public       | prop_line_openings          | player_id     | text              |                         
+ public       | prop_lines_history          | player_id     | text              |                         
+ public       | rosters                     | player_id     | text              |                         
+(35 rows)
+
+                   section                    
+----------------------------------------------
+ ======== TEAM COLUMNS ACROSS TABLES ========
+(1 row)
+
+ table_schema |         table_name          | column_name |     data_type     | character_maximum_length 
+--------------+-----------------------------+-------------+-------------------+--------------------------
+ mart         | asof_team_features          | away_team   | text              |                         
+ mart         | odds_coverage               | away_team   | text              |                         
+ mart         | unmatched_odds_events       | away_team   | text              |                         
+ predictions  | bayesian_edges              | away_team   | text              |                         
+ predictions  | bayesian_props_current_week | away_team   | text              |                         
+ predictions  | current_week_props          | away_team   | text              |                         
+ public       | games                       | away_team   | text              |                         
+ public       | latest_odds                 | away_team   | text              |                         
+ public       | odds_history                | away_team   | text              |                         
+ public       | depth_charts                | club_code   | text              |                         
+ public       | plays                       | defteam     | text              |                         
+ mart         | asof_team_features          | home_team   | text              |                         
+ mart         | odds_coverage               | home_team   | text              |                         
+ mart         | unmatched_odds_events       | home_team   | text              |                         
+ predictions  | bayesian_edges              | home_team   | text              |                         
+ predictions  | bayesian_props_current_week | home_team   | text              |                         
+ predictions  | current_week_props          | home_team   | text              |                         
+ public       | games                       | home_team   | text              |                         
+ public       | latest_odds                 | home_team   | text              |                         
+ public       | odds_history                | home_team   | text              |                         
+ mart         | rolling_features            | opponent    | text              |                         
+ predictions  | bayesian_props_current_week | opponent    | text              |                         
+ predictions  | current_week_props          | opponent    | text              |                         
+ public       | pfr_defense                 | opponent    | text              |                         
+ public       | pfr_passing                 | opponent    | text              |                         
+ public       | snap_counts                 | opponent    | text              |                         
+ predictions  | bayesian_edges              | player_team | text              |                         
+ predictions  | bayesian_props_current_week | player_team | text              |                         
+ predictions  | current_week_props          | player_team | text              |                         
+ predictions  | prop_predictions            | player_team | text              |                         
+ predictions  | props_with_lines            | player_team | text              |                         
+ public       | best_prop_lines             | player_team | text              |                         
+ public       | latest_prop_lines           | player_team | text              |                         
+ public       | prop_lines_history          | player_team | text              |                         
+ mart         | team_epa                    | posteam     | text              |                         
+ mart         | team_ratings                | posteam     | text              |                         
+ public       | plays                       | posteam     | text              |                         
+ mart         | bayesian_team_ratings       | team        | text              |                         
+ mart         | rolling_features            | team        | text              |                         
+ mart         | team_4th_down_features      | team        | text              |                         
+ mart         | team_injury_load            | team        | text              |                         
+ mart         | team_playoff_context        | team        | text              |                         
+ public       | contracts                   | team        | text              |                         
+ public       | draft_picks                 | team        | text              |                         
+ public       | injuries                    | team        | character varying |                        3
+ public       | pfr_defense                 | team        | text              |                         
+ public       | pfr_passing                 | team        | text              |                         
+ public       | rosters                     | team        | text              |                         
+ public       | rosters_weekly              | team        | text              |                         
+ public       | snap_counts                 | team        | text              |                         
+ reference    | team_display                | team        | character varying |                        3
+ reference    | stadiums                    | team_abbr   | character varying |                        3
+(52 rows)
+
+                      section                      
+---------------------------------------------------
+ ======== TEAM CODE VALUES IN GAMES TABLE ========
+(1 row)
+
+ home_team 
+-----------
+ ARI
+ ATL
+ BAL
+ BUF
+ CAR
+ CHI
+ CIN
+ CLE
+ DAL
+ DEN
+ DET
+ GB
+ HOU
+ IND
+ JAX
+ KC
+ LA
+ LAC
+ LV
+ MIA
+ MIN
+ NE
+ NO
+ NYG
+ NYJ
+ PHI
+ PIT
+ SEA
+ SF
+ TB
+ TEN
+ WAS
+(32 rows)
+
+                      section                      
+---------------------------------------------------
+ ======== TEAM CODE VALUES IN PLAYS TABLE ========
+(1 row)
+
+ posteam 
+---------
+ 
+ ARI
+ ATL
+ BAL
+ BUF
+ CAR
+ CHI
+ CIN
+ CLE
+ DAL
+ DEN
+ DET
+ GB
+ HOU
+ IND
+ JAX
+ KC
+ LA
+ LAC
+ LV
+ MIA
+ MIN
+ NE
+ NO
+ NYG
+ NYJ
+ PHI
+ PIT
+ SEA
+ SF
+ TB
+ TEN
+ WAS
+(33 rows)
+
+              section              
+-----------------------------------
+ ======== GAME ID FORMATS ========
+(1 row)
+
+ table_name | unique_games |   sample_min    |   sample_max    
+------------+--------------+-----------------+-----------------
+ games      |         7263 | 1999_01_ARI_PHI | 2025_18_WAS_PHI
+ officials  |         2837 | 2015091000      | 2025101301
+ plays      |         7053 | 1999_01_ARI_PHI | 2025_05_SF_LA
+(3 rows)
+
+                    section                    
+-----------------------------------------------
+ ======== POTENTIAL DUPLICATE RECORDS ========
+(1 row)
+
+ table_name | game_id | duplicate_count 
+------------+---------+-----------------
+(0 rows)
+
+                   section                    
+----------------------------------------------
+ ======== NULL VALUES IN KEY COLUMNS ========
+(1 row)
+
+psql:/Users/dro/rice/nfl-analytics/db/audit/comprehensive_dba_audit.sql:184: ERROR:  column "gsis_id" does not exist
+LINE 19:     COUNT(*) FILTER (WHERE gsis_id IS NULL) as null_gsis_id,
+                                    ^
+                              section                               
+--------------------------------------------------------------------
+ ======== SIMILAR COLUMN NAMES (POTENTIAL INCONSISTENCIES) ========
+(1 row)
+
+   schema1   |           table1            |    column1    |   schema2   |         table2         |    column2    
+-------------+-----------------------------+---------------+-------------+------------------------+---------------
+ public      | depth_charts                | club_code     | public      | draft_picks            | team
+ public      | depth_charts                | club_code     | public      | injuries               | team
+ public      | depth_charts                | club_code     | public      | pfr_defense            | team
+ public      | depth_charts                | club_code     | public      | pfr_passing            | team
+ public      | depth_charts                | club_code     | mart        | rolling_features       | team
+ public      | depth_charts                | club_code     | public      | rosters                | team
+ public      | depth_charts                | club_code     | public      | rosters_weekly         | team
+ public      | depth_charts                | club_code     | public      | snap_counts            | team
+ public      | depth_charts                | club_code     | mart        | team_4th_down_features | team
+ public      | depth_charts                | club_code     | mart        | team_injury_load       | team
+ public      | depth_charts                | club_code     | mart        | team_playoff_context   | team
+ public      | contracts                   | gsis_id       | predictions | current_week_props     | player_id
+ public      | contracts                   | gsis_id       | public      | draft_picks            | pfr_player_id
+ public      | contracts                   | gsis_id       | public      | espn_qbr               | player_id
+ public      | contracts                   | gsis_id       | public      | latest_prop_lines      | player_id
+ public      | contracts                   | gsis_id       | public      | nextgen_passing        | player_id
+ public      | contracts                   | gsis_id       | public      | nextgen_receiving      | player_id
+ public      | contracts                   | gsis_id       | public      | nextgen_rushing        | player_id
+ public      | contracts                   | gsis_id       | public      | pfr_defense            | pfr_player_id
+ public      | contracts                   | gsis_id       | public      | pfr_passing            | pfr_player_id
+ public      | contracts                   | gsis_id       | public      | player_id_mapping      | pfr_id
+ public      | contracts                   | gsis_id       | public      | player_id_mapping      | player_id
+ public      | contracts                   | gsis_id       | public      | players                | player_id
+ public      | contracts                   | gsis_id       | public      | prop_line_openings     | player_id
+ public      | contracts                   | gsis_id       | public      | prop_lines_history     | player_id
+ public      | contracts                   | gsis_id       | predictions | prop_predictions       | player_id
+ public      | contracts                   | gsis_id       | predictions | props_with_lines       | player_id
+ public      | contracts                   | gsis_id       | public      | rosters                | player_id
+ public      | contracts                   | gsis_id       | public      | rosters_weekly         | pfr_id
+ public      | contracts                   | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | contracts                   | gsis_id       | public      | trades                 | pfr_id
+ public      | depth_charts                | gsis_id       | public      | draft_picks            | pfr_player_id
+ public      | depth_charts                | gsis_id       | public      | espn_qbr               | player_id
+ public      | depth_charts                | gsis_id       | public      | latest_prop_lines      | player_id
+ public      | depth_charts                | gsis_id       | public      | nextgen_passing        | player_id
+ public      | depth_charts                | gsis_id       | public      | nextgen_receiving      | player_id
+ public      | depth_charts                | gsis_id       | public      | nextgen_rushing        | player_id
+ public      | depth_charts                | gsis_id       | public      | pfr_defense            | pfr_player_id
+ public      | depth_charts                | gsis_id       | public      | pfr_passing            | pfr_player_id
+ public      | depth_charts                | gsis_id       | public      | player_id_mapping      | pfr_id
+ public      | depth_charts                | gsis_id       | public      | player_id_mapping      | player_id
+ public      | depth_charts                | gsis_id       | public      | players                | player_id
+ public      | depth_charts                | gsis_id       | public      | prop_line_openings     | player_id
+ public      | depth_charts                | gsis_id       | public      | prop_lines_history     | player_id
+ public      | depth_charts                | gsis_id       | predictions | prop_predictions       | player_id
+ public      | depth_charts                | gsis_id       | predictions | props_with_lines       | player_id
+ public      | depth_charts                | gsis_id       | public      | rosters                | player_id
+ public      | depth_charts                | gsis_id       | public      | rosters_weekly         | pfr_id
+ public      | depth_charts                | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | depth_charts                | gsis_id       | public      | trades                 | pfr_id
+ public      | draft_picks                 | gsis_id       | public      | espn_qbr               | player_id
+ public      | draft_picks                 | gsis_id       | public      | latest_prop_lines      | player_id
+ public      | draft_picks                 | gsis_id       | public      | nextgen_passing        | player_id
+ public      | draft_picks                 | gsis_id       | public      | nextgen_receiving      | player_id
+ public      | draft_picks                 | gsis_id       | public      | nextgen_rushing        | player_id
+ public      | draft_picks                 | gsis_id       | public      | pfr_defense            | pfr_player_id
+ public      | draft_picks                 | gsis_id       | public      | pfr_passing            | pfr_player_id
+ public      | draft_picks                 | gsis_id       | public      | player_id_mapping      | pfr_id
+ public      | draft_picks                 | gsis_id       | public      | player_id_mapping      | player_id
+ public      | draft_picks                 | gsis_id       | public      | players                | player_id
+ public      | draft_picks                 | gsis_id       | public      | prop_line_openings     | player_id
+ public      | draft_picks                 | gsis_id       | public      | prop_lines_history     | player_id
+ public      | draft_picks                 | gsis_id       | predictions | prop_predictions       | player_id
+ public      | draft_picks                 | gsis_id       | predictions | props_with_lines       | player_id
+ public      | draft_picks                 | gsis_id       | public      | rosters                | player_id
+ public      | draft_picks                 | gsis_id       | public      | rosters_weekly         | pfr_id
+ public      | draft_picks                 | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | draft_picks                 | gsis_id       | public      | trades                 | pfr_id
+ public      | injuries                    | gsis_id       | public      | latest_prop_lines      | player_id
+ public      | injuries                    | gsis_id       | public      | nextgen_passing        | player_id
+ public      | injuries                    | gsis_id       | public      | nextgen_receiving      | player_id
+ public      | injuries                    | gsis_id       | public      | nextgen_rushing        | player_id
+ public      | injuries                    | gsis_id       | public      | pfr_defense            | pfr_player_id
+ public      | injuries                    | gsis_id       | public      | pfr_passing            | pfr_player_id
+ public      | injuries                    | gsis_id       | public      | player_id_mapping      | pfr_id
+ public      | injuries                    | gsis_id       | public      | player_id_mapping      | player_id
+ public      | injuries                    | gsis_id       | public      | players                | player_id
+ public      | injuries                    | gsis_id       | public      | prop_line_openings     | player_id
+ public      | injuries                    | gsis_id       | public      | prop_lines_history     | player_id
+ public      | injuries                    | gsis_id       | predictions | prop_predictions       | player_id
+ public      | injuries                    | gsis_id       | predictions | props_with_lines       | player_id
+ public      | injuries                    | gsis_id       | public      | rosters                | player_id
+ public      | injuries                    | gsis_id       | public      | rosters_weekly         | pfr_id
+ public      | injuries                    | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | injuries                    | gsis_id       | public      | trades                 | pfr_id
+ public      | player_id_mapping           | gsis_id       | public      | players                | player_id
+ public      | player_id_mapping           | gsis_id       | public      | prop_line_openings     | player_id
+ public      | player_id_mapping           | gsis_id       | public      | prop_lines_history     | player_id
+ public      | player_id_mapping           | gsis_id       | predictions | prop_predictions       | player_id
+ public      | player_id_mapping           | gsis_id       | predictions | props_with_lines       | player_id
+ public      | player_id_mapping           | gsis_id       | public      | rosters                | player_id
+ public      | player_id_mapping           | gsis_id       | public      | rosters_weekly         | pfr_id
+ public      | player_id_mapping           | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | player_id_mapping           | gsis_id       | public      | trades                 | pfr_id
+ public      | rosters_weekly              | gsis_id       | public      | snap_counts            | pfr_player_id
+ public      | rosters_weekly              | gsis_id       | public      | trades                 | pfr_id
+ public      | combine                     | pfr_id        | public      | contracts              | gsis_id
+ public      | combine                     | pfr_id        | predictions | current_week_props     | player_id
+ public      | combine                     | pfr_id        | public      | depth_charts           | gsis_id
+ public      | combine                     | pfr_id        | public      | draft_picks            | gsis_id
+ public      | combine                     | pfr_id        | public      | draft_picks            | pfr_player_id
+ public      | combine                     | pfr_id        | public      | espn_qbr               | player_id
+ public      | combine                     | pfr_id        | public      | injuries               | gsis_id
+ public      | combine                     | pfr_id        | public      | latest_prop_lines      | player_id
+ public      | combine                     | pfr_id        | public      | nextgen_passing        | player_id
+ public      | combine                     | pfr_id        | public      | nextgen_receiving      | player_id
+ public      | combine                     | pfr_id        | public      | nextgen_rushing        | player_id
+ public      | combine                     | pfr_id        | public      | pfr_defense            | pfr_player_id
+ public      | combine                     | pfr_id        | public      | pfr_passing            | pfr_player_id
+ public      | combine                     | pfr_id        | public      | player_id_mapping      | gsis_id
+ public      | combine                     | pfr_id        | public      | player_id_mapping      | player_id
+ public      | combine                     | pfr_id        | public      | players                | player_id
+ public      | combine                     | pfr_id        | public      | prop_line_openings     | player_id
+ public      | combine                     | pfr_id        | public      | prop_lines_history     | player_id
+ public      | combine                     | pfr_id        | predictions | prop_predictions       | player_id
+ public      | combine                     | pfr_id        | predictions | props_with_lines       | player_id
+ public      | combine                     | pfr_id        | public      | rosters                | player_id
+ public      | combine                     | pfr_id        | public      | rosters_weekly         | gsis_id
+ public      | combine                     | pfr_id        | public      | snap_counts            | pfr_player_id
+ public      | player_id_mapping           | pfr_id        | public      | players                | player_id
+ public      | player_id_mapping           | pfr_id        | public      | prop_line_openings     | player_id
+ public      | player_id_mapping           | pfr_id        | public      | prop_lines_history     | player_id
+ public      | player_id_mapping           | pfr_id        | predictions | prop_predictions       | player_id
+ public      | player_id_mapping           | pfr_id        | predictions | props_with_lines       | player_id
+ public      | player_id_mapping           | pfr_id        | public      | rosters                | player_id
+ public      | player_id_mapping           | pfr_id        | public      | rosters_weekly         | gsis_id
+ public      | player_id_mapping           | pfr_id        | public      | snap_counts            | pfr_player_id
+ public      | rosters_weekly              | pfr_id        | public      | snap_counts            | pfr_player_id
+ public      | draft_picks                 | pfr_player_id | public      | espn_qbr               | player_id
+ public      | draft_picks                 | pfr_player_id | public      | injuries               | gsis_id
+ public      | draft_picks                 | pfr_player_id | public      | latest_prop_lines      | player_id
+ public      | draft_picks                 | pfr_player_id | public      | nextgen_passing        | player_id
+ public      | draft_picks                 | pfr_player_id | public      | nextgen_receiving      | player_id
+ public      | draft_picks                 | pfr_player_id | public      | nextgen_rushing        | player_id
+ public      | draft_picks                 | pfr_player_id | public      | player_id_mapping      | gsis_id
+ public      | draft_picks                 | pfr_player_id | public      | player_id_mapping      | pfr_id
+ public      | draft_picks                 | pfr_player_id | public      | player_id_mapping      | player_id
+ public      | draft_picks                 | pfr_player_id | public      | players                | player_id
+ public      | draft_picks                 | pfr_player_id | public      | prop_line_openings     | player_id
+ public      | draft_picks                 | pfr_player_id | public      | prop_lines_history     | player_id
+ public      | draft_picks                 | pfr_player_id | predictions | prop_predictions       | player_id
+ public      | draft_picks                 | pfr_player_id | predictions | props_with_lines       | player_id
+ public      | draft_picks                 | pfr_player_id | public      | rosters                | player_id
+ public      | draft_picks                 | pfr_player_id | public      | rosters_weekly         | gsis_id
+ public      | draft_picks                 | pfr_player_id | public      | rosters_weekly         | pfr_id
+ public      | draft_picks                 | pfr_player_id | public      | trades                 | pfr_id
+ public      | pfr_defense                 | pfr_player_id | public      | player_id_mapping      | gsis_id
+ public      | pfr_defense                 | pfr_player_id | public      | player_id_mapping      | pfr_id
+ public      | pfr_defense                 | pfr_player_id | public      | player_id_mapping      | player_id
+ public      | pfr_defense                 | pfr_player_id | public      | players                | player_id
+ public      | pfr_defense                 | pfr_player_id | public      | prop_line_openings     | player_id
+ public      | pfr_defense                 | pfr_player_id | public      | prop_lines_history     | player_id
+ public      | pfr_defense                 | pfr_player_id | predictions | prop_predictions       | player_id
+ public      | pfr_defense                 | pfr_player_id | predictions | props_with_lines       | player_id
+ public      | pfr_defense                 | pfr_player_id | public      | rosters                | player_id
+ public      | pfr_defense                 | pfr_player_id | public      | rosters_weekly         | gsis_id
+ public      | pfr_defense                 | pfr_player_id | public      | rosters_weekly         | pfr_id
+ public      | pfr_defense                 | pfr_player_id | public      | trades                 | pfr_id
+ public      | pfr_passing                 | pfr_player_id | public      | player_id_mapping      | gsis_id
+ public      | pfr_passing                 | pfr_player_id | public      | player_id_mapping      | pfr_id
+ public      | pfr_passing                 | pfr_player_id | public      | player_id_mapping      | player_id
+ public      | pfr_passing                 | pfr_player_id | public      | players                | player_id
+ public      | pfr_passing                 | pfr_player_id | public      | prop_line_openings     | player_id
+ public      | pfr_passing                 | pfr_player_id | public      | prop_lines_history     | player_id
+ public      | pfr_passing                 | pfr_player_id | predictions | prop_predictions       | player_id
+ public      | pfr_passing                 | pfr_player_id | predictions | props_with_lines       | player_id
+ public      | pfr_passing                 | pfr_player_id | public      | rosters                | player_id
+ public      | pfr_passing                 | pfr_player_id | public      | rosters_weekly         | gsis_id
+ public      | pfr_passing                 | pfr_player_id | public      | rosters_weekly         | pfr_id
+ public      | pfr_passing                 | pfr_player_id | public      | trades                 | pfr_id
+ public      | snap_counts                 | pfr_player_id | public      | trades                 | pfr_id
+ predictions | bayesian_edges              | player_id     | public      | combine                | pfr_id
+ predictions | bayesian_edges              | player_id     | public      | contracts              | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | depth_charts           | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | draft_picks            | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | draft_picks            | pfr_player_id
+ predictions | bayesian_edges              | player_id     | public      | injuries               | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | pfr_defense            | pfr_player_id
+ predictions | bayesian_edges              | player_id     | public      | pfr_passing            | pfr_player_id
+ predictions | bayesian_edges              | player_id     | public      | player_id_mapping      | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | player_id_mapping      | pfr_id
+ predictions | bayesian_edges              | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | bayesian_edges              | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | bayesian_edges              | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | bayesian_edges              | player_id     | public      | trades                 | pfr_id
+ mart        | bayesian_player_ratings     | player_id     | public      | combine                | pfr_id
+ mart        | bayesian_player_ratings     | player_id     | public      | contracts              | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | depth_charts           | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | draft_picks            | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | draft_picks            | pfr_player_id
+ mart        | bayesian_player_ratings     | player_id     | public      | injuries               | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | pfr_defense            | pfr_player_id
+ mart        | bayesian_player_ratings     | player_id     | public      | pfr_passing            | pfr_player_id
+ mart        | bayesian_player_ratings     | player_id     | public      | player_id_mapping      | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | player_id_mapping      | pfr_id
+ mart        | bayesian_player_ratings     | player_id     | public      | rosters_weekly         | gsis_id
+ mart        | bayesian_player_ratings     | player_id     | public      | rosters_weekly         | pfr_id
+ mart        | bayesian_player_ratings     | player_id     | public      | snap_counts            | pfr_player_id
+ mart        | bayesian_player_ratings     | player_id     | public      | trades                 | pfr_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | combine                | pfr_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | contracts              | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | depth_charts           | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | draft_picks            | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | draft_picks            | pfr_player_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | injuries               | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | pfr_defense            | pfr_player_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | pfr_passing            | pfr_player_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | player_id_mapping      | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | player_id_mapping      | pfr_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | bayesian_prop_predictions   | player_id     | public      | trades                 | pfr_id
+ predictions | bayesian_props_current_week | player_id     | public      | combine                | pfr_id
+ predictions | bayesian_props_current_week | player_id     | public      | contracts              | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | depth_charts           | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | draft_picks            | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | draft_picks            | pfr_player_id
+ predictions | bayesian_props_current_week | player_id     | public      | injuries               | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | pfr_defense            | pfr_player_id
+ predictions | bayesian_props_current_week | player_id     | public      | pfr_passing            | pfr_player_id
+ predictions | bayesian_props_current_week | player_id     | public      | player_id_mapping      | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | player_id_mapping      | pfr_id
+ predictions | bayesian_props_current_week | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | bayesian_props_current_week | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | bayesian_props_current_week | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | bayesian_props_current_week | player_id     | public      | trades                 | pfr_id
+ public      | best_prop_lines             | player_id     | public      | combine                | pfr_id
+ public      | best_prop_lines             | player_id     | public      | contracts              | gsis_id
+ public      | best_prop_lines             | player_id     | public      | depth_charts           | gsis_id
+ public      | best_prop_lines             | player_id     | public      | draft_picks            | gsis_id
+ public      | best_prop_lines             | player_id     | public      | draft_picks            | pfr_player_id
+ public      | best_prop_lines             | player_id     | public      | injuries               | gsis_id
+ public      | best_prop_lines             | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | best_prop_lines             | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | best_prop_lines             | player_id     | public      | player_id_mapping      | gsis_id
+ public      | best_prop_lines             | player_id     | public      | player_id_mapping      | pfr_id
+ public      | best_prop_lines             | player_id     | public      | rosters_weekly         | gsis_id
+ public      | best_prop_lines             | player_id     | public      | rosters_weekly         | pfr_id
+ public      | best_prop_lines             | player_id     | public      | snap_counts            | pfr_player_id
+ public      | best_prop_lines             | player_id     | public      | trades                 | pfr_id
+ predictions | current_week_props          | player_id     | public      | depth_charts           | gsis_id
+ predictions | current_week_props          | player_id     | public      | draft_picks            | gsis_id
+ predictions | current_week_props          | player_id     | public      | draft_picks            | pfr_player_id
+ predictions | current_week_props          | player_id     | public      | injuries               | gsis_id
+ predictions | current_week_props          | player_id     | public      | pfr_defense            | pfr_player_id
+ predictions | current_week_props          | player_id     | public      | pfr_passing            | pfr_player_id
+ predictions | current_week_props          | player_id     | public      | player_id_mapping      | gsis_id
+ predictions | current_week_props          | player_id     | public      | player_id_mapping      | pfr_id
+ predictions | current_week_props          | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | current_week_props          | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | current_week_props          | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | current_week_props          | player_id     | public      | trades                 | pfr_id
+ public      | espn_qbr                    | player_id     | public      | injuries               | gsis_id
+ public      | espn_qbr                    | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | espn_qbr                    | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | espn_qbr                    | player_id     | public      | player_id_mapping      | gsis_id
+ public      | espn_qbr                    | player_id     | public      | player_id_mapping      | pfr_id
+ public      | espn_qbr                    | player_id     | public      | rosters_weekly         | gsis_id
+ public      | espn_qbr                    | player_id     | public      | rosters_weekly         | pfr_id
+ public      | espn_qbr                    | player_id     | public      | snap_counts            | pfr_player_id
+ public      | espn_qbr                    | player_id     | public      | trades                 | pfr_id
+ public      | latest_prop_lines           | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | latest_prop_lines           | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | latest_prop_lines           | player_id     | public      | player_id_mapping      | gsis_id
+ public      | latest_prop_lines           | player_id     | public      | player_id_mapping      | pfr_id
+ public      | latest_prop_lines           | player_id     | public      | rosters_weekly         | gsis_id
+ public      | latest_prop_lines           | player_id     | public      | rosters_weekly         | pfr_id
+ public      | latest_prop_lines           | player_id     | public      | snap_counts            | pfr_player_id
+ public      | latest_prop_lines           | player_id     | public      | trades                 | pfr_id
+ public      | nextgen_passing             | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | nextgen_passing             | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | nextgen_passing             | player_id     | public      | player_id_mapping      | gsis_id
+ public      | nextgen_passing             | player_id     | public      | player_id_mapping      | pfr_id
+ public      | nextgen_passing             | player_id     | public      | rosters_weekly         | gsis_id
+ public      | nextgen_passing             | player_id     | public      | rosters_weekly         | pfr_id
+ public      | nextgen_passing             | player_id     | public      | snap_counts            | pfr_player_id
+ public      | nextgen_passing             | player_id     | public      | trades                 | pfr_id
+ public      | nextgen_receiving           | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | nextgen_receiving           | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | nextgen_receiving           | player_id     | public      | player_id_mapping      | gsis_id
+ public      | nextgen_receiving           | player_id     | public      | player_id_mapping      | pfr_id
+ public      | nextgen_receiving           | player_id     | public      | rosters_weekly         | gsis_id
+ public      | nextgen_receiving           | player_id     | public      | rosters_weekly         | pfr_id
+ public      | nextgen_receiving           | player_id     | public      | snap_counts            | pfr_player_id
+ public      | nextgen_receiving           | player_id     | public      | trades                 | pfr_id
+ public      | nextgen_rushing             | player_id     | public      | pfr_defense            | pfr_player_id
+ public      | nextgen_rushing             | player_id     | public      | pfr_passing            | pfr_player_id
+ public      | nextgen_rushing             | player_id     | public      | player_id_mapping      | gsis_id
+ public      | nextgen_rushing             | player_id     | public      | player_id_mapping      | pfr_id
+ public      | nextgen_rushing             | player_id     | public      | rosters_weekly         | gsis_id
+ public      | nextgen_rushing             | player_id     | public      | rosters_weekly         | pfr_id
+ public      | nextgen_rushing             | player_id     | public      | snap_counts            | pfr_player_id
+ public      | nextgen_rushing             | player_id     | public      | trades                 | pfr_id
+ public      | player_id_mapping           | player_id     | public      | rosters_weekly         | gsis_id
+ public      | player_id_mapping           | player_id     | public      | rosters_weekly         | pfr_id
+ public      | player_id_mapping           | player_id     | public      | snap_counts            | pfr_player_id
+ public      | player_id_mapping           | player_id     | public      | trades                 | pfr_id
+ public      | players                     | player_id     | public      | rosters_weekly         | gsis_id
+ public      | players                     | player_id     | public      | rosters_weekly         | pfr_id
+ public      | players                     | player_id     | public      | snap_counts            | pfr_player_id
+ public      | players                     | player_id     | public      | trades                 | pfr_id
+ public      | prop_line_openings          | player_id     | public      | rosters_weekly         | gsis_id
+ public      | prop_line_openings          | player_id     | public      | rosters_weekly         | pfr_id
+ public      | prop_line_openings          | player_id     | public      | snap_counts            | pfr_player_id
+ public      | prop_line_openings          | player_id     | public      | trades                 | pfr_id
+ public      | prop_lines_history          | player_id     | public      | rosters_weekly         | gsis_id
+ public      | prop_lines_history          | player_id     | public      | rosters_weekly         | pfr_id
+ public      | prop_lines_history          | player_id     | public      | snap_counts            | pfr_player_id
+ public      | prop_lines_history          | player_id     | public      | trades                 | pfr_id
+ predictions | prop_predictions            | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | prop_predictions            | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | prop_predictions            | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | prop_predictions            | player_id     | public      | trades                 | pfr_id
+ predictions | props_with_lines            | player_id     | public      | rosters_weekly         | gsis_id
+ predictions | props_with_lines            | player_id     | public      | rosters_weekly         | pfr_id
+ predictions | props_with_lines            | player_id     | public      | snap_counts            | pfr_player_id
+ predictions | props_with_lines            | player_id     | public      | trades                 | pfr_id
+ public      | rosters                     | player_id     | public      | rosters_weekly         | gsis_id
+ public      | rosters                     | player_id     | public      | rosters_weekly         | pfr_id
+ public      | rosters                     | player_id     | public      | snap_counts            | pfr_player_id
+ public      | rosters                     | player_id     | public      | trades                 | pfr_id
+ mart        | bayesian_team_ratings       | team          | public      | depth_charts           | club_code
+ public      | contracts                   | team          | public      | depth_charts           | club_code
+(324 rows)
+
+             section              
+----------------------------------
+ ======== INDEX COVERAGE ========
+(1 row)
+
+ schemaname  |         tablename         |                            indexname                            |                                                                                              indexdef                                                                                               
+-------------+---------------------------+-----------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ mart        | asof_team_features        | asof_team_features_pkey                                         | CREATE UNIQUE INDEX asof_team_features_pkey ON mart.asof_team_features USING btree (game_id)
+ mart        | bayesian_player_ratings   | bayesian_player_ratings_pkey                                    | CREATE UNIQUE INDEX bayesian_player_ratings_pkey ON mart.bayesian_player_ratings USING btree (player_id, stat_type, season, model_version)
+ mart        | bayesian_player_ratings   | idx_bayesian_player_ratings_player                              | CREATE INDEX idx_bayesian_player_ratings_player ON mart.bayesian_player_ratings USING btree (player_id)
+ mart        | bayesian_player_ratings   | idx_bayesian_player_ratings_season                              | CREATE INDEX idx_bayesian_player_ratings_season ON mart.bayesian_player_ratings USING btree (season)
+ mart        | bayesian_player_ratings   | idx_bayesian_player_ratings_stat_type                           | CREATE INDEX idx_bayesian_player_ratings_stat_type ON mart.bayesian_player_ratings USING btree (stat_type)
+ mart        | game_features_enhanced    | idx_game_features_enhanced_id                                   | CREATE INDEX idx_game_features_enhanced_id ON mart.game_features_enhanced USING btree (game_id)
+ mart        | game_features_enhanced    | idx_game_features_enhanced_season                               | CREATE INDEX idx_game_features_enhanced_season ON mart.game_features_enhanced USING btree (season)
+ mart        | game_features_enhanced    | idx_game_features_enhanced_teams                                | CREATE INDEX idx_game_features_enhanced_teams ON mart.game_features_enhanced USING btree (home_team, away_team)
+ mart        | game_features_enhanced    | idx_game_features_refresh                                       | CREATE UNIQUE INDEX idx_game_features_refresh ON mart.game_features_enhanced USING btree (game_id)
+ mart        | game_summary              | mart_game_summary_idx                                           | CREATE INDEX mart_game_summary_idx ON mart.game_summary USING btree (season, week)
+ mart        | game_summary              | mart_game_summary_team_idx                                      | CREATE INDEX mart_game_summary_team_idx ON mart.game_summary USING btree (home_team, season)
+ mart        | game_weather              | idx_game_weather_game_id                                        | CREATE INDEX idx_game_weather_game_id ON mart.game_weather USING btree (game_id)
+ mart        | game_weather              | idx_game_weather_season_week                                    | CREATE INDEX idx_game_weather_season_week ON mart.game_weather USING btree (season, week)
+ mart        | game_weather              | idx_game_weather_temp                                           | CREATE INDEX idx_game_weather_temp ON mart.game_weather USING btree (temp_c) WHERE (temp_c IS NOT NULL)
+ mart        | game_weather              | idx_game_weather_wind                                           | CREATE INDEX idx_game_weather_wind ON mart.game_weather USING btree (wind_kph) WHERE (wind_kph IS NOT NULL)
+ mart        | player_game_stats         | idx_player_game_stats_category                                  | CREATE INDEX idx_player_game_stats_category ON mart.player_game_stats USING btree (stat_category)
+ mart        | player_game_stats         | idx_player_game_stats_player_id                                 | CREATE INDEX idx_player_game_stats_player_id ON mart.player_game_stats USING btree (player_id)
+ mart        | player_game_stats         | idx_player_game_stats_position_group                            | CREATE INDEX idx_player_game_stats_position_group ON mart.player_game_stats USING btree (position_group)
+ mart        | player_game_stats         | idx_player_game_stats_season_week                               | CREATE INDEX idx_player_game_stats_season_week ON mart.player_game_stats USING btree (season, week)
+ mart        | player_game_stats         | idx_player_game_stats_unique                                    | CREATE UNIQUE INDEX idx_player_game_stats_unique ON mart.player_game_stats USING btree (player_id, season, week, stat_category)
+ mart        | player_hierarchy          | idx_player_hierarchy_player_id                                  | CREATE UNIQUE INDEX idx_player_hierarchy_player_id ON mart.player_hierarchy USING btree (player_id)
+ mart        | player_hierarchy          | idx_player_hierarchy_position_group                             | CREATE INDEX idx_player_hierarchy_position_group ON mart.player_hierarchy USING btree (position_group)
+ mart        | player_hierarchy          | idx_player_hierarchy_team                                       | CREATE INDEX idx_player_hierarchy_team ON mart.player_hierarchy USING btree (current_team)
+ mart        | position_groups           | position_groups_pkey                                            | CREATE UNIQUE INDEX position_groups_pkey ON mart.position_groups USING btree ("position")
+ mart        | team_4th_down_features    | idx_4th_down_game                                               | CREATE INDEX idx_4th_down_game ON mart.team_4th_down_features USING btree (game_id)
+ mart        | team_4th_down_features    | idx_4th_down_team                                               | CREATE INDEX idx_4th_down_team ON mart.team_4th_down_features USING btree (team)
+ mart        | team_4th_down_features    | team_4th_down_features_pkey                                     | CREATE UNIQUE INDEX team_4th_down_features_pkey ON mart.team_4th_down_features USING btree (game_id, team)
+ mart        | team_epa                  | team_epa_pkey                                                   | CREATE UNIQUE INDEX team_epa_pkey ON mart.team_epa USING btree (game_id, posteam)
+ mart        | team_injury_load          | idx_injury_qb_out                                               | CREATE INDEX idx_injury_qb_out ON mart.team_injury_load USING btree (qb_out) WHERE (qb_out = true)
+ mart        | team_injury_load          | idx_injury_season_week                                          | CREATE INDEX idx_injury_season_week ON mart.team_injury_load USING btree (season, week)
+ mart        | team_injury_load          | idx_injury_team_season                                          | CREATE INDEX idx_injury_team_season ON mart.team_injury_load USING btree (team, season)
+ mart        | team_injury_load          | team_injury_load_pkey                                           | CREATE UNIQUE INDEX team_injury_load_pkey ON mart.team_injury_load USING btree (season, week, team)
+ mart        | team_playoff_context      | idx_playoff_desperate                                           | CREATE INDEX idx_playoff_desperate ON mart.team_playoff_context USING btree (desperate) WHERE (desperate = true)
+ mart        | team_playoff_context      | idx_playoff_eliminated                                          | CREATE INDEX idx_playoff_eliminated ON mart.team_playoff_context USING btree (eliminated) WHERE (eliminated = true)
+ mart        | team_playoff_context      | idx_playoff_season_week                                         | CREATE INDEX idx_playoff_season_week ON mart.team_playoff_context USING btree (season, week)
+ mart        | team_playoff_context      | idx_playoff_team_season                                         | CREATE INDEX idx_playoff_team_season ON mart.team_playoff_context USING btree (team, season)
+ mart        | team_playoff_context      | team_playoff_context_pkey                                       | CREATE UNIQUE INDEX team_playoff_context_pkey ON mart.team_playoff_context USING btree (team, season, week)
+ mart        | team_ratings              | team_ratings_pkey                                               | CREATE UNIQUE INDEX team_ratings_pkey ON mart.team_ratings USING btree (game_id, posteam, method)
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_game_id_player_id_stat_type_model_key | CREATE UNIQUE INDEX bayesian_prop_predictions_game_id_player_id_stat_type_model_key ON predictions.bayesian_prop_predictions USING btree (game_id, player_id, stat_type, model_version)
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_pkey                                  | CREATE UNIQUE INDEX bayesian_prop_predictions_pkey ON predictions.bayesian_prop_predictions USING btree (prediction_id)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_ci_coverage                                  | CREATE INDEX idx_bayesian_props_ci_coverage ON predictions.bayesian_prop_predictions USING btree (stat_type, model_version, actual_in_ci) WHERE (actual_in_ci IS NOT NULL)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_game_id                                      | CREATE INDEX idx_bayesian_props_game_id ON predictions.bayesian_prop_predictions USING btree (game_id)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_game_kickoff                                 | CREATE INDEX idx_bayesian_props_game_kickoff ON predictions.bayesian_prop_predictions USING btree (game_kickoff)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_has_edge                                     | CREATE INDEX idx_bayesian_props_has_edge ON predictions.bayesian_prop_predictions USING btree (implied_edge DESC NULLS LAST) WHERE ((book_line IS NOT NULL) AND (implied_edge IS NOT NULL))
+ predictions | bayesian_prop_predictions | idx_bayesian_props_model_version                                | CREATE INDEX idx_bayesian_props_model_version ON predictions.bayesian_prop_predictions USING btree (model_version)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_player_id                                    | CREATE INDEX idx_bayesian_props_player_id ON predictions.bayesian_prop_predictions USING btree (player_id)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_predicted_at                                 | CREATE INDEX idx_bayesian_props_predicted_at ON predictions.bayesian_prop_predictions USING btree (predicted_at DESC)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_stat_type                                    | CREATE INDEX idx_bayesian_props_stat_type ON predictions.bayesian_prop_predictions USING btree (stat_type)
+ predictions | bayesian_prop_predictions | idx_bayesian_props_validation                                   | CREATE INDEX idx_bayesian_props_validation ON predictions.bayesian_prop_predictions USING btree (stat_type, model_version, actual_value) WHERE (actual_value IS NOT NULL)
+ predictions | game_predictions          | game_predictions_pkey                                           | CREATE UNIQUE INDEX game_predictions_pkey ON predictions.game_predictions USING btree (prediction_id)
+ predictions | game_predictions          | idx_pred_game_id                                                | CREATE INDEX idx_pred_game_id ON predictions.game_predictions USING btree (game_id)
+ predictions | game_predictions          | idx_pred_model_version                                          | CREATE INDEX idx_pred_model_version ON predictions.game_predictions USING btree (model_version)
+ predictions | game_predictions          | idx_pred_predicted_at                                           | CREATE INDEX idx_pred_predicted_at ON predictions.game_predictions USING btree (predicted_at DESC)
+ predictions | game_predictions          | idx_pred_recommended_bet                                        | CREATE INDEX idx_pred_recommended_bet ON predictions.game_predictions USING btree (recommended_bet) WHERE (recommended_bet <> 'none'::text)
+ predictions | learning_loop             | idx_learning_category                                           | CREATE INDEX idx_learning_category ON predictions.learning_loop USING btree (category)
+ predictions | learning_loop             | idx_learning_pattern                                            | CREATE INDEX idx_learning_pattern ON predictions.learning_loop USING btree (pattern_name)
+ predictions | learning_loop             | idx_learning_pending                                            | CREATE INDEX idx_learning_pending ON predictions.learning_loop USING btree (implemented) WHERE (NOT implemented)
+ predictions | learning_loop             | idx_learning_priority                                           | CREATE INDEX idx_learning_priority ON predictions.learning_loop USING btree (priority) WHERE (NOT implemented)
+ predictions | learning_loop             | learning_loop_pattern_name_key                                  | CREATE UNIQUE INDEX learning_loop_pattern_name_key ON predictions.learning_loop USING btree (pattern_name)
+ predictions | learning_loop             | learning_loop_pkey                                              | CREATE UNIQUE INDEX learning_loop_pkey ON predictions.learning_loop USING btree (learning_id)
+ predictions | prediction_versions       | idx_version_game                                                | CREATE INDEX idx_version_game ON predictions.prediction_versions USING btree (game_id)
+ predictions | prediction_versions       | idx_version_label                                               | CREATE INDEX idx_version_label ON predictions.prediction_versions USING btree (version_label)
+ predictions | prediction_versions       | idx_version_timestamp                                           | CREATE INDEX idx_version_timestamp ON predictions.prediction_versions USING btree (version_timestamp DESC)
+ predictions | prediction_versions       | prediction_versions_game_id_version_label_key                   | CREATE UNIQUE INDEX prediction_versions_game_id_version_label_key ON predictions.prediction_versions USING btree (game_id, version_label)
+ predictions | prediction_versions       | prediction_versions_pkey                                        | CREATE UNIQUE INDEX prediction_versions_pkey ON predictions.prediction_versions USING btree (version_id)
+ predictions | prop_predictions          | idx_prop_predictions_game_id                                    | CREATE INDEX idx_prop_predictions_game_id ON predictions.prop_predictions USING btree (game_id)
+ predictions | prop_predictions          | idx_prop_predictions_generated_at                               | CREATE INDEX idx_prop_predictions_generated_at ON predictions.prop_predictions USING btree (generated_at)
+ predictions | prop_predictions          | idx_prop_predictions_player_id                                  | CREATE INDEX idx_prop_predictions_player_id ON predictions.prop_predictions USING btree (player_id)
+ predictions | prop_predictions          | idx_prop_predictions_prop_type                                  | CREATE INDEX idx_prop_predictions_prop_type ON predictions.prop_predictions USING btree (prop_type)
+ predictions | prop_predictions          | idx_prop_predictions_season_week                                | CREATE INDEX idx_prop_predictions_season_week ON predictions.prop_predictions USING btree (season, week)
+ predictions | prop_predictions          | idx_prop_predictions_team                                       | CREATE INDEX idx_prop_predictions_team ON predictions.prop_predictions USING btree (player_team)
+ predictions | prop_predictions          | prop_predictions_game_id_player_id_prop_type_model_version_key  | CREATE UNIQUE INDEX prop_predictions_game_id_player_id_prop_type_model_version_key ON predictions.prop_predictions USING btree (game_id, player_id, prop_type, model_version)
+ predictions | prop_predictions          | prop_predictions_pkey                                           | CREATE UNIQUE INDEX prop_predictions_pkey ON predictions.prop_predictions USING btree (prediction_id)
+ predictions | retrospectives            | idx_retro_failure_mode                                          | CREATE INDEX idx_retro_failure_mode ON predictions.retrospectives USING btree (primary_failure_mode)
+ predictions | retrospectives            | idx_retro_not_implemented                                       | CREATE INDEX idx_retro_not_implemented ON predictions.retrospectives USING btree (implemented) WHERE (NOT implemented)
+ predictions | retrospectives            | idx_retro_outcome_type                                          | CREATE INDEX idx_retro_outcome_type ON predictions.retrospectives USING btree (outcome_type)
+ predictions | retrospectives            | idx_retro_surprise                                              | CREATE INDEX idx_retro_surprise ON predictions.retrospectives USING btree (surprise_factor DESC)
+ predictions | retrospectives            | retrospectives_game_id_key                                      | CREATE UNIQUE INDEX retrospectives_game_id_key ON predictions.retrospectives USING btree (game_id)
+ predictions | retrospectives            | retrospectives_pkey                                             | CREATE UNIQUE INDEX retrospectives_pkey ON predictions.retrospectives USING btree (retro_id)
+ public      | api_usage_tracker         | api_usage_tracker_month_api_name_key                            | CREATE UNIQUE INDEX api_usage_tracker_month_api_name_key ON public.api_usage_tracker USING btree (month, api_name)
+ public      | api_usage_tracker         | api_usage_tracker_pkey                                          | CREATE UNIQUE INDEX api_usage_tracker_pkey ON public.api_usage_tracker USING btree (id)
+ public      | combine                   | combine_pkey                                                    | CREATE UNIQUE INDEX combine_pkey ON public.combine USING btree (season, pfr_id)
+ public      | combine                   | idx_combine_draft                                               | CREATE INDEX idx_combine_draft ON public.combine USING btree (draft_year, draft_round)
+ public      | combine                   | idx_combine_player                                              | CREATE INDEX idx_combine_player ON public.combine USING btree (pfr_id)
+ public      | combine                   | idx_combine_position                                            | CREATE INDEX idx_combine_position ON public.combine USING btree (pos, season)
+ public      | contracts                 | contracts_pkey                                                  | CREATE UNIQUE INDEX contracts_pkey ON public.contracts USING btree (otc_id)
+ public      | contracts                 | idx_contracts_active                                            | CREATE INDEX idx_contracts_active ON public.contracts USING btree (is_active, team)
+ public      | contracts                 | idx_contracts_player                                            | CREATE INDEX idx_contracts_player ON public.contracts USING btree (gsis_id)
+ public      | contracts                 | idx_contracts_team                                              | CREATE INDEX idx_contracts_team ON public.contracts USING btree (team)
+ public      | data_quality_log          | data_quality_log_pkey                                           | CREATE UNIQUE INDEX data_quality_log_pkey ON public.data_quality_log USING btree (id)
+ public      | dba_audit_log             | dba_audit_log_pkey                                              | CREATE UNIQUE INDEX dba_audit_log_pkey ON public.dba_audit_log USING btree (audit_id)
+ public      | dba_audit_log             | idx_dba_audit_log_check                                         | CREATE INDEX idx_dba_audit_log_check ON public.dba_audit_log USING btree (check_name, audit_timestamp DESC)
+ public      | dba_audit_log             | idx_dba_audit_log_status                                        | CREATE INDEX idx_dba_audit_log_status ON public.dba_audit_log USING btree (status, audit_timestamp DESC) WHERE (status = ANY (ARRAY['WARNING'::text, 'FAIL'::text]))
+ public      | dba_audit_log             | idx_dba_audit_log_table                                         | CREATE INDEX idx_dba_audit_log_table ON public.dba_audit_log USING btree (table_name, check_name) WHERE (table_name IS NOT NULL)
+ public      | dba_audit_log             | idx_dba_audit_log_timestamp                                     | CREATE INDEX idx_dba_audit_log_timestamp ON public.dba_audit_log USING btree (audit_timestamp DESC)
+ public      | depth_charts              | depth_charts_pkey                                               | CREATE UNIQUE INDEX depth_charts_pkey ON public.depth_charts USING btree (gsis_id, club_code, season, season_type, week, depth_team, formation, "position", depth_position)
+ public      | depth_charts              | idx_depth_charts_player                                         | CREATE INDEX idx_depth_charts_player ON public.depth_charts USING btree (gsis_id)
+ public      | depth_charts              | idx_depth_charts_season_week                                    | CREATE INDEX idx_depth_charts_season_week ON public.depth_charts USING btree (season, season_type, week)
+ public      | depth_charts              | idx_depth_charts_starters                                       | CREATE INDEX idx_depth_charts_starters ON public.depth_charts USING btree (club_code, season, week) WHERE (depth_team = '1'::text)
+ public      | depth_charts              | idx_depth_charts_team                                           | CREATE INDEX idx_depth_charts_team ON public.depth_charts USING btree (club_code, season, week)
+ public      | draft_picks               | draft_picks_pkey                                                | CREATE UNIQUE INDEX draft_picks_pkey ON public.draft_picks USING btree (season, round, pick)
+ public      | draft_picks               | idx_draft_picks_hof                                             | CREATE INDEX idx_draft_picks_hof ON public.draft_picks USING btree (hof) WHERE (hof = true)
+ public      | draft_picks               | idx_draft_picks_player                                          | CREATE INDEX idx_draft_picks_player ON public.draft_picks USING btree (gsis_id)
+ public      | draft_picks               | idx_draft_picks_position                                        | CREATE INDEX idx_draft_picks_position ON public.draft_picks USING btree ("position", season)
+ public      | draft_picks               | idx_draft_picks_team                                            | CREATE INDEX idx_draft_picks_team ON public.draft_picks USING btree (team, season)
+ public      | espn_qbr                  | espn_qbr_pkey                                                   | CREATE UNIQUE INDEX espn_qbr_pkey ON public.espn_qbr USING btree (player_id, season, game_week, season_type)
+ public      | espn_qbr                  | idx_espn_qbr_player                                             | CREATE INDEX idx_espn_qbr_player ON public.espn_qbr USING btree (player_id)
+ public      | espn_qbr                  | idx_espn_qbr_season_week                                        | CREATE INDEX idx_espn_qbr_season_week ON public.espn_qbr USING btree (season, game_week)
+ public      | espn_qbr                  | idx_espn_qbr_total                                              | CREATE INDEX idx_espn_qbr_total ON public.espn_qbr USING btree (qbr_total) WHERE (qbr_total IS NOT NULL)
+ public      | ftn_charting              | ftn_charting_pkey                                               | CREATE UNIQUE INDEX ftn_charting_pkey ON public.ftn_charting USING btree (nflverse_game_id, nflverse_play_id)
+ public      | ftn_charting              | idx_ftn_charting_game                                           | CREATE INDEX idx_ftn_charting_game ON public.ftn_charting USING btree (nflverse_game_id)
+ public      | ftn_charting              | idx_ftn_charting_play_action                                    | CREATE INDEX idx_ftn_charting_play_action ON public.ftn_charting USING btree (is_play_action) WHERE (is_play_action = true)
+ public      | ftn_charting              | idx_ftn_charting_rpo                                            | CREATE INDEX idx_ftn_charting_rpo ON public.ftn_charting USING btree (is_rpo) WHERE (is_rpo = true)
+ public      | ftn_charting              | idx_ftn_charting_season_week                                    | CREATE INDEX idx_ftn_charting_season_week ON public.ftn_charting USING btree (season, week)
+ public      | games                     | games_away_team_idx                                             | CREATE INDEX games_away_team_idx ON public.games USING btree (away_team)
+ public      | games                     | games_home_team_idx                                             | CREATE INDEX games_home_team_idx ON public.games USING btree (home_team)
+ public      | games                     | games_pkey                                                      | CREATE UNIQUE INDEX games_pkey ON public.games USING btree (game_id)
+ public      | games                     | games_season_week_idx                                           | CREATE INDEX games_season_week_idx ON public.games USING btree (season, week)
+ public      | games                     | idx_games_odds_event_id                                         | CREATE INDEX idx_games_odds_event_id ON public.games USING btree (odds_api_event_id) WHERE (odds_api_event_id IS NOT NULL)
+ public      | games                     | idx_games_odds_fetch_priority                                   | CREATE INDEX idx_games_odds_fetch_priority ON public.games USING btree (odds_fetch_priority, kickoff)
+ public      | games_weather_backup      | games_weather_backup_pkey                                       | CREATE UNIQUE INDEX games_weather_backup_pkey ON public.games_weather_backup USING btree (game_id)
+ public      | games_weather_backup      | idx_games_weather_backup_backed_up_at                           | CREATE INDEX idx_games_weather_backup_backed_up_at ON public.games_weather_backup USING btree (backed_up_at)
+ public      | injuries                  | idx_injuries_gsis_id                                            | CREATE INDEX idx_injuries_gsis_id ON public.injuries USING btree (gsis_id)
+ public      | injuries                  | idx_injuries_player                                             | CREATE INDEX idx_injuries_player ON public.injuries USING btree (gsis_id)
+ public      | injuries                  | idx_injuries_report_status                                      | CREATE INDEX idx_injuries_report_status ON public.injuries USING btree (report_status) WHERE (report_status IS NOT NULL)
+ public      | injuries                  | idx_injuries_season_week                                        | CREATE INDEX idx_injuries_season_week ON public.injuries USING btree (season, week)
+ public      | injuries                  | idx_injuries_status                                             | CREATE INDEX idx_injuries_status ON public.injuries USING btree (report_status)
+ public      | injuries                  | idx_injuries_team                                               | CREATE INDEX idx_injuries_team ON public.injuries USING btree (team, season, week)
+ public      | injuries                  | idx_injuries_team_week                                          | CREATE INDEX idx_injuries_team_week ON public.injuries USING btree (team, week, season)
+ public      | injuries                  | injuries_pkey                                                   | CREATE UNIQUE INDEX injuries_pkey ON public.injuries USING btree (season, game_type, team, week, gsis_id)
+ public      | mv_betting_features       | idx_mv_betting_game_id                                          | CREATE UNIQUE INDEX idx_mv_betting_game_id ON public.mv_betting_features USING btree (game_id)
+ public      | mv_betting_features       | idx_mv_betting_home_team                                        | CREATE INDEX idx_mv_betting_home_team ON public.mv_betting_features USING btree (home_team, season)
+ public      | mv_betting_features       | idx_mv_betting_kickoff                                          | CREATE INDEX idx_mv_betting_kickoff ON public.mv_betting_features USING btree (kickoff)
+ public      | mv_betting_features       | idx_mv_betting_season_week                                      | CREATE INDEX idx_mv_betting_season_week ON public.mv_betting_features USING btree (season, week)
+ public      | mv_game_aggregates        | idx_mv_game_agg_away_team_season                                | CREATE INDEX idx_mv_game_agg_away_team_season ON public.mv_game_aggregates USING btree (away_team, season, week)
+ public      | mv_game_aggregates        | idx_mv_game_agg_game_id                                         | CREATE UNIQUE INDEX idx_mv_game_agg_game_id ON public.mv_game_aggregates USING btree (game_id)
+ public      | mv_game_aggregates        | idx_mv_game_agg_home_team_season                                | CREATE INDEX idx_mv_game_agg_home_team_season ON public.mv_game_aggregates USING btree (home_team, season, week)
+ public      | mv_game_aggregates        | idx_mv_game_agg_kickoff                                         | CREATE INDEX idx_mv_game_agg_kickoff ON public.mv_game_aggregates USING btree (kickoff)
+ public      | mv_game_aggregates        | idx_mv_game_agg_season_week                                     | CREATE INDEX idx_mv_game_agg_season_week ON public.mv_game_aggregates USING btree (season, week)
+ public      | mv_player_season_stats    | idx_mv_player_stats_gsis_season                                 | CREATE INDEX idx_mv_player_stats_gsis_season ON public.mv_player_season_stats USING btree (gsis_id, season, week) WHERE (gsis_id IS NOT NULL)
+ public      | mv_player_season_stats    | idx_mv_player_stats_player_season                               | CREATE UNIQUE INDEX idx_mv_player_stats_player_season ON public.mv_player_season_stats USING btree (player_id, season, week, "position")
+ public      | mv_player_season_stats    | idx_mv_player_stats_position                                    | CREATE INDEX idx_mv_player_stats_position ON public.mv_player_season_stats USING btree ("position", season)
+ public      | mv_player_season_stats    | idx_mv_player_stats_season_week                                 | CREATE INDEX idx_mv_player_stats_season_week ON public.mv_player_season_stats USING btree (season, week)
+ public      | mv_refresh_log            | idx_mv_refresh_log_status                                       | CREATE INDEX idx_mv_refresh_log_status ON public.mv_refresh_log USING btree (status, refresh_started_at DESC)
+ public      | mv_refresh_log            | idx_mv_refresh_log_view                                         | CREATE INDEX idx_mv_refresh_log_view ON public.mv_refresh_log USING btree (view_name, refresh_started_at DESC)
+ public      | mv_refresh_log            | mv_refresh_log_pkey                                             | CREATE UNIQUE INDEX mv_refresh_log_pkey ON public.mv_refresh_log USING btree (refresh_id)
+ public      | mv_team_matchup_history   | idx_mv_matchup_team1                                            | CREATE INDEX idx_mv_matchup_team1 ON public.mv_team_matchup_history USING btree (team1, season)
+ public      | mv_team_matchup_history   | idx_mv_matchup_team2                                            | CREATE INDEX idx_mv_matchup_team2 ON public.mv_team_matchup_history USING btree (team2, season)
+ public      | mv_team_matchup_history   | idx_mv_matchup_teams_season                                     | CREATE UNIQUE INDEX idx_mv_matchup_teams_season ON public.mv_team_matchup_history USING btree (team1, team2, season)
+ public      | mv_team_rolling_stats     | idx_mv_team_rolling_game_id                                     | CREATE UNIQUE INDEX idx_mv_team_rolling_game_id ON public.mv_team_rolling_stats USING btree (game_id, team)
+ public      | mv_team_rolling_stats     | idx_mv_team_rolling_kickoff                                     | CREATE INDEX idx_mv_team_rolling_kickoff ON public.mv_team_rolling_stats USING btree (kickoff)
+ public      | mv_team_rolling_stats     | idx_mv_team_rolling_team_season                                 | CREATE INDEX idx_mv_team_rolling_team_season ON public.mv_team_rolling_stats USING btree (team, season, week)
+ public      | mv_venue_weather_features | idx_mv_venue_game_id                                            | CREATE UNIQUE INDEX idx_mv_venue_game_id ON public.mv_venue_weather_features USING btree (game_id)
+ public      | mv_venue_weather_features | idx_mv_venue_home_team                                          | CREATE INDEX idx_mv_venue_home_team ON public.mv_venue_weather_features USING btree (home_team, season)
+ public      | mv_venue_weather_features | idx_mv_venue_season_week                                        | CREATE INDEX idx_mv_venue_season_week ON public.mv_venue_weather_features USING btree (season, week)
+ public      | mv_venue_weather_features | idx_mv_venue_stadium                                            | CREATE INDEX idx_mv_venue_stadium ON public.mv_venue_weather_features USING btree (stadium)
+ public      | mv_venue_weather_features | idx_mv_venue_surface                                            | CREATE INDEX idx_mv_venue_surface ON public.mv_venue_weather_features USING btree (surface_type)
+ public      | mv_venue_weather_features | idx_mv_venue_temp_cat                                           | CREATE INDEX idx_mv_venue_temp_cat ON public.mv_venue_weather_features USING btree (temp_category) WHERE (temp_category <> 'indoor'::text)
+ public      | nextgen_passing           | idx_nextgen_passing_cpoe                                        | CREATE INDEX idx_nextgen_passing_cpoe ON public.nextgen_passing USING btree (completion_percentage_above_expectation) WHERE (completion_percentage_above_expectation IS NOT NULL)
+ public      | nextgen_passing           | idx_nextgen_passing_player                                      | CREATE INDEX idx_nextgen_passing_player ON public.nextgen_passing USING btree (player_id)
+ public      | nextgen_passing           | idx_nextgen_passing_season_week                                 | CREATE INDEX idx_nextgen_passing_season_week ON public.nextgen_passing USING btree (season, week)
+ public      | nextgen_passing           | nextgen_passing_pkey                                            | CREATE UNIQUE INDEX nextgen_passing_pkey ON public.nextgen_passing USING btree (player_id, season, week)
+ public      | nextgen_receiving         | idx_nextgen_receiving_player                                    | CREATE INDEX idx_nextgen_receiving_player ON public.nextgen_receiving USING btree (player_id)
+ public      | nextgen_receiving         | idx_nextgen_receiving_season_week                               | CREATE INDEX idx_nextgen_receiving_season_week ON public.nextgen_receiving USING btree (season, week)
+ public      | nextgen_receiving         | idx_nextgen_receiving_separation                                | CREATE INDEX idx_nextgen_receiving_separation ON public.nextgen_receiving USING btree (avg_separation) WHERE (avg_separation IS NOT NULL)
+ public      | nextgen_receiving         | idx_nextgen_receiving_yac_above_exp                             | CREATE INDEX idx_nextgen_receiving_yac_above_exp ON public.nextgen_receiving USING btree (avg_yac_above_expectation) WHERE (avg_yac_above_expectation IS NOT NULL)
+ public      | nextgen_receiving         | nextgen_receiving_pkey                                          | CREATE UNIQUE INDEX nextgen_receiving_pkey ON public.nextgen_receiving USING btree (player_id, season, week)
+ public      | nextgen_rushing           | idx_nextgen_rushing_efficiency                                  | CREATE INDEX idx_nextgen_rushing_efficiency ON public.nextgen_rushing USING btree (efficiency) WHERE (efficiency IS NOT NULL)
+ public      | nextgen_rushing           | idx_nextgen_rushing_player                                      | CREATE INDEX idx_nextgen_rushing_player ON public.nextgen_rushing USING btree (player_id)
+ public      | nextgen_rushing           | idx_nextgen_rushing_season_week                                 | CREATE INDEX idx_nextgen_rushing_season_week ON public.nextgen_rushing USING btree (season, week)
+ public      | nextgen_rushing           | nextgen_rushing_pkey                                            | CREATE UNIQUE INDEX nextgen_rushing_pkey ON public.nextgen_rushing USING btree (player_id, season, week)
+ public      | odds_history              | idx_odds_history_recent                                         | CREATE INDEX idx_odds_history_recent ON public.odds_history USING btree (event_id, market_key, bookmaker_key, snapshot_at) WHERE (snapshot_at > '2024-01-01 00:00:00+00'::timestamp with time zone)
+ public      | odds_history              | idx_odds_history_snapshot_brin                                  | CREATE INDEX idx_odds_history_snapshot_brin ON public.odds_history USING brin (snapshot_at) WITH (pages_per_range='32')
+ public      | odds_history              | idx_odds_history_spreads                                        | CREATE INDEX idx_odds_history_spreads ON public.odds_history USING btree (event_id, bookmaker_key, snapshot_at) WHERE (market_key = 'spreads'::text)
+ public      | odds_history              | idx_odds_history_totals                                         | CREATE INDEX idx_odds_history_totals ON public.odds_history USING btree (event_id, bookmaker_key, snapshot_at) WHERE (market_key = 'totals'::text)
+ public      | odds_history              | odds_history_bookmaker_idx                                      | CREATE INDEX odds_history_bookmaker_idx ON public.odds_history USING btree (bookmaker_key, market_key, snapshot_at)
+ public      | odds_history              | odds_history_event_idx                                          | CREATE INDEX odds_history_event_idx ON public.odds_history USING btree (event_id, snapshot_at)
+ public      | odds_history              | odds_history_pkey                                               | CREATE UNIQUE INDEX odds_history_pkey ON public.odds_history USING btree (event_id, bookmaker_key, market_key, outcome_name, snapshot_at)
+ public      | odds_history              | odds_history_snapshot_at_idx                                    | CREATE INDEX odds_history_snapshot_at_idx ON public.odds_history USING btree (snapshot_at DESC)
+ public      | officials                 | idx_officials_game                                              | CREATE INDEX idx_officials_game ON public.officials USING btree (game_id)
+ public      | officials                 | idx_officials_name                                              | CREATE INDEX idx_officials_name ON public.officials USING btree (official_name)
+ public      | officials                 | idx_officials_season_week                                       | CREATE INDEX idx_officials_season_week ON public.officials USING btree (season, week)
+ public      | officials                 | officials_pkey                                                  | CREATE UNIQUE INDEX officials_pkey ON public.officials USING btree (game_id, official_name, "position")
+ public      | participation             | idx_participation_coverage                                      | CREATE INDEX idx_participation_coverage ON public.participation USING btree (defense_coverage_type)
+ public      | participation             | idx_participation_formation                                     | CREATE INDEX idx_participation_formation ON public.participation USING btree (offense_formation)
+ public      | participation             | idx_participation_game                                          | CREATE INDEX idx_participation_game ON public.participation USING btree (nflverse_game_id)
+ public      | participation             | participation_pkey                                              | CREATE UNIQUE INDEX participation_pkey ON public.participation USING btree (nflverse_game_id, play_id)
+ public      | pfr_defense               | idx_pfr_defense_game                                            | CREATE INDEX idx_pfr_defense_game ON public.pfr_defense USING btree (game_id)
+ public      | pfr_defense               | idx_pfr_defense_player                                          | CREATE INDEX idx_pfr_defense_player ON public.pfr_defense USING btree (pfr_player_id)
+ public      | pfr_defense               | idx_pfr_defense_season_week                                     | CREATE INDEX idx_pfr_defense_season_week ON public.pfr_defense USING btree (season, week)
+ public      | pfr_defense               | idx_pfr_defense_team                                            | CREATE INDEX idx_pfr_defense_team ON public.pfr_defense USING btree (team, season, week)
+ public      | pfr_defense               | pfr_defense_pkey                                                | CREATE UNIQUE INDEX pfr_defense_pkey ON public.pfr_defense USING btree (pfr_player_id, game_id)
+ public      | pfr_passing               | idx_pfr_passing_game                                            | CREATE INDEX idx_pfr_passing_game ON public.pfr_passing USING btree (game_id)
+ public      | pfr_passing               | idx_pfr_passing_player                                          | CREATE INDEX idx_pfr_passing_player ON public.pfr_passing USING btree (pfr_player_id)
+ public      | pfr_passing               | idx_pfr_passing_season_week                                     | CREATE INDEX idx_pfr_passing_season_week ON public.pfr_passing USING btree (season, week)
+ public      | pfr_passing               | idx_pfr_passing_team                                            | CREATE INDEX idx_pfr_passing_team ON public.pfr_passing USING btree (team, season)
+ public      | pfr_passing               | pfr_passing_pkey                                                | CREATE UNIQUE INDEX pfr_passing_pkey ON public.pfr_passing USING btree (pfr_player_id, game_id)
+ public      | pipeline_refresh_log      | idx_pipeline_refresh_season_week                                | CREATE INDEX idx_pipeline_refresh_season_week ON public.pipeline_refresh_log USING btree (season, week)
+ public      | pipeline_refresh_log      | idx_pipeline_refresh_timestamp                                  | CREATE INDEX idx_pipeline_refresh_timestamp ON public.pipeline_refresh_log USING btree (refresh_timestamp DESC)
+ public      | pipeline_refresh_log      | pipeline_refresh_log_pkey                                       | CREATE UNIQUE INDEX pipeline_refresh_log_pkey ON public.pipeline_refresh_log USING btree (refresh_id)
+ public      | pipeline_refresh_log      | pipeline_refresh_log_season_week_key                            | CREATE UNIQUE INDEX pipeline_refresh_log_season_week_key ON public.pipeline_refresh_log USING btree (season, week)
+ public      | players                   | players_name_idx                                                | CREATE INDEX players_name_idx ON public.players USING btree (player_name)
+ public      | players                   | players_pkey                                                    | CREATE UNIQUE INDEX players_pkey ON public.players USING btree (player_id)
+ public      | players                   | players_position_idx                                            | CREATE INDEX players_position_idx ON public.players USING btree ("position")
+ public      | plays                     | idx_plays_game_id                                               | CREATE INDEX idx_plays_game_id ON public.plays USING btree (game_id)
+ public      | plays                     | plays_pkey                                                      | CREATE UNIQUE INDEX plays_pkey ON public.plays USING btree (game_id, play_id)
+ public      | prop_line_openings        | idx_prop_openings_player                                        | CREATE INDEX idx_prop_openings_player ON public.prop_line_openings USING btree (player_id, prop_type)
+ public      | prop_line_openings        | prop_line_openings_pkey                                         | CREATE UNIQUE INDEX prop_line_openings_pkey ON public.prop_line_openings USING btree (event_id, player_id, prop_type, bookmaker_key)
+ public      | prop_lines_history        | idx_prop_lines_bookmaker                                        | CREATE INDEX idx_prop_lines_bookmaker ON public.prop_lines_history USING btree (bookmaker_key, prop_type, snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_event_id                                         | CREATE INDEX idx_prop_lines_event_id ON public.prop_lines_history USING btree (event_id, player_id, snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_game_id                                          | CREATE INDEX idx_prop_lines_game_id ON public.prop_lines_history USING btree (game_id, snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_player_id                                        | CREATE INDEX idx_prop_lines_player_id ON public.prop_lines_history USING btree (player_id, prop_type, snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_prop_type                                        | CREATE INDEX idx_prop_lines_prop_type ON public.prop_lines_history USING btree (prop_type, player_team, snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_snapshot                                         | CREATE INDEX idx_prop_lines_snapshot ON public.prop_lines_history USING btree (snapshot_at DESC)
+ public      | prop_lines_history        | idx_prop_lines_snapshot_brin                                    | CREATE INDEX idx_prop_lines_snapshot_brin ON public.prop_lines_history USING brin (snapshot_at) WITH (pages_per_range='32')
+ public      | prop_lines_history        | prop_lines_history_pkey                                         | CREATE UNIQUE INDEX prop_lines_history_pkey ON public.prop_lines_history USING btree (event_id, player_id, prop_type, bookmaker_key, snapshot_at)
+ public      | rosters                   | rosters_pkey                                                    | CREATE UNIQUE INDEX rosters_pkey ON public.rosters USING btree (season, week, team, player_id)
+ public      | rosters                   | rosters_player_id_idx                                           | CREATE INDEX rosters_player_id_idx ON public.rosters USING btree (player_id)
+ public      | rosters                   | rosters_season_week_idx                                         | CREATE INDEX rosters_season_week_idx ON public.rosters USING btree (season, week)
+ public      | rosters                   | rosters_team_season_idx                                         | CREATE INDEX rosters_team_season_idx ON public.rosters USING btree (team, season)
+ public      | rosters_weekly            | idx_rosters_weekly_player                                       | CREATE INDEX idx_rosters_weekly_player ON public.rosters_weekly USING btree (gsis_id)
+ public      | rosters_weekly            | idx_rosters_weekly_position                                     | CREATE INDEX idx_rosters_weekly_position ON public.rosters_weekly USING btree ("position", team, season)
+ public      | rosters_weekly            | idx_rosters_weekly_team                                         | CREATE INDEX idx_rosters_weekly_team ON public.rosters_weekly USING btree (team, season, week)
+ public      | rosters_weekly            | rosters_weekly_pkey                                             | CREATE UNIQUE INDEX rosters_weekly_pkey ON public.rosters_weekly USING btree (season, week, game_type, team, gsis_id)
+ public      | snap_counts               | idx_snap_counts_game                                            | CREATE INDEX idx_snap_counts_game ON public.snap_counts USING btree (game_id)
+ public      | snap_counts               | idx_snap_counts_player                                          | CREATE INDEX idx_snap_counts_player ON public.snap_counts USING btree (pfr_player_id)
+ public      | snap_counts               | idx_snap_counts_season_week                                     | CREATE INDEX idx_snap_counts_season_week ON public.snap_counts USING btree (season, week)
+ public      | snap_counts               | idx_snap_counts_team                                            | CREATE INDEX idx_snap_counts_team ON public.snap_counts USING btree (team, season, week)
+ public      | snap_counts               | snap_counts_pkey                                                | CREATE UNIQUE INDEX snap_counts_pkey ON public.snap_counts USING btree (pfr_player_id, game_id)
+ public      | trades                    | idx_trades_player                                               | CREATE INDEX idx_trades_player ON public.trades USING btree (pfr_id)
+ public      | trades                    | idx_trades_season                                               | CREATE INDEX idx_trades_season ON public.trades USING btree (season)
+ public      | trades                    | idx_trades_team_gave                                            | CREATE INDEX idx_trades_team_gave ON public.trades USING btree (gave, season)
+ public      | trades                    | idx_trades_team_received                                        | CREATE INDEX idx_trades_team_received ON public.trades USING btree (received, season)
+ public      | trades                    | trades_pkey                                                     | CREATE UNIQUE INDEX trades_pkey ON public.trades USING btree (trade_id, gave, received)
+ public      | weather                   | weather_pkey                                                    | CREATE UNIQUE INDEX weather_pkey ON public.weather USING btree (game_id)
+ reference   | column_mappings           | column_mappings_pkey                                            | CREATE UNIQUE INDEX column_mappings_pkey ON reference.column_mappings USING btree (table_name, canonical_name, source_name, data_source)
+ reference   | column_mappings           | idx_column_mappings_lookup                                      | CREATE INDEX idx_column_mappings_lookup ON reference.column_mappings USING btree (table_name, source_name, data_source)
+ reference   | stadiums                  | stadiums_pkey                                                   | CREATE UNIQUE INDEX stadiums_pkey ON reference.stadiums USING btree (stadium_id)
+ reference   | teams                     | idx_teams_alt_abbr                                              | CREATE INDEX idx_teams_alt_abbr ON reference.teams USING btree (alt_abbr_1, alt_abbr_2, alt_abbr_3)
+ reference   | teams                     | teams_full_name_key                                             | CREATE UNIQUE INDEX teams_full_name_key ON reference.teams USING btree (full_name)
+ reference   | teams                     | teams_pkey                                                      | CREATE UNIQUE INDEX teams_pkey ON reference.teams USING btree (canonical_abbr)
+(241 rows)
+
+               section               
+-------------------------------------
+ ======== CHECK CONSTRAINTS ========
+(1 row)
+
+ schema_name |        table_name         |                 constraint_name                  |                                                                                                                                                                                            constraint_definition                                                                                                                                                                                            
+-------------+---------------------------+--------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_rhat_check             | CHECK (((rhat IS NULL) OR (rhat <= (1.1)::double precision)))
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_stat_type_check        | CHECK ((stat_type = ANY (ARRAY['passing_yards'::text, 'passing_tds'::text, 'interceptions'::text, 'rushing_yards'::text, 'rushing_tds'::text, 'rushing_attempts'::text, 'receiving_yards'::text, 'receiving_tds'::text, 'receptions'::text, 'completions'::text, 'pass_attempts'::text, 'completion_pct'::text])))
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_kelly_fraction_check   | CHECK (((kelly_fraction IS NULL) OR (kelly_fraction >= (0)::double precision)))
+ predictions | bayesian_prop_predictions | bayesian_prop_predictions_recommended_side_check | CHECK ((recommended_side = ANY (ARRAY['over'::text, 'under'::text, 'pass'::text, NULL::text])))
+ predictions | game_predictions          | game_predictions_kelly_fraction_check            | CHECK ((kelly_fraction >= (0)::numeric))
+ predictions | game_predictions          | game_predictions_bayesian_prob_check             | CHECK (((bayesian_prob IS NULL) OR ((bayesian_prob >= (0)::numeric) AND (bayesian_prob <= (1)::numeric))))
+ predictions | game_predictions          | game_predictions_bayesian_sd_check               | CHECK (((bayesian_sd IS NULL) OR (bayesian_sd >= (0)::numeric)))
+ predictions | game_predictions          | game_predictions_recommended_bet_check           | CHECK ((recommended_bet = ANY (ARRAY['home'::text, 'away'::text, 'over'::text, 'under'::text, 'none'::text])))
+ predictions | game_predictions          | game_predictions_bet_confidence_check            | CHECK (((bet_confidence >= (0)::numeric) AND (bet_confidence <= (1)::numeric)))
+ predictions | game_predictions          | game_predictions_days_before_game_check          | CHECK ((days_before_game >= 0))
+ predictions | game_predictions          | game_predictions_home_win_prob_check             | CHECK (((home_win_prob >= (0)::numeric) AND (home_win_prob <= (1)::numeric)))
+ predictions | game_predictions          | game_predictions_xgb_prob_check                  | CHECK (((xgb_prob IS NULL) OR ((xgb_prob >= (0)::numeric) AND (xgb_prob <= (1)::numeric))))
+ predictions | learning_loop             | learning_loop_sample_size_check                  | CHECK ((sample_size > 0))
+ predictions | learning_loop             | learning_loop_priority_check                     | CHECK ((priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'critical'::text])))
+ predictions | learning_loop             | learning_loop_statistical_significance_check     | CHECK (((statistical_significance >= (0)::numeric) AND (statistical_significance <= (1)::numeric)))
+ predictions | learning_loop             | learning_loop_category_check                     | CHECK ((category = ANY (ARRAY['situational'::text, 'personnel'::text, 'temporal'::text, 'market'::text, 'model_bias'::text])))
+ predictions | prediction_versions       | prediction_versions_home_win_prob_check          | CHECK (((home_win_prob >= (0)::numeric) AND (home_win_prob <= (1)::numeric)))
+ predictions | prediction_versions       | prediction_versions_version_label_check          | CHECK ((version_label = ANY (ARRAY['7_days_out'::text, '5_days_out'::text, '3_days_out'::text, 'day_before'::text, 'day_of'::text, 'final'::text])))
+ predictions | prediction_versions       | prediction_versions_bet_confidence_check         | CHECK (((bet_confidence >= (0)::numeric) AND (bet_confidence <= (1)::numeric)))
+ predictions | prop_predictions          | prop_predictions_prop_type_check                 | CHECK ((prop_type = ANY (ARRAY['passing_yards'::text, 'passing_tds'::text, 'interceptions'::text, 'rushing_yards'::text, 'rushing_tds'::text, 'rushing_attempts'::text, 'receiving_yards'::text, 'receiving_tds'::text, 'receptions'::text, 'completions'::text, 'pass_attempts'::text])))
+ predictions | retrospectives            | retrospectives_actual_winner_check               | CHECK ((actual_winner = ANY (ARRAY['home'::text, 'away'::text, 'push'::text])))
+ predictions | retrospectives            | retrospectives_home_score_check                  | CHECK ((home_score >= 0))
+ predictions | retrospectives            | retrospectives_away_score_check                  | CHECK ((away_score >= 0))
+ predictions | retrospectives            | retrospectives_predicted_winner_check            | CHECK ((predicted_winner = ANY (ARRAY['home'::text, 'away'::text])))
+ predictions | retrospectives            | retrospectives_prediction_confidence_check       | CHECK (((prediction_confidence >= (0)::numeric) AND (prediction_confidence <= (1)::numeric)))
+ predictions | retrospectives            | retrospectives_abs_margin_error_check            | CHECK ((abs_margin_error >= (0)::numeric))
+ predictions | retrospectives            | retrospectives_outcome_type_check                | CHECK ((outcome_type = ANY (ARRAY['correct_high_conf'::text, 'correct_low_conf'::text, 'wrong_close'::text, 'wrong_upset'::text, 'wrong_blowout'::text, 'push'::text])))
+ predictions | retrospectives            | retrospectives_surprise_factor_check             | CHECK (((surprise_factor >= (0)::numeric) AND (surprise_factor <= (1)::numeric)))
+ predictions | retrospectives            | retrospectives_primary_failure_mode_check        | CHECK ((primary_failure_mode = ANY (ARRAY['correct_prediction'::text, 'missed_injury_impact'::text, 'underestimated_home_field'::text, 'weather_not_captured'::text, 'backup_qb_uncertainty'::text, 'thursday_night_effect'::text, 'divisional_game_variance'::text, 'garbage_time_skew'::text, 'referee_impact'::text, 'narrative_overreaction'::text, 'model_uncertainty_high'::text, 'unknown'::text])))
+ predictions | retrospectives            | retrospectives_update_priority_check             | CHECK (((update_priority = ANY (ARRAY['low'::text, 'medium'::text, 'high'::text, 'critical'::text])) OR (update_priority IS NULL)))
+ public      | dba_audit_log             | dba_audit_log_status_check                       | CHECK ((status = ANY (ARRAY['PASS'::text, 'WARNING'::text, 'FAIL'::text])))
+ public      | games                     | chk_games_scores                                 | CHECK ((((home_score IS NULL) AND (away_score IS NULL)) OR ((home_score >= 0) AND (away_score >= 0) AND (home_score < 100) AND (away_score < 100))))
+ public      | mv_refresh_log            | mv_refresh_log_status_check                      | CHECK ((status = ANY (ARRAY['running'::text, 'completed'::text, 'failed'::text])))
+ public      | plays                     | chk_plays_down                                   | CHECK (((down IS NULL) OR ((down >= 1) AND (down <= 4))))
+ public      | plays                     | chk_plays_quarter                                | CHECK (((quarter IS NULL) OR ((quarter >= 1) AND (quarter <= 6))))
+ reference   | stadiums                  | stadiums_surface_type_check                      | CHECK (((surface_type)::text = ANY ((ARRAY['grass'::character varying, 'turf'::character varying, 'fieldturf'::character varying])::text[])))
+ reference   | stadiums                  | stadiums_roof_type_check                         | CHECK (((roof_type)::text = ANY ((ARRAY['dome'::character varying, 'retractable'::character varying, 'outdoor'::character varying])::text[])))
+ reference   | teams                     | teams_division_check                             | CHECK (((division)::text = ANY ((ARRAY['East'::character varying, 'North'::character varying, 'South'::character varying, 'West'::character varying])::text[])))
+ reference   | teams                     | teams_conference_check                           | CHECK (((conference)::text = ANY ((ARRAY['AFC'::character varying, 'NFC'::character varying])::text[])))
+(39 rows)
+
+                               section                                
+----------------------------------------------------------------------
+ ======== DATA TYPE INCONSISTENCIES FOR SAME LOGICAL COLUMNS ========
+(1 row)
+
+ column_name |     data_type     | character_maximum_length | numeric_precision | usage_count |                                                                                                                                                                                                                               tables                                                                                                                                                                                                                                
+-------------+-------------------+--------------------------+-------------------+-------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ gsis_id     | text              |                          |                   |           5 | public.rosters_weekly, public.contracts, public.depth_charts, public.draft_picks, public.player_id_mapping
+ gsis_id     | character varying |                       20 |                   |           1 | public.injuries
+ player_id   | text              |                          |                   |          17 | public.espn_qbr, predictions.bayesian_props_current_week, public.player_id_mapping, public.players, predictions.bayesian_edges, predictions.prop_predictions, public.nextgen_receiving, public.nextgen_rushing, predictions.bayesian_prop_predictions, public.prop_line_openings, public.prop_lines_history, public.best_prop_lines, public.nextgen_passing, predictions.current_week_props, predictions.props_with_lines, public.latest_prop_lines, public.rosters
+ player_id   | character varying |                       50 |                   |           1 | mart.bayesian_player_ratings
+ team        | text              |                          |                   |          12 | public.rosters_weekly, mart.team_playoff_context, public.rosters, public.draft_picks, mart.team_4th_down_features, public.snap_counts, public.contracts, mart.rolling_features, mart.bayesian_team_ratings, public.pfr_defense, public.pfr_passing, mart.team_injury_load
+ team        | character varying |                        3 |                   |           2 | public.injuries, reference.team_display
+(6 rows)
+

@@ -1,0 +1,292 @@
+Loading required package: Rcpp
+Loading 'brms' package (version 2.23.0). Useful instructions
+can be found by typing help('brms'). A more detailed introduction
+to the package is available through vignette('brms_overview').
+
+Attaching package: ‘brms’
+
+The following object is masked from ‘package:stats’:
+
+    ar
+
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+INFO [2025-10-13 02:27:48] Starting v2.5 prediction generation for 2024 holdout data
+INFO [2025-10-13 02:27:48] Loading v2.5 model from: models/bayesian/passing_informative_priors_v1.rds
+INFO [2025-10-13 02:27:48] ✓ Model loaded successfully
+INFO [2025-10-13 02:27:48] Fetching 2024 player data...
+Error: Failed to prepare query : ERROR:  column ngs.pass_attempts does not exist
+LINE 10:     ngs.pass_attempts as attempts,
+             ^
+
+Error traceback:
+11: (function () 
+    {
+        cat("\nError traceback:\n")
+        traceback(2)
+    })()
+10: result_create(conn@ptr, statement, immediate)
+9: initialize(value, ...)
+8: initialize(value, ...)
+7: new("PqResult", conn = conn, ptr = result_create(conn@ptr, statement, 
+       immediate), sql = statement, bigint = conn@bigint)
+6: .local(conn, statement, ...)
+5: dbSendQuery(conn, statement, ...)
+4: dbSendQuery(conn, statement, ...)
+3: .local(conn, statement, ...)
+2: dbGetQuery(con, query)
+1: dbGetQuery(con, query)
+Error: object 'player_data' not found
+
+Error traceback:
+5: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+4: nrow(player_data)
+3: paste("✓ Loaded", nrow(player_data), "players for prediction")
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("✓ Loaded", nrow(player_data), "players for prediction"))
+Error: object 'player_data' not found
+
+Error traceback:
+3: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+2: mutate(., log_attempts = log(avg_attempts), is_home = pct_home, 
+       is_bad_weather = pct_bad_weather, position = factor(position), 
+       team = factor(team), player_id = factor(player_id), season = factor(season))
+1: player_data %>% mutate(log_attempts = log(avg_attempts), is_home = pct_home, 
+       is_bad_weather = pct_bad_weather, position = factor(position), 
+       team = factor(team), player_id = factor(player_id), season = factor(season))
+INFO [2025-10-13 02:27:48] Generating predictions with posterior samples...
+Loading required namespace: rstan
+Error: object 'pred_data' not found
+
+Error traceback:
+8: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+7: current_data(object, newdata, newdata2 = data2, re_formula = re_formula, 
+       ...)
+6: standata.brmsfit(x, newdata = newdata, re_formula = re_formula, 
+       newdata2 = newdata2, resp = resp, allow_new_levels = allow_new_levels, 
+       internal = TRUE, ...)
+5: standata(x, newdata = newdata, re_formula = re_formula, newdata2 = newdata2, 
+       resp = resp, allow_new_levels = allow_new_levels, internal = TRUE, 
+       ...)
+4: prepare_predictions.brmsfit(object, newdata = newdata, re_formula = re_formula, 
+       resp = resp, ndraws = ndraws, draw_ids = draw_ids, check_response = FALSE, 
+       ...)
+3: prepare_predictions(object, newdata = newdata, re_formula = re_formula, 
+       resp = resp, ndraws = ndraws, draw_ids = draw_ids, check_response = FALSE, 
+       ...)
+2: predict.brmsfit(model, newdata = pred_data, allow_new_levels = TRUE, 
+       probs = c(0.05, 0.95), summary = TRUE)
+1: predict(model, newdata = pred_data, allow_new_levels = TRUE, 
+       probs = c(0.05, 0.95), summary = TRUE)
+Error: object 'player_data' not found
+
+Error traceback:
+2: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+1: data.frame(player_id = player_data$player_id, player_name = player_data$player_name, 
+       position = player_data$position, season = player_data$season, 
+       model_version = "informative_priors_v2.5", rating_mean_log = predictions[, 
+           "Estimate"], rating_sd_log = predictions[, "Est.Error"], 
+       rating_q05_log = predictions[, "Q5"], rating_q95_log = predictions[, 
+           "Q95"], pred_yards = exp(predictions[, "Estimate"]), 
+       pred_q05 = exp(predictions[, "Q5"]), pred_q95 = exp(predictions[, 
+           "Q95"]), n_games_2024 = player_data$n_games_2024, actual_yards = player_data$avg_yards_actual)
+INFO [2025-10-13 02:27:49] ✓ Predictions generated
+Error: object 'results' not found
+
+Error traceback:
+5: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+4: mean(results$pred_yards)
+3: paste("  Mean predicted yards:", round(mean(results$pred_yards), 
+       2))
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  Mean predicted yards:", round(mean(results$pred_yards), 
+       2)))
+Error: object 'results' not found
+
+Error traceback:
+5: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+4: mean(results$actual_yards)
+3: paste("  Mean actual yards:", round(mean(results$actual_yards), 
+       2))
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  Mean actual yards:", round(mean(results$actual_yards), 
+       2)))
+Error: object 'results' not found
+
+Error traceback:
+6: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+5: is.data.frame(y)
+4: cor(results$pred_yards, results$actual_yards)
+3: paste("  Correlation:", round(cor(results$pred_yards, results$actual_yards), 
+       3))
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  Correlation:", round(cor(results$pred_yards, 
+       results$actual_yards), 3)))
+Error in eval(expr, p) : object 'results' not found
+Calls: write.csv ... eval.parent -> eval -> eval -> <Anonymous> -> is.data.frame
+
+Error traceback:
+7: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+6: is.data.frame(x)
+5: utils::write.table(results, output_path, row.names = FALSE, col.names = TRUE, 
+       sep = ",", dec = ".", qmethod = "double")
+4: eval(expr, p)
+3: eval(expr, p)
+2: eval.parent(Call)
+1: write.csv(results, output_path, row.names = FALSE)
+INFO [2025-10-13 02:27:49] ✓ Saved predictions to: models/bayesian/v2_5_predictions_2024.csv
+Error: object 'results' not found
+
+Error traceback:
+2: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+1: mean(abs(results$pred_yards - results$actual_yards))
+Error: object 'results' not found
+
+Error traceback:
+2: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+1: mean((results$pred_yards - results$actual_yards)^2)
+Error: object 'results' not found
+
+Error traceback:
+3: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+2: is.data.frame(y)
+1: cor(results$pred_yards, results$actual_yards)
+INFO [2025-10-13 02:27:49] 
+INFO [2025-10-13 02:27:49] === v2.5 Informative Priors Performance (2024 Holdout) ===
+Error: object 'results' not found
+
+Error traceback:
+5: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+4: nrow(results)
+3: paste("  n_predictions:", nrow(results))
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  n_predictions:", nrow(results)))
+Error: object 'mae' not found
+
+Error traceback:
+4: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+3: paste("  MAE:", round(mae, 2), "yards")
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  MAE:", round(mae, 2), "yards"))
+Error: object 'rmse' not found
+
+Error traceback:
+4: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+3: paste("  RMSE:", round(rmse, 2), "yards")
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  RMSE:", round(rmse, 2), "yards"))
+Error: object 'correlation' not found
+
+Error traceback:
+4: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+3: paste("  Correlation:", round(correlation, 3))
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  Correlation:", round(correlation, 3)))
+Error: object 'results' not found
+
+Error traceback:
+1: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+Error: object 'results' not found
+
+Error traceback:
+2: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+1: mean(results$in_ci)
+Error: object 'ci_coverage' not found
+
+Error traceback:
+4: (function () 
+   {
+       cat("\nError traceback:\n")
+       traceback(2)
+   })()
+3: paste("  90% CI Coverage:", round(ci_coverage * 100, 1), "%")
+2: log_level(INFO, ..., namespace = namespace, .logcall = .logcall, 
+       .topcall = .topcall, .topenv = .topenv, .timestamp = .timestamp)
+1: log_info(paste("  90% CI Coverage:", round(ci_coverage * 100, 
+       1), "%"))
+INFO [2025-10-13 02:27:49] ✓ Complete

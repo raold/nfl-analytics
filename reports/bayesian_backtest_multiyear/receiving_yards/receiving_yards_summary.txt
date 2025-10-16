@@ -1,0 +1,33 @@
+Multi-Year Backtest Summary: receiving_yards
+================================================================================
+
+2022 Season:
+  Predictions: 11,041
+  MAE: 27.37 yards
+  RMSE: 35.51 yards
+  MAPE: 90.2%
+  Correlation: 0.372
+  90% CI Coverage: 89.8%
+
+2023 Season:
+  Predictions: 12,301
+  MAE: 27.96 yards
+  RMSE: 36.25 yards
+  MAPE: 81.4%
+  Correlation: 0.373
+  90% CI Coverage: 88.4%
+
+2024 Season:
+  Predictions: 10,753
+  MAE: 26.41 yards
+  RMSE: 34.12 yards
+  MAPE: 70.1%
+  Correlation: 0.299
+  90% CI Coverage: 89.6%
+
+
+Overall Statistics:
+  Total Predictions: 34,095
+  Overall MAE: 27.28 yards
+  Overall RMSE: 35.35 yards
+  Overall Correlation: 0.350

@@ -1,0 +1,8 @@
+parameter,distribution,param1,param2,source,interpretation
+intercept,normal,5.5,0.3,historical_mean,Mean log yards ~5.5 (exp = 245 yards)
+player_sd,normal,0.15,0.05,empirical,Player skill varies by ~15% (log scale)
+team_sd,normal,0.08,0.03,empirical,Team quality varies by ~8% (log scale)
+season_sd,normal,0.05,0.02,empirical,Season trends vary by ~5% (log scale)
+log_attempts,normal,1,0.2,historical_regression,Strong positive: +1 log attempt → +1 log yards
+is_home,normal,0.03,0.02,historical_regression,Home field ~3% boost
+is_bad_weather,normal,-0.08,0.04,historical_regression,Bad weather ~8% penalty

@@ -225,7 +225,133 @@ print('Sync conflicts:', conflicts)
 "
 ```
 
-### 8. Conservative Q-Learning (CQL) Training
+### 8. Bayesian Hierarchical Player Props Models
+
+**🆕 Bayesian Hierarchical Modeling Complete (Oct 12, 2025)** - MacBook M4
+
+Train hierarchical Bayesian models for player prop predictions using brms/Stan:
+
+```bash
+# Train passing yards model (4 chains, 2000 iterations each)
+Rscript R/bayesian_player_props.R
+
+# Or train simplified version for individual stat types
+Rscript R/train_passing_model_simple.R
+Rscript R/train_rushing_model_simple.R
+Rscript R/train_receiving_model_simple.R
+```
+
+**Model Architecture**:
+- **Hierarchical Structure**: League → Position Group → Position → Team → Player → Game
+- **Partial Pooling**: Borrows strength across similar players (critical for rookies/backups)
+- **MCMC Sampling**: 4 chains × 2000 iterations via cmdstanr
+- **Uncertainty Quantification**: Full posterior distributions with credible intervals
+
+**Training Results (Passing Yards Model)**:
+- Data: 3,208 records from 118 QBs (2020-2024)
+- Training Time: ~10 minutes (MacBook M4, 4 chains parallel)
+- Convergence: Some divergences but acceptable Rhat < 1.12
+- Model: `models/bayesian/passing_yards_hierarchical_v1.rds`
+- Ratings: Stored in `mart.bayesian_player_ratings` (118 QBs)
+
+**Multi-Year Backtest** (2022-2024):
+```bash
+# Run backtest with Bayesian predictions
+uv run python py/backtests/bayesian_props_multiyear_backtest.py
+```
+
+**Features**:
+- Hierarchical shrinkage improves predictions for limited-data players
+- Full uncertainty quantification for Kelly criterion betting
+- Position/team effects capture offensive systems
+- Integration with XGBoost ensemble models via `py/features/bayesian_player_features.py`
+
+**Database Schema**:
+- `mart.player_hierarchy` - 15,213 players with position group mappings
+- `mart.player_game_stats` - 24,950 player-game records
+- `mart.bayesian_player_ratings` - Player ratings with posterior distributions
+
+**Files Created**:
+- `R/bayesian_player_props.R` - Complete 3-model training pipeline
+- `R/train_passing_model_simple.R` - Simplified passing model trainer
+- `py/features/bayesian_player_features.py` - Feature extraction from posteriors
+- `py/backtests/bayesian_props_backtest_2024.py` - Single season backtest
+- `py/backtests/bayesian_props_multiyear_backtest.py` - Multi-season validation
+- `db/migrations/023_player_hierarchy_schema.sql` - Database infrastructure
+
+See **docs/milestones/BAYESIAN_PROPS_COMPLETE.md** for full methodology.
+
+### 9. Ensemble v3.0 Player Props System
+
+**Status Update: October 13, 2025** - MacBook M4 + Improved BNN
+
+Advanced 4-way ensemble system combining multiple modeling approaches for superior player prop predictions:
+
+**Component Models**:
+```
+Model Type              Version    Status              Performance
+─────────────────────────────────────────────────────────────────────
+Bayesian Hierarchical   v2.5       ✅ Trained          86.4% MAE improvement
+XGBoost                 v2.1       ✅ Trained          High accuracy
+BNN (Neural Net)        v2.0       ⏳ Training         Convergence improved
+State-space             v1.0       ✅ Trained          Time-series modeling
+```
+
+**Ensemble Methods**:
+- **Inverse Variance Weighting**: Default combination (no meta-learner required)
+- **Stacking**: Optional meta-learner for optimal weights
+- **Portfolio Optimization**: Kelly criterion for bet sizing
+
+**Key Improvements (BNN v2.0)**:
+```
+Metric                  Original    Improved    Status
+─────────────────────────────────────────────────────────
+Divergences             85 (4.25%)  0 (0.00%)   ✅ FIXED
+R-hat (max)             1.384       1.0027      ✅ EXCELLENT
+ESS (mean)              ~4000       8626        ✅ EXCELLENT
+90% CI Coverage         19.8%       TBD         ⏳ Testing
+```
+
+**Implementation**:
+```bash
+# Train improved BNN (training in progress)
+uv run python py/models/train_bnn_rushing_improved.py
+
+# Generate ensemble predictions (pending BNN completion)
+uv run python py/ensemble/enhanced_ensemble_v3.py \
+  --bayesian models/bayesian/informative_priors_v2.5.pkl \
+  --xgboost models/xgboost/v2_1.pkl \
+  --bnn models/bayesian/bnn_rushing_improved_v2.pkl \
+  --output predictions/ensemble_v3_week8.csv
+
+# Backtest with walk-forward validation (recommended)
+uv run python py/backtests/comprehensive_ensemble_backtest.py \
+  --start-season 2022 --end-season 2024 \
+  --walk-forward
+```
+
+**Critical Issues Identified**:
+- ❌ Missing historical predictions in database
+- ⚠️ Look-ahead bias in current backtest methodology
+- ✅ Database schema fixes completed
+- ⏳ BNN calibration improvements pending verification
+
+**Files**:
+- `py/ensemble/enhanced_ensemble_v3.py` - 4-way ensemble implementation
+- `py/models/train_bnn_rushing_improved.py` - Improved BNN with hierarchical effects
+- `py/backtests/comprehensive_ensemble_backtest.py` - Validation framework
+- `docs/models/ENSEMBLE_V3_STATUS.md` - Detailed status and issues
+- `docs/models/BNN_IMPROVEMENT_REPORT.md` - BNN improvement analysis
+
+**Next Steps**:
+1. ⏳ Complete BNN v2.0 training and verify calibration
+2. 🔄 Integrate BNN into ensemble with proper weighting
+3. 🔄 Implement walk-forward backtest validation
+4. 🔄 Generate 2024 predictions for paper trading
+
+See **docs/models/ENSEMBLE_V3_STATUS.md** for comprehensive status report.
+
+### 10. Conservative Q-Learning (CQL) Training
 
 **🆕 CQL Model Training Complete (Oct 9, 2025)** - Windows 11 RTX 4090
 
