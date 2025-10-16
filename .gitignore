@@ -61,6 +61,8 @@ htmlcov/
 .RData
 .Ruserdata
 .Rproj.user/
+.Rprofile
+renv.lock
 renv/library/
 renv/staging/
 
@@ -91,6 +93,7 @@ analysis/results/*_tmp.csv
 venv/
 env/
 .direnv/
+uv.lock
 
 # LaTeX build artifacts
 *.aux
