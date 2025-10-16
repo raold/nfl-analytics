@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/ChatGPT Image Oct 13, 2025, 06_54_27 PM (1).png" alt="NFL Analytics" width="520" />
+</p>
+
 # NFL Analytics – Local Dev Quickstart
 
 This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**.
