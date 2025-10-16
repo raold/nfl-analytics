@@ -1,0 +1,16 @@
+{
+  "hidden_dim": 16,
+  "activation": "relu",
+  "prior_std": 0.5,
+  "n_players": 177,
+  "features": [
+    "carries",
+    "avg_rushing_l3",
+    "season_avg",
+    "week",
+    "spread_close",
+    "total_close"
+  ],
+  "n_features": 6,
+  "timestamp": "2025-10-16T13:50:52.245369"
+}

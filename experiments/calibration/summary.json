@@ -1,15 +1,17 @@
 [
   {
-    "experiment_name": "baseline_bnn_4features",
+    "experiment_name": "vegas_bnn_6features",
     "config": {
-      "model": "BNN Hierarchical",
+      "model": "BNN Hierarchical + Vegas",
       "features": [
         "carries",
         "avg_rushing_l3",
         "season_avg",
-        "week"
+        "week",
+        "spread_close",
+        "total_close"
       ],
-      "n_features": 4,
+      "n_features": 6,
       "hidden_dim": 16,
       "activation": "relu",
       "prior_std": 0.5,
@@ -21,25 +23,25 @@
     },
     "metrics": {
       "coverage": {
-        "90pct": 0.2620320855614973,
-        "68pct": 0.19518716577540107,
-        "95pct": 0.28609625668449196
+        "90pct": 0.2970027247956403,
+        "68pct": 0.18528610354223432,
+        "95pct": 0.3405994550408719
       },
       "sharpness": {
-        "width_90": 14.174826671546626,
-        "width_68": 8.648771913508604
+        "width_90": 15.477333382480746,
+        "width_68": 9.458483905730008
       },
       "point_accuracy": {
-        "mae": 18.69366584835524,
-        "rmse": 26.014855556175025,
-        "mape": 28.90272642046403
+        "mae": 18.40024414702032,
+        "rmse": 25.727893604311166,
+        "mape": 28.05691351550812
       },
       "advanced": {
-        "calibration_error": 0.015123933575540762,
-        "crps": 19.51730887830244
+        "calibration_error": 0.014868258643144503,
+        "crps": 19.28634935984859
       },
-      "n_samples": 374
+      "n_samples": 367
     },
-    "notes": "Baseline BNN with only 4 features (carries, recent form, season avg, week).\n    Uses hierarchical player effects with tight priors (sigma=0.3 on log scale).\n    Prediction bug FIXED - proper player encoding after train/test split.\n    CALIBRATION ISSUE: 26% coverage vs 90% target (3.5x too narrow)."
+    "notes": "BNN with Vegas features: baseline (4) + spread_close + total_close (2).\n    Hypothesis: Game context (spread, total) improves uncertainty quantification.\n    Same prior configuration as baseline for fair comparison (sigma=0.3).\n    Testing if additional features improve calibration from 26% \u2192 85-95%."
   }
 ]

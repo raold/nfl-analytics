@@ -1,0 +1,45 @@
+{
+  "experiment_name": "vegas_bnn_6features",
+  "config": {
+    "model": "BNN Hierarchical + Vegas",
+    "features": [
+      "carries",
+      "avg_rushing_l3",
+      "season_avg",
+      "week",
+      "spread_close",
+      "total_close"
+    ],
+    "n_features": 6,
+    "hidden_dim": 16,
+    "activation": "relu",
+    "prior_std": 0.5,
+    "player_effect_sigma": 0.2,
+    "sigma": 0.3,
+    "n_samples": 2000,
+    "n_chains": 4,
+    "target_accept": 0.95
+  },
+  "metrics": {
+    "coverage": {
+      "90pct": 0.2970027247956403,
+      "68pct": 0.18528610354223432,
+      "95pct": 0.3405994550408719
+    },
+    "sharpness": {
+      "width_90": 15.477333382480746,
+      "width_68": 9.458483905730008
+    },
+    "point_accuracy": {
+      "mae": 18.40024414702032,
+      "rmse": 25.727893604311166,
+      "mape": 28.05691351550812
+    },
+    "advanced": {
+      "calibration_error": 0.014868258643144503,
+      "crps": 19.28634935984859
+    },
+    "n_samples": 367
+  },
+  "notes": "BNN with Vegas features: baseline (4) + spread_close + total_close (2).\n    Hypothesis: Game context (spread, total) improves uncertainty quantification.\n    Same prior configuration as baseline for fair comparison (sigma=0.3).\n    Testing if additional features improve calibration from 26% \u2192 85-95%."
+}
