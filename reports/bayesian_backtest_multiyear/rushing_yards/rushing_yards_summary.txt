@@ -1,0 +1,33 @@
+Multi-Year Backtest Summary: rushing_yards
+================================================================================
+
+2022 Season:
+  Predictions: 5,089
+  MAE: 27.85 yards
+  RMSE: 36.73 yards
+  MAPE: 52.1%
+  Correlation: 0.250
+  90% CI Coverage: 86.8%
+
+2023 Season:
+  Predictions: 5,301
+  MAE: 24.76 yards
+  RMSE: 31.38 yards
+  MAPE: 51.8%
+  Correlation: 0.201
+  90% CI Coverage: 91.1%
+
+2024 Season:
+  Predictions: 5,158
+  MAE: 27.77 yards
+  RMSE: 35.62 yards
+  MAPE: 51.6%
+  Correlation: 0.238
+  90% CI Coverage: 90.5%
+
+
+Overall Statistics:
+  Total Predictions: 15,548
+  Overall MAE: 26.77 yards
+  Overall RMSE: 34.62 yards
+  Overall Correlation: 0.234

@@ -1,0 +1,33 @@
+Multi-Year Backtest Summary: passing_yards
+================================================================================
+
+2022 Season:
+  Predictions: 0
+  MAE: 0.00 yards
+  RMSE: 0.00 yards
+  MAPE: 0.0%
+  Correlation: 0.000
+  90% CI Coverage: 0.0%
+
+2023 Season:
+  Predictions: 0
+  MAE: 0.00 yards
+  RMSE: 0.00 yards
+  MAPE: 0.0%
+  Correlation: 0.000
+  90% CI Coverage: 0.0%
+
+2024 Season:
+  Predictions: 1,028
+  MAE: 57.11 yards
+  RMSE: 72.53 yards
+  MAPE: 29.5%
+  Correlation: 0.215
+  90% CI Coverage: 49.1%
+
+
+Overall Statistics:
+  Total Predictions: 1,028
+  Overall MAE: 57.11 yards
+  Overall RMSE: 72.53 yards
+  Overall Correlation: 0.215

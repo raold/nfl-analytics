@@ -1,0 +1,30 @@
+{
+  "feature_cols": [
+    "log_attempts",
+    "completion_rate",
+    "yards_per_attempt",
+    "td_rate",
+    "is_home",
+    "spread_abs",
+    "total_line",
+    "is_bad_weather",
+    "yards_L3",
+    "completion_rate_L3",
+    "yards_per_attempt_L3",
+    "week_in_season",
+    "temp",
+    "wind"
+  ],
+  "y_mean": 236.84003698566806,
+  "y_std": 76.22705775011588,
+  "train_seasons": [
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "test_season": 2024,
+  "test_mae": 58.69758103135434,
+  "test_rmse": 73.45308435771216,
+  "calibration": 0.8680926916221033
+}

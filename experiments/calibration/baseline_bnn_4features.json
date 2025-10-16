@@ -1,0 +1,43 @@
+{
+  "experiment_name": "baseline_bnn_4features",
+  "config": {
+    "model": "BNN Hierarchical",
+    "features": [
+      "carries",
+      "avg_rushing_l3",
+      "season_avg",
+      "week"
+    ],
+    "n_features": 4,
+    "hidden_dim": 16,
+    "activation": "relu",
+    "prior_std": 0.5,
+    "player_effect_sigma": 0.2,
+    "sigma": 0.3,
+    "n_samples": 2000,
+    "n_chains": 4,
+    "target_accept": 0.95
+  },
+  "metrics": {
+    "coverage": {
+      "90pct": 0.2620320855614973,
+      "68pct": 0.19518716577540107,
+      "95pct": 0.28609625668449196
+    },
+    "sharpness": {
+      "width_90": 14.174826671546626,
+      "width_68": 8.648771913508604
+    },
+    "point_accuracy": {
+      "mae": 18.69366584835524,
+      "rmse": 26.014855556175025,
+      "mape": 28.90272642046403
+    },
+    "advanced": {
+      "calibration_error": 0.015123933575540762,
+      "crps": 19.51730887830244
+    },
+    "n_samples": 374
+  },
+  "notes": "Baseline BNN with only 4 features (carries, recent form, season avg, week).\n    Uses hierarchical player effects with tight priors (sigma=0.3 on log scale).\n    Prediction bug FIXED - proper player encoding after train/test split.\n    CALIBRATION ISSUE: 26% coverage vs 90% target (3.5x too narrow)."
+}

@@ -1,0 +1,9 @@
+{
+  "hidden_dims": [
+    32,
+    16
+  ],
+  "activation": "relu",
+  "prior_std": 1.0,
+  "timestamp": "2025-10-13T19:13:40.357684"
+}

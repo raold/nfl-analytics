@@ -17,26 +17,29 @@
 \contentsline {figure}{\numberline {6.6}{\ignorespaces Copula impact on teaser/SGP EV}}{61}{figure.caption.448}%
 \contentsline {figure}{\numberline {6.7}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{65}{figure.caption.474}%
 \contentsline {figure}{\numberline {6.8}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{66}{figure.caption.475}%
+\contentsline {figure}{\numberline {6.9}{\ignorespaces Model evolution performance}}{70}{figure.caption.499}%
+\contentsline {figure}{\numberline {6.10}{\ignorespaces Ensemble component performance}}{71}{figure.caption.504}%
+\contentsline {figure}{\numberline {6.11}{\ignorespaces Calibration comparison}}{72}{figure.caption.505}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Offline RL learning curves (median and IQR across seeds).}}{80}{figure.caption.516}%
-\contentsline {figure}{\numberline {7.2}{\ignorespaces Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}}{81}{figure.caption.517}%
-\contentsline {figure}{\numberline {7.3}{\ignorespaces End-to-end offline RL workflow from data to promotion.}}{82}{figure.caption.525}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Offline RL learning curves (median and IQR across seeds).}}{87}{figure.caption.560}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}}{88}{figure.caption.561}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces End-to-end offline RL workflow from data to promotion.}}{89}{figure.caption.569}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces Final bankroll distribution}}{92}{figure.caption.582}%
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Fractional Kelly bankroll trajectories}}{93}{figure.caption.588}%
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Final bankroll distribution}}{100}{figure.caption.626}%
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Fractional Kelly bankroll trajectories}}{101}{figure.caption.632}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {9.1}{\ignorespaces Simulated teaser expected value surface as a function of leg success probabilities. The zero contour (white) marks the middle threshold that informs acceptance tests inside the simulator (\Cref {sec:teaser-math}).}}{97}{figure.caption.603}%
-\contentsline {figure}{\numberline {9.2}{\ignorespaces Acceptance pass/fail rates by season and test category (margins, key masses, dependence).}}{104}{figure.caption.654}%
-\contentsline {figure}{\numberline {9.3}{\ignorespaces Relationship between acceptance outcomes and live performance (e.g., CLV/ROI). Failing acceptance correlates with degraded live metrics, justifying the gate.}}{105}{figure.caption.655}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {11.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{129}{figure.caption.741}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {13.1}{\ignorespaces Profit Optimization System Architecture}}{173}{figure.caption.954}%
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Simulated teaser expected value surface as a function of leg success probabilities. The zero contour (white) marks the middle threshold that informs acceptance tests inside the simulator (\Cref {sec:teaser-math}).}}{105}{figure.caption.647}%
+\contentsline {figure}{\numberline {9.2}{\ignorespaces Acceptance pass/fail rates by season and test category (margins, key masses, dependence).}}{112}{figure.caption.698}%
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Relationship between acceptance outcomes and live performance (e.g., CLV/ROI). Failing acceptance correlates with degraded live metrics, justifying the gate.}}{113}{figure.caption.699}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{187}{figure.caption.1013}%
+\contentsline {figure}{\numberline {11.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{137}{figure.caption.785}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {13.1}{\ignorespaces Profit Optimization System Architecture}}{181}{figure.caption.998}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{195}{figure.caption.1057}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

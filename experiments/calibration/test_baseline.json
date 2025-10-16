@@ -1,0 +1,31 @@
+{
+  "experiment_name": "test_baseline",
+  "config": {
+    "method": "test",
+    "features": [
+      "test"
+    ]
+  },
+  "metrics": {
+    "coverage": {
+      "90pct": 1.0,
+      "68pct": 0.87,
+      "95pct": 0.98
+    },
+    "sharpness": {
+      "width_90": 50.0,
+      "width_68": 30.0
+    },
+    "point_accuracy": {
+      "mae": 8.356481458391539,
+      "rmse": 10.699634499888234,
+      "mape": 22.11428775426464
+    },
+    "advanced": {
+      "calibration_error": 0.009438838870189016,
+      "crps": 16.666666666666668
+    },
+    "n_samples": 100
+  },
+  "notes": "Test run of calibration harness"
+}

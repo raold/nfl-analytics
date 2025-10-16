@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  12 OCT 2025 10:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  13 OCT 2025 18:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1345,307 +1345,34 @@ File: ts1ppl.fd 2001/06/04 font definitions for TS1/ppl.
 [2
 
 {/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}] 
-(./main.toc
-Overfull \hbox (1.55939pt too wide) detected at line 22
- []\T1/ppl/m/n/12 lxiii
- []
-
-
-Overfull \hbox (1.55939pt too wide) detected at line 23
- []\T1/ppl/m/n/12 lxiii
- []
-
-
-Overfull \hbox (1.55939pt too wide) detected at line 24
- []\T1/ppl/m/n/12 lxiii
- []
-
-
-Overfull \hbox (1.3555pt too wide) detected at line 34
- []\T1/ppl/m/n/12 lxvi
- []
-
-
-Overfull \hbox (4.84738pt too wide) detected at line 35
- []\T1/ppl/m/n/12 lxvii
- []
-
-
-Overfull \hbox (4.84738pt too wide) detected at line 36
- []\T1/ppl/m/n/12 lxvii
- []
-
-
-Overfull \hbox (4.84738pt too wide) detected at line 37
- []\T1/ppl/m/n/12 lxvii
- []
-
-
-Overfull \hbox (8.33926pt too wide) detected at line 38
- []\T1/ppl/m/n/12 lxviii
- []
-
-
-Overfull \hbox (8.33926pt too wide) detected at line 39
- []\T1/ppl/m/n/12 lxviii
- []
-
-
-Overfull \hbox (8.33926pt too wide) detected at line 40
- []\T1/ppl/m/n/12 lxviii
- []
-
-
-Overfull \hbox (0.76752pt too wide) detected at line 42
- []\T1/ppl/m/n/12 lxix
- []
+(./main.toc)
+\tf@toc=\write6
+\openout6 = `main.toc'.
 
 
 
 [3
 
 
-]
-Underfull \hbox (badness 10000) in paragraph at lines 66--66
- [][] [][][]\T1/ppl/m/n/12 (+20) Dixon & Coles (1997): De-pen-dence and Low-Sco
-re 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 78--78
- [][] [][][]\T1/ppl/m/n/12 (+20) Dixon--Coles low-score ad-just-ment vs key-num
-ber 
- []
-
-
-
-[4]
-
-[5]
-
-[6]
-
-[7]
-
-[8]
-
-[9]
-Underfull \hbox (badness 10000) in paragraph at lines 418--418
- [][] [][][]\T1/ppl/m/n/12 (+20) Use Case 2: Nar-ra-tive Val-i-da-tion (Rest Ad
--van-tage, 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 433--433
- [][] [][][]\T1/ppl/m/n/12 (+20) Future Ex-ten-sions: Retrieval[]Augmented Gen-
-er-a-tion and 
- []
-
-
-
-[10]
-
-[11]
-
-[12]
-Overfull \hbox (0.93591pt too wide) detected at line 649
-\T1/ppl/m/n/12 A.14.10 
- []
-
-
-
-[13]
-
-[14]
-
-[15]
-Overfull \hbox (0.67175pt too wide) detected at line 785
-\T1/ppl/b/n/12 AA 
- []
-
-
-Overfull \hbox (1.33183pt too wide) detected at line 798
-\T1/ppl/b/n/12 AD 
- []
-
-)
-\tf@toc=\write6
-\openout6 = `main.toc'.
-
-
-
-[16] (./main.lof
-Underfull \hbox (badness 10000) in paragraph at lines 9--9
- [][] [][][]\T1/ppl/m/n/12 (+20) Feature-importance snap-shot (per-mu-ta-tion) 
-for a base-line 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 10--10
- [][] [][][]\T1/ppl/m/n/12 (+20) Relative weight by sea-son un-der ex-po-nen-ti
-al de-cay with half[]life 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 22--22
- [][] [][][]\T1/ppl/m/n/12 (+20) Sensitivity of EV and cal-i-bra-tion to key hy
--per-pa-ram-e-ters (en-tropy 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 28--28
- \T1/ppl/m/n/12 (+9) prob-a-bil-i-ties. The zero con-tour (white) marks the mid
--dle thresh-old 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 29--29
- [][] [][][]\T1/ppl/m/n/12 (+20) Acceptance pass/fail rates by sea-son and test
- cat-e-gory (mar-gins, 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 30--30
- [][] [][][]\T1/ppl/m/n/12 (+20) Relationship be-tween ac-cep-tance out-comes a
-nd live per-for-mance 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 30--30
- \T1/ppl/m/n/12 (+20) (e.g., CLV/ROI). Fail-ing ac-cep-tance cor-re-lates with 
-de-graded live 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
- [][] [][][]\T1/ppl/m/n/12 (+20) Claude AI se-man-tic re-search work-flow. User
- queries in nat-u-ral 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
- \T1/ppl/m/n/12 (+20) lan-guage are trans-lated to ex-e-cutable code (SQL, R, P
-ython), 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
- \T1/ppl/m/n/12 (+20) val-i-dated with sta-tis-ti-cal rigor, and in-ter-preted 
-with do-main 
- []
-
-
-
-[17
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
- [][] [][][]\T1/ppl/m/n/12 (+14) CQL Train-ing Curves: To-tal loss, TD er-ror, 
-CQL penalty, and mean 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
- \T1/ppl/m/n/12 (+20) Q-value across 2000 epochs. Train-ing com-pleted in ap-pr
-ox-i-mately 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
- \T1/ppl/m/n/12 (+20) 9 min-utes on NVIDIA RTX 4090 (24GB VRAM) with CUDA 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
- \T1/ppl/m/n/12 (+20) ac-cel-er-a-tion. Loss re-duc-tion of 75% demon-strates e
-f-fec-tive 
- []
-
-)
+] (./main.lof)
 \tf@lof=\write7
 \openout7 = `main.lof'.
 
 
 
-[18] (./main.lot
-Underfull \hbox (badness 10000) in paragraph at lines 8--8
- [][] [][][]\T1/ppl/m/n/12 (+20) Effective sam-ple size (sea-son units) un-der 
-ex-po-nen-tial de-cay 
- []
+[4
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 11--11
- [][] [][][]\T1/ppl/m/n/12 (+20) Paired com-par-i-son of tem-po-ral weight-ing 
-schemes on 2024 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 19--19
- [][] [][][]\T1/ppl/m/n/12 (+20) Two-leg teaser EV sen-si-tiv-ity to de-pen-den
-ce (Gaus-sian and t 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 34--34
- [][] [][][]\T1/ppl/m/n/12 (+20) RL Agent Per-for-mance vs Base-line Mod-els (2
-020-2024 Out-of- 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 37--37
- [][] [][][]\T1/ppl/m/n/12 (+20) Common of-fline RL al-go-rithms and their trad
-e-offs for 
- []
-
-
-
-[19
-
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 49--49
- [][] [][][]\T1/ppl/m/n/12 (+20) Model per-for-mance com-par-i-son against pub-
-lished bench-marks. 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 49--49
- \T1/ppl/m/n/12 (+20) Our stacked en-sem-ble achieves best-in-class cal-i-bra-t
-ion (Brier = 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 49--49
- \T1/ppl/m/n/12 (+20) 0.2515) but fails to over-come mar-ket ef-fi-ciency for p
-rof-itabil-ity 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 50--50
- [][] [][][]\T1/ppl/m/n/12 (+20) Statistical sig-nif-i-cance of cal-i-bra-tion 
-im-prove-ments (Brier score 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 57--57
- [][] [][][]\T1/ppl/m/n/12 (+20) Diebold-Mariano tests for pre-dic-tive ac-cu-r
-acy com-par-i-son (5,529 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 58--58
- [][] [][][]\T1/ppl/m/n/12 (+20) Bootstrap con-fi-dence in-ter-vals for Brier s
-cores (95% CI, 5,000 
- []
-
-)
+] (./main.lot)
 \tf@lot=\write8
 \openout8 = `main.lot'.
 
 
 
-[20] (../appendix/notation_glossary.tex
+[5
+
+
+] (../appendix/notation_glossary.tex
 LaTeX Font Info:    Trying to load font information for U+fplmbb on input line 
 16.
 
@@ -1653,10 +1380,49 @@ LaTeX Font Info:    Trying to load font information for U+fplmbb on input line
 File: ufplmbb.fd 2003/10/30 Fontinst v1.914 font definitions for U/fplmbb.
 )
 
-[21
+[6
 
 
 ]
+
+[7]
+
+[8]
+
+[9]
+
+[10]
+
+[11]) (../appendix/acronyms.tex
+
+[12]
+
+LaTeX Warning: Reference `chap:results' on page xiii undefined on input line 20
+.
+
+
+
+[13
+
+]) (../appendix/master_todos.tex
+
+[14]
+
+[15
+
+]
+
+[16]
+
+[17]
+
+[18]
+
+[19]
+
+[20]
+
+[21]
 
 [22]
 
@@ -1666,25 +1432,70 @@ File: ufplmbb.fd 2003/10/30 Fontinst v1.914 font definitions for U/fplmbb.
 
 [25]
 
-[26]) (../appendix/acronyms.tex
+[26]
 
 [27]
 
-[28
+[28]
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 631.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-cmr.cfg
+File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
+(RS)
+)
 
-]) (../appendix/master_todos.tex
+[29{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.en
+c}]
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 648.
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 669.
 
-[29]
 
-[30
+[30]
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 702.
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 702.
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 708.
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 727.
 
-]
 
 [31]
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 737.
+LaTeX Info: Symbol \textrightarrow not provided by
+            font family ppl in TS1 encoding.
+            Default family used instead on input line 745.
+
 
 [32]
 
 [33]
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.872 ...way) \textcolor{green!60!black}{✓ BEST}
+                                                  
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
 
 [34]
 
@@ -1704,88 +1515,9 @@ File: ufplmbb.fd 2003/10/30 Fontinst v1.914 font definitions for U/fplmbb.
 
 [42]
 
-[43]
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 631.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-cmr.cfg
-File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
-(RS)
-)
+[43]) (../appendix/systems_blueprint.tex
 
-[44{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.en
-c}]
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 648.
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 669.
-
-
-[45]
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 702.
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 702.
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 708.
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 727.
-
-
-[46]
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 737.
-LaTeX Info: Symbol \textrightarrow not provided by
-            font family ppl in TS1 encoding.
-            Default family used instead on input line 745.
-
-
-[47]
-
-[48]
-
-! LaTeX Error: Unicode character ✓ (U+2713)
-               not set up for use with LaTeX.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.872 ...way) \textcolor{green!60!black}{✓ BEST}
-                                                  
-You may provide a definition with
-\DeclareUnicodeCharacter 
-
-
-
-[49]
-
-[50]
-
-[51]
-
-[52]
-
-[53]
-
-[54]
-
-[55]
-
-[56]
-
-[57]
-
-[58]) (../appendix/systems_blueprint.tex
-
-[59]
+[44]
 Chapter 1.
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
 put line 11.
@@ -1799,17 +1531,17 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 6.25204pt on input line 14.
 
 
-[60
+[45
 
 ]
 
-[61]) (../appendix/productionization_guide.tex
+[46]) (../appendix/productionization_guide.tex
 
-[62]
+[47]
 Chapter 2.
 
 
-[63
+[48
 
 ]
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
@@ -1818,26 +1550,26 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 7.91925pt on input line 41.
 
 
-[64]
+[49]
 
-[65]
+[50]
 
-[66]
+[51]
 Underfull \hbox (badness 1215) in paragraph at lines 143--144
 []\T1/ppl/m/n/12 (+20) Dependence + fric-tions; CVaR/drawdown thresh-olds
  []
 
 
 
-[67]
+[52]
 
-[68]
+[53]
 
-[69])
+[54])
 Package hyperref Info: Option `pageanchor' set `true' on input line 289.
 
 
-[70] (../chapter_1_intro/chapter_1_intro.tex
+[55] (../chapter_1_intro/chapter_1_intro.tex
 Chapter 3.
 
 
@@ -1848,12 +1580,22 @@ Chapter 3.
 
 [2]
 
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 82.
+
+
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 82.
+
+
+
 [3]
 
 [4]) (../chapter_2_lit_review/chapter_2_lit_review.tex
 
 [5]
 Chapter 4.
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 6.
+
 
 
 [6
@@ -1864,7 +1606,36 @@ Chapter 4.
 
 [8]
 
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 76.
+
+
+Package natbib Warning: Citation `skellam1946' on page 9 undefined on input lin
+e 81.
+
+
+Package natbib Warning: Citation `maher1982' on page 9 undefined on input line 
+81.
+
+
+Package natbib Warning: Citation `dixon1997' on page 9 undefined on input line 
+81.
+
+
+Package natbib Warning: Citation `karlis2003' on page 9 undefined on input line
+ 81.
+
+
+Package natbib Warning: Citation `koopman2015' on page 9 undefined on input lin
+e 81.
+
+
+
 [9]
+
+Package natbib Warning: Citation `stern1991' on page 10 undefined on input line
+ 124.
+
+
 
 [10]
 Underfull \hbox (badness 10000) in paragraph at lines 143--146
@@ -1873,17 +1644,47 @@ g to cor-rect de-pen-
  []
 
 
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 165.
+
+
 
 [11]
 
 [12]
 
+Package natbib Warning: Citation `bradleyterry1952' on page 13 undefined on inp
+ut line 233.
+
+
+Package natbib Warning: Citation `elo1978' on page 13 undefined on input line 2
+33.
+
+
+Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
+ine 233.
+
+
+Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
+ine 233.
+
+
+
 [13]
+
+Package natbib Warning: Citation `nelsen2006' on page 14 undefined on input lin
+e 245.
+
+
 
 [14]
 
+Package natbib Warning: Citation `joe1997' on page 15 undefined on input line 2
+56.
+
+
+
 [15]
-<../figures/joint_exceedance_vs_rho.png, id=3498, 715.2321pt x 499.3857pt>
+<../figures/joint_exceedance_vs_rho.png, id=1146, 715.2321pt x 499.3857pt>
 File: ../figures/joint_exceedance_vs_rho.png Graphic file (type png)
 <use ../figures/joint_exceedance_vs_rho.png>
 Package pdftex.def Info: ../figures/joint_exceedance_vs_rho.png  used on input 
@@ -1891,10 +1692,23 @@ line 296.
 (pdftex.def)             Requested size: 390.25536pt x 272.48366pt.
 
 
+Package natbib Warning: Citation `daniels1954' on page 16 undefined on input li
+ne 313.
+
+
+
 [16]
 
+Package natbib Warning: Citation `karlis2003' on page 17 undefined on input lin
+e 325.
+
+
+
 [17 <../figures/joint_exceedance_vs_rho.png>]
-<../figures/reliability_diagram.png, id=3543, 715.2321pt x 716.1957pt>
+
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 342.
+
+<../figures/reliability_diagram.png, id=1189, 715.2321pt x 716.1957pt>
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
@@ -1916,6 +1730,10 @@ de-fense, by down/distance)
 
 [21]
 
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 457.
+
+
+
 [22]
 Underfull \hbox (badness 4543) in paragraph at lines 469--471
 \T1/ppl/m/n/12 (+20) Game[]theoretic fric-tions pre-dict pock-ets of in-ef-fi-c
@@ -1929,23 +1747,91 @@ Underfull \hbox (badness 2158) in paragraph at lines 469--471
  []
 
 
+Package natbib Warning: Citation `sauer1998' on page 23 undefined on input line
+ 476.
+
+
+Package natbib Warning: Citation `levitt2004' on page 23 undefined on input lin
+e 477.
+
+
 
 [23]
-<../figures/key_number_pmf.png, id=3585, 505.89pt x 289.08pt>
+
+LaTeX Warning: Reference `chap:rl' on page 1 undefined on input line 526.
+
+<../figures/key_number_pmf.png, id=1222, 505.89pt x 289.08pt>
 File: ../figures/key_number_pmf.png Graphic file (type png)
 <use ../figures/key_number_pmf.png>
 Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 547.
 
 (pdftex.def)             Requested size: 433.62001pt x 247.7879pt.
 
+Package natbib Warning: Citation `harville1980' on page 24 undefined on input l
+ine 555.
+
+
+Package natbib Warning: Citation `glickman1998' on page 24 undefined on input l
+ine 556.
+
+
+Package natbib Warning: Citation `stern1991' on page 24 undefined on input line
+ 557.
+
+
 
 [24 <../figures/key_number_pmf.png>]
+
+Package natbib Warning: Citation `dixon1997' on page 25 undefined on input line
+ 558.
+
+
+Package natbib Warning: Citation `karlis2003' on page 25 undefined on input lin
+e 559.
+
+
+Package natbib Warning: Citation `koopman2015' on page 25 undefined on input li
+ne 560.
+
+
+Package natbib Warning: Citation `lock2014' on page 25 undefined on input line 
+561.
+
+
+Package natbib Warning: Citation `sauer1998' on page 25 undefined on input line
+ 562.
+
+
+Package natbib Warning: Citation `levitt2004' on page 25 undefined on input lin
+e 563.
+
+
+Package natbib Warning: Citation `szalkowski2012' on page 25 undefined on input
+ line 564.
+
+
+Package natbib Warning: Citation `nichols2014' on page 25 undefined on input li
+ne 565.
+
+
+Package natbib Warning: Citation `baio2010' on page 25 undefined on input line 
+566.
+
+
 
 [25]
 
 [26]
 
 [27]
+
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 623.
+
+
+LaTeX Warning: Reference `fig:sim-teaser-surface' on page 1 undefined on input 
+line 623.
+
+
 
 [28]) (../chapter_3_data_foundation/chapter_3_data_foundation.tex
 
@@ -2280,7 +2166,7 @@ features_enhanced.py\T1/ppl/m/n/12 (+20) ,
 
 
 [36]
-<../figures/feature_importance.png, id=3700, 1405.25pt x 903.375pt>
+<../figures/feature_importance.png, id=1307, 1405.25pt x 903.375pt>
 File: ../figures/feature_importance.png Graphic file (type png)
 <use ../figures/feature_importance.png>
 Package pdftex.def Info: ../figures/feature_importance.png  used on input line 
@@ -2291,7 +2177,7 @@ Package pdftex.def Info: ../figures/feature_importance.png  used on input line
 [37]
 
 [38 <../figures/feature_importance.png>]
-<../figures/out/time_decay_weights.png, id=3715, 1003.75pt x 562.1pt>
+<../figures/out/time_decay_weights.png, id=1323, 1003.75pt x 562.1pt>
 File: ../figures/out/time_decay_weights.png Graphic file (type png)
 <use ../figures/out/time_decay_weights.png>
 Package pdftex.def Info: ../figures/out/time_decay_weights.png  used on input l
@@ -2315,19 +2201,19 @@ Chapter 6.
 [42
 
 ]
-<../figures/out/rolling_oos_logloss.png, id=3752, 578.16pt x 325.215pt>
+<../figures/out/rolling_oos_logloss.png, id=1363, 578.16pt x 325.215pt>
 File: ../figures/out/rolling_oos_logloss.png Graphic file (type png)
 <use ../figures/out/rolling_oos_logloss.png>
 Package pdftex.def Info: ../figures/out/rolling_oos_logloss.png  used on input 
 line 33.
 (pdftex.def)             Requested size: 411.93768pt x 231.71312pt.
-<../figures/out/rolling_oos_ece.png, id=3753, 578.16pt x 325.215pt>
+<../figures/out/rolling_oos_ece.png, id=1364, 578.16pt x 325.215pt>
 File: ../figures/out/rolling_oos_ece.png Graphic file (type png)
 <use ../figures/out/rolling_oos_ece.png>
 Package pdftex.def Info: ../figures/out/rolling_oos_ece.png  used on input line
  44.
 (pdftex.def)             Requested size: 411.93768pt x 231.71312pt.
-<../figures/out/reliability_curves_timeframe.png, id=3754, 469.755pt x 361.35pt
+<../figures/out/reliability_curves_timeframe.png, id=1365, 469.755pt x 361.35pt
 >
 File: ../figures/out/reliability_curves_timeframe.png Graphic file (type png)
 <use ../figures/out/reliability_curves_timeframe.png>
@@ -2351,7 +2237,32 @@ me/away. Kalman fil-ter-
 
 [45 <../figures/out/reliability_curves_timeframe.png>]
 
+Package natbib Warning: Citation `glickman1998' on page 46 undefined on input l
+ine 110.
+
+
+Package natbib Warning: Citation `harville1980' on page 46 undefined on input l
+ine 110.
+
+
+
 [46]
+
+Package natbib Warning: Citation `dixon1997' on page 47 undefined on input line
+ 123.
+
+
+Package natbib Warning: Citation `maher1982' on page 47 undefined on input line
+ 144.
+
+
+Underfull \hbox (badness 2573) in paragraph at lines 144--145
+ []\T1/ppl/b/n/12 (+20) Team Strength Pa-ram-e-ter-i-za-tion.[] \T1/ppl/m/n/12 
+(+20) Fol-low-ing \T1/ppl/b/n/12 (+20) ?\T1/ppl/m/n/12 (+20) , we model in-ten-
+si-ties via
+ []
+
+
 
 [47]
 Overfull \hbox (31.9687pt too wide) in paragraph at lines 159--161
@@ -2363,6 +2274,14 @@ Overfull \hbox (31.9687pt too wide) in paragraph at lines 159--161
 
 
 [48]
+
+Package natbib Warning: Citation `koopman2015' on page 49 undefined on input li
+ne 185.
+
+
+Package natbib Warning: Citation `elo1978' on page 49 undefined on input line 1
+93.
+
 
 Package natbib Warning: Citation `glickman1999' on page 49 undefined on input l
 ine 193.
@@ -2386,6 +2305,10 @@ line 199.
 
 
 [49]
+
+Package natbib Warning: Citation `maher1982' on page 50 undefined on input line
+ 217.
+
 ! Missing $ inserted.
 <inserted text> 
                 $
@@ -2419,9 +2342,12 @@ Mod-els are re-trained ev-ery Tues-day us-ing
  []
 
 
+LaTeX Warning: Reference `chap:rl' on page 1 undefined on input line 376.
+
+
 
 [53]
-<../figures/out/integer_margin_calibration.png, id=3853, 650.43pt x 361.35pt>
+<../figures/out/integer_margin_calibration.png, id=1457, 650.43pt x 361.35pt>
 File: ../figures/out/integer_margin_calibration.png Graphic file (type png)
 <use ../figures/out/integer_margin_calibration.png>
 Package pdftex.def Info: ../figures/out/integer_margin_calibration.png  used on
@@ -2439,6 +2365,15 @@ Package pdftex.def Info: ../figures/out/integer_margin_calibration.png  used on
 (../figures/out/teaser_ev_oos_table.tex)
 (../figures/out/teaser_ev_sensitivity_table.tex)
 (../figures/out/reweighting_ablation_table.tex)
+
+Package natbib Warning: Citation `brier1950' on page 58 undefined on input line
+ 584.
+
+
+Package natbib Warning: Citation `gneiting2007' on page 58 undefined on input l
+ine 584.
+
+
 
 [58]
 File: ../figures/reliability_diagram.png Graphic file (type png)
@@ -2463,7 +2398,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 613--613
 
 (../figures/out/copula_gof_table.tex) (../figures/out/tail_dependence_table.tex
 )
-<../figures/out/teaser_pricing_copula_delta.png, id=3907, 505.89pt x 317.988pt>
+<../figures/out/teaser_pricing_copula_delta.png, id=1507, 505.89pt x 317.988pt>
 
 File: ../figures/out/teaser_pricing_copula_delta.png Graphic file (type png)
 <use ../figures/out/teaser_pricing_copula_delta.png>
@@ -2474,6 +2409,10 @@ n input line 673.
 
 [59]
 
+Package natbib Warning: Citation `lock2014' on page 60 undefined on input line 
+682.
+
+
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
@@ -2481,6 +2420,11 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [60]
 
 [61 <../figures/out/teaser_pricing_copula_delta.png>]
+
+Package natbib Warning: Citation `lock2014' on page 62 undefined on input line 
+769.
+
+
 
 [62]
 
@@ -2494,35 +2438,43 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [63] (../figures/out/glm_baseline_table.tex)
 (../figures/out/glm_harness_overall.tex)
 (../figures/out/glm_reliability_panel.tex
-<../figures/out/reliability_diagram_s2015.png, id=3950, 426.393pt x 427.1157pt>
+
+LaTeX Warning: Reference `fig:reliability-panels-b' on page 64 undefined on inp
+ut line 4.
+
+
+LaTeX Warning: Reference `fig:reliability-panels-b' on page 64 undefined on inp
+ut line 4.
+
+<../figures/out/reliability_diagram_s2015.png, id=1547, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2015.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2015.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2015.png  used on 
 input line 8.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2016.png, id=3951, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2016.png, id=1548, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2016.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2016.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2016.png  used on 
 input line 9.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2017.png, id=3952, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2017.png, id=1549, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2017.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2017.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2017.png  used on 
 input line 11.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2018.png, id=3953, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2018.png, id=1550, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2018.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2018.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2018.png  used on 
 input line 12.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2019.png, id=3954, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2019.png, id=1551, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2019.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2019.png>
@@ -2530,38 +2482,45 @@ Package pdftex.def Info: ../figures/out/reliability_diagram_s2019.png  used on
 input line 14.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
 
-
 LaTeX Warning: Float too large for page by 29.84439pt on input line 15.
 
-<../figures/out/reliability_diagram_s2020.png, id=3957, 426.393pt x 427.1157pt>
+
+LaTeX Warning: Reference `fig:reliability-panels' on page 64 undefined on input
+ line 20.
+
+
+LaTeX Warning: Reference `fig:reliability-panels' on page 64 undefined on input
+ line 20.
+
+<../figures/out/reliability_diagram_s2020.png, id=1552, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2020.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2020.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2020.png  used on 
 input line 23.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2021.png, id=3958, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2021.png, id=1553, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2021.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2021.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2021.png  used on 
 input line 24.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2022.png, id=3959, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2022.png, id=1554, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2022.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2022.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2022.png  used on 
 input line 26.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2023.png, id=3960, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2023.png, id=1555, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2023.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2023.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2023.png  used on 
 input line 27.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2024.png, id=3961, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2024.png, id=1556, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2024.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2024.png>
@@ -2571,8 +2530,8 @@ input line 29.
 
 LaTeX Warning: Float too large for page by 29.84439pt on input line 30.
 
-) (../figures/out/multimodel_table.tex))
-(../chapter_5_rl_design/chapter_5_rl_design.tex
+) (../figures/out/multimodel_table.tex)
+(../chapter_4_baseline_modeling/v3_ensemble_section.tex
 
 [64]
 
@@ -2589,37 +2548,319 @@ ut/reliability_diagram_s2023.png> <../figures/out/reliability_diagram_s2024.png
 [67]
 
 [68]
+<../figures/out/v3_model_evolution.pdf, id=1611, 505.89pt x 289.08pt>
+File: ../figures/out/v3_model_evolution.pdf Graphic file (type pdf)
+<use ../figures/out/v3_model_evolution.pdf>
+Package pdftex.def Info: ../figures/out/v3_model_evolution.pdf  used on input l
+ine 143.
+(pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../figures/out/v3_ensemble_components.pdf, id=1612, 505.89pt x 289.08pt>
+File: ../figures/out/v3_ensemble_components.pdf Graphic file (type pdf)
+<use ../figures/out/v3_ensemble_components.pdf>
+Package pdftex.def Info: ../figures/out/v3_ensemble_components.pdf  used on inp
+ut line 190.
+(pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<../figures/out/v3_calibration.pdf, id=1613, 433.62pt x 433.62pt>
+File: ../figures/out/v3_calibration.pdf Graphic file (type pdf)
+<use ../figures/out/v3_calibration.pdf>
+Package pdftex.def Info: ../figures/out/v3_calibration.pdf  used on input line 
+199.
+(pdftex.def)             Requested size: 346.89732pt x 346.91632pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
 
 [69]
 
-[70]
+[70 <../figures/out/v3_model_evolution.pdf>]
 
-[71]
-Chapter 7.
+[71 <../figures/out/v3_ensemble_components.pdf>]
 
+[72 <../figures/out/v3_calibration.pdf>]
 
-[72
+LaTeX Warning: `h' float specifier changed to `ht'.
 
-]
+)
 
-[73] (../figures/out/ope_grid_table.tex)
+[73]
+
+LaTeX Warning: Reference `chap:rl' on page 1 undefined on input line 937.
+
+) (../chapter_5_rl_design/chapter_5_rl_design.tex
 
 [74]
 
 [75]
 
-[76] (../figures/out/rl_agent_comparison_table.tex)
+[76]
 
 [77]
 
 [78]
-<../figures/rl_learning_curves.png, id=4179, 1405.25pt x 903.375pt>
+
+[79]
+Chapter 7.
+
+Package natbib Warning: Citation `fujimoto2021td3bc' on page 80 undefined on in
+put line 7.
+
+
+Package natbib Warning: Citation `nair2020awac' on page 80 undefined on input l
+ine 7.
+
+
+Underfull \hbox (badness 1648) in paragraph at lines 7--8
+\T1/ppl/m/n/12 (+20) (IQL), TD3 with be-hav-ior cloning (TD3+BC) (\T1/ppl/b/n/1
+2 (+20) ?\T1/ppl/m/n/12 (+20) ), and advantage[]weighted
+ []
+
+
+Package natbib Warning: Citation `mnih2015' on page 80 undefined on input line 
+12.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 80 undefined on input
+ line 12.
+
+
+Package natbib Warning: Citation `wang2016dueling' on page 80 undefined on inpu
+t line 12.
+
+
+Package natbib Warning: Citation `schaul2016per' on page 80 undefined on input 
+line 12.
+
+
+Package natbib Warning: Citation `schulman2015trpo' on page 80 undefined on inp
+ut line 13.
+
+
+Package natbib Warning: Citation `schulman2016gae' on page 80 undefined on inpu
+t line 13.
+
+
+Package natbib Warning: Citation `schulman2017ppo' on page 80 undefined on inpu
+t line 13.
+
+
+Package natbib Warning: Citation `fujimoto2018td3' on page 80 undefined on inpu
+t line 14.
+
+
+Package natbib Warning: Citation `haarnoja2018sac' on page 80 undefined on inpu
+t line 14.
+
+
+Package natbib Warning: Citation `bellemare2017distributional' on page 80 undef
+ined on input line 15.
+
+
+Package natbib Warning: Citation `dabney2018quantile' on page 80 undefined on i
+nput line 15.
+
+
+Package natbib Warning: Citation `fujimoto2019' on page 80 undefined on input l
+ine 16.
+
+
+Package natbib Warning: Citation `wu2019brac' on page 80 undefined on input lin
+e 16.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 80 undefined on input 
+line 16.
+
+
+Package natbib Warning: Citation `kumar2020' on page 80 undefined on input line
+ 16.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 80 undefined on inp
+ut line 16.
+
+
+Package natbib Warning: Citation `agarwal2020offline' on page 80 undefined on i
+nput line 16.
+
+
+Package natbib Warning: Citation `levine2020' on page 80 undefined on input lin
+e 16.
+
+
+
+[80
+
+]
+
+Package natbib Warning: Citation `sutton2018' on page 81 undefined on input lin
+e 36.
+
+
+Package natbib Warning: Citation `mnih2015' on page 81 undefined on input line 
+36.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 81 undefined on input
+ line 36.
+
+
+
+[81]
+
+Package natbib Warning: Citation `dudik2014' on page 82 undefined on input line
+ 49.
+
+
+Package natbib Warning: Citation `jiang2016' on page 82 undefined on input line
+ 49.
+
+
+Package natbib Warning: Citation `thomas2015' on page 82 undefined on input lin
+e 49.
+
+(../figures/out/ope_grid_table.tex)
+
+[82]
+
+Package natbib Warning: Citation `schulman2016gae' on page 83 undefined on inpu
+t line 72.
+
+
+Package natbib Warning: Citation `schulman2017ppo' on page 83 undefined on inpu
+t line 72.
+
+
+Package natbib Warning: Citation `schulman2015trpo' on page 83 undefined on inp
+ut line 72.
+
+
+Package natbib Warning: Citation `achiam2017cpo' on page 83 undefined on input 
+line 72.
+
+
+Package natbib Warning: Citation `vanhasselt2016' on page 83 undefined on input
+ line 75.
+
+
+Package natbib Warning: Citation `wang2016dueling' on page 83 undefined on inpu
+t line 75.
+
+
+Package natbib Warning: Citation `schaul2016per' on page 83 undefined on input 
+line 75.
+
+
+Package natbib Warning: Citation `fujimoto2018td3' on page 83 undefined on inpu
+t line 75.
+
+
+Package natbib Warning: Citation `haarnoja2018sac' on page 83 undefined on inpu
+t line 75.
+
+
+Package natbib Warning: Citation `bellemare2017distributional' on page 83 undef
+ined on input line 75.
+
+
+Package natbib Warning: Citation `dabney2018quantile' on page 83 undefined on i
+nput line 75.
+
+
+Package natbib Warning: Citation `fujimoto2019' on page 83 undefined on input l
+ine 85.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 83 undefined on input 
+line 85.
+
+
+Package natbib Warning: Citation `kumar2020' on page 83 undefined on input line
+ 85.
+
+
+Package natbib Warning: Citation `wu2019brac' on page 83 undefined on input lin
+e 85.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 83 undefined on inp
+ut line 85.
+
+
+Package natbib Warning: Citation `levine2020' on page 83 undefined on input lin
+e 85.
+
+
+Package natbib Warning: Citation `agarwal2020offline' on page 83 undefined on i
+nput line 85.
+
+
+
+[83]
+
+LaTeX Warning: Reference `tab:rl_agent_comparison' on page 1 undefined on input
+ line 103.
+
+
+
+[84] (../figures/out/rl_agent_comparison_table.tex)
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 124.
+
+
+Package natbib Warning: Citation `achiam2017cpo' on page 85 undefined on input 
+line 124.
+
+
+Package natbib Warning: Citation `tamar2015cvar' on page 85 undefined on input 
+line 124.
+
+
+
+[85]
+
+Package natbib Warning: Citation `thomas2015' on page 86 undefined on input lin
+e 127.
+
+
+Package natbib Warning: Citation `dudik2014' on page 86 undefined on input line
+ 137.
+
+
+Package natbib Warning: Citation `jiang2016' on page 86 undefined on input line
+ 137.
+
+
+
+[86]
+
+LaTeX Warning: Reference `fig:rl-curves' on page 1 undefined on input line 158.
+
+
+
+LaTeX Warning: Reference `fig:hparam-sens' on page 1 undefined on input line 15
+8.
+
+<../figures/rl_learning_curves.png, id=1798, 1405.25pt x 903.375pt>
 File: ../figures/rl_learning_curves.png Graphic file (type png)
 <use ../figures/rl_learning_curves.png>
 Package pdftex.def Info: ../figures/rl_learning_curves.png  used on input line 
 161.
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
-<../figures/hparam_sensitivity.png, id=4180, 1405.25pt x 903.375pt>
+<../figures/hparam_sensitivity.png, id=1799, 1405.25pt x 903.375pt>
 File: ../figures/hparam_sensitivity.png Graphic file (type png)
 <use ../figures/hparam_sensitivity.png>
 Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line 
@@ -2627,7 +2868,7 @@ Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
 
 
-[79]
+[87 <../figures/rl_learning_curves.png>]
 Underfull \hbox (badness 1215) in paragraph at lines 191--192
 []\T1/ppl/b/n/12 (+20) State\T1/ppl/m/n/12 (+20) : model prob-a-bil-i-ties, CBV
 , line ve-loc-ity, cross-book deltas, ros-
@@ -2635,45 +2876,160 @@ Underfull \hbox (badness 1215) in paragraph at lines 191--192
 
 
 
-[80 <../figures/rl_learning_curves.png>]
+[88 <../figures/hparam_sensitivity.png>]
 
-[81 <../figures/hparam_sensitivity.png>]
+LaTeX Warning: Reference `fig:rl-workflow' on page 1 undefined on input line 27
+0.
 
-[82]
 
-[83] (../figures/out/rl_vs_baseline_table.tex)
 
-[84] (../figures/out/utilization_adjusted_sharpe_table.tex)
+[89]
+
+Package natbib Warning: Citation `fujimoto2019' undefined on input line 312.
+
+
+Package natbib Warning: Citation `wu2019brac' undefined on input line 312.
+
+
+Package natbib Warning: Citation `kumar2019bear' undefined on input line 312.
+
+
+Package natbib Warning: Citation `kumar2020' undefined on input line 312.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' undefined on input line 312
+.
+
+
+Package natbib Warning: Citation `fujimoto2021td3bc' undefined on input line 31
+2.
+
+
+Package natbib Warning: Citation `nair2020awac' undefined on input line 312.
+
+
+
+[90] (../figures/out/rl_vs_baseline_table.tex)
+
+[91]
+
+LaTeX Warning: Reference `sec:ope' on page 92 undefined on input line 352.
+
+
+LaTeX Warning: Reference `sec:sim-acceptance-outcomes' on page 92 undefined on 
+input line 352.
+
+
+
+[92]
+
+LaTeX Warning: Reference `chap:risk' on page 93 undefined on input line 372.
+
+(../figures/out/utilization_adjusted_sharpe_table.tex)
 (../figures/out/cvar_benchmark_table.tex)
 
-[85])
-(../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
+[93]
 
-[86]
+Package natbib Warning: Citation `fujimoto2019' on page 94 undefined on input l
+ine 404.
 
-[87]
+
+Package natbib Warning: Citation `wu2019brac' on page 94 undefined on input lin
+e 405.
+
+
+Package natbib Warning: Citation `kumar2019bear' on page 94 undefined on input 
+line 406.
+
+
+Package natbib Warning: Citation `kumar2020' on page 94 undefined on input line
+ 407.
+
+
+Package natbib Warning: Citation `kostrikov2021iql' on page 94 undefined on inp
+ut line 408.
+
+
+Package natbib Warning: Citation `fujimoto2021td3bc' on page 94 undefined on in
+put line 409.
+
+
+Package natbib Warning: Citation `nair2020awac' on page 94 undefined on input l
+ine 410.
+
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 419.
+
+
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 419.
+
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 425.
+
+) (../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
+
+
+[94]
+
+[95]
 Chapter 8.
 
+LaTeX Warning: Reference `sec:kelly-math' on page 96 undefined on input line 4.
 
-[88
+
+
+LaTeX Warning: Reference `sec:cvar-math' on page 96 undefined on input line 4.
+
+
+Package natbib Warning: Citation `kelly1956' on page 96 undefined on input line
+ 8.
+
+
+LaTeX Warning: Reference `eq:kelly-opt' on page 96 undefined on input line 19.
+
+
+
+[96
 
 ] (../figures/out/cvar_benchmark_table.tex)
 (../figures/out/teaser_copula_impact_table.tex)
 
-[89]
+[97]
 
-[90]
-<../figures/bankroll_hist.png, id=4308, 715.2321pt x 426.393pt>
+Package natbib Warning: Citation `rockafellar2000' on page 98 undefined on inpu
+t line 74.
+
+
+LaTeX Warning: Reference `eq:cvar-prog' on page 98 undefined on input line 75.
+
+
+LaTeX Warning: Reference `eq:cvar-prog' on page 98 undefined on input line 81.
+
+
+LaTeX Warning: Reference `eq:cvar-prog' on page 98 undefined on input line 83.
+
+
+
+[98]
+<../figures/bankroll_hist.png, id=1918, 715.2321pt x 426.393pt>
 File: ../figures/bankroll_hist.png Graphic file (type png)
 <use ../figures/bankroll_hist.png>
 Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 106.
 (pdftex.def)             Requested size: 390.25536pt x 232.65608pt.
 
 
-[91] (../figures/out/budgets_caps_table.tex
+[99] (../figures/out/budgets_caps_table.tex
 Underfull \hbox (badness 10000) in paragraph at lines 33--33
 []| \T1/ppl/m/n/10.95 (+20) LCB quan-tile
  []
+
+
+LaTeX Warning: Reference `eq:lcb-kelly' on page 100 undefined on input line 33.
+
+
+
+LaTeX Warning: Reference `eq:cvar-prog' on page 100 undefined on input line 33.
+
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 33--33
@@ -2690,8 +3046,15 @@ Underfull \hbox (badness 10000) in paragraph at lines 33--33
 []| \T1/ppl/m/n/10.95 (+20) Correlated-
  []
 
+
+LaTeX Warning: Reference `subsec:ruin' on page 100 undefined on input line 33.
+
 )
-<../figures/bankroll_trajectories.png, id=4323, 1004.7939pt x 723.4227pt>
+
+LaTeX Warning: Reference `tab:budgets-caps' on page 1 undefined on input line 1
+16.
+
+<../figures/bankroll_trajectories.png, id=1928, 1004.7939pt x 723.4227pt>
 File: ../figures/bankroll_trajectories.png Graphic file (type png)
 <use ../figures/bankroll_trajectories.png>
 Package pdftex.def Info: ../figures/bankroll_trajectories.png  used on input li
@@ -2699,21 +3062,35 @@ ne 126.
 (pdftex.def)             Requested size: 390.25536pt x 280.97467pt.
 
 
-[92 <../figures/bankroll_hist.png>])
-(../chapter_7_simulation/chapter_7_simulation.tex
+[100 <../figures/bankroll_hist.png>]
 
-[93 <../figures/bankroll_trajectories.png>]
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 153.
 
-[94]
+) (../chapter_7_simulation/chapter_7_simulation.tex
 
-[95]
+[101 <../figures/bankroll_trajectories.png>]
+
+[102]
+
+[103]
 Chapter 9.
 
+Package natbib Warning: Citation `glasserman2003' on page 104 undefined on inpu
+t line 13.
 
-[96
+
+LaTeX Warning: Reference `subsec:vr' on page 104 undefined on input line 13.
+
+
+Package natbib Warning: Citation `wong2001sharp' on page 104 undefined on input
+ line 28.
+
+
+
+[104
 
 ]
-<../figures/teaser_ev_heatmap.png, id=4371, 451.6875pt x 379.4175pt>
+<../figures/teaser_ev_heatmap.png, id=1980, 451.6875pt x 379.4175pt>
 File: ../figures/teaser_ev_heatmap.png Graphic file (type png)
 <use ../figures/teaser_ev_heatmap.png>
 Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 4
@@ -2721,30 +3098,76 @@ Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 4
 (pdftex.def)             Requested size: 390.25536pt x 327.83267pt.
 
 
-[97 <../figures/teaser_ev_heatmap.png>]
+LaTeX Warning: Reference `sec:teaser-math' on page 1 undefined on input line 41
+.
 
-[98]
 
-[99]
+LaTeX Warning: Reference `sec:teaser-math' on page 1 undefined on input line 41
+.
 
-[100]
 
-[101]
 
-[102] (../figures/out/slippage_model_table.tex)
+[105 <../figures/teaser_ev_heatmap.png>]
+
+LaTeX Warning: Reference `chap:rl' on page 1 undefined on input line 61.
+
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 61.
+
+
+
+[106]
+
+[107]
+
+LaTeX Warning: Reference `tab:mc-convergence' on page 1 undefined on input line
+ 115.
+
+
+
+[108]
+
+LaTeX Warning: Reference `tab:sim-calibration' on page 1 undefined on input lin
+e 180.
+
+
+
+[109]
+
+[110] (../figures/out/slippage_model_table.tex)
 (../figures/out/sim_acceptance_table.tex
 
-[103])) (../chapter_8_results_discussion/chapter_8_results_discussion.tex
+[111])
 
-[104]
+LaTeX Warning: Reference `chap:results' on page 1 undefined on input line 341.
 
-[105]
+) (../chapter_8_results_discussion/chapter_8_results_discussion.tex
+
+[112]
+
+[113]
 Chapter 10.
 
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 5.
 
-[106
 
-] (../figures/out/multimodel_comparison_table.tex)
+LaTeX Warning: Reference `tab:multimodel-comparison' on page 1 undefined on inp
+ut line 15.
+
+
+
+[114
+
+]
+
+LaTeX Warning: Reference `tab:multimodel-comparison' on page 1 undefined on inp
+ut line 22.
+
+(../figures/out/multimodel_comparison_table.tex)
+
+LaTeX Warning: Reference `tab:benchmark-comparison' on page 1 undefined on inpu
+t line 31.
+
 (../figures/out/benchmark_comparison_table.tex
 Overfull \hbox (31.27357pt too wide) in paragraph at lines 6--21
  [][] 
@@ -2752,12 +3175,30 @@ Overfull \hbox (31.27357pt too wide) in paragraph at lines 6--21
 
 ) (../figures/out/benchmark_significance_table.tex)
 
-[107]
+LaTeX Warning: Reference `tab:oos-record' on page 1 undefined on input line 37.
 
-[108] (../figures/out/betting_performance_table.tex)
+
+
+LaTeX Warning: Reference `sec:ablations' on page 1 undefined on input line 43.
+
+
+
+[115]
+
+[116]
+
+LaTeX Warning: Reference `tab:betting-performance' on page 1 undefined on input
+ line 58.
+
+(../figures/out/betting_performance_table.tex)
 (../figures/out/oos_record_table.tex)
 
-[109] (../figures/out/zero_weeks_table.tex)
+[117]
+
+LaTeX Warning: Reference `tab:zero-weeks' on page 1 undefined on input line 76.
+
+
+(../figures/out/zero_weeks_table.tex)
 Underfull \hbox (badness 1648) in paragraph at lines 91--92
 \T1/ppl/m/n/12 (+20) or sim-u-la-tor ac-cep-tance (CVaR/drawdown breach in pes-
 simistic fric-tions).
@@ -2765,19 +3206,29 @@ simistic fric-tions).
 
 
 
-[110]
+[118]
 
-[111]
+[119]
 
-[112] (../figures/out/weather_effects_comparison_table.tex)
+[120]
 
-[113]
+LaTeX Warning: Reference `tab:weather-effects' on page 1 undefined on input lin
+e 181.
 
-[114]
+(../figures/out/weather_effects_comparison_table.tex)
 
-[115] (../figures/out/extreme_weather_table.tex)
+[121]
 
-[116
+[122]
+
+[123]
+
+LaTeX Warning: Reference `tab:extreme-weather' on page 1 undefined on input lin
+e 186.
+
+(../figures/out/extreme_weather_table.tex)
+
+[124
 
 ]
 Overfull \hbox (28.02348pt too wide) in paragraph at lines 195--196
@@ -2791,46 +3242,122 @@ LaTeX Info: Symbol \textrightarrow not provided by
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 201.
+
+LaTeX Warning: Reference `tab:core-ablation' on page 1 undefined on input line 
+209.
+
 (../figures/out/core_ablation_table.tex)
 
-[117]
+[125]
 
-[118]
+LaTeX Warning: Reference `sec:parsimonious-choice' on page 126 undefined on inp
+ut line 218.
 
-[119] (../figures/out/diebold_mariano_table.tex)
+
+
+[126]
+
+LaTeX Warning: Reference `sec:cvar-math' on page 1 undefined on input line 241.
+
+
+
+
+[127]
+
+LaTeX Warning: Reference `tab:diebold-mariano' on page 1 undefined on input lin
+e 256.
+
+(../figures/out/diebold_mariano_table.tex)
+
+LaTeX Warning: Reference `tab:bootstrap-ci' on page 1 undefined on input line 2
+62.
+
 (../figures/out/bootstrap_ci_table.tex)
 
-[120] (../figures/out/multiple_testing_table.tex)
+[128]
 
-[121]
+LaTeX Warning: Reference `tab:multiple-testing' on page 1 undefined on input li
+ne 268.
+
+(../figures/out/multiple_testing_table.tex)
+
+[129]
 Underfull \hbox (badness 1365) in paragraph at lines 283--284
 \T1/ppl/m/n/12 (+20) Across 1999^^U2005, clas-si-cal base-lines an-chored cal-i
 -bra-tion while ML gains
  []
 
+
+LaTeX Warning: Reference `tab:per-season-top3' on page 1 undefined on input lin
+e 285.
+
 (../figures/out/per_season_top3_table.tex
 
-[122])
+[130])
 
-[123]
+[131]
 
-[124]) (../chapter_9_production_deployment/chapter_9_production_deployment.tex
+[132]
 
-[125
+LaTeX Warning: Reference `chap:production' on page 1 undefined on input line 30
+0.
+
+) (../chapter_9_production_deployment/chapter_9_production_deployment.tex
+
+[133
 
 ]
 Chapter 11.
 
+LaTeX Warning: Reference `sec:claude_integration' on page 134 undefined on inpu
+t line 10.
 
-[126
+
+LaTeX Warning: Reference `sec:claude_integration' on page 134 undefined on inpu
+t line 12.
+
+
+LaTeX Warning: Reference `sec:system_architecture' on page 134 undefined on inp
+ut line 12.
+
+
+LaTeX Warning: Reference `sec:kelly_sizing' on page 134 undefined on input line
+ 12.
+
+
+LaTeX Warning: Reference `sec:line_shopping' on page 134 undefined on input lin
+e 12.
+
+
+LaTeX Warning: Reference `sec:early_week' on page 134 undefined on input line 1
+2.
+
+
+LaTeX Warning: Reference `sec:props' on page 134 undefined on input line 12.
+
+
+LaTeX Warning: Reference `sec:monitoring' on page 134 undefined on input line 1
+2.
+
+
+LaTeX Warning: Reference `sec:data_sources' on page 134 undefined on input line
+ 12.
+
+
+
+[134
 
 ]
 
-[127]
+[135]
 Underfull \hbox (badness 3323) in paragraph at lines 46--47
 []\T1/ppl/m/n/12 (+20) This con-ver-sa-tional work-flow trans-forms ex-plorator
 y re-search from a
  []
+
+
+LaTeX Warning: Reference `fig:claude_architecture' on page 136 undefined on inp
+ut line 54.
 
 
 Underfull \hbox (badness 3229) in paragraph at lines 89--90
@@ -2841,9 +3368,9 @@ ures (\T1/cmtt/m/n/12 prior_epa_mean_diff\T1/ppl/m/n/12 (+20) , \T1/cmtt/m/n/12
 
 
 
-[128]
+[136]
 
-[129]
+[137]
 Underfull \hbox (badness 5161) in paragraph at lines 100--101
 []\T1/ppl/m/n/12 (+20) Identify TNF games: \T1/cmtt/m/n/12 EXTRACT(DOW FROM kic
 koff) = 4 \T1/ppl/m/n/12 (+20) (Thurs-day =
@@ -2855,7 +3382,7 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             See the microtype manual for details.
 
 
-[130]
+[138]
 
 ! LaTeX Error: Unicode character ≥ (U+2265)
                not set up for use with LaTeX.
@@ -2891,9 +3418,9 @@ n/12 (+20) in-ter-ac-tion
 
 
 
-[131]
+[139]
 
-[132]
+[140]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 233.
 
@@ -2905,7 +3432,7 @@ mpute/statistics/
 
 
 
-[133]
+[141]
 Overfull \hbox (2.79616pt too wide) in paragraph at lines 299--300
 []\T1/ppl/m/n/12 (-20) Result: \T1/cmtt/m/n/12 game_id: 2024_11_NYG_PHI, home: 
 NYG, away: PHI, home_score:
@@ -2919,7 +3446,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 299--300
 
 
 
-[134]
+[142]
 Underfull \hbox (badness 1082) in paragraph at lines 372--373
 []\T1/ppl/m/n/12 (+20) Claude gen-er-ates a query fil-ter-ing for TNF games whe
 re \T1/cmtt/m/n/12 home_score >
@@ -2927,15 +3454,15 @@ re \T1/cmtt/m/n/12 home_score >
 
 
 
-[135]
+[143]
 
-[136]
+[144]
 
-[137]
+[145]
 
-[138]
+[146]
 
-[139]
+[147]
 Underfull \hbox (badness 1642) in paragraph at lines 560--561
 \T1/ppl/m/n/12 (+20) All ta-bles are ac-ces-si-ble: \T1/cmtt/m/n/12 games\T1/pp
 l/m/n/12 (+20) , \T1/cmtt/m/n/12 plays\T1/ppl/m/n/12 (+20) , \T1/cmtt/m/n/12 od
@@ -2945,9 +3472,9 @@ ds_history\T1/ppl/m/n/12 (+20) , \T1/cmtt/m/n/12 mart.game_summary\T1/ppl/m/n/1
 
 
 
-[140]
+[148]
 
-[141]
+[149]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 668.
@@ -2968,17 +3495,17 @@ You may provide a definition with
 
 
 
-[142]
+[150]
 
-[143]
+[151]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 722.
 
 
-[144]
+[152]
 
-[145]
+[153]
 
 ! LaTeX Error: Command \item invalid in math mode.
 
@@ -3036,11 +3563,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 787--788
 
 
 
-[146]
+[154]
 
-[147]
+[155]
 
-[148]
+[156]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 878.
@@ -3079,7 +3606,7 @@ LaTeX Info: Symbol \textrightarrow not provided by
             Default family used instead on input line 905.
 
 
-[149]
+[157]
 Underfull \hbox (badness 1762) in paragraph at lines 932--933
  []\T1/ppl/b/n/12 (+20) NFL Pro Sub-scrip-tion (LOW VALUE).[] \T1/ppl/m/n/12 (+
 20) The user sub-scribes to NFL Pro
@@ -3087,7 +3614,7 @@ Underfull \hbox (badness 1762) in paragraph at lines 932--933
 
 
 
-[150]
+[158]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 964.
@@ -3099,26 +3626,65 @@ LaTeX Info: Symbol \textrightarrow not provided by
             Default family used instead on input line 966.
 
 
-[151]
+[159]
 
-[152]
+[160]
 
-[153]
+[161]
+
+LaTeX Warning: Reference `sec:claude_integration' on page 162 undefined on inpu
+t line 1053.
+
+
+LaTeX Warning: Reference `sec:system_architecture' on page 162 undefined on inp
+ut line 1053.
+
+
+LaTeX Warning: Reference `sec:kelly_sizing' on page 162 undefined on input line
+ 1053.
+
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 1053.
+
+LaTeX Warning: Reference `sec:line_shopping' on page 162 undefined on input lin
+e 1053.
+
+
+LaTeX Warning: Reference `sec:early_week' on page 162 undefined on input line 1
+053.
+
+
+LaTeX Warning: Reference `sec:props' on page 162 undefined on input line 1053.
+
+
+LaTeX Warning: Reference `sec:monitoring' on page 162 undefined on input line 1
+053.
+
+
+LaTeX Warning: Reference `sec:data_sources' on page 162 undefined on input line
+ 1053.
+
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 1053.
+
+LaTeX Warning: Reference `chap:conclusion' on page 162 undefined on input line 
+1053.
+
+
+LaTeX Warning: Reference `sec:system_architecture' on page 162 undefined on inp
+ut line 1059.
+
 ) (../chapter_11_market_optimization/chapter_11_market_optimization.tex
 
-[154]
+[162]
 
-[155]
+[163]
 Chapter 12.
 
 
-[156
+[164
 
 ]
 Overfull \hbox (111.1326pt too wide) in paragraph at lines 46--47
@@ -3136,7 +3702,7 @@ ewb_deployment.py\T1/ppl/m/n/12 (-20) ,
 
 
 
-[157]
+[165]
 Overfull \hbox (1.09007pt too wide) in paragraph at lines 71--72
 \T1/ppl/m/n/12 (-20) Historical analysis shows that approximately 68% of sharp-
 side bets placed Tuesday--
@@ -3144,13 +3710,23 @@ side bets placed Tuesday--
 
 
 
-[158]
+[166]
 
-[159]
+[167]
 
-[160]
+LaTeX Warning: Reference `tab:props-models-performance' on page 168 undefined o
+n input line 133.
 
-[161]
+
+
+[168]
+
+[169]
+
+LaTeX Warning: Reference `tab:weather-totals-performance' on page 170 undefined
+ on input line 205.
+
+
 Underfull \hbox (badness 3826) in paragraph at lines 242--243
  []\T1/ppl/b/n/12 (+20) Lane 5: In-Game Win Prob-a-bil-ity Live Bet-ting (+10--
 18% ROI).[] \T1/ppl/m/n/12 (+20) The
@@ -3164,17 +3740,21 @@ is op-er-a-tional with Brier score
 
 
 
-[162]
+[170]
 Underfull \hbox (badness 1728) in paragraph at lines 245--246
  []\T1/ppl/b/n/12 (+20) Lane 6: Teaser and Cor-re-lated Par-lay Op-ti-miza-tion
  (+5--9% ROI).[] \T1/ppl/m/n/12 (+20) The
  []
 
 
+LaTeX Warning: Reference `tab:lanes-summary' on page 171 undefined on input lin
+e 261.
 
-[163]
 
-[164]
+
+[171]
+
+[172]
 Underfull \hbox (badness 4805) in paragraph at lines 341--342
 []\T1/ppl/m/n/12 (+20) The 10-lane frame-work ex-tends the re-pro-ducible predi
 ction--decision--
@@ -3188,17 +3768,17 @@ Underfull \hbox (badness 2443) in paragraph at lines 341--342
 
 
 
-[165]) (../chapter_12_profit_optimization/chapter_12_profit_optimization.tex
+[173]) (../chapter_12_profit_optimization/chapter_12_profit_optimization.tex
 
-[166]
+[174]
 Chapter 13.
 
 
-[167
+[175
 
 ]
 
-[168]
+[176]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 83.
@@ -3210,23 +3790,23 @@ LaTeX Info: Symbol \textrightarrow not provided by
             Default family used instead on input line 85.
 
 
-[169]
+[177]
 
-[170]
+[178]
 
-[171]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
-[172]
+[179]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[173]
+[180]
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+
+[181]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 361.
@@ -3235,15 +3815,15 @@ LaTeX Info: Symbol \textrightarrow not provided by
             Default family used instead on input line 362.
 
 
-[174]
+[182]
 LaTeX Info: Symbol \textrightarrow not provided by
             font family ppl in TS1 encoding.
             Default family used instead on input line 398.
 
 
-[175]
+[183]
 
-[176]
+[184]
 Underfull \hbox (badness 10000) in paragraph at lines 446--447
 []\T1/ppl/m/n/12 (+20) The key paradigm shift^^Vfrom max-i-miz-ing ac-cu-racy t
 o op-ti-miz-ing
@@ -3251,27 +3831,59 @@ o op-ti-miz-ing
 
 ) (../chapter_10_conclusion/chapter_10_conclusion.tex
 
-[177]
+[185]
 Chapter 14.
 
+LaTeX Warning: Reference `chap:results' on page 1 undefined on input line 35.
 
-[178
+
+LaTeX Warning: Reference `tab:weather-effects' on page 186 undefined on input l
+ine 35.
+
+
+LaTeX Warning: Reference `tab:rl_vs_baseline' on page 186 undefined on input li
+ne 35.
+
+
+LaTeX Warning: Reference `chap:sim' on page 1 undefined on input line 35.
+
+
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 35.
+
+
+LaTeX Warning: Reference `subsec:teaser-copula' on page 186 undefined on input 
+line 35.
+
+
+LaTeX Warning: Reference `chap:results' on page 1 undefined on input line 35.
+
+
+LaTeX Warning: Reference `tab:zero-weeks' on page 186 undefined on input line 3
+5.
+
+
+
+[186
 
 ]
 
-[179]
+LaTeX Warning: Reference `chap:risk' on page 1 undefined on input line 52.
 
-[180]
 
-[181]
 
-[182])
+[187]
 
-[183]
+[188]
+
+[189]
+
+[190])
+
+[191]
 Appendix A.
 
 
-[184
+[192
 
 ] (../figures/out/cql_performance_table.tex
 Underfull \hbox (badness 10000) in paragraph at lines 39--40
@@ -3280,8 +3892,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 39--40
 
 
 
-[185])
-<../figures/out/cql_training_curves.png, id=5028, 860.013pt x 570.2103pt>
+[193])
+<../figures/out/cql_training_curves.png, id=2776, 860.013pt x 570.2103pt>
 File: ../figures/out/cql_training_curves.png Graphic file (type png)
 <use ../figures/out/cql_training_curves.png>
 Package pdftex.def Info: ../figures/out/cql_training_curves.png  used on input 
@@ -3289,13 +3901,18 @@ line 376.
 (pdftex.def)             Requested size: 411.93768pt x 273.12358pt.
 
 
-[186]
+[194]
 
-[187 <../figures/out/cql_training_curves.png>]
+[195 <../figures/out/cql_training_curves.png>]
 
-[188]
+LaTeX Warning: Reference `tab:bootstrap-worst-case' on page 196 undefined on in
+put line 390.
 
-[189]
+
+
+[196]
+
+[197]
 Underfull \hbox (badness 4108) in paragraph at lines 458--459
  []\T1/ppl/b/n/12 (+20) Realistic Sce-nario.[] \T1/ppl/m/n/12 (+20) +0.5--1% ac
 -cu-racy im-prove-ment. The base-line XG-
@@ -3309,11 +3926,11 @@ tt/m/n/12 prior_epa_mean_diff\T1/ppl/m/n/12 (+20) ,
 
 
 
-[190]
+[198]
 
-[191]
+[199]
 
-[192]
+[200]
 
 ! LaTeX Error: Unicode character ≈ (U+2248)
                not set up for use with LaTeX.
@@ -3344,9 +3961,9 @@ You may provide a definition with
 
 
 
-[193]
+[201]
 
-[194]
+[202]
 
 ! LaTeX Error: Unicode character ≥ (U+2265)
                not set up for use with LaTeX.
@@ -3363,146 +3980,255 @@ You may provide a definition with
 
 
 
-[195]
+[203]
 
-[196]
+[204]
 
-[197]
+[205]
+
+[206]
+
+[207]
+
+[208]
+Underfull \hbox (badness 1303) in paragraph at lines 818--819
+ []\T1/ppl/b/n/12 (+20) Implementation De-tails.[] \T1/ppl/m/n/12 (+20) File: \
+T1/cmtt/m/n/12 py/ensemble/enhanced_ensemble_v3.py \T1/ppl/m/n/12 (+20) (280
+ []
+
+
+Overfull \hbox (23.34404pt too wide) in paragraph at lines 818--819
+\T1/ppl/m/n/12 (-20) lines). In-te-grates with port-fo-lio op-ti-mizer (\T1/cmt
+t/m/n/12 py/optimization/portfolio_optimizer.py\T1/ppl/m/n/12 (-20) )
+ []
+
+
+
+[209]
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.856   \item ✓
+                  State-space models implemented and tested (R/state\_space\...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.856   \item ✓
+                  State-space models implemented and tested (R/state\_space\...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.857   \item ✓
+                  Advanced priors implemented with empirical Bayes (R/advanc...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.857   \item ✓
+                  Advanced priors implemented with empirical Bayes (R/advanc...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Overfull \hbox (44.21968pt too wide) in paragraph at lines 857--858
+[]\T1/ppl/m/n/12 (-20) Advanced pri-ors im-ple-mented with em-pir-i-cal Bayes (
+R/advanced_priors_elicitation.R) 
+ []
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.858   \item ✓
+                  Bayesian neural network implemented and demo tested (py/mo...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.858   \item ✓
+                  Bayesian neural network implemented and demo tested (py/mo...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Overfull \hbox (109.15686pt too wide) in paragraph at lines 858--859
+[]\T1/ppl/m/n/12 (-20) Bayesian neu-ral net-work im-ple-mented and demo tested 
+(py/models/bayesian_neural_network.py) 
+ []
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.859   \item ✓
+                  4-way ensemble integration layer (py/ensemble/enhanced\_en...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.859   \item ✓
+                  4-way ensemble integration layer (py/ensemble/enhanced\_en...
+
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.860   \item ✓
+                  Comprehensive documentation (docs/ADVANCED\_BAYESIAN\_V3.md)
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+! LaTeX Error: Unicode character ✓ (U+2713)
+               not set up for use with LaTeX.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.860   \item ✓
+                  Comprehensive documentation (docs/ADVANCED\_BAYESIAN\_V3.md)
+You may provide a definition with
+\DeclareUnicodeCharacter 
+
+
+Overfull \hbox (67.70135pt too wide) in paragraph at lines 865--866
+[]\T1/ppl/m/n/12 (-20) Train QB-WR chem-istry model on full dataset (R/bayesian
+_receiving_with_qb_chemistry.R) 
+ []
+
+
+
+[210]
+
+[211]
 Appendix B.
 
 
-[198
+[212
 
 ]
 Appendix C.
 
 
-[199
+[213
 
 ]
 Appendix D.
 
 
-[200
+[214
 
 ]
 Appendix E.
 
 
-[201
+[215
 
 ]
-
-[202]
-Appendix F.
-
-
-[203
-
-]
-
-[204]
-Appendix G.
-
-
-[205
-
-]
-Appendix H.
-
-
-[206
-
-]
-Appendix I.
-
-
-[207
-
-]
-Appendix J.
-
-
-[208
-
-]
-
-[209]
-
-[210]
-Appendix K.
-
-
-[211
-
-]
-
-[212]
-
-[213]
-Appendix L.
-
-Underfull \hbox (badness 1226) in paragraph at lines 889--890
- []\T1/ppl/b/n/12 (+20) 2002[] \T1/ppl/m/n/12 (+20) League re-align-ment al-ter
-ed travel pat-terns and di-vi-sional matchups.
- []
-
-
-
-[214
-
-]
-
-[215]
 
 [216]
-Appendix M.
+Appendix F.
 
 
 [217
 
 ]
-Appendix N.
 
-Overfull \hbox (27.25104pt too wide) in paragraph at lines 966--967
-[] \T1/ppl/m/n/12 (-20) Com-pute CQL penalty: $\OMS/zplm/m/n/12 L[]   [] [][] [
-]$ 
- []
+[218]
+Appendix G.
 
 
-
-[218
+[219
 
 ]
-
-[219]
-Appendix O.
+Appendix H.
 
 
 [220
 
 ]
-Appendix P.
+Appendix I.
 
 
 [221
 
 ]
-
-[222]
-Appendix Q.
+Appendix J.
 
 
-[223
+[222
 
 ]
-Appendix R.
 
+[223]
 
-[224
-
-]
-Appendix S.
+[224]
+Appendix K.
 
 
 [225
@@ -3510,39 +4236,37 @@ Appendix S.
 ]
 
 [226]
-Appendix T.
 
-Underfull \hbox (badness 1348) in paragraph at lines 1111--1112
-\T1/ppl/m/n/12 (+20) Rolling EPA splits show re-gres-sion to-ward league mean a
-f-ter bye weeks;
+[227]
+Appendix L.
+
+Underfull \hbox (badness 1226) in paragraph at lines 1144--1145
+ []\T1/ppl/b/n/12 (+20) 2002[] \T1/ppl/m/n/12 (+20) League re-align-ment al-ter
+ed travel pat-terns and di-vi-sional matchups.
  []
 
 
 
-[227
+[228
 
 ]
 
-[228]
-Appendix U.
+[229]
 
-
-[229
-
-]
-Appendix V.
-
-
-[230
-
-]
-Appendix W.
+[230]
+Appendix M.
 
 
 [231
 
 ]
-Appendix X.
+Appendix N.
+
+Overfull \hbox (27.25104pt too wide) in paragraph at lines 1221--1222
+[] \T1/ppl/m/n/12 (-20) Com-pute CQL penalty: $\OMS/zplm/m/n/12 L[]   [] [][] [
+]$ 
+ []
+
 
 
 [232
@@ -3550,37 +4274,33 @@ Appendix X.
 ]
 
 [233]
-Appendix Y.
+Appendix O.
 
 
 [234
 
 ]
-Appendix Z.
+Appendix P.
 
 
 [235
 
 ]
-Appendix AA.
 
-
-[236
-
-]
-Appendix AB.
+[236]
+Appendix Q.
 
 
 [237
 
 ]
-Appendix AC.
+Appendix R.
 
 
 [238
 
 ]
-Appendix AD.
+Appendix S.
 
 
 [239
@@ -3588,7 +4308,13 @@ Appendix AD.
 ]
 
 [240]
-Appendix AE.
+Appendix T.
+
+Underfull \hbox (badness 1348) in paragraph at lines 1366--1367
+\T1/ppl/m/n/12 (+20) Rolling EPA splits show re-gres-sion to-ward league mean a
+f-ter bye weeks;
+ []
+
 
 
 [241
@@ -3596,14 +4322,86 @@ Appendix AE.
 ]
 
 [242]
-Appendix AF.
+Appendix U.
 
 
 [243
 
-] (./main.bbl
+]
+Appendix V.
+
 
 [244
+
+]
+Appendix W.
+
+
+[245
+
+]
+Appendix X.
+
+
+[246
+
+]
+
+[247]
+Appendix Y.
+
+
+[248
+
+]
+Appendix Z.
+
+
+[249
+
+]
+Appendix AA.
+
+
+[250
+
+]
+Appendix AB.
+
+
+[251
+
+]
+Appendix AC.
+
+
+[252
+
+]
+Appendix AD.
+
+
+[253
+
+]
+
+[254]
+Appendix AE.
+
+
+[255
+
+]
+
+[256]
+Appendix AF.
+
+
+[257
+
+] (./main.bbl
+
+[258
 
 
 
@@ -3621,17 +4419,22 @@ Underfull \hbox (badness 1072) in paragraph at lines 83--89
 
 
 
-[245]
+[259]
 
-[246]
+[260]
 
-[247])
+[261])
 
 Package natbib Warning: There were undefined citations.
 
 
 
-[248] (./main.aux)
+[262] (./main.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -3640,16 +4443,24 @@ L3 programming layer <2025-01-18>
 
 LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 4EE7C18BC586AE30B0F31AA547E7116A;110117.
 
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: 9CACB15030F5F3DED394D9BD1D1CC798;36517
+(rerunfilecheck)             After:  750C83916A90A0171A5F98DCAEADC4E8;114168.
  ) 
 Here is how much of TeX's memory you used:
- 46837 strings out of 473190
- 1020895 string characters out of 5715801
- 1508375 words of memory out of 5000000
- 66681 multiletter control sequences out of 15000+600000
- 686639 words of font info for 793 fonts, out of 8000000 for 9000
+ 46646 strings out of 473190
+ 1018869 string characters out of 5715801
+ 1511375 words of memory out of 5000000
+ 66346 multiletter control sequences out of 15000+600000
+ 687134 words of font info for 803 fonts, out of 8000000 for 9000
  1151 hyphenation exceptions out of 8191
  103i,17n,117p,1905b,980s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
@@ -3672,10 +4483,10 @@ mf-dist/fonts/type1/public/cm-super/sftt1200.pfb></usr/local/texlive/2025/texmf
 onts/type1/urw/palatino/uplbi8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/t
 ype1/urw/palatino/uplr8a.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/ur
 w/palatino/uplri8a.pfb>
-Output written on main.pdf (319 pages, 4344553 bytes).
+Output written on main.pdf (318 pages, 4308517 bytes).
 PDF statistics:
- 5870 PDF objects out of 6186 (max. 8388607)
- 5394 compressed objects within 54 object streams
- 1597 named destinations out of 1728 (max. 500000)
- 143791 words of extra memory for PDF output out of 154059 (max. 10000000)
+ 3937 PDF objects out of 4296 (max. 8388607)
+ 3484 compressed objects within 35 object streams
+ 1723 named destinations out of 1728 (max. 500000)
+ 140806 words of extra memory for PDF output out of 154059 (max. 10000000)
 

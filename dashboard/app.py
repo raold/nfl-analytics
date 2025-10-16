@@ -15,6 +15,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import os
 from zoneinfo import ZoneInfo
+import requests
+import time
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -164,7 +166,123 @@ def fetch_model_comparison():
 
     return df
 
-@st.cache_data(ttl=60)  # Cache for 1 minute
+@st.cache_data(ttl=30)  # Cache for 30 seconds for live data
+def fetch_live_scores(season, week):
+    """Fetch live scores from ESPN API."""
+    try:
+        url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+        params = {
+            'limit': 100
+        }
+
+        # ESPN to database team abbreviation mapping
+        # Note: Database now uses LAR for Rams (not LA) after migration 018
+        espn_to_db_teams = {
+            'LAR': 'LAR',  # LA Rams (database uses LAR)
+            'LA': 'LAR',   # Some APIs still use LA for Rams
+            'LAC': 'LAC',  # LA Chargers (stays same)
+            'WSH': 'WAS',  # Washington (some APIs use WSH, we use WAS)
+            'WAS': 'WAS'   # Database standard
+        }
+
+        # For current week, just get current scoreboard (no week/season params needed)
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+
+        live_scores = {}
+
+        if 'events' in data:
+            for event in data['events']:
+                try:
+                    competitions = event.get('competitions', [])
+                    if not competitions:
+                        continue
+
+                    competition = competitions[0]
+                    competitors = competition.get('competitors', [])
+
+                    # Get teams
+                    home_team = None
+                    away_team = None
+                    home_score = 0
+                    away_score = 0
+
+                    for comp in competitors:
+                        team_abbr = comp.get('team', {}).get('abbreviation', '')
+                        # Map ESPN team abbr to our database team abbr
+                        team_abbr = espn_to_db_teams.get(team_abbr, team_abbr)
+                        score = int(comp.get('score', 0))
+
+                        if comp.get('homeAway') == 'home':
+                            home_team = team_abbr
+                            home_score = score
+                        elif comp.get('homeAway') == 'away':
+                            away_team = team_abbr
+                            away_score = score
+
+                    # Get status
+                    status = event.get('status', {})
+                    status_type = status.get('type', {}).get('state', 'pre')
+
+                    # Get clock and period
+                    clock = status.get('displayClock', '')
+                    period = status.get('period', 0)
+                    detail = status.get('type', {}).get('detail', '')
+
+                    # Create game key (away_home format like our game_id)
+                    if home_team and away_team:
+                        game_key = f"{away_team}_{home_team}"
+
+                        live_scores[game_key] = {
+                            'away_team': away_team,
+                            'home_team': home_team,
+                            'away_score': away_score,
+                            'home_score': home_score,
+                            'status': status_type,  # 'pre', 'in', 'post'
+                            'clock': clock,
+                            'period': period,
+                            'detail': detail
+                        }
+                except Exception as e:
+                    continue
+
+        return live_scores
+    except Exception as e:
+        st.warning(f"Could not fetch live scores: {str(e)}")
+        return {}
+
+@st.cache_data(ttl=300)  # Cache for 5 minutes
+def fetch_bye_week_teams(season, week):
+    """Fetch teams on bye for a specific week."""
+    # Convert numpy int64 to Python int for psycopg3 compatibility
+    season = int(season)
+    week = int(week)
+
+    query = """
+    WITH all_teams AS (
+        SELECT DISTINCT home_team as team FROM games WHERE season = %s
+        UNION
+        SELECT DISTINCT away_team as team FROM games WHERE season = %s
+    ),
+    week_teams AS (
+        SELECT DISTINCT home_team as team FROM games WHERE season = %s AND week = %s AND game_type = 'REG'
+        UNION
+        SELECT DISTINCT away_team as team FROM games WHERE season = %s AND week = %s AND game_type = 'REG'
+    )
+    SELECT t.team
+    FROM all_teams t
+    LEFT JOIN week_teams w ON t.team = w.team
+    WHERE w.team IS NULL
+    ORDER BY t.team
+    """
+
+    with psycopg.connect(**DB_CONFIG) as conn:
+        df = pd.read_sql_query(query, conn, params=(season, season, season, week, season, week))
+
+    return df['team'].tolist() if not df.empty else []
+
+@st.cache_data(ttl=30)  # Cache for 30 seconds for live updates
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
     # Dynamically determine current week based on today's date
@@ -184,6 +302,7 @@ def fetch_current_week_games():
         g.kickoff,
         CASE
             WHEN g.home_score IS NOT NULL THEN 'completed'
+            WHEN g.kickoff < NOW() THEN 'in_progress'
             ELSE 'scheduled'
         END as game_status,
         p.home_win_prob,
@@ -203,12 +322,50 @@ def fetch_current_week_games():
     with psycopg.connect(**DB_CONFIG) as conn:
         df = pd.read_sql_query(query, conn)
 
+    # Fetch live scores for in-progress games
+    if not df.empty:
+        # Add display columns (LA -> LAR for clarity)
+        df['away_team_display'] = df['away_team'].apply(normalize_team_display)
+        df['home_team_display'] = df['home_team'].apply(normalize_team_display)
+
+        season = df['season'].iloc[0]
+        week = df['week'].iloc[0]
+        live_scores = fetch_live_scores(season, week)
+
+        # Merge live scores into dataframe
+        for idx, row in df.iterrows():
+            # Use display team codes for matching with live scores
+            game_key = f"{row['away_team_display']}_{row['home_team_display']}"
+            if game_key in live_scores:
+                live_data = live_scores[game_key]
+
+                # Update status based on ESPN data
+                if live_data['status'] == 'in':
+                    df.at[idx, 'game_status'] = 'in_progress'
+                    df.at[idx, 'away_score'] = live_data['away_score']
+                    df.at[idx, 'home_score'] = live_data['home_score']
+                    df.at[idx, 'clock'] = live_data['clock']
+                    df.at[idx, 'period'] = live_data['period']
+                    df.at[idx, 'detail'] = live_data['detail']
+                elif live_data['status'] == 'post':
+                    df.at[idx, 'game_status'] = 'completed'
+                    df.at[idx, 'away_score'] = live_data['away_score']
+                    df.at[idx, 'home_score'] = live_data['home_score']
+
     return df
+
+def normalize_team_display(team_abbr):
+    """Normalize team abbreviation for display (LA -> LAR for clarity)."""
+    if team_abbr == 'LA':
+        return 'LAR'  # Display as LAR to distinguish from LAC
+    return team_abbr
 
 def get_team_logo_url(team_abbr):
     """Get team logo URL from nflverse."""
     # Using ESPN's logo service which is reliable
-    return f"https://a.espncdn.com/i/teamlogos/nfl/500/{team_abbr}.png"
+    # Always use LAR for Rams logo (ESPN uses LAR)
+    display_abbr = normalize_team_display(team_abbr)
+    return f"https://a.espncdn.com/i/teamlogos/nfl/500/{display_abbr}.png"
 
 def plot_win_rate_over_time(df):
     """Plot win rate over time."""
@@ -460,16 +617,155 @@ def main():
         else:
             st.metric("ATS Accuracy", "N/A")
 
-    # This Week's Games Section
-    st.header("📅 Week 6")
-
+    # Fetch current week games data
     df_current_week = fetch_current_week_games()
 
     if not df_current_week.empty:
-        # Separate completed and upcoming games
+        # Separate completed, in-progress, and upcoming games
         completed_games = df_current_week[df_current_week['game_status'] == 'completed']
+        in_progress_games = df_current_week[df_current_week['game_status'] == 'in_progress']
         upcoming_games = df_current_week[df_current_week['game_status'] == 'scheduled']
 
+        # In-Progress Games (LIVE) - Show at top
+        if not in_progress_games.empty:
+            # Add refresh button in top right
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.empty()  # Spacer
+            with col2:
+                if st.button("🔄 Refresh", type="primary"):
+                    st.rerun()
+
+            st.subheader("🔴 LIVE GAMES")
+
+            # Create two-column layout for games
+            for i in range(0, len(in_progress_games), 2):
+                col1, col2 = st.columns(2)
+
+                for col_idx, col in enumerate([col1, col2]):
+                    game_idx = i + col_idx
+                    if game_idx >= len(in_progress_games):
+                        break
+
+                    game = in_progress_games.iloc[game_idx]
+                    away_score = int(game['away_score']) if pd.notna(game['away_score']) else 0
+                    home_score = int(game['home_score']) if pd.notna(game['home_score']) else 0
+
+                    # Get clock and period info
+                    clock = game.get('clock', '')
+                    period = int(game.get('period', 0)) if pd.notna(game.get('period')) else 0
+                    detail = game.get('detail', 'In Progress')
+
+                    # Format period display (Q1, Q2, Q3, Q4, OT, etc.)
+                    if period > 0:
+                        if period <= 4:
+                            period_display = f"Q{period}"
+                        else:
+                            period_display = f"OT{period - 4}" if period > 5 else "OT"
+                    else:
+                        period_display = ""
+
+                    # Combine clock and period for status display
+                    if clock and period_display:
+                        status_display = f"{period_display} {clock}"
+                    elif period_display:
+                        status_display = period_display
+                    elif clock:
+                        status_display = clock
+                    elif detail:
+                        status_display = detail
+                    else:
+                        # Fallback: show kickoff time if available
+                        if pd.notna(game['kickoff']):
+                            kickoff_utc = pd.to_datetime(game['kickoff'])
+                            if kickoff_utc.tzinfo is None:
+                                kickoff_utc = kickoff_utc.tz_localize('UTC')
+                            kickoff_et = kickoff_utc.astimezone(ZoneInfo('America/New_York'))
+                            status_display = kickoff_et.strftime('%I:%M %p ET')
+                        else:
+                            status_display = "TBD"
+
+                    # Determine who's winning
+                    leading_team = None
+                    if away_score > home_score:
+                        leading_team = game['away_team']
+                    elif home_score > away_score:
+                        leading_team = game['home_team']
+
+                    # Sportsbook info
+                    spread = game['spread_close'] if pd.notna(game['spread_close']) else None
+                    total = game['total_close'] if pd.notna(game['total_close']) else None
+
+                    if spread is not None:
+                        spread_text = f"Spread: {game['home_team_display']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
+                    else:
+                        spread_text = "Spread: N/A"
+
+                    if total is not None:
+                        total_text = f"Total: O/U {total:.1f}"
+                    else:
+                        total_text = "Total: N/A"
+
+                    # Our model predictions
+                    prediction_lines = []
+                    if pd.notna(game['home_win_prob']):
+                        home_prob = float(game['home_win_prob']) * 100
+                        away_prob = (1 - float(game['home_win_prob'])) * 100
+                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
+                        prediction_lines.append(f"<strong>Winner:</strong> {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
+
+                    if pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        prediction_lines.append(f"<strong>Spread:</strong> {game['home_team_display']} {pred_spread:+.1f}")
+
+                    # Calculate predicted total from predicted margin and average score
+                    if pd.notna(game['predicted_margin']):
+                        # Estimate total based on predicted margin (rough estimate assuming avg 45 pts total)
+                        pred_total_estimate = 45.0  # You could make this more sophisticated
+                        prediction_lines.append(f"<strong>Total:</strong> ~{pred_total_estimate:.0f}")
+
+                    prediction_info = "<div style='font-size: 14px; color: #333;'>" + " | ".join(prediction_lines) + "</div>" if prediction_lines else ""
+
+                    with col:
+                        st.markdown(f"""
+                        <div style="background-color: #fff3cd; padding: 20px; border-radius: 10px; margin: 10px 0;
+                                    border: 3px solid #ff8c00; box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);">
+                            <div style="text-align: center; margin-bottom: 10px;">
+                                <div style="display: inline-flex; align-items: center; background-color: #ff8c00;
+                                           color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold;">
+                                    <span style="font-size: 18px; margin-right: 8px;">🔴</span>
+                                    <span style="font-size: 16px;">LIVE - {status_display}</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="text-align: center; flex: 1;">
+                                    <img src="{get_team_logo_url(game['away_team'])}" width="60" style="margin-bottom: 10px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: {'#ff8c00' if leading_team == game['away_team'] else '#212529'};">{game['away_team_display']}</div>
+                                    <div style="font-size: 36px; font-weight: bold; color: {'#ff8c00' if leading_team == game['away_team'] else '#6c757d'};">{away_score}</div>
+                                </div>
+                                <div style="text-align: center; flex: 0.5;">
+                                    <div style="font-size: 20px; font-weight: bold; color: #212529;">@</div>
+                                </div>
+                                <div style="text-align: center; flex: 1;">
+                                    <img src="{get_team_logo_url(game['home_team'])}" width="60" style="margin-bottom: 10px;">
+                                    <div style="font-size: 24px; font-weight: bold; color: {'#ff8c00' if leading_team == game['home_team'] else '#212529'};">{game['home_team_display']}</div>
+                                    <div style="font-size: 36px; font-weight: bold; color: {'#ff8c00' if leading_team == game['home_team'] else '#6c757d'};">{home_score}</div>
+                                </div>
+                            </div>
+                            <hr style="margin: 15px 0; border-color: #ff8c00;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 14px; margin-bottom: 5px; color: #212529;">📊 <strong>Sportsbooks:</strong> {spread_text} | {total_text}</div>
+                                {f'<div style="font-size: 14px; margin-top: 5px; color: #333;"><strong>🎯 Our Predictions:</strong> {prediction_info}</div>' if prediction_info else ''}
+                            </div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+            st.markdown("---")  # Separator after live games
+
+    # This Week's Games Section
+    st.header("📅 Week 6")
+
+    if not df_current_week.empty:
         # Completed Games
         if not completed_games.empty:
 
@@ -508,6 +804,39 @@ def main():
                         margin_error = abs(game['margin_error']) if pd.notna(game['margin_error']) else 0
                         prediction_text = f"{'✅ CORRECT' if prediction_correct else '❌ WRONG'} (Error: {margin_error:.1f} pts)"
 
+                    # Sportsbook info
+                    spread = game['spread_close'] if pd.notna(game['spread_close']) else None
+                    total = game['total_close'] if pd.notna(game['total_close']) else None
+
+                    if spread is not None:
+                        spread_text = f"Spread: {game['home_team_display']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
+                    else:
+                        spread_text = "Spread: N/A"
+
+                    if total is not None:
+                        total_text = f"Total: O/U {total:.1f}"
+                    else:
+                        total_text = "Total: N/A"
+
+                    # Our model predictions
+                    prediction_lines = []
+                    if pd.notna(game['home_win_prob']):
+                        home_prob = float(game['home_win_prob']) * 100
+                        away_prob = (1 - float(game['home_win_prob'])) * 100
+                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
+                        prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
+
+                    if pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
+
+                    # Calculate predicted total from predicted margin (rough estimate)
+                    if pd.notna(game['predicted_margin']):
+                        pred_total_estimate = 45.0
+                        prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
+
+                    prediction_info = " | ".join(prediction_lines) if prediction_lines else ""
+
                     with col:
                         st.markdown(f"""
                         <div style="background-color: {'#d4edda' if prediction_correct else '#f8d7da'};
@@ -516,7 +845,7 @@ def main():
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="text-align: center; flex: 1;">
                                     <img src="{get_team_logo_url(game['away_team'])}" width="60" style="margin-bottom: 10px;">
-                                    <div style="font-size: 24px; font-weight: bold;">{game['away_team']}</div>
+                                    <div style="font-size: 24px; font-weight: bold;">{game['away_team_display']}</div>
                                     <div style="font-size: 32px; font-weight: bold; color: {'#28a745' if winner == game['away_team'] else '#6c757d'};">{away_score}</div>
                                 </div>
                                 <div style="text-align: center; flex: 0.5;">
@@ -525,14 +854,15 @@ def main():
                                 </div>
                                 <div style="text-align: center; flex: 1;">
                                     <img src="{get_team_logo_url(game['home_team'])}" width="60" style="margin-bottom: 10px;">
-                                    <div style="font-size: 24px; font-weight: bold;">{game['home_team']}</div>
+                                    <div style="font-size: 24px; font-weight: bold;">{game['home_team_display']}</div>
                                     <div style="font-size: 32px; font-weight: bold; color: {'#28a745' if winner == game['home_team'] else '#6c757d'};">{home_score}</div>
                                 </div>
                             </div>
                             <hr style="margin: 15px 0;">
                             <div style="text-align: center;">
-                                <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">{prediction_text}</div>
-                                {f'<div style="font-size: 14px;">Spread: {game["spread_close"]:.1f} | Our Line: {game["predicted_spread"]:.1f}</div>' if pd.notna(game['predicted_spread']) else ''}
+                                <div style="font-size: 14px; margin-bottom: 5px; color: #212529;">📊 <strong>Sportsbooks:</strong> {spread_text} | {total_text}</div>
+                                {f'<div style="font-size: 14px; margin-top: 5px; color: #333;"><strong>🎯 Our Predictions:</strong> {prediction_info}</div>' if prediction_info else ''}
+                                <div style="font-size: 16px; font-weight: bold; margin-top: 8px;">{prediction_text}</div>
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -563,19 +893,28 @@ def main():
                     else:
                         kickoff_time = "TBD"
 
-                    # Prediction info
+                    # Sportsbook info
+                    spread_text = f"Spread: {game['home_team_display']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
+                    total_text = f"Total: O/U {total:.1f}"
+
+                    # Our model predictions
+                    prediction_lines = []
                     if pd.notna(game['home_win_prob']):
                         home_prob = float(game['home_win_prob']) * 100
                         away_prob = (1 - float(game['home_win_prob'])) * 100
-                        predicted_winner = game['home_team'] if game['home_win_prob'] > 0.5 else game['away_team']
-                        predicted_winner_prob = max(home_prob, away_prob)
-                        prediction_info = f"<div style='font-weight: bold; color: #007bff;'>Prediction: {predicted_winner} ({predicted_winner_prob:.1f}%)</div>"
-                    else:
-                        prediction_info = "<div style='font-size: 14px; color: #666; font-style: italic;'>No prediction available</div>"
+                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
+                        prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    # Sportsbook info
-                    spread_text = f"Spread: {game['home_team']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
-                    total_text = f"Total: O/U {total:.1f}"
+                    if pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
+
+                    # Calculate predicted total from predicted margin (rough estimate)
+                    if pd.notna(game['predicted_margin']):
+                        pred_total_estimate = 45.0
+                        prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
+
+                    prediction_info = " | ".join(prediction_lines) if prediction_lines else ""
 
                     with col:
                         st.markdown(f"""
@@ -587,20 +926,20 @@ def main():
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div style="text-align: center; flex: 1;">
                                     <img src="{get_team_logo_url(game['away_team'])}" width="60" style="margin-bottom: 10px;">
-                                    <div style="font-size: 24px; font-weight: bold; color: #212529;">{game['away_team']}</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #212529;">{game['away_team_display']}</div>
                                 </div>
                                 <div style="text-align: center; flex: 0.5;">
                                     <div style="font-size: 20px; font-weight: bold; color: #212529;">@</div>
                                 </div>
                                 <div style="text-align: center; flex: 1;">
                                     <img src="{get_team_logo_url(game['home_team'])}" width="60" style="margin-bottom: 10px;">
-                                    <div style="font-size: 24px; font-weight: bold; color: #212529;">{game['home_team']}</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #212529;">{game['home_team_display']}</div>
                                 </div>
                             </div>
                             <hr style="margin: 15px 0; border-color: #007bff;">
                             <div style="text-align: center;">
                                 <div style="font-size: 14px; margin-bottom: 5px; color: #212529;">📊 <strong>Sportsbooks:</strong> {spread_text} | {total_text}</div>
-                                {prediction_info}
+                                {f'<div style="font-size: 14px; margin-top: 5px; color: #333;"><strong>🎯 Our Predictions:</strong> {prediction_info}</div>' if prediction_info else '<div style="font-size: 14px; margin-top: 5px; color: #666; font-style: italic;">No prediction available</div>'}
                             </div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -610,6 +949,30 @@ def main():
 
     else:
         st.info("No games data available for current week.")
+
+    # Bye Week Teams Section
+    if not df_current_week.empty:
+        season = df_current_week['season'].iloc[0]
+        week = df_current_week['week'].iloc[0]
+        bye_teams = fetch_bye_week_teams(season, week)
+
+        if bye_teams:
+            st.markdown("---")
+            st.subheader(f"🏖️ Teams on Bye - Week {week}")
+
+            # Create a nice display of bye week teams with logos
+            cols = st.columns(len(bye_teams))
+            for idx, team in enumerate(bye_teams):
+                with cols[idx]:
+                    st.markdown(f"""
+                    <div style="text-align: center; padding: 15px; background-color: #f8f9fa;
+                                border-radius: 10px; border: 2px solid #dee2e6;">
+                        <img src="{get_team_logo_url(team)}" width="80" style="margin-bottom: 10px;">
+                        <div style="font-size: 20px; font-weight: bold; color: #495057;">{team}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            st.markdown("---")
 
     # Performance over time
     st.header("📈 Performance Over Time")
@@ -794,7 +1157,7 @@ def main():
     # Footer
     st.markdown("---")
     st.markdown(f"**Last updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    st.markdown("Data refreshes every 5 minutes")
+    st.markdown("Live scores update every 30 seconds • Historical data refreshes every 5 minutes")
 
 if __name__ == "__main__":
     main()

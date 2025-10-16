@@ -415,7 +415,8 @@ class PropsPredictor:
         return {"train": train_metrics, "val": val_metrics}
 
     def predict(
-        self, X: pd.DataFrame, with_uncertainty: bool = True
+        self, X: pd.DataFrame, with_uncertainty: bool = True,
+        bayesian_priors: Optional[pd.DataFrame] = None
     ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """
         Predict prop values with uncertainty estimates.
@@ -423,6 +424,7 @@ class PropsPredictor:
         Args:
             X: Features dataframe
             with_uncertainty: If True, estimate prediction std via quantile regression
+            bayesian_priors: DataFrame with Bayesian predictions (player_id, predicted_value, predicted_std)
 
         Returns:
             predictions, std (if with_uncertainty=True)
@@ -433,18 +435,58 @@ class PropsPredictor:
         # Standardize features
         X_scaled = (X[self.feature_cols].values - self.scaler_mean) / self.scaler_std
 
-        # Predict
-        predictions = self.model.predict(X_scaled)
+        # Get XGBoost predictions
+        xgb_predictions = self.model.predict(X_scaled)
 
-        # Estimate uncertainty via empirical residuals
-        if with_uncertainty:
-            # Use training residuals as proxy for uncertainty
-            # (In production, use quantile regression or Bayesian methods)
-            std = np.full(len(predictions), self.xgb_params.get("rmse", 10.0))
+        # Combine with Bayesian priors if available
+        if bayesian_priors is not None and 'player_id' in X.columns:
+            predictions = np.zeros_like(xgb_predictions)
+            stds = np.zeros_like(xgb_predictions)
+
+            for i, player_id in enumerate(X['player_id']):
+                # Check if we have Bayesian prior for this player
+                bayesian_row = bayesian_priors[bayesian_priors['player_id'] == player_id]
+
+                if not bayesian_row.empty:
+                    # We have a Bayesian prior - combine with XGBoost
+                    bayesian_mean = bayesian_row['predicted_value'].iloc[0]
+                    bayesian_std = bayesian_row['predicted_std'].iloc[0]
+                    xgb_mean = xgb_predictions[i]
+                    xgb_std = self.xgb_params.get("rmse", 10.0)
+
+                    # Combine using inverse variance weighting
+                    # This gives more weight to the more confident prediction
+                    bayesian_weight = 1 / (bayesian_std ** 2)
+                    xgb_weight = 1 / (xgb_std ** 2)
+                    total_weight = bayesian_weight + xgb_weight
+
+                    # Combined mean
+                    predictions[i] = (
+                        bayesian_mean * bayesian_weight + xgb_mean * xgb_weight
+                    ) / total_weight
+
+                    # Combined std (simplified - could use more sophisticated approach)
+                    stds[i] = 1 / np.sqrt(total_weight)
+
+                    # Log the combination
+                    logger.debug(
+                        f"Player {player_id}: Bayesian={bayesian_mean:.1f}±{bayesian_std:.1f}, "
+                        f"XGBoost={xgb_mean:.1f}±{xgb_std:.1f}, "
+                        f"Combined={predictions[i]:.1f}±{stds[i]:.1f}"
+                    )
+                else:
+                    # No Bayesian prior - use XGBoost only
+                    predictions[i] = xgb_predictions[i]
+                    stds[i] = self.xgb_params.get("rmse", 10.0)
         else:
-            std = None
+            # No Bayesian priors provided - use XGBoost only
+            predictions = xgb_predictions
+            stds = np.full(len(predictions), self.xgb_params.get("rmse", 10.0))
 
-        return predictions, std
+        if with_uncertainty:
+            return predictions, stds
+        else:
+            return predictions, None
 
     def predict_single(
         self,
@@ -519,6 +561,7 @@ class PropsPredictor:
         line_col: str = "prop_line",
         over_odds_col: str = "over_odds",
         under_odds_col: str = "under_odds",
+        bayesian_priors: Optional[pd.DataFrame] = None,
     ) -> BacktestResult:
         """
         Backtest prop predictions against historical lines.
