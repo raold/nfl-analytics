@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/ChatGPT Image Oct 13, 2025, 06_54_27 PM (1).png" alt="NFL Analytics" width="520" />
+  <img src="docs/images/logo.png" alt="NFL Analytics" width="520" />
 </p>
 
 # NFL Analytics – Local Dev Quickstart
