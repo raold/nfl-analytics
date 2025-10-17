@@ -274,6 +274,8 @@ Tail behavior is summarized by the upper/lower tail coefficients
 \]
 estimated empirically by high/low quantile counts. Gaussian copulas imply $\lambda_U=\lambda_L=0$; $t$‑copulas yield $\lambda_U=\lambda_L>0$ depending on $\nu$ and $\rho$. We report $(\hat\lambda_U,\hat\lambda_L)$ with block bootstrap intervals to decide whether heavy‑tailed dependence is required.
 
+\input{../figures/out/tail_dependence_table.tex}
+
 \begin{algorithm}[t]
   \caption{Copula GOF and Tail Diagnostics}
   \label{alg:copula-gof}
@@ -325,21 +327,6 @@ To enforce key masses $\tilde q(k)=m_k$ ($k\in\mathcal{K}$), project $(\lambda,\
 onto the feasible set $\{(\lambda,\mu): \sum_{d\in\mathbb{Z}} w_d(\lambda,\mu)q(d)=1,\ \tilde q(k)=m_k\}$.\footnote{See also \Cref{subsec:bp-pmf} and \citet{karlis2003} for related EM-style constructions in bivariate settings.}
 
 % (Removed duplicative recaps of Bradley--Terry/Elo/Harville/Glickman--Stern; see Canonical Foundations \S\ref{subsec:harville1980}, \S\ref{subsec:glickman1998} and Paired-Comparison \S\ref{sec:paired} for the full treatment.)
-
-\section{Score / Margin Distributions}
-\label{sec:score}
-
-\paragraph{Summary (pointers, not repeats).} To avoid duplication, we summarize the score/margin families used and point to the derivations already given:
-\begin{itemize}
-  \item \textbf{Independent Poisson with Dixon--Coles small-score reweighting:} see \Cref{subsec:maher1982,subsec:dixon1997}. We use this for quick calibration near low scores.
-  \item \textbf{Bivariate Poisson (shared component):} see \Cref{subsec:karlis2003,subsec:bp-pmf}. This supplies coherent joint pricing for correlated legs.
-  \item \textbf{Dynamic bivariate Poisson:} see \Cref{subsec:koopman2015} for the time-evolving formulation; we use it to let dependence shift through the season.
-  \item \textbf{Skellam margins and key numbers:} construction/moments in \Cref{subsec:skellam1946,subsec:skellam-mom}; integer reweighting in \Cref{subsec:key-reweight,subsec:dc-vs-keys}.
-  \item \textbf{Spread-to-win mapping:} derivation and usage in \Cref{subsec:stern1991,subsec:stern-derivation}.
-  \item \textbf{Zero-inflated/hurdle variants:} used rarely for extreme low-scoring eras; orthogonal to integer-margin reweighting.
-\end{itemize}
-
-These components are the building blocks for simulation and pricing in \Cref{chap:sim}; we do not restate formulas here.
 
 \section{Calibration, Scoring \& Uncertainty}
 \label{sec:calib}
@@ -488,7 +475,7 @@ We treat the market (closing lines) as both:
   \item A performance benchmark: our models must outperform or capture CLV (closing line value) edge
   \item A feature: cross-book spreads, line velocity, implied vs model delta, push rules
 \end{itemize}
-We define **Comparative Book Value (CBV)** as the difference between our fair probability and implied market probability; large CBV signals potential mispricing worth a bet.
+We use Comparative Book Value (CBV, \Cref{subsec:vig-cbv-lit}) to identify mispricing: large positive CBV signals opportunities where our model assigns higher fair probability than the no-vig market price.
 
 \section{Design Synthesis and Implications}
 \label{sec:synth}
@@ -600,7 +587,7 @@ Hence, conditional on placing the bet, the first‑order EV error is $\varepsilo
 
 Selection adds a gating effect: trades are taken only when $\hat p\ge \pi+\tau_\pi$ (a no‑vig threshold plus a margin for friction $\tau_\pi$). Near the threshold, a Taylor expansion shows false positives/negatives occur with probability proportional to the density of $\hat p$ at $\pi$, and their EV impact scales with the slope $\partial\,\mathrm{EV}/\partial p\big|_{p=\pi}=1/\pi$. Thus reducing calibration error (Brier/RMSE) and sharpening uncertainty (smaller variance of $\hat p$ near $\pi$) jointly improves realized EV.
 
-In price space, let comparative book value $\mathrm{CBV}=\hat p-\pi$. Ignoring friction, $\mathrm{EV}\approx \mathrm{CBV}/\pi$; with slippage/fees $\tau$ and fill limits $c$, the executable EV is $\max\{0,\ \mathrm{CBV}/\pi-\tau\}$ with stake capped by $c$. This is why we optimize strictly proper scores (log‑loss, Brier/CRPS) while monitoring EV/CLV degradation from slippage and limits.
+In price space, the CBV (\Cref{subsec:vig-cbv-lit}) translates directly to EV: ignoring friction, $\mathrm{EV}\approx \mathrm{CBV}/\pi$; with slippage/fees $\tau$ and fill limits $c$, the executable EV is $\max\{0,\ \mathrm{CBV}/\pi-\tau\}$ with stake capped by $c$. This is why we optimize strictly proper scores (log‑loss, Brier/CRPS) while monitoring EV/CLV degradation from slippage and limits.
 
 \section{Market Efficiency and Bias Tests}
 We outline simple tests for favorite‑longshot bias, key‑number mispricing, and cross‑book arbitrage signals, emphasizing multiple‑testing corrections and robust standard errors.

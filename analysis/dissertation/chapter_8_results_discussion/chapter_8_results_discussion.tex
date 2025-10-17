@@ -69,6 +69,8 @@ We report out-of-sample performance by season. Stability across 2015--2024 demon
 \section{Economic Value and Risk}
 We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.
 
+\IfFileExists{../figures/out/clv_distribution_table.tex}{\input{../figures/out/clv_distribution_table.tex}}{}
+
 \section{Failure Analysis}\label{sec:failure-analysis}
 Transparent failure analysis clarifies when the system declines to act and why losses occur.
 
@@ -127,7 +129,11 @@ Measures performance degradation when feature values are randomly shuffled:
 \end{itemize}
 
 \subsection{SHAP Value Analysis}
-We apply SHAP (SHapley Additive exPlanations) to decompose individual predictions. For a representative Week 10 game (favorites -7.5):
+We apply SHAP (SHapley Additive exPlanations) to decompose individual predictions. \Cref{tab:shap-global-importance} presents global feature importance rankings based on mean absolute SHAP values across all test games, confirming that market microstructure and EPA differentials dominate model predictions.
+
+\input{../figures/out/shap_global_importance_table.tex}
+
+For individual game explanations, \Cref{tab:shap-local-examples} shows local SHAP decompositions for representative games spanning the predicted probability distribution. For a representative Week 10 game (favorites -7.5):
 
 \begin{itemize}
   \item Base prediction: 58.2\% favorite covers
@@ -140,6 +146,8 @@ We apply SHAP (SHapley Additive exPlanations) to decompose individual prediction
     \end{itemize}
   \item Final prediction: 59.8\% favorite covers
 \end{itemize}
+
+\input{../figures/out/shap_local_examples_table.tex}
 
 \subsection{Local Interpretable Model-Agnostic Explanations (LIME)}
 For complex predictions near decision boundaries, we fit local linear approximations. Example case where model correctly predicted upset (underdog +10.5 won outright):
@@ -294,7 +302,7 @@ Removing market features cut CLV capture substantially, confirming their role as
 Historical odds coverage, execution assumptions, and data revisions limit generalization. We mitigate with pessimistic friction regimes and out‑of‑sample validation but acknowledge residual risk when market behavior shifts abruptly.
 
 \chaptersummary{
-This chapter presented comprehensive empirical results validating the hybrid prediction and betting framework. We demonstrated that the ensemble achieves sustained profitability with positive CLV, strong calibration, and robust risk management.
+This chapter presented comprehensive empirical results from the hybrid prediction framework across 5,529 games (2004--2024). We achieved strong calibration (Brier = 0.2515) and positive CLV (+14.9 bps), but failed to overcome vigorish (ROI = -7.5\%, Sharpe = -1.22). This negative result demonstrates market efficiency: publicly available information is insufficient to beat the house edge in NFL betting markets. The technical infrastructure—uncertainty quantification, risk controls, and systematic evaluation—successfully converts predictive accuracy into operational discipline, providing a template for deployment in less efficient markets.
 }{
-Having validated the system offline, \Cref{chap:production} details the production deployment architecture, monitoring infrastructure, and operational protocols that enable reliable real-time execution.
+\Cref{chap:production} details the production deployment architecture, monitoring infrastructure, and operational protocols that enable reliable real-time execution.
 }

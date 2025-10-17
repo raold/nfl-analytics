@@ -1,0 +1,28 @@
+% BNN Prior Sensitivity Analysis Results
+% Generated from BNN calibration experiments
+
+\begin{table}[htbp]
+\centering
+\caption{Bayesian Neural Network Prior Sensitivity Analysis}
+\label{tab:bnn-prior-sensitivity}
+\small
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Noise} & \textbf{90\% CI} & \textbf{68\% CI} & \textbf{MAE} & \textbf{Training} & \textbf{Calibration} \\
+\textbf{$\sigma$} & \textbf{Coverage} & \textbf{Coverage} & \textbf{(yards)} & \textbf{Time (min)} & \textbf{Status} \\
+\midrule
+0.3 (baseline) & 26.2\% & 19.5\% & 18.69 & 95 & Under-calibrated \\
+0.5            & 26.2\% & 19.3\% & 18.70 & 97 & Under-calibrated \\
+0.7            & 25.7\% & 19.3\% & 18.70 & 97 & Under-calibrated \\
+1.0            & 25.7\% & 19.5\% & 18.69 & 97 & Under-calibrated \\
+1.5            & 26.2\% & 19.3\% & 18.69 & 95 & Under-calibrated \\
+\midrule
+\multicolumn{6}{l}{\textit{Target}} \\
+Expected       & 90.0\% & 68.0\% & --- & --- & Well-calibrated \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textbf{Notes:} Results from hierarchical BNN trained on 2,663 rushing performances (2020--2024), evaluated on 374 holdout games. Each configuration trained with 4 MCMC chains, 2,000 post-warmup samples (8,000 total). No divergences observed. Coverage measures percentage of actual outcomes falling within posterior credible intervals. Target coverage: 90\% for 90\% CI, 68\% for $\pm 1\sigma$. \textbf{Key finding}: Relaxing noise prior had no effect on calibration, ruling out tight priors as cause of under-calibration. All models show ~70 percentage point coverage deficit. MAE stable across configurations, confirming mean predictions are accurate but uncertainty estimates are severely miscalibrated. Convergence warnings: R-hat $>1.01$ and ESS $<100$ for some parameters in all runs.
+\end{tablenotes}
+\end{table}

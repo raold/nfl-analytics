@@ -73,7 +73,7 @@
 \block{Evaluation \& Datasets}
 \begin{itemize}
   \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}. \done\ (Brier, CLV bp, ROI\%, Max DD defined in Ch.~5 \S OPE; Ch.~8 uses these)
-  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \wip
+  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \done\ (Feature catalog: py/features/catalog.yaml; Audit script: scripts/audit\_leakage.py; Validator: py/features/catalog\_validator.py; Appendix: Appendix~\ref{app:leakage_audit})
 \end{itemize}
 
 \block{Modeling Specifics}
@@ -869,7 +869,7 @@
     \item LOO-CV ELPD: -11075, No time-varying effects
     \item Baseline hierarchical structure with team random intercepts
   \end{itemize}
-  \item \done\ \textbf{Model 2 (Time-Varying)}: margin $\sim$ home + (1+t$|$home) + (1+t$|$away) \textcolor{green!60!black}{✓ BEST}
+  \item \done\ \textbf{Model 2 (Time-Varying)}: margin $\sim$ home + (1+t$|$home) + (1+t$|$away) \textcolor{green!60!black}{$\checkmark$ BEST}
   \begin{itemize}
     \item LOO-CV ELPD: -11039 (3.3\% improvement over Model 1)
     \item Random slopes capture in-season momentum and team improvement/decline

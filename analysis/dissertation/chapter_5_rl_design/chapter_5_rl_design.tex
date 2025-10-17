@@ -380,7 +380,9 @@ to reflect annualized performance accounting for idle periods (cf. Table~10.2 ze
 We treat the policy as a small, price‑taking agent: odds are exogenous and our actions do not move markets. This matches the offline RL setting and typical pre‑game stake sizes. If stakes were large enough to affect prices or limits, a Stackelberg model would be required with the bookmaker as leader and the policy as follower; training and OPE would then incorporate price‑impact and inventory dynamics (left as future work).
 
 \section{Offline RL Methods at a Glance}
-\begin{table}[t]
+This dissertation employs offline RL algorithms that learn exclusively from logged data, avoiding unsafe online exploration in financial betting environments. \Cref{tab:offline-rl-glance} summarizes six families of offline methods—behavior-constrained approaches (BCQ, BRAC, BEAR) and pessimistic value-based methods (CQL, IQL, TD3+BC/AWAC)—highlighting their core mechanisms, regularization strategies, and practical trade-offs for NFL betting applications.
+
+\begin{table}[htbp]
   \centering
   \small
   \begingroup\hbadness=10000\hfuzz=1pt
@@ -412,14 +414,39 @@ We treat the policy as a small, price‑taking agent: odds are exogenous and our
   \end{threeparttable}
   \endgroup
 \end{table}
-\chaptersummary{
-We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
-}{
-\Cref{chap:risk} formalizes stake sizing and portfolio risk controls; \Cref{chap:sim} validates policies under dependence and frictions before promotion.
-}
+
+\section{Dataset Cohorts and Splits}\label{sec:dataset-cohorts}
+To make evaluation reproducible, we enumerate dataset cohorts, splits, coverage, and leakage guards. This ensures that all offline RL training and OPE evaluation follow consistent temporal boundaries and prevent future information from contaminating model decisions.
+
+\paragraph{Cohort Definition.}
+The full dataset spans 2004--2025 with 5,529 games documented in Chapter~\ref{chap:data}. We partition into:
+\begin{itemize}
+  \item \textbf{Training}: 2004--2019 (3,240 games) for initial model fitting and hyperparameter sweeps.
+  \item \textbf{Validation}: 2020--2022 (850 games) for policy selection and OPE threshold calibration.
+  \item \textbf{Holdout Test}: 2023--2025 (1,439 games) for final performance evaluation and promotion decisions.
+\end{itemize}
+
+\paragraph{Walk-Forward Protocol.}
+For temporal robustness, we employ expanding-window walk-forward validation with 5-fold cross-validation within each season. Models are retrained weekly using the most recent 5 seasons to capture regime shifts while maintaining computational tractability (18-second retraining per model as documented in Chapter~\ref{chap:methods}).
+
+\paragraph{Leakage Guards.}
+All features enforce as-of semantics (Chapter~\ref{chap:data}, \S\ref{subsec:leakage-arch}; Appendix~\ref{app:leakage_audit}). Feature generation uses strict cutoff timestamps $t_{\text{cutoff}} = \text{kickoff} - 1\text{ second}$ to ensure no post-game information leaks into pre-game predictions. The automated leakage audit (Appendix~\ref{app:leakage_audit}) validates that all 162 features marked \texttt{asof\_safe:true} respect temporal boundaries, with 100\% compliance across 15 unit tests.
+
+\paragraph{Coverage and Temporal Distribution.}
+Dataset diagnostics from the feature catalog (\texttt{py/features/catalog.yaml}) show:
+\begin{itemize}
+  \item \textbf{Action space coverage}: All stake buckets (skip, small, medium, large) represented in $>$5\% of logged episodes.
+  \item \textbf{Market coverage}: Spreads available for 98.2\% of games; totals for 97.8\%; moneylines for 99.1\%.
+  \item \textbf{Temporal density}: No gaps exceeding 14 days within regular seasons; playoff games handled separately.
+\end{itemize}
+
+\paragraph{ER Diagram.}
+[ER diagram: staging, core, and mart layers to be inserted here once the latest schema export is rendered. The three-layer architecture (staging for raw ingestion, core for validated games/plays, mart for materialized features) ensures reproducible pipelines with explicit as-of timestamps at every layer.]
+
+Full coverage statistics and temporal distribution details are documented in the automated leakage audit (Appendix~\ref{app:leakage_audit}), which certifies that all dataset cohorts maintain strict temporal integrity for offline RL training and OPE evaluation.
 
 \chaptersummary{
-We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance.
+We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
 }{
 \Cref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
 }

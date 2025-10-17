@@ -21,11 +21,11 @@ Breakeven: $q_1q_2\ge d^{-1}$; symmetric legs require $q\ge d^{-1/2}$. Under dep
 true threshold increases; our simulator estimates the correlation penalty from the reweighted pmf.
 
 \begin{example}[Two-leg teaser threshold]
-For a two-leg teaser paying $d=1.8$ (net $+80$), symmetry implies $q\ge d^{-1/2}\approx 0.745$. If the joint success correlation is positive (common in spread+total pairs), the true breakeven $q$ is higher; we quantify this using the copula from \S\ref{subsec:copula-impact}.
+For a two-leg teaser paying $d=1.8$ (net $+80$), symmetry implies $q\ge d^{-1/2}\approx 0.745$. If the joint success correlation is positive (common in spread+total pairs), the true breakeven $q$ is higher; we quantify this using the copula from \Cref{subsec:copula-st}.
 \end{example}
 
 \paragraph{Relation to Wong teasers.}
-Classical \emph{Wong teasers} recommend teasing through the key numbers 3 and 7 (e.g., 6-point two-team NFL teasers at about \(-120\) or better), popularized by \citet{wong2001sharp}. Our approach operationalizes the same intuition with calibrated integer-margin masses: we reweight the baseline margin pmf to match empirical key probabilities (\Cref{subsec:key-reweight}), then price teaser legs and their joint success under dependence (\Cref{subsec:copula-impact}). This replaces static rules with scenario-specific EV that adapts to era (extra-point rules), teams, and totals. When the reweighted pmf and dependence imply sufficient leg success and correlation penalty, the simulator accepts teaser strategies consistent with the spirit of Wong’s criteria.
+Classical \emph{Wong teasers} recommend teasing through the key numbers 3 and 7 (e.g., 6-point two-team NFL teasers at about \(-120\) or better), popularized by \citet{wong2001sharp}. Our approach operationalizes the same intuition with calibrated integer-margin masses: we reweight the baseline margin pmf to match empirical key probabilities (\Cref{subsec:key-reweight}), then price teaser legs and their joint success under dependence (\Cref{subsec:copula-st}). This replaces static rules with scenario-specific EV that adapts to era (extra-point rules), teams, and totals. When the reweighted pmf and dependence imply sufficient leg success and correlation penalty, the simulator accepts teaser strategies consistent with the spirit of Wong’s criteria.
 
 For a \emph{middle} at integer $n$ using lines $n\!-\!\tfrac12$ and $n\!+\!\tfrac12$, a breakeven condition is
 \[
@@ -73,15 +73,7 @@ Let $\Delta p$ be the realized price impact (executed price minus quoted), $q$ t
 \[\E[\Delta p\mid q,\tau,\text{book}]=\beta_0(\text{book})+\beta_1\,q+\beta_2\,q^2+\beta_3\,\tau^{-1},\]
 optionally with book‑specific random effects. Residual spread is captured by a heteroskedastic error model with variance increasing in $q$ and decreasing in $\tau$. These regressions are estimated from historical order logs; weekly slippage priors are then drawn from the posterior and fed to the simulator. We validate by back‑testing paper trades and comparing realized and simulated execution deltas.
 
-\subsection{Vigorish removal and CBV}\label{subsec:vig-cbv}
-For two-outcome market with American odds $(o_1,o_2)$ convert to decimals $(d_1,d_2)$ and implied
-probabilities $\pi_i^{\mathrm{raw}}=1/d_i$. The hold is $H=\pi_1^{\mathrm{raw}}+\pi_2^{\mathrm{raw}}-1$.
-No-vig probabilities are $\pi_i=\pi_i^{\mathrm{raw}}/(1+H)$. Given model fair $\hat\pi_i$, the
-comparative book value is
-\[
-\mathrm{CBV}_i=\hat\pi_i-\pi_i,
-\]
-or in price space $\Delta_i = d_i - (1/\hat\pi_i)$. We bet when $\mathrm{CBV}_i>\tau$ or $\Delta_i>\tau'$.
+% Vigorish removal and CBV calculations follow \Cref{subsec:vig-cbv-lit}.
 
 \section{Strategy Catalogue}
 \begin{enumerate}
@@ -114,23 +106,26 @@ For $B$ total simulations divided into $K$ batches of size $m = B/K$, we compute
 
 \Cref{tab:mc-convergence} shows convergence metrics at different sample sizes, confirming stability at $B \geq 10,000$ for key statistics.
 
-\begin{table}[t]
-  \centering
-  \small
-  \caption{Monte Carlo convergence diagnostics by sample size.}
-  \label{tab:mc-convergence}
-  \begin{tabular}{lccccc}
-    \toprule
-    \textbf{Sample Size} & \textbf{ESS} & \textbf{Geweke p-val} & \textbf{H-W Test} & \textbf{Mean SE} & \textbf{95\% CI Width} \\
-    \midrule
-    1,000    & 823    & 0.043 & Fail & 0.0142 & 0.0556 \\
-    5,000    & 4,412  & 0.187 & Pass & 0.0063 & 0.0247 \\
-    10,000   & 8,956  & 0.412 & Pass & 0.0045 & 0.0176 \\
-    50,000   & 45,230 & 0.623 & Pass & 0.0020 & 0.0078 \\
-    100,000  & 91,445 & 0.701 & Pass & 0.0014 & 0.0055 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\IfFileExists{../figures/out/mc_convergence_table.tex}{\input{../figures/out/mc_convergence_table.tex}}{%
+  % Fallback placeholder if file doesn't exist
+  \begin{table}[t]
+    \centering
+    \small
+    \caption{Monte Carlo convergence diagnostics by sample size.}
+    \label{tab:mc-convergence}
+    \begin{tabular}{lccccc}
+      \toprule
+      \textbf{Sample Size} & \textbf{ESS} & \textbf{Geweke p-val} & \textbf{H-W Test} & \textbf{Mean SE} & \textbf{95\% CI Width} \\
+      \midrule
+      1,000    & 823    & 0.043 & Fail & 0.0142 & 0.0556 \\
+      5,000    & 4,412  & 0.187 & Pass & 0.0063 & 0.0247 \\
+      10,000   & 8,956  & 0.412 & Pass & 0.0045 & 0.0176 \\
+      50,000   & 45,230 & 0.623 & Pass & 0.0020 & 0.0078 \\
+      100,000  & 91,445 & 0.701 & Pass & 0.0014 & 0.0055 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+}
 
 \subsection{Distribution Calibration Metrics}
 
@@ -249,11 +244,6 @@ We require the simulator to reproduce marginal score/margin distributions, key�
 \section{Friction Models}
 Vig and slippage vary by book, time, and market. We parameterize friction with priors learned from historical fills and allow pessimistic and optimistic regimes to bound expected EV.
 
-\paragraph{Calibration of slippage parameters.}
-Let $\Delta p$ be the realized price impact (executed price minus quoted), $q$ the order size as a fraction of posted limits, and $\tau$ minutes to kickoff. We fit
-\[\E[\Delta p\mid q,\tau,\text{book}]=\beta_0(\text{book})+\beta_1\,q+\beta_2\,q^2+\beta_3\,\tau^{-1},\]
-optionally with book‑specific random effects and heteroskedastic errors with variance increasing in $q$ and decreasing in $\tau$. Estimates produce weekly priors used in simulation; we validate by back‑testing paper trades and comparing realized and simulated execution deltas.
-
 % Include real slippage model table from generated data
 \IfFileExists{../figures/out/slippage_model_table.tex}{\input{../figures/out/slippage_model_table.tex}}{%
   % Fallback if file doesn't exist
@@ -265,7 +255,7 @@ optionally with book‑specific random effects and heteroskedastic errors with v
 }
 
 \section{Simulator Acceptance Tests: Outcomes}\label{sec:sim-acceptance-outcomes}
-Algorithm~9.14 defines acceptance tests on margins and key‑mass calibration (tolerances $\tau_{\mathrm{marg}},\tau_{\mathrm{key}}$), and dependence checks vs. historical co‑movements. Here we report pass/fail rates, typical deviations when failing, and whether failures predict poor live performance.
+\Cref{alg:sim-accept} defines acceptance tests on margins and key‑mass calibration (tolerances $\tau_{\mathrm{marg}},\tau_{\mathrm{key}}$), and dependence checks vs. historical co‑movements. Here we report pass/fail rates, typical deviations when failing, and whether failures predict poor live performance.
 
 % Auto-included acceptance summary table if present
 \IfFileExists{../figures/out/sim_acceptance_table.tex}{\input{../figures/out/sim_acceptance_table.tex}}{%

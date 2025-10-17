@@ -1,0 +1,1214 @@
+{
+  "catalog": {
+    "total_feature_groups": 11,
+    "safe_features": 95,
+    "unsafe_features": 7
+  },
+  "scripts_audited": {
+    "feature_scripts": 14,
+    "model_scripts": 33,
+    "total": 47
+  },
+  "audit_results": {
+    "passed": 22,
+    "warnings": 25,
+    "status": "WARN"
+  },
+  "findings": {
+    "feature_scripts": [
+      {
+        "file": "py/features/catalog.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/features/asof_snapshot.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 63,
+            "query_snippet": "select         home_team,         away_team,         gdate,         max(case when market_key='spread"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/materialized_view_features.py",
+        "unsafe_field_refs": [
+          {
+            "field": "over_hit",
+            "line": 348,
+            "context": "df['over_hit'] = ((df['home_score'] + df['away_score']) > df['total_close']).astype(float)"
+          },
+          {
+            "field": "away_score",
+            "line": 348,
+            "context": "df['over_hit'] = ((df['home_score'] + df['away_score']) > df['total_close']).astype(float)"
+          },
+          {
+            "field": "away_score",
+            "line": 351,
+            "context": "df['actual_total'] = df['home_score'] + df['away_score']"
+          },
+          {
+            "field": "away_score",
+            "line": 372,
+            "context": "key_cols = ['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']"
+          },
+          {
+            "field": "home_score",
+            "line": 348,
+            "context": "df['over_hit'] = ((df['home_score'] + df['away_score']) > df['total_close']).astype(float)"
+          },
+          {
+            "field": "home_score",
+            "line": 351,
+            "context": "df['actual_total'] = df['home_score'] + df['away_score']"
+          },
+          {
+            "field": "home_score",
+            "line": 372,
+            "context": "key_cols = ['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']"
+          },
+          {
+            "field": "home_cover",
+            "line": 347,
+            "context": "df['home_cover'] = (df['home_margin'] + df['spread_close'] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 346,
+            "context": "df['home_win'] = (df['home_margin'] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 347,
+            "context": "df['home_cover'] = (df['home_margin'] + df['spread_close'] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 352,
+            "context": "df['cover_margin'] = df['home_margin'] + df['spread_close']"
+          },
+          {
+            "field": "home_win",
+            "line": 346,
+            "context": "df['home_win'] = (df['home_margin'] > 0).astype(float)"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 57,
+            "query_snippet": "SELECT     ga.game_id,     ga.season,     ga.week,     ga.game_type,     ga.kickoff,     ga.home_tea"
+          },
+          {
+            "line": 206,
+            "query_snippet": "SELECT     game_id,     -- We need to join on team matchups properly     -- For now, we'll skip this"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/merge_advanced_features.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/features/line_movement_tracker.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/features/player_features.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 90,
+            "query_snippet": "SELECT                 p.game_id,                 g.season,                 g.week,                 "
+          },
+          {
+            "line": 190,
+            "query_snippet": "SELECT                 game_id,                 season,                 week,                 kickof"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/asof_features_v2.py",
+        "unsafe_field_refs": [
+          {
+            "field": "over_hit",
+            "line": 435,
+            "context": "merged[\"over_hit\"] = ("
+          },
+          {
+            "field": "away_score",
+            "line": 331,
+            "context": "\"away_score\","
+          },
+          {
+            "field": "away_score",
+            "line": 432,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "away_score",
+            "line": 436,
+            "context": "(merged[\"home_score\"] + merged[\"away_score\"]) > merged[\"total_close\"]"
+          },
+          {
+            "field": "is_push",
+            "line": 438,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_score",
+            "line": 330,
+            "context": "\"home_score\","
+          },
+          {
+            "field": "home_score",
+            "line": 432,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_score",
+            "line": 436,
+            "context": "(merged[\"home_score\"] + merged[\"away_score\"]) > merged[\"total_close\"]"
+          },
+          {
+            "field": "home_cover",
+            "line": 434,
+            "context": "merged[\"home_cover\"] = (merged[\"home_margin\"] + merged[\"spread_close\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_cover",
+            "line": 438,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_margin",
+            "line": 432,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_margin",
+            "line": 433,
+            "context": "merged[\"home_win\"] = (merged[\"home_margin\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 434,
+            "context": "merged[\"home_cover\"] = (merged[\"home_margin\"] + merged[\"spread_close\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 441,
+            "context": "merged[\"is_tie\"] = (merged[\"home_margin\"] == 0).astype(bool)"
+          },
+          {
+            "field": "home_win",
+            "line": 433,
+            "context": "merged[\"home_win\"] = (merged[\"home_margin\"] > 0).astype(float)"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 48,
+            "query_snippet": "SELECT g.game_id,            g.season,            g.week,            g.kickoff,            g.home_te"
+          },
+          {
+            "line": 151,
+            "query_snippet": "SELECT tg.game_id,        tg.team,        tg.is_home,        tg.season,        tg.week,        tg.ki"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/asof_features.py",
+        "unsafe_field_refs": [
+          {
+            "field": "points_for",
+            "line": 208,
+            "context": "team_df[\"points_for\"] = team_df[\"points_for\"].astype(float)"
+          },
+          {
+            "field": "points_for",
+            "line": 208,
+            "context": "team_df[\"points_for\"] = team_df[\"points_for\"].astype(float)"
+          },
+          {
+            "field": "points_for",
+            "line": 220,
+            "context": "team_df[\"points_total\"] = team_df[\"points_for\"] + team_df[\"points_against\"]"
+          },
+          {
+            "field": "points_for",
+            "line": 230,
+            "context": "team_df[\"_points_for_f\"] = team_df[\"points_for\"].fillna(0.0)"
+          },
+          {
+            "field": "away_score",
+            "line": 385,
+            "context": "\"away_score\","
+          },
+          {
+            "field": "away_score",
+            "line": 423,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "is_push",
+            "line": 429,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_score",
+            "line": 384,
+            "context": "\"home_score\","
+          },
+          {
+            "field": "home_score",
+            "line": 423,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_cover",
+            "line": 424,
+            "context": "merged[\"home_cover\"] = np.where("
+          },
+          {
+            "field": "home_cover",
+            "line": 429,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_margin",
+            "line": 423,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_margin",
+            "line": 425,
+            "context": "merged[\"home_margin\"] - merged[\"spread_close\"] > 0,"
+          },
+          {
+            "field": "home_margin",
+            "line": 427,
+            "context": "np.where(merged[\"home_margin\"] - merged[\"spread_close\"] < 0, 0, np.nan),"
+          },
+          {
+            "field": "points_against",
+            "line": 209,
+            "context": "team_df[\"points_against\"] = team_df[\"points_against\"].astype(float)"
+          },
+          {
+            "field": "points_against",
+            "line": 209,
+            "context": "team_df[\"points_against\"] = team_df[\"points_against\"].astype(float)"
+          },
+          {
+            "field": "points_against",
+            "line": 220,
+            "context": "team_df[\"points_total\"] = team_df[\"points_for\"] + team_df[\"points_against\"]"
+          },
+          {
+            "field": "points_against",
+            "line": 231,
+            "context": "team_df[\"_points_against_f\"] = team_df[\"points_against\"].fillna(0.0)"
+          },
+          {
+            "field": "result_value",
+            "line": 228,
+            "context": "team_df[\"result_value\"] = result_values"
+          },
+          {
+            "field": "margin",
+            "line": 210,
+            "context": "team_df[\"margin\"] = team_df[\"margin\"].astype(float)"
+          },
+          {
+            "field": "margin",
+            "line": 210,
+            "context": "team_df[\"margin\"] = team_df[\"margin\"].astype(float)"
+          },
+          {
+            "field": "margin",
+            "line": 223,
+            "context": "team_df[\"margin\"] > 0, 1.0, np.where(team_df[\"margin\"] < 0, 0.0, np.nan)"
+          },
+          {
+            "field": "margin",
+            "line": 223,
+            "context": "team_df[\"margin\"] > 0, 1.0, np.where(team_df[\"margin\"] < 0, 0.0, np.nan)"
+          },
+          {
+            "field": "margin",
+            "line": 226,
+            "context": "np.isnan(result_values) & team_df[\"margin\"].notna(), 0.5, result_values"
+          },
+          {
+            "field": "margin",
+            "line": 232,
+            "context": "team_df[\"_margin_f\"] = team_df[\"margin\"].fillna(0.0)"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 26,
+            "query_snippet": "SELECT g.game_id,            g.season,            g.week,            g.kickoff,            g.home_te"
+          },
+          {
+            "line": 79,
+            "query_snippet": "SELECT tg.game_id,        tg.team,        tg.is_home,        tg.season,        tg.week,        tg.ki"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/bayesian_player_features.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 77,
+            "query_snippet": "SELECT             bpr.player_id,             bpr.stat_type,             bpr.season,             bpr"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/line_movement_enhanced.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/features/bayesian_features.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/features/gnn_team_ratings.py",
+        "unsafe_field_refs": [
+          {
+            "field": "away_score",
+            "line": 220,
+            "context": "train_outcomes = torch.FloatTensor((train_df['home_score'] > train_df['away_score']).astype(float).v"
+          },
+          {
+            "field": "away_score",
+            "line": 225,
+            "context": "val_outcomes = torch.FloatTensor((val_df['home_score'] > val_df['away_score']).astype(float).values)"
+          },
+          {
+            "field": "away_score",
+            "line": 360,
+            "context": "y_train = (train_df['home_score'] > train_df['away_score']).astype(int)"
+          },
+          {
+            "field": "away_score",
+            "line": 361,
+            "context": "y_test = (test_df['home_score'] > test_df['away_score']).astype(int)"
+          },
+          {
+            "field": "home_score",
+            "line": 220,
+            "context": "train_outcomes = torch.FloatTensor((train_df['home_score'] > train_df['away_score']).astype(float).v"
+          },
+          {
+            "field": "home_score",
+            "line": 225,
+            "context": "val_outcomes = torch.FloatTensor((val_df['home_score'] > val_df['away_score']).astype(float).values)"
+          },
+          {
+            "field": "home_score",
+            "line": 360,
+            "context": "y_train = (train_df['home_score'] > train_df['away_score']).astype(int)"
+          },
+          {
+            "field": "home_score",
+            "line": 361,
+            "context": "y_test = (test_df['home_score'] > test_df['away_score']).astype(int)"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/matchup_features.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 103,
+            "query_snippet": "SELECT                 game_id,                 season,                 week,                 game_t"
+          },
+          {
+            "line": 120,
+            "query_snippet": "SELECT                 g1.game_id,                 COUNT(g2.game_id) as h2h_games_played,           "
+          },
+          {
+            "line": 166,
+            "query_snippet": "SELECT             gl.*,             COALESCE(hm.h2h_games_played, 0) as h2h_games_played,          "
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/features/asof_features_enhanced.py",
+        "unsafe_field_refs": [
+          {
+            "field": "over_hit",
+            "line": 392,
+            "context": "merged[\"over_hit\"] = ("
+          },
+          {
+            "field": "away_score",
+            "line": 340,
+            "context": "\"away_score\","
+          },
+          {
+            "field": "away_score",
+            "line": 389,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "away_score",
+            "line": 393,
+            "context": "(merged[\"home_score\"] + merged[\"away_score\"]) > merged[\"total_close\"]"
+          },
+          {
+            "field": "is_push",
+            "line": 395,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_score",
+            "line": 339,
+            "context": "\"home_score\","
+          },
+          {
+            "field": "home_score",
+            "line": 389,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_score",
+            "line": 393,
+            "context": "(merged[\"home_score\"] + merged[\"away_score\"]) > merged[\"total_close\"]"
+          },
+          {
+            "field": "home_cover",
+            "line": 391,
+            "context": "merged[\"home_cover\"] = (merged[\"home_margin\"] + merged[\"spread_close\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_cover",
+            "line": 395,
+            "context": "merged[\"is_push\"] = merged[\"home_cover\"].isna()"
+          },
+          {
+            "field": "home_margin",
+            "line": 389,
+            "context": "merged[\"home_margin\"] = merged[\"home_score\"] - merged[\"away_score\"]"
+          },
+          {
+            "field": "home_margin",
+            "line": 390,
+            "context": "merged[\"home_win\"] = (merged[\"home_margin\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_margin",
+            "line": 391,
+            "context": "merged[\"home_cover\"] = (merged[\"home_margin\"] + merged[\"spread_close\"] > 0).astype(float)"
+          },
+          {
+            "field": "home_win",
+            "line": 390,
+            "context": "merged[\"home_win\"] = (merged[\"home_margin\"] > 0).astype(float)"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 40,
+            "query_snippet": "SELECT g.game_id,            g.season,            g.week,            g.kickoff,            g.home_te"
+          },
+          {
+            "line": 125,
+            "query_snippet": "SELECT tg.game_id,        tg.team,        tg.is_home,        tg.season,        tg.week,        tg.ki"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      }
+    ],
+    "model_scripts": [
+      {
+        "file": "py/models/bayesian_neural_network.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/xgboost_gpu.py",
+        "unsafe_field_refs": [
+          {
+            "field": "home_cover",
+            "line": 84,
+            "context": "required = ['season', 'home_cover'] + features"
+          },
+          {
+            "field": "home_cover",
+            "line": 96,
+            "context": "df = df.dropna(subset=['home_cover'])"
+          },
+          {
+            "field": "home_cover",
+            "line": 100,
+            "context": "print(f\"Target balance: {df['home_cover'].mean():.3f}\")"
+          },
+          {
+            "field": "home_cover",
+            "line": 177,
+            "context": "stratify=train_val_df['home_cover']"
+          },
+          {
+            "field": "home_cover",
+            "line": 197,
+            "context": "y_train = train_df['home_cover'].values"
+          },
+          {
+            "field": "home_cover",
+            "line": 199,
+            "context": "y_val = val_df['home_cover'].values"
+          },
+          {
+            "field": "home_cover",
+            "line": 201,
+            "context": "y_test = test_df['home_cover'].values"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/calibration_test_harness.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/train_bnn_receiving.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 22,
+            "query_snippet": "selection import train_test_split  logging.basicConfig(level=logging.INFO) logger = logging.getLogge"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/train_bnn_rushing_simple.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/train_bnn_prior_sensitivity.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/bivariate_poisson.py",
+        "unsafe_field_refs": [
+          {
+            "field": "away_score",
+            "line": 202,
+            "context": "away_goals = df[df['away_team'] == team]['away_score'].mean()"
+          },
+          {
+            "field": "away_score",
+            "line": 206,
+            "context": "goals_conceded_home = df[df['home_team'] == team]['away_score'].mean()"
+          },
+          {
+            "field": "away_score",
+            "line": 238,
+            "context": "df: DataFrame with columns ['home_team', 'away_team', 'home_score', 'away_score']"
+          },
+          {
+            "field": "away_score",
+            "line": 255,
+            "context": "y = df['away_score'].values.astype(int)"
+          },
+          {
+            "field": "away_score",
+            "line": 277,
+            "context": "df: DataFrame with columns ['home_team', 'away_team', 'home_score', 'away_score']"
+          },
+          {
+            "field": "home_score",
+            "line": 201,
+            "context": "home_goals = df[df['home_team'] == team]['home_score'].mean()"
+          },
+          {
+            "field": "home_score",
+            "line": 207,
+            "context": "goals_conceded_away = df[df['away_team'] == team]['home_score'].mean()"
+          },
+          {
+            "field": "home_score",
+            "line": 238,
+            "context": "df: DataFrame with columns ['home_team', 'away_team', 'home_score', 'away_score']"
+          },
+          {
+            "field": "home_score",
+            "line": 254,
+            "context": "x = df['home_score'].values.astype(int)"
+          },
+          {
+            "field": "home_score",
+            "line": 277,
+            "context": "df: DataFrame with columns ['home_team', 'away_team', 'home_score', 'away_score']"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 61,
+            "query_snippet": "SELECT game_id, season, week, kickoff, home_team, away_team,                home_score, away_score  "
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/copulas.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/bnn_mixture_experts_v2.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/load_cql_ensemble.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/train_bnn_rushing.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 115,
+            "query_snippet": "SELECT                 game_id,                 posteam,                 AVG(epa) FILTER (WHERE play"
+          },
+          {
+            "line": 125,
+            "query_snippet": "SELECT                 game_id,                 defteam,                 AVG(epa) FILTER (WHERE play"
+          },
+          {
+            "line": 135,
+            "query_snippet": "SELECT                 player_id,                 season,                 week,                 AVG("
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/spread_coverage_model.py",
+        "unsafe_field_refs": [
+          {
+            "field": "away_score",
+            "line": 141,
+            "context": "df['cover_margin'] = df['home_score'] - df['away_score'] - df['spread_close']"
+          },
+          {
+            "field": "home_score",
+            "line": 141,
+            "context": "df['cover_margin'] = df['home_score'] - df['away_score'] - df['spread_close']"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/evaluate_bnn_vegas.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/bnn_simpler_v2.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/xgboost_gpu_v2.py",
+        "unsafe_field_refs": [
+          {
+            "field": "home_win",
+            "line": 92,
+            "context": "required = ['season', 'home_win'] + features"
+          },
+          {
+            "field": "home_win",
+            "line": 104,
+            "context": "df = df.dropna(subset=['home_win'])"
+          },
+          {
+            "field": "home_win",
+            "line": 108,
+            "context": "print(f\"Target balance: {df['home_win'].mean():.3f}\")"
+          },
+          {
+            "field": "home_win",
+            "line": 185,
+            "context": "stratify=train_val_df['home_win']"
+          },
+          {
+            "field": "home_win",
+            "line": 205,
+            "context": "y_train = train_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 207,
+            "context": "y_val = val_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 209,
+            "context": "y_test = test_df['home_win'].values"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/xgboost_gpu_v3.py",
+        "unsafe_field_refs": [
+          {
+            "field": "home_win",
+            "line": 157,
+            "context": "required = ['season', 'home_win'] + features"
+          },
+          {
+            "field": "home_win",
+            "line": 169,
+            "context": "df = df.dropna(subset=['home_win'])"
+          },
+          {
+            "field": "home_win",
+            "line": 173,
+            "context": "print(f\"Target balance: {df['home_win'].mean():.3f}\")"
+          },
+          {
+            "field": "home_win",
+            "line": 253,
+            "context": "stratify=train_val_df['home_win']"
+          },
+          {
+            "field": "home_win",
+            "line": 274,
+            "context": "y_train = train_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 276,
+            "context": "y_val = val_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 292,
+            "context": "y_test = test_df['home_win'].values"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/props_predictor.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/train_bnn_rushing_improved.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/ingame_win_probability.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 93,
+            "query_snippet": "SELECT                 game_id,                 home_team,                 away_team,               "
+          },
+          {
+            "line": 103,
+            "query_snippet": "SELECT                 p.game_id,                 p.play_id,                 p.posteam,             "
+          },
+          {
+            "line": 440,
+            "query_snippet": "SELECT             p.game_id,             p.play_id,             p.quarter,             p.time_secon"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/evaluate_bnn_baseline.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/train_bnn_rushing_vegas.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 30,
+            "query_snippet": "selection import train_test_split  logging.basicConfig(level=logging.INFO) logger = logging.getLogge"
+          },
+          {
+            "line": 106,
+            "query_snippet": "SELECT                 game_id,                 season,                 week,                 home_t"
+          },
+          {
+            "line": 117,
+            "query_snippet": "SELECT             rd.*,             -- Join with games to get Vegas lines             CASE         "
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/copula_gof.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/score_distributions.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/monitor_prior_sensitivity.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/autonomous_phase2_runner.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/totals_model.py",
+        "unsafe_field_refs": [
+          {
+            "field": "over_hit",
+            "line": 116,
+            "context": "'over_hit', 'total_vs_line', 'cover_hit', 'spread_vs_line',"
+          },
+          {
+            "field": "away_score",
+            "line": 107,
+            "context": "df['actual_total'] = df['home_score'] + df['away_score']"
+          },
+          {
+            "field": "away_score",
+            "line": 113,
+            "context": "'home_score', 'away_score', 'actual_total', 'over_under_margin',"
+          },
+          {
+            "field": "home_score",
+            "line": 64,
+            "context": "(df['home_score'].notna()) &"
+          },
+          {
+            "field": "home_score",
+            "line": 107,
+            "context": "df['actual_total'] = df['home_score'] + df['away_score']"
+          },
+          {
+            "field": "home_score",
+            "line": 113,
+            "context": "'home_score', 'away_score', 'actual_total', 'over_under_margin',"
+          },
+          {
+            "field": "home_cover",
+            "line": 120,
+            "context": "'home_win', 'home_cover', 'home_covered', 'cover_margin', 'home_margin',"
+          },
+          {
+            "field": "home_margin",
+            "line": 120,
+            "context": "'home_win', 'home_cover', 'home_covered', 'cover_margin', 'home_margin',"
+          },
+          {
+            "field": "home_win",
+            "line": 120,
+            "context": "'home_win', 'home_cover', 'home_covered', 'cover_margin', 'home_margin',"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/xgboost_gpu_v2_1.py",
+        "unsafe_field_refs": [
+          {
+            "field": "home_win",
+            "line": 96,
+            "context": "required = ['season', 'home_win'] + features"
+          },
+          {
+            "field": "home_win",
+            "line": 108,
+            "context": "df = df.dropna(subset=['home_win'])"
+          },
+          {
+            "field": "home_win",
+            "line": 112,
+            "context": "print(f\"Target balance: {df['home_win'].mean():.3f}\")"
+          },
+          {
+            "field": "home_win",
+            "line": 192,
+            "context": "stratify=train_val_df['home_win']"
+          },
+          {
+            "field": "home_win",
+            "line": 213,
+            "context": "y_train = train_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 215,
+            "context": "y_val = val_df['home_win'].values"
+          },
+          {
+            "field": "home_win",
+            "line": 231,
+            "context": "y_test = test_df['home_win'].values"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/train_bnn_passing.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 43,
+            "query_snippet": "SELECT         pgs.player_id,         pgs.season,         pgs.week,         pgs.stat_yards as yards,"
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/state_space.py",
+        "unsafe_field_refs": [
+          {
+            "field": "away_score",
+            "line": 70,
+            "context": "df[\"margin\"] = df[\"home_score\"] - df[\"away_score\"]"
+          },
+          {
+            "field": "home_score",
+            "line": 70,
+            "context": "df[\"margin\"] = df[\"home_score\"] - df[\"away_score\"]"
+          },
+          {
+            "field": "margin",
+            "line": 70,
+            "context": "df[\"margin\"] = df[\"home_score\"] - df[\"away_score\"]"
+          },
+          {
+            "field": "margin",
+            "line": 190,
+            "context": "self.update_game(row[\"home_team\"], row[\"away_team\"], row[\"margin\"])"
+          },
+          {
+            "field": "margin",
+            "line": 261,
+            "context": "margin_true = row[\"margin\"]"
+          }
+        ],
+        "missing_cutoff": [
+          {
+            "line": 60,
+            "query_snippet": "SELECT game_id, season, week, kickoff, home_team, away_team,                home_score, away_score, "
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/weather_totals_model.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [
+          {
+            "line": 136,
+            "query_snippet": "SELECT             game_id,             season,             week,             game_type,            "
+          }
+        ],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/train_v2_model.py",
+        "unsafe_field_refs": [
+          {
+            "field": "over_hit",
+            "line": 165,
+            "context": "\"over_hit\","
+          },
+          {
+            "field": "away_score",
+            "line": 116,
+            "context": "df = df[df[\"home_score\"].notna() & df[\"away_score\"].notna()].copy()"
+          },
+          {
+            "field": "away_score",
+            "line": 159,
+            "context": "\"away_score\","
+          },
+          {
+            "field": "is_push",
+            "line": 166,
+            "context": "\"is_push\","
+          },
+          {
+            "field": "home_score",
+            "line": 116,
+            "context": "df = df[df[\"home_score\"].notna() & df[\"away_score\"].notna()].copy()"
+          },
+          {
+            "field": "home_score",
+            "line": 158,
+            "context": "\"home_score\","
+          },
+          {
+            "field": "home_cover",
+            "line": 164,
+            "context": "\"home_cover\","
+          },
+          {
+            "field": "home_margin",
+            "line": 162,
+            "context": "\"home_margin\","
+          },
+          {
+            "field": "home_win",
+            "line": 163,
+            "context": "\"home_win\","
+          },
+          {
+            "field": "home_win",
+            "line": 172,
+            "context": "y = df[\"home_win\"].astype(float)"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      },
+      {
+        "file": "py/models/bnn_deeper_v2.py",
+        "unsafe_field_refs": [],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "PASS"
+      },
+      {
+        "file": "py/models/ensemble_stacking.py",
+        "unsafe_field_refs": [
+          {
+            "field": "away_score",
+            "line": 74,
+            "context": "df['home_win'] = (df['home_score'] > df['away_score']).astype(int)"
+          },
+          {
+            "field": "home_score",
+            "line": 71,
+            "context": "(df['home_score'].notna())"
+          },
+          {
+            "field": "home_score",
+            "line": 74,
+            "context": "df['home_win'] = (df['home_score'] > df['away_score']).astype(int)"
+          },
+          {
+            "field": "home_win",
+            "line": 74,
+            "context": "df['home_win'] = (df['home_score'] > df['away_score']).astype(int)"
+          },
+          {
+            "field": "home_win",
+            "line": 371,
+            "context": "y_true = df['home_win'].values"
+          }
+        ],
+        "missing_cutoff": [],
+        "safe_patterns": [],
+        "status": "WARN"
+      }
+    ]
+  }
+}

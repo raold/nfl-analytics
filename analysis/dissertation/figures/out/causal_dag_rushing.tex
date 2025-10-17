@@ -1,0 +1,56 @@
+% Causal DAG for NFL Rushing Performance
+% Shows causal relationships between confounders, treatment, and outcome
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=2.5cm and 3cm,
+  every node/.style={draw, rounded corners, align=center, minimum width=2.2cm, minimum height=0.8cm},
+  arrow/.style={->, >=stealth, thick},
+  confounder/.style={fill=blue!10},
+  treatment/.style={fill=green!15, thick},
+  outcome/.style={fill=orange!15, thick}
+]
+
+% Nodes
+\node[confounder] (ability) {Player\\Ability};
+\node[confounder, right=of ability] (team) {Team\\Quality};
+\node[confounder, below right=1cm and 0.5cm of team] (opponent) {Opponent\\Defense};
+\node[confounder, below=of ability] (script) {Game\\Script};
+
+\node[treatment, below=2.5cm of team] (carries) {\textbf{Carries}\\(Treatment)};
+\node[outcome, right=of carries] (yards) {\textbf{Rushing Yards}\\(Outcome)};
+
+% Confounding arrows
+\draw[arrow, blue!60] (ability) -- (carries);
+\draw[arrow, blue!60] (ability) -- (yards);
+
+\draw[arrow, blue!60] (team) -- (carries);
+\draw[arrow, blue!60] (team) -- (script);
+\draw[arrow, blue!60] (team) -- (yards);
+
+\draw[arrow, blue!60] (opponent) -- (carries);
+\draw[arrow, blue!60] (opponent) -- (yards);
+
+\draw[arrow, blue!60] (script) -- (carries);
+
+% Causal effect of interest
+\draw[arrow, green!60, very thick] (carries) -- node[above, draw=none, fill=white] {Causal Effect} (yards);
+
+% Backdoor paths (dashed)
+\draw[arrow, dashed, red!50, bend left=20] (ability) to (yards);
+\draw[arrow, dashed, red!50, bend left=10] (team) to (yards);
+\draw[arrow, dashed, red!50, bend right=10] (opponent) to (yards);
+
+% Legend
+\node[draw=none, below=0.3cm of yards, anchor=north east, align=left, font=\small] {
+  \textcolor{blue!80}{$\blacksquare$} Confounders \\
+  \textcolor{green!80}{$\blacksquare$} Treatment \\
+  \textcolor{orange!80}{$\blacksquare$} Outcome \\
+  \textcolor{red!60}{- - -} Backdoor paths (blocked by adjustment)
+};
+
+\end{tikzpicture}
+\caption{Causal DAG for NFL Rushing Performance. Solid arrows represent causal relationships. Dashed red paths show confounding backdoor paths from treatment (carries) to outcome (yards) that must be blocked via adjustment. Minimal adjustment set: \{Player Ability, Team Quality, Opponent Defense\}. Game Script is a collider (affected by Team Quality) and should NOT be conditioned on to avoid inducing bias.}
+\label{fig:causal-dag-rushing}
+\end{figure}

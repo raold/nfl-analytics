@@ -1,0 +1,24 @@
+\begin{table}[htbp]
+\centering
+\caption{Phase 1: BNN Prior Sensitivity Analysis Results}
+\label{tab:phase1_prior_sensitivity}
+\begin{tabular}{cccccc}
+\toprule
+$\sigma$ & MAE (yards) & RMSE (yards) & 90\% Coverage & 68\% Coverage & Error (pp) \\
+\midrule
+0.5 & 18.70 & 26.03 & 26.2\% & 19.3\% & -63.8 \\
+0.7 & 18.70 & 26.02 & 25.7\% & 19.3\% & -64.3 \\
+1.0 & 18.69 & 26.01 & 25.7\% & 19.5\% & -64.3 \\
+1.5 & 18.69 & 26.01 & 26.2\% & 19.3\% & -63.8 \\
+\midrule
+\textbf{Mean} & 18.70 & 26.02 & 25.9\% & 19.3\% & -64.1 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item All models use 4 baseline features, 16 hidden units, 4 chains $\times$ 2000 samples.
+\item Target coverage: 90\% (CI) and 68\% ($\pm 1\sigma$).
+\item Error = Observed - Target (negative indicates under-calibration).
+\item \textbf{Conclusion:} Prior insensitivity confirmed; architectural fix needed.
+\end{tablenotes}
+\end{table}

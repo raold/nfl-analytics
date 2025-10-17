@@ -5,7 +5,7 @@
 \chapter{Production Deployment and Operational Edges}
 \label{chap:production}
 
-This chapter documents the transition from research (Tasks 1--10) to production deployment. Having completed comprehensive modeling, ensemble design, and stress testing, we now address the operational infrastructure required for real‑money betting at scale. The analysis reveals a critical insight: \textbf{the limiting factor for expected value is SIGNAL, not COMPUTE}. Throwing additional GPU resources at the problem yields diminishing returns in NFL markets characterized by data scarcity (256 games per season) and efficient closing lines. Instead, value accrues from operational improvements: line shopping across sportsbooks, Kelly criterion bet sizing, early‑week betting strategies, and enhanced data sources.
+This chapter documents the transition from research to production deployment. Having completed comprehensive modeling, ensemble design, and stress testing, we now address the operational infrastructure required for real‑money betting at scale. The analysis reveals a critical insight: \textbf{the limiting factor for expected value is SIGNAL, not COMPUTE}. Throwing additional GPU resources at the problem yields diminishing returns in NFL markets characterized by data scarcity (256 games per season) and efficient closing lines. Instead, value accrues from operational improvements: line shopping across sportsbooks, Kelly criterion bet sizing, early‑week betting strategies, and enhanced data sources.
 
 Section~\ref{sec:claude_integration} introduces a novel contribution: the integration of large language models (specifically Claude AI) for semantic research exploration. This represents the first documented use of conversational AI to bridge statistical modeling and domain‑specific betting narratives, enabling rapid hypothesis testing and feature discovery through natural language queries.
 
@@ -169,13 +169,13 @@ print(f"p-value: {p_value:.4f}")
 print(f"Cohen's d: {cohens_d:.3f}")
 \end{verbatim}
 
-Result: \texttt{p-value: 0.0823, Cohen's d: 0.31}. Interpretation: \textit{``The TNF rest advantage is not statistically significant at $\alpha = 0.05$ (p = 0.082), though the effect size is small‑to‑medium (d = 0.31). With only 18 TNF +3 games, we lack power to detect this effect reliably. Recommendation: Do NOT add this feature to the production model based on current evidence. Re‑test after accumulating more TNF games (target n ≥ 30).''}
+Result: \texttt{p-value: 0.0823, Cohen's d: 0.31}. Interpretation: \textit{``The TNF rest advantage is not statistically significant at $\alpha = 0.05$ (p = 0.082), though the effect size is small‑to‑medium (d = 0.31). With only 18 TNF +3 games, we lack power to detect this effect reliably. Recommendation: Do NOT add this feature to the production model based on current evidence. Re‑test after accumulating more TNF games (target n $\geq$ 30).''}
 
 \paragraph{Step 6: Production Recommendations.}
 Claude provides actionable guidance grounded in statistical rigor:
 \begin{itemize}
 \item \textbf{Decision}: Skip the \texttt{tnf\_rest\_interaction} feature (insufficient evidence).
-\item \textbf{Monitoring}: Track TNF +3 rest games over the next 2--3 seasons; re‑test when n ≥ 30.
+\item \textbf{Monitoring}: Track TNF +3 rest games over the next 2--3 seasons; re‑test when n $\geq$ 30.
 \item \textbf{Alternative}: Consider a broader \texttt{primetime × rest\_diff} interaction (includes SNF, MNF) to increase sample size.
 \item \textbf{Documentation}: Generate a Quarto notebook documenting this analysis for future reference.
 \end{itemize}
@@ -680,7 +680,7 @@ Claude integration delivers value in six key areas:
 \paragraph{Limitations and Risks.}
 Claude integration has important constraints:
 
-\textbf{1. Sample Size Constraints.} NFL data is sparse: 256 games per season, ~35 TNF games per season, ~18 bye‑week road games per season. Many narratives (``TNF home edge in division games'') have n < 10, insufficient for reliable inference. Claude must flag low‑power scenarios and recommend conservative thresholds (e.g., require n ≥ 30 before adding a feature).
+\textbf{1. Sample Size Constraints.} NFL data is sparse: 256 games per season, ~35 TNF games per season, ~18 bye‑week road games per season. Many narratives (``TNF home edge in division games'') have n < 10, insufficient for reliable inference. Claude must flag low‑power scenarios and recommend conservative thresholds (e.g., require n $\geq$ 30 before adding a feature).
 
 \textbf{2. Multiple Comparison Problem.} Testing many narratives (rest advantage, division games, weather, referee effects, day‑of‑week, primetime, etc.) inflates false discovery rate. Claude must apply FDR correction (Benjamini--Hochberg) or Bonferroni adjustment when exploring multiple hypotheses simultaneously.
 
@@ -743,7 +743,7 @@ This enables adaptive modeling without manual recalibration.
 \section{System Architecture and Ensemble Deployment}
 \label{sec:system_architecture}
 
-The production system deploys a conservative ensemble strategy informed by bootstrap stress testing (Task 8, Technical Appendix). Three voting strategies were evaluated: Majority voting (71.4\% win rate, 35 bets/season, CVaR -0.05\%), Weighted voting (66.7\% win rate, 48 bets, CVaR -0.34\%), and Thompson Sampling (59.4\% win rate, 217 bets, CVaR -1.29\%). The critical finding: volume and resilience trade off. Majority voting survives all stress scenarios with minimal tail risk, while Thompson Sampling achieves higher baseline returns (+1.43\% vs +0.36\%) but suffers 26× worse CVaR under adversarial conditions.
+The production system deploys a conservative ensemble strategy informed by bootstrap stress testing. Three voting strategies were evaluated: Majority voting (71.4\% win rate, 35 bets/season, CVaR -0.05\%), Weighted voting (66.7\% win rate, 48 bets, CVaR -0.34\%), and Thompson Sampling (59.4\% win rate, 217 bets, CVaR -1.29\%). The critical finding: volume and resilience trade off. Majority voting survives all stress scenarios with minimal tail risk, while Thompson Sampling achieves higher baseline returns (+1.43\% vs +0.36\%) but suffers 26× worse CVaR under adversarial conditions.
 
 The production architecture deploys Majority voting as the baseline strategy, with Thompson Sampling available as an aggressive upgrade contingent on sustained win‑rate thresholds. The ensemble combines XGBoost v2 (Brier 0.1715, 11 features), Conservative Q‑Learning Config 4 (reward 0.0381), and Implicit Q‑Learning (expectile 0.9, reward 0.0375). Majority voting requires at least 2 of 3 models to agree; Thompson Sampling weights models by historical Sharpe ratio and explores exploitation trade‑offs via multi‑armed bandit logic.
 
@@ -783,8 +783,8 @@ Start with 1/4 Kelly. After 25 bets, if win rate > 65\%, scale to 1/2 Kelly. If 
 
 \paragraph{Risk Limits.}
 \begin{itemize}
-\item \textbf{Max bet size}: 2\% of bankroll ($200 initially). Prevents single‑bet catastrophic loss.
-\item \textbf{Max drawdown}: 10\% of bankroll ($1,000). If bankroll falls below \$9,000, pause betting until cause is diagnosed.
+\item \textbf{Max bet size}: 2\% of bankroll (\$200 initially). Prevents single‑bet catastrophic loss.
+\item \textbf{Max drawdown}: 10\% of bankroll (\$1,000). If bankroll falls below \$9,000, pause betting until cause is diagnosed.
 \item \textbf{Min bankroll}: \$8,000. Below this threshold, reduce bet sizes to 1\% until bankroll recovers to \$9,000.
 \end{itemize}
 
@@ -899,7 +899,7 @@ Track win rate, ROI, Sharpe ratio, and Sortino ratio over rolling 25‑bet windo
 \end{itemize}
 
 \paragraph{2. Weekly Bootstrap Stress Tests.}
-Run 1000 Monte Carlo bootstrap trials on latest 50 bets under six scenarios: baseline, 5\% model degradation, 10\% degradation, variance shock (+20\% std), correlated losses (ρ=0.3), and worst case. Compute CVaR(95\%) for each scenario. Alert if:
+Run 1000 Monte Carlo bootstrap trials on latest 50 bets under six scenarios: baseline, 5\% model degradation, 10\% degradation, variance shock (+20\% std), correlated losses ($\rho=0.3$), and worst case. Compute CVaR(95\%) for each scenario. Alert if:
 \begin{itemize}
 \item CVaR(95\%) < -1\% → CRITICAL (tail risk exceeds tolerance).
 \item Max drawdown > 10\% in >5\% of trials → Reduce bet sizes.
@@ -926,7 +926,7 @@ Real‑time dashboard visualizing:
 \section{Data Sources for Signal Enhancement}
 \label{sec:data_sources}
 
-The GNN failure (Task 9: -22.3\% performance degradation) demonstrated that complexity hurts when data is scarce. The limiting factor is \textbf{SIGNAL, not COMPUTE}. Enhanced data sources can improve signal quality:
+The GNN failure (-22.3\% performance degradation) demonstrated that complexity hurts when data is scarce. The limiting factor is \textbf{SIGNAL, not COMPUTE}. Enhanced data sources can improve signal quality:
 
 \paragraph{NFL Pro Subscription (LOW VALUE).}
 The user subscribes to NFL Pro (\$100/year). Content includes NFL Films, RedZone, replays, and fantasy advice. \textbf{Verdict}: Entertainment only. No predictive data (no play‑by‑play, no advanced stats, no injury reports beyond public sources). \textbf{Recommendation}: Cancel or keep for entertainment; do NOT expect betting edge.
@@ -1047,13 +1047,7 @@ Risk: Thompson CVaR(95\%) = -1.29\% (27 units loss in worst 5\% of outcomes). Fo
 \textbf{Ready for full‑season deployment after Week 8}.
 
 \chaptersummary{
-This chapter documented the production deployment roadmap, from research (Tasks 1--10) to real‑money betting. Section~\ref{sec:claude_integration} introduced Claude AI integration for semantic research exploration, enabling conversational hypothesis testing, post‑mortem analysis, and feature discovery through natural language queries (a novel contribution to sports betting analytics). Section~\ref{sec:system_architecture} detailed ensemble deployment (Majority voting as baseline, Thompson Sampling as aggressive upgrade with kill switches). Section~\ref{sec:kelly_sizing} formalized fractional Kelly sizing (1/4 → 1/2 Kelly with dynamic scaling). Section~\ref{sec:line_shopping} analyzed 15 Virginia sportsbooks across three tiers, with expected +0.5\% EV gain from line shopping. Section~\ref{sec:early_week} validated early‑week betting strategy (+0.5\% EV from Tuesday--Wednesday bets on road underdogs). Section~\ref{sec:props} extended the framework to player props markets (53--55\% win rate target). Section~\ref{sec:monitoring} established monitoring infrastructure (weekly bootstrap stress tests, Thompson switching logic, Streamlit dashboard). Section~\ref{sec:data_sources} evaluated data sources (NFL Pro = low value, PFF Elite = \$300/year + 0.5--1\% EV, NextGen Stats = \$5--10K/year + 1--2\% EV). Expected Year 1 returns: \$10,000 → \$10,500--\$11,200 (+5--12\%) with operational edges; Year 2: \$12,600--\$14,000 (+12--25\%) with enhanced data. The 8‑week deployment timeline enables staged rollout with risk controls, ready for full‑scale deployment by Week 9 after validating performance on 25+ bets. The critical insight remains: \textbf{SIGNAL > COMPUTE}. Operational improvements (line shopping, Kelly, EWB, data) deliver more value than GPU scaling or complex deep learning.
+This chapter documented the production deployment roadmap, from research to real‑money betting. We introduced Claude AI integration for semantic research exploration (Section~\ref{sec:claude_integration}), enabling conversational hypothesis testing, post‑mortem analysis, and feature discovery through natural language queries—a novel contribution to sports betting analytics. The integration leverages the full analytics stack (PostgreSQL, R, Python, Quarto) while maintaining statistical rigor (permutation tests, FDR correction, bootstrap CIs). We detailed ensemble deployment (Section~\ref{sec:system_architecture}): Majority voting as baseline, Thompson Sampling as aggressive upgrade with kill switches. Fractional Kelly sizing (Section~\ref{sec:kelly_sizing}) implements dynamic scaling (1/4 → 1/2 Kelly). Line shopping infrastructure (Section~\ref{sec:line_shopping}) targets 15 Virginia sportsbooks with expected +0.5\% EV gain. Early‑week betting strategy (Section~\ref{sec:early_week}) validates +0.5\% EV from Tuesday--Wednesday bets on road underdogs. Player props extension (Section~\ref{sec:props}) targets 53--55\% win rates. Monitoring infrastructure (Section~\ref{sec:monitoring}) includes weekly bootstrap stress tests, Thompson switching logic, and Streamlit dashboard. Data source evaluation (Section~\ref{sec:data_sources}): NFL Pro = low value, PFF Elite = \$300/year + 0.5--1\% EV, NextGen Stats = \$5--10K/year + 1--2\% EV. Expected Year 1 returns: \$10,000 → \$10,040--\$10,095 with free data and operational edges. The 8‑week deployment timeline enables staged rollout with risk controls, ready for full‑scale deployment by Week 9 after validating performance on 25+ bets. The critical insight remains: \textbf{SIGNAL > COMPUTE}. Operational improvements deliver more value than GPU scaling or complex deep learning.
 }{
 Chapter~\ref{chap:conclusion} synthesizes findings, discusses contributions to sports betting analytics and AI‑assisted research, and outlines future work including live in‑game extensions and causal inference integration.
-}
-
-\chaptersummary{
-This section introduced Claude AI integration for semantic research exploration, enabling conversational hypothesis testing, post‑mortem analysis, and feature discovery. Three use cases demonstrated the workflow: post‑game upset analysis (Giants‑Eagles TNF), narrative validation (bye‑week rest advantage), and model debugging (Week 5 underperformance). The integration leverages the full analytics stack (PostgreSQL, R, Python, Quarto) while maintaining statistical rigor (permutation tests, FDR correction, bootstrap CIs). Limitations include sample size constraints, multiple comparison problems, and overfitting risk; production recommendations emphasize exploratory use only, with out‑of‑sample validation required before deployment. Future extensions include retrieval‑augmented generation, live game analysis, automated narrative discovery, and cross‑season drift detection. This represents the first documented use of LLMs for sports betting research, bridging statistical modeling and domain knowledge in a conversational interface.
-}{
-Section~\ref{sec:system_architecture} details the production system architecture, deploying majority voting and Thompson sampling ensembles with kill switches for risk management.
 }

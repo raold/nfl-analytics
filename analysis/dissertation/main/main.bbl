@@ -1,4 +1,4 @@
-\begin{thebibliography}{51}
+\begin{thebibliography}{56}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -46,6 +46,23 @@ Glenn~W. Brier.
 \newblock Verification of forecasts expressed in terms of probability.
 \newblock \emph{Monthly Weather Review}, 78\penalty0 (1):\penalty0 1--3, 1950.
 \newblock \doi{10.1175/1520-0493(1950)078<0001:VOFEIT>2.0.CO;2}.
+
+\bibitem[B{\"u}rkner(2017)]{burkner2017}
+Paul-Christian B{\"u}rkner.
+\newblock brms: An r package for bayesian multilevel models using stan.
+\newblock \emph{Journal of Statistical Software}, 80\penalty0 (1):\penalty0
+  1--28, 2017.
+\newblock \doi{10.18637/jss.v080.i01}.
+
+\bibitem[Carpenter et~al.(2017)Carpenter, Gelman, Hoffman, Lee, Goodrich,
+  Betancourt, Brubaker, Guo, Li, and Riddell]{carpenter2017}
+Bob Carpenter, Andrew Gelman, Matthew~D. Hoffman, Daniel Lee, Ben Goodrich,
+  Michael Betancourt, Marcus Brubaker, Jiqiang Guo, Peter Li, and Allen
+  Riddell.
+\newblock Stan: A probabilistic programming language.
+\newblock \emph{Journal of Statistical Software}, 76\penalty0 (1):\penalty0
+  1--32, 2017.
+\newblock \doi{10.18637/jss.v076.i01}.
 
 \bibitem[Dabney et~al.(2018)Dabney, Rowland, Bellemare, and
   Munos]{dabney2018quantile}
@@ -101,11 +118,26 @@ Scott Fujimoto, David Meger, and Doina Precup.
   Learning}, volume~97 of \emph{Proceedings of Machine Learning Research},
   pages 2052--2062. PMLR, 2019.
 
+\bibitem[Gelman et~al.(2013)Gelman, Carlin, Stern, Dunson, Vehtari, and
+  Rubin]{gelman2013}
+Andrew Gelman, John~B. Carlin, Hal~S. Stern, David~B. Dunson, Aki Vehtari, and
+  Donald~B. Rubin.
+\newblock \emph{Bayesian Data Analysis}.
+\newblock CRC Press, 3 edition, 2013.
+\newblock ISBN 978-1439840955.
+
 \bibitem[Glasserman(2003)]{glasserman2003}
 Paul Glasserman.
 \newblock \emph{Monte Carlo Methods in Financial Engineering}.
 \newblock Stochastic Modelling and Applied Probability. Springer, 2003.
 \newblock \doi{10.1007/978-0-387-21617-1}.
+
+\bibitem[Glickman(1999)]{glickman1999}
+Mark~E. Glickman.
+\newblock Parameter estimation in large dynamic paired comparison experiments.
+\newblock \emph{Journal of the Royal Statistical Society: Series C (Applied
+  Statistics)}, 48\penalty0 (3):\penalty0 377--394, 1999.
+\newblock \doi{10.1111/1467-9876.00159}.
 
 \bibitem[Glickman and Stern(1998)]{glickman1998}
 Mark~E Glickman and Hal~S Stern.
@@ -334,6 +366,14 @@ Hado van Hasselt, Arthur Guez, and David Silver.
 \newblock In \emph{Proceedings of the AAAI Conference on Artificial
   Intelligence}, 2016.
 \newblock \doi{10.1609/aaai.v30i1.10295}.
+
+\bibitem[Vehtari et~al.(2017)Vehtari, Gelman, and Gabry]{vehtari2017}
+Aki Vehtari, Andrew Gelman, and Jonah Gabry.
+\newblock Practical bayesian model evaluation using leave-one-out
+  cross-validation and waic.
+\newblock \emph{Statistics and Computing}, 27\penalty0 (5):\penalty0
+  1413--1432, 2017.
+\newblock \doi{10.1007/s11222-016-9696-4}.
 
 \bibitem[Wang et~al.(2016)Wang, Schaul, Hessel, Van~Hasselt, Lanctot, and
   De~Freitas]{wang2016dueling}

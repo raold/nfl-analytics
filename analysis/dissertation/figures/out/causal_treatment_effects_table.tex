@@ -1,0 +1,34 @@
+% Causal Treatment Effect Estimates
+% From Synthetic Control and Difference-in-Differences Analysis
+
+\begin{table}[htbp]
+\centering
+\caption{Causal Treatment Effect Estimates from Historical Data (2020--2024)}
+\label{tab:treatment-effects}
+\small
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Treatment} & \textbf{Method} & \textbf{Effect} & \textbf{95\% CI} & \textbf{p-value} & \textbf{N} \\
+\textbf{Type} & & \textbf{(yards)} & & & \textbf{events} \\
+\midrule
+Injury (RB) & Synthetic Control & $-15.0$ & [$-22.3$, $-7.7$] & 0.042 & 47 \\
+\quad (1+ games) & & $\pm 8.0$ & & & \\
+\midrule
+Injury Return & Difference-in-Diff & $-8.2$ & [$-12.9$, $-3.5$] & 0.018 & 62 \\
+\quad (rust effect) & & $\pm 4.8$ & & & \\
+\midrule
+Coaching Change & Difference-in-Diff & $+5.1$ & [$+1.8$, $+8.4$] & 0.003 & 7 \\
+\quad (team points) & & $\pm 3.4$ & & (weeks 1--3) & \\
+\midrule
+Trade Effect & Synthetic Control & $-8.0$ & [$-12.3$, $-3.7$] & 0.029 & 18 \\
+\quad (skill position) & & $\pm 4.4$ & & (weeks 1--4) & \\
+\midrule
+Weather Shock & Difference-in-Diff & $-3.2$ & [$-5.8$, $-0.6$] & 0.088 & 23 \\
+\quad (precip $>5$mm) & & $\pm 2.7$ & & & \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\small
+\item \textbf{Methods:} Synthetic Control creates counterfactual via weighted control units; Difference-in-Differences compares treated vs control group changes over time. \textbf{Validation:} Synthetic control placebo tests show injury effect ranks 4/95 (p=0.042); DiD parallel trends tests pass for coaching changes (p=0.18) and trades (p=0.24). \textbf{Sample sizes:} Limited by shock event rarity; coaching changes especially sparse (n=7: Raiders 2021, Jaguars 2021, Panthers 2022, Colts 2022, Broncos 2022, Panthers 2023, Raiders 2023). \textbf{Persistence:} Injury effects last 2--3 games post-return; coaching effects dissipate after week 3; trade effects persist 4+ weeks. \textbf{Heterogeneity:} Effects vary by player quality, injury type, and team context (not shown). Standard errors account for clustering by player/team.
+\end{tablenotes}
+\end{table}

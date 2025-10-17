@@ -5,7 +5,7 @@
 
 \section{Why Focus on the NFL}
 
-The **National Football League (NFL)** is an ideal testbed for quantitative decision systems because it combines: (i) deep liquid betting markets; (ii) abundant, granular data; and (iii) inherently sequential strategic decisions. These properties support rigorous modeling and credible evaluation of edge.
+The \textbf{National Football League (NFL)} is an ideal testbed for quantitative decision systems because it combines: (i) deep liquid betting markets; (ii) abundant, granular data; and (iii) inherently sequential strategic decisions. These properties support rigorous modeling and credible evaluation of edge.
 
 \begingroup\RaggedRight\sloppy\hbadness=10000
 \begin{itemize}
@@ -34,46 +34,31 @@ We target pre-game markets (spread/total/moneyline) from 1999 onward. Player pro
 
 \section{Thesis Statement and Hypotheses}
 
-\subsection{The Research Question}
-
 This dissertation investigates a fundamental question in quantitative sports analytics: \textit{Can rigorous statistical methods and machine learning extract systematic profits from NFL betting markets using publicly available data?}
 
-We develop a complete betting system pipeline—from data ingestion to model training to risk management to evaluation—and test it rigorously on 5,529 games across 21 seasons (2004--2024). The results challenge the initial hypothesis but yield valuable methodological contributions.
+We develop a complete betting system pipeline—from data ingestion to model training to risk management to evaluation—and test it rigorously on 5,529 games across 21 seasons (2004--2024).
 
-\subsection{Initial Thesis}
-\textbf{Thesis.} A hybrid stack with explicit uncertainty and governance transforms edge into reliable bankroll growth in NFL markets.
+\textbf{Thesis.} A hybrid stack combining classical models, modern ML, and reinforcement learning—with explicit uncertainty quantification and risk governance—can extract reliable edge from NFL betting markets.
 
 \textbf{Hypotheses.}
 \begin{enumerate}
   \item State-space priors improve temporal stability and calibration relative to purely discriminative baselines.
   \item Structured score distributions (Skellam and bivariate Poisson) enable superior pricing of spreads/totals and better teaser/middle planning than direct margin regression.
   \item Market microstructure features (line velocity, cross-book discrepancies) contribute unique signal beyond team-performance covariates.
-  \item RL policies trained offline with conservative constraints and posterior-variance gating convert modeling edge into drawdown-aware bankroll growth, supporting the thesis.
+  \item RL policies trained offline with conservative constraints and posterior-variance gating convert modeling edge into drawdown-aware bankroll growth.
 \end{enumerate}
 
-\subsection{What We Actually Find}
+\subsection{Methodological Contributions}
 
-This dissertation arrives at a more nuanced conclusion than the initial thesis proposed. Our models achieve:
-\begin{itemize}
-  \item \textbf{Strong calibration}: Brier score = 0.2515 (top tier for NFL prediction models)
-  \item \textbf{Positive closing line value}: CLV = +14.9 basis points (beating market closes on average)
-  \item \textbf{Temporal stability}: Consistent Brier scores across 2015--2024 (range: 0.2486--0.2511)
-\end{itemize}
-
-Yet the system loses money: ROI = $-7.5\%$, Sharpe ratio = $-1.22$.
-
-This is not a failure of implementation—it is a demonstration of \textit{semi-strong form market efficiency}. NFL betting markets efficiently incorporate public information, leaving marginal gains that fall short of the 4.5\% hurdle imposed by vigorish at $-110$ odds.
-
-\paragraph{Reframed Contribution.}
-While the initial thesis of profitable betting proves untenable with public data alone, this work makes four methodological contributions:
+This work makes four primary contributions, independent of profitability outcomes:
 \begin{enumerate}
-  \item \textbf{Rigorous negative results}: Weather has no predictive value; calibration does not imply profitability; RL provides marginal gains over simpler Kelly baselines.
-  \item \textbf{Complete system architecture}: A full pipeline from ingestion to evaluation, reusable for alternative domains.
-  \item \textbf{Dependence-aware evaluation}: Copula-based methods for correlated outcomes (same-game parlays, teasers).
-  \item \textbf{Transparent failure analysis}: Documentation of when and why the system declines to act (21\% zero-bet weeks).
+  \item \textbf{Rigorous empirical evaluation}: Comprehensive testing of weather effects, calibration-to-profitability gaps, and RL vs Kelly baselines with transparent reporting of negative results.
+  \item \textbf{Complete system architecture}: A full pipeline from ingestion to evaluation, reusable for sports analytics and sequential decision domains.
+  \item \textbf{Dependence-aware methods}: Copula-based pricing for correlated outcomes (same-game parlays, teasers) and key-number reweighting for integer margins.
+  \item \textbf{Transparent governance}: Documentation of model selection, risk constraints, and operational decision logic, including when the system declines to act.
 \end{enumerate}
 
-The lesson: Do not confuse model quality with betting viability. Strong calibration is necessary but insufficient for profit in efficient markets.
+\noindent The dissertation demonstrates that strong calibration, while necessary, is insufficient for profitability in semi-strong efficient markets where vigorish imposes a 4--5\% hurdle. Full results appear in \Cref{chap:results}.
 
 \section{Reproducibility and Ethics}
 Pipelines are containerized and deterministic. Seeds, dataset manifests, and artefacts are versioned. We adopt responsible-gambling principles with exposure caps, volatility limits, and stop-losses; results are presented with uncertainty, not as guarantees.
