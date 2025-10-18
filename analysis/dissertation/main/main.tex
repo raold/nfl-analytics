@@ -95,15 +95,44 @@
   mar-ket-mi-cro-struc-ture ma-te-ri-al-ized}
 
 % ---------------------------------------------------
+% Enhanced Table & Typography Packages
+% ---------------------------------------------------
+\usepackage{siunitx}              % Consistent numeric formatting (#24)
+\usepackage{makecell}             % Better column headers with line breaks (#4)
+\usepackage{colortbl}             % Row coloring for zebra striping (#5)
+\usepackage[titles]{tocloft}      % Better TOC/LOF/LOT control (fix orphans)
+
+% Configure siunitx for consistent number formatting
+\sisetup{
+  group-separator = {,},
+  group-minimum-digits = 4,
+  round-mode = places,
+  round-precision = 2,
+  detect-weight = true,
+  detect-inline-weight = math
+}
+
+% ---------------------------------------------------
 % Table helpers and caption styling
 % ---------------------------------------------------
 % Ragged-right, auto-wrapping X-style columns.
 % Use \begin{tabularx}{\linewidth}{@{} l Y Y @{} } ... \end{tabularx}
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 \newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
+% Right-aligned column for numeric data (#1)
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+% siunitx numeric column for automatic alignment (#1, #24)
+\newcolumntype{N}{S[table-format=3.2]}
+
 % Slightly smaller table captions and content by default
 \captionsetup[table]{font=small}
 \captionsetup[figure]{font=small}
+
+% Helper commands for consistent table formatting
+% #4: Better header command with automatic line breaks
+\renewcommand{\thead}[1]{\multicolumn{1}{c}{\bfseries\makecell{#1}}}
+% #7: Heavier rule for baseline separation
+\newcommand{\baselinerule}{\midrule[0.08em]}
 
 % ---------------------------------------------------
 % Theorem style with margin headings (slick variant)
