@@ -29,17 +29,15 @@ Schedule via cron (daily at 10am):
 """
 
 import argparse
+import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
-import json
 
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -62,37 +60,38 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', 5544)),
-    'dbname': os.getenv('DB_NAME', 'devdb01'),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 5544)),
+    "dbname": os.getenv("DB_NAME", "devdb01"),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 DB_URL = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
 
 # Default prop types to process
 DEFAULT_PROP_TYPES = [
-    'passing_yards',
-    'passing_tds',
-    'interceptions',
-    'rushing_yards',
-    'rushing_tds',
-    'receiving_yards',
-    'receptions',
-    'receiving_tds',
+    "passing_yards",
+    "passing_tds",
+    "interceptions",
+    "rushing_yards",
+    "rushing_tds",
+    "receiving_yards",
+    "receptions",
+    "receiving_tds",
 ]
 
 # Model paths
-MODELS_DIR = Path(__file__).parent.parent.parent / 'models' / 'props'
+MODELS_DIR = Path(__file__).parent.parent.parent / "models" / "props"
 
 # Output directory
-OUTPUT_DIR = Path(__file__).parent.parent.parent / 'output' / 'props_recommendations'
+OUTPUT_DIR = Path(__file__).parent.parent.parent / "output" / "props_recommendations"
 
 
 # ============================================================================
 # Pipeline Orchestrator
 # ============================================================================
+
 
 class PropsPipeline:
     """Orchestrate the complete props betting pipeline."""
@@ -100,10 +99,10 @@ class PropsPipeline:
     def __init__(
         self,
         api_key: str = None,
-        db_config: Dict = None,
-        prop_types: List[str] = None,
+        db_config: dict = None,
+        prop_types: list[str] = None,
         bankroll: float = 10000.0,
-        test_mode: bool = False
+        test_mode: bool = False,
     ):
         self.api_key = api_key
         self.db_config = db_config or DB_CONFIG
@@ -116,10 +115,7 @@ class PropsPipeline:
         self.feature_engineer = PlayerFeatureEngineer(db_url=DB_URL)
         self.predictors = {}  # Will load models for each prop type
         self.selector = PropsEVSelector(
-            min_edge=0.03,
-            kelly_fraction=0.15,
-            max_bet_pct=0.03,
-            check_injuries=True
+            min_edge=0.03, kelly_fraction=0.15, max_bet_pct=0.03, check_injuries=True
         )
 
         # Create output directory
@@ -127,13 +123,13 @@ class PropsPipeline:
 
         # Stats tracking
         self.stats = {
-            'lines_fetched': 0,
-            'features_generated': 0,
-            'predictions_made': 0,
-            'bets_selected': 0,
-            'total_to_wager': 0.0,
-            'avg_edge': 0.0,
-            'avg_ev': 0.0,
+            "lines_fetched": 0,
+            "features_generated": 0,
+            "predictions_made": 0,
+            "bets_selected": 0,
+            "total_to_wager": 0.0,
+            "avg_edge": 0.0,
+            "avg_ev": 0.0,
         }
 
     def step_1_fetch_prop_lines(self, max_events: int = None) -> int:
@@ -157,10 +153,10 @@ class PropsPipeline:
         try:
             lines_fetched = self.fetcher.fetch_and_store_all_props(
                 markets=[f"player_{pt.replace('_', '_')}" for pt in self.prop_types],
-                max_events=max_events
+                max_events=max_events,
             )
 
-            self.stats['lines_fetched'] = lines_fetched
+            self.stats["lines_fetched"] = lines_fetched
             logger.info(f"✅ Fetched {lines_fetched} prop lines")
             return lines_fetched
 
@@ -205,16 +201,18 @@ class PropsPipeline:
             features = self.feature_engineer.generate_features(
                 start_season=season - 3,  # Last 3 seasons for rolling features
                 end_season=season,
-                positions=['QB', 'RB', 'WR', 'TE']
+                positions=["QB", "RB", "WR", "TE"],
             )
 
             # Filter to only players with active prop lines
-            features = features[features['player_id'].isin(players_df['player_id'])]
+            features = features[features["player_id"].isin(players_df["player_id"])]
 
             # Get most recent features (latest week for each player)
-            features = features.sort_values(['player_id', 'season', 'week']).groupby('player_id').tail(1)
+            features = (
+                features.sort_values(["player_id", "season", "week"]).groupby("player_id").tail(1)
+            )
 
-            self.stats['features_generated'] = len(features)
+            self.stats["features_generated"] = len(features)
             logger.info(f"✅ Generated features for {len(features)} players")
 
             return features
@@ -223,7 +221,7 @@ class PropsPipeline:
             logger.error(f"Error generating features: {e}", exc_info=True)
             return pd.DataFrame()
 
-    def step_3_load_models(self) -> Dict:
+    def step_3_load_models(self) -> dict:
         """
         Step 3: Load trained models for each prop type.
 
@@ -282,8 +280,8 @@ class PropsPipeline:
                 predictions = predictor.predict(features)
 
                 # Add metadata
-                predictions['prop_type'] = prop_type
-                predictions['prediction_time'] = datetime.now()
+                predictions["prop_type"] = prop_type
+                predictions["prediction_time"] = datetime.now()
 
                 all_predictions.append(predictions)
 
@@ -297,7 +295,7 @@ class PropsPipeline:
 
         predictions_df = pd.concat(all_predictions, ignore_index=True)
 
-        self.stats['predictions_made'] = len(predictions_df)
+        self.stats["predictions_made"] = len(predictions_df)
         logger.info(f"✅ Made {len(predictions_df)} total predictions")
 
         return predictions_df
@@ -349,9 +347,7 @@ class PropsPipeline:
             return pd.DataFrame()
 
     def step_6_select_bets(
-        self,
-        predictions: pd.DataFrame,
-        prop_lines: pd.DataFrame
+        self, predictions: pd.DataFrame, prop_lines: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Step 6: Run EV-based bet selection.
@@ -381,16 +377,16 @@ class PropsPipeline:
                 predictions_df=predictions,
                 prop_lines_df=prop_lines,
                 bankroll=self.bankroll,
-                max_bets=None  # No limit
+                max_bets=None,  # No limit
             )
 
             conn.close()
 
             if not selected_bets.empty:
-                self.stats['bets_selected'] = len(selected_bets)
-                self.stats['total_to_wager'] = selected_bets['bet_amount'].sum()
-                self.stats['avg_edge'] = selected_bets['edge'].mean()
-                self.stats['avg_ev'] = selected_bets['ev'].mean()
+                self.stats["bets_selected"] = len(selected_bets)
+                self.stats["total_to_wager"] = selected_bets["bet_amount"].sum()
+                self.stats["avg_edge"] = selected_bets["edge"].mean()
+                self.stats["avg_ev"] = selected_bets["ev"].mean()
 
                 logger.info(f"✅ Selected {len(selected_bets)} profitable bets")
                 logger.info(f"   Total to wager: ${self.stats['total_to_wager']:,.0f}")
@@ -406,11 +402,8 @@ class PropsPipeline:
             return pd.DataFrame()
 
     def step_7_save_recommendations(
-        self,
-        selected_bets: pd.DataFrame,
-        predictions: pd.DataFrame,
-        prop_lines: pd.DataFrame
-    ) -> Dict[str, Path]:
+        self, selected_bets: pd.DataFrame, predictions: pd.DataFrame, prop_lines: pd.DataFrame
+    ) -> dict[str, Path]:
         """
         Step 7: Save recommendations and supplementary data.
 
@@ -434,17 +427,17 @@ class PropsPipeline:
             if not selected_bets.empty:
                 bets_file = OUTPUT_DIR / f"recommended_bets_{timestamp}.csv"
                 selected_bets.to_csv(bets_file, index=False)
-                output_files['bets'] = bets_file
+                output_files["bets"] = bets_file
                 logger.info(f"  ✓ Saved {len(selected_bets)} recommended bets to {bets_file}")
 
                 # Also save as "latest" for easy access
                 latest_file = OUTPUT_DIR / "recommended_bets_latest.csv"
                 selected_bets.to_csv(latest_file, index=False)
-                output_files['bets_latest'] = latest_file
+                output_files["bets_latest"] = latest_file
 
                 # Create human-readable summary
                 summary_file = OUTPUT_DIR / f"summary_{timestamp}.txt"
-                with open(summary_file, 'w') as f:
+                with open(summary_file, "w") as f:
                     f.write("=" * 80 + "\n")
                     f.write("DAILY PROPS BETTING RECOMMENDATIONS\n")
                     f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
@@ -459,9 +452,11 @@ class PropsPipeline:
                     f.write("TOP 10 BETS BY EV:\n")
                     f.write("-" * 80 + "\n")
 
-                    top_bets = selected_bets.nlargest(10, 'ev')
+                    top_bets = selected_bets.nlargest(10, "ev")
                     for idx, row in top_bets.iterrows():
-                        f.write(f"\n{row['player_name']} - {row['prop_type']} {row['bet_side'].upper()}\n")
+                        f.write(
+                            f"\n{row['player_name']} - {row['prop_type']} {row['bet_side'].upper()}\n"
+                        )
                         f.write(f"  Line: {row['line_value']}\n")
                         f.write(f"  Prediction: {row['prediction']:.1f}\n")
                         f.write(f"  Odds: {row['odds']:+d} ({row['bookmaker']})\n")
@@ -470,21 +465,21 @@ class PropsPipeline:
                         f.write(f"  Bet size: ${row['bet_amount']:.2f}\n")
                         f.write(f"  Confidence: {row['confidence']:.1f}/100\n")
 
-                output_files['summary'] = summary_file
+                output_files["summary"] = summary_file
                 logger.info(f"  ✓ Saved summary to {summary_file}")
 
             # Save all predictions (for analysis)
             if not predictions.empty:
                 preds_file = OUTPUT_DIR / f"predictions_{timestamp}.csv"
                 predictions.to_csv(preds_file, index=False)
-                output_files['predictions'] = preds_file
+                output_files["predictions"] = preds_file
                 logger.info(f"  ✓ Saved {len(predictions)} predictions to {preds_file}")
 
             # Save statistics
             stats_file = OUTPUT_DIR / f"stats_{timestamp}.json"
-            with open(stats_file, 'w') as f:
+            with open(stats_file, "w") as f:
                 json.dump(self.stats, f, indent=2)
-            output_files['stats'] = stats_file
+            output_files["stats"] = stats_file
             logger.info(f"  ✓ Saved pipeline stats to {stats_file}")
 
             logger.info(f"✅ All outputs saved to {OUTPUT_DIR}")
@@ -494,11 +489,7 @@ class PropsPipeline:
             logger.error(f"Error saving recommendations: {e}", exc_info=True)
             return output_files
 
-    def run_full_pipeline(
-        self,
-        skip_fetch: bool = False,
-        max_events: int = None
-    ) -> Dict:
+    def run_full_pipeline(self, skip_fetch: bool = False, max_events: int = None) -> dict:
         """
         Run the complete end-to-end pipeline.
 
@@ -530,28 +521,28 @@ class PropsPipeline:
 
         if features.empty:
             logger.error("❌ Pipeline failed: No features generated")
-            return {'success': False, 'error': 'No features generated'}
+            return {"success": False, "error": "No features generated"}
 
         # Step 3: Load models
         self.step_3_load_models()
 
         if not self.predictors:
             logger.error("❌ Pipeline failed: No models loaded")
-            return {'success': False, 'error': 'No models loaded'}
+            return {"success": False, "error": "No models loaded"}
 
         # Step 4: Make predictions
         predictions = self.step_4_make_predictions(features)
 
         if predictions.empty:
             logger.error("❌ Pipeline failed: No predictions made")
-            return {'success': False, 'error': 'No predictions made'}
+            return {"success": False, "error": "No predictions made"}
 
         # Step 5: Get prop lines
         prop_lines = self.step_5_get_prop_lines()
 
         if prop_lines.empty:
             logger.error("❌ Pipeline failed: No prop lines available")
-            return {'success': False, 'error': 'No prop lines available'}
+            return {"success": False, "error": "No prop lines available"}
 
         # Step 6: Select bets
         selected_bets = self.step_6_select_bets(predictions, prop_lines)
@@ -571,17 +562,17 @@ class PropsPipeline:
         logger.info(f"Predictions made: {self.stats['predictions_made']}")
         logger.info(f"Bets selected: {self.stats['bets_selected']}")
 
-        if self.stats['bets_selected'] > 0:
+        if self.stats["bets_selected"] > 0:
             logger.info(f"Total to wager: ${self.stats['total_to_wager']:,.2f}")
             logger.info(f"Average edge: {self.stats['avg_edge']*100:.2f}%")
             logger.info(f"Average EV: ${self.stats['avg_ev']:.2f}")
         logger.info("=" * 80 + "\n")
 
         return {
-            'success': True,
-            'stats': self.stats,
-            'output_files': output_files,
-            'duration_seconds': duration
+            "success": True,
+            "stats": self.stats,
+            "output_files": output_files,
+            "duration_seconds": duration,
         }
 
 
@@ -589,50 +580,36 @@ class PropsPipeline:
 # CLI
 # ============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(
-        description='Daily Props Betting Production Pipeline'
-    )
+    parser = argparse.ArgumentParser(description="Daily Props Betting Production Pipeline")
 
     # API configuration
     parser.add_argument(
-        '--api-key',
-        default=os.getenv('ODDS_API_KEY'),
-        help='The Odds API key (or set ODDS_API_KEY env var)'
+        "--api-key",
+        default=os.getenv("ODDS_API_KEY"),
+        help="The Odds API key (or set ODDS_API_KEY env var)",
     )
 
     # Pipeline options
     parser.add_argument(
-        '--skip-fetch',
-        action='store_true',
-        help='Skip fetching new prop lines (use existing)'
+        "--skip-fetch", action="store_true", help="Skip fetching new prop lines (use existing)"
     )
     parser.add_argument(
-        '--prop-types',
-        nargs='+',
+        "--prop-types",
+        nargs="+",
         default=DEFAULT_PROP_TYPES,
-        help=f'Prop types to process (default: {DEFAULT_PROP_TYPES})'
+        help=f"Prop types to process (default: {DEFAULT_PROP_TYPES})",
     )
-    parser.add_argument(
-        '--max-events',
-        type=int,
-        help='Maximum number of events to process'
-    )
+    parser.add_argument("--max-events", type=int, help="Maximum number of events to process")
 
     # Betting parameters
     parser.add_argument(
-        '--bankroll',
-        type=float,
-        default=10000.0,
-        help='Current bankroll (default: 10000)'
+        "--bankroll", type=float, default=10000.0, help="Current bankroll (default: 10000)"
     )
 
     # Testing
-    parser.add_argument(
-        '--test-mode',
-        action='store_true',
-        help='Test mode (no database writes)'
-    )
+    parser.add_argument("--test-mode", action="store_true", help="Test mode (no database writes)")
 
     args = parser.parse_args()
 
@@ -649,17 +626,14 @@ def main():
         db_config=DB_CONFIG,
         prop_types=args.prop_types,
         bankroll=args.bankroll,
-        test_mode=args.test_mode
+        test_mode=args.test_mode,
     )
 
     # Run pipeline
     try:
-        result = pipeline.run_full_pipeline(
-            skip_fetch=args.skip_fetch,
-            max_events=args.max_events
-        )
+        result = pipeline.run_full_pipeline(skip_fetch=args.skip_fetch, max_events=args.max_events)
 
-        if result['success']:
+        if result["success"]:
             logger.info("✅ Pipeline completed successfully")
             return 0
         else:
@@ -671,5 +645,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

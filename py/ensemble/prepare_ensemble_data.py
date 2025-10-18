@@ -62,11 +62,11 @@ def prepare_ensemble_data(input_path: str, output_path: str, season: int = None)
     print(f"  Loaded {len(df)} games")
 
     if season is not None:
-        df = df[df['season'] == season].copy()
+        df = df[df["season"] == season].copy()
         print(f"  Filtered to season {season}: {len(df)} games")
 
     # Check required columns
-    required = ['spread_close', 'total_close', 'home_score', 'away_score']
+    required = ["spread_close", "total_close", "home_score", "away_score"]
     missing = set(required) - set(df.columns)
     if missing:
         raise ValueError(f"Missing required columns: {missing}")
@@ -75,27 +75,27 @@ def prepare_ensemble_data(input_path: str, output_path: str, season: int = None)
     print("Computing RL state features...")
 
     # EPA gap (simplified: use point differential as proxy if EPA not available)
-    if 'prior_epa_mean_diff' in df.columns:
-        df['epa_gap'] = df['prior_epa_mean_diff']
+    if "prior_epa_mean_diff" in df.columns:
+        df["epa_gap"] = df["prior_epa_mean_diff"]
     else:
         print("  WARNING: prior_epa_mean_diff not found, using 0.0")
-        df['epa_gap'] = 0.0
+        df["epa_gap"] = 0.0
 
     # Market probability from spread
-    df['market_prob'] = df['spread_close'].apply(spread_to_prob)
+    df["market_prob"] = df["spread_close"].apply(spread_to_prob)
 
     # Placeholder for p_hat (will be computed by XGBoost model in ensemble)
     # For now, set to market_prob (ensemble will overwrite)
-    df['p_hat'] = df['market_prob']
+    df["p_hat"] = df["market_prob"]
 
     # Edge (will be computed in ensemble after p_hat is updated)
-    df['edge'] = 0.0
+    df["edge"] = 0.0
 
     # Home result (for backtesting)
-    df['home_result'] = (df['home_score'] > df['away_score']).astype(int)
+    df["home_result"] = (df["home_score"] > df["away_score"]).astype(int)
 
     # Keep all original features plus new RL features
-    print(f"  Added RL state features: epa_gap, market_prob, p_hat, edge, home_result")
+    print("  Added RL state features: epa_gap, market_prob, p_hat, edge, home_result")
 
     # Save
     output_path = Path(output_path)
@@ -107,7 +107,7 @@ def prepare_ensemble_data(input_path: str, output_path: str, season: int = None)
     print(f"  Features: {len(df.columns)}")
 
     # Summary stats
-    print(f"\nSummary statistics:")
+    print("\nSummary statistics:")
     print(f"  Spread range: [{df['spread_close'].min():.1f}, {df['spread_close'].max():.1f}]")
     print(f"  Market prob range: [{df['market_prob'].min():.3f}, {df['market_prob'].max():.3f}]")
     print(f"  Home win rate: {df['home_result'].mean()*100:.1f}%")
@@ -116,10 +116,10 @@ def prepare_ensemble_data(input_path: str, output_path: str, season: int = None)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Prepare ensemble prediction data')
-    parser.add_argument('--input', required=True, help='Input XGBoost v2 CSV')
-    parser.add_argument('--output', required=True, help='Output ensemble CSV')
-    parser.add_argument('--season', type=int, help='Filter to specific season')
+    parser = argparse.ArgumentParser(description="Prepare ensemble prediction data")
+    parser.add_argument("--input", required=True, help="Input XGBoost v2 CSV")
+    parser.add_argument("--output", required=True, help="Output ensemble CSV")
+    parser.add_argument("--season", type=int, help="Filter to specific season")
 
     args = parser.parse_args()
 
@@ -128,5 +128,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

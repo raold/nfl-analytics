@@ -31,18 +31,15 @@ Usage:
 """
 
 import argparse
-import json
 import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import List, Dict
 
 import pandas as pd
 from sqlalchemy import create_engine
 
 
-def run_command(cmd: List[str], description: str = None):
+def run_command(cmd: list[str], description: str = None):
     """
     Run a shell command and handle errors.
 
@@ -72,9 +69,9 @@ def recommend_bets(week: int, season: int = 2025):
         week: NFL week number
         season: NFL season year
     """
-    print("="*80)
+    print("=" * 80)
     print(f"WEEK {week} PAPER TRADING RECOMMENDATIONS")
-    print("="*80)
+    print("=" * 80)
 
     # Path to upcoming games CSV (user should prepare this)
     games_csv = f"data/week{week}_games.csv"
@@ -95,24 +92,30 @@ def recommend_bets(week: int, season: int = 2025):
     cmd = [
         sys.executable,
         "py/production/majority_betting_system.py",
-        "--games-csv", games_csv,
-        "--bankroll", "10000",
-        "--kelly-fraction", "0.25",
-        "--max-bet-fraction", "0.05",
-        "--min-edge", "0.02",
+        "--games-csv",
+        games_csv,
+        "--bankroll",
+        "10000",
+        "--kelly-fraction",
+        "0.25",
+        "--max-bet-fraction",
+        "0.05",
+        "--min-edge",
+        "0.02",
         "--paper-trade",  # PAPER TRADING MODE
-        "--output", str(output_path),
+        "--output",
+        str(output_path),
     ]
 
     run_command(cmd, f"Generating Week {week} betting recommendations")
 
     print(f"\n✅ Recommendations saved to {output_path}")
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"1. Review recommendations in {output_path}")
-    print(f"2. For each bet you want to place, run:")
-    print(f"   python py/production/paper_trade.py log --game-id <game> --bet-type <type> ...")
-    print(f"3. After games finish, update results with:")
-    print(f"   python py/production/paper_trade.py update --bet-id <id> --result <win/loss> ...")
+    print("2. For each bet you want to place, run:")
+    print("   python py/production/paper_trade.py log --game-id <game> --bet-type <type> ...")
+    print("3. After games finish, update results with:")
+    print("   python py/production/paper_trade.py update --bet-id <id> --result <win/loss> ...")
 
 
 def log_bet(args: argparse.Namespace):
@@ -126,15 +129,24 @@ def log_bet(args: argparse.Namespace):
         sys.executable,
         "py/production/monitor_performance.py",
         "log",
-        "--game-id", args.game_id,
-        "--week", str(args.week),
-        "--season", str(args.season),
-        "--bet-type", args.bet_type,
-        "--side", args.side,
-        "--line", str(args.line),
-        "--odds", str(args.odds),
-        "--stake", str(args.stake),
-        "--prediction", str(args.prediction),
+        "--game-id",
+        args.game_id,
+        "--week",
+        str(args.week),
+        "--season",
+        str(args.season),
+        "--bet-type",
+        args.bet_type,
+        "--side",
+        args.side,
+        "--line",
+        str(args.line),
+        "--odds",
+        str(args.odds),
+        "--stake",
+        str(args.stake),
+        "--prediction",
+        str(args.prediction),
         "--paper-trade",  # PAPER TRADING MODE
     ]
 
@@ -152,10 +164,14 @@ def update_bet(args: argparse.Namespace):
         sys.executable,
         "py/production/monitor_performance.py",
         "update",
-        "--bet-id", str(args.bet_id),
-        "--result", args.result,
-        "--home-score", str(args.home_score),
-        "--away-score", str(args.away_score),
+        "--bet-id",
+        str(args.bet_id),
+        "--result",
+        args.result,
+        "--home-score",
+        str(args.home_score),
+        "--away-score",
+        str(args.away_score),
     ]
 
     if args.closing_line:
@@ -185,20 +201,20 @@ def list_bets():
         print("No paper trade bets found.")
         return
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("PAPER TRADE BETS")
-    print("="*80)
+    print("=" * 80)
     print(bets.to_string(index=False))
-    print("="*80)
+    print("=" * 80)
 
 
 def generate_report():
     """
     Generate paper trading performance report.
     """
-    print("="*80)
+    print("=" * 80)
     print("PAPER TRADING PERFORMANCE REPORT")
-    print("="*80)
+    print("=" * 80)
 
     engine = create_engine("postgresql://dro:sicillionbillions@localhost:5544/devdb01")
 
@@ -233,19 +249,23 @@ def generate_report():
         total_payout = settled["payout"].sum()
         roi = (total_payout / total_staked) if total_staked > 0 else 0
 
-        print(f"\nResults:")
+        print("\nResults:")
         print(f"  Wins: {wins}")
         print(f"  Losses: {losses}")
         print(f"  Pushes: {pushes}")
-        print(f"  Win Rate: {wins/(wins+losses)*100:.1f}%" if (wins+losses) > 0 else "  Win Rate: N/A")
+        print(
+            f"  Win Rate: {wins/(wins+losses)*100:.1f}%"
+            if (wins + losses) > 0
+            else "  Win Rate: N/A"
+        )
 
-        print(f"\nFinancial:")
+        print("\nFinancial:")
         print(f"  Total Staked: ${total_staked:,.2f}")
         print(f"  Total Payout: ${total_payout:+,.2f}")
         print(f"  ROI: {roi:+.2%}")
         print(f"  Final Bankroll: ${10000 + total_payout:,.2f}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
     # Assessment
     print("\nPaper Trading Assessment:")
@@ -255,13 +275,13 @@ def generate_report():
         else:
             print("⚠️  Negative ROI - Review strategy before going live")
 
-        if wins/(wins+losses) >= 0.53:
+        if wins / (wins + losses) >= 0.53:
             print("✅ Win rate above breakeven (52.4%)")
         else:
             print("⚠️  Win rate below breakeven - Monitor closely")
 
         print("\nRecommendation for Week 7:")
-        if roi > 0.02 and wins/(wins+losses) >= 0.53:
+        if roi > 0.02 and wins / (wins + losses) >= 0.53:
             print("🟢 PROCEED TO LIVE BETTING (start small)")
         elif roi > -0.05:
             print("🟡 REVIEW AND ITERATE (paper trade another week)")
@@ -270,7 +290,7 @@ def generate_report():
     else:
         print("⏳ Need at least 10 settled bets for meaningful assessment")
 
-    print("="*80)
+    print("=" * 80)
 
 
 def main():

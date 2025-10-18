@@ -46,14 +46,12 @@ import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import TimeSeriesSplit
 
 logging.basicConfig(
     level=logging.INFO,
@@ -81,7 +79,7 @@ class PropPrediction:
     over_prob: float
     under_prob: float
     edge: float  # EV advantage over fair odds
-    recommended_bet: Optional[str]  # "over", "under", or None
+    recommended_bet: str | None  # "over", "under", or None
 
 
 @dataclass
@@ -254,7 +252,7 @@ class PropsPredictor:
     def __init__(
         self,
         prop_type: str,
-        xgb_params: Optional[Dict] = None,
+        xgb_params: dict | None = None,
         min_edge: float = 0.03,
         kelly_fraction: float = 0.25,
     ):
@@ -291,14 +289,12 @@ class PropsPredictor:
             "random_state": 42,
         }
 
-        self.model: Optional[xgb.XGBRegressor] = None
-        self.feature_cols: List[str] = []
-        self.scaler_mean: Optional[np.ndarray] = None
-        self.scaler_std: Optional[np.ndarray] = None
+        self.model: xgb.XGBRegressor | None = None
+        self.feature_cols: list[str] = []
+        self.scaler_mean: np.ndarray | None = None
+        self.scaler_std: np.ndarray | None = None
 
-    def prepare_features(
-        self, df: pd.DataFrame, target_col: str
-    ) -> Tuple[pd.DataFrame, pd.Series]:
+    def prepare_features(self, df: pd.DataFrame, target_col: str) -> tuple[pd.DataFrame, pd.Series]:
         """
         Prepare features for training/prediction.
 
@@ -317,8 +313,7 @@ class PropsPredictor:
             self.feature_cols = [
                 col
                 for col in df.columns
-                if col != target_col
-                and df[col].dtype in [np.float64, np.int64]
+                if col != target_col and df[col].dtype in [np.float64, np.int64]
             ]
 
         logger.info(
@@ -345,7 +340,7 @@ class PropsPredictor:
         target_col: str,
         val_split: float = 0.2,
         early_stopping_rounds: int = 50,
-    ) -> Dict:
+    ) -> dict:
         """
         Train XGBoost model.
 
@@ -368,9 +363,7 @@ class PropsPredictor:
         X_train, X_val = X[:split_idx], X[split_idx:]
         y_train, y_val = y[:split_idx], y[split_idx:]
 
-        logger.info(
-            f"Train: {len(X_train)} samples | Val: {len(X_val)} samples"
-        )
+        logger.info(f"Train: {len(X_train)} samples | Val: {len(X_val)} samples")
 
         # Standardize features (helps with XGBoost convergence)
         self.scaler_mean = X_train.mean().values
@@ -415,9 +408,11 @@ class PropsPredictor:
         return {"train": train_metrics, "val": val_metrics}
 
     def predict(
-        self, X: pd.DataFrame, with_uncertainty: bool = True,
-        bayesian_priors: Optional[pd.DataFrame] = None
-    ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+        self,
+        X: pd.DataFrame,
+        with_uncertainty: bool = True,
+        bayesian_priors: pd.DataFrame | None = None,
+    ) -> tuple[np.ndarray, np.ndarray | None]:
         """
         Predict prop values with uncertainty estimates.
 
@@ -439,25 +434,25 @@ class PropsPredictor:
         xgb_predictions = self.model.predict(X_scaled)
 
         # Combine with Bayesian priors if available
-        if bayesian_priors is not None and 'player_id' in X.columns:
+        if bayesian_priors is not None and "player_id" in X.columns:
             predictions = np.zeros_like(xgb_predictions)
             stds = np.zeros_like(xgb_predictions)
 
-            for i, player_id in enumerate(X['player_id']):
+            for i, player_id in enumerate(X["player_id"]):
                 # Check if we have Bayesian prior for this player
-                bayesian_row = bayesian_priors[bayesian_priors['player_id'] == player_id]
+                bayesian_row = bayesian_priors[bayesian_priors["player_id"] == player_id]
 
                 if not bayesian_row.empty:
                     # We have a Bayesian prior - combine with XGBoost
-                    bayesian_mean = bayesian_row['predicted_value'].iloc[0]
-                    bayesian_std = bayesian_row['predicted_std'].iloc[0]
+                    bayesian_mean = bayesian_row["predicted_value"].iloc[0]
+                    bayesian_std = bayesian_row["predicted_std"].iloc[0]
                     xgb_mean = xgb_predictions[i]
                     xgb_std = self.xgb_params.get("rmse", 10.0)
 
                     # Combine using inverse variance weighting
                     # This gives more weight to the more confident prediction
-                    bayesian_weight = 1 / (bayesian_std ** 2)
-                    xgb_weight = 1 / (xgb_std ** 2)
+                    bayesian_weight = 1 / (bayesian_std**2)
+                    xgb_weight = 1 / (xgb_std**2)
                     total_weight = bayesian_weight + xgb_weight
 
                     # Combined mean
@@ -492,7 +487,7 @@ class PropsPredictor:
         self,
         player_id: str,
         player_name: str,
-        features: Dict,
+        features: dict,
         line: float,
         over_odds: int = -110,
         under_odds: int = -110,
@@ -561,7 +556,7 @@ class PropsPredictor:
         line_col: str = "prop_line",
         over_odds_col: str = "over_odds",
         under_odds_col: str = "under_odds",
-        bayesian_priors: Optional[pd.DataFrame] = None,
+        bayesian_priors: pd.DataFrame | None = None,
     ) -> BacktestResult:
         """
         Backtest prop predictions against historical lines.
@@ -586,8 +581,12 @@ class PropsPredictor:
 
         # Get lines and odds
         lines = df[line_col].values
-        over_odds = df[over_odds_col].values if over_odds_col in df.columns else np.full(len(df), -110)
-        under_odds = df[under_odds_col].values if under_odds_col in df.columns else np.full(len(df), -110)
+        over_odds = (
+            df[over_odds_col].values if over_odds_col in df.columns else np.full(len(df), -110)
+        )
+        under_odds = (
+            df[under_odds_col].values if under_odds_col in df.columns else np.full(len(df), -110)
+        )
 
         # Simulate betting
         bets = []
@@ -647,11 +646,15 @@ class PropsPredictor:
         bets_df = pd.DataFrame(bets)
 
         roi = bets_df["payout"].mean()
-        sharpe = bets_df["payout"].mean() / (bets_df["payout"].std() + 1e-8) if len(bets) > 1 else 0.0
+        sharpe = (
+            bets_df["payout"].mean() / (bets_df["payout"].std() + 1e-8) if len(bets) > 1 else 0.0
+        )
         win_rate = bets_df["win"].mean()
         avg_edge = bets_df["edge"].mean()
 
-        logger.info(f"Backtest: {len(bets)} bets | ROI: {roi:.2%} | Sharpe: {sharpe:.3f} | Win Rate: {win_rate:.2%}")
+        logger.info(
+            f"Backtest: {len(bets)} bets | ROI: {roi:.2%} | Sharpe: {sharpe:.3f} | Win Rate: {win_rate:.2%}"
+        )
 
         return BacktestResult(
             prop_type=self.prop_type,
@@ -694,7 +697,7 @@ class PropsPredictor:
     @classmethod
     def load_model(cls, filepath: str) -> "PropsPredictor":
         """Load model from disk."""
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             model_data = json.load(f)
 
         predictor = cls(
@@ -731,9 +734,7 @@ class PropsPredictor:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="NFL Player Props Prediction Model"
-    )
+    parser = argparse.ArgumentParser(description="NFL Player Props Prediction Model")
     parser.add_argument(
         "--features",
         type=str,
@@ -840,9 +841,7 @@ def main():
         if args.model:
             predictor = PropsPredictor.load_model(args.model)
         elif args.features:
-            predictor = PropsPredictor(
-                prop_type=args.prop_type, min_edge=args.min_edge
-            )
+            predictor = PropsPredictor(prop_type=args.prop_type, min_edge=args.min_edge)
         else:
             parser.error("--backtest requires --model or --features")
 
@@ -852,9 +851,7 @@ def main():
             df = df[df["season"] == args.test_season]
 
         # Backtest
-        result = predictor.backtest(
-            df, target_col=args.prop_type, line_col="prop_line"
-        )
+        result = predictor.backtest(df, target_col=args.prop_type, line_col="prop_line")
 
         print("\n" + "=" * 70)
         print(f"BACKTEST RESULTS: {result.prop_type.upper()}")
@@ -916,14 +913,12 @@ def main():
 
     # Train model
     predictor = PropsPredictor(prop_type=args.prop_type, min_edge=args.min_edge)
-    metrics = predictor.train(df_train, target_col=args.prop_type)
+    predictor.train(df_train, target_col=args.prop_type)
 
     # Test set evaluation
     if df_test is not None and len(df_test) > 0:
         logger.info(f"Testing on {len(df_test)} samples from {args.test_season}")
-        test_result = predictor.backtest(
-            df_test, target_col=args.prop_type, line_col="prop_line"
-        )
+        test_result = predictor.backtest(df_test, target_col=args.prop_type, line_col="prop_line")
 
         print("\n" + "=" * 70)
         print(f"TEST SET RESULTS: {args.test_season}")

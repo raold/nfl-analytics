@@ -7,15 +7,13 @@ transitive relations: if A beats B and B beats C, then A should beat C.
 Uses message passing on a temporal game graph to learn team embeddings.
 """
 
-import numpy as np
+import json
+from pathlib import Path
+
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from typing import Dict, List, Tuple, Optional
-import json
-from pathlib import Path
-from collections import defaultdict
 
 
 class TeamRatingGNN(nn.Module):
@@ -28,11 +26,9 @@ class TeamRatingGNN(nn.Module):
     3. Predict game outcome from team embeddings
     """
 
-    def __init__(self,
-                 n_teams: int,
-                 embedding_dim: int = 32,
-                 hidden_dim: int = 64,
-                 n_message_passes: int = 3):
+    def __init__(
+        self, n_teams: int, embedding_dim: int = 32, hidden_dim: int = 64, n_message_passes: int = 3
+    ):
         super().__init__()
 
         self.n_teams = n_teams
@@ -46,14 +42,11 @@ class TeamRatingGNN(nn.Module):
         self.message_mlp = nn.Sequential(
             nn.Linear(2 * embedding_dim, hidden_dim),
             nn.ReLU(),
-            nn.Linear(hidden_dim, embedding_dim)
+            nn.Linear(hidden_dim, embedding_dim),
         )
 
         # Aggregation for message passing
-        self.update_mlp = nn.Sequential(
-            nn.Linear(2 * embedding_dim, embedding_dim),
-            nn.ReLU()
-        )
+        self.update_mlp = nn.Sequential(nn.Linear(2 * embedding_dim, embedding_dim), nn.ReLU())
 
         # Prediction head
         self.predictor = nn.Sequential(
@@ -63,15 +56,15 @@ class TeamRatingGNN(nn.Module):
             nn.Linear(hidden_dim, 32),
             nn.ReLU(),
             nn.Linear(32, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
         # Initialize embeddings
         nn.init.xavier_uniform_(self.team_embeddings.weight)
 
-    def message_pass(self,
-                     team_embeds: torch.Tensor,
-                     adjacency: List[Tuple[int, int]]) -> torch.Tensor:
+    def message_pass(
+        self, team_embeds: torch.Tensor, adjacency: list[tuple[int, int]]
+    ) -> torch.Tensor:
         """
         One round of message passing.
 
@@ -108,10 +101,12 @@ class TeamRatingGNN(nn.Module):
 
         return new_embeds
 
-    def forward(self,
-                home_ids: torch.Tensor,
-                away_ids: torch.Tensor,
-                adjacency: Optional[List[Tuple[int, int]]] = None) -> torch.Tensor:
+    def forward(
+        self,
+        home_ids: torch.Tensor,
+        away_ids: torch.Tensor,
+        adjacency: list[tuple[int, int]] | None = None,
+    ) -> torch.Tensor:
         """
         Predict game outcomes.
 
@@ -149,9 +144,9 @@ class TeamRatingGNN(nn.Module):
             return embed.norm().item()
 
 
-def build_temporal_graph(games_df: pd.DataFrame,
-                         team_to_id: Dict[str, int],
-                         lookback_weeks: int = 4) -> List[List[Tuple[int, int]]]:
+def build_temporal_graph(
+    games_df: pd.DataFrame, team_to_id: dict[str, int], lookback_weeks: int = 4
+) -> list[list[tuple[int, int]]]:
     """
     Build temporal game graphs for each week.
 
@@ -162,16 +157,16 @@ def build_temporal_graph(games_df: pd.DataFrame,
         List of adjacency lists, one per week
     """
     # Sort by season and week
-    games_df = games_df.sort_values(['season', 'week'])
+    games_df = games_df.sort_values(["season", "week"])
 
     # Build adjacency for each week
-    max_week_id = games_df.groupby(['season', 'week']).ngroup().max()
+    max_week_id = games_df.groupby(["season", "week"]).ngroup().max()
     adjacencies = [[] for _ in range(max_week_id + 1)]
 
     for idx, row in games_df.iterrows():
-        week_id = games_df.loc[:idx].groupby(['season', 'week']).ngroup().max()
-        home_id = team_to_id[row['home_team']]
-        away_id = team_to_id[row['away_team']]
+        week_id = games_df.loc[:idx].groupby(["season", "week"]).ngroup().max()
+        home_id = team_to_id[row["home_team"]]
+        away_id = team_to_id[row["away_team"]]
 
         # Add edge to current and future weeks
         for future_week in range(week_id, min(week_id + lookback_weeks, max_week_id + 1)):
@@ -180,16 +175,18 @@ def build_temporal_graph(games_df: pd.DataFrame,
     return adjacencies
 
 
-def train_gnn_ratings(train_df: pd.DataFrame,
-                      val_df: pd.DataFrame,
-                      embedding_dim: int = 32,
-                      hidden_dim: int = 64,
-                      n_message_passes: int = 3,
-                      epochs: int = 100,
-                      batch_size: int = 64,
-                      lr: float = 1e-3,
-                      device: str = 'cuda' if torch.cuda.is_available() else 'cpu',
-                      output_path: Optional[str] = None) -> Tuple[TeamRatingGNN, Dict[str, int]]:
+def train_gnn_ratings(
+    train_df: pd.DataFrame,
+    val_df: pd.DataFrame,
+    embedding_dim: int = 32,
+    hidden_dim: int = 64,
+    n_message_passes: int = 3,
+    epochs: int = 100,
+    batch_size: int = 64,
+    lr: float = 1e-3,
+    device: str = "cuda" if torch.cuda.is_available() else "cpu",
+    output_path: str | None = None,
+) -> tuple[TeamRatingGNN, dict[str, int]]:
     """
     Train GNN team ratings.
 
@@ -200,7 +197,7 @@ def train_gnn_ratings(train_df: pd.DataFrame,
     print(f"Training GNN team ratings on {len(train_df)} games...")
 
     # Build team vocabulary
-    all_teams = sorted(set(train_df['home_team'].unique()) | set(train_df['away_team'].unique()))
+    all_teams = sorted(set(train_df["home_team"].unique()) | set(train_df["away_team"].unique()))
     team_to_id = {team: idx for idx, team in enumerate(all_teams)}
     n_teams = len(all_teams)
 
@@ -210,26 +207,30 @@ def train_gnn_ratings(train_df: pd.DataFrame,
     print("  Building game graph...")
     train_adjacency = []
     for _, row in train_df.iterrows():
-        home_id = team_to_id[row['home_team']]
-        away_id = team_to_id[row['away_team']]
+        home_id = team_to_id[row["home_team"]]
+        away_id = team_to_id[row["away_team"]]
         train_adjacency.append((home_id, away_id))
 
     # Prepare training data
-    train_home_ids = torch.LongTensor([team_to_id[t] for t in train_df['home_team']])
-    train_away_ids = torch.LongTensor([team_to_id[t] for t in train_df['away_team']])
-    train_outcomes = torch.FloatTensor((train_df['home_score'] > train_df['away_score']).astype(float).values).unsqueeze(1)
+    train_home_ids = torch.LongTensor([team_to_id[t] for t in train_df["home_team"]])
+    train_away_ids = torch.LongTensor([team_to_id[t] for t in train_df["away_team"]])
+    train_outcomes = torch.FloatTensor(
+        (train_df["home_score"] > train_df["away_score"]).astype(float).values
+    ).unsqueeze(1)
 
     # Validation data
-    val_home_ids = torch.LongTensor([team_to_id.get(t, 0) for t in val_df['home_team']])
-    val_away_ids = torch.LongTensor([team_to_id.get(t, 0) for t in val_df['away_team']])
-    val_outcomes = torch.FloatTensor((val_df['home_score'] > val_df['away_score']).astype(float).values).unsqueeze(1)
+    val_home_ids = torch.LongTensor([team_to_id.get(t, 0) for t in val_df["home_team"]])
+    val_away_ids = torch.LongTensor([team_to_id.get(t, 0) for t in val_df["away_team"]])
+    val_outcomes = torch.FloatTensor(
+        (val_df["home_score"] > val_df["away_score"]).astype(float).values
+    ).unsqueeze(1)
 
     # Create model
     model = TeamRatingGNN(
         n_teams=n_teams,
         embedding_dim=embedding_dim,
         hidden_dim=hidden_dim,
-        n_message_passes=n_message_passes
+        n_message_passes=n_message_passes,
     ).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -238,7 +239,7 @@ def train_gnn_ratings(train_df: pd.DataFrame,
     # Training loop
     n_batches = (len(train_df) + batch_size - 1) // batch_size
 
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
     best_model_state = None
 
     for epoch in range(epochs):
@@ -283,7 +284,9 @@ def train_gnn_ratings(train_df: pd.DataFrame,
 
         if (epoch + 1) % 10 == 0:
             avg_loss = total_loss / n_batches
-            print(f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.3f}")
+            print(
+                f"Epoch {epoch+1}/{epochs}, Train Loss: {avg_loss:.4f}, Val Loss: {val_loss:.4f}, Val Acc: {val_acc:.3f}"
+            )
 
         # Save best model
         if val_loss < best_val_loss:
@@ -296,21 +299,24 @@ def train_gnn_ratings(train_df: pd.DataFrame,
     # Save model
     if output_path:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        torch.save({
-            'model_state_dict': model.state_dict(),
-            'team_to_id': team_to_id,
-            'embedding_dim': embedding_dim,
-            'hidden_dim': hidden_dim,
-            'n_message_passes': n_message_passes,
-        }, output_path)
+        torch.save(
+            {
+                "model_state_dict": model.state_dict(),
+                "team_to_id": team_to_id,
+                "embedding_dim": embedding_dim,
+                "hidden_dim": hidden_dim,
+                "n_message_passes": n_message_passes,
+            },
+            output_path,
+        )
         print(f"Model saved to {output_path}")
 
     return model, team_to_id
 
 
-def extract_gnn_features(model: TeamRatingGNN,
-                        team_to_id: Dict[str, int],
-                        games_df: pd.DataFrame) -> pd.DataFrame:
+def extract_gnn_features(
+    model: TeamRatingGNN, team_to_id: dict[str, int], games_df: pd.DataFrame
+) -> pd.DataFrame:
     """
     Extract GNN-derived team strength features for downstream models.
 
@@ -326,25 +332,26 @@ def extract_gnn_features(model: TeamRatingGNN,
 
     # Add features to games
     df = games_df.copy()
-    df['gnn_home_strength'] = df['home_team'].map(team_strengths).fillna(0.0)
-    df['gnn_away_strength'] = df['away_team'].map(team_strengths).fillna(0.0)
-    df['gnn_strength_diff'] = df['gnn_home_strength'] - df['gnn_away_strength']
+    df["gnn_home_strength"] = df["home_team"].map(team_strengths).fillna(0.0)
+    df["gnn_away_strength"] = df["away_team"].map(team_strengths).fillna(0.0)
+    df["gnn_strength_diff"] = df["gnn_home_strength"] - df["gnn_away_strength"]
 
     # Get direct GNN predictions
     with torch.no_grad():
-        home_ids = torch.LongTensor([team_to_id.get(t, 0) for t in df['home_team']])
-        away_ids = torch.LongTensor([team_to_id.get(t, 0) for t in df['away_team']])
+        home_ids = torch.LongTensor([team_to_id.get(t, 0) for t in df["home_team"]])
+        away_ids = torch.LongTensor([team_to_id.get(t, 0) for t in df["away_team"]])
 
         device = next(model.parameters()).device
-        gnn_probs = model(home_ids.to(device), away_ids.to(device), adjacency=None).cpu().numpy().flatten()
+        gnn_probs = (
+            model(home_ids.to(device), away_ids.to(device), adjacency=None).cpu().numpy().flatten()
+        )
 
-        df['gnn_win_prob'] = gnn_probs
+        df["gnn_win_prob"] = gnn_probs
 
     return df
 
 
-def evaluate_gnn_features(features_df: pd.DataFrame,
-                         test_season: int = 2024) -> Dict:
+def evaluate_gnn_features(features_df: pd.DataFrame, test_season: int = 2024) -> dict:
     """
     Evaluate if GNN features improve prediction accuracy.
 
@@ -352,21 +359,29 @@ def evaluate_gnn_features(features_df: pd.DataFrame,
     1. Baseline XGBoost features only
     2. Baseline + GNN features
     """
-    from sklearn.metrics import log_loss, roc_auc_score, accuracy_score
+    from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 
-    train_df = features_df[features_df['season'] < test_season].copy()
-    test_df = features_df[features_df['season'] == test_season].copy()
+    train_df = features_df[features_df["season"] < test_season].copy()
+    test_df = features_df[features_df["season"] == test_season].copy()
 
-    y_train = (train_df['home_score'] > train_df['away_score']).astype(int)
-    y_test = (test_df['home_score'] > test_df['away_score']).astype(int)
+    y_train = (train_df["home_score"] > train_df["away_score"]).astype(int)
+    y_test = (test_df["home_score"] > test_df["away_score"]).astype(int)
 
     # Baseline features
-    baseline_features = ['prior_epa_mean_diff', 'epa_pp_last3_diff', 'season_win_pct_diff',
-                        'win_pct_last5_diff', 'prior_margin_avg_diff', 'points_for_last3_diff',
-                        'points_against_last3_diff', 'rest_diff', 'week']
+    baseline_features = [
+        "prior_epa_mean_diff",
+        "epa_pp_last3_diff",
+        "season_win_pct_diff",
+        "win_pct_last5_diff",
+        "prior_margin_avg_diff",
+        "points_for_last3_diff",
+        "points_against_last3_diff",
+        "rest_diff",
+        "week",
+    ]
 
     # GNN features
-    gnn_features = ['gnn_strength_diff', 'gnn_win_prob']
+    gnn_features = ["gnn_strength_diff", "gnn_win_prob"]
 
     # Train simple logistic regression for comparison
     from sklearn.linear_model import LogisticRegression
@@ -399,32 +414,32 @@ def evaluate_gnn_features(features_df: pd.DataFrame,
     gnn_acc = accuracy_score(y_test, (y_pred_gnn > 0.5).astype(int))
 
     # GNN only (for reference)
-    gnn_only_logloss = log_loss(y_test, test_df['gnn_win_prob'])
-    gnn_only_auc = roc_auc_score(y_test, test_df['gnn_win_prob'])
-    gnn_only_acc = accuracy_score(y_test, (test_df['gnn_win_prob'] > 0.5).astype(int))
+    gnn_only_logloss = log_loss(y_test, test_df["gnn_win_prob"])
+    gnn_only_auc = roc_auc_score(y_test, test_df["gnn_win_prob"])
+    gnn_only_acc = accuracy_score(y_test, (test_df["gnn_win_prob"] > 0.5).astype(int))
 
     return {
-        'baseline': {
-            'logloss': base_logloss,
-            'auc': base_auc,
-            'accuracy': base_acc,
+        "baseline": {
+            "logloss": base_logloss,
+            "auc": base_auc,
+            "accuracy": base_acc,
         },
-        'baseline_plus_gnn': {
-            'logloss': gnn_logloss,
-            'auc': gnn_auc,
-            'accuracy': gnn_acc,
+        "baseline_plus_gnn": {
+            "logloss": gnn_logloss,
+            "auc": gnn_auc,
+            "accuracy": gnn_acc,
         },
-        'gnn_only': {
-            'logloss': gnn_only_logloss,
-            'auc': gnn_only_auc,
-            'accuracy': gnn_only_acc,
+        "gnn_only": {
+            "logloss": gnn_only_logloss,
+            "auc": gnn_only_auc,
+            "accuracy": gnn_only_acc,
         },
-        'improvement': {
-            'logloss_delta': base_logloss - gnn_logloss,
-            'logloss_pct': (base_logloss - gnn_logloss) / base_logloss * 100,
-            'auc_delta': gnn_auc - base_auc,
-            'accuracy_delta': gnn_acc - base_acc,
-        }
+        "improvement": {
+            "logloss_delta": base_logloss - gnn_logloss,
+            "logloss_pct": (base_logloss - gnn_logloss) / base_logloss * 100,
+            "auc_delta": gnn_auc - base_auc,
+            "accuracy_delta": gnn_acc - base_acc,
+        },
     }
 
 
@@ -434,21 +449,34 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description='GNN team ratings')
-    parser.add_argument('--data', type=str, required=True,
-                        help='Path to features CSV')
-    parser.add_argument('--output-model', type=str, default='models/gnn/team_ratings.pth',
-                        help='Output path for trained model')
-    parser.add_argument('--output-features', type=str, default='data/processed/features/gnn_features.csv',
-                        help='Output path for features with GNN ratings')
-    parser.add_argument('--output-results', type=str, default='results/gnn/evaluation.json',
-                        help='Output path for evaluation results')
-    parser.add_argument('--test-season', type=int, default=2024,
-                        help='Test season')
-    parser.add_argument('--epochs', type=int, default=100,
-                        help='Training epochs')
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
-                        help='Device to use')
+    parser = argparse.ArgumentParser(description="GNN team ratings")
+    parser.add_argument("--data", type=str, required=True, help="Path to features CSV")
+    parser.add_argument(
+        "--output-model",
+        type=str,
+        default="models/gnn/team_ratings.pth",
+        help="Output path for trained model",
+    )
+    parser.add_argument(
+        "--output-features",
+        type=str,
+        default="data/processed/features/gnn_features.csv",
+        help="Output path for features with GNN ratings",
+    )
+    parser.add_argument(
+        "--output-results",
+        type=str,
+        default="results/gnn/evaluation.json",
+        help="Output path for evaluation results",
+    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season")
+    parser.add_argument("--epochs", type=int, default=100, help="Training epochs")
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        help="Device to use",
+    )
 
     args = parser.parse_args()
 
@@ -461,9 +489,9 @@ def main():
     df = pd.read_csv(args.data)
 
     # Split train/val/test
-    train_df = df[df['season'] < args.test_season - 1].copy()
-    val_df = df[df['season'] == args.test_season - 1].copy()
-    test_df = df[df['season'] == args.test_season].copy()
+    train_df = df[df["season"] < args.test_season - 1].copy()
+    val_df = df[df["season"] == args.test_season - 1].copy()
+    test_df = df[df["season"] == args.test_season].copy()
 
     print(f"  Train: {len(train_df)} games (seasons < {args.test_season - 1})")
     print(f"  Val: {len(val_df)} games (season {args.test_season - 1})")
@@ -493,29 +521,31 @@ def main():
 
     # Save results
     Path(args.output_results).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output_results, 'w') as f:
+    with open(args.output_results, "w") as f:
         json.dump(results, f, indent=2)
 
     print(f"\n{'=' * 80}")
     print("Evaluation Results")
     print(f"{'=' * 80}")
-    print(f"\nBaseline (XGBoost features only):")
+    print("\nBaseline (XGBoost features only):")
     print(f"  Log Loss: {results['baseline']['logloss']:.4f}")
     print(f"  AUC: {results['baseline']['auc']:.4f}")
     print(f"  Accuracy: {results['baseline']['accuracy']:.3f}")
 
-    print(f"\nBaseline + GNN:")
+    print("\nBaseline + GNN:")
     print(f"  Log Loss: {results['baseline_plus_gnn']['logloss']:.4f}")
     print(f"  AUC: {results['baseline_plus_gnn']['auc']:.4f}")
     print(f"  Accuracy: {results['baseline_plus_gnn']['accuracy']:.3f}")
 
-    print(f"\nGNN Only (for reference):")
+    print("\nGNN Only (for reference):")
     print(f"  Log Loss: {results['gnn_only']['logloss']:.4f}")
     print(f"  AUC: {results['gnn_only']['auc']:.4f}")
     print(f"  Accuracy: {results['gnn_only']['accuracy']:.3f}")
 
-    print(f"\nImprovement:")
-    print(f"  Log Loss: {results['improvement']['logloss_delta']:.4f} ({results['improvement']['logloss_pct']:.2f}%)")
+    print("\nImprovement:")
+    print(
+        f"  Log Loss: {results['improvement']['logloss_delta']:.4f} ({results['improvement']['logloss_pct']:.2f}%)"
+    )
     print(f"  AUC: {results['improvement']['auc_delta']:.4f}")
     print(f"  Accuracy: {results['improvement']['accuracy_delta']:.3f}")
 
@@ -524,5 +554,5 @@ def main():
     print(f"{'=' * 80}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

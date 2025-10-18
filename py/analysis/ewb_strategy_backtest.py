@@ -36,15 +36,13 @@ Date: 2025-10-10
 import argparse
 import json
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-
 
 # ============================================================================
 # Data Models
@@ -54,6 +52,7 @@ from scipy import stats
 @dataclass
 class BettingResult:
     """Result of a single bet."""
+
     game_id: str
     strategy: str  # 'ewb', 'cl', 'adaptive'
     line: float  # Spread bet at
@@ -65,6 +64,7 @@ class BettingResult:
 @dataclass
 class StrategyPerformance:
     """Performance metrics for a betting strategy."""
+
     strategy: str
     total_bets: int
     wins: int
@@ -105,17 +105,17 @@ class EWBBacktest:
         else:
             self.payout_mult = 100.0 / abs(odds)
 
-        self.results: Dict[str, List[BettingResult]] = {
-            'ewb': [],
-            'cl': [],
-            'adaptive': [],
+        self.results: dict[str, list[BettingResult]] = {
+            "ewb": [],
+            "cl": [],
+            "adaptive": [],
         }
 
     def load_data(
         self,
         lines_csv: str,
         results_csv: str,
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Load historical lines and game results.
 
@@ -140,7 +140,7 @@ class EWBBacktest:
         home_score: int,
         away_score: int,
         bet_home: bool = True,
-    ) -> Tuple[int, float]:
+    ) -> tuple[int, float]:
         """
         Calculate bet result.
 
@@ -191,26 +191,21 @@ class EWBBacktest:
         Strategy: Bet when opening line is posted (Tuesday-Wednesday)
         """
         # Get opening lines
-        opening_lines = lines_df[lines_df['source'] == 'opening'].copy()
-        closing_lines = lines_df[lines_df['source'] == 'closing'].copy()
+        opening_lines = lines_df[lines_df["source"] == "opening"].copy()
+        closing_lines = lines_df[lines_df["source"] == "closing"].copy()
 
         # Merge with results
         data = opening_lines.merge(
-            closing_lines[['game_id', 'spread']],
-            on='game_id',
-            suffixes=('_open', '_close')
-        ).merge(
-            results_df,
-            on='game_id'
-        )
+            closing_lines[["game_id", "spread"]], on="game_id", suffixes=("_open", "_close")
+        ).merge(results_df, on="game_id")
 
         # Simulate bets
         for _, row in data.iterrows():
-            game_id = row['game_id']
-            spread_open = row['spread_open']
-            spread_close = row['spread_close']
-            home_score = row['home_score']
-            away_score = row['away_score']
+            game_id = row["game_id"]
+            spread_open = row["spread_open"]
+            spread_close = row["spread_close"]
+            home_score = row["home_score"]
+            away_score = row["away_score"]
 
             # Bet at opening line
             result, payout = self.calculate_bet_result(
@@ -224,14 +219,16 @@ class EWBBacktest:
             # Calculate CLV
             clv = spread_close - spread_open
 
-            self.results['ewb'].append(BettingResult(
-                game_id=game_id,
-                strategy='ewb',
-                line=spread_open,
-                result=result,
-                payout=payout,
-                clv=clv,
-            ))
+            self.results["ewb"].append(
+                BettingResult(
+                    game_id=game_id,
+                    strategy="ewb",
+                    line=spread_open,
+                    result=result,
+                    payout=payout,
+                    clv=clv,
+                )
+            )
 
     def backtest_closing_line(
         self,
@@ -244,17 +241,17 @@ class EWBBacktest:
         Strategy: Bet at closing line (Sunday morning)
         """
         # Get closing lines
-        closing_lines = lines_df[lines_df['source'] == 'closing'].copy()
+        closing_lines = lines_df[lines_df["source"] == "closing"].copy()
 
         # Merge with results
-        data = closing_lines.merge(results_df, on='game_id')
+        data = closing_lines.merge(results_df, on="game_id")
 
         # Simulate bets
         for _, row in data.iterrows():
-            game_id = row['game_id']
-            spread_close = row['spread']
-            home_score = row['home_score']
-            away_score = row['away_score']
+            game_id = row["game_id"]
+            spread_close = row["spread"]
+            home_score = row["home_score"]
+            away_score = row["away_score"]
 
             # Bet at closing line
             result, payout = self.calculate_bet_result(
@@ -268,14 +265,16 @@ class EWBBacktest:
             # CLV = 0 (bet at closing)
             clv = 0
 
-            self.results['cl'].append(BettingResult(
-                game_id=game_id,
-                strategy='cl',
-                line=spread_close,
-                result=result,
-                payout=payout,
-                clv=clv,
-            ))
+            self.results["cl"].append(
+                BettingResult(
+                    game_id=game_id,
+                    strategy="cl",
+                    line=spread_close,
+                    result=result,
+                    payout=payout,
+                    clv=clv,
+                )
+            )
 
     def backtest_adaptive(
         self,
@@ -290,24 +289,19 @@ class EWBBacktest:
         - If opening line moves >0.5 points in our favor → bet early (EWB)
         - Otherwise → wait for closing line
         """
-        opening_lines = lines_df[lines_df['source'] == 'opening'].copy()
-        closing_lines = lines_df[lines_df['source'] == 'closing'].copy()
+        opening_lines = lines_df[lines_df["source"] == "opening"].copy()
+        closing_lines = lines_df[lines_df["source"] == "closing"].copy()
 
         data = opening_lines.merge(
-            closing_lines[['game_id', 'spread']],
-            on='game_id',
-            suffixes=('_open', '_close')
-        ).merge(
-            results_df,
-            on='game_id'
-        )
+            closing_lines[["game_id", "spread"]], on="game_id", suffixes=("_open", "_close")
+        ).merge(results_df, on="game_id")
 
         for _, row in data.iterrows():
-            game_id = row['game_id']
-            spread_open = row['spread_open']
-            spread_close = row['spread_close']
-            home_score = row['home_score']
-            away_score = row['away_score']
+            game_id = row["game_id"]
+            spread_open = row["spread_open"]
+            spread_close = row["spread_close"]
+            home_score = row["home_score"]
+            away_score = row["away_score"]
 
             # Calculate expected CLV
             expected_clv = spread_close - spread_open
@@ -330,14 +324,16 @@ class EWBBacktest:
 
             clv = spread_close - bet_line
 
-            self.results['adaptive'].append(BettingResult(
-                game_id=game_id,
-                strategy='adaptive',
-                line=bet_line,
-                result=result,
-                payout=payout,
-                clv=clv,
-            ))
+            self.results["adaptive"].append(
+                BettingResult(
+                    game_id=game_id,
+                    strategy="adaptive",
+                    line=bet_line,
+                    result=result,
+                    payout=payout,
+                    clv=clv,
+                )
+            )
 
     def calculate_performance(
         self,
@@ -406,7 +402,7 @@ class EWBBacktest:
         """Compare all strategies."""
         performances = []
 
-        for strategy in ['ewb', 'cl', 'adaptive']:
+        for strategy in ["ewb", "cl", "adaptive"]:
             perf = self.calculate_performance(strategy)
             performances.append(asdict(perf))
 
@@ -416,7 +412,7 @@ class EWBBacktest:
         self,
         strategy1: str,
         strategy2: str,
-    ) -> Dict:
+    ) -> dict:
         """
         Perform statistical test between two strategies.
 
@@ -429,11 +425,11 @@ class EWBBacktest:
         # Paired t-test (same games)
         if len(payouts1) == len(payouts2):
             t_stat, p_value = stats.ttest_rel(payouts1, payouts2)
-            test_type = 'paired_ttest'
+            test_type = "paired_ttest"
         else:
             # Independent t-test
             t_stat, p_value = stats.ttest_ind(payouts1, payouts2)
-            test_type = 'independent_ttest'
+            test_type = "independent_ttest"
 
         # Effect size (Cohen's d)
         mean_diff = np.mean(payouts1) - np.mean(payouts2)
@@ -441,14 +437,14 @@ class EWBBacktest:
         cohens_d = mean_diff / pooled_std if pooled_std > 0 else 0
 
         return {
-            'strategy1': strategy1,
-            'strategy2': strategy2,
-            'test_type': test_type,
-            't_statistic': t_stat,
-            'p_value': p_value,
-            'mean_diff': mean_diff,
-            'cohens_d': cohens_d,
-            'significant': p_value < 0.05,
+            "strategy1": strategy1,
+            "strategy2": strategy2,
+            "test_type": test_type,
+            "t_statistic": t_stat,
+            "p_value": p_value,
+            "mean_diff": mean_diff,
+            "cohens_d": cohens_d,
+            "significant": p_value < 0.05,
         }
 
 
@@ -458,21 +454,18 @@ class EWBBacktest:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        description='EWB Strategy Backtest vs Closing Line'
-    )
+    ap = argparse.ArgumentParser(description="EWB Strategy Backtest vs Closing Line")
 
-    ap.add_argument('--lines-csv', required=True,
-                    help='CSV with historical lines (opening and closing)')
-    ap.add_argument('--results-csv', required=True,
-                    help='CSV with game results')
-    ap.add_argument('--strategies', nargs='+', default=['ewb', 'cl', 'adaptive'],
-                    help='Strategies to test')
-    ap.add_argument('--bet-amount', type=float, default=100.0,
-                    help='Bet amount per game ($)')
-    ap.add_argument('--odds', type=int, default=-110,
-                    help='American odds')
-    ap.add_argument('--output', help='Output JSON path')
+    ap.add_argument(
+        "--lines-csv", required=True, help="CSV with historical lines (opening and closing)"
+    )
+    ap.add_argument("--results-csv", required=True, help="CSV with game results")
+    ap.add_argument(
+        "--strategies", nargs="+", default=["ewb", "cl", "adaptive"], help="Strategies to test"
+    )
+    ap.add_argument("--bet-amount", type=float, default=100.0, help="Bet amount per game ($)")
+    ap.add_argument("--odds", type=int, default=-110, help="American odds")
+    ap.add_argument("--output", help="Output JSON path")
 
     return ap.parse_args()
 
@@ -481,14 +474,14 @@ def main():
     args = parse_args()
 
     print(f"{'='*80}")
-    print(f"Early Week Betting (EWB) Strategy Backtest")
+    print("Early Week Betting (EWB) Strategy Backtest")
     print(f"{'='*80}")
 
     # Initialize backtest
     backtest = EWBBacktest(bet_amount=args.bet_amount, odds=args.odds)
 
     # Load data
-    print(f"\nLoading data...")
+    print("\nLoading data...")
     print(f"  Lines: {args.lines_csv}")
     print(f"  Results: {args.results_csv}")
 
@@ -497,35 +490,35 @@ def main():
     print(f"  Loaded {len(lines_df)} line snapshots, {len(results_df)} game results")
 
     # Run backtests
-    print(f"\nRunning backtests...")
+    print("\nRunning backtests...")
 
-    if 'ewb' in args.strategies:
-        print(f"  Running EWB strategy...")
+    if "ewb" in args.strategies:
+        print("  Running EWB strategy...")
         backtest.backtest_ewb(lines_df, results_df)
 
-    if 'cl' in args.strategies:
-        print(f"  Running Closing Line strategy...")
+    if "cl" in args.strategies:
+        print("  Running Closing Line strategy...")
         backtest.backtest_closing_line(lines_df, results_df)
 
-    if 'adaptive' in args.strategies:
-        print(f"  Running Adaptive strategy...")
+    if "adaptive" in args.strategies:
+        print("  Running Adaptive strategy...")
         backtest.backtest_adaptive(lines_df, results_df)
 
     # Compare strategies
     print(f"\n{'='*80}")
-    print(f"Strategy Comparison")
+    print("Strategy Comparison")
     print(f"{'='*80}")
 
     comparison = backtest.compare_strategies()
     print(f"\n{comparison.to_string(index=False)}")
 
     # Statistical tests
-    if 'ewb' in args.strategies and 'cl' in args.strategies:
+    if "ewb" in args.strategies and "cl" in args.strategies:
         print(f"\n{'='*80}")
-        print(f"Statistical Test: EWB vs Closing Line")
+        print("Statistical Test: EWB vs Closing Line")
         print(f"{'='*80}")
 
-        test = backtest.statistical_test('ewb', 'cl')
+        test = backtest.statistical_test("ewb", "cl")
 
         print(f"\nTest: {test['test_type']}")
         print(f"  t-statistic: {test['t_statistic']:.3f}")
@@ -534,18 +527,18 @@ def main():
         print(f"  Cohen's d: {test['cohens_d']:.3f}")
         print(f"  Significant: {'YES' if test['significant'] else 'NO'} (α=0.05)")
 
-        if test['significant']:
-            winner = 'EWB' if test['mean_diff'] > 0 else 'Closing Line'
+        if test["significant"]:
+            winner = "EWB" if test["mean_diff"] > 0 else "Closing Line"
             print(f"\n✅ {winner} strategy is statistically better (p<0.05)")
         else:
-            print(f"\n⚠️ No significant difference between strategies")
+            print("\n⚠️ No significant difference between strategies")
 
     # Recommendation
     print(f"\n{'='*80}")
-    print(f"Recommendation")
+    print("Recommendation")
     print(f"{'='*80}")
 
-    best_strategy = comparison.loc[comparison['roi'].idxmax()]
+    best_strategy = comparison.loc[comparison["roi"].idxmax()]
 
     print(f"\nBest strategy: {best_strategy['strategy'].upper()}")
     print(f"  ROI: {best_strategy['roi']:+.2f}%")
@@ -553,14 +546,14 @@ def main():
     print(f"  Avg CLV: {best_strategy['avg_clv']:+.2f} points")
     print(f"  Sharpe ratio: {best_strategy['sharpe_ratio']:.3f}")
 
-    if best_strategy['strategy'] == 'ewb':
-        print(f"\n✅ Bet early (Tuesday-Wednesday) when lines open")
+    if best_strategy["strategy"] == "ewb":
+        print("\n✅ Bet early (Tuesday-Wednesday) when lines open")
         print(f"   Expected edge: {best_strategy['avg_clv']:.2f} points CLV")
-    elif best_strategy['strategy'] == 'cl':
-        print(f"\n✅ Wait for closing line (Sunday morning)")
-        print(f"   Sharp money moves lines against us")
+    elif best_strategy["strategy"] == "cl":
+        print("\n✅ Wait for closing line (Sunday morning)")
+        print("   Sharp money moves lines against us")
     else:
-        print(f"\n✅ Use adaptive strategy (bet early if line moves >0.5 pts)")
+        print("\n✅ Use adaptive strategy (bet early if line moves >0.5 pts)")
 
     # Save results
     if args.output:
@@ -568,20 +561,24 @@ def main():
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         output_data = {
-            'timestamp': datetime.now().isoformat(),
-            'bet_amount': args.bet_amount,
-            'odds': args.odds,
-            'comparison': comparison.to_dict('records'),
-            'statistical_tests': [
-                backtest.statistical_test('ewb', 'cl') if 'ewb' in args.strategies and 'cl' in args.strategies else None,
+            "timestamp": datetime.now().isoformat(),
+            "bet_amount": args.bet_amount,
+            "odds": args.odds,
+            "comparison": comparison.to_dict("records"),
+            "statistical_tests": [
+                (
+                    backtest.statistical_test("ewb", "cl")
+                    if "ewb" in args.strategies and "cl" in args.strategies
+                    else None
+                ),
             ],
-            'results': {
+            "results": {
                 strategy: [asdict(r) for r in results]
                 for strategy, results in backtest.results.items()
             },
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(output_data, f, indent=2)
 
         print(f"\nResults saved to {output_path}")
@@ -589,5 +586,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

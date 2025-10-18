@@ -33,7 +33,6 @@ from ..models.copula_gof import sim_t_copula
 from ..models.copulas import joint_success_prob_gaussian
 from ..models.score_distributions import (
     cover_push_probs,
-    reweight_key_masses,
     reweight_with_moments,
     skellam_pmf_range,
 )
@@ -456,7 +455,9 @@ def main() -> None:
     # If a dependence model is specified, compute EVs under that model
     evs_base_dep, pairs_base_dep = None, None
     if args.dep != "indep":
-        evs_base_dep, pairs_base_dep = pairwise_ev(legs_base, d, dep_model=args.dep, rho=args.rho, nu=args.nu)
+        evs_base_dep, pairs_base_dep = pairwise_ev(
+            legs_base, d, dep_model=args.dep, rho=args.rho, nu=args.nu
+        )
 
     def summarize(evs: Sequence[float]) -> tuple[float, float]:
         if not evs:

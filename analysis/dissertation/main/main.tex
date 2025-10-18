@@ -280,14 +280,15 @@ The code is released under the MIT License for academic and research use. Commer
 \listoftables
 \endgroup
 
-% Insert master TODOs after lists (front matter), integrated styling
+% Insert notation glossary and acronyms after lists (front matter)
 \cleardoublepage
 \phantomsection
 \IfFileExists{../appendix/notation_glossary.tex}{\input{../appendix/notation_glossary.tex}}{}
 \IfFileExists{../appendix/acronyms.tex}{\input{../appendix/acronyms.tex}}{}
-\IfFileExists{../appendix/master_todos.tex}{\input{../appendix/master_todos.tex}}{}
-\IfFileExists{../appendix/systems_blueprint.tex}{\input{../appendix/systems_blueprint.tex}}{}
-\IfFileExists{../appendix/productionization_guide.tex}{\input{../appendix/productionization_guide.tex}}{}
+% Development artifacts - commented out for final dissertation
+% \IfFileExists{../appendix/master_todos.tex}{\input{../appendix/master_todos.tex}}{}
+% \IfFileExists{../appendix/systems_blueprint.tex}{\input{../appendix/systems_blueprint.tex}}{}
+% \IfFileExists{../appendix/productionization_guide.tex}{\input{../appendix/productionization_guide.tex}}{}
 % \listoftodos
 
 % ---------------------------------------------------

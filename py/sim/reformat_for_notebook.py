@@ -14,8 +14,8 @@ This script creates the properly formatted files.
 """
 
 from pathlib import Path
+
 import pandas as pd
-import numpy as np
 
 
 def reformat_acceptance_data():
@@ -35,26 +35,28 @@ def reformat_acceptance_data():
     records = []
 
     for _, week_row in live.iterrows():
-        season = week_row['season']
-        week = week_row['week']
+        season = week_row["season"]
+        week = week_row["week"]
 
         for _, test_row in acc.iterrows():
             # Extract test name from test column (e.g., "margin_emd" -> "margin_emd")
-            test_name = test_row['test']
+            test_name = test_row["test"]
 
             # Deviation = |value - threshold| if failed, else 0
-            if test_row['pass']:
+            if test_row["pass"]:
                 deviation = 0.0
             else:
-                deviation = abs(test_row['value'] - test_row['threshold'])
+                deviation = abs(test_row["value"] - test_row["threshold"])
 
-            records.append({
-                'season': int(season),
-                'week': int(week),
-                'test': test_name,
-                'pass': 1 if test_row['pass'] else 0,
-                'deviation': deviation
-            })
+            records.append(
+                {
+                    "season": int(season),
+                    "week": int(week),
+                    "test": test_name,
+                    "pass": 1 if test_row["pass"] else 0,
+                    "deviation": deviation,
+                }
+            )
 
     # Create DataFrame
     df = pd.DataFrame(records)
@@ -80,10 +82,10 @@ def reformat_live_metrics():
     df = pd.read_csv("data/live_metrics.csv")
 
     # Convert CLV to basis points
-    df['clv_bps'] = df['mean_clv'] * 10000  # Convert from fraction to bps
+    df["clv_bps"] = df["mean_clv"] * 10000  # Convert from fraction to bps
 
     # Select expected columns
-    df_out = df[['season', 'week', 'clv_bps', 'roi']].copy()
+    df_out = df[["season", "week", "clv_bps", "roi"]].copy()
 
     # Save to expected location
     output_path = Path("analysis/results/live_metrics.csv")

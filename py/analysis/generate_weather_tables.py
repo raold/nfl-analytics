@@ -13,7 +13,7 @@ def generate_weather_comparison_table():
     out_dir = Path("analysis/dissertation/figures/out")
 
     # Load temperature stats
-    with open(out_dir / "temperature_impact_stats.json", "r") as f:
+    with open(out_dir / "temperature_impact_stats.json") as f:
         temp_stats = json.load(f)
 
     # Load wind stats (from wind_hypothesis.md and prior analysis)
@@ -61,14 +61,14 @@ def generate_weather_comparison_table():
         f.write("  \\end{tabular}\n")
         f.write("\\end{table}\n")
 
-    print(f"✅ Generated weather_effects_comparison_table.tex")
+    print("✅ Generated weather_effects_comparison_table.tex")
 
 
 def generate_extreme_conditions_table():
     """Generate table for extreme weather conditions analysis."""
     out_dir = Path("analysis/dissertation/figures/out")
 
-    with open(out_dir / "temperature_impact_stats.json", "r") as f:
+    with open(out_dir / "temperature_impact_stats.json") as f:
         temp_stats = json.load(f)
 
     with open(out_dir / "extreme_weather_table.tex", "w") as f:
@@ -88,9 +88,7 @@ def generate_extreme_conditions_table():
         f.write("    \\midrule\n")
 
         # High wind
-        f.write(
-            f"    High wind & 31 & >40 kph & No significant effect \\\\\n"
-        )
+        f.write("    High wind & 31 & >40 kph & No significant effect \\\\\n")
 
         # Freezing
         f.write(
@@ -111,7 +109,7 @@ def generate_extreme_conditions_table():
         f.write("  \\end{tabular}\n")
         f.write("\\end{table}\n")
 
-    print(f"✅ Generated extreme_weather_table.tex")
+    print("✅ Generated extreme_weather_table.tex")
 
 
 def generate_precipitation_interaction_table():
@@ -135,15 +133,15 @@ def generate_precipitation_interaction_table():
         f.write("    \\midrule\n")
 
         # From temperature analysis output
-        f.write(f"    Cold + precip (snow) & 10 & 0.9 & 43.0 \\\\\n")
-        f.write(f"    Warm + precip (rain) & 61 & 15.1 & 45.7 \\\\\n")
-        f.write(f"    No precipitation & 950 & 14.3 & 45.2 \\\\\n")
+        f.write("    Cold + precip (snow) & 10 & 0.9 & 43.0 \\\\\n")
+        f.write("    Warm + precip (rain) & 61 & 15.1 & 45.7 \\\\\n")
+        f.write("    No precipitation & 950 & 14.3 & 45.2 \\\\\n")
 
         f.write("    \\bottomrule\n")
         f.write("  \\end{tabular}\n")
         f.write("\\end{table}\n")
 
-    print(f"✅ Generated precipitation_interaction_table.tex")
+    print("✅ Generated precipitation_interaction_table.tex")
 
 
 def generate_weather_coverage_table():
@@ -175,25 +173,23 @@ def generate_weather_coverage_table():
             weather_data = int(outdoor * 0.927)
             coverage = (weather_data / outdoor) * 100
 
-            f.write(
-                f"    {season} & {total} & {weather_data} & {coverage:.1f} & {dome} \\\\\n"
-            )
+            f.write(f"    {season} & {total} & {weather_data} & {coverage:.1f} & {dome} \\\\\n")
 
         f.write("    \\midrule\n")
-        f.write(f"    Total (2020--2024) & 1,389 & 1,306 & 92.7 & 303 \\\\\n")
+        f.write("    Total (2020--2024) & 1,389 & 1,306 & 92.7 & 303 \\\\\n")
 
         f.write("    \\bottomrule\n")
         f.write("  \\end{tabular}\n")
         f.write("\\end{table}\n")
 
-    print(f"✅ Generated weather_coverage_table.tex")
+    print("✅ Generated weather_coverage_table.tex")
 
 
 def generate_weather_summary_stats():
     """Generate summary statistics document for weather analysis."""
     out_dir = Path("analysis/dissertation/figures/out")
 
-    with open(out_dir / "temperature_impact_stats.json", "r") as f:
+    with open(out_dir / "temperature_impact_stats.json") as f:
         temp_stats = json.load(f)
 
     summary = f"""# Weather Analysis Summary Statistics
@@ -238,7 +234,7 @@ Both wind and temperature show **null effects** on scoring:
     with open(out_dir / "weather_analysis_summary.md", "w") as f:
         f.write(summary)
 
-    print(f"✅ Generated weather_analysis_summary.md")
+    print("✅ Generated weather_analysis_summary.md")
 
 
 def main():
@@ -251,9 +247,7 @@ def main():
     generate_weather_coverage_table()
     generate_weather_summary_stats()
 
-    print(
-        f"\n✅ All weather tables generated in analysis/dissertation/figures/out/\n"
-    )
+    print("\n✅ All weather tables generated in analysis/dissertation/figures/out/\n")
     print("Generated files:")
     print("  • weather_effects_comparison_table.tex")
     print("  • extreme_weather_table.tex")

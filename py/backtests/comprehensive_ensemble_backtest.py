@@ -12,24 +12,19 @@ Compares:
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from datetime import datetime, timedelta
-import logging
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import json
+import logging
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+
 import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
+import pandas as pd
+import psycopg2
 
 from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
-from py.optimization.portfolio_optimizer import (
-    CorrelatedPortfolioOptimizer,
-    BetOpportunity
-)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -53,7 +48,7 @@ class ComprehensiveEnsembleBacktest:
         end_season: int = 2024,
         initial_bankroll: float = 10000.0,
         kelly_fraction: float = 0.25,
-        min_edge: float = 0.02
+        min_edge: float = 0.02,
     ):
         """
         Initialize backtest.
@@ -72,11 +67,11 @@ class ComprehensiveEnsembleBacktest:
         self.min_edge = min_edge
 
         self.db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         # Initialize ensemble
@@ -85,16 +80,12 @@ class ComprehensiveEnsembleBacktest:
             use_stacking=True,
             use_portfolio_opt=True,
             kelly_fraction=kelly_fraction,
-            min_edge=min_edge
+            min_edge=min_edge,
         )
 
         logger.info(f"✓ Initialized backtest for {start_season}-{end_season}")
 
-    def load_historical_data(
-        self,
-        season: int,
-        week: Optional[int] = None
-    ) -> pd.DataFrame:
+    def load_historical_data(self, season: int, week: int | None = None) -> pd.DataFrame:
         """Load historical game and player data"""
         conn = psycopg2.connect(**self.db_config)
 
@@ -190,16 +181,14 @@ class ComprehensiveEnsembleBacktest:
         df = pd.read_sql(query, conn, params=params)
         conn.close()
 
-        logger.info(f"Loaded {len(df)} player-games for season {season}" +
-                   (f" week {week}" if week else ""))
+        logger.info(
+            f"Loaded {len(df)} player-games for season {season}" + (f" week {week}" if week else "")
+        )
 
         return df
 
     def load_model_predictions(
-        self,
-        model_version: str,
-        season: int,
-        week: Optional[int] = None
+        self, model_version: str, season: int, week: int | None = None
     ) -> pd.DataFrame:
         """Load predictions from a specific model version"""
 
@@ -240,11 +229,7 @@ class ComprehensiveEnsembleBacktest:
 
         return df
 
-    def _generate_ensemble_predictions(
-        self,
-        season: int,
-        week: Optional[int] = None
-    ) -> pd.DataFrame:
+    def _generate_ensemble_predictions(self, season: int, week: int | None = None) -> pd.DataFrame:
         """Generate 4-way ensemble predictions"""
 
         # Load base model predictions
@@ -255,33 +240,29 @@ class ComprehensiveEnsembleBacktest:
 
         # XGBoost (slightly different from Bayesian)
         xgb_preds = bayesian_preds.copy()
-        xgb_preds['xgb_pred'] = xgb_preds['prediction'] * np.random.normal(1.0, 0.1, len(xgb_preds))
-        xgb_preds['stat_type'] = 'passing_yards'
+        xgb_preds["xgb_pred"] = xgb_preds["prediction"] * np.random.normal(1.0, 0.1, len(xgb_preds))
+        xgb_preds["stat_type"] = "passing_yards"
 
         # BNN (with more uncertainty)
         bnn_preds = bayesian_preds.copy()
-        bnn_preds['bnn_pred'] = xgb_preds['xgb_pred'] * np.random.normal(1.0, 0.15, len(bnn_preds))
-        bnn_preds['bnn_uncertainty'] = bayesian_preds['uncertainty'] * 1.2
+        bnn_preds["bnn_pred"] = xgb_preds["xgb_pred"] * np.random.normal(1.0, 0.15, len(bnn_preds))
+        bnn_preds["bnn_uncertainty"] = bayesian_preds["uncertainty"] * 1.2
 
         # Rename columns for merge
-        bayesian_preds.rename(columns={
-            'prediction': 'bayesian_pred',
-            'uncertainty': 'bayesian_uncertainty'
-        }, inplace=True)
+        bayesian_preds.rename(
+            columns={"prediction": "bayesian_pred", "uncertainty": "bayesian_uncertainty"},
+            inplace=True,
+        )
 
         # Generate ensemble predictions
         ensemble_preds = self.ensemble.get_4way_ensemble_predictions(
-            bayesian_preds,
-            xgb_preds,
-            bnn_preds
+            bayesian_preds, xgb_preds, bnn_preds
         )
 
         return ensemble_preds
 
     def simulate_betting_lines(
-        self,
-        actual_values: pd.Series,
-        noise_level: float = 0.05
+        self, actual_values: pd.Series, noise_level: float = 0.05
     ) -> pd.DataFrame:
         """Simulate realistic betting lines based on actual values"""
 
@@ -291,13 +272,9 @@ class ComprehensiveEnsembleBacktest:
         # Simulate odds (typical -110 on both sides)
         odds = np.random.choice([-110, -105, -115, -120, 100], size=len(actual_values))
 
-        return pd.DataFrame({
-            'line': lines,
-            'odds': odds,
-            'actual': actual_values
-        })
+        return pd.DataFrame({"line": lines, "odds": odds, "actual": actual_values})
 
-    def run_backtest(self) -> Dict:
+    def run_backtest(self) -> dict:
         """
         Run comprehensive backtest across all seasons.
 
@@ -325,7 +302,7 @@ class ComprehensiveEnsembleBacktest:
 
         return results
 
-    def _backtest_model(self, model_version: str) -> Dict:
+    def _backtest_model(self, model_version: str) -> dict:
         """Backtest a single model version"""
 
         all_bets = []
@@ -344,7 +321,7 @@ class ComprehensiveEnsembleBacktest:
 
             # Process by week
             for week in range(1, 18):  # Regular season only
-                week_data = actual_data[actual_data['week'] == week]
+                week_data = actual_data[actual_data["week"] == week]
 
                 if week_data.empty:
                     continue
@@ -357,37 +334,37 @@ class ComprehensiveEnsembleBacktest:
                     continue
 
                 # Filter to passing yards for QBs
-                qb_data = week_data[week_data['position'] == 'QB'].copy()
+                qb_data = week_data[week_data["position"] == "QB"].copy()
 
                 if qb_data.empty:
                     continue
 
                 # Simulate betting lines
-                lines = self.simulate_betting_lines(qb_data['passing_yards'])
+                lines = self.simulate_betting_lines(qb_data["passing_yards"])
 
                 # Make betting decisions
                 for idx, row in qb_data.iterrows():
-                    player_id = row['player_id']
+                    player_id = row["player_id"]
 
                     # Get prediction for this player
-                    player_pred = predictions[predictions['player_id'] == player_id]
+                    player_pred = predictions[predictions["player_id"] == player_id]
 
                     if player_pred.empty:
                         continue
 
-                    pred_value = player_pred.iloc[0]['prediction']
-                    line = lines.loc[idx, 'line']
-                    odds = lines.loc[idx, 'odds']
-                    actual = lines.loc[idx, 'actual']
+                    pred_value = player_pred.iloc[0]["prediction"]
+                    line = lines.loc[idx, "line"]
+                    odds = lines.loc[idx, "odds"]
+                    actual = lines.loc[idx, "actual"]
 
                     # Calculate edge
                     if pred_value > line:
                         # Bet over
-                        bet_type = 'over'
+                        bet_type = "over"
                         win = actual > line
                     else:
                         # Bet under
-                        bet_type = 'under'
+                        bet_type = "under"
                         win = actual < line
 
                     edge = abs(pred_value - line) / line
@@ -414,48 +391,52 @@ class ComprehensiveEnsembleBacktest:
                     bankroll_history.append(bankroll)
 
                     # Record bet
-                    all_bets.append({
-                        'season': season,
-                        'week': week,
-                        'player_id': player_id,
-                        'prediction': pred_value,
-                        'line': line,
-                        'actual': actual,
-                        'bet_type': bet_type,
-                        'odds': odds,
-                        'edge': edge,
-                        'bet_amount': bet_amount,
-                        'win': win,
-                        'profit': profit,
-                        'bankroll': bankroll
-                    })
+                    all_bets.append(
+                        {
+                            "season": season,
+                            "week": week,
+                            "player_id": player_id,
+                            "prediction": pred_value,
+                            "line": line,
+                            "actual": actual,
+                            "bet_type": bet_type,
+                            "odds": odds,
+                            "edge": edge,
+                            "bet_amount": bet_amount,
+                            "win": win,
+                            "profit": profit,
+                            "bankroll": bankroll,
+                        }
+                    )
 
-            logger.info(f"  Season {season} bets: {len([b for b in all_bets if b['season'] == season])}")
+            logger.info(
+                f"  Season {season} bets: {len([b for b in all_bets if b['season'] == season])}"
+            )
             logger.info(f"  Current bankroll: ${bankroll:.2f}")
 
         # Calculate metrics
         if not all_bets:
             return {
-                'total_bets': 0,
-                'win_rate': 0,
-                'roi': 0,
-                'sharpe_ratio': 0,
-                'max_drawdown': 0,
-                'final_bankroll': bankroll,
-                'bets': []
+                "total_bets": 0,
+                "win_rate": 0,
+                "roi": 0,
+                "sharpe_ratio": 0,
+                "max_drawdown": 0,
+                "final_bankroll": bankroll,
+                "bets": [],
             }
 
         bets_df = pd.DataFrame(all_bets)
 
         # Calculate metrics
         total_bets = len(bets_df)
-        win_rate = bets_df['win'].mean() * 100
-        total_wagered = bets_df['bet_amount'].sum()
-        total_profit = bets_df['profit'].sum()
+        win_rate = bets_df["win"].mean() * 100
+        total_wagered = bets_df["bet_amount"].sum()
+        total_profit = bets_df["profit"].sum()
         roi = (total_profit / total_wagered * 100) if total_wagered > 0 else 0
 
         # Sharpe ratio
-        daily_returns = bets_df.groupby(['season', 'week'])['profit'].sum()
+        daily_returns = bets_df.groupby(["season", "week"])["profit"].sum()
         if len(daily_returns) > 1:
             sharpe_ratio = (daily_returns.mean() / daily_returns.std()) * np.sqrt(17)  # 17 weeks
         else:
@@ -468,14 +449,14 @@ class ComprehensiveEnsembleBacktest:
         max_drawdown = drawdown.min() * 100
 
         return {
-            'total_bets': total_bets,
-            'win_rate': win_rate,
-            'roi': roi,
-            'sharpe_ratio': sharpe_ratio,
-            'max_drawdown': max_drawdown,
-            'final_bankroll': bankroll,
-            'bets': bets_df,
-            'bankroll_history': bankroll_history
+            "total_bets": total_bets,
+            "win_rate": win_rate,
+            "roi": roi,
+            "sharpe_ratio": sharpe_ratio,
+            "max_drawdown": max_drawdown,
+            "final_bankroll": bankroll,
+            "bets": bets_df,
+            "bankroll_history": bankroll_history,
         }
 
     def _odds_to_probability(self, odds: int) -> float:
@@ -492,37 +473,39 @@ class ComprehensiveEnsembleBacktest:
         else:
             return odds / 100
 
-    def generate_comparison_report(self, results: Dict):
+    def generate_comparison_report(self, results: dict):
         """Generate comprehensive comparison report"""
 
         # Create comparison DataFrame
         comparison = []
         for model_version, metrics in results.items():
-            comparison.append({
-                'Model': model_version,
-                'Total Bets': metrics['total_bets'],
-                'Win Rate': f"{metrics['win_rate']:.1f}%",
-                'ROI': f"{metrics['roi']:.2f}%",
-                'Sharpe Ratio': f"{metrics['sharpe_ratio']:.2f}",
-                'Max Drawdown': f"{metrics['max_drawdown']:.1f}%",
-                'Final Bankroll': f"${metrics['final_bankroll']:.2f}",
-                'Profit': f"${metrics['final_bankroll'] - self.initial_bankroll:.2f}"
-            })
+            comparison.append(
+                {
+                    "Model": model_version,
+                    "Total Bets": metrics["total_bets"],
+                    "Win Rate": f"{metrics['win_rate']:.1f}%",
+                    "ROI": f"{metrics['roi']:.2f}%",
+                    "Sharpe Ratio": f"{metrics['sharpe_ratio']:.2f}",
+                    "Max Drawdown": f"{metrics['max_drawdown']:.1f}%",
+                    "Final Bankroll": f"${metrics['final_bankroll']:.2f}",
+                    "Profit": f"${metrics['final_bankroll'] - self.initial_bankroll:.2f}",
+                }
+            )
 
         comparison_df = pd.DataFrame(comparison)
 
         # Print report
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("COMPREHENSIVE ENSEMBLE BACKTEST RESULTS")
         print(f"Period: {self.start_season}-{self.end_season}")
         print(f"Initial Bankroll: ${self.initial_bankroll:.2f}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         print(comparison_df.to_string(index=False))
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("KEY FINDINGS:")
-        print("="*80)
+        print("=" * 80)
 
         # Compare v3.0 to baseline
         if "ensemble_v3.0" in results and "hierarchical_v1.0" in results:
@@ -543,65 +526,64 @@ class ComprehensiveEnsembleBacktest:
         report_path = Path("reports/comprehensive_backtest_results.json")
         report_path.parent.mkdir(exist_ok=True)
 
-        with open(report_path, 'w') as f:
+        with open(report_path, "w") as f:
             # Convert for JSON serialization
             json_results = {}
             for model, metrics in results.items():
                 json_results[model] = {
-                    k: v for k, v in metrics.items()
-                    if k not in ['bets', 'bankroll_history']
+                    k: v for k, v in metrics.items() if k not in ["bets", "bankroll_history"]
                 }
             json.dump(json_results, f, indent=2)
 
         print(f"\n✓ Results saved to {report_path}")
 
-    def plot_results(self, results: Dict):
+    def plot_results(self, results: dict):
         """Create visualization of backtest results"""
 
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-        fig.suptitle(f'Comprehensive Backtest Results ({self.start_season}-{self.end_season})',
-                    fontsize=16)
+        fig.suptitle(
+            f"Comprehensive Backtest Results ({self.start_season}-{self.end_season})", fontsize=16
+        )
 
         # 1. Bankroll evolution
         ax = axes[0, 0]
         for model_version, metrics in results.items():
-            if 'bankroll_history' in metrics:
-                ax.plot(metrics['bankroll_history'], label=model_version)
-        ax.set_title('Bankroll Evolution')
-        ax.set_xlabel('Number of Bets')
-        ax.set_ylabel('Bankroll ($)')
+            if "bankroll_history" in metrics:
+                ax.plot(metrics["bankroll_history"], label=model_version)
+        ax.set_title("Bankroll Evolution")
+        ax.set_xlabel("Number of Bets")
+        ax.set_ylabel("Bankroll ($)")
         ax.legend()
         ax.grid(True, alpha=0.3)
 
         # 2. ROI comparison
         ax = axes[0, 1]
         models = list(results.keys())
-        rois = [results[m]['roi'] for m in models]
+        rois = [results[m]["roi"] for m in models]
         bars = ax.bar(range(len(models)), rois)
         ax.set_xticks(range(len(models)))
-        ax.set_xticklabels([m.replace('_', '\n') for m in models], rotation=0)
-        ax.set_title('ROI Comparison')
-        ax.set_ylabel('ROI (%)')
-        ax.axhline(y=5.0, color='r', linestyle='--', label='Target (5%)')
+        ax.set_xticklabels([m.replace("_", "\n") for m in models], rotation=0)
+        ax.set_title("ROI Comparison")
+        ax.set_ylabel("ROI (%)")
+        ax.axhline(y=5.0, color="r", linestyle="--", label="Target (5%)")
         ax.legend()
 
         # Color bars based on performance
         for i, (bar, roi) in enumerate(zip(bars, rois)):
             if roi >= 5.0:
-                bar.set_color('green')
+                bar.set_color("green")
             elif roi >= 3.0:
-                bar.set_color('yellow')
+                bar.set_color("yellow")
             else:
-                bar.set_color('red')
+                bar.set_color("red")
 
         # 3. Win rate vs ROI scatter
         ax = axes[1, 0]
         for model_version, metrics in results.items():
-            ax.scatter(metrics['win_rate'], metrics['roi'],
-                      s=100, label=model_version)
-        ax.set_xlabel('Win Rate (%)')
-        ax.set_ylabel('ROI (%)')
-        ax.set_title('Win Rate vs ROI')
+            ax.scatter(metrics["win_rate"], metrics["roi"], s=100, label=model_version)
+        ax.set_xlabel("Win Rate (%)")
+        ax.set_ylabel("ROI (%)")
+        ax.set_title("Win Rate vs ROI")
         ax.legend()
         ax.grid(True, alpha=0.3)
 
@@ -609,18 +591,18 @@ class ComprehensiveEnsembleBacktest:
         ax = axes[1, 1]
         x = np.arange(len(models))
         width = 0.35
-        sharpes = [results[m]['sharpe_ratio'] for m in models]
-        drawdowns = [abs(results[m]['max_drawdown']) for m in models]
+        sharpes = [results[m]["sharpe_ratio"] for m in models]
+        drawdowns = [abs(results[m]["max_drawdown"]) for m in models]
 
-        ax.bar(x - width/2, sharpes, width, label='Sharpe Ratio', color='blue', alpha=0.7)
-        ax.bar(x + width/2, drawdowns, width, label='Max Drawdown (%)', color='red', alpha=0.7)
+        ax.bar(x - width / 2, sharpes, width, label="Sharpe Ratio", color="blue", alpha=0.7)
+        ax.bar(x + width / 2, drawdowns, width, label="Max Drawdown (%)", color="red", alpha=0.7)
         ax.set_xticks(x)
-        ax.set_xticklabels([m.replace('_', '\n') for m in models], rotation=0)
-        ax.set_title('Risk Metrics')
+        ax.set_xticklabels([m.replace("_", "\n") for m in models], rotation=0)
+        ax.set_title("Risk Metrics")
         ax.legend()
 
         plt.tight_layout()
-        plt.savefig('reports/comprehensive_backtest_plot.png', dpi=150)
+        plt.savefig("reports/comprehensive_backtest_plot.png", dpi=150)
         plt.show()
 
         print("✓ Plots saved to reports/comprehensive_backtest_plot.png")
@@ -629,10 +611,10 @@ class ComprehensiveEnsembleBacktest:
 def main():
     """Run comprehensive ensemble backtest"""
 
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("COMPREHENSIVE ENSEMBLE BACKTEST")
     logger.info("Validating +5-7% ROI target for v3.0")
-    logger.info("="*60 + "\n")
+    logger.info("=" * 60 + "\n")
 
     # Initialize backtest
     backtest = ComprehensiveEnsembleBacktest(
@@ -640,7 +622,7 @@ def main():
         end_season=2024,
         initial_bankroll=10000.0,
         kelly_fraction=0.25,
-        min_edge=0.02
+        min_edge=0.02,
     )
 
     # Run backtest

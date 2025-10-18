@@ -7,16 +7,18 @@ Date: October 2024
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-import time
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import json
-from pathlib import Path
-import subprocess
 import logging
+import subprocess
+import time
+from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
+
 
 class AutonomousPhase2Runner:
     """Autonomously runs Phases 2.1 and 2.2, compares results"""
@@ -59,7 +61,7 @@ class AutonomousPhase2Runner:
                 with open(results_file) as f:
                     results = json.load(f)
 
-                logger.info(f"\nPhase 2.1 Results:")
+                logger.info("\nPhase 2.1 Results:")
                 logger.info(f"  90% Coverage: {results['coverage_90']:.1f}% (target: 90%)")
                 logger.info(f"  MAE: {results['mae']:.1f} yards")
 
@@ -71,9 +73,9 @@ class AutonomousPhase2Runner:
 
     def run_phase22(self):
         """Run Phase 2.2 (Mixture-of-Experts BNN)"""
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("Starting Phase 2.2: Mixture-of-Experts BNN")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         script_path = self.base_dir / "py" / "models" / "bnn_mixture_experts_v2.py"
 
@@ -82,7 +84,7 @@ class AutonomousPhase2Runner:
             ["uv", "run", "python", str(script_path)],
             capture_output=True,
             text=True,
-            cwd=str(self.base_dir)
+            cwd=str(self.base_dir),
         )
 
         if result.returncode == 0:
@@ -95,9 +97,9 @@ class AutonomousPhase2Runner:
 
     def compare_results(self):
         """Compare Phase 2.1 and 2.2 results"""
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("COMPARING PHASE 2 RESULTS")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Load results
         results_21 = json.load(open(self.results_dir / "simpler_bnn_v2_results.json"))
@@ -110,18 +112,24 @@ class AutonomousPhase2Runner:
         results_22 = json.load(open(results_22_file))
 
         # Compare
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("PHASE 2 COMPARISON: Simpler BNN vs Mixture-of-Experts")
-        print("="*80)
+        print("=" * 80)
         print(f"{'Metric':<20} {'Phase 1':<12} {'Phase 2.1':<12} {'Phase 2.2':<12} {'Best'}")
-        print("-"*80)
+        print("-" * 80)
 
         phase1_coverage = 26.0
         phase1_mae = 18.7
 
         metrics = [
-            ("90% Coverage (%)", phase1_coverage, results_21['coverage_90'], results_22['coverage_90'], 90.0),
-            ("MAE (yards)", phase1_mae, results_21['mae'], results_22['mae'], None)
+            (
+                "90% Coverage (%)",
+                phase1_coverage,
+                results_21["coverage_90"],
+                results_22["coverage_90"],
+                90.0,
+            ),
+            ("MAE (yards)", phase1_mae, results_21["mae"], results_22["mae"], None),
         ]
 
         for name, p1, p21, p22, target in metrics:
@@ -133,44 +141,44 @@ class AutonomousPhase2Runner:
             print(f"{name:<20} {p1:<12.1f} {p21:<12.1f} {p22:<12.1f} {best}")
 
         # Recommendation
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("RECOMMENDATION")
-        print("="*80)
+        print("=" * 80)
 
-        if results_21['coverage_90'] >= 75:
+        if results_21["coverage_90"] >= 75:
             print("✓ Phase 2.1 (Simpler BNN) achieved target calibration (≥75%)")
             print(f"  Coverage: {results_21['coverage_90']:.1f}%")
             print("\nRECOMMENDATION: Use Phase 2.1 model (simpler, faster, sufficient)")
 
-        elif results_22['coverage_90'] >= 75:
+        elif results_22["coverage_90"] >= 75:
             print("✓ Phase 2.2 (Mixture-of-Experts) achieved target calibration")
             print(f"  Coverage: {results_22['coverage_90']:.1f}%")
             print("\nRECOMMENDATION: Use Phase 2.2 model (more complex but better calibrated)")
 
         else:
-            best_cov = max(results_21['coverage_90'], results_22['coverage_90'])
+            best_cov = max(results_21["coverage_90"], results_22["coverage_90"])
             print(f"⚠️  Neither model achieved 75% target (best: {best_cov:.1f}%)")
             print("\nRECOMMENDATION: Proceed with hybrid calibration (Phase 2.3)")
 
         # Save comparison
         comparison = {
-            'phase_1': {'coverage_90': phase1_coverage, 'mae': phase1_mae},
-            'phase_2.1': results_21,
-            'phase_2.2': results_22,
-            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S")
+            "phase_1": {"coverage_90": phase1_coverage, "mae": phase1_mae},
+            "phase_2.1": results_21,
+            "phase_2.2": results_22,
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
 
         comparison_file = self.results_dir / "phase2_comparison.json"
-        with open(comparison_file, 'w') as f:
+        with open(comparison_file, "w") as f:
             json.dump(comparison, f, indent=2)
 
         logger.info(f"\n✓ Comparison saved to: {comparison_file}")
 
     def run(self):
         """Main autonomous execution"""
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("AUTONOMOUS PHASE 2 EXECUTION")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("\nThis script will:")
         logger.info("  1. Wait for Phase 2.1 to complete")
         logger.info("  2. Run Phase 2.2 (Mixture-of-Experts)")
@@ -189,9 +197,9 @@ class AutonomousPhase2Runner:
         # Step 3: Compare
         self.compare_results()
 
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("AUTONOMOUS PHASE 2 EXECUTION COMPLETE")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         return True
 

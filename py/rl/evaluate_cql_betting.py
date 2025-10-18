@@ -28,22 +28,21 @@ Usage:
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 
-
 # ============================================================================
 # Q-Network Architecture (must match cql_agent.py)
 # ============================================================================
 
+
 class QNetwork(nn.Module):
     """MLP for Q(s, a) estimation."""
 
-    def __init__(self, state_dim: int, action_dim: int, hidden_dims: List[int]):
+    def __init__(self, state_dim: int, action_dim: int, hidden_dims: list[int]):
         super().__init__()
         layers = []
         prev_dim = state_dim
@@ -65,6 +64,7 @@ class QNetwork(nn.Module):
 # Model Loading
 # ============================================================================
 
+
 def load_cql_model(model_path: Path, device: str = "cpu") -> tuple[QNetwork, dict]:
     """Load CQL model from checkpoint."""
     metadata_path = model_path / "metadata.json"
@@ -85,7 +85,9 @@ def load_cql_model(model_path: Path, device: str = "cpu") -> tuple[QNetwork, dic
     return model, metadata
 
 
-def load_ensemble(ensemble_dir: Path, ensemble_ids: List[str], device: str = "cpu") -> List[QNetwork]:
+def load_ensemble(
+    ensemble_dir: Path, ensemble_ids: list[str], device: str = "cpu"
+) -> list[QNetwork]:
     """Load ensemble of CQL models."""
     models = []
     for model_id in ensemble_ids:
@@ -99,6 +101,7 @@ def load_ensemble(ensemble_dir: Path, ensemble_ids: List[str], device: str = "cp
 # ============================================================================
 # Baseline Policies
 # ============================================================================
+
 
 def random_policy(df: pd.DataFrame) -> pd.DataFrame:
     """Random 50% betting."""
@@ -143,7 +146,8 @@ def kelly_lcb_policy(df: pd.DataFrame, alpha: float = 0.1, threshold: float = 0.
 # CQL Policies
 # ============================================================================
 
-def cql_single_policy(df: pd.DataFrame, model: QNetwork, state_cols: List[str]) -> pd.DataFrame:
+
+def cql_single_policy(df: pd.DataFrame, model: QNetwork, state_cols: list[str]) -> pd.DataFrame:
     """Single CQL model policy."""
     df = df.copy()
 
@@ -180,9 +184,9 @@ def cql_single_policy(df: pd.DataFrame, model: QNetwork, state_cols: List[str]) 
 
 def cql_ensemble_policy(
     df: pd.DataFrame,
-    models: List[QNetwork],
-    state_cols: List[str],
-    confidence_threshold: float = 0.05
+    models: list[QNetwork],
+    state_cols: list[str],
+    confidence_threshold: float = 0.05,
 ) -> pd.DataFrame:
     """Ensemble CQL policy with uncertainty filtering."""
     df = df.copy()
@@ -202,7 +206,7 @@ def cql_ensemble_policy(
 
     # Ensemble statistics for each action
     q_mean = q_values_ensemble.mean(axis=0)  # (n_samples, 4)
-    q_std = q_values_ensemble.std(axis=0)    # (n_samples, 4)
+    q_std = q_values_ensemble.std(axis=0)  # (n_samples, 4)
 
     df["q_no_bet_mean"] = q_mean[:, 0]
     df["q_small_mean"] = q_mean[:, 1]
@@ -241,7 +245,8 @@ def cql_ensemble_policy(
 # Performance Metrics
 # ============================================================================
 
-def calculate_metrics(df: pd.DataFrame) -> Dict[str, float]:
+
+def calculate_metrics(df: pd.DataFrame) -> dict[str, float]:
     """Calculate betting performance metrics."""
     # Filter to actual bets
     bets = df[df["predicted_action"] == 1].copy()
@@ -294,12 +299,13 @@ def calculate_metrics(df: pd.DataFrame) -> Dict[str, float]:
 # Main Evaluation
 # ============================================================================
 
+
 def evaluate_all_policies(
     df: pd.DataFrame,
-    best_model: Optional[QNetwork],
-    ensemble_models: Optional[List[QNetwork]],
-    state_cols: List[str],
-) -> Dict[str, Dict[str, float]]:
+    best_model: QNetwork | None,
+    ensemble_models: list[QNetwork] | None,
+    state_cols: list[str],
+) -> dict[str, dict[str, float]]:
     """Evaluate all policies and return metrics."""
     results = {}
 
@@ -322,7 +328,9 @@ def evaluate_all_policies(
 
     # CQL Ensemble
     if ensemble_models is not None and len(ensemble_models) > 0:
-        df_cql_ensemble = cql_ensemble_policy(df, ensemble_models, state_cols, confidence_threshold=0.05)
+        df_cql_ensemble = cql_ensemble_policy(
+            df, ensemble_models, state_cols, confidence_threshold=0.05
+        )
         results["cql_ensemble"] = calculate_metrics(df_cql_ensemble)
 
     return results
@@ -331,10 +339,19 @@ def evaluate_all_policies(
 def main():
     parser = argparse.ArgumentParser(description="Evaluate CQL betting performance")
     parser.add_argument("--best-model", type=str, help="Path to best CQL model directory")
-    parser.add_argument("--ensemble-dir", type=str, default="models/cql", help="Directory containing ensemble models")
+    parser.add_argument(
+        "--ensemble-dir",
+        type=str,
+        default="models/cql",
+        help="Directory containing ensemble models",
+    )
     parser.add_argument("--data", type=str, required=True, help="Path to logged dataset CSV")
-    parser.add_argument("--output", type=str, default="results/cql_betting_evaluation.json", help="Output JSON path")
-    parser.add_argument("--test-split", type=float, default=0.2, help="Test set fraction (default: 0.2)")
+    parser.add_argument(
+        "--output", type=str, default="results/cql_betting_evaluation.json", help="Output JSON path"
+    )
+    parser.add_argument(
+        "--test-split", type=float, default=0.2, help="Test set fraction (default: 0.2)"
+    )
     parser.add_argument("--device", type=str, default="cpu", help="Device (cpu, cuda, mps)")
 
     args = parser.parse_args()
@@ -361,11 +378,26 @@ def main():
 
     # Load ensemble (Phase 3 models, seed 42-61)
     ensemble_ids = [
-        'ee237922', 'a19dc3fe', '90fe41f9', 'aa67f6f5',
-        'c46a91c3', 'cd7d1ed9', 'dc57c8a2', 'df2233d9',
-        'fbaa0f3f', 'fef28489', '655b2be4', '1e76793f',
-        '3a5be1ef', '3ea3746c', '33ad8155', '487eb7aa',
-        '74b1acbf', '80e26617', '88c895db', '090d1bd4'
+        "ee237922",
+        "a19dc3fe",
+        "90fe41f9",
+        "aa67f6f5",
+        "c46a91c3",
+        "cd7d1ed9",
+        "dc57c8a2",
+        "df2233d9",
+        "fbaa0f3f",
+        "fef28489",
+        "655b2be4",
+        "1e76793f",
+        "3a5be1ef",
+        "3ea3746c",
+        "33ad8155",
+        "487eb7aa",
+        "74b1acbf",
+        "80e26617",
+        "88c895db",
+        "090d1bd4",
     ]
     ensemble_dir = Path(args.ensemble_dir)
     ensemble_models = load_ensemble(ensemble_dir, ensemble_ids, args.device)

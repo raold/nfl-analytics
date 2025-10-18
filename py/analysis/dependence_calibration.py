@@ -16,13 +16,12 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
-from typing import Tuple, Dict, List
 
 import numpy as np
 import pandas as pd
 from scipy import stats
-from scipy.stats import kendalltau, spearmanr
 from scipy.optimize import minimize_scalar
+from scipy.stats import kendalltau
 
 try:
     import psycopg2
@@ -34,11 +33,9 @@ except ImportError:
 # Tail Dependence Estimation
 # ============================================================================
 
+
 def empirical_tail_dependence(
-    u: np.ndarray,
-    v: np.ndarray,
-    threshold: float = 0.95,
-    tail: str = "upper"
+    u: np.ndarray, v: np.ndarray, threshold: float = 0.95, tail: str = "upper"
 ) -> float:
     """
     Compute empirical tail dependence coefficient.
@@ -56,10 +53,10 @@ def empirical_tail_dependence(
     """
     if tail == "upper":
         exceedances = (u > threshold) & (v > threshold)
-        margin_exceed = (u > threshold)
+        margin_exceed = u > threshold
     elif tail == "lower":
         exceedances = (u < (1 - threshold)) & (v < (1 - threshold))
-        margin_exceed = (u < (1 - threshold))
+        margin_exceed = u < (1 - threshold)
     else:
         raise ValueError(f"tail must be 'upper' or 'lower', got {tail}")
 
@@ -70,7 +67,7 @@ def empirical_tail_dependence(
     return np.sum(exceedances) / n_margin
 
 
-def theoretical_tail_dependence_t(df: int, rho: float) -> Tuple[float, float]:
+def theoretical_tail_dependence_t(df: int, rho: float) -> tuple[float, float]:
     """
     Theoretical tail dependence for t-copula.
 
@@ -95,7 +92,7 @@ def theoretical_tail_dependence_t(df: int, rho: float) -> Tuple[float, float]:
     return (lambda_tail, lambda_tail)
 
 
-def theoretical_tail_dependence_gaussian(rho: float) -> Tuple[float, float]:
+def theoretical_tail_dependence_gaussian(rho: float) -> tuple[float, float]:
     """
     Theoretical tail dependence for Gaussian copula.
 
@@ -110,6 +107,7 @@ def theoretical_tail_dependence_gaussian(rho: float) -> Tuple[float, float]:
 # ============================================================================
 # Copula Goodness-of-Fit
 # ============================================================================
+
 
 def kendall_tau_to_rho_gaussian(tau: float) -> float:
     """Convert Kendall's tau to Gaussian copula correlation."""
@@ -127,11 +125,7 @@ def kendall_tau_to_rho_t(tau: float, df: int) -> float:
     return np.sin(np.pi * tau / 2)
 
 
-def fit_copula_params(
-    u: np.ndarray,
-    v: np.ndarray,
-    copula: str = "gaussian"
-) -> Dict[str, float]:
+def fit_copula_params(u: np.ndarray, v: np.ndarray, copula: str = "gaussian") -> dict[str, float]:
     """
     Fit copula parameters using rank-based methods.
 
@@ -168,14 +162,10 @@ def fit_copula_params(
             kurt_emp = (kurt_emp_u + kurt_emp_v) / 2
             return (kurt_theo - kurt_emp) ** 2
 
-        result = minimize_scalar(loss, bounds=(5, 30), method='bounded')
+        result = minimize_scalar(loss, bounds=(5, 30), method="bounded")
         df_est = result.x
 
-        return {
-            "rho": rho,
-            "df": df_est,
-            "tau_empirical": tau_emp
-        }
+        return {"rho": rho, "df": df_est, "tau_empirical": tau_emp}
 
     else:
         raise ValueError(f"Unknown copula: {copula}")
@@ -184,6 +174,7 @@ def fit_copula_params(
 # ============================================================================
 # Database Query
 # ============================================================================
+
 
 def load_spread_results(db_url: str = None, csv_path: str = None) -> pd.DataFrame:
     """
@@ -212,19 +203,21 @@ def load_spread_results(db_url: str = None, csv_path: str = None) -> pd.DataFram
         df = pd.read_csv(csv_path)
 
         # Rename columns to match expected schema
-        df_out = pd.DataFrame({
-            'game_id': df['game_id'],
-            'season': df['season'],
-            'week': df['week'],
-            'home_team': df.get('home_team', 'UNK'),
-            'away_team': df.get('away_team', 'UNK'),
-            'home_score': df['home_score'],
-            'away_score': df['away_score'],
-            'actual_margin': df['home_margin'],
-            'spread_line': df['spread_close'],
-            'predicted_margin': df['predicted_margin'],
-            'cover': df['home_cover']
-        })
+        df_out = pd.DataFrame(
+            {
+                "game_id": df["game_id"],
+                "season": df["season"],
+                "week": df["week"],
+                "home_team": df.get("home_team", "UNK"),
+                "away_team": df.get("away_team", "UNK"),
+                "home_score": df["home_score"],
+                "away_score": df["away_score"],
+                "actual_margin": df["home_margin"],
+                "spread_line": df["spread_close"],
+                "predicted_margin": df["predicted_margin"],
+                "cover": df["home_cover"],
+            }
+        )
 
         return df_out
 
@@ -256,19 +249,21 @@ def load_spread_results(db_url: str = None, csv_path: str = None) -> pd.DataFram
             actual_margin = home_score - away_score
 
             # Create DataFrame for season
-            season_df = pd.DataFrame({
-                'game_id': [f"{season}_{i:04d}" for i in range(n_games)],
-                'season': season,
-                'week': np.repeat(range(1, 19), n_games // 18 + 1)[:n_games],
-                'home_team': np.random.choice(['BUF', 'MIA', 'DAL', 'KC', 'SF'], n_games),
-                'away_team': np.random.choice(['NE', 'NYJ', 'PHI', 'LAC', 'SEA'], n_games),
-                'home_score': home_score,
-                'away_score': away_score,
-                'actual_margin': actual_margin,
-                'spread_line': spread,
-                'predicted_margin': predicted_margin,
-                'cover': (actual_margin + spread) > 0
-            })
+            season_df = pd.DataFrame(
+                {
+                    "game_id": [f"{season}_{i:04d}" for i in range(n_games)],
+                    "season": season,
+                    "week": np.repeat(range(1, 19), n_games // 18 + 1)[:n_games],
+                    "home_team": np.random.choice(["BUF", "MIA", "DAL", "KC", "SF"], n_games),
+                    "away_team": np.random.choice(["NE", "NYJ", "PHI", "LAC", "SEA"], n_games),
+                    "home_score": home_score,
+                    "away_score": away_score,
+                    "actual_margin": actual_margin,
+                    "spread_line": spread,
+                    "predicted_margin": predicted_margin,
+                    "cover": (actual_margin + spread) > 0,
+                }
+            )
 
             seasons.append(season_df)
 
@@ -316,10 +311,9 @@ def load_spread_results(db_url: str = None, csv_path: str = None) -> pd.DataFram
 # Calibration Analysis
 # ============================================================================
 
+
 def compute_era_tail_dependence(
-    df: pd.DataFrame,
-    era_col: str = "season",
-    eras: List[Tuple[int, int]] = None
+    df: pd.DataFrame, era_col: str = "season", eras: list[tuple[int, int]] = None
 ) -> pd.DataFrame:
     """
     Compute tail dependence by era.
@@ -341,12 +335,7 @@ def compute_era_tail_dependence(
     """
     if eras is None:
         # Default: 5-year eras
-        eras = [
-            (2004, 2008),
-            (2009, 2013),
-            (2014, 2018),
-            (2019, 2024)
-        ]
+        eras = [(2004, 2008), (2009, 2013), (2014, 2018), (2019, 2024)]
 
     results = []
 
@@ -357,8 +346,8 @@ def compute_era_tail_dependence(
             continue
 
         # Convert to uniform marginals via empirical CDF
-        u = stats.rankdata(era_df['predicted_margin']) / (len(era_df) + 1)
-        v = stats.rankdata(era_df['actual_margin']) / (len(era_df) + 1)
+        u = stats.rankdata(era_df["predicted_margin"]) / (len(era_df) + 1)
+        v = stats.rankdata(era_df["actual_margin"]) / (len(era_df) + 1)
 
         # Fit copulas
         params_gaussian = fit_copula_params(u, v, copula="gaussian")
@@ -369,27 +358,30 @@ def compute_era_tail_dependence(
         lambda_lower_emp = empirical_tail_dependence(u, v, threshold=0.95, tail="lower")
 
         # Theoretical tail dependence
-        lambda_upper_gauss, lambda_lower_gauss = theoretical_tail_dependence_gaussian(params_gaussian['rho'])
+        lambda_upper_gauss, lambda_lower_gauss = theoretical_tail_dependence_gaussian(
+            params_gaussian["rho"]
+        )
         lambda_upper_t, lambda_lower_t = theoretical_tail_dependence_t(
-            df=params_t['df'],
-            rho=params_t['rho']
+            df=params_t["df"], rho=params_t["rho"]
         )
 
-        results.append({
-            'era_start': start,
-            'era_end': end,
-            'n_games': len(era_df),
-            'kendall_tau': params_gaussian['tau_empirical'],
-            'rho_gaussian': params_gaussian['rho'],
-            'rho_t': params_t['rho'],
-            'df_t': params_t['df'],
-            'lambda_upper_emp': lambda_upper_emp,
-            'lambda_lower_emp': lambda_lower_emp,
-            'lambda_upper_gaussian': lambda_upper_gauss,
-            'lambda_lower_gaussian': lambda_lower_gauss,
-            'lambda_upper_t': lambda_upper_t,
-            'lambda_lower_t': lambda_lower_t
-        })
+        results.append(
+            {
+                "era_start": start,
+                "era_end": end,
+                "n_games": len(era_df),
+                "kendall_tau": params_gaussian["tau_empirical"],
+                "rho_gaussian": params_gaussian["rho"],
+                "rho_t": params_t["rho"],
+                "df_t": params_t["df"],
+                "lambda_upper_emp": lambda_upper_emp,
+                "lambda_lower_emp": lambda_lower_emp,
+                "lambda_upper_gaussian": lambda_upper_gauss,
+                "lambda_lower_gaussian": lambda_lower_gauss,
+                "lambda_upper_t": lambda_upper_t,
+                "lambda_lower_t": lambda_lower_t,
+            }
+        )
 
     return pd.DataFrame(results)
 
@@ -397,6 +389,7 @@ def compute_era_tail_dependence(
 # ============================================================================
 # LaTeX Table Generation
 # ============================================================================
+
 
 def generate_latex_table(results_df: pd.DataFrame, output_path: Path) -> None:
     """Generate tail_dependence_table.tex for dissertation."""
@@ -410,37 +403,41 @@ def generate_latex_table(results_df: pd.DataFrame, output_path: Path) -> None:
         r"\begin{tabularx}{\linewidth}{@{}lYYYYYY@{}}",
         r"\toprule",
         r"Era & $n$ & $\tau$ & $\lambda_U^{\text{emp}}$ & $\lambda_U^{\text{Gauss}}$ & $\lambda_U^{t}$ & $\nu$ \\",
-        r"\midrule"
+        r"\midrule",
     ]
 
     for _, row in results_df.iterrows():
         era = f"{row['era_start']}-{row['era_end']}"
         n = f"{int(row['n_games']):,}"
         tau = f"{row['kendall_tau']:.3f}"
-        lambda_emp = f"{row['lambda_upper_emp']:.3f}" if not np.isnan(row['lambda_upper_emp']) else "---"
+        lambda_emp = (
+            f"{row['lambda_upper_emp']:.3f}" if not np.isnan(row["lambda_upper_emp"]) else "---"
+        )
         lambda_gauss = f"{row['lambda_upper_gaussian']:.3f}"
-        lambda_t = f"{row['lambda_upper_t']:.3f}" if not np.isnan(row['lambda_upper_t']) else "---"
-        df_t = f"{row['df_t']:.1f}" if not np.isnan(row['df_t']) else "---"
+        lambda_t = f"{row['lambda_upper_t']:.3f}" if not np.isnan(row["lambda_upper_t"]) else "---"
+        df_t = f"{row['df_t']:.1f}" if not np.isnan(row["df_t"]) else "---"
 
         lines.append(
             f"{era} & {n} & {tau} & {lambda_emp} & {lambda_gauss} & {lambda_t} & {df_t} \\\\"
         )
 
-    lines.extend([
-        r"\bottomrule",
-        r"\end{tabularx}",
-        r"\begin{tablenotes}[flushleft]",
-        r"\footnotesize",
-        r"\item \textit{Notes:} $\tau$ = Kendall's tau (rank correlation). "
-        r"$\lambda_U$ = upper tail dependence coefficient. "
-        r"Gaussian copulas exhibit zero tail dependence (asymptotic independence), "
-        r"while t-copulas with $\nu < 30$ exhibit positive tail dependence. "
-        r"Empirical estimates computed at 95th percentile threshold.",
-        r"\end{tablenotes}",
-        r"\end{threeparttable}",
-        r"\end{table}",
-        ""
-    ])
+    lines.extend(
+        [
+            r"\bottomrule",
+            r"\end{tabularx}",
+            r"\begin{tablenotes}[flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} $\tau$ = Kendall's tau (rank correlation). "
+            r"$\lambda_U$ = upper tail dependence coefficient. "
+            r"Gaussian copulas exhibit zero tail dependence (asymptotic independence), "
+            r"while t-copulas with $\nu < 30$ exhibit positive tail dependence. "
+            r"Empirical estimates computed at 95th percentile threshold.",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines))
@@ -451,36 +448,29 @@ def generate_latex_table(results_df: pd.DataFrame, output_path: Path) -> None:
 # Main
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Dependence calibration study for copula validation"
     )
-    parser.add_argument(
-        "--db-url",
-        default=None,
-        help="Database connection URL"
-    )
+    parser.add_argument("--db-url", default=None, help="Database connection URL")
     parser.add_argument(
         "--csv",
         type=Path,
         default=Path("data/processed/merged_predictions_features.csv"),
-        help="Path to merged predictions CSV (default: use real data)"
+        help="Path to merged predictions CSV (default: use real data)",
     )
     parser.add_argument(
         "--output",
         type=Path,
         default=Path("analysis/dissertation/figures/out/tail_dependence_table.tex"),
-        help="Output path for LaTeX table"
+        help="Output path for LaTeX table",
     )
     parser.add_argument(
-        "--eras",
-        nargs="+",
-        help="Era boundaries as 'start-end' pairs (e.g., 2004-2008 2009-2013)"
+        "--eras", nargs="+", help="Era boundaries as 'start-end' pairs (e.g., 2004-2008 2009-2013)"
     )
     parser.add_argument(
-        "--use-synthetic",
-        action="store_true",
-        help="Use synthetic data instead of real CSV"
+        "--use-synthetic", action="store_true", help="Use synthetic data instead of real CSV"
     )
 
     args = parser.parse_args()
@@ -511,19 +501,25 @@ def main():
     print("\nResults:")
     print(results.to_string(index=False))
 
-    print(f"\nGenerating LaTeX table...")
+    print("\nGenerating LaTeX table...")
     generate_latex_table(results, args.output)
 
     # Summary statistics
     print("\n" + "=" * 60)
     print("SUMMARY")
     print("=" * 60)
-    print(f"Overall Kendall's tau: {results['kendall_tau'].mean():.3f} ± {results['kendall_tau'].std():.3f}")
-    print(f"Avg empirical λ_U:     {results['lambda_upper_emp'].mean():.3f} ± {results['lambda_upper_emp'].std():.3f}")
-    print(f"Avg t-copula λ_U:      {results['lambda_upper_t'].mean():.3f} ± {results['lambda_upper_t'].std():.3f}")
+    print(
+        f"Overall Kendall's tau: {results['kendall_tau'].mean():.3f} ± {results['kendall_tau'].std():.3f}"
+    )
+    print(
+        f"Avg empirical λ_U:     {results['lambda_upper_emp'].mean():.3f} ± {results['lambda_upper_emp'].std():.3f}"
+    )
+    print(
+        f"Avg t-copula λ_U:      {results['lambda_upper_t'].mean():.3f} ± {results['lambda_upper_t'].std():.3f}"
+    )
     print(f"Avg t-copula df:       {results['df_t'].mean():.1f} ± {results['df_t'].std():.1f}")
     print("\nInterpretation:")
-    if results['lambda_upper_emp'].mean() > 0.05:
+    if results["lambda_upper_emp"].mean() > 0.05:
         print("  → Empirical tail dependence detected")
         print("  → t-copula preferred over Gaussian for same-game parlays")
     else:

@@ -18,19 +18,16 @@ Usage:
 import argparse
 import json
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional
 from datetime import datetime
 
-import pandas as pd
 import numpy as np
-from sklearn.metrics import brier_score_loss, accuracy_score, roc_auc_score, log_loss
+import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
+from sklearn.metrics import accuracy_score, brier_score_loss, log_loss, roc_auc_score
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -38,14 +35,14 @@ logger = logging.getLogger(__name__)
 class ProductionMonitor:
     """Monitor model performance in production."""
 
-    def __init__(self, db_config: Optional[Dict] = None):
+    def __init__(self, db_config: dict | None = None):
         """Initialize monitor with database connection."""
         self.db_config = db_config or {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+            "host": "localhost",
+            "port": 5544,
         }
 
     def connect_db(self):
@@ -61,7 +58,8 @@ class ProductionMonitor:
         cur.execute("CREATE SCHEMA IF NOT EXISTS monitoring")
 
         # Predictions log table
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS monitoring.predictions (
                 prediction_id SERIAL PRIMARY KEY,
                 game_id TEXT NOT NULL,
@@ -83,10 +81,12 @@ class ProductionMonitor:
                 log_loss FLOAT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Performance metrics table
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS monitoring.model_metrics (
                 metric_id SERIAL PRIMARY KEY,
                 model_version TEXT NOT NULL,
@@ -101,10 +101,12 @@ class ProductionMonitor:
                 calibration_score FLOAT,
                 computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Feature drift table
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS monitoring.feature_drift (
                 drift_id SERIAL PRIMARY KEY,
                 feature_name TEXT NOT NULL,
@@ -118,10 +120,12 @@ class ProductionMonitor:
                 drift_score FLOAT,
                 computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Alerts table
-        cur.execute("""
+        cur.execute(
+            """
             CREATE TABLE IF NOT EXISTS monitoring.alerts (
                 alert_id SERIAL PRIMARY KEY,
                 alert_type TEXT NOT NULL,
@@ -132,7 +136,8 @@ class ProductionMonitor:
                 resolved_at TIMESTAMP,
                 resolved_by TEXT
             )
-        """)
+        """
+        )
 
         conn.commit()
         cur.close()
@@ -170,11 +175,7 @@ class ProductionMonitor:
 
         return df
 
-    def evaluate_predictions(
-        self,
-        predictions: pd.DataFrame,
-        actuals: pd.DataFrame
-    ) -> Dict:
+    def evaluate_predictions(self, predictions: pd.DataFrame, actuals: pd.DataFrame) -> dict:
         """
         Evaluate predictions against actual results.
 
@@ -183,9 +184,7 @@ class ProductionMonitor:
         """
         # Merge predictions with actuals
         merged = predictions.merge(
-            actuals,
-            on=['game_id', 'season', 'week', 'home_team', 'away_team'],
-            how='inner'
+            actuals, on=["game_id", "season", "week", "home_team", "away_team"], how="inner"
         )
 
         if len(merged) == 0:
@@ -193,15 +192,15 @@ class ProductionMonitor:
             return {}
 
         # Calculate metrics
-        y_true = merged['home_win'].values
-        y_pred = merged['home_win_prob'].values
+        y_true = merged["home_win"].values
+        y_pred = merged["home_win_prob"].values
 
         metrics = {
-            'num_games': len(merged),
-            'accuracy': float(accuracy_score(y_true, (y_pred > 0.5).astype(int))),
-            'brier_score': float(brier_score_loss(y_true, y_pred)),
-            'log_loss': float(log_loss(y_true, y_pred)),
-            'auc': float(roc_auc_score(y_true, y_pred))
+            "num_games": len(merged),
+            "accuracy": float(accuracy_score(y_true, (y_pred > 0.5).astype(int))),
+            "brier_score": float(brier_score_loss(y_true, y_pred)),
+            "log_loss": float(log_loss(y_true, y_pred)),
+            "auc": float(roc_auc_score(y_true, y_pred)),
         }
 
         # Calibration analysis (binned)
@@ -215,14 +214,16 @@ class ProductionMonitor:
                 bin_actual = y_true[mask].mean()
                 calibration_diffs.append(abs(bin_pred - bin_actual))
 
-        metrics['calibration_score'] = float(np.mean(calibration_diffs)) if calibration_diffs else None
+        metrics["calibration_score"] = (
+            float(np.mean(calibration_diffs)) if calibration_diffs else None
+        )
 
         # Add per-game correctness
-        merged['correct'] = (merged['predicted_winner'] == merged['winner'])
+        merged["correct"] = merged["predicted_winner"] == merged["winner"]
 
         return metrics, merged
 
-    def log_predictions(self, predictions: pd.DataFrame, actuals: Optional[pd.DataFrame] = None):
+    def log_predictions(self, predictions: pd.DataFrame, actuals: pd.DataFrame | None = None):
         """Log predictions to monitoring database."""
         conn = self.connect_db()
         cur = conn.cursor()
@@ -230,34 +231,34 @@ class ProductionMonitor:
         # Merge with actuals if provided
         if actuals is not None:
             predictions = predictions.merge(
-                actuals[['game_id', 'winner', 'home_win']],
-                on='game_id',
-                how='left'
+                actuals[["game_id", "winner", "home_win"]], on="game_id", how="left"
             )
-            predictions['actual_winner'] = predictions['winner']
-            predictions['actual_home_win'] = predictions['home_win']
-            predictions['correct'] = (predictions['predicted_winner'] == predictions['winner'])
+            predictions["actual_winner"] = predictions["winner"]
+            predictions["actual_home_win"] = predictions["home_win"]
+            predictions["correct"] = predictions["predicted_winner"] == predictions["winner"]
 
         # Prepare data for insertion
         records = []
         for _, row in predictions.iterrows():
-            records.append((
-                row['game_id'],
-                int(row['season']),
-                int(row['week']),
-                row['home_team'],
-                row['away_team'],
-                row.get('model_version', 'v3.0.0'),
-                float(row['home_win_prob']),
-                float(row['away_win_prob']),
-                row['predicted_winner'],
-                float(row['confidence']),
-                row.get('actual_winner'),
-                row.get('actual_home_win'),
-                row.get('predicted_at', datetime.now()),
-                datetime.now() if actuals is not None else None,
-                row.get('correct')
-            ))
+            records.append(
+                (
+                    row["game_id"],
+                    int(row["season"]),
+                    int(row["week"]),
+                    row["home_team"],
+                    row["away_team"],
+                    row.get("model_version", "v3.0.0"),
+                    float(row["home_win_prob"]),
+                    float(row["away_win_prob"]),
+                    row["predicted_winner"],
+                    float(row["confidence"]),
+                    row.get("actual_winner"),
+                    row.get("actual_home_win"),
+                    row.get("predicted_at", datetime.now()),
+                    datetime.now() if actuals is not None else None,
+                    row.get("correct"),
+                )
+            )
 
         # Insert
         execute_values(
@@ -270,7 +271,7 @@ class ProductionMonitor:
             VALUES %s
             ON CONFLICT DO NOTHING
             """,
-            records
+            records,
         )
 
         conn.commit()
@@ -279,28 +280,31 @@ class ProductionMonitor:
 
         logger.info(f"Logged {len(records)} predictions to database")
 
-    def log_metrics(self, model_version: str, season: int, week: int, metrics: Dict):
+    def log_metrics(self, model_version: str, season: int, week: int, metrics: dict):
         """Log performance metrics to database."""
         conn = self.connect_db()
         cur = conn.cursor()
 
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO monitoring.model_metrics
             (model_version, metric_type, season, week, num_predictions,
              accuracy, brier_score, log_loss, auc, calibration_score)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """, (
-            model_version,
-            'weekly',
-            season,
-            week,
-            metrics['num_games'],
-            metrics['accuracy'],
-            metrics['brier_score'],
-            metrics['log_loss'],
-            metrics.get('auc'),
-            metrics.get('calibration_score')
-        ))
+        """,
+            (
+                model_version,
+                "weekly",
+                season,
+                week,
+                metrics["num_games"],
+                metrics["accuracy"],
+                metrics["brier_score"],
+                metrics["log_loss"],
+                metrics.get("auc"),
+                metrics.get("calibration_score"),
+            ),
+        )
 
         conn.commit()
         cur.close()
@@ -308,7 +312,7 @@ class ProductionMonitor:
 
         logger.info(f"Logged metrics for {model_version} week {season}-{week}")
 
-    def generate_weekly_report(self, season: int, week: int) -> Dict:
+    def generate_weekly_report(self, season: int, week: int) -> dict:
         """Generate weekly performance report."""
         conn = self.connect_db()
 
@@ -329,15 +333,17 @@ class ProductionMonitor:
         conn.close()
 
         report = {
-            'season': season,
-            'week': week,
-            'generated_at': datetime.now().isoformat(),
-            'models': metrics_df.to_dict('records') if not metrics_df.empty else []
+            "season": season,
+            "week": week,
+            "generated_at": datetime.now().isoformat(),
+            "models": metrics_df.to_dict("records") if not metrics_df.empty else [],
         }
 
         return report
 
-    def check_data_drift(self, current_features: pd.DataFrame, baseline_features: pd.DataFrame) -> List[Dict]:
+    def check_data_drift(
+        self, current_features: pd.DataFrame, baseline_features: pd.DataFrame
+    ) -> list[dict]:
         """Check for feature drift compared to baseline."""
         drift_alerts = []
 
@@ -348,7 +354,7 @@ class ProductionMonitor:
                 continue
 
             curr_mean = current_features[feature].mean()
-            curr_std = current_features[feature].std()
+            current_features[feature].std()
             base_mean = baseline_features[feature].mean()
             base_std = baseline_features[feature].std()
 
@@ -360,26 +366,28 @@ class ProductionMonitor:
 
             # Alert if significant drift (z > 3)
             if z_score > 3:
-                drift_alerts.append({
-                    'feature': feature,
-                    'current_mean': float(curr_mean),
-                    'baseline_mean': float(base_mean),
-                    'z_score': float(z_score),
-                    'severity': 'warning' if z_score < 5 else 'error'
-                })
+                drift_alerts.append(
+                    {
+                        "feature": feature,
+                        "current_mean": float(curr_mean),
+                        "baseline_mean": float(base_mean),
+                        "z_score": float(z_score),
+                        "severity": "warning" if z_score < 5 else "error",
+                    }
+                )
 
         return drift_alerts
 
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Monitor model production performance')
-    parser.add_argument('--init-tables', action='store_true', help='Initialize monitoring tables')
-    parser.add_argument('--predictions-file', help='Path to predictions CSV')
-    parser.add_argument('--season', type=int, help='Season to monitor')
-    parser.add_argument('--week', type=int, help='Week to monitor')
-    parser.add_argument('--weekly-report', action='store_true', help='Generate weekly report')
-    parser.add_argument('--model-version', default='v3.0.0', help='Model version')
+    parser = argparse.ArgumentParser(description="Monitor model production performance")
+    parser.add_argument("--init-tables", action="store_true", help="Initialize monitoring tables")
+    parser.add_argument("--predictions-file", help="Path to predictions CSV")
+    parser.add_argument("--season", type=int, help="Season to monitor")
+    parser.add_argument("--week", type=int, help="Week to monitor")
+    parser.add_argument("--weekly-report", action="store_true", help="Generate weekly report")
+    parser.add_argument("--model-version", default="v3.0.0", help="Model version")
 
     args = parser.parse_args()
 
@@ -420,10 +428,10 @@ def main():
         print(f"Brier Score: {metrics['brier_score']:.4f}")
         print(f"Log Loss: {metrics['log_loss']:.4f}")
         print(f"AUC: {metrics['auc']:.4f}")
-        if metrics.get('calibration_score'):
+        if metrics.get("calibration_score"):
             print(f"Calibration: {metrics['calibration_score']:.4f}")
         print("\n✓ Metrics logged to monitoring.model_metrics")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

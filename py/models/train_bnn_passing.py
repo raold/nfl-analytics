@@ -12,13 +12,15 @@ Expected:
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
+import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from pathlib import Path
-import logging
 
 from py.models.bayesian_neural_network import BayesianNeuralNetwork
 
@@ -32,11 +34,7 @@ def load_passing_data_from_db():
     logger.info("Connecting to database...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions",
-        database="devdb01"
+        host="localhost", port=5544, user="dro", password="sicillionbillions", database="devdb01"
     )
 
     query = """
@@ -84,34 +82,34 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("Engineering features...")
 
     # Basic features
-    df['log_attempts'] = np.log1p(df['attempts'])
-    df['completion_rate'] = df['completions'] / df['attempts']
-    df['yards_per_attempt'] = df['yards'] / df['attempts']
-    df['td_rate'] = df['touchdowns'] / df['attempts']
+    df["log_attempts"] = np.log1p(df["attempts"])
+    df["completion_rate"] = df["completions"] / df["attempts"]
+    df["yards_per_attempt"] = df["yards"] / df["attempts"]
+    df["td_rate"] = df["touchdowns"] / df["attempts"]
 
     # Game context
-    df['spread_abs'] = df['spread_line'].abs()
+    df["spread_abs"] = df["spread_line"].abs()
 
     # Convert weather columns to numeric (handle 'DOME'/'CLOSED ROOF' etc)
-    df['temp'] = pd.to_numeric(df['temp'], errors='coerce')
-    df['wind'] = pd.to_numeric(df['wind'], errors='coerce')
+    df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
+    df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df['is_bad_weather'] = (
-        ((df['temp'] < 32) | (df['wind'] > 15))
-        .fillna(False)  # Dome games = False
-        .astype(int)
+    df["is_bad_weather"] = (
+        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)  # Dome games = False
     )
 
     # Rolling averages (per player)
-    df = df.sort_values(['player_id', 'season', 'week'])
+    df = df.sort_values(["player_id", "season", "week"])
 
-    for col in ['yards', 'completion_rate', 'yards_per_attempt']:
-        df[f'{col}_L3'] = df.groupby('player_id')[col].transform(
-            lambda x: x.rolling(window=3, min_periods=1).mean()
-        ).shift(1)  # Shift to avoid lookahead
+    for col in ["yards", "completion_rate", "yards_per_attempt"]:
+        df[f"{col}_L3"] = (
+            df.groupby("player_id")[col]
+            .transform(lambda x: x.rolling(window=3, min_periods=1).mean())
+            .shift(1)
+        )  # Shift to avoid lookahead
 
     # Season progress
-    df['week_in_season'] = df['week'].astype(float)
+    df["week_in_season"] = df["week"].astype(float)
 
     # Fill NaNs
     df = df.fillna(df.median(numeric_only=True))
@@ -127,22 +125,32 @@ def prepare_train_test_split(df: pd.DataFrame):
     train_seasons = [2020, 2021, 2022, 2023]
     test_season = 2024
 
-    train_df = df[df['season'].isin(train_seasons)].copy()
-    test_df = df[df['season'] == test_season].copy()
+    train_df = df[df["season"].isin(train_seasons)].copy()
+    test_df = df[df["season"] == test_season].copy()
 
     # Feature columns
     feature_cols = [
-        'log_attempts', 'completion_rate', 'yards_per_attempt', 'td_rate',
-        'is_home', 'spread_abs', 'total_line', 'is_bad_weather',
-        'yards_L3', 'completion_rate_L3', 'yards_per_attempt_L3',
-        'week_in_season', 'temp', 'wind'
+        "log_attempts",
+        "completion_rate",
+        "yards_per_attempt",
+        "td_rate",
+        "is_home",
+        "spread_abs",
+        "total_line",
+        "is_bad_weather",
+        "yards_L3",
+        "completion_rate_L3",
+        "yards_per_attempt_L3",
+        "week_in_season",
+        "temp",
+        "wind",
     ]
 
     X_train = train_df[feature_cols].values
-    y_train = train_df['yards'].values
+    y_train = train_df["yards"].values
 
     X_test = test_df[feature_cols].values
-    y_test = test_df['yards'].values
+    y_test = test_df["yards"].values
 
     logger.info(f"Train: {len(X_train)} samples ({train_seasons})")
     logger.info(f"Test: {len(X_test)} samples ({test_season})")
@@ -154,9 +162,9 @@ def prepare_train_test_split(df: pd.DataFrame):
 def train_and_evaluate():
     """Main training pipeline"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("BNN TRAINING ON REAL NFL PASSING DATA")
-    logger.info("="*70 + "\n")
+    logger.info("=" * 70 + "\n")
 
     # 1. Load data
     df = load_passing_data_from_db()
@@ -172,7 +180,7 @@ def train_and_evaluate():
     y_train_std = y_train.std()
 
     y_train_norm = (y_train - y_train_mean) / y_train_std
-    y_test_norm = (y_test - y_train_mean) / y_train_std
+    (y_test - y_train_mean) / y_train_std
 
     logger.info(f"\nTarget normalization: mean={y_train_mean:.1f}, std={y_train_std:.1f}\n")
 
@@ -182,7 +190,7 @@ def train_and_evaluate():
     bnn = BayesianNeuralNetwork(
         hidden_dims=(64, 32),
         inference_method="advi",  # Fast for production (2-5 min)
-        n_samples=2000
+        n_samples=2000,
     )
 
     logger.info("Training BNN (this will take 2-5 minutes)...\n")
@@ -197,7 +205,7 @@ def train_and_evaluate():
     pred_std = pred_std_norm * y_train_std  # Scale std
 
     # 7. Evaluate
-    mse = np.mean((pred_mean - y_test)**2)
+    mse = np.mean((pred_mean - y_test) ** 2)
     mae = np.mean(np.abs(pred_mean - y_test))
     rmse = np.sqrt(mse)
 
@@ -208,9 +216,9 @@ def train_and_evaluate():
     # Baseline (mean prediction)
     baseline_mae = np.mean(np.abs(y_train.mean() - y_test))
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("BNN TEST SET PERFORMANCE (2024 SEASON)")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"MAE: {mae:.2f} yards")
     logger.info(f"RMSE: {rmse:.2f} yards")
     logger.info(f"Mean Prediction: {pred_mean.mean():.1f} yards")
@@ -232,23 +240,24 @@ def train_and_evaluate():
 
     # Also save feature info
     metadata = {
-        'feature_cols': feature_cols,
-        'y_mean': float(y_train_mean),
-        'y_std': float(y_train_std),
-        'train_seasons': [2020, 2021, 2022, 2023],
-        'test_season': 2024,
-        'test_mae': float(mae),
-        'test_rmse': float(rmse),
-        'calibration': float(calibration)
+        "feature_cols": feature_cols,
+        "y_mean": float(y_train_mean),
+        "y_std": float(y_train_std),
+        "train_seasons": [2020, 2021, 2022, 2023],
+        "test_season": 2024,
+        "test_mae": float(mae),
+        "test_rmse": float(rmse),
+        "calibration": float(calibration),
     }
 
     import json
-    with open(model_path.parent / "bnn_passing_v1_metadata.json", 'w') as f:
+
+    with open(model_path.parent / "bnn_passing_v1_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info(f"\n✓ Model saved to: {model_path}")
     logger.info(f"✓ Metadata saved to: {model_path.parent}/bnn_passing_v1_metadata.json")
-    logger.info(f"\n✓ BNN training complete and ready for ensemble integration!\n")
+    logger.info("\n✓ BNN training complete and ready for ensemble integration!\n")
 
     return bnn, metadata
 

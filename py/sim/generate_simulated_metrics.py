@@ -15,14 +15,13 @@ Usage:
 
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy.stats import kendalltau, norm
 
 
-def load_dixon_coles_params(path: str = "models/dixon_coles_params.json") -> Dict:
+def load_dixon_coles_params(path: str = "models/dixon_coles_params.json") -> dict:
     """
     Load Dixon-Coles parameters.
 
@@ -36,10 +35,10 @@ def load_dixon_coles_params(path: str = "models/dixon_coles_params.json") -> Dic
         print(f"⚠️  Dixon-Coles params not found at {path}")
         print("   Using default parameters from NFL averages")
         return {
-            'home_advantage': 0.3,  # ~2.5 points
-            'avg_attack': 1.3,      # ~23 points per team
-            'avg_defense': 1.3,
-            'rho': -0.15            # Slight negative dependence
+            "home_advantage": 0.3,  # ~2.5 points
+            "avg_attack": 1.3,  # ~23 points per team
+            "avg_defense": 1.3,
+            "rho": -0.15,  # Slight negative dependence
         }
 
     with open(path) as f:
@@ -52,8 +51,8 @@ def simulate_game_copula(
     away_attack: float,
     away_defense: float,
     rho: float = -0.1,
-    n_sims: int = 1
-) -> Tuple[np.ndarray, np.ndarray]:
+    n_sims: int = 1,
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Simulate game using Gaussian copula + Poisson marginals.
 
@@ -72,7 +71,9 @@ def simulate_game_copula(
     # Dixon-Coles: log(λ_home) = attack_home - defense_away + home_adv
     #              log(λ_away) = attack_away - defense_home
     # Defense parameters are NEGATIVE, so we subtract them (i.e., add their absolute value)
-    lambda_home = np.exp(home_attack - away_defense)  # away_defense is negative, so subtracting adds
+    lambda_home = np.exp(
+        home_attack - away_defense
+    )  # away_defense is negative, so subtracting adds
     lambda_away = np.exp(away_attack - home_defense)  # home_defense is negative
 
     # Gaussian copula
@@ -96,11 +97,7 @@ def simulate_game_copula(
     return home_scores.astype(int), away_scores.astype(int)
 
 
-def simulate_season(
-    n_games: int = 1408,
-    params: Dict = None,
-    seed: int = 42
-) -> pd.DataFrame:
+def simulate_season(n_games: int = 1408, params: dict = None, seed: int = 42) -> pd.DataFrame:
     """
     Simulate a full season of games.
 
@@ -118,12 +115,12 @@ def simulate_season(
         params = load_dixon_coles_params()
 
     # Extract parameters
-    home_adv = params.get('home_advantage', 0.1)
-    rho = params.get('rho', -0.1)
+    home_adv = params.get("home_advantage", 0.1)
+    rho = params.get("rho", -0.1)
 
     # Get team strengths
-    attack_params = params.get('attack', {})
-    defense_params = params.get('defense', {})
+    attack_params = params.get("attack", {})
+    defense_params = params.get("defense", {})
 
     teams = list(attack_params.keys())
     if len(teams) == 0:
@@ -150,15 +147,12 @@ def simulate_season(
         home_scores.append(h_score[0])
         away_scores.append(a_score[0])
 
-    return pd.DataFrame({
-        'home_score': home_scores,
-        'away_score': away_scores
-    })
+    return pd.DataFrame({"home_score": home_scores, "away_score": away_scores})
 
 
-def compute_margin_distribution(df: pd.DataFrame) -> Dict:
+def compute_margin_distribution(df: pd.DataFrame) -> dict:
     """Compute margin distribution (same as historical)."""
-    margins = df['home_score'] - df['away_score']
+    margins = df["home_score"] - df["away_score"]
 
     margin_counts = margins.value_counts().sort_index()
     total_games = len(margins)
@@ -168,18 +162,18 @@ def compute_margin_distribution(df: pd.DataFrame) -> Dict:
         pmf[int(margin)] = float(count / total_games)
 
     return {
-        'pmf': pmf,
-        'mean': float(margins.mean()),
-        'std': float(margins.std()),
-        'min': int(margins.min()),
-        'max': int(margins.max()),
-        'n_games': total_games
+        "pmf": pmf,
+        "mean": float(margins.mean()),
+        "std": float(margins.std()),
+        "min": int(margins.min()),
+        "max": int(margins.max()),
+        "n_games": total_games,
     }
 
 
-def compute_key_number_masses(df: pd.DataFrame, key_numbers: List[int]) -> Dict:
+def compute_key_number_masses(df: pd.DataFrame, key_numbers: list[int]) -> dict:
     """Compute key number masses (same as historical)."""
-    margins = (df['home_score'] - df['away_score']).abs()
+    margins = (df["home_score"] - df["away_score"]).abs()
     total_games = len(margins)
 
     masses = {}
@@ -190,9 +184,9 @@ def compute_key_number_masses(df: pd.DataFrame, key_numbers: List[int]) -> Dict:
     return masses
 
 
-def compute_total_distribution(df: pd.DataFrame) -> Dict:
+def compute_total_distribution(df: pd.DataFrame) -> dict:
     """Compute total distribution (same as historical)."""
-    totals = df['home_score'] + df['away_score']
+    totals = df["home_score"] + df["away_score"]
 
     total_counts = totals.value_counts().sort_index()
     n_games = len(totals)
@@ -202,45 +196,45 @@ def compute_total_distribution(df: pd.DataFrame) -> Dict:
         pmf[int(total)] = float(count / n_games)
 
     return {
-        'pmf': pmf,
-        'mean': float(totals.mean()),
-        'std': float(totals.std()),
-        'min': int(totals.min()),
-        'max': int(totals.max()),
-        'n_games': n_games
+        "pmf": pmf,
+        "mean": float(totals.mean()),
+        "std": float(totals.std()),
+        "min": int(totals.min()),
+        "max": int(totals.max()),
+        "n_games": n_games,
     }
 
 
-def compute_score_dependence(df: pd.DataFrame) -> Dict:
+def compute_score_dependence(df: pd.DataFrame) -> dict:
     """Compute score dependence (same as historical)."""
-    home = df['home_score'].values
-    away = df['away_score'].values
+    home = df["home_score"].values
+    away = df["away_score"].values
 
     tau, p_value = kendalltau(home, away)
     pearson = np.corrcoef(home, away)[0, 1]
 
     from scipy.stats import spearmanr
+
     spearman, _ = spearmanr(home, away)
 
     return {
-        'kendall_tau': float(tau),
-        'kendall_p_value': float(p_value),
-        'pearson': float(pearson),
-        'spearman': float(spearman),
-        'n_games': len(df)
+        "kendall_tau": float(tau),
+        "kendall_p_value": float(p_value),
+        "pearson": float(pearson),
+        "spearman": float(spearman),
+        "n_games": len(df),
     }
 
 
 def compute_upset_rate(df: pd.DataFrame) -> float:
     """Compute home win rate (same as historical)."""
-    home_wins = (df['home_score'] > df['away_score']).sum()
+    home_wins = (df["home_score"] > df["away_score"]).sum()
     total_games = len(df)
     return float(home_wins / total_games)
 
 
 def generate_simulated_metrics(
-    n_games: int = 10000,
-    output_path: str = "analysis/results/simulated_metrics.json"
+    n_games: int = 10000, output_path: str = "analysis/results/simulated_metrics.json"
 ):
     """
     Main function to generate simulated metrics.
@@ -286,7 +280,9 @@ def generate_simulated_metrics(
 
     print("\n6. Computing score dependence...")
     dependence = compute_score_dependence(df)
-    print(f"✅ Kendall's tau: {dependence['kendall_tau']:.4f} (p={dependence['kendall_p_value']:.4e})")
+    print(
+        f"✅ Kendall's tau: {dependence['kendall_tau']:.4f} (p={dependence['kendall_p_value']:.4e})"
+    )
     print(f"   Pearson: {dependence['pearson']:.4f}")
     print(f"   Spearman: {dependence['spearman']:.4f}")
 
@@ -296,17 +292,17 @@ def generate_simulated_metrics(
 
     # Compile results
     results = {
-        'metadata': {
-            'n_games': len(df),
-            'simulation_seed': 42,
-            'description': 'Simulated NFL games using Gaussian copula + Poisson marginals'
+        "metadata": {
+            "n_games": len(df),
+            "simulation_seed": 42,
+            "description": "Simulated NFL games using Gaussian copula + Poisson marginals",
         },
-        'parameters': params,
-        'margin_distribution': margin_dist,
-        'key_number_masses': key_masses,
-        'total_distribution': total_dist,
-        'score_dependence': dependence,
-        'home_win_rate': home_win_rate
+        "parameters": params,
+        "margin_distribution": margin_dist,
+        "key_number_masses": key_masses,
+        "total_distribution": total_dist,
+        "score_dependence": dependence,
+        "home_win_rate": home_win_rate,
     }
 
     # Save to file
@@ -314,7 +310,7 @@ def generate_simulated_metrics(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(results, f, indent=2)
 
     print(f"✅ Saved to {output_path}")
@@ -322,13 +318,13 @@ def generate_simulated_metrics(
     print("\n" + "=" * 80)
     print("SIMULATED METRICS COMPLETE")
     print("=" * 80)
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Games simulated: {len(df)}")
     print(f"  Mean margin: {margin_dist['mean']:.2f}")
     print(f"  Key mass (3pt): {key_masses[3]*100:.2f}%")
     print(f"  Key mass (7pt): {key_masses[7]*100:.2f}%")
     print(f"  Kendall's tau: {dependence['kendall_tau']:.4f}")
-    print(f"\n✅ Ready for Phase 3: Acceptance test comparison")
+    print("\n✅ Ready for Phase 3: Acceptance test comparison")
 
 
 if __name__ == "__main__":

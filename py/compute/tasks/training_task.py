@@ -18,10 +18,10 @@ from __future__ import annotations
 
 import json
 import uuid
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any
 
 import redis
 
@@ -52,7 +52,7 @@ class TrainingTask:
     """
 
     model_type: str
-    config: Dict[str, Any]
+    config: dict[str, Any]
     priority: int = 5
     min_gpu_memory: int = 8  # GB
     estimated_hours: float = 1.0
@@ -62,18 +62,18 @@ class TrainingTask:
     # Auto-populated fields
     task_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     status: str = "pending"  # pending, claimed, running, completed, failed
-    worker_id: Optional[str] = None
+    worker_id: str | None = None
     created_at: str = field(default_factory=lambda: datetime.utcnow().isoformat())
-    started_at: Optional[str] = None
-    completed_at: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    started_at: str | None = None
+    completed_at: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> TrainingTask:
+    def from_dict(cls, data: dict[str, Any]) -> TrainingTask:
         """Create TrainingTask from dictionary."""
         return cls(**data)
 
@@ -99,15 +99,20 @@ class TrainingTask:
         """
         # Store task metadata in Redis hash
         task_key = f"task:{self.task_id}"
-        redis_client.hset(task_key, mapping={
-            "data": self.to_json(),
-            "status": self.status,
-            "priority": self.priority,
-            "min_gpu_memory": self.min_gpu_memory
-        })
+        redis_client.hset(
+            task_key,
+            mapping={
+                "data": self.to_json(),
+                "status": self.status,
+                "priority": self.priority,
+                "min_gpu_memory": self.min_gpu_memory,
+            },
+        )
 
         # Add to priority queue (sorted set by priority)
-        redis_client.zadd(queue_name, {self.task_id: -self.priority})  # Negative for high-priority-first
+        redis_client.zadd(
+            queue_name, {self.task_id: -self.priority}
+        )  # Negative for high-priority-first
 
         print(f"✓ Submitted task {self.task_id} ({self.model_type}) with priority {self.priority}")
         return self.task_id
@@ -119,8 +124,8 @@ class TrainingTask:
         device_type: str,
         gpu_memory_gb: int,
         min_priority: int = 1,
-        queue_name: str = "training_queue"
-    ) -> Optional[TrainingTask]:
+        queue_name: str = "training_queue",
+    ) -> TrainingTask | None:
         """
         Claim a task from the queue if device capabilities match.
 
@@ -139,7 +144,7 @@ class TrainingTask:
         tasks = redis_client.zrange(queue_name, 0, -1, withscores=True)
 
         for task_id_bytes, neg_priority in tasks:
-            task_id = task_id_bytes.decode('utf-8')
+            task_id = task_id_bytes.decode("utf-8")
             priority = -int(neg_priority)
 
             # Skip if priority too low
@@ -155,7 +160,7 @@ class TrainingTask:
                 redis_client.zrem(queue_name, task_id)
                 continue
 
-            task = TrainingTask.from_json(task_data.decode('utf-8'))
+            task = TrainingTask.from_json(task_data.decode("utf-8"))
 
             # Check if task already claimed
             if task.status != "pending":
@@ -172,24 +177,20 @@ class TrainingTask:
             task.started_at = datetime.utcnow().isoformat()
 
             # Update in Redis
-            redis_client.hset(task_key, mapping={
-                "data": task.to_json(),
-                "status": "claimed"
-            })
+            redis_client.hset(task_key, mapping={"data": task.to_json(), "status": "claimed"})
 
             # Remove from queue
             redis_client.zrem(queue_name, task_id)
 
-            print(f"✓ Worker {worker_id} claimed task {task_id} ({task.model_type}, priority {priority})")
+            print(
+                f"✓ Worker {worker_id} claimed task {task_id} ({task.model_type}, priority {priority})"
+            )
             return task
 
         return None  # No suitable task found
 
     def update_status(
-        self,
-        redis_client: redis.Redis,
-        status: str,
-        metadata: Optional[Dict[str, Any]] = None
+        self, redis_client: redis.Redis, status: str, metadata: dict[str, Any] | None = None
     ):
         """
         Update task status in Redis.
@@ -208,17 +209,14 @@ class TrainingTask:
             self.metadata.update(metadata)
 
         task_key = f"task:{self.task_id}"
-        redis_client.hset(task_key, mapping={
-            "data": self.to_json(),
-            "status": status
-        })
+        redis_client.hset(task_key, mapping={"data": self.to_json(), "status": status})
 
     def save_checkpoint(
         self,
         redis_client: redis.Redis,
         epoch: int,
-        metrics: Dict[str, float],
-        checkpoint_path: Path
+        metrics: dict[str, float],
+        checkpoint_path: Path,
     ):
         """
         Record checkpoint metadata in Redis.
@@ -230,18 +228,21 @@ class TrainingTask:
             checkpoint_path: Path to saved checkpoint file
         """
         checkpoint_key = f"checkpoint:{self.task_id}:{epoch}"
-        redis_client.hset(checkpoint_key, mapping={
-            "epoch": epoch,
-            "metrics": json.dumps(metrics),
-            "path": str(checkpoint_path),
-            "timestamp": datetime.utcnow().isoformat()
-        })
+        redis_client.hset(
+            checkpoint_key,
+            mapping={
+                "epoch": epoch,
+                "metrics": json.dumps(metrics),
+                "path": str(checkpoint_path),
+                "timestamp": datetime.utcnow().isoformat(),
+            },
+        )
 
         # Update task metadata with latest checkpoint
         self.metadata["latest_checkpoint"] = {
             "epoch": epoch,
             "metrics": metrics,
-            "path": str(checkpoint_path)
+            "path": str(checkpoint_path),
         }
         self.update_status(redis_client, self.status)
 
@@ -266,13 +267,13 @@ class HyperparameterSweep:
     """
 
     model_type: str
-    base_config: Dict[str, Any]
-    param_grid: Dict[str, List[Any]]
+    base_config: dict[str, Any]
+    param_grid: dict[str, list[Any]]
     priority: int = 5
     min_gpu_memory: int = 8
     estimated_hours: float = 1.0
 
-    def generate_configs(self) -> List[Dict[str, Any]]:
+    def generate_configs(self) -> list[dict[str, Any]]:
         """
         Generate all combinations from parameter grid.
 
@@ -293,7 +294,7 @@ class HyperparameterSweep:
 
         return configs
 
-    def submit(self, redis_client: redis.Redis, queue_name: str = "training_queue") -> List[str]:
+    def submit(self, redis_client: redis.Redis, queue_name: str = "training_queue") -> list[str]:
         """
         Submit all configurations as separate tasks.
 
@@ -312,7 +313,7 @@ class HyperparameterSweep:
                 priority=self.priority,
                 min_gpu_memory=self.min_gpu_memory,
                 estimated_hours=self.estimated_hours,
-                metadata={"sweep_index": i, "total_configs": len(configs)}
+                metadata={"sweep_index": i, "total_configs": len(configs)},
             )
             task_id = task.submit(redis_client, queue_name)
             task_ids.append(task_id)
@@ -325,11 +326,9 @@ class HyperparameterSweep:
 # Utility Functions
 # ============================================================================
 
+
 def get_redis_client(
-    host: str = "localhost",
-    port: int = 6379,
-    db: int = 0,
-    password: Optional[str] = None
+    host: str = "localhost", port: int = 6379, db: int = 0, password: str | None = None
 ) -> redis.Redis:
     """
     Create Redis client connection.
@@ -348,11 +347,13 @@ def get_redis_client(
         port=port,
         db=db,
         password=password,
-        decode_responses=False  # Keep bytes for compatibility
+        decode_responses=False,  # Keep bytes for compatibility
     )
 
 
-def get_queue_status(redis_client: redis.Redis, queue_name: str = "training_queue") -> Dict[str, Any]:
+def get_queue_status(
+    redis_client: redis.Redis, queue_name: str = "training_queue"
+) -> dict[str, Any]:
     """
     Get current queue status.
 
@@ -370,14 +371,11 @@ def get_queue_status(redis_client: redis.Redis, queue_name: str = "training_queu
     return {
         "total_pending": total_pending,
         "priority_breakdown": priority_counts,
-        "queue_name": queue_name
+        "queue_name": queue_name,
     }
 
 
-def list_tasks(
-    redis_client: redis.Redis,
-    status_filter: Optional[str] = None
-) -> List[TrainingTask]:
+def list_tasks(redis_client: redis.Redis, status_filter: str | None = None) -> list[TrainingTask]:
     """
     List all tasks, optionally filtered by status.
 
@@ -394,7 +392,7 @@ def list_tasks(
     for key in redis_client.scan_iter("task:*"):
         task_data = redis_client.hget(key, "data")
         if task_data:
-            task = TrainingTask.from_json(task_data.decode('utf-8'))
+            task = TrainingTask.from_json(task_data.decode("utf-8"))
             if status_filter is None or task.status == status_filter:
                 tasks.append(task)
 

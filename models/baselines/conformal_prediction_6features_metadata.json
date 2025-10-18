@@ -1,0 +1,18 @@
+{
+  "method": "Conformal Prediction",
+  "coverage_target": 0.9,
+  "conformal_method": "plus",
+  "cv_folds": 5,
+  "base_model": "RandomForest",
+  "n_estimators": 100,
+  "n_features": 6,
+  "features": [
+    "carries",
+    "avg_rushing_l3",
+    "season_avg",
+    "week",
+    "spread_close",
+    "total_close"
+  ],
+  "timestamp": "2025-10-18T07:46:39.672941"
+}

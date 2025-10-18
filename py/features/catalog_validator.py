@@ -21,9 +21,9 @@ Author: Claude Code
 Date: 2025-10-17
 """
 
+from collections.abc import Callable, Iterable
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Iterable
 
 import pandas as pd
 import yaml
@@ -57,12 +57,12 @@ class FeatureCatalog:
 
         for catalog_path in possible_paths:
             if catalog_path.exists():
-                with open(catalog_path, "r") as f:
+                with open(catalog_path) as f:
                     self._catalog = yaml.safe_load(f)
                 return
 
         raise FileNotFoundError(
-            f"Feature catalog not found. Searched:\n" + "\n".join(str(p) for p in possible_paths)
+            "Feature catalog not found. Searched:\n" + "\n".join(str(p) for p in possible_paths)
         )
 
     def get_safe_features(self) -> set[str]:
@@ -136,16 +136,16 @@ def validate_feature_list(
     # Check for unsafe features
     if unsafe_detected:
         error_msg = (
-            f"❌ TEMPORAL LEAKAGE DETECTED!\n\n"
-            f"The following features are marked asof_safe:false and MUST NOT be "
-            f"used in prediction:\n"
+            "❌ TEMPORAL LEAKAGE DETECTED!\n\n"
+            "The following features are marked asof_safe:false and MUST NOT be "
+            "used in prediction:\n"
         )
         for feat in sorted(unsafe_detected):
             error_msg += f"  - {feat}\n"
 
         error_msg += (
-            f"\nThese are post-game outcome variables that would cause leakage.\n"
-            f"Remove them from your feature list before training.\n"
+            "\nThese are post-game outcome variables that would cause leakage.\n"
+            "Remove them from your feature list before training.\n"
         )
 
         if strict:
@@ -156,15 +156,15 @@ def validate_feature_list(
     # Check for undocumented features
     if undocumented and not allow_undocumented:
         warning_msg = (
-            f"⚠️  UNDOCUMENTED FEATURES DETECTED:\n\n"
-            f"The following features are not in catalog.yaml:\n"
+            "⚠️  UNDOCUMENTED FEATURES DETECTED:\n\n"
+            "The following features are not in catalog.yaml:\n"
         )
         for feat in sorted(undocumented):
             warning_msg += f"  - {feat}\n"
 
         warning_msg += (
-            f"\nThese features have not been audited for temporal safety.\n"
-            f"Add them to py/features/catalog.yaml before using in production.\n"
+            "\nThese features have not been audited for temporal safety.\n"
+            "Add them to py/features/catalog.yaml before using in production.\n"
         )
 
         print(warning_msg)

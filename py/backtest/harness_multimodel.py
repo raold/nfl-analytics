@@ -265,8 +265,7 @@ def walk_forward_predictions(
 
 def all_combinations(items: Sequence[str]) -> Iterable[tuple[str, ...]]:
     for r in range(2, len(items) + 1):
-        for combo in itertools.combinations(items, r):
-            yield combo
+        yield from itertools.combinations(items, r)
 
 
 def add_equal_weight_ensembles(pred_df: pd.DataFrame, base_models: list[str]) -> None:

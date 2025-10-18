@@ -12,18 +12,16 @@ Usage:
 import argparse
 import json
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional
 from datetime import datetime
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
-import xgboost as xgb
+import pandas as pd
 import psycopg2
+import xgboost as xgb
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -41,29 +39,27 @@ class V3LivePredictor:
         self.model = xgb.Booster()
         self.model.load_model(str(self.model_path))
 
-        with open(self.metadata_path, 'r') as f:
+        with open(self.metadata_path) as f:
             self.metadata = json.load(f)
 
-        self.features = self.metadata['training_data']['features']
-        logger.info(f"Model v{self.metadata['model_version']} loaded with {len(self.features)} features")
+        self.features = self.metadata["training_data"]["features"]
+        logger.info(
+            f"Model v{self.metadata['model_version']} loaded with {len(self.features)} features"
+        )
 
     def connect_db(self):
         """Create database connection."""
         return psycopg2.connect(
-            dbname="devdb01",
-            user="dro",
-            password="sicillionbillions",
-            host="localhost",
-            port=5544
+            dbname="devdb01", user="dro", password="sicillionbillions", host="localhost", port=5544
         )
 
     def fetch_live_features(
         self,
-        game_ids: Optional[List[str]] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
-        week_start: Optional[int] = None,
-        week_end: Optional[int] = None
+        game_ids: list[str] | None = None,
+        season: int | None = None,
+        week: int | None = None,
+        week_start: int | None = None,
+        week_end: int | None = None,
     ) -> pd.DataFrame:
         """
         Fetch features for games by computing rolling stats at inference time.
@@ -88,9 +84,13 @@ class V3LivePredictor:
         elif season and week:
             where_clause = f"WHERE g.season = {season} AND g.week = {week}"
         elif season and week_start and week_end:
-            where_clause = f"WHERE g.season = {season} AND g.week >= {week_start} AND g.week <= {week_end}"
+            where_clause = (
+                f"WHERE g.season = {season} AND g.week >= {week_start} AND g.week <= {week_end}"
+            )
         else:
-            raise ValueError("Must provide game_ids or (season, week) or (season, week_start, week_end)")
+            raise ValueError(
+                "Must provide game_ids or (season, week) or (season, week_start, week_end)"
+            )
 
         # Query to compute features at inference time
         query = f"""
@@ -228,46 +228,46 @@ class V3LivePredictor:
         df = df.copy()
 
         # EPA differentials
-        df['epa_per_play_l3_diff'] = df['home_epa_per_play_l3'] - df['away_epa_per_play_l3']
-        df['epa_per_play_l5_diff'] = df['home_epa_per_play_l5'] - df['away_epa_per_play_l5']
-        df['epa_per_play_l10_diff'] = df['home_epa_per_play_l10'] - df['away_epa_per_play_l10']
+        df["epa_per_play_l3_diff"] = df["home_epa_per_play_l3"] - df["away_epa_per_play_l3"]
+        df["epa_per_play_l5_diff"] = df["home_epa_per_play_l5"] - df["away_epa_per_play_l5"]
+        df["epa_per_play_l10_diff"] = df["home_epa_per_play_l10"] - df["away_epa_per_play_l10"]
 
         # Success rate differentials
-        df['success_rate_l3_diff'] = df['home_success_rate_l3'] - df['away_success_rate_l3']
-        df['success_rate_l5_diff'] = df['home_success_rate_l5'] - df['away_success_rate_l5']
+        df["success_rate_l3_diff"] = df["home_success_rate_l3"] - df["away_success_rate_l3"]
+        df["success_rate_l5_diff"] = df["home_success_rate_l5"] - df["away_success_rate_l5"]
 
         # Points differentials
-        df['points_l3_diff'] = df['home_points_l3'] - df['away_points_l3']
-        df['points_l5_diff'] = df['home_points_l5'] - df['away_points_l5']
-        df['points_l10_diff'] = df['home_points_l10'] - df['away_points_l10']
+        df["points_l3_diff"] = df["home_points_l3"] - df["away_points_l3"]
+        df["points_l5_diff"] = df["home_points_l5"] - df["away_points_l5"]
+        df["points_l10_diff"] = df["home_points_l10"] - df["away_points_l10"]
 
         # Pass/rush EPA differentials
-        df['pass_epa_l5_diff'] = df['home_pass_epa_l5'] - df['away_pass_epa_l5']
-        df['rush_epa_l5_diff'] = df['home_rush_epa_l5'] - df['away_rush_epa_l5']
+        df["pass_epa_l5_diff"] = df["home_pass_epa_l5"] - df["away_pass_epa_l5"]
+        df["rush_epa_l5_diff"] = df["home_rush_epa_l5"] - df["away_rush_epa_l5"]
 
         # Win rate differential
-        with np.errstate(divide='ignore', invalid='ignore'):
-            df['home_win_pct'] = np.where(
-                (df['home_wins'] + df['home_losses']) > 0,
-                df['home_wins'] / (df['home_wins'] + df['home_losses']),
-                0.5
+        with np.errstate(divide="ignore", invalid="ignore"):
+            df["home_win_pct"] = np.where(
+                (df["home_wins"] + df["home_losses"]) > 0,
+                df["home_wins"] / (df["home_wins"] + df["home_losses"]),
+                0.5,
             )
-            df['away_win_pct'] = np.where(
-                (df['away_wins'] + df['away_losses']) > 0,
-                df['away_wins'] / (df['away_wins'] + df['away_losses']),
-                0.5
+            df["away_win_pct"] = np.where(
+                (df["away_wins"] + df["away_losses"]) > 0,
+                df["away_wins"] / (df["away_wins"] + df["away_losses"]),
+                0.5,
             )
-        df['win_pct_diff'] = df['home_win_pct'] - df['away_win_pct']
+        df["win_pct_diff"] = df["home_win_pct"] - df["away_win_pct"]
 
         return df
 
     def predict(
         self,
-        game_ids: Optional[List[str]] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
-        week_start: Optional[int] = None,
-        week_end: Optional[int] = None
+        game_ids: list[str] | None = None,
+        season: int | None = None,
+        week: int | None = None,
+        week_start: int | None = None,
+        week_end: int | None = None,
     ) -> pd.DataFrame:
         """
         Generate predictions with live feature computation.
@@ -280,11 +280,7 @@ class V3LivePredictor:
         """
         # Fetch live features
         df = self.fetch_live_features(
-            game_ids=game_ids,
-            season=season,
-            week=week,
-            week_start=week_start,
-            week_end=week_end
+            game_ids=game_ids, season=season, week=week, week_start=week_start, week_end=week_end
         )
 
         if len(df) == 0:
@@ -310,16 +306,15 @@ class V3LivePredictor:
         win_probs = self.model.predict(dmatrix)
 
         # Create results
-        results = df[['game_id', 'season', 'week', 'home_team', 'away_team']].copy()
-        results['home_win_prob'] = win_probs
-        results['away_win_prob'] = 1 - win_probs
-        results['predicted_winner'] = results.apply(
-            lambda row: row['home_team'] if row['home_win_prob'] > 0.5 else row['away_team'],
-            axis=1
+        results = df[["game_id", "season", "week", "home_team", "away_team"]].copy()
+        results["home_win_prob"] = win_probs
+        results["away_win_prob"] = 1 - win_probs
+        results["predicted_winner"] = results.apply(
+            lambda row: row["home_team"] if row["home_win_prob"] > 0.5 else row["away_team"], axis=1
         )
-        results['confidence'] = results[['home_win_prob', 'away_win_prob']].max(axis=1)
-        results['model_version'] = self.metadata['model_version']
-        results['predicted_at'] = datetime.now().isoformat()
+        results["confidence"] = results[["home_win_prob", "away_win_prob"]].max(axis=1)
+        results["model_version"] = self.metadata["model_version"]
+        results["predicted_at"] = datetime.now().isoformat()
 
         return results
 
@@ -341,15 +336,15 @@ class V3LivePredictor:
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Generate v3 predictions with live features')
-    parser.add_argument('--model-path', default='models/xgboost/v3_production/model.json')
-    parser.add_argument('--game-ids', nargs='+', help='Specific game IDs')
-    parser.add_argument('--season', type=int, help='Season')
-    parser.add_argument('--week', type=int, help='Single week')
-    parser.add_argument('--week-start', type=int, help='Start week (use with --week-end)')
-    parser.add_argument('--week-end', type=int, help='End week (use with --week-start)')
-    parser.add_argument('--output', default='data/predictions/v3_live_predictions.csv')
-    parser.add_argument('--verbose', action='store_true')
+    parser = argparse.ArgumentParser(description="Generate v3 predictions with live features")
+    parser.add_argument("--model-path", default="models/xgboost/v3_production/model.json")
+    parser.add_argument("--game-ids", nargs="+", help="Specific game IDs")
+    parser.add_argument("--season", type=int, help="Season")
+    parser.add_argument("--week", type=int, help="Single week")
+    parser.add_argument("--week-start", type=int, help="Start week (use with --week-end)")
+    parser.add_argument("--week-end", type=int, help="End week (use with --week-start)")
+    parser.add_argument("--output", default="data/predictions/v3_live_predictions.csv")
+    parser.add_argument("--verbose", action="store_true")
 
     args = parser.parse_args()
 
@@ -359,10 +354,14 @@ def main():
     # Validate inputs
     has_game_ids = args.game_ids is not None
     has_single_week = args.season is not None and args.week is not None
-    has_week_range = args.season is not None and args.week_start is not None and args.week_end is not None
+    has_week_range = (
+        args.season is not None and args.week_start is not None and args.week_end is not None
+    )
 
     if not (has_game_ids or has_single_week or has_week_range):
-        parser.error("Must provide --game-ids, or (--season --week), or (--season --week-start --week-end)")
+        parser.error(
+            "Must provide --game-ids, or (--season --week), or (--season --week-start --week-end)"
+        )
 
     # Initialize predictor
     predictor = V3LivePredictor(model_path=args.model_path)
@@ -374,7 +373,7 @@ def main():
         season=args.season,
         week=args.week,
         week_start=args.week_start,
-        week_end=args.week_end
+        week_end=args.week_end,
     )
 
     # Display results
@@ -384,13 +383,15 @@ def main():
         print("=" * 80)
 
         for _, row in results.iterrows():
-            print(f"\n{row['game_id']:<25} {row['away_team']:>3} @ {row['home_team']:<3} → "
-                  f"{row['predicted_winner']:>3} ({row['confidence']:.1%})")
+            print(
+                f"\n{row['game_id']:<25} {row['away_team']:>3} @ {row['home_team']:<3} → "
+                f"{row['predicted_winner']:>3} ({row['confidence']:.1%})"
+            )
 
         print(f"\n✓ Saved {len(results)} predictions to {args.output}")
     else:
         print("\n⚠ No predictions generated")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

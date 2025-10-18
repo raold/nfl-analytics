@@ -6,15 +6,16 @@ Shows the distribution of final bankroll outcomes under the drawdown-screened
 Kelly policy after Monte Carlo simulation with CVaR gating.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
-import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Set publication-quality style
-plt.rcParams['figure.facecolor'] = 'white'
-plt.rcParams['axes.facecolor'] = 'white'
-plt.rcParams['savefig.facecolor'] = 'white'
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["axes.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
+
 
 def generate_bankroll_histogram(
     n_sims: int = 10000,
@@ -22,7 +23,7 @@ def generate_bankroll_histogram(
     n_bets: int = 250,
     base_edge: float = 0.014,  # CLV = +14.9 bps from dissertation
     kelly_fraction: float = 0.25,  # Fractional Kelly
-    seed: int = 42
+    seed: int = 42,
 ):
     """Generate histogram of final bankroll outcomes."""
 
@@ -50,7 +51,7 @@ def generate_bankroll_histogram(
 
             # Simulate outcome
             if np.random.random() < win_prob:
-                bankroll += stake * (100/110)  # Win at -110 odds
+                bankroll += stake * (100 / 110)  # Win at -110 odds
             else:
                 bankroll -= stake
 
@@ -74,34 +75,35 @@ def generate_bankroll_histogram(
         bins=50,
         density=True,
         alpha=0.7,
-        color='steelblue',
-        edgecolor='black',
-        linewidth=0.5
+        color="steelblue",
+        edgecolor="black",
+        linewidth=0.5,
     )
 
     # Add KDE
     from scipy import stats
+
     kde = stats.gaussian_kde(final_bankrolls)
     x_range = np.linspace(final_bankrolls.min(), final_bankrolls.max(), 200)
-    ax.plot(x_range, kde(x_range), 'r-', linewidth=2, label='KDE')
+    ax.plot(x_range, kde(x_range), "r-", linewidth=2, label="KDE")
 
     # Mark initial bankroll
     ax.axvline(
         initial_bankroll,
-        color='green',
-        linestyle='--',
+        color="green",
+        linestyle="--",
         linewidth=2,
-        label=f'Initial: ${initial_bankroll:,.0f}'
+        label=f"Initial: ${initial_bankroll:,.0f}",
     )
 
     # Mark median
     median_bankroll = np.median(final_bankrolls)
     ax.axvline(
         median_bankroll,
-        color='orange',
-        linestyle='--',
+        color="orange",
+        linestyle="--",
         linewidth=2,
-        label=f'Median: ${median_bankroll:,.0f}'
+        label=f"Median: ${median_bankroll:,.0f}",
     )
 
     # Statistics box
@@ -110,41 +112,43 @@ def generate_bankroll_histogram(
     loss_rate = (final_bankrolls < initial_bankroll).mean()
 
     stats_text = (
-        f'Mean: ${mean_bankroll:,.0f}\n'
-        f'Std: ${std_bankroll:,.0f}\n'
-        f'Loss rate: {loss_rate:.1%}\n'
-        f'5th pct: ${np.percentile(final_bankrolls, 5):,.0f}\n'
-        f'95th pct: ${np.percentile(final_bankrolls, 95):,.0f}'
+        f"Mean: ${mean_bankroll:,.0f}\n"
+        f"Std: ${std_bankroll:,.0f}\n"
+        f"Loss rate: {loss_rate:.1%}\n"
+        f"5th pct: ${np.percentile(final_bankrolls, 5):,.0f}\n"
+        f"95th pct: ${np.percentile(final_bankrolls, 95):,.0f}"
     )
 
     ax.text(
-        0.98, 0.97,
+        0.98,
+        0.97,
         stats_text,
         transform=ax.transAxes,
-        verticalalignment='top',
-        horizontalalignment='right',
-        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
+        verticalalignment="top",
+        horizontalalignment="right",
+        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5),
         fontsize=10,
-        family='monospace'
+        family="monospace",
     )
 
     # Labels and title
-    ax.set_xlabel('Final Bankroll ($)', fontsize=12, fontweight='bold')
-    ax.set_ylabel('Density', fontsize=12, fontweight='bold')
+    ax.set_xlabel("Final Bankroll ($)", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Density", fontsize=12, fontweight="bold")
     ax.set_title(
-        'Final Bankroll Distribution\n'
-        f'(Kelly fraction={kelly_fraction}, {n_bets} bets, {n_sims:,} simulations)',
+        "Final Bankroll Distribution\n"
+        f"(Kelly fraction={kelly_fraction}, {n_bets} bets, {n_sims:,} simulations)",
         fontsize=14,
-        fontweight='bold',
-        pad=15
+        fontweight="bold",
+        pad=15,
     )
 
-    ax.legend(loc='upper left', fontsize=10, framealpha=0.9)
-    ax.grid(True, alpha=0.3, linestyle='--')
+    ax.legend(loc="upper left", fontsize=10, framealpha=0.9)
+    ax.grid(True, alpha=0.3, linestyle="--")
 
     plt.tight_layout()
 
     return fig, final_bankrolls
+
 
 def main():
     """Generate and save the figure."""
@@ -158,18 +162,24 @@ def main():
         n_bets=250,
         base_edge=0.0149,  # CLV = +14.9 bps
         kelly_fraction=0.25,
-        seed=42
+        seed=42,
     )
 
     # Save to figures directory
-    output_path = Path(__file__).parent.parent.parent / 'analysis' / 'dissertation' / 'figures' / 'bankroll_hist.png'
+    output_path = (
+        Path(__file__).parent.parent.parent
+        / "analysis"
+        / "dissertation"
+        / "figures"
+        / "bankroll_hist.png"
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+    fig.savefig(output_path, dpi=300, bbox_inches="tight", facecolor="white")
     print(f"✓ Saved to {output_path}")
 
     # Summary statistics
-    print(f"\nBankroll Statistics:")
+    print("\nBankroll Statistics:")
     print(f"  Mean: ${np.mean(bankrolls):,.2f}")
     print(f"  Median: ${np.median(bankrolls):,.2f}")
     print(f"  Std: ${np.std(bankrolls):,.2f}")
@@ -180,5 +190,6 @@ def main():
     plt.close()
     print("\n✓ Figure 8.1 complete")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

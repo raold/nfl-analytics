@@ -14,7 +14,7 @@ import pandas as pd
 
 def load_training_logs(agent_type="dqn", epochs=400):
     """Load training log JSON for specified agent."""
-    log_path = Path(f"models/{agent_type}_{epochs}ep_train.log")
+    Path(f"models/{agent_type}_{epochs}ep_train.log")
     json_path = Path(f"models/{agent_type}_training_log.json")
 
     if json_path.exists():

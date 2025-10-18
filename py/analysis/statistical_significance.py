@@ -4,15 +4,16 @@ Statistical significance testing for dissertation Chapter 8.
 Implements Diebold-Mariano tests, bootstrap confidence intervals, and multiple testing corrections.
 """
 
-import pandas as pd
-import numpy as np
-from scipy import stats
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-import warnings
 
-def diebold_mariano_test(losses1: np.ndarray, losses2: np.ndarray,
-                         h: int = 1, alternative: str = 'two-sided') -> Dict[str, float]:
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+
+def diebold_mariano_test(
+    losses1: np.ndarray, losses2: np.ndarray, h: int = 1, alternative: str = "two-sided"
+) -> dict[str, float]:
     """
     Perform Diebold-Mariano test for predictive accuracy.
 
@@ -50,22 +51,24 @@ def diebold_mariano_test(losses1: np.ndarray, losses2: np.ndarray,
     dm_stat = mean_d / np.sqrt(var_d)
 
     # P-value
-    if alternative == 'two-sided':
+    if alternative == "two-sided":
         p_value = 2 * (1 - stats.norm.cdf(abs(dm_stat)))
-    elif alternative == 'less':
+    elif alternative == "less":
         p_value = stats.norm.cdf(dm_stat)
     else:  # greater
         p_value = 1 - stats.norm.cdf(dm_stat)
 
     return {
-        'dm_statistic': dm_stat,
-        'p_value': p_value,
-        'mean_difference': mean_d,
-        'std_error': np.sqrt(var_d)
+        "dm_statistic": dm_stat,
+        "p_value": p_value,
+        "mean_difference": mean_d,
+        "std_error": np.sqrt(var_d),
     }
 
-def bootstrap_confidence_interval(data: np.ndarray, statistic_func: callable,
-                                 alpha: float = 0.05, n_bootstrap: int = 10000) -> Dict[str, float]:
+
+def bootstrap_confidence_interval(
+    data: np.ndarray, statistic_func: callable, alpha: float = 0.05, n_bootstrap: int = 10000
+) -> dict[str, float]:
     """
     Compute bootstrap confidence interval for a statistic.
 
@@ -102,15 +105,20 @@ def bootstrap_confidence_interval(data: np.ndarray, statistic_func: callable,
     ci_upper = np.percentile(bootstrap_stats, upper_percentile)
 
     return {
-        'estimate': point_estimate,
-        'ci_lower': ci_lower,
-        'ci_upper': ci_upper,
-        'std_error': np.std(bootstrap_stats),
-        'bias': np.mean(bootstrap_stats) - point_estimate
+        "estimate": point_estimate,
+        "ci_lower": ci_lower,
+        "ci_upper": ci_upper,
+        "std_error": np.std(bootstrap_stats),
+        "bias": np.mean(bootstrap_stats) - point_estimate,
     }
 
-def paired_t_test_models(model1_preds: np.ndarray, model2_preds: np.ndarray,
-                        actuals: np.ndarray, loss_func: str = 'brier') -> Dict[str, float]:
+
+def paired_t_test_models(
+    model1_preds: np.ndarray,
+    model2_preds: np.ndarray,
+    actuals: np.ndarray,
+    loss_func: str = "brier",
+) -> dict[str, float]:
     """
     Perform paired t-test between two models.
 
@@ -128,15 +136,19 @@ def paired_t_test_models(model1_preds: np.ndarray, model2_preds: np.ndarray,
     Dictionary with test results
     """
     # Compute losses
-    if loss_func == 'brier':
+    if loss_func == "brier":
         losses1 = (model1_preds - actuals) ** 2
         losses2 = (model2_preds - actuals) ** 2
-    elif loss_func == 'log_loss':
+    elif loss_func == "log_loss":
         eps = 1e-15
-        losses1 = -(actuals * np.log(np.clip(model1_preds, eps, 1-eps)) +
-                   (1 - actuals) * np.log(np.clip(1 - model1_preds, eps, 1-eps)))
-        losses2 = -(actuals * np.log(np.clip(model2_preds, eps, 1-eps)) +
-                   (1 - actuals) * np.log(np.clip(1 - model2_preds, eps, 1-eps)))
+        losses1 = -(
+            actuals * np.log(np.clip(model1_preds, eps, 1 - eps))
+            + (1 - actuals) * np.log(np.clip(1 - model1_preds, eps, 1 - eps))
+        )
+        losses2 = -(
+            actuals * np.log(np.clip(model2_preds, eps, 1 - eps))
+            + (1 - actuals) * np.log(np.clip(1 - model2_preds, eps, 1 - eps))
+        )
     else:  # accuracy
         losses1 = (model1_preds.round() != actuals).astype(float)
         losses2 = (model2_preds.round() != actuals).astype(float)
@@ -149,15 +161,16 @@ def paired_t_test_models(model1_preds: np.ndarray, model2_preds: np.ndarray,
     cohens_d = np.mean(diff) / np.std(diff, ddof=1)
 
     return {
-        't_statistic': t_stat,
-        'p_value': p_value,
-        'mean_diff': np.mean(losses1) - np.mean(losses2),
-        'cohens_d': cohens_d,
-        'model1_mean_loss': np.mean(losses1),
-        'model2_mean_loss': np.mean(losses2)
+        "t_statistic": t_stat,
+        "p_value": p_value,
+        "mean_diff": np.mean(losses1) - np.mean(losses2),
+        "cohens_d": cohens_d,
+        "model1_mean_loss": np.mean(losses1),
+        "model2_mean_loss": np.mean(losses2),
     }
 
-def multiple_testing_correction(p_values: List[float], method: str = 'holm') -> np.ndarray:
+
+def multiple_testing_correction(p_values: list[float], method: str = "holm") -> np.ndarray:
     """
     Apply multiple testing correction.
 
@@ -175,9 +188,9 @@ def multiple_testing_correction(p_values: List[float], method: str = 'holm') -> 
     p_values = np.array(p_values)
     n = len(p_values)
 
-    if method == 'bonferroni':
+    if method == "bonferroni":
         return np.minimum(p_values * n, 1.0)
-    elif method == 'holm':
+    elif method == "holm":
         # Holm-Bonferroni method
         sorted_idx = np.argsort(p_values)
         sorted_p = p_values[sorted_idx]
@@ -186,12 +199,12 @@ def multiple_testing_correction(p_values: List[float], method: str = 'holm') -> 
             corrected[i] = min(sorted_p[i] * (n - i), 1.0)
         # Ensure monotonicity
         for i in range(1, n):
-            corrected[i] = max(corrected[i], corrected[i-1])
+            corrected[i] = max(corrected[i], corrected[i - 1])
         # Unsort
         unsorted_corrected = np.zeros_like(corrected)
         unsorted_corrected[sorted_idx] = corrected
         return unsorted_corrected
-    elif method == 'fdr_bh':
+    elif method == "fdr_bh":
         # Benjamini-Hochberg FDR
         sorted_idx = np.argsort(p_values)
         sorted_p = p_values[sorted_idx]
@@ -199,14 +212,15 @@ def multiple_testing_correction(p_values: List[float], method: str = 'holm') -> 
         for i in range(n):
             corrected[i] = min(sorted_p[i] * n / (i + 1), 1.0)
         # Ensure monotonicity (from end)
-        for i in range(n-2, -1, -1):
-            corrected[i] = min(corrected[i], corrected[i+1])
+        for i in range(n - 2, -1, -1):
+            corrected[i] = min(corrected[i], corrected[i + 1])
         # Unsort
         unsorted_corrected = np.zeros_like(corrected)
         unsorted_corrected[sorted_idx] = corrected
         return unsorted_corrected
     else:
         raise ValueError(f"Unknown method: {method}")
+
 
 def generate_significance_tables(output_dir: Path) -> None:
     """Generate comprehensive statistical significance tables."""
@@ -237,24 +251,28 @@ def generate_significance_tables(output_dir: Path) -> None:
     ensemble_brier = (our_ensemble - actuals) ** 2
     glm_brier = (glm_baseline - actuals) ** 2
     dm_test = diebold_mariano_test(ensemble_brier, glm_brier, h=1)
-    dm_results.append({
-        'Comparison': 'Ensemble vs GLM',
-        'DM Statistic': dm_test['dm_statistic'],
-        'P-value': dm_test['p_value'],
-        'Mean Diff': dm_test['mean_difference'],
-        'Significant': dm_test['p_value'] < 0.05
-    })
+    dm_results.append(
+        {
+            "Comparison": "Ensemble vs GLM",
+            "DM Statistic": dm_test["dm_statistic"],
+            "P-value": dm_test["p_value"],
+            "Mean Diff": dm_test["mean_difference"],
+            "Significant": dm_test["p_value"] < 0.05,
+        }
+    )
 
     # Ensemble vs FTE
     fte_brier = (fte_model - actuals) ** 2
     dm_test = diebold_mariano_test(ensemble_brier, fte_brier, h=1)
-    dm_results.append({
-        'Comparison': 'Ensemble vs FTE',
-        'DM Statistic': dm_test['dm_statistic'],
-        'P-value': dm_test['p_value'],
-        'Mean Diff': dm_test['mean_difference'],
-        'Significant': dm_test['p_value'] < 0.05
-    })
+    dm_results.append(
+        {
+            "Comparison": "Ensemble vs FTE",
+            "DM Statistic": dm_test["dm_statistic"],
+            "P-value": dm_test["p_value"],
+            "Mean Diff": dm_test["mean_difference"],
+            "Significant": dm_test["p_value"] < 0.05,
+        }
+    )
 
     # Generate DM test table
     dm_df = pd.DataFrame(dm_results)
@@ -283,33 +301,28 @@ def generate_significance_tables(output_dir: Path) -> None:
 \end{table}
 """
 
-    (output_dir / 'diebold_mariano_table.tex').write_text(latex_dm)
+    (output_dir / "diebold_mariano_table.tex").write_text(latex_dm)
 
     # 2. Bootstrap Confidence Intervals
     def brier_score(preds):
-        return np.mean((preds - actuals[:len(preds)]) ** 2)
+        return np.mean((preds - actuals[: len(preds)]) ** 2)
 
     ci_results = []
-    models = {
-        'Ensemble': our_ensemble,
-        'GLM Baseline': glm_baseline,
-        'FiveThirtyEight': fte_model
-    }
+    models = {"Ensemble": our_ensemble, "GLM Baseline": glm_baseline, "FiveThirtyEight": fte_model}
 
     for name, preds in models.items():
         ci = bootstrap_confidence_interval(
-            (preds - actuals) ** 2,
-            np.mean,
-            alpha=0.05,
-            n_bootstrap=5000
+            (preds - actuals) ** 2, np.mean, alpha=0.05, n_bootstrap=5000
         )
-        ci_results.append({
-            'Model': name,
-            'Brier Score': ci['estimate'],
-            'CI Lower': ci['ci_lower'],
-            'CI Upper': ci['ci_upper'],
-            'Std Error': ci['std_error']
-        })
+        ci_results.append(
+            {
+                "Model": name,
+                "Brier Score": ci["estimate"],
+                "CI Lower": ci["ci_lower"],
+                "CI Upper": ci["ci_upper"],
+                "Std Error": ci["std_error"],
+            }
+        )
 
     # Generate CI table
     ci_df = pd.DataFrame(ci_results)
@@ -325,8 +338,8 @@ def generate_significance_tables(output_dir: Path) -> None:
 """
 
     for _, row in ci_df.iterrows():
-        model = row['Model']
-        if 'Ensemble' in model:
+        model = row["Model"]
+        if "Ensemble" in model:
             model = f"\\textbf{{{model}}}"
         latex_ci += f"    {model} & {row['Brier Score']:.4f} & "
         latex_ci += f"[{row['CI Lower']:.4f}, {row['CI Upper']:.4f}] & "
@@ -341,7 +354,7 @@ def generate_significance_tables(output_dir: Path) -> None:
 \end{table}
 """
 
-    (output_dir / 'bootstrap_ci_table.tex').write_text(latex_ci)
+    (output_dir / "bootstrap_ci_table.tex").write_text(latex_ci)
 
     # 3. Multiple Testing Correction
     # Simulate multiple hypothesis tests
@@ -352,23 +365,23 @@ def generate_significance_tables(output_dir: Path) -> None:
         0.089,  # Model comparison 2
         0.021,  # Calibration test
         0.156,  # Temporal stability
-        0.007   # CLV improvement
+        0.007,  # CLV improvement
     ]
 
     test_names = [
-        'EPA features vs baseline',
-        'Market features vs baseline',
-        'Ensemble vs GLM',
-        'Ensemble vs XGBoost',
-        'Calibration slope = 1',
-        'Temporal stability',
-        'CLV > 0'
+        "EPA features vs baseline",
+        "Market features vs baseline",
+        "Ensemble vs GLM",
+        "Ensemble vs XGBoost",
+        "Calibration slope = 1",
+        "Temporal stability",
+        "CLV > 0",
     ]
 
     # Apply corrections
-    p_bonf = multiple_testing_correction(p_values, 'bonferroni')
-    p_holm = multiple_testing_correction(p_values, 'holm')
-    p_fdr = multiple_testing_correction(p_values, 'fdr_bh')
+    p_bonf = multiple_testing_correction(p_values, "bonferroni")
+    p_holm = multiple_testing_correction(p_values, "holm")
+    p_fdr = multiple_testing_correction(p_values, "fdr_bh")
 
     # Generate multiple testing table
     latex_mt = r"""\begin{table}[t]
@@ -395,7 +408,7 @@ def generate_significance_tables(output_dir: Path) -> None:
 \end{table}
 """
 
-    (output_dir / 'multiple_testing_table.tex').write_text(latex_mt)
+    (output_dir / "multiple_testing_table.tex").write_text(latex_mt)
 
     print(f"Generated statistical significance tables in {output_dir}")
     print("Tables created:")
@@ -403,13 +416,15 @@ def generate_significance_tables(output_dir: Path) -> None:
     print("  - bootstrap_ci_table.tex")
     print("  - multiple_testing_table.tex")
 
+
 def main():
     """Generate all statistical significance analyses."""
 
-    output_dir = Path('/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out')
+    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     generate_significance_tables(output_dir)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -10,18 +10,17 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 
 
-def load_training_log(log_path: Path) -> Dict:
+def load_training_log(log_path: Path) -> dict:
     """Load training log JSON file."""
     with open(log_path) as f:
         return json.load(f)
 
 
-def extract_epochs_and_rewards(log: Dict) -> Tuple[List[int], List[float]]:
+def extract_epochs_and_rewards(log: dict) -> tuple[list[int], list[float]]:
     """
     Extract epoch numbers and rewards from training log.
 
@@ -55,9 +54,8 @@ def extract_epochs_and_rewards(log: Dict) -> Tuple[List[int], List[float]]:
 
 
 def compute_rolling_stats(
-    rewards: List[float],
-    window: int = 50
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    rewards: list[float], window: int = 50
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute rolling mean and IQR bands.
 
@@ -70,17 +68,15 @@ def compute_rolling_stats(
     if n < window:
         window = max(n // 4, 1)
 
-    mean = np.convolve(rewards_arr, np.ones(window)/window, mode='same')
+    mean = np.convolve(rewards_arr, np.ones(window) / window, mode="same")
 
     # For IQR, use percentiles
-    lower = np.array([
-        np.percentile(rewards_arr[max(0, i-window):min(n, i+window)], 25)
-        for i in range(n)
-    ])
-    upper = np.array([
-        np.percentile(rewards_arr[max(0, i-window):min(n, i+window)], 75)
-        for i in range(n)
-    ])
+    lower = np.array(
+        [np.percentile(rewards_arr[max(0, i - window) : min(n, i + window)], 25) for i in range(n)]
+    )
+    upper = np.array(
+        [np.percentile(rewards_arr[max(0, i - window) : min(n, i + window)], 75) for i in range(n)]
+    )
 
     return mean, lower, upper
 
@@ -122,32 +118,26 @@ def plot_learning_curves(
     fig, ax = plt.subplots(figsize=(8, 5), dpi=150)
 
     # DQN
-    ax.plot(dqn_epochs, dqn_mean, label='DQN', color='#2a6fbb', linewidth=2)
-    ax.fill_between(
-        dqn_epochs, dqn_lower, dqn_upper,
-        color='#2a6fbb', alpha=0.2, label='DQN IQR'
-    )
+    ax.plot(dqn_epochs, dqn_mean, label="DQN", color="#2a6fbb", linewidth=2)
+    ax.fill_between(dqn_epochs, dqn_lower, dqn_upper, color="#2a6fbb", alpha=0.2, label="DQN IQR")
 
     # PPO
-    ax.plot(ppo_epochs, ppo_mean, label='PPO', color='#d95f02', linewidth=2)
-    ax.fill_between(
-        ppo_epochs, ppo_lower, ppo_upper,
-        color='#d95f02', alpha=0.2, label='PPO IQR'
-    )
+    ax.plot(ppo_epochs, ppo_mean, label="PPO", color="#d95f02", linewidth=2)
+    ax.fill_between(ppo_epochs, ppo_lower, ppo_upper, color="#d95f02", alpha=0.2, label="PPO IQR")
 
     # Labels and formatting
-    ax.set_xlabel('Epoch', fontsize=11)
-    ax.set_ylabel('Reward', fontsize=11)
-    ax.set_title('Offline RL Training Curves (Median and IQR)', fontsize=12)
-    ax.legend(loc='lower right', fontsize=9)
-    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+    ax.set_xlabel("Epoch", fontsize=11)
+    ax.set_ylabel("Reward", fontsize=11)
+    ax.set_title("Offline RL Training Curves (Median and IQR)", fontsize=12)
+    ax.legend(loc="lower right", fontsize=9)
+    ax.grid(True, alpha=0.3, linestyle="--", linewidth=0.5)
 
     # Tight layout
     plt.tight_layout()
 
     # Save
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
 
     print(f"✅ Saved learning curves to: {output_path}")
@@ -156,9 +146,7 @@ def plot_learning_curves(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Plot RL learning curves from training logs"
-    )
+    parser = argparse.ArgumentParser(description="Plot RL learning curves from training logs")
     parser.add_argument(
         "--dqn-log",
         type=Path,
@@ -207,6 +195,7 @@ def main():
     except Exception as e:
         print(f"ERROR: Failed to generate plot: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

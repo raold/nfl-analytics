@@ -137,11 +137,7 @@ dbDisconnect(conn)
 
 if __name__ == "__main__":
     print("Running R script to generate Bayesian ratings...")
-    result = subprocess.run(
-        ["Rscript", "-e", r_script],
-        capture_output=True,
-        text=True
-    )
+    result = subprocess.run(["Rscript", "-e", r_script], capture_output=True, text=True)
 
     print(result.stdout)
     if result.stderr:

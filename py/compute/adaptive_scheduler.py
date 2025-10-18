@@ -16,8 +16,8 @@ from enum import Enum
 from typing import Any
 
 import numpy as np
-from performance_tracker import PerformanceTracker
 from hardware.task_router import task_router
+from performance_tracker import PerformanceTracker
 from scipy import stats
 from sync.machine_manager import get_machine_id
 from task_queue import TaskPriority, TaskQueue

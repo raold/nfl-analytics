@@ -501,7 +501,7 @@ class MultipleComparisonCorrection:
         Returns:
             Dictionary with power estimates
         """
-        m = len(effect_sizes)
+        len(effect_sizes)
         power_estimates = []
 
         for _ in range(n_simulations):

@@ -13,44 +13,39 @@ Key Analyses:
 - Position-specific trends
 """
 
+import json
+import logging
+import sys
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
-from typing import Dict, List, Tuple, Optional
-import logging
-from datetime import datetime
-import json
-from pathlib import Path
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-import sys
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
-from features.bayesian_player_features import BayesianPlayerFeatures
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'dbname': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions'
+    "host": "localhost",
+    "port": 5544,
+    "dbname": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
 
 
 class MultiYearBacktest:
     """Multi-season backtesting for Bayesian player props models."""
 
-    def __init__(self, db_config: Dict = None):
+    def __init__(self, db_config: dict = None):
         """Initialize backtester."""
         self.db_config = db_config or DB_CONFIG
         self.conn = None
@@ -66,10 +61,7 @@ class MultiYearBacktest:
             raise
 
     def fetch_actual_outcomes_multiyear(
-        self,
-        stat_type: str,
-        seasons: List[int],
-        weeks: Optional[List[int]] = None
+        self, stat_type: str, seasons: list[int], weeks: list[int] | None = None
     ) -> pd.DataFrame:
         """
         Fetch actual player outcomes across multiple seasons.
@@ -83,9 +75,9 @@ class MultiYearBacktest:
             DataFrame with actual outcomes across all seasons
         """
         stat_column_map = {
-            'passing_yards': ('nextgen_passing', 'pass_yards', 'attempts'),
-            'rushing_yards': ('nextgen_rushing', 'rush_yards', 'carries'),
-            'receiving_yards': ('nextgen_receiving', 'receiving_yards', 'targets')
+            "passing_yards": ("nextgen_passing", "pass_yards", "attempts"),
+            "rushing_yards": ("nextgen_rushing", "rush_yards", "carries"),
+            "receiving_yards": ("nextgen_receiving", "receiving_yards", "targets"),
         }
 
         table, stat_col, volume_col = stat_column_map.get(stat_type)
@@ -121,9 +113,7 @@ class MultiYearBacktest:
             return pd.DataFrame()
 
     def get_bayesian_predictions_multiyear(
-        self,
-        stat_type: str,
-        seasons: List[int]
+        self, stat_type: str, seasons: list[int]
     ) -> pd.DataFrame:
         """
         Fetch Bayesian predictions for multiple seasons.
@@ -144,7 +134,7 @@ class MultiYearBacktest:
 
             try:
                 players_df = pd.read_sql_query(query, self.conn)
-                player_ids = players_df['player_id'].tolist()
+                players_df["player_id"].tolist()
 
                 # Fetch Bayesian ratings for this season
                 ratings_query = """
@@ -175,9 +165,7 @@ class MultiYearBacktest:
                 """
 
                 predictions = pd.read_sql_query(
-                    ratings_query,
-                    self.conn,
-                    params=(stat_type, season)
+                    ratings_query, self.conn, params=(stat_type, season)
                 )
 
                 if not predictions.empty:
@@ -193,43 +181,56 @@ class MultiYearBacktest:
         else:
             return pd.DataFrame()
 
-    def calculate_season_metrics(self, results: pd.DataFrame, season: int) -> Dict:
+    def calculate_season_metrics(self, results: pd.DataFrame, season: int) -> dict:
         """Calculate metrics for a specific season."""
-        season_data = results[results['season'] == season]
+        season_data = results[results["season"] == season]
 
         if season_data.empty:
             return {}
 
         metrics = {
-            'season': season,
-            'n_predictions': len(season_data),
-            'mae': mean_absolute_error(season_data['actual_yards'], season_data['bayes_prediction']),
-            'rmse': np.sqrt(mean_squared_error(season_data['actual_yards'], season_data['bayes_prediction'])),
-            'mape': np.mean(np.abs((season_data['actual_yards'] - season_data['bayes_prediction']) /
-                                  season_data['actual_yards'].clip(lower=1))) * 100,
-            'correlation': season_data[['actual_yards', 'bayes_prediction']].corr().iloc[0, 1],
+            "season": season,
+            "n_predictions": len(season_data),
+            "mae": mean_absolute_error(
+                season_data["actual_yards"], season_data["bayes_prediction"]
+            ),
+            "rmse": np.sqrt(
+                mean_squared_error(season_data["actual_yards"], season_data["bayes_prediction"])
+            ),
+            "mape": np.mean(
+                np.abs(
+                    (season_data["actual_yards"] - season_data["bayes_prediction"])
+                    / season_data["actual_yards"].clip(lower=1)
+                )
+            )
+            * 100,
+            "correlation": season_data[["actual_yards", "bayes_prediction"]].corr().iloc[0, 1],
         }
 
         # Coverage metrics
-        if 'in_ci_90' in season_data.columns:
-            metrics['ci_90_coverage'] = season_data['in_ci_90'].mean()
-            metrics['ci_68_coverage'] = season_data['in_ci_68'].mean() if 'in_ci_68' in season_data.columns else None
+        if "in_ci_90" in season_data.columns:
+            metrics["ci_90_coverage"] = season_data["in_ci_90"].mean()
+            metrics["ci_68_coverage"] = (
+                season_data["in_ci_68"].mean() if "in_ci_68" in season_data.columns else None
+            )
 
         # Position breakdown
-        for pos in season_data['player_position'].unique():
-            pos_data = season_data[season_data['player_position'] == pos]
+        for pos in season_data["player_position"].unique():
+            pos_data = season_data[season_data["player_position"] == pos]
             if len(pos_data) >= 10:
-                metrics[f'mae_{pos}'] = mean_absolute_error(pos_data['actual_yards'], pos_data['bayes_prediction'])
+                metrics[f"mae_{pos}"] = mean_absolute_error(
+                    pos_data["actual_yards"], pos_data["bayes_prediction"]
+                )
 
         return metrics
 
     def run_multiyear_backtest(
         self,
         stat_type: str,
-        seasons: List[int] = [2022, 2023, 2024],
+        seasons: list[int] = [2022, 2023, 2024],
         start_week: int = 1,
-        end_week: int = 17
-    ) -> Tuple[pd.DataFrame, Dict]:
+        end_week: int = 17,
+    ) -> tuple[pd.DataFrame, dict]:
         """
         Run backtest across multiple seasons.
 
@@ -246,13 +247,11 @@ class MultiYearBacktest:
         logger.info(f"Multi-Year Backtest: {stat_type}")
         logger.info(f"Seasons: {seasons}")
         logger.info(f"Weeks: {start_week}-{end_week}")
-        logger.info('='*80)
+        logger.info("=" * 80)
 
         # Fetch actual outcomes for all seasons
         actuals = self.fetch_actual_outcomes_multiyear(
-            stat_type=stat_type,
-            seasons=seasons,
-            weeks=list(range(start_week, end_week + 1))
+            stat_type=stat_type, seasons=seasons, weeks=list(range(start_week, end_week + 1))
         )
 
         if actuals.empty:
@@ -260,10 +259,7 @@ class MultiYearBacktest:
             return pd.DataFrame(), {}
 
         # Fetch Bayesian predictions for all seasons
-        predictions = self.get_bayesian_predictions_multiyear(
-            stat_type=stat_type,
-            seasons=seasons
-        )
+        predictions = self.get_bayesian_predictions_multiyear(stat_type=stat_type, seasons=seasons)
 
         if predictions.empty:
             logger.warning("No Bayesian predictions found - using fallback approach")
@@ -272,10 +268,7 @@ class MultiYearBacktest:
 
         # Merge actuals with predictions
         results = actuals.merge(
-            predictions,
-            on=['player_id', 'season'],
-            how='inner',
-            suffixes=('_actual', '_pred')
+            predictions, on=["player_id", "season"], how="inner", suffixes=("_actual", "_pred")
         )
 
         if results.empty:
@@ -286,41 +279,54 @@ class MultiYearBacktest:
 
         # Calculate derived metrics
         # CRITICAL: Transform from log-space to yards (model was trained on log(yards))
-        if 'rating_mean' in results.columns:
-            results['bayes_prediction'] = np.exp(results['rating_mean'])
+        if "rating_mean" in results.columns:
+            results["bayes_prediction"] = np.exp(results["rating_mean"])
             # Transform uncertainty: use delta method for log-normal distribution
             # Var(exp(X)) ≈ exp(2μ + σ²)(exp(σ²) - 1) for X ~ N(μ, σ²)
-            results['bayes_uncertainty'] = results['bayes_prediction'] * results.get('rating_sd', 0.5)
+            results["bayes_uncertainty"] = results["bayes_prediction"] * results.get(
+                "rating_sd", 0.5
+            )
             # Transform quantiles from log-space to yards
-            if 'rating_q05' in results.columns:
-                results['bayes_ci_lower'] = np.exp(results['rating_q05'])
+            if "rating_q05" in results.columns:
+                results["bayes_ci_lower"] = np.exp(results["rating_q05"])
             else:
-                results['bayes_ci_lower'] = results['bayes_prediction'] - 1.645 * results['bayes_uncertainty']
-            if 'rating_q95' in results.columns:
-                results['bayes_ci_upper'] = np.exp(results['rating_q95'])
+                results["bayes_ci_lower"] = (
+                    results["bayes_prediction"] - 1.645 * results["bayes_uncertainty"]
+                )
+            if "rating_q95" in results.columns:
+                results["bayes_ci_upper"] = np.exp(results["rating_q95"])
             else:
-                results['bayes_ci_upper'] = results['bayes_prediction'] + 1.645 * results['bayes_uncertainty']
+                results["bayes_ci_upper"] = (
+                    results["bayes_prediction"] + 1.645 * results["bayes_uncertainty"]
+                )
         else:
-            results['bayes_prediction'] = results.get('bayes_prediction', 0)
-            results['bayes_uncertainty'] = results.get('bayes_uncertainty', 50)
-            results['bayes_ci_lower'] = results.get('rating_q05', results['bayes_prediction'] - 1.645 * results['bayes_uncertainty'])
-            results['bayes_ci_upper'] = results.get('rating_q95', results['bayes_prediction'] + 1.645 * results['bayes_uncertainty'])
+            results["bayes_prediction"] = results.get("bayes_prediction", 0)
+            results["bayes_uncertainty"] = results.get("bayes_uncertainty", 50)
+            results["bayes_ci_lower"] = results.get(
+                "rating_q05", results["bayes_prediction"] - 1.645 * results["bayes_uncertainty"]
+            )
+            results["bayes_ci_upper"] = results.get(
+                "rating_q95", results["bayes_prediction"] + 1.645 * results["bayes_uncertainty"]
+            )
 
         # Calculate errors
-        results['error'] = results['bayes_prediction'] - results['actual_yards']
-        results['abs_error'] = np.abs(results['error'])
-        results['squared_error'] = results['error'] ** 2
-        results['pct_error'] = np.abs(results['error'] / results['actual_yards'].clip(lower=1))
+        results["error"] = results["bayes_prediction"] - results["actual_yards"]
+        results["abs_error"] = np.abs(results["error"])
+        results["squared_error"] = results["error"] ** 2
+        results["pct_error"] = np.abs(results["error"] / results["actual_yards"].clip(lower=1))
 
         # Check credible interval coverage
-        results['in_ci_90'] = (
-            (results['actual_yards'] >= results['bayes_ci_lower']) &
-            (results['actual_yards'] <= results['bayes_ci_upper'])
+        results["in_ci_90"] = (
+            (results["actual_yards"] >= results["bayes_ci_lower"])
+            & (results["actual_yards"] <= results["bayes_ci_upper"])
         ).astype(int)
 
-        results['in_ci_68'] = (
-            (results['actual_yards'] >= results['bayes_prediction'] - results['bayes_uncertainty']) &
-            (results['actual_yards'] <= results['bayes_prediction'] + results['bayes_uncertainty'])
+        results["in_ci_68"] = (
+            (results["actual_yards"] >= results["bayes_prediction"] - results["bayes_uncertainty"])
+            & (
+                results["actual_yards"]
+                <= results["bayes_prediction"] + results["bayes_uncertainty"]
+            )
         ).astype(int)
 
         # Calculate metrics for each season
@@ -336,38 +342,44 @@ class MultiYearBacktest:
         logger.info("Generating baseline predictions from historical data")
 
         # Calculate rolling averages for each player
-        actuals_sorted = actuals.sort_values(['player_id', 'season', 'week'])
+        actuals_sorted = actuals.sort_values(["player_id", "season", "week"])
 
         baseline_preds = []
-        for player_id in actuals_sorted['player_id'].unique():
-            player_data = actuals_sorted[actuals_sorted['player_id'] == player_id].copy()
+        for player_id in actuals_sorted["player_id"].unique():
+            player_data = actuals_sorted[actuals_sorted["player_id"] == player_id].copy()
 
             # Use expanding mean (all previous weeks)
-            player_data['bayes_prediction'] = player_data['actual_yards'].expanding(min_periods=1).mean().shift(1)
+            player_data["bayes_prediction"] = (
+                player_data["actual_yards"].expanding(min_periods=1).mean().shift(1)
+            )
 
             # For first game, use position average
-            first_game_mask = player_data['bayes_prediction'].isna()
-            if first_game_mask.any() and 'player_position' in player_data.columns:
-                pos = player_data['player_position'].iloc[0]
-                pos_avg = actuals[actuals['player_position'] == pos]['actual_yards'].mean()
-                player_data.loc[first_game_mask, 'bayes_prediction'] = pos_avg
+            first_game_mask = player_data["bayes_prediction"].isna()
+            if first_game_mask.any() and "player_position" in player_data.columns:
+                pos = player_data["player_position"].iloc[0]
+                pos_avg = actuals[actuals["player_position"] == pos]["actual_yards"].mean()
+                player_data.loc[first_game_mask, "bayes_prediction"] = pos_avg
 
             # Estimate uncertainty as standard deviation of recent games
-            player_data['bayes_uncertainty'] = player_data['actual_yards'].expanding(min_periods=2).std().shift(1)
-            player_data['bayes_uncertainty'] = player_data['bayes_uncertainty'].fillna(50)  # Default uncertainty
+            player_data["bayes_uncertainty"] = (
+                player_data["actual_yards"].expanding(min_periods=2).std().shift(1)
+            )
+            player_data["bayes_uncertainty"] = player_data["bayes_uncertainty"].fillna(
+                50
+            )  # Default uncertainty
 
             baseline_preds.append(player_data)
 
         baseline_df = pd.concat(baseline_preds, ignore_index=True)
 
-        return baseline_df[['player_id', 'season', 'bayes_prediction', 'bayes_uncertainty']]
+        return baseline_df[["player_id", "season", "bayes_prediction", "bayes_uncertainty"]]
 
     def generate_comparative_report(
         self,
         results: pd.DataFrame,
-        season_metrics: Dict,
+        season_metrics: dict,
         stat_type: str,
-        output_dir: str = 'reports/bayesian_backtest_multiyear'
+        output_dir: str = "reports/bayesian_backtest_multiyear",
     ):
         """Generate comprehensive multi-year comparative report."""
 
@@ -380,37 +392,37 @@ class MultiYearBacktest:
         # 1. MAE by Season
         ax1 = fig.add_subplot(gs[0, 0])
         seasons = sorted(season_metrics.keys())
-        maes = [season_metrics[s].get('mae', 0) for s in seasons]
-        ax1.bar(seasons, maes, color=['#1f77b4', '#ff7f0e', '#2ca02c'][:len(seasons)])
-        ax1.set_xlabel('Season')
-        ax1.set_ylabel('MAE (yards)')
-        ax1.set_title('MAE by Season')
+        maes = [season_metrics[s].get("mae", 0) for s in seasons]
+        ax1.bar(seasons, maes, color=["#1f77b4", "#ff7f0e", "#2ca02c"][: len(seasons)])
+        ax1.set_xlabel("Season")
+        ax1.set_ylabel("MAE (yards)")
+        ax1.set_title("MAE by Season")
         ax1.set_xticks(seasons)
         for i, (s, mae) in enumerate(zip(seasons, maes)):
-            ax1.text(s, mae + 1, f'{mae:.1f}', ha='center', va='bottom')
+            ax1.text(s, mae + 1, f"{mae:.1f}", ha="center", va="bottom")
 
         # 2. Correlation by Season
         ax2 = fig.add_subplot(gs[0, 1])
-        correlations = [season_metrics[s].get('correlation', 0) for s in seasons]
-        ax2.bar(seasons, correlations, color=['#1f77b4', '#ff7f0e', '#2ca02c'][:len(seasons)])
-        ax2.set_xlabel('Season')
-        ax2.set_ylabel('Correlation')
-        ax2.set_title('Prediction Correlation by Season')
+        correlations = [season_metrics[s].get("correlation", 0) for s in seasons]
+        ax2.bar(seasons, correlations, color=["#1f77b4", "#ff7f0e", "#2ca02c"][: len(seasons)])
+        ax2.set_xlabel("Season")
+        ax2.set_ylabel("Correlation")
+        ax2.set_title("Prediction Correlation by Season")
         ax2.set_xticks(seasons)
         ax2.set_ylim([0, 1])
         for i, (s, corr) in enumerate(zip(seasons, correlations)):
-            ax2.text(s, corr + 0.02, f'{corr:.3f}', ha='center', va='bottom')
+            ax2.text(s, corr + 0.02, f"{corr:.3f}", ha="center", va="bottom")
 
         # 3. Coverage by Season
         ax3 = fig.add_subplot(gs[0, 2])
-        coverage_90 = [season_metrics[s].get('ci_90_coverage', 0) for s in seasons]
+        coverage_90 = [season_metrics[s].get("ci_90_coverage", 0) for s in seasons]
         x = np.arange(len(seasons))
         width = 0.35
-        ax3.bar(x - width/2, coverage_90, width, label='90% CI', color='steelblue')
-        ax3.axhline(y=0.90, color='r', linestyle='--', label='Expected 90%')
-        ax3.set_xlabel('Season')
-        ax3.set_ylabel('Coverage Rate')
-        ax3.set_title('Credible Interval Coverage by Season')
+        ax3.bar(x - width / 2, coverage_90, width, label="90% CI", color="steelblue")
+        ax3.axhline(y=0.90, color="r", linestyle="--", label="Expected 90%")
+        ax3.set_xlabel("Season")
+        ax3.set_ylabel("Coverage Rate")
+        ax3.set_title("Credible Interval Coverage by Season")
         ax3.set_xticks(x)
         ax3.set_xticklabels(seasons)
         ax3.legend()
@@ -418,101 +430,114 @@ class MultiYearBacktest:
 
         # 4. Sample Size by Season
         ax4 = fig.add_subplot(gs[0, 3])
-        sample_sizes = [season_metrics[s].get('n_predictions', 0) for s in seasons]
-        ax4.bar(seasons, sample_sizes, color=['#1f77b4', '#ff7f0e', '#2ca02c'][:len(seasons)])
-        ax4.set_xlabel('Season')
-        ax4.set_ylabel('Number of Predictions')
-        ax4.set_title('Sample Size by Season')
+        sample_sizes = [season_metrics[s].get("n_predictions", 0) for s in seasons]
+        ax4.bar(seasons, sample_sizes, color=["#1f77b4", "#ff7f0e", "#2ca02c"][: len(seasons)])
+        ax4.set_xlabel("Season")
+        ax4.set_ylabel("Number of Predictions")
+        ax4.set_title("Sample Size by Season")
         ax4.set_xticks(seasons)
         for i, (s, n) in enumerate(zip(seasons, sample_sizes)):
-            ax4.text(s, n + 50, f'{n:,}', ha='center', va='bottom')
+            ax4.text(s, n + 50, f"{n:,}", ha="center", va="bottom")
 
         # 5. Error Distribution by Season
         ax5 = fig.add_subplot(gs[1, :2])
         for season in seasons:
-            season_data = results[results['season'] == season]
+            season_data = results[results["season"] == season]
             if not season_data.empty:
-                ax5.hist(season_data['error'], bins=50, alpha=0.5, label=f'{season}', density=True)
-        ax5.axvline(0, color='black', linestyle='--', linewidth=2)
-        ax5.set_xlabel('Prediction Error (yards)')
-        ax5.set_ylabel('Density')
-        ax5.set_title('Error Distribution Comparison')
+                ax5.hist(season_data["error"], bins=50, alpha=0.5, label=f"{season}", density=True)
+        ax5.axvline(0, color="black", linestyle="--", linewidth=2)
+        ax5.set_xlabel("Prediction Error (yards)")
+        ax5.set_ylabel("Density")
+        ax5.set_title("Error Distribution Comparison")
         ax5.legend()
 
         # 6. Actual vs Predicted by Season
         ax6 = fig.add_subplot(gs[1, 2:])
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+        colors = ["#1f77b4", "#ff7f0e", "#2ca02c"]
         for i, season in enumerate(seasons):
-            season_data = results[results['season'] == season]
+            season_data = results[results["season"] == season]
             if not season_data.empty:
-                ax6.scatter(season_data['actual_yards'], season_data['bayes_prediction'],
-                          alpha=0.3, s=10, label=f'{season}', color=colors[i])
+                ax6.scatter(
+                    season_data["actual_yards"],
+                    season_data["bayes_prediction"],
+                    alpha=0.3,
+                    s=10,
+                    label=f"{season}",
+                    color=colors[i],
+                )
 
-        max_val = results[['actual_yards', 'bayes_prediction']].max().max()
-        ax6.plot([0, max_val], [0, max_val], 'k--', alpha=0.5, label='Perfect Prediction')
-        ax6.set_xlabel('Actual Yards')
-        ax6.set_ylabel('Predicted Yards')
-        ax6.set_title('Predictions vs Actuals (All Seasons)')
+        max_val = results[["actual_yards", "bayes_prediction"]].max().max()
+        ax6.plot([0, max_val], [0, max_val], "k--", alpha=0.5, label="Perfect Prediction")
+        ax6.set_xlabel("Actual Yards")
+        ax6.set_ylabel("Predicted Yards")
+        ax6.set_title("Predictions vs Actuals (All Seasons)")
         ax6.legend()
 
         # 7. Weekly MAE Trend Across Seasons
         ax7 = fig.add_subplot(gs[2, :2])
         for season in seasons:
-            season_data = results[results['season'] == season]
-            if not season_data.empty and 'week' in season_data.columns:
-                weekly_mae = season_data.groupby('week').apply(
-                    lambda x: mean_absolute_error(x['actual_yards'], x['bayes_prediction'])
+            season_data = results[results["season"] == season]
+            if not season_data.empty and "week" in season_data.columns:
+                weekly_mae = season_data.groupby("week").apply(
+                    lambda x: mean_absolute_error(x["actual_yards"], x["bayes_prediction"])
                 )
-                ax7.plot(weekly_mae.index, weekly_mae.values, 'o-', label=f'{season}', alpha=0.7)
+                ax7.plot(weekly_mae.index, weekly_mae.values, "o-", label=f"{season}", alpha=0.7)
 
-        ax7.set_xlabel('Week')
-        ax7.set_ylabel('MAE (yards)')
-        ax7.set_title('Weekly MAE Trend (All Seasons)')
+        ax7.set_xlabel("Week")
+        ax7.set_ylabel("MAE (yards)")
+        ax7.set_title("Weekly MAE Trend (All Seasons)")
         ax7.legend()
         ax7.grid(True, alpha=0.3)
 
         # 8. Position-specific Performance
         ax8 = fig.add_subplot(gs[2, 2:])
-        if 'player_position' in results.columns:
+        if "player_position" in results.columns:
             position_performance = []
             for season in seasons:
-                season_data = results[results['season'] == season]
-                for pos in season_data['player_position'].unique():
-                    pos_data = season_data[season_data['player_position'] == pos]
+                season_data = results[results["season"] == season]
+                for pos in season_data["player_position"].unique():
+                    pos_data = season_data[season_data["player_position"] == pos]
                     if len(pos_data) >= 10:
-                        position_performance.append({
-                            'season': season,
-                            'position': pos,
-                            'mae': mean_absolute_error(pos_data['actual_yards'], pos_data['bayes_prediction'])
-                        })
+                        position_performance.append(
+                            {
+                                "season": season,
+                                "position": pos,
+                                "mae": mean_absolute_error(
+                                    pos_data["actual_yards"], pos_data["bayes_prediction"]
+                                ),
+                            }
+                        )
 
             if position_performance:
                 perf_df = pd.DataFrame(position_performance)
-                pivot = perf_df.pivot(index='position', columns='season', values='mae')
-                pivot.plot(kind='bar', ax=ax8)
-                ax8.set_xlabel('Position')
-                ax8.set_ylabel('MAE (yards)')
-                ax8.set_title('Position-Specific MAE by Season')
-                ax8.legend(title='Season')
-                ax8.tick_params(axis='x', rotation=45)
+                pivot = perf_df.pivot(index="position", columns="season", values="mae")
+                pivot.plot(kind="bar", ax=ax8)
+                ax8.set_xlabel("Position")
+                ax8.set_ylabel("MAE (yards)")
+                ax8.set_title("Position-Specific MAE by Season")
+                ax8.legend(title="Season")
+                ax8.tick_params(axis="x", rotation=45)
 
-        plt.suptitle(f'{stat_type.replace("_", " ").title()} - Multi-Year Backtest Report',
-                    fontsize=16, fontweight='bold')
+        plt.suptitle(
+            f'{stat_type.replace("_", " ").title()} - Multi-Year Backtest Report',
+            fontsize=16,
+            fontweight="bold",
+        )
 
-        plt.savefig(f'{output_dir}/{stat_type}_multiyear_report.png', dpi=150, bbox_inches='tight')
+        plt.savefig(f"{output_dir}/{stat_type}_multiyear_report.png", dpi=150, bbox_inches="tight")
         plt.close()
 
         # Save detailed results
-        results.to_csv(f'{output_dir}/{stat_type}_detailed_results.csv', index=False)
+        results.to_csv(f"{output_dir}/{stat_type}_detailed_results.csv", index=False)
 
         # Save season metrics
-        with open(f'{output_dir}/{stat_type}_season_metrics.json', 'w') as f:
+        with open(f"{output_dir}/{stat_type}_season_metrics.json", "w") as f:
             json.dump(season_metrics, f, indent=2, default=str)
 
         # Generate text summary
-        with open(f'{output_dir}/{stat_type}_summary.txt', 'w') as f:
+        with open(f"{output_dir}/{stat_type}_summary.txt", "w") as f:
             f.write(f"Multi-Year Backtest Summary: {stat_type}\n")
-            f.write("="*80 + "\n\n")
+            f.write("=" * 80 + "\n\n")
 
             for season in sorted(season_metrics.keys()):
                 metrics = season_metrics[season]
@@ -528,23 +553,29 @@ class MultiYearBacktest:
             # Overall statistics
             f.write("\nOverall Statistics:\n")
             f.write(f"  Total Predictions: {len(results):,}\n")
-            f.write(f"  Overall MAE: {mean_absolute_error(results['actual_yards'], results['bayes_prediction']):.2f} yards\n")
-            f.write(f"  Overall RMSE: {np.sqrt(mean_squared_error(results['actual_yards'], results['bayes_prediction'])):.2f} yards\n")
-            f.write(f"  Overall Correlation: {results[['actual_yards', 'bayes_prediction']].corr().iloc[0, 1]:.3f}\n")
+            f.write(
+                f"  Overall MAE: {mean_absolute_error(results['actual_yards'], results['bayes_prediction']):.2f} yards\n"
+            )
+            f.write(
+                f"  Overall RMSE: {np.sqrt(mean_squared_error(results['actual_yards'], results['bayes_prediction'])):.2f} yards\n"
+            )
+            f.write(
+                f"  Overall Correlation: {results[['actual_yards', 'bayes_prediction']].corr().iloc[0, 1]:.3f}\n"
+            )
 
         logger.info(f"Multi-year report saved to {output_dir}")
 
     def run_full_multiyear_backtest(
         self,
-        stat_types: List[str] = ['passing_yards', 'rushing_yards', 'receiving_yards'],
-        seasons: List[int] = [2022, 2023, 2024]
+        stat_types: list[str] = ["passing_yards", "rushing_yards", "receiving_yards"],
+        seasons: list[int] = [2022, 2023, 2024],
     ):
         """Run complete multi-year backtest for all stat types."""
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("MULTI-YEAR BAYESIAN HIERARCHICAL BACKTEST")
         print(f"Seasons: {seasons}")
-        print("="*80)
+        print("=" * 80)
 
         all_results = {}
         all_metrics = {}
@@ -552,10 +583,7 @@ class MultiYearBacktest:
         for stat_type in stat_types:
             try:
                 results, season_metrics = self.run_multiyear_backtest(
-                    stat_type=stat_type,
-                    seasons=seasons,
-                    start_week=1,
-                    end_week=17
+                    stat_type=stat_type, seasons=seasons, start_week=1, end_week=17
                 )
 
                 if not results.empty:
@@ -567,7 +595,7 @@ class MultiYearBacktest:
                         results,
                         season_metrics,
                         stat_type,
-                        output_dir=f'reports/bayesian_backtest_multiyear/{stat_type}'
+                        output_dir=f"reports/bayesian_backtest_multiyear/{stat_type}",
                     )
 
                     # Print summary
@@ -575,25 +603,27 @@ class MultiYearBacktest:
                     print("-" * 60)
                     for season in sorted(season_metrics.keys()):
                         metrics = season_metrics[season]
-                        print(f"  {season}: MAE={metrics.get('mae', 0):.2f}, "
-                              f"Corr={metrics.get('correlation', 0):.3f}, "
-                              f"Coverage={metrics.get('ci_90_coverage', 0):.1%}")
+                        print(
+                            f"  {season}: MAE={metrics.get('mae', 0):.2f}, "
+                            f"Corr={metrics.get('correlation', 0):.3f}, "
+                            f"Coverage={metrics.get('ci_90_coverage', 0):.1%}"
+                        )
 
             except Exception as e:
                 logger.error(f"Error processing {stat_type}: {e}", exc_info=True)
                 continue
 
         # Save combined summary
-        summary_dir = 'reports/bayesian_backtest_multiyear'
+        summary_dir = "reports/bayesian_backtest_multiyear"
         Path(summary_dir).mkdir(parents=True, exist_ok=True)
 
-        with open(f'{summary_dir}/combined_summary.json', 'w') as f:
+        with open(f"{summary_dir}/combined_summary.json", "w") as f:
             json.dump(all_metrics, f, indent=2, default=str)
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("MULTI-YEAR BACKTEST COMPLETE")
         print(f"Reports saved to {summary_dir}")
-        print("="*80)
+        print("=" * 80)
 
         return all_results, all_metrics
 
@@ -606,8 +636,8 @@ def main():
     try:
         # Run full backtest for 2022-2024
         results, metrics = backtest.run_full_multiyear_backtest(
-            stat_types=['passing_yards', 'rushing_yards', 'receiving_yards'],
-            seasons=[2022, 2023, 2024]
+            stat_types=["passing_yards", "rushing_yards", "receiving_yards"],
+            seasons=[2022, 2023, 2024],
         )
 
         print("\n✅ Multi-year backtest complete!")
@@ -621,5 +651,5 @@ def main():
         backtest.conn.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

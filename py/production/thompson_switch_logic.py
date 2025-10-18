@@ -37,13 +37,10 @@ Usage:
 """
 
 import argparse
-import json
 import logging
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -157,9 +154,7 @@ class ThompsonSampler:
         beta_param = row["beta"]
 
         expected_win_rate = alpha / (alpha + beta_param)
-        variance = (alpha * beta_param) / (
-            (alpha + beta_param) ** 2 * (alpha + beta_param + 1)
-        )
+        variance = (alpha * beta_param) / ((alpha + beta_param) ** 2 * (alpha + beta_param + 1))
 
         return ModelStats(
             model_name=row["model_name"],
@@ -184,17 +179,12 @@ class ThompsonSampler:
         stats = [self.get_model_stats(name) for name in self.models]
 
         # Sample from each model's Beta distribution
-        samples = {
-            model.model_name: beta.rvs(model.alpha, model.beta)
-            for model in stats
-        }
+        samples = {model.model_name: beta.rvs(model.alpha, model.beta) for model in stats}
 
         # Select model with highest sample
         selected_model = max(samples, key=samples.get)
 
-        logger.info(
-            f"Thompson Sampling selected '{selected_model}' (samples: {samples})"
-        )
+        logger.info(f"Thompson Sampling selected '{selected_model}' (samples: {samples})")
 
         return selected_model
 
@@ -247,7 +237,7 @@ class ThompsonSampler:
 
         return df
 
-    def reset(self, model_name: Optional[str] = None):
+    def reset(self, model_name: str | None = None):
         """
         Reset statistics for a model (or all models).
 
@@ -315,7 +305,7 @@ class ThompsonSampler:
         logger.info("Saved distributions plot to results/thompson_distributions.png")
         plt.close()
 
-    def simulate_regret(self, n_bets: int = 1000, true_win_rates: Dict[str, float] = None):
+    def simulate_regret(self, n_bets: int = 1000, true_win_rates: dict[str, float] = None):
         """
         Simulate Thompson Sampling and calculate regret.
 
@@ -436,7 +426,7 @@ def main():
 
         # Show updated stats
         stats = sampler.get_model_stats(args.model)
-        print(f"\nUpdated Statistics:")
+        print("\nUpdated Statistics:")
         print(f"  Model: {stats.model_name}")
         print(f"  Bets: {stats.n_bets} (W: {stats.n_wins}, L: {stats.n_losses})")
         print(f"  Win Rate: {stats.win_rate:.1%}")
@@ -455,7 +445,9 @@ def main():
             print(f"Model: {row['model_name'].upper()}")
             print(f"  Bets: {row['n_bets']} (W: {row['n_wins']}, L: {row['n_losses']})")
             print(f"  Win Rate: {row['win_rate']:.1%}")
-            print(f"  Expected Win Rate: {row['expected_win_rate']:.1%} ± {np.sqrt(row['variance']):.2%}")
+            print(
+                f"  Expected Win Rate: {row['expected_win_rate']:.1%} ± {np.sqrt(row['variance']):.2%}"
+            )
             print(f"  Beta Parameters: α={row['alpha']:.1f}, β={row['beta']:.1f}")
             print()
 
@@ -463,9 +455,7 @@ def main():
 
     elif args.command == "reset":
         sampler.reset(model_name=args.model)
-        print(
-            f"Reset {'all models' if args.model is None else args.model} to uniform prior"
-        )
+        print(f"Reset {'all models' if args.model is None else args.model} to uniform prior")
 
     elif args.command == "plot":
         sampler.plot_distributions()

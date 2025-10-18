@@ -33,13 +33,12 @@ Usage:
 import argparse
 import json
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-
 
 # ============================================================================
 # Data Models
@@ -49,15 +48,16 @@ import pandas as pd
 @dataclass
 class OddsLine:
     """Single odds line from a sportsbook."""
+
     book: str
     game_id: str
     bet_type: str  # 'spread', 'total', 'moneyline'
     side: str  # 'home', 'away', 'over', 'under'
-    line: Optional[float]  # spread/total value (None for moneyline)
+    line: float | None  # spread/total value (None for moneyline)
     odds: int  # American odds
     timestamp: str
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return asdict(self)
 
     def get_implied_prob(self) -> float:
@@ -78,29 +78,30 @@ class OddsLine:
 @dataclass
 class BestLine:
     """Best available line across all books."""
+
     game_id: str
     bet_type: str
     side: str
     best_book: str
-    best_line: Optional[float]
+    best_line: float | None
     best_odds: int
     consensus_odds: int  # Average odds across books
     improvement_cents: float  # Cents better than consensus
     ev_gain: float  # Expected value gain ($) on $100 bet
-    all_books: List[OddsLine]
+    all_books: list[OddsLine]
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
-            'game_id': self.game_id,
-            'bet_type': self.bet_type,
-            'side': self.side,
-            'best_book': self.best_book,
-            'best_line': self.best_line,
-            'best_odds': self.best_odds,
-            'consensus_odds': self.consensus_odds,
-            'improvement_cents': self.improvement_cents,
-            'ev_gain': self.ev_gain,
-            'all_books': [b.to_dict() for b in self.all_books],
+            "game_id": self.game_id,
+            "bet_type": self.bet_type,
+            "side": self.side,
+            "best_book": self.best_book,
+            "best_line": self.best_line,
+            "best_odds": self.best_odds,
+            "consensus_odds": self.consensus_odds,
+            "improvement_cents": self.improvement_cents,
+            "ev_gain": self.ev_gain,
+            "all_books": [b.to_dict() for b in self.all_books],
         }
 
 
@@ -114,7 +115,7 @@ class OddsAggregator:
     Aggregate odds from multiple sportsbooks and find best lines.
     """
 
-    def __init__(self, books: List[str] = None):
+    def __init__(self, books: list[str] = None):
         """
         Initialize odds aggregator.
 
@@ -122,10 +123,16 @@ class OddsAggregator:
             books: List of sportsbook names to track
         """
         self.books = books or [
-            'fanduel', 'draftkings', 'betmgm', 'caesars',
-            'espnbet', 'bet365', 'circa', 'fanatics'
+            "fanduel",
+            "draftkings",
+            "betmgm",
+            "caesars",
+            "espnbet",
+            "bet365",
+            "circa",
+            "fanatics",
         ]
-        self.odds_data: Dict[str, List[OddsLine]] = {}
+        self.odds_data: dict[str, list[OddsLine]] = {}
 
     def add_odds_line(
         self,
@@ -133,7 +140,7 @@ class OddsAggregator:
         game_id: str,
         bet_type: str,
         side: str,
-        line: Optional[float],
+        line: float | None,
         odds: int,
     ):
         """Add a single odds line to the aggregator."""
@@ -153,7 +160,7 @@ class OddsAggregator:
 
         self.odds_data[key].append(odds_line)
 
-    def parse_manual_odds(self, odds_str: str) -> Tuple[str, float, int]:
+    def parse_manual_odds(self, odds_str: str) -> tuple[str, float, int]:
         """
         Parse manual odds string.
 
@@ -165,15 +172,15 @@ class OddsAggregator:
         Returns:
             (book, line, odds)
         """
-        parts = odds_str.split(':')
+        parts = odds_str.split(":")
         if len(parts) != 2:
             raise ValueError(f"Invalid format: {odds_str}. Use 'book:line/odds'")
 
         book = parts[0].lower()
 
         # Parse line and odds
-        if '/' in parts[1]:
-            line_str, odds_str = parts[1].split('/')
+        if "/" in parts[1]:
+            line_str, odds_str = parts[1].split("/")
             line = float(line_str)
             odds = int(odds_str)
         else:
@@ -196,12 +203,12 @@ class OddsAggregator:
 
         for _, row in df.iterrows():
             self.add_odds_line(
-                book=row['book'],
-                game_id=row['game_id'],
-                bet_type=row['bet_type'],
-                side=row['side'],
-                line=row['line'] if pd.notna(row.get('line')) else None,
-                odds=int(row['odds']),
+                book=row["book"],
+                game_id=row["game_id"],
+                bet_type=row["bet_type"],
+                side=row["side"],
+                line=row["line"] if pd.notna(row.get("line")) else None,
+                odds=int(row["odds"]),
             )
 
     def get_best_line(
@@ -209,7 +216,7 @@ class OddsAggregator:
         game_id: str,
         bet_type: str,
         side: str,
-    ) -> Optional[BestLine]:
+    ) -> BestLine | None:
         """
         Find best available line for a specific bet.
 
@@ -266,14 +273,14 @@ class OddsAggregator:
             all_books=sorted(lines, key=lambda x: x.odds, reverse=True),
         )
 
-    def get_all_best_lines(self) -> List[BestLine]:
+    def get_all_best_lines(self) -> list[BestLine]:
         """Get best lines for all tracked bets."""
         best_lines = []
 
         # Deduplicate keys
         unique_bets = set()
         for key in self.odds_data.keys():
-            parts = key.rsplit('_', 2)
+            parts = key.rsplit("_", 2)
             if len(parts) == 3:
                 game_id, bet_type, side = parts
                 unique_bets.add((game_id, bet_type, side))
@@ -292,30 +299,35 @@ class OddsAggregator:
         Returns:
             DataFrame with book performance metrics
         """
-        book_stats = {book: {'best_count': 0, 'total_lines': 0} for book in self.books}
+        book_stats = {book: {"best_count": 0, "total_lines": 0} for book in self.books}
 
         for best_line in self.get_all_best_lines():
             # Count how many times each book had the best line
-            book_stats[best_line.best_book]['best_count'] += 1
+            book_stats[best_line.best_book]["best_count"] += 1
 
             # Count total lines per book
             for odds_line in best_line.all_books:
                 if odds_line.book in book_stats:
-                    book_stats[odds_line.book]['total_lines'] += 1
+                    book_stats[odds_line.book]["total_lines"] += 1
 
         # Convert to DataFrame
-        df = pd.DataFrame([
-            {
-                'book': book,
-                'best_line_count': stats['best_count'],
-                'total_lines': stats['total_lines'],
-                'best_line_pct': (stats['best_count'] / stats['total_lines'] * 100)
-                                 if stats['total_lines'] > 0 else 0,
-            }
-            for book, stats in book_stats.items()
-        ])
+        df = pd.DataFrame(
+            [
+                {
+                    "book": book,
+                    "best_line_count": stats["best_count"],
+                    "total_lines": stats["total_lines"],
+                    "best_line_pct": (
+                        (stats["best_count"] / stats["total_lines"] * 100)
+                        if stats["total_lines"] > 0
+                        else 0
+                    ),
+                }
+                for book, stats in book_stats.items()
+            ]
+        )
 
-        return df.sort_values('best_line_pct', ascending=False)
+        return df.sort_values("best_line_pct", ascending=False)
 
 
 # ============================================================================
@@ -366,10 +378,10 @@ class TheOddsAPIClient:
 
     def get_odds(
         self,
-        sport: str = 'americanfootball_nfl',
-        markets: str = 'h2h,spreads,totals',
-        regions: str = 'us',
-    ) -> Dict:
+        sport: str = "americanfootball_nfl",
+        markets: str = "h2h,spreads,totals",
+        regions: str = "us",
+    ) -> dict:
         """
         Fetch odds from The Odds API.
 
@@ -379,9 +391,9 @@ class TheOddsAPIClient:
 
         url = f"{self.base_url}/sports/{sport}/odds/"
         params = {
-            'apiKey': self.api_key,
-            'regions': regions,
-            'markets': markets,
+            "apiKey": self.api_key,
+            "regions": regions,
+            "markets": markets,
         }
 
         response = requests.get(url, params=params)
@@ -391,39 +403,41 @@ class TheOddsAPIClient:
 
     def parse_to_aggregator(
         self,
-        api_response: Dict,
+        api_response: dict,
         aggregator: OddsAggregator,
     ):
         """Parse The Odds API response into OddsAggregator."""
         for game in api_response:
             game_id = f"{game['away_team']}_vs_{game['home_team']}"
 
-            for bookmaker in game.get('bookmakers', []):
-                book_name = bookmaker['title'].lower().replace(' ', '')
+            for bookmaker in game.get("bookmakers", []):
+                book_name = bookmaker["title"].lower().replace(" ", "")
 
-                for market in bookmaker.get('markets', []):
-                    market_type = market['key']  # 'h2h', 'spreads', 'totals'
+                for market in bookmaker.get("markets", []):
+                    market_type = market["key"]  # 'h2h', 'spreads', 'totals'
 
-                    for outcome in market.get('outcomes', []):
+                    for outcome in market.get("outcomes", []):
                         # Determine bet type and side
-                        if market_type == 'h2h':
-                            bet_type = 'moneyline'
-                            side = outcome['name']
+                        if market_type == "h2h":
+                            bet_type = "moneyline"
+                            side = outcome["name"]
                             line = None
-                        elif market_type == 'spreads':
-                            bet_type = 'spread'
-                            side = outcome['name']
-                            line = outcome.get('point', 0)
-                        elif market_type == 'totals':
-                            bet_type = 'total'
-                            side = outcome['name'].lower()  # 'over' or 'under'
-                            line = outcome.get('point', 0)
+                        elif market_type == "spreads":
+                            bet_type = "spread"
+                            side = outcome["name"]
+                            line = outcome.get("point", 0)
+                        elif market_type == "totals":
+                            bet_type = "total"
+                            side = outcome["name"].lower()  # 'over' or 'under'
+                            line = outcome.get("point", 0)
                         else:
                             continue
 
                         # Convert odds (The Odds API uses decimal odds)
-                        decimal_odds = outcome['price']
-                        american_odds = decimal_to_american_odds(decimal_odds - 1)  # Subtract 1 for payout only
+                        decimal_odds = outcome["price"]
+                        american_odds = decimal_to_american_odds(
+                            decimal_odds - 1
+                        )  # Subtract 1 for payout only
 
                         aggregator.add_odds_line(
                             book=book_name,
@@ -441,28 +455,30 @@ class TheOddsAPIClient:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        description='Multi-Book Odds Aggregator and Line Shopping'
-    )
+    ap = argparse.ArgumentParser(description="Multi-Book Odds Aggregator and Line Shopping")
 
     # Input methods
-    ap.add_argument('--game', help='Game ID (e.g., KC_vs_BUF)')
-    ap.add_argument('--manual-odds', nargs='+',
-                    help='Manual odds (format: book:line/odds, e.g., fanduel:-3/-110)')
-    ap.add_argument('--odds-csv', help='CSV file with odds data')
-    ap.add_argument('--api', choices=['theoddsapi', 'sportsdataio'],
-                    help='API source (requires API key)')
-    ap.add_argument('--api-key', help='API key for odds provider')
+    ap.add_argument("--game", help="Game ID (e.g., KC_vs_BUF)")
+    ap.add_argument(
+        "--manual-odds",
+        nargs="+",
+        help="Manual odds (format: book:line/odds, e.g., fanduel:-3/-110)",
+    )
+    ap.add_argument("--odds-csv", help="CSV file with odds data")
+    ap.add_argument(
+        "--api", choices=["theoddsapi", "sportsdataio"], help="API source (requires API key)"
+    )
+    ap.add_argument("--api-key", help="API key for odds provider")
 
     # Bet specification
-    ap.add_argument('--bet-type', choices=['spread', 'total', 'moneyline'],
-                    help='Bet type (for manual query)')
-    ap.add_argument('--side', help='Bet side (team name, over, under)')
+    ap.add_argument(
+        "--bet-type", choices=["spread", "total", "moneyline"], help="Bet type (for manual query)"
+    )
+    ap.add_argument("--side", help="Bet side (team name, over, under)")
 
     # Output
-    ap.add_argument('--output', help='Output JSON path')
-    ap.add_argument('--compare-books', action='store_true',
-                    help='Compare book performance')
+    ap.add_argument("--output", help="Output JSON path")
+    ap.add_argument("--compare-books", action="store_true", help="Compare book performance")
 
     return ap.parse_args()
 
@@ -471,7 +487,7 @@ def main():
     args = parse_args()
 
     print(f"{'='*80}")
-    print(f"Multi-Book Odds Aggregator")
+    print("Multi-Book Odds Aggregator")
     print(f"{'='*80}")
 
     # Initialize aggregator
@@ -479,7 +495,7 @@ def main():
 
     # Load data
     if args.manual_odds:
-        print(f"\nParsing manual odds...")
+        print("\nParsing manual odds...")
 
         if not args.game:
             print("ERROR: --game required with --manual-odds")
@@ -491,14 +507,14 @@ def main():
 
                 # Infer bet type from line
                 if line is None:
-                    bet_type = 'moneyline'
-                    side = args.side or 'home'
+                    bet_type = "moneyline"
+                    side = args.side or "home"
                 elif abs(line) < 10:
-                    bet_type = 'spread'
-                    side = args.side or 'home'
+                    bet_type = "spread"
+                    side = args.side or "home"
                 else:
-                    bet_type = 'total'
-                    side = args.side or 'over'
+                    bet_type = "total"
+                    side = args.side or "over"
 
                 aggregator.add_odds_line(
                     book=book,
@@ -522,7 +538,7 @@ def main():
     elif args.api:
         print(f"\nFetching odds from {args.api} API...")
 
-        if args.api == 'theoddsapi':
+        if args.api == "theoddsapi":
             if not args.api_key:
                 print("ERROR: --api-key required for The Odds API")
                 return 1
@@ -546,7 +562,7 @@ def main():
 
     # Find best lines
     print(f"\n{'='*80}")
-    print(f"Best Available Lines")
+    print("Best Available Lines")
     print(f"{'='*80}")
 
     best_lines = aggregator.get_all_best_lines()
@@ -562,14 +578,14 @@ def main():
         print(f"  Improvement: +{best_line.improvement_cents:.1f} cents")
         print(f"  EV Gain: ${best_line.ev_gain:+.2f} on $100 bet")
 
-        print(f"  All books:")
+        print("  All books:")
         for odds_line in best_line.all_books[:5]:  # Top 5
             print(f"    {odds_line.book:15s} {odds_line.line}/{odds_line.odds}")
 
     # Book comparison
     if args.compare_books:
         print(f"\n{'='*80}")
-        print(f"Book Performance Comparison")
+        print("Book Performance Comparison")
         print(f"{'='*80}")
 
         comparison = aggregator.compare_books()
@@ -580,17 +596,25 @@ def main():
         output_path = Path(args.output)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w') as f:
-            json.dump({
-                'timestamp': datetime.now().isoformat(),
-                'best_lines': [bl.to_dict() for bl in best_lines],
-                'book_comparison': aggregator.compare_books().to_dict('records') if args.compare_books else None,
-            }, f, indent=2)
+        with open(output_path, "w") as f:
+            json.dump(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "best_lines": [bl.to_dict() for bl in best_lines],
+                    "book_comparison": (
+                        aggregator.compare_books().to_dict("records")
+                        if args.compare_books
+                        else None
+                    ),
+                },
+                f,
+                indent=2,
+            )
 
         print(f"\nResults saved to {output_path}")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

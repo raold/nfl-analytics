@@ -5,20 +5,21 @@ Implements a learned game outcome simulator to stress test betting strategies.
 Computes CVaR, VaR, and max drawdown under various adverse scenarios.
 """
 
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from typing import Dict, List, Tuple, Optional
-import json
-from pathlib import Path
-from dataclasses import dataclass
 
 
 @dataclass
 class SimulationResult:
     """Results from Monte Carlo simulation."""
+
     strategy_name: str
     n_trials: int
     mean_return: float
@@ -28,8 +29,8 @@ class SimulationResult:
     max_drawdown: float
     var_95: float
     cvar_95: float
-    returns_distribution: List[float]
-    drawdown_distribution: List[float]
+    returns_distribution: list[float]
+    drawdown_distribution: list[float]
 
 
 class GameOutcomeSimulator(nn.Module):
@@ -40,17 +41,19 @@ class GameOutcomeSimulator(nn.Module):
     Used for Monte Carlo simulation of betting strategies.
     """
 
-    def __init__(self, input_dim: int, hidden_dims: List[int] = [128, 64, 32]):
+    def __init__(self, input_dim: int, hidden_dims: list[int] = [128, 64, 32]):
         super().__init__()
 
         layers = []
         prev_dim = input_dim
         for hidden_dim in hidden_dims:
-            layers.extend([
-                nn.Linear(prev_dim, hidden_dim),
-                nn.ReLU(),
-                nn.Dropout(0.2),
-            ])
+            layers.extend(
+                [
+                    nn.Linear(prev_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.Dropout(0.2),
+                ]
+            )
             prev_dim = hidden_dim
 
         self.network = nn.Sequential(*layers)
@@ -60,7 +63,7 @@ class GameOutcomeSimulator(nn.Module):
         self.cover_head = nn.Linear(prev_dim, 1)
         self.score_head = nn.Linear(prev_dim, 2)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Forward pass.
 
@@ -87,17 +90,18 @@ class MonteCarloSimulator:
     Monte Carlo simulator for stress testing betting strategies.
     """
 
-    def __init__(self,
-                 outcome_model: GameOutcomeSimulator,
-                 device: str = 'cuda' if torch.cuda.is_available() else 'cpu'):
+    def __init__(
+        self,
+        outcome_model: GameOutcomeSimulator,
+        device: str = "cuda" if torch.cuda.is_available() else "cpu",
+    ):
         self.outcome_model = outcome_model.to(device)
         self.outcome_model.eval()
         self.device = device
 
-    def simulate_game(self,
-                      features: np.ndarray,
-                      spread: float,
-                      n_simulations: int = 1) -> Tuple[np.ndarray, np.ndarray]:
+    def simulate_game(
+        self, features: np.ndarray, spread: float, n_simulations: int = 1
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Simulate game outcomes.
 
@@ -112,7 +116,9 @@ class MonteCarloSimulator:
         """
         with torch.no_grad():
             # Repeat features for all simulations
-            features_t = torch.FloatTensor(features).unsqueeze(0).repeat(n_simulations, 1).to(self.device)
+            features_t = (
+                torch.FloatTensor(features).unsqueeze(0).repeat(n_simulations, 1).to(self.device)
+            )
 
             # Get probabilities
             win_prob, cover_prob, scores = self.outcome_model(features_t)
@@ -123,14 +129,16 @@ class MonteCarloSimulator:
 
         return home_wins.astype(int), spread_covers.astype(int)
 
-    def simulate_season(self,
-                        games_df: pd.DataFrame,
-                        strategy_actions: np.ndarray,
-                        feature_cols: List[str],
-                        n_trials: int = 1000,
-                        bankroll: float = 100.0,
-                        bet_size_pct: float = 0.01,
-                        vig: float = 0.0476) -> SimulationResult:
+    def simulate_season(
+        self,
+        games_df: pd.DataFrame,
+        strategy_actions: np.ndarray,
+        feature_cols: list[str],
+        n_trials: int = 1000,
+        bankroll: float = 100.0,
+        bet_size_pct: float = 0.01,
+        vig: float = 0.0476,
+    ) -> SimulationResult:
         """
         Monte Carlo simulation of a betting strategy over a season.
 
@@ -150,7 +158,11 @@ class MonteCarloSimulator:
 
         # Extract features and spreads
         features = games_df[feature_cols].values
-        spreads = games_df['spread_close'].values if 'spread_close' in games_df.columns else np.zeros(n_games)
+        spreads = (
+            games_df["spread_close"].values
+            if "spread_close" in games_df.columns
+            else np.zeros(n_games)
+        )
 
         # Storage for results
         final_returns = []
@@ -179,7 +191,9 @@ class MonteCarloSimulator:
                 bet_amount = bankroll_t * bet_pct
 
                 # Simulate outcome
-                home_win, spread_cover = self.simulate_game(features[i], spreads[i], n_simulations=1)
+                home_win, spread_cover = self.simulate_game(
+                    features[i], spreads[i], n_simulations=1
+                )
 
                 # Determine bet result
                 if action > 0:
@@ -240,12 +254,14 @@ class MonteCarloSimulator:
             drawdown_distribution=max_drawdowns.tolist(),
         )
 
-    def stress_test(self,
-                    games_df: pd.DataFrame,
-                    strategy_actions: np.ndarray,
-                    feature_cols: List[str],
-                    scenarios: Dict[str, Dict],
-                    n_trials: int = 1000) -> Dict[str, SimulationResult]:
+    def stress_test(
+        self,
+        games_df: pd.DataFrame,
+        strategy_actions: np.ndarray,
+        feature_cols: list[str],
+        scenarios: dict[str, dict],
+        n_trials: int = 1000,
+    ) -> dict[str, SimulationResult]:
         """
         Run multiple stress test scenarios.
 
@@ -296,13 +312,15 @@ class MonteCarloSimulator:
         return results
 
 
-def train_outcome_model(train_df: pd.DataFrame,
-                        feature_cols: List[str],
-                        epochs: int = 100,
-                        batch_size: int = 64,
-                        lr: float = 1e-3,
-                        device: str = 'cuda' if torch.cuda.is_available() else 'cpu',
-                        output_path: Optional[str] = None) -> GameOutcomeSimulator:
+def train_outcome_model(
+    train_df: pd.DataFrame,
+    feature_cols: list[str],
+    epochs: int = 100,
+    batch_size: int = 64,
+    lr: float = 1e-3,
+    device: str = "cuda" if torch.cuda.is_available() else "cpu",
+    output_path: str | None = None,
+) -> GameOutcomeSimulator:
     """
     Train the game outcome simulator.
 
@@ -324,16 +342,20 @@ def train_outcome_model(train_df: pd.DataFrame,
     X = train_df[feature_cols].values
 
     # Outcomes
-    y_win = (train_df['home_score'] > train_df['away_score']).astype(float).values
+    y_win = (train_df["home_score"] > train_df["away_score"]).astype(float).values
 
     # Spread cover (home team covers if home_score + spread > away_score)
-    if 'spread_close' in train_df.columns:
-        y_cover = ((train_df['home_score'] + train_df['spread_close']) > train_df['away_score']).astype(float).values
+    if "spread_close" in train_df.columns:
+        y_cover = (
+            ((train_df["home_score"] + train_df["spread_close"]) > train_df["away_score"])
+            .astype(float)
+            .values
+        )
     else:
         y_cover = y_win  # Fallback to win if no spread
 
     # Scores
-    y_scores = train_df[['home_score', 'away_score']].values
+    y_scores = train_df[["home_score", "away_score"]].values
 
     # Convert to tensors
     X_t = torch.FloatTensor(X).to(device)
@@ -402,17 +424,22 @@ def train_outcome_model(train_df: pd.DataFrame,
     # Save model if requested
     if output_path:
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        torch.save({
-            'model_state_dict': model.state_dict(),
-            'feature_cols': feature_cols,
-            'input_dim': input_dim,
-        }, output_path)
+        torch.save(
+            {
+                "model_state_dict": model.state_dict(),
+                "feature_cols": feature_cols,
+                "input_dim": input_dim,
+            },
+            output_path,
+        )
         print(f"Model saved to {output_path}")
 
     return model
 
 
-def load_outcome_model(model_path: str, device: str = 'cuda' if torch.cuda.is_available() else 'cpu') -> Tuple[GameOutcomeSimulator, List[str]]:
+def load_outcome_model(
+    model_path: str, device: str = "cuda" if torch.cuda.is_available() else "cpu"
+) -> tuple[GameOutcomeSimulator, list[str]]:
     """
     Load a trained outcome model.
 
@@ -422,11 +449,11 @@ def load_outcome_model(model_path: str, device: str = 'cuda' if torch.cuda.is_av
     """
     checkpoint = torch.load(model_path, map_location=device)
 
-    input_dim = checkpoint['input_dim']
-    feature_cols = checkpoint['feature_cols']
+    input_dim = checkpoint["input_dim"]
+    feature_cols = checkpoint["feature_cols"]
 
     model = GameOutcomeSimulator(input_dim=input_dim).to(device)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
     return model, feature_cols
@@ -438,23 +465,40 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description='Neural simulator for risk validation')
-    parser.add_argument('--mode', type=str, choices=['train', 'simulate', 'stress'], required=True,
-                        help='Mode: train model, run simulation, or stress test')
-    parser.add_argument('--data', type=str, required=True,
-                        help='Path to data CSV')
-    parser.add_argument('--model', type=str, default='models/simulator/outcome_model.pth',
-                        help='Path to model checkpoint')
-    parser.add_argument('--strategy-file', type=str,
-                        help='Path to strategy actions JSON (for simulate/stress modes)')
-    parser.add_argument('--output', type=str, default='results/simulation/stress_test.json',
-                        help='Output path for results')
-    parser.add_argument('--epochs', type=int, default=100,
-                        help='Training epochs')
-    parser.add_argument('--n-trials', type=int, default=1000,
-                        help='Number of Monte Carlo trials')
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
-                        help='Device to use')
+    parser = argparse.ArgumentParser(description="Neural simulator for risk validation")
+    parser.add_argument(
+        "--mode",
+        type=str,
+        choices=["train", "simulate", "stress"],
+        required=True,
+        help="Mode: train model, run simulation, or stress test",
+    )
+    parser.add_argument("--data", type=str, required=True, help="Path to data CSV")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="models/simulator/outcome_model.pth",
+        help="Path to model checkpoint",
+    )
+    parser.add_argument(
+        "--strategy-file",
+        type=str,
+        help="Path to strategy actions JSON (for simulate/stress modes)",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="results/simulation/stress_test.json",
+        help="Output path for results",
+    )
+    parser.add_argument("--epochs", type=int, default=100, help="Training epochs")
+    parser.add_argument("--n-trials", type=int, default=1000, help="Number of Monte Carlo trials")
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        help="Device to use",
+    )
 
     args = parser.parse_args()
 
@@ -464,15 +508,22 @@ def main():
 
     # Define feature columns (same as ensemble)
     feature_cols = [
-        'prior_epa_mean_diff', 'epa_pp_last3_diff', 'season_win_pct_diff',
-        'win_pct_last5_diff', 'prior_margin_avg_diff', 'points_for_last3_diff',
-        'points_against_last3_diff', 'rest_diff', 'week', 'fourth_downs_diff',
-        'fourth_down_epa_diff'
+        "prior_epa_mean_diff",
+        "epa_pp_last3_diff",
+        "season_win_pct_diff",
+        "win_pct_last5_diff",
+        "prior_margin_avg_diff",
+        "points_for_last3_diff",
+        "points_against_last3_diff",
+        "rest_diff",
+        "week",
+        "fourth_downs_diff",
+        "fourth_down_epa_diff",
     ]
 
-    if args.mode == 'train':
+    if args.mode == "train":
         # Train outcome model
-        train_df = df[df['season'] < 2024].copy()
+        train_df = df[df["season"] < 2024].copy()
 
         model = train_outcome_model(
             train_df=train_df,
@@ -484,19 +535,19 @@ def main():
 
         print(f"\nTraining complete! Model saved to {args.model}")
 
-    elif args.mode == 'simulate':
+    elif args.mode == "simulate":
         # Load model
         model, feature_cols_loaded = load_outcome_model(args.model, device=args.device)
         simulator = MonteCarloSimulator(model, device=args.device)
 
         # Load strategy actions
-        with open(args.strategy_file, 'r') as f:
+        with open(args.strategy_file) as f:
             strategy_data = json.load(f)
 
-        actions = np.array([bet['action'] for bet in strategy_data['bets']])
+        actions = np.array([bet["action"] for bet in strategy_data["bets"]])
 
         # Filter to test season
-        test_df = df[df['season'] == 2024].copy()
+        test_df = df[df["season"] == 2024].copy()
 
         # Run simulation
         result = simulator.simulate_season(
@@ -508,18 +559,22 @@ def main():
 
         # Save results
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.output, 'w') as f:
-            json.dump({
-                'strategy_name': result.strategy_name,
-                'n_trials': result.n_trials,
-                'mean_return': result.mean_return,
-                'std_return': result.std_return,
-                'sharpe_ratio': result.sharpe_ratio,
-                'win_rate': result.win_rate,
-                'max_drawdown': result.max_drawdown,
-                'var_95': result.var_95,
-                'cvar_95': result.cvar_95,
-            }, f, indent=2)
+        with open(args.output, "w") as f:
+            json.dump(
+                {
+                    "strategy_name": result.strategy_name,
+                    "n_trials": result.n_trials,
+                    "mean_return": result.mean_return,
+                    "std_return": result.std_return,
+                    "sharpe_ratio": result.sharpe_ratio,
+                    "win_rate": result.win_rate,
+                    "max_drawdown": result.max_drawdown,
+                    "var_95": result.var_95,
+                    "cvar_95": result.cvar_95,
+                },
+                f,
+                indent=2,
+            )
 
         print(f"\nSimulation complete! Results saved to {args.output}")
         print(f"Mean return: {result.mean_return:.4f}")
@@ -527,27 +582,27 @@ def main():
         print(f"VaR(95%): {result.var_95:.4f}")
         print(f"CVaR(95%): {result.cvar_95:.4f}")
 
-    elif args.mode == 'stress':
+    elif args.mode == "stress":
         # Load model
         model, feature_cols_loaded = load_outcome_model(args.model, device=args.device)
         simulator = MonteCarloSimulator(model, device=args.device)
 
         # Load strategy actions
-        with open(args.strategy_file, 'r') as f:
+        with open(args.strategy_file) as f:
             strategy_data = json.load(f)
 
-        actions = np.array([bet['action'] for bet in strategy_data['bets']])
+        actions = np.array([bet["action"] for bet in strategy_data["bets"]])
 
         # Filter to test season
-        test_df = df[df['season'] == 2024].copy()
+        test_df = df[df["season"] == 2024].copy()
 
         # Define stress test scenarios
         scenarios = {
-            'baseline': {},
-            'model_degradation': {'model_degradation': 0.05},
-            'market_efficiency': {'edge_reduction': 0.5},
-            'adverse_selection': {'adverse_selection': 0.5},
-            'correlated_losses': {'correlation': 0.3},
+            "baseline": {},
+            "model_degradation": {"model_degradation": 0.05},
+            "market_efficiency": {"edge_reduction": 0.5},
+            "adverse_selection": {"adverse_selection": 0.5},
+            "correlated_losses": {"correlation": 0.3},
         }
 
         # Run stress tests
@@ -561,23 +616,23 @@ def main():
 
         # Save results
         Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             output_data = {}
             for scenario_name, result in results.items():
                 output_data[scenario_name] = {
-                    'n_trials': result.n_trials,
-                    'mean_return': result.mean_return,
-                    'std_return': result.std_return,
-                    'sharpe_ratio': result.sharpe_ratio,
-                    'win_rate': result.win_rate,
-                    'max_drawdown': result.max_drawdown,
-                    'var_95': result.var_95,
-                    'cvar_95': result.cvar_95,
+                    "n_trials": result.n_trials,
+                    "mean_return": result.mean_return,
+                    "std_return": result.std_return,
+                    "sharpe_ratio": result.sharpe_ratio,
+                    "win_rate": result.win_rate,
+                    "max_drawdown": result.max_drawdown,
+                    "var_95": result.var_95,
+                    "cvar_95": result.cvar_95,
                 }
             json.dump(output_data, f, indent=2)
 
         print(f"\nStress test complete! Results saved to {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

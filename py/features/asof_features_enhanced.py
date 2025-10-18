@@ -95,29 +95,29 @@ team_stats AS (
            -- Base metrics
            COALESCE(SUM(epa), 0) AS epa_sum,
            COUNT(*) AS plays,
-           
+
            -- Success rate (EPA > 0)
            COALESCE(AVG(CASE WHEN success = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS success_rate,
-           
+
            -- Passing efficiency (pass and rush are BOOLEAN)
            COALESCE(AVG(CASE WHEN pass = TRUE THEN air_yards END), 0) AS air_yards_mean,
            COALESCE(AVG(CASE WHEN pass = TRUE THEN yards_after_catch END), 0) AS yac_mean,
            COALESCE(AVG(CASE WHEN pass = TRUE THEN cpoe END), 0) AS cpoe_mean,
            COALESCE(AVG(CASE WHEN pass = TRUE AND complete_pass = 1 THEN 1.0 ELSE 0.0 END), 0) AS completion_pct,
-           
+
            -- Win probability
            COALESCE(MAX(wp), 0.5) AS wp_max,
            COALESCE(MIN(wp), 0.5) AS wp_min,
            COALESCE(AVG(CASE WHEN quarter = 4 THEN wp END), 0.5) AS wp_q4_mean,
-           
+
            -- Situational play-calling
            COALESCE(AVG(CASE WHEN shotgun = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS shotgun_rate,
            COALESCE(AVG(CASE WHEN no_huddle = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS no_huddle_rate,
-           
+
            -- Explosive plays (pass and rush are BOOLEAN)
            COUNT(CASE WHEN pass = TRUE AND yards_gained >= 20 THEN 1 END) AS explosive_pass,
            COUNT(CASE WHEN rush = TRUE AND yards_gained >= 10 THEN 1 END) AS explosive_rush
-           
+
     FROM plays
     WHERE posteam IS NOT NULL
     GROUP BY 1, 2
@@ -147,11 +147,11 @@ SELECT tg.game_id,
        tg.penalties,
        tg.penalty_yards,
        tg.points_for - tg.points_against AS margin,
-       
+
        -- Base EPA
        COALESCE(ts.epa_sum, 0) AS epa_sum,
        COALESCE(ts.plays, 0) AS plays,
-       
+
        -- Advanced play metrics
        COALESCE(ts.success_rate, 0) AS success_rate,
        COALESCE(ts.air_yards_mean, 0) AS air_yards_mean,
@@ -165,7 +165,7 @@ SELECT tg.game_id,
        COALESCE(ts.no_huddle_rate, 0) AS no_huddle_rate,
        COALESCE(ts.explosive_pass, 0) AS explosive_pass,
        COALESCE(ts.explosive_rush, 0) AS explosive_rush
-       
+
 FROM team_games tg
 LEFT JOIN team_stats ts
   ON ts.game_id = tg.game_id AND ts.team = tg.team

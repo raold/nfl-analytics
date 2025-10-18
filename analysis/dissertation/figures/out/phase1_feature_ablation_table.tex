@@ -1,0 +1,24 @@
+% Phase 1: Feature Ablation Study - Table Content Only
+% Table environment and caption added in main document
+\begin{threeparttable}
+  \begin{tabular}{lccccc}
+    \toprule
+    \textbf{Model} & \textbf{Features} & \textbf{90\% Coverage} & \textbf{$\pm$1$\sigma$ Coverage} & \textbf{CI Width} & \textbf{$\Delta$ Coverage} \\
+    \midrule
+    Baseline & 4 & 26.2\% & 19.5\% & 17.0 yds & -- \\
+    + Vegas Lines & 6 & 29.7\% & 20.0\% & 17.0 yds & +3.5pp \\
+    + Environment & 10 & 29.7\% & 20.2\% & 16.9 yds & +0.0pp \\
+    + Opponent Defense & 9 & 31.3\% & 21.8\% & 17.0 yds & +5.1pp \\
+    \midrule
+    \textit{Target} & -- & \textit{90.0\%} & \textit{68.0\%} & -- & -- \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}[flushleft]\footnotesize
+    \item \textit{Baseline features}: carries, avg\_rushing\_l3, season\_avg, week
+    \item \textit{Vegas}: + spread\_close, total\_close
+    \item \textit{Environment}: + is\_dome, is\_turf, temp, wind
+    \item \textit{Opponent}: + opp\_rush\_yds\_allowed, opp\_rank, opp\_rush\_yds\_l3
+    \item All models use hierarchical BNN with 16 hidden units, $\sigma_{\text{prior}} = 0.5$
+    \item $\Delta$ Coverage shows improvement over baseline
+  \end{tablenotes}
+\end{threeparttable}

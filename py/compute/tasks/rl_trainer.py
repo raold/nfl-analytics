@@ -18,7 +18,7 @@ import torch.nn as nn
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from rl.dqn_agent import DQNAgent, QNetwork
+from rl.dqn_agent import QNetwork
 
 
 class RLTrainer:
@@ -183,8 +183,6 @@ class RLTrainer:
         """Train PPO model."""
         # Similar to DQN but with PPO-specific training
         # Placeholder for now
-        state_dim = 6
-        action_dim = 4
 
         # Simulate training
         best_reward = -float("inf")

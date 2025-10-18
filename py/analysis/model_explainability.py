@@ -16,13 +16,10 @@ Usage:
 
 import argparse
 import sys
-import warnings
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
@@ -30,6 +27,7 @@ from sklearn.preprocessing import StandardScaler
 # Try to import SHAP (optional dependency)
 try:
     import shap
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -37,59 +35,54 @@ except ImportError:
 
 from sklearn.inspection import permutation_importance
 
-
 # ============================================================================
 # Feature Selection
 # ============================================================================
 
 CORE_FEATURES = [
     # EPA features (expected points added)
-    'home_prior_epa_mean',
-    'away_prior_epa_mean',
-    'prior_epa_mean_diff',
-    'home_epa_pp_last3',
-    'away_epa_pp_last3',
-    'epa_pp_last3_diff',
-
+    "home_prior_epa_mean",
+    "away_prior_epa_mean",
+    "prior_epa_mean_diff",
+    "home_epa_pp_last3",
+    "away_epa_pp_last3",
+    "epa_pp_last3_diff",
     # Margin/performance features
-    'home_prior_margin_avg',
-    'away_prior_margin_avg',
-    'prior_margin_avg_diff',
-    'home_margin_last3',
-    'away_margin_last3',
-    'margin_last3_diff',
-
+    "home_prior_margin_avg",
+    "away_prior_margin_avg",
+    "prior_margin_avg_diff",
+    "home_margin_last3",
+    "away_margin_last3",
+    "margin_last3_diff",
     # Rest and travel
-    'home_rest_days',
-    'away_rest_days',
-    'rest_days_diff',
-    'home_rest_lt_6',
-    'away_rest_lt_6',
-
+    "home_rest_days",
+    "away_rest_days",
+    "rest_days_diff",
+    "home_rest_lt_6",
+    "away_rest_lt_6",
     # Coaching and QB stability
-    'home_qb_change',
-    'away_qb_change',
-    'qb_change_diff',
-    'home_coach_change',
-    'away_coach_change',
-
+    "home_qb_change",
+    "away_qb_change",
+    "qb_change_diff",
+    "home_coach_change",
+    "away_coach_change",
     # Win percentage
-    'home_prior_win_pct',
-    'away_prior_win_pct',
-    'prior_win_pct_diff',
-
+    "home_prior_win_pct",
+    "away_prior_win_pct",
+    "prior_win_pct_diff",
     # Recent form
-    'home_prev_result',
-    'away_prev_result',
-
+    "home_prev_result",
+    "away_prev_result",
     # Scoring
-    'home_prior_points_for_avg',
-    'away_prior_points_for_avg',
-    'prior_points_for_avg_diff',
+    "home_prior_points_for_avg",
+    "away_prior_points_for_avg",
+    "prior_points_for_avg_diff",
 ]
 
 
-def select_features(df: pd.DataFrame, feature_list: List[str] = None) -> Tuple[pd.DataFrame, List[str]]:
+def select_features(
+    df: pd.DataFrame, feature_list: list[str] = None
+) -> tuple[pd.DataFrame, list[str]]:
     """
     Select and prepare features for analysis.
 
@@ -127,17 +120,13 @@ def select_features(df: pd.DataFrame, feature_list: List[str] = None) -> Tuple[p
 # Model Training
 # ============================================================================
 
+
 def train_logistic_regression(X: pd.DataFrame, y: np.ndarray) -> LogisticRegression:
     """Train GLM-style logistic regression model."""
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
-    model = LogisticRegression(
-        penalty='l2',
-        C=1.0,
-        max_iter=1000,
-        random_state=42
-    )
+    model = LogisticRegression(penalty="l2", C=1.0, max_iter=1000, random_state=42)
     model.fit(X_scaled, y)
 
     return model
@@ -151,7 +140,7 @@ def train_gradient_boosting(X: pd.DataFrame, y: np.ndarray) -> GradientBoostingC
         max_depth=5,
         min_samples_split=20,
         min_samples_leaf=10,
-        random_state=42
+        random_state=42,
     )
     model.fit(X, y)
 
@@ -162,11 +151,9 @@ def train_gradient_boosting(X: pd.DataFrame, y: np.ndarray) -> GradientBoostingC
 # SHAP Analysis
 # ============================================================================
 
+
 def compute_permutation_importance(
-    model,
-    X: pd.DataFrame,
-    y: np.ndarray,
-    n_repeats: int = 10
+    model, X: pd.DataFrame, y: np.ndarray, n_repeats: int = 10
 ) -> np.ndarray:
     """
     Compute permutation importance as proxy for SHAP values.
@@ -174,20 +161,13 @@ def compute_permutation_importance(
     Returns:
         importance: (n_features,) array of importance scores
     """
-    result = permutation_importance(
-        model, X, y,
-        n_repeats=n_repeats,
-        random_state=42,
-        n_jobs=-1
-    )
+    result = permutation_importance(model, X, y, n_repeats=n_repeats, random_state=42, n_jobs=-1)
 
     return result.importances_mean
 
 
 def compute_shap_values_tree(
-    model: GradientBoostingClassifier,
-    X: pd.DataFrame,
-    y: np.ndarray = None
+    model: GradientBoostingClassifier, X: pd.DataFrame, y: np.ndarray = None
 ) -> np.ndarray:
     """
     Compute SHAP values for tree-based model using TreeExplainer.
@@ -220,10 +200,7 @@ def compute_shap_values_tree(
     return shap_values
 
 
-def compute_shap_values_linear(
-    model: LogisticRegression,
-    X: pd.DataFrame
-) -> np.ndarray:
+def compute_shap_values_linear(model: LogisticRegression, X: pd.DataFrame) -> np.ndarray:
     """
     Compute SHAP values for linear model using LinearExplainer.
 
@@ -243,7 +220,7 @@ def compute_shap_values_linear(
     return shap_values
 
 
-def global_feature_importance(shap_values: np.ndarray, feature_names: List[str]) -> pd.DataFrame:
+def global_feature_importance(shap_values: np.ndarray, feature_names: list[str]) -> pd.DataFrame:
     """
     Compute global feature importance from SHAP values.
 
@@ -254,10 +231,9 @@ def global_feature_importance(shap_values: np.ndarray, feature_names: List[str])
     """
     importance = np.abs(shap_values).mean(axis=0)
 
-    df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': importance
-    }).sort_values('importance', ascending=False)
+    df = pd.DataFrame({"feature": feature_names, "importance": importance}).sort_values(
+        "importance", ascending=False
+    )
 
     return df
 
@@ -266,11 +242,9 @@ def global_feature_importance(shap_values: np.ndarray, feature_names: List[str])
 # LaTeX Table Generation
 # ============================================================================
 
+
 def generate_global_importance_table(
-    importance_df: pd.DataFrame,
-    output_path: Path,
-    top_k: int = 15,
-    model_name: str = "XGBoost"
+    importance_df: pd.DataFrame, output_path: Path, top_k: int = 15, model_name: str = "XGBoost"
 ) -> None:
     """Generate LaTeX table of global feature importance."""
 
@@ -283,30 +257,32 @@ def generate_global_importance_table(
         r"\begin{tabularx}{\linewidth}{@{}rXY@{}}",
         r"\toprule",
         r"Rank & Feature & Mean |SHAP| \\",
-        r"\midrule"
+        r"\midrule",
     ]
 
     for i, row in importance_df.head(top_k).iterrows():
         rank = i + 1 if isinstance(i, int) else importance_df.index.get_loc(i) + 1
-        feature_clean = row['feature'].replace('_', r'\_')
+        feature_clean = row["feature"].replace("_", r"\_")
         importance_val = f"{row['importance']:.4f}"
 
         lines.append(f"{rank} & \\texttt{{{feature_clean}}} & {importance_val} \\\\")
 
-    lines.extend([
-        r"\bottomrule",
-        r"\end{tabularx}",
-        r"\begin{tablenotes}[flushleft]",
-        r"\footnotesize",
-        r"\item \textit{Notes:} SHAP (SHapley Additive exPlanations) values measure each feature's contribution to predictions. "
-        r"Mean |SHAP| aggregates absolute contributions across all test games. "
-        r"Higher values indicate more influential features. "
-        r"EPA = Expected Points Added (advanced play-by-play metric).",
-        r"\end{tablenotes}",
-        r"\end{threeparttable}",
-        r"\end{table}",
-        ""
-    ])
+    lines.extend(
+        [
+            r"\bottomrule",
+            r"\end{tabularx}",
+            r"\begin{tablenotes}[flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} SHAP (SHapley Additive exPlanations) values measure each feature's contribution to predictions. "
+            r"Mean |SHAP| aggregates absolute contributions across all test games. "
+            r"Higher values indicate more influential features. "
+            r"EPA = Expected Points Added (advanced play-by-play metric).",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines))
@@ -316,9 +292,9 @@ def generate_global_importance_table(
 def generate_local_examples_table(
     df: pd.DataFrame,
     shap_values: np.ndarray,
-    feature_names: List[str],
+    feature_names: list[str],
     output_path: Path,
-    n_examples: int = 3
+    n_examples: int = 3,
 ) -> None:
     """
     Generate LaTeX table showing local explanations for example games.
@@ -326,7 +302,7 @@ def generate_local_examples_table(
     Selects games with highest, lowest, and median predicted probabilities.
     """
     # Select example indices
-    probs = df['prob_ensemble'].values
+    probs = df["prob_ensemble"].values
     idx_high = np.argmax(probs)
     idx_low = np.argmin(probs)
     idx_median = np.argsort(probs)[len(probs) // 2]
@@ -334,7 +310,7 @@ def generate_local_examples_table(
     examples = [
         ("Highest Confidence", idx_high),
         ("Lowest Confidence", idx_low),
-        ("Median", idx_median)
+        ("Median", idx_median),
     ]
 
     lines = [
@@ -346,7 +322,7 @@ def generate_local_examples_table(
         r"\begin{tabularx}{\linewidth}{@{}lYYY@{}}",
         r"\toprule",
         r"Example & Top Feature & SHAP Value & Pred Prob \\",
-        r"\midrule"
+        r"\midrule",
     ]
 
     for label, idx in examples[:n_examples]:
@@ -358,25 +334,27 @@ def generate_local_examples_table(
 
         prob = probs[idx]
 
-        feature_clean = top_feat.replace('_', r'\_')
+        feature_clean = top_feat.replace("_", r"\_")
         shap_fmt = f"{top_shap:+.3f}"
         prob_fmt = f"{prob:.1%}"
 
         lines.append(f"{label} & \\texttt{{{feature_clean}}} & {shap_fmt} & {prob_fmt} \\\\")
 
-    lines.extend([
-        r"\bottomrule",
-        r"\end{tabularx}",
-        r"\begin{tablenotes}[flushleft]",
-        r"\footnotesize",
-        r"\item \textit{Notes:} Local SHAP values explain individual predictions. "
-        r"Positive values increase predicted home win probability; negative decrease it. "
-        r"Examples selected by predicted probability distribution (min, median, max).",
-        r"\end{tablenotes}",
-        r"\end{threeparttable}",
-        r"\end{table}",
-        ""
-    ])
+    lines.extend(
+        [
+            r"\bottomrule",
+            r"\end{tabularx}",
+            r"\begin{tablenotes}[flushleft]",
+            r"\footnotesize",
+            r"\item \textit{Notes:} Local SHAP values explain individual predictions. "
+            r"Positive values increase predicted home win probability; negative decrease it. "
+            r"Examples selected by predicted probability distribution (min, median, max).",
+            r"\end{tablenotes}",
+            r"\end{threeparttable}",
+            r"\end{table}",
+            "",
+        ]
+    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines))
@@ -387,6 +365,7 @@ def generate_local_examples_table(
 # Main
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="SHAP explainability analysis for NFL prediction models"
@@ -395,26 +374,26 @@ def main():
         "--data",
         type=Path,
         default=Path("data/processed/merged_predictions_features.csv"),
-        help="Path to merged predictions CSV"
+        help="Path to merged predictions CSV",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         default=Path("analysis/dissertation/figures/out"),
-        help="Output directory for LaTeX tables"
+        help="Output directory for LaTeX tables",
     )
     parser.add_argument(
         "--model",
         choices=["glm", "xgb", "both"],
         default="xgb",
-        help="Which model to explain (default: xgb)"
+        help="Which model to explain (default: xgb)",
     )
     parser.add_argument(
         "--test-seasons",
         nargs="+",
         type=int,
         default=[2020, 2021, 2022, 2023, 2024],
-        help="Seasons to use for test set (default: 2020-2024)"
+        help="Seasons to use for test set (default: 2020-2024)",
     )
 
     args = parser.parse_args()
@@ -428,7 +407,7 @@ def main():
     print(f"✓ Loaded {len(df):,} games")
 
     # Split train/test
-    test_mask = df['season'].isin(args.test_seasons)
+    test_mask = df["season"].isin(args.test_seasons)
     df_train = df[~test_mask]
     df_test = df[test_mask]
     print(f"Train: {len(df_train):,} games, Test: {len(df_test):,} games")
@@ -439,8 +418,8 @@ def main():
     X_test, _ = select_features(df_test, feature_list=feature_names)
 
     # Use home_cover as target (did home team cover the spread?)
-    y_train = df_train['home_cover'].values.astype(int)
-    y_test = df_test['home_cover'].values.astype(int)
+    y_train = df_train["home_cover"].values.astype(int)
+    y_test = df_test["home_cover"].values.astype(int)
     print(f"✓ Using {len(feature_names)} features")
 
     # Train and explain models
@@ -463,7 +442,7 @@ def main():
         generate_global_importance_table(
             importance_xgb,
             args.output_dir / "shap_global_importance_table.tex",
-            model_name="XGBoost"
+            model_name="XGBoost",
         )
 
         print("Generating local examples table...")
@@ -471,7 +450,7 @@ def main():
             df_test,
             shap_values_xgb,
             feature_names,
-            args.output_dir / "shap_local_examples_table.tex"
+            args.output_dir / "shap_local_examples_table.tex",
         )
 
     if args.model in ["glm", "both"]:
@@ -493,7 +472,7 @@ def main():
         generate_global_importance_table(
             importance_glm,
             args.output_dir / "shap_global_importance_glm_table.tex",
-            model_name="GLM"
+            model_name="GLM",
         )
 
     print("\n" + "=" * 60)

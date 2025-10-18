@@ -48,7 +48,6 @@ import json
 import random
 from collections import deque
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -450,13 +449,15 @@ def train_cql(
         avg_cql_loss = np.mean(epoch_cql_losses)
         avg_q = np.mean(epoch_q_means)
 
-        metrics_log.append({
-            "epoch": epoch + 1,
-            "loss": avg_loss,
-            "td_loss": avg_td_loss,
-            "cql_loss": avg_cql_loss,
-            "q_mean": avg_q,
-        })
+        metrics_log.append(
+            {
+                "epoch": epoch + 1,
+                "loss": avg_loss,
+                "td_loss": avg_td_loss,
+                "cql_loss": avg_cql_loss,
+                "q_mean": avg_q,
+            }
+        )
 
         if (epoch + 1) % log_freq == 0 or epoch == 0:
             print(

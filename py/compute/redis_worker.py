@@ -6,16 +6,14 @@ Extends the base ComputeWorker to work with Redis task queues and
 provide distributed computing capabilities.
 """
 
-import asyncio
 import logging
 import time
 from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Any
 
-from worker import ComputeWorker
-from redis_task_queue import RedisTaskQueue, HardwareProfile
-from sync_manager import GoogleDriveSyncManager
 from compute_odometer import ComputeOdometer
+from redis_task_queue import HardwareProfile, RedisTaskQueue
+from worker import ComputeWorker
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +26,15 @@ class RedisComputeWorker(ComputeWorker):
     coordinate with other machines via Google Drive sync.
     """
 
-    def __init__(self, intensity: str = "medium", use_adaptive: bool = True,
-                 machine_id: Optional[str] = None,
-                 hardware_profile: Optional[str] = None,
-                 redis_host: str = "localhost",
-                 redis_port: int = 6379):
+    def __init__(
+        self,
+        intensity: str = "medium",
+        use_adaptive: bool = True,
+        machine_id: str | None = None,
+        hardware_profile: str | None = None,
+        redis_host: str = "localhost",
+        redis_port: int = 6379,
+    ):
         """Initialize Redis compute worker."""
 
         # Initialize base worker
@@ -50,10 +52,7 @@ class RedisComputeWorker(ComputeWorker):
         self.redis_queue = None
 
         # Compute odometer for lifetime tracking
-        self.odometer = ComputeOdometer(
-            redis_host=redis_host,
-            redis_port=redis_port
-        )
+        self.odometer = ComputeOdometer(redis_host=redis_host, redis_port=redis_port)
 
         # Performance tracking
         self.tasks_completed = 0
@@ -62,7 +61,7 @@ class RedisComputeWorker(ComputeWorker):
 
         logger.info(f"🫀 Initialized Redis compute worker for machine {self.machine_id}")
 
-    def _detect_or_use_hardware_profile(self, profile_name: Optional[str]) -> HardwareProfile:
+    def _detect_or_use_hardware_profile(self, profile_name: str | None) -> HardwareProfile:
         """Detect or use provided hardware profile."""
         if profile_name:
             # Use provided profile name to create basic profile
@@ -73,10 +72,11 @@ class RedisComputeWorker(ComputeWorker):
 
     def _create_profile_from_name(self, profile_name: str) -> HardwareProfile:
         """Create hardware profile from profile name."""
-        import platform
-        import psutil
         import hashlib
+        import platform
         import socket
+
+        import psutil
 
         # Generate machine ID
         hostname = socket.gethostname()
@@ -107,7 +107,7 @@ class RedisComputeWorker(ComputeWorker):
             gpu_memory=gpu_memory,
             gpu_name=gpu_name,
             platform=platform.system(),
-            capabilities=capabilities
+            capabilities=capabilities,
         )
 
     def _get_hardware_type(self) -> str:
@@ -132,10 +132,11 @@ class RedisComputeWorker(ComputeWorker):
 
     def _detect_hardware_profile(self) -> HardwareProfile:
         """Auto-detect hardware capabilities."""
-        import platform
-        import psutil
-        import socket
         import hashlib
+        import platform
+        import socket
+
+        import psutil
 
         try:
             # Generate machine ID
@@ -154,6 +155,7 @@ class RedisComputeWorker(ComputeWorker):
 
             try:
                 import torch
+
                 if torch.cuda.is_available():
                     gpu_name = torch.cuda.get_device_name(0)
                     gpu_memory = torch.cuda.get_device_properties(0).total_memory
@@ -178,6 +180,7 @@ class RedisComputeWorker(ComputeWorker):
             if gpu_memory > 0:
                 try:
                     import torch
+
                     if torch.cuda.is_available():
                         capabilities.append("cuda")
                     elif torch.backends.mps.is_available():
@@ -192,7 +195,7 @@ class RedisComputeWorker(ComputeWorker):
                 gpu_memory=gpu_memory,
                 gpu_name=gpu_name,
                 platform=platform.system(),
-                capabilities=capabilities
+                capabilities=capabilities,
             )
 
         except Exception as e:
@@ -204,26 +207,26 @@ class RedisComputeWorker(ComputeWorker):
         try:
             # Connect to Redis
             self.redis_queue = RedisTaskQueue(
-                redis_host=self.redis_host,
-                redis_port=self.redis_port,
-                machine_id=self.machine_id
+                redis_host=self.redis_host, redis_port=self.redis_port, machine_id=self.machine_id
             )
 
             # Register machine capabilities
             self.redis_queue.register_machine(self.hardware_profile)
 
-            logger.info(f"✅ Connected to Redis and registered machine capabilities")
+            logger.info("✅ Connected to Redis and registered machine capabilities")
             logger.info(f"   Machine ID: {self.hardware_profile.machine_id}")
             logger.info(f"   CPU: {self.hardware_profile.cpu_cores} cores")
             logger.info(f"   Memory: {self.hardware_profile.total_memory / (1024**3):.1f} GB")
             if self.hardware_profile.gpu_memory > 0:
-                logger.info(f"   GPU: {self.hardware_profile.gpu_name} ({self.hardware_profile.gpu_memory / (1024**3):.1f} GB)")
+                logger.info(
+                    f"   GPU: {self.hardware_profile.gpu_name} ({self.hardware_profile.gpu_memory / (1024**3):.1f} GB)"
+                )
 
         except Exception as e:
             logger.error(f"❌ Failed to initialize Redis worker: {e}")
             raise
 
-    def get_next_task(self) -> Optional[Dict[str, Any]]:
+    def get_next_task(self) -> dict[str, Any] | None:
         """Get next task from Redis queue based on machine capabilities."""
         try:
             task = self.redis_queue.get_next_task(self.hardware_profile)
@@ -236,8 +239,15 @@ class RedisComputeWorker(ComputeWorker):
             logger.error(f"❌ Failed to get next task: {e}")
             return None
 
-    def complete_task(self, task_id: str, task_type: str, result: Dict[str, Any],
-                     cpu_hours: float = 0, gpu_hours: float = 0, expected_value: float = 0.0):
+    def complete_task(
+        self,
+        task_id: str,
+        task_type: str,
+        result: dict[str, Any],
+        cpu_hours: float = 0,
+        gpu_hours: float = 0,
+        expected_value: float = 0.0,
+    ):
         """Mark task as completed in Redis and record in odometer."""
         try:
             # Get hardware type for accurate normalization
@@ -250,7 +260,7 @@ class RedisComputeWorker(ComputeWorker):
                 cpu_hours=cpu_hours,
                 gpu_hours=gpu_hours,
                 expected_value=expected_value,
-                hardware_type=hardware_type
+                hardware_type=hardware_type,
             )
 
             # Complete in Redis
@@ -274,7 +284,7 @@ class RedisComputeWorker(ComputeWorker):
 
     def run(self):
         """Main worker loop with Redis task processing."""
-        logger.info(f"🚀 Starting Redis compute worker")
+        logger.info("🚀 Starting Redis compute worker")
 
         # Initialize Redis connections
         self.initialize()
@@ -308,7 +318,7 @@ class RedisComputeWorker(ComputeWorker):
         finally:
             self._cleanup()
 
-    def _process_redis_task(self, task: Dict[str, Any]):
+    def _process_redis_task(self, task: dict[str, Any]):
         """Process a task from Redis queue."""
         task_id = task["id"]
         task_name = task["name"]
@@ -327,7 +337,11 @@ class RedisComputeWorker(ComputeWorker):
             # Calculate compute hours
             elapsed_time = time.time() - start_time
             cpu_hours = elapsed_time / 3600
-            gpu_hours = cpu_hours if self.hardware_profile.gpu_memory > 0 and task.get("requires_gpu") else 0
+            gpu_hours = (
+                cpu_hours
+                if self.hardware_profile.gpu_memory > 0 and task.get("requires_gpu")
+                else 0
+            )
 
             # Complete task
             self.complete_task(task_id, task_type, result, cpu_hours, gpu_hours, expected_value)
@@ -337,20 +351,16 @@ class RedisComputeWorker(ComputeWorker):
             logger.error(f"❌ {error_message}")
             self.fail_task(task_id, error_message)
 
-    def _execute_task_by_type(self, task_type: str, config: Dict[str, Any]) -> Dict[str, Any]:
+    def _execute_task_by_type(self, task_type: str, config: dict[str, Any]) -> dict[str, Any]:
         """Execute task based on type with actual CPU-intensive work."""
         import time
-        import random
+
         import numpy as np
 
         start_time = time.time()
 
         # Scale work based on intensity and task type
-        intensity_multiplier = {
-            'low': 0.5,
-            'medium': 1.0,
-            'high': 2.0
-        }.get(self.intensity, 1.0)
+        intensity_multiplier = {"low": 0.5, "medium": 1.0, "high": 2.0}.get(self.intensity, 1.0)
 
         # Get base iterations from config
         base_iterations = config.get("iterations", 1000000)
@@ -386,7 +396,7 @@ class RedisComputeWorker(ComputeWorker):
             poly_features = np.zeros((size, 50 * 49 // 2))
             idx = 0
             for i in range(50):
-                for j in range(i+1, 50):
+                for j in range(i + 1, 50):
                     poly_features[:, idx] = data[:, i] * data[:, j]
                     idx += 1
 
@@ -395,7 +405,9 @@ class RedisComputeWorker(ComputeWorker):
 
             results["features_created"] = poly_features.shape[1]
             results["samples_processed"] = size
-            results["max_correlation"] = float(np.max(np.abs(corr_matrix[~np.eye(corr_matrix.shape[0], dtype=bool)])))
+            results["max_correlation"] = float(
+                np.max(np.abs(corr_matrix[~np.eye(corr_matrix.shape[0], dtype=bool)]))
+            )
 
         elif task_type == "matrix_computation":
             # Heavy linear algebra
@@ -427,8 +439,8 @@ class RedisComputeWorker(ComputeWorker):
                 # Compute gradient
                 grad = np.zeros_like(x)
                 for i in range(len(x) - 1):
-                    grad[i] += -400 * x[i] * (x[i+1] - x[i]**2) - 2 * (1 - x[i])
-                    grad[i+1] += 200 * (x[i+1] - x[i]**2)
+                    grad[i] += -400 * x[i] * (x[i + 1] - x[i] ** 2) - 2 * (1 - x[i])
+                    grad[i + 1] += 200 * (x[i + 1] - x[i] ** 2)
 
                 # Update
                 x -= learning_rate * grad
@@ -466,7 +478,7 @@ class RedisComputeWorker(ComputeWorker):
             "execution_time": execution_time,
             "machine_id": self.hardware_profile.machine_id,
             "intensity": self.intensity,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     def _update_heartbeat(self):
@@ -486,13 +498,15 @@ class RedisComputeWorker(ComputeWorker):
 
         # Print final statistics
         elapsed_time = datetime.utcnow() - self.start_time
-        logger.info(f"📊 Worker Statistics:")
+        logger.info("📊 Worker Statistics:")
         logger.info(f"   Runtime: {elapsed_time}")
         logger.info(f"   Tasks Completed: {self.tasks_completed}")
         logger.info(f"   Tasks Failed: {self.tasks_failed}")
-        logger.info(f"   Success Rate: {self.tasks_completed / max(self.tasks_completed + self.tasks_failed, 1) * 100:.1f}%")
+        logger.info(
+            f"   Success Rate: {self.tasks_completed / max(self.tasks_completed + self.tasks_failed, 1) * 100:.1f}%"
+        )
 
-    def get_worker_status(self) -> Dict[str, Any]:
+    def get_worker_status(self) -> dict[str, Any]:
         """Get current worker status."""
         elapsed_time = datetime.utcnow() - self.start_time
 
@@ -503,15 +517,16 @@ class RedisComputeWorker(ComputeWorker):
                 "total_memory_gb": self.hardware_profile.total_memory / (1024**3),
                 "gpu_memory_gb": self.hardware_profile.gpu_memory / (1024**3),
                 "gpu_name": self.hardware_profile.gpu_name,
-                "platform": self.hardware_profile.platform
+                "platform": self.hardware_profile.platform,
             },
             "performance": {
                 "tasks_completed": self.tasks_completed,
                 "tasks_failed": self.tasks_failed,
-                "success_rate": self.tasks_completed / max(self.tasks_completed + self.tasks_failed, 1),
-                "runtime_hours": elapsed_time.total_seconds() / 3600
+                "success_rate": self.tasks_completed
+                / max(self.tasks_completed + self.tasks_failed, 1),
+                "runtime_hours": elapsed_time.total_seconds() / 3600,
             },
-            "status": "active"
+            "status": "active",
         }
 
 
@@ -520,15 +535,14 @@ if __name__ == "__main__":
     print("🧪 Testing Redis Compute Worker")
 
     worker = RedisComputeWorker(
-        intensity="medium",
-        machine_id="test_machine",
-        hardware_profile="gpu_standard"
+        intensity="medium", machine_id="test_machine", hardware_profile="gpu_standard"
     )
 
     print(f"Worker Status: {worker.get_worker_status()}")
 
     # Short test run
     import threading
+
     worker_thread = threading.Thread(target=worker.run)
     worker_thread.daemon = True
     worker_thread.start()

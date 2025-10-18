@@ -17,7 +17,6 @@ import os
 from pathlib import Path
 
 import pandas as pd
-import numpy as np
 from scipy import stats
 from sqlalchemy import create_engine
 
@@ -97,7 +96,9 @@ def main():
 
     # Compute home advantage metrics
     df_outdoor["home_won"] = (df_outdoor["home_score"] > df_outdoor["away_score"]).astype(int)
-    df_outdoor["home_ats"] = (df_outdoor["home_margin"] + df_outdoor["spread_close"] > 0).astype(int)
+    df_outdoor["home_ats"] = (df_outdoor["home_margin"] + df_outdoor["spread_close"] > 0).astype(
+        int
+    )
 
     # Temperature extremes flags
     df_outdoor["is_extreme_cold"] = (df_outdoor["temp_c"] < 0).astype(int)
@@ -123,7 +124,13 @@ def main():
         )
         .round(3)
     )
-    climate_summary.columns = ["n_games", "home_win_rate", "home_ats_rate", "avg_temp_c", "avg_wind_kph"]
+    climate_summary.columns = [
+        "n_games",
+        "home_win_rate",
+        "home_ats_rate",
+        "avg_temp_c",
+        "avg_wind_kph",
+    ]
     print(climate_summary)
 
     # 2. Cold-weather stadium performance in extreme cold
@@ -194,8 +201,7 @@ def main():
     ]
 
     normal_matchup = df_outdoor[
-        (df_outdoor["home_climate"] == "cold")
-        & (df_outdoor["away_climate"] != "warm")
+        (df_outdoor["home_climate"] == "cold") & (df_outdoor["away_climate"] != "warm")
     ]
 
     if len(mismatch) > 0:
@@ -265,12 +271,16 @@ def main():
         "climate_summary": climate_summary.to_dict(),
         "cold_weather_edge": {
             "extreme_cold_games": int(len(cold_extreme)) if len(cold_extreme) > 0 else 0,
-            "extreme_cold_win_rate": float(cold_extreme["home_won"].mean()) if len(cold_extreme) > 0 else 0.0,
+            "extreme_cold_win_rate": (
+                float(cold_extreme["home_won"].mean()) if len(cold_extreme) > 0 else 0.0
+            ),
             "normal_win_rate": float(cold_normal["home_won"].mean()),
         },
         "warm_weather_edge": {
             "extreme_heat_games": int(len(warm_extreme)) if len(warm_extreme) > 0 else 0,
-            "extreme_heat_win_rate": float(warm_extreme["home_won"].mean()) if len(warm_extreme) > 0 else 0.0,
+            "extreme_heat_win_rate": (
+                float(warm_extreme["home_won"].mean()) if len(warm_extreme) > 0 else 0.0
+            ),
             "normal_win_rate": float(warm_normal["home_won"].mean()),
         },
         "climate_mismatch": {
@@ -288,11 +298,15 @@ def main():
     with open(out_dir / "stadium_weather_clustering_stats.json", "w") as f:
         json.dump(results, f, indent=2, default=str)
 
-    print(f"✅ Saved stadium clustering stats to {out_dir / 'stadium_weather_clustering_stats.json'}")
+    print(
+        f"✅ Saved stadium clustering stats to {out_dir / 'stadium_weather_clustering_stats.json'}"
+    )
 
     # Export team-specific cold weather table
     team_cold_perf.to_csv(out_dir / "team_cold_weather_performance.csv")
-    print(f"✅ Saved team cold weather performance to {out_dir / 'team_cold_weather_performance.csv'}")
+    print(
+        f"✅ Saved team cold weather performance to {out_dir / 'team_cold_weather_performance.csv'}"
+    )
 
     print("\n" + "=" * 80)
     print("SUMMARY")

@@ -25,7 +25,7 @@ The leakage audit consists of four complementary layers:
 
 The feature catalog organizes features into 11 groups based on source tables and temporal properties:
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering
 \caption{Feature Groups in Catalog}
 \label{tab:feature_groups}
@@ -93,7 +93,7 @@ validate_feature_list(safe_features)  # PASS
 
 Table~\ref{tab:feature_safety_matrix} presents the complete mapping from features to source tables to temporal cutoff mechanisms.
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering
 \caption{Feature → Source → Cutoff Safety Matrix (Partial)}
 \label{tab:feature_safety_matrix}
@@ -118,7 +118,7 @@ Table~\ref{tab:feature_safety_matrix} presents the complete mapping from feature
 
 The test suite (\texttt{tests/unit/test\_asof\_features.py}) covers the following leakage scenarios:
 
-\begin{table}[htbp]
+\begin{table}[!ht]
 \centering
 \caption{Temporal Leakage Unit Tests}
 \label{tab:leakage_tests}

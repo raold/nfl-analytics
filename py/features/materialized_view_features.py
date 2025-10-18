@@ -23,7 +23,6 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -273,26 +272,27 @@ ORDER BY ps.season, ps.week, ps.position, ps.player_id;
 # FEATURE ENGINEERING FUNCTIONS
 # ============================================================
 
-def fetch_game_features(conn: Connection, season_start: Optional[int] = None) -> pd.DataFrame:
+
+def fetch_game_features(conn: Connection, season_start: int | None = None) -> pd.DataFrame:
     """Fetch game-level features from materialized views."""
     df = pd.read_sql(SQL_GAME_FEATURES, conn)
 
     if season_start:
-        df = df[df['season'] >= season_start].copy()
+        df = df[df["season"] >= season_start].copy()
 
     # Convert timestamps
-    if 'kickoff' in df.columns:
-        df['kickoff'] = pd.to_datetime(df['kickoff'], errors='coerce')
+    if "kickoff" in df.columns:
+        df["kickoff"] = pd.to_datetime(df["kickoff"], errors="coerce")
 
     return df
 
 
-def fetch_player_features(conn: Connection, season_start: Optional[int] = None) -> pd.DataFrame:
+def fetch_player_features(conn: Connection, season_start: int | None = None) -> pd.DataFrame:
     """Fetch player-level features from materialized views."""
     df = pd.read_sql(SQL_PLAYER_FEATURES, conn)
 
     if season_start:
-        df = df[df['season'] >= season_start].copy()
+        df = df[df["season"] >= season_start].copy()
 
     return df
 
@@ -302,38 +302,38 @@ def compute_differentials(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # EPA differentials
-    df['epa_per_play_diff'] = df['home_epa_per_play'] - df['away_epa_per_play']
-    df['epa_per_play_l3_diff'] = df['home_epa_per_play_l3'] - df['away_epa_per_play_l3']
-    df['epa_per_play_l5_diff'] = df['home_epa_per_play_l5'] - df['away_epa_per_play_l5']
-    df['epa_per_play_l10_diff'] = df['home_epa_per_play_l10'] - df['away_epa_per_play_l10']
+    df["epa_per_play_diff"] = df["home_epa_per_play"] - df["away_epa_per_play"]
+    df["epa_per_play_l3_diff"] = df["home_epa_per_play_l3"] - df["away_epa_per_play_l3"]
+    df["epa_per_play_l5_diff"] = df["home_epa_per_play_l5"] - df["away_epa_per_play_l5"]
+    df["epa_per_play_l10_diff"] = df["home_epa_per_play_l10"] - df["away_epa_per_play_l10"]
 
     # Success rate differentials
-    df['success_rate_diff'] = df['home_success_rate'] - df['away_success_rate']
-    df['success_rate_l3_diff'] = df['home_success_rate_l3'] - df['away_success_rate_l3']
-    df['success_rate_l5_diff'] = df['home_success_rate_l5'] - df['away_success_rate_l5']
+    df["success_rate_diff"] = df["home_success_rate"] - df["away_success_rate"]
+    df["success_rate_l3_diff"] = df["home_success_rate_l3"] - df["away_success_rate_l3"]
+    df["success_rate_l5_diff"] = df["home_success_rate_l5"] - df["away_success_rate_l5"]
 
     # Points differentials
-    df['points_l3_diff'] = df['home_points_l3'] - df['away_points_l3']
-    df['points_l5_diff'] = df['home_points_l5'] - df['away_points_l5']
-    df['points_l10_diff'] = df['home_points_l10'] - df['away_points_l10']
+    df["points_l3_diff"] = df["home_points_l3"] - df["away_points_l3"]
+    df["points_l5_diff"] = df["home_points_l5"] - df["away_points_l5"]
+    df["points_l10_diff"] = df["home_points_l10"] - df["away_points_l10"]
 
     # Pass/rush EPA differentials
-    df['pass_epa_l5_diff'] = df['home_pass_epa_l5'] - df['away_pass_epa_l5']
-    df['rush_epa_l5_diff'] = df['home_rush_epa_l5'] - df['away_rush_epa_l5']
+    df["pass_epa_l5_diff"] = df["home_pass_epa_l5"] - df["away_pass_epa_l5"]
+    df["rush_epa_l5_diff"] = df["home_rush_epa_l5"] - df["away_rush_epa_l5"]
 
     # Win rate differential
-    with np.errstate(divide='ignore', invalid='ignore'):
-        df['home_win_pct'] = np.where(
-            (df['home_wins'] + df['home_losses']) > 0,
-            df['home_wins'] / (df['home_wins'] + df['home_losses']),
-            0.5
+    with np.errstate(divide="ignore", invalid="ignore"):
+        df["home_win_pct"] = np.where(
+            (df["home_wins"] + df["home_losses"]) > 0,
+            df["home_wins"] / (df["home_wins"] + df["home_losses"]),
+            0.5,
         )
-        df['away_win_pct'] = np.where(
-            (df['away_wins'] + df['away_losses']) > 0,
-            df['away_wins'] / (df['away_wins'] + df['away_losses']),
-            0.5
+        df["away_win_pct"] = np.where(
+            (df["away_wins"] + df["away_losses"]) > 0,
+            df["away_wins"] / (df["away_wins"] + df["away_losses"]),
+            0.5,
         )
-    df['win_pct_diff'] = df['home_win_pct'] - df['away_win_pct']
+    df["win_pct_diff"] = df["home_win_pct"] - df["away_win_pct"]
 
     return df
 
@@ -343,14 +343,14 @@ def add_target_variables(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # Binary outcomes
-    df['home_win'] = (df['home_margin'] > 0).astype(float)
-    df['home_cover'] = (df['home_margin'] + df['spread_close'] > 0).astype(float)
-    df['over_hit'] = ((df['home_score'] + df['away_score']) > df['total_close']).astype(float)
+    df["home_win"] = (df["home_margin"] > 0).astype(float)
+    df["home_cover"] = (df["home_margin"] + df["spread_close"] > 0).astype(float)
+    df["over_hit"] = ((df["home_score"] + df["away_score"]) > df["total_close"]).astype(float)
 
     # Continuous outcomes
-    df['actual_total'] = df['home_score'] + df['away_score']
-    df['cover_margin'] = df['home_margin'] + df['spread_close']
-    df['total_vs_line'] = df['actual_total'] - df['total_close']
+    df["actual_total"] = df["home_score"] + df["away_score"]
+    df["cover_margin"] = df["home_margin"] + df["spread_close"]
+    df["total_vs_line"] = df["actual_total"] - df["total_close"]
 
     return df
 
@@ -360,29 +360,35 @@ def validate_features(df: pd.DataFrame) -> None:
     print("\n=== Feature Validation ===")
 
     # Check for missing game_id
-    if df['game_id'].isna().any():
+    if df["game_id"].isna().any():
         raise ValueError("Found missing game_id values")
 
     # Check for duplicates
-    dup_count = df.duplicated(subset=['game_id']).sum()
+    dup_count = df.duplicated(subset=["game_id"]).sum()
     if dup_count > 0:
         print(f"WARNING: Found {dup_count} duplicate game_ids")
 
     # Check for missing values in key columns
-    key_cols = ['season', 'week', 'home_team', 'away_team', 'home_score', 'away_score']
+    key_cols = ["season", "week", "home_team", "away_team", "home_score", "away_score"]
     missing = df[key_cols].isna().sum()
     if missing.sum() > 0:
         print("WARNING: Missing values in key columns:")
         print(missing[missing > 0])
 
     # Check rolling stats coverage
-    rolling_cols = [c for c in df.columns if '_l3' in c or '_l5' in c or '_l10' in c]
+    rolling_cols = [c for c in df.columns if "_l3" in c or "_l5" in c or "_l10" in c]
     if rolling_cols:
         missing_rolling = df[rolling_cols].isna().sum()
-        print(f"\nRolling stats coverage:")
-        print(f"  - L3 features: {100 * (1 - missing_rolling.filter(like='_l3').mean() / len(df)):.1f}% populated")
-        print(f"  - L5 features: {100 * (1 - missing_rolling.filter(like='_l5').mean() / len(df)):.1f}% populated")
-        print(f"  - L10 features: {100 * (1 - missing_rolling.filter(like='_l10').mean() / len(df)):.1f}% populated")
+        print("\nRolling stats coverage:")
+        print(
+            f"  - L3 features: {100 * (1 - missing_rolling.filter(like='_l3').mean() / len(df)):.1f}% populated"
+        )
+        print(
+            f"  - L5 features: {100 * (1 - missing_rolling.filter(like='_l5').mean() / len(df)):.1f}% populated"
+        )
+        print(
+            f"  - L10 features: {100 * (1 - missing_rolling.filter(like='_l10').mean() / len(df)):.1f}% populated"
+        )
 
     print("\n[PASS] Validation complete")
 
@@ -392,34 +398,19 @@ def main():
     parser.add_argument(
         "--output",
         default="data/processed/features/mv_game_features.csv",
-        help="Output CSV path for game features"
+        help="Output CSV path for game features",
     )
     parser.add_argument(
         "--output-players",
         default="data/processed/features/mv_player_features.csv",
-        help="Output CSV path for player features"
+        help="Output CSV path for player features",
     )
     parser.add_argument(
-        "--season-start",
-        type=int,
-        default=2010,
-        help="First season to include (default: 2010)"
+        "--season-start", type=int, default=2010, help="First season to include (default: 2010)"
     )
-    parser.add_argument(
-        "--validate",
-        action="store_true",
-        help="Run validation checks"
-    )
-    parser.add_argument(
-        "--players-only",
-        action="store_true",
-        help="Only extract player features"
-    )
-    parser.add_argument(
-        "--games-only",
-        action="store_true",
-        help="Only extract game features"
-    )
+    parser.add_argument("--validate", action="store_true", help="Run validation checks")
+    parser.add_argument("--players-only", action="store_true", help="Only extract player features")
+    parser.add_argument("--games-only", action="store_true", help="Only extract game features")
     args = parser.parse_args()
 
     print("=== Materialized View Feature Extraction ===")
@@ -456,7 +447,9 @@ def main():
         print(f"\nWriting player features to {args.output_players}...")
         os.makedirs(os.path.dirname(args.output_players), exist_ok=True)
         player_features.to_csv(args.output_players, index=False)
-        print(f"[SUCCESS] Wrote {player_features.shape[0]} player-weeks, {player_features.shape[1]} columns")
+        print(
+            f"[SUCCESS] Wrote {player_features.shape[0]} player-weeks, {player_features.shape[1]} columns"
+        )
 
     conn.close()
     print("\n✅ Feature extraction complete!")

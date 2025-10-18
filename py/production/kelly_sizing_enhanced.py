@@ -11,12 +11,12 @@ This module extends traditional Kelly sizing with:
 Expected impact: Better risk management, 30% reduction in drawdowns
 """
 
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 import logging
-from scipy import stats, optimize
+from dataclasses import dataclass
+from datetime import datetime
+
+import numpy as np
+from scipy import optimize, stats
 from scipy.stats import norm
 
 logger = logging.getLogger(__name__)
@@ -25,13 +25,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BetOpportunity:
     """Enhanced bet opportunity with confidence metrics"""
+
     game_id: str
     side: str  # 'home', 'away', 'over', 'under'
     model_prob: float
     market_odds: float  # American odds
     edge: float
     confidence: float  # 0-1 confidence in edge estimate
-    correlation_group: Optional[str] = None  # For correlated bets
+    correlation_group: str | None = None  # For correlated bets
     timestamp: datetime = None
 
     @property
@@ -46,6 +47,7 @@ class BetOpportunity:
 @dataclass
 class PortfolioConstraints:
     """Risk constraints for portfolio optimization"""
+
     max_single_bet: float = 0.05  # Max 5% on single bet
     max_total_exposure: float = 0.25  # Max 25% total exposure
     max_correlation_group: float = 0.10  # Max 10% on correlated bets
@@ -98,9 +100,7 @@ class EdgeDecayFunction:
 
     @staticmethod
     def combined_decay(
-        edge: float,
-        confidence: float,
-        minutes_to_game: Optional[float] = None
+        edge: float, confidence: float, minutes_to_game: float | None = None
     ) -> float:
         """Apply both confidence and time decay"""
         decayed_edge = EdgeDecayFunction.confidence_decay(edge, confidence)
@@ -115,18 +115,12 @@ class CVaRCalculator:
     """Calculate Conditional Value at Risk for bet portfolios"""
 
     @staticmethod
-    def calculate_var(
-        returns: np.ndarray,
-        confidence_level: float = 0.95
-    ) -> float:
+    def calculate_var(returns: np.ndarray, confidence_level: float = 0.95) -> float:
         """Calculate Value at Risk at given confidence level"""
         return np.percentile(returns, (1 - confidence_level) * 100)
 
     @staticmethod
-    def calculate_cvar(
-        returns: np.ndarray,
-        confidence_level: float = 0.95
-    ) -> float:
+    def calculate_cvar(returns: np.ndarray, confidence_level: float = 0.95) -> float:
         """
         Calculate Conditional Value at Risk (Expected Shortfall).
 
@@ -137,10 +131,10 @@ class CVaRCalculator:
 
     @staticmethod
     def simulate_portfolio_returns(
-        bets: List[BetOpportunity],
+        bets: list[BetOpportunity],
         sizes: np.ndarray,
         n_simulations: int = 10000,
-        correlation_matrix: Optional[np.ndarray] = None
+        correlation_matrix: np.ndarray | None = None,
     ) -> np.ndarray:
         """
         Monte Carlo simulation of portfolio returns.
@@ -194,9 +188,9 @@ class EnhancedKellySizer:
     def __init__(
         self,
         kelly_multiplier: float = 0.25,
-        constraints: Optional[PortfolioConstraints] = None,
+        constraints: PortfolioConstraints | None = None,
         edge_decay: bool = True,
-        cvar_constraint: bool = True
+        cvar_constraint: bool = True,
     ):
         self.kelly_multiplier = kelly_multiplier
         self.constraints = constraints or PortfolioConstraints()
@@ -224,10 +218,10 @@ class EnhancedKellySizer:
 
     def optimize_portfolio(
         self,
-        bets: List[BetOpportunity],
+        bets: list[BetOpportunity],
         bankroll: float,
-        correlation_matrix: Optional[np.ndarray] = None
-    ) -> Dict:
+        correlation_matrix: np.ndarray | None = None,
+    ) -> dict:
         """
         Optimize bet sizing for portfolio of bets with CVaR constraint.
 
@@ -237,7 +231,7 @@ class EnhancedKellySizer:
         n_bets = len(bets)
 
         if n_bets == 0:
-            return {'sizes': [], 'expected_value': 0, 'cvar': 0}
+            return {"sizes": [], "expected_value": 0, "cvar": 0}
 
         # Calculate base Kelly sizes
         base_sizes = np.array([self.calculate_base_kelly(bet) for bet in bets])
@@ -255,9 +249,9 @@ class EnhancedKellySizer:
                 final_sizes *= self.constraints.max_total_exposure / final_sizes.sum()
 
             return {
-                'sizes': final_sizes,
-                'expected_value': self._calculate_ev(bets, final_sizes),
-                'cvar': None
+                "sizes": final_sizes,
+                "expected_value": self._calculate_ev(bets, final_sizes),
+                "cvar": None,
             }
 
         # With CVaR constraint, use optimization
@@ -282,18 +276,18 @@ class EnhancedKellySizer:
         # Set up constraints
         constraints = [
             # CVaR constraint
-            {'type': 'ineq', 'fun': cvar_constraint_fn},
-
+            {"type": "ineq", "fun": cvar_constraint_fn},
             # Total exposure constraint
-            {'type': 'ineq', 'fun': lambda x: self.constraints.max_total_exposure - x.sum()},
-
+            {"type": "ineq", "fun": lambda x: self.constraints.max_total_exposure - x.sum()},
             # Minimum bankroll reserve
-            {'type': 'ineq', 'fun': lambda x: 1.0 - x.sum() - self.constraints.min_bankroll_reserve}
+            {
+                "type": "ineq",
+                "fun": lambda x: 1.0 - x.sum() - self.constraints.min_bankroll_reserve,
+            },
         ]
 
         # Bounds for individual bets
-        bounds = [(0, min(base_sizes[i], self.constraints.max_single_bet))
-                  for i in range(n_bets)]
+        bounds = [(0, min(base_sizes[i], self.constraints.max_single_bet)) for i in range(n_bets)]
 
         # Initial guess: scaled base Kelly
         x0 = base_sizes * 0.5
@@ -303,10 +297,10 @@ class EnhancedKellySizer:
             result = optimize.minimize(
                 objective,
                 x0,
-                method='SLSQP',
+                method="SLSQP",
                 bounds=bounds,
                 constraints=constraints,
-                options={'maxiter': 100}
+                options={"maxiter": 100},
             )
 
             if result.success:
@@ -326,15 +320,15 @@ class EnhancedKellySizer:
         )
 
         return {
-            'sizes': final_sizes,
-            'amounts': final_sizes * bankroll,
-            'expected_value': self._calculate_ev(bets, final_sizes),
-            'cvar': CVaRCalculator.calculate_cvar(returns),
-            'var': CVaRCalculator.calculate_var(returns),
-            'sharpe': returns.mean() / returns.std() if returns.std() > 0 else 0
+            "sizes": final_sizes,
+            "amounts": final_sizes * bankroll,
+            "expected_value": self._calculate_ev(bets, final_sizes),
+            "cvar": CVaRCalculator.calculate_cvar(returns),
+            "var": CVaRCalculator.calculate_var(returns),
+            "sharpe": returns.mean() / returns.std() if returns.std() > 0 else 0,
         }
 
-    def _calculate_ev(self, bets: List[BetOpportunity], sizes: np.ndarray) -> float:
+    def _calculate_ev(self, bets: list[BetOpportunity], sizes: np.ndarray) -> float:
         """Calculate expected value of portfolio"""
         ev = 0
         for i, bet in enumerate(bets):
@@ -345,10 +339,7 @@ class EnhancedKellySizer:
         return ev
 
     def adjust_for_regime(
-        self,
-        base_size: float,
-        volatility_regime: str,
-        streak_info: Optional[Dict] = None
+        self, base_size: float, volatility_regime: str, streak_info: dict | None = None
     ) -> float:
         """
         Adjust bet sizing based on market regime.
@@ -364,27 +355,23 @@ class EnhancedKellySizer:
         size = base_size
 
         # Volatility adjustments
-        if volatility_regime == 'high':
+        if volatility_regime == "high":
             size *= 0.7  # Reduce size in high volatility
-        elif volatility_regime == 'low':
+        elif volatility_regime == "low":
             size *= 1.1  # Slightly increase in low volatility
 
         # Streak adjustments (anti-martingale)
         if streak_info:
-            if streak_info.get('winning_streak', 0) >= 3:
+            if streak_info.get("winning_streak", 0) >= 3:
                 # On winning streak, slightly increase
                 size *= 1.1
-            elif streak_info.get('losing_streak', 0) >= 3:
+            elif streak_info.get("losing_streak", 0) >= 3:
                 # On losing streak, reduce size
                 size *= 0.8
 
         return min(size, self.constraints.max_single_bet)
 
-    def generate_sizing_report(
-        self,
-        bets: List[BetOpportunity],
-        portfolio_result: Dict
-    ) -> str:
+    def generate_sizing_report(self, bets: list[BetOpportunity], portfolio_result: dict) -> str:
         """Generate detailed sizing report"""
         report = []
         report.append("=" * 80)
@@ -398,7 +385,7 @@ class EnhancedKellySizer:
         report.append(f"  Total exposure: {portfolio_result['sizes'].sum():.1%}")
         report.append(f"  Expected value: {portfolio_result['expected_value']:.3f}")
 
-        if portfolio_result.get('cvar') is not None:
+        if portfolio_result.get("cvar") is not None:
             report.append(f"  95% CVaR: {portfolio_result['cvar']:.3f}")
             report.append(f"  95% VaR: {portfolio_result['var']:.3f}")
             report.append(f"  Sharpe ratio: {portfolio_result.get('sharpe', 0):.3f}")
@@ -408,7 +395,7 @@ class EnhancedKellySizer:
         report.append("-" * 80)
 
         for i, bet in enumerate(bets):
-            if portfolio_result['sizes'][i] > 0:
+            if portfolio_result["sizes"][i] > 0:
                 report.append(f"\n{bet.game_id} - {bet.side}")
                 report.append(f"  Model prob: {bet.model_prob:.1%}")
                 report.append(f"  Market odds: {bet.market_odds:+d}")
@@ -417,7 +404,7 @@ class EnhancedKellySizer:
 
                 # Calculate base and final Kelly
                 base_kelly = self.calculate_base_kelly(bet)
-                final_size = portfolio_result['sizes'][i]
+                final_size = portfolio_result["sizes"][i]
 
                 report.append(f"  Base Kelly: {base_kelly:.3%}")
                 report.append(f"  Final size: {final_size:.3%}")
@@ -447,7 +434,7 @@ def demo_enhanced_kelly():
             model_prob=0.58,
             market_odds=-110,
             edge=0.035,
-            confidence=0.85
+            confidence=0.85,
         ),
         BetOpportunity(
             game_id="KC_vs_BUF",
@@ -456,7 +443,7 @@ def demo_enhanced_kelly():
             market_odds=-105,
             edge=0.028,
             confidence=0.75,
-            correlation_group="KC_game"
+            correlation_group="KC_game",
         ),
         BetOpportunity(
             game_id="SF_vs_DAL",
@@ -464,7 +451,7 @@ def demo_enhanced_kelly():
             model_prob=0.62,
             market_odds=+105,
             edge=0.065,
-            confidence=0.90
+            confidence=0.90,
         ),
         BetOpportunity(
             game_id="MIA_vs_NYJ",
@@ -472,16 +459,12 @@ def demo_enhanced_kelly():
             model_prob=0.56,
             market_odds=-115,
             edge=0.025,
-            confidence=0.70
-        )
+            confidence=0.70,
+        ),
     ]
 
     # Initialize enhanced Kelly sizer
-    sizer = EnhancedKellySizer(
-        kelly_multiplier=0.25,
-        edge_decay=True,
-        cvar_constraint=True
-    )
+    sizer = EnhancedKellySizer(kelly_multiplier=0.25, edge_decay=True, cvar_constraint=True)
 
     # Create correlation matrix (higher correlation for same game)
     n_bets = len(bets)
@@ -505,29 +488,30 @@ def demo_enhanced_kelly():
 
     # Without CVaR
     sizer_no_cvar = EnhancedKellySizer(
-        kelly_multiplier=0.25,
-        edge_decay=True,
-        cvar_constraint=False
+        kelly_multiplier=0.25, edge_decay=True, cvar_constraint=False
     )
     result_no_cvar = sizer_no_cvar.optimize_portfolio(bets, bankroll)
 
-    print(f"\nWithout CVaR constraint:")
+    print("\nWithout CVaR constraint:")
     print(f"  Total exposure: {result_no_cvar['sizes'].sum():.1%}")
     print(f"  Expected value: {result_no_cvar['expected_value']:.3f}")
 
-    print(f"\nWith CVaR constraint:")
+    print("\nWith CVaR constraint:")
     print(f"  Total exposure: {result['sizes'].sum():.1%}")
     print(f"  Expected value: {result['expected_value']:.3f}")
     print(f"  95% CVaR: {result['cvar']:.3f}")
 
-    print(f"\nReduction in exposure: {(result_no_cvar['sizes'].sum() - result['sizes'].sum()) / result_no_cvar['sizes'].sum():.1%}")
-    print(f"Improvement in worst-case scenario: {abs(result['cvar']):.1%} max loss vs unconstrained")
+    print(
+        f"\nReduction in exposure: {(result_no_cvar['sizes'].sum() - result['sizes'].sum()) / result_no_cvar['sizes'].sum():.1%}"
+    )
+    print(
+        f"Improvement in worst-case scenario: {abs(result['cvar']):.1%} max loss vs unconstrained"
+    )
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     demo_enhanced_kelly()

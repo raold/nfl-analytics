@@ -17,20 +17,17 @@ Expected impact: +1-2% ROI improvement through systematic alt line selection
 """
 
 import logging
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-import numpy as np
+import os
 
 # Import from existing score distributions module
 import sys
-import os
+from dataclasses import dataclass
+from datetime import datetime
+
+import numpy as np
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models.score_distributions import (
-    skellam_pmf_range,
-    reweight_key_masses,
-    cover_push_probs
-)
+from models.score_distributions import cover_push_probs, reweight_key_masses, skellam_pmf_range
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +35,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AltLine:
     """Alternative line with pricing"""
+
     line: float  # Spread or total value
     price: float  # American odds (e.g., -110, +150)
     book: str
@@ -60,6 +58,7 @@ class AltLine:
 @dataclass
 class EVOpportunity:
     """Identified EV+ alternative line"""
+
     line_type: str  # 'spread' or 'total'
     line: float
     side: str  # 'home', 'away', 'over', 'under'
@@ -77,16 +76,16 @@ class AltLinesOptimizer:
 
     # Key number masses for NFL (empirical from 2000-2023)
     KEY_NUMBER_TARGETS = {
-        3: 0.094,   # Field goal
-        6: 0.058,   # Touchdown minus XP
-        7: 0.068,   # Touchdown
+        3: 0.094,  # Field goal
+        6: 0.058,  # Touchdown minus XP
+        7: 0.068,  # Touchdown
         10: 0.052,  # Field goal + touchdown
         14: 0.039,  # Two touchdowns
         -3: 0.094,  # Symmetric
         -6: 0.058,
         -7: 0.068,
         -10: 0.052,
-        -14: 0.039
+        -14: 0.039,
     }
 
     def __init__(
@@ -94,7 +93,7 @@ class AltLinesOptimizer:
         min_edge: float = 0.03,  # 3% minimum edge
         kelly_multiplier: float = 0.25,  # Quarter Kelly
         max_exposure_pct: float = 0.10,  # Max 10% of bankroll per game
-        correlation_factor: float = 0.65  # Spread-total correlation
+        correlation_factor: float = 0.65,  # Spread-total correlation
     ):
         self.min_edge = min_edge
         self.kelly_multiplier = kelly_multiplier
@@ -102,16 +101,16 @@ class AltLinesOptimizer:
         self.correlation_factor = correlation_factor
 
         # Track opportunities for reporting
-        self.opportunities: List[EVOpportunity] = []
+        self.opportunities: list[EVOpportunity] = []
 
     def optimize_game(
         self,
         mu_home: float,  # Expected home score
         mu_away: float,  # Expected away score
-        spread_ladder: List[AltLine],
-        total_ladder: List[AltLine],
-        model_std: Optional[float] = None
-    ) -> List[EVOpportunity]:
+        spread_ladder: list[AltLine],
+        total_ladder: list[AltLine],
+        model_std: float | None = None,
+    ) -> list[EVOpportunity]:
         """
         Find all +EV alternative lines for a game.
 
@@ -138,9 +137,7 @@ class AltLinesOptimizer:
         opportunities.extend(spread_opps)
 
         # Optimize totals
-        total_opps = self._optimize_totals(
-            mu_home, mu_away, total_ladder, model_std
-        )
+        total_opps = self._optimize_totals(mu_home, mu_away, total_ladder, model_std)
         opportunities.extend(total_opps)
 
         # Joint optimization for correlated plays
@@ -160,11 +157,8 @@ class AltLinesOptimizer:
         return opportunities
 
     def _optimize_spreads(
-        self,
-        pmf: Dict[int, float],
-        ladder: List[AltLine],
-        model_std: Optional[float]
-    ) -> List[EVOpportunity]:
+        self, pmf: dict[int, float], ladder: list[AltLine], model_std: float | None
+    ) -> list[EVOpportunity]:
         """Find +EV alternative spread bets"""
         opportunities = []
 
@@ -189,32 +183,28 @@ class AltLinesOptimizer:
             kelly = self._calculate_kelly(effective_prob, alt_line.decimal_odds)
 
             # Confidence based on model uncertainty and line distance from main
-            confidence = self._assess_confidence(
-                abs(alt_line.line), model_std, edge
-            )
+            confidence = self._assess_confidence(abs(alt_line.line), model_std, edge)
 
-            opportunities.append(EVOpportunity(
-                line_type='spread',
-                line=alt_line.line,
-                side='home' if alt_line.line < 0 else 'away',
-                model_prob=effective_prob,
-                market_price=alt_line.price,
-                edge=edge,
-                ev=ev,
-                kelly_fraction=kelly * self.kelly_multiplier,
-                book=alt_line.book,
-                confidence=confidence
-            ))
+            opportunities.append(
+                EVOpportunity(
+                    line_type="spread",
+                    line=alt_line.line,
+                    side="home" if alt_line.line < 0 else "away",
+                    model_prob=effective_prob,
+                    market_price=alt_line.price,
+                    edge=edge,
+                    ev=ev,
+                    kelly_fraction=kelly * self.kelly_multiplier,
+                    book=alt_line.book,
+                    confidence=confidence,
+                )
+            )
 
         return opportunities
 
     def _optimize_totals(
-        self,
-        mu_home: float,
-        mu_away: float,
-        ladder: List[AltLine],
-        model_std: Optional[float]
-    ) -> List[EVOpportunity]:
+        self, mu_home: float, mu_away: float, ladder: list[AltLine], model_std: float | None
+    ) -> list[EVOpportunity]:
         """Find +EV alternative total bets"""
         opportunities = []
 
@@ -230,6 +220,7 @@ class AltLinesOptimizer:
             # Calculate over probability using normal approximation
             # (More accurate would use convolution of Poissons)
             from scipy import stats
+
             z_score = (alt_line.line - mu_total) / std_total
             over_prob = 1 - stats.norm.cdf(z_score)
 
@@ -237,14 +228,14 @@ class AltLinesOptimizer:
             implied_prob = alt_line.implied_prob
 
             # Determine if this is over or under line
-            is_over = 'o' in alt_line.book.lower() or 'over' in alt_line.book.lower()
+            is_over = "o" in alt_line.book.lower() or "over" in alt_line.book.lower()
 
             if is_over:
                 model_prob = over_prob
-                side = 'over'
+                side = "over"
             else:
                 model_prob = 1 - over_prob
-                side = 'under'
+                side = "under"
 
             edge = model_prob - implied_prob
 
@@ -258,31 +249,28 @@ class AltLinesOptimizer:
             kelly = self._calculate_kelly(model_prob, alt_line.decimal_odds)
 
             # Confidence assessment
-            confidence = self._assess_confidence(
-                abs(alt_line.line - mu_total), model_std, edge
-            )
+            confidence = self._assess_confidence(abs(alt_line.line - mu_total), model_std, edge)
 
-            opportunities.append(EVOpportunity(
-                line_type='total',
-                line=alt_line.line,
-                side=side,
-                model_prob=model_prob,
-                market_price=alt_line.price,
-                edge=edge,
-                ev=ev,
-                kelly_fraction=kelly * self.kelly_multiplier,
-                book=alt_line.book,
-                confidence=confidence
-            ))
+            opportunities.append(
+                EVOpportunity(
+                    line_type="total",
+                    line=alt_line.line,
+                    side=side,
+                    model_prob=model_prob,
+                    market_price=alt_line.price,
+                    edge=edge,
+                    ev=ev,
+                    kelly_fraction=kelly * self.kelly_multiplier,
+                    book=alt_line.book,
+                    confidence=confidence,
+                )
+            )
 
         return opportunities
 
     def _optimize_joint(
-        self,
-        best_spread: EVOpportunity,
-        best_total: EVOpportunity,
-        correlation: float
-    ) -> List[EVOpportunity]:
+        self, best_spread: EVOpportunity, best_total: EVOpportunity, correlation: float
+    ) -> list[EVOpportunity]:
         """
         Optimize correlated spread/total plays.
 
@@ -296,18 +284,21 @@ class AltLinesOptimizer:
         # P(A and B) = P(A) * P(B) + correlation_adjustment
 
         # Positive correlations (same direction)
-        if (best_spread.side == 'home' and best_total.side == 'over') or \
-           (best_spread.side == 'away' and best_total.side == 'under'):
+        if (best_spread.side == "home" and best_total.side == "over") or (
+            best_spread.side == "away" and best_total.side == "under"
+        ):
 
             # Correlation increases joint probability
             correlation_adj = correlation * np.sqrt(
-                best_spread.model_prob * (1 - best_spread.model_prob) *
-                best_total.model_prob * (1 - best_total.model_prob)
+                best_spread.model_prob
+                * (1 - best_spread.model_prob)
+                * best_total.model_prob
+                * (1 - best_total.model_prob)
             )
 
             joint_prob = (
-                best_spread.model_prob * best_total.model_prob +
-                correlation_adj * 0.5  # Conservative adjustment
+                best_spread.model_prob * best_total.model_prob
+                + correlation_adj * 0.5  # Conservative adjustment
             )
 
             # Only consider if both legs have edge
@@ -331,12 +322,7 @@ class AltLinesOptimizer:
         kelly = (prob * b - q) / b
         return max(0, min(kelly, self.max_exposure_pct / self.kelly_multiplier))
 
-    def _assess_confidence(
-        self,
-        line_distance: float,
-        model_std: Optional[float],
-        edge: float
-    ) -> str:
+    def _assess_confidence(self, line_distance: float, model_std: float | None, edge: float) -> str:
         """Assess confidence level based on multiple factors"""
         score = 0
 
@@ -363,17 +349,15 @@ class AltLinesOptimizer:
 
         # Map score to confidence
         if score >= 6:
-            return 'high'
+            return "high"
         elif score >= 3:
-            return 'medium'
+            return "medium"
         else:
-            return 'low'
+            return "low"
 
     def find_arbitrage(
-        self,
-        ladder: List[AltLine],
-        tolerance: float = 0.001
-    ) -> Optional[Tuple[AltLine, AltLine]]:
+        self, ladder: list[AltLine], tolerance: float = 0.001
+    ) -> tuple[AltLine, AltLine] | None:
         """
         Find arbitrage opportunities in alternative lines.
 
@@ -394,7 +378,7 @@ class AltLinesOptimizer:
 
             # Check all pairs
             for i, alt1 in enumerate(alts):
-                for alt2 in alts[i+1:]:
+                for alt2 in alts[i + 1 :]:
                     # Check if opposite sides create arb
                     total_prob = alt1.implied_prob + alt2.implied_prob
 
@@ -407,7 +391,7 @@ class AltLinesOptimizer:
 
         return None
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """Generate summary report of opportunities"""
         if not self.opportunities:
             return {"status": "No opportunities found"}
@@ -417,17 +401,17 @@ class AltLinesOptimizer:
             "avg_edge": np.mean([o.edge for o in self.opportunities]),
             "max_edge": max(o.edge for o in self.opportunities),
             "by_confidence": {
-                "high": sum(1 for o in self.opportunities if o.confidence == 'high'),
-                "medium": sum(1 for o in self.opportunities if o.confidence == 'medium'),
-                "low": sum(1 for o in self.opportunities if o.confidence == 'low')
+                "high": sum(1 for o in self.opportunities if o.confidence == "high"),
+                "medium": sum(1 for o in self.opportunities if o.confidence == "medium"),
+                "low": sum(1 for o in self.opportunities if o.confidence == "low"),
             },
             "by_type": {
-                "spread": sum(1 for o in self.opportunities if o.line_type == 'spread'),
-                "total": sum(1 for o in self.opportunities if o.line_type == 'total')
+                "spread": sum(1 for o in self.opportunities if o.line_type == "spread"),
+                "total": sum(1 for o in self.opportunities if o.line_type == "total"),
             },
             "total_ev": sum(o.ev for o in self.opportunities),
             "recommended_exposure": sum(o.kelly_fraction for o in self.opportunities),
-            "top_5_edges": sorted(self.opportunities, key=lambda x: x.edge, reverse=True)[:5]
+            "top_5_edges": sorted(self.opportunities, key=lambda x: x.edge, reverse=True)[:5],
         }
 
         return report
@@ -482,7 +466,9 @@ def demo_alt_lines_optimization():
         for opp in opportunities[:5]:  # Top 5
             print(f"{opp.line_type.upper()} {opp.line} {opp.side}")
             print(f"  Price: {opp.market_price:+d} ({opp.book})")
-            print(f"  Model: {opp.model_prob:.1%} vs Market: {1/((100/abs(opp.market_price)) if opp.market_price < 0 else (opp.market_price/100 + 1)):.1%}")
+            print(
+                f"  Model: {opp.model_prob:.1%} vs Market: {1/((100/abs(opp.market_price)) if opp.market_price < 0 else (opp.market_price/100 + 1)):.1%}"
+            )
             print(f"  Edge: {opp.edge:.1%}, EV: {opp.ev:+.3f}u")
             print(f"  Kelly: {opp.kelly_fraction:.1%} of bankroll")
             print(f"  Confidence: {opp.confidence}\n")
@@ -493,14 +479,13 @@ def demo_alt_lines_optimization():
     report = optimizer.generate_report()
     print("\n=== SUMMARY REPORT ===")
     for key, value in report.items():
-        if key != 'top_5_edges':
+        if key != "top_5_edges":
             print(f"{key}: {value}")
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     demo_alt_lines_optimization()

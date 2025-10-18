@@ -6,12 +6,11 @@ Builds player-game and team-game panel datasets suitable for causal analysis.
 Includes treatment indicators, pre/post periods, and control group identification.
 """
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from typing import Dict, List, Tuple, Optional
 import logging
-from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,21 +26,18 @@ class PanelConstructor:
     - Player-season: Aggregated player performance by season
     """
 
-    def __init__(self, db_config: Optional[Dict] = None):
+    def __init__(self, db_config: dict | None = None):
         """Initialize panel constructor with database connection"""
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     def build_player_game_panel(
-        self,
-        start_season: int = 2020,
-        end_season: int = 2024,
-        position_groups: List[str] = None
+        self, start_season: int = 2020, end_season: int = 2024, position_groups: list[str] = None
     ) -> pd.DataFrame:
         """
         Build player-game panel dataset with rich features for causal analysis.
@@ -246,13 +242,13 @@ class PanelConstructor:
         # Add derived features useful for causal analysis
         df = self._add_causal_features(df)
 
-        logger.info(f"Built player-game panel: {len(df)} observations, {df['player_id'].nunique()} players")
+        logger.info(
+            f"Built player-game panel: {len(df)} observations, {df['player_id'].nunique()} players"
+        )
         return df
 
     def build_team_game_panel(
-        self,
-        start_season: int = 2020,
-        end_season: int = 2024
+        self, start_season: int = 2020, end_season: int = 2024
     ) -> pd.DataFrame:
         """
         Build team-game panel dataset for team-level causal analysis.
@@ -391,33 +387,31 @@ class PanelConstructor:
         """Add features useful for causal inference"""
 
         # Create treatment indicators
-        df['games_missed'] = df.groupby('player_id')['missed_prev_game'].cumsum()
+        df["games_missed"] = df.groupby("player_id")["missed_prev_game"].cumsum()
 
         # Identify "star" players (top performers who matter more)
-        season_stats = df.groupby(['player_id', 'season'])['stat_yards'].mean()
+        season_stats = df.groupby(["player_id", "season"])["stat_yards"].mean()
         top_percentile = season_stats.quantile(0.8)
-        star_players = season_stats[season_stats > top_percentile].index.get_level_values(0).unique()
-        df['is_star'] = df['player_id'].isin(star_players).astype(int)
+        star_players = (
+            season_stats[season_stats > top_percentile].index.get_level_values(0).unique()
+        )
+        df["is_star"] = df["player_id"].isin(star_players).astype(int)
 
         # Create pre/post treatment periods for injuries
-        df['post_injury'] = df.groupby('player_id')['injury_flag'].cumsum() > 0
+        df["post_injury"] = df.groupby("player_id")["injury_flag"].cumsum() > 0
 
         # Market expectation vs actual (useful for identifying shocks)
-        df['score_vs_spread'] = (df['team_score'] - df['opponent_score']) - df['spread_close']
-        df['total_vs_ou'] = (df['team_score'] + df['opponent_score']) - df['total_close']
+        df["score_vs_spread"] = (df["team_score"] - df["opponent_score"]) - df["spread_close"]
+        df["total_vs_ou"] = (df["team_score"] + df["opponent_score"]) - df["total_close"]
 
         # Experience/tenure features
-        df['is_rookie'] = df['career_game_number'] <= 16
-        df['is_veteran'] = df['career_game_number'] > 48
+        df["is_rookie"] = df["career_game_number"] <= 16
+        df["is_veteran"] = df["career_game_number"] > 48
 
         return df
 
     def create_matched_pairs(
-        self,
-        df: pd.DataFrame,
-        treatment_col: str,
-        match_cols: List[str],
-        caliper: float = 0.1
+        self, df: pd.DataFrame, treatment_col: str, match_cols: list[str], caliper: float = 0.1
     ) -> pd.DataFrame:
         """
         Create matched pairs for causal analysis using propensity score matching.
@@ -431,9 +425,9 @@ class PanelConstructor:
         Returns:
             DataFrame with matched pairs
         """
+        from scipy.spatial.distance import cdist
         from sklearn.linear_model import LogisticRegression
         from sklearn.preprocessing import StandardScaler
-        from scipy.spatial.distance import cdist
 
         # Prepare data
         X = df[match_cols].fillna(0)
@@ -447,7 +441,7 @@ class PanelConstructor:
         model.fit(X_scaled, y)
 
         propensity_scores = model.predict_proba(X_scaled)[:, 1]
-        df['propensity_score'] = propensity_scores
+        df["propensity_score"] = propensity_scores
 
         # Split into treatment and control
         treated = df[df[treatment_col] == 1].copy()
@@ -457,24 +451,26 @@ class PanelConstructor:
         matches = []
         for idx, treated_row in treated.iterrows():
             # Find controls within caliper
-            ps_dist = np.abs(control['propensity_score'] - treated_row['propensity_score'])
+            ps_dist = np.abs(control["propensity_score"] - treated_row["propensity_score"])
             valid_controls = control[ps_dist < caliper]
 
             if len(valid_controls) > 0:
                 # Find closest match
                 distances = cdist(
                     [treated_row[match_cols].fillna(0).values],
-                    valid_controls[match_cols].fillna(0).values
+                    valid_controls[match_cols].fillna(0).values,
                 )
                 best_match_idx = valid_controls.iloc[distances.argmin()].name
 
-                matches.append({
-                    'treated_id': treated_row['panel_id'],
-                    'control_id': control.loc[best_match_idx, 'panel_id'],
-                    'treated_idx': idx,
-                    'control_idx': best_match_idx,
-                    'ps_distance': ps_dist.loc[best_match_idx]
-                })
+                matches.append(
+                    {
+                        "treated_id": treated_row["panel_id"],
+                        "control_id": control.loc[best_match_idx, "panel_id"],
+                        "treated_idx": idx,
+                        "control_idx": best_match_idx,
+                        "ps_distance": ps_dist.loc[best_match_idx],
+                    }
+                )
 
         matches_df = pd.DataFrame(matches)
 
@@ -484,7 +480,7 @@ class PanelConstructor:
     def save_panel(self, df: pd.DataFrame, filename: str):
         """Save panel dataset to parquet for efficient storage"""
         output_path = f"data/panels/{filename}"
-        df.to_parquet(output_path, compression='snappy')
+        df.to_parquet(output_path, compression="snappy")
         logger.info(f"Saved panel to {output_path}")
 
     def load_panel(self, filename: str) -> pd.DataFrame:
@@ -501,9 +497,7 @@ def main():
     # Build player-game panel for RBs and WRs
     logger.info("Building player-game panel for skill positions...")
     player_panel = constructor.build_player_game_panel(
-        start_season=2020,
-        end_season=2024,
-        position_groups=['RB', 'WR', 'TE']
+        start_season=2020, end_season=2024, position_groups=["RB", "WR", "TE"]
     )
 
     logger.info(f"Panel shape: {player_panel.shape}")
@@ -511,9 +505,9 @@ def main():
 
     # Example: Create matched pairs for injury analysis
     injury_matches = constructor.create_matched_pairs(
-        player_panel[player_panel['is_star'] == 1],  # Only star players
-        treatment_col='injury_flag',
-        match_cols=['avg_yards_l3', 'season_avg_yards', 'team_win_pct_to_date', 'spread_close']
+        player_panel[player_panel["is_star"] == 1],  # Only star players
+        treatment_col="injury_flag",
+        match_cols=["avg_yards_l3", "season_avg_yards", "team_win_pct_to_date", "spread_close"],
     )
 
     logger.info(f"Created {len(injury_matches)} matched pairs for injury analysis")

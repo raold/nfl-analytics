@@ -16,13 +16,10 @@ Uncertainty sources:
 Expected impact: 20-30% reduction in losses on uncertain games
 """
 
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 import logging
-from scipy import stats
-from sklearn.ensemble import IsolationForest
+from dataclasses import dataclass
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +27,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class GameContext:
     """Contextual factors affecting game uncertainty"""
+
     game_id: str
     home_team: str
     away_team: str
@@ -44,9 +42,9 @@ class GameContext:
 
     # Weather conditions
     weather_impact: float  # 0=dome/perfect, 1=extreme conditions
-    temperature: Optional[float] = None
-    wind_speed: Optional[float] = None
-    precipitation: Optional[float] = None
+    temperature: float | None = None
+    wind_speed: float | None = None
+    precipitation: float | None = None
 
     # Situational factors
     divisional_game: bool = False
@@ -64,16 +62,17 @@ class GameContext:
 @dataclass
 class ModelUncertainty:
     """Model's prediction uncertainty"""
+
     game_id: str
 
     # Prediction intervals
     spread_mean: float
     spread_std: float
-    spread_confidence_interval: Tuple[float, float]  # 95% CI
+    spread_confidence_interval: tuple[float, float]  # 95% CI
 
     total_mean: float
     total_std: float
-    total_confidence_interval: Tuple[float, float]
+    total_confidence_interval: tuple[float, float]
 
     # Ensemble disagreement
     model_disagreement: float  # Std dev across models
@@ -89,6 +88,7 @@ class ModelUncertainty:
 @dataclass
 class MarketUncertainty:
     """Market-based uncertainty metrics"""
+
     game_id: str
 
     # Line movement
@@ -110,6 +110,7 @@ class MarketUncertainty:
 @dataclass
 class SegmentProfile:
     """Profile for an uncertainty segment"""
+
     name: str
     confidence_level: str  # 'high', 'medium', 'low'
 
@@ -135,8 +136,7 @@ class UncertaintyCalculator:
 
     @staticmethod
     def calculate_epistemic_uncertainty(
-        model: ModelUncertainty,
-        training_sample_size: int
+        model: ModelUncertainty, training_sample_size: int
     ) -> float:
         """
         Calculate model uncertainty from limited data.
@@ -161,18 +161,13 @@ class UncertaintyCalculator:
 
         # Weighted combination
         epistemic = (
-            0.3 * size_factor +
-            0.3 * disagreement_factor +
-            0.2 * ci_factor +
-            0.2 * stability_factor
+            0.3 * size_factor + 0.3 * disagreement_factor + 0.2 * ci_factor + 0.2 * stability_factor
         )
 
         return np.clip(epistemic, 0, 1)
 
     @staticmethod
-    def calculate_aleatoric_uncertainty(
-        context: GameContext
-    ) -> float:
+    def calculate_aleatoric_uncertainty(context: GameContext) -> float:
         """
         Calculate inherent randomness/unpredictability.
 
@@ -192,7 +187,7 @@ class UncertaintyCalculator:
             context.divisional_game,
             context.revenge_game,
             context.playoff_implications,
-            context.primetime
+            context.primetime,
         ]
         situational_factor = sum(situational_factors) / 8.0  # Normalize
 
@@ -204,19 +199,17 @@ class UncertaintyCalculator:
 
         # Weighted combination
         aleatoric = (
-            0.3 * weather_factor +
-            0.3 * injury_factor +
-            0.2 * situational_factor +
-            0.1 * rest_factor +
-            0.1 * travel_factor
+            0.3 * weather_factor
+            + 0.3 * injury_factor
+            + 0.2 * situational_factor
+            + 0.1 * rest_factor
+            + 0.1 * travel_factor
         )
 
         return np.clip(aleatoric, 0, 1)
 
     @staticmethod
-    def calculate_market_uncertainty(
-        market: MarketUncertainty
-    ) -> float:
+    def calculate_market_uncertainty(market: MarketUncertainty) -> float:
         """
         Calculate uncertainty from market signals.
 
@@ -241,11 +234,11 @@ class UncertaintyCalculator:
 
         # Weighted combination
         market_uncertainty = (
-            0.25 * movement_factor +
-            0.25 * dispersion_factor +
-            0.20 * divergence_factor +
-            0.15 * unclear_factor +
-            0.15 * volume_factor
+            0.25 * movement_factor
+            + 0.25 * dispersion_factor
+            + 0.20 * divergence_factor
+            + 0.15 * unclear_factor
+            + 0.15 * volume_factor
         )
 
         return np.clip(market_uncertainty, 0, 1)
@@ -255,7 +248,7 @@ class UncertaintyCalculator:
         epistemic: float,
         aleatoric: float,
         market: float,
-        weights: Optional[Tuple[float, float, float]] = None
+        weights: tuple[float, float, float] | None = None,
     ) -> float:
         """
         Combine all uncertainty sources into composite score.
@@ -272,11 +265,7 @@ class UncertaintyCalculator:
         if weights is None:
             weights = (0.4, 0.3, 0.3)  # Slightly favor model uncertainty
 
-        composite = (
-            weights[0] * epistemic +
-            weights[1] * aleatoric +
-            weights[2] * market
-        )
+        composite = weights[0] * epistemic + weights[1] * aleatoric + weights[2] * market
 
         return np.clip(composite, 0, 1)
 
@@ -286,30 +275,30 @@ class MatchupSegmenter:
 
     # Default segment profiles
     DEFAULT_SEGMENTS = {
-        'high_confidence': SegmentProfile(
-            name='High Confidence',
-            confidence_level='high',
+        "high_confidence": SegmentProfile(
+            name="High Confidence",
+            confidence_level="high",
             min_edge_required=0.025,  # 2.5% edge
             max_kelly_fraction=0.30,  # 30% Kelly
             max_bet_count=10,
             historical_roi=0.045,
             historical_win_rate=0.56,
-            avg_uncertainty_score=0.25
+            avg_uncertainty_score=0.25,
         ),
-        'medium_confidence': SegmentProfile(
-            name='Medium Confidence',
-            confidence_level='medium',
+        "medium_confidence": SegmentProfile(
+            name="Medium Confidence",
+            confidence_level="medium",
             min_edge_required=0.035,  # 3.5% edge
             max_kelly_fraction=0.20,  # 20% Kelly
             max_bet_count=5,
             historical_roi=0.015,
             historical_win_rate=0.53,
             avg_uncertainty_score=0.50,
-            prefer_totals=True  # Totals more stable
+            prefer_totals=True,  # Totals more stable
         ),
-        'low_confidence': SegmentProfile(
-            name='Low Confidence',
-            confidence_level='low',
+        "low_confidence": SegmentProfile(
+            name="Low Confidence",
+            confidence_level="low",
             min_edge_required=0.050,  # 5% edge required
             max_kelly_fraction=0.10,  # 10% Kelly max
             max_bet_count=2,
@@ -318,21 +307,21 @@ class MatchupSegmenter:
             avg_uncertainty_score=0.75,
             prefer_dogs=True,  # Dogs have more value in chaos
             avoid_favorites=True,
-            require_clv=True  # Must beat closing line
-        )
+            require_clv=True,  # Must beat closing line
+        ),
     }
 
-    def __init__(self, segments: Optional[Dict[str, SegmentProfile]] = None):
+    def __init__(self, segments: dict[str, SegmentProfile] | None = None):
         self.segments = segments or self.DEFAULT_SEGMENTS
-        self.game_segments: Dict[str, str] = {}  # game_id -> segment_name
+        self.game_segments: dict[str, str] = {}  # game_id -> segment_name
 
     def segment_game(
         self,
         game_id: str,
         model_uncertainty: ModelUncertainty,
         game_context: GameContext,
-        market_uncertainty: MarketUncertainty
-    ) -> Tuple[str, float, Dict]:
+        market_uncertainty: MarketUncertainty,
+    ) -> tuple[str, float, dict]:
         """
         Assign game to uncertainty segment.
 
@@ -341,17 +330,12 @@ class MatchupSegmenter:
         """
         # Calculate uncertainty components
         epistemic = UncertaintyCalculator.calculate_epistemic_uncertainty(
-            model_uncertainty,
-            training_sample_size=1000  # Placeholder
+            model_uncertainty, training_sample_size=1000  # Placeholder
         )
 
-        aleatoric = UncertaintyCalculator.calculate_aleatoric_uncertainty(
-            game_context
-        )
+        aleatoric = UncertaintyCalculator.calculate_aleatoric_uncertainty(game_context)
 
-        market = UncertaintyCalculator.calculate_market_uncertainty(
-            market_uncertainty
-        )
+        market = UncertaintyCalculator.calculate_market_uncertainty(market_uncertainty)
 
         # Composite score
         composite = UncertaintyCalculator.calculate_composite_uncertainty(
@@ -360,32 +344,29 @@ class MatchupSegmenter:
 
         # Assign to segment
         if composite < 0.33:
-            segment_name = 'high_confidence'
+            segment_name = "high_confidence"
         elif composite < 0.67:
-            segment_name = 'medium_confidence'
+            segment_name = "medium_confidence"
         else:
-            segment_name = 'low_confidence'
+            segment_name = "low_confidence"
 
         # Store assignment
         self.game_segments[game_id] = segment_name
 
         # Return details
         details = {
-            'epistemic_uncertainty': epistemic,
-            'aleatoric_uncertainty': aleatoric,
-            'market_uncertainty': market,
-            'composite_score': composite,
-            'segment': self.segments[segment_name]
+            "epistemic_uncertainty": epistemic,
+            "aleatoric_uncertainty": aleatoric,
+            "market_uncertainty": market,
+            "composite_score": composite,
+            "segment": self.segments[segment_name],
         }
 
         return segment_name, composite, details
 
     def adjust_bet_strategy(
-        self,
-        base_edge: float,
-        base_kelly: float,
-        segment_name: str
-    ) -> Tuple[bool, float, str]:
+        self, base_edge: float, base_kelly: float, segment_name: str
+    ) -> tuple[bool, float, str]:
         """
         Adjust betting strategy based on segment.
 
@@ -407,11 +388,11 @@ class MatchupSegmenter:
         adjusted_kelly = min(base_kelly, segment.max_kelly_fraction)
 
         # Further adjustments for low confidence
-        if segment_name == 'low_confidence':
+        if segment_name == "low_confidence":
             # Extra conservative in chaos
             adjusted_kelly *= 0.7
             reason = "Ultra-conservative sizing for high uncertainty"
-        elif segment_name == 'medium_confidence':
+        elif segment_name == "medium_confidence":
             # Moderate adjustment
             adjusted_kelly *= 0.85
             reason = "Moderate sizing for medium uncertainty"
@@ -482,9 +463,9 @@ def demo_uncertainty_segmentation():
     games = [
         # High confidence game
         {
-            'game_id': 'KC_vs_HOU',
-            'model': ModelUncertainty(
-                game_id='KC_vs_HOU',
+            "game_id": "KC_vs_HOU",
+            "model": ModelUncertainty(
+                game_id="KC_vs_HOU",
                 spread_mean=-10.5,
                 spread_std=2.1,
                 spread_confidence_interval=(-14.5, -6.5),
@@ -494,37 +475,36 @@ def demo_uncertainty_segmentation():
                 model_disagreement=1.8,
                 feature_stability=0.85,
                 similar_games_accuracy=0.58,
-                similar_games_count=150
+                similar_games_count=150,
             ),
-            'context': GameContext(
-                game_id='KC_vs_HOU',
-                home_team='KC',
-                away_team='HOU',
+            "context": GameContext(
+                game_id="KC_vs_HOU",
+                home_team="KC",
+                away_team="HOU",
                 home_injury_impact=0.1,
                 away_injury_impact=0.05,
                 home_rest_days=7,
                 away_rest_days=7,
                 weather_impact=0.0,  # Dome
                 divisional_game=False,
-                travel_distance=500
+                travel_distance=500,
             ),
-            'market': MarketUncertainty(
-                game_id='KC_vs_HOU',
+            "market": MarketUncertainty(
+                game_id="KC_vs_HOU",
                 spread_movement=0.5,
                 total_movement=1.0,
                 spread_dispersion=0.3,
                 total_dispersion=0.5,
                 sharp_public_divergence=0.1,
                 handle_ratio=1.2,
-                sharp_action_unclear=False
-            )
+                sharp_action_unclear=False,
+            ),
         },
-
         # Medium confidence game
         {
-            'game_id': 'BUF_at_MIA',
-            'model': ModelUncertainty(
-                game_id='BUF_at_MIA',
+            "game_id": "BUF_at_MIA",
+            "model": ModelUncertainty(
+                game_id="BUF_at_MIA",
                 spread_mean=-3.0,
                 spread_std=3.5,
                 spread_confidence_interval=(-9, 3),
@@ -534,12 +514,12 @@ def demo_uncertainty_segmentation():
                 model_disagreement=3.2,
                 feature_stability=0.65,
                 similar_games_accuracy=0.52,
-                similar_games_count=45
+                similar_games_count=45,
             ),
-            'context': GameContext(
-                game_id='BUF_at_MIA',
-                home_team='MIA',
-                away_team='BUF',
+            "context": GameContext(
+                game_id="BUF_at_MIA",
+                home_team="MIA",
+                away_team="BUF",
                 home_injury_impact=0.25,
                 away_injury_impact=0.15,
                 home_rest_days=7,
@@ -547,25 +527,24 @@ def demo_uncertainty_segmentation():
                 weather_impact=0.3,  # Hot weather
                 temperature=88,
                 divisional_game=True,
-                travel_distance=1200
+                travel_distance=1200,
             ),
-            'market': MarketUncertainty(
-                game_id='BUF_at_MIA',
+            "market": MarketUncertainty(
+                game_id="BUF_at_MIA",
                 spread_movement=2.5,
                 total_movement=3.0,
                 spread_dispersion=1.1,
                 total_dispersion=1.5,
                 sharp_public_divergence=0.35,
                 handle_ratio=0.9,
-                sharp_action_unclear=True
-            )
+                sharp_action_unclear=True,
+            ),
         },
-
         # Low confidence game
         {
-            'game_id': 'CHI_at_GB',
-            'model': ModelUncertainty(
-                game_id='CHI_at_GB',
+            "game_id": "CHI_at_GB",
+            "model": ModelUncertainty(
+                game_id="CHI_at_GB",
                 spread_mean=-1.5,
                 spread_std=5.2,
                 spread_confidence_interval=(-11, 8),
@@ -575,12 +554,12 @@ def demo_uncertainty_segmentation():
                 model_disagreement=4.5,
                 feature_stability=0.45,
                 similar_games_accuracy=0.48,
-                similar_games_count=12
+                similar_games_count=12,
             ),
-            'context': GameContext(
-                game_id='CHI_at_GB',
-                home_team='GB',
-                away_team='CHI',
+            "context": GameContext(
+                game_id="CHI_at_GB",
+                home_team="GB",
+                away_team="CHI",
                 home_injury_impact=0.4,  # Key injuries
                 away_injury_impact=0.35,
                 home_rest_days=4,  # Short week
@@ -590,19 +569,19 @@ def demo_uncertainty_segmentation():
                 wind_speed=25,
                 divisional_game=True,
                 revenge_game=True,
-                playoff_implications=True
+                playoff_implications=True,
             ),
-            'market': MarketUncertainty(
-                game_id='CHI_at_GB',
+            "market": MarketUncertainty(
+                game_id="CHI_at_GB",
                 spread_movement=4.0,
                 total_movement=5.5,
                 spread_dispersion=2.0,
                 total_dispersion=2.5,
                 sharp_public_divergence=0.6,
                 handle_ratio=0.6,
-                sharp_action_unclear=True
-            )
-        }
+                sharp_action_unclear=True,
+            ),
+        },
     ]
 
     # Create segmenter
@@ -615,10 +594,7 @@ def demo_uncertainty_segmentation():
 
     for game_data in games:
         segment_name, uncertainty_score, details = segmenter.segment_game(
-            game_data['game_id'],
-            game_data['model'],
-            game_data['context'],
-            game_data['market']
+            game_data["game_id"], game_data["model"], game_data["context"], game_data["market"]
         )
 
         print(f"\n{game_data['game_id']}:")
@@ -636,7 +612,7 @@ def demo_uncertainty_segmentation():
             base_edge, base_kelly, segment_name
         )
 
-        print(f"\n  Betting Strategy (4% edge, 25% Kelly base):")
+        print("\n  Betting Strategy (4% edge, 25% Kelly base):")
         print(f"    Should bet: {should_bet}")
         print(f"    Adjusted Kelly: {adjusted_kelly:.1%}")
         print(f"    Reason: {reason}")
@@ -649,8 +625,7 @@ def demo_uncertainty_segmentation():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     demo_uncertainty_segmentation()

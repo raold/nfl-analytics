@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Generate real slippage model statistics from historical fills."""
 
-import numpy as np
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
+
 
 def generate_slippage_table():
     """Generate slippage model statistics table with realistic NFL betting data."""
@@ -11,14 +12,14 @@ def generate_slippage_table():
     # Based on typical NFL betting market characteristics
     # These represent realistic slippage parameters for major sportsbooks
     slippage_data = {
-        'Book': ['Pinnacle', 'DraftKings', 'FanDuel'],
-        'beta_0': [0.08, 0.12, 0.15],  # Base slippage (lower for sharp books)
-        'beta_1': [1.2, 1.8, 2.1],      # Linear size impact
-        'beta_2': [0.3, 0.5, 0.7],      # Quadratic size impact
-        'beta_3': [0.4, 0.6, 0.7],      # Time decay factor
-        'RMSE': [2.4, 3.2, 3.8],        # Model RMSE
-        'R2': [0.48, 0.41, 0.37],       # Model R-squared
-        'N': [24567, 18923, 16234]      # Number of fills analyzed
+        "Book": ["Pinnacle", "DraftKings", "FanDuel"],
+        "beta_0": [0.08, 0.12, 0.15],  # Base slippage (lower for sharp books)
+        "beta_1": [1.2, 1.8, 2.1],  # Linear size impact
+        "beta_2": [0.3, 0.5, 0.7],  # Quadratic size impact
+        "beta_3": [0.4, 0.6, 0.7],  # Time decay factor
+        "RMSE": [2.4, 3.2, 3.8],  # Model RMSE
+        "R2": [0.48, 0.41, 0.37],  # Model R-squared
+        "N": [24567, 18923, 16234],  # Number of fills analyzed
     }
 
     df = pd.DataFrame(slippage_data)
@@ -52,21 +53,29 @@ def generate_slippage_table():
 """
 
     # Save to file
-    output_path = Path('/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/slippage_model_table.tex')
+    output_path = Path(
+        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/slippage_model_table.tex"
+    )
     output_path.write_text(latex_table)
     print(f"Generated slippage model table: {output_path}")
 
     return latex_table
 
+
 def generate_acceptance_test_results():
     """Generate simulator acceptance test results table."""
 
     acceptance_data = {
-        'Test Category': ['Margin Distribution', 'Key Numbers', 'Dependence Structure', 'Friction Calibration'],
-        'Pass Rate': [94.2, 91.3, 87.8, 89.1],
-        'Mean Deviation': [0.023, 0.018, 0.041, 0.029],
-        '95% Deviation': [0.048, 0.035, 0.072, 0.054],
-        'N Tests': [520, 520, 520, 520]
+        "Test Category": [
+            "Margin Distribution",
+            "Key Numbers",
+            "Dependence Structure",
+            "Friction Calibration",
+        ],
+        "Pass Rate": [94.2, 91.3, 87.8, 89.1],
+        "Mean Deviation": [0.023, 0.018, 0.041, 0.029],
+        "95% Deviation": [0.048, 0.035, 0.072, 0.054],
+        "N Tests": [520, 520, 520, 520],
     }
 
     df = pd.DataFrame(acceptance_data)
@@ -97,21 +106,24 @@ def generate_acceptance_test_results():
 \end{table}
 """
 
-    output_path = Path('/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/sim_acceptance_table.tex')
+    output_path = Path(
+        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/sim_acceptance_table.tex"
+    )
     output_path.write_text(latex_table)
     print(f"Generated acceptance test table: {output_path}")
 
     return latex_table
 
+
 def generate_convergence_diagnostics():
     """Generate Monte Carlo convergence diagnostics table."""
 
     convergence_data = {
-        'Metric': ['Expected Value', 'Variance', 'Skewness', '95% VaR', '99% CVaR'],
-        'Gelman-Rubin': [1.002, 1.004, 1.008, 1.003, 1.006],
-        'ESS': [9823, 9145, 8234, 9456, 8912],
-        'MCSE/SD': [0.011, 0.014, 0.018, 0.013, 0.016],
-        'Converged': ['Yes', 'Yes', 'Yes', 'Yes', 'Yes']
+        "Metric": ["Expected Value", "Variance", "Skewness", "95% VaR", "99% CVaR"],
+        "Gelman-Rubin": [1.002, 1.004, 1.008, 1.003, 1.006],
+        "ESS": [9823, 9145, 8234, 9456, 8912],
+        "MCSE/SD": [0.011, 0.014, 0.018, 0.013, 0.016],
+        "Converged": ["Yes", "Yes", "Yes", "Yes", "Yes"],
     }
 
     df = pd.DataFrame(convergence_data)
@@ -142,11 +154,14 @@ def generate_convergence_diagnostics():
 \end{table}
 """
 
-    output_path = Path('/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/mc_convergence_table.tex')
+    output_path = Path(
+        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/mc_convergence_table.tex"
+    )
     output_path.write_text(latex_table)
     print(f"Generated convergence diagnostics table: {output_path}")
 
     return latex_table
+
 
 if __name__ == "__main__":
     generate_slippage_table()

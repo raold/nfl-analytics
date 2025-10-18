@@ -6,14 +6,14 @@ Provides intelligent task routing between different hardware configurations
 """
 
 from .task_router import (
-    TaskRouter,
+    HardwareScore,
     TaskAffinity,
     TaskCharacteristics,
-    HardwareScore,
-    task_router,
+    TaskRouter,
     get_task_score,
-    should_defer_task,
     optimize_config,
+    should_defer_task,
+    task_router,
 )
 
 __all__ = [

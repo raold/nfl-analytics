@@ -10,22 +10,18 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 
 
-def load_sweep_results(results_path: Path) -> Dict:
+def load_sweep_results(results_path: Path) -> dict:
     """Load hyperparameter sweep results from JSON."""
     with open(results_path) as f:
         return json.load(f)
 
 
 def extract_grid_data(
-    results: Dict,
-    param1: str,
-    param2: str,
-    metric: str = "final_reward"
+    results: dict, param1: str, param2: str, metric: str = "final_reward"
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Extract 2D grid data for heatmap.
@@ -48,8 +44,12 @@ def extract_grid_data(
         raise ValueError("Unknown results format")
 
     # Extract unique parameter values
-    param1_vals = sorted(set(exp["params"][param1] for exp in experiments if param1 in exp["params"]))
-    param2_vals = sorted(set(exp["params"][param2] for exp in experiments if param2 in exp["params"]))
+    param1_vals = sorted(
+        set(exp["params"][param1] for exp in experiments if param1 in exp["params"])
+    )
+    param2_vals = sorted(
+        set(exp["params"][param2] for exp in experiments if param2 in exp["params"])
+    )
 
     # Build grid
     grid = np.full((len(param2_vals), len(param1_vals)), np.nan)
@@ -81,7 +81,7 @@ def plot_sensitivity_heatmap(
     param1: str = "learning_rate",
     param2: str = "entropy_coef",
     metric: str = "final_reward",
-    title: Optional[str] = None,
+    title: str | None = None,
 ) -> None:
     """
     Create hyperparameter sensitivity heatmap.
@@ -117,23 +117,20 @@ def plot_sensitivity_heatmap(
     # Create heatmap
     im = ax.imshow(
         grid,
-        aspect='auto',
-        origin='lower',
-        cmap='RdYlGn',
-        interpolation='nearest',
-        extent=[
-            param1_vals[0], param1_vals[-1],
-            param2_vals[0], param2_vals[-1]
-        ]
+        aspect="auto",
+        origin="lower",
+        cmap="RdYlGn",
+        interpolation="nearest",
+        extent=[param1_vals[0], param1_vals[-1], param2_vals[0], param2_vals[-1]],
     )
 
     # Add colorbar
     cbar = plt.colorbar(im, ax=ax)
-    cbar.set_label(metric.replace('_', ' ').title(), fontsize=10)
+    cbar.set_label(metric.replace("_", " ").title(), fontsize=10)
 
     # Set labels
-    ax.set_xlabel(param1.replace('_', ' ').title(), fontsize=11)
-    ax.set_ylabel(param2.replace('_', ' ').title(), fontsize=11)
+    ax.set_xlabel(param1.replace("_", " ").title(), fontsize=11)
+    ax.set_ylabel(param2.replace("_", " ").title(), fontsize=11)
 
     # Set title
     if title is None:
@@ -142,23 +139,25 @@ def plot_sensitivity_heatmap(
 
     # Apply log scale if needed
     if use_log_x:
-        ax.set_xscale('log')
+        ax.set_xscale("log")
     if use_log_y:
-        ax.set_yscale('log')
+        ax.set_yscale("log")
 
     # Add grid
-    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+    ax.grid(True, alpha=0.3, linestyle="--", linewidth=0.5)
 
     # Annotate cells with values
     for i in range(len(param2_vals)):
         for j in range(len(param1_vals)):
             if not np.isnan(grid[i, j]):
-                text = ax.text(
-                    param1_vals[j], param2_vals[i],
-                    f'{grid[i, j]:.3f}',
-                    ha='center', va='center',
+                ax.text(
+                    param1_vals[j],
+                    param2_vals[i],
+                    f"{grid[i, j]:.3f}",
+                    ha="center",
+                    va="center",
                     fontsize=8,
-                    color='black' if grid[i, j] > np.nanmean(grid) else 'white'
+                    color="black" if grid[i, j] > np.nanmean(grid) else "white",
                 )
 
     # Tight layout
@@ -166,7 +165,7 @@ def plot_sensitivity_heatmap(
 
     # Save
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
 
     print(f"✅ Saved sensitivity heatmap to: {output_path}")
@@ -176,9 +175,7 @@ def plot_sensitivity_heatmap(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Plot hyperparameter sensitivity heatmap"
-    )
+    parser = argparse.ArgumentParser(description="Plot hyperparameter sensitivity heatmap")
     parser.add_argument(
         "--results",
         type=Path,
@@ -217,7 +214,8 @@ def main():
     if not args.results.exists():
         print(f"ERROR: Results file not found: {args.results}")
         print("\nExpected JSON format:")
-        print("""
+        print(
+            """
 {
   "experiments": [
     {
@@ -237,7 +235,8 @@ OR
   },
   ...
 ]
-        """)
+        """
+        )
         return 1
 
     # Generate plot
@@ -254,6 +253,7 @@ OR
     except Exception as e:
         print(f"ERROR: Failed to generate plot: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

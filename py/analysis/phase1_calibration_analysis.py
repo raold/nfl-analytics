@@ -10,17 +10,17 @@ Date: October 2024
 """
 
 import json
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
-from pathlib import Path
-from typing import Dict, List
 
 # Set style
 sns.set_style("whitegrid")
-plt.rcParams['figure.figsize'] = (12, 8)
-plt.rcParams['font.size'] = 10
+plt.rcParams["figure.figsize"] = (12, 8)
+plt.rcParams["font.size"] = 10
 
 
 class Phase1CalibrationAnalyzer:
@@ -38,7 +38,7 @@ class Phase1CalibrationAnalyzer:
         for sigma in sigma_values:
             result_file = self.results_dir / f"prior_sensitivity_sigma{sigma:.1f}.json"
             if result_file.exists():
-                with open(result_file, 'r') as f:
+                with open(result_file) as f:
                     self.results[sigma] = json.load(f)
                 print(f"✓ Loaded results for sigma={sigma}")
             else:
@@ -49,24 +49,26 @@ class Phase1CalibrationAnalyzer:
         data = []
 
         for sigma, result in sorted(self.results.items()):
-            data.append({
-                'sigma': sigma,
-                'prior_std': result.get('prior_std', 0.5),
-                'hidden_dim': result.get('hidden_dim', 16),
-                'features': result.get('features', 'baseline_4'),
-                'mae': result['accuracy']['mae'],
-                'rmse': result['accuracy']['rmse'],
-                'coverage_90': result['calibration']['90%_coverage'] * 100,
-                'coverage_68': result['calibration']['68%_coverage'] * 100,
-                'target_90': 90.0,
-                'target_68': 68.0
-            })
+            data.append(
+                {
+                    "sigma": sigma,
+                    "prior_std": result.get("prior_std", 0.5),
+                    "hidden_dim": result.get("hidden_dim", 16),
+                    "features": result.get("features", "baseline_4"),
+                    "mae": result["accuracy"]["mae"],
+                    "rmse": result["accuracy"]["rmse"],
+                    "coverage_90": result["calibration"]["90%_coverage"] * 100,
+                    "coverage_68": result["calibration"]["68%_coverage"] * 100,
+                    "target_90": 90.0,
+                    "target_68": 68.0,
+                }
+            )
 
         df = pd.DataFrame(data)
 
         # Calculate deviations
-        df['coverage_90_error'] = df['coverage_90'] - df['target_90']
-        df['coverage_68_error'] = df['coverage_68'] - df['target_68']
+        df["coverage_90_error"] = df["coverage_90"] - df["target_90"]
+        df["coverage_68_error"] = df["coverage_68"] - df["target_68"]
 
         return df
 
@@ -74,22 +76,26 @@ class Phase1CalibrationAnalyzer:
         """Print comprehensive summary of Phase 1 results"""
         df = self.create_summary_table()
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("PHASE 1: BNN PRIOR SENSITIVITY ANALYSIS - COMPREHENSIVE SUMMARY")
-        print("="*80)
+        print("=" * 80)
 
         print("\n📊 RESULTS TABLE:")
         print(df.to_string(index=False, float_format=lambda x: f"{x:.2f}"))
 
         print("\n\n📈 KEY FINDINGS:")
-        print(f"  • Coverage Range (90% CI): {df['coverage_90'].min():.1f}% - {df['coverage_90'].max():.1f}%")
-        print(f"  • Coverage Range (68% CI): {df['coverage_68'].min():.1f}% - {df['coverage_68'].max():.1f}%")
+        print(
+            f"  • Coverage Range (90% CI): {df['coverage_90'].min():.1f}% - {df['coverage_90'].max():.1f}%"
+        )
+        print(
+            f"  • Coverage Range (68% CI): {df['coverage_68'].min():.1f}% - {df['coverage_68'].max():.1f}%"
+        )
         print(f"  • MAE Range: {df['mae'].min():.2f} - {df['mae'].max():.2f} yards")
         print(f"  • RMSE Range: {df['rmse'].min():.2f} - {df['rmse'].max():.2f} yards")
 
         print("\n\n⚠️  CALIBRATION ANALYSIS:")
-        avg_coverage_90 = df['coverage_90'].mean()
-        avg_coverage_68 = df['coverage_68'].mean()
+        avg_coverage_90 = df["coverage_90"].mean()
+        avg_coverage_68 = df["coverage_68"].mean()
 
         print(f"  • Average 90% Coverage: {avg_coverage_90:.1f}% (target: 90%)")
         print(f"  • Average 68% Coverage: {avg_coverage_68:.1f}% (target: 68%)")
@@ -102,8 +108,8 @@ class Phase1CalibrationAnalyzer:
             print("  → Uncertainty estimates are unreliable")
 
         print("\n\n🔍 PRIOR SENSITIVITY:")
-        coverage_std = df['coverage_90'].std()
-        mae_std = df['mae'].std()
+        coverage_std = df["coverage_90"].std()
+        mae_std = df["mae"].std()
 
         print(f"  • Coverage Std Dev: {coverage_std:.2f} percentage points")
         print(f"  • MAE Std Dev: {mae_std:.3f} yards")
@@ -131,46 +137,50 @@ class Phase1CalibrationAnalyzer:
         df = self.create_summary_table()
 
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-        fig.suptitle('Phase 1: BNN Prior Sensitivity Analysis', fontsize=16, fontweight='bold')
+        fig.suptitle("Phase 1: BNN Prior Sensitivity Analysis", fontsize=16, fontweight="bold")
 
         # Plot 1: Coverage vs Sigma
         ax = axes[0, 0]
-        ax.plot(df['sigma'], df['coverage_90'], 'o-', label='90% CI Coverage', linewidth=2, markersize=8)
-        ax.plot(df['sigma'], df['coverage_68'], 's-', label='68% CI Coverage', linewidth=2, markersize=8)
-        ax.axhline(y=90, color='red', linestyle='--', alpha=0.5, label='Target 90%')
-        ax.axhline(y=68, color='orange', linestyle='--', alpha=0.5, label='Target 68%')
-        ax.set_xlabel('Noise Prior (σ)', fontweight='bold')
-        ax.set_ylabel('Coverage (%)', fontweight='bold')
-        ax.set_title('Calibration vs Prior Strength')
+        ax.plot(
+            df["sigma"], df["coverage_90"], "o-", label="90% CI Coverage", linewidth=2, markersize=8
+        )
+        ax.plot(
+            df["sigma"], df["coverage_68"], "s-", label="68% CI Coverage", linewidth=2, markersize=8
+        )
+        ax.axhline(y=90, color="red", linestyle="--", alpha=0.5, label="Target 90%")
+        ax.axhline(y=68, color="orange", linestyle="--", alpha=0.5, label="Target 68%")
+        ax.set_xlabel("Noise Prior (σ)", fontweight="bold")
+        ax.set_ylabel("Coverage (%)", fontweight="bold")
+        ax.set_title("Calibration vs Prior Strength")
         ax.legend()
         ax.grid(True, alpha=0.3)
 
         # Plot 2: MAE vs Sigma
         ax = axes[0, 1]
-        ax.plot(df['sigma'], df['mae'], 'o-', color='green', linewidth=2, markersize=8)
-        ax.set_xlabel('Noise Prior (σ)', fontweight='bold')
-        ax.set_ylabel('MAE (yards)', fontweight='bold')
-        ax.set_title('Prediction Accuracy vs Prior Strength')
+        ax.plot(df["sigma"], df["mae"], "o-", color="green", linewidth=2, markersize=8)
+        ax.set_xlabel("Noise Prior (σ)", fontweight="bold")
+        ax.set_ylabel("MAE (yards)", fontweight="bold")
+        ax.set_title("Prediction Accuracy vs Prior Strength")
         ax.grid(True, alpha=0.3)
 
         # Plot 3: Coverage Error
         ax = axes[1, 0]
         x = np.arange(len(df))
         width = 0.35
-        ax.bar(x - width/2, df['coverage_90_error'], width, label='90% CI Error', alpha=0.8)
-        ax.bar(x + width/2, df['coverage_68_error'], width, label='68% CI Error', alpha=0.8)
-        ax.axhline(y=0, color='black', linestyle='-', linewidth=1)
-        ax.set_xlabel('Noise Prior (σ)', fontweight='bold')
-        ax.set_ylabel('Coverage Error (pp)', fontweight='bold')
-        ax.set_title('Calibration Error (Negative = Under-calibrated)')
+        ax.bar(x - width / 2, df["coverage_90_error"], width, label="90% CI Error", alpha=0.8)
+        ax.bar(x + width / 2, df["coverage_68_error"], width, label="68% CI Error", alpha=0.8)
+        ax.axhline(y=0, color="black", linestyle="-", linewidth=1)
+        ax.set_xlabel("Noise Prior (σ)", fontweight="bold")
+        ax.set_ylabel("Coverage Error (pp)", fontweight="bold")
+        ax.set_title("Calibration Error (Negative = Under-calibrated)")
         ax.set_xticks(x)
-        ax.set_xticklabels([f"{s:.1f}" for s in df['sigma']])
+        ax.set_xticklabels([f"{s:.1f}" for s in df["sigma"]])
         ax.legend()
-        ax.grid(True, alpha=0.3, axis='y')
+        ax.grid(True, alpha=0.3, axis="y")
 
         # Plot 4: Summary Stats
         ax = axes[1, 1]
-        ax.axis('off')
+        ax.axis("off")
 
         summary_text = f"""
         PHASE 1 SUMMARY (n={len(df)} models)
@@ -197,11 +207,18 @@ class Phase1CalibrationAnalyzer:
         → Architectural fix needed (Phase 2)
         """
 
-        ax.text(0.1, 0.5, summary_text, fontsize=10, family='monospace',
-                verticalalignment='center', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+        ax.text(
+            0.1,
+            0.5,
+            summary_text,
+            fontsize=10,
+            family="monospace",
+            verticalalignment="center",
+            bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.3),
+        )
 
         plt.tight_layout()
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
         print(f"\n✓ Visualization saved to: {output_path}")
 
         return fig
@@ -244,7 +261,7 @@ $\sigma$ & MAE (yards) & RMSE (yards) & 90\% Coverage & 68\% Coverage & Error (p
 """
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(latex)
 
         print(f"✓ LaTeX table saved to: {output_path}")
@@ -257,9 +274,9 @@ def main():
     output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/phase1_summary")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print("="*80)
+    print("=" * 80)
     print("PHASE 1 CALIBRATION ANALYSIS")
-    print("="*80)
+    print("=" * 80)
 
     # Initialize analyzer
     analyzer = Phase1CalibrationAnalyzer(results_dir)
@@ -277,13 +294,15 @@ def main():
     analyzer.create_visualization(viz_path)
 
     # Save LaTeX table
-    latex_path = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex")
+    latex_path = Path(
+        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex"
+    )
     analyzer.save_latex_table(latex_path)
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("✓ PHASE 1 ANALYSIS COMPLETE")
-    print("="*80)
-    print(f"\nOutputs:")
+    print("=" * 80)
+    print("\nOutputs:")
     print(f"  • Summary: {csv_path}")
     print(f"  • Visualization: {viz_path}")
     print(f"  • LaTeX table: {latex_path}")

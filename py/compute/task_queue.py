@@ -60,8 +60,10 @@ class TaskQueue:
                 return operation(*args, **kwargs)
             except sqlite3.OperationalError as e:
                 if "database is locked" in str(e) and attempt < max_retries - 1:
-                    wait_time = (2 ** attempt) * 0.1  # Exponential backoff
-                    logger.warning(f"Database locked, retrying in {wait_time}s (attempt {attempt + 1}/{max_retries})")
+                    wait_time = (2**attempt) * 0.1  # Exponential backoff
+                    logger.warning(
+                        f"Database locked, retrying in {wait_time}s (attempt {attempt + 1}/{max_retries})"
+                    )
                     time.sleep(wait_time)
                     continue
                 else:
@@ -163,6 +165,7 @@ class TaskQueue:
 
     def get_next_task(self) -> dict[str, Any] | None:
         """Get the next available task based on priority and dependencies."""
+
         def _get_next_operation():
             # Find tasks that are ready to run (no pending dependencies)
             cursor = self.conn.execute(
@@ -205,6 +208,7 @@ class TaskQueue:
 
     def update_progress(self, task_id: str, progress: float, checkpoint_path: str | None = None):
         """Update task progress and optional checkpoint."""
+
         def _update_operation():
             self.conn.execute(
                 """
@@ -233,7 +237,13 @@ class TaskQueue:
                     progress = 1.0, cpu_hours = ?, gpu_hours = ?
                 WHERE id = ?
             """,
-                (TaskStatus.COMPLETED.value, json.dumps(serializable_result), cpu_hours, gpu_hours, task_id),
+                (
+                    TaskStatus.COMPLETED.value,
+                    json.dumps(serializable_result),
+                    cpu_hours,
+                    gpu_hours,
+                    task_id,
+                ),
             )
             self.conn.commit()
 
@@ -242,6 +252,7 @@ class TaskQueue:
 
     def fail_task(self, task_id: str, error_msg: str):
         """Mark task as failed with error message."""
+
         def _fail_operation():
             self.conn.execute(
                 """

@@ -458,7 +458,6 @@ class DatabaseConflictResolver:
 
                         # Check for unique constraints (simple approach)
                         has_id = "id" in columns
-                        has_created_at = "created_at" in columns
 
                         # Read conflict records
                         cursor = conflict_conn.execute(f"SELECT * FROM {table}")

@@ -32,7 +32,7 @@ def generate_table(log_path: Path, output_path: Path):
     eval_metrics = {
         "match_rate": 0.9846482705013603,
         "estimated_policy_reward": 0.017487371831935432,
-        "logged_avg_reward": 0.014117764309048653
+        "logged_avg_reward": 0.014117764309048653,
     }
 
     # Training config (inferred from training command)
@@ -44,11 +44,12 @@ def generate_table(log_path: Path, output_path: Path):
         "lr": 0.0001,
         "alpha": 0.3,
         "hidden_dims": [128, 64, 32],
-        "device": "cuda"
+        "device": "cuda",
     }
 
     # Build LaTeX table
-    latex = r"""\begin{table}[htbp]
+    latex = (
+        r"""\begin{table}[htbp]
 \centering
 \caption{Conservative Q-Learning (CQL) Training Performance}
 \label{tab:cql_performance}
@@ -58,29 +59,63 @@ def generate_table(log_path: Path, output_path: Path):
 \textbf{Metric} & \textbf{Value} \\
 \midrule
 \multicolumn{2}{l}{\textit{Training Configuration}} \\
-Dataset Size & """ + f"{config['dataset_size']:,}" + r""" games \\
-State Dimension & """ + str(config['state_dim']) + r""" \\
-Action Space & """ + str(config['n_actions']) + r""" actions \\
-Training Epochs & """ + f"{config['epochs']:,}" + r""" \\
-Learning Rate & """ + f"{config['lr']:.5f}" + r""" \\
-CQL Alpha & """ + f"{config['alpha']:.2f}" + r""" \\
-Hidden Layers & """ + str(config['hidden_dims']).replace('[', '').replace(']', '') + r""" \\
+Dataset Size & """
+        + f"{config['dataset_size']:,}"
+        + r""" games \\
+State Dimension & """
+        + str(config["state_dim"])
+        + r""" \\
+Action Space & """
+        + str(config["n_actions"])
+        + r""" actions \\
+Training Epochs & """
+        + f"{config['epochs']:,}"
+        + r""" \\
+Learning Rate & """
+        + f"{config['lr']:.5f}"
+        + r""" \\
+CQL Alpha & """
+        + f"{config['alpha']:.2f}"
+        + r""" \\
+Hidden Layers & """
+        + str(config["hidden_dims"]).replace("[", "").replace("]", "")
+        + r""" \\
 \midrule
 \multicolumn{2}{l}{\textit{Training Metrics (Final Epoch)}} \\
-Total Loss & """ + f"{final_epoch['loss']:.4f}" + r""" \\
-TD Error & """ + f"{final_epoch['td_loss']:.4f}" + r""" \\
-CQL Penalty & """ + f"{final_epoch['cql_loss']:.4f}" + r""" \\
-Mean Q-Value & """ + f"{final_epoch['q_mean']:.4f}" + r""" \\
+Total Loss & """
+        + f"{final_epoch['loss']:.4f}"
+        + r""" \\
+TD Error & """
+        + f"{final_epoch['td_loss']:.4f}"
+        + r""" \\
+CQL Penalty & """
+        + f"{final_epoch['cql_loss']:.4f}"
+        + r""" \\
+Mean Q-Value & """
+        + f"{final_epoch['q_mean']:.4f}"
+        + r""" \\
 \midrule
 \multicolumn{2}{l}{\textit{Evaluation Metrics}} \\
-Policy Match Rate & """ + f"{eval_metrics.get('match_rate', 0) * 100:.1f}" + r"""\% \\
-Estimated Policy Reward & """ + f"{eval_metrics.get('estimated_policy_reward', 0) * 100:.2f}" + r"""\% \\
-Logged Avg Reward & """ + f"{eval_metrics.get('logged_avg_reward', 0) * 100:.2f}" + r"""\% \\
-Policy Improvement & """ + f"{(eval_metrics.get('estimated_policy_reward', 0) - eval_metrics.get('logged_avg_reward', 0)) / eval_metrics.get('logged_avg_reward', 0.01) * 100:.1f}" + r"""\% \\
+Policy Match Rate & """
+        + f"{eval_metrics.get('match_rate', 0) * 100:.1f}"
+        + r"""\% \\
+Estimated Policy Reward & """
+        + f"{eval_metrics.get('estimated_policy_reward', 0) * 100:.2f}"
+        + r"""\% \\
+Logged Avg Reward & """
+        + f"{eval_metrics.get('logged_avg_reward', 0) * 100:.2f}"
+        + r"""\% \\
+Policy Improvement & """
+        + f"{(eval_metrics.get('estimated_policy_reward', 0) - eval_metrics.get('logged_avg_reward', 0)) / eval_metrics.get('logged_avg_reward', 0.01) * 100:.1f}"
+        + r"""\% \\
 \midrule
 \multicolumn{2}{l}{\textit{Hardware \& Runtime}} \\
-Device & """ + config.get('device', 'cuda') + r""" \\
-Training Time & """ + f"~{config['epochs'] // 222:.0f}" + r""" minutes\tnote{a} \\
+Device & """
+        + config.get("device", "cuda")
+        + r""" \\
+Training Time & """
+        + f"~{config['epochs'] // 222:.0f}"
+        + r""" minutes\tnote{a} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
@@ -91,17 +126,20 @@ Training Time & """ + f"~{config['epochs'] // 222:.0f}" + r""" minutes\tnote{a} 
 \end{threeparttable}
 \end{table}
 """
+    )
 
     # Write output
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         f.write(latex)
 
     print(f"[cql_performance_table] Generated LaTeX table -> {output_path}")
     print(f"  Dataset: {config['dataset_size']:,} games")
     print(f"  Match Rate: {eval_metrics.get('match_rate', 0) * 100:.1f}%")
     print(f"  Policy Reward: {eval_metrics.get('estimated_policy_reward', 0) * 100:.2f}%")
-    print(f"  Improvement: {(eval_metrics.get('estimated_policy_reward', 0) - eval_metrics.get('logged_avg_reward', 0)) / eval_metrics.get('logged_avg_reward', 0.01) * 100:.1f}%")
+    print(
+        f"  Improvement: {(eval_metrics.get('estimated_policy_reward', 0) - eval_metrics.get('logged_avg_reward', 0)) / eval_metrics.get('logged_avg_reward', 0.01) * 100:.1f}%"
+    )
 
 
 def main():

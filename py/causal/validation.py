@@ -15,19 +15,19 @@ Key validation approaches:
 4. Betting backtest: Compare ROI with/without causal adjustments
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional, Callable
-from scipy import stats
 import logging
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from causal.synthetic_control import SyntheticControl
 from causal.diff_in_diff import DifferenceInDifferences
+from causal.synthetic_control import SyntheticControl
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -42,12 +42,8 @@ class CausalValidator:
         self.validation_results = {}
 
     def placebo_test(
-        self,
-        estimator: Any,
-        df: pd.DataFrame,
-        n_placebos: int = 100,
-        random_seed: int = 42
-    ) -> Dict:
+        self, estimator: Any, df: pd.DataFrame, n_placebos: int = 100, random_seed: int = 42
+    ) -> dict:
         """
         Run placebo tests by randomly assigning treatment.
 
@@ -71,7 +67,7 @@ class CausalValidator:
         for i in range(n_placebos):
             # Randomly assign treatment
             df_placebo = df.copy()
-            df_placebo['placebo_treatment'] = np.random.binomial(1, 0.5, len(df))
+            df_placebo["placebo_treatment"] = np.random.binomial(1, 0.5, len(df))
 
             try:
                 # Re-run estimator with placebo treatment
@@ -80,11 +76,11 @@ class CausalValidator:
                     did_placebo.fit(
                         df=df_placebo,
                         outcome_col=estimator.model_.model.endog_names,
-                        treatment_col='placebo_treatment',
-                        unit_col='player_id' if 'player_id' in df.columns else 'team',
-                        time_col='week'
+                        treatment_col="placebo_treatment",
+                        unit_col="player_id" if "player_id" in df.columns else "team",
+                        time_col="week",
                     )
-                    placebo_estimates.append(did_placebo.treatment_effect_['estimate'])
+                    placebo_estimates.append(did_placebo.treatment_effect_["estimate"])
 
                 elif isinstance(estimator, SyntheticControl):
                     # SC placebo is handled internally
@@ -96,41 +92,43 @@ class CausalValidator:
 
         if len(placebo_estimates) == 0:
             logger.warning("No successful placebo iterations")
-            return {'success': False}
+            return {"success": False}
 
         placebo_estimates = np.array(placebo_estimates)
 
         # Compare to actual estimate
-        if hasattr(estimator, 'treatment_effect_'):
-            actual_estimate = estimator.treatment_effect_['estimate']
+        if hasattr(estimator, "treatment_effect_"):
+            actual_estimate = estimator.treatment_effect_["estimate"]
 
             # P-value: proportion of placebos as extreme as actual
             p_value = np.mean(np.abs(placebo_estimates) >= np.abs(actual_estimate))
 
             result = {
-                'success': True,
-                'actual_estimate': actual_estimate,
-                'placebo_mean': placebo_estimates.mean(),
-                'placebo_std': placebo_estimates.std(),
-                'placebo_estimates': placebo_estimates,
-                'p_value': p_value,
-                'passes': p_value < 0.05,
-                'interpretation': 'Significant' if p_value < 0.05 else 'Not significant'
+                "success": True,
+                "actual_estimate": actual_estimate,
+                "placebo_mean": placebo_estimates.mean(),
+                "placebo_std": placebo_estimates.std(),
+                "placebo_estimates": placebo_estimates,
+                "p_value": p_value,
+                "passes": p_value < 0.05,
+                "interpretation": "Significant" if p_value < 0.05 else "Not significant",
             }
 
-            logger.info(f"Placebo test: actual={actual_estimate:.2f}, "
-                       f"placebo_mean={result['placebo_mean']:.2f}, "
-                       f"p={p_value:.3f}")
+            logger.info(
+                f"Placebo test: actual={actual_estimate:.2f}, "
+                f"placebo_mean={result['placebo_mean']:.2f}, "
+                f"p={p_value:.3f}"
+            )
 
             return result
 
-        return {'success': False}
+        return {"success": False}
 
     def sensitivity_analysis(
         self,
         estimator: Any,
         df: pd.DataFrame,
-        confounder_strength_range: List[float] = [0.0, 0.1, 0.2, 0.3]
+        confounder_strength_range: list[float] = [0.0, 0.1, 0.2, 0.3],
     ) -> pd.DataFrame:
         """
         Sensitivity analysis: How sensitive are results to unmeasured confounding?
@@ -147,11 +145,11 @@ class CausalValidator:
         """
         logger.info("Running sensitivity analysis...")
 
-        if not hasattr(estimator, 'treatment_effect_'):
+        if not hasattr(estimator, "treatment_effect_"):
             logger.warning("Estimator must have treatment_effect_ attribute")
             return pd.DataFrame()
 
-        actual_effect = estimator.treatment_effect_['estimate']
+        actual_effect = estimator.treatment_effect_["estimate"]
 
         sensitivity_results = []
 
@@ -163,34 +161,37 @@ class CausalValidator:
 
             # Add synthetic confounder
             np.random.seed(int(strength * 1000))
-            df_sens['unmeasured_confounder'] = np.random.normal(0, 1, len(df))
+            df_sens["unmeasured_confounder"] = np.random.normal(0, 1, len(df))
 
             # Confounder affects treatment (selection bias)
-            if 'injury_treatment' in df.columns:
-                treatment_col = 'injury_treatment'
+            if "injury_treatment" in df.columns:
+                treatment_col = "injury_treatment"
             else:
-                treatment_col = 'treated'
+                treatment_col = "treated"
 
             # Adjust treatment based on confounder
-            treatment_prob = 1 / (1 + np.exp(-(
-                df_sens[treatment_col] * 2 +
-                df_sens['unmeasured_confounder'] * strength
-            )))
-
-            df_sens[f'{treatment_col}_adjusted'] = (
-                np.random.binomial(1, treatment_prob)
+            treatment_prob = 1 / (
+                1
+                + np.exp(
+                    -(df_sens[treatment_col] * 2 + df_sens["unmeasured_confounder"] * strength)
+                )
             )
+
+            df_sens[f"{treatment_col}_adjusted"] = np.random.binomial(1, treatment_prob)
 
             # Compute adjusted effect (placeholder)
             # In practice, would re-run estimator
             adjusted_effect = actual_effect * (1 - strength * 2)
 
-            sensitivity_results.append({
-                'confounder_strength': strength,
-                'adjusted_effect': adjusted_effect,
-                'effect_reduction': (actual_effect - adjusted_effect) / actual_effect * 100,
-                'still_significant': abs(adjusted_effect) > 2 * estimator.treatment_effect_['std_error']
-            })
+            sensitivity_results.append(
+                {
+                    "confounder_strength": strength,
+                    "adjusted_effect": adjusted_effect,
+                    "effect_reduction": (actual_effect - adjusted_effect) / actual_effect * 100,
+                    "still_significant": abs(adjusted_effect)
+                    > 2 * estimator.treatment_effect_["std_error"],
+                }
+            )
 
         sensitivity_df = pd.DataFrame(sensitivity_results)
 
@@ -206,8 +207,8 @@ class CausalValidator:
         treatment_col: str,
         unit_col: str,
         time_col: str,
-        n_folds: int = 5
-    ) -> Dict:
+        n_folds: int = 5,
+    ) -> dict:
         """
         Cross-validate treatment effect estimates.
 
@@ -253,7 +254,7 @@ class CausalValidator:
                         outcome_col=outcome_col,
                         treatment_col=treatment_col,
                         unit_col=unit_col,
-                        time_col=time_col
+                        time_col=time_col,
                     )
 
                 elif estimator_class == SyntheticControl:
@@ -267,7 +268,7 @@ class CausalValidator:
                             unit_col=unit_col,
                             time_col=time_col,
                             outcome_col=outcome_col,
-                            treatment_time=train_df[train_df[treatment_col] == 1][time_col].min()
+                            treatment_time=train_df[train_df[treatment_col] == 1][time_col].min(),
                         )
                     else:
                         continue
@@ -277,8 +278,8 @@ class CausalValidator:
                     continue
 
                 # Extract estimate
-                if hasattr(estimator, 'treatment_effect_'):
-                    fold_estimates.append(estimator.treatment_effect_['estimate'])
+                if hasattr(estimator, "treatment_effect_"):
+                    fold_estimates.append(estimator.treatment_effect_["estimate"])
 
             except Exception as e:
                 logger.debug(f"Fold {fold} failed: {e}")
@@ -286,25 +287,32 @@ class CausalValidator:
 
         if len(fold_estimates) == 0:
             logger.warning("No successful CV folds")
-            return {'success': False}
+            return {"success": False}
 
         fold_estimates = np.array(fold_estimates)
 
         # Compute CV statistics
         cv_results = {
-            'success': True,
-            'n_folds': n_folds,
-            'n_successful': len(fold_estimates),
-            'cv_mean': fold_estimates.mean(),
-            'cv_std': fold_estimates.std(),
-            'cv_estimates': fold_estimates,
-            'cv_coefficient_of_variation': fold_estimates.std() / abs(fold_estimates.mean()) if fold_estimates.mean() != 0 else np.inf,
-            'consistent': fold_estimates.std() / abs(fold_estimates.mean()) < 0.5  # Heuristic threshold
+            "success": True,
+            "n_folds": n_folds,
+            "n_successful": len(fold_estimates),
+            "cv_mean": fold_estimates.mean(),
+            "cv_std": fold_estimates.std(),
+            "cv_estimates": fold_estimates,
+            "cv_coefficient_of_variation": (
+                fold_estimates.std() / abs(fold_estimates.mean())
+                if fold_estimates.mean() != 0
+                else np.inf
+            ),
+            "consistent": fold_estimates.std() / abs(fold_estimates.mean())
+            < 0.5,  # Heuristic threshold
         }
 
-        logger.info(f"CV results: mean={cv_results['cv_mean']:.2f}, "
-                   f"std={cv_results['cv_std']:.2f}, "
-                   f"consistent={cv_results['consistent']}")
+        logger.info(
+            f"CV results: mean={cv_results['cv_mean']:.2f}, "
+            f"std={cv_results['cv_std']:.2f}, "
+            f"consistent={cv_results['consistent']}"
+        )
 
         return cv_results
 
@@ -323,8 +331,8 @@ class CausalBacktester:
         baseline_pred_col: str,
         causal_pred_col: str,
         actual_col: str,
-        market_line_col: Optional[str] = None
-    ) -> Dict:
+        market_line_col: str | None = None,
+    ) -> dict:
         """
         Backtest predictive accuracy: baseline vs causal-adjusted.
 
@@ -348,27 +356,29 @@ class CausalBacktester:
         baseline_mae = np.mean(np.abs(df_test[baseline_pred_col] - df_test[actual_col]))
         causal_mae = np.mean(np.abs(df_test[causal_pred_col] - df_test[actual_col]))
 
-        baseline_rmse = np.sqrt(np.mean((df_test[baseline_pred_col] - df_test[actual_col])**2))
-        causal_rmse = np.sqrt(np.mean((df_test[causal_pred_col] - df_test[actual_col])**2))
+        baseline_rmse = np.sqrt(np.mean((df_test[baseline_pred_col] - df_test[actual_col]) ** 2))
+        causal_rmse = np.sqrt(np.mean((df_test[causal_pred_col] - df_test[actual_col]) ** 2))
 
         # Improvement
         mae_improvement = (baseline_mae - causal_mae) / baseline_mae * 100
         rmse_improvement = (baseline_rmse - causal_rmse) / baseline_rmse * 100
 
         results = {
-            'n_predictions': len(df_test),
-            'baseline_mae': baseline_mae,
-            'causal_mae': causal_mae,
-            'mae_improvement_pct': mae_improvement,
-            'baseline_rmse': baseline_rmse,
-            'causal_rmse': causal_rmse,
-            'rmse_improvement_pct': rmse_improvement,
-            'causal_better': causal_mae < baseline_mae
+            "n_predictions": len(df_test),
+            "baseline_mae": baseline_mae,
+            "causal_mae": causal_mae,
+            "mae_improvement_pct": mae_improvement,
+            "baseline_rmse": baseline_rmse,
+            "causal_rmse": causal_rmse,
+            "rmse_improvement_pct": rmse_improvement,
+            "causal_better": causal_mae < baseline_mae,
         }
 
         # Betting performance if market lines available
         if market_line_col and market_line_col in df.columns:
-            df_betting = df[[baseline_pred_col, causal_pred_col, actual_col, market_line_col]].dropna()
+            df_betting = df[
+                [baseline_pred_col, causal_pred_col, actual_col, market_line_col]
+            ].dropna()
 
             # Over/under bets
             baseline_over_bets = df_betting[baseline_pred_col] > df_betting[market_line_col]
@@ -390,23 +400,27 @@ class CausalBacktester:
             baseline_roi = compute_roi(baseline_win_rate)
             causal_roi = compute_roi(causal_win_rate)
 
-            results['betting'] = {
-                'n_bets': len(df_betting),
-                'baseline_win_rate': baseline_win_rate,
-                'causal_win_rate': causal_win_rate,
-                'win_rate_improvement': causal_win_rate - baseline_win_rate,
-                'baseline_roi': baseline_roi,
-                'causal_roi': causal_roi,
-                'roi_improvement': causal_roi - baseline_roi
+            results["betting"] = {
+                "n_bets": len(df_betting),
+                "baseline_win_rate": baseline_win_rate,
+                "causal_win_rate": causal_win_rate,
+                "win_rate_improvement": causal_win_rate - baseline_win_rate,
+                "baseline_roi": baseline_roi,
+                "causal_roi": causal_roi,
+                "roi_improvement": causal_roi - baseline_roi,
             }
 
-        logger.info(f"Backtest: Causal MAE={causal_mae:.2f} vs Baseline={baseline_mae:.2f} "
-                   f"({mae_improvement:+.1f}%)")
+        logger.info(
+            f"Backtest: Causal MAE={causal_mae:.2f} vs Baseline={baseline_mae:.2f} "
+            f"({mae_improvement:+.1f}%)"
+        )
 
-        if 'betting' in results:
-            logger.info(f"Betting: Causal WR={results['betting']['causal_win_rate']:.1f}% "
-                       f"vs Baseline={results['betting']['baseline_win_rate']:.1f}% "
-                       f"(ROI: {results['betting']['roi_improvement']:+.1f}%)")
+        if "betting" in results:
+            logger.info(
+                f"Betting: Causal WR={results['betting']['causal_win_rate']:.1f}% "
+                f"vs Baseline={results['betting']['baseline_win_rate']:.1f}% "
+                f"(ROI: {results['betting']['roi_improvement']:+.1f}%)"
+            )
 
         return results
 
@@ -418,8 +432,8 @@ class CausalBacktester:
         time_col: str,
         unit_col: str,
         pre_periods: int = 3,
-        post_periods: int = 5
-    ) -> Dict:
+        post_periods: int = 5,
+    ) -> dict:
         """
         Validate treatment effects using event study.
 
@@ -451,14 +465,14 @@ class CausalBacktester:
 
         # Create event time variable
         df_event = df.copy()
-        df_event['event_time'] = np.nan
+        df_event["event_time"] = np.nan
 
         for unit, event_time in event_times.items():
             unit_mask = df_event[unit_col] == unit
-            df_event.loc[unit_mask, 'event_time'] = df_event.loc[unit_mask, time_col] - event_time
+            df_event.loc[unit_mask, "event_time"] = df_event.loc[unit_mask, time_col] - event_time
 
         # Compute average outcome by event time
-        event_study = df_event.groupby('event_time')[outcome_col].agg(['mean', 'std', 'count'])
+        event_study = df_event.groupby("event_time")[outcome_col].agg(["mean", "std", "count"])
         event_study = event_study.loc[-pre_periods:post_periods]
 
         # Pre-trend test (parallel trends)
@@ -466,13 +480,15 @@ class CausalBacktester:
         if len(pre_trend_data) > 1:
             # Linear trend in pre-period
             t = np.arange(len(pre_trend_data))
-            slope, intercept, r_value, p_value, std_err = stats.linregress(t, pre_trend_data['mean'])
+            slope, intercept, r_value, p_value, std_err = stats.linregress(
+                t, pre_trend_data["mean"]
+            )
 
             pre_trend_test = {
-                'slope': slope,
-                'p_value': p_value,
-                'passes': p_value > 0.05,  # No significant pre-trend
-                'interpretation': 'Parallel trends OK' if p_value > 0.05 else 'Pre-trend detected'
+                "slope": slope,
+                "p_value": p_value,
+                "passes": p_value > 0.05,  # No significant pre-trend
+                "interpretation": "Parallel trends OK" if p_value > 0.05 else "Pre-trend detected",
             }
         else:
             pre_trend_test = None
@@ -482,23 +498,20 @@ class CausalBacktester:
         if pre_trend_test:
             logger.info(f"Pre-trend test: {pre_trend_test['interpretation']}")
 
-        return {
-            'event_study': event_study,
-            'pre_trend_test': pre_trend_test
-        }
+        return {"event_study": event_study, "pre_trend_test": pre_trend_test}
 
 
 def main():
     """Example validation workflow"""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("CAUSAL INFERENCE VALIDATION")
-    print("="*80)
+    print("=" * 80)
 
     # Simulate data
     np.random.seed(42)
 
-    teams = ['Team_' + str(i) for i in range(10)]
+    teams = ["Team_" + str(i) for i in range(10)]
     weeks = list(range(1, 21))
 
     data = []
@@ -516,74 +529,70 @@ def main():
             if treated and post:
                 points += 5
 
-            data.append({
-                'team': team,
-                'week': week,
-                'points': points,
-                'treated': treated,
-                'baseline_pred': baseline,
-                'causal_pred': baseline + (5 if treated and post else 0),
-                'market_line': baseline - 2
-            })
+            data.append(
+                {
+                    "team": team,
+                    "week": week,
+                    "points": points,
+                    "treated": treated,
+                    "baseline_pred": baseline,
+                    "causal_pred": baseline + (5 if treated and post else 0),
+                    "market_line": baseline - 2,
+                }
+            )
 
     df = pd.DataFrame(data)
 
     # Fit DiD
     did = DifferenceInDifferences()
-    did.fit(
-        df=df,
-        outcome_col='points',
-        treatment_col='treated',
-        unit_col='team',
-        time_col='week'
-    )
+    did.fit(df=df, outcome_col="points", treatment_col="treated", unit_col="team", time_col="week")
 
     # Validation
     validator = CausalValidator()
 
     # Placebo test
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("PLACEBO TEST")
-    print("="*80)
+    print("=" * 80)
 
     placebo_results = validator.placebo_test(did, df, n_placebos=50)
 
-    if placebo_results['success']:
+    if placebo_results["success"]:
         print(f"Actual estimate: {placebo_results['actual_estimate']:.2f}")
         print(f"Placebo mean: {placebo_results['placebo_mean']:.2f}")
         print(f"P-value: {placebo_results['p_value']:.3f}")
         print(f"Result: {placebo_results['interpretation']}")
 
     # Sensitivity analysis
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("SENSITIVITY ANALYSIS")
-    print("="*80)
+    print("=" * 80)
 
     sensitivity = validator.sensitivity_analysis(did, df)
     print(sensitivity.to_string(index=False))
 
     # Backtesting
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("PREDICTION BACKTEST")
-    print("="*80)
+    print("=" * 80)
 
     backtester = CausalBacktester()
 
     backtest_results = backtester.backtest_predictions(
-        df=df[df['week'] >= 10],  # Post-treatment period
-        baseline_pred_col='baseline_pred',
-        causal_pred_col='causal_pred',
-        actual_col='points',
-        market_line_col='market_line'
+        df=df[df["week"] >= 10],  # Post-treatment period
+        baseline_pred_col="baseline_pred",
+        causal_pred_col="causal_pred",
+        actual_col="points",
+        market_line_col="market_line",
     )
 
-    print(f"\nPrediction Accuracy:")
+    print("\nPrediction Accuracy:")
     print(f"  Baseline MAE: {backtest_results['baseline_mae']:.2f}")
     print(f"  Causal MAE: {backtest_results['causal_mae']:.2f}")
     print(f"  Improvement: {backtest_results['mae_improvement_pct']:+.1f}%")
 
-    if 'betting' in backtest_results:
-        print(f"\nBetting Performance:")
+    if "betting" in backtest_results:
+        print("\nBetting Performance:")
         print(f"  Baseline Win Rate: {backtest_results['betting']['baseline_win_rate']:.1f}%")
         print(f"  Causal Win Rate: {backtest_results['betting']['causal_win_rate']:.1f}%")
         print(f"  Baseline ROI: {backtest_results['betting']['baseline_roi']:+.1f}%")

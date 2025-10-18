@@ -6,15 +6,16 @@ Shows simulated bankroll paths under different Kelly fractions with median,
 50% and 90% credible envelopes highlighting growth vs drawdown tradeoff.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
-import sys
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Set publication-quality style
-plt.rcParams['figure.facecolor'] = 'white'
-plt.rcParams['axes.facecolor'] = 'white'
-plt.rcParams['savefig.facecolor'] = 'white'
+plt.rcParams["figure.facecolor"] = "white"
+plt.rcParams["axes.facecolor"] = "white"
+plt.rcParams["savefig.facecolor"] = "white"
+
 
 def simulate_trajectory(
     n_bets: int,
@@ -22,7 +23,7 @@ def simulate_trajectory(
     kelly_fraction: float,
     base_edge: float,
     win_prob: float,
-    seed: int
+    seed: int,
 ):
     """Simulate a single bankroll trajectory."""
 
@@ -43,13 +44,14 @@ def simulate_trajectory(
 
         # Outcome at -110 odds
         if np.random.random() < win_prob:
-            bankroll += stake * (100/110)
+            bankroll += stake * (100 / 110)
         else:
             bankroll -= stake
 
         trajectory.append(bankroll)
 
     return np.array(trajectory)
+
 
 def generate_trajectories(
     kelly_fractions=[0.1, 0.25, 0.5, 1.0],
@@ -58,7 +60,7 @@ def generate_trajectories(
     initial_bankroll: float = 10000,
     base_edge: float = 0.0149,
     win_prob: float = 0.51,
-    seed: int = 42
+    seed: int = 42,
 ):
     """Generate bankroll trajectories for multiple Kelly fractions."""
 
@@ -67,7 +69,7 @@ def generate_trajectories(
     fig, axes = plt.subplots(2, 2, figsize=(14, 10), dpi=300)
     axes = axes.flatten()
 
-    colors = ['steelblue', 'darkorange', 'forestgreen', 'crimson']
+    colors = ["steelblue", "darkorange", "forestgreen", "crimson"]
 
     for idx, (kelly_frac, ax) in enumerate(zip(kelly_fractions, axes)):
 
@@ -80,7 +82,7 @@ def generate_trajectories(
                 kelly_fraction=kelly_frac,
                 base_edge=base_edge,
                 win_prob=win_prob,
-                seed=seed + sim_idx
+                seed=seed + sim_idx,
             )
             trajectories.append(traj)
 
@@ -96,56 +98,52 @@ def generate_trajectories(
         x = np.arange(n_bets + 1)
 
         # Plot envelopes
-        ax.fill_between(x, p5, p95, alpha=0.2, color=colors[idx], label='90% CI')
-        ax.fill_between(x, p25, p75, alpha=0.3, color=colors[idx], label='50% CI')
+        ax.fill_between(x, p5, p95, alpha=0.2, color=colors[idx], label="90% CI")
+        ax.fill_between(x, p25, p75, alpha=0.3, color=colors[idx], label="50% CI")
 
         # Plot median
-        ax.plot(x, median, color=colors[idx], linewidth=2.5, label='Median')
+        ax.plot(x, median, color=colors[idx], linewidth=2.5, label="Median")
 
         # Initial bankroll line
         ax.axhline(
-            initial_bankroll,
-            color='black',
-            linestyle='--',
-            linewidth=1,
-            alpha=0.6,
-            label='Initial'
+            initial_bankroll, color="black", linestyle="--", linewidth=1, alpha=0.6, label="Initial"
         )
 
         # Final stats
         final_median = median[-1]
-        final_mean = np.mean(trajectories[:, -1])
+        np.mean(trajectories[:, -1])
         max_dd = np.min(median / initial_bankroll - 1) * 100
 
         # Title with stats
         ax.set_title(
-            f'Kelly Fraction = {kelly_frac}\\n'
-            f'Final Median: ${final_median:,.0f} | Max DD: {max_dd:.1f}%',
+            f"Kelly Fraction = {kelly_frac}\\n"
+            f"Final Median: ${final_median:,.0f} | Max DD: {max_dd:.1f}%",
             fontsize=11,
-            fontweight='bold',
-            pad=10
+            fontweight="bold",
+            pad=10,
         )
 
-        ax.set_xlabel('Bet Number', fontsize=10)
-        ax.set_ylabel('Bankroll ($)', fontsize=10)
-        ax.legend(loc='upper left', fontsize=8, framealpha=0.9)
-        ax.grid(True, alpha=0.3, linestyle='--')
+        ax.set_xlabel("Bet Number", fontsize=10)
+        ax.set_ylabel("Bankroll ($)", fontsize=10)
+        ax.legend(loc="upper left", fontsize=8, framealpha=0.9)
+        ax.grid(True, alpha=0.3, linestyle="--")
 
         # Format y-axis
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x/1000:.0f}K'))
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x/1000:.0f}K"))
 
     # Main title
     fig.suptitle(
-        'Fractional Kelly Bankroll Trajectories\\n'
-        f'({n_sims} simulations, Win Rate = {win_prob:.1%}, Edge = {base_edge:.2%})',
+        "Fractional Kelly Bankroll Trajectories\\n"
+        f"({n_sims} simulations, Win Rate = {win_prob:.1%}, Edge = {base_edge:.2%})",
         fontsize=16,
-        fontweight='bold',
-        y=0.995
+        fontweight="bold",
+        y=0.995,
     )
 
     plt.tight_layout(rect=[0, 0, 1, 0.985])
 
     return fig
+
 
 def main():
     """Generate and save the figure."""
@@ -160,18 +158,25 @@ def main():
         initial_bankroll=10000,
         base_edge=0.0149,  # CLV = +14.9 bps
         win_prob=0.51,  # 51% win rate from dissertation
-        seed=42
+        seed=42,
     )
 
     # Save to figures directory
-    output_path = Path(__file__).parent.parent.parent / 'analysis' / 'dissertation' / 'figures' / 'bankroll_trajectories.png'
+    output_path = (
+        Path(__file__).parent.parent.parent
+        / "analysis"
+        / "dissertation"
+        / "figures"
+        / "bankroll_trajectories.png"
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig.savefig(output_path, dpi=300, bbox_inches='tight', facecolor='white')
+    fig.savefig(output_path, dpi=300, bbox_inches="tight", facecolor="white")
     print(f"✓ Saved to {output_path}")
 
     plt.close()
     print("\\n✓ Figure 8.2 complete")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

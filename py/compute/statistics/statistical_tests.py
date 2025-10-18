@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 """
 Core Statistical Testing Module.
 
@@ -111,7 +112,9 @@ class PermutationTest(BaseStatisticalTest):
             alternative: Type of test ("two-sided", "less", "greater")
         """
         if statistic_func is None:
-            statistic_func = lambda x, y: np.mean(x) - np.mean(y)
+
+            def statistic_func(x, y):
+                return np.mean(x) - np.mean(y)
 
         def combined_statistic(x, axis):
             # Split combined data back into two samples
@@ -217,9 +220,15 @@ class PermutationTest(BaseStatisticalTest):
             method: Correlation method ("pearson", "spearman")
         """
         if method == "pearson":
-            correlation_func = lambda a, b: stats.pearsonr(a, b)[0]
+
+            def correlation_func(a, b):
+                return stats.pearsonr(a, b)[0]
+
         elif method == "spearman":
-            correlation_func = lambda a, b: stats.spearmanr(a, b)[0]
+
+            def correlation_func(a, b):
+                return stats.spearmanr(a, b)[0]
+
         else:
             raise ValueError("Method must be 'pearson' or 'spearman'")
 
@@ -442,7 +451,9 @@ class BootstrapTest(BaseStatisticalTest):
             statistic_func: Function to compute difference statistic
         """
         if statistic_func is None:
-            statistic_func = lambda x, y: np.mean(x) - np.mean(y)
+
+            def statistic_func(x, y):
+                return np.mean(x) - np.mean(y)
 
         observed_diff = statistic_func(sample1, sample2)
 

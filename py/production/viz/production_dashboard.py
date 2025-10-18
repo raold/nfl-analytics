@@ -29,12 +29,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 from scipy.stats import beta
-from sqlalchemy import create_engine
 
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -99,17 +97,21 @@ st.sidebar.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 # Initialize Monitors
 # ============================================================================
 
+
 @st.cache_resource
 def get_performance_monitor():
     return PerformanceMonitor(db_url=DB_URL)
+
 
 @st.cache_resource
 def get_stress_test_monitor():
     return StressTestMonitor(db_url=DB_URL)
 
+
 @st.cache_resource
 def get_thompson_sampler():
     return ThompsonSampler(db_url=DB_URL)
+
 
 perf_monitor = get_performance_monitor()
 stress_monitor = get_stress_test_monitor()
@@ -327,10 +329,7 @@ elif page == "Model Comparison":
 
     # TODO: Add model_name column to bets table
     # For now, show placeholder
-    st.info(
-        "Model comparison requires adding 'model_name' column to bets table. "
-        "Coming soon!"
-    )
+    st.info("Model comparison requires adding 'model_name' column to bets table. " "Coming soon!")
 
     # Placeholder charts
     st.subheader("Model Performance (Coming Soon)")
@@ -451,10 +450,7 @@ elif page == "Stress Tests":
     y = (
         1
         / (latest["bootstrap_std_roi"] * np.sqrt(2 * np.pi))
-        * np.exp(
-            -0.5
-            * ((x - latest["bootstrap_mean_roi"]) / latest["bootstrap_std_roi"]) ** 2
-        )
+        * np.exp(-0.5 * ((x - latest["bootstrap_mean_roi"]) / latest["bootstrap_std_roi"]) ** 2)
     )
 
     fig = go.Figure()
@@ -555,10 +551,21 @@ elif page == "Bet History":
 
     # Display table
     st.dataframe(
-        bets[[
-            "timestamp", "game_id", "bet_type", "side", "line", "odds",
-            "stake", "prediction", "result", "payout", "clv"
-        ]],
+        bets[
+            [
+                "timestamp",
+                "game_id",
+                "bet_type",
+                "side",
+                "line",
+                "odds",
+                "stake",
+                "prediction",
+                "result",
+                "payout",
+                "clv",
+            ]
+        ],
         use_container_width=True,
         height=600,
     )

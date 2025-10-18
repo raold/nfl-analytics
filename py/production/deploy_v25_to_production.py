@@ -10,17 +10,16 @@ Handles the deployment of the validated v2.5 model with:
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from datetime import datetime, timedelta
-import json
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
-import subprocess
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 from py.production.ab_test_controller import ABTestController, ModelVersion
 
@@ -35,17 +34,17 @@ class V25ProductionDeployer:
 
     def __init__(self):
         self.db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         self.model_version = "informative_priors_v2.5"
         self.deployment_date = datetime.now()
 
-        logger.info(f"Initialized v2.5 Production Deployer")
+        logger.info("Initialized v2.5 Production Deployer")
         logger.info(f"Model version: {self.model_version}")
         logger.info(f"Deployment date: {self.deployment_date}")
 
@@ -53,9 +52,9 @@ class V25ProductionDeployer:
         """Verify the v2.5 model exists and is trained"""
 
         model_paths = {
-            'passing': 'models/bayesian/passing_informative_priors_v1.rds',
-            'receiving_chemistry': 'models/bayesian/receiving_qb_chemistry_v1.rds',
-            'bnn_passing': 'models/bayesian/bnn_passing_v1.pkl'
+            "passing": "models/bayesian/passing_informative_priors_v1.rds",
+            "receiving_chemistry": "models/bayesian/receiving_qb_chemistry_v1.rds",
+            "bnn_passing": "models/bayesian/bnn_passing_v1.pkl",
         }
 
         missing = []
@@ -70,7 +69,7 @@ class V25ProductionDeployer:
         logger.info("✓ All model files verified")
         return True
 
-    def load_validation_metrics(self) -> Dict:
+    def load_validation_metrics(self) -> dict:
         """Load validation metrics from previous runs"""
 
         conn = psycopg2.connect(**self.db_config)
@@ -92,11 +91,11 @@ class V25ProductionDeployer:
 
         metrics = {}
         for _, row in df.iterrows():
-            metrics[row['model_version']] = {
-                'mae': row['avg_mae'],
-                'rmse': row['avg_rmse'],
-                'correlation': row['avg_correlation'],
-                'n_validations': row['n_validations']
+            metrics[row["model_version"]] = {
+                "mae": row["avg_mae"],
+                "rmse": row["avg_rmse"],
+                "correlation": row["avg_correlation"],
+                "n_validations": row["n_validations"],
             }
 
         return metrics
@@ -121,15 +120,18 @@ class V25ProductionDeployer:
         """
 
         try:
-            cur.execute(query, (
-                self.model_version,
-                self.deployment_date,
-                'A/B Test',
-                0.5,  # 50% allocation initially
-                'active',
-                'automated_deployment',
-                'v2.5 with informative priors, QB-WR chemistry, and enhanced features'
-            ))
+            cur.execute(
+                query,
+                (
+                    self.model_version,
+                    self.deployment_date,
+                    "A/B Test",
+                    0.5,  # 50% allocation initially
+                    "active",
+                    "automated_deployment",
+                    "v2.5 with informative priors, QB-WR chemistry, and enhanced features",
+                ),
+            )
             deployment_id = cur.fetchone()[0]
             conn.commit()
             logger.info(f"✓ Created deployment record: {deployment_id}")
@@ -142,11 +144,7 @@ class V25ProductionDeployer:
 
         return deployment_id
 
-    def generate_predictions_batch(
-        self,
-        season: int = 2024,
-        week: int = None
-    ) -> pd.DataFrame:
+    def generate_predictions_batch(self, season: int = 2024, week: int = None) -> pd.DataFrame:
         """Generate batch predictions for current week"""
 
         if week is None:
@@ -176,69 +174,64 @@ class V25ProductionDeployer:
 
         for _, player in players_df.iterrows():
             # Determine prop type based on position
-            if player['position'] == 'QB':
-                prop_types = ['passing_yards', 'passing_tds']
-            elif player['position'] == 'RB':
-                prop_types = ['rushing_yards', 'receiving_yards']
+            if player["position"] == "QB":
+                prop_types = ["passing_yards", "passing_tds"]
+            elif player["position"] == "RB":
+                prop_types = ["rushing_yards", "receiving_yards"]
             else:  # WR, TE
-                prop_types = ['receiving_yards', 'receiving_tds']
+                prop_types = ["receiving_yards", "receiving_tds"]
 
             for prop_type in prop_types:
                 # Generate prediction (placeholder - would call R model)
                 pred = self._generate_single_prediction(
-                    player['player_id'],
-                    prop_type,
-                    season,
-                    week
+                    player["player_id"], prop_type, season, week
                 )
 
-                predictions.append({
-                    'player_id': player['player_id'],
-                    'player_name': player['player_name'],
-                    'position': player['position'],
-                    'team': player['team'],
-                    'season': season,
-                    'week': week,
-                    'prop_type': prop_type,
-                    'prediction': pred['mean'],
-                    'uncertainty': pred['sd'],
-                    'q05': pred['q05'],
-                    'q95': pred['q95'],
-                    'model_version': self.model_version
-                })
+                predictions.append(
+                    {
+                        "player_id": player["player_id"],
+                        "player_name": player["player_name"],
+                        "position": player["position"],
+                        "team": player["team"],
+                        "season": season,
+                        "week": week,
+                        "prop_type": prop_type,
+                        "prediction": pred["mean"],
+                        "uncertainty": pred["sd"],
+                        "q05": pred["q05"],
+                        "q95": pred["q95"],
+                        "model_version": self.model_version,
+                    }
+                )
 
         conn.close()
 
         return pd.DataFrame(predictions)
 
     def _generate_single_prediction(
-        self,
-        player_id: str,
-        prop_type: str,
-        season: int,
-        week: int
-    ) -> Dict:
+        self, player_id: str, prop_type: str, season: int, week: int
+    ) -> dict:
         """Generate single prediction (simplified for demo)"""
 
         # In production, this would call the R model
         # For now, return placeholder values
 
         base_values = {
-            'passing_yards': 250,
-            'passing_tds': 1.5,
-            'rushing_yards': 60,
-            'receiving_yards': 50,
-            'receiving_tds': 0.4
+            "passing_yards": 250,
+            "passing_tds": 1.5,
+            "rushing_yards": 60,
+            "receiving_yards": 50,
+            "receiving_tds": 0.4,
         }
 
         base = base_values.get(prop_type, 50)
         sd = base * 0.25
 
         return {
-            'mean': base + np.random.normal(0, 10),
-            'sd': sd,
-            'q05': base - 1.645 * sd,
-            'q95': base + 1.645 * sd
+            "mean": base + np.random.normal(0, 10),
+            "sd": sd,
+            "q05": base - 1.645 * sd,
+            "q95": base + 1.645 * sd,
         }
 
     def _get_current_nfl_week(self) -> int:
@@ -273,19 +266,22 @@ class V25ProductionDeployer:
             """
 
             try:
-                cur.execute(query, (
-                    pred['player_id'],
-                    pred['season'],
-                    pred['week'],
-                    pred['prop_type'],
-                    pred['model_version'],
-                    pred['prediction'],
-                    pred['uncertainty'],
-                    pred['q05'],
-                    pred['prediction'],  # q50 = mean
-                    pred['q95'],
-                    datetime.now()
-                ))
+                cur.execute(
+                    query,
+                    (
+                        pred["player_id"],
+                        pred["season"],
+                        pred["week"],
+                        pred["prop_type"],
+                        pred["model_version"],
+                        pred["prediction"],
+                        pred["uncertainty"],
+                        pred["q05"],
+                        pred["prediction"],  # q50 = mean
+                        pred["q95"],
+                        datetime.now(),
+                    ),
+                )
                 saved_count += 1
             except Exception as e:
                 logger.warning(f"Could not save prediction for {pred['player_id']}: {e}")
@@ -307,7 +303,7 @@ class V25ProductionDeployer:
             treatment_version=ModelVersion.V2_5_INFORMATIVE,
             allocation_pct=initial_allocation,
             min_samples=100,
-            confidence_threshold=0.95
+            confidence_threshold=0.95,
         )
 
         logger.info("✓ A/B test controller configured")
@@ -335,11 +331,9 @@ class V25ProductionDeployer:
 
         # Test 2: Model predictions
         try:
-            test_pred = self._generate_single_prediction(
-                "test_player", "passing_yards", 2024, 8
-            )
-            assert 'mean' in test_pred
-            assert 'sd' in test_pred
+            test_pred = self._generate_single_prediction("test_player", "passing_yards", 2024, 8)
+            assert "mean" in test_pred
+            assert "sd" in test_pred
             logger.info("✓ Model prediction test passed")
         except Exception as e:
             logger.error(f"✗ Model prediction test failed: {e}")
@@ -348,6 +342,7 @@ class V25ProductionDeployer:
         # Test 3: API endpoint (if running)
         try:
             import requests
+
             response = requests.get("http://localhost:8000/health", timeout=2)
             if response.status_code == 200:
                 logger.info("✓ API endpoint test passed")
@@ -358,16 +353,12 @@ class V25ProductionDeployer:
 
         return tests_passed
 
-    def deploy(
-        self,
-        initial_allocation: float = 0.2,
-        generate_predictions: bool = True
-    ):
+    def deploy(self, initial_allocation: float = 0.2, generate_predictions: bool = True):
         """Main deployment process"""
 
-        logger.info("="*60)
+        logger.info("=" * 60)
         logger.info("DEPLOYING v2.5 MODEL TO PRODUCTION")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
         # Step 1: Verify model exists
         if not self.verify_model_exists():
@@ -391,7 +382,7 @@ class V25ProductionDeployer:
         deployment_id = self.create_deployment_record()
 
         # Step 5: Setup A/B test
-        ab_controller = self.setup_ab_test(initial_allocation)
+        self.setup_ab_test(initial_allocation)
 
         # Step 6: Generate initial predictions
         if generate_predictions:
@@ -403,12 +394,12 @@ class V25ProductionDeployer:
             self.save_predictions_to_db(predictions_df)
 
         # Step 7: Final status
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("✓ DEPLOYMENT COMPLETE")
-        logger.info("="*60)
+        logger.info("=" * 60)
         logger.info(f"Model: {self.model_version}")
         logger.info(f"Deployment ID: {deployment_id}")
-        logger.info(f"Status: Active")
+        logger.info("Status: Active")
         logger.info(f"A/B Test: {initial_allocation:.0%} allocation")
         logger.info("\nNext steps:")
         logger.info("1. Monitor A/B test metrics via dashboard")
@@ -425,10 +416,7 @@ def main():
     deployer = V25ProductionDeployer()
 
     # Deploy with 20% initial traffic allocation
-    success = deployer.deploy(
-        initial_allocation=0.2,
-        generate_predictions=True
-    )
+    success = deployer.deploy(initial_allocation=0.2, generate_predictions=True)
 
     if success:
         logger.info("\n🚀 v2.5 model successfully deployed to production!")

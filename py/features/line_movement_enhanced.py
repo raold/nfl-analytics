@@ -25,32 +25,31 @@ Expected Impact:
 import argparse
 import json
 import sys
-from dataclasses import dataclass, asdict, field
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Set
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
-from scipy import stats
-
 
 # ============================================================================
 # Enhanced Data Models
 # ============================================================================
 
+
 @dataclass
 class EnhancedLineSnapshot:
     """Enhanced line snapshot with microstructure data."""
+
     timestamp: datetime
     book: str
     spread: float
     total: float
     spread_juice_home: int = -110  # e.g., -115
     spread_juice_away: int = -110  # e.g., -105
-    moneyline_home: Optional[int] = None
-    moneyline_away: Optional[int] = None
-    volume_indicator: Optional[str] = None  # 'high', 'medium', 'low'
-    limit_size: Optional[float] = None  # Max bet size allowed
+    moneyline_home: int | None = None
+    moneyline_away: int | None = None
+    volume_indicator: str | None = None  # 'high', 'medium', 'low'
+    limit_size: float | None = None  # Max bet size allowed
 
     @property
     def hold(self) -> float:
@@ -70,6 +69,7 @@ class EnhancedLineSnapshot:
 @dataclass
 class LineVelocity:
     """Line movement velocity metrics."""
+
     instant_velocity: float  # Current rate of change
     weighted_velocity: float  # Weighted by recency
     acceleration: float  # Second derivative
@@ -84,33 +84,36 @@ class LineVelocity:
 @dataclass
 class MarketMicrostructure:
     """Market microstructure analysis."""
+
     consensus_spread: float
     consensus_total: float
     spread_std: float  # Cross-book disagreement
     total_std: float
-    outlier_books: List[str]  # Books with outlier lines
+    outlier_books: list[str]  # Books with outlier lines
     lowest_hold_book: str
     lowest_hold: float
     avg_hold: float
     arbitrage_exists: bool
-    arbitrage_details: Optional[Dict] = None
+    arbitrage_details: dict | None = None
 
 
 @dataclass
 class PublicSharpSplit:
     """Public vs sharp money indicators."""
+
     public_side: str  # 'home' or 'away'
     public_percentage: float  # % of bets on public side
     sharp_side: str
     sharp_confidence: float  # Confidence in sharp side
     reverse_line_move: bool  # Line moved against public
-    steam_side: Optional[str] = None
+    steam_side: str | None = None
     professional_books_aligned: bool = False  # Pinnacle, Circa, etc aligned
 
 
 @dataclass
 class EnhancedLineMovement:
     """Enhanced line movement with all advanced metrics."""
+
     game_id: str
     # Basic movement
     opening_spread: float
@@ -128,12 +131,13 @@ class EnhancedLineMovement:
     expected_future_move: float  # Predicted movement
     confidence_score: float  # Overall confidence
     # Features for model
-    features: Dict[str, float] = field(default_factory=dict)
+    features: dict[str, float] = field(default_factory=dict)
 
 
 # ============================================================================
 # Utility Functions
 # ============================================================================
+
 
 def american_to_implied_prob(odds: int) -> float:
     """Convert American odds to implied probability."""
@@ -144,8 +148,7 @@ def american_to_implied_prob(odds: int) -> float:
 
 
 def calculate_weighted_velocity(
-    snapshots: List[EnhancedLineSnapshot],
-    half_life_hours: float = 6.0
+    snapshots: list[EnhancedLineSnapshot], half_life_hours: float = 6.0
 ) -> LineVelocity:
     """
     Calculate line velocity with exponential weighting.
@@ -163,9 +166,9 @@ def calculate_weighted_velocity(
     timestamps = []
 
     for i in range(1, len(snapshots)):
-        dt = (snapshots[i].timestamp - snapshots[i-1].timestamp).total_seconds() / 3600
+        dt = (snapshots[i].timestamp - snapshots[i - 1].timestamp).total_seconds() / 3600
         if dt > 0:
-            velocity = (snapshots[i].spread - snapshots[i-1].spread) / dt
+            velocity = (snapshots[i].spread - snapshots[i - 1].spread) / dt
             velocities.append(velocity)
             timestamps.append(snapshots[i].timestamp)
 
@@ -206,18 +209,18 @@ def calculate_weighted_velocity(
         weighted_velocity=weighted_vel,
         acceleration=acceleration,
         momentum=momentum,
-        confidence=confidence
+        confidence=confidence,
     )
 
 
 def analyze_microstructure(
-    snapshots_by_book: Dict[str, List[EnhancedLineSnapshot]]
+    snapshots_by_book: dict[str, list[EnhancedLineSnapshot]],
 ) -> MarketMicrostructure:
     """
     Analyze market microstructure across books.
     """
     if not snapshots_by_book:
-        return MarketMicrostructure(0, 0, 0, 0, [], '', 1.0, 1.0, False)
+        return MarketMicrostructure(0, 0, 0, 0, [], "", 1.0, 1.0, False)
 
     # Get most recent snapshot from each book
     current_lines = {}
@@ -226,7 +229,7 @@ def analyze_microstructure(
             current_lines[book] = sorted(snapshots, key=lambda x: x.timestamp)[-1]
 
     if not current_lines:
-        return MarketMicrostructure(0, 0, 0, 0, [], '', 1.0, 1.0, False)
+        return MarketMicrostructure(0, 0, 0, 0, [], "", 1.0, 1.0, False)
 
     # Calculate consensus
     spreads = [s.spread for s in current_lines.values()]
@@ -261,11 +264,11 @@ def analyze_microstructure(
                 if snap1.spread > snap2.spread + 1.0:  # Significant line difference
                     arbitrage_exists = True
                     arbitrage_details = {
-                        'book1': book1,
-                        'book2': book2,
-                        'spread1': snap1.spread,
-                        'spread2': snap2.spread,
-                        'difference': snap1.spread - snap2.spread
+                        "book1": book1,
+                        "book2": book2,
+                        "spread1": snap1.spread,
+                        "spread2": snap2.spread,
+                        "difference": snap1.spread - snap2.spread,
                     }
                     break
 
@@ -279,19 +282,18 @@ def analyze_microstructure(
         lowest_hold=lowest_hold,
         avg_hold=avg_hold,
         arbitrage_exists=arbitrage_exists,
-        arbitrage_details=arbitrage_details
+        arbitrage_details=arbitrage_details,
     )
 
 
 def detect_public_sharp_split(
-    snapshots: List[EnhancedLineSnapshot],
-    public_betting_pct: Optional[float] = None
+    snapshots: list[EnhancedLineSnapshot], public_betting_pct: float | None = None
 ) -> PublicSharpSplit:
     """
     Detect public vs sharp money flow.
     """
     if len(snapshots) < 2:
-        return PublicSharpSplit('unknown', 50.0, 'unknown', 0.0, False)
+        return PublicSharpSplit("unknown", 50.0, "unknown", 0.0, False)
 
     # Sort by timestamp
     snapshots = sorted(snapshots, key=lambda x: x.timestamp)
@@ -307,38 +309,38 @@ def detect_public_sharp_split(
         else:
             public_betting_pct = 35.0  # Public on away
 
-    public_side = 'home' if public_betting_pct > 50 else 'away'
+    public_side = "home" if public_betting_pct > 50 else "away"
 
     # Reverse line move detection
     reverse_line_move = False
-    sharp_side = 'unknown'
+    sharp_side = "unknown"
     sharp_confidence = 0.0
 
-    if public_side == 'home' and total_movement > 0.5:
+    if public_side == "home" and total_movement > 0.5:
         # Line moved toward home (more expensive) despite public on home
         # This is normal, not RLM
         reverse_line_move = False
-        sharp_side = 'home'
-    elif public_side == 'home' and total_movement < -0.5:
+        sharp_side = "home"
+    elif public_side == "home" and total_movement < -0.5:
         # Line moved toward away despite public on home
         # This is RLM - sharps on away
         reverse_line_move = True
-        sharp_side = 'away'
+        sharp_side = "away"
         sharp_confidence = min(0.9, abs(total_movement) / 2.0)
-    elif public_side == 'away' and total_movement < -0.5:
+    elif public_side == "away" and total_movement < -0.5:
         # Line moved toward away despite public on away
         # This is normal
         reverse_line_move = False
-        sharp_side = 'away'
-    elif public_side == 'away' and total_movement > 0.5:
+        sharp_side = "away"
+    elif public_side == "away" and total_movement > 0.5:
         # Line moved toward home despite public on away
         # This is RLM - sharps on home
         reverse_line_move = True
-        sharp_side = 'home'
+        sharp_side = "home"
         sharp_confidence = min(0.9, abs(total_movement) / 2.0)
 
     # Check if professional books aligned
-    pro_books = {'pinnacle', 'circa', 'bookmaker'}
+    pro_books = {"pinnacle", "circa", "bookmaker"}
     pro_movements = []
 
     for book in pro_books:
@@ -358,11 +360,11 @@ def detect_public_sharp_split(
     # Detect steam
     steam_side = None
     for i in range(1, len(snapshots)):
-        dt = (snapshots[i].timestamp - snapshots[i-1].timestamp).total_seconds() / 60
+        dt = (snapshots[i].timestamp - snapshots[i - 1].timestamp).total_seconds() / 60
         if dt > 0 and dt < 15:  # Within 15 minutes
-            move = snapshots[i].spread - snapshots[i-1].spread
+            move = snapshots[i].spread - snapshots[i - 1].spread
             if abs(move) >= 0.5:
-                steam_side = 'home' if move > 0 else 'away'
+                steam_side = "home" if move > 0 else "away"
                 sharp_confidence = min(1.0, sharp_confidence + 0.3)
                 break
 
@@ -373,7 +375,7 @@ def detect_public_sharp_split(
         sharp_confidence=sharp_confidence,
         reverse_line_move=reverse_line_move,
         steam_side=steam_side,
-        professional_books_aligned=professional_books_aligned
+        professional_books_aligned=professional_books_aligned,
     )
 
 
@@ -381,22 +383,23 @@ def detect_public_sharp_split(
 # Enhanced Line Movement Tracker
 # ============================================================================
 
+
 class EnhancedLineMovementTracker:
     """
     Enhanced line movement tracker with velocity and microstructure.
     """
 
     def __init__(self):
-        self.snapshots_by_game: Dict[str, List[EnhancedLineSnapshot]] = {}
-        self.snapshots_by_book: Dict[str, Dict[str, List[EnhancedLineSnapshot]]] = {}
-        self.movements: List[EnhancedLineMovement] = []
+        self.snapshots_by_game: dict[str, list[EnhancedLineSnapshot]] = {}
+        self.snapshots_by_book: dict[str, dict[str, list[EnhancedLineSnapshot]]] = {}
+        self.movements: list[EnhancedLineMovement] = []
 
         # Reduced juice windows by book
         self.reduced_juice_windows = {
-            'draftkings': [(2, 15, 16)],  # Wed 3-4pm ET
-            'fanduel': [(3, 14, 15)],      # Thu 2-3pm ET
-            'betmgm': [(4, 12, 13)],       # Fri 12-1pm ET
-            'caesars': [(3, 18, 19)],      # Thu 6-7pm ET
+            "draftkings": [(2, 15, 16)],  # Wed 3-4pm ET
+            "fanduel": [(3, 14, 15)],  # Thu 2-3pm ET
+            "betmgm": [(4, 12, 13)],  # Fri 12-1pm ET
+            "caesars": [(3, 18, 19)],  # Thu 6-7pm ET
         }
 
     def add_snapshot(
@@ -408,7 +411,7 @@ class EnhancedLineMovementTracker:
         total: float,
         spread_juice_home: int = -110,
         spread_juice_away: int = -110,
-        **kwargs
+        **kwargs,
     ):
         """Add enhanced snapshot."""
         snapshot = EnhancedLineSnapshot(
@@ -418,7 +421,7 @@ class EnhancedLineMovementTracker:
             total=total,
             spread_juice_home=spread_juice_home,
             spread_juice_away=spread_juice_away,
-            **kwargs
+            **kwargs,
         )
 
         # Store by game
@@ -440,15 +443,12 @@ class EnhancedLineMovementTracker:
             return False
 
         for day, start_hour, end_hour in self.reduced_juice_windows[book_lower]:
-            if (timestamp.weekday() == day and
-                start_hour <= timestamp.hour < end_hour):
+            if timestamp.weekday() == day and start_hour <= timestamp.hour < end_hour:
                 return True
         return False
 
     def analyze_game_enhanced(
-        self,
-        game_id: str,
-        public_betting_pct: Optional[float] = None
+        self, game_id: str, public_betting_pct: float | None = None
     ) -> EnhancedLineMovement:
         """
         Perform enhanced analysis of line movement.
@@ -464,11 +464,11 @@ class EnhancedLineMovementTracker:
         movement = closing_spread - opening_spread
 
         if abs(movement) < 0.25:
-            movement_direction = 'stable'
+            movement_direction = "stable"
         elif movement > 0:
-            movement_direction = 'toward_home'
+            movement_direction = "toward_home"
         else:
-            movement_direction = 'toward_away'
+            movement_direction = "toward_away"
 
         # Calculate velocity
         velocity = calculate_weighted_velocity(snapshots)
@@ -480,24 +480,16 @@ class EnhancedLineMovementTracker:
         public_sharp = detect_public_sharp_split(snapshots, public_betting_pct)
 
         # Determine optimal bet timing
-        optimal_bet_timing = self._determine_bet_timing(
-            velocity, microstructure, public_sharp
-        )
+        optimal_bet_timing = self._determine_bet_timing(velocity, microstructure, public_sharp)
 
         # Predict future movement
-        expected_future_move = self._predict_future_movement(
-            velocity, public_sharp, movement
-        )
+        expected_future_move = self._predict_future_movement(velocity, public_sharp, movement)
 
         # Calculate confidence score
-        confidence_score = self._calculate_confidence(
-            velocity, microstructure, public_sharp
-        )
+        confidence_score = self._calculate_confidence(velocity, microstructure, public_sharp)
 
         # Extract features for model
-        features = self._extract_features(
-            snapshots, velocity, microstructure, public_sharp
-        )
+        features = self._extract_features(snapshots, velocity, microstructure, public_sharp)
 
         return EnhancedLineMovement(
             game_id=game_id,
@@ -511,14 +503,14 @@ class EnhancedLineMovementTracker:
             optimal_bet_timing=optimal_bet_timing,
             expected_future_move=expected_future_move,
             confidence_score=confidence_score,
-            features=features
+            features=features,
         )
 
     def _determine_bet_timing(
         self,
         velocity: LineVelocity,
         microstructure: MarketMicrostructure,
-        public_sharp: PublicSharpSplit
+        public_sharp: PublicSharpSplit,
     ) -> str:
         """
         Determine optimal bet timing based on signals.
@@ -527,9 +519,9 @@ class EnhancedLineMovementTracker:
         """
         # If velocity predicts further movement in our favor, wait
         if velocity.predicts_further_movement():
-            if public_sharp.sharp_side != 'unknown':
+            if public_sharp.sharp_side != "unknown":
                 # Line moving toward sharp side, wait for it
-                return 'wait'
+                return "wait"
 
         # If reduced juice available soon, wait
         current_time = datetime.now()
@@ -538,28 +530,25 @@ class EnhancedLineMovementTracker:
                 if current_time.weekday() == day:
                     hours_until = start_hour - current_time.hour
                     if 0 < hours_until <= 2:  # Within 2 hours
-                        return 'wait'
+                        return "wait"
 
         # If arbitrage exists, bet now
         if microstructure.arbitrage_exists:
-            return 'now'
+            return "now"
 
         # If reverse line move detected, bet now (sharp opportunity)
         if public_sharp.reverse_line_move and public_sharp.sharp_confidence > 0.7:
-            return 'now'
+            return "now"
 
         # If consensus reached and velocity low, bet now
         if abs(velocity.weighted_velocity) < 0.05 and microstructure.spread_std < 0.5:
-            return 'now'
+            return "now"
 
         # Default
-        return 'wait' if velocity.confidence < 0.5 else 'now'
+        return "wait" if velocity.confidence < 0.5 else "now"
 
     def _predict_future_movement(
-        self,
-        velocity: LineVelocity,
-        public_sharp: PublicSharpSplit,
-        current_movement: float
+        self, velocity: LineVelocity, public_sharp: PublicSharpSplit, current_movement: float
     ) -> float:
         """
         Predict expected future line movement.
@@ -573,7 +562,7 @@ class EnhancedLineMovementTracker:
 
         # Sharp money component
         if public_sharp.sharp_confidence > 0.6:
-            if public_sharp.sharp_side == 'home':
+            if public_sharp.sharp_side == "home":
                 # Expect line to move toward home
                 prediction += 0.5 * public_sharp.sharp_confidence
             else:
@@ -593,7 +582,7 @@ class EnhancedLineMovementTracker:
         self,
         velocity: LineVelocity,
         microstructure: MarketMicrostructure,
-        public_sharp: PublicSharpSplit
+        public_sharp: PublicSharpSplit,
     ) -> float:
         """
         Calculate overall confidence score (0-1).
@@ -622,46 +611,43 @@ class EnhancedLineMovementTracker:
 
     def _extract_features(
         self,
-        snapshots: List[EnhancedLineSnapshot],
+        snapshots: list[EnhancedLineSnapshot],
         velocity: LineVelocity,
         microstructure: MarketMicrostructure,
-        public_sharp: PublicSharpSplit
-    ) -> Dict[str, float]:
+        public_sharp: PublicSharpSplit,
+    ) -> dict[str, float]:
         """
         Extract features for ML models.
         """
         features = {
             # Velocity features
-            'velocity_instant': velocity.instant_velocity,
-            'velocity_weighted': velocity.weighted_velocity,
-            'velocity_acceleration': velocity.acceleration,
-            'velocity_momentum': velocity.momentum,
-            'velocity_confidence': velocity.confidence,
-
+            "velocity_instant": velocity.instant_velocity,
+            "velocity_weighted": velocity.weighted_velocity,
+            "velocity_acceleration": velocity.acceleration,
+            "velocity_momentum": velocity.momentum,
+            "velocity_confidence": velocity.confidence,
             # Microstructure features
-            'spread_consensus': microstructure.consensus_spread,
-            'spread_std': microstructure.spread_std,
-            'lowest_hold': microstructure.lowest_hold,
-            'avg_hold': microstructure.avg_hold,
-            'has_arbitrage': 1.0 if microstructure.arbitrage_exists else 0.0,
-            'n_outlier_books': len(microstructure.outlier_books),
-
+            "spread_consensus": microstructure.consensus_spread,
+            "spread_std": microstructure.spread_std,
+            "lowest_hold": microstructure.lowest_hold,
+            "avg_hold": microstructure.avg_hold,
+            "has_arbitrage": 1.0 if microstructure.arbitrage_exists else 0.0,
+            "n_outlier_books": len(microstructure.outlier_books),
             # Public/Sharp features
-            'public_percentage': public_sharp.public_percentage,
-            'sharp_confidence': public_sharp.sharp_confidence,
-            'is_rlm': 1.0 if public_sharp.reverse_line_move else 0.0,
-            'has_steam': 1.0 if public_sharp.steam_side is not None else 0.0,
-            'pro_books_aligned': 1.0 if public_sharp.professional_books_aligned else 0.0,
-
+            "public_percentage": public_sharp.public_percentage,
+            "sharp_confidence": public_sharp.sharp_confidence,
+            "is_rlm": 1.0 if public_sharp.reverse_line_move else 0.0,
+            "has_steam": 1.0 if public_sharp.steam_side is not None else 0.0,
+            "pro_books_aligned": 1.0 if public_sharp.professional_books_aligned else 0.0,
             # Time features
-            'hours_since_open': (datetime.now() - snapshots[0].timestamp).total_seconds() / 3600,
-            'n_snapshots': len(snapshots),
-            'n_books': len(set(s.book for s in snapshots)),
+            "hours_since_open": (datetime.now() - snapshots[0].timestamp).total_seconds() / 3600,
+            "n_snapshots": len(snapshots),
+            "n_books": len(set(s.book for s in snapshots)),
         }
 
         return features
 
-    def get_clv_conversion_rate(self) -> Dict[str, float]:
+    def get_clv_conversion_rate(self) -> dict[str, float]:
         """
         Calculate how well CLV converts to actual profit.
         """
@@ -669,9 +655,9 @@ class EnhancedLineMovementTracker:
             return {}
 
         clv_buckets = {
-            'small': [],    # < 0.5 points
-            'medium': [],   # 0.5 - 1.5 points
-            'large': []     # > 1.5 points
+            "small": [],  # < 0.5 points
+            "medium": [],  # 0.5 - 1.5 points
+            "large": [],  # > 1.5 points
         }
 
         for movement in self.movements:
@@ -679,11 +665,11 @@ class EnhancedLineMovementTracker:
 
             # Bucket by CLV size
             if clv < 0.5:
-                bucket = 'small'
+                bucket = "small"
             elif clv < 1.5:
-                bucket = 'medium'
+                bucket = "medium"
             else:
-                bucket = 'large'
+                bucket = "large"
 
             # Calculate ROI for this CLV
             # Simplified: assume 2% edge per 0.5 points CLV
@@ -702,8 +688,8 @@ class EnhancedLineMovementTracker:
         results = {}
         for bucket, rois in clv_buckets.items():
             if rois:
-                results[f'{bucket}_clv_roi'] = np.mean(rois)
-                results[f'{bucket}_clv_count'] = len(rois)
+                results[f"{bucket}_clv_roi"] = np.mean(rois)
+                results[f"{bucket}_clv_count"] = len(rois)
 
         return results
 
@@ -712,17 +698,17 @@ class EnhancedLineMovementTracker:
 # CLI
 # ============================================================================
 
+
 def parse_args():
     parser = argparse.ArgumentParser(
-        description='Enhanced Line Movement Tracker with Velocity and Microstructure'
+        description="Enhanced Line Movement Tracker with Velocity and Microstructure"
     )
 
-    parser.add_argument('--game-id', required=True, help='Game identifier')
-    parser.add_argument('--snapshots-csv', help='CSV with line snapshots')
-    parser.add_argument('--public-pct', type=float, help='Public betting percentage')
-    parser.add_argument('--output', help='Output JSON file')
-    parser.add_argument('--features-only', action='store_true',
-                       help='Only output features for ML')
+    parser.add_argument("--game-id", required=True, help="Game identifier")
+    parser.add_argument("--snapshots-csv", help="CSV with line snapshots")
+    parser.add_argument("--public-pct", type=float, help="Public betting percentage")
+    parser.add_argument("--output", help="Output JSON file")
+    parser.add_argument("--features-only", action="store_true", help="Only output features for ML")
 
     return parser.parse_args()
 
@@ -742,20 +728,19 @@ def main():
 
         for _, row in df.iterrows():
             tracker.add_snapshot(
-                game_id=row['game_id'],
-                timestamp=pd.to_datetime(row['timestamp']),
-                book=row['book'],
-                spread=row['spread'],
-                total=row['total'],
-                spread_juice_home=row.get('juice_home', -110),
-                spread_juice_away=row.get('juice_away', -110),
+                game_id=row["game_id"],
+                timestamp=pd.to_datetime(row["timestamp"]),
+                book=row["book"],
+                spread=row["spread"],
+                total=row["total"],
+                spread_juice_home=row.get("juice_home", -110),
+                spread_juice_away=row.get("juice_away", -110),
             )
 
     # Analyze game
     try:
         movement = tracker.analyze_game_enhanced(
-            game_id=args.game_id,
-            public_betting_pct=args.public_pct
+            game_id=args.game_id, public_betting_pct=args.public_pct
         )
 
         if args.features_only:
@@ -764,27 +749,37 @@ def main():
         else:
             # Full analysis output
             print(f"\nGame: {movement.game_id}")
-            print(f"Movement: {movement.opening_spread} → {movement.closing_spread} ({movement.movement:+.1f})")
+            print(
+                f"Movement: {movement.opening_spread} → {movement.closing_spread} ({movement.movement:+.1f})"
+            )
 
-            print(f"\nVelocity Analysis:")
+            print("\nVelocity Analysis:")
             print(f"  Current velocity: {movement.velocity.instant_velocity:+.3f} pts/hr")
             print(f"  Weighted velocity: {movement.velocity.weighted_velocity:+.3f} pts/hr")
             print(f"  Momentum: {movement.velocity.momentum:+.2f}")
             print(f"  Confidence: {movement.velocity.confidence:.1%}")
 
-            print(f"\nMarket Microstructure:")
+            print("\nMarket Microstructure:")
             print(f"  Consensus spread: {movement.microstructure.consensus_spread:.1f}")
             print(f"  Cross-book std: {movement.microstructure.spread_std:.2f}")
-            print(f"  Lowest hold: {movement.microstructure.lowest_hold:.1%} ({movement.microstructure.lowest_hold_book})")
+            print(
+                f"  Lowest hold: {movement.microstructure.lowest_hold:.1%} ({movement.microstructure.lowest_hold_book})"
+            )
             print(f"  Arbitrage: {'YES' if movement.microstructure.arbitrage_exists else 'No'}")
 
-            print(f"\nPublic vs Sharp:")
-            print(f"  Public side: {movement.public_sharp.public_side} ({movement.public_sharp.public_percentage:.0f}%)")
-            print(f"  Sharp side: {movement.public_sharp.sharp_side} (conf: {movement.public_sharp.sharp_confidence:.1%})")
-            print(f"  Reverse line move: {'YES' if movement.public_sharp.reverse_line_move else 'No'}")
+            print("\nPublic vs Sharp:")
+            print(
+                f"  Public side: {movement.public_sharp.public_side} ({movement.public_sharp.public_percentage:.0f}%)"
+            )
+            print(
+                f"  Sharp side: {movement.public_sharp.sharp_side} (conf: {movement.public_sharp.sharp_confidence:.1%})"
+            )
+            print(
+                f"  Reverse line move: {'YES' if movement.public_sharp.reverse_line_move else 'No'}"
+            )
             print(f"  Steam detected: {movement.public_sharp.steam_side or 'No'}")
 
-            print(f"\nRecommendation:")
+            print("\nRecommendation:")
             print(f"  Optimal timing: {movement.optimal_bet_timing.upper()}")
             print(f"  Expected future move: {movement.expected_future_move:+.2f} pts")
             print(f"  Overall confidence: {movement.confidence_score:.1%}")
@@ -792,23 +787,23 @@ def main():
         # Save output
         if args.output:
             output_data = {
-                'game_id': movement.game_id,
-                'movement': movement.movement,
-                'velocity': asdict(movement.velocity),
-                'microstructure': {
-                    'consensus_spread': movement.microstructure.consensus_spread,
-                    'spread_std': movement.microstructure.spread_std,
-                    'lowest_hold': movement.microstructure.lowest_hold,
-                    'arbitrage': movement.microstructure.arbitrage_exists,
+                "game_id": movement.game_id,
+                "movement": movement.movement,
+                "velocity": asdict(movement.velocity),
+                "microstructure": {
+                    "consensus_spread": movement.microstructure.consensus_spread,
+                    "spread_std": movement.microstructure.spread_std,
+                    "lowest_hold": movement.microstructure.lowest_hold,
+                    "arbitrage": movement.microstructure.arbitrage_exists,
                 },
-                'public_sharp': asdict(movement.public_sharp),
-                'timing': movement.optimal_bet_timing,
-                'expected_move': movement.expected_future_move,
-                'confidence': movement.confidence_score,
-                'features': movement.features,
+                "public_sharp": asdict(movement.public_sharp),
+                "timing": movement.optimal_bet_timing,
+                "expected_move": movement.expected_future_move,
+                "confidence": movement.confidence_score,
+                "features": movement.features,
             }
 
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(output_data, f, indent=2, default=str)
 
             print(f"\nResults saved to {args.output}")
@@ -820,5 +815,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

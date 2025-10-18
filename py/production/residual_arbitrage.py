@@ -14,12 +14,11 @@ Key concepts:
 Expected impact: +0.5-1% ROI from systematic mispricing exploitation
 """
 
-import numpy as np
-from typing import Dict, List, Optional, Tuple
+import logging
 from dataclasses import dataclass
 from datetime import datetime
-import logging
-from scipy import stats
+
+import numpy as np
 from sklearn.covariance import EllipticEnvelope
 
 logger = logging.getLogger(__name__)
@@ -28,13 +27,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class MarketLine:
     """Single market line from a book"""
+
     book: str
     market: str  # 'spread', 'total', 'moneyline'
     team: str
     line: float
     price: int  # American odds
     timestamp: datetime
-    volume: Optional[float] = None  # Betting volume if available
+    volume: float | None = None  # Betting volume if available
 
     @property
     def implied_prob(self) -> float:
@@ -57,14 +57,15 @@ class MarketLine:
 @dataclass
 class ArbitrageOpportunity:
     """Identified arbitrage or quasi-arbitrage opportunity"""
+
     type: str  # 'pure', 'residual', 'correlation', 'synthetic'
-    markets: List[MarketLine]
-    model_prob: Optional[float]
+    markets: list[MarketLine]
+    model_prob: float | None
     consensus_prob: float
-    outlier_book: Optional[str]
+    outlier_book: str | None
     edge: float
     confidence: float
-    required_stakes: Dict[str, float]  # book -> stake amount
+    required_stakes: dict[str, float]  # book -> stake amount
     expected_profit: float
     risk_level: str  # 'low', 'medium', 'high'
 
@@ -74,9 +75,8 @@ class MarketConsensus:
 
     @staticmethod
     def calculate_consensus(
-        lines: List[MarketLine],
-        weights: Optional[Dict[str, float]] = None
-    ) -> Tuple[float, float]:
+        lines: list[MarketLine], weights: dict[str, float] | None = None
+    ) -> tuple[float, float]:
         """
         Calculate consensus line and probability.
 
@@ -88,15 +88,15 @@ class MarketConsensus:
         # Default weights (sharp books weighted higher)
         if weights is None:
             weights = {
-                'Pinnacle': 2.0,
-                'Bookmaker': 2.0,
-                'Circa': 1.8,
-                'BetOnline': 1.3,
-                'Heritage': 1.2,
-                'DraftKings': 1.0,
-                'FanDuel': 1.0,
-                'BetMGM': 0.9,
-                'Caesars': 0.9
+                "Pinnacle": 2.0,
+                "Bookmaker": 2.0,
+                "Circa": 1.8,
+                "BetOnline": 1.3,
+                "Heritage": 1.2,
+                "DraftKings": 1.0,
+                "FanDuel": 1.0,
+                "BetMGM": 0.9,
+                "Caesars": 0.9,
             }
 
         # Calculate weighted consensus
@@ -121,7 +121,7 @@ class MarketConsensus:
         return consensus_line, consensus_prob
 
     @staticmethod
-    def calculate_dispersion(lines: List[MarketLine]) -> float:
+    def calculate_dispersion(lines: list[MarketLine]) -> float:
         """Calculate market dispersion (disagreement level)"""
         if len(lines) < 2:
             return 0.0
@@ -142,10 +142,8 @@ class OutlierDetector:
         self.detector = EllipticEnvelope(contamination=contamination, support_fraction=0.9)
 
     def find_outliers(
-        self,
-        lines: List[MarketLine],
-        features: Optional[List[str]] = None
-    ) -> List[Tuple[MarketLine, float]]:
+        self, lines: list[MarketLine], features: list[str] | None = None
+    ) -> list[tuple[MarketLine, float]]:
         """
         Find outlier lines using robust covariance.
 
@@ -177,7 +175,7 @@ class OutlierDetector:
 
         return sorted(outliers, key=lambda x: x[1], reverse=True)
 
-    def _extract_features(self, lines: List[MarketLine], features: List[str]) -> np.ndarray:
+    def _extract_features(self, lines: list[MarketLine], features: list[str]) -> np.ndarray:
         """Extract specified features from lines"""
         # Simplified for demo
         return np.array([[line.line, line.implied_prob] for line in lines])
@@ -188,24 +186,20 @@ class CorrelationArbitrage:
 
     # Historical correlations between markets
     MARKET_CORRELATIONS = {
-        ('spread', 'total'): {
-            'favorite_cover_over': 0.15,  # Favorites covering correlates with overs
-            'dog_cover_under': 0.10,  # Dogs covering correlates with unders
+        ("spread", "total"): {
+            "favorite_cover_over": 0.15,  # Favorites covering correlates with overs
+            "dog_cover_under": 0.10,  # Dogs covering correlates with unders
         },
-        ('team_total', 'spread'): {
-            'correlation': 0.60  # Team totals highly correlated with spreads
+        ("team_total", "spread"): {
+            "correlation": 0.60  # Team totals highly correlated with spreads
         },
-        ('first_half', 'game'): {
-            'correlation': 0.75  # First half outcomes predict game
-        }
+        ("first_half", "game"): {"correlation": 0.75},  # First half outcomes predict game
     }
 
     @staticmethod
     def find_correlation_arbs(
-        spreads: List[MarketLine],
-        totals: List[MarketLine],
-        model_correlation: float = 0.15
-    ) -> List[ArbitrageOpportunity]:
+        spreads: list[MarketLine], totals: list[MarketLine], model_correlation: float = 0.15
+    ) -> list[ArbitrageOpportunity]:
         """
         Find arbitrage opportunities using correlation.
 
@@ -223,16 +217,12 @@ class CorrelationArbitrage:
             for total_line in totals:
                 # Calculate joint probability using correlation
                 joint_prob = CorrelationArbitrage._calculate_joint_prob(
-                    spread_line.implied_prob,
-                    total_line.implied_prob,
-                    model_correlation
+                    spread_line.implied_prob, total_line.implied_prob, model_correlation
                 )
 
                 # Expected from consensus
                 expected_joint = CorrelationArbitrage._calculate_joint_prob(
-                    spread_consensus,
-                    total_consensus,
-                    model_correlation
+                    spread_consensus, total_consensus, model_correlation
                 )
 
                 # Edge from correlation mispricing
@@ -245,7 +235,7 @@ class CorrelationArbitrage:
                     )
 
                     opp = ArbitrageOpportunity(
-                        type='correlation',
+                        type="correlation",
                         markets=[spread_line, total_line],
                         model_prob=joint_prob,
                         consensus_prob=expected_joint,
@@ -254,7 +244,7 @@ class CorrelationArbitrage:
                         confidence=min(0.8, abs(edge) * 10),  # Confidence from edge size
                         required_stakes=stakes,
                         expected_profit=abs(edge) * 100,  # Rough estimate
-                        risk_level='medium'
+                        risk_level="medium",
                     )
                     opportunities.append(opp)
 
@@ -276,16 +266,15 @@ class CorrelationArbitrage:
 
         # Approximate joint probability
         from scipy.stats import multivariate_normal
+
         joint = multivariate_normal.cdf([z1, z2], mean, cov)
 
         return joint
 
     @staticmethod
     def _calculate_correlation_stakes(
-        line1: MarketLine,
-        line2: MarketLine,
-        edge: float
-    ) -> Dict[str, float]:
+        line1: MarketLine, line2: MarketLine, edge: float
+    ) -> dict[str, float]:
         """Calculate optimal stakes for correlation arbitrage"""
         # Simplified stake calculation
         base_stake = 100  # $100 base
@@ -294,19 +283,14 @@ class CorrelationArbitrage:
         stake1 = base_stake * (1 + edge)
         stake2 = base_stake * (1 - edge)
 
-        return {
-            line1.book: stake1,
-            line2.book: stake2
-        }
+        return {line1.book: stake1, line2.book: stake2}
 
 
 class SyntheticArbitrage:
     """Create synthetic positions from multiple bets"""
 
     @staticmethod
-    def find_synthetic_arbs(
-        all_markets: Dict[str, List[MarketLine]]
-    ) -> List[ArbitrageOpportunity]:
+    def find_synthetic_arbs(all_markets: dict[str, list[MarketLine]]) -> list[ArbitrageOpportunity]:
         """
         Find synthetic arbitrage by combining multiple markets.
 
@@ -318,10 +302,14 @@ class SyntheticArbitrage:
         opportunities = []
 
         # Example: Team totals vs game total
-        if 'home_total' in all_markets and 'away_total' in all_markets and 'game_total' in all_markets:
-            home_totals = all_markets['home_total']
-            away_totals = all_markets['away_total']
-            game_totals = all_markets['game_total']
+        if (
+            "home_total" in all_markets
+            and "away_total" in all_markets
+            and "game_total" in all_markets
+        ):
+            home_totals = all_markets["home_total"]
+            away_totals = all_markets["away_total"]
+            game_totals = all_markets["game_total"]
 
             for home_line in home_totals:
                 for away_line in away_totals:
@@ -340,7 +328,7 @@ class SyntheticArbitrage:
 
                             if abs(edge) > 0.04:  # 4% edge
                                 opp = ArbitrageOpportunity(
-                                    type='synthetic',
+                                    type="synthetic",
                                     markets=[home_line, away_line, game_line],
                                     model_prob=synthetic_prob,
                                     consensus_prob=game_line.implied_prob,
@@ -350,10 +338,10 @@ class SyntheticArbitrage:
                                     required_stakes={
                                         home_line.book: 100,
                                         away_line.book: 100,
-                                        game_line.book: -200  # Opposite side
+                                        game_line.book: -200,  # Opposite side
                                     },
                                     expected_profit=edge * 200,
-                                    risk_level='high'  # Synthetic = higher risk
+                                    risk_level="high",  # Synthetic = higher risk
                                 )
                                 opportunities.append(opp)
 
@@ -365,13 +353,11 @@ class ResidualArbitrageEngine:
 
     def __init__(self):
         self.outlier_detector = OutlierDetector()
-        self.recent_opportunities: List[ArbitrageOpportunity] = []
+        self.recent_opportunities: list[ArbitrageOpportunity] = []
 
     def find_all_opportunities(
-        self,
-        markets: Dict[str, List[MarketLine]],
-        model_probs: Optional[Dict[str, float]] = None
-    ) -> List[ArbitrageOpportunity]:
+        self, markets: dict[str, list[MarketLine]], model_probs: dict[str, float] | None = None
+    ) -> list[ArbitrageOpportunity]:
         """
         Find all types of arbitrage opportunities.
 
@@ -393,9 +379,9 @@ class ResidualArbitrageEngine:
         all_opportunities.extend(residual_arbs)
 
         # 3. Correlation arbitrage
-        if 'spread' in markets and 'total' in markets:
+        if "spread" in markets and "total" in markets:
             corr_arbs = CorrelationArbitrage.find_correlation_arbs(
-                markets['spread'], markets['total']
+                markets["spread"], markets["total"]
             )
             all_opportunities.extend(corr_arbs)
 
@@ -412,9 +398,8 @@ class ResidualArbitrageEngine:
         return all_opportunities
 
     def _find_pure_arbitrage(
-        self,
-        markets: Dict[str, List[MarketLine]]
-    ) -> List[ArbitrageOpportunity]:
+        self, markets: dict[str, list[MarketLine]]
+    ) -> list[ArbitrageOpportunity]:
         """Find guaranteed profit opportunities"""
         opportunities = []
 
@@ -424,12 +409,12 @@ class ResidualArbitrageEngine:
 
             # Check each pair of lines
             for i, line1 in enumerate(lines):
-                for line2 in lines[i+1:]:
+                for line2 in lines[i + 1 :]:
                     # Check if opposite sides create arbitrage
                     total_prob = line1.implied_prob + line2.implied_prob
 
                     if total_prob < 0.99:  # Less than 99% = arbitrage!
-                        profit_pct = (1 / total_prob - 1) * 100
+                        (1 / total_prob - 1) * 100
 
                         # Calculate required stakes
                         stake1 = 100 / line1.implied_prob
@@ -438,29 +423,24 @@ class ResidualArbitrageEngine:
                         guaranteed_profit = 100 - total_stake
 
                         opp = ArbitrageOpportunity(
-                            type='pure',
+                            type="pure",
                             markets=[line1, line2],
                             model_prob=None,
                             consensus_prob=0.5,  # Not relevant for pure arb
                             outlier_book=None,
                             edge=1 - total_prob,
                             confidence=1.0,  # Guaranteed
-                            required_stakes={
-                                line1.book: stake1,
-                                line2.book: stake2
-                            },
+                            required_stakes={line1.book: stake1, line2.book: stake2},
                             expected_profit=guaranteed_profit,
-                            risk_level='low'  # No risk!
+                            risk_level="low",  # No risk!
                         )
                         opportunities.append(opp)
 
         return opportunities
 
     def _find_residual_arbitrage(
-        self,
-        markets: Dict[str, List[MarketLine]],
-        model_probs: Optional[Dict[str, float]]
-    ) -> List[ArbitrageOpportunity]:
+        self, markets: dict[str, list[MarketLine]], model_probs: dict[str, float] | None
+    ) -> list[ArbitrageOpportunity]:
         """Find arbitrage from outliers + model edge"""
         opportunities = []
 
@@ -493,7 +473,7 @@ class ResidualArbitrageEngine:
                     confidence = min(0.9, outlier_score / 10 + abs(edge) * 5)
 
                     opp = ArbitrageOpportunity(
-                        type='residual',
+                        type="residual",
                         markets=[outlier_line],
                         model_prob=model_prob,
                         consensus_prob=consensus_prob,
@@ -502,7 +482,7 @@ class ResidualArbitrageEngine:
                         confidence=confidence,
                         required_stakes={outlier_line.book: 100},
                         expected_profit=edge * 100,
-                        risk_level='medium'
+                        risk_level="medium",
                     )
                     opportunities.append(opp)
 
@@ -550,7 +530,7 @@ class ResidualArbitrageEngine:
             if opp.outlier_book:
                 report.append(f"  Outlier: {opp.outlier_book}")
 
-            report.append(f"  Markets:")
+            report.append("  Markets:")
             for market in opp.markets:
                 report.append(f"    {market.book}: {market.team} {market.line} @ {market.price:+d}")
 
@@ -562,36 +542,38 @@ def demo_residual_arbitrage():
 
     # Create sample market lines with more variation for demo
     markets = {
-        'spread': [
-            MarketLine('Pinnacle', 'spread', 'KC -3', -3, -105, datetime.now()),
-            MarketLine('DraftKings', 'spread', 'KC -3', -3, -110, datetime.now()),
-            MarketLine('FanDuel', 'spread', 'KC -3', -3, -108, datetime.now()),
-            MarketLine('BetMGM', 'spread', 'KC -3', -2.5, -115, datetime.now()),  # Different line
-            MarketLine('Caesars', 'spread', 'KC -3', -3.5, +120, datetime.now()),  # Big outlier!
-            MarketLine('BetOnline', 'spread', 'KC -3', -3, -107, datetime.now()),
-            MarketLine('LocalBook', 'spread', 'BUF +3', 3, +105, datetime.now()),  # Arbitrage opportunity
+        "spread": [
+            MarketLine("Pinnacle", "spread", "KC -3", -3, -105, datetime.now()),
+            MarketLine("DraftKings", "spread", "KC -3", -3, -110, datetime.now()),
+            MarketLine("FanDuel", "spread", "KC -3", -3, -108, datetime.now()),
+            MarketLine("BetMGM", "spread", "KC -3", -2.5, -115, datetime.now()),  # Different line
+            MarketLine("Caesars", "spread", "KC -3", -3.5, +120, datetime.now()),  # Big outlier!
+            MarketLine("BetOnline", "spread", "KC -3", -3, -107, datetime.now()),
+            MarketLine(
+                "LocalBook", "spread", "BUF +3", 3, +105, datetime.now()
+            ),  # Arbitrage opportunity
         ],
-        'total': [
-            MarketLine('Pinnacle', 'total', 'Over 51', 51, -108, datetime.now()),
-            MarketLine('DraftKings', 'total', 'Over 51.5', 51.5, -110, datetime.now()),
-            MarketLine('FanDuel', 'total', 'Over 51', 51, -105, datetime.now()),
-            MarketLine('BetMGM', 'total', 'Over 50.5', 50.5, -105, datetime.now()),
-            MarketLine('Caesars', 'total', 'Over 52', 52, -120, datetime.now()),
+        "total": [
+            MarketLine("Pinnacle", "total", "Over 51", 51, -108, datetime.now()),
+            MarketLine("DraftKings", "total", "Over 51.5", 51.5, -110, datetime.now()),
+            MarketLine("FanDuel", "total", "Over 51", 51, -105, datetime.now()),
+            MarketLine("BetMGM", "total", "Over 50.5", 50.5, -105, datetime.now()),
+            MarketLine("Caesars", "total", "Over 52", 52, -120, datetime.now()),
         ],
-        'home_total': [
-            MarketLine('DraftKings', 'home_total', 'KC Over 27', 27, -115, datetime.now()),
-            MarketLine('FanDuel', 'home_total', 'KC Over 26.5', 26.5, -110, datetime.now()),
+        "home_total": [
+            MarketLine("DraftKings", "home_total", "KC Over 27", 27, -115, datetime.now()),
+            MarketLine("FanDuel", "home_total", "KC Over 26.5", 26.5, -110, datetime.now()),
         ],
-        'away_total': [
-            MarketLine('DraftKings', 'away_total', 'BUF Over 24', 24, -110, datetime.now()),
-            MarketLine('FanDuel', 'away_total', 'BUF Over 24.5', 24.5, -115, datetime.now()),
-        ]
+        "away_total": [
+            MarketLine("DraftKings", "away_total", "BUF Over 24", 24, -110, datetime.now()),
+            MarketLine("FanDuel", "away_total", "BUF Over 24.5", 24.5, -115, datetime.now()),
+        ],
     }
 
     # Model probabilities
     model_probs = {
-        'spread': 0.58,  # 58% KC covers
-        'total': 0.52,  # 52% over
+        "spread": 0.58,  # 58% KC covers
+        "total": 0.52,  # 52% over
     }
 
     # Create engine and find opportunities
@@ -620,7 +602,7 @@ def demo_residual_arbitrage():
 
             print(f"\nExpected Profit: ${opp.expected_profit:,.2f}")
 
-            if opp.type == 'residual':
+            if opp.type == "residual":
                 print(f"Consensus Probability: {opp.consensus_prob:.1%}")
                 if opp.model_prob:
                     print(f"Model Probability: {opp.model_prob:.1%}")
@@ -629,8 +611,7 @@ def demo_residual_arbitrage():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     demo_residual_arbitrage()

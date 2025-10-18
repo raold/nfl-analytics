@@ -21,12 +21,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from compute.tasks.training_task import (
-    TrainingTask,
-    get_redis_client,
-    get_queue_status,
-    list_tasks
-)
+from compute.tasks.training_task import TrainingTask, get_queue_status, get_redis_client
 
 
 def test_submit_task():
@@ -40,13 +35,10 @@ def test_submit_task():
     # Create test task
     task = TrainingTask(
         model_type="test",
-        config={
-            "epochs": 5,
-            "sleep_per_epoch": 1
-        },
+        config={"epochs": 5, "sleep_per_epoch": 1},
         priority=5,
         min_gpu_memory=1,
-        estimated_hours=0.1
+        estimated_hours=0.1,
     )
 
     print(f"Submitting task {task.task_id}...")
@@ -54,11 +46,11 @@ def test_submit_task():
 
     # Verify in queue
     status = get_queue_status(redis_client)
-    print(f"\nQueue status after submission:")
+    print("\nQueue status after submission:")
     print(f"  Total pending: {status['total_pending']}")
     print(f"  Priority breakdown: {status['priority_breakdown']}")
 
-    assert status['total_pending'] >= 1, "Task not in queue!"
+    assert status["total_pending"] >= 1, "Task not in queue!"
     print(f"\n✓ Task {task_id} successfully submitted")
 
     return task_id
@@ -74,11 +66,7 @@ def test_claim_task():
 
     # Simulate worker claiming task
     task = TrainingTask.claim(
-        redis_client,
-        worker_id="test_worker",
-        device_type="mps",
-        gpu_memory_gb=16,
-        min_priority=1
+        redis_client, worker_id="test_worker", device_type="mps", gpu_memory_gb=16, min_priority=1
     )
 
     if task is None:
@@ -124,10 +112,7 @@ def test_execute_task(task: TrainingTask):
         time.sleep(sleep_per_epoch)
 
         # Simulate metrics
-        metrics = {
-            "loss": 1.0 / epoch,
-            "accuracy": min(0.9, 0.5 + 0.05 * epoch)
-        }
+        metrics = {"loss": 1.0 / epoch, "accuracy": min(0.9, 0.5 + 0.05 * epoch)}
         print(f" loss={metrics['loss']:.4f}, acc={metrics['accuracy']:.4f}")
 
         # Save checkpoint every 2 epochs
@@ -136,10 +121,7 @@ def test_execute_task(task: TrainingTask):
             checkpoint_path.write_text(f"Checkpoint at epoch {epoch}\nMetrics: {metrics}\n")
 
             task.save_checkpoint(
-                redis_client,
-                epoch=epoch,
-                metrics=metrics,
-                checkpoint_path=checkpoint_path
+                redis_client, epoch=epoch, metrics=metrics, checkpoint_path=checkpoint_path
             )
             print(f"    Saved checkpoint: {checkpoint_path.name}")
 
@@ -164,7 +146,7 @@ def test_verify_results(task_id: str):
         print(f"✗ Task {task_id} not found in Redis")
         return
 
-    task = TrainingTask.from_json(task_data.decode('utf-8'))
+    task = TrainingTask.from_json(task_data.decode("utf-8"))
 
     print(f"Task {task_id}:")
     print(f"  Status: {task.status}")
@@ -175,7 +157,7 @@ def test_verify_results(task_id: str):
 
     if "latest_checkpoint" in task.metadata:
         checkpoint_info = task.metadata["latest_checkpoint"]
-        print(f"  Latest checkpoint:")
+        print("  Latest checkpoint:")
         print(f"    Epoch: {checkpoint_info['epoch']}")
         print(f"    Metrics: {checkpoint_info['metrics']}")
         print(f"    Path: {checkpoint_info['path']}")
@@ -189,7 +171,7 @@ def test_verify_results(task_id: str):
 
     assert task.status == "completed", "Task should be completed"
     assert len(checkpoints) > 0, "No checkpoints saved"
-    print(f"\n✓ Task results verified")
+    print("\n✓ Task results verified")
 
 
 def test_cleanup():
@@ -206,7 +188,7 @@ def test_cleanup():
             cp.unlink()
             print(f"  Deleted: {cp.name}")
 
-    print(f"\n✓ Cleanup complete")
+    print("\n✓ Cleanup complete")
 
 
 def main():
@@ -235,12 +217,15 @@ def main():
         print("\nInfrastructure is ready for production use!")
         print("\nNext steps:")
         print("  1. Start worker: python py/compute/worker_enhanced.py --worker-id macbook_m4")
-        print("  2. Submit sweep: python py/compute/submit_sweep.py --model test --param epochs 10 20 30")
+        print(
+            "  2. Submit sweep: python py/compute/submit_sweep.py --model test --param epochs 10 20 30"
+        )
         print("  3. Monitor: watch -n 1 'redis-cli zrange training_queue 0 -1 withscores'")
 
     except Exception as e:
         print(f"\n✗ TEST FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

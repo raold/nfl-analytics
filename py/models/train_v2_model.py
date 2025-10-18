@@ -41,7 +41,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.metrics import log_loss, roc_auc_score, brier_score_loss
+from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
 
 # Add project root to path
 ROOT = Path(__file__).resolve().parents[2]
@@ -72,7 +72,7 @@ class V2ModelTrainer:
         self.validate_season = validate_season
         self.validate_week = validate_week
 
-        print(f"=== v2 Model Training ===")
+        print("=== v2 Model Training ===")
         print(f"Features: {self.features_csv}")
         print(f"Train seasons: {train_seasons}")
         if validate_season:
@@ -98,7 +98,7 @@ class V2ModelTrainer:
         if missing:
             raise ValueError(f"Missing v2 features in CSV: {missing}")
 
-        print(f"✓ Verified v2 features present")
+        print("✓ Verified v2 features present")
         return df
 
     def prepare_train_test_split(
@@ -204,7 +204,7 @@ class V2ModelTrainer:
         Returns:
             Trained XGBoost booster
         """
-        print(f"\n=== Training XGBoost ===")
+        print("\n=== Training XGBoost ===")
         print(f"Training samples: {len(X_train)}")
         print(f"Test samples: {len(X_test)}")
         print(f"Features: {len(X_train.columns)}")
@@ -305,16 +305,15 @@ class V2ModelTrainer:
             model: Trained model
             feature_names: List of feature names
         """
-        print(f"\n=== v2 Feature Importance ===")
+        print("\n=== v2 Feature Importance ===")
 
         # Get importance scores
         importance = model.get_score(importance_type="gain")
 
         # Convert to dataframe
-        importance_df = pd.DataFrame([
-            {"feature": k, "gain": v}
-            for k, v in importance.items()
-        ]).sort_values("gain", ascending=False)
+        importance_df = pd.DataFrame(
+            [{"feature": k, "gain": v} for k, v in importance.items()]
+        ).sort_values("gain", ascending=False)
 
         # Identify v2 features
         v2_keywords = [
@@ -331,7 +330,7 @@ class V2ModelTrainer:
         ]
 
         if len(v2_importance) > 0:
-            print(f"\nTop v2 features by gain:")
+            print("\nTop v2 features by gain:")
             for _, row in v2_importance.head(15).iterrows():
                 print(f"  {row['feature']}: {row['gain']:.2f}")
         else:
@@ -422,13 +421,11 @@ class V2ModelTrainer:
 
         self.save_model(model, output_path, metadata)
 
-        print(f"\n[SUCCESS] v2 model training complete!")
+        print("\n[SUCCESS] v2 model training complete!")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Train v2 model with Migration 019 features"
-    )
+    parser = argparse.ArgumentParser(description="Train v2 model with Migration 019 features")
     parser.add_argument(
         "--features",
         default="data/processed/features/asof_team_features_v2.csv",

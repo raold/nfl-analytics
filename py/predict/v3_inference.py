@@ -12,22 +12,20 @@ Usage:
 import argparse
 import json
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional
 from datetime import datetime
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
-import xgboost as xgb
+import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
+import xgboost as xgb
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 class V3Predictor:
     """Production predictor for v3 XGBoost model."""
@@ -42,25 +40,23 @@ class V3Predictor:
         self.model = xgb.Booster()
         self.model.load_model(str(self.model_path))
 
-        with open(self.metadata_path, 'r') as f:
+        with open(self.metadata_path) as f:
             self.metadata = json.load(f)
 
-        self.features = self.metadata['training_data']['features']
-        logger.info(f"Model v{self.metadata['model_version']} loaded with {len(self.features)} features")
+        self.features = self.metadata["training_data"]["features"]
+        logger.info(
+            f"Model v{self.metadata['model_version']} loaded with {len(self.features)} features"
+        )
 
     def connect_db(self) -> psycopg2.extensions.connection:
         """Create database connection."""
         return psycopg2.connect(
-            dbname="devdb01",
-            user="dro",
-            password="sicillionbillions",
-            host="localhost",
-            port=5544
+            dbname="devdb01", user="dro", password="sicillionbillions", host="localhost", port=5544
         )
 
-    def fetch_game_features(self, game_ids: Optional[List[str]] = None,
-                           season: Optional[int] = None,
-                           week: Optional[int] = None) -> pd.DataFrame:
+    def fetch_game_features(
+        self, game_ids: list[str] | None = None, season: int | None = None, week: int | None = None
+    ) -> pd.DataFrame:
         """
         Fetch features for games from materialized views.
 
@@ -105,27 +101,25 @@ class V3Predictor:
         ORDER BY season, week, game_id;
         """
 
-        games_df = pd.read_sql_query(query, conn, dtype={'season': int, 'week': int})
+        games_df = pd.read_sql_query(query, conn, dtype={"season": int, "week": int})
         conn.close()
 
         logger.info(f"Fetched {len(games_df)} games")
 
         # Load pre-computed features
         # In production, this should be replaced with live feature computation
-        features_df = pd.read_csv('data/processed/features/asof_team_features_v3.csv')
+        features_df = pd.read_csv("data/processed/features/asof_team_features_v3.csv")
 
         # Merge with games
-        result = games_df[['game_id', 'season', 'week', 'home_team', 'away_team']].merge(
-            features_df,
-            on=['game_id', 'season', 'week', 'home_team', 'away_team'],
-            how='left'
+        result = games_df[["game_id", "season", "week", "home_team", "away_team"]].merge(
+            features_df, on=["game_id", "season", "week", "home_team", "away_team"], how="left"
         )
 
         return result
 
-    def predict(self, game_ids: Optional[List[str]] = None,
-               season: Optional[int] = None,
-               week: Optional[int] = None) -> pd.DataFrame:
+    def predict(
+        self, game_ids: list[str] | None = None, season: int | None = None, week: int | None = None
+    ) -> pd.DataFrame:
         """
         Generate win probability predictions for games.
 
@@ -163,16 +157,15 @@ class V3Predictor:
         win_probs = self.model.predict(dmatrix)
 
         # Create results dataframe
-        results = games_df[['game_id', 'season', 'week', 'home_team', 'away_team']].copy()
-        results['home_win_prob'] = win_probs
-        results['away_win_prob'] = 1 - win_probs
-        results['predicted_winner'] = results.apply(
-            lambda row: row['home_team'] if row['home_win_prob'] > 0.5 else row['away_team'],
-            axis=1
+        results = games_df[["game_id", "season", "week", "home_team", "away_team"]].copy()
+        results["home_win_prob"] = win_probs
+        results["away_win_prob"] = 1 - win_probs
+        results["predicted_winner"] = results.apply(
+            lambda row: row["home_team"] if row["home_win_prob"] > 0.5 else row["away_team"], axis=1
         )
-        results['confidence'] = results[['home_win_prob', 'away_win_prob']].max(axis=1)
-        results['model_version'] = self.metadata['model_version']
-        results['predicted_at'] = datetime.now().isoformat()
+        results["confidence"] = results[["home_win_prob", "away_win_prob"]].max(axis=1)
+        results["model_version"] = self.metadata["model_version"]
+        results["predicted_at"] = datetime.now().isoformat()
 
         return results
 
@@ -191,15 +184,17 @@ class V3Predictor:
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Generate v3 model predictions')
-    parser.add_argument('--model-path', default='models/xgboost/v3_production/model.json',
-                       help='Path to model file')
-    parser.add_argument('--game-ids', nargs='+', help='Specific game IDs to predict')
-    parser.add_argument('--season', type=int, help='Season to predict')
-    parser.add_argument('--week', type=int, help='Week to predict')
-    parser.add_argument('--output', default='data/predictions/v3_predictions.csv',
-                       help='Output file path')
-    parser.add_argument('--verbose', action='store_true', help='Verbose logging')
+    parser = argparse.ArgumentParser(description="Generate v3 model predictions")
+    parser.add_argument(
+        "--model-path", default="models/xgboost/v3_production/model.json", help="Path to model file"
+    )
+    parser.add_argument("--game-ids", nargs="+", help="Specific game IDs to predict")
+    parser.add_argument("--season", type=int, help="Season to predict")
+    parser.add_argument("--week", type=int, help="Week to predict")
+    parser.add_argument(
+        "--output", default="data/predictions/v3_predictions.csv", help="Output file path"
+    )
+    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 
@@ -215,10 +210,7 @@ def main():
 
     # Generate predictions
     results = predictor.predict_and_save(
-        output_path=args.output,
-        game_ids=args.game_ids,
-        season=args.season,
-        week=args.week
+        output_path=args.output, game_ids=args.game_ids, season=args.season, week=args.week
     )
 
     # Display results
@@ -233,5 +225,5 @@ def main():
     print(f"\n✓ Saved to {args.output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

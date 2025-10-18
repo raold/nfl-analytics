@@ -73,9 +73,7 @@ class BayesianXGBoostEnsemble:
                 - prob_diff: Absolute difference between models
                 - models_agree: Boolean indicating if models agree
         """
-        ensemble_prob = (
-            self.bayesian_weight * bayesian_prob + self.xgb_weight * xgb_prob
-        )
+        ensemble_prob = self.bayesian_weight * bayesian_prob + self.xgb_weight * xgb_prob
 
         prob_diff = abs(bayesian_prob - xgb_prob)
         models_agree = prob_diff <= self.agreement_threshold
@@ -211,13 +209,9 @@ class BayesianXGBoostEnsemble:
         reason = ""
 
         if not models_agree:
-            reason = "Models disagree (prob_diff > {:.2f})".format(
-                self.agreement_threshold
-            )
+            reason = f"Models disagree (prob_diff > {self.agreement_threshold:.2f})"
         elif not has_edge:
-            reason = "Insufficient edge (edge={:.3f} < threshold={:.3f})".format(
-                edge, self.edge_threshold
-            )
+            reason = f"Insufficient edge (edge={edge:.3f} < threshold={self.edge_threshold:.3f})"
         else:
             should_bet = True
             bet_side = "home" if ensemble_prob > 0.5 else "away"
@@ -332,9 +326,8 @@ def evaluate_ensemble(
         }
 
     # Evaluate outcomes
-    bets["bet_won"] = (
-        ((bets["bet_side"] == "home") & (bets["home_cover"] == 1.0))
-        | ((bets["bet_side"] == "away") & (bets["home_cover"] == 0.0))
+    bets["bet_won"] = ((bets["bet_side"] == "home") & (bets["home_cover"] == 1.0)) | (
+        (bets["bet_side"] == "away") & (bets["home_cover"] == 0.0)
     )
 
     # Metrics
@@ -357,9 +350,7 @@ def evaluate_ensemble(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Ensemble betting system: Bayesian + XGBoost"
-    )
+    parser = argparse.ArgumentParser(description="Ensemble betting system: Bayesian + XGBoost")
     parser.add_argument(
         "--games",
         required=True,
@@ -440,17 +431,17 @@ def main():
         edge_threshold=args.edge_threshold,
     )
 
-    print(f"\n=== Ensemble Configuration ===")
+    print("\n=== Ensemble Configuration ===")
     print(f"Bayesian weight: {ensemble.bayesian_weight:.2f}")
     print(f"XGBoost weight: {ensemble.xgb_weight:.2f}")
     print(f"Agreement threshold: {ensemble.agreement_threshold:.2f}")
     print(f"Edge threshold: {ensemble.edge_threshold:.3f}")
 
     # Evaluate
-    print(f"\n=== Evaluating Ensemble ===")
+    print("\n=== Evaluating Ensemble ===")
     results = evaluate_ensemble(games_df, ensemble)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Games analyzed: {results['n_games']}")
     print(f"  Bets placed: {results['n_bets']} ({results['bet_rate']:.1%} of games)")
     print(f"  Win rate: {results['win_rate']:.1%}")

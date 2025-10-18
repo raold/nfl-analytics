@@ -12,17 +12,18 @@ Key Metrics:
 - Continuous Ranked Probability Score (CRPS)
 """
 
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional
-from dataclasses import dataclass
-import json
-from pathlib import Path
 
 
 @dataclass
 class CalibrationMetrics:
     """Container for calibration metrics"""
+
     # Coverage metrics
     coverage_90: float  # Percentage in 90% CI
     coverage_68: float  # Percentage in 68% CI (±1σ)
@@ -44,28 +45,18 @@ class CalibrationMetrics:
     # Sample statistics
     n_samples: int
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for serialization"""
         return {
-            'coverage': {
-                '90pct': self.coverage_90,
-                '68pct': self.coverage_68,
-                '95pct': self.coverage_95
+            "coverage": {
+                "90pct": self.coverage_90,
+                "68pct": self.coverage_68,
+                "95pct": self.coverage_95,
             },
-            'sharpness': {
-                'width_90': self.interval_width_90,
-                'width_68': self.interval_width_68
-            },
-            'point_accuracy': {
-                'mae': self.mae,
-                'rmse': self.rmse,
-                'mape': self.mape
-            },
-            'advanced': {
-                'calibration_error': self.calibration_error,
-                'crps': self.crps
-            },
-            'n_samples': self.n_samples
+            "sharpness": {"width_90": self.interval_width_90, "width_68": self.interval_width_68},
+            "point_accuracy": {"mae": self.mae, "rmse": self.rmse, "mape": self.mape},
+            "advanced": {"calibration_error": self.calibration_error, "crps": self.crps},
+            "n_samples": self.n_samples,
         }
 
     def summary(self) -> str:
@@ -101,28 +92,19 @@ class CalibrationEvaluator:
     """Evaluates calibration quality of uncertainty estimates"""
 
     @staticmethod
-    def compute_coverage(
-        y_true: np.ndarray,
-        q_lower: np.ndarray,
-        q_upper: np.ndarray
-    ) -> float:
+    def compute_coverage(y_true: np.ndarray, q_lower: np.ndarray, q_upper: np.ndarray) -> float:
         """Compute coverage percentage"""
         in_interval = (y_true >= q_lower) & (y_true <= q_upper)
         return float(in_interval.mean())
 
     @staticmethod
-    def compute_sharpness(
-        q_lower: np.ndarray,
-        q_upper: np.ndarray
-    ) -> float:
+    def compute_sharpness(q_lower: np.ndarray, q_upper: np.ndarray) -> float:
         """Compute mean interval width"""
         return float((q_upper - q_lower).mean())
 
     @staticmethod
     def compute_calibration_error(
-        y_true: np.ndarray,
-        predictions: Dict[str, np.ndarray],
-        n_bins: int = 10
+        y_true: np.ndarray, predictions: dict[str, np.ndarray], n_bins: int = 10
     ) -> float:
         """
         Expected Calibration Error (ECE)
@@ -131,7 +113,7 @@ class CalibrationEvaluator:
         expected and observed frequency.
         """
         # Use prediction as confidence score (normalized)
-        y_pred = predictions['mean']
+        y_pred = predictions["mean"]
         confidence = 1 - np.abs(y_true - y_pred) / np.maximum(y_true, 1)
         confidence = np.clip(confidence, 0, 1)
 
@@ -155,15 +137,14 @@ class CalibrationEvaluator:
             avg_confidence_in_bin = confidence[in_bin].mean()
 
             # Weight by proportion of samples in bin
-            ece += (in_bin.sum() / len(y_true)) * np.abs(avg_confidence_in_bin - (1 - accuracy_in_bin))
+            ece += (in_bin.sum() / len(y_true)) * np.abs(
+                avg_confidence_in_bin - (1 - accuracy_in_bin)
+            )
 
         return float(ece)
 
     @staticmethod
-    def compute_crps(
-        y_true: np.ndarray,
-        predictions: Dict[str, np.ndarray]
-    ) -> float:
+    def compute_crps(y_true: np.ndarray, predictions: dict[str, np.ndarray]) -> float:
         """
         Continuous Ranked Probability Score
 
@@ -171,22 +152,17 @@ class CalibrationEvaluator:
         Lower is better.
         """
         # Approximate CRPS using quantiles
-        q05 = predictions['q05']
-        q50 = predictions['q50']
-        q95 = predictions['q95']
+        q05 = predictions["q05"]
+        q50 = predictions["q50"]
+        q95 = predictions["q95"]
 
         # Simplified CRPS (exact requires full distribution)
-        crps = np.mean([
-            np.abs(y_true - q05) + np.abs(y_true - q50) + np.abs(y_true - q95)
-        ]) / 3
+        crps = np.mean([np.abs(y_true - q05) + np.abs(y_true - q50) + np.abs(y_true - q95)]) / 3
 
         return float(crps)
 
     @staticmethod
-    def evaluate(
-        y_true: np.ndarray,
-        predictions: Dict[str, np.ndarray]
-    ) -> CalibrationMetrics:
+    def evaluate(y_true: np.ndarray, predictions: dict[str, np.ndarray]) -> CalibrationMetrics:
         """
         Comprehensive calibration evaluation
 
@@ -201,11 +177,11 @@ class CalibrationEvaluator:
             CalibrationMetrics object
         """
         # Extract predictions
-        y_pred = predictions['mean']
-        std = predictions['std']
-        q05 = predictions['q05']
-        q50 = predictions['q50']
-        q95 = predictions['q95']
+        y_pred = predictions["mean"]
+        std = predictions["std"]
+        q05 = predictions["q05"]
+        predictions["q50"]
+        q95 = predictions["q95"]
 
         # Compute 68% CI from mean ± 1σ
         q16 = y_pred - std
@@ -232,9 +208,7 @@ class CalibrationEvaluator:
         mape = float(np.mean(np.abs(y_true - y_pred) / np.maximum(y_true, 1)) * 100)
 
         # Advanced metrics
-        calibration_error = CalibrationEvaluator.compute_calibration_error(
-            y_true, predictions
-        )
+        calibration_error = CalibrationEvaluator.compute_calibration_error(y_true, predictions)
         crps = CalibrationEvaluator.compute_crps(y_true, predictions)
 
         return CalibrationMetrics(
@@ -248,7 +222,7 @@ class CalibrationEvaluator:
             mape=mape,
             calibration_error=calibration_error,
             crps=crps,
-            n_samples=len(y_true)
+            n_samples=len(y_true),
         )
 
 
@@ -261,24 +235,20 @@ class ExperimentLogger:
         self.results = []
 
     def log_experiment(
-        self,
-        experiment_name: str,
-        config: Dict,
-        metrics: CalibrationMetrics,
-        notes: str = ""
+        self, experiment_name: str, config: dict, metrics: CalibrationMetrics, notes: str = ""
     ):
         """Log a single experiment"""
         result = {
-            'experiment_name': experiment_name,
-            'config': config,
-            'metrics': metrics.to_dict(),
-            'notes': notes
+            "experiment_name": experiment_name,
+            "config": config,
+            "metrics": metrics.to_dict(),
+            "notes": notes,
         }
         self.results.append(result)
 
         # Save individual result
         output_file = self.output_dir / f"{experiment_name}.json"
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(result, f, indent=2)
 
         print(f"✓ Logged experiment: {experiment_name}")
@@ -291,17 +261,19 @@ class ExperimentLogger:
 
         comparison = []
         for result in self.results:
-            metrics = result['metrics']
-            comparison.append({
-                'Experiment': result['experiment_name'],
-                'Coverage 90%': metrics['coverage']['90pct'],
-                'Coverage 68%': metrics['coverage']['68pct'],
-                'Width 90%': metrics['sharpness']['width_90'],
-                'MAE': metrics['point_accuracy']['mae'],
-                'CRPS': metrics['advanced']['crps'],
-                'Cal Error': metrics['advanced']['calibration_error'],
-                'Notes': result['notes']
-            })
+            metrics = result["metrics"]
+            comparison.append(
+                {
+                    "Experiment": result["experiment_name"],
+                    "Coverage 90%": metrics["coverage"]["90pct"],
+                    "Coverage 68%": metrics["coverage"]["68pct"],
+                    "Width 90%": metrics["sharpness"]["width_90"],
+                    "MAE": metrics["point_accuracy"]["mae"],
+                    "CRPS": metrics["advanced"]["crps"],
+                    "Cal Error": metrics["advanced"]["calibration_error"],
+                    "Notes": result["notes"],
+                }
+            )
 
         df = pd.DataFrame(comparison)
 
@@ -314,7 +286,7 @@ class ExperimentLogger:
     def save_summary(self):
         """Save comprehensive summary"""
         summary_file = self.output_dir / "summary.json"
-        with open(summary_file, 'w') as f:
+        with open(summary_file, "w") as f:
             json.dump(self.results, f, indent=2)
 
         print(f"\n✓ Saved summary to {summary_file}")
@@ -330,11 +302,11 @@ if __name__ == "__main__":
 
     # Simulate well-calibrated predictions
     predictions = {
-        'mean': y_true + np.random.normal(0, 10, n_samples),
-        'std': np.full(n_samples, 15.0),
-        'q05': y_true - 25,
-        'q50': y_true,
-        'q95': y_true + 25
+        "mean": y_true + np.random.normal(0, 10, n_samples),
+        "std": np.full(n_samples, 15.0),
+        "q05": y_true - 25,
+        "q50": y_true,
+        "q95": y_true + 25,
     }
 
     # Evaluate
@@ -347,9 +319,9 @@ if __name__ == "__main__":
     logger = ExperimentLogger()
     logger.log_experiment(
         experiment_name="test_baseline",
-        config={'method': 'test', 'features': ['test']},
+        config={"method": "test", "features": ["test"]},
         metrics=metrics,
-        notes="Test run of calibration harness"
+        notes="Test run of calibration harness",
     )
 
     print("\n✓ Calibration test harness working correctly")

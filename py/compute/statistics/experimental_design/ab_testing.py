@@ -326,7 +326,7 @@ class ABTest:
             self._update_allocation_probabilities()
 
         # Check for interim analysis
-        total_n = sum(arm.n for arm in self.arms.values())
+        sum(arm.n for arm in self.arms.values())
         min_arm_n = min(arm.n for arm in self.arms.values())
 
         # Check if we should perform interim analysis
@@ -718,7 +718,7 @@ def test():
 
         # Print interim results every 100 observations
         if (i + 1) % 100 == 0:
-            interim_result = test.analyze()
+            test.analyze()
             print(f"Interim analysis at n={i+1}:")
             print(
                 f"  Control: {test.arms['control'].success_rate:.3f} "

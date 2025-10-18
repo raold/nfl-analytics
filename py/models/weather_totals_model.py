@@ -32,7 +32,6 @@ import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -62,8 +61,8 @@ class TotalPrediction:
     under_prob: float
     weather_impact: float  # Expected points impact from weather
     edge: float
-    recommended_bet: Optional[str]  # "over", "under", or None
-    weather_factors: Dict[str, any]
+    recommended_bet: str | None  # "over", "under", or None
+    weather_factors: dict[str, any]
 
 
 class WeatherTotalsModel:
@@ -85,12 +84,12 @@ class WeatherTotalsModel:
 
     TEMP_THRESHOLDS = {
         "freezing": 32,  # °F - under bias
-        "cold": 45,      # °F - slight under bias
+        "cold": 45,  # °F - slight under bias
     }
 
     def __init__(
         self,
-        xgb_params: Optional[Dict] = None,
+        xgb_params: dict | None = None,
         min_edge: float = 0.03,
         kelly_fraction: float = 0.25,
     ):
@@ -115,10 +114,10 @@ class WeatherTotalsModel:
             "random_state": 42,
         }
 
-        self.model: Optional[xgb.XGBRegressor] = None
-        self.feature_cols: List[str] = []
-        self.scaler_mean: Optional[np.ndarray] = None
-        self.scaler_std: Optional[np.ndarray] = None
+        self.model: xgb.XGBRegressor | None = None
+        self.feature_cols: list[str] = []
+        self.scaler_mean: np.ndarray | None = None
+        self.scaler_std: np.ndarray | None = None
 
     def load_data(self, start_season: int, end_season: int) -> pd.DataFrame:
         """Load games data with weather and scoring."""
@@ -129,7 +128,7 @@ class WeatherTotalsModel:
             port=5544,
             user="dro",
             password="sicillionbillions",
-            database="devdb01"
+            database="devdb01",
         )
 
         query = f"""
@@ -182,16 +181,24 @@ class WeatherTotalsModel:
         df["is_turf"] = (df["surface"] == "fieldturf").astype(int)
 
         # Wind impact features
-        df["wind_high"] = ((df["wind_numeric"] >= self.WIND_THRESHOLDS["high"]) & (df["is_outdoors"] == 1)).astype(int)
-        df["wind_moderate"] = ((df["wind_numeric"] >= self.WIND_THRESHOLDS["moderate"]) &
-                               (df["wind_numeric"] < self.WIND_THRESHOLDS["high"]) &
-                               (df["is_outdoors"] == 1)).astype(int)
+        df["wind_high"] = (
+            (df["wind_numeric"] >= self.WIND_THRESHOLDS["high"]) & (df["is_outdoors"] == 1)
+        ).astype(int)
+        df["wind_moderate"] = (
+            (df["wind_numeric"] >= self.WIND_THRESHOLDS["moderate"])
+            & (df["wind_numeric"] < self.WIND_THRESHOLDS["high"])
+            & (df["is_outdoors"] == 1)
+        ).astype(int)
 
         # Temperature impact features
-        df["temp_freezing"] = ((df["temp_numeric"] <= self.TEMP_THRESHOLDS["freezing"]) & (df["is_outdoors"] == 1)).astype(int)
-        df["temp_cold"] = ((df["temp_numeric"] > self.TEMP_THRESHOLDS["freezing"]) &
-                           (df["temp_numeric"] <= self.TEMP_THRESHOLDS["cold"]) &
-                           (df["is_outdoors"] == 1)).astype(int)
+        df["temp_freezing"] = (
+            (df["temp_numeric"] <= self.TEMP_THRESHOLDS["freezing"]) & (df["is_outdoors"] == 1)
+        ).astype(int)
+        df["temp_cold"] = (
+            (df["temp_numeric"] > self.TEMP_THRESHOLDS["freezing"])
+            & (df["temp_numeric"] <= self.TEMP_THRESHOLDS["cold"])
+            & (df["is_outdoors"] == 1)
+        ).astype(int)
 
         # Fill missing weather with defaults (dome assumptions)
         df["temp_numeric"] = df["temp_numeric"].fillna(70)
@@ -205,7 +212,7 @@ class WeatherTotalsModel:
 
         return df
 
-    def prepare_features(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
+    def prepare_features(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
         """Prepare feature matrix and target."""
         # Feature columns
         self.feature_cols = [
@@ -239,7 +246,7 @@ class WeatherTotalsModel:
         self,
         df_train: pd.DataFrame,
         val_split: float = 0.2,
-    ) -> Dict:
+    ) -> dict:
         """Train XGBoost totals model."""
         logger.info("Training weather totals model...")
 
@@ -296,22 +303,25 @@ class WeatherTotalsModel:
         logger.info(f"Val   - MAE: {val_metrics['mae']:.2f} pts, R²: {val_metrics['r2']:.3f}")
 
         # Feature importance
-        importance = pd.DataFrame({
-            "feature": self.feature_cols,
-            "importance": self.model.feature_importances_
-        }).sort_values("importance", ascending=False)
+        importance = pd.DataFrame(
+            {"feature": self.feature_cols, "importance": self.model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
         logger.info("\nTop 5 Most Important Features:")
         for _, row in importance.head(5).iterrows():
             logger.info(f"  {row['feature']}: {row['importance']:.3f}")
 
-        return {"train": train_metrics, "val": val_metrics, "importance": importance.to_dict("records")}
+        return {
+            "train": train_metrics,
+            "val": val_metrics,
+            "importance": importance.to_dict("records"),
+        }
 
     def predict(
         self,
         df: pd.DataFrame,
         with_uncertainty: bool = True,
-    ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+    ) -> tuple[np.ndarray, np.ndarray | None]:
         """Predict total points."""
         if self.model is None:
             raise ValueError("Model not trained")
@@ -359,7 +369,7 @@ class WeatherTotalsModel:
     @classmethod
     def load_model(cls, filepath: str) -> "WeatherTotalsModel":
         """Load model from disk."""
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             model_data = json.load(f)
 
         predictor = cls(
@@ -385,7 +395,9 @@ def main():
     parser = argparse.ArgumentParser(description="Weather-Based NFL Totals Model")
     parser.add_argument("--train-seasons", type=str, help="Training seasons (e.g., '2010-2023')")
     parser.add_argument("--test-season", type=int, help="Test season")
-    parser.add_argument("--output", type=str, default="models/weather/totals_v1.json", help="Output model path")
+    parser.add_argument(
+        "--output", type=str, default="models/weather/totals_v1.json", help="Output model path"
+    )
     parser.add_argument("--model", type=str, help="Path to saved model (for prediction)")
     parser.add_argument("--predict", action="store_true", help="Prediction mode")
     parser.add_argument("--season", type=int, help="Season to predict")
@@ -411,7 +423,7 @@ def main():
             df_test = None
 
         # Train
-        metrics = model.train(df_train)
+        model.train(df_train)
 
         # Test
         if df_test is not None and len(df_test) > 0:
@@ -424,7 +436,9 @@ def main():
             test_rmse = np.sqrt(mean_squared_error(actual, preds))
             test_r2 = r2_score(actual, preds)
 
-            logger.info(f"Test - MAE: {test_mae:.2f} pts, RMSE: {test_rmse:.2f} pts, R²: {test_r2:.3f}")
+            logger.info(
+                f"Test - MAE: {test_mae:.2f} pts, RMSE: {test_rmse:.2f} pts, R²: {test_r2:.3f}"
+            )
 
         # Save
         model.save_model(args.output)

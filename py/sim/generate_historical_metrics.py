@@ -16,7 +16,6 @@ Usage:
 
 import json
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -27,11 +26,7 @@ from scipy.stats import kendalltau
 def connect_db():
     """Connect to NFL database."""
     return psycopg.connect(
-        dbname="devdb01",
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions"
+        dbname="devdb01", host="localhost", port=5544, user="dro", password="sicillionbillions"
     )
 
 
@@ -64,7 +59,7 @@ def fetch_completed_games(conn, start_season: int = 2020) -> pd.DataFrame:
     return pd.read_sql(query, conn)
 
 
-def compute_margin_distribution(df: pd.DataFrame) -> Dict:
+def compute_margin_distribution(df: pd.DataFrame) -> dict:
     """
     Compute margin distribution.
 
@@ -74,7 +69,7 @@ def compute_margin_distribution(df: pd.DataFrame) -> Dict:
     Returns:
         Dict with margin PMF and statistics
     """
-    margins = df['home_score'] - df['away_score']
+    margins = df["home_score"] - df["away_score"]
 
     # Count frequency of each margin
     margin_counts = margins.value_counts().sort_index()
@@ -86,16 +81,16 @@ def compute_margin_distribution(df: pd.DataFrame) -> Dict:
         pmf[int(margin)] = float(count / total_games)
 
     return {
-        'pmf': pmf,
-        'mean': float(margins.mean()),
-        'std': float(margins.std()),
-        'min': int(margins.min()),
-        'max': int(margins.max()),
-        'n_games': total_games
+        "pmf": pmf,
+        "mean": float(margins.mean()),
+        "std": float(margins.std()),
+        "min": int(margins.min()),
+        "max": int(margins.max()),
+        "n_games": total_games,
     }
 
 
-def compute_key_number_masses(df: pd.DataFrame, key_numbers: List[int]) -> Dict:
+def compute_key_number_masses(df: pd.DataFrame, key_numbers: list[int]) -> dict:
     """
     Compute probability mass at key numbers.
 
@@ -106,7 +101,7 @@ def compute_key_number_masses(df: pd.DataFrame, key_numbers: List[int]) -> Dict:
     Returns:
         Dict mapping key_number -> probability mass
     """
-    margins = (df['home_score'] - df['away_score']).abs()
+    margins = (df["home_score"] - df["away_score"]).abs()
     total_games = len(margins)
 
     masses = {}
@@ -117,7 +112,7 @@ def compute_key_number_masses(df: pd.DataFrame, key_numbers: List[int]) -> Dict:
     return masses
 
 
-def compute_total_distribution(df: pd.DataFrame) -> Dict:
+def compute_total_distribution(df: pd.DataFrame) -> dict:
     """
     Compute total score distribution.
 
@@ -127,7 +122,7 @@ def compute_total_distribution(df: pd.DataFrame) -> Dict:
     Returns:
         Dict with total PMF and statistics
     """
-    totals = df['home_score'] + df['away_score']
+    totals = df["home_score"] + df["away_score"]
 
     # Count frequency of each total
     total_counts = totals.value_counts().sort_index()
@@ -139,16 +134,16 @@ def compute_total_distribution(df: pd.DataFrame) -> Dict:
         pmf[int(total)] = float(count / n_games)
 
     return {
-        'pmf': pmf,
-        'mean': float(totals.mean()),
-        'std': float(totals.std()),
-        'min': int(totals.min()),
-        'max': int(totals.max()),
-        'n_games': n_games
+        "pmf": pmf,
+        "mean": float(totals.mean()),
+        "std": float(totals.std()),
+        "min": int(totals.min()),
+        "max": int(totals.max()),
+        "n_games": n_games,
     }
 
 
-def compute_score_dependence(df: pd.DataFrame) -> Dict:
+def compute_score_dependence(df: pd.DataFrame) -> dict:
     """
     Compute dependence between home and away scores.
 
@@ -158,8 +153,8 @@ def compute_score_dependence(df: pd.DataFrame) -> Dict:
     Returns:
         Dict with Kendall's tau and other dependence metrics
     """
-    home = df['home_score'].values
-    away = df['away_score'].values
+    home = df["home_score"].values
+    away = df["away_score"].values
 
     # Kendall's tau (rank correlation)
     tau, p_value = kendalltau(home, away)
@@ -169,14 +164,15 @@ def compute_score_dependence(df: pd.DataFrame) -> Dict:
 
     # Spearman correlation
     from scipy.stats import spearmanr
+
     spearman, _ = spearmanr(home, away)
 
     return {
-        'kendall_tau': float(tau),
-        'kendall_p_value': float(p_value),
-        'pearson': float(pearson),
-        'spearman': float(spearman),
-        'n_games': len(df)
+        "kendall_tau": float(tau),
+        "kendall_p_value": float(p_value),
+        "pearson": float(pearson),
+        "spearman": float(spearman),
+        "n_games": len(df),
     }
 
 
@@ -193,7 +189,7 @@ def compute_upset_rate(df: pd.DataFrame) -> float:
     Returns:
         Upset rate (fraction of games where home team lost)
     """
-    home_wins = (df['home_score'] > df['away_score']).sum()
+    home_wins = (df["home_score"] > df["away_score"]).sum()
     total_games = len(df)
 
     # Home win rate (not exactly upset rate, but a proxy)
@@ -246,7 +242,9 @@ def generate_historical_metrics(output_path: str = "analysis/results/historical_
 
     print("\n6. Computing score dependence...")
     dependence = compute_score_dependence(df)
-    print(f"✅ Kendall's tau: {dependence['kendall_tau']:.4f} (p={dependence['kendall_p_value']:.4e})")
+    print(
+        f"✅ Kendall's tau: {dependence['kendall_tau']:.4f} (p={dependence['kendall_p_value']:.4e})"
+    )
     print(f"   Pearson: {dependence['pearson']:.4f}")
     print(f"   Spearman: {dependence['spearman']:.4f}")
 
@@ -256,19 +254,19 @@ def generate_historical_metrics(output_path: str = "analysis/results/historical_
 
     # Compile results
     results = {
-        'metadata': {
-            'n_games': len(df),
-            'seasons': f"{df['season'].min()}-{df['season'].max()}",
-            'start_season': int(df['season'].min()),
-            'end_season': int(df['season'].max()),
-            'n_seasons': int(df['season'].nunique()),
-            'description': 'Historical NFL game outcomes (regular season only)'
+        "metadata": {
+            "n_games": len(df),
+            "seasons": f"{df['season'].min()}-{df['season'].max()}",
+            "start_season": int(df["season"].min()),
+            "end_season": int(df["season"].max()),
+            "n_seasons": int(df["season"].nunique()),
+            "description": "Historical NFL game outcomes (regular season only)",
         },
-        'margin_distribution': margin_dist,
-        'key_number_masses': key_masses,
-        'total_distribution': total_dist,
-        'score_dependence': dependence,
-        'home_win_rate': home_win_rate
+        "margin_distribution": margin_dist,
+        "key_number_masses": key_masses,
+        "total_distribution": total_dist,
+        "score_dependence": dependence,
+        "home_win_rate": home_win_rate,
     }
 
     # Save to file
@@ -276,7 +274,7 @@ def generate_historical_metrics(output_path: str = "analysis/results/historical_
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(results, f, indent=2)
 
     print(f"✅ Saved to {output_path}")
@@ -284,13 +282,13 @@ def generate_historical_metrics(output_path: str = "analysis/results/historical_
     print("\n" + "=" * 80)
     print("HISTORICAL METRICS COMPLETE")
     print("=" * 80)
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Games analyzed: {len(df)}")
     print(f"  Mean margin: {margin_dist['mean']:.2f}")
     print(f"  Key mass (3pt): {key_masses[3]*100:.2f}%")
     print(f"  Key mass (7pt): {key_masses[7]*100:.2f}%")
     print(f"  Kendall's tau: {dependence['kendall_tau']:.4f}")
-    print(f"\n✅ Ready for Phase 2: Simulated metrics generation")
+    print("\n✅ Ready for Phase 2: Simulated metrics generation")
 
 
 if __name__ == "__main__":

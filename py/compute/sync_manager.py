@@ -6,17 +6,17 @@ Handles synchronization of Redis data and results across multiple machines
 using Google Drive as the shared storage medium.
 """
 
+import hashlib
 import json
 import logging
 import shutil
 import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
-import os
+from typing import Any
+
 import redis
-import hashlib
-from dataclasses import dataclass, asdict
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +24,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SyncMetadata:
     """Metadata for sync operations."""
+
     machine_id: str
     last_sync: datetime
-    redis_info: Dict[str, Any]
+    redis_info: dict[str, Any]
     sync_version: str = "v1"
     conflicts_detected: int = 0
     conflicts_resolved: int = 0
@@ -38,7 +39,7 @@ class SyncConflictResolver:
     def __init__(self, redis_client: redis.Redis):
         self.redis = redis_client
 
-    def detect_conflicts(self, local_dump: Path, remote_dumps: Dict[str, Path]) -> bool:
+    def detect_conflicts(self, local_dump: Path, remote_dumps: dict[str, Path]) -> bool:
         """Detect if there are conflicts between local and remote dumps."""
         if not remote_dumps:
             return False
@@ -56,7 +57,7 @@ class SyncConflictResolver:
         # Conflict if multiple machines have newer data
         return len(recent_remotes) > 1
 
-    def resolve_conflicts(self, local_dump: Path, remote_dumps: Dict[str, Path]) -> Path:
+    def resolve_conflicts(self, local_dump: Path, remote_dumps: dict[str, Path]) -> Path:
         """
         Resolve conflicts by merging Redis data intelligently.
 
@@ -69,7 +70,7 @@ class SyncConflictResolver:
         logger.info("🔄 Resolving Redis data conflicts...")
 
         # Create temporary Redis instance for merging
-        temp_redis = redis.Redis(host='localhost', port=6380, decode_responses=True)
+        temp_redis = redis.Redis(host="localhost", port=6380, decode_responses=True)
 
         try:
             # Start with local data
@@ -108,7 +109,9 @@ class SyncConflictResolver:
         # For now, we'll implement a simpler approach
         pass
 
-    def _merge_dump_to_redis(self, dump_path: Path, redis_instance: redis.Redis, source_machine: str):
+    def _merge_dump_to_redis(
+        self, dump_path: Path, redis_instance: redis.Redis, source_machine: str
+    ):
         """Merge dump data into Redis instance with conflict resolution."""
         # Implementation would depend on specific Redis dump format
         # For now, implement basic strategy
@@ -126,10 +129,13 @@ class GoogleDriveSyncManager:
     - Result file synchronization
     """
 
-    def __init__(self, redis_client: redis.Redis,
-                 sync_directory: Path = Path("/data"),
-                 machine_id: str = None,
-                 sync_interval: int = 300):
+    def __init__(
+        self,
+        redis_client: redis.Redis,
+        sync_directory: Path = Path("/data"),
+        machine_id: str = None,
+        sync_interval: int = 300,
+    ):
         """Initialize sync manager."""
         self.redis = redis_client
         self.sync_dir = Path(sync_directory)
@@ -157,8 +163,8 @@ class GoogleDriveSyncManager:
 
     def _get_machine_id(self) -> str:
         """Get or generate machine ID."""
-        import socket
         import platform
+        import socket
 
         hostname = socket.gethostname()
         platform_info = platform.platform()
@@ -170,7 +176,7 @@ class GoogleDriveSyncManager:
         """Load sync metadata from file."""
         if self.sync_metadata_file.exists():
             try:
-                with open(self.sync_metadata_file, 'r') as f:
+                with open(self.sync_metadata_file) as f:
                     data = json.load(f)
                     return SyncMetadata(
                         machine_id=data["machine_id"],
@@ -178,7 +184,7 @@ class GoogleDriveSyncManager:
                         redis_info=data["redis_info"],
                         sync_version=data.get("sync_version", "v1"),
                         conflicts_detected=data.get("conflicts_detected", 0),
-                        conflicts_resolved=data.get("conflicts_resolved", 0)
+                        conflicts_resolved=data.get("conflicts_resolved", 0),
                     )
             except Exception as e:
                 logger.warning(f"Failed to load sync metadata: {e}")
@@ -187,18 +193,18 @@ class GoogleDriveSyncManager:
         return SyncMetadata(
             machine_id=self.machine_id,
             last_sync=datetime.utcnow() - timedelta(days=1),  # Force initial sync
-            redis_info={}
+            redis_info={},
         )
 
     def _save_sync_metadata(self):
         """Save sync metadata to file."""
         try:
-            with open(self.sync_metadata_file, 'w') as f:
+            with open(self.sync_metadata_file, "w") as f:
                 json.dump(asdict(self.sync_metadata), f, indent=2, default=str)
         except Exception as e:
             logger.error(f"Failed to save sync metadata: {e}")
 
-    def create_redis_snapshot(self) -> Optional[Path]:
+    def create_redis_snapshot(self) -> Path | None:
         """Create atomic Redis snapshot for syncing."""
         try:
             # Trigger background save
@@ -284,7 +290,7 @@ class GoogleDriveSyncManager:
             logger.error(f"❌ Redis sync failed: {e}")
             return False
 
-    def _find_remote_snapshots(self) -> Dict[str, Path]:
+    def _find_remote_snapshots(self) -> dict[str, Path]:
         """Find Redis snapshots from other machines."""
         remote_snapshots = {}
 
@@ -407,7 +413,7 @@ class GoogleDriveSyncManager:
                 logger.error(f"❌ Background sync error: {e}")
                 time.sleep(60)  # Wait before retrying
 
-    def get_sync_status(self) -> Dict[str, Any]:
+    def get_sync_status(self) -> dict[str, Any]:
         """Get current sync status and statistics."""
         return {
             "machine_id": self.machine_id,
@@ -416,7 +422,7 @@ class GoogleDriveSyncManager:
             "conflicts_resolved": self.sync_metadata.conflicts_resolved,
             "sync_directory": str(self.sync_dir),
             "redis_info": self.sync_metadata.redis_info,
-            "active_machines": len(list(self.machine_dumps_dir.glob("*.rdb")))
+            "active_machines": len(list(self.machine_dumps_dir.glob("*.rdb"))),
         }
 
 
@@ -425,13 +431,11 @@ if __name__ == "__main__":
     print("🧪 Testing Google Drive Sync Manager")
 
     # Connect to Redis
-    redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
     # Initialize sync manager
     sync_manager = GoogleDriveSyncManager(
-        redis_client=redis_client,
-        sync_directory=Path("/tmp/test_sync"),
-        machine_id="test_machine"
+        redis_client=redis_client, sync_directory=Path("/tmp/test_sync"), machine_id="test_machine"
     )
 
     # Perform test sync

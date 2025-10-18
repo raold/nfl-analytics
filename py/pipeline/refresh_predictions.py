@@ -19,14 +19,13 @@ import argparse
 import logging
 import subprocess
 import sys
-from pathlib import Path
-from typing import List, Dict, Optional
 from datetime import datetime
+from pathlib import Path
+
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -38,11 +37,11 @@ class PredictionRefreshPipeline:
         """Initialize pipeline."""
         self.dry_run = dry_run
         self.db_config = {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+            "host": "localhost",
+            "port": 5544,
         }
         self.project_root = Path(__file__).resolve().parents[2]
 
@@ -50,7 +49,7 @@ class PredictionRefreshPipeline:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def detect_latest_completed_week(self) -> Optional[Dict]:
+    def detect_latest_completed_week(self) -> dict | None:
         """
         Detect the most recent week with completed games.
 
@@ -86,13 +85,13 @@ class PredictionRefreshPipeline:
             completion_pct = (completed / total) * 100
 
             return {
-                'season': season,
-                'week': week,
-                'total_games': total,
-                'completed_games': completed,
-                'completion_pct': completion_pct,
-                'latest_game_date': latest_date,
-                'is_fully_complete': completed == total
+                "season": season,
+                "week": week,
+                "total_games": total,
+                "completed_games": completed,
+                "completion_pct": completion_pct,
+                "latest_game_date": latest_date,
+                "is_fully_complete": completed == total,
             }
         return None
 
@@ -117,12 +116,12 @@ class PredictionRefreshPipeline:
         cur = conn.cursor()
 
         views = [
-            'mv_game_aggregates',
-            'mv_team_rolling_stats',
-            'mv_team_matchup_history',
-            'mv_player_season_stats',
-            'mv_betting_features',
-            'mv_venue_weather_features'
+            "mv_game_aggregates",
+            "mv_team_rolling_stats",
+            "mv_team_matchup_history",
+            "mv_player_season_stats",
+            "mv_betting_features",
+            "mv_venue_weather_features",
         ]
 
         try:
@@ -135,10 +134,13 @@ class PredictionRefreshPipeline:
                 logger.info(f"  ✓ {view} refreshed in {duration:.1f}s")
 
             # Log refresh to tracking table
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO mv_refresh_log (view_name, refresh_started_at, refresh_duration_seconds, status)
                 VALUES ('ALL_VIEWS', NOW(), %s, 'success')
-            """, (sum([1 for _ in views]),))
+            """,
+                (sum([1 for _ in views]),),
+            )
             conn.commit()
 
             cur.close()
@@ -154,10 +156,7 @@ class PredictionRefreshPipeline:
             return False
 
     def generate_win_probability_predictions(
-        self,
-        season: int,
-        current_week: int,
-        weeks_ahead: int = 2
+        self, season: int, current_week: int, weeks_ahead: int = 2
     ) -> bool:
         """
         Generate win probability predictions for upcoming weeks.
@@ -176,22 +175,33 @@ class PredictionRefreshPipeline:
         logger.info(f"Generating win probability predictions for weeks {next_week}-{end_week}...")
 
         if self.dry_run:
-            logger.info(f"[DRY RUN] Would generate predictions for {end_week - next_week + 1} weeks")
+            logger.info(
+                f"[DRY RUN] Would generate predictions for {end_week - next_week + 1} weeks"
+            )
             return True
 
         cmd = [
-            'uv', 'run', 'python',
-            str(self.project_root / 'py/predict/v3_inference_live.py'),
-            '--season', str(season),
-            '--week-start', str(next_week),
-            '--week-end', str(end_week),
-            '--output', str(self.project_root / f'data/predictions/{season}_weeks_{next_week}-{end_week}_winprob.csv')
+            "uv",
+            "run",
+            "python",
+            str(self.project_root / "py/predict/v3_inference_live.py"),
+            "--season",
+            str(season),
+            "--week-start",
+            str(next_week),
+            "--week-end",
+            str(end_week),
+            "--output",
+            str(
+                self.project_root
+                / f"data/predictions/{season}_weeks_{next_week}-{end_week}_winprob.csv"
+            ),
         ]
 
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if result.returncode == 0:
-                logger.info(f"✓ Win probability predictions generated")
+                logger.info("✓ Win probability predictions generated")
                 return True
             else:
                 logger.error(f"✗ Win probability prediction failed: {result.stderr}")
@@ -201,10 +211,7 @@ class PredictionRefreshPipeline:
             return False
 
     def generate_spread_predictions(
-        self,
-        season: int,
-        current_week: int,
-        weeks_ahead: int = 2
+        self, season: int, current_week: int, weeks_ahead: int = 2
     ) -> bool:
         """
         Generate spread coverage predictions for upcoming weeks.
@@ -223,23 +230,35 @@ class PredictionRefreshPipeline:
         logger.info(f"Generating spread coverage predictions for weeks {next_week}-{end_week}...")
 
         if self.dry_run:
-            logger.info(f"[DRY RUN] Would generate spread predictions for {end_week - next_week + 1} weeks")
+            logger.info(
+                f"[DRY RUN] Would generate spread predictions for {end_week - next_week + 1} weeks"
+            )
             return True
 
         cmd = [
-            'uv', 'run', 'python',
-            str(self.project_root / 'py/predict/spread_coverage_inference.py'),
-            '--season', str(season),
-            '--week-start', str(next_week),
-            '--week-end', str(end_week),
-            '--min-edge', '2.0',
-            '--output', str(self.project_root / f'data/predictions/{season}_weeks_{next_week}-{end_week}_spread.csv')
+            "uv",
+            "run",
+            "python",
+            str(self.project_root / "py/predict/spread_coverage_inference.py"),
+            "--season",
+            str(season),
+            "--week-start",
+            str(next_week),
+            "--week-end",
+            str(end_week),
+            "--min-edge",
+            "2.0",
+            "--output",
+            str(
+                self.project_root
+                / f"data/predictions/{season}_weeks_{next_week}-{end_week}_spread.csv"
+            ),
         ]
 
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
             if result.returncode == 0:
-                logger.info(f"✓ Spread coverage predictions generated")
+                logger.info("✓ Spread coverage predictions generated")
                 return True
             else:
                 logger.error(f"✗ Spread prediction failed: {result.stderr}")
@@ -257,12 +276,15 @@ class PredictionRefreshPipeline:
         conn = self.connect_db()
         cur = conn.cursor()
 
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO pipeline_refresh_log (season, week, refresh_timestamp, success)
             VALUES (%s, %s, NOW(), %s)
             ON CONFLICT (season, week) DO UPDATE
             SET refresh_timestamp = NOW(), success = EXCLUDED.success
-        """, (season, week, success))
+        """,
+            (season, week, success),
+        )
 
         conn.commit()
         cur.close()
@@ -270,10 +292,10 @@ class PredictionRefreshPipeline:
 
     def run_pipeline(
         self,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
+        season: int | None = None,
+        week: int | None = None,
         auto_detect: bool = False,
-        weeks_ahead: int = 2
+        weeks_ahead: int = 2,
     ) -> bool:
         """
         Run the full refresh pipeline.
@@ -303,15 +325,19 @@ class PredictionRefreshPipeline:
                 logger.error("✗ No completed games found")
                 return False
 
-            season = week_info['season']
-            week = week_info['week']
+            season = week_info["season"]
+            week = week_info["week"]
 
             logger.info(f"✓ Detected: {season} Week {week}")
-            logger.info(f"  Completed: {week_info['completed_games']}/{week_info['total_games']} games "
-                       f"({week_info['completion_pct']:.0f}%)")
+            logger.info(
+                f"  Completed: {week_info['completed_games']}/{week_info['total_games']} games "
+                f"({week_info['completion_pct']:.0f}%)"
+            )
 
-            if not week_info['is_fully_complete']:
-                logger.warning(f"⚠️  Week {week} is not fully complete - predictions may be suboptimal")
+            if not week_info["is_fully_complete"]:
+                logger.warning(
+                    f"⚠️  Week {week} is not fully complete - predictions may be suboptimal"
+                )
 
         else:
             if season is None or week is None:
@@ -320,24 +346,24 @@ class PredictionRefreshPipeline:
             logger.info(f"\n[1/5] Using specified week: {season} Week {week}")
 
         # Step 2: Refresh materialized views
-        logger.info(f"\n[2/5] Refreshing materialized views...")
+        logger.info("\n[2/5] Refreshing materialized views...")
         if not self.refresh_materialized_views(season, week):
             logger.error("✗ Materialized view refresh failed")
             self.log_refresh_completion(season, week, False)
             return False
 
         # Step 3: Generate win probability predictions
-        logger.info(f"\n[3/5] Generating win probability predictions...")
+        logger.info("\n[3/5] Generating win probability predictions...")
         if not self.generate_win_probability_predictions(season, week, weeks_ahead):
             logger.warning("⚠️  Win probability prediction failed (continuing...)")
 
         # Step 4: Generate spread predictions
-        logger.info(f"\n[4/5] Generating spread coverage predictions...")
+        logger.info("\n[4/5] Generating spread coverage predictions...")
         if not self.generate_spread_predictions(season, week, weeks_ahead):
             logger.warning("⚠️  Spread prediction failed (continuing...)")
 
         # Step 5: Log completion
-        logger.info(f"\n[5/5] Logging refresh completion...")
+        logger.info("\n[5/5] Logging refresh completion...")
         self.log_refresh_completion(season, week, True)
 
         logger.info("\n" + "=" * 80)
@@ -353,19 +379,19 @@ class PredictionRefreshPipeline:
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Automated prediction refresh pipeline')
-    parser.add_argument('--auto', action='store_true',
-                       help='Auto-detect latest completed week')
-    parser.add_argument('--season', type=int,
-                       help='Season to refresh (required if not --auto)')
-    parser.add_argument('--week', type=int,
-                       help='Week that just completed (required if not --auto)')
-    parser.add_argument('--weeks-ahead', type=int, default=2,
-                       help='Number of weeks ahead to predict (default: 2)')
-    parser.add_argument('--dry-run', action='store_true',
-                       help='Show what would be done without making changes')
-    parser.add_argument('--verbose', action='store_true',
-                       help='Verbose logging')
+    parser = argparse.ArgumentParser(description="Automated prediction refresh pipeline")
+    parser.add_argument("--auto", action="store_true", help="Auto-detect latest completed week")
+    parser.add_argument("--season", type=int, help="Season to refresh (required if not --auto)")
+    parser.add_argument(
+        "--week", type=int, help="Week that just completed (required if not --auto)"
+    )
+    parser.add_argument(
+        "--weeks-ahead", type=int, default=2, help="Number of weeks ahead to predict (default: 2)"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be done without making changes"
+    )
+    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 
@@ -377,14 +403,11 @@ def main():
 
     # Run
     success = pipeline.run_pipeline(
-        season=args.season,
-        week=args.week,
-        auto_detect=args.auto,
-        weeks_ahead=args.weeks_ahead
+        season=args.season, week=args.week, auto_detect=args.auto, weeks_ahead=args.weeks_ahead
     )
 
     sys.exit(0 if success else 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

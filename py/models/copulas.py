@@ -107,10 +107,10 @@ def _owen_t(h: float, a: float, *, max_iter: int = 50, tol: float = 1e-10) -> fl
         pwr = a
         for k in range(1, max_iter):
             pwr *= -as_
-            hs_term = hs ** k
+            hs_term = hs**k
             denom = 1.0
             for j in range(1, k + 1):
-                denom *= (2 * j)
+                denom *= 2 * j
             term = pwr * ex * hs_term / (denom * (2 * k + 1))
             s += term
             if abs(term) < tol:
@@ -119,9 +119,11 @@ def _owen_t(h: float, a: float, *, max_iter: int = 50, tol: float = 1e-10) -> fl
     else:
         # For |a| > 1, use T(h,a) = 0.5*Phi(h) - Phi(h*sqrt(1+a^2)) + T(h*a, 1/a)
         rhs = h / math.sqrt(1.0 + a * a)
-        return 0.5 * (1.0 + math.erf(h / math.sqrt(2))) / 2.0 - \
-               (1.0 + math.erf(rhs / math.sqrt(2))) / 2.0 + \
-               _owen_t(h * a, 1.0 / a)
+        return (
+            0.5 * (1.0 + math.erf(h / math.sqrt(2))) / 2.0
+            - (1.0 + math.erf(rhs / math.sqrt(2))) / 2.0
+            + _owen_t(h * a, 1.0 / a)
+        )
 
 
 def _bvn_cdf(x: float, y: float, rho: float) -> float:

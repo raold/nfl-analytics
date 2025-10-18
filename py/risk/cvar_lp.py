@@ -22,6 +22,7 @@ import os
 try:
     import cvxpy as cp
     import numpy as np
+
     HAS_CVXPY = True
 except ImportError:
     HAS_CVXPY = False
@@ -29,21 +30,15 @@ except ImportError:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        description="CVaR stake sizing via Rockafellar-Uryasev LP"
-    )
+    ap = argparse.ArgumentParser(description="CVaR stake sizing via Rockafellar-Uryasev LP")
     ap.add_argument("--scenarios", required=True, help="CSV matrix BxN of scenario returns")
     ap.add_argument("--alpha", type=float, default=0.95, help="CVaR level (e.g., 0.95)")
-    ap.add_argument(
-        "--cap", type=float, default=0.02, help="Per-position stake cap (fraction)"
-    )
+    ap.add_argument("--cap", type=float, default=0.02, help="Per-position stake cap (fraction)")
     ap.add_argument(
         "--budget", type=float, default=1.0, help="Total budget (sum of stakes ≤ budget)"
     )
     ap.add_argument("--output", required=True, help="JSON output path for stakes + CVaR")
-    ap.add_argument(
-        "--solver", default="CLARABEL", help="cvxpy solver (CLARABEL, OSQP, SCS, ECOS)"
-    )
+    ap.add_argument("--solver", default="CLARABEL", help="cvxpy solver (CLARABEL, OSQP, SCS, ECOS)")
     return ap.parse_args()
 
 
@@ -56,11 +51,7 @@ def load_matrix(path: str) -> list[list[float]]:
 
 
 def solve_cvar_lp(
-    returns: np.ndarray,
-    alpha: float,
-    cap: float,
-    budget: float,
-    solver: str = "CLARABEL"
+    returns: np.ndarray, alpha: float, cap: float, budget: float, solver: str = "CLARABEL"
 ) -> tuple[np.ndarray, float, float]:
     """
     Solve CVaR optimization using Rockafellar-Uryasev LP formulation.
@@ -213,8 +204,10 @@ def main() -> None:
     with open(args.output, "w", encoding="utf-8") as g:
         json.dump(result, g, indent=2)
 
-    print(f"[cvar] method={method} α={args.alpha} CVaR={cvar:.6f} VaR={var:.6f} "
-          f"total_stake={sum(stakes_list):.4f} -> {args.output}")
+    print(
+        f"[cvar] method={method} α={args.alpha} CVaR={cvar:.6f} VaR={var:.6f} "
+        f"total_stake={sum(stakes_list):.4f} -> {args.output}"
+    )
 
 
 if __name__ == "__main__":

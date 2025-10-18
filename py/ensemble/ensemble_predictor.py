@@ -34,19 +34,16 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 import torch
 import xgboost as xgb
-from scipy.stats import entropy
 
 # Import RL agents
-sys.path.append(str(Path(__file__).parent.parent / 'rl'))
+sys.path.append(str(Path(__file__).parent.parent / "rl"))
 from cql_agent import CQLAgent
 from iql_agent import IQLAgent
-
 
 # ============================================================================
 # XGBoost Model Loader
@@ -71,7 +68,7 @@ class XGBoostPredictor:
             with open(config_path) as f:
                 self.config = json.load(f)
 
-    def predict(self, features: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, features: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
         """
         Predict win probabilities with uncertainty.
 
@@ -86,8 +83,7 @@ class XGBoostPredictor:
         # Normalized to [0, 1] by dividing by max entropy (log(2))
         eps = 1e-10
         p_clipped = np.clip(probs, eps, 1 - eps)
-        uncertainties = -(p_clipped * np.log2(p_clipped) +
-                         (1 - p_clipped) * np.log2(1 - p_clipped))
+        uncertainties = -(p_clipped * np.log2(p_clipped) + (1 - p_clipped) * np.log2(1 - p_clipped))
 
         return probs, uncertainties
 
@@ -118,7 +114,7 @@ class XGBoostPredictor:
 class CQLPredictor:
     """Wrapper for CQL agent with uncertainty quantification."""
 
-    def __init__(self, model_path: str, state_dim: int = 6, device: str = 'cpu'):
+    def __init__(self, model_path: str, state_dim: int = 6, device: str = "cpu"):
         """Load CQL model from checkpoint."""
         self.device = torch.device(device)
 
@@ -136,7 +132,7 @@ class CQLPredictor:
         self.agent.load(str(model_path))
         self.agent.q_network.eval()
 
-    def predict(self, states: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, states: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Predict actions with uncertainty.
 
@@ -179,7 +175,7 @@ class CQLPredictor:
 class IQLPredictor:
     """Wrapper for IQL agent with uncertainty quantification."""
 
-    def __init__(self, model_path: str, state_dim: int = 6, device: str = 'cpu'):
+    def __init__(self, model_path: str, state_dim: int = 6, device: str = "cpu"):
         """Load IQL model from checkpoint."""
         self.device = torch.device(device)
 
@@ -200,7 +196,7 @@ class IQLPredictor:
         self.agent.q_network.eval()
         self.agent.v_network.eval()
 
-    def predict(self, states: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, states: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Predict actions with uncertainty.
 
@@ -267,7 +263,7 @@ class EnsemblePredictor:
         xgb_model: XGBoostPredictor,
         cql_model: CQLPredictor,
         iql_model: IQLPredictor,
-        strategy: str = 'unanimous',
+        strategy: str = "unanimous",
         uncertainty_threshold: float = 0.5,
         xgb_weight: float = 0.5,
         cql_weight: float = 0.3,
@@ -290,7 +286,7 @@ class EnsemblePredictor:
         xgb_features: pd.DataFrame,
         rl_states: np.ndarray,
         market_probs: np.ndarray,
-    ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
+    ) -> tuple[np.ndarray, dict[str, np.ndarray]]:
         """
         Predict actions with ensemble voting and uncertainty filtering.
 
@@ -311,10 +307,9 @@ class EnsemblePredictor:
         iql_actions, iql_uncertainties = self.iql.predict(rl_states)
 
         # Convert XGBoost probabilities to actions
-        xgb_actions = np.array([
-            self.xgb.get_action(xgb_probs[i], market_probs[i])
-            for i in range(n_samples)
-        ])
+        xgb_actions = np.array(
+            [self.xgb.get_action(xgb_probs[i], market_probs[i]) for i in range(n_samples)]
+        )
 
         # Initialize ensemble actions
         ensemble_actions = np.zeros(n_samples, dtype=int)
@@ -322,22 +317,24 @@ class EnsemblePredictor:
         # Apply voting strategy
         for i in range(n_samples):
             # Check uncertainty threshold
-            if (xgb_uncertainties[i] > self.uncertainty_threshold or
-                cql_uncertainties[i] > self.uncertainty_threshold or
-                iql_uncertainties[i] > self.uncertainty_threshold):
+            if (
+                xgb_uncertainties[i] > self.uncertainty_threshold
+                or cql_uncertainties[i] > self.uncertainty_threshold
+                or iql_uncertainties[i] > self.uncertainty_threshold
+            ):
                 # Too uncertain - no bet
                 ensemble_actions[i] = 0
                 continue
 
             # Voting
-            if self.strategy == 'unanimous':
+            if self.strategy == "unanimous":
                 # All 3 must agree
                 if xgb_actions[i] == cql_actions[i] == iql_actions[i]:
                     ensemble_actions[i] = xgb_actions[i]
                 else:
                     ensemble_actions[i] = 0  # no-bet
 
-            elif self.strategy == 'majority':
+            elif self.strategy == "majority":
                 # At least 2 must agree
                 votes = [xgb_actions[i], cql_actions[i], iql_actions[i]]
                 action_counts = {a: votes.count(a) for a in set(votes)}
@@ -348,7 +345,7 @@ class EnsemblePredictor:
                 else:
                     ensemble_actions[i] = 0  # no-bet
 
-            elif self.strategy == 'weighted':
+            elif self.strategy == "weighted":
                 # Weighted vote by confidence (inverse uncertainty)
                 # Weight each action by (1 - uncertainty) * model_weight
                 action_scores = {}
@@ -373,13 +370,13 @@ class EnsemblePredictor:
 
         # Metadata
         metadata = {
-            'xgb_probs': xgb_probs,
-            'xgb_actions': xgb_actions,
-            'xgb_uncertainties': xgb_uncertainties,
-            'cql_actions': cql_actions,
-            'cql_uncertainties': cql_uncertainties,
-            'iql_actions': iql_actions,
-            'iql_uncertainties': iql_uncertainties,
+            "xgb_probs": xgb_probs,
+            "xgb_actions": xgb_actions,
+            "xgb_uncertainties": xgb_uncertainties,
+            "cql_actions": cql_actions,
+            "cql_uncertainties": cql_uncertainties,
+            "iql_actions": iql_actions,
+            "iql_uncertainties": iql_uncertainties,
         }
 
         return ensemble_actions, metadata
@@ -393,10 +390,10 @@ class EnsemblePredictor:
 def backtest_ensemble(
     ensemble: EnsemblePredictor,
     test_df: pd.DataFrame,
-    xgb_features: List[str],
-    rl_state_cols: List[str],
-    bet_sizes: Dict[int, float] = None,
-) -> Dict:
+    xgb_features: list[str],
+    rl_state_cols: list[str],
+    bet_sizes: dict[int, float] = None,
+) -> dict:
     """
     Backtest ensemble on historical data.
 
@@ -421,7 +418,7 @@ def backtest_ensemble(
     # Market probabilities (from closing spread)
     # Simplified: convert spread to implied probability using empirical rule
     # P(home win) ≈ 0.5 + (spread / 27)  [rough approximation]
-    spreads = test_df['spread_close'].to_numpy()
+    spreads = test_df["spread_close"].to_numpy()
     market_probs = 0.5 + (spreads / 27.0)
     market_probs = np.clip(market_probs, 0.01, 0.99)
 
@@ -429,7 +426,7 @@ def backtest_ensemble(
     actions, metadata = ensemble.predict(xgb_feats, rl_states, market_probs)
 
     # Compute returns for each bet
-    home_results = test_df['home_result'].to_numpy()  # 1 if home won, 0 otherwise
+    home_results = test_df["home_result"].to_numpy()  # 1 if home won, 0 otherwise
 
     returns = []
     bets = []
@@ -444,7 +441,7 @@ def backtest_ensemble(
         bet_size = bet_sizes[action]
 
         # Direction: bet home if model prob > market prob
-        model_prob = metadata['xgb_probs'][i]
+        model_prob = metadata["xgb_probs"][i]
         bet_home = model_prob > market_probs[i]
 
         # Outcome
@@ -458,32 +455,34 @@ def backtest_ensemble(
             ret = -bet_size  # lose $1 per $1 risked
 
         returns.append(ret)
-        bets.append({
-            'action': action,
-            'bet_size': bet_size,
-            'bet_home': bet_home,
-            'bet_won': bet_won,
-            'return': ret,
-            'model_prob': model_prob,
-            'market_prob': market_probs[i],
-            'edge': model_prob - market_probs[i],
-        })
+        bets.append(
+            {
+                "action": action,
+                "bet_size": bet_size,
+                "bet_home": bet_home,
+                "bet_won": bet_won,
+                "return": ret,
+                "model_prob": model_prob,
+                "market_prob": market_probs[i],
+                "edge": model_prob - market_probs[i],
+            }
+        )
 
     # Aggregate metrics
     if len(returns) == 0:
         return {
-            'n_games': len(test_df),
-            'n_bets': 0,
-            'bet_rate': 0.0,
-            'total_return': 0.0,
-            'roi': 0.0,
-            'win_rate': 0.0,
-            'sharpe_ratio': 0.0,
-            'max_drawdown': 0.0,
-            'action_distribution': {},
-            'agreement_rates': {},
-            'uncertainty_stats': {},
-            'avg_edge': 0.0,
+            "n_games": len(test_df),
+            "n_bets": 0,
+            "bet_rate": 0.0,
+            "total_return": 0.0,
+            "roi": 0.0,
+            "win_rate": 0.0,
+            "sharpe_ratio": 0.0,
+            "max_drawdown": 0.0,
+            "action_distribution": {},
+            "agreement_rates": {},
+            "uncertainty_stats": {},
+            "avg_edge": 0.0,
         }
 
     returns = np.array(returns)
@@ -494,7 +493,7 @@ def backtest_ensemble(
     bet_rate = n_bets / n_games
     total_return = returns.sum()
     roi = (total_return / n_bets) * 100  # percent
-    win_rate = np.mean([b['bet_won'] for b in bets]) * 100
+    win_rate = np.mean([b["bet_won"] for b in bets]) * 100
 
     # Risk metrics
     sharpe_ratio = returns.mean() / returns.std() if returns.std() > 0 else 0.0
@@ -507,38 +506,40 @@ def backtest_ensemble(
     action_dist = pd.Series(actions).value_counts(normalize=True).to_dict()
 
     # Agreement metrics
-    xgb_cql_agree = (metadata['xgb_actions'] == metadata['cql_actions']).mean()
-    xgb_iql_agree = (metadata['xgb_actions'] == metadata['iql_actions']).mean()
-    cql_iql_agree = (metadata['cql_actions'] == metadata['iql_actions']).mean()
-    all_agree = ((metadata['xgb_actions'] == metadata['cql_actions']) &
-                 (metadata['cql_actions'] == metadata['iql_actions'])).mean()
+    xgb_cql_agree = (metadata["xgb_actions"] == metadata["cql_actions"]).mean()
+    xgb_iql_agree = (metadata["xgb_actions"] == metadata["iql_actions"]).mean()
+    cql_iql_agree = (metadata["cql_actions"] == metadata["iql_actions"]).mean()
+    all_agree = (
+        (metadata["xgb_actions"] == metadata["cql_actions"])
+        & (metadata["cql_actions"] == metadata["iql_actions"])
+    ).mean()
 
     # Uncertainty statistics
     uncertainty_stats = {
-        'xgb_mean': metadata['xgb_uncertainties'].mean(),
-        'cql_mean': metadata['cql_uncertainties'].mean(),
-        'iql_mean': metadata['iql_uncertainties'].mean(),
+        "xgb_mean": metadata["xgb_uncertainties"].mean(),
+        "cql_mean": metadata["cql_uncertainties"].mean(),
+        "iql_mean": metadata["iql_uncertainties"].mean(),
     }
 
     return {
-        'n_games': n_games,
-        'n_bets': n_bets,
-        'bet_rate': bet_rate,
-        'total_return': total_return,
-        'roi': roi,
-        'win_rate': win_rate,
-        'sharpe_ratio': sharpe_ratio,
-        'max_drawdown': max_drawdown,
-        'action_distribution': action_dist,
-        'agreement_rates': {
-            'xgb_cql': xgb_cql_agree,
-            'xgb_iql': xgb_iql_agree,
-            'cql_iql': cql_iql_agree,
-            'all_agree': all_agree,
+        "n_games": n_games,
+        "n_bets": n_bets,
+        "bet_rate": bet_rate,
+        "total_return": total_return,
+        "roi": roi,
+        "win_rate": win_rate,
+        "sharpe_ratio": sharpe_ratio,
+        "max_drawdown": max_drawdown,
+        "action_distribution": action_dist,
+        "agreement_rates": {
+            "xgb_cql": xgb_cql_agree,
+            "xgb_iql": xgb_iql_agree,
+            "cql_iql": cql_iql_agree,
+            "all_agree": all_agree,
         },
-        'uncertainty_stats': uncertainty_stats,
-        'avg_edge': np.mean([b['edge'] for b in bets]),
-        'bets_detail': bets,
+        "uncertainty_stats": uncertainty_stats,
+        "avg_edge": np.mean([b["edge"] for b in bets]),
+        "bets_detail": bets,
     }
 
 
@@ -548,41 +549,66 @@ def backtest_ensemble(
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description='Ensemble uncertainty filtering (Task 6)')
+    ap = argparse.ArgumentParser(description="Ensemble uncertainty filtering (Task 6)")
 
     # Model paths
-    ap.add_argument('--xgb-model', required=True, help='XGBoost model JSON path')
-    ap.add_argument('--cql-model', required=True, help='CQL model PTH path')
-    ap.add_argument('--iql-model', required=True, help='IQL model PTH path')
+    ap.add_argument("--xgb-model", required=True, help="XGBoost model JSON path")
+    ap.add_argument("--cql-model", required=True, help="CQL model PTH path")
+    ap.add_argument("--iql-model", required=True, help="IQL model PTH path")
 
     # Data
-    ap.add_argument('--test-data', required=True, help='Test data CSV')
-    ap.add_argument('--test-season', type=int, default=2024, help='Test season')
+    ap.add_argument("--test-data", required=True, help="Test data CSV")
+    ap.add_argument("--test-season", type=int, default=2024, help="Test season")
 
     # Ensemble config
-    ap.add_argument('--strategy', choices=['unanimous', 'majority', 'weighted'],
-                    default='unanimous', help='Voting strategy')
-    ap.add_argument('--uncertainty-threshold', type=float, default=0.5,
-                    help='Max uncertainty to allow betting')
-    ap.add_argument('--xgb-weight', type=float, default=0.5, help='XGBoost weight (weighted voting)')
-    ap.add_argument('--cql-weight', type=float, default=0.3, help='CQL weight (weighted voting)')
-    ap.add_argument('--iql-weight', type=float, default=0.2, help='IQL weight (weighted voting)')
+    ap.add_argument(
+        "--strategy",
+        choices=["unanimous", "majority", "weighted"],
+        default="unanimous",
+        help="Voting strategy",
+    )
+    ap.add_argument(
+        "--uncertainty-threshold", type=float, default=0.5, help="Max uncertainty to allow betting"
+    )
+    ap.add_argument(
+        "--xgb-weight", type=float, default=0.5, help="XGBoost weight (weighted voting)"
+    )
+    ap.add_argument("--cql-weight", type=float, default=0.3, help="CQL weight (weighted voting)")
+    ap.add_argument("--iql-weight", type=float, default=0.2, help="IQL weight (weighted voting)")
 
     # Features
-    ap.add_argument('--xgb-features', nargs='+',
-                    default=['prior_epa_mean_diff', 'epa_pp_last3_diff', 'season_win_pct_diff',
-                            'win_pct_last5_diff', 'prior_margin_avg_diff', 'points_for_last3_diff',
-                            'points_against_last3_diff', 'rest_diff', 'week',
-                            'fourth_downs_diff', 'fourth_down_epa_diff'],
-                    help='XGBoost feature columns')
-    ap.add_argument('--rl-state-cols', nargs='+',
-                    default=['spread_close', 'total_close', 'epa_gap', 'market_prob', 'p_hat', 'edge'],
-                    help='RL state feature columns')
+    ap.add_argument(
+        "--xgb-features",
+        nargs="+",
+        default=[
+            "prior_epa_mean_diff",
+            "epa_pp_last3_diff",
+            "season_win_pct_diff",
+            "win_pct_last5_diff",
+            "prior_margin_avg_diff",
+            "points_for_last3_diff",
+            "points_against_last3_diff",
+            "rest_diff",
+            "week",
+            "fourth_downs_diff",
+            "fourth_down_epa_diff",
+        ],
+        help="XGBoost feature columns",
+    )
+    ap.add_argument(
+        "--rl-state-cols",
+        nargs="+",
+        default=["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"],
+        help="RL state feature columns",
+    )
 
     # Output
-    ap.add_argument('--output', default='results/ensemble_backtest.json',
-                    help='Output path for backtest results')
-    ap.add_argument('--device', default='cpu', help='Device: cpu/cuda/mps')
+    ap.add_argument(
+        "--output",
+        default="results/ensemble_backtest.json",
+        help="Output path for backtest results",
+    )
+    ap.add_argument("--device", default="cpu", help="Device: cpu/cuda/mps")
 
     return ap.parse_args()
 
@@ -591,14 +617,14 @@ def main():
     args = parse_args()
 
     print(f"{'='*80}")
-    print(f"Ensemble Uncertainty Filtering (Task 6)")
+    print("Ensemble Uncertainty Filtering (Task 6)")
     print(f"{'='*80}")
     print(f"Strategy: {args.strategy}")
     print(f"Uncertainty threshold: {args.uncertainty_threshold}")
     print(f"Test season: {args.test_season}")
 
     # Load models
-    print(f"\nLoading models...")
+    print("\nLoading models...")
     print(f"  XGBoost: {args.xgb_model}")
     xgb_model = XGBoostPredictor(args.xgb_model)
 
@@ -625,11 +651,11 @@ def main():
     df = pd.read_csv(args.test_data)
 
     # Filter to test season
-    test_df = df[df['season'] == args.test_season].copy()
+    test_df = df[df["season"] == args.test_season].copy()
     print(f"  Test season {args.test_season}: {len(test_df)} games")
 
     # Check required columns
-    required_cols = set(args.xgb_features + args.rl_state_cols + ['home_result', 'spread_close'])
+    required_cols = set(args.xgb_features + args.rl_state_cols + ["home_result", "spread_close"])
     missing_cols = required_cols - set(test_df.columns)
     if missing_cols:
         print(f"ERROR: Missing columns: {missing_cols}")
@@ -640,7 +666,7 @@ def main():
     print(f"  After dropping NaN: {len(test_df)} games")
 
     # Backtest
-    print(f"\nRunning backtest...")
+    print("\nRunning backtest...")
     results = backtest_ensemble(
         ensemble=ensemble,
         test_df=test_df,
@@ -650,7 +676,7 @@ def main():
 
     # Print results
     print(f"\n{'='*80}")
-    print(f"Backtest Results")
+    print("Backtest Results")
     print(f"{'='*80}")
     print(f"Games: {results['n_games']}")
     print(f"Bets placed: {results['n_bets']} ({results['bet_rate']*100:.1f}% of games)")
@@ -661,17 +687,19 @@ def main():
     print(f"Max drawdown: {results['max_drawdown']:.2f} units")
     print(f"Average edge: {results['avg_edge']:+.4f}")
 
-    print(f"\nAction distribution:")
-    for action, pct in sorted(results['action_distribution'].items()):
-        action_name = {0: 'no-bet', 1: 'small', 2: 'medium', 3: 'large'}.get(action, f'action_{action}')
+    print("\nAction distribution:")
+    for action, pct in sorted(results["action_distribution"].items()):
+        action_name = {0: "no-bet", 1: "small", 2: "medium", 3: "large"}.get(
+            action, f"action_{action}"
+        )
         print(f"  {action_name}: {pct*100:.1f}%")
 
-    print(f"\nModel agreement rates:")
-    for pair, rate in results['agreement_rates'].items():
+    print("\nModel agreement rates:")
+    for pair, rate in results["agreement_rates"].items():
         print(f"  {pair}: {rate*100:.1f}%")
 
-    print(f"\nUncertainty statistics:")
-    for model, mean_unc in results['uncertainty_stats'].items():
+    print("\nUncertainty statistics:")
+    for model, mean_unc in results["uncertainty_stats"].items():
         print(f"  {model}: {mean_unc:.3f}")
 
     # Save results
@@ -680,12 +708,12 @@ def main():
 
     # Convert bets_detail to serializable format
     results_copy = results.copy()
-    results_copy['bets_detail'] = [
+    results_copy["bets_detail"] = [
         {k: (float(v) if isinstance(v, np.generic) else v) for k, v in bet.items()}
-        for bet in results['bets_detail']
+        for bet in results["bets_detail"]
     ]
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(results_copy, f, indent=2, default=str)
 
     print(f"\nResults saved to {output_path}")
@@ -693,5 +721,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

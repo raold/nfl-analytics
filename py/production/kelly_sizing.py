@@ -37,10 +37,8 @@ Usage:
 
 import argparse
 import sys
-from typing import Tuple, Dict, List
-import numpy as np
-import matplotlib.pyplot as plt
 
+import numpy as np
 
 # ============================================================================
 # Kelly Criterion Calculations
@@ -154,7 +152,7 @@ def optimal_bet_size(
     kelly_fraction: float = 0.25,
     max_bet_fraction: float = 0.05,
     min_edge: float = 0.01,
-) -> Dict:
+) -> dict:
     """
     Calculate optimal bet size with Kelly criterion.
 
@@ -175,9 +173,9 @@ def optimal_bet_size(
     # Check if +EV
     if edge < min_edge:
         return {
-            'should_bet': False,
-            'edge': edge,
-            'reason': f'Insufficient edge ({edge:.3f} < {min_edge:.3f})',
+            "should_bet": False,
+            "edge": edge,
+            "reason": f"Insufficient edge ({edge:.3f} < {min_edge:.3f})",
         }
 
     # Calculate Kelly bet
@@ -195,15 +193,15 @@ def optimal_bet_size(
     ev = bet_amount * (model_prob * decimal_odds - (1 - model_prob))
 
     return {
-        'should_bet': True,
-        'edge': edge,
-        'model_prob': model_prob,
-        'implied_prob': american_odds_to_implied_prob(market_odds),
-        'decimal_odds': decimal_odds,
-        'bet_fraction': bet_fraction,
-        'bet_amount': bet_amount,
-        'expected_value': ev,
-        'roi': (ev / bet_amount) * 100 if bet_amount > 0 else 0.0,
+        "should_bet": True,
+        "edge": edge,
+        "model_prob": model_prob,
+        "implied_prob": american_odds_to_implied_prob(market_odds),
+        "decimal_odds": decimal_odds,
+        "bet_fraction": bet_fraction,
+        "bet_amount": bet_amount,
+        "expected_value": ev,
+        "roi": (ev / bet_amount) * 100 if bet_amount > 0 else 0.0,
     }
 
 
@@ -220,7 +218,7 @@ def simulate_kelly_growth(
     kelly_fraction: float = 1.0,
     max_bet_fraction: float = 0.10,
     seed: int = None,
-) -> Dict:
+) -> dict:
     """
     Simulate bankroll growth using Kelly criterion.
 
@@ -276,17 +274,17 @@ def simulate_kelly_growth(
     drawdown = (peak - bankroll_history) / peak * 100  # percentage
 
     return {
-        'final_bankroll': bankroll,
-        'total_return': bankroll - initial_bankroll,
-        'roi': ((bankroll / initial_bankroll) - 1) * 100,
-        'n_bets': n_bets,
-        'wins': wins,
-        'losses': losses,
-        'win_rate': (wins / n_bets) * 100,
-        'bet_fraction': bet_fraction,
-        'max_drawdown_pct': drawdown.max(),
-        'sharpe_ratio': returns.mean() / returns.std() if returns.std() > 0 else 0,
-        'bankroll_history': bankroll_history,
+        "final_bankroll": bankroll,
+        "total_return": bankroll - initial_bankroll,
+        "roi": ((bankroll / initial_bankroll) - 1) * 100,
+        "n_bets": n_bets,
+        "wins": wins,
+        "losses": losses,
+        "win_rate": (wins / n_bets) * 100,
+        "bet_fraction": bet_fraction,
+        "max_drawdown_pct": drawdown.max(),
+        "sharpe_ratio": returns.mean() / returns.std() if returns.std() > 0 else 0,
+        "bankroll_history": bankroll_history,
     }
 
 
@@ -295,9 +293,9 @@ def compare_kelly_fractions(
     decimal_odds: float,
     initial_bankroll: float,
     n_bets: int,
-    fractions: List[float] = None,
+    fractions: list[float] = None,
     n_simulations: int = 100,
-) -> Dict:
+) -> dict:
     """
     Compare different Kelly fractions via Monte Carlo simulation.
 
@@ -331,22 +329,22 @@ def compare_kelly_fractions(
                 max_bet_fraction=0.50,  # Allow large bets for comparison
                 seed=sim,
             )
-            final_bankrolls.append(sim_result['final_bankroll'])
-            max_drawdowns.append(sim_result['max_drawdown_pct'])
+            final_bankrolls.append(sim_result["final_bankroll"])
+            max_drawdowns.append(sim_result["max_drawdown_pct"])
 
         final_bankrolls = np.array(final_bankrolls)
         max_drawdowns = np.array(max_drawdowns)
 
-        results[f'{frac:.3f}'] = {
-            'kelly_fraction': frac,
-            'median_final': np.median(final_bankrolls),
-            'mean_final': np.mean(final_bankrolls),
-            'std_final': np.std(final_bankrolls),
-            'p5': np.percentile(final_bankrolls, 5),
-            'p95': np.percentile(final_bankrolls, 95),
-            'median_drawdown': np.median(max_drawdowns),
-            'max_drawdown': np.max(max_drawdowns),
-            'ruin_rate': np.mean(final_bankrolls < initial_bankroll * 0.5) * 100,  # >50% loss
+        results[f"{frac:.3f}"] = {
+            "kelly_fraction": frac,
+            "median_final": np.median(final_bankrolls),
+            "mean_final": np.mean(final_bankrolls),
+            "std_final": np.std(final_bankrolls),
+            "p5": np.percentile(final_bankrolls, 5),
+            "p95": np.percentile(final_bankrolls, 95),
+            "median_drawdown": np.median(max_drawdowns),
+            "max_drawdown": np.max(max_drawdowns),
+            "ruin_rate": np.mean(final_bankrolls < initial_bankroll * 0.5) * 100,  # >50% loss
         }
 
     return results
@@ -358,27 +356,25 @@ def compare_kelly_fractions(
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        description='Kelly Criterion Bet Sizing for NFL Betting'
-    )
+    ap = argparse.ArgumentParser(description="Kelly Criterion Bet Sizing for NFL Betting")
 
     # Single bet calculation
-    ap.add_argument('--win-prob', type=float, help='Win probability (0-1)')
-    ap.add_argument('--odds', type=int, help='American odds (e.g., -110)')
-    ap.add_argument('--bankroll', type=float, default=10000.0, help='Bankroll ($)')
-    ap.add_argument('--kelly-fraction', type=float, default=0.25, help='Fraction of Kelly to bet')
-    ap.add_argument('--max-bet-fraction', type=float, default=0.05, help='Max bet fraction')
-    ap.add_argument('--min-edge', type=float, default=0.01, help='Minimum edge to bet')
+    ap.add_argument("--win-prob", type=float, help="Win probability (0-1)")
+    ap.add_argument("--odds", type=int, help="American odds (e.g., -110)")
+    ap.add_argument("--bankroll", type=float, default=10000.0, help="Bankroll ($)")
+    ap.add_argument("--kelly-fraction", type=float, default=0.25, help="Fraction of Kelly to bet")
+    ap.add_argument("--max-bet-fraction", type=float, default=0.05, help="Max bet fraction")
+    ap.add_argument("--min-edge", type=float, default=0.01, help="Minimum edge to bet")
 
     # Simulation
-    ap.add_argument('--simulate', action='store_true', help='Run simulation')
-    ap.add_argument('--n-bets', type=int, default=1000, help='Number of bets to simulate')
-    ap.add_argument('--n-simulations', type=int, default=100, help='Number of Monte Carlo trials')
-    ap.add_argument('--compare-fractions', action='store_true', help='Compare Kelly fractions')
+    ap.add_argument("--simulate", action="store_true", help="Run simulation")
+    ap.add_argument("--n-bets", type=int, default=1000, help="Number of bets to simulate")
+    ap.add_argument("--n-simulations", type=int, default=100, help="Number of Monte Carlo trials")
+    ap.add_argument("--compare-fractions", action="store_true", help="Compare Kelly fractions")
 
     # Output
-    ap.add_argument('--plot', action='store_true', help='Generate plots')
-    ap.add_argument('--output', help='Output file for plot (e.g., kelly_growth.png)')
+    ap.add_argument("--plot", action="store_true", help="Generate plots")
+    ap.add_argument("--output", help="Output file for plot (e.g., kelly_growth.png)")
 
     return ap.parse_args()
 
@@ -387,7 +383,7 @@ def main():
     args = parse_args()
 
     print(f"{'='*80}")
-    print(f"Kelly Criterion Bet Sizing")
+    print("Kelly Criterion Bet Sizing")
     print(f"{'='*80}")
 
     # Validate inputs
@@ -401,7 +397,7 @@ def main():
 
     if args.simulate:
         # Simulation mode
-        print(f"\nSimulation Parameters:")
+        print("\nSimulation Parameters:")
         print(f"  Win probability: {args.win_prob:.3f}")
         print(f"  Odds: {args.odds} ({american_to_decimal_odds(args.odds):.3f} decimal)")
         print(f"  Initial bankroll: ${args.bankroll:,.0f}")
@@ -423,23 +419,27 @@ def main():
             )
 
             # Print table
-            print(f"\n{'Fraction':<10} {'Median Final':<15} {'Mean Final':<15} "
-                  f"{'5th %ile':<12} {'95th %ile':<12} {'Med DD %':<10} {'Ruin %':<8}")
+            print(
+                f"\n{'Fraction':<10} {'Median Final':<15} {'Mean Final':<15} "
+                f"{'5th %ile':<12} {'95th %ile':<12} {'Med DD %':<10} {'Ruin %':<8}"
+            )
             print(f"{'-'*90}")
 
             for frac, res in sorted(results.items(), key=lambda x: float(x[0])):
-                print(f"{res['kelly_fraction']:<10.3f} "
-                      f"${res['median_final']:<14,.0f} "
-                      f"${res['mean_final']:<14,.0f} "
-                      f"${res['p5']:<11,.0f} "
-                      f"${res['p95']:<11,.0f} "
-                      f"{res['median_drawdown']:<9.1f} "
-                      f"{res['ruin_rate']:<7.1f}")
+                print(
+                    f"{res['kelly_fraction']:<10.3f} "
+                    f"${res['median_final']:<14,.0f} "
+                    f"${res['mean_final']:<14,.0f} "
+                    f"${res['p5']:<11,.0f} "
+                    f"${res['p95']:<11,.0f} "
+                    f"{res['median_drawdown']:<9.1f} "
+                    f"{res['ruin_rate']:<7.1f}"
+                )
 
-            print(f"\nRecommendation:")
-            print(f"  Quarter Kelly (0.25): Best risk-adjusted returns")
-            print(f"  Half Kelly (0.5): Moderate growth, acceptable drawdowns")
-            print(f"  Full Kelly (1.0): Maximum growth, high variance (not recommended)")
+            print("\nRecommendation:")
+            print("  Quarter Kelly (0.25): Best risk-adjusted returns")
+            print("  Half Kelly (0.5): Moderate growth, acceptable drawdowns")
+            print("  Full Kelly (1.0): Maximum growth, high variance (not recommended)")
 
         else:
             # Single simulation
@@ -453,8 +453,10 @@ def main():
                 max_bet_fraction=args.max_bet_fraction,
             )
 
-            print(f"\nSimulation Results:")
-            print(f"  Kelly fraction: {result['bet_fraction']:.4f} ({args.kelly_fraction*100:.0f}% Kelly)")
+            print("\nSimulation Results:")
+            print(
+                f"  Kelly fraction: {result['bet_fraction']:.4f} ({args.kelly_fraction*100:.0f}% Kelly)"
+            )
             print(f"  Final bankroll: ${result['final_bankroll']:,.0f}")
             print(f"  Total return: ${result['total_return']:+,.0f}")
             print(f"  ROI: {result['roi']:+.2f}%")
@@ -467,23 +469,25 @@ def main():
                 import matplotlib.pyplot as plt
 
                 plt.figure(figsize=(12, 6))
-                plt.plot(result['bankroll_history'], linewidth=2)
-                plt.axhline(args.bankroll, color='k', linestyle='--', label='Initial bankroll')
-                plt.xlabel('Bet Number')
-                plt.ylabel('Bankroll ($)')
-                plt.title(f'Kelly Growth Simulation (p={args.win_prob:.2f}, {args.kelly_fraction*100:.0f}% Kelly)')
+                plt.plot(result["bankroll_history"], linewidth=2)
+                plt.axhline(args.bankroll, color="k", linestyle="--", label="Initial bankroll")
+                plt.xlabel("Bet Number")
+                plt.ylabel("Bankroll ($)")
+                plt.title(
+                    f"Kelly Growth Simulation (p={args.win_prob:.2f}, {args.kelly_fraction*100:.0f}% Kelly)"
+                )
                 plt.legend()
                 plt.grid(True, alpha=0.3)
 
                 if args.output:
-                    plt.savefig(args.output, dpi=300, bbox_inches='tight')
+                    plt.savefig(args.output, dpi=300, bbox_inches="tight")
                     print(f"\nPlot saved to {args.output}")
                 else:
                     plt.show()
 
     else:
         # Single bet calculation
-        print(f"\nBet Analysis:")
+        print("\nBet Analysis:")
         print(f"  Model win probability: {args.win_prob:.3f}")
         print(f"  Market odds: {args.odds}")
         print(f"  Bankroll: ${args.bankroll:,.0f}")
@@ -497,8 +501,8 @@ def main():
             min_edge=args.min_edge,
         )
 
-        if result['should_bet']:
-            print(f"\n✓ BET RECOMMENDED")
+        if result["should_bet"]:
+            print("\n✓ BET RECOMMENDED")
             print(f"  Edge: {result['edge']*100:+.2f}%")
             print(f"  Model prob: {result['model_prob']:.3f}")
             print(f"  Implied prob: {result['implied_prob']:.3f}")
@@ -508,11 +512,11 @@ def main():
             print(f"  Expected value: ${result['expected_value']:+,.2f}")
             print(f"  ROI: {result['roi']:+.2f}%")
         else:
-            print(f"\n✗ NO BET")
+            print("\n✗ NO BET")
             print(f"  Reason: {result['reason']}")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

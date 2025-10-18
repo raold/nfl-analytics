@@ -24,7 +24,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 
 def load_base_features(csv_path: Path) -> pd.DataFrame:
@@ -40,11 +39,7 @@ def load_4th_down_features() -> pd.DataFrame:
     print("Loading 4th down features from database...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = """
@@ -78,11 +73,7 @@ def load_injury_features() -> pd.DataFrame:
     print("Loading injury features from database...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = """
@@ -116,11 +107,7 @@ def load_playoff_features() -> pd.DataFrame:
     print("Loading playoff context features from database...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     try:
@@ -160,49 +147,52 @@ def pivot_4th_down_features(df_4th: pd.DataFrame, df_base: pd.DataFrame) -> pd.D
 
     # Merge home team features
     df_home = df_4th.copy()
-    df_home.columns = ['game_id'] + [f'home_{col}' if col != 'game_id' else col
-                                      for col in df_home.columns if col != 'game_id']
+    df_home.columns = ["game_id"] + [
+        f"home_{col}" if col != "game_id" else col for col in df_home.columns if col != "game_id"
+    ]
 
     # Merge away team features
     df_away = df_4th.copy()
-    df_away.columns = ['game_id'] + [f'away_{col}' if col != 'game_id' else col
-                                      for col in df_away.columns if col != 'game_id']
+    df_away.columns = ["game_id"] + [
+        f"away_{col}" if col != "game_id" else col for col in df_away.columns if col != "game_id"
+    ]
 
     # Get game_id to team mapping from base
-    game_teams = df_base[['game_id', 'home_team', 'away_team']].drop_duplicates()
+    game_teams = df_base[["game_id", "home_team", "away_team"]].drop_duplicates()
 
     # Join home features
     df_game = game_teams.merge(
-        df_home,
-        left_on=['game_id', 'home_team'],
-        right_on=['game_id', 'home_team'],
-        how='left'
+        df_home, left_on=["game_id", "home_team"], right_on=["game_id", "home_team"], how="left"
     )
 
     # Join away features
     df_game = df_game.merge(
         df_away,
-        left_on=['game_id', 'away_team'],
-        right_on=['game_id', 'away_team'],
-        how='left',
-        suffixes=('', '_dup')
+        left_on=["game_id", "away_team"],
+        right_on=["game_id", "away_team"],
+        how="left",
+        suffixes=("", "_dup"),
     )
 
     # Drop duplicate columns and team columns
-    df_game = df_game.drop(columns=['home_team', 'away_team'])
-    df_game = df_game[[col for col in df_game.columns if not col.endswith('_dup')]]
+    df_game = df_game.drop(columns=["home_team", "away_team"])
+    df_game = df_game[[col for col in df_game.columns if not col.endswith("_dup")]]
 
     # Create differential features
     diff_metrics = [
-        'fourth_downs', 'go_rate', 'bad_decision_rate', 'conversion_rate',
-        'avg_go_boost', 'fourth_down_epa'
+        "fourth_downs",
+        "go_rate",
+        "bad_decision_rate",
+        "conversion_rate",
+        "avg_go_boost",
+        "fourth_down_epa",
     ]
 
     for metric in diff_metrics:
-        home_col = f'home_{metric}'
-        away_col = f'away_{metric}'
+        home_col = f"home_{metric}"
+        away_col = f"away_{metric}"
         if home_col in df_game.columns and away_col in df_game.columns:
-            df_game[f'{metric}_diff'] = df_game[home_col] - df_game[away_col]
+            df_game[f"{metric}_diff"] = df_game[home_col] - df_game[away_col]
 
     print(f"  Created {len(df_game)} game records with {len(df_game.columns)-3} new columns")
 
@@ -214,7 +204,7 @@ def merge_all_features(
     df_base: pd.DataFrame,
     df_4th: pd.DataFrame,
     df_injury: pd.DataFrame,
-    df_playoff: pd.DataFrame = None
+    df_playoff: pd.DataFrame = None,
 ) -> pd.DataFrame:
     """Merge all feature sets into one dataframe."""
     print("\nMerging all features...")
@@ -226,18 +216,18 @@ def merge_all_features(
 
     # Pivot and merge 4th down features
     df_4th_wide = pivot_4th_down_features(df_4th, df_base)
-    df_merged = df_merged.merge(df_4th_wide, on='game_id', how='left')
+    df_merged = df_merged.merge(df_4th_wide, on="game_id", how="left")
     fourth_added = len(df_merged.columns) - initial_cols
     print(f"  + 4th down: {fourth_added} features added")
 
     # Merge injury features
-    df_merged = df_merged.merge(df_injury, on='game_id', how='left')
+    df_merged = df_merged.merge(df_injury, on="game_id", how="left")
     injury_added = len(df_merged.columns) - initial_cols - fourth_added
     print(f"  + Injury: {injury_added} features added")
 
     # Merge playoff features (if available)
     if df_playoff is not None:
-        df_merged = df_merged.merge(df_playoff, on='game_id', how='left')
+        df_merged = df_merged.merge(df_playoff, on="game_id", how="left")
         playoff_added = len(df_merged.columns) - initial_cols - fourth_added - injury_added
         print(f"  + Playoff: {playoff_added} features added")
 
@@ -266,39 +256,41 @@ def validate_merged_data(df: pd.DataFrame, df_base: pd.DataFrame):
     missing_pct = df[new_cols].isnull().sum() / len(df) * 100
 
     if (missing_pct > 50).any():
-        print(f"  WARNING: Some new features have >50% missing values:")
+        print("  WARNING: Some new features have >50% missing values:")
         for col in missing_pct[missing_pct > 50].index:
             print(f"    {col}: {missing_pct[col]:.1f}% missing")
     else:
-        print(f"  [OK] All new features have <50% missing values")
+        print("  [OK] All new features have <50% missing values")
 
     # Check data types
     numeric_cols = df.select_dtypes(include=[np.number]).columns
-    print(f"  [OK] {len(numeric_cols)} numeric features ({len(numeric_cols)/len(df.columns)*100:.1f}%)")
+    print(
+        f"  [OK] {len(numeric_cols)} numeric features ({len(numeric_cols)/len(df.columns)*100:.1f}%)"
+    )
 
     # Summary statistics for new features
-    print(f"\n  Summary of new features:")
+    print("\n  Summary of new features:")
     print(df[new_cols].describe())
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Merge advanced features into base dataset')
+    parser = argparse.ArgumentParser(description="Merge advanced features into base dataset")
     parser.add_argument(
-        '--base',
+        "--base",
         type=Path,
-        default=Path('data/processed/features/asof_team_features_enhanced.csv'),
-        help='Path to base features CSV'
+        default=Path("data/processed/features/asof_team_features_enhanced.csv"),
+        help="Path to base features CSV",
     )
     parser.add_argument(
-        '--output',
+        "--output",
         type=Path,
-        default=Path('data/processed/features/asof_team_features_v2.csv'),
-        help='Output path for merged CSV'
+        default=Path("data/processed/features/asof_team_features_v2.csv"),
+        help="Output path for merged CSV",
     )
     parser.add_argument(
-        '--include-playoff',
-        action='store_true',
-        help='Include playoff context features (if available)'
+        "--include-playoff",
+        action="store_true",
+        help="Include playoff context features (if available)",
     )
 
     args = parser.parse_args()
@@ -324,11 +316,13 @@ def main():
     df_merged.to_csv(args.output, index=False)
 
     print(f"\n[SUCCESS] Merged features saved to {args.output}")
-    print(f"  Features: {len(df_base.columns)} -> {len(df_merged.columns)} (+{len(df_merged.columns) - len(df_base.columns)})")
+    print(
+        f"  Features: {len(df_base.columns)} -> {len(df_merged.columns)} (+{len(df_merged.columns) - len(df_base.columns)})"
+    )
     print(f"  Games: {len(df_merged)}")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

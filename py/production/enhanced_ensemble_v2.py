@@ -5,20 +5,16 @@ Combines: Bayesian (with chemistry) + XGBoost + Stacked Meta-Learner + Portfolio
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
+import logging
+from pathlib import Path
 
 import pandas as pd
-import numpy as np
-from pathlib import Path
-import logging
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
 
-from py.ensemble.stacked_meta_learner import StackedMetaLearner, DynamicWeightEnsemble
-from py.optimization.portfolio_optimizer import (
-    CorrelatedPortfolioOptimizer,
-    BetOpportunity
-)
+from py.ensemble.stacked_meta_learner import StackedMetaLearner
+from py.optimization.portfolio_optimizer import BetOpportunity, CorrelatedPortfolioOptimizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,7 +35,7 @@ class EnhancedEnsembleV2:
         use_portfolio_opt: bool = True,
         kelly_fraction: float = 0.25,
         min_edge: float = 0.02,
-        max_bet_size: float = 0.05
+        max_bet_size: float = 0.05,
     ):
         self.use_stacking = use_stacking
         self.use_portfolio_opt = use_portfolio_opt
@@ -55,19 +51,14 @@ class EnhancedEnsembleV2:
 
         if use_portfolio_opt:
             self.portfolio_optimizer = CorrelatedPortfolioOptimizer(
-                kelly_fraction=kelly_fraction,
-                min_edge=min_edge,
-                max_bet_size=max_bet_size
+                kelly_fraction=kelly_fraction, min_edge=min_edge, max_bet_size=max_bet_size
             )
         else:
             self.portfolio_optimizer = None
 
         logger.info("✓ Enhanced Ensemble v2.0 initialized")
 
-    def load_bayesian_predictions(
-        self,
-        model_version: str = "qb_chemistry_v1.0"
-    ) -> pd.DataFrame:
+    def load_bayesian_predictions(self, model_version: str = "qb_chemistry_v1.0") -> pd.DataFrame:
         """Load Bayesian predictions from database"""
         import psycopg2
 
@@ -76,7 +67,7 @@ class EnhancedEnsembleV2:
             port=5544,
             database="devdb01",
             user="dro",
-            password="sicillionbillions"
+            password="sicillionbillions",
         )
 
         query = f"""
@@ -103,14 +94,11 @@ class EnhancedEnsembleV2:
         logger.info(f"✓ Loaded {len(df)} Bayesian predictions (v{model_version})")
         return df
 
-    def load_xgboost_predictions(
-        self,
-        model_path: Path
-    ) -> pd.DataFrame:
+    def load_xgboost_predictions(self, model_path: Path) -> pd.DataFrame:
         """Load XGBoost predictions from saved model"""
         import joblib
 
-        model = joblib.load(model_path)
+        joblib.load(model_path)
         # TODO: Load features and generate predictions
         logger.info(f"✓ Loaded XGBoost model from {model_path}")
         return pd.DataFrame()
@@ -119,46 +107,37 @@ class EnhancedEnsembleV2:
         self,
         bayesian_preds: pd.DataFrame,
         xgb_preds: pd.DataFrame,
-        context: Optional[pd.DataFrame] = None
+        context: pd.DataFrame | None = None,
     ) -> pd.DataFrame:
         """Generate ensemble predictions using stacking"""
 
         # Merge predictions
         merged = bayesian_preds.merge(
-            xgb_preds,
-            on=['player_id', 'stat_type'],
-            how='inner',
-            suffixes=('_bayesian', '_xgb')
+            xgb_preds, on=["player_id", "stat_type"], how="inner", suffixes=("_bayesian", "_xgb")
         )
 
         if self.use_stacking and self.meta_learner.is_fitted:
             # Use meta-learner
             ensemble_preds = self.meta_learner.predict_proba(
-                merged['bayesian_pred'].values,
-                merged['xgb_pred'].values,
-                merged['bayesian_uncertainty'].values,
-                context
+                merged["bayesian_pred"].values,
+                merged["xgb_pred"].values,
+                merged["bayesian_uncertainty"].values,
+                context,
             )
-            merged['ensemble_pred'] = ensemble_preds
+            merged["ensemble_pred"] = ensemble_preds
             method = "stacked"
 
         else:
             # Simple weighted average
-            merged['ensemble_pred'] = (
-                0.40 * merged['bayesian_pred'] +
-                0.60 * merged['xgb_pred']
-            )
+            merged["ensemble_pred"] = 0.40 * merged["bayesian_pred"] + 0.60 * merged["xgb_pred"]
             method = "weighted_avg"
 
         logger.info(f"✓ Generated ensemble predictions using {method}")
         return merged
 
     def optimize_bet_portfolio(
-        self,
-        predictions: pd.DataFrame,
-        lines: pd.DataFrame,
-        bankroll: float = 1000.0
-    ) -> Tuple[pd.DataFrame, Dict]:
+        self, predictions: pd.DataFrame, lines: pd.DataFrame, bankroll: float = 1000.0
+    ) -> tuple[pd.DataFrame, dict]:
         """
         Optimize bet sizes considering correlation
 
@@ -173,31 +152,27 @@ class EnhancedEnsembleV2:
         """
 
         # Merge predictions with lines
-        bets_df = predictions.merge(
-            lines,
-            on=['player_id', 'stat_type'],
-            how='inner'
-        )
+        bets_df = predictions.merge(lines, on=["player_id", "stat_type"], how="inner")
 
         # Convert to BetOpportunity objects
         bets = []
         for _, row in bets_df.iterrows():
             # Convert ensemble prediction to probability
-            implied_prob = 1.0 / row['odds']
-            edge = row['ensemble_pred'] - implied_prob
+            implied_prob = 1.0 / row["odds"]
+            edge = row["ensemble_pred"] - implied_prob
 
             if edge > self.min_edge:
                 bet = BetOpportunity(
-                    player_id=row['player_id'],
-                    prop_type=row['stat_type'],
-                    line=row['line'],
-                    odds=row['odds'],
-                    predicted_prob=row['ensemble_pred'],
-                    predicted_mean=row.get('bayesian_pred', 0),
-                    predicted_std=row.get('bayesian_uncertainty', 1),
-                    game_id=row.get('game_id', 'unknown'),
-                    season=row.get('season', 2024),
-                    week=row.get('week', 1)
+                    player_id=row["player_id"],
+                    prop_type=row["stat_type"],
+                    line=row["line"],
+                    odds=row["odds"],
+                    predicted_prob=row["ensemble_pred"],
+                    predicted_mean=row.get("bayesian_pred", 0),
+                    predicted_std=row.get("bayesian_uncertainty", 1),
+                    game_id=row.get("game_id", "unknown"),
+                    season=row.get("season", 2024),
+                    week=row.get("week", 1),
                 )
                 bets.append(bet)
 
@@ -210,8 +185,10 @@ class EnhancedEnsembleV2:
             recommendations, metrics = self.portfolio_optimizer.get_bet_recommendations(
                 bets, bankroll
             )
-            logger.info(f"✓ Optimized portfolio: {metrics['n_bets']} bets, "
-                       f"{metrics['total_exposure']:.1%} exposure")
+            logger.info(
+                f"✓ Optimized portfolio: {metrics['n_bets']} bets, "
+                f"{metrics['total_exposure']:.1%} exposure"
+            )
         else:
             # Simple Kelly without correlation
             recommendations = []
@@ -220,26 +197,25 @@ class EnhancedEnsembleV2:
                 bet_size = min(kelly, self.max_bet_size)
                 bet_amount = bet_size * bankroll
 
-                recommendations.append({
-                    'player_id': bet.player_id,
-                    'prop_type': bet.prop_type,
-                    'line': bet.line,
-                    'odds': bet.odds,
-                    'edge': bet.edge,
-                    'bet_amount': bet_amount,
-                    'expected_profit': bet_amount * bet.edge
-                })
+                recommendations.append(
+                    {
+                        "player_id": bet.player_id,
+                        "prop_type": bet.prop_type,
+                        "line": bet.line,
+                        "odds": bet.odds,
+                        "edge": bet.edge,
+                        "bet_amount": bet_amount,
+                        "expected_profit": bet_amount * bet.edge,
+                    }
+                )
 
             recommendations = pd.DataFrame(recommendations)
-            metrics = {'method': 'simple_kelly'}
+            metrics = {"method": "simple_kelly"}
 
         return recommendations, metrics
 
     def generate_daily_recommendations(
-        self,
-        week: int,
-        season: int = 2024,
-        bankroll: float = 1000.0
+        self, week: int, season: int = 2024, bankroll: float = 1000.0
     ) -> pd.DataFrame:
         """
         Generate daily bet recommendations
@@ -258,7 +234,7 @@ class EnhancedEnsembleV2:
         logger.info(f"{'='*60}\n")
 
         # 1. Load predictions
-        bayesian_preds = self.load_bayesian_predictions()
+        self.load_bayesian_predictions()
 
         # TODO: Load XGBoost predictions
         # xgb_preds = self.load_xgboost_predictions(...)
@@ -278,11 +254,8 @@ class EnhancedEnsembleV2:
         return pd.DataFrame()
 
     def backtest(
-        self,
-        start_season: int,
-        end_season: int,
-        initial_bankroll: float = 1000.0
-    ) -> Dict:
+        self, start_season: int, end_season: int, initial_bankroll: float = 1000.0
+    ) -> dict:
         """
         Backtest enhanced ensemble across multiple seasons
 
@@ -295,13 +268,13 @@ class EnhancedEnsembleV2:
         logger.info(f"\nBacktesting {start_season}-{end_season}...")
 
         results = {
-            'seasons': [],
-            'weeks': [],
-            'n_bets': [],
-            'wins': [],
-            'losses': [],
-            'roi': [],
-            'bankroll': [initial_bankroll]
+            "seasons": [],
+            "weeks": [],
+            "n_bets": [],
+            "wins": [],
+            "losses": [],
+            "roi": [],
+            "bankroll": [initial_bankroll],
         }
 
         # TODO: Implement full backtest loop
@@ -313,16 +286,12 @@ if __name__ == "__main__":
     # Demo
     logger.info("Enhanced Ensemble v2.0 - Demo\n")
 
-    ensemble = EnhancedEnsembleV2(
-        use_stacking=True,
-        use_portfolio_opt=True,
-        kelly_fraction=0.25
-    )
+    ensemble = EnhancedEnsembleV2(use_stacking=True, use_portfolio_opt=True, kelly_fraction=0.25)
 
     # Try loading Bayesian predictions
     try:
         bayesian_preds = ensemble.load_bayesian_predictions()
-        logger.info(f"\nTop 10 Bayesian predictions:")
+        logger.info("\nTop 10 Bayesian predictions:")
         logger.info(bayesian_preds.head(10).to_string(index=False))
     except Exception as e:
         logger.error(f"Could not load predictions: {e}")

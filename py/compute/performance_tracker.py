@@ -236,6 +236,7 @@ class PerformanceTracker:
 
         # Insert performance record
         is_baseline = baseline is None
+
         def _record_operation():
             self.conn.execute(
                 """
@@ -243,7 +244,14 @@ class PerformanceTracker:
                 (model_id, task_id, metrics, compute_hours_invested, performance_delta, is_baseline)
                 VALUES (?, ?, ?, ?, ?, ?)
             """,
-                (model_id, task_id, json.dumps(self._make_json_serializable(metrics)), compute_hours, performance_delta, is_baseline),
+                (
+                    model_id,
+                    task_id,
+                    json.dumps(self._make_json_serializable(metrics)),
+                    compute_hours,
+                    performance_delta,
+                    is_baseline,
+                ),
             )
             self.conn.commit()
 
@@ -1137,13 +1145,16 @@ class PerformanceTracker:
     def _execute_with_retry(self, operation, *args, max_retries=3, **kwargs):
         """Execute database operation with retry logic for handling locks."""
         import time
+
         for attempt in range(max_retries):
             try:
                 return operation(*args, **kwargs)
             except sqlite3.OperationalError as e:
                 if "database is locked" in str(e) and attempt < max_retries - 1:
-                    wait_time = (2 ** attempt) * 0.1  # Exponential backoff
-                    logger.warning(f"Database locked, retrying in {wait_time}s (attempt {attempt + 1}/{max_retries})")
+                    wait_time = (2**attempt) * 0.1  # Exponential backoff
+                    logger.warning(
+                        f"Database locked, retrying in {wait_time}s (attempt {attempt + 1}/{max_retries})"
+                    )
                     time.sleep(wait_time)
                     continue
                 else:

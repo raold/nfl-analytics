@@ -27,7 +27,6 @@ import json
 import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -105,9 +104,7 @@ def tau(x: int, y: int, lambda_x: float, lambda_y: float, rho: float) -> float:
         return 1.0
 
 
-def bivariate_poisson_pmf(
-    x: int, y: int, lambda_x: float, lambda_y: float, rho: float
-) -> float:
+def bivariate_poisson_pmf(x: int, y: int, lambda_x: float, lambda_y: float, rho: float) -> float:
     """
     Bivariate Poisson probability mass function with Dixon-Coles adjustment.
 
@@ -132,6 +129,7 @@ def bivariate_poisson_pmf(
 @dataclass
 class DixonColesParams:
     """Parameters for Dixon-Coles model."""
+
     attack: dict[str, float]  # Team attack strengths
     defense: dict[str, float]  # Team defense strengths
     home_advantage: float  # Home-field advantage (in log space)
@@ -174,7 +172,7 @@ class DixonColesModel:
         self.max_iter = max_iter
         self.tol = tol
 
-        self.params: Optional[DixonColesParams] = None
+        self.params: DixonColesParams | None = None
         self.teams: list[str] = []
         self.team_to_idx: dict[str, int] = {}
 
@@ -186,7 +184,7 @@ class DixonColesModel:
             Initial parameter vector [attack_1, ..., attack_N, defense_1, ..., defense_N, hfa, rho]
         """
         # Get unique teams
-        self.teams = sorted(set(df['home_team'].unique()) | set(df['away_team'].unique()))
+        self.teams = sorted(set(df["home_team"].unique()) | set(df["away_team"].unique()))
         self.team_to_idx = {team: idx for idx, team in enumerate(self.teams)}
         n_teams = len(self.teams)
 
@@ -198,13 +196,13 @@ class DixonColesModel:
             idx = self.team_to_idx[team]
 
             # Attack strength: average goals scored as home and away
-            home_goals = df[df['home_team'] == team]['home_score'].mean()
-            away_goals = df[df['away_team'] == team]['away_score'].mean()
+            home_goals = df[df["home_team"] == team]["home_score"].mean()
+            away_goals = df[df["away_team"] == team]["away_score"].mean()
             attack[idx] = np.log(max(0.1, (home_goals + away_goals) / 2.0))
 
             # Defense strength: average goals conceded as home and away
-            goals_conceded_home = df[df['home_team'] == team]['away_score'].mean()
-            goals_conceded_away = df[df['away_team'] == team]['home_score'].mean()
+            goals_conceded_home = df[df["home_team"] == team]["away_score"].mean()
+            goals_conceded_away = df[df["away_team"] == team]["home_score"].mean()
             defense[idx] = np.log(max(0.1, (goals_conceded_home + goals_conceded_away) / 2.0))
 
         # Normalize to prevent identifiability issues (set sum of attack = sum of defense)
@@ -224,9 +222,9 @@ class DixonColesModel:
         """
         n_teams = len(self.teams)
         attack = params[:n_teams]
-        defense = params[n_teams:2*n_teams]
-        home_advantage = params[2*n_teams]
-        rho = params[2*n_teams + 1]
+        defense = params[n_teams : 2 * n_teams]
+        home_advantage = params[2 * n_teams]
+        rho = params[2 * n_teams + 1]
         return attack, defense, home_advantage, rho
 
     def _negative_log_likelihood(self, params: np.ndarray, df: pd.DataFrame) -> float:
@@ -243,16 +241,16 @@ class DixonColesModel:
         attack, defense, hfa, rho = self._unpack_params(params)
 
         # Vectorized computation
-        home_indices = df['home_team'].map(self.team_to_idx).values
-        away_indices = df['away_team'].map(self.team_to_idx).values
+        home_indices = df["home_team"].map(self.team_to_idx).values
+        away_indices = df["away_team"].map(self.team_to_idx).values
 
         # Expected scores (Poisson rates)
         lambda_home = np.exp(attack[home_indices] - defense[away_indices] + hfa)
         lambda_away = np.exp(attack[away_indices] - defense[home_indices])
 
         # Observed scores
-        x = df['home_score'].values.astype(int)
-        y = df['away_score'].values.astype(int)
+        x = df["home_score"].values.astype(int)
+        y = df["away_score"].values.astype(int)
 
         # Vectorized tau computation (only for low scores where it matters)
         tau_vals = np.ones(len(df))
@@ -293,9 +291,9 @@ class DixonColesModel:
             self._negative_log_likelihood,
             params_init,
             args=(df,),
-            method='L-BFGS-B',
+            method="L-BFGS-B",
             bounds=bounds,
-            options={'maxiter': self.max_iter, 'ftol': self.tol}
+            options={"maxiter": self.max_iter, "ftol": self.tol},
         )
 
         # Extract fitted parameters
@@ -308,7 +306,7 @@ class DixonColesModel:
             rho=rho,
             converged=result.success,
             iterations=result.nit,
-            log_likelihood=-result.fun
+            log_likelihood=-result.fun,
         )
 
         print(f"Fitted: HFA={hfa:.4f}, rho={rho:.4f}, log-lik={-result.fun:.2f}")
@@ -408,14 +406,14 @@ class DixonColesModel:
             raise ValueError("No parameters to save")
 
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             json.dump(asdict(self.params), f, indent=2)
 
         print(f"Saved parameters to {path}")
 
     def load(self, path: Path) -> None:
         """Load fitted parameters from JSON."""
-        with open(path, 'r') as f:
+        with open(path) as f:
             data = json.load(f)
 
         self.params = DixonColesParams(**data)
@@ -432,7 +430,9 @@ class DixonColesModel:
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Dixon-Coles bivariate Poisson model")
-    ap.add_argument("--seasons", required=True, help="Comma-separated seasons (e.g., 2020,2021,2022)")
+    ap.add_argument(
+        "--seasons", required=True, help="Comma-separated seasons (e.g., 2020,2021,2022)"
+    )
     ap.add_argument("--output", default="models/dixon_coles_params.json", help="Output params JSON")
     ap.add_argument("--table", help="Optional TeX table output path")
     ap.add_argument("--hfa-init", type=float, default=0.15, help="Initial home-field advantage")
@@ -488,13 +488,15 @@ def generate_latex_table(model: DixonColesModel, output_path: Path) -> None:
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("% Auto-generated by py/models/bivariate_poisson.py\n")
         f.write("% !TEX root = ../../main/main.tex\n")
         f.write("\\begin{table}[t]\n")
         f.write("  \\centering\n")
         f.write("  \\small\n")
-        f.write(f"  \\caption{{Dixon-Coles bivariate Poisson parameters. HFA={model.params.home_advantage:.3f}, $\\rho$={model.params.rho:.3f}}}\n")
+        f.write(
+            f"  \\caption{{Dixon-Coles bivariate Poisson parameters. HFA={model.params.home_advantage:.3f}, $\\rho$={model.params.rho:.3f}}}\n"
+        )
         f.write("  \\label{tab:dixon-coles}\n")
         f.write("  \\setlength{\\tabcolsep}{4pt}\\renewcommand{\\arraystretch}{1.1}\n")
         f.write("  \\begin{tabular}{@{} l r r @{}}\n")

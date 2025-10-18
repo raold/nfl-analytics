@@ -3,9 +3,15 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
 The style file: plainnat.bst
 Database file #1: ../references.bib
+Warning--I didn't find a database entry for "koenker1978regression"
+Warning--I didn't find a database entry for "vovk2005algorithmic"
+Warning--I didn't find a database entry for "shafer2008tutorial"
+Warning--I didn't find a database entry for "taquet2021mapie"
+Warning--I didn't find a database entry for "akiba2019optuna"
+Warning--I didn't find a database entry for "sculley2018winner"
 You've used 56 entries,
             2773 wiz_defined-function locations,
-            948 strings with 14641 characters,
+            954 strings with 14746 characters,
 and the built_in function-call counts, 26614 in all, are:
 = -- 2429
 > -- 1501
@@ -44,3 +50,4 @@ warning$ -- 0
 while$ -- 230
 width$ -- 0
 write$ -- 815
+(There were 6 warnings)

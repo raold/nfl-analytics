@@ -33,21 +33,17 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any
 
 import yaml
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from compute.tasks.training_task import (
-    HyperparameterSweep,
-    get_redis_client,
-    get_queue_status
-)
+from compute.tasks.training_task import HyperparameterSweep, get_queue_status, get_redis_client
 
 
-def load_sweep_config(config_path: Path) -> Dict[str, Any]:
+def load_sweep_config(config_path: Path) -> dict[str, Any]:
     """
     Load sweep configuration from YAML file.
 
@@ -74,7 +70,7 @@ def load_sweep_config(config_path: Path) -> Dict[str, Any]:
     return config
 
 
-def estimate_sweep(sweep: HyperparameterSweep) -> Dict[str, Any]:
+def estimate_sweep(sweep: HyperparameterSweep) -> dict[str, Any]:
     """
     Estimate sweep statistics.
 
@@ -99,7 +95,7 @@ def estimate_sweep(sweep: HyperparameterSweep) -> Dict[str, Any]:
     return estimate
 
 
-def print_sweep_summary(sweep: HyperparameterSweep, estimate: Dict[str, Any]):
+def print_sweep_summary(sweep: HyperparameterSweep, estimate: dict[str, Any]):
     """Print formatted sweep summary."""
     print("=" * 60)
     print("HYPERPARAMETER SWEEP SUMMARY")
@@ -136,73 +132,40 @@ def print_sweep_summary(sweep: HyperparameterSweep, estimate: Dict[str, Any]):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Submit hyperparameter sweep to training queue"
-    )
+    parser = argparse.ArgumentParser(description="Submit hyperparameter sweep to training queue")
 
     # Config source
     config_group = parser.add_mutually_exclusive_group(required=True)
-    config_group.add_argument(
-        "--config",
-        type=Path,
-        help="Path to YAML config file"
-    )
-    config_group.add_argument(
-        "--model",
-        help="Model type (for manual parameter specification)"
-    )
+    config_group.add_argument("--config", type=Path, help="Path to YAML config file")
+    config_group.add_argument("--model", help="Model type (for manual parameter specification)")
 
     # Manual config (if not using YAML)
     parser.add_argument(
         "--base-config",
         type=json.loads,
         default={},
-        help="Base config as JSON string (e.g., '{\"batch_size\": 256}')"
+        help="Base config as JSON string (e.g., '{\"batch_size\": 256}')",
     )
     parser.add_argument(
-        "--param",
-        action="append",
-        nargs="+",
-        help="Parameter grid: --param alpha 0.1 0.5 1.0"
+        "--param", action="append", nargs="+", help="Parameter grid: --param alpha 0.1 0.5 1.0"
     )
+    parser.add_argument("--priority", type=int, default=5, help="Task priority (1-10, default: 5)")
     parser.add_argument(
-        "--priority",
-        type=int,
-        default=5,
-        help="Task priority (1-10, default: 5)"
-    )
-    parser.add_argument(
-        "--min-gpu-memory",
-        type=int,
-        default=8,
-        help="Minimum GPU memory in GB (default: 8)"
+        "--min-gpu-memory", type=int, default=8, help="Minimum GPU memory in GB (default: 8)"
     )
     parser.add_argument(
         "--estimated-hours",
         type=float,
         default=1.0,
-        help="Estimated hours per config (default: 1.0)"
+        help="Estimated hours per config (default: 1.0)",
     )
 
     # Redis connection
-    parser.add_argument(
-        "--redis-host",
-        default="localhost",
-        help="Redis host (default: localhost)"
-    )
-    parser.add_argument(
-        "--redis-port",
-        type=int,
-        default=6379,
-        help="Redis port (default: 6379)"
-    )
+    parser.add_argument("--redis-host", default="localhost", help="Redis host (default: localhost)")
+    parser.add_argument("--redis-port", type=int, default=6379, help="Redis port (default: 6379)")
 
     # Actions
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Print summary without submitting"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Print summary without submitting")
 
     args = parser.parse_args()
 
@@ -217,7 +180,7 @@ def main():
             param_grid=config["param_grid"],
             priority=config.get("priority", 5),
             min_gpu_memory=config.get("min_gpu_memory", 8),
-            estimated_hours=config.get("estimated_hours", 1.0)
+            estimated_hours=config.get("estimated_hours", 1.0),
         )
 
     else:
@@ -232,7 +195,7 @@ def main():
 
             # Try to parse as numbers
             try:
-                param_values = [float(v) if '.' in v or 'e' in v else int(v) for v in param_values]
+                param_values = [float(v) if "." in v or "e" in v else int(v) for v in param_values]
             except ValueError:
                 pass  # Keep as strings
 
@@ -244,7 +207,7 @@ def main():
             param_grid=param_grid,
             priority=args.priority,
             min_gpu_memory=args.min_gpu_memory,
-            estimated_hours=args.estimated_hours
+            estimated_hours=args.estimated_hours,
         )
 
     # Estimate sweep
@@ -258,7 +221,7 @@ def main():
 
     # Confirm submission
     confirm = input("\nSubmit this sweep? (y/N): ")
-    if confirm.lower() != 'y':
+    if confirm.lower() != "y":
         print("Cancelled")
         return
 

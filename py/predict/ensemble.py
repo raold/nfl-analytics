@@ -13,15 +13,14 @@ import argparse
 import json
 import logging
 from pathlib import Path
-from typing import List, Dict, Optional, Literal
+from typing import Literal
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -33,7 +32,7 @@ class EnsemblePredictor:
         self,
         v3_model_path: str = "models/xgboost/v3_production/model.json",
         v2_1_model_path: str = "models/xgboost/v2_1_sweep/best_model.json",
-        method: Literal['weighted', 'fallback', 'average'] = 'weighted'
+        method: Literal["weighted", "fallback", "average"] = "weighted",
     ):
         """
         Initialize ensemble predictor.
@@ -54,9 +53,9 @@ class EnsemblePredictor:
         self.v3_model = xgb.Booster()
         self.v3_model.load_model(str(v3_path))
 
-        with open(v3_path.parent / 'metadata.json', 'r') as f:
+        with open(v3_path.parent / "metadata.json") as f:
             self.v3_metadata = json.load(f)
-        self.v3_features = self.v3_metadata['training_data']['features']
+        self.v3_features = self.v3_metadata["training_data"]["features"]
 
         # Load v2.1 model (if it exists)
         v2_1_path = Path(v2_1_model_path)
@@ -65,23 +64,27 @@ class EnsemblePredictor:
             self.v2_1_model = xgb.Booster()
             self.v2_1_model.load_model(str(v2_1_path))
 
-            with open(v2_1_path.parent / 'metadata.json', 'r') as f:
+            with open(v2_1_path.parent / "metadata.json") as f:
                 self.v2_1_metadata = json.load(f)
-            self.v2_1_features = self.v2_1_metadata['training_data']['features']
+            self.v2_1_features = self.v2_1_metadata["training_data"]["features"]
         else:
             logger.warning(f"v2.1 model not found at {v2_1_path}, using v3 only")
             self.v2_1_model = None
             self.v2_1_features = []
 
         # Ensemble weights
-        self.weights = {'v3': 0.7, 'v2.1': 0.3} if method == 'weighted' else {'v3': 0.5, 'v2.1': 0.5}
+        self.weights = (
+            {"v3": 0.7, "v2.1": 0.3} if method == "weighted" else {"v3": 0.5, "v2.1": 0.5}
+        )
 
         logger.info(f"Ensemble method: {method}")
         logger.info(f"v3 features: {len(self.v3_features)}")
         if self.v2_1_model:
             logger.info(f"v2.1 features: {len(self.v2_1_features)}")
 
-    def load_features(self, features_path: str = "data/processed/features/asof_team_features_v3.csv") -> pd.DataFrame:
+    def load_features(
+        self, features_path: str = "data/processed/features/asof_team_features_v3.csv"
+    ) -> pd.DataFrame:
         """Load feature data."""
         return pd.read_csv(features_path)
 
@@ -101,7 +104,7 @@ class EnsemblePredictor:
         dmatrix = xgb.DMatrix(X, feature_names=self.v3_features)
         return self.v3_model.predict(dmatrix)
 
-    def predict_v2_1(self, df: pd.DataFrame) -> Optional[np.ndarray]:
+    def predict_v2_1(self, df: pd.DataFrame) -> np.ndarray | None:
         """Generate v2.1 predictions."""
         if self.v2_1_model is None:
             return None
@@ -121,10 +124,7 @@ class EnsemblePredictor:
         return self.v2_1_model.predict(dmatrix)
 
     def predict(
-        self,
-        game_ids: Optional[List[str]] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None
+        self, game_ids: list[str] | None = None, season: int | None = None, week: int | None = None
     ) -> pd.DataFrame:
         """
         Generate ensemble predictions.
@@ -142,9 +142,9 @@ class EnsemblePredictor:
 
         # Filter games
         if game_ids:
-            df = df[df['game_id'].isin(game_ids)]
+            df = df[df["game_id"].isin(game_ids)]
         elif season and week:
-            df = df[(df['season'] == season) & (df['week'] == week)]
+            df = df[(df["season"] == season) & (df["week"] == week)]
         else:
             raise ValueError("Must provide either game_ids or (season, week)")
 
@@ -161,21 +161,20 @@ class EnsemblePredictor:
         v2_1_preds = self.predict_v2_1(df.copy()) if self.v2_1_model else None
 
         # Combine predictions based on method
-        if self.method == 'fallback':
+        if self.method == "fallback":
             # Use v3, fallback to v2.1 if v3 confidence is low
             ensemble_preds = v3_preds.copy()
             if v2_1_preds is not None:
                 low_confidence = (v3_preds > 0.4) & (v3_preds < 0.6)
                 ensemble_preds[low_confidence] = v2_1_preds[low_confidence]
-                logger.info(f"Used v2.1 fallback for {low_confidence.sum()} low-confidence predictions")
+                logger.info(
+                    f"Used v2.1 fallback for {low_confidence.sum()} low-confidence predictions"
+                )
 
-        elif self.method in ['weighted', 'average']:
+        elif self.method in ["weighted", "average"]:
             # Weighted or simple average
             if v2_1_preds is not None:
-                ensemble_preds = (
-                    self.weights['v3'] * v3_preds +
-                    self.weights['v2.1'] * v2_1_preds
-                )
+                ensemble_preds = self.weights["v3"] * v3_preds + self.weights["v2.1"] * v2_1_preds
             else:
                 ensemble_preds = v3_preds
 
@@ -183,40 +182,48 @@ class EnsemblePredictor:
             raise ValueError(f"Unknown ensemble method: {self.method}")
 
         # Create results dataframe
-        results = df[['game_id', 'season', 'week', 'home_team', 'away_team']].copy()
-        results['home_win_prob'] = ensemble_preds
-        results['away_win_prob'] = 1 - ensemble_preds
-        results['predicted_winner'] = results.apply(
-            lambda row: row['home_team'] if row['home_win_prob'] > 0.5 else row['away_team'],
-            axis=1
+        results = df[["game_id", "season", "week", "home_team", "away_team"]].copy()
+        results["home_win_prob"] = ensemble_preds
+        results["away_win_prob"] = 1 - ensemble_preds
+        results["predicted_winner"] = results.apply(
+            lambda row: row["home_team"] if row["home_win_prob"] > 0.5 else row["away_team"], axis=1
         )
-        results['confidence'] = results[['home_win_prob', 'away_win_prob']].max(axis=1)
+        results["confidence"] = results[["home_win_prob", "away_win_prob"]].max(axis=1)
 
         # Add component predictions for transparency
-        results['v3_home_win_prob'] = v3_preds
+        results["v3_home_win_prob"] = v3_preds
         if v2_1_preds is not None:
-            results['v2_1_home_win_prob'] = v2_1_preds
+            results["v2_1_home_win_prob"] = v2_1_preds
 
-        results['model_version'] = f'ensemble_{self.method}_v3.0+v2.1'
+        results["model_version"] = f"ensemble_{self.method}_v3.0+v2.1"
 
         return results
 
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Generate ensemble predictions')
-    parser.add_argument('--v3-model', default='models/xgboost/v3_production/model.json',
-                       help='Path to v3 model')
-    parser.add_argument('--v2-1-model', default='models/xgboost/v2_1_sweep/best_model.json',
-                       help='Path to v2.1 model')
-    parser.add_argument('--method', choices=['weighted', 'fallback', 'average'],
-                       default='weighted', help='Ensemble method')
-    parser.add_argument('--game-ids', nargs='+', help='Specific game IDs to predict')
-    parser.add_argument('--season', type=int, help='Season to predict')
-    parser.add_argument('--week', type=int, help='Week to predict')
-    parser.add_argument('--output', default='data/predictions/ensemble_predictions.csv',
-                       help='Output file path')
-    parser.add_argument('--verbose', action='store_true', help='Verbose logging')
+    parser = argparse.ArgumentParser(description="Generate ensemble predictions")
+    parser.add_argument(
+        "--v3-model", default="models/xgboost/v3_production/model.json", help="Path to v3 model"
+    )
+    parser.add_argument(
+        "--v2-1-model",
+        default="models/xgboost/v2_1_sweep/best_model.json",
+        help="Path to v2.1 model",
+    )
+    parser.add_argument(
+        "--method",
+        choices=["weighted", "fallback", "average"],
+        default="weighted",
+        help="Ensemble method",
+    )
+    parser.add_argument("--game-ids", nargs="+", help="Specific game IDs to predict")
+    parser.add_argument("--season", type=int, help="Season to predict")
+    parser.add_argument("--week", type=int, help="Week to predict")
+    parser.add_argument(
+        "--output", default="data/predictions/ensemble_predictions.csv", help="Output file path"
+    )
+    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 
@@ -229,17 +236,11 @@ def main():
 
     # Initialize predictor
     predictor = EnsemblePredictor(
-        v3_model_path=args.v3_model,
-        v2_1_model_path=args.v2_1_model,
-        method=args.method
+        v3_model_path=args.v3_model, v2_1_model_path=args.v2_1_model, method=args.method
     )
 
     # Generate predictions
-    results = predictor.predict(
-        game_ids=args.game_ids,
-        season=args.season,
-        week=args.week
-    )
+    results = predictor.predict(game_ids=args.game_ids, season=args.season, week=args.week)
 
     # Save results
     output_path = Path(args.output)
@@ -254,12 +255,12 @@ def main():
     for _, row in results.iterrows():
         print(f"\n{row['game_id']}: {row['away_team']} @ {row['home_team']}")
         print(f"  Home Win Prob: {row['home_win_prob']:.1%}")
-        if 'v3_home_win_prob' in row:
+        if "v3_home_win_prob" in row:
             print(f"    v3:   {row['v3_home_win_prob']:.1%}")
-        if 'v2_1_home_win_prob' in row:
+        if "v2_1_home_win_prob" in row:
             print(f"    v2.1: {row['v2_1_home_win_prob']:.1%}")
         print(f"  Predicted: {row['predicted_winner']} (confidence: {row['confidence']:.1%})")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

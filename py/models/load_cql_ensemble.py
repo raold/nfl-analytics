@@ -35,24 +35,23 @@ Usage:
         print(f"Confidence: {prediction['confidence']:.2%}")
 """
 
-from pathlib import Path
-from typing import Dict, List, Optional, Union
-
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 
-
 # ============================================================================
 # Q-Network Architecture (must match cql_agent.py)
 # ============================================================================
 
+
 class QNetwork(nn.Module):
     """MLP for Q(s, a) estimation."""
 
-    def __init__(self, state_dim: int, action_dim: int, hidden_dims: List[int]):
+    def __init__(self, state_dim: int, action_dim: int, hidden_dims: list[int]):
         super().__init__()
         layers = []
         prev_dim = state_dim
@@ -74,14 +73,15 @@ class QNetwork(nn.Module):
 # CQL Ensemble Class
 # ============================================================================
 
+
 class CQLEnsemble:
     """Production-ready CQL ensemble for betting decisions."""
 
     def __init__(
         self,
-        models_dir: Union[str, Path] = "models/cql",
-        state_cols: Optional[List[str]] = None,
-        device: str = "cpu"
+        models_dir: str | Path = "models/cql",
+        state_cols: list[str] | None = None,
+        device: str = "cpu",
     ):
         """
         Initialize CQL ensemble.
@@ -94,21 +94,25 @@ class CQLEnsemble:
         self.models_dir = Path(models_dir)
         self.device = device
         self.state_cols = state_cols or [
-            "spread_close", "total_close", "epa_gap",
-            "market_prob", "p_hat", "edge"
+            "spread_close",
+            "total_close",
+            "epa_gap",
+            "market_prob",
+            "p_hat",
+            "edge",
         ]
 
-        self.best_model: Optional[QNetwork] = None
-        self.best_model_id: Optional[str] = None
-        self.ensemble_models: List[QNetwork] = []
-        self.ensemble_model_ids: List[str] = []
+        self.best_model: QNetwork | None = None
+        self.best_model_id: str | None = None
+        self.ensemble_models: list[QNetwork] = []
+        self.ensemble_model_ids: list[str] = []
 
         # Action space: {no-bet (0), small (1), medium (2), large (3)}
         self.action_space = {
-            0: {'name': 'no-bet', 'size': 0.0},
-            1: {'name': 'small', 'size': 0.01},
-            2: {'name': 'medium', 'size': 0.03},
-            3: {'name': 'large', 'size': 0.05}
+            0: {"name": "no-bet", "size": 0.0},
+            1: {"name": "small", "size": 0.01},
+            2: {"name": "medium", "size": 0.03},
+            3: {"name": "large", "size": 0.05},
         }
 
     def load_model(self, model_id: str) -> tuple[QNetwork, dict]:
@@ -143,16 +147,31 @@ class CQLEnsemble:
         self.best_model_id = model_id
         print(f"✅ Loaded best model: {model_id} (loss={metadata['latest_metrics']['loss']:.4f})")
 
-    def load_ensemble_models(self, model_ids: Optional[List[str]] = None):
+    def load_ensemble_models(self, model_ids: list[str] | None = None):
         """Load ensemble models."""
         if model_ids is None:
             # Default Phase 3 ensemble (seed 42-61)
             model_ids = [
-                'ee237922', 'a19dc3fe', '90fe41f9', 'aa67f6f5',
-                'c46a91c3', 'cd7d1ed9', 'dc57c8a2', 'df2233d9',
-                'fbaa0f3f', 'fef28489', '655b2be4', '1e76793f',
-                '3a5be1ef', '3ea3746c', '33ad8155', '487eb7aa',
-                '74b1acbf', '80e26617', '88c895db', '090d1bd4'
+                "ee237922",
+                "a19dc3fe",
+                "90fe41f9",
+                "aa67f6f5",
+                "c46a91c3",
+                "cd7d1ed9",
+                "dc57c8a2",
+                "df2233d9",
+                "fbaa0f3f",
+                "fef28489",
+                "655b2be4",
+                "1e76793f",
+                "3a5be1ef",
+                "3ea3746c",
+                "33ad8155",
+                "487eb7aa",
+                "74b1acbf",
+                "80e26617",
+                "88c895db",
+                "090d1bd4",
             ]
 
         for model_id in model_ids:
@@ -165,7 +184,7 @@ class CQLEnsemble:
 
         print(f"✅ Loaded ensemble: {len(self.ensemble_models)} models")
 
-    def _prepare_state(self, state: Union[Dict, pd.Series, np.ndarray]) -> torch.Tensor:
+    def _prepare_state(self, state: dict | pd.Series | np.ndarray) -> torch.Tensor:
         """Convert state to tensor."""
         if isinstance(state, dict):
             state_array = np.array([state[col] for col in self.state_cols])
@@ -176,7 +195,7 @@ class CQLEnsemble:
 
         return torch.FloatTensor(state_array).unsqueeze(0)
 
-    def predict_single(self, state: Union[Dict, pd.Series, np.ndarray]) -> Dict:
+    def predict_single(self, state: dict | pd.Series | np.ndarray) -> dict:
         """Predict using best single model."""
         if self.best_model is None:
             raise RuntimeError("Best model not loaded. Call load_best_model() first.")
@@ -191,21 +210,19 @@ class CQLEnsemble:
         action_info = self.action_space[best_action]
 
         return {
-            'action': best_action,
-            'action_name': action_info['name'],
-            'bet_size': action_info['size'],
-            'q_values': q_values.tolist(),
-            'q_best': float(q_values[best_action]),
-            'q_no_bet': float(q_values[0]),
-            'q_advantage': float(q_values[best_action] - q_values[0]),
-            'model_id': self.best_model_id
+            "action": best_action,
+            "action_name": action_info["name"],
+            "bet_size": action_info["size"],
+            "q_values": q_values.tolist(),
+            "q_best": float(q_values[best_action]),
+            "q_no_bet": float(q_values[0]),
+            "q_advantage": float(q_values[best_action] - q_values[0]),
+            "model_id": self.best_model_id,
         }
 
     def predict_ensemble(
-        self,
-        state: Union[Dict, pd.Series, np.ndarray],
-        confidence_threshold: float = 0.05
-    ) -> Dict:
+        self, state: dict | pd.Series | np.ndarray, confidence_threshold: float = 0.05
+    ) -> dict:
         """Predict using ensemble with uncertainty quantification."""
         if len(self.ensemble_models) == 0:
             raise RuntimeError("Ensemble not loaded. Call load_ensemble_models() first.")
@@ -235,33 +252,30 @@ class CQLEnsemble:
 
         # Decision
         if best_action == 0 or not high_confidence:
-            decision = 'skip'
+            decision = "skip"
             bet_size = 0.0
         else:
-            decision = 'bet'
-            bet_size = action_info['size']
+            decision = "bet"
+            bet_size = action_info["size"]
 
         return {
-            'action': best_action if high_confidence else 0,
-            'action_name': action_info['name'] if high_confidence else 'skip',
-            'decision': decision,
-            'bet_size': bet_size,
-            'q_mean': q_mean.tolist(),
-            'q_std': q_std.tolist(),
-            'q_best': float(q_mean[best_action]),
-            'q_no_bet': float(q_mean[0]),
-            'q_advantage': float(q_mean[best_action] - q_mean[0]),
-            'uncertainty': float(best_q_std),
-            'confidence': float(1 / (1 + best_q_std)),
-            'high_confidence': bool(high_confidence),
-            'ensemble_size': len(self.ensemble_models)
+            "action": best_action if high_confidence else 0,
+            "action_name": action_info["name"] if high_confidence else "skip",
+            "decision": decision,
+            "bet_size": bet_size,
+            "q_mean": q_mean.tolist(),
+            "q_std": q_std.tolist(),
+            "q_best": float(q_mean[best_action]),
+            "q_no_bet": float(q_mean[0]),
+            "q_advantage": float(q_mean[best_action] - q_mean[0]),
+            "uncertainty": float(best_q_std),
+            "confidence": float(1 / (1 + best_q_std)),
+            "high_confidence": bool(high_confidence),
+            "ensemble_size": len(self.ensemble_models),
         }
 
     def predict_batch(
-        self,
-        states: pd.DataFrame,
-        use_ensemble: bool = True,
-        confidence_threshold: float = 0.05
+        self, states: pd.DataFrame, use_ensemble: bool = True, confidence_threshold: float = 0.05
     ) -> pd.DataFrame:
         """Predict on batch of states."""
         predictions = []
@@ -279,9 +293,9 @@ class CQLEnsemble:
     def export_predictions(
         self,
         states: pd.DataFrame,
-        output_path: Union[str, Path],
+        output_path: str | Path,
         use_ensemble: bool = True,
-        format: str = "csv"
+        format: str = "csv",
     ):
         """Export predictions to file."""
         predictions = self.predict_batch(states, use_ensemble)
@@ -303,6 +317,7 @@ class CQLEnsemble:
 # Example Usage
 # ============================================================================
 
+
 def example_usage():
     """Example of using CQL ensemble in production."""
     # Initialize ensemble
@@ -314,18 +329,18 @@ def example_usage():
 
     # Example game state
     state = {
-        'spread_close': 7.0,
-        'total_close': 48.5,
-        'epa_gap': 0.15,
-        'market_prob': 0.65,
-        'p_hat': 0.72,
-        'edge': 0.07
+        "spread_close": 7.0,
+        "total_close": 48.5,
+        "epa_gap": 0.15,
+        "market_prob": 0.65,
+        "p_hat": 0.72,
+        "edge": 0.07,
     }
 
     # Single model prediction
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("SINGLE MODEL PREDICTION")
-    print("="*60)
+    print("=" * 60)
     pred_single = ensemble.predict_single(state)
     print(f"Action: {pred_single['action_name']}")
     print(f"Bet size: {pred_single['bet_size']:.2%}")
@@ -333,9 +348,9 @@ def example_usage():
     print(f"Advantage: {pred_single['q_advantage']:.3f}")
 
     # Ensemble prediction
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ENSEMBLE PREDICTION (with uncertainty)")
-    print("="*60)
+    print("=" * 60)
     pred_ensemble = ensemble.predict_ensemble(state, confidence_threshold=0.05)
     print(f"Decision: {pred_ensemble['decision']}")
     print(f"Action: {pred_ensemble['action_name']}")

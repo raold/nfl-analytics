@@ -7,27 +7,22 @@ Supports v2.5 and v3.0 models with sub-100ms latency.
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-from fastapi import FastAPI, HTTPException, Query, Depends, BackgroundTasks
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from typing import List, Dict, Optional, Any
-import pandas as pd
-import numpy as np
-import psycopg2
-from psycopg2.pool import SimpleConnectionPool
-from datetime import datetime, timedelta
-import redis
-import json
-import hashlib
-import logging
-from pathlib import Path
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import asyncio
-import aioredis
+import json
+import logging
+from datetime import datetime
+
+import numpy as np
+import redis
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from psycopg2.pool import SimpleConnectionPool
+from pydantic import BaseModel, Field
 
 from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
-from py.production.ab_test_controller import ABTestController, ModelVersion
+from py.production.ab_test_controller import ABTestController
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -37,28 +32,24 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="NFL Props Prediction API",
     description="Real-time predictions for NFL player props with ensemble models",
-    version="3.0.0"
+    version="3.0.0",
 )
 
 # Database connection pool
 db_pool = SimpleConnectionPool(
-    1, 20,  # min and max connections
+    1,
+    20,  # min and max connections
     host="localhost",
     port=5544,
     database="devdb01",
     user="dro",
-    password="sicillionbillions"
+    password="sicillionbillions",
 )
 
 # Redis cache (for sub-100ms latency)
 redis_client = None
 try:
-    redis_client = redis.Redis(
-        host='localhost',
-        port=6379,
-        db=0,
-        decode_responses=True
-    )
+    redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
     redis_client.ping()
     logger.info("✓ Redis connected for caching")
 except:
@@ -74,28 +65,34 @@ ab_controller = None
 # DATA MODELS
 # ============================================================================
 
+
 class PredictionRequest(BaseModel):
     """Request model for predictions"""
+
     player_id: str = Field(..., description="Player GSIS ID")
-    prop_type: str = Field(..., description="Type of prop (passing_yards, rushing_yards, receiving_yards)")
+    prop_type: str = Field(
+        ..., description="Type of prop (passing_yards, rushing_yards, receiving_yards)"
+    )
     week: int = Field(..., ge=1, le=18, description="NFL week")
     season: int = Field(default=2024, description="Season year")
-    model_version: Optional[str] = Field(None, description="Force specific model version")
+    model_version: str | None = Field(None, description="Force specific model version")
 
 
 class BatchPredictionRequest(BaseModel):
     """Request model for batch predictions"""
-    players: List[PredictionRequest]
+
+    players: list[PredictionRequest]
     use_cache: bool = Field(default=True, description="Use Redis cache")
 
 
 class PredictionResponse(BaseModel):
     """Response model for predictions"""
+
     player_id: str
-    player_name: Optional[str]
+    player_name: str | None
     prop_type: str
     prediction: float
-    confidence_interval: Dict[str, float]  # q05, q50, q95
+    confidence_interval: dict[str, float]  # q05, q50, q95
     uncertainty: float
     model_version: str
     cache_hit: bool
@@ -105,30 +102,33 @@ class PredictionResponse(BaseModel):
 
 class EnsemblePredictionResponse(BaseModel):
     """Response for ensemble predictions"""
+
     player_id: str
-    player_name: Optional[str]
+    player_name: str | None
     prop_type: str
     ensemble_prediction: float
-    model_predictions: Dict[str, float]  # Each model's prediction
-    confidence_interval: Dict[str, float]
+    model_predictions: dict[str, float]  # Each model's prediction
+    confidence_interval: dict[str, float]
     uncertainty: float
     recommendation: str
-    edge: Optional[float]
+    edge: float | None
     timestamp: datetime
 
 
 class HealthResponse(BaseModel):
     """Health check response"""
+
     status: str
     database: bool
     redis: bool
-    models_loaded: Dict[str, bool]
+    models_loaded: dict[str, bool]
     uptime_seconds: float
 
 
 # ============================================================================
 # STARTUP AND SHUTDOWN
 # ============================================================================
+
 
 @app.on_event("startup")
 async def startup_event():
@@ -142,7 +142,7 @@ async def startup_event():
         ensemble_v3 = EnhancedEnsembleV3(
             use_bnn=False,  # Disable BNN for faster startup in demo
             use_stacking=True,
-            use_portfolio_opt=True
+            use_portfolio_opt=True,
         )
         logger.info("✓ Ensemble v3.0 initialized")
     except Exception as e:
@@ -150,10 +150,7 @@ async def startup_event():
 
     # Initialize A/B test controller
     try:
-        ab_controller = ABTestController(
-            test_name="v2.5_production",
-            allocation_pct=0.5
-        )
+        ab_controller = ABTestController(test_name="v2.5_production", allocation_pct=0.5)
         logger.info("✓ A/B test controller initialized")
     except Exception as e:
         logger.error(f"Failed to initialize A/B controller: {e}")
@@ -184,7 +181,10 @@ async def shutdown_event():
 # HELPER FUNCTIONS
 # ============================================================================
 
-def get_cache_key(player_id: str, prop_type: str, week: int, season: int, model_version: str) -> str:
+
+def get_cache_key(
+    player_id: str, prop_type: str, week: int, season: int, model_version: str
+) -> str:
     """Generate cache key for prediction"""
     return f"pred:{model_version}:{season}:{week}:{prop_type}:{player_id}"
 
@@ -215,13 +215,13 @@ async def warm_cache():
         # Cache predictions for top players
         cached = 0
         for player_id in top_players:
-            for prop_type in ['passing_yards', 'rushing_yards', 'receiving_yards']:
+            for prop_type in ["passing_yards", "rushing_yards", "receiving_yards"]:
                 # This would actually load predictions - simplified for demo
                 cache_key = get_cache_key(player_id, prop_type, 7, 2024, "v2.5")
                 redis_client.setex(
                     cache_key,
                     900,  # 15 minute TTL
-                    json.dumps({"prediction": 250.0, "cached_at": datetime.now().isoformat()})
+                    json.dumps({"prediction": 250.0, "cached_at": datetime.now().isoformat()}),
                 )
                 cached += 1
 
@@ -232,11 +232,8 @@ async def warm_cache():
 
 
 def load_prediction_from_db(
-    player_id: str,
-    prop_type: str,
-    season: int,
-    model_version: str
-) -> Dict:
+    player_id: str, prop_type: str, season: int, model_version: str
+) -> dict:
     """Load prediction from database"""
     conn = db_pool.getconn()
     try:
@@ -270,7 +267,7 @@ def load_prediction_from_db(
                 "q05": result[2],
                 "q50": result[3],
                 "q95": result[4],
-                "player_name": result[5]
+                "player_name": result[5],
             }
         else:
             return None
@@ -282,6 +279,7 @@ def load_prediction_from_db(
 # ============================================================================
 # API ENDPOINTS
 # ============================================================================
+
 
 @app.get("/", tags=["Info"])
 async def root():
@@ -295,8 +293,8 @@ async def root():
             "/predict/ensemble": "4-way ensemble prediction",
             "/models": "Available models",
             "/health": "Health check",
-            "/docs": "API documentation"
-        }
+            "/docs": "API documentation",
+        },
     }
 
 
@@ -304,6 +302,7 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     import time
+
     start_time = time.time()
 
     # Check database
@@ -330,7 +329,7 @@ async def health_check():
     # Check models
     models_loaded = {
         "ensemble_v3": ensemble_v3 is not None,
-        "ab_controller": ab_controller is not None
+        "ab_controller": ab_controller is not None,
     }
 
     return HealthResponse(
@@ -338,7 +337,7 @@ async def health_check():
         database=db_healthy,
         redis=redis_healthy,
         models_loaded=models_loaded,
-        uptime_seconds=time.time() - start_time
+        uptime_seconds=time.time() - start_time,
     )
 
 
@@ -350,16 +349,14 @@ async def predict(request: PredictionRequest):
     Uses A/B test controller to determine model version unless specified.
     """
     import time
+
     start_time = time.time()
 
     # Determine model version
     if request.model_version:
         model_version = request.model_version
     elif ab_controller:
-        model_assignment = ab_controller.get_model_assignment(
-            request.player_id,
-            request.week
-        )
+        model_assignment = ab_controller.get_model_assignment(request.player_id, request.week)
         model_version = model_assignment.value
     else:
         model_version = "informative_priors_v2.5"
@@ -367,11 +364,7 @@ async def predict(request: PredictionRequest):
     # Check cache
     cache_hit = False
     cache_key = get_cache_key(
-        request.player_id,
-        request.prop_type,
-        request.week,
-        request.season,
-        model_version
+        request.player_id, request.prop_type, request.week, request.season, model_version
     )
 
     if redis_client:
@@ -391,26 +384,18 @@ async def predict(request: PredictionRequest):
     # Load from database if not cached
     if not prediction_data:
         prediction_data = load_prediction_from_db(
-            request.player_id,
-            request.prop_type,
-            request.season,
-            model_version
+            request.player_id, request.prop_type, request.season, model_version
         )
 
         if not prediction_data:
             raise HTTPException(
-                status_code=404,
-                detail=f"No prediction found for player {request.player_id}"
+                status_code=404, detail=f"No prediction found for player {request.player_id}"
             )
 
         # Cache the result
         if redis_client:
             try:
-                redis_client.setex(
-                    cache_key,
-                    900,  # 15 minute TTL
-                    json.dumps(prediction_data)
-                )
+                redis_client.setex(cache_key, 900, json.dumps(prediction_data))  # 15 minute TTL
             except:
                 pass
 
@@ -425,21 +410,18 @@ async def predict(request: PredictionRequest):
         confidence_interval={
             "q05": prediction_data.get("q05", 0),
             "q50": prediction_data.get("q50", prediction_data["prediction"]),
-            "q95": prediction_data.get("q95", 0)
+            "q95": prediction_data.get("q95", 0),
         },
         uncertainty=prediction_data.get("uncertainty", 0),
         model_version=model_version,
         cache_hit=cache_hit,
         latency_ms=latency_ms,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
     )
 
 
 @app.post("/predict/batch", tags=["Predictions"])
-async def predict_batch(
-    request: BatchPredictionRequest,
-    background_tasks: BackgroundTasks
-):
+async def predict_batch(request: BatchPredictionRequest, background_tasks: BackgroundTasks):
     """
     Get predictions for multiple players.
 
@@ -465,7 +447,7 @@ async def predict_batch(
         "predictions": predictions,
         "total_requested": len(request.players),
         "successful": len(predictions),
-        "failed": len(request.players) - len(predictions)
+        "failed": len(request.players) - len(predictions),
     }
 
 
@@ -481,20 +463,14 @@ async def predict_ensemble(request: PredictionRequest):
     - Meta-learner combination
     """
     if not ensemble_v3:
-        raise HTTPException(
-            status_code=503,
-            detail="Ensemble model not available"
-        )
+        raise HTTPException(status_code=503, detail="Ensemble model not available")
 
     # Load individual model predictions
     model_predictions = {}
 
     # Bayesian v2.5
     bayesian_pred = load_prediction_from_db(
-        request.player_id,
-        request.prop_type,
-        request.season,
-        "informative_priors_v2.5"
+        request.player_id, request.prop_type, request.season, "informative_priors_v2.5"
     )
     if bayesian_pred:
         model_predictions["bayesian_v2.5"] = bayesian_pred["prediction"]
@@ -509,14 +485,10 @@ async def predict_ensemble(request: PredictionRequest):
     if model_predictions:
         # Inverse variance weighting
         weights = {"bayesian_v2.5": 0.4, "xgboost": 0.35, "bnn": 0.25}
-        ensemble_pred = sum(
-            model_predictions[m] * weights.get(m, 0.33)
-            for m in model_predictions
-        )
+        ensemble_pred = sum(model_predictions[m] * weights.get(m, 0.33) for m in model_predictions)
     else:
         raise HTTPException(
-            status_code=404,
-            detail=f"No predictions available for player {request.player_id}"
+            status_code=404, detail=f"No predictions available for player {request.player_id}"
         )
 
     # Generate recommendation
@@ -540,12 +512,12 @@ async def predict_ensemble(request: PredictionRequest):
         confidence_interval={
             "q05": ensemble_pred * 0.7,
             "q50": ensemble_pred,
-            "q95": ensemble_pred * 1.3
+            "q95": ensemble_pred * 1.3,
         },
         uncertainty=ensemble_pred * 0.15,
         recommendation=recommendation,
         edge=abs(ensemble_pred - 250) / 250 * 100,  # Simplified edge calculation
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
     )
 
 
@@ -562,16 +534,13 @@ async def list_models():
         ORDER BY model_version DESC
         """
         cur.execute(query)
-        models = [
-            {"version": row[0], "predictions": row[1]}
-            for row in cur.fetchall()
-        ]
+        models = [{"version": row[0], "predictions": row[1]} for row in cur.fetchall()]
         cur.close()
 
         return {
             "models": models,
             "default": "informative_priors_v2.5",
-            "ensemble_available": ensemble_v3 is not None
+            "ensemble_available": ensemble_v3 is not None,
         }
 
     finally:
@@ -580,11 +549,7 @@ async def list_models():
 
 @app.post("/feedback", tags=["Feedback"])
 async def submit_feedback(
-    player_id: str,
-    prop_type: str,
-    predicted: float,
-    actual: float,
-    model_version: str
+    player_id: str, prop_type: str, predicted: float, actual: float, model_version: str
 ):
     """
     Submit outcome feedback for model improvement.
@@ -597,13 +562,13 @@ async def submit_feedback(
             week=7,  # Would get from context
             actual_value=actual,
             predicted_value=predicted,
-            model_version=model_version
+            model_version=model_version,
         )
 
     return {
         "status": "recorded",
         "error": abs(predicted - actual),
-        "percentage_error": abs(predicted - actual) / actual * 100
+        "percentage_error": abs(predicted - actual) / actual * 100,
     }
 
 
@@ -616,10 +581,4 @@ if __name__ == "__main__":
 
     logger.info("Starting NFL Props API server...")
 
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000,
-        log_level="info",
-        reload=False
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info", reload=False)

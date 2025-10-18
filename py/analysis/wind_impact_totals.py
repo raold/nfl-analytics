@@ -32,7 +32,7 @@ def main():
 
     # Fetch games with weather and totals
     sql = """
-        SELECT 
+        SELECT
             g.game_id,
             g.season,
             g.week,

@@ -256,7 +256,9 @@ def compute_team_history_v2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Historical division game win rate (as-of)
     team_df["division_game_indicator"] = team_df["is_division_game"].astype(float)
-    team_df["division_game_win"] = (team_df["is_division_game"] & (team_df["margin"] > 0)).astype(float)
+    team_df["division_game_win"] = (team_df["is_division_game"] & (team_df["margin"] > 0)).astype(
+        float
+    )
 
     team_df["prior_division_games"] = team_group["division_game_indicator"].transform(
         lambda s: s.shift(1).cumsum()
@@ -274,9 +276,7 @@ def compute_team_history_v2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Thursday night performance (as-of)
     team_df["thursday_game_indicator"] = team_df["is_thursday_night"].astype(float)
-    team_df["thursday_game_margin"] = np.where(
-        team_df["is_thursday_night"], team_df["margin"], 0.0
-    )
+    team_df["thursday_game_margin"] = np.where(team_df["is_thursday_night"], team_df["margin"], 0.0)
 
     team_df["prior_thursday_games"] = team_group["thursday_game_indicator"].transform(
         lambda s: s.shift(1).cumsum()
@@ -294,9 +294,7 @@ def compute_team_history_v2(df: pd.DataFrame) -> pd.DataFrame:
 
     # Short week performance (as-of)
     team_df["short_week_indicator"] = team_df["is_short_week"].astype(float)
-    team_df["short_week_margin"] = np.where(
-        team_df["is_short_week"], team_df["margin"], 0.0
-    )
+    team_df["short_week_margin"] = np.where(team_df["is_short_week"], team_df["margin"], 0.0)
 
     team_df["prior_short_week_games"] = team_group["short_week_indicator"].transform(
         lambda s: s.shift(1).cumsum()
@@ -346,13 +344,6 @@ def pivot_to_games_v2(df: pd.DataFrame) -> pd.DataFrame:
     away = df[~df["is_home"]].copy()
 
     # Team-specific features (split home/away)
-    team_specific_v2 = [
-        "def_epa_last_4",
-        "opp_def_epa_last_4",
-        "prior_division_win_rate",
-        "prior_thursday_avg_margin",
-        "prior_short_week_avg_margin",
-    ]
 
     team_features = TEAM_FEATURE_COLUMNS_V2.copy()
     # Remove game-level features from team split (they're added at game level)
@@ -422,7 +413,9 @@ def pivot_to_games_v2(df: pd.DataFrame) -> pd.DataFrame:
 
     # v2 specific differentials
     if "home_def_epa_last_4" in merged.columns and "away_def_epa_last_4" in merged.columns:
-        merged["def_epa_last_4_diff"] = merged["home_def_epa_last_4"] - merged["away_def_epa_last_4"]
+        merged["def_epa_last_4_diff"] = (
+            merged["home_def_epa_last_4"] - merged["away_def_epa_last_4"]
+        )
 
     # One-hot encode weather_condition
     weather_dummies = pd.get_dummies(merged["weather_condition"], prefix="weather")
@@ -441,9 +434,7 @@ def pivot_to_games_v2(df: pd.DataFrame) -> pd.DataFrame:
     merged["is_tie"] = (merged["home_margin"] == 0).astype(bool)
 
     # Add tie probability indicator (for spreads < 1.5)
-    merged["high_tie_prob"] = (
-        merged["spread_close"].abs() < 1.5
-    ).fillna(False).astype(bool)
+    merged["high_tie_prob"] = (merged["spread_close"].abs() < 1.5).fillna(False).astype(bool)
 
     merged.sort_values(["season", "week", "game_id"], inplace=True)
     return merged
@@ -514,18 +505,20 @@ def main():
 
     # Print feature counts by category
     print("\nFeature category counts:")
-    print(f"  - Game-level flags: {sum('is_' in c and 'prior' not in c for c in games_wide.columns)}")
+    print(
+        f"  - Game-level flags: {sum('is_' in c and 'prior' not in c for c in games_wide.columns)}"
+    )
     print(f"  - Weather categories: {sum('weather_' in c for c in games_wide.columns)}")
     print(f"  - Defensive EPA: {sum('def_epa' in c for c in games_wide.columns)}")
     print(f"  - Division history: {sum('division' in c for c in games_wide.columns)}")
-    print(f"  - Thursday/Short week history: {sum('thursday' in c or 'short_week' in c for c in games_wide.columns)}")
+    print(
+        f"  - Thursday/Short week history: {sum('thursday' in c or 'short_week' in c for c in games_wide.columns)}"
+    )
 
     # Sample 2025 Week 6 features
-    week6_2025 = games_wide[
-        (games_wide["season"] == 2025) & (games_wide["week"] == 6)
-    ]
+    week6_2025 = games_wide[(games_wide["season"] == 2025) & (games_wide["week"] == 6)]
     if len(week6_2025) > 0:
-        print(f"\n2025 Week 6 sample (first 5 games):")
+        print("\n2025 Week 6 sample (first 5 games):")
         sample_cols = [
             "game_id",
             "home_team",

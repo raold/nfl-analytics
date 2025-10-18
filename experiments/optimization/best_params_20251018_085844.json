@@ -1,0 +1,19 @@
+{
+  "trial_number": 0,
+  "score": 0.5394587864034794,
+  "params": {
+    "prior_std": 0.548167853281987,
+    "hidden_units": 32,
+    "player_sigma": 0.39279757672456206,
+    "noise_sigma": 0.379597545259111,
+    "use_vegas": true,
+    "use_environment": false,
+    "use_opponent": false
+  },
+  "metrics": {
+    "coverage_90": 34.19117647058824,
+    "mae": 19.097894630865774,
+    "interval_width": 20.611754822579748,
+    "num_features": 6
+  }
+}

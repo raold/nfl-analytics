@@ -6,18 +6,20 @@ The kickoff times are currently all set to midnight UTC.
 This script updates them with proper kickoff times based on typical NFL game times.
 """
 
+from datetime import datetime
+
 import psycopg2
-from datetime import datetime, timedelta, timezone
 import pytz
 
 # Database connection parameters
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'dbname': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions'
+    "host": "localhost",
+    "port": 5544,
+    "dbname": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
+
 
 def get_typical_kickoff_time(day_of_week, is_primetime=False, is_morning=False):
     """
@@ -41,6 +43,7 @@ def get_typical_kickoff_time(day_of_week, is_primetime=False, is_morning=False):
     else:
         return 13  # Default to 1 PM ET
 
+
 def fix_kickoff_times():
     """Fix kickoff times in the games table."""
 
@@ -49,17 +52,19 @@ def fix_kickoff_times():
 
     try:
         # Get all games with their current kickoff times
-        cur.execute("""
+        cur.execute(
+            """
             SELECT game_id, season, week, kickoff, home_team, away_team
             FROM games
             ORDER BY season, week, game_id
-        """)
+        """
+        )
 
         games = cur.fetchall()
         print(f"Found {len(games)} games to process")
 
         # Eastern Time zone
-        et_tz = pytz.timezone('America/New_York')
+        et_tz = pytz.timezone("America/New_York")
 
         updates = []
         for game_id, season, week, kickoff_ts, home_team, away_team in games:
@@ -86,7 +91,7 @@ def fix_kickoff_times():
                 if games_on_date:
                     if game_id == games_on_date[0][0]:
                         # Could be London game
-                        if 'JAX' in (home_team, away_team) or week <= 8:
+                        if "JAX" in (home_team, away_team) or week <= 8:
                             is_morning = True
                     elif game_id == games_on_date[-1][0]:
                         is_primetime = True
@@ -98,9 +103,7 @@ def fix_kickoff_times():
 
             # Create the proper kickoff time in ET
             kickoff_et = datetime(
-                game_date.year, game_date.month, game_date.day,
-                hour, minute, 0,
-                tzinfo=et_tz
+                game_date.year, game_date.month, game_date.day, hour, minute, 0, tzinfo=et_tz
             )
 
             # Convert to UTC for storage
@@ -113,24 +116,29 @@ def fix_kickoff_times():
 
         # Update all games
         print(f"Updating {len(updates)} games with proper kickoff times...")
-        cur.executemany("""
+        cur.executemany(
+            """
             UPDATE games
             SET kickoff = %s
             WHERE game_id = %s
-        """, updates)
+        """,
+            updates,
+        )
 
         conn.commit()
         print(f"Successfully updated {len(updates)} games")
 
         # Verify a sample
-        cur.execute("""
+        cur.execute(
+            """
             SELECT game_id, season, week, kickoff,
                    kickoff AT TIME ZONE 'America/New_York' as kickoff_et
             FROM games
             WHERE season = 2024 AND week = 1
             ORDER BY kickoff
             LIMIT 10
-        """)
+        """
+        )
 
         print("\nSample of updated games (2024 Week 1):")
         print("Game ID | Kickoff UTC | Kickoff ET")
@@ -146,6 +154,7 @@ def fix_kickoff_times():
     finally:
         cur.close()
         conn.close()
+
 
 if __name__ == "__main__":
     fix_kickoff_times()

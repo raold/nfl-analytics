@@ -34,7 +34,7 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Union
+from typing import Any
 
 import torch
 
@@ -54,7 +54,7 @@ class ModelRegistry:
                     metrics_history.jsonl
     """
 
-    def __init__(self, base_dir: Union[str, Path] = "models"):
+    def __init__(self, base_dir: str | Path = "models"):
         """
         Initialize model registry.
 
@@ -73,11 +73,11 @@ class ModelRegistry:
         model_type: str,
         run_id: str,
         epoch: int,
-        checkpoint_data: Dict[str, Any],
-        metrics: Dict[str, float],
-        config: Dict[str, Any],
+        checkpoint_data: dict[str, Any],
+        metrics: dict[str, float],
+        config: dict[str, Any],
         is_best: bool = False,
-        device_info: Optional[Dict[str, Any]] = None
+        device_info: dict[str, Any] | None = None,
     ) -> Path:
         """
         Save model checkpoint with metadata.
@@ -110,11 +110,12 @@ class ModelRegistry:
         # Append metrics to history
         metrics_history_path = run_dir / "metrics_history.jsonl"
         with metrics_history_path.open("a") as f:
-            f.write(json.dumps({
-                "epoch": epoch,
-                "metrics": metrics,
-                "timestamp": datetime.utcnow().isoformat()
-            }) + "\n")
+            f.write(
+                json.dumps(
+                    {"epoch": epoch, "metrics": metrics, "timestamp": datetime.utcnow().isoformat()}
+                )
+                + "\n"
+            )
 
         # Update metadata
         metadata = {
@@ -125,7 +126,7 @@ class ModelRegistry:
             "latest_metrics": metrics,
             "config": config,
             "device_info": device_info,
-            "updated_at": datetime.utcnow().isoformat()
+            "updated_at": datetime.utcnow().isoformat(),
         }
         metadata_path = run_dir / "metadata.json"
         metadata_path.write_text(json.dumps(metadata, indent=2))
@@ -143,10 +144,10 @@ class ModelRegistry:
         self,
         model_type: str,
         run_id: str,
-        epoch: Optional[int] = None,
+        epoch: int | None = None,
         load_best: bool = False,
-        device: str = "cpu"
-    ) -> Dict[str, Any]:
+        device: str = "cpu",
+    ) -> dict[str, Any]:
         """
         Load model checkpoint.
 
@@ -179,7 +180,7 @@ class ModelRegistry:
 
         return torch.load(checkpoint_path, map_location=device)
 
-    def get_metadata(self, model_type: str, run_id: str) -> Dict[str, Any]:
+    def get_metadata(self, model_type: str, run_id: str) -> dict[str, Any]:
         """
         Get metadata for a run.
 
@@ -194,7 +195,7 @@ class ModelRegistry:
 
         return json.loads(metadata_path.read_text())
 
-    def get_metrics_history(self, model_type: str, run_id: str) -> List[Dict[str, Any]]:
+    def get_metrics_history(self, model_type: str, run_id: str) -> list[dict[str, Any]]:
         """
         Get full metrics history for a run.
 
@@ -215,11 +216,8 @@ class ModelRegistry:
         return history
 
     def list_runs(
-        self,
-        model_type: str,
-        sort_by: str = "updated_at",
-        reverse: bool = True
-    ) -> List[Dict[str, Any]]:
+        self, model_type: str, sort_by: str = "updated_at", reverse: bool = True
+    ) -> list[dict[str, Any]]:
         """
         List all runs for a model type.
 
@@ -263,11 +261,8 @@ class ModelRegistry:
             shutil.rmtree(run_dir)
 
     def find_best_run(
-        self,
-        model_type: str,
-        metric_name: str,
-        maximize: bool = True
-    ) -> Optional[Dict[str, Any]]:
+        self, model_type: str, metric_name: str, maximize: bool = True
+    ) -> dict[str, Any] | None:
         """
         Find best run by a metric.
 
@@ -293,8 +288,9 @@ class ModelRegistry:
         # Find best
         best_run = max(
             valid_runs,
-            key=lambda r: r["latest_metrics"][metric_name] if maximize
-            else -r["latest_metrics"][metric_name]
+            key=lambda r: (
+                r["latest_metrics"][metric_name] if maximize else -r["latest_metrics"][metric_name]
+            ),
         )
 
         return best_run
@@ -330,7 +326,7 @@ class ModelRegistry:
                 row = {
                     "run_id": run["run_id"],
                     "latest_epoch": run["latest_epoch"],
-                    "updated_at": run["updated_at"]
+                    "updated_at": run["updated_at"],
                 }
                 row.update(run.get("latest_metrics", {}))
                 writer.writerow(row)
@@ -341,6 +337,7 @@ class ModelRegistry:
 # ============================================================================
 # CLI
 # ============================================================================
+
 
 def main():
     import argparse

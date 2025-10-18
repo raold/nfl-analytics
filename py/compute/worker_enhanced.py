@@ -22,17 +22,15 @@ Usage:
 
 import argparse
 import logging
-import os
 import signal
 import sys
 import time
 import traceback
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any
 
 import numpy as np
 import psutil
-import redis
 import torch
 
 # Add parent directory to path
@@ -41,8 +39,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from compute.tasks.training_task import TrainingTask, get_redis_client
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -51,7 +48,8 @@ logger = logging.getLogger(__name__)
 # Device Detection
 # ============================================================================
 
-def get_device_info() -> Dict[str, Any]:
+
+def get_device_info() -> dict[str, Any]:
     """
     Auto-detect best available device and its capabilities.
 
@@ -81,11 +79,11 @@ def get_device_info() -> Dict[str, Any]:
         "device_memory_gb": int(device_memory_gb),
         "device_str": device_str,
         "cpu_count": psutil.cpu_count(),
-        "total_ram_gb": psutil.virtual_memory().total / (1024**3)
+        "total_ram_gb": psutil.virtual_memory().total / (1024**3),
     }
 
 
-def set_device(device_arg: Optional[str] = None) -> torch.device:
+def set_device(device_arg: str | None = None) -> torch.device:
     """
     Set PyTorch device.
 
@@ -106,6 +104,7 @@ def set_device(device_arg: Optional[str] = None) -> torch.device:
 # Enhanced Worker
 # ============================================================================
 
+
 class EnhancedWorker:
     """
     Worker that claims and executes training tasks from Redis queue.
@@ -122,10 +121,10 @@ class EnhancedWorker:
         worker_id: str,
         redis_host: str = "localhost",
         redis_port: int = 6379,
-        device: Optional[str] = None,
+        device: str | None = None,
         min_priority: int = 1,
         poll_interval: int = 5,
-        checkpoint_dir: str = "checkpoints"
+        checkpoint_dir: str = "checkpoints",
     ):
         """
         Initialize worker.
@@ -152,12 +151,14 @@ class EnhancedWorker:
         # Detect device
         self.device = set_device(device)
         self.device_info = get_device_info()
-        logger.info(f"Worker {worker_id} using device: {self.device_info['device_name']} "
-                   f"({self.device_info['device_memory_gb']} GB)")
+        logger.info(
+            f"Worker {worker_id} using device: {self.device_info['device_name']} "
+            f"({self.device_info['device_memory_gb']} GB)"
+        )
 
         # State
         self.running = True
-        self.current_task: Optional[TrainingTask] = None
+        self.current_task: TrainingTask | None = None
 
         # Register signal handlers
         signal.signal(signal.SIGTERM, self._handle_shutdown)
@@ -188,7 +189,7 @@ class EnhancedWorker:
                     worker_id=self.worker_id,
                     device_type=self.device_info["device_type"],
                     gpu_memory_gb=self.device_info["device_memory_gb"],
-                    min_priority=self.min_priority
+                    min_priority=self.min_priority,
                 )
 
                 if task is None:
@@ -251,7 +252,7 @@ class EnhancedWorker:
             task.update_status(
                 self.redis_client,
                 "failed",
-                metadata={"error": str(e), "traceback": traceback.format_exc()}
+                metadata={"error": str(e), "traceback": traceback.format_exc()},
             )
 
     def _train_test(self, task: TrainingTask):
@@ -277,7 +278,7 @@ class EnhancedWorker:
             # Simulate metrics
             metrics = {
                 "loss": 1.0 / epoch,  # Decreasing loss
-                "accuracy": min(0.9, 0.5 + 0.05 * epoch)  # Increasing accuracy
+                "accuracy": min(0.9, 0.5 + 0.05 * epoch),  # Increasing accuracy
             }
 
             logger.info(f"Epoch {epoch}/{epochs}: {metrics}")
@@ -288,10 +289,7 @@ class EnhancedWorker:
                 checkpoint_path.write_text(f"Checkpoint at epoch {epoch}\n")
 
                 task.save_checkpoint(
-                    self.redis_client,
-                    epoch=epoch,
-                    metrics=metrics,
-                    checkpoint_path=checkpoint_path
+                    self.redis_client, epoch=epoch, metrics=metrics, checkpoint_path=checkpoint_path
                 )
                 logger.info(f"Saved checkpoint: {checkpoint_path}")
 
@@ -315,7 +313,7 @@ class EnhancedWorker:
 
         # Import CQL agent
         sys.path.insert(0, str(Path(__file__).parent.parent))
-        from rl.cql_agent import CQLAgent, load_dataset, populate_replay_buffer, train_cql
+        from rl.cql_agent import CQLAgent, load_dataset, populate_replay_buffer
 
         logger.info("Starting CQL training...")
 
@@ -327,9 +325,9 @@ class EnhancedWorker:
         epochs = int(config.get("epochs", 200))
         batch_size = int(config.get("batch_size", 128))
         hidden_dims = config.get("hidden_dims", [128, 64, 32])
-        state_cols = config.get("state_cols", [
-            "spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"
-        ])
+        state_cols = config.get(
+            "state_cols", ["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"]
+        )
 
         logger.info(f"Config: alpha={alpha}, lr={lr}, epochs={epochs}, batch_size={batch_size}")
         logger.info(f"Hidden dims: {hidden_dims}")
@@ -404,12 +402,13 @@ class EnhancedWorker:
                     self.redis_client,
                     epoch=epoch,
                     metrics=avg_metrics,
-                    checkpoint_path=checkpoint_path
+                    checkpoint_path=checkpoint_path,
                 )
                 logger.info(f"Saved checkpoint: {checkpoint_path}")
 
         # Save final model to registry
         from compute.model_registry import ModelRegistry
+
         registry = ModelRegistry(base_dir="models")
 
         final_metrics = {
@@ -430,7 +429,7 @@ class EnhancedWorker:
             metrics=final_metrics,
             config=config,
             is_best=True,  # Can implement comparison logic later
-            device_info=self.device_info
+            device_info=self.device_info,
         )
 
         logger.info(f"CQL training completed. Model saved to registry: cql/{task.task_id}")
@@ -452,6 +451,7 @@ class EnhancedWorker:
 # CLI
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Enhanced compute worker with device auto-detection"
@@ -459,40 +459,35 @@ def main():
     parser.add_argument(
         "--worker-id",
         required=True,
-        help="Unique worker identifier (e.g., 'macbook_m4', 'rtx_gpu0')"
+        help="Unique worker identifier (e.g., 'macbook_m4', 'rtx_gpu0')",
     )
     parser.add_argument(
-        "--redis-host",
-        default="localhost",
-        help="Redis server host (default: localhost)"
+        "--redis-host", default="localhost", help="Redis server host (default: localhost)"
     )
     parser.add_argument(
-        "--redis-port",
-        type=int,
-        default=6379,
-        help="Redis server port (default: 6379)"
+        "--redis-port", type=int, default=6379, help="Redis server port (default: 6379)"
     )
     parser.add_argument(
         "--device",
         default=None,
-        help="Device to use (e.g., 'cuda:0', 'mps', 'cpu'). If not specified, auto-detects."
+        help="Device to use (e.g., 'cuda:0', 'mps', 'cpu'). If not specified, auto-detects.",
     )
     parser.add_argument(
         "--min-priority",
         type=int,
         default=1,
-        help="Minimum task priority to claim (default: 1). Set to 5+ for RTX workers."
+        help="Minimum task priority to claim (default: 1). Set to 5+ for RTX workers.",
     )
     parser.add_argument(
         "--poll-interval",
         type=int,
         default=5,
-        help="Seconds to wait between queue checks (default: 5)"
+        help="Seconds to wait between queue checks (default: 5)",
     )
     parser.add_argument(
         "--checkpoint-dir",
         default="checkpoints",
-        help="Directory to save checkpoints (default: checkpoints)"
+        help="Directory to save checkpoints (default: checkpoints)",
     )
 
     args = parser.parse_args()
@@ -505,7 +500,7 @@ def main():
         device=args.device,
         min_priority=args.min_priority,
         poll_interval=args.poll_interval,
-        checkpoint_dir=args.checkpoint_dir
+        checkpoint_dir=args.checkpoint_dir,
     )
 
     worker.run()

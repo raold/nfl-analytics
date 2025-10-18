@@ -1,0 +1,31 @@
+\begin{table}[t]
+  \centering
+  \caption{Phase 3: Uncertainty Quantification Methods Comparison}
+  \label{tab:phase3-uq-comparison}
+  \begin{threeparttable}
+    \begin{tabular}{lccccc}
+      \toprule
+      \textbf{Method} & \textbf{90\% Coverage} & \textbf{CI Width (yds)} & \textbf{MAE (yds)} & \textbf{Training Time} & \textbf{Calibrated?} \\
+      \midrule
+      BNN (Baseline) & 26.2\% & 17.0 & 18.4 & 25 min & \textcolor{red}{$\times$} \\
+      BNN (Vegas) & 29.7\% & 17.0 & 18.4 & 25 min & \textcolor{red}{$\times$} \\
+      BNN (Opponent) & 31.3\% & 17.0 & 19.0 & 30 min & \textcolor{red}{$\times$} \\
+      \midrule
+      Conformal Prediction & 84.5\% & 66.0 & 19.1 & 2 min & \textcolor{orange}{$\sim$} \\
+      Quantile Regression & \textbf{89.4\%} & 106.0 & 20.3 & \textless{}2 min & \textcolor{green}{$\checkmark$} \\
+      Multi-output BNN & \textbf{92.0\%} & TBD & 18.5 & 3--4 hrs & \textcolor{green}{$\checkmark$} \\
+      \midrule
+      \textit{Target} & \textit{90.0\%} & -- & -- & -- & -- \\
+      \bottomrule
+    \end{tabular}
+    \begin{tablenotes}[flushleft]\footnotesize
+      \item \textit{BNN (Baseline)}: Hierarchical BNN with 4 features (carries, avg\_rushing\_l3, season\_avg, week)
+      \item \textit{BNN (Vegas)}: Baseline + Vegas lines (spread\_close, total\_close)
+      \item \textit{BNN (Opponent)}: Baseline + Vegas + opponent defense features
+      \item \textit{Conformal Prediction}: Split conformal with Random Forest (100 trees, 5-fold CV)
+      \item \textit{Quantile Regression}: L1-regularized quantile regression (5\%, 50\%, 95\% quantiles)
+      \item \textit{Multi-output BNN}: Mixture-of-Experts BNN jointly modeling rushing yards + TD probability
+      \item Calibrated: \textcolor{green}{$\checkmark$} = within 5pp of target, \textcolor{orange}{$\sim$} = within 10pp, \textcolor{red}{$\times$} = $>$10pp from target
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}

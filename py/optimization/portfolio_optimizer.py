@@ -5,12 +5,12 @@ Uses cvxpy for quadratic programming with Kelly criterion constraints
 Handles correlation between props on same game
 """
 
+import logging
+from dataclasses import dataclass
+
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BetOpportunity:
     """Single betting opportunity"""
+
     player_id: str
     prop_type: str
     line: float
@@ -64,10 +65,7 @@ class CorrelatedPortfolioOptimizer:
         self.kelly_fraction = kelly_fraction
         self.correlation_penalty = correlation_penalty
 
-    def estimate_correlation_matrix(
-        self,
-        bets: List[BetOpportunity]
-    ) -> np.ndarray:
+    def estimate_correlation_matrix(self, bets: list[BetOpportunity]) -> np.ndarray:
         """
         Estimate correlation matrix between bets
         Based on:
@@ -104,10 +102,8 @@ class CorrelatedPortfolioOptimizer:
         return corr_matrix
 
     def optimize_portfolio(
-        self,
-        bets: List[BetOpportunity],
-        bankroll: float = 1.0
-    ) -> Tuple[np.ndarray, Dict[str, float]]:
+        self, bets: list[BetOpportunity], bankroll: float = 1.0
+    ) -> tuple[np.ndarray, dict[str, float]]:
         """
         Optimize bet sizes using quadratic programming
 
@@ -128,11 +124,11 @@ class CorrelatedPortfolioOptimizer:
 
         if not valid_bets:
             logger.warning("No bets with sufficient edge found")
-            return np.zeros(n), {'n_bets': 0, 'total_exposure': 0}
+            return np.zeros(n), {"n_bets": 0, "total_exposure": 0}
 
         # Get edges and standard deviations
         edges = np.array([b.edge for b in valid_bets])
-        odds = np.array([b.odds for b in valid_bets])
+        np.array([b.odds for b in valid_bets])
 
         # Estimate variance-covariance matrix
         corr_matrix = self.estimate_correlation_matrix(valid_bets)
@@ -156,9 +152,7 @@ class CorrelatedPortfolioOptimizer:
         expected_return = edges @ f
         portfolio_variance = cp.quad_form(f, cov_matrix)
 
-        objective = cp.Maximize(
-            expected_return - 0.5 * portfolio_variance
-        )
+        objective = cp.Maximize(expected_return - 0.5 * portfolio_variance)
 
         # Constraints
         constraints = [
@@ -173,7 +167,7 @@ class CorrelatedPortfolioOptimizer:
 
         if problem.status != cp.OPTIMAL:
             logger.warning(f"Optimization failed: {problem.status}")
-            return np.zeros(n), {'status': problem.status}
+            return np.zeros(n), {"status": problem.status}
 
         # Extract solution
         bet_sizes = f.value
@@ -185,22 +179,23 @@ class CorrelatedPortfolioOptimizer:
 
         # Calculate metrics
         metrics = {
-            'n_bets': np.sum(bet_sizes > 1e-4),
-            'total_exposure': np.sum(bet_sizes),
-            'expected_return': float(expected_return.value),
-            'portfolio_std': float(np.sqrt(portfolio_variance.value)),
-            'sharpe_ratio': float(expected_return.value / np.sqrt(portfolio_variance.value)) if portfolio_variance.value > 0 else 0,
-            'max_bet_size': float(np.max(bet_sizes)),
-            'avg_correlation': float(np.mean(corr_matrix[np.triu_indices_from(corr_matrix, k=1)])),
+            "n_bets": np.sum(bet_sizes > 1e-4),
+            "total_exposure": np.sum(bet_sizes),
+            "expected_return": float(expected_return.value),
+            "portfolio_std": float(np.sqrt(portfolio_variance.value)),
+            "sharpe_ratio": (
+                float(expected_return.value / np.sqrt(portfolio_variance.value))
+                if portfolio_variance.value > 0
+                else 0
+            ),
+            "max_bet_size": float(np.max(bet_sizes)),
+            "avg_correlation": float(np.mean(corr_matrix[np.triu_indices_from(corr_matrix, k=1)])),
         }
 
         return full_bet_sizes, metrics
 
     def get_bet_recommendations(
-        self,
-        bets: List[BetOpportunity],
-        bankroll: float,
-        min_bet_amount: float = 10.0
+        self, bets: list[BetOpportunity], bankroll: float, min_bet_amount: float = 10.0
     ) -> pd.DataFrame:
         """
         Get actionable bet recommendations
@@ -217,24 +212,26 @@ class CorrelatedPortfolioOptimizer:
                 bet_amount = size * bankroll
 
                 if bet_amount >= min_bet_amount:
-                    recommendations.append({
-                        'player_id': bet.player_id,
-                        'prop_type': bet.prop_type,
-                        'line': bet.line,
-                        'odds': bet.odds,
-                        'predicted_prob': bet.predicted_prob,
-                        'edge': bet.edge,
-                        'kelly_fraction': size,
-                        'bet_amount': bet_amount,
-                        'expected_profit': bet_amount * bet.edge,
-                        'game_id': bet.game_id,
-                        'week': bet.week,
-                    })
+                    recommendations.append(
+                        {
+                            "player_id": bet.player_id,
+                            "prop_type": bet.prop_type,
+                            "line": bet.line,
+                            "odds": bet.odds,
+                            "predicted_prob": bet.predicted_prob,
+                            "edge": bet.edge,
+                            "kelly_fraction": size,
+                            "bet_amount": bet_amount,
+                            "expected_profit": bet_amount * bet.edge,
+                            "game_id": bet.game_id,
+                            "week": bet.week,
+                        }
+                    )
 
         df = pd.DataFrame(recommendations)
 
         if not df.empty:
-            df = df.sort_values('expected_profit', ascending=False)
+            df = df.sort_values("expected_profit", ascending=False)
 
         return df, metrics
 
@@ -245,28 +242,19 @@ class SimpleKellyOptimizer:
     Faster but less accurate for correlated bets
     """
 
-    def __init__(
-        self,
-        kelly_fraction: float = 0.25,
-        max_bet_size: float = 0.05
-    ):
+    def __init__(self, kelly_fraction: float = 0.25, max_bet_size: float = 0.05):
         self.kelly_fraction = kelly_fraction
         self.max_bet_size = max_bet_size
 
-    def optimize_bets(
-        self,
-        bets: List[BetOpportunity],
-        bankroll: float = 1.0
-    ) -> np.ndarray:
+    def optimize_bets(self, bets: list[BetOpportunity], bankroll: float = 1.0) -> np.ndarray:
         """Simple Kelly criterion for each bet independently"""
 
-        bet_sizes = np.array([
-            min(
-                b.kelly_fraction * self.kelly_fraction,
-                self.max_bet_size
-            ) if b.edge > 0 else 0
-            for b in bets
-        ])
+        bet_sizes = np.array(
+            [
+                min(b.kelly_fraction * self.kelly_fraction, self.max_bet_size) if b.edge > 0 else 0
+                for b in bets
+            ]
+        )
 
         return bet_sizes
 
@@ -287,7 +275,7 @@ if __name__ == "__main__":
             predicted_std=35.0,
             game_id="2024_06_KC_BUF",
             season=2024,
-            week=6
+            week=6,
         ),
         BetOpportunity(
             player_id="kelce",
@@ -299,7 +287,7 @@ if __name__ == "__main__":
             predicted_std=25.0,
             game_id="2024_06_KC_BUF",
             season=2024,
-            week=6
+            week=6,
         ),
         BetOpportunity(
             player_id="hill",
@@ -311,7 +299,7 @@ if __name__ == "__main__":
             predicted_std=30.0,
             game_id="2024_06_MIA_NE",
             season=2024,
-            week=6
+            week=6,
         ),
     ]
 
@@ -333,7 +321,7 @@ if __name__ == "__main__":
             f"{simple_sizes[i]:6.2%}       {corr_sizes[i]:6.2%}"
         )
 
-    logger.info(f"\nPortfolio metrics:")
+    logger.info("\nPortfolio metrics:")
     logger.info(f"  Total exposure: {metrics['total_exposure']:.2%}")
     logger.info(f"  Expected return: {metrics['expected_return']:.4f}")
     logger.info(f"  Portfolio Std: {metrics['portfolio_std']:.4f}")

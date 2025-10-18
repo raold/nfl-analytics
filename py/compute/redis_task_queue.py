@@ -11,13 +11,12 @@ import logging
 import time
 import uuid
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import redis
-from redis.exceptions import ConnectionError, RedisError
+from redis.exceptions import ConnectionError
 
 # Import existing enums for compatibility
 from py.compute.task_queue import TaskPriority, TaskStatus
@@ -28,13 +27,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class HardwareProfile:
     """Hardware capability profile for task routing."""
+
     machine_id: str
     cpu_cores: int
     total_memory: int  # bytes
     gpu_memory: int = 0  # bytes
     gpu_name: str = ""
     platform: str = ""
-    capabilities: List[str] = None
+    capabilities: list[str] = None
 
     def __post_init__(self):
         if self.capabilities is None:
@@ -44,19 +44,20 @@ class HardwareProfile:
 @dataclass
 class TaskDefinition:
     """Enhanced task definition with hardware requirements."""
+
     id: str
     name: str
     task_type: str
-    config: Dict[str, Any]
+    config: dict[str, Any]
     priority: TaskPriority = TaskPriority.MEDIUM
-    depends_on: List[str] = None
+    depends_on: list[str] = None
     estimated_hours: float = 1.0
     requires_gpu: bool = False
     min_gpu_memory: int = 0
     min_cpu_cores: int = 1
     min_memory: int = 1024 * 1024 * 1024  # 1GB default
     expected_value: float = 0.0  # Expected value in dollars
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None
     schema_version: str = "v2"
 
     def __post_init__(self):
@@ -69,12 +70,13 @@ class TaskDefinition:
 @dataclass
 class TaskResult:
     """Task execution result."""
+
     task_id: str
     status: TaskStatus
-    result: Dict[str, Any] = None
+    result: dict[str, Any] = None
     error_message: str = ""
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     machine_id: str = ""
     cpu_hours: float = 0.0
     gpu_hours: float = 0.0
@@ -87,12 +89,13 @@ class TaskResult:
 
 class QueueType(str, Enum):
     """Task queue types for hardware-aware routing."""
-    GPU_HIGH = "gpu:high"           # RTX 4090, high-end GPUs
-    GPU_STANDARD = "gpu:standard"   # Standard GPUs
-    CPU_PARALLEL = "cpu:parallel"   # Multi-core CPU tasks
+
+    GPU_HIGH = "gpu:high"  # RTX 4090, high-end GPUs
+    GPU_STANDARD = "gpu:standard"  # Standard GPUs
+    CPU_PARALLEL = "cpu:parallel"  # Multi-core CPU tasks
     CPU_SEQUENTIAL = "cpu:sequential"  # Single-thread tasks
-    DATA_PIPELINE = "data:pipeline"    # ETL and ingestion
-    ANALYSIS = "analysis:standard"     # Research and reporting
+    DATA_PIPELINE = "data:pipeline"  # ETL and ingestion
+    ANALYSIS = "analysis:standard"  # Research and reporting
 
 
 class RedisTaskQueue:
@@ -103,8 +106,13 @@ class RedisTaskQueue:
     for better distributed coordination and atomic operations.
     """
 
-    def __init__(self, redis_host: str = "localhost", redis_port: int = 6379,
-                 redis_db: int = 0, machine_id: str = None):
+    def __init__(
+        self,
+        redis_host: str = "localhost",
+        redis_port: int = 6379,
+        redis_db: int = 0,
+        machine_id: str = None,
+    ):
         """Initialize Redis task queue."""
         self.redis_host = redis_host
         self.redis_port = redis_port
@@ -119,7 +127,7 @@ class RedisTaskQueue:
             decode_responses=True,
             socket_connect_timeout=5,
             socket_timeout=5,
-            retry_on_timeout=True
+            retry_on_timeout=True,
         )
 
         # Test connection
@@ -163,7 +171,7 @@ class RedisTaskQueue:
         machine_info = {
             "registered_at": datetime.utcnow().isoformat(),
             "last_seen": datetime.utcnow().isoformat(),
-            "status": "active"
+            "status": "active",
         }
         self.redis_client.hset(machine_key, mapping=machine_info)
 
@@ -184,21 +192,28 @@ class RedisTaskQueue:
             "capabilities": json.dumps(hardware_profile.capabilities),
             "registered_at": datetime.utcnow().isoformat(),
             "last_seen": datetime.utcnow().isoformat(),
-            "status": "active"
+            "status": "active",
         }
 
         self.redis_client.hset(machine_key, mapping=machine_data)
         self.redis_client.expire(machine_key, 3600)
 
-        logger.info(f"🖥️ Registered machine {self.machine_id} with profile: {hardware_profile.gpu_name or 'CPU'}")
+        logger.info(
+            f"🖥️ Registered machine {self.machine_id} with profile: {hardware_profile.gpu_name or 'CPU'}"
+        )
 
-    def add_task(self, name: str, task_type: str, config: Dict[str, Any],
-                 priority: TaskPriority = TaskPriority.MEDIUM,
-                 depends_on: Optional[List[str]] = None,
-                 estimated_hours: float = 1.0,
-                 requires_gpu: bool = False,
-                 min_gpu_memory: int = 0,
-                 expected_value: float = 0.0) -> str:
+    def add_task(
+        self,
+        name: str,
+        task_type: str,
+        config: dict[str, Any],
+        priority: TaskPriority = TaskPriority.MEDIUM,
+        depends_on: list[str] | None = None,
+        estimated_hours: float = 1.0,
+        requires_gpu: bool = False,
+        min_gpu_memory: int = 0,
+        expected_value: float = 0.0,
+    ) -> str:
         """Add task to appropriate queue based on requirements."""
 
         task_id = f"{task_type}_{uuid.uuid4().hex[:8]}"
@@ -213,7 +228,7 @@ class RedisTaskQueue:
             depends_on=depends_on or [],
             estimated_hours=estimated_hours,
             requires_gpu=requires_gpu,
-            min_gpu_memory=min_gpu_memory
+            min_gpu_memory=min_gpu_memory,
         )
 
         # Determine appropriate queue
@@ -224,7 +239,7 @@ class RedisTaskQueue:
             "task": json.dumps(asdict(task), default=str),
             "added_at": datetime.utcnow().isoformat(),
             "queue": queue_name,
-            "status": TaskStatus.PENDING.value
+            "status": TaskStatus.PENDING.value,
         }
 
         # Add to Redis with atomic operations
@@ -277,7 +292,7 @@ class RedisTaskQueue:
             TaskPriority.HIGH: 800,
             TaskPriority.MEDIUM: 500,
             TaskPriority.LOW: 200,
-            TaskPriority.BACKGROUND: 100
+            TaskPriority.BACKGROUND: 100,
         }
 
         score = base_scores.get(task.priority, 500)
@@ -287,7 +302,9 @@ class RedisTaskQueue:
 
         return score + timestamp_component
 
-    def get_next_task(self, machine_capabilities: Optional[HardwareProfile] = None) -> Optional[Dict[str, Any]]:
+    def get_next_task(
+        self, machine_capabilities: HardwareProfile | None = None
+    ) -> dict[str, Any] | None:
         """Get next suitable task for this machine."""
 
         if machine_capabilities:
@@ -308,7 +325,7 @@ class RedisTaskQueue:
 
         return None
 
-    def _get_suitable_queues(self, capabilities: HardwareProfile) -> List[str]:
+    def _get_suitable_queues(self, capabilities: HardwareProfile) -> list[str]:
         """Get list of queues this machine can handle, in priority order."""
         suitable = []
 
@@ -322,15 +339,17 @@ class RedisTaskQueue:
         if capabilities.cpu_cores > 4:
             suitable.append(QueueType.CPU_PARALLEL.value)
 
-        suitable.extend([
-            QueueType.CPU_SEQUENTIAL.value,
-            QueueType.DATA_PIPELINE.value,
-            QueueType.ANALYSIS.value
-        ])
+        suitable.extend(
+            [
+                QueueType.CPU_SEQUENTIAL.value,
+                QueueType.DATA_PIPELINE.value,
+                QueueType.ANALYSIS.value,
+            ]
+        )
 
         return suitable
 
-    def _claim_task_from_queue(self, queue_name: str) -> Optional[str]:
+    def _claim_task_from_queue(self, queue_name: str) -> str | None:
         """Atomically claim a task from queue."""
 
         # Use Lua script for atomic pop and update
@@ -366,7 +385,7 @@ class RedisTaskQueue:
             1,  # number of keys
             queue_name,  # KEYS[1]
             self.machine_id,  # ARGV[1]
-            datetime.utcnow().isoformat()  # ARGV[2]
+            datetime.utcnow().isoformat(),  # ARGV[2]
         )
 
         if task_id:
@@ -374,7 +393,7 @@ class RedisTaskQueue:
 
         return task_id
 
-    def _get_task_details(self, task_id: str) -> Dict[str, Any]:
+    def _get_task_details(self, task_id: str) -> dict[str, Any]:
         """Get complete task details."""
         task_key = f"task:{task_id}"
         task_data = self.redis_client.hgetall(task_key)
@@ -392,8 +411,9 @@ class RedisTaskQueue:
 
         return task_json
 
-    def complete_task(self, task_id: str, result: Dict[str, Any],
-                     cpu_hours: float = 0, gpu_hours: float = 0):
+    def complete_task(
+        self, task_id: str, result: dict[str, Any], cpu_hours: float = 0, gpu_hours: float = 0
+    ):
         """Mark task as completed with results."""
 
         # Ensure result is a dict
@@ -407,7 +427,7 @@ class RedisTaskQueue:
             completed_at=datetime.utcnow(),
             machine_id=self.machine_id,
             cpu_hours=cpu_hours,
-            gpu_hours=gpu_hours
+            gpu_hours=gpu_hours,
         )
 
         # Store result
@@ -415,7 +435,7 @@ class RedisTaskQueue:
         result_data = {
             "result": json.dumps(asdict(task_result), default=str),
             "completed_at": datetime.utcnow().isoformat(),
-            "machine_id": self.machine_id
+            "machine_id": self.machine_id,
         }
 
         pipe = self.redis_client.pipeline()
@@ -425,10 +445,13 @@ class RedisTaskQueue:
 
         # Update task status
         task_key = f"task:{task_id}"
-        pipe.hset(task_key, mapping={
-            "status": TaskStatus.COMPLETED.value,
-            "completed_at": datetime.utcnow().isoformat()
-        })
+        pipe.hset(
+            task_key,
+            mapping={
+                "status": TaskStatus.COMPLETED.value,
+                "completed_at": datetime.utcnow().isoformat(),
+            },
+        )
 
         # Move task status indices
         pipe.srem("tasks_by_status:running", task_id)
@@ -445,11 +468,14 @@ class RedisTaskQueue:
 
         # Update task status
         task_key = f"task:{task_id}"
-        pipe.hset(task_key, mapping={
-            "status": TaskStatus.FAILED.value,
-            "error_message": error_message,
-            "failed_at": datetime.utcnow().isoformat()
-        })
+        pipe.hset(
+            task_key,
+            mapping={
+                "status": TaskStatus.FAILED.value,
+                "error_message": error_message,
+                "failed_at": datetime.utcnow().isoformat(),
+            },
+        )
 
         # Move task status indices
         pipe.srem("tasks_by_status:running", task_id)
@@ -459,7 +485,7 @@ class RedisTaskQueue:
 
         logger.error(f"❌ Failed task {task_id}: {error_message}")
 
-    def get_queue_status(self) -> Dict[str, Dict[str, Any]]:
+    def get_queue_status(self) -> dict[str, dict[str, Any]]:
         """Get comprehensive queue status."""
 
         status = {}
@@ -469,10 +495,7 @@ class RedisTaskQueue:
             queue_name = queue_type.value
             pending_count = self.redis_client.zcard(queue_name)
 
-            status[queue_name] = {
-                "pending": pending_count,
-                "queue_type": queue_type.name
-            }
+            status[queue_name] = {"pending": pending_count, "queue_type": queue_type.name}
 
         # Get counts by status
         for task_status in TaskStatus:
@@ -484,10 +507,7 @@ class RedisTaskQueue:
         machine_keys = self.redis_client.keys("machines:*")
         active_machines = len(machine_keys)
 
-        status["machines"] = {
-            "active": active_machines,
-            "current": self.machine_id
-        }
+        status["machines"] = {"active": active_machines, "current": self.machine_id}
 
         return status
 
@@ -495,15 +515,12 @@ class RedisTaskQueue:
         """Update machine heartbeat and capabilities."""
         machine_key = f"machines:{self.machine_id}"
 
-        heartbeat_data = {
-            "last_seen": datetime.utcnow().isoformat(),
-            "status": "active"
-        }
+        heartbeat_data = {"last_seen": datetime.utcnow().isoformat(), "status": "active"}
 
         self.redis_client.hset(machine_key, mapping=heartbeat_data)
         self.redis_client.expire(machine_key, 3600)  # Reset expiration
 
-    def get_running_tasks(self) -> List[Dict[str, Any]]:
+    def get_running_tasks(self) -> list[dict[str, Any]]:
         """Get all currently running tasks."""
         running_task_ids = self.redis_client.smembers("tasks_by_status:running")
 
@@ -517,7 +534,7 @@ class RedisTaskQueue:
 
     def close(self):
         """Clean up Redis connection."""
-        if hasattr(self, 'redis_client'):
+        if hasattr(self, "redis_client"):
             self.redis_client.close()
             logger.info("🔌 Closed Redis connection")
 
@@ -533,6 +550,7 @@ class TaskQueue(RedisTaskQueue):
         else:
             # Fallback to original SQLite implementation if needed
             from task_queue import TaskQueue as OriginalTaskQueue
+
             self.__class__ = OriginalTaskQueue
             OriginalTaskQueue.__init__(self, db_path)
 
@@ -549,9 +567,9 @@ if __name__ == "__main__":
         machine_id="test_machine",
         cpu_cores=8,
         total_memory=16 * 1024 * 1024 * 1024,  # 16GB
-        gpu_memory=8 * 1024 * 1024 * 1024,     # 8GB
+        gpu_memory=8 * 1024 * 1024 * 1024,  # 8GB
         gpu_name="Test GPU",
-        platform="test"
+        platform="test",
     )
 
     queue.register_machine(profile)
@@ -562,14 +580,10 @@ if __name__ == "__main__":
         "rl_train",
         {"epochs": 100},
         requires_gpu=True,
-        min_gpu_memory=4 * 1024 * 1024 * 1024
+        min_gpu_memory=4 * 1024 * 1024 * 1024,
     )
 
-    task_id_2 = queue.add_task(
-        "Test CPU Task",
-        "feature_engineering",
-        {"dataset": "test"}
-    )
+    task_id_2 = queue.add_task("Test CPU Task", "feature_engineering", {"dataset": "test"})
 
     # Check status
     status = queue.get_queue_status()
@@ -581,10 +595,6 @@ if __name__ == "__main__":
         print(f"Got task: {next_task['name']}")
 
         # Complete task
-        queue.complete_task(
-            next_task["id"],
-            {"accuracy": 0.95},
-            cpu_hours=1.0
-        )
+        queue.complete_task(next_task["id"], {"accuracy": 0.95}, cpu_hours=1.0)
 
     print("✅ Redis Task Queue test completed")

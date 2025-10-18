@@ -39,12 +39,18 @@ def generate_reliability_for_season(
     cmd = [
         "python3",
         "py/backtest/baseline_glm.py",
-        "--features-csv", features_csv,
-        "--start-season", str(season),
-        "--end-season", str(season),
-        "--min-season", str(max(2001, season - 5)),  # Use 5 years of training data
-        "--cal-plot", str(plot_path),
-        "--cal-bins", "10",
+        "--features-csv",
+        features_csv,
+        "--start-season",
+        str(season),
+        "--end-season",
+        str(season),
+        "--min-season",
+        str(max(2001, season - 5)),  # Use 5 years of training data
+        "--cal-plot",
+        str(plot_path),
+        "--cal-bins",
+        "10",
     ]
 
     print(f"Generating reliability diagram for season {season}...")
@@ -79,9 +85,7 @@ def generate_reliability_for_season(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate per-season reliability diagrams"
-    )
+    parser = argparse.ArgumentParser(description="Generate per-season reliability diagrams")
     parser.add_argument(
         "--start-season",
         type=int,

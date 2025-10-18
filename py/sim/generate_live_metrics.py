@@ -16,7 +16,6 @@ Usage:
 
 import json
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -26,19 +25,11 @@ import psycopg
 def connect_db():
     """Connect to NFL database."""
     return psycopg.connect(
-        dbname="devdb01",
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions"
+        dbname="devdb01", host="localhost", port=5544, user="dro", password="sicillionbillions"
     )
 
 
-def fetch_betting_games(
-    conn,
-    start_season: int = 2023,
-    min_week: int = 1
-) -> pd.DataFrame:
+def fetch_betting_games(conn, start_season: int = 2023, min_week: int = 1) -> pd.DataFrame:
     """
     Fetch games with estimated betting lines.
 
@@ -74,17 +65,13 @@ def fetch_betting_games(
     return pd.read_sql(query, conn)
 
 
-def load_model_params(path: str = "models/dixon_coles_params.json") -> Dict:
+def load_model_params(path: str = "models/dixon_coles_params.json") -> dict:
     """Load Dixon-Coles model parameters."""
     with open(path) as f:
         return json.load(f)
 
 
-def predict_spread_and_prob(
-    home_team: str,
-    away_team: str,
-    params: Dict
-) -> tuple[float, float]:
+def predict_spread_and_prob(home_team: str, away_team: str, params: dict) -> tuple[float, float]:
     """
     Predict spread and win probability using Dixon-Coles.
 
@@ -97,9 +84,9 @@ def predict_spread_and_prob(
         (estimated_spread, win_probability)
     """
     # Get team parameters
-    attack = params['attack']
-    defense = params['defense']
-    hfa = params['home_advantage']
+    attack = params["attack"]
+    defense = params["defense"]
+    hfa = params["home_advantage"]
 
     # Check if teams exist
     if home_team not in attack or away_team not in attack:
@@ -129,10 +116,7 @@ def predict_spread_and_prob(
     return estimated_spread, p_win
 
 
-def compute_clv(
-    model_prob: float,
-    closing_line: float
-) -> float:
+def compute_clv(model_prob: float, closing_line: float) -> float:
     """
     Compute Closing Line Value (CLV).
 
@@ -156,10 +140,7 @@ def compute_clv(
 
 
 def compute_roi(
-    df: pd.DataFrame,
-    model_probs: np.ndarray,
-    spreads: np.ndarray,
-    kelly_fraction: float = 0.25
+    df: pd.DataFrame, model_probs: np.ndarray, spreads: np.ndarray, kelly_fraction: float = 0.25
 ) -> float:
     """
     Compute ROI using Kelly criterion betting.
@@ -191,7 +172,7 @@ def compute_roi(
     kelly_bets = np.clip(kelly_bets * kelly_fraction, 0, 0.05)  # Max 5% per bet
 
     # Actual outcomes
-    margins = df['home_score'].values - df['away_score'].values
+    margins = df["home_score"].values - df["away_score"].values
     covers = margins > spreads
 
     # Calculate P&L
@@ -208,10 +189,7 @@ def compute_roi(
     return roi
 
 
-def generate_live_metrics(
-    output_path: str = "data/live_metrics.csv",
-    start_season: int = 2023
-):
+def generate_live_metrics(output_path: str = "data/live_metrics.csv", start_season: int = 2023):
     """
     Main function to generate live performance metrics.
 
@@ -243,49 +221,39 @@ def generate_live_metrics(
     model_probs = []
 
     for _, row in df.iterrows():
-        spread, prob = predict_spread_and_prob(row['home_team'], row['away_team'], params)
+        spread, prob = predict_spread_and_prob(row["home_team"], row["away_team"], params)
         # Add noise to simulate market uncertainty (±0.5 to ±2 points)
         spread_with_noise = spread + np.random.normal(0, 1.0)
         model_spreads.append(spread_with_noise)
         model_probs.append(prob)
 
-    df['model_spread'] = model_spreads
-    df['model_prob'] = model_probs
+    df["model_spread"] = model_spreads
+    df["model_prob"] = model_probs
     print(f"✅ Predicted {len(model_probs)} games")
 
     # Compute CLV (use model_spread as the "closing line" for dissertation)
     print("\n4. Computing CLV...")
-    df['clv'] = df.apply(
-        lambda row: compute_clv(row['model_prob'], row['model_spread']),
-        axis=1
-    )
+    df["clv"] = df.apply(lambda row: compute_clv(row["model_prob"], row["model_spread"]), axis=1)
     print(f"✅ Mean CLV: {df['clv'].mean():.4f}")
 
     # Compute weekly metrics
     print("\n5. Aggregating by week...")
-    weekly = df.groupby(['season', 'week']).agg({
-        'clv': ['mean', 'std', 'count'],
-        'model_prob': 'mean'
-    }).reset_index()
+    weekly = (
+        df.groupby(["season", "week"])
+        .agg({"clv": ["mean", "std", "count"], "model_prob": "mean"})
+        .reset_index()
+    )
 
-    weekly.columns = ['season', 'week', 'mean_clv', 'std_clv', 'n_games', 'mean_prob']
+    weekly.columns = ["season", "week", "mean_clv", "std_clv", "n_games", "mean_prob"]
 
     # Compute ROI for each week
     roi_by_week = []
-    for (season, week), group in df.groupby(['season', 'week']):
-        roi = compute_roi(
-            group,
-            group['model_prob'].values,
-            group['model_spread'].values
-        )
-        roi_by_week.append({
-            'season': season,
-            'week': week,
-            'roi': roi
-        })
+    for (season, week), group in df.groupby(["season", "week"]):
+        roi = compute_roi(group, group["model_prob"].values, group["model_spread"].values)
+        roi_by_week.append({"season": season, "week": week, "roi": roi})
 
     roi_df = pd.DataFrame(roi_by_week)
-    weekly = weekly.merge(roi_df, on=['season', 'week'])
+    weekly = weekly.merge(roi_df, on=["season", "week"])
 
     print(f"✅ Aggregated {len(weekly)} weeks")
 

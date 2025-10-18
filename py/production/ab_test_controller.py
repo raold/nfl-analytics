@@ -7,23 +7,23 @@ Tracks performance metrics and manages traffic allocation.
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from datetime import datetime, timedelta
-import logging
-import json
-from typing import Dict, List, Tuple, Optional
-from enum import Enum
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import hashlib
+import json
+import logging
+from datetime import datetime
+from enum import Enum
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 from py.compute.statistics.experimental_design.ab_testing import (
     ABTest,
-    TestArm,
     AllocationMethod,
-    TestStatus
+    TestStatus,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 
 class ModelVersion(Enum):
     """Available model versions for A/B testing"""
+
     V1_0_BASELINE = "hierarchical_v1.0"
     V2_5_INFORMATIVE = "informative_priors_v2.5"
     V3_0_ENSEMBLE = "ensemble_v3.0"
@@ -56,7 +57,7 @@ class ABTestController:
         treatment_version: ModelVersion = ModelVersion.V2_5_INFORMATIVE,
         allocation_pct: float = 0.5,
         min_samples: int = 100,
-        confidence_threshold: float = 0.95
+        confidence_threshold: float = 0.95,
     ):
         """
         Initialize A/B test controller.
@@ -82,7 +83,7 @@ class ABTestController:
             alpha=0.05,
             power=0.8,
             minimum_effect_size=0.02,  # 2% improvement threshold
-            allocation_method=AllocationMethod.FIXED
+            allocation_method=AllocationMethod.FIXED,
         )
 
         # Add arms
@@ -91,11 +92,11 @@ class ABTestController:
 
         # Database connection
         self.db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         # Start test
@@ -132,12 +133,7 @@ class ABTestController:
         else:
             return self.control_version
 
-    def get_predictions(
-        self,
-        player_ids: List[str],
-        week: int,
-        season: int = 2024
-    ) -> pd.DataFrame:
+    def get_predictions(self, player_ids: list[str], week: int, season: int = 2024) -> pd.DataFrame:
         """
         Get predictions from appropriate model version for each player.
 
@@ -156,36 +152,31 @@ class ABTestController:
             model_version = self.get_model_assignment(player_id, week)
 
             # Load prediction from database
-            prediction = self._load_prediction(
-                player_id,
-                model_version.value,
-                season
-            )
+            prediction = self._load_prediction(player_id, model_version.value, season)
 
-            results.append({
-                'player_id': player_id,
-                'week': week,
-                'season': season,
-                'model_version': model_version.value,
-                'prediction': prediction.get('rating_mean', None),
-                'uncertainty': prediction.get('rating_sd', None),
-                'assigned_arm': 'treatment' if model_version == self.treatment_version else 'control'
-            })
+            results.append(
+                {
+                    "player_id": player_id,
+                    "week": week,
+                    "season": season,
+                    "model_version": model_version.value,
+                    "prediction": prediction.get("rating_mean", None),
+                    "uncertainty": prediction.get("rating_sd", None),
+                    "assigned_arm": (
+                        "treatment" if model_version == self.treatment_version else "control"
+                    ),
+                }
+            )
 
         df = pd.DataFrame(results)
 
         # Log assignment distribution
-        treatment_pct = (df['assigned_arm'] == 'treatment').mean()
+        treatment_pct = (df["assigned_arm"] == "treatment").mean()
         logger.info(f"Assigned {len(df)} predictions: {treatment_pct:.1%} to treatment")
 
         return df
 
-    def _load_prediction(
-        self,
-        player_id: str,
-        model_version: str,
-        season: int
-    ) -> Dict:
+    def _load_prediction(self, player_id: str, model_version: str, season: int) -> dict:
         """Load prediction from database"""
         conn = psycopg2.connect(**self.db_config)
         cur = conn.cursor()
@@ -208,18 +199,18 @@ class ABTestController:
 
         if result:
             return {
-                'rating_mean': result[0],
-                'rating_sd': result[1],
-                'rating_q05': result[2],
-                'rating_q95': result[3]
+                "rating_mean": result[0],
+                "rating_sd": result[1],
+                "rating_q05": result[2],
+                "rating_q95": result[3],
             }
         else:
             # Return default if no prediction found
             return {
-                'rating_mean': 250.0,  # Default passing yards
-                'rating_sd': 50.0,
-                'rating_q05': 150.0,
-                'rating_q95': 350.0
+                "rating_mean": 250.0,  # Default passing yards
+                "rating_sd": 50.0,
+                "rating_q05": 150.0,
+                "rating_q95": 350.0,
             }
 
     def record_outcome(
@@ -228,7 +219,7 @@ class ABTestController:
         week: int,
         actual_value: float,
         predicted_value: float,
-        model_version: str
+        model_version: str,
     ):
         """
         Record the outcome of a prediction for A/B test analysis.
@@ -257,8 +248,14 @@ class ABTestController:
 
         # Log to database
         self._log_outcome(
-            player_id, week, actual_value, predicted_value,
-            model_version, error, abs_error, pct_error
+            player_id,
+            week,
+            actual_value,
+            predicted_value,
+            model_version,
+            error,
+            abs_error,
+            pct_error,
         )
 
         # Check if test should stop
@@ -279,7 +276,7 @@ class ABTestController:
         model_version: str,
         error: float,
         abs_error: float,
-        pct_error: float
+        pct_error: float,
     ):
         """Log outcome to database for analysis"""
         conn = psycopg2.connect(**self.db_config)
@@ -295,11 +292,21 @@ class ABTestController:
         """
 
         try:
-            cur.execute(query, (
-                self.test_name, player_id, week, model_version,
-                predicted_value, actual_value, error,
-                abs_error, pct_error, datetime.now()
-            ))
+            cur.execute(
+                query,
+                (
+                    self.test_name,
+                    player_id,
+                    week,
+                    model_version,
+                    predicted_value,
+                    actual_value,
+                    error,
+                    abs_error,
+                    pct_error,
+                    datetime.now(),
+                ),
+            )
             conn.commit()
         except Exception as e:
             logger.warning(f"Could not log outcome: {e}")
@@ -307,7 +314,7 @@ class ABTestController:
         finally:
             conn.close()
 
-    def get_current_metrics(self) -> Dict:
+    def get_current_metrics(self) -> dict:
         """
         Get current A/B test metrics.
 
@@ -316,47 +323,50 @@ class ABTestController:
         """
         result = self.ab_test.analyze()
 
-        control_arm = self.ab_test.arms['control']
-        treatment_arm = self.ab_test.arms['treatment']
+        control_arm = self.ab_test.arms["control"]
+        treatment_arm = self.ab_test.arms["treatment"]
 
         metrics = {
-            'test_name': self.test_name,
-            'status': result.status.value,
-            'control_n': control_arm.n,
-            'treatment_n': treatment_arm.n,
-            'control_mae': -control_arm.mean if control_arm.n > 0 else None,
-            'treatment_mae': -treatment_arm.mean if treatment_arm.n > 0 else None,
-            'control_success_rate': control_arm.success_rate,
-            'treatment_success_rate': treatment_arm.success_rate,
-            'p_value': result.p_value,
-            'confidence': result.confidence,
-            'winner': result.winner,
-            'recommendation': result.recommendation
+            "test_name": self.test_name,
+            "status": result.status.value,
+            "control_n": control_arm.n,
+            "treatment_n": treatment_arm.n,
+            "control_mae": -control_arm.mean if control_arm.n > 0 else None,
+            "treatment_mae": -treatment_arm.mean if treatment_arm.n > 0 else None,
+            "control_success_rate": control_arm.success_rate,
+            "treatment_success_rate": treatment_arm.success_rate,
+            "p_value": result.p_value,
+            "confidence": result.confidence,
+            "winner": result.winner,
+            "recommendation": result.recommendation,
         }
 
         # Calculate lift
-        if metrics['control_mae'] and metrics['treatment_mae']:
-            metrics['mae_improvement'] = (
-                (metrics['control_mae'] - metrics['treatment_mae']) /
-                metrics['control_mae'] * 100
+        if metrics["control_mae"] and metrics["treatment_mae"]:
+            metrics["mae_improvement"] = (
+                (metrics["control_mae"] - metrics["treatment_mae"]) / metrics["control_mae"] * 100
             )
         else:
-            metrics['mae_improvement'] = 0
+            metrics["mae_improvement"] = 0
 
         return metrics
 
     def _save_test_results(self, result):
         """Save final test results"""
-        with open(f'reports/ab_test_{self.test_name}_results.json', 'w') as f:
-            json.dump({
-                'test_name': self.test_name,
-                'status': result.status.value,
-                'winner': result.winner,
-                'confidence': result.confidence,
-                'p_value': result.p_value,
-                'effect_size': result.effect_size,
-                'timestamp': datetime.now().isoformat()
-            }, f, indent=2)
+        with open(f"reports/ab_test_{self.test_name}_results.json", "w") as f:
+            json.dump(
+                {
+                    "test_name": self.test_name,
+                    "status": result.status.value,
+                    "winner": result.winner,
+                    "confidence": result.confidence,
+                    "p_value": result.p_value,
+                    "effect_size": result.effect_size,
+                    "timestamp": datetime.now().isoformat(),
+                },
+                f,
+                indent=2,
+            )
 
         logger.info(f"✓ Test results saved to reports/ab_test_{self.test_name}_results.json")
 
@@ -377,28 +387,23 @@ class ABTestController:
 
 def demo():
     """Demo the A/B test controller"""
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("A/B TEST CONTROLLER DEMO")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     # Initialize controller
     controller = ABTestController(
-        test_name="v2.5_deployment_demo",
-        allocation_pct=0.5  # 50/50 split
+        test_name="v2.5_deployment_demo", allocation_pct=0.5  # 50/50 split
     )
 
     # Simulate some predictions
     player_ids = [f"player_{i:03d}" for i in range(10)]
 
     # Get predictions with model assignments
-    predictions_df = controller.get_predictions(
-        player_ids=player_ids,
-        week=7,
-        season=2024
-    )
+    predictions_df = controller.get_predictions(player_ids=player_ids, week=7, season=2024)
 
     logger.info("\nModel Assignments:")
-    logger.info(predictions_df[['player_id', 'model_version']].to_string(index=False))
+    logger.info(predictions_df[["player_id", "model_version"]].to_string(index=False))
 
     # Simulate some outcomes
     logger.info("\nSimulating outcomes...")
@@ -406,14 +411,14 @@ def demo():
 
     for _, row in predictions_df.iterrows():
         # Simulate actual value (with some noise)
-        actual = row['prediction'] + np.random.normal(0, 30) if row['prediction'] else 250
+        actual = row["prediction"] + np.random.normal(0, 30) if row["prediction"] else 250
 
         controller.record_outcome(
-            player_id=row['player_id'],
-            week=row['week'],
+            player_id=row["player_id"],
+            week=row["week"],
             actual_value=actual,
-            predicted_value=row['prediction'] or 250,
-            model_version=row['model_version']
+            predicted_value=row["prediction"] or 250,
+            model_version=row["model_version"],
         )
 
     # Get current metrics

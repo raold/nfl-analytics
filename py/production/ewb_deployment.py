@@ -28,9 +28,8 @@ import logging
 import os
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import pandas as pd
 import requests
@@ -39,7 +38,7 @@ from sqlalchemy import create_engine
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.features.line_movement_tracker import LineMovementTracker, LineSnapshot
+from py.features.line_movement_tracker import LineMovementTracker
 
 logging.basicConfig(
     level=logging.INFO,
@@ -56,10 +55,7 @@ logger = logging.getLogger(__name__)
 ODDS_API_KEY = os.getenv("ODDS_API_KEY", "")
 ODDS_API_BASE = "https://api.the-odds-api.com/v4"
 
-DB_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-)
+DB_URL = os.getenv("DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01")
 
 # EWB Strategy Parameters
 MIN_EDGE_THRESHOLD = 0.03  # 3% minimum edge to place bet
@@ -76,9 +72,11 @@ EWB_WINDOW_END = "Thursday 23:59 ET"  # End of early week window
 # Data Models
 # ============================================================================
 
+
 @dataclass
 class GamePrediction:
     """Model prediction for a game."""
+
     game_id: str
     home_team: str
     away_team: str
@@ -91,6 +89,7 @@ class GamePrediction:
 @dataclass
 class BettingOpportunity:
     """Betting opportunity identified by EWB strategy."""
+
     game_id: str
     home_team: str
     away_team: str
@@ -108,6 +107,7 @@ class BettingOpportunity:
 # Odds API Integration
 # ============================================================================
 
+
 class OddsAPIClient:
     """Client for The Odds API."""
 
@@ -117,9 +117,9 @@ class OddsAPIClient:
 
     def fetch_nfl_odds(
         self,
-        markets: List[str] = ["spreads", "totals"],
-        bookmakers: List[str] = ["fanduel", "draftkings", "bet365", "pinnacle"]
-    ) -> List[Dict]:
+        markets: list[str] = ["spreads", "totals"],
+        bookmakers: list[str] = ["fanduel", "draftkings", "bet365", "pinnacle"],
+    ) -> list[dict]:
         """
         Fetch current NFL odds from API.
 
@@ -149,10 +149,8 @@ class OddsAPIClient:
             return []
 
     def fetch_historical_lines(
-        self,
-        game_date: str,
-        markets: List[str] = ["spreads"]
-    ) -> List[Dict]:
+        self, game_date: str, markets: list[str] = ["spreads"]
+    ) -> list[dict]:
         """
         Fetch historical line snapshots for a specific date.
 
@@ -167,6 +165,7 @@ class OddsAPIClient:
 # ============================================================================
 # Model Integration
 # ============================================================================
+
 
 class ModelPredictor:
     """Generate model predictions for upcoming games."""
@@ -204,11 +203,8 @@ class ModelPredictor:
         return df
 
     def predict_games(
-        self,
-        season: int,
-        week: int,
-        model_path: str = "models/xgboost/v3/model.json"
-    ) -> List[GamePrediction]:
+        self, season: int, week: int, model_path: str = "models/xgboost/v3/model.json"
+    ) -> list[GamePrediction]:
         """
         Generate predictions for all games in a week.
 
@@ -230,13 +226,13 @@ class ModelPredictor:
             # Placeholder: Use closing line as model prediction
             # In production, this would call the actual XGBoost model
             prediction = GamePrediction(
-                game_id=game['game_id'],
-                home_team=game['home_team'],
-                away_team=game['away_team'],
-                predicted_spread=game['spread_close'] if pd.notna(game['spread_close']) else 0,
+                game_id=game["game_id"],
+                home_team=game["home_team"],
+                away_team=game["away_team"],
+                predicted_spread=game["spread_close"] if pd.notna(game["spread_close"]) else 0,
                 model_confidence=0.65,  # Placeholder
-                predicted_total=game['total_close'] if pd.notna(game['total_close']) else 45,
-                kickoff=game['kickoff'].isoformat() if pd.notna(game['kickoff']) else ""
+                predicted_total=game["total_close"] if pd.notna(game["total_close"]) else 45,
+                kickoff=game["kickoff"].isoformat() if pd.notna(game["kickoff"]) else "",
             )
             predictions.append(prediction)
 
@@ -247,6 +243,7 @@ class ModelPredictor:
 # ============================================================================
 # EWB Strategy Engine
 # ============================================================================
+
 
 class EWBStrategy:
     """Execute Early Week Betting strategy."""
@@ -270,7 +267,7 @@ class EWBStrategy:
         self,
         season: int,
         week: int,
-    ) -> List[BettingOpportunity]:
+    ) -> list[BettingOpportunity]:
         """
         Identify EWB betting opportunities for a specific week.
 
@@ -296,8 +293,7 @@ class EWBStrategy:
 
         # Step 2: Fetch current market lines
         market_odds = self.odds_client.fetch_nfl_odds(
-            markets=["spreads", "totals"],
-            bookmakers=["fanduel", "draftkings", "pinnacle"]
+            markets=["spreads", "totals"], bookmakers=["fanduel", "draftkings", "pinnacle"]
         )
         logger.info(f"  Market odds: {len(market_odds)} games")
 
@@ -326,33 +322,28 @@ class EWBStrategy:
 
         return opportunities
 
-    def _find_game_odds(
-        self,
-        prediction: GamePrediction,
-        market_odds: List[Dict]
-    ) -> Optional[Dict]:
+    def _find_game_odds(self, prediction: GamePrediction, market_odds: list[dict]) -> dict | None:
         """Find market odds matching a prediction."""
         for game_odds in market_odds:
-            if (game_odds.get('home_team') == prediction.home_team and
-                game_odds.get('away_team') == prediction.away_team):
+            if (
+                game_odds.get("home_team") == prediction.home_team
+                and game_odds.get("away_team") == prediction.away_team
+            ):
                 return game_odds
         return None
 
     def _evaluate_spread(
-        self,
-        prediction: GamePrediction,
-        game_odds: Dict
-    ) -> List[BettingOpportunity]:
+        self, prediction: GamePrediction, game_odds: dict
+    ) -> list[BettingOpportunity]:
         """Evaluate spread betting opportunities."""
         opportunities = []
 
         # Get best available spread lines
-        bookmakers = game_odds.get('bookmakers', [])
+        bookmakers = game_odds.get("bookmakers", [])
 
         for book in bookmakers:
             spread_market = next(
-                (m for m in book.get('markets', []) if m['key'] == 'spreads'),
-                None
+                (m for m in book.get("markets", []) if m["key"] == "spreads"), None
             )
 
             if not spread_market:
@@ -360,12 +351,11 @@ class EWBStrategy:
 
             # Home team spread
             home_outcome = next(
-                (o for o in spread_market['outcomes'] if o['name'] == prediction.home_team),
-                None
+                (o for o in spread_market["outcomes"] if o["name"] == prediction.home_team), None
             )
 
             if home_outcome:
-                market_spread = home_outcome['point']
+                market_spread = home_outcome["point"]
                 model_spread = prediction.predicted_spread
 
                 # Edge = |model - market| as percentage
@@ -381,49 +371,43 @@ class EWBStrategy:
 
                     stake = self._calculate_stake(edge, -110)  # Assuming -110 odds
 
-                    opportunities.append(BettingOpportunity(
-                        game_id=prediction.game_id,
-                        home_team=prediction.home_team,
-                        away_team=prediction.away_team,
-                        bet_type="spread",
-                        bet_side=bet_side,
-                        market_line=market_spread,
-                        model_line=model_spread,
-                        edge=edge,
-                        recommended_stake=stake,
-                        book=book['key'],
-                        timestamp=datetime.now().isoformat(),
-                    ))
+                    opportunities.append(
+                        BettingOpportunity(
+                            game_id=prediction.game_id,
+                            home_team=prediction.home_team,
+                            away_team=prediction.away_team,
+                            bet_type="spread",
+                            bet_side=bet_side,
+                            market_line=market_spread,
+                            model_line=model_spread,
+                            edge=edge,
+                            recommended_stake=stake,
+                            book=book["key"],
+                            timestamp=datetime.now().isoformat(),
+                        )
+                    )
 
         return opportunities
 
     def _evaluate_total(
-        self,
-        prediction: GamePrediction,
-        game_odds: Dict
-    ) -> List[BettingOpportunity]:
+        self, prediction: GamePrediction, game_odds: dict
+    ) -> list[BettingOpportunity]:
         """Evaluate totals betting opportunities."""
         opportunities = []
 
         # Get best available totals lines
-        bookmakers = game_odds.get('bookmakers', [])
+        bookmakers = game_odds.get("bookmakers", [])
 
         for book in bookmakers:
-            total_market = next(
-                (m for m in book.get('markets', []) if m['key'] == 'totals'),
-                None
-            )
+            total_market = next((m for m in book.get("markets", []) if m["key"] == "totals"), None)
 
             if not total_market:
                 continue
 
-            over_outcome = next(
-                (o for o in total_market['outcomes'] if o['name'] == 'Over'),
-                None
-            )
+            over_outcome = next((o for o in total_market["outcomes"] if o["name"] == "Over"), None)
 
             if over_outcome:
-                market_total = over_outcome['point']
+                market_total = over_outcome["point"]
                 model_total = prediction.predicted_total
 
                 # Edge calculation
@@ -438,19 +422,21 @@ class EWBStrategy:
 
                     stake = self._calculate_stake(edge, -110)
 
-                    opportunities.append(BettingOpportunity(
-                        game_id=prediction.game_id,
-                        home_team=prediction.home_team,
-                        away_team=prediction.away_team,
-                        bet_type="total",
-                        bet_side=bet_side,
-                        market_line=market_total,
-                        model_line=model_total,
-                        edge=edge,
-                        recommended_stake=stake,
-                        book=book['key'],
-                        timestamp=datetime.now().isoformat(),
-                    ))
+                    opportunities.append(
+                        BettingOpportunity(
+                            game_id=prediction.game_id,
+                            home_team=prediction.home_team,
+                            away_team=prediction.away_team,
+                            bet_type="total",
+                            bet_side=bet_side,
+                            market_line=market_total,
+                            model_line=model_total,
+                            edge=edge,
+                            recommended_stake=stake,
+                            book=book["key"],
+                            timestamp=datetime.now().isoformat(),
+                        )
+                    )
 
         return opportunities
 
@@ -499,10 +485,9 @@ class EWBStrategy:
 # CLI
 # ============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Early Week Betting (EWB) Deployment Script"
-    )
+    parser = argparse.ArgumentParser(description="Early Week Betting (EWB) Deployment Script")
 
     parser.add_argument("--season", type=int, required=True, help="NFL season")
     parser.add_argument("--week", type=int, help="Week number (for single week)")
@@ -519,7 +504,7 @@ def main():
     args = parser.parse_args()
 
     print(f"{'='*80}")
-    print(f"Early Week Betting (EWB) Deployment")
+    print("Early Week Betting (EWB) Deployment")
     print(f"{'='*80}")
     print(f"Season: {args.season}")
     print(f"Mode: {'BACKTEST' if args.backtest else 'LIVE' if not args.dry_run else 'DRY RUN'}")
@@ -573,14 +558,18 @@ def main():
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(output_path, 'w') as f:
-                json.dump({
-                    'timestamp': datetime.now().isoformat(),
-                    'season': args.season,
-                    'week': args.week,
-                    'opportunities': [vars(opp) for opp in opportunities],
-                    'total_stake': total_stake,
-                }, f, indent=2)
+            with open(output_path, "w") as f:
+                json.dump(
+                    {
+                        "timestamp": datetime.now().isoformat(),
+                        "season": args.season,
+                        "week": args.week,
+                        "opportunities": [vars(opp) for opp in opportunities],
+                        "total_stake": total_stake,
+                    },
+                    f,
+                    indent=2,
+                )
 
             logger.info(f"Results saved to {output_path}")
 
@@ -596,10 +585,14 @@ def main():
             logger.info(f"  {len(opportunities)} opportunities")
 
         print(f"\n{'='*80}")
-        print(f"Backtest Summary")
+        print("Backtest Summary")
         print(f"{'='*80}")
         print(f"Total Opportunities: {len(all_opportunities)}")
-        print(f"Avg Edge: {sum(o.edge for o in all_opportunities) / len(all_opportunities):.2%}" if all_opportunities else "N/A")
+        print(
+            f"Avg Edge: {sum(o.edge for o in all_opportunities) / len(all_opportunities):.2%}"
+            if all_opportunities
+            else "N/A"
+        )
         print(f"Total Stake: ${sum(o.recommended_stake for o in all_opportunities):,.2f}")
 
     else:

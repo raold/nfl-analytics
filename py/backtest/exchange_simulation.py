@@ -22,14 +22,13 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 
 
-def calculate_implied_odds(win_prob: float, vig_pct: float = 2.0) -> Tuple[float, float]:
+def calculate_implied_odds(win_prob: float, vig_pct: float = 2.0) -> tuple[float, float]:
     """
     Calculate implied odds with specified vig.
 
@@ -57,10 +56,7 @@ def calculate_implied_odds(win_prob: float, vig_pct: float = 2.0) -> Tuple[float
 
 
 def simulate_bet_outcome(
-    win_prob: float,
-    actual_won: bool,
-    stake: float = 1.0,
-    vig_pct: float = 2.0
+    win_prob: float, actual_won: bool, stake: float = 1.0, vig_pct: float = 2.0
 ) -> float:
     """
     Simulate a single bet outcome.
@@ -83,10 +79,7 @@ def simulate_bet_outcome(
 
 
 def load_test_predictions(
-    model_path: Path,
-    features_path: Path,
-    test_seasons: List[int],
-    feature_cols: List[str]
+    model_path: Path, features_path: Path, test_seasons: list[int], feature_cols: list[str]
 ) -> pd.DataFrame:
     """
     Load model predictions for test seasons.
@@ -102,7 +95,7 @@ def load_test_predictions(
     """
     # Load features
     df = pd.read_csv(features_path)
-    df_test = df[df['season'].isin(test_seasons)].copy()
+    df_test = df[df["season"].isin(test_seasons)].copy()
 
     print(f"\nLoading test data: {len(df_test)} games from seasons {test_seasons}")
 
@@ -117,15 +110,17 @@ def load_test_predictions(
     home_win_probs = bst.predict(dtest)
 
     # Create results dataframe
-    results = pd.DataFrame({
-        'game_id': df_test['game_id'].values,
-        'season': df_test['season'].values,
-        'week': df_test['week'].values,
-        'home_team': df_test['home_team'].values,
-        'away_team': df_test['away_team'].values,
-        'home_win_prob': home_win_probs,
-        'home_won': df_test['home_win'].values,
-    })
+    results = pd.DataFrame(
+        {
+            "game_id": df_test["game_id"].values,
+            "season": df_test["season"].values,
+            "week": df_test["week"].values,
+            "home_team": df_test["home_team"].values,
+            "away_team": df_test["away_team"].values,
+            "home_win_prob": home_win_probs,
+            "home_won": df_test["home_win"].values,
+        }
+    )
 
     return results
 
@@ -134,8 +129,8 @@ def run_exchange_simulation(
     predictions: pd.DataFrame,
     vig_pct: float = 2.0,
     bet_threshold: float = 0.52,  # Only bet when model confident
-    stake_per_bet: float = 1.0
-) -> Dict:
+    stake_per_bet: float = 1.0,
+) -> dict:
     """
     Simulate betting on exchange with specified vig.
 
@@ -155,8 +150,8 @@ def run_exchange_simulation(
     n_wins = 0
 
     for _, row in predictions.iterrows():
-        home_win_prob = row['home_win_prob']
-        home_won = bool(row['home_won'])
+        home_win_prob = row["home_win_prob"]
+        home_won = bool(row["home_won"])
 
         # Decide whether to bet
         # Bet on home if prob > threshold, away if prob < (1 - threshold)
@@ -168,15 +163,17 @@ def run_exchange_simulation(
             actual_won = home_won
             profit = simulate_bet_outcome(home_win_prob, actual_won, stake_per_bet, vig_pct)
 
-            results.append({
-                'game_id': row['game_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'bet_on': row['home_team'],
-                'win_prob': home_win_prob,
-                'actual_won': actual_won,
-                'profit': profit,
-            })
+            results.append(
+                {
+                    "game_id": row["game_id"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "bet_on": row["home_team"],
+                    "win_prob": home_win_prob,
+                    "actual_won": actual_won,
+                    "profit": profit,
+                }
+            )
 
             total_profit += profit
             total_staked += stake_per_bet
@@ -190,15 +187,17 @@ def run_exchange_simulation(
             actual_won = not home_won
             profit = simulate_bet_outcome(away_win_prob, actual_won, stake_per_bet, vig_pct)
 
-            results.append({
-                'game_id': row['game_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'bet_on': row['away_team'],
-                'win_prob': away_win_prob,
-                'actual_won': actual_won,
-                'profit': profit,
-            })
+            results.append(
+                {
+                    "game_id": row["game_id"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "bet_on": row["away_team"],
+                    "win_prob": away_win_prob,
+                    "actual_won": actual_won,
+                    "profit": profit,
+                }
+            )
 
             total_profit += profit
             total_staked += stake_per_bet
@@ -212,7 +211,7 @@ def run_exchange_simulation(
         win_rate = (n_wins / n_bets) * 100
 
         # Calculate Sharpe ratio
-        profits_array = np.array([r['profit'] for r in results])
+        profits_array = np.array([r["profit"] for r in results])
         sharpe = np.mean(profits_array) / np.std(profits_array) if np.std(profits_array) > 0 else 0
 
         # Calculate max drawdown
@@ -229,26 +228,25 @@ def run_exchange_simulation(
         max_drawdown_pct = 0.0
 
     return {
-        'vig_pct': vig_pct,
-        'bet_threshold': bet_threshold,
-        'n_games': len(predictions),
-        'n_bets': n_bets,
-        'n_wins': n_wins,
-        'n_losses': n_bets - n_wins,
-        'win_rate': win_rate,
-        'total_profit': total_profit,
-        'total_staked': total_staked,
-        'roi': roi,
-        'sharpe_ratio': sharpe,
-        'max_drawdown': max_drawdown,
-        'max_drawdown_pct': max_drawdown_pct,
-        'bets': results,
+        "vig_pct": vig_pct,
+        "bet_threshold": bet_threshold,
+        "n_games": len(predictions),
+        "n_bets": n_bets,
+        "n_wins": n_wins,
+        "n_losses": n_bets - n_wins,
+        "win_rate": win_rate,
+        "total_profit": total_profit,
+        "total_staked": total_staked,
+        "roi": roi,
+        "sharpe_ratio": sharpe,
+        "max_drawdown": max_drawdown,
+        "max_drawdown_pct": max_drawdown_pct,
+        "bets": results,
     }
 
 
 def compare_vig_scenarios(
-    predictions: pd.DataFrame,
-    vig_scenarios: List[Tuple[float, str]]
+    predictions: pd.DataFrame, vig_scenarios: list[tuple[float, str]]
 ) -> pd.DataFrame:
     """
     Compare profitability across different vig scenarios.
@@ -265,79 +263,70 @@ def compare_vig_scenarios(
     for vig_pct, description in vig_scenarios:
         sim = run_exchange_simulation(predictions, vig_pct=vig_pct)
 
-        results.append({
-            'scenario': description,
-            'vig_pct': vig_pct,
-            'n_bets': sim['n_bets'],
-            'win_rate': f"{sim['win_rate']:.1f}%",
-            'roi': f"{sim['roi']:.2f}%",
-            'total_profit': f"${sim['total_profit']:.2f}",
-            'sharpe_ratio': f"{sim['sharpe_ratio']:.3f}",
-            'max_dd_pct': f"{sim['max_drawdown_pct']:.1f}%",
-            'profitable': 'YES' if sim['roi'] > 0 else 'NO',
-        })
+        results.append(
+            {
+                "scenario": description,
+                "vig_pct": vig_pct,
+                "n_bets": sim["n_bets"],
+                "win_rate": f"{sim['win_rate']:.1f}%",
+                "roi": f"{sim['roi']:.2f}%",
+                "total_profit": f"${sim['total_profit']:.2f}",
+                "sharpe_ratio": f"{sim['sharpe_ratio']:.3f}",
+                "max_dd_pct": f"{sim['max_drawdown_pct']:.1f}%",
+                "profitable": "YES" if sim["roi"] > 0 else "NO",
+            }
+        )
 
     return pd.DataFrame(results)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Exchange simulation at 2% vig')
+    parser = argparse.ArgumentParser(description="Exchange simulation at 2% vig")
     parser.add_argument(
-        '--model',
+        "--model",
         type=Path,
-        default=Path('models/xgboost/v2/model_2024_full.ubj'),
-        help='Path to trained model'
+        default=Path("models/xgboost/v2/model_2024_full.ubj"),
+        help="Path to trained model",
     )
     parser.add_argument(
-        '--features',
+        "--features",
         type=Path,
-        default=Path('data/processed/features/asof_team_features_v2.csv'),
-        help='Path to features CSV'
+        default=Path("data/processed/features/asof_team_features_v2.csv"),
+        help="Path to features CSV",
     )
+    parser.add_argument("--test-seasons", type=int, nargs="+", default=[2024], help="Test seasons")
     parser.add_argument(
-        '--test-seasons',
-        type=int,
-        nargs='+',
-        default=[2024],
-        help='Test seasons'
-    )
-    parser.add_argument(
-        '--output',
+        "--output",
         type=Path,
-        default=Path('results/exchange_simulation.json'),
-        help='Output path for results'
+        default=Path("results/exchange_simulation.json"),
+        help="Output path for results",
     )
 
     args = parser.parse_args()
 
     # Feature columns for v2 model
     FEATURE_COLS = [
-        'prior_epa_mean_diff',
-        'epa_pp_last3_diff',
-        'season_win_pct_diff',
-        'win_pct_last5_diff',
-        'prior_margin_avg_diff',
-        'points_for_last3_diff',
-        'points_against_last3_diff',
-        'rest_diff',
-        'week',
-        'fourth_downs_diff',
-        'fourth_down_epa_diff',
-        'injury_load_diff',
-        'qb_injury_diff',
+        "prior_epa_mean_diff",
+        "epa_pp_last3_diff",
+        "season_win_pct_diff",
+        "win_pct_last5_diff",
+        "prior_margin_avg_diff",
+        "points_for_last3_diff",
+        "points_against_last3_diff",
+        "rest_diff",
+        "week",
+        "fourth_downs_diff",
+        "fourth_down_epa_diff",
+        "injury_load_diff",
+        "qb_injury_diff",
     ]
 
-    print("="*80)
+    print("=" * 80)
     print("EXCHANGE SIMULATION: Proving Immediate Profitability at 2% Vig")
-    print("="*80)
+    print("=" * 80)
 
     # Load predictions
-    predictions = load_test_predictions(
-        args.model,
-        args.features,
-        args.test_seasons,
-        FEATURE_COLS
-    )
+    predictions = load_test_predictions(args.model, args.features, args.test_seasons, FEATURE_COLS)
 
     # Define vig scenarios
     vig_scenarios = [
@@ -347,17 +336,17 @@ def main():
         (1.5, "Low-vig Exchange (ideal)"),
     ]
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("COMPARING VIG SCENARIOS")
-    print("="*80)
+    print("=" * 80)
 
     comparison = compare_vig_scenarios(predictions, vig_scenarios)
     print("\n" + comparison.to_string(index=False))
 
     # Run detailed simulation at 2% vig
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("DETAILED SIMULATION AT 2% VIG (Exchange)")
-    print("="*80)
+    print("=" * 80)
 
     sim_2pct = run_exchange_simulation(predictions, vig_pct=2.0)
 
@@ -373,46 +362,46 @@ def main():
     print(f"Max Drawdown: ${sim_2pct['max_drawdown']:.2f} ({sim_2pct['max_drawdown_pct']:.1f}%)")
 
     # Key insight
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("KEY INSIGHT")
-    print("="*80)
-    if sim_2pct['roi'] > 0:
+    print("=" * 80)
+    if sim_2pct["roi"] > 0:
         print(f"[OK] PROFITABLE! ROI = {sim_2pct['roi']:.2f}% at 2% vig")
-        print(f"     This proves the model is IMMEDIATELY profitable on exchanges")
-        print(f"     (Pinnacle, Betfair) without any additional training!")
+        print("     This proves the model is IMMEDIATELY profitable on exchanges")
+        print("     (Pinnacle, Betfair) without any additional training!")
     else:
         print(f"[X] Not yet profitable. ROI = {sim_2pct['roi']:.2f}%")
-        print(f"    Current strategy: betting on all games with >52% confidence")
+        print("    Current strategy: betting on all games with >52% confidence")
         print(f"    Issue: High win rate ({sim_2pct['win_rate']:.1f}%) but poor odds on favorites")
-        print(f"    Solution: Need to bet only when expected value is positive")
+        print("    Solution: Need to bet only when expected value is positive")
 
     # Save results
     args.output.parent.mkdir(parents=True, exist_ok=True)
 
     # Save comparison
     comparison_dict = {
-        'test_seasons': args.test_seasons,
-        'model_path': str(args.model),
-        'comparison': comparison.to_dict(orient='records'),
-        'detailed_2pct_vig': {
-            'vig_pct': sim_2pct['vig_pct'],
-            'n_games': sim_2pct['n_games'],
-            'n_bets': sim_2pct['n_bets'],
-            'win_rate': sim_2pct['win_rate'],
-            'roi': sim_2pct['roi'],
-            'sharpe_ratio': sim_2pct['sharpe_ratio'],
-            'max_drawdown_pct': sim_2pct['max_drawdown_pct'],
-            'profitable': sim_2pct['roi'] > 0,
+        "test_seasons": args.test_seasons,
+        "model_path": str(args.model),
+        "comparison": comparison.to_dict(orient="records"),
+        "detailed_2pct_vig": {
+            "vig_pct": sim_2pct["vig_pct"],
+            "n_games": sim_2pct["n_games"],
+            "n_bets": sim_2pct["n_bets"],
+            "win_rate": sim_2pct["win_rate"],
+            "roi": sim_2pct["roi"],
+            "sharpe_ratio": sim_2pct["sharpe_ratio"],
+            "max_drawdown_pct": sim_2pct["max_drawdown_pct"],
+            "profitable": sim_2pct["roi"] > 0,
         },
     }
 
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         json.dump(comparison_dict, f, indent=2)
 
     print(f"\n✅ Results saved to {args.output}")
 
-    return 0 if sim_2pct['roi'] > 0 else 1
+    return 0 if sim_2pct["roi"] > 0 else 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

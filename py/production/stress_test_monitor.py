@@ -23,10 +23,8 @@ Usage:
 import argparse
 import logging
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -298,7 +296,7 @@ class StressTestMonitor:
 
         return tests
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """
         Generate stress test report.
 
@@ -318,7 +316,7 @@ class StressTestMonitor:
         history = self.get_stress_test_history(limit=10)
 
         # Calculate failure rate
-        failure_rate = (history["passed"] == False).mean()
+        failure_rate = (not history["passed"]).mean()
 
         report = {
             "latest_test": {
@@ -339,8 +337,8 @@ class StressTestMonitor:
             },
             "historical_summary": {
                 "total_tests": len(history),
-                "passed": int((history["passed"] == True).sum()),
-                "failed": int((history["passed"] == False).sum()),
+                "passed": int((history["passed"]).sum()),
+                "failed": int((not history["passed"]).sum()),
                 "failure_rate": float(failure_rate),
                 "avg_actual_roi": float(history["actual_roi"].mean()),
                 "avg_percentile_rank": float(history["percentile_rank"].mean()),
@@ -349,7 +347,7 @@ class StressTestMonitor:
 
         return report
 
-    def check_health(self) -> List[str]:
+    def check_health(self) -> list[str]:
         """
         Check if model is healthy based on stress tests.
 
@@ -375,7 +373,7 @@ class StressTestMonitor:
             )
 
         # Alert 2: Multiple recent failures
-        recent_failures = (tests.head(3)["passed"] == False).sum()
+        recent_failures = (not tests.head(3)["passed"]).sum()
         if recent_failures >= 2:
             alerts.append(
                 f"🚨 ALERT: {recent_failures}/3 recent stress tests failed. "
@@ -458,7 +456,9 @@ def main():
         print(f"  Mean: {result.bootstrap_mean_roi:+.2%}")
         print(f"  Median: {result.bootstrap_median_roi:+.2%}")
         print(f"  Std Dev: {result.bootstrap_std_roi:.2%}")
-        print(f"  95% CI: [{result.bootstrap_5th_percentile:+.2%}, {result.bootstrap_95th_percentile:+.2%}]")
+        print(
+            f"  95% CI: [{result.bootstrap_5th_percentile:+.2%}, {result.bootstrap_95th_percentile:+.2%}]"
+        )
         print()
         print("Extreme Scenarios:")
         print(f"  Worst Case (1%): {result.worst_case_roi:+.2%}")
@@ -482,7 +482,9 @@ def main():
         print("Latest Test:")
         print(f"  Date: {latest['test_date']}")
         print(f"  Bets: {latest['n_bets']} ({latest['weeks_tested']} weeks)")
-        print(f"  Actual ROI: {latest['actual_roi']:+.2%} (Percentile: {latest['percentile_rank']:.1f}%)")
+        print(
+            f"  Actual ROI: {latest['actual_roi']:+.2%} (Percentile: {latest['percentile_rank']:.1f}%)"
+        )
         print(
             f"  Bootstrap: {latest['bootstrap_mean_roi']:+.2%} ± {latest['bootstrap_std_roi']:.2%}"
         )

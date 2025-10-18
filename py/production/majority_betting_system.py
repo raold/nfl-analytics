@@ -37,15 +37,13 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 
 # Import ensemble predictor
-sys.path.append(str(Path(__file__).parent.parent / 'ensemble'))
-from ensemble_predictor import EnsemblePredictor, XGBoostPredictor, CQLPredictor, IQLPredictor
-
+sys.path.append(str(Path(__file__).parent.parent / "ensemble"))
+from ensemble_predictor import CQLPredictor, EnsemblePredictor, IQLPredictor, XGBoostPredictor
 
 # ============================================================================
 # Kelly Criterion Bet Sizing
@@ -135,9 +133,9 @@ class MajorityBettingSystem:
         max_bet_fraction: float = 0.05,
         min_edge: float = 0.02,
         uncertainty_threshold: float = 0.5,
-        xgb_features: List[str] = None,
-        rl_state_cols: List[str] = None,
-        device: str = 'cpu',
+        xgb_features: list[str] = None,
+        rl_state_cols: list[str] = None,
+        device: str = "cpu",
     ):
         """
         Initialize production betting system.
@@ -165,18 +163,30 @@ class MajorityBettingSystem:
 
         # Default features
         self.xgb_features = xgb_features or [
-            'prior_epa_mean_diff', 'epa_pp_last3_diff', 'season_win_pct_diff',
-            'win_pct_last5_diff', 'prior_margin_avg_diff', 'points_for_last3_diff',
-            'points_against_last3_diff', 'rest_diff', 'week',
-            'fourth_downs_diff', 'fourth_down_epa_diff',
+            "prior_epa_mean_diff",
+            "epa_pp_last3_diff",
+            "season_win_pct_diff",
+            "win_pct_last5_diff",
+            "prior_margin_avg_diff",
+            "points_for_last3_diff",
+            "points_against_last3_diff",
+            "rest_diff",
+            "week",
+            "fourth_downs_diff",
+            "fourth_down_epa_diff",
         ]
 
         self.rl_state_cols = rl_state_cols or [
-            'spread_close', 'total_close', 'epa_gap', 'market_prob', 'p_hat', 'edge',
+            "spread_close",
+            "total_close",
+            "epa_gap",
+            "market_prob",
+            "p_hat",
+            "edge",
         ]
 
         # Load models
-        print(f"Loading models...")
+        print("Loading models...")
         print(f"  XGBoost: {xgb_model_path}")
         xgb_model = XGBoostPredictor(xgb_model_path)
 
@@ -191,25 +201,25 @@ class MajorityBettingSystem:
             xgb_model=xgb_model,
             cql_model=cql_model,
             iql_model=iql_model,
-            strategy='majority',  # Most resilient
+            strategy="majority",  # Most resilient
             uncertainty_threshold=uncertainty_threshold,
         )
 
         # Tracking
         self.bet_history = []
         self.performance = {
-            'total_bets': 0,
-            'total_won': 0,
-            'total_return': 0.0,
-            'max_drawdown': 0.0,
-            'peak_bankroll': bankroll,
+            "total_bets": 0,
+            "total_won": 0,
+            "total_return": 0.0,
+            "max_drawdown": 0.0,
+            "peak_bankroll": bankroll,
         }
 
     def get_betting_recommendations(
         self,
         games_df: pd.DataFrame,
-        market_odds: Dict[str, int] = None,
-    ) -> List[Dict]:
+        market_odds: dict[str, int] = None,
+    ) -> list[dict]:
         """
         Get betting recommendations for upcoming games.
 
@@ -225,11 +235,11 @@ class MajorityBettingSystem:
         rl_states = games_df[self.rl_state_cols].fillna(0).to_numpy(dtype=np.float32)
 
         # Market probabilities
-        if 'market_prob' in games_df.columns:
-            market_probs = games_df['market_prob'].to_numpy()
-        elif 'spread_close' in games_df.columns:
+        if "market_prob" in games_df.columns:
+            market_probs = games_df["market_prob"].to_numpy()
+        elif "spread_close" in games_df.columns:
             # Convert spread to implied probability
-            spreads = games_df['spread_close'].to_numpy()
+            spreads = games_df["spread_close"].to_numpy()
             market_probs = 0.5 + (spreads / 27.0)
             market_probs = np.clip(market_probs, 0.01, 0.99)
         else:
@@ -243,7 +253,7 @@ class MajorityBettingSystem:
 
         for i, row in games_df.iterrows():
             # Model probability (use XGBoost as primary)
-            model_prob = metadata['xgb_probs'][i]
+            model_prob = metadata["xgb_probs"][i]
             market_prob = market_probs[i]
             edge = model_prob - market_prob
 
@@ -251,9 +261,9 @@ class MajorityBettingSystem:
             action = actions[i]
 
             # Uncertainty metrics
-            xgb_unc = metadata['xgb_uncertainties'][i]
-            cql_unc = metadata['cql_uncertainties'][i]
-            iql_unc = metadata['iql_uncertainties'][i]
+            xgb_unc = metadata["xgb_uncertainties"][i]
+            cql_unc = metadata["cql_uncertainties"][i]
+            iql_unc = metadata["iql_uncertainties"][i]
 
             # Skip if action is 0 (no bet)
             if action == 0:
@@ -267,7 +277,7 @@ class MajorityBettingSystem:
             bet_home = model_prob > market_prob
 
             # Get market odds (default to -110 if not provided)
-            game_id = row.get('game_id', f"game_{i}")
+            game_id = row.get("game_id", f"game_{i}")
             if market_odds and game_id in market_odds:
                 odds = market_odds[game_id]
             else:
@@ -299,39 +309,41 @@ class MajorityBettingSystem:
 
             # Create recommendation
             rec = {
-                'game_id': game_id,
-                'matchup': f"{row.get('away_team', 'AWAY')} @ {row.get('home_team', 'HOME')}",
-                'bet_team': row.get('home_team', 'HOME') if bet_home else row.get('away_team', 'AWAY'),
-                'bet_direction': 'home' if bet_home else 'away',
-                'model_prob': float(model_prob),
-                'market_prob': float(market_prob),
-                'edge': float(edge),
-                'odds': odds,
-                'bet_fraction': float(bet_fraction),
-                'bet_amount': float(bet_amount),
-                'action': int(action),
-                'uncertainty': {
-                    'xgb': float(xgb_unc),
-                    'cql': float(cql_unc),
-                    'iql': float(iql_unc),
+                "game_id": game_id,
+                "matchup": f"{row.get('away_team', 'AWAY')} @ {row.get('home_team', 'HOME')}",
+                "bet_team": (
+                    row.get("home_team", "HOME") if bet_home else row.get("away_team", "AWAY")
+                ),
+                "bet_direction": "home" if bet_home else "away",
+                "model_prob": float(model_prob),
+                "market_prob": float(market_prob),
+                "edge": float(edge),
+                "odds": odds,
+                "bet_fraction": float(bet_fraction),
+                "bet_amount": float(bet_amount),
+                "action": int(action),
+                "uncertainty": {
+                    "xgb": float(xgb_unc),
+                    "cql": float(cql_unc),
+                    "iql": float(iql_unc),
                 },
-                'ensemble_agreement': {
-                    'xgb_action': int(metadata['xgb_actions'][i]),
-                    'cql_action': int(metadata['cql_actions'][i]),
-                    'iql_action': int(metadata['iql_actions'][i]),
+                "ensemble_agreement": {
+                    "xgb_action": int(metadata["xgb_actions"][i]),
+                    "cql_action": int(metadata["cql_actions"][i]),
+                    "iql_action": int(metadata["iql_actions"][i]),
                 },
             }
 
             recommendations.append(rec)
 
         # Sort by edge (descending)
-        recommendations.sort(key=lambda x: abs(x['edge']), reverse=True)
+        recommendations.sort(key=lambda x: abs(x["edge"]), reverse=True)
 
         return recommendations
 
     def record_bet_result(
         self,
-        bet: Dict,
+        bet: dict,
         won: bool,
     ):
         """
@@ -344,63 +356,65 @@ class MajorityBettingSystem:
         # Calculate return
         if won:
             # Win: get bet_amount * (odds payout)
-            odds = bet['odds']
+            odds = bet["odds"]
             if odds > 0:
-                payout = bet['bet_amount'] * (odds / 100.0)
+                payout = bet["bet_amount"] * (odds / 100.0)
             else:
-                payout = bet['bet_amount'] * (100.0 / abs(odds))
+                payout = bet["bet_amount"] * (100.0 / abs(odds))
             ret = payout
         else:
             # Loss: lose bet_amount
-            ret = -bet['bet_amount']
+            ret = -bet["bet_amount"]
 
         # Update bankroll
         self.bankroll += ret
 
         # Update performance
-        self.performance['total_bets'] += 1
+        self.performance["total_bets"] += 1
         if won:
-            self.performance['total_won'] += 1
-        self.performance['total_return'] += ret
+            self.performance["total_won"] += 1
+        self.performance["total_return"] += ret
 
         # Track peak and drawdown
-        if self.bankroll > self.performance['peak_bankroll']:
-            self.performance['peak_bankroll'] = self.bankroll
+        if self.bankroll > self.performance["peak_bankroll"]:
+            self.performance["peak_bankroll"] = self.bankroll
 
-        drawdown = self.performance['peak_bankroll'] - self.bankroll
-        if drawdown > self.performance['max_drawdown']:
-            self.performance['max_drawdown'] = drawdown
+        drawdown = self.performance["peak_bankroll"] - self.bankroll
+        if drawdown > self.performance["max_drawdown"]:
+            self.performance["max_drawdown"] = drawdown
 
         # Store in history
-        self.bet_history.append({
-            **bet,
-            'won': won,
-            'return': ret,
-            'bankroll_after': self.bankroll,
-        })
+        self.bet_history.append(
+            {
+                **bet,
+                "won": won,
+                "return": ret,
+                "bankroll_after": self.bankroll,
+            }
+        )
 
-    def get_performance_summary(self) -> Dict:
+    def get_performance_summary(self) -> dict:
         """Get performance summary."""
-        total_bets = self.performance['total_bets']
-        total_won = self.performance['total_won']
+        total_bets = self.performance["total_bets"]
+        total_won = self.performance["total_won"]
 
         return {
-            'initial_bankroll': self.initial_bankroll,
-            'current_bankroll': self.bankroll,
-            'net_return': self.bankroll - self.initial_bankroll,
-            'roi': ((self.bankroll / self.initial_bankroll) - 1) * 100,
-            'total_bets': total_bets,
-            'total_won': total_won,
-            'win_rate': (total_won / total_bets * 100) if total_bets > 0 else 0.0,
-            'max_drawdown': self.performance['max_drawdown'],
-            'max_drawdown_pct': (self.performance['max_drawdown'] / self.initial_bankroll) * 100,
+            "initial_bankroll": self.initial_bankroll,
+            "current_bankroll": self.bankroll,
+            "net_return": self.bankroll - self.initial_bankroll,
+            "roi": ((self.bankroll / self.initial_bankroll) - 1) * 100,
+            "total_bets": total_bets,
+            "total_won": total_won,
+            "win_rate": (total_won / total_bets * 100) if total_bets > 0 else 0.0,
+            "max_drawdown": self.performance["max_drawdown"],
+            "max_drawdown_pct": (self.performance["max_drawdown"] / self.initial_bankroll) * 100,
         }
 
     def backtest(
         self,
         games_df: pd.DataFrame,
         season: int = None,
-    ) -> Dict:
+    ) -> dict:
         """
         Backtest on historical data.
 
@@ -412,7 +426,7 @@ class MajorityBettingSystem:
             Performance summary
         """
         if season:
-            games_df = games_df[games_df['season'] == season].copy()
+            games_df = games_df[games_df["season"] == season].copy()
 
         print(f"\nBacktesting on {len(games_df)} games...")
 
@@ -424,7 +438,7 @@ class MajorityBettingSystem:
         # Simulate bets
         for rec in recommendations:
             # Find actual outcome
-            game_idx = games_df[games_df.get('game_id', games_df.index) == rec['game_id']].index
+            game_idx = games_df[games_df.get("game_id", games_df.index) == rec["game_id"]].index
 
             if len(game_idx) == 0:
                 continue
@@ -432,16 +446,16 @@ class MajorityBettingSystem:
             game_idx = game_idx[0]
 
             # Get actual result
-            if 'home_result' in games_df.columns:
-                home_won = games_df.loc[game_idx, 'home_result'] == 1
-            elif 'home_win' in games_df.columns:
-                home_won = games_df.loc[game_idx, 'home_win'] == 1
+            if "home_result" in games_df.columns:
+                home_won = games_df.loc[game_idx, "home_result"] == 1
+            elif "home_win" in games_df.columns:
+                home_won = games_df.loc[game_idx, "home_win"] == 1
             else:
                 # Skip if no outcome data
                 continue
 
             # Determine if bet won
-            bet_home = rec['bet_direction'] == 'home'
+            bet_home = rec["bet_direction"] == "home"
             won = (bet_home and home_won) or (not bet_home and not home_won)
 
             # Record result
@@ -456,42 +470,42 @@ class MajorityBettingSystem:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(
-        description='Production Majority Voting Betting System'
-    )
+    ap = argparse.ArgumentParser(description="Production Majority Voting Betting System")
 
     # Data
-    ap.add_argument('--games-csv', required=True, help='Games CSV with features')
-    ap.add_argument('--season', type=int, help='Season to filter (for backtest)')
+    ap.add_argument("--games-csv", required=True, help="Games CSV with features")
+    ap.add_argument("--season", type=int, help="Season to filter (for backtest)")
 
     # Models (defaults to best models)
     ap.add_argument(
-        '--xgb-model',
-        default='models/xgboost/v2_sweep/xgb_config18_season2024.json',
-        help='XGBoost model path'
+        "--xgb-model",
+        default="models/xgboost/v2_sweep/xgb_config18_season2024.json",
+        help="XGBoost model path",
     )
     ap.add_argument(
-        '--cql-model',
-        default='models/cql/sweep/cql_config4.pth',
-        help='CQL model path'
+        "--cql-model", default="models/cql/sweep/cql_config4.pth", help="CQL model path"
     )
-    ap.add_argument(
-        '--iql-model',
-        default='models/iql/baseline_model.pth',
-        help='IQL model path'
-    )
+    ap.add_argument("--iql-model", default="models/iql/baseline_model.pth", help="IQL model path")
 
     # Bankroll management
-    ap.add_argument('--bankroll', type=float, default=10000.0, help='Starting bankroll ($)')
-    ap.add_argument('--kelly-fraction', type=float, default=0.25, help='Fraction of Kelly to bet')
-    ap.add_argument('--max-bet-fraction', type=float, default=0.05, help='Max bet as fraction of bankroll')
-    ap.add_argument('--min-edge', type=float, default=0.02, help='Minimum edge to bet (2%)')
+    ap.add_argument("--bankroll", type=float, default=10000.0, help="Starting bankroll ($)")
+    ap.add_argument("--kelly-fraction", type=float, default=0.25, help="Fraction of Kelly to bet")
+    ap.add_argument(
+        "--max-bet-fraction", type=float, default=0.05, help="Max bet as fraction of bankroll"
+    )
+    ap.add_argument("--min-edge", type=float, default=0.02, help="Minimum edge to bet (2%)")
 
     # Mode
-    ap.add_argument('--backtest', action='store_true', help='Backtest mode (simulate historical bets)')
-    ap.add_argument('--paper-trade', action='store_true', help='Paper trading mode (virtual money, no real bets)')
-    ap.add_argument('--output', help='Output JSON path for recommendations')
-    ap.add_argument('--device', default='cpu', help='cpu/cuda')
+    ap.add_argument(
+        "--backtest", action="store_true", help="Backtest mode (simulate historical bets)"
+    )
+    ap.add_argument(
+        "--paper-trade",
+        action="store_true",
+        help="Paper trading mode (virtual money, no real bets)",
+    )
+    ap.add_argument("--output", help="Output JSON path for recommendations")
+    ap.add_argument("--device", default="cpu", help="cpu/cuda")
 
     return ap.parse_args()
 
@@ -500,10 +514,12 @@ def main():
     args = parse_args()
 
     print(f"{'='*80}")
-    print(f"Production Majority Voting Betting System")
+    print("Production Majority Voting Betting System")
     print(f"{'='*80}")
-    print(f"Configuration:")
-    print(f"  Mode: {'PAPER TRADING (Virtual Money)' if args.paper_trade else 'LIVE BETTING (Real Money)'}")
+    print("Configuration:")
+    print(
+        f"  Mode: {'PAPER TRADING (Virtual Money)' if args.paper_trade else 'LIVE BETTING (Real Money)'}"
+    )
     print(f"  Bankroll: ${args.bankroll:,.0f}")
     print(f"  Kelly fraction: {args.kelly_fraction} (quarter Kelly)")
     print(f"  Max bet: {args.max_bet_fraction*100:.1f}% of bankroll")
@@ -514,7 +530,7 @@ def main():
     games_df = pd.read_csv(args.games_csv)
 
     if args.season:
-        games_df = games_df[games_df['season'] == args.season]
+        games_df = games_df[games_df["season"] == args.season]
 
     print(f"  Loaded {len(games_df)} games")
 
@@ -533,13 +549,13 @@ def main():
     if args.backtest:
         # Backtest mode
         print(f"\n{'='*80}")
-        print(f"BACKTEST MODE")
+        print("BACKTEST MODE")
         print(f"{'='*80}")
 
         performance = system.backtest(games_df, season=args.season)
 
         print(f"\n{'='*80}")
-        print(f"Backtest Results")
+        print("Backtest Results")
         print(f"{'='*80}")
         print(f"Initial bankroll: ${performance['initial_bankroll']:,.0f}")
         print(f"Final bankroll: ${performance['current_bankroll']:,.0f}")
@@ -547,65 +563,83 @@ def main():
         print(f"ROI: {performance['roi']:+.2f}%")
         print(f"Total bets: {performance['total_bets']}")
         print(f"Win rate: {performance['win_rate']:.1f}%")
-        print(f"Max drawdown: ${performance['max_drawdown']:,.0f} ({performance['max_drawdown_pct']:.1f}%)")
+        print(
+            f"Max drawdown: ${performance['max_drawdown']:,.0f} ({performance['max_drawdown_pct']:.1f}%)"
+        )
 
         # Save results
         if args.output:
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(output_path, 'w') as f:
-                json.dump({
-                    'is_paper_trade': args.paper_trade,
-                    'performance': performance,
-                    'bet_history': system.bet_history,
-                }, f, indent=2)
+            with open(output_path, "w") as f:
+                json.dump(
+                    {
+                        "is_paper_trade": args.paper_trade,
+                        "performance": performance,
+                        "bet_history": system.bet_history,
+                    },
+                    f,
+                    indent=2,
+                )
 
             print(f"\nResults saved to {output_path}")
 
     else:
         # Live mode - get recommendations
         print(f"\n{'='*80}")
-        print(f"BETTING RECOMMENDATIONS")
+        print("BETTING RECOMMENDATIONS")
         print(f"{'='*80}")
 
         recommendations = system.get_betting_recommendations(games_df)
 
         if len(recommendations) == 0:
-            print(f"No betting opportunities found (all bets filtered by edge/uncertainty thresholds)")
+            print(
+                "No betting opportunities found (all bets filtered by edge/uncertainty thresholds)"
+            )
             return 0
 
         print(f"\nFound {len(recommendations)} betting opportunities:")
-        print(f"\n{'#':<3} {'Matchup':<30} {'Bet':<12} {'Edge':<8} {'Odds':<8} {'Amount':<10} {'Action':<6}")
+        print(
+            f"\n{'#':<3} {'Matchup':<30} {'Bet':<12} {'Edge':<8} {'Odds':<8} {'Amount':<10} {'Action':<6}"
+        )
         print(f"{'-'*80}")
 
         for i, rec in enumerate(recommendations, 1):
-            print(f"{i:<3} {rec['matchup']:<30} {rec['bet_team']:<12} "
-                  f"{rec['edge']*100:>6.2f}% {rec['odds']:>7} ${rec['bet_amount']:>8,.0f} {rec['action']:>6}")
+            print(
+                f"{i:<3} {rec['matchup']:<30} {rec['bet_team']:<12} "
+                f"{rec['edge']*100:>6.2f}% {rec['odds']:>7} ${rec['bet_amount']:>8,.0f} {rec['action']:>6}"
+            )
 
         # Summary
-        total_risk = sum(r['bet_amount'] for r in recommendations)
-        print(f"\nTotal capital at risk: ${total_risk:,.0f} ({total_risk/args.bankroll*100:.1f}% of bankroll)")
+        total_risk = sum(r["bet_amount"] for r in recommendations)
+        print(
+            f"\nTotal capital at risk: ${total_risk:,.0f} ({total_risk/args.bankroll*100:.1f}% of bankroll)"
+        )
 
         # Save recommendations
         if args.output:
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(output_path, 'w') as f:
-                json.dump({
-                    'date': datetime.now().isoformat(),
-                    'is_paper_trade': args.paper_trade,
-                    'bankroll': args.bankroll,
-                    'total_recommendations': len(recommendations),
-                    'total_risk': total_risk,
-                    'recommendations': recommendations,
-                }, f, indent=2)
+            with open(output_path, "w") as f:
+                json.dump(
+                    {
+                        "date": datetime.now().isoformat(),
+                        "is_paper_trade": args.paper_trade,
+                        "bankroll": args.bankroll,
+                        "total_recommendations": len(recommendations),
+                        "total_risk": total_risk,
+                        "recommendations": recommendations,
+                    },
+                    f,
+                    indent=2,
+                )
 
             print(f"\nRecommendations saved to {output_path}")
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

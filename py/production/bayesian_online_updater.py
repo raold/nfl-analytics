@@ -10,17 +10,15 @@ Implements continuous model improvement through:
 """
 
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from datetime import datetime, timedelta
+sys.path.append("/Users/dro/rice/nfl-analytics")
+
 import logging
-from typing import Dict, List, Tuple, Optional
-from scipy import stats
-import json
-from pathlib import Path
+from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,7 +41,7 @@ class BayesianOnlineUpdater:
         learning_rate: float = 0.1,
         forgetting_factor: float = 0.95,
         min_observations: int = 10,
-        drift_threshold: float = 2.0
+        drift_threshold: float = 2.0,
     ):
         """
         Initialize online updater.
@@ -63,11 +61,11 @@ class BayesianOnlineUpdater:
 
         # Database connection
         self.db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         # State tracking
@@ -75,16 +73,12 @@ class BayesianOnlineUpdater:
         self.observation_buffer = []
         self.drift_detector = DriftDetector(threshold=drift_threshold)
 
-        logger.info(f"Initialized Bayesian Online Updater")
+        logger.info("Initialized Bayesian Online Updater")
         logger.info(f"  Model: {model_version}")
         logger.info(f"  Learning rate: {learning_rate}")
         logger.info(f"  Forgetting factor: {forgetting_factor}")
 
-    def load_current_posterior(
-        self,
-        player_id: str,
-        prop_type: str
-    ) -> Dict:
+    def load_current_posterior(self, player_id: str, prop_type: str) -> dict:
         """Load current posterior parameters from database"""
 
         conn = psycopg2.connect(**self.db_config)
@@ -110,41 +104,41 @@ class BayesianOnlineUpdater:
 
         if result:
             return {
-                'mean': result[0],
-                'sd': result[1],
-                'n_obs': result[2],
-                'last_update': result[3]
+                "mean": result[0],
+                "sd": result[1],
+                "n_obs": result[2],
+                "last_update": result[3],
             }
         else:
             # Initialize with weakly informative prior
             return {
-                'mean': self._get_default_prior(prop_type)['mean'],
-                'sd': self._get_default_prior(prop_type)['sd'],
-                'n_obs': 0,
-                'last_update': None
+                "mean": self._get_default_prior(prop_type)["mean"],
+                "sd": self._get_default_prior(prop_type)["sd"],
+                "n_obs": 0,
+                "last_update": None,
             }
 
-    def _get_default_prior(self, prop_type: str) -> Dict:
+    def _get_default_prior(self, prop_type: str) -> dict:
         """Get default prior for prop type"""
 
         priors = {
-            'passing_yards': {'mean': 250, 'sd': 75},
-            'rushing_yards': {'mean': 60, 'sd': 30},
-            'receiving_yards': {'mean': 50, 'sd': 25},
-            'passing_tds': {'mean': 1.5, 'sd': 1.0},
-            'rushing_tds': {'mean': 0.5, 'sd': 0.5},
-            'receiving_tds': {'mean': 0.4, 'sd': 0.4}
+            "passing_yards": {"mean": 250, "sd": 75},
+            "rushing_yards": {"mean": 60, "sd": 30},
+            "receiving_yards": {"mean": 50, "sd": 25},
+            "passing_tds": {"mean": 1.5, "sd": 1.0},
+            "rushing_tds": {"mean": 0.5, "sd": 0.5},
+            "receiving_tds": {"mean": 0.4, "sd": 0.4},
         }
 
-        return priors.get(prop_type, {'mean': 50, 'sd': 25})
+        return priors.get(prop_type, {"mean": 50, "sd": 25})
 
     def update_posterior(
         self,
         player_id: str,
         prop_type: str,
         observation: float,
-        observation_variance: Optional[float] = None
-    ) -> Dict:
+        observation_variance: float | None = None,
+    ) -> dict:
         """
         Update posterior with new observation using conjugate updating.
 
@@ -166,15 +160,15 @@ class BayesianOnlineUpdater:
         prior = self.load_current_posterior(player_id, prop_type)
 
         # Apply forgetting factor to increase uncertainty over time
-        prior['sd'] = prior['sd'] / np.sqrt(self.forgetting_factor)
+        prior["sd"] = prior["sd"] / np.sqrt(self.forgetting_factor)
 
         # Set observation variance if not provided
         if observation_variance is None:
             # Use 20% of prior variance as observation noise
-            observation_variance = (prior['sd'] ** 2) * 0.2
+            observation_variance = (prior["sd"] ** 2) * 0.2
 
         # Convert to precisions
-        prior_precision = 1.0 / (prior['sd'] ** 2)
+        prior_precision = 1.0 / (prior["sd"] ** 2)
         obs_precision = 1.0 / observation_variance
 
         # Conjugate update
@@ -182,21 +176,19 @@ class BayesianOnlineUpdater:
         posterior_variance = 1.0 / posterior_precision
 
         posterior_mean = (
-            (prior_precision * prior['mean'] +
-             obs_precision * self.learning_rate * observation) /
-            posterior_precision
-        )
+            prior_precision * prior["mean"] + obs_precision * self.learning_rate * observation
+        ) / posterior_precision
 
         posterior_sd = np.sqrt(posterior_variance)
 
         # Update observation count
-        n_obs = prior['n_obs'] + 1
+        n_obs = prior["n_obs"] + 1
 
         updated_params = {
-            'mean': posterior_mean,
-            'sd': posterior_sd,
-            'n_obs': n_obs,
-            'last_update': datetime.now()
+            "mean": posterior_mean,
+            "sd": posterior_sd,
+            "n_obs": n_obs,
+            "last_update": datetime.now(),
         }
 
         # Log the update
@@ -207,10 +199,7 @@ class BayesianOnlineUpdater:
 
         return updated_params
 
-    def batch_update(
-        self,
-        observations_df: pd.DataFrame
-    ) -> Dict[str, Dict]:
+    def batch_update(self, observations_df: pd.DataFrame) -> dict[str, dict]:
         """
         Update multiple players with batch of observations.
 
@@ -233,19 +222,12 @@ class BayesianOnlineUpdater:
             player_key = f"{row['player_id']}_{row['prop_type']}"
 
             # Check for drift
-            if self.drift_detector.check_drift(
-                row['predicted'],
-                row['actual']
-            ):
+            if self.drift_detector.check_drift(row["predicted"], row["actual"]):
                 logger.warning(f"⚠️ Drift detected for {player_key}")
                 drift_detected = True
 
             # Update posterior
-            updated = self.update_posterior(
-                row['player_id'],
-                row['prop_type'],
-                row['actual']
-            )
+            updated = self.update_posterior(row["player_id"], row["prop_type"], row["actual"])
 
             updates[player_key] = updated
 
@@ -258,14 +240,14 @@ class BayesianOnlineUpdater:
 
         return updates
 
-    def _save_updates(self, updates: Dict[str, Dict]):
+    def _save_updates(self, updates: dict[str, dict]):
         """Save updated posteriors to database"""
 
         conn = psycopg2.connect(**self.db_config)
         cur = conn.cursor()
 
         for player_key, params in updates.items():
-            player_id, prop_type = player_key.split('_', 1)
+            player_id, prop_type = player_key.split("_", 1)
 
             query = """
             INSERT INTO mart.bayesian_player_ratings (
@@ -286,25 +268,28 @@ class BayesianOnlineUpdater:
             """
 
             # Calculate quantiles
-            q05 = params['mean'] - 1.645 * params['sd']
-            q50 = params['mean']
-            q95 = params['mean'] + 1.645 * params['sd']
+            q05 = params["mean"] - 1.645 * params["sd"]
+            q50 = params["mean"]
+            q95 = params["mean"] + 1.645 * params["sd"]
 
             try:
-                cur.execute(query, (
-                    player_id,
-                    prop_type,
-                    2024,  # Current season
-                    self._get_current_week(),
-                    self.model_version + "_online",
-                    params['mean'],
-                    params['sd'],
-                    q05,
-                    q50,
-                    q95,
-                    params['n_obs'],
-                    params['last_update']
-                ))
+                cur.execute(
+                    query,
+                    (
+                        player_id,
+                        prop_type,
+                        2024,  # Current season
+                        self._get_current_week(),
+                        self.model_version + "_online",
+                        params["mean"],
+                        params["sd"],
+                        q05,
+                        q50,
+                        q95,
+                        params["n_obs"],
+                        params["last_update"],
+                    ),
+                )
             except Exception as e:
                 logger.warning(f"Could not save update for {player_key}: {e}")
 
@@ -335,24 +320,17 @@ class BayesianOnlineUpdater:
         """
 
         try:
-            cur.execute(query, (
-                self.model_version,
-                'Concept drift detected',
-                'high',
-                datetime.now(),
-                'pending'
-            ))
+            cur.execute(
+                query,
+                (self.model_version, "Concept drift detected", "high", datetime.now(), "pending"),
+            )
             conn.commit()
         except:
             pass
         finally:
             conn.close()
 
-    def calculate_learning_metrics(
-        self,
-        start_date: datetime,
-        end_date: datetime
-    ) -> Dict:
+    def calculate_learning_metrics(self, start_date: datetime, end_date: datetime) -> dict:
         """Calculate online learning performance metrics"""
 
         conn = psycopg2.connect(**self.db_config)
@@ -383,24 +361,20 @@ class BayesianOnlineUpdater:
         FROM predictions_and_actuals
         """
 
-        df = pd.read_sql(
-            query,
-            conn,
-            params=[self.model_version + "_online", start_date, end_date]
-        )
+        df = pd.read_sql(query, conn, params=[self.model_version + "_online", start_date, end_date])
         conn.close()
 
         if not df.empty:
             row = df.iloc[0]
             return {
-                'n_updates': int(row['n_updates']) if row['n_updates'] else 0,
-                'mae': float(row['mae']) if row['mae'] else 0,
-                'std_error': float(row['std_error']) if row['std_error'] else 0,
-                'min_error': float(row['min_error']) if row['min_error'] else 0,
-                'max_error': float(row['max_error']) if row['max_error'] else 0
+                "n_updates": int(row["n_updates"]) if row["n_updates"] else 0,
+                "mae": float(row["mae"]) if row["mae"] else 0,
+                "std_error": float(row["std_error"]) if row["std_error"] else 0,
+                "min_error": float(row["min_error"]) if row["min_error"] else 0,
+                "max_error": float(row["max_error"]) if row["max_error"] else 0,
             }
         else:
-            return {'n_updates': 0}
+            return {"n_updates": 0}
 
 
 class DriftDetector:
@@ -428,7 +402,7 @@ class DriftDetector:
 
         # Page-Hinkley test
         mean_error = np.mean(self.errors[-30:])
-        self.cumsum += (error - mean_error - self.alpha)
+        self.cumsum += error - mean_error - self.alpha
         self.min_cumsum = min(self.min_cumsum, self.cumsum)
 
         ph_statistic = self.cumsum - self.min_cumsum
@@ -447,23 +421,17 @@ class DriftDetector:
 def run_online_updates():
     """Run online updating for recent games"""
 
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("BAYESIAN ONLINE UPDATING")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
     updater = BayesianOnlineUpdater(
-        model_version="informative_priors_v2.5",
-        learning_rate=0.1,
-        forgetting_factor=0.95
+        model_version="informative_priors_v2.5", learning_rate=0.1, forgetting_factor=0.95
     )
 
     # Load recent outcomes
     conn = psycopg2.connect(
-        host='localhost',
-        port=5544,
-        database='devdb01',
-        user='dro',
-        password='sicillionbillions'
+        host="localhost", port=5544, database="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = """
@@ -511,9 +479,9 @@ def run_online_updates():
     logger.info(f"  MAE: {metrics.get('mae', 0):.2f}")
     logger.info(f"  Std Error: {metrics.get('std_error', 0):.2f}")
 
-    logger.info("\n" + "="*60)
+    logger.info("\n" + "=" * 60)
     logger.info("✓ Online updating complete")
-    logger.info("="*60)
+    logger.info("=" * 60)
 
 
 if __name__ == "__main__":

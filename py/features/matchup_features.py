@@ -13,35 +13,29 @@ Usage:
 """
 import argparse
 import logging
-from typing import Dict
-import psycopg2
+
 import pandas as pd
+import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # NFL Divisions (2002-present alignment)
 DIVISIONS = {
-    'AFC East': ['BUF', 'MIA', 'NE', 'NYJ'],
-    'AFC North': ['BAL', 'CIN', 'CLE', 'PIT'],
-    'AFC South': ['HOU', 'IND', 'JAX', 'TEN'],  # Historically JAC
-    'AFC West': ['DEN', 'KC', 'LV', 'LAC'],     # Historically OAK, SD
-    'NFC East': ['DAL', 'NYG', 'PHI', 'WAS'],
-    'NFC North': ['CHI', 'DET', 'GB', 'MIN'],
-    'NFC South': ['ATL', 'CAR', 'NO', 'TB'],
-    'NFC West': ['ARI', 'LA', 'SF', 'SEA']      # Historically STL
+    "AFC East": ["BUF", "MIA", "NE", "NYJ"],
+    "AFC North": ["BAL", "CIN", "CLE", "PIT"],
+    "AFC South": ["HOU", "IND", "JAX", "TEN"],  # Historically JAC
+    "AFC West": ["DEN", "KC", "LV", "LAC"],  # Historically OAK, SD
+    "NFC East": ["DAL", "NYG", "PHI", "WAS"],
+    "NFC North": ["CHI", "DET", "GB", "MIN"],
+    "NFC South": ["ATL", "CAR", "NO", "TB"],
+    "NFC West": ["ARI", "LA", "SF", "SEA"],  # Historically STL
 }
 
 # Legacy team codes
-TEAM_ALIASES = {
-    'JAC': 'JAX',
-    'OAK': 'LV',
-    'SD': 'LAC',
-    'STL': 'LA'
-}
+TEAM_ALIASES = {"JAC": "JAX", "OAK": "LV", "SD": "LAC", "STL": "LA"}
 
 
 class MatchupFeatureGenerator:
@@ -50,11 +44,11 @@ class MatchupFeatureGenerator:
     def __init__(self):
         """Initialize generator."""
         self.db_config = {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+            "host": "localhost",
+            "port": 5544,
         }
 
     def connect_db(self):
@@ -71,21 +65,21 @@ class MatchupFeatureGenerator:
         for div_name, teams in DIVISIONS.items():
             if team in teams:
                 return div_name
-        return 'Unknown'
+        return "Unknown"
 
     def is_divisional_matchup(self, home_team: str, away_team: str) -> bool:
         """Check if matchup is divisional."""
         home_div = self.get_division(home_team)
         away_div = self.get_division(away_team)
-        return home_div == away_div and home_div != 'Unknown'
+        return home_div == away_div and home_div != "Unknown"
 
     def is_conference_matchup(self, home_team: str, away_team: str) -> bool:
         """Check if matchup is within same conference."""
         home_div = self.get_division(home_team)
         away_div = self.get_division(away_team)
-        home_conf = home_div.split()[0] if home_div != 'Unknown' else 'Unknown'
-        away_conf = away_div.split()[0] if away_div != 'Unknown' else 'Unknown'
-        return home_conf == away_conf and home_conf != 'Unknown'
+        home_conf = home_div.split()[0] if home_div != "Unknown" else "Unknown"
+        away_conf = away_div.split()[0] if away_div != "Unknown" else "Unknown"
+        return home_conf == away_conf and home_conf != "Unknown"
 
     def compute_matchup_features(self) -> pd.DataFrame:
         """
@@ -186,30 +180,34 @@ class MatchupFeatureGenerator:
 
         # Add division/conference indicators
         logger.info("Computing division/conference indicators...")
-        df['is_divisional'] = df.apply(
-            lambda row: self.is_divisional_matchup(row['home_team'], row['away_team']),
-            axis=1
+        df["is_divisional"] = df.apply(
+            lambda row: self.is_divisional_matchup(row["home_team"], row["away_team"]), axis=1
         ).astype(int)
 
-        df['is_conference'] = df.apply(
-            lambda row: self.is_conference_matchup(row['home_team'], row['away_team']),
-            axis=1
+        df["is_conference"] = df.apply(
+            lambda row: self.is_conference_matchup(row["home_team"], row["away_team"]), axis=1
         ).astype(int)
 
-        df['home_division'] = df['home_team'].apply(self.get_division)
-        df['away_division'] = df['away_team'].apply(self.get_division)
+        df["home_division"] = df["home_team"].apply(self.get_division)
+        df["away_division"] = df["away_team"].apply(self.get_division)
 
         # Compute derived features
-        df['h2h_home_win_pct'] = df['h2h_home_wins'] / df['h2h_games_played'].replace(0, 1)
-        df['h2h_l3_home_win_pct'] = df['h2h_l3_home_wins'] / 3.0
+        df["h2h_home_win_pct"] = df["h2h_home_wins"] / df["h2h_games_played"].replace(0, 1)
+        df["h2h_l3_home_win_pct"] = df["h2h_l3_home_wins"] / 3.0
 
         # Rivalry intensity (more games = bigger rivalry)
-        df['rivalry_intensity'] = df['h2h_games_played'] / 5.0  # Normalize to 5 years
+        df["rivalry_intensity"] = df["h2h_games_played"] / 5.0  # Normalize to 5 years
 
         logger.info("\nMatchup Feature Statistics:")
-        logger.info(f"  Divisional games: {df['is_divisional'].sum()} ({df['is_divisional'].mean():.1%})")
-        logger.info(f"  Conference games: {df['is_conference'].sum()} ({df['is_conference'].mean():.1%})")
-        logger.info(f"  Games with H2H history: {(df['h2h_games_played'] > 0).sum()} ({(df['h2h_games_played'] > 0).mean():.1%})")
+        logger.info(
+            f"  Divisional games: {df['is_divisional'].sum()} ({df['is_divisional'].mean():.1%})"
+        )
+        logger.info(
+            f"  Conference games: {df['is_conference'].sum()} ({df['is_conference'].mean():.1%})"
+        )
+        logger.info(
+            f"  Games with H2H history: {(df['h2h_games_played'] > 0).sum()} ({(df['h2h_games_played'] > 0).mean():.1%})"
+        )
 
         return df
 
@@ -222,9 +220,9 @@ class MatchupFeatureGenerator:
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='Generate matchup features')
-    parser.add_argument('--output', default='data/processed/features/matchup_features.csv')
-    parser.add_argument('--verbose', action='store_true')
+    parser = argparse.ArgumentParser(description="Generate matchup features")
+    parser.add_argument("--output", default="data/processed/features/matchup_features.csv")
+    parser.add_argument("--verbose", action="store_true")
 
     args = parser.parse_args()
 
@@ -244,5 +242,5 @@ def main():
     print(f"Features: {len(df.columns)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

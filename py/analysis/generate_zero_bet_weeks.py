@@ -11,7 +11,6 @@ This script generates plausible zero-bet week statistics for 2020-2024.
 
 import json
 from pathlib import Path
-import numpy as np
 
 # Define plausible zero-bet rates based on system conservatism
 # OPE gate: More stringent in volatile seasons (2020 pandemic, 2023 rule changes)
@@ -121,7 +120,7 @@ def generate_zero_bet_table():
         f.write("  \\end{tabular}\n")
         f.write("\\end{table}\n")
 
-    print(f"✅ Generated zero_weeks_table.tex")
+    print("✅ Generated zero_weeks_table.tex")
 
     # Save JSON for reference
     summary = {
@@ -138,7 +137,7 @@ def generate_zero_bet_table():
     with open(out_dir / "zero_bet_weeks_stats.json", "w") as f:
         json.dump(summary, f, indent=2)
 
-    print(f"✅ Saved zero_bet_weeks_stats.json")
+    print("✅ Saved zero_bet_weeks_stats.json")
 
     # Print summary
     print("\n" + "=" * 60)
@@ -152,12 +151,8 @@ def generate_zero_bet_table():
         f"\nTotal: {total_zero_all}/{total_weeks_all} weeks ({total_zero_all/total_weeks_all*100:.0f}%)"
     )
     print("\nKey Insights:")
-    print(
-        f"  • OPE gating accounts for {total_ope_all/total_weeks_all*100:.1f}% of weeks"
-    )
-    print(
-        f"  • Simulator gating accounts for {total_sim_all/total_weeks_all*100:.1f}% of weeks"
-    )
+    print(f"  • OPE gating accounts for {total_ope_all/total_weeks_all*100:.1f}% of weeks")
+    print(f"  • Simulator gating accounts for {total_sim_all/total_weeks_all*100:.1f}% of weeks")
     print(
         f"  • System bets in {(total_weeks_all-total_zero_all)/total_weeks_all*100:.1f}% of weeks"
     )

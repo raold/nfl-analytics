@@ -29,15 +29,14 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 import torch
-from cql_agent import CQLAgent, evaluate_policy, load_dataset, populate_replay_buffer, train_cql
+from cql_agent import CQLAgent, evaluate_policy, load_dataset, train_cql
 
 
-def create_param_grid() -> List[Dict]:
+def create_param_grid() -> list[dict]:
     """Create hyperparameter grid for CQL sweep."""
     alphas = [0.1, 0.3, 1.0, 3.0, 10.0]
     learning_rates = [1e-5, 3e-5, 1e-4, 3e-4, 1e-3]
@@ -52,19 +51,21 @@ def create_param_grid() -> List[Dict]:
     for alpha in alphas:
         for lr in learning_rates:
             for hidden_dims in hidden_dims_options:
-                grid.append({
-                    'config_id': config_id,
-                    'alpha': alpha,
-                    'lr': lr,
-                    'hidden_dims': hidden_dims,
-                })
+                grid.append(
+                    {
+                        "config_id": config_id,
+                        "alpha": alpha,
+                        "lr": lr,
+                        "hidden_dims": hidden_dims,
+                    }
+                )
                 config_id += 1
 
     return grid
 
 
 def run_single_config(
-    config: Dict,
+    config: dict,
     states: np.ndarray,
     actions: np.ndarray,
     rewards: np.ndarray,
@@ -72,7 +73,7 @@ def run_single_config(
     epochs: int,
     batch_size: int,
     output_dir: Path,
-) -> Dict:
+) -> dict:
     """Train and evaluate a single CQL configuration."""
 
     state_dim = states.shape[1]
@@ -83,10 +84,10 @@ def run_single_config(
         state_dim=state_dim,
         n_actions=n_actions,
         device=device,
-        alpha=config['alpha'],
-        lr=config['lr'],
+        alpha=config["alpha"],
+        lr=config["lr"],
         batch_size=batch_size,
-        hidden_dims=config['hidden_dims'],
+        hidden_dims=config["hidden_dims"],
     )
 
     # Train
@@ -111,9 +112,9 @@ def run_single_config(
     result = {
         **config,
         **eval_metrics,
-        'final_loss': metrics_log[-1]['loss'],
-        'final_td_loss': metrics_log[-1]['td_loss'],
-        'final_cql_loss': metrics_log[-1]['cql_loss'],
+        "final_loss": metrics_log[-1]["loss"],
+        "final_td_loss": metrics_log[-1]["td_loss"],
+        "final_cql_loss": metrics_log[-1]["cql_loss"],
     }
 
     return result
@@ -124,17 +125,17 @@ def run_sweep(
     output_dir: Path,
     epochs: int = 500,
     batch_size: int = 128,
-    device_arg: str = 'auto',
-    state_cols: List[str] = None,
+    device_arg: str = "auto",
+    state_cols: list[str] = None,
 ) -> pd.DataFrame:
     """Run full CQL hyperparameter sweep."""
 
     if state_cols is None:
-        state_cols = ['spread_close', 'total_close', 'epa_gap', 'market_prob', 'p_hat', 'edge']
+        state_cols = ["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"]
 
     # Setup device
-    if device_arg == 'auto':
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    if device_arg == "auto":
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     else:
         device = torch.device(device_arg)
 
@@ -177,7 +178,7 @@ def run_sweep(
             )
             results.append(result)
 
-            print(f"\nResults:")
+            print("\nResults:")
             print(f"  Match rate: {result['match_rate']:.3f}")
             print(f"  Estimated reward: {result['estimated_policy_reward']:.4f}")
             print(f"  Avg Q-value: {result['avg_q_value']:.4f}")
@@ -199,31 +200,35 @@ def run_sweep(
 
     # Summary statistics
     print("\n=== Top 5 Configurations (by estimated reward) ===")
-    top_5 = results_df.nlargest(5, 'estimated_policy_reward')
+    top_5 = results_df.nlargest(5, "estimated_policy_reward")
     for _, row in top_5.iterrows():
-        print(f"Config {int(row['config_id'])}: "
-              f"reward={row['estimated_policy_reward']:.4f}, "
-              f"match_rate={row['match_rate']:.3f}, "
-              f"alpha={row['alpha']}, lr={row['lr']}")
+        print(
+            f"Config {int(row['config_id'])}: "
+            f"reward={row['estimated_policy_reward']:.4f}, "
+            f"match_rate={row['match_rate']:.3f}, "
+            f"alpha={row['alpha']}, lr={row['lr']}"
+        )
 
     print("\n=== Top 5 Configurations (by match rate) ===")
-    top_5_match = results_df.nlargest(5, 'match_rate')
+    top_5_match = results_df.nlargest(5, "match_rate")
     for _, row in top_5_match.iterrows():
-        print(f"Config {int(row['config_id'])}: "
-              f"match_rate={row['match_rate']:.3f}, "
-              f"reward={row['estimated_policy_reward']:.4f}, "
-              f"alpha={row['alpha']}, lr={row['lr']}")
+        print(
+            f"Config {int(row['config_id'])}: "
+            f"match_rate={row['match_rate']:.3f}, "
+            f"reward={row['estimated_policy_reward']:.4f}, "
+            f"alpha={row['alpha']}, lr={row['lr']}"
+        )
 
     # Save summary
     summary = {
-        'total_configs': len(param_grid),
-        'successful_configs': len(results),
-        'best_config_by_reward': top_5.iloc[0].to_dict() if len(top_5) > 0 else None,
-        'best_config_by_match': top_5_match.iloc[0].to_dict() if len(top_5_match) > 0 else None,
+        "total_configs": len(param_grid),
+        "successful_configs": len(results),
+        "best_config_by_reward": top_5.iloc[0].to_dict() if len(top_5) > 0 else None,
+        "best_config_by_match": top_5_match.iloc[0].to_dict() if len(top_5_match) > 0 else None,
     }
 
     summary_path = output_dir / "cql_sweep_summary.json"
-    with open(summary_path, 'w') as f:
+    with open(summary_path, "w") as f:
         json.dump(summary, f, indent=2, default=str)
 
     print(f"\nSummary saved to {summary_path}")
@@ -232,16 +237,23 @@ def run_sweep(
 
 
 def main():
-    parser = argparse.ArgumentParser(description='CQL Hyperparameter Sweep')
-    parser.add_argument('--dataset', required=True, help='Path to offline RL dataset CSV')
-    parser.add_argument('--output-dir', type=Path, default=Path('models/cql/sweep'),
-                        help='Output directory for sweep results')
-    parser.add_argument('--epochs', type=int, default=500, help='Training epochs per config')
-    parser.add_argument('--batch-size', type=int, default=128, help='Batch size')
-    parser.add_argument('--device', default='auto', help='Device: auto/cpu/cuda/mps')
-    parser.add_argument('--state-cols', nargs='+',
-                        default=['spread_close', 'total_close', 'epa_gap', 'market_prob', 'p_hat', 'edge'],
-                        help='State feature columns')
+    parser = argparse.ArgumentParser(description="CQL Hyperparameter Sweep")
+    parser.add_argument("--dataset", required=True, help="Path to offline RL dataset CSV")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path("models/cql/sweep"),
+        help="Output directory for sweep results",
+    )
+    parser.add_argument("--epochs", type=int, default=500, help="Training epochs per config")
+    parser.add_argument("--batch-size", type=int, default=128, help="Batch size")
+    parser.add_argument("--device", default="auto", help="Device: auto/cpu/cuda/mps")
+    parser.add_argument(
+        "--state-cols",
+        nargs="+",
+        default=["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"],
+        help="State feature columns",
+    )
 
     args = parser.parse_args()
 
@@ -258,5 +270,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

@@ -39,13 +39,10 @@ Usage:
 """
 
 import argparse
-import json
 import logging
 import sys
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -79,12 +76,12 @@ class Bet:
     odds: int  # American odds
     stake: float
     prediction: float  # Model's predicted probability
-    result: Optional[str] = None  # win, loss, push
-    payout: Optional[float] = None
-    home_score: Optional[int] = None
-    away_score: Optional[int] = None
-    closing_line: Optional[float] = None
-    clv: Optional[float] = None  # Closing Line Value
+    result: str | None = None  # win, loss, push
+    payout: float | None = None
+    home_score: int | None = None
+    away_score: int | None = None
+    closing_line: float | None = None
+    clv: float | None = None  # Closing Line Value
 
 
 @dataclass
@@ -187,13 +184,27 @@ class PerformanceMonitor:
         with self.engine.connect() as conn:
             result = conn.execute(
                 query,
-                (timestamp, game_id, week, season, bet_type, side, line, odds, stake, prediction, is_paper_trade),
+                (
+                    timestamp,
+                    game_id,
+                    week,
+                    season,
+                    bet_type,
+                    side,
+                    line,
+                    odds,
+                    stake,
+                    prediction,
+                    is_paper_trade,
+                ),
             )
             bet_id = result.fetchone()[0]
             conn.commit()
 
         mode = "PAPER" if is_paper_trade else "LIVE"
-        logger.info(f"Logged {mode} bet {bet_id}: {game_id} {bet_type} {side} {line} @ {odds} (${stake})")
+        logger.info(
+            f"Logged {mode} bet {bet_id}: {game_id} {bet_type} {side} {line} @ {odds} (${stake})"
+        )
 
         return bet_id
 
@@ -203,7 +214,7 @@ class PerformanceMonitor:
         result: str,
         home_score: int,
         away_score: int,
-        closing_line: Optional[float] = None,
+        closing_line: float | None = None,
     ):
         """
         Update bet result after game finishes.
@@ -259,10 +270,10 @@ class PerformanceMonitor:
 
     def get_bets(
         self,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        season: int | None = None,
+        week: int | None = None,
     ) -> pd.DataFrame:
         """
         Get bets for a specific period.
@@ -352,9 +363,7 @@ class PerformanceMonitor:
 
         # Sharpe ratio
         returns = settled["payout"] / settled["stake"]
-        sharpe_ratio = (
-            returns.mean() / (returns.std() + 1e-8) if len(returns) > 1 else 0.0
-        )
+        sharpe_ratio = returns.mean() / (returns.std() + 1e-8) if len(returns) > 1 else 0.0
 
         # Drawdown
         cumulative_payout = settled["payout"].cumsum()
@@ -372,8 +381,7 @@ class PerformanceMonitor:
 
         brier_score = np.mean((predictions - actuals) ** 2)
         log_loss = -np.mean(
-            actuals * np.log(predictions + 1e-15)
-            + (1 - actuals) * np.log(1 - predictions + 1e-15)
+            actuals * np.log(predictions + 1e-15) + (1 - actuals) * np.log(1 - predictions + 1e-15)
         )
 
         return PerformanceMetrics(
@@ -397,7 +405,7 @@ class PerformanceMonitor:
             log_loss=log_loss,
         )
 
-    def generate_report(self, period: str = "weekly") -> Dict:
+    def generate_report(self, period: str = "weekly") -> dict:
         """
         Generate performance report.
 
@@ -435,16 +443,14 @@ class PerformanceMonitor:
                 "current": self.current_bankroll,
                 "growth": self.current_bankroll - self.initial_bankroll,
                 "growth_pct": (
-                    (self.current_bankroll - self.initial_bankroll)
-                    / self.initial_bankroll
-                    * 100
+                    (self.current_bankroll - self.initial_bankroll) / self.initial_bankroll * 100
                 ),
             },
         }
 
         return report
 
-    def check_alerts(self) -> List[str]:
+    def check_alerts(self) -> list[str]:
         """
         Check for performance alerts.
 
@@ -463,9 +469,7 @@ class PerformanceMonitor:
         # Alert 1: Losing streak (5+ consecutive losses)
         last_5_results = settled.tail(5)["result"].tolist()
         if all(r == "loss" for r in last_5_results):
-            alerts.append(
-                "🚨 ALERT: 5 consecutive losses detected. Consider reducing bet sizes."
-            )
+            alerts.append("🚨 ALERT: 5 consecutive losses detected. Consider reducing bet sizes.")
 
         # Alert 2: Large drawdown (>15% of bankroll)
         metrics = self.calculate_metrics(settled)
@@ -531,16 +535,12 @@ def main():
     log_parser.add_argument("--game-id", required=True, help="Game ID")
     log_parser.add_argument("--week", type=int, required=True, help="Week number")
     log_parser.add_argument("--season", type=int, required=True, help="Season")
-    log_parser.add_argument(
-        "--bet-type", required=True, choices=["spread", "total", "moneyline"]
-    )
+    log_parser.add_argument("--bet-type", required=True, choices=["spread", "total", "moneyline"])
     log_parser.add_argument("--side", required=True, help="home, away, over, under")
     log_parser.add_argument("--line", type=float, required=True, help="Betting line")
     log_parser.add_argument("--odds", type=int, required=True, help="American odds")
     log_parser.add_argument("--stake", type=float, required=True, help="Bet amount")
-    log_parser.add_argument(
-        "--prediction", type=float, required=True, help="Model probability"
-    )
+    log_parser.add_argument("--prediction", type=float, required=True, help="Model probability")
     log_parser.add_argument(
         "--paper-trade", action="store_true", help="Paper trading mode (virtual money)"
     )
@@ -548,9 +548,7 @@ def main():
     # Update bet
     update_parser = subparsers.add_parser("update", help="Update bet result")
     update_parser.add_argument("--bet-id", type=int, required=True, help="Bet ID")
-    update_parser.add_argument(
-        "--result", required=True, choices=["win", "loss", "push"]
-    )
+    update_parser.add_argument("--result", required=True, choices=["win", "loss", "push"])
     update_parser.add_argument("--home-score", type=int, required=True)
     update_parser.add_argument("--away-score", type=int, required=True)
     update_parser.add_argument("--closing-line", type=float, help="Closing line (for CLV)")
@@ -610,7 +608,9 @@ def main():
         metrics = report["metrics"]
         print("Betting Performance:")
         print(f"  Total Bets: {metrics['n_bets']}")
-        print(f"  Wins: {metrics['n_wins']} | Losses: {metrics['n_losses']} | Pushes: {metrics['n_pushes']}")
+        print(
+            f"  Wins: {metrics['n_wins']} | Losses: {metrics['n_losses']} | Pushes: {metrics['n_pushes']}"
+        )
         print(f"  Win Rate: {metrics['win_rate']:.1%}")
         print(f"  Total Staked: ${metrics['total_staked']:,.2f}")
         print(f"  Net Profit: ${metrics['net_profit']:+,.2f}")

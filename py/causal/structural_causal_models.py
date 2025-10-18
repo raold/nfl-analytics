@@ -17,12 +17,9 @@ Applications in NFL:
 - Design valid causal queries with minimal adjustment sets
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Set, Tuple, Optional
-from itertools import combinations, chain
-from collections import defaultdict, deque
 import logging
+from collections import defaultdict, deque
+from itertools import combinations
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,9 +34,9 @@ class CausalDAG:
 
     def __init__(self):
         """Initialize empty DAG"""
-        self.nodes: Set[str] = set()
-        self.edges: Dict[str, Set[str]] = defaultdict(set)  # node -> children
-        self.parents: Dict[str, Set[str]] = defaultdict(set)  # node -> parents
+        self.nodes: set[str] = set()
+        self.edges: dict[str, set[str]] = defaultdict(set)  # node -> children
+        self.parents: dict[str, set[str]] = defaultdict(set)  # node -> parents
 
     def add_node(self, node: str):
         """Add a node to the DAG"""
@@ -88,15 +85,15 @@ class CausalDAG:
 
         return False
 
-    def get_children(self, node: str) -> Set[str]:
+    def get_children(self, node: str) -> set[str]:
         """Get immediate children of node"""
         return self.edges.get(node, set())
 
-    def get_parents(self, node: str) -> Set[str]:
+    def get_parents(self, node: str) -> set[str]:
         """Get immediate parents of node"""
         return self.parents.get(node, set())
 
-    def get_ancestors(self, node: str) -> Set[str]:
+    def get_ancestors(self, node: str) -> set[str]:
         """Get all ancestors of node (parents, grandparents, etc.)"""
         ancestors = set()
         to_visit = list(self.parents.get(node, set()))
@@ -109,7 +106,7 @@ class CausalDAG:
 
         return ancestors
 
-    def get_descendants(self, node: str) -> Set[str]:
+    def get_descendants(self, node: str) -> set[str]:
         """Get all descendants of node (children, grandchildren, etc.)"""
         descendants = set()
         to_visit = list(self.edges.get(node, set()))
@@ -122,12 +119,7 @@ class CausalDAG:
 
         return descendants
 
-    def is_d_separated(
-        self,
-        X: Set[str],
-        Y: Set[str],
-        Z: Set[str]
-    ) -> bool:
+    def is_d_separated(self, X: set[str], Y: set[str], Z: set[str]) -> bool:
         """
         Test if X and Y are d-separated given Z.
 
@@ -149,7 +141,7 @@ class CausalDAG:
 
         return True
 
-    def _has_active_path(self, start: str, end: str, Z: Set[str]) -> bool:
+    def _has_active_path(self, start: str, end: str, Z: set[str]) -> bool:
         """
         Check if there's an active (unblocked) path from start to end given Z.
 
@@ -165,9 +157,9 @@ class CausalDAG:
 
         # Initialize: start from children and parents
         for child in self.get_children(start):
-            queue.append((child, start, 'down'))
+            queue.append((child, start, "down"))
         for parent in self.get_parents(start):
-            queue.append((parent, start, 'up'))
+            queue.append((parent, start, "up"))
 
         visited = set()
 
@@ -201,37 +193,37 @@ class CausalDAG:
                     continue  # Path blocked
 
             # Add next nodes to queue
-            if direction == 'down':
+            if direction == "down":
                 # Coming from parent, can go to children or other parents
                 for child in children:
                     if child != previous:
-                        queue.append((child, current, 'down'))
+                        queue.append((child, current, "down"))
 
                 # Can go up through collider
                 if is_collider:
                     for parent in parents:
                         if parent != previous:
-                            queue.append((parent, current, 'up'))
+                            queue.append((parent, current, "up"))
 
             else:  # direction == 'up'
                 # Coming from child, can go to parents
                 for parent in parents:
                     if parent != previous:
-                        queue.append((parent, current, 'up'))
+                        queue.append((parent, current, "up"))
 
                 # Can go down if not collider or collider is activated
-                if not is_collider or current in Z or any(d in Z for d in self.get_descendants(current)):
+                if (
+                    not is_collider
+                    or current in Z
+                    or any(d in Z for d in self.get_descendants(current))
+                ):
                     for child in children:
                         if child != previous:
-                            queue.append((child, current, 'down'))
+                            queue.append((child, current, "down"))
 
         return False
 
-    def find_backdoor_adjustment_set(
-        self,
-        treatment: str,
-        outcome: str
-    ) -> Optional[Set[str]]:
+    def find_backdoor_adjustment_set(self, treatment: str, outcome: str) -> set[str] | None:
         """
         Find minimal set satisfying backdoor criterion.
 
@@ -279,7 +271,7 @@ class CausalDAG:
         logger.warning(f"No valid backdoor adjustment set found for {treatment} -> {outcome}")
         return None
 
-    def _find_backdoor_paths(self, treatment: str, outcome: str) -> List[List[str]]:
+    def _find_backdoor_paths(self, treatment: str, outcome: str) -> list[list[str]]:
         """Find all backdoor paths from treatment to outcome"""
         backdoor_paths = []
 
@@ -297,11 +289,8 @@ class CausalDAG:
         return backdoor_paths
 
     def _find_all_paths(
-        self,
-        start: str,
-        end: str,
-        avoid: Optional[Set[str]] = None
-    ) -> List[List[str]]:
+        self, start: str, end: str, avoid: set[str] | None = None
+    ) -> list[list[str]]:
         """Find all paths from start to end (undirected)"""
         if avoid is None:
             avoid = set()
@@ -332,14 +321,14 @@ class CausalDAG:
 
         return paths
 
-    def _blocks_all_paths(self, paths: List[List[str]], adjustment_set: Set[str]) -> bool:
+    def _blocks_all_paths(self, paths: list[list[str]], adjustment_set: set[str]) -> bool:
         """Check if adjustment set blocks all paths"""
         for path in paths:
             if not self._blocks_path(path, adjustment_set):
                 return False
         return True
 
-    def _blocks_path(self, path: List[str], adjustment_set: Set[str]) -> bool:
+    def _blocks_path(self, path: list[str], adjustment_set: set[str]) -> bool:
         """Check if adjustment set blocks a single path"""
         # Path is blocked if any non-collider node is in adjustment set
         # or if all collider nodes are outside adjustment set
@@ -350,9 +339,8 @@ class CausalDAG:
             next_node = path[i + 1]
 
             # Check if node is a collider
-            is_collider = (
-                next_node in self.get_parents(node) and
-                prev_node in self.get_parents(node)
+            is_collider = next_node in self.get_parents(node) and prev_node in self.get_parents(
+                node
             )
 
             if is_collider:
@@ -399,23 +387,23 @@ def create_nfl_rushing_dag() -> CausalDAG:
     dag = CausalDAG()
 
     # Unobserved confounder
-    dag.add_edge('player_ability', 'carries')
-    dag.add_edge('player_ability', 'rushing_yards')
+    dag.add_edge("player_ability", "carries")
+    dag.add_edge("player_ability", "rushing_yards")
 
     # Team context
-    dag.add_edge('team_quality', 'carries')
-    dag.add_edge('team_quality', 'game_script')
-    dag.add_edge('team_quality', 'rushing_yards')
+    dag.add_edge("team_quality", "carries")
+    dag.add_edge("team_quality", "game_script")
+    dag.add_edge("team_quality", "rushing_yards")
 
     # Opponent
-    dag.add_edge('opponent_defense', 'carries')
-    dag.add_edge('opponent_defense', 'rushing_yards')
+    dag.add_edge("opponent_defense", "carries")
+    dag.add_edge("opponent_defense", "rushing_yards")
 
     # Game script affects usage
-    dag.add_edge('game_script', 'carries')
+    dag.add_edge("game_script", "carries")
 
     # Treatment -> Outcome
-    dag.add_edge('carries', 'rushing_yards')
+    dag.add_edge("carries", "rushing_yards")
 
     logger.info("Created NFL rushing performance DAG")
 
@@ -436,18 +424,18 @@ def create_coaching_change_dag() -> CausalDAG:
     dag = CausalDAG()
 
     # Confounders
-    dag.add_edge('team_resources', 'coaching_change')
-    dag.add_edge('team_resources', 'new_performance')
+    dag.add_edge("team_resources", "coaching_change")
+    dag.add_edge("team_resources", "new_performance")
 
-    dag.add_edge('prior_performance', 'coaching_change')
-    dag.add_edge('prior_performance', 'new_performance')
+    dag.add_edge("prior_performance", "coaching_change")
+    dag.add_edge("prior_performance", "new_performance")
 
     # Treatment -> Mediator -> Outcome
-    dag.add_edge('coaching_change', 'player_morale')
-    dag.add_edge('player_morale', 'new_performance')
+    dag.add_edge("coaching_change", "player_morale")
+    dag.add_edge("player_morale", "new_performance")
 
     # Direct effect
-    dag.add_edge('coaching_change', 'new_performance')
+    dag.add_edge("coaching_change", "new_performance")
 
     logger.info("Created coaching change DAG")
 
@@ -457,9 +445,9 @@ def create_coaching_change_dag() -> CausalDAG:
 def main():
     """Example usage of causal DAGs"""
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("STRUCTURAL CAUSAL MODEL - NFL RUSHING EXAMPLE")
-    print("="*80)
+    print("=" * 80)
 
     # Create DAG
     dag = create_nfl_rushing_dag()
@@ -467,12 +455,12 @@ def main():
     print("\n" + dag.visualize())
 
     # Find backdoor adjustment set
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("BACKDOOR CRITERION")
-    print("="*80)
+    print("=" * 80)
 
-    treatment = 'carries'
-    outcome = 'rushing_yards'
+    treatment = "carries"
+    outcome = "rushing_yards"
 
     adjustment_set = dag.find_backdoor_adjustment_set(treatment, outcome)
 
@@ -480,34 +468,34 @@ def main():
         print(f"\nTo estimate causal effect of {treatment} on {outcome}:")
         print(f"Adjust for: {adjustment_set}")
     else:
-        print(f"\nNo valid adjustment set found")
+        print("\nNo valid adjustment set found")
 
     # Test d-separation
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("CONDITIONAL INDEPENDENCE (d-separation)")
-    print("="*80)
+    print("=" * 80)
 
     # Test: carries ⊥ opponent_defense | {team_quality, player_ability}?
-    X = {'carries'}
-    Y = {'opponent_defense'}
-    Z = {'team_quality', 'player_ability'}
+    X = {"carries"}
+    Y = {"opponent_defense"}
+    Z = {"team_quality", "player_ability"}
 
     is_independent = dag.is_d_separated(X, Y, Z)
-    print(f"\ncarries ⊥ opponent_defense | {{team_quality, player_ability}}?")
+    print("\ncarries ⊥ opponent_defense | {team_quality, player_ability}?")
     print(f"Result: {is_independent}")
 
     # Coaching change example
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("COACHING CHANGE CAUSAL MODEL")
-    print("="*80)
+    print("=" * 80)
 
     dag2 = create_coaching_change_dag()
     print("\n" + dag2.visualize())
 
-    adjustment_set2 = dag2.find_backdoor_adjustment_set('coaching_change', 'new_performance')
+    adjustment_set2 = dag2.find_backdoor_adjustment_set("coaching_change", "new_performance")
 
     if adjustment_set2:
-        print(f"\nTo estimate coaching change effect:")
+        print("\nTo estimate coaching change effect:")
         print(f"Adjust for: {adjustment_set2}")
 
         print("\nInterpretation:")
@@ -515,9 +503,9 @@ def main():
         print("confounding paths, enabling valid causal inference.")
 
     # Test mediation
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("MEDIATION ANALYSIS")
-    print("="*80)
+    print("=" * 80)
 
     # Direct effect: coaching_change → new_performance
     # Indirect effect: coaching_change → player_morale → new_performance

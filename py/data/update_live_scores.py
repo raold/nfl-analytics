@@ -7,16 +7,13 @@ It should be run periodically during game days to keep scores up-to-date.
 """
 
 import logging
-import sys
 import os
-from pathlib import Path
+
 import psycopg
 import requests
-from datetime import datetime
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -26,7 +23,7 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 
@@ -34,13 +31,13 @@ def fetch_espn_scores():
     """Fetch current scores from ESPN API."""
     try:
         url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
-        params = {'limit': 100}
+        params = {"limit": 100}
 
         # ESPN to database team abbreviation mapping
         espn_to_db_teams = {
-            'LAR': 'LA',   # LA Rams
-            'LAC': 'LAC',  # LA Chargers (stays same)
-            'WSH': 'WAS'   # Washington (some APIs use WSH, we use WAS)
+            "LAR": "LA",  # LA Rams
+            "LAC": "LAC",  # LA Chargers (stays same)
+            "WSH": "WAS",  # Washington (some APIs use WSH, we use WAS)
         }
 
         response = requests.get(url, params=params, timeout=10)
@@ -49,15 +46,15 @@ def fetch_espn_scores():
 
         games_data = []
 
-        if 'events' in data:
-            for event in data['events']:
+        if "events" in data:
+            for event in data["events"]:
                 try:
-                    competitions = event.get('competitions', [])
+                    competitions = event.get("competitions", [])
                     if not competitions:
                         continue
 
                     competition = competitions[0]
-                    competitors = competition.get('competitors', [])
+                    competitors = competition.get("competitors", [])
 
                     # Get teams
                     home_team = None
@@ -66,41 +63,43 @@ def fetch_espn_scores():
                     away_score = None
 
                     for comp in competitors:
-                        team_abbr = comp.get('team', {}).get('abbreviation', '')
+                        team_abbr = comp.get("team", {}).get("abbreviation", "")
                         # Map ESPN team abbr to our database team abbr
                         team_abbr = espn_to_db_teams.get(team_abbr, team_abbr)
 
-                        score_str = comp.get('score', '0')
+                        score_str = comp.get("score", "0")
                         try:
                             score = int(score_str) if score_str else 0
                         except (ValueError, TypeError):
                             score = 0
 
-                        if comp.get('homeAway') == 'home':
+                        if comp.get("homeAway") == "home":
                             home_team = team_abbr
                             home_score = score
-                        elif comp.get('homeAway') == 'away':
+                        elif comp.get("homeAway") == "away":
                             away_team = team_abbr
                             away_score = score
 
                     # Get status
-                    status = event.get('status', {})
-                    status_type = status.get('type', {}).get('state', 'pre')
+                    status = event.get("status", {})
+                    status_type = status.get("type", {}).get("state", "pre")
 
                     # Get season info
-                    season = event.get('season', {}).get('year')
-                    week = event.get('week', {}).get('number')
+                    season = event.get("season", {}).get("year")
+                    week = event.get("week", {}).get("number")
 
                     if home_team and away_team:
-                        games_data.append({
-                            'home_team': home_team,
-                            'away_team': away_team,
-                            'home_score': home_score,
-                            'away_score': away_score,
-                            'status': status_type,  # 'pre', 'in', 'post'
-                            'season': season,
-                            'week': week
-                        })
+                        games_data.append(
+                            {
+                                "home_team": home_team,
+                                "away_team": away_team,
+                                "home_score": home_score,
+                                "away_score": away_score,
+                                "status": status_type,  # 'pre', 'in', 'post'
+                                "season": season,
+                                "week": week,
+                            }
+                        )
 
                 except Exception as e:
                     logger.warning(f"Error parsing event: {e}")
@@ -122,7 +121,7 @@ def update_game_scores(conn, games_data):
         for game in games_data:
             # Only update scores if game has actually started (status is 'in' or 'post')
             # Skip pre-game ('pre') status to avoid setting 0-0 scores
-            if game['status'] not in ('in', 'post'):
+            if game["status"] not in ("in", "post"):
                 continue
 
             # For games in progress or completed, update even if scores are 0
@@ -143,7 +142,13 @@ def update_game_scores(conn, games_data):
 
             cursor.execute(
                 update_query,
-                (game['home_score'], game['away_score'], game_id, game['home_score'], game['away_score'])
+                (
+                    game["home_score"],
+                    game["away_score"],
+                    game_id,
+                    game["home_score"],
+                    game["away_score"],
+                ),
             )
 
             if cursor.rowcount > 0:
@@ -271,7 +276,7 @@ def main():
     # Connect to database
     with psycopg.connect(**DB_CONFIG) as conn:
         # Update game scores
-        updated_count = update_game_scores(conn, games_data)
+        update_game_scores(conn, games_data)
 
         # Update retrospectives for newly completed games
         # Skip for now - retrospectives can be generated later with proper logic

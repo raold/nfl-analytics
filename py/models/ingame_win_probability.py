@@ -33,16 +33,15 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
 import psycopg2
 import xgboost as xgb
-from sklearn.metrics import brier_score_loss, accuracy_score, roc_auc_score
+from sklearn.metrics import accuracy_score, brier_score_loss, roc_auc_score
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -53,11 +52,11 @@ class InGameWinProbabilityModel:
     def __init__(self):
         """Initialize model."""
         self.db_config = {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+            "host": "localhost",
+            "port": 5544,
         }
         self.model = None
         self.feature_names = None
@@ -66,11 +65,7 @@ class InGameWinProbabilityModel:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def extract_features(
-        self,
-        seasons: List[int],
-        min_time_remaining: int = 0
-    ) -> pd.DataFrame:
+    def extract_features(self, seasons: list[int], min_time_remaining: int = 0) -> pd.DataFrame:
         """
         Extract in-game features from play-by-play data.
 
@@ -86,7 +81,7 @@ class InGameWinProbabilityModel:
         conn = self.connect_db()
 
         # Build season list for SQL
-        season_list = ','.join(str(s) for s in seasons)
+        season_list = ",".join(str(s) for s in seasons)
 
         query = f"""
         WITH game_outcomes AS (
@@ -194,52 +189,55 @@ class InGameWinProbabilityModel:
         logger.info("Engineering features...")
 
         # Handle missing values
-        df['down'] = df['down'].fillna(0)
-        df['ydstogo'] = df['ydstogo'].fillna(10)
-        df['estimated_yardline'] = df['estimated_yardline'].fillna(50)
+        df["down"] = df["down"].fillna(0)
+        df["ydstogo"] = df["ydstogo"].fillna(10)
+        df["estimated_yardline"] = df["estimated_yardline"].fillna(50)
 
         # Score features (from perspective of posteam)
-        df['posteam_score_lead'] = df.apply(
-            lambda row: row['posteam_score'] - row['defteam_score']
-            if row['posteam_is_home'] == 1
-            else row['defteam_score'] - row['posteam_score'],
-            axis=1
+        df["posteam_score_lead"] = df.apply(
+            lambda row: (
+                row["posteam_score"] - row["defteam_score"]
+                if row["posteam_is_home"] == 1
+                else row["defteam_score"] - row["posteam_score"]
+            ),
+            axis=1,
         )
 
         # For home team win prediction, flip if posteam is away
-        df['home_score_lead'] = df.apply(
-            lambda row: row['posteam_score'] - row['defteam_score']
-            if row['posteam_is_home'] == 1
-            else row['defteam_score'] - row['posteam_score'],
-            axis=1
+        df["home_score_lead"] = df.apply(
+            lambda row: (
+                row["posteam_score"] - row["defteam_score"]
+                if row["posteam_is_home"] == 1
+                else row["defteam_score"] - row["posteam_score"]
+            ),
+            axis=1,
         )
 
         # Time features
-        df['time_remaining_minutes'] = df['time_remaining'] / 60.0
-        df['quarter_time_ratio'] = df['time_seconds'] / 900.0  # % through quarter
+        df["time_remaining_minutes"] = df["time_remaining"] / 60.0
+        df["quarter_time_ratio"] = df["time_seconds"] / 900.0  # % through quarter
 
         # Situation features
-        df['is_red_zone'] = (df['estimated_yardline'] <= 20).astype(int)
-        df['is_midfield'] = ((df['estimated_yardline'] >= 40) & (df['estimated_yardline'] <= 60)).astype(int)
-        df['is_4th_down'] = (df['down'] == 4).astype(int)
-        df['is_3rd_down'] = (df['down'] == 3).astype(int)
-        df['long_distance'] = (df['ydstogo'] >= 7).astype(int)
+        df["is_red_zone"] = (df["estimated_yardline"] <= 20).astype(int)
+        df["is_midfield"] = (
+            (df["estimated_yardline"] >= 40) & (df["estimated_yardline"] <= 60)
+        ).astype(int)
+        df["is_4th_down"] = (df["down"] == 4).astype(int)
+        df["is_3rd_down"] = (df["down"] == 3).astype(int)
+        df["long_distance"] = (df["ydstogo"] >= 7).astype(int)
 
         # Critical game situations
-        df['is_two_minute_drill'] = (df['time_remaining'] <= 120).astype(int)
-        df['is_final_minute'] = (df['time_remaining'] <= 60).astype(int)
+        df["is_two_minute_drill"] = (df["time_remaining"] <= 120).astype(int)
+        df["is_final_minute"] = (df["time_remaining"] <= 60).astype(int)
 
         # Remove plays with missing critical data
-        df = df.dropna(subset=['time_remaining', 'home_score_lead', 'home_won'])
+        df = df.dropna(subset=["time_remaining", "home_score_lead", "home_won"])
 
         logger.info(f"Engineered features, {len(df):,} plays remaining")
 
         return df
 
-    def prepare_training_data(
-        self,
-        df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, np.ndarray, List[str]]:
+    def prepare_training_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray, list[str]]:
         """
         Prepare features and target for training.
 
@@ -251,28 +249,28 @@ class InGameWinProbabilityModel:
         """
         # Feature columns
         feature_cols = [
-            'home_score_lead',
-            'time_remaining',
-            'time_remaining_minutes',
-            'quarter',
-            'quarter_time_ratio',
-            'down',
-            'ydstogo',
-            'estimated_yardline',
-            'goal_to_go',
-            'is_red_zone',
-            'is_midfield',
-            'is_4th_down',
-            'is_3rd_down',
-            'long_distance',
-            'is_two_minute_drill',
-            'is_final_minute',
-            'qb_kneel',
-            'qb_spike'
+            "home_score_lead",
+            "time_remaining",
+            "time_remaining_minutes",
+            "quarter",
+            "quarter_time_ratio",
+            "down",
+            "ydstogo",
+            "estimated_yardline",
+            "goal_to_go",
+            "is_red_zone",
+            "is_midfield",
+            "is_4th_down",
+            "is_3rd_down",
+            "long_distance",
+            "is_two_minute_drill",
+            "is_final_minute",
+            "qb_kneel",
+            "qb_spike",
         ]
 
         X = df[feature_cols].copy()
-        y = df['home_won'].values
+        y = df["home_won"].values
 
         # Fill any remaining NaNs
         X = X.fillna(0)
@@ -286,8 +284,8 @@ class InGameWinProbabilityModel:
         self,
         X_train: pd.DataFrame,
         y_train: np.ndarray,
-        X_val: Optional[pd.DataFrame] = None,
-        y_val: Optional[np.ndarray] = None
+        X_val: pd.DataFrame | None = None,
+        y_val: np.ndarray | None = None,
     ) -> xgb.Booster:
         """
         Train XGBoost model.
@@ -305,25 +303,25 @@ class InGameWinProbabilityModel:
 
         # XGBoost parameters
         params = {
-            'objective': 'binary:logistic',
-            'eval_metric': 'logloss',
-            'max_depth': 6,
-            'eta': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'min_child_weight': 5,
-            'tree_method': 'hist',
-            'seed': 42
+            "objective": "binary:logistic",
+            "eval_metric": "logloss",
+            "max_depth": 6,
+            "eta": 0.1,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 5,
+            "tree_method": "hist",
+            "seed": 42,
         }
 
         # Create DMatrix
         dtrain = xgb.DMatrix(X_train, label=y_train)
 
         # Eval set
-        evals = [(dtrain, 'train')]
+        evals = [(dtrain, "train")]
         if X_val is not None and y_val is not None:
             dval = xgb.DMatrix(X_val, label=y_val)
-            evals.append((dval, 'val'))
+            evals.append((dval, "val"))
 
         # Train
         logger.info(f"Training with {len(X_train):,} plays...")
@@ -333,7 +331,7 @@ class InGameWinProbabilityModel:
             num_boost_round=200,
             evals=evals,
             early_stopping_rounds=20,
-            verbose_eval=False
+            verbose_eval=False,
         )
 
         logger.info(f"✓ Training complete (best iteration: {model.best_iteration})")
@@ -341,12 +339,8 @@ class InGameWinProbabilityModel:
         return model
 
     def evaluate(
-        self,
-        model: xgb.Booster,
-        X: pd.DataFrame,
-        y: np.ndarray,
-        label: str = "Test"
-    ) -> Dict:
+        self, model: xgb.Booster, X: pd.DataFrame, y: np.ndarray, label: str = "Test"
+    ) -> dict:
         """
         Evaluate model performance.
 
@@ -364,11 +358,11 @@ class InGameWinProbabilityModel:
         y_pred = (y_pred_proba >= 0.5).astype(int)
 
         metrics = {
-            'brier_score': float(brier_score_loss(y, y_pred_proba)),
-            'accuracy': float(accuracy_score(y, y_pred)),
-            'auc': float(roc_auc_score(y, y_pred_proba)),
-            'home_win_rate': float(y.mean()),
-            'n_samples': len(y)
+            "brier_score": float(brier_score_loss(y, y_pred_proba)),
+            "accuracy": float(accuracy_score(y, y_pred)),
+            "auc": float(roc_auc_score(y, y_pred_proba)),
+            "home_win_rate": float(y.mean()),
+            "n_samples": len(y),
         }
 
         logger.info(f"\n{label} Metrics:")
@@ -379,42 +373,38 @@ class InGameWinProbabilityModel:
 
         return metrics
 
-    def save_model(self, model: xgb.Booster, output_dir: Path, metadata: Dict):
+    def save_model(self, model: xgb.Booster, output_dir: Path, metadata: dict):
         """Save model and metadata."""
         output_dir.mkdir(parents=True, exist_ok=True)
 
         # Save model
-        model_path = output_dir / 'model.json'
+        model_path = output_dir / "model.json"
         model.save_model(str(model_path))
         logger.info(f"✓ Saved model to {model_path}")
 
         # Save metadata
-        metadata_path = output_dir / 'metadata.json'
-        with open(metadata_path, 'w') as f:
+        metadata_path = output_dir / "metadata.json"
+        with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
         logger.info(f"✓ Saved metadata to {metadata_path}")
 
-    def load_model(self, model_dir: Path) -> Tuple[xgb.Booster, Dict]:
+    def load_model(self, model_dir: Path) -> tuple[xgb.Booster, dict]:
         """Load model and metadata."""
-        model_path = model_dir / 'model.json'
-        metadata_path = model_dir / 'metadata.json'
+        model_path = model_dir / "model.json"
+        metadata_path = model_dir / "metadata.json"
 
         model = xgb.Booster()
         model.load_model(str(model_path))
 
-        with open(metadata_path, 'r') as f:
+        with open(metadata_path) as f:
             metadata = json.load(f)
 
-        self.feature_names = metadata['feature_names']
+        self.feature_names = metadata["feature_names"]
 
         logger.info(f"✓ Loaded model from {model_dir}")
         return model, metadata
 
-    def predict_game(
-        self,
-        game_id: str,
-        model: Optional[xgb.Booster] = None
-    ) -> pd.DataFrame:
+    def predict_game(self, game_id: str, model: xgb.Booster | None = None) -> pd.DataFrame:
         """
         Generate play-by-play win probabilities for a specific game.
 
@@ -465,58 +455,70 @@ class InGameWinProbabilityModel:
             return pd.DataFrame()
 
         # Engineer features (simplified for inference)
-        df['time_remaining'] = 3600 - (
-            (df['quarter'] - 1) * 900 + (900 - df['time_seconds'])
-        )
-        df['time_remaining'] = df['time_remaining'].clip(lower=0)
-        df['time_remaining_minutes'] = df['time_remaining'] / 60.0
-        df['quarter_time_ratio'] = df['time_seconds'] / 900.0
+        df["time_remaining"] = 3600 - ((df["quarter"] - 1) * 900 + (900 - df["time_seconds"]))
+        df["time_remaining"] = df["time_remaining"].clip(lower=0)
+        df["time_remaining_minutes"] = df["time_remaining"] / 60.0
+        df["quarter_time_ratio"] = df["time_seconds"] / 900.0
 
-        df['home_score_lead'] = df.apply(
-            lambda row: row['posteam_score'] - row['defteam_score']
-            if row['posteam'] == row['home_team']
-            else row['defteam_score'] - row['posteam_score'],
-            axis=1
+        df["home_score_lead"] = df.apply(
+            lambda row: (
+                row["posteam_score"] - row["defteam_score"]
+                if row["posteam"] == row["home_team"]
+                else row["defteam_score"] - row["posteam_score"]
+            ),
+            axis=1,
         )
 
-        df['down'] = df['down'].fillna(0)
-        df['ydstogo'] = df['ydstogo'].fillna(10)
-        df['estimated_yardline'] = 100 - df['ydstogo']  # Rough estimate
-        df['goal_to_go'] = 0
-        df['is_red_zone'] = (df['estimated_yardline'] <= 20).astype(int)
-        df['is_midfield'] = ((df['estimated_yardline'] >= 40) & (df['estimated_yardline'] <= 60)).astype(int)
-        df['is_4th_down'] = (df['down'] == 4).astype(int)
-        df['is_3rd_down'] = (df['down'] == 3).astype(int)
-        df['long_distance'] = (df['ydstogo'] >= 7).astype(int)
-        df['is_two_minute_drill'] = (df['time_remaining'] <= 120).astype(int)
-        df['is_final_minute'] = (df['time_remaining'] <= 60).astype(int)
-        df['qb_kneel'] = 0
-        df['qb_spike'] = 0
+        df["down"] = df["down"].fillna(0)
+        df["ydstogo"] = df["ydstogo"].fillna(10)
+        df["estimated_yardline"] = 100 - df["ydstogo"]  # Rough estimate
+        df["goal_to_go"] = 0
+        df["is_red_zone"] = (df["estimated_yardline"] <= 20).astype(int)
+        df["is_midfield"] = (
+            (df["estimated_yardline"] >= 40) & (df["estimated_yardline"] <= 60)
+        ).astype(int)
+        df["is_4th_down"] = (df["down"] == 4).astype(int)
+        df["is_3rd_down"] = (df["down"] == 3).astype(int)
+        df["long_distance"] = (df["ydstogo"] >= 7).astype(int)
+        df["is_two_minute_drill"] = (df["time_remaining"] <= 120).astype(int)
+        df["is_final_minute"] = (df["time_remaining"] <= 60).astype(int)
+        df["qb_kneel"] = 0
+        df["qb_spike"] = 0
 
         # Prepare features
         X = df[self.feature_names].fillna(0)
 
         # Predict
         dtest = xgb.DMatrix(X)
-        df['home_win_prob'] = model.predict(dtest)
+        df["home_win_prob"] = model.predict(dtest)
 
         logger.info(f"✓ Generated {len(df)} play-by-play probabilities")
 
-        return df[['game_id', 'play_id', 'quarter', 'time_seconds', 'posteam',
-                   'posteam_score', 'defteam_score', 'home_win_prob']]
+        return df[
+            [
+                "game_id",
+                "play_id",
+                "quarter",
+                "time_seconds",
+                "posteam",
+                "posteam_score",
+                "defteam_score",
+                "home_win_prob",
+            ]
+        ]
 
 
 def main():
     """CLI entry point."""
-    parser = argparse.ArgumentParser(description='In-game win probability model')
-    parser.add_argument('--mode', choices=['train', 'inference'], default='train')
-    parser.add_argument('--start-season', type=int, default=2006)
-    parser.add_argument('--end-season', type=int, default=2021)
-    parser.add_argument('--test-seasons', type=int, nargs='+', default=[2024])
-    parser.add_argument('--output-dir', default='models/ingame_wp/v1')
-    parser.add_argument('--model-dir', help='Model directory for inference')
-    parser.add_argument('--game-id', help='Game ID for inference')
-    parser.add_argument('--verbose', action='store_true')
+    parser = argparse.ArgumentParser(description="In-game win probability model")
+    parser.add_argument("--mode", choices=["train", "inference"], default="train")
+    parser.add_argument("--start-season", type=int, default=2006)
+    parser.add_argument("--end-season", type=int, default=2021)
+    parser.add_argument("--test-seasons", type=int, nargs="+", default=[2024])
+    parser.add_argument("--output-dir", default="models/ingame_wp/v1")
+    parser.add_argument("--model-dir", help="Model directory for inference")
+    parser.add_argument("--game-id", help="Game ID for inference")
+    parser.add_argument("--verbose", action="store_true")
 
     args = parser.parse_args()
 
@@ -525,7 +527,7 @@ def main():
 
     model_trainer = InGameWinProbabilityModel()
 
-    if args.mode == 'train':
+    if args.mode == "train":
         # Training mode
         logger.info("=" * 80)
         logger.info("IN-GAME WIN PROBABILITY MODEL TRAINING")
@@ -566,21 +568,21 @@ def main():
 
         # Save model
         metadata = {
-            'model_type': 'ingame_win_probability',
-            'version': 'v1',
-            'created_at': datetime.now().isoformat(),
-            'train_seasons': f"{train_seasons[0]}-{train_seasons[-1]}",
-            'test_seasons': test_seasons,
-            'feature_names': feature_names,
-            'n_features': len(feature_names),
-            'train_metrics': train_metrics,
-            'test_results': test_results,
-            'hyperparameters': {
-                'max_depth': 6,
-                'eta': 0.1,
-                'subsample': 0.8,
-                'colsample_bytree': 0.8
-            }
+            "model_type": "ingame_win_probability",
+            "version": "v1",
+            "created_at": datetime.now().isoformat(),
+            "train_seasons": f"{train_seasons[0]}-{train_seasons[-1]}",
+            "test_seasons": test_seasons,
+            "feature_names": feature_names,
+            "n_features": len(feature_names),
+            "train_metrics": train_metrics,
+            "test_results": test_results,
+            "hyperparameters": {
+                "max_depth": 6,
+                "eta": 0.1,
+                "subsample": 0.8,
+                "colsample_bytree": 0.8,
+            },
         }
 
         output_dir = Path(args.output_dir)
@@ -591,7 +593,9 @@ def main():
         print("=" * 80)
         print(f"Output: {output_dir}")
         print(f"Train Brier: {train_metrics['brier_score']:.4f}")
-        print(f"Test Brier ({test_seasons[0]}): {test_results[str(test_seasons[0])]['brier_score']:.4f}")
+        print(
+            f"Test Brier ({test_seasons[0]}): {test_results[str(test_seasons[0])]['brier_score']:.4f}"
+        )
 
     else:
         # Inference mode
@@ -613,8 +617,18 @@ def main():
         print(f"IN-GAME WIN PROBABILITIES: {args.game_id}")
         print("=" * 80)
         print("\nSample Predictions (every 20 plays):")
-        print(predictions.iloc[::20][['quarter', 'time_seconds', 'posteam',
-                                       'posteam_score', 'defteam_score', 'home_win_prob']])
+        print(
+            predictions.iloc[::20][
+                [
+                    "quarter",
+                    "time_seconds",
+                    "posteam",
+                    "posteam_score",
+                    "defteam_score",
+                    "home_win_prob",
+                ]
+            ]
+        )
 
         # Save to CSV
         output_path = f"data/predictions/ingame_wp_{args.game_id}.csv"
@@ -622,5 +636,5 @@ def main():
         print(f"\n✓ Saved predictions to {output_path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

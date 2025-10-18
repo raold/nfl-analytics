@@ -8,16 +8,15 @@ This script:
 3. Saves predictions to predictions.bayesian_prop_predictions table
 """
 
-import psycopg
-import pandas as pd
-import numpy as np
-from datetime import datetime, timezone
 import logging
-from typing import Dict, List, Tuple
+from datetime import UTC, datetime
+
+import numpy as np
+import pandas as pd
+import psycopg
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
 
 # Confidence interval inflation factor (2.5x for better coverage)
@@ -60,7 +59,7 @@ def get_upcoming_games(conn, season: int, week: int) -> pd.DataFrame:
 
 def get_player_matchups(conn, games_df: pd.DataFrame) -> pd.DataFrame:
     """Get player matchups for the games."""
-    game_ids = games_df['game_id'].tolist()
+    game_ids = games_df["game_id"].tolist()
 
     query = """
     WITH active_players AS (
@@ -125,7 +124,7 @@ def get_bayesian_ratings(conn) -> pd.DataFrame:
     return pd.read_sql_query(query, conn)
 
 
-def get_defensive_adjustments(conn, season: int) -> Dict[str, float]:
+def get_defensive_adjustments(conn, season: int) -> dict[str, float]:
     """Get defensive strength adjustments for each team."""
     query = """
     WITH def_stats AS (
@@ -155,10 +154,10 @@ def get_defensive_adjustments(conn, season: int) -> Dict[str, float]:
     df = pd.read_sql_query(query, conn, params=(season,))
 
     # Create adjustment factors (1.0 = average, >1.0 = allows more, <1.0 = allows less)
-    pass_adj = dict(zip(df['opponent'], df['pass_def_factor'].fillna(1.0)))
-    rush_adj = dict(zip(df['opponent'], df['rush_def_factor'].fillna(1.0)))
+    pass_adj = dict(zip(df["opponent"], df["pass_def_factor"].fillna(1.0)))
+    rush_adj = dict(zip(df["opponent"], df["rush_def_factor"].fillna(1.0)))
 
-    return {'pass': pass_adj, 'rush': rush_adj}
+    return {"pass": pass_adj, "rush": rush_adj}
 
 
 def apply_game_context(
@@ -169,8 +168,8 @@ def apply_game_context(
     spread: float,
     total: float,
     weather_factor: float,
-    opponent_adj: float
-) -> Tuple[float, float]:
+    opponent_adj: float,
+) -> tuple[float, float]:
     """Apply game-specific adjustments to base prediction."""
 
     # Start with base prediction
@@ -223,17 +222,15 @@ def generate_predictions(
     matchups_df: pd.DataFrame,
     ratings_df: pd.DataFrame,
     games_df: pd.DataFrame,
-    def_adjustments: Dict[str, Dict[str, float]]
-) -> List[Dict]:
+    def_adjustments: dict[str, dict[str, float]],
+) -> list[dict]:
     """Generate game-specific predictions."""
 
     predictions = []
 
     for _, matchup in matchups_df.iterrows():
         # Get player's base rating
-        player_rating = ratings_df[
-            ratings_df['player_id'] == matchup['player_id']
-        ]
+        player_rating = ratings_df[ratings_df["player_id"] == matchup["player_id"]]
 
         if player_rating.empty:
             # No rating for this player - skip
@@ -242,47 +239,47 @@ def generate_predictions(
         rating = player_rating.iloc[0]
 
         # Get game context
-        game = games_df[games_df['game_id'] == matchup['game_id']].iloc[0]
+        game = games_df[games_df["game_id"] == matchup["game_id"]].iloc[0]
 
         # Determine stat type based on position
-        if matchup['position'] == 'QB':
-            stat_type = 'passing_yards'
-            def_type = 'pass'
-        elif matchup['position'] == 'RB':
-            stat_type = 'rushing_yards'
-            def_type = 'rush'
+        if matchup["position"] == "QB":
+            stat_type = "passing_yards"
+            def_type = "pass"
+        elif matchup["position"] == "RB":
+            stat_type = "rushing_yards"
+            def_type = "rush"
         else:
-            stat_type = 'receiving_yards'
-            def_type = 'pass'
+            stat_type = "receiving_yards"
+            def_type = "pass"
 
         # Skip if we don't have ratings for this stat type
-        if rating['stat_type'] != stat_type:
+        if rating["stat_type"] != stat_type:
             continue
 
         # Get defensive adjustment
-        opponent_adj = def_adjustments[def_type].get(matchup['opponent'], 1.0)
+        opponent_adj = def_adjustments[def_type].get(matchup["opponent"], 1.0)
 
         # Weather adjustment
         weather_factor = 1.0
-        if game['wind'] and game['wind'] > 15:
+        if game["wind"] and game["wind"] > 15:
             weather_factor *= 0.95
-        if game['temp'] and game['temp'] < 32:
+        if game["temp"] and game["temp"] < 32:
             weather_factor *= 0.97
-        if game['roof'] in ['dome', 'closed']:
+        if game["roof"] in ["dome", "closed"]:
             weather_factor = 1.0  # No weather impact
 
         # Determine if player's team is favored
         is_favored = False
-        spread = game['spread']
+        spread = game["spread"]
         if spread:
-            if matchup['is_home'] and spread < 0:
+            if matchup["is_home"] and spread < 0:
                 is_favored = True
-            elif not matchup['is_home'] and spread > 0:
+            elif not matchup["is_home"] and spread > 0:
                 is_favored = True
 
         # Get base prediction (in log space)
-        base_mean_log = rating['rating_mean']
-        base_sd_log = rating['rating_sd'] * CI_INFLATION  # Apply inflation
+        base_mean_log = rating["rating_mean"]
+        base_sd_log = rating["rating_sd"] * CI_INFLATION  # Apply inflation
 
         # Convert to normal space for adjustments
         base_mean = np.exp(base_mean_log)
@@ -291,12 +288,12 @@ def generate_predictions(
         adjusted_mean, adjusted_sd = apply_game_context(
             base_mean,
             base_sd_log * base_mean,  # Approximate SD in normal space
-            matchup['is_home'],
+            matchup["is_home"],
             is_favored,
             spread,
-            game['total'],
+            game["total"],
             weather_factor,
-            opponent_adj
+            opponent_adj,
         )
 
         # Convert back to log space for consistency
@@ -308,41 +305,41 @@ def generate_predictions(
         q95 = np.exp(adjusted_mean_log + 1.645 * adjusted_sd_log)
 
         prediction = {
-            'game_id': matchup['game_id'],
-            'player_id': matchup['player_id'],
-            'stat_type': stat_type,
-            'model_version': f"{rating['model_version']}_context",
-            'rating_mean': adjusted_mean_log,
-            'rating_sd': adjusted_sd_log,
-            'rating_q05': np.log(q05),
-            'rating_q50': adjusted_mean_log,
-            'rating_q95': np.log(q95),
-            'predicted_value': adjusted_mean,
-            'predicted_q05': q05,
-            'predicted_q95': q95,
-            'league_intercept': 0.0,
-            'position_group_effect': 0.0,
-            'team_effect': 0.0,
-            'vs_opponent_effect': np.log(opponent_adj),
-            'player_effect': base_mean_log,
-            'log_attempts_adjustment': 0.0,
-            'home_field_adjustment': 0.03 if matchup['is_home'] else 0.0,
-            'favorite_adjustment': 0.02 if is_favored else 0.0,
-            'weather_adjustment': np.log(weather_factor),
-            'total_line_adjustment': 0.0,
-            'spread_adjustment': 0.0,
-            'n_posterior_draws': 4000,
-            'effective_sample_size': 1000.0,
-            'rhat': 1.0,
-            'game_context': {
-                'is_home': bool(matchup['is_home']),
-                'opponent': matchup['opponent'],
-                'spread': float(spread) if spread else None,
-                'total': float(game['total']) if game['total'] else None,
-                'weather_factor': weather_factor
+            "game_id": matchup["game_id"],
+            "player_id": matchup["player_id"],
+            "stat_type": stat_type,
+            "model_version": f"{rating['model_version']}_context",
+            "rating_mean": adjusted_mean_log,
+            "rating_sd": adjusted_sd_log,
+            "rating_q05": np.log(q05),
+            "rating_q50": adjusted_mean_log,
+            "rating_q95": np.log(q95),
+            "predicted_value": adjusted_mean,
+            "predicted_q05": q05,
+            "predicted_q95": q95,
+            "league_intercept": 0.0,
+            "position_group_effect": 0.0,
+            "team_effect": 0.0,
+            "vs_opponent_effect": np.log(opponent_adj),
+            "player_effect": base_mean_log,
+            "log_attempts_adjustment": 0.0,
+            "home_field_adjustment": 0.03 if matchup["is_home"] else 0.0,
+            "favorite_adjustment": 0.02 if is_favored else 0.0,
+            "weather_adjustment": np.log(weather_factor),
+            "total_line_adjustment": 0.0,
+            "spread_adjustment": 0.0,
+            "n_posterior_draws": 4000,
+            "effective_sample_size": 1000.0,
+            "rhat": 1.0,
+            "game_context": {
+                "is_home": bool(matchup["is_home"]),
+                "opponent": matchup["opponent"],
+                "spread": float(spread) if spread else None,
+                "total": float(game["total"]) if game["total"] else None,
+                "weather_factor": weather_factor,
             },
-            'game_kickoff': game['kickoff'],
-            'predicted_at': datetime.now(timezone.utc)
+            "game_kickoff": game["kickoff"],
+            "predicted_at": datetime.now(UTC),
         }
 
         predictions.append(prediction)
@@ -350,7 +347,7 @@ def generate_predictions(
     return predictions
 
 
-def save_predictions(conn, predictions: List[Dict]) -> int:
+def save_predictions(conn, predictions: list[dict]) -> int:
     """Save predictions to database."""
 
     if not predictions:
@@ -360,14 +357,14 @@ def save_predictions(conn, predictions: List[Dict]) -> int:
     cursor = conn.cursor()
 
     # Clear old predictions for these games
-    game_ids = list(set(p['game_id'] for p in predictions))
+    game_ids = list(set(p["game_id"] for p in predictions))
     cursor.execute(
         """
         DELETE FROM predictions.bayesian_prop_predictions
         WHERE game_id = ANY(%s)
             AND model_version LIKE '%_context'
         """,
-        (game_ids,)
+        (game_ids,),
     )
 
     inserted = 0
@@ -398,20 +395,36 @@ def save_predictions(conn, predictions: List[Dict]) -> int:
                 )
                 """,
                 (
-                    pred['game_id'], pred['player_id'], pred['stat_type'],
-                    pred['model_version'],
-                    pred['rating_mean'], pred['rating_sd'], pred['rating_q05'],
-                    pred['rating_q50'], pred['rating_q95'],
-                    pred['predicted_value'], pred['predicted_q05'], pred['predicted_q95'],
-                    pred['league_intercept'], pred['position_group_effect'],
-                    pred['team_effect'], pred['vs_opponent_effect'],
-                    pred['player_effect'], pred['log_attempts_adjustment'],
-                    pred['home_field_adjustment'], pred['favorite_adjustment'],
-                    pred['weather_adjustment'], pred['total_line_adjustment'],
-                    pred['spread_adjustment'],
-                    pred['n_posterior_draws'], pred['effective_sample_size'], pred['rhat'],
-                    pred['game_context'], pred['game_kickoff'], pred['predicted_at']
-                )
+                    pred["game_id"],
+                    pred["player_id"],
+                    pred["stat_type"],
+                    pred["model_version"],
+                    pred["rating_mean"],
+                    pred["rating_sd"],
+                    pred["rating_q05"],
+                    pred["rating_q50"],
+                    pred["rating_q95"],
+                    pred["predicted_value"],
+                    pred["predicted_q05"],
+                    pred["predicted_q95"],
+                    pred["league_intercept"],
+                    pred["position_group_effect"],
+                    pred["team_effect"],
+                    pred["vs_opponent_effect"],
+                    pred["player_effect"],
+                    pred["log_attempts_adjustment"],
+                    pred["home_field_adjustment"],
+                    pred["favorite_adjustment"],
+                    pred["weather_adjustment"],
+                    pred["total_line_adjustment"],
+                    pred["spread_adjustment"],
+                    pred["n_posterior_draws"],
+                    pred["effective_sample_size"],
+                    pred["rhat"],
+                    pred["game_context"],
+                    pred["game_kickoff"],
+                    pred["predicted_at"],
+                ),
             )
             inserted += 1
 
@@ -462,9 +475,7 @@ def main():
         def_adjustments = get_defensive_adjustments(conn, season)
 
         # Generate predictions
-        predictions = generate_predictions(
-            matchups_df, ratings_df, games_df, def_adjustments
-        )
+        predictions = generate_predictions(matchups_df, ratings_df, games_df, def_adjustments)
         logger.info(f"Generated {len(predictions)} predictions")
 
         # Save to database

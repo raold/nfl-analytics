@@ -77,7 +77,7 @@ def kelly_lcb_baseline(conn, season_start=2020, season_end=2024, threshold=0.55,
         Dict with metrics: brier, clv_bps, roi_pct, max_dd_pct, sharpe_active, sharpe_util
     """
     query = """
-    SELECT 
+    SELECT
         g.game_id,
         g.season,
         g.week,

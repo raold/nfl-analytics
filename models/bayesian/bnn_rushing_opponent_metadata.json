@@ -1,0 +1,19 @@
+{
+  "hidden_dim": 16,
+  "activation": "relu",
+  "prior_std": 0.5,
+  "n_players": 177,
+  "features": [
+    "carries",
+    "avg_rushing_l3",
+    "season_avg",
+    "week",
+    "spread_close",
+    "total_close",
+    "opp_rush_yds_allowed_avg",
+    "opp_rush_rank",
+    "opp_rush_yds_l3"
+  ],
+  "n_features": 9,
+  "timestamp": "2025-10-18T06:46:05.743115"
+}

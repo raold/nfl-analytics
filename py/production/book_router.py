@@ -18,8 +18,8 @@ Expected impact: +0.5-1% ROI from reduced friction costs
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 from enum import Enum
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 class BookTier(Enum):
     """Sportsbook tiers based on sharpness and limits"""
+
     SHARP = "sharp"  # Pinnacle, Bookmaker, Circa
     REDUCED_JUICE = "reduced_juice"  # BetOnline, Heritage
     RECREATIONAL = "recreational"  # DraftKings, FanDuel, BetMGM
@@ -36,11 +37,12 @@ class BookTier(Enum):
 @dataclass
 class WithdrawalPolicy:
     """Book withdrawal terms"""
+
     fee_structure: str  # 'flat', 'percentage', 'free'
     fee_amount: float  # Dollar amount or percentage
     minimum_withdrawal: float
     processing_days: int
-    free_withdrawal_frequency: Optional[int] = None  # Days between free withdrawals
+    free_withdrawal_frequency: int | None = None  # Days between free withdrawals
     crypto_available: bool = False
     crypto_fee: float = 0.0
 
@@ -48,6 +50,7 @@ class WithdrawalPolicy:
 @dataclass
 class BonusTerms:
     """Active bonus requirements"""
+
     bonus_amount: float
     rollover_requirement: float  # e.g., 10x means bet 10x bonus amount
     rollover_remaining: float
@@ -59,6 +62,7 @@ class BonusTerms:
 @dataclass
 class BookProfile:
     """Complete sportsbook profile with limits and friction"""
+
     name: str
     tier: BookTier
 
@@ -73,12 +77,12 @@ class BookProfile:
     account_balance: float
     lifetime_profit: float  # Track to avoid winning too much
     heat_level: float = 0.0  # 0-1 scale of account heat
-    last_bet: Optional[datetime] = None
-    restricted_markets: List[str] = field(default_factory=list)
+    last_bet: datetime | None = None
+    restricted_markets: list[str] = field(default_factory=list)
 
     # Friction costs
-    withdrawal_policy: Optional[WithdrawalPolicy] = None
-    active_bonus: Optional[BonusTerms] = None
+    withdrawal_policy: WithdrawalPolicy | None = None
+    active_bonus: BonusTerms | None = None
 
     # Market availability
     has_alt_lines: bool = True
@@ -86,13 +90,14 @@ class BookProfile:
     live_betting: bool = True
 
     # Geographic
-    available_states: List[str] = field(default_factory=list)
+    available_states: list[str] = field(default_factory=list)
     vpn_friendly: bool = False
 
 
 @dataclass
 class BetRoute:
     """Optimal routing decision for a bet"""
+
     bet_id: str
     book: str
     line: float
@@ -101,8 +106,8 @@ class BetRoute:
     expected_value: float
     friction_cost: float
     net_ev: float
-    reasons: List[str]
-    warnings: List[str]
+    reasons: list[str]
+    warnings: list[str]
 
 
 class FrictionCalculator:
@@ -110,13 +115,11 @@ class FrictionCalculator:
 
     @staticmethod
     def calculate_withdrawal_cost(
-        amount: float,
-        policy: WithdrawalPolicy,
-        last_withdrawal: Optional[datetime] = None
+        amount: float, policy: WithdrawalPolicy, last_withdrawal: datetime | None = None
     ) -> float:
         """Calculate cost to withdraw winnings"""
         if amount < policy.minimum_withdrawal:
-            return float('inf')  # Can't withdraw
+            return float("inf")  # Can't withdraw
 
         # Check if free withdrawal available
         if policy.free_withdrawal_frequency and last_withdrawal:
@@ -125,19 +128,15 @@ class FrictionCalculator:
                 return 0.0
 
         # Calculate fee
-        if policy.fee_structure == 'flat':
+        if policy.fee_structure == "flat":
             return policy.fee_amount
-        elif policy.fee_structure == 'percentage':
+        elif policy.fee_structure == "percentage":
             return amount * policy.fee_amount
         else:  # free
             return 0.0
 
     @staticmethod
-    def calculate_bonus_cost(
-        bet_amount: float,
-        odds: int,
-        bonus: BonusTerms
-    ) -> float:
+    def calculate_bonus_cost(bet_amount: float, odds: int, bonus: BonusTerms) -> float:
         """Calculate opportunity cost of bonus rollover"""
         # Check if bet qualifies
         if odds > bonus.qualifying_odds:  # More negative is "less than"
@@ -149,7 +148,7 @@ class FrictionCalculator:
         # Opportunity cost: locked funds * expected time * rate
         days_to_expiry = (bonus.expires - datetime.now()).days
         if days_to_expiry <= 0:
-            return float('inf')  # Bonus expired, funds locked
+            return float("inf")  # Bonus expired, funds locked
 
         # Rough estimate: 2% monthly opportunity cost
         daily_opportunity_cost = 0.02 / 30
@@ -162,10 +161,7 @@ class FrictionCalculator:
 
     @staticmethod
     def calculate_heat_cost(
-        current_heat: float,
-        lifetime_profit: float,
-        bet_amount: float,
-        book_tier: BookTier
+        current_heat: float, lifetime_profit: float, bet_amount: float, book_tier: BookTier
     ) -> float:
         """Calculate cost of account heat/restrictions"""
         # Sharp books don't limit winners as much
@@ -190,11 +186,8 @@ class FrictionCalculator:
 
     @staticmethod
     def calculate_total_friction(
-        bet_amount: float,
-        odds: int,
-        book: BookProfile,
-        last_withdrawal: Optional[datetime] = None
-    ) -> Tuple[float, List[str]]:
+        bet_amount: float, odds: int, book: BookProfile, last_withdrawal: datetime | None = None
+    ) -> tuple[float, list[str]]:
         """Calculate total friction cost for a bet"""
         costs = []
         reasons = []
@@ -202,9 +195,7 @@ class FrictionCalculator:
         # Withdrawal cost (amortized)
         if book.withdrawal_policy:
             withdrawal_cost = FrictionCalculator.calculate_withdrawal_cost(
-                bet_amount * 2,  # Assume 2x return
-                book.withdrawal_policy,
-                last_withdrawal
+                bet_amount * 2, book.withdrawal_policy, last_withdrawal  # Assume 2x return
             )
             if withdrawal_cost > 0:
                 # Amortize over expected number of bets before withdrawal
@@ -215,9 +206,7 @@ class FrictionCalculator:
         # Bonus cost
         if book.active_bonus:
             bonus_cost = FrictionCalculator.calculate_bonus_cost(
-                bet_amount,
-                odds,
-                book.active_bonus
+                bet_amount, odds, book.active_bonus
             )
             if bonus_cost > 0:
                 costs.append(bonus_cost)
@@ -225,10 +214,7 @@ class FrictionCalculator:
 
         # Heat cost
         heat_cost = FrictionCalculator.calculate_heat_cost(
-            book.heat_level,
-            book.lifetime_profit,
-            bet_amount,
-            book.tier
+            book.heat_level, book.lifetime_profit, bet_amount, book.tier
         )
         if heat_cost > 0:
             costs.append(heat_cost)
@@ -240,10 +226,10 @@ class FrictionCalculator:
 class BookRouter:
     """Intelligent routing of bets to optimal sportsbooks"""
 
-    def __init__(self, books: List[BookProfile]):
+    def __init__(self, books: list[BookProfile]):
         self.books = {book.name: book for book in books}
-        self.last_withdrawals: Dict[str, datetime] = {}
-        self.recent_bets: List[BetRoute] = []
+        self.last_withdrawals: dict[str, datetime] = {}
+        self.recent_bets: list[BetRoute] = []
 
     def route_bet(
         self,
@@ -251,9 +237,9 @@ class BookRouter:
         market: str,  # 'spread', 'total', 'prop'
         team: str,
         model_prob: float,
-        available_lines: Dict[str, Tuple[float, int]],  # book -> (line, odds)
+        available_lines: dict[str, tuple[float, int]],  # book -> (line, odds)
         desired_amount: float,
-        user_state: str = "NV"
+        user_state: str = "NV",
     ) -> BetRoute:
         """
         Route a bet to optimal book considering all factors.
@@ -271,7 +257,7 @@ class BookRouter:
             Optimal routing decision
         """
         best_route = None
-        best_net_ev = -float('inf')
+        best_net_ev = -float("inf")
 
         for book_name, (line, odds) in available_lines.items():
             if book_name not in self.books:
@@ -284,21 +270,25 @@ class BookRouter:
                 continue
 
             # Check limits
-            if market == 'spread' and desired_amount > book.max_bet_spread:
+            if market == "spread" and desired_amount > book.max_bet_spread:
                 actual_amount = book.max_bet_spread
-            elif market == 'total' and desired_amount > book.max_bet_total:
+            elif market == "total" and desired_amount > book.max_bet_total:
                 actual_amount = book.max_bet_total
-            elif market == 'prop' and desired_amount > book.max_bet_prop:
+            elif market == "prop" and desired_amount > book.max_bet_prop:
                 actual_amount = book.max_bet_prop
             else:
                 actual_amount = desired_amount
 
             # Check daily limit
-            today_total = sum(
-                r.bet_amount for r in self.recent_bets
-                if r.book == book_name and
-                (datetime.now() - book.last_bet).days == 0
-            ) if book.last_bet else 0
+            today_total = (
+                sum(
+                    r.bet_amount
+                    for r in self.recent_bets
+                    if r.book == book_name and (datetime.now() - book.last_bet).days == 0
+                )
+                if book.last_bet
+                else 0
+            )
 
             if today_total + actual_amount > book.daily_limit:
                 actual_amount = max(0, book.daily_limit - today_total)
@@ -312,10 +302,7 @@ class BookRouter:
 
             # Calculate friction
             friction_cost, friction_reasons = FrictionCalculator.calculate_total_friction(
-                actual_amount,
-                odds,
-                book,
-                self.last_withdrawals.get(book_name)
+                actual_amount, odds, book, self.last_withdrawals.get(book_name)
             )
 
             # Net EV
@@ -331,7 +318,9 @@ class BookRouter:
                 if book.lifetime_profit > 25000:
                     warnings.append("Significant lifetime profit - expect limits")
                 if book.active_bonus and book.active_bonus.rollover_remaining > 0:
-                    warnings.append(f"${book.active_bonus.rollover_remaining:.0f} rollover remaining")
+                    warnings.append(
+                        f"${book.active_bonus.rollover_remaining:.0f} rollover remaining"
+                    )
 
                 best_route = BetRoute(
                     bet_id=bet_id,
@@ -343,7 +332,7 @@ class BookRouter:
                     friction_cost=friction_cost,
                     net_ev=net_ev,
                     reasons=friction_reasons,
-                    warnings=warnings
+                    warnings=warnings,
                 )
 
         if best_route:
@@ -366,11 +355,7 @@ class BookRouter:
         else:
             return 1 + (100 / abs(odds))
 
-    def optimize_portfolio(
-        self,
-        bets: List[Dict],
-        target_exposure: float
-    ) -> List[BetRoute]:
+    def optimize_portfolio(self, bets: list[dict], target_exposure: float) -> list[BetRoute]:
         """
         Optimize routing for portfolio of bets.
 
@@ -379,7 +364,7 @@ class BookRouter:
         routes = []
 
         # Sort bets by edge (highest first)
-        sorted_bets = sorted(bets, key=lambda x: x['edge'], reverse=True)
+        sorted_bets = sorted(bets, key=lambda x: x["edge"], reverse=True)
 
         # Track book usage
         book_usage = {name: 0 for name in self.books}
@@ -390,16 +375,16 @@ class BookRouter:
             if remaining_exposure <= 0:
                 break
 
-            desired_amount = min(bet['desired_amount'], remaining_exposure)
+            desired_amount = min(bet["desired_amount"], remaining_exposure)
 
             # Route considering current book usage
             route = self.route_bet(
-                bet_id=bet['id'],
-                market=bet['market'],
-                team=bet['team'],
-                model_prob=bet['model_prob'],
-                available_lines=bet['available_lines'],
-                desired_amount=desired_amount
+                bet_id=bet["id"],
+                market=bet["market"],
+                team=bet["team"],
+                model_prob=bet["model_prob"],
+                available_lines=bet["available_lines"],
+                desired_amount=desired_amount,
             )
 
             if route:
@@ -408,7 +393,7 @@ class BookRouter:
 
         return routes
 
-    def generate_routing_report(self, routes: List[BetRoute]) -> str:
+    def generate_routing_report(self, routes: list[BetRoute]) -> str:
         """Generate comprehensive routing report"""
         report = []
         report.append("=" * 80)
@@ -435,13 +420,13 @@ class BookRouter:
         book_dist = {}
         for r in routes:
             if r.book not in book_dist:
-                book_dist[r.book] = {'count': 0, 'amount': 0, 'friction': 0}
-            book_dist[r.book]['count'] += 1
-            book_dist[r.book]['amount'] += r.bet_amount
-            book_dist[r.book]['friction'] += r.friction_cost
+                book_dist[r.book] = {"count": 0, "amount": 0, "friction": 0}
+            book_dist[r.book]["count"] += 1
+            book_dist[r.book]["amount"] += r.bet_amount
+            book_dist[r.book]["friction"] += r.friction_cost
 
         report.append("BOOK DISTRIBUTION:")
-        for book, stats in sorted(book_dist.items(), key=lambda x: x[1]['amount'], reverse=True):
+        for book, stats in sorted(book_dist.items(), key=lambda x: x[1]["amount"], reverse=True):
             report.append(f"  {book}:")
             report.append(f"    Bets: {stats['count']}")
             report.append(f"    Amount: ${stats['amount']:,.2f}")
@@ -489,15 +474,15 @@ def demo_book_router():
             lifetime_profit=15000,
             heat_level=0.1,  # Sharp books don't care about winners
             withdrawal_policy=WithdrawalPolicy(
-                fee_structure='flat',
+                fee_structure="flat",
                 fee_amount=50,
                 minimum_withdrawal=100,
                 processing_days=3,
                 crypto_available=True,
-                crypto_fee=0
+                crypto_fee=0,
             ),
             available_states=["NV", "International"],
-            vpn_friendly=True
+            vpn_friendly=True,
         ),
         BookProfile(
             name="DraftKings",
@@ -515,16 +500,13 @@ def demo_book_router():
                 rollover_requirement=10000,
                 rollover_remaining=3000,
                 qualifying_odds=-200,
-                expires=datetime.now() + timedelta(days=30)
+                expires=datetime.now() + timedelta(days=30),
             ),
             withdrawal_policy=WithdrawalPolicy(
-                fee_structure='free',
-                fee_amount=0,
-                minimum_withdrawal=20,
-                processing_days=1
+                fee_structure="free", fee_amount=0, minimum_withdrawal=20, processing_days=1
             ),
             available_states=["NV", "NJ", "PA", "MI", "IN", "IA", "IL", "CO", "WV", "TN", "AZ"],
-            vpn_friendly=False
+            vpn_friendly=False,
         ),
         BookProfile(
             name="BetOnline",
@@ -538,17 +520,17 @@ def demo_book_router():
             lifetime_profit=8000,
             heat_level=0.3,
             withdrawal_policy=WithdrawalPolicy(
-                fee_structure='flat',
+                fee_structure="flat",
                 fee_amount=35,
                 minimum_withdrawal=50,
                 processing_days=5,
                 free_withdrawal_frequency=30,
                 crypto_available=True,
-                crypto_fee=0
+                crypto_fee=0,
             ),
             available_states=["International"],
-            vpn_friendly=True
-        )
+            vpn_friendly=True,
+        ),
     ]
 
     # Create router
@@ -557,43 +539,40 @@ def demo_book_router():
     # Sample bets to route
     bets = [
         {
-            'id': 'KC_BUF_spread',
-            'market': 'spread',
-            'team': 'KC -3',
-            'model_prob': 0.58,
-            'edge': 0.035,
-            'desired_amount': 2000,
-            'available_lines': {
-                'Pinnacle': (-3, -105),
-                'DraftKings': (-3, -110),
-                'BetOnline': (-3, -107)
-            }
+            "id": "KC_BUF_spread",
+            "market": "spread",
+            "team": "KC -3",
+            "model_prob": 0.58,
+            "edge": 0.035,
+            "desired_amount": 2000,
+            "available_lines": {
+                "Pinnacle": (-3, -105),
+                "DraftKings": (-3, -110),
+                "BetOnline": (-3, -107),
+            },
         },
         {
-            'id': 'KC_BUF_total',
-            'market': 'total',
-            'team': 'Over 51',
-            'model_prob': 0.54,
-            'edge': 0.025,
-            'desired_amount': 1500,
-            'available_lines': {
-                'Pinnacle': (51, -108),
-                'DraftKings': (51.5, -110),
-                'BetOnline': (51, -105)
-            }
+            "id": "KC_BUF_total",
+            "market": "total",
+            "team": "Over 51",
+            "model_prob": 0.54,
+            "edge": 0.025,
+            "desired_amount": 1500,
+            "available_lines": {
+                "Pinnacle": (51, -108),
+                "DraftKings": (51.5, -110),
+                "BetOnline": (51, -105),
+            },
         },
         {
-            'id': 'Mahomes_passing',
-            'market': 'prop',
-            'team': 'Over 285.5',
-            'model_prob': 0.56,
-            'edge': 0.04,
-            'desired_amount': 500,
-            'available_lines': {
-                'DraftKings': (285.5, -115),
-                'BetOnline': (284.5, -110)
-            }
-        }
+            "id": "Mahomes_passing",
+            "market": "prop",
+            "team": "Over 285.5",
+            "model_prob": 0.56,
+            "edge": 0.04,
+            "desired_amount": 500,
+            "available_lines": {"DraftKings": (285.5, -115), "BetOnline": (284.5, -110)},
+        },
     ]
 
     # Route portfolio
@@ -622,8 +601,7 @@ def demo_book_router():
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     demo_book_router()

@@ -8,13 +8,12 @@ Key insight: Games are not independent - divisional rivals, same-week games,
 and conference matchups exhibit correlation that affects parlay EV.
 """
 
+import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from scipy import stats
-from scipy.optimize import minimize
-from typing import List, Tuple, Dict, Optional
-import json
-from pathlib import Path
 
 
 class GaussianCopulaParlay:
@@ -29,9 +28,9 @@ class GaussianCopulaParlay:
         self.correlation_matrix = None
         self.marginal_probs = None
 
-    def fit_correlation(self,
-                       outcomes: np.ndarray,
-                       features: Optional[np.ndarray] = None) -> np.ndarray:
+    def fit_correlation(
+        self, outcomes: np.ndarray, features: np.ndarray | None = None
+    ) -> np.ndarray:
         """
         Estimate correlation matrix from historical outcomes.
 
@@ -69,10 +68,9 @@ class GaussianCopulaParlay:
 
         return correlation_matrix
 
-    def simulate_parlay(self,
-                       marginal_probs: np.ndarray,
-                       correlation_matrix: np.ndarray,
-                       n_simulations: int = 10000) -> np.ndarray:
+    def simulate_parlay(
+        self, marginal_probs: np.ndarray, correlation_matrix: np.ndarray, n_simulations: int = 10000
+    ) -> np.ndarray:
         """
         Simulate correlated game outcomes for parlay pricing.
 
@@ -89,9 +87,7 @@ class GaussianCopulaParlay:
         # Sample from multivariate normal
         mean = np.zeros(n_games)
         normals = np.random.multivariate_normal(
-            mean=mean,
-            cov=correlation_matrix,
-            size=n_simulations
+            mean=mean, cov=correlation_matrix, size=n_simulations
         )
 
         # Transform to uniform via standard normal CDF
@@ -102,11 +98,13 @@ class GaussianCopulaParlay:
 
         return outcomes
 
-    def price_parlay(self,
-                    marginal_probs: np.ndarray,
-                    correlation_matrix: np.ndarray,
-                    parlay_odds: float,
-                    n_simulations: int = 10000) -> Dict:
+    def price_parlay(
+        self,
+        marginal_probs: np.ndarray,
+        correlation_matrix: np.ndarray,
+        parlay_odds: float,
+        n_simulations: int = 10000,
+    ) -> dict:
         """
         Price a parlay accounting for correlation.
 
@@ -138,22 +136,24 @@ class GaussianCopulaParlay:
         implied_prob = 1 / parlay_odds
 
         return {
-            'win_prob': win_prob,
-            'fair_odds': fair_odds,
-            'offered_odds': parlay_odds,
-            'implied_prob': implied_prob,
-            'edge': win_prob - implied_prob,
-            'ev': ev,
-            'ev_pct': ev_pct * 100,
+            "win_prob": win_prob,
+            "fair_odds": fair_odds,
+            "offered_odds": parlay_odds,
+            "implied_prob": implied_prob,
+            "edge": win_prob - implied_prob,
+            "ev": ev,
+            "ev_pct": ev_pct * 100,
         }
 
-    def price_teaser(self,
-                    marginal_probs: np.ndarray,
-                    spreads: np.ndarray,
-                    teaser_points: float,
-                    correlation_matrix: np.ndarray,
-                    teaser_odds: float,
-                    n_simulations: int = 10000) -> Dict:
+    def price_teaser(
+        self,
+        marginal_probs: np.ndarray,
+        spreads: np.ndarray,
+        teaser_points: float,
+        correlation_matrix: np.ndarray,
+        teaser_odds: float,
+        n_simulations: int = 10000,
+    ) -> dict:
         """
         Price a teaser (adjusted spreads, reduced payout).
 
@@ -201,31 +201,33 @@ def estimate_game_correlation(games_df: pd.DataFrame) -> pd.DataFrame:
             corr = 0.0
 
             # Same week
-            if game1['season'] == game2['season'] and game1['week'] == game2['week']:
+            if game1["season"] == game2["season"] and game1["week"] == game2["week"]:
                 corr += 0.05
 
             # Shared team
-            shared_teams = set([game1['home_team'], game1['away_team']]) & \
-                          set([game2['home_team'], game2['away_team']])
+            shared_teams = set([game1["home_team"], game1["away_team"]]) & set(
+                [game2["home_team"], game2["away_team"]]
+            )
             if len(shared_teams) > 0:
                 corr += 0.15
 
             # Same division
             # (Would need division lookup table)
 
-            correlations.append({
-                'game1_id': idx1,
-                'game2_id': idx2,
-                'correlation': corr,
-            })
+            correlations.append(
+                {
+                    "game1_id": idx1,
+                    "game2_id": idx2,
+                    "correlation": corr,
+                }
+            )
 
     return pd.DataFrame(correlations)
 
 
-def backtest_parlay_pricing(games_df: pd.DataFrame,
-                            model_probs: np.ndarray,
-                            parlay_size: int = 2,
-                            n_trials: int = 100) -> Dict:
+def backtest_parlay_pricing(
+    games_df: pd.DataFrame, model_probs: np.ndarray, parlay_size: int = 2, n_trials: int = 100
+) -> dict:
     """
     Backtest parlay pricing with copula vs independence assumption.
 
@@ -242,11 +244,11 @@ def backtest_parlay_pricing(games_df: pd.DataFrame,
 
     # Prepare outcomes matrix for recent games (last 500)
     recent_df = games_df.tail(500).copy()
-    outcomes = (recent_df['home_score'] > recent_df['away_score']).values.reshape(-1, 1)
+    (recent_df["home_score"] > recent_df["away_score"]).values.reshape(-1, 1)
 
     # Build correlation matrix (simplified: use same week as proxy)
     # In production, would use proper temporal correlation estimation
-    n_recent = len(recent_df)
+    len(recent_df)
 
     # For simplicity, assume small correlation (0.05) between all games
     # This is a placeholder - real implementation would estimate from data
@@ -255,8 +257,8 @@ def backtest_parlay_pricing(games_df: pd.DataFrame,
     np.fill_diagonal(correlation_matrix, 1.0)
 
     results = {
-        'independent': [],
-        'copula': [],
+        "independent": [],
+        "copula": [],
     }
 
     for trial in range(n_trials):
@@ -265,8 +267,10 @@ def backtest_parlay_pricing(games_df: pd.DataFrame,
         sample_probs = model_probs[sample_indices]
 
         # True outcomes
-        true_outcomes = (games_df.iloc[sample_indices]['home_score'] >
-                        games_df.iloc[sample_indices]['away_score']).values
+        true_outcomes = (
+            games_df.iloc[sample_indices]["home_score"]
+            > games_df.iloc[sample_indices]["away_score"]
+        ).values
 
         all_won = true_outcomes.all()
 
@@ -279,37 +283,41 @@ def backtest_parlay_pricing(games_df: pd.DataFrame,
             marginal_probs=sample_probs,
             correlation_matrix=correlation_matrix,
             parlay_odds=independent_fair_odds,  # Compare against independence
-            n_simulations=1000
+            n_simulations=1000,
         )
 
-        results['independent'].append({
-            'win_prob': independent_prob,
-            'fair_odds': independent_fair_odds,
-            'actual_won': all_won,
-        })
+        results["independent"].append(
+            {
+                "win_prob": independent_prob,
+                "fair_odds": independent_fair_odds,
+                "actual_won": all_won,
+            }
+        )
 
-        results['copula'].append({
-            'win_prob': copula_result['win_prob'],
-            'fair_odds': copula_result['fair_odds'],
-            'actual_won': all_won,
-        })
+        results["copula"].append(
+            {
+                "win_prob": copula_result["win_prob"],
+                "fair_odds": copula_result["fair_odds"],
+                "actual_won": all_won,
+            }
+        )
 
     # Aggregate results
-    independent_win_prob_mean = np.mean([r['win_prob'] for r in results['independent']])
-    copula_win_prob_mean = np.mean([r['win_prob'] for r in results['copula']])
+    independent_win_prob_mean = np.mean([r["win_prob"] for r in results["independent"]])
+    copula_win_prob_mean = np.mean([r["win_prob"] for r in results["copula"]])
 
-    actual_win_rate = np.mean([r['actual_won'] for r in results['independent']])
+    actual_win_rate = np.mean([r["actual_won"] for r in results["independent"]])
 
     return {
-        'n_trials': n_trials,
-        'parlay_size': parlay_size,
-        'actual_win_rate': actual_win_rate,
-        'independent_predicted': independent_win_prob_mean,
-        'copula_predicted': copula_win_prob_mean,
-        'independent_error': abs(independent_win_prob_mean - actual_win_rate),
-        'copula_error': abs(copula_win_prob_mean - actual_win_rate),
-        'copula_improvement': abs(independent_win_prob_mean - actual_win_rate) - \
-                             abs(copula_win_prob_mean - actual_win_rate),
+        "n_trials": n_trials,
+        "parlay_size": parlay_size,
+        "actual_win_rate": actual_win_rate,
+        "independent_predicted": independent_win_prob_mean,
+        "copula_predicted": copula_win_prob_mean,
+        "independent_error": abs(independent_win_prob_mean - actual_win_rate),
+        "copula_error": abs(copula_win_prob_mean - actual_win_rate),
+        "copula_improvement": abs(independent_win_prob_mean - actual_win_rate)
+        - abs(copula_win_prob_mean - actual_win_rate),
     }
 
 
@@ -319,15 +327,15 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(description='Copula parlay pricing')
-    parser.add_argument('--data', type=str, required=True,
-                        help='Path to games CSV with model predictions')
-    parser.add_argument('--output', type=str, default='results/copula/parlay_analysis.json',
-                        help='Output path')
-    parser.add_argument('--parlay-size', type=int, default=2,
-                        help='Parlay size (number of games)')
-    parser.add_argument('--n-trials', type=int, default=100,
-                        help='Number of backtests')
+    parser = argparse.ArgumentParser(description="Copula parlay pricing")
+    parser.add_argument(
+        "--data", type=str, required=True, help="Path to games CSV with model predictions"
+    )
+    parser.add_argument(
+        "--output", type=str, default="results/copula/parlay_analysis.json", help="Output path"
+    )
+    parser.add_argument("--parlay-size", type=int, default=2, help="Parlay size (number of games)")
+    parser.add_argument("--n-trials", type=int, default=100, help="Number of backtests")
 
     args = parser.parse_args()
 
@@ -340,9 +348,9 @@ def main():
     df = pd.read_csv(args.data)
 
     # Check for model probabilities
-    if 'model_prob' not in df.columns and 'gnn_win_prob' in df.columns:
-        df['model_prob'] = df['gnn_win_prob']
-    elif 'model_prob' not in df.columns:
+    if "model_prob" not in df.columns and "gnn_win_prob" in df.columns:
+        df["model_prob"] = df["gnn_win_prob"]
+    elif "model_prob" not in df.columns:
         print("ERROR: No model_prob column found")
         return
 
@@ -352,29 +360,29 @@ def main():
     print(f"\nBacktesting {args.parlay_size}-game parlays ({args.n_trials} trials)...")
     results = backtest_parlay_pricing(
         games_df=df,
-        model_probs=df['model_prob'].values,
+        model_probs=df["model_prob"].values,
         parlay_size=args.parlay_size,
-        n_trials=args.n_trials
+        n_trials=args.n_trials,
     )
 
     # Save results
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         json.dump(results, f, indent=2)
 
     print(f"\n{'=' * 80}")
     print("Results")
     print(f"{'=' * 80}")
     print(f"\nActual win rate: {results['actual_win_rate']:.3f}")
-    print(f"\nIndependence assumption:")
+    print("\nIndependence assumption:")
     print(f"  Predicted: {results['independent_predicted']:.3f}")
     print(f"  Error: {results['independent_error']:.4f}")
-    print(f"\nCopula model:")
+    print("\nCopula model:")
     print(f"  Predicted: {results['copula_predicted']:.3f}")
     print(f"  Error: {results['copula_error']:.4f}")
     print(f"\nImprovement: {results['copula_improvement']:.4f}")
 
-    if results['copula_improvement'] > 0:
+    if results["copula_improvement"] > 0:
         print("✓ Copula model more accurate than independence")
     else:
         print("✗ Copula model not improving over independence")
@@ -384,5 +392,5 @@ def main():
     print(f"{'=' * 80}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

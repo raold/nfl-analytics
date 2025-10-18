@@ -343,7 +343,6 @@ class SyncSafetyManager:
         """
         base_path = Path(file_path)
         parent = base_path.parent
-        name = base_path.name
 
         # Google Drive creates conflict files with pattern:
         # filename (Conflicted copy 2024-01-01 123456).ext

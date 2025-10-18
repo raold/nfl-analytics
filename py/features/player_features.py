@@ -26,9 +26,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -69,9 +67,7 @@ class PlayerFeatureEngineer:
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_play_by_play(
-        self, start_season: int, end_season: int
-    ) -> pd.DataFrame:
+    def load_play_by_play(self, start_season: int, end_season: int) -> pd.DataFrame:
         """
         Load play-by-play data from database.
 
@@ -82,9 +78,7 @@ class PlayerFeatureEngineer:
         Returns:
             Play-by-play dataframe
         """
-        logger.info(
-            f"Loading play-by-play data ({start_season}-{end_season})..."
-        )
+        logger.info(f"Loading play-by-play data ({start_season}-{end_season})...")
 
         query = f"""
             SELECT
@@ -215,9 +209,7 @@ class PlayerFeatureEngineer:
 
         return games
 
-    def aggregate_player_stats(
-        self, pbp: pd.DataFrame, position: str
-    ) -> pd.DataFrame:
+    def aggregate_player_stats(self, pbp: pd.DataFrame, position: str) -> pd.DataFrame:
         """
         Aggregate player statistics from play-by-play.
 
@@ -235,7 +227,14 @@ class PlayerFeatureEngineer:
             passing = pbp[pbp["passer_player_id"].notna()].copy()
             stats = (
                 passing.groupby(
-                    ["game_id", "season", "week", "passer_player_id", "passer_player_name", "posteam"]
+                    [
+                        "game_id",
+                        "season",
+                        "week",
+                        "passer_player_id",
+                        "passer_player_name",
+                        "posteam",
+                    ]
                 )
                 .agg(
                     pass_attempts=("passer_player_id", "count"),
@@ -264,7 +263,14 @@ class PlayerFeatureEngineer:
             rushing = pbp[pbp["rusher_player_id"].notna()].copy()
             stats = (
                 rushing.groupby(
-                    ["game_id", "season", "week", "rusher_player_id", "rusher_player_name", "posteam"]
+                    [
+                        "game_id",
+                        "season",
+                        "week",
+                        "rusher_player_id",
+                        "rusher_player_name",
+                        "posteam",
+                    ]
                 )
                 .agg(
                     rush_attempts=("rusher_player_id", "count"),
@@ -290,7 +296,14 @@ class PlayerFeatureEngineer:
             receiving = pbp[pbp["receiver_player_id"].notna()].copy()
             stats = (
                 receiving.groupby(
-                    ["game_id", "season", "week", "receiver_player_id", "receiver_player_name", "posteam"]
+                    [
+                        "game_id",
+                        "season",
+                        "week",
+                        "receiver_player_id",
+                        "receiver_player_name",
+                        "posteam",
+                    ]
                 )
                 .agg(
                     targets=("receiver_player_id", "count"),
@@ -321,7 +334,7 @@ class PlayerFeatureEngineer:
         return stats
 
     def calculate_rolling_features(
-        self, stats: pd.DataFrame, windows: List[int] = [3, 5]
+        self, stats: pd.DataFrame, windows: list[int] = [3, 5]
     ) -> pd.DataFrame:
         """
         Calculate rolling averages for player stats.
@@ -357,23 +370,19 @@ class PlayerFeatureEngineer:
         # Calculate rolling features
         for window in windows:
             for col in stat_cols:
-                stats[f"{col}_last{window}"] = (
-                    stats.groupby("player_id")[col]
-                    .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+                stats[f"{col}_last{window}"] = stats.groupby("player_id")[col].transform(
+                    lambda x: x.shift(1).rolling(window, min_periods=1).mean()
                 )
 
         # Season totals (up to current game)
         for col in stat_cols:
-            stats[f"{col}_season"] = (
-                stats.groupby(["player_id", "season"])[col]
-                .transform(lambda x: x.shift(1).expanding(min_periods=1).sum())
+            stats[f"{col}_season"] = stats.groupby(["player_id", "season"])[col].transform(
+                lambda x: x.shift(1).expanding(min_periods=1).sum()
             )
 
         return stats
 
-    def add_opponent_features(
-        self, stats: pd.DataFrame, pbp: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_opponent_features(self, stats: pd.DataFrame, pbp: pd.DataFrame) -> pd.DataFrame:
         """
         Add opponent defensive strength features.
 
@@ -415,16 +424,13 @@ class PlayerFeatureEngineer:
 
         # Calculate rolling average for opponent
         opponent_pass_def = opponent_pass_def.sort_values(["defteam", "season", "week"])
-        opponent_pass_def["opponent_pass_yards_allowed_avg"] = (
-            opponent_pass_def.groupby("defteam")["pass_yards_allowed"]
-            .transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
-        )
+        opponent_pass_def["opponent_pass_yards_allowed_avg"] = opponent_pass_def.groupby("defteam")[
+            "pass_yards_allowed"
+        ].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
 
         # Merge opponent features
         stats = stats.merge(
-            opponent_pass_def[
-                ["season", "week", "defteam", "opponent_pass_yards_allowed_avg"]
-            ],
+            opponent_pass_def[["season", "week", "defteam", "opponent_pass_yards_allowed_avg"]],
             left_on=["season", "week", "opponent"],
             right_on=["season", "week", "defteam"],
             how="left",
@@ -434,9 +440,7 @@ class PlayerFeatureEngineer:
 
         return stats
 
-    def add_game_script_features(
-        self, stats: pd.DataFrame, games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_game_script_features(self, stats: pd.DataFrame, games: pd.DataFrame) -> pd.DataFrame:
         """
         Add game script features (spread, total, implied team total).
 
@@ -450,12 +454,8 @@ class PlayerFeatureEngineer:
         logger.info("Adding game script features...")
 
         # Calculate implied team totals
-        games["implied_home_total"] = (
-            games["total_close"] / 2 - games["spread_close"] / 2
-        )
-        games["implied_away_total"] = (
-            games["total_close"] / 2 + games["spread_close"] / 2
-        )
+        games["implied_home_total"] = games["total_close"] / 2 - games["spread_close"] / 2
+        games["implied_away_total"] = games["total_close"] / 2 + games["spread_close"] / 2
 
         # Merge for home teams
         stats = stats.merge(
@@ -525,9 +525,7 @@ class PlayerFeatureEngineer:
 
         return stats
 
-    def add_weather_features(
-        self, stats: pd.DataFrame, games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_weather_features(self, stats: pd.DataFrame, games: pd.DataFrame) -> pd.DataFrame:
         """
         Add weather features.
 
@@ -555,8 +553,8 @@ class PlayerFeatureEngineer:
         )
 
         # Convert weather from TEXT to numeric (handle missing/invalid values)
-        stats["weather_temp"] = pd.to_numeric(stats["temp"], errors='coerce').fillna(70)
-        stats["weather_wind_mph"] = pd.to_numeric(stats["wind"], errors='coerce').fillna(0)
+        stats["weather_temp"] = pd.to_numeric(stats["temp"], errors="coerce").fillna(70)
+        stats["weather_wind_mph"] = pd.to_numeric(stats["wind"], errors="coerce").fillna(0)
 
         # Encode roof/surface
         stats["is_dome"] = (stats["roof"] == "dome").astype(int)
@@ -572,7 +570,7 @@ class PlayerFeatureEngineer:
         self,
         start_season: int,
         end_season: int,
-        positions: Optional[List[str]] = None,
+        positions: list[str] | None = None,
     ) -> pd.DataFrame:
         """
         Generate all player features for given seasons.
@@ -585,9 +583,7 @@ class PlayerFeatureEngineer:
         Returns:
             Complete player features dataframe
         """
-        logger.info(
-            f"Generating player features ({start_season}-{end_season})..."
-        )
+        logger.info(f"Generating player features ({start_season}-{end_season})...")
 
         if positions is None:
             positions = ["QB", "RB", "WR", "TE"]

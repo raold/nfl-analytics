@@ -51,7 +51,6 @@ import json
 import random
 from collections import deque
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -59,7 +58,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 
 # ============================================================================
 # Utilities
@@ -245,7 +243,7 @@ class IQLAgent:
         For τ > 0.5, V(s) is optimistic (upper tail).
         """
         weight = torch.where(diff > 0, expectile, 1 - expectile)
-        return (weight * diff ** 2).mean()
+        return (weight * diff**2).mean()
 
     def update_v(
         self, states: torch.Tensor, actions: torch.Tensor, next_states: torch.Tensor
@@ -460,7 +458,9 @@ def train_iql(
     """Train IQL agent on offline dataset."""
     populate_replay_buffer(agent, states, actions, rewards)
 
-    print(f"Training IQL (expectile={agent.expectile}, temperature={agent.temperature}) for {epochs} epochs...")
+    print(
+        f"Training IQL (expectile={agent.expectile}, temperature={agent.temperature}) for {epochs} epochs..."
+    )
     print(f"Device: {agent.device}, Batch size: {batch_size}, Buffer: {len(agent.replay_buffer)}")
 
     metrics_log = []
@@ -484,13 +484,15 @@ def train_iql(
         avg_v = np.mean(epoch_v_means)
         avg_q = np.mean(epoch_q_means)
 
-        metrics_log.append({
-            "epoch": epoch + 1,
-            "v_loss": avg_v_loss,
-            "q_loss": avg_q_loss,
-            "v_mean": avg_v,
-            "q_mean": avg_q,
-        })
+        metrics_log.append(
+            {
+                "epoch": epoch + 1,
+                "v_loss": avg_v_loss,
+                "q_loss": avg_q_loss,
+                "v_mean": avg_v,
+                "q_mean": avg_q,
+            }
+        )
 
         if (epoch + 1) % log_freq == 0 or epoch == 0:
             print(
@@ -549,8 +551,12 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--batch-size", type=int, default=128, help="Batch size")
     ap.add_argument("--lr-v", type=float, default=3e-4, help="Learning rate for V-network")
     ap.add_argument("--lr-q", type=float, default=3e-4, help="Learning rate for Q-network")
-    ap.add_argument("--expectile", type=float, default=0.9, help="Expectile for V-learning (0.7-0.95)")
-    ap.add_argument("--temperature", type=float, default=3.0, help="Temperature for policy extraction")
+    ap.add_argument(
+        "--expectile", type=float, default=0.9, help="Expectile for V-learning (0.7-0.95)"
+    )
+    ap.add_argument(
+        "--temperature", type=float, default=3.0, help="Temperature for policy extraction"
+    )
     ap.add_argument("--gamma", type=float, default=0.99, help="Discount factor")
     ap.add_argument("--device", default="auto", help="Device: auto/cpu/cuda/mps")
     ap.add_argument("--seed", type=int, default=42, help="Random seed")
@@ -596,7 +602,9 @@ def main():
         hidden_dims=args.hidden_dims,
     )
 
-    print(f"IQL hyperparameters: expectile={args.expectile}, temperature={args.temperature}, lr_v={args.lr_v}, lr_q={args.lr_q}")
+    print(
+        f"IQL hyperparameters: expectile={args.expectile}, temperature={args.temperature}, lr_v={args.lr_v}, lr_q={args.lr_q}"
+    )
 
     if args.load:
         print(f"Loading checkpoint from {args.load}...")

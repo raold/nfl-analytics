@@ -13,35 +13,31 @@ Features include:
 - Credible intervals for uncertainty quantification
 """
 
+import logging
+
 import numpy as np
 import pandas as pd
 import psycopg2
-from typing import Dict, List, Optional, Tuple
-import logging
-from datetime import datetime, timedelta
-import json
-from pathlib import Path
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'dbname': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions'
+    "host": "localhost",
+    "port": 5544,
+    "dbname": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
 
 
 class BayesianPlayerFeatures:
     """Extract Bayesian hierarchical model features for player props."""
 
-    def __init__(self, db_config: Dict = None):
+    def __init__(self, db_config: dict = None):
         """Initialize with database configuration."""
         self.db_config = db_config or DB_CONFIG
         self.conn = None
@@ -57,10 +53,7 @@ class BayesianPlayerFeatures:
             raise
 
     def fetch_player_ratings(
-        self,
-        stat_type: str,
-        season: int,
-        model_version: str = 'hierarchical_v1.0'
+        self, stat_type: str, season: int, model_version: str = "hierarchical_v1.0"
     ) -> pd.DataFrame:
         """
         Fetch Bayesian player ratings from database.
@@ -106,11 +99,7 @@ class BayesianPlayerFeatures:
         """
 
         try:
-            df = pd.read_sql_query(
-                query,
-                self.conn,
-                params=(stat_type, season, model_version)
-            )
+            df = pd.read_sql_query(query, self.conn, params=(stat_type, season, model_version))
             logger.info(f"Fetched {len(df)} player ratings for {stat_type} in {season}")
             return df
         except Exception as e:
@@ -118,9 +107,7 @@ class BayesianPlayerFeatures:
             return pd.DataFrame()
 
     def calculate_hierarchical_features(
-        self,
-        player_ratings: pd.DataFrame,
-        opponent_team: Optional[str] = None
+        self, player_ratings: pd.DataFrame, opponent_team: str | None = None
     ) -> pd.DataFrame:
         """
         Calculate hierarchical Bayesian features for modeling.
@@ -142,83 +129,93 @@ class BayesianPlayerFeatures:
         features = player_ratings.copy()
 
         # Core Bayesian estimates
-        features['bayes_prediction'] = features['rating_mean']
-        features['bayes_uncertainty'] = features['rating_sd']
+        features["bayes_prediction"] = features["rating_mean"]
+        features["bayes_uncertainty"] = features["rating_sd"]
 
         # Credible interval features
-        features['bayes_ci_width'] = features['rating_q95'] - features['rating_q05']
-        features['bayes_ci_lower'] = features['rating_q05']
-        features['bayes_ci_upper'] = features['rating_q95']
+        features["bayes_ci_width"] = features["rating_q95"] - features["rating_q05"]
+        features["bayes_ci_lower"] = features["rating_q05"]
+        features["bayes_ci_upper"] = features["rating_q95"]
 
         # Shrinkage features (how much player differs from group)
-        features['shrinkage_from_position'] = (
-            features['rating_mean'] - features['position_group_mean']
+        features["shrinkage_from_position"] = (
+            features["rating_mean"] - features["position_group_mean"]
         )
-        features['shrinkage_ratio'] = features.apply(
-            lambda x: x['shrinkage_from_position'] / x['position_group_mean']
-            if x['position_group_mean'] != 0 else 0,
-            axis=1
+        features["shrinkage_ratio"] = features.apply(
+            lambda x: (
+                x["shrinkage_from_position"] / x["position_group_mean"]
+                if x["position_group_mean"] != 0
+                else 0
+            ),
+            axis=1,
         )
 
         # Team effects
-        features['team_offensive_effect'] = features['team_effect']
+        features["team_offensive_effect"] = features["team_effect"]
 
         # Data quality indicators
-        features['bayes_data_strength'] = features['n_games_observed'] / 17  # Normalize by full season
-        features['bayes_ess_quality'] = features['effective_sample_size'] / 1000  # Normalize ESS
+        features["bayes_data_strength"] = (
+            features["n_games_observed"] / 17
+        )  # Normalize by full season
+        features["bayes_ess_quality"] = features["effective_sample_size"] / 1000  # Normalize ESS
 
         # Uncertainty-adjusted predictions (mean ± k*SD for different confidence levels)
-        features['bayes_conservative'] = features['rating_mean'] - features['rating_sd']  # ~16th percentile
-        features['bayes_aggressive'] = features['rating_mean'] + features['rating_sd']    # ~84th percentile
+        features["bayes_conservative"] = (
+            features["rating_mean"] - features["rating_sd"]
+        )  # ~16th percentile
+        features["bayes_aggressive"] = (
+            features["rating_mean"] + features["rating_sd"]
+        )  # ~84th percentile
 
         # Experience interaction with uncertainty
-        features['experience_uncertainty_interaction'] = (
-            features['years_exp'] * features['bayes_uncertainty']
+        features["experience_uncertainty_interaction"] = (
+            features["years_exp"] * features["bayes_uncertainty"]
         )
 
         # Flag for high uncertainty (useful for ensemble)
-        features['high_uncertainty_flag'] = (features['bayes_uncertainty'] >
-                                            features['bayes_uncertainty'].quantile(0.75)).astype(int)
+        features["high_uncertainty_flag"] = (
+            features["bayes_uncertainty"] > features["bayes_uncertainty"].quantile(0.75)
+        ).astype(int)
 
         # Reliability score (combines convergence and data strength)
-        features['bayes_reliability_score'] = (
-            (1 / features['rhat']) *  # Better convergence = higher score
-            features['bayes_data_strength'] *  # More data = higher score
-            (1 / (1 + features['bayes_uncertainty']))  # Lower uncertainty = higher score
+        features["bayes_reliability_score"] = (
+            (1 / features["rhat"])  # Better convergence = higher score
+            * features["bayes_data_strength"]  # More data = higher score
+            * (1 / (1 + features["bayes_uncertainty"]))  # Lower uncertainty = higher score
         )
 
         # Select final features
         feature_cols = [
-            'player_id',
-            'player_name',
-            'position',
-            'current_team',
-            'bayes_prediction',
-            'bayes_uncertainty',
-            'bayes_ci_width',
-            'bayes_ci_lower',
-            'bayes_ci_upper',
-            'bayes_conservative',
-            'bayes_aggressive',
-            'shrinkage_from_position',
-            'shrinkage_ratio',
-            'team_offensive_effect',
-            'bayes_data_strength',
-            'bayes_ess_quality',
-            'experience_uncertainty_interaction',
-            'high_uncertainty_flag',
-            'bayes_reliability_score'
+            "player_id",
+            "player_name",
+            "position",
+            "current_team",
+            "bayes_prediction",
+            "bayes_uncertainty",
+            "bayes_ci_width",
+            "bayes_ci_lower",
+            "bayes_ci_upper",
+            "bayes_conservative",
+            "bayes_aggressive",
+            "shrinkage_from_position",
+            "shrinkage_ratio",
+            "team_offensive_effect",
+            "bayes_data_strength",
+            "bayes_ess_quality",
+            "experience_uncertainty_interaction",
+            "high_uncertainty_flag",
+            "bayes_reliability_score",
         ]
 
         return features[feature_cols]
 
     def get_player_props_features(
         self,
-        players: List[str],
+        players: list[str],
         stat_type: str,
         season: int,
-        week: Optional[int] = None,
-        opponent_teams: Optional[Dict[str, str]] = None
+        week: int | None = None,
+        opponent_teams: dict[str, str] | None = None,
     ) -> pd.DataFrame:
         """
         Get Bayesian features for specific players and matchups.
@@ -237,7 +234,7 @@ class BayesianPlayerFeatures:
         all_ratings = self.fetch_player_ratings(stat_type, season)
 
         # Filter to requested players
-        player_ratings = all_ratings[all_ratings['player_id'].isin(players)]
+        player_ratings = all_ratings[all_ratings["player_id"].isin(players)]
 
         if len(player_ratings) == 0:
             logger.warning(f"No Bayesian ratings found for players: {players}")
@@ -258,10 +255,7 @@ class BayesianPlayerFeatures:
         return features
 
     def _add_matchup_adjustments(
-        self,
-        features: pd.DataFrame,
-        opponent_teams: Dict[str, str],
-        season: int
+        self, features: pd.DataFrame, opponent_teams: dict[str, str], season: int
     ) -> pd.DataFrame:
         """Add opponent-specific adjustments based on defensive strength."""
 
@@ -291,37 +285,33 @@ class BayesianPlayerFeatures:
 
             # Map opponent ratings to players
             for player_id, opponent in opponent_teams.items():
-                if opponent in defense_ratings['team'].values:
-                    def_rating = defense_ratings[defense_ratings['team'] == opponent].iloc[0]
+                if opponent in defense_ratings["team"].values:
+                    def_rating = defense_ratings[defense_ratings["team"] == opponent].iloc[0]
 
                     # Add defensive adjustment to features
-                    player_mask = features['player_id'] == player_id
+                    player_mask = features["player_id"] == player_id
                     if player_mask.any():
                         # Adjust based on stat type
-                        if 'passing' in features.columns[0]:
-                            adjustment = def_rating['pass_defense_rating']
-                        elif 'rushing' in features.columns[0]:
-                            adjustment = def_rating['rush_defense_rating']
+                        if "passing" in features.columns[0]:
+                            adjustment = def_rating["pass_defense_rating"]
+                        elif "rushing" in features.columns[0]:
+                            adjustment = def_rating["rush_defense_rating"]
                         else:
-                            adjustment = def_rating['rec_defense_rating']
+                            adjustment = def_rating["rec_defense_rating"]
 
-                        features.loc[player_mask, 'opponent_adjustment'] = adjustment
-                        features.loc[player_mask, 'bayes_matchup_adjusted'] = (
-                            features.loc[player_mask, 'bayes_prediction'] + adjustment
+                        features.loc[player_mask, "opponent_adjustment"] = adjustment
+                        features.loc[player_mask, "bayes_matchup_adjusted"] = (
+                            features.loc[player_mask, "bayes_prediction"] + adjustment
                         )
 
         except Exception as e:
             logger.warning(f"Could not add matchup adjustments: {e}")
-            features['opponent_adjustment'] = 0
-            features['bayes_matchup_adjusted'] = features['bayes_prediction']
+            features["opponent_adjustment"] = 0
+            features["bayes_matchup_adjusted"] = features["bayes_prediction"]
 
         return features
 
-    def _add_temporal_adjustments(
-        self,
-        features: pd.DataFrame,
-        week: int
-    ) -> pd.DataFrame:
+    def _add_temporal_adjustments(self, features: pd.DataFrame, week: int) -> pd.DataFrame:
         """Add week-based temporal adjustments for trend/momentum."""
 
         # Simple linear trend adjustment (could be enhanced with actual trend data)
@@ -329,44 +319,43 @@ class BayesianPlayerFeatures:
         season_progress = week / 18  # Normalized week
 
         # Reduce uncertainty as season progresses (more data available)
-        features['temporal_uncertainty_factor'] = 1 - (0.3 * season_progress)
-        features['bayes_uncertainty_adjusted'] = (
-            features['bayes_uncertainty'] * features['temporal_uncertainty_factor']
+        features["temporal_uncertainty_factor"] = 1 - (0.3 * season_progress)
+        features["bayes_uncertainty_adjusted"] = (
+            features["bayes_uncertainty"] * features["temporal_uncertainty_factor"]
         )
 
         # Adjust credible intervals
-        features['bayes_ci_width_adjusted'] = (
-            features['bayes_ci_width'] * features['temporal_uncertainty_factor']
+        features["bayes_ci_width_adjusted"] = (
+            features["bayes_ci_width"] * features["temporal_uncertainty_factor"]
         )
 
         return features
 
-    def _empty_features_df(self, players: List[str]) -> pd.DataFrame:
+    def _empty_features_df(self, players: list[str]) -> pd.DataFrame:
         """Create empty features DataFrame with proper schema."""
-        return pd.DataFrame({
-            'player_id': players,
-            'bayes_prediction': np.nan,
-            'bayes_uncertainty': np.nan,
-            'bayes_ci_width': np.nan,
-            'bayes_ci_lower': np.nan,
-            'bayes_ci_upper': np.nan,
-            'bayes_conservative': np.nan,
-            'bayes_aggressive': np.nan,
-            'shrinkage_from_position': np.nan,
-            'shrinkage_ratio': np.nan,
-            'team_offensive_effect': np.nan,
-            'bayes_data_strength': 0,
-            'bayes_ess_quality': 0,
-            'experience_uncertainty_interaction': np.nan,
-            'high_uncertainty_flag': 0,
-            'bayes_reliability_score': 0
-        })
+        return pd.DataFrame(
+            {
+                "player_id": players,
+                "bayes_prediction": np.nan,
+                "bayes_uncertainty": np.nan,
+                "bayes_ci_width": np.nan,
+                "bayes_ci_lower": np.nan,
+                "bayes_ci_upper": np.nan,
+                "bayes_conservative": np.nan,
+                "bayes_aggressive": np.nan,
+                "shrinkage_from_position": np.nan,
+                "shrinkage_ratio": np.nan,
+                "team_offensive_effect": np.nan,
+                "bayes_data_strength": 0,
+                "bayes_ess_quality": 0,
+                "experience_uncertainty_interaction": np.nan,
+                "high_uncertainty_flag": 0,
+                "bayes_reliability_score": 0,
+            }
+        )
 
     def create_ensemble_features(
-        self,
-        xgboost_predictions: pd.DataFrame,
-        stat_type: str,
-        season: int
+        self, xgboost_predictions: pd.DataFrame, stat_type: str, season: int
     ) -> pd.DataFrame:
         """
         Create ensemble features combining XGBoost and Bayesian predictions.
@@ -380,58 +369,54 @@ class BayesianPlayerFeatures:
             DataFrame with ensemble features
         """
         # Get Bayesian features for all players in XGBoost predictions
-        player_ids = xgboost_predictions['player_id'].unique().tolist()
+        player_ids = xgboost_predictions["player_id"].unique().tolist()
         bayes_features = self.get_player_props_features(player_ids, stat_type, season)
 
         # Merge with XGBoost predictions
         ensemble_df = xgboost_predictions.merge(
-            bayes_features,
-            on='player_id',
-            how='left',
-            suffixes=('_xgb', '_bayes')
+            bayes_features, on="player_id", how="left", suffixes=("_xgb", "_bayes")
         )
 
         # Create ensemble features
         # 1. Simple average
-        ensemble_df['ensemble_mean'] = (
-            ensemble_df['prediction_xgb'] + ensemble_df['bayes_prediction']
+        ensemble_df["ensemble_mean"] = (
+            ensemble_df["prediction_xgb"] + ensemble_df["bayes_prediction"]
         ) / 2
 
         # 2. Weighted average based on uncertainty
         # Lower uncertainty = higher weight
-        xgb_weight = 1 / (1 + ensemble_df.get('prediction_std_xgb', 1))
-        bayes_weight = 1 / (1 + ensemble_df['bayes_uncertainty'])
+        xgb_weight = 1 / (1 + ensemble_df.get("prediction_std_xgb", 1))
+        bayes_weight = 1 / (1 + ensemble_df["bayes_uncertainty"])
         total_weight = xgb_weight + bayes_weight
 
-        ensemble_df['ensemble_weighted'] = (
-            (xgb_weight * ensemble_df['prediction_xgb'] +
-             bayes_weight * ensemble_df['bayes_prediction']) /
-            total_weight
-        )
+        ensemble_df["ensemble_weighted"] = (
+            xgb_weight * ensemble_df["prediction_xgb"]
+            + bayes_weight * ensemble_df["bayes_prediction"]
+        ) / total_weight
 
         # 3. Reliability-weighted ensemble
         # Use Bayesian reliability score
-        reliability_weight = ensemble_df['bayes_reliability_score']
-        ensemble_df['ensemble_reliability'] = (
-            reliability_weight * ensemble_df['bayes_prediction'] +
-            (1 - reliability_weight) * ensemble_df['prediction_xgb']
+        reliability_weight = ensemble_df["bayes_reliability_score"]
+        ensemble_df["ensemble_reliability"] = (
+            reliability_weight * ensemble_df["bayes_prediction"]
+            + (1 - reliability_weight) * ensemble_df["prediction_xgb"]
         )
 
         # 4. Conservative ensemble (use lower bound)
-        ensemble_df['ensemble_conservative'] = np.minimum(
-            ensemble_df['prediction_xgb'],
-            ensemble_df['bayes_conservative']
+        ensemble_df["ensemble_conservative"] = np.minimum(
+            ensemble_df["prediction_xgb"], ensemble_df["bayes_conservative"]
         )
 
         # 5. Agreement score (how much models agree)
-        ensemble_df['model_agreement'] = 1 - np.abs(
-            ensemble_df['prediction_xgb'] - ensemble_df['bayes_prediction']
-        ) / ensemble_df['prediction_xgb']
+        ensemble_df["model_agreement"] = (
+            1
+            - np.abs(ensemble_df["prediction_xgb"] - ensemble_df["bayes_prediction"])
+            / ensemble_df["prediction_xgb"]
+        )
 
         # 6. Ensemble uncertainty (combined from both models)
-        ensemble_df['ensemble_uncertainty'] = np.sqrt(
-            ensemble_df.get('prediction_std_xgb', 1)**2 +
-            ensemble_df['bayes_uncertainty']**2
+        ensemble_df["ensemble_uncertainty"] = np.sqrt(
+            ensemble_df.get("prediction_std_xgb", 1) ** 2 + ensemble_df["bayes_uncertainty"] ** 2
         ) / np.sqrt(2)
 
         return ensemble_df
@@ -451,82 +436,96 @@ def main():
 
     try:
         # Test 1: Fetch passing yards ratings
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TEST 1: Fetching Bayesian Passing Yards Ratings")
-        print("="*60)
+        print("=" * 60)
 
-        passing_ratings = extractor.fetch_player_ratings(
-            stat_type='passing_yards',
-            season=2024
-        )
+        passing_ratings = extractor.fetch_player_ratings(stat_type="passing_yards", season=2024)
 
         if not passing_ratings.empty:
-            print(f"\nTop 10 QBs by Bayesian Rating:")
-            print(passing_ratings[['player_name', 'rating_mean', 'rating_sd',
-                                  'n_games_observed']].head(10))
+            print("\nTop 10 QBs by Bayesian Rating:")
+            print(
+                passing_ratings[
+                    ["player_name", "rating_mean", "rating_sd", "n_games_observed"]
+                ].head(10)
+            )
 
         # Test 2: Calculate hierarchical features
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TEST 2: Calculating Hierarchical Features")
-        print("="*60)
+        print("=" * 60)
 
         if not passing_ratings.empty:
             features = extractor.calculate_hierarchical_features(passing_ratings)
             print(f"\nFeature columns generated: {features.columns.tolist()}")
-            print(f"\nSample features for top QB:")
+            print("\nSample features for top QB:")
             print(features.iloc[0])
 
         # Test 3: Get features for specific players
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TEST 3: Get Features for Specific Players")
-        print("="*60)
+        print("=" * 60)
 
         # Example player IDs (would need real ones)
-        test_players = ['00-0023459', '00-0026498', '00-0033106']  # Example IDs
+        test_players = ["00-0023459", "00-0026498", "00-0033106"]  # Example IDs
 
         player_features = extractor.get_player_props_features(
-            players=test_players,
-            stat_type='passing_yards',
-            season=2024,
-            week=10
+            players=test_players, stat_type="passing_yards", season=2024, week=10
         )
 
         if not player_features.empty:
             print(f"\nFeatures for {len(player_features)} players:")
-            print(player_features[['player_name', 'bayes_prediction',
-                                  'bayes_uncertainty', 'bayes_reliability_score']])
+            print(
+                player_features[
+                    [
+                        "player_name",
+                        "bayes_prediction",
+                        "bayes_uncertainty",
+                        "bayes_reliability_score",
+                    ]
+                ]
+            )
 
         # Test 4: Create ensemble features (mock XGBoost predictions)
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TEST 4: Creating Ensemble Features")
-        print("="*60)
+        print("=" * 60)
 
         # Mock XGBoost predictions
-        mock_xgb = pd.DataFrame({
-            'player_id': test_players,
-            'prediction_xgb': [250, 275, 230],
-            'prediction_std_xgb': [20, 15, 25]
-        })
+        mock_xgb = pd.DataFrame(
+            {
+                "player_id": test_players,
+                "prediction_xgb": [250, 275, 230],
+                "prediction_std_xgb": [20, 15, 25],
+            }
+        )
 
         ensemble_features = extractor.create_ensemble_features(
-            xgboost_predictions=mock_xgb,
-            stat_type='passing_yards',
-            season=2024
+            xgboost_predictions=mock_xgb, stat_type="passing_yards", season=2024
         )
 
         if not ensemble_features.empty:
-            print(f"\nEnsemble predictions:")
-            print(ensemble_features[['player_id', 'prediction_xgb', 'bayes_prediction',
-                                    'ensemble_mean', 'ensemble_weighted',
-                                    'model_agreement']])
+            print("\nEnsemble predictions:")
+            print(
+                ensemble_features[
+                    [
+                        "player_id",
+                        "prediction_xgb",
+                        "bayes_prediction",
+                        "ensemble_mean",
+                        "ensemble_weighted",
+                        "model_agreement",
+                    ]
+                ]
+            )
 
     finally:
         extractor.close()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Bayesian Player Features Module Test Complete")
-    print("="*60)
+    print("=" * 60)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

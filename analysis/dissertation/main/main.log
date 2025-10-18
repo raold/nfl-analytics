@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  17 OCT 2025 08:21
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  18 OCT 2025 10:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1320,39 +1320,18 @@ Package microtype Info: Loading generic protrusion settings for font family
 [2
 
 {/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
- (./main.toc)
-\tf@toc=\write6
-\openout6 = `main.toc'.
-
-
+ (./main.toc
 
 [3
 
 
-] (./main.lof)
-\tf@lof=\write7
-\openout7 = `main.lof'.
-
-
-
-[4
-
-
-] (./main.lot)
-\tf@lot=\write8
-\openout8 = `main.lot'.
-
-
-
-[5
-
-
-] (../appendix/notation_glossary.tex
-
-[6
-
-
 ]
+
+[4]
+
+[5]
+
+[6]
 
 [7]
 
@@ -1362,47 +1341,501 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 [10]
 
-[11]) (../appendix/acronyms.tex
+[11]
 
 [12]
 
-LaTeX Warning: Reference `chap:results' on page xiii undefined on input line 20
-.
-
-
-
-[13
-
-]) (../appendix/master_todos.tex
+[13]
 
 [14]
 
-[15
+[15])
+\tf@toc=\write6
+\openout6 = `main.toc'.
+
+
+
+[16] (./main.lof
+Underfull \hbox (badness 10000) in paragraph at lines 7--7
+ [][] [][][]\T1/cmr/m/n/12 (+20) Permutation fea-ture im-por-tance for XG-Boost
+ base-line en-sem-ble on 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7--7
+ \T1/cmr/m/n/12 (+20) 2024 hold-out (281 games). Mar-ket delta and spread dom-i
+-nate (0.24 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7--7
+ \T1/cmr/m/n/12 (+20) and 0.18 nor-mal-ized im-por-tance), con-firm-ing mar-ket
+ ef-fi-ciency as 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7--7
+ \T1/cmr/m/n/12 (+20) the pri-mary sig-nal. Rolling EPA met-rics and QB sta-tus
+ con-tribute 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--8
+ [][] [][][]\T1/cmr/m/n/12 (+20) Relative weight by sea-son un-der ex-po-nen-ti
+al de-cay with half[]life 
+ []
+
+
+Underfull \hbox (badness 1888) in paragraph at lines 8--8
+ \OML/cmm/m/it/12 H \OMS/cmsy/m/n/12 2 f\OT1/cmr/m/n/12 (+20) 3\OML/cmm/m/it/12
+ ; \OT1/cmr/m/n/12 (+20) 4\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 (+20) 5\OMS/cmsy/m
+/n/12 g$ \T1/cmr/m/n/12 (+20) (cen-tered on 2024). An-no-ta-tions high-light 19
+99 and 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 24--24
+ [][] [][][]\T1/cmr/m/n/12 (+20) Sensitivity of EV and cal-i-bra-tion to key hy
+-per-pa-ram-e-ters (en-tropy 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 26--26
+ [][] [][][]\T1/cmr/m/n/12 (+20) Sensitivity of growth/-draw-down to pes-simism
+ level $\OML/cmm/m/it/12 $ \T1/cmr/m/n/12 (+20) in Kelly[]LCB 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--31
+ [][] [][][]\T1/cmr/m/n/12 (+20) Simulated teaser ex-pected value sur-face as a
+ func-tion of leg suc-cess 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--31
+ \T1/cmr/m/n/12 (+20) prob-a-bil-i-ties. The zero con-tour (white) marks the mi
+d-dle thresh-old 
+ []
+
+
+
+[17
+
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+ [][] [][][]\T1/cmr/m/n/12 (+20) Relationship be-tween ac-cep-tance out-comes a
+nd live per-for-mance 
+ []
 
-LaTeX Warning: Reference `app:leakage_audit' on page xvi undefined on input lin
-e 76.
+
+Underfull \hbox (badness 10000) in paragraph at lines 33--33
+ \T1/cmr/m/n/12 (+20) (e.g., CLV/ROI). Fail-ing ac-cep-tance cor-re-lates with 
+de-graded live 
+ []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ [][] [][][]\T1/cmr/m/n/12 (+20) Comparison of 90% cred-i-ble in-ter-val cov-er
+-age across all meth-ods 
+ []
 
-[16]
 
-[17]
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ \T1/cmr/m/n/12 (+20) of 90%. All single-output BNN vari-ants (base-line, with 
+Ve-gas 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ \T1/cmr/m/n/12 (+20) fea-tures, with op-po-nent fea-tures, with op-ti-mized hy
+-per-pa-ram-e-ters) 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ \T1/cmr/m/n/12 (+20) re-main severely under-calibrated re-gard-less of mod-i-f
+i-ca-tions. In 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ \T1/cmr/m/n/12 (+20) con-trast, non-Bayesian base-lines (con-for-mal pre-dic-t
+ion, quan-tile 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 35--35
+ \T1/cmr/m/n/12 (+20) re-gres-sion) and the ar-chi-tec-tural in-no-va-tion (mul
+ti-output BNN) 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ [][] [][][]\T1/cmr/m/n/12 (+20) Incremental im-pact of fea-ture en-gi-neer-ing
+ on 90% cred-i-ble in-ter-val 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) cov-er-age. Each bar rep-re-sents a cu-mu-la-tive fea-tur
+e con-fig-u-ra-tion: 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) base-line (4 fea-tures), +Ve-gas lines (6 fea-tures), +en
+-vi-ron-ment (10 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) fea-tures), +op-po-nent de-fense (9 fea-tures, en-vi-ron-
+ment fea-tures 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) re-moved). Er-ror bars rep-re-sent boot-strapped 95% con-
+fi-dence 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) in-ter-vals (1000 re-sam-ples). The hor-i-zon-tal red das
+hed line in-di-cates 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) the tar-get 90% cov-er-age. De-spite in-cor-po-rat-ing do
+-main ex-per-tise 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) and mul-ti-ple in-for-ma-tion sources, the best fea-ture 
+set im-proves 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 36--36
+ \T1/cmr/m/n/12 (+20) cov-er-age by only 5.1 per-cent-age points, leav-ing the 
+model severely 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ [][] [][][]\T1/cmr/m/n/12 (+20) Coverage-sharpness trade-off across un-cer-tai
+nty quan-tifi-ca-tion 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) meth-ods. Each point rep-re-sents a method, with x-axis s
+how-ing 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) av-er-age 90% in-ter-val width (lower is sharper) and y-a
+xis show-ing 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) em-pir-i-cal cov-er-age (closer to 90% is bet-ter cal-i-b
+rated). The dashed 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) hor-i-zon-tal line in-di-cates tar-get 90% cov-er-age; th
+e shaded re-gion 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) marks ac-cept-able cal-i-bra-tion (85-95%). The dashed ve
+r-ti-cal line 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) shows the single-output BNN's in-ter-val width. Single-ou
+tput BNN 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) vari-ants clus-ter in the bottom-left (nar-row but under-
+calibrated), 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+3) while quan-tile re-gres-sion and con-for-mal pre-dic-tion 
+achieve cal-i-bra-tion 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) by dras-ti-cally widen-ing in-ter-vals. The multi-output 
+BNN achieves 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 37--37
+ \T1/cmr/m/n/12 (+20) near-optimal bal-ance: strong cal-i-bra-tion with-out ex-
+treme in-ter-val 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--39
+ [][] [][][]\T1/cmr/m/n/12 (+20) Claude AI se-man-tic re-search work-flow. User
+ queries in nat-u-ral 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--39
+ \T1/cmr/m/n/12 (+20) lan-guage are trans-lated to ex-e-cutable code (SQL, R, P
+ython), 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--39
+ \T1/cmr/m/n/12 (+20) val-i-dated with sta-tis-ti-cal rigor, and in-ter-preted 
+with do-main 
+ []
+
+
 
 [18]
+Underfull \hbox (badness 10000) in paragraph at lines 48--48
+ \T1/cmr/m/n/12 (+20) Q-value across 2000 epochs. Train-ing com-pleted in ap-pr
+ox-i-mately 9 
+ []
 
-[19]
 
-[20]
+Underfull \hbox (badness 10000) in paragraph at lines 48--48
+ \T1/cmr/m/n/12 (+20) tion. Loss re-duc-tion of 75% demon-strates ef-fec-tive c
+on-ver-gence with 
+ []
+
+)
+\tf@lof=\write7
+\openout7 = `main.lof'.
+
+
+
+[19] (./main.lot
+Underfull \hbox (badness 10000) in paragraph at lines 6--6
+ [][] [][][]\T1/cmr/m/n/12 (+20) Missingness and cov-er-age statis-tics for key
+ data fields (2015--2025). 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--6
+ \T1/cmr/m/n/12 (+20) Com-plete-ness for core bet-ting fea-tures (spread, to-ta
+l, mon-ey-line) 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6--6
+ \T1/cmr/m/n/12 (+20) en-ables re-li-able mod-el-ing, while sparse early-era we
+ather data is 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10--10
+ [][] [][][]\T1/cmr/m/n/12 (+20) Paired com-par-i-son of tem-po-ral weight-ing 
+schemes on 2024 hold-out 
+ []
+
+
+
+[20
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 42--42
+ [][] [][][]\T1/cmr/m/n/12 (+20) Common of-fline RL al-go-rithms and their trad
+e-offs for betting-style 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 47--47
+ [][] [][][]\T1/cmr/m/n/12 (+20) Multi-model re-li-a-bil-ity com-par-i-son acro
+ss model classes (2023--2025 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+ [][] [][][]\T1/cmr/m/n/12 (+20) Model per-for-mance com-par-i-son against pub-
+lished bench-marks. Our 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+ \T1/cmr/m/n/12 (+20) stacked en-sem-ble achieves best-in-class cal-i-bra-tion 
+(Brier = 0.2515) 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+ \T1/cmr/m/n/12 (+20) but fails to over-come mar-ket ef-fi-ciency for prof-itab
+il-ity (51.0% ATS 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--56
+ [][] [][][]\T1/cmr/m/n/12 (+20) Statistical sig-nif-i-cance of cal-i-bra-tion 
+im-prove-ments (Brier score 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 66--66
+ [][] [][][]\T1/cmr/m/n/12 (+20) Diebold-Mariano tests for pre-dic-tive ac-cu-r
+acy com-par-i-son (5,529 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 67--67
+ [][] [][][]\T1/cmr/m/n/12 (+20) Bootstrap con-fi-dence in-ter-vals for Brier s
+cores (95% CI, 5,000 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
+ [][] [][][]\T1/cmr/m/n/12 (+16) Comprehensive com-par-i-son of all un-cer-tain
+ty quan-tifi-ca-tion meth-ods 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
+ \T1/cmr/m/n/12 (+20) in-ves-ti-gated. The ``Gap to 90%'' col-umn quan-ti-fies 
+the cal-i-bra-tion 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
+ \T1/cmr/m/n/12 (+20) short-fall rel-a-tive to the nom-i-nal 90% cov-er-age tar
+-get. Train-ing 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
+ \T1/cmr/m/n/12 (+20) times re-flect wall-clock du-ra-tion on a sin-gle ma-chin
+e with Ap-ple 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--70
+ \T1/cmr/m/n/12 (+20) Sil-i-con (M1). Meth-ods are or-dered by their un-der-ly-
+ing ap-proach: 
+ []
+
+
 
 [21]
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ [][] [][][]\T1/cmr/m/n/12 (+20) Bayesian op-ti-miza-tion re-sults for single-o
+utput BNN hy-per-pa-ram-e- 
+ []
 
-[22]
 
-[23]
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+20) ters (10-trial pi-lot study). Only 3 of 10 tri-als com-pl
+eted suc-cess-fully; 
+ []
 
-[24]
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+20) the re-main-der failed due to database query er-rors when
+ us-ing 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+20) en-vi-ron-ment or op-po-nent fea-tures. The best con-fig-
+u-ra-tion (Trial 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+20) #0) achieved 34.2% cov-er-age with Ve-gas fea-tures, 32 h
+id-den units, 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+20) and $\OML/cmm/m/it/12 ^^[[] \OT1/cmr/m/n/12 (+20) = 0\OML
+/cmm/m/it/12 :\OT1/cmr/m/n/12 (+20) 548$\T1/cmr/m/n/12 (+20) . This rep-re-sent
+s only an 8 per-cent-age point 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 74--74
+ \T1/cmr/m/n/12 (+4) im-prove-ment over the 26.2% base-line, leav-ing a 55.8 pe
+r-cent-age point 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--75
+ \T1/cmr/m/n/12 (+20) per com-pute hour) for each in-ves-ti-ga-tion phase. Phas
+e 3 (ar-chi- 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--75
+ \T1/cmr/m/n/12 (+20) tec-tural ex-plo-ration) pro-vides the high-est ROI at 13
+.2 per-cent-age 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--75
+ \T1/cmr/m/n/12 (+20) points per hour, more than 5 times bet-ter than fea-ture 
+en-gi-neer-ing 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 75--75
+ \T1/cmr/m/n/12 (+20) and 26 times bet-ter than prior tun-ing. This quan-ti-fie
+s the ef-fi-ciency 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--76
+ [][] [][][]\T1/cmr/m/n/12 (+20) Decision ma-trix for prac-ti-tion-ers se-lect-
+ing un-cer-tainty quan-tifi-ca-tion 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--76
+ \T1/cmr/m/n/12 (+20) meth-ods. No sin-gle method dom-i-nates across all cri-te
+-ria; choice 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 76--76
+ \T1/cmr/m/n/12 (+20) de-pends on ap-pli-ca-tion pri-or-i-ties. Avoid single-ou
+tput BNNs for 
+ []
+
+
+
+[22])
+\tf@lot=\write8
+\openout8 = `main.lot'.
+
+
+
+[23] (../appendix/notation_glossary.tex
+
+[24
+
+
+]
 
 [25]
 
@@ -1412,87 +1845,24 @@ e 76.
 
 [28]
 
-[29]
+[29]) (../appendix/acronyms.tex
 
 [30]
 
-[31]
+[31
 
-[32]
+])
+Package hyperref Info: Option `pageanchor' set `true' on input line 298.
 
-[33]
 
-[34]
-
-[35]
-
-[36]
-
-[37]
-
-[38]
-
-[39]
-
-[40]
-
-[41]
-
-[42]
-
-[43]) (../appendix/systems_blueprint.tex
-
-[44]
+[32] (../chapter_1_intro/chapter_1_intro.tex
 Chapter 1.
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 11.
-
-
-[45
-
-]
-
-[46]) (../appendix/productionization_guide.tex
-
-[47]
-Chapter 2.
-
-
-[48
-
-]
-
-[49]
-
-[50]
-
-[51]
-Underfull \hbox (badness 1424) in paragraph at lines 143--144
-[]\T1/cmr/m/n/12 (+20) Dependence + fric-tions; CVaR/-draw-down thresh-olds
- []
-
-
-
-[52]
-
-[53]
-
-[54])
-Package hyperref Info: Option `pageanchor' set `true' on input line 297.
-
-
-[55] (../chapter_1_intro/chapter_1_intro.tex
-Chapter 3.
 
 
 [1
 
 
 ]
-
-LaTeX Warning: Reference `chap:results' on page 1 undefined on input line 61.
-
-
 
 [2]
 
@@ -1501,7 +1871,7 @@ LaTeX Warning: Reference `chap:results' on page 1 undefined on input line 61.
 [4]) (../chapter_2_lit_review/chapter_2_lit_review.tex
 
 [5]
-Chapter 4.
+Chapter 2.
 
 
 [6
@@ -1512,70 +1882,25 @@ Chapter 4.
 
 [8]
 
-Package natbib Warning: Citation `skellam1946' on page 9 undefined on input lin
-e 81.
-
-
-Package natbib Warning: Citation `maher1982' on page 9 undefined on input line 
-81.
-
-
-Package natbib Warning: Citation `dixon1997' on page 9 undefined on input line 
-81.
-
-
-Package natbib Warning: Citation `karlis2003' on page 9 undefined on input line
- 81.
-
-
-Package natbib Warning: Citation `koopman2015' on page 9 undefined on input lin
-e 81.
-
-
-
 [9]
 
-Package natbib Warning: Citation `stern1991' on page 10 undefined on input line
- 124.
-
-
-
 [10]
+
+LaTeX Warning: Reference `alg:kl-tilt' on page 1 undefined on input line 162.
+
+
 
 [11]
 
 [12]
-
-Package natbib Warning: Citation `bradleyterry1952' on page 13 undefined on inp
-ut line 233.
-
-
-Package natbib Warning: Citation `elo1978' on page 13 undefined on input line 2
-33.
-
-
-Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
-ine 233.
-
-
-Package natbib Warning: Citation `glickman1998' on page 13 undefined on input l
-ine 233.
-
+Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
+put line 216.
 
 
 [13]
 
-Package natbib Warning: Citation `nelsen2006' on page 14 undefined on input lin
-e 245.
-
-
-Package natbib Warning: Citation `joe1997' on page 14 undefined on input line 2
-56.
-
-
-
 [14] (../figures/out/tail_dependence_table.tex)
-<../figures/joint_exceedance_vs_rho.png, id=1465, 715.2321pt x 499.3857pt>
+<../figures/joint_exceedance_vs_rho.png, id=3542, 715.2321pt x 499.3857pt>
 File: ../figures/joint_exceedance_vs_rho.png Graphic file (type png)
 <use ../figures/joint_exceedance_vs_rho.png>
 Package pdftex.def Info: ../figures/joint_exceedance_vs_rho.png  used on input 
@@ -1585,17 +1910,8 @@ line 298.
 
 [15]
 
-Package natbib Warning: Citation `daniels1954' on page 16 undefined on input li
-ne 315.
-
-
-Package natbib Warning: Citation `karlis2003' on page 16 undefined on input lin
-e 327.
-
-
-
 [16]
-<../figures/reliability_diagram.png, id=1497, 715.2321pt x 716.1957pt>
+<../figures/reliability_diagram.png, id=3581, 715.2321pt x 716.1957pt>
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
@@ -1613,17 +1929,8 @@ Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
 
 [21]
 
-Package natbib Warning: Citation `sauer1998' on page 22 undefined on input line
- 463.
-
-
-Package natbib Warning: Citation `levitt2004' on page 22 undefined on input lin
-e 464.
-
-
-
 [22]
-<../figures/key_number_pmf.png, id=1535, 505.89pt x 289.08pt>
+<../figures/key_number_pmf.png, id=3623, 505.89pt x 289.08pt>
 File: ../figures/key_number_pmf.png Graphic file (type png)
 <use ../figures/key_number_pmf.png>
 Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 534.
@@ -1632,55 +1939,6 @@ Package pdftex.def Info: ../figures/key_number_pmf.png  used on input line 534.
 
 
 [23 <../figures/key_number_pmf.png>]
-
-Package natbib Warning: Citation `harville1980' on page 24 undefined on input l
-ine 542.
-
-
-Package natbib Warning: Citation `glickman1998' on page 24 undefined on input l
-ine 543.
-
-
-Package natbib Warning: Citation `stern1991' on page 24 undefined on input line
- 544.
-
-
-Package natbib Warning: Citation `dixon1997' on page 24 undefined on input line
- 545.
-
-
-Package natbib Warning: Citation `karlis2003' on page 24 undefined on input lin
-e 546.
-
-
-Package natbib Warning: Citation `koopman2015' on page 24 undefined on input li
-ne 547.
-
-
-Package natbib Warning: Citation `lock2014' on page 24 undefined on input line 
-548.
-
-
-Package natbib Warning: Citation `sauer1998' on page 24 undefined on input line
- 549.
-
-
-Package natbib Warning: Citation `levitt2004' on page 24 undefined on input lin
-e 550.
-
-
-Package natbib Warning: Citation `szalkowski2012' on page 24 undefined on input
- line 551.
-
-
-Package natbib Warning: Citation `nichols2014' on page 24 undefined on input li
-ne 552.
-
-
-Package natbib Warning: Citation `baio2010' on page 24 undefined on input line 
-553.
-
-
 
 [24]
 
@@ -1693,7 +1951,7 @@ Package natbib Warning: Citation `baio2010' on page 24 undefined on input line
 [28]
 
 [29]
-Chapter 5.
+Chapter 3.
 
 
 [30
@@ -1751,13 +2009,9 @@ features_enhanced.py\T1/cmr/m/n/12 (+20) ,
  []
 
 
-LaTeX Warning: Reference `app:leakage_audit' on page 36 undefined on input line
- 187.
-
-
 
 [36]
-<../figures/feature_importance.png, id=1675, 1405.25pt x 903.375pt>
+<../figures/feature_importance.png, id=3790, 1405.25pt x 903.375pt>
 File: ../figures/feature_importance.png Graphic file (type png)
 <use ../figures/feature_importance.png>
 Package pdftex.def Info: ../figures/feature_importance.png  used on input line 
@@ -1768,7 +2022,7 @@ Package pdftex.def Info: ../figures/feature_importance.png  used on input line
 [37]
 
 [38 <../figures/feature_importance.png>]
-<../figures/out/time_decay_weights.png, id=1692, 1003.75pt x 562.1pt>
+<../figures/out/time_decay_weights.png, id=3806, 1003.75pt x 562.1pt>
 File: ../figures/out/time_decay_weights.png Graphic file (type png)
 <use ../figures/out/time_decay_weights.png>
 Package pdftex.def Info: ../figures/out/time_decay_weights.png  used on input l
@@ -1791,19 +2045,7 @@ LaTeX Warning: Reference `chap:baseline' on page 1 undefined on input line 387.
 ) (../chapter_4_baseline_modeling/chapter_4_baseline_modeling.tex
 
 [41]
-Chapter 6.
-
-Package natbib Warning: Citation `harville1980' on page 42 undefined on input l
-ine 6.
-
-
-Package natbib Warning: Citation `glickman1998' on page 42 undefined on input l
-ine 6.
-
-
-Package natbib Warning: Citation `dixon1997' on page 42 undefined on input line
- 6.
-
+Chapter 4.
 
 
 [42
@@ -1813,19 +2055,19 @@ Package natbib Warning: Citation `dixon1997' on page 42 undefined on input line
 LaTeX Warning: Reference `sec:timeframe-lookback' on page 1 undefined on input 
 line 25.
 
-<../figures/out/rolling_oos_logloss.png, id=1732, 578.16pt x 325.215pt>
+<../figures/out/rolling_oos_logloss.png, id=3851, 578.16pt x 325.215pt>
 File: ../figures/out/rolling_oos_logloss.png Graphic file (type png)
 <use ../figures/out/rolling_oos_logloss.png>
 Package pdftex.def Info: ../figures/out/rolling_oos_logloss.png  used on input 
 line 38.
 (pdftex.def)             Requested size: 411.93768pt x 231.71312pt.
-<../figures/out/rolling_oos_ece.png, id=1733, 578.16pt x 325.215pt>
+<../figures/out/rolling_oos_ece.png, id=3852, 578.16pt x 325.215pt>
 File: ../figures/out/rolling_oos_ece.png Graphic file (type png)
 <use ../figures/out/rolling_oos_ece.png>
 Package pdftex.def Info: ../figures/out/rolling_oos_ece.png  used on input line
  49.
 (pdftex.def)             Requested size: 411.93768pt x 231.71312pt.
-<../figures/out/reliability_curves_timeframe.png, id=1734, 469.755pt x 361.35pt
+<../figures/out/reliability_curves_timeframe.png, id=3853, 469.755pt x 361.35pt
 >
 File: ../figures/out/reliability_curves_timeframe.png Graphic file (type png)
 <use ../figures/out/reliability_curves_timeframe.png>
@@ -1840,112 +2082,47 @@ on input line 60.
 
 [45 <../figures/out/rolling_oos_ece.png>]
 
-Package natbib Warning: Citation `glickman1998' on page 46 undefined on input l
-ine 98.
-
-
-Package natbib Warning: Citation `harville1980' on page 46 undefined on input l
-ine 98.
-
-
-
 [46 <../figures/out/reliability_curves_timeframe.png>]
 
-Package natbib Warning: Citation `dixon1997' on page 47 undefined on input line
- 111.
-
-
-
 [47]
-
-Package natbib Warning: Citation `maher1982' on page 48 undefined on input line
- 132.
-
-
 Overfull \hbox (37.45068pt too wide) in paragraph at lines 147--149
  []\T1/cmr/bx/n/12 (-20) Implementation and Re-sults.[] \T1/cmr/m/n/12 (-20) Ou
 r im-ple-men-ta-tion (\T1/cmtt/m/n/12 py/models/bivariate_poisson.py\T1/cmr/m/n
 /12 (-20) ,
  []
 
-(../figures/out/dixon_coles_table.tex)
-
-[48]
-
-Package natbib Warning: Citation `koopman2015' on page 49 undefined on input li
-ne 175.
 
 
+[48] (../figures/out/dixon_coles_table.tex)
 
 [49]
 
-Package natbib Warning: Citation `elo1978' on page 50 undefined on input line 1
-83.
-
-
-Package natbib Warning: Citation `glickman1999' on page 50 undefined on input l
-ine 183.
-
-
-LaTeX Warning: Reference `app:state-space' on page 1 undefined on input line 18
-3.
-
-
-Package natbib Warning: Citation `gelman2013' on page 50 undefined on input lin
-e 185.
-
-
-Package natbib Warning: Citation `burkner2017' on page 50 undefined on input li
-ne 189.
-
-
-Package natbib Warning: Citation `carpenter2017' on page 50 undefined on input 
-line 189.
-
-
-Package natbib Warning: Citation `maher1982' on page 50 undefined on input line
- 207.
-
-
-
 [50]
-
-Package natbib Warning: Citation `vehtari2017' on page 51 undefined on input li
-ne 218.
-
-
 
 [51]
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
 [52]
+
+[53]
 Underfull \hbox (badness 1067) in paragraph at lines 328--329
  []\T1/cmr/bx/n/12 (+20) Weekly Re-train-ing Pro-to-col.[] \T1/cmr/m/n/12 (+20)
  Mod-els are re-trained ev-ery Tues-day us-ing
  []
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
-[53]
 
 [54]
 
 [55]
-<../figures/out/integer_margin_calibration.png, id=1846, 650.43pt x 361.35pt>
+
+[56]
+<../figures/out/integer_margin_calibration.png, id=3992, 650.43pt x 361.35pt>
 File: ../figures/out/integer_margin_calibration.png Graphic file (type png)
 <use ../figures/out/integer_margin_calibration.png>
 Package pdftex.def Info: ../figures/out/integer_margin_calibration.png  used on
  input line 426.
 (pdftex.def)             Requested size: 390.25536pt x 216.81168pt.
 
-
-[56]
 
 [57 <../figures/out/integer_margin_calibration.png>]
 
@@ -1956,21 +2133,13 @@ Package pdftex.def Info: ../figures/out/integer_margin_calibration.png  used on
 (../figures/out/teaser_ev_sensitivity_table.tex)
 (../figures/out/reweighting_ablation_table.tex)
 
-Package natbib Warning: Citation `brier1950' on page 60 undefined on input line
- 577.
-
-
-Package natbib Warning: Citation `gneiting2007' on page 60 undefined on input l
-ine 577.
-
+[60]
 File: ../figures/reliability_diagram.png Graphic file (type png)
 <use ../figures/reliability_diagram.png>
 Package pdftex.def Info: ../figures/reliability_diagram.png  used on input line
  583.
 (pdftex.def)             Requested size: 303.53267pt x 303.93655pt.
 
-
-[60]
 Underfull \hbox (badness 7256) in paragraph at lines 606--606
 []|\T1/cmr/m/n/10.95 (+20) impacts fa-
  []
@@ -1982,7 +2151,7 @@ Underfull \hbox (badness 3635) in paragraph at lines 606--606
 
 (../figures/out/copula_gof_table.tex) (../figures/out/tail_dependence_table.tex
 )
-<../figures/out/teaser_pricing_copula_delta.png, id=1898, 505.89pt x 317.988pt>
+<../figures/out/teaser_pricing_copula_delta.png, id=4039, 505.89pt x 317.988pt>
 
 File: ../figures/out/teaser_pricing_copula_delta.png Graphic file (type png)
 <use ../figures/out/teaser_pricing_copula_delta.png>
@@ -1993,78 +2162,50 @@ n input line 641.
 
 [61]
 
-Package natbib Warning: Citation `lock2014' on page 62 undefined on input line 
-652.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
 [62]
 
 [63 <../figures/out/teaser_pricing_copula_delta.png>]
 
-Package natbib Warning: Citation `lock2014' on page 64 undefined on input line 
-739.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
 [64]
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
 [65]
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
 
 [66]
 
 [67]
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
 [68] (../figures/out/glm_baseline_table.tex)
 (../figures/out/glm_harness_overall.tex)
 (../figures/out/glm_reliability_panel.tex
-<../figures/out/reliability_diagram_s2015.png, id=1965, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2015.png, id=4108, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2015.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2015.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2015.png  used on 
 input line 8.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2016.png, id=1966, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2016.png, id=4109, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2016.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2016.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2016.png  used on 
 input line 9.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2017.png, id=1967, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2017.png, id=4110, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2017.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2017.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2017.png  used on 
 input line 11.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2018.png, id=1968, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2018.png, id=4111, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2018.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2018.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2018.png  used on 
 input line 12.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2019.png, id=1969, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2019.png, id=4112, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2019.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2019.png>
@@ -2075,35 +2216,35 @@ input line 14.
 
 LaTeX Warning: Float too large for page by 29.84439pt on input line 15.
 
-<../figures/out/reliability_diagram_s2020.png, id=1972, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2020.png, id=4115, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2020.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2020.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2020.png  used on 
 input line 23.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2021.png, id=1973, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2021.png, id=4116, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2021.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2021.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2021.png  used on 
 input line 24.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2022.png, id=1974, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2022.png, id=4117, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2022.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2022.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2022.png  used on 
 input line 26.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2023.png, id=1975, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2023.png, id=4118, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2023.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2023.png>
 Package pdftex.def Info: ../figures/out/reliability_diagram_s2023.png  used on 
 input line 27.
 (pdftex.def)             Requested size: 208.13574pt x 208.4869pt.
-<../figures/out/reliability_diagram_s2024.png, id=1976, 426.393pt x 427.1157pt>
+<../figures/out/reliability_diagram_s2024.png, id=4119, 426.393pt x 427.1157pt>
 
 File: ../figures/out/reliability_diagram_s2024.png Graphic file (type png)
 <use ../figures/out/reliability_diagram_s2024.png>
@@ -2114,7 +2255,7 @@ input line 29.
 LaTeX Warning: Float too large for page by 29.84439pt on input line 30.
 
 )
-<../figures/out/glm_calibration_platt.png, id=1977, 426.393pt x 427.1157pt>
+<../figures/out/glm_calibration_platt.png, id=4120, 426.393pt x 427.1157pt>
 File: ../figures/out/glm_calibration_platt.png Graphic file (type png)
 <use ../figures/out/glm_calibration_platt.png>
 Package pdftex.def Info: ../figures/out/glm_calibration_platt.png  used on inpu
@@ -2126,7 +2267,7 @@ Underfull \hbox (badness 5832) in paragraph at lines 998--999
 tt/m/it/12 py/backtest/baseline_glm.py
  []
 
-(../figures/out/multimodel_table.tex)
+(../figures/out/multimodel_table.tex
 
 [69]
 
@@ -2138,39 +2279,33 @@ ut/reliability_diagram_s2018.png> <../figures/out/reliability_diagram_s2019.png
 [71 <../figures/out/reliability_diagram_s2020.png> <../figures/out/reliability_
 diagram_s2021.png> <../figures/out/reliability_diagram_s2022.png> <../figures/o
 ut/reliability_diagram_s2023.png> <../figures/out/reliability_diagram_s2024.png
->] (../chapter_4_baseline_modeling/v3_ensemble_section.tex
+>])
 
 [72 <../figures/out/glm_calibration_platt.png>]
+(../chapter_4_baseline_modeling/v3_ensemble_section.tex
 
 [73]
 
 [74]
-<../figures/out/v3_model_evolution.pdf, id=2031, 505.89pt x 289.08pt>
+
+[75]
+<../figures/out/v3_model_evolution.pdf, id=4182, 505.89pt x 289.08pt>
 File: ../figures/out/v3_model_evolution.pdf Graphic file (type pdf)
 <use ../figures/out/v3_model_evolution.pdf>
 Package pdftex.def Info: ../figures/out/v3_model_evolution.pdf  used on input l
 ine 143.
 (pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<../figures/out/v3_ensemble_components.pdf, id=2032, 505.89pt x 289.08pt>
+<../figures/out/v3_ensemble_components.pdf, id=4183, 505.89pt x 289.08pt>
 File: ../figures/out/v3_ensemble_components.pdf Graphic file (type pdf)
 <use ../figures/out/v3_ensemble_components.pdf>
 Package pdftex.def Info: ../figures/out/v3_ensemble_components.pdf  used on inp
 ut line 190.
 (pdftex.def)             Requested size: 390.25536pt x 223.00691pt.
 
+
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-<../figures/out/v3_calibration.pdf, id=2033, 433.62pt x 433.62pt>
+<../figures/out/v3_calibration.pdf, id=4184, 433.62pt x 433.62pt>
 File: ../figures/out/v3_calibration.pdf Graphic file (type pdf)
 <use ../figures/out/v3_calibration.pdf>
 Package pdftex.def Info: ../figures/out/v3_calibration.pdf  used on input line 
@@ -2181,19 +2316,13 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[75]
-
 [76 <../figures/out/v3_model_evolution.pdf>]
 
 [77 <../figures/out/v3_ensemble_components.pdf>]
 
 [78 <../figures/out/v3_calibration.pdf>]
 
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-)
-
-[79]
+[79])
 
 [80]) (../chapter_5_rl_design/chapter_5_rl_design.tex
 
@@ -2210,232 +2339,31 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [86]
 
 [87]
-Chapter 7.
-
-Package natbib Warning: Citation `fujimoto2021td3bc' on page 88 undefined on in
-put line 7.
-
-
-Package natbib Warning: Citation `nair2020awac' on page 88 undefined on input l
-ine 7.
-
-
-Package natbib Warning: Citation `mnih2015' on page 88 undefined on input line 
-12.
-
-
-Package natbib Warning: Citation `vanhasselt2016' on page 88 undefined on input
- line 12.
-
-
-Package natbib Warning: Citation `wang2016dueling' on page 88 undefined on inpu
-t line 12.
-
-
-Package natbib Warning: Citation `schaul2016per' on page 88 undefined on input 
-line 12.
-
-
-Package natbib Warning: Citation `schulman2015trpo' on page 88 undefined on inp
-ut line 13.
-
-
-Package natbib Warning: Citation `schulman2016gae' on page 88 undefined on inpu
-t line 13.
-
-
-Package natbib Warning: Citation `schulman2017ppo' on page 88 undefined on inpu
-t line 13.
-
-
-Package natbib Warning: Citation `fujimoto2018td3' on page 88 undefined on inpu
-t line 14.
-
-
-Package natbib Warning: Citation `haarnoja2018sac' on page 88 undefined on inpu
-t line 14.
-
-
-Package natbib Warning: Citation `bellemare2017distributional' on page 88 undef
-ined on input line 15.
-
-
-Package natbib Warning: Citation `dabney2018quantile' on page 88 undefined on i
-nput line 15.
-
-
-Package natbib Warning: Citation `fujimoto2019' on page 88 undefined on input l
-ine 16.
-
-
-Package natbib Warning: Citation `wu2019brac' on page 88 undefined on input lin
-e 16.
-
-
-Package natbib Warning: Citation `kumar2019bear' on page 88 undefined on input 
-line 16.
-
-
-Package natbib Warning: Citation `kumar2020' on page 88 undefined on input line
- 16.
-
-
-Package natbib Warning: Citation `kostrikov2021iql' on page 88 undefined on inp
-ut line 16.
-
-
-Package natbib Warning: Citation `agarwal2020offline' on page 88 undefined on i
-nput line 16.
-
-
-Package natbib Warning: Citation `levine2020' on page 88 undefined on input lin
-e 16.
-
+Chapter 5.
 
 
 [88
 
 ]
 
-Package natbib Warning: Citation `sutton2018' on page 89 undefined on input lin
-e 36.
-
-
-Package natbib Warning: Citation `mnih2015' on page 89 undefined on input line 
-36.
-
-
-Package natbib Warning: Citation `vanhasselt2016' on page 89 undefined on input
- line 36.
-
-
-
-[89]
-
-Package natbib Warning: Citation `dudik2014' on page 90 undefined on input line
- 49.
-
-
-Package natbib Warning: Citation `jiang2016' on page 90 undefined on input line
- 49.
-
-
-Package natbib Warning: Citation `thomas2015' on page 90 undefined on input lin
-e 49.
-
-(../figures/out/ope_grid_table.tex)
+[89] (../figures/out/ope_grid_table.tex)
 
 [90]
-
-Package natbib Warning: Citation `schulman2016gae' on page 91 undefined on inpu
-t line 72.
-
-
-Package natbib Warning: Citation `schulman2017ppo' on page 91 undefined on inpu
-t line 72.
-
-
-Package natbib Warning: Citation `schulman2015trpo' on page 91 undefined on inp
-ut line 72.
-
-
-Package natbib Warning: Citation `achiam2017cpo' on page 91 undefined on input 
-line 72.
-
-
-Package natbib Warning: Citation `vanhasselt2016' on page 91 undefined on input
- line 75.
-
-
-Package natbib Warning: Citation `wang2016dueling' on page 91 undefined on inpu
-t line 75.
-
-
-Package natbib Warning: Citation `schaul2016per' on page 91 undefined on input 
-line 75.
-
-
-Package natbib Warning: Citation `fujimoto2018td3' on page 91 undefined on inpu
-t line 75.
-
-
-Package natbib Warning: Citation `haarnoja2018sac' on page 91 undefined on inpu
-t line 75.
-
-
-Package natbib Warning: Citation `bellemare2017distributional' on page 91 undef
-ined on input line 75.
-
-
-Package natbib Warning: Citation `dabney2018quantile' on page 91 undefined on i
-nput line 75.
-
-
-Package natbib Warning: Citation `fujimoto2019' on page 91 undefined on input l
-ine 85.
-
-
-Package natbib Warning: Citation `kumar2019bear' on page 91 undefined on input 
-line 85.
-
-
-Package natbib Warning: Citation `kumar2020' on page 91 undefined on input line
- 85.
-
-
-Package natbib Warning: Citation `wu2019brac' on page 91 undefined on input lin
-e 85.
-
-
-Package natbib Warning: Citation `kostrikov2021iql' on page 91 undefined on inp
-ut line 85.
-
-
-Package natbib Warning: Citation `levine2020' on page 91 undefined on input lin
-e 85.
-
-
-Package natbib Warning: Citation `agarwal2020offline' on page 91 undefined on i
-nput line 85.
-
-
 
 [91]
 
 [92] (../figures/out/rl_agent_comparison_table.tex)
 
-Package natbib Warning: Citation `achiam2017cpo' on page 93 undefined on input 
-line 124.
-
-
-Package natbib Warning: Citation `tamar2015cvar' on page 93 undefined on input 
-line 124.
-
-
-
 [93]
 
-Package natbib Warning: Citation `thomas2015' on page 94 undefined on input lin
-e 127.
-
-
-Package natbib Warning: Citation `dudik2014' on page 94 undefined on input line
- 137.
-
-
-Package natbib Warning: Citation `jiang2016' on page 94 undefined on input line
- 137.
-
-
-
 [94]
-<../figures/rl_learning_curves.png, id=2219, 1405.25pt x 903.375pt>
+<../figures/rl_learning_curves.png, id=4455, 1405.25pt x 903.375pt>
 File: ../figures/rl_learning_curves.png Graphic file (type png)
 <use ../figures/rl_learning_curves.png>
 Package pdftex.def Info: ../figures/rl_learning_curves.png  used on input line 
 161.
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
-<../figures/hparam_sensitivity.png, id=2220, 1405.25pt x 903.375pt>
+<../figures/hparam_sensitivity.png, id=4456, 1405.25pt x 903.375pt>
 File: ../figures/hparam_sensitivity.png Graphic file (type png)
 <use ../figures/hparam_sensitivity.png>
 Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line 
@@ -2443,54 +2371,29 @@ Package pdftex.def Info: ../figures/hparam_sensitivity.png  used on input line
 (pdftex.def)             Requested size: 368.57965pt x 236.93962pt.
 
 
-[95 <../figures/rl_learning_curves.png>]
+[95]
 
-[96 <../figures/hparam_sensitivity.png>]
+[96 <../figures/rl_learning_curves.png>]
 
-[97]
+[97 <../figures/hparam_sensitivity.png>]
 
-Package natbib Warning: Citation `fujimoto2019' undefined on input line 312.
+[98]
 
+[99] (../figures/out/rl_vs_baseline_table.tex)
 
-Package natbib Warning: Citation `wu2019brac' undefined on input line 312.
-
-
-Package natbib Warning: Citation `kumar2019bear' undefined on input line 312.
-
-
-Package natbib Warning: Citation `kumar2020' undefined on input line 312.
-
-
-Package natbib Warning: Citation `kostrikov2021iql' undefined on input line 312
-.
-
-
-Package natbib Warning: Citation `fujimoto2021td3bc' undefined on input line 31
-2.
-
-
-Package natbib Warning: Citation `nair2020awac' undefined on input line 312.
-
-
-
-[98] (../figures/out/rl_vs_baseline_table.tex)
-
-[99]
-
-LaTeX Warning: Reference `sec:sim-acceptance-outcomes' on page 100 undefined on
- input line 352.
-
-<../figures/out/alpha_sensitivity_panel.png, id=2261, 903.375pt x 451.6875pt>
+[100]
+<../figures/out/alpha_sensitivity_panel.png, id=4510, 903.375pt x 451.6875pt>
 File: ../figures/out/alpha_sensitivity_panel.png Graphic file (type png)
 <use ../figures/out/alpha_sensitivity_panel.png>
 Package pdftex.def Info: ../figures/out/alpha_sensitivity_panel.png  used on in
 put line 366.
 (pdftex.def)             Requested size: 368.57965pt x 184.29019pt.
-(../figures/out/utilization_adjusted_sharpe_table.tex
-
-[100]) (../figures/out/cvar_benchmark_table.tex)
+ (../figures/out/utilization_adjusted_sharpe_table.tex)
+(../figures/out/cvar_benchmark_table.tex)
 
 [101 <../figures/out/alpha_sensitivity_panel.png>]
+
+[102]
 Underfull \hbox (badness 1314) in paragraph at lines 383--384
 \T1/cmr/m/n/12 (+20) This dis-ser-ta-tion em-ploys of-fline RL al-go-rithms tha
 t learn ex-clu-sively from
@@ -2502,75 +2405,25 @@ Overfull \hbox (8.72466pt too wide) in paragraph at lines 404--404
  []
 
 
-Package natbib Warning: Citation `fujimoto2019' on page 102 undefined on input 
-line 406.
-
-
-Package natbib Warning: Citation `wu2019brac' on page 102 undefined on input li
-ne 407.
-
-
-Package natbib Warning: Citation `kumar2019bear' on page 102 undefined on input
- line 408.
-
-
-Package natbib Warning: Citation `kumar2020' on page 102 undefined on input lin
-e 409.
-
-
-Package natbib Warning: Citation `kostrikov2021iql' on page 102 undefined on in
-put line 410.
-
-
-Package natbib Warning: Citation `fujimoto2021td3bc' on page 102 undefined on i
-nput line 411.
-
-
-Package natbib Warning: Citation `nair2020awac' on page 102 undefined on input 
-line 412.
-
-
-LaTeX Warning: Reference `app:leakage_audit' on page 102 undefined on input lin
-e 433.
-
-
-LaTeX Warning: Reference `app:leakage_audit' on page 102 undefined on input lin
-e 433.
-
-
-
-[102]
 
 [103]
 
-LaTeX Warning: Reference `app:leakage_audit' on page 104 undefined on input lin
-e 446.
+[104])
+(../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
 
-) (../chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex
-
-
-[104]
-Chapter 8.
-
-Package natbib Warning: Citation `kelly1956' on page 105 undefined on input lin
-e 8.
+[105]
+Chapter 6.
 
 
-
-[105
+[106
 
 ] (../figures/out/cvar_benchmark_table.tex)
 (../figures/out/teaser_copula_impact_table.tex)
 
-Package natbib Warning: Citation `rockafellar2000' on page 106 undefined on inp
-ut line 74.
-
-
-
-[106]
-
 [107]
-<../figures/bankroll_hist.png, id=2346, 715.2321pt x 426.393pt>
+
+[108]
+<../figures/bankroll_hist.png, id=4608, 715.2321pt x 426.393pt>
 File: ../figures/bankroll_hist.png Graphic file (type png)
 <use ../figures/bankroll_hist.png>
 Package pdftex.def Info: ../figures/bankroll_hist.png  used on input line 97.
@@ -2602,8 +2455,8 @@ Underfull \hbox (badness 3907) in paragraph at lines 33--33
 
 )
 
-[108 <../figures/bankroll_hist.png>]
-<../figures/bankroll_trajectories.png, id=2363, 1004.7939pt x 723.4227pt>
+[109 <../figures/bankroll_hist.png>]
+<../figures/bankroll_trajectories.png, id=4624, 1004.7939pt x 723.4227pt>
 File: ../figures/bankroll_trajectories.png Graphic file (type png)
 <use ../figures/bankroll_trajectories.png>
 Package pdftex.def Info: ../figures/bankroll_trajectories.png  used on input li
@@ -2611,28 +2464,20 @@ ne 111.
 (pdftex.def)             Requested size: 390.25536pt x 280.97467pt.
 
 
-[109 <../figures/bankroll_trajectories.png>]
+[110 <../figures/bankroll_trajectories.png>]
 
-[110]) (../chapter_7_simulation/chapter_7_simulation.tex
-
-[111]
+[111]) (../chapter_7_simulation/chapter_7_simulation.tex
 
 [112]
-Chapter 9.
 
-Package natbib Warning: Citation `glasserman2003' on page 113 undefined on inpu
-t line 13.
-
-
-Package natbib Warning: Citation `wong2001sharp' on page 113 undefined on input
- line 28.
+[113]
+Chapter 7.
 
 
-
-[113
+[114
 
 ]
-<../figures/teaser_ev_heatmap.png, id=2413, 451.6875pt x 379.4175pt>
+<../figures/teaser_ev_heatmap.png, id=4677, 451.6875pt x 379.4175pt>
 File: ../figures/teaser_ev_heatmap.png Graphic file (type png)
 <use ../figures/teaser_ev_heatmap.png>
 Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 4
@@ -2640,923 +2485,853 @@ Package pdftex.def Info: ../figures/teaser_ev_heatmap.png  used on input line 4
 (pdftex.def)             Requested size: 390.25536pt x 327.83267pt.
 
 
-[114 <../figures/teaser_ev_heatmap.png>]
-
-[115]
+[115 <../figures/teaser_ev_heatmap.png>]
 
 [116]
 
-LaTeX Warning: Reference `tab:mc-convergence' on page 1 undefined on input line
- 107.
+[117] (../figures/out/mc_convergence_table.tex)
 
-(../figures/out/mc_convergence_table.tex
-! Misplaced \noalign.
-\bottomrule ->\noalign 
-                       {\ifnum 0=`}\fi \@aboverulesep =\aboverulesep \global...
-l.16       \bottomrule
-                      
-I expect to see \noalign only after the \cr of
-an alignment. Proceed, and I'll ignore this case.
+[118]
 
-! Missing } inserted.
-<inserted text> 
-                }
-l.17     \end
-             {tabular}
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
+[119]
 
-! Missing \endgroup inserted.
-<inserted text> 
-                \endgroup 
-l.17     \end
-             {tabular}
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
+[120] (../figures/out/slippage_model_table.tex)
+(../figures/out/sim_acceptance_table.tex)
+<../figures/out/sim_acceptance_rates.png, id=4737, 650.43pt x 325.215pt>
+File: ../figures/out/sim_acceptance_rates.png Graphic file (type png)
+<use ../figures/out/sim_acceptance_rates.png>
+Package pdftex.def Info: ../figures/out/sim_acceptance_rates.png  used on input
+ line 300.
+(pdftex.def)             Requested size: 390.25536pt x 195.1305pt.
+<../figures/out/sim_acceptance_vs_live_perf.png, id=4738, 650.43pt x 325.215pt>
 
-! Missing } inserted.
-<inserted text> 
-                }
-l.17     \end
-             {tabular}
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
+File: ../figures/out/sim_acceptance_vs_live_perf.png Graphic file (type png)
+<use ../figures/out/sim_acceptance_vs_live_perf.png>
+Package pdftex.def Info: ../figures/out/sim_acceptance_vs_live_perf.png  used o
+n input line 325.
+(pdftex.def)             Requested size: 390.25536pt x 195.1305pt.
+)
+(../chapter_8_results_discussion/chapter_8_results_discussion.tex
 
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
+[121]
 
-! Missing } inserted.
-<inserted text> 
-                }
-l.17     \end
-             {tabular}
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
+[122 <../figures/out/sim_acceptance_rates.png> <../figures/out/sim_acceptance_v
+s_live_perf.png>]
+Chapter 8.
+(../figures/out/multimodel_comparison_table.tex)
 
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
+[123
 
-! Misplaced \cr.
-<inserted text> \cr 
+] (../figures/out/benchmark_comparison_table.tex
+Overfull \hbox (55.32356pt too wide) in paragraph at lines 6--21
+ [][] 
+ []
+
+) (../figures/out/benchmark_significance_table.tex)
+
+[124] (../figures/out/betting_performance_table.tex)
+
+[125] (../figures/out/oos_record_table.tex)
+(../figures/out/clv_distribution_table.tex)
+(../figures/out/zero_weeks_table.tex)
+
+[126]
+
+[127] (../figures/out/shap_global_importance_table.tex)
+(../figures/out/shap_local_examples_table.tex
+Overfull \hbox (5.38696pt too wide) in paragraph at lines 14--14
+[]|\T1/cmtt/m/n/12 away_epa_pp_last3|  
+ []
+
+
+Overfull \hbox (5.38696pt too wide) in paragraph at lines 14--14
+[]|\T1/cmtt/m/n/12 away_epa_pp_last3|  
+ []
+
+
+Overfull \hbox (5.38696pt too wide) in paragraph at lines 14--14
+[]|\T1/cmtt/m/n/12 away_epa_pp_last3|  
+ []
+
+)
+
+[128]
+Underfull \hbox (badness 10000) in paragraph at lines 152--152
+[]\T1/cmr/bx/n/14.4 (+20) Local In-ter-pretable Model-Agnostic Ex-pla-na-tions
+ []
+
+
+
+[129] (../figures/out/weather_effects_comparison_table.tex)
+
+[130]
+
+[131]
+
+[132]
+
+[133] (../figures/out/extreme_weather_table.tex)
+
+[134
+
+] (../figures/out/core_ablation_table.tex)
+
+[135]
+Underfull \hbox (badness 1448) in paragraph at lines 224--226
+\T1/cmr/m/n/12 (+20) bivariate[]Poisson//copulas), mul-ti-ple RL al-go-rithms (
+IQL//CQL//TD3+BC//
+ []
+
+
+
+[136]
+
+[137] (../figures/out/diebold_mariano_table.tex)
+(../figures/out/bootstrap_ci_table.tex)
+
+[138] (../figures/out/multiple_testing_table.tex)
+
+[139] (../figures/out/per_season_top3_table.tex
+
+[140])
+
+[141]
+
+[142] (../chapter_8_results_discussion/section_bnn_calibration_study.tex
+
+[143
+
+]
+
+[144]
+<../figures/out/coverage_comparison_bar_chart.pdf, id=4903, 568.742pt x 351.769
+84pt>
+File: ../figures/out/coverage_comparison_bar_chart.pdf Graphic file (type pdf)
+<use ../figures/out/coverage_comparison_bar_chart.pdf>
+Package pdftex.def Info: ../figures/out/coverage_comparison_bar_chart.pdf  used
+ on input line 51.
+(pdftex.def)             Requested size: 411.93768pt x 254.7931pt.
+ (../figures/out/final_comparison_comprehensive_table.tex)
+Overfull \hbox (60.04637pt too wide) in paragraph at lines 3--61
+ [][] 
+ []
+
+
+
+[145 <../figures/out/coverage_comparison_bar_chart.pdf>]
+
+[146]
+
+[147] (../figures/out/phase1_feature_ablation_table.tex)
+Overfull \hbox (85.90952pt too wide) in paragraph at lines 4--141
+ [] 
+ []
+
+<../figures/out/feature_ablation_progression.pdf, id=5022, 566.18411pt x 351.84
+6pt>
+File: ../figures/out/feature_ablation_progression.pdf Graphic file (type pdf)
+<use ../figures/out/feature_ablation_progression.pdf>
+Package pdftex.def Info: ../figures/out/feature_ablation_progression.pdf  used 
+on input line 147.
+(pdftex.def)             Requested size: 368.57965pt x 229.05688pt.
+
+
+[148]
+
+[149 <../figures/out/feature_ablation_progression.pdf>]
+
+[150] (../figures/out/bnn_prior_sensitivity_table.tex)
+
+[151]
+
+[152]
+
+[153]
+
+Package natbib Warning: Citation `koenker1978regression' on page 154 undefined 
+on input line 280.
+
+
+Package natbib Warning: Citation `vovk2005algorithmic' on page 154 undefined on
+ input line 300.
+
+
+Package natbib Warning: Citation `shafer2008tutorial' on page 154 undefined on 
+input line 300.
+
+
+
+[154]
+
+Package natbib Warning: Citation `taquet2021mapie' on page 155 undefined on inp
+ut line 314.
+
+
+
+[155] (../figures/out/phase3_uq_methods_comparison_table.tex
+
+! LaTeX Error: Not in outer par mode.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.1 \begin{table}[t]
                     
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-I can't figure out why you would want to use a tab mark
-or \cr or \span just now. If something like a right brace
-up above has ended a previous alignment prematurely,
-you're probably due for more error messages, and you
-might try typing `S' now just to see what is salvageable.
-
-! Missing \cr inserted.
-<inserted text> 
-                \cr 
-l.17     \end
-             {tabular}
-I'm guessing that you meant to end an alignment here.
-
-! Misplaced \cr.
-<inserted text> \cr 
-                    
-l.17     \end
-             {tabular}
-(That makes 100 errors; please try again.) 
+You've lost some text.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (144.62987pt too wide) in paragraph at lines 6--31
+ [] 
+ []
+
+)
+
+[156]
+<../figures/out/calibration_sharpness_scatter.pdf, id=5199, 568.5902pt x 423.99
+53pt>
+File: ../figures/out/calibration_sharpness_scatter.pdf Graphic file (type pdf)
+<use ../figures/out/calibration_sharpness_scatter.pdf>
+Package pdftex.def Info: ../figures/out/calibration_sharpness_scatter.pdf  used
+ on input line 376.
+(pdftex.def)             Requested size: 368.57965pt x 274.85614pt.
+
+
+[157]
+
+[158 <../figures/out/calibration_sharpness_scatter.pdf>]
+
+[159]
+
+[160]
+
+Package natbib Warning: Citation `akiba2019optuna' on page 161 undefined on inp
+ut line 456.
+
+
+Overfull \hbox (53.00801pt too wide) detected at line 472
+[][][][][] \OT1/cmr/m/n/12 = 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 7 \OMS/cmsy/m/n
+/12 ^^A [] [] \OT1/cmr/m/n/12 + 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 2 \OMS/cmsy/
+m/n/12 ^^A [] [] \OT1/cmr/m/n/12 + 0\OML/cmm/m/it/12 :\OT1/cmr/m/n/12 1 \OMS/cm
+sy/m/n/12 ^^A [] []
+ []
+
+
+
+[161]
+
+LaTeX Warning: Reference `fig:phase_improvements_breakdown' on page 162 undefin
+ed on input line 510.
+
+
+
+[162]
+
+Package natbib Warning: Citation `sculley2018winner' on page 163 undefined on i
+nput line 553.
+
+
+
+[163]
+
+LaTeX Warning: Reference `fig:improvement_hierarchy' on page 164 undefined on i
+nput line 568.
+
+
+
+[164]
+Overfull \hbox (101.54271pt too wide) in paragraph at lines 609--621
+ [][] 
+ []
+
+
+
+[165]
+Underfull \hbox (badness 1297) in paragraph at lines 642--643
+\T1/cmr/m/n/12 (+20) pet-i-tive point pre-dic-tion (18.5
+ []
+
+
+Overfull \hbox (12.6892pt too wide) in paragraph at lines 638--651
+ [][] 
+ []
+
+
+
+[166]
+
+[167]
+
+[168])) (../chapter_9_production_deployment/chapter_9_production_deployment.tex
+
+
+[169]
+Chapter 9.
+
+
+[170
+
+]
+
+[171]
+Underfull \hbox (badness 3724) in paragraph at lines 100--101
+[]\T1/cmr/m/n/12 (+20) Identify TNF games: \T1/cmtt/m/n/12 EXTRACT(DOW FROM kic
+koff) = 4 \T1/cmr/m/n/12 (+20) (Thurs-day =
+ []
+
+
+
+[172]
+
+[173]
+Package microtype Info: Loading generic protrusion settings for font family
+(microtype)             `cmtt' (encoding: TS1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+
+
+[174]
+
+[175]
+
+[176]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 233.
+
+Overfull \hbox (12.93333pt too wide) in paragraph at lines 233--235
+ []\T1/cmr/bx/n/12 (-20) Statistical Frame-work (\T1/cmtt/m/n/12 py/compute/sta
+tistics/\T1/cmr/bx/n/12 (-20) ).[] \T1/cmr/m/n/12 (-20) The \T1/cmtt/m/n/12 py/
+compute/statistics/
+ []
+
+
+Underfull \hbox (badness 2205) in paragraph at lines 235--236
+[]\T1/cmtt/m/n/12 permutation_test(x, y, n_permutations)\T1/cmr/m/n/12 (+20) : 
+Non[]parametric two[]sample
+ []
+
+
+Underfull \hbox (badness 1168) in paragraph at lines 237--238
+[]\T1/cmtt/m/n/12 multiple_comparisons.fdr_correction(p_values)\T1/cmr/m/n/12 (
++20) : Benjamini--Hochberg
+ []
+
+
+
+[177]
+Overfull \hbox (3.64082pt too wide) in paragraph at lines 299--300
+[]\T1/cmr/m/n/12 (-20) Result: \T1/cmtt/m/n/12 game_id: 2024_11_NYG_PHI, home: 
+NYG, away: PHI, home_score:
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 299--300
+\T1/cmtt/m/n/12 21, away_score: 17, spread: -7.0 (PHI), home_rest: 7, away_rest
+:
+ []
+
+
+
+[178]
+
+[179]
+Underfull \hbox (badness 1590) in paragraph at lines 372--373
+[]\T1/cmr/m/n/12 (+20) Claude gen-er-ates a query fil-ter-ing for TNF games whe
+re \T1/cmtt/m/n/12 home_score >
+ []
+
+
+
+[180]
+
+[181]
+
+[182]
+
+[183]
+Underfull \hbox (badness 1019) in paragraph at lines 560--561
+\T1/cmr/m/n/12 (+20) All ta-bles are ac-ces-si-ble: \T1/cmtt/m/n/12 games\T1/cm
+r/m/n/12 (+20) , \T1/cmtt/m/n/12 plays\T1/cmr/m/n/12 (+20) , \T1/cmtt/m/n/12 od
+ds_history\T1/cmr/m/n/12 (+20) , \T1/cmtt/m/n/12 mart.game_summary\T1/cmr/m/n/1
+2 (+20) ,
+ []
+
+
+
+[184]
+
+[185]
+
+[186]
+
+[187]
+
+[188]
+
+[189]
+
+[190]
+
+[191]
+
+[192]
+
+[193]
+
+[194]
+Underfull \hbox (badness 5316) in paragraph at lines 953--955
+ []\T1/cmr/bx/n/12 (+20) SportsRadar NFL API ($10--20K/year, +0.5--1% EV).[] \T
+1/cmr/m/n/12 (+20) Real[]time
+ []
+
+
+
+[195]
+
+[196]
+
+[197]) (../chapter_10_conclusion/chapter_10_conclusion.tex
+
+[198]
+Chapter 10.
+
+
+[199
+
+]
+
+[200]
+
+[201]
+
+[202]
+
+[203]) (../chapter_11_market_optimization/chapter_11_market_optimization.tex
+
+[204]
+Chapter 11.
+
+
+[205
+
+]
+Overfull \hbox (119.8247pt too wide) in paragraph at lines 46--47
+ []\T1/cmr/bx/n/12 (-20) Line Move-ment Track-ing.[] \T1/cmr/m/n/12 (-20) The \
+T1/cmtt/m/n/12 LineMovementTracker \T1/cmr/m/n/12 (-20) class (\T1/cmtt/m/n/12 
+py/features/line_movement_tracker.py\T1/cmr/m/n/12 (-20) ,
+ []
+
+
+Overfull \hbox (17.72739pt too wide) in paragraph at lines 49--51
+ []\T1/cmr/bx/n/12 (-20) Deployment Pipeline.[] \T1/cmr/m/n/12 (-20) The \T1/cm
+tt/m/n/12 EWBStrategy \T1/cmr/m/n/12 (-20) class (\T1/cmtt/m/n/12 py/production
+/ewb_deployment.py\T1/cmr/m/n/12 (-20) ,
+ []
+
+
+
+[206]
+
+[207]
+
+[208]
+
+[209]
+
+[210]
+
+[211]
+
+[212]
+
+[213]
+
+[214]) (../chapter_12_profit_optimization/chapter_12_profit_optimization.tex
+
+[215]
+Chapter 12.
+
+
+[216
+
+]
+
+[217]
+
+[218]
+
+[219]
+
+[220]
+
+[221]
+
+[222]
+
+[223]
+
+[224]
+Underfull \hbox (badness 1028) in paragraph at lines 452--452
+\T1/cmr/m/n/12 (+20) book rout-ing, ar-bi-trage de-tec-tion, and un-cer-tainty 
+seg-men-ta-tion^^Vcollectively
+ []
+
+) (../appendix/appendix_consolidated.tex
+
+[225]
+
+[226]
+Appendix A.
+
+
+[227
+
+]
+
+[228]
+Overfull \hbox (20.25954pt too wide) in paragraph at lines 97--98
+[] \T1/cmr/m/n/12 (-20) Com-pute CQL penalty: $\OMS/cmsy/m/n/12 L[]   [] [][] [
+]$ 
+ []
+
+
+
+[229]
+
+[230]
+
+[231]
+Appendix B.
+
+
+[232
+
+]
+
+[233]
+
+[234]
+
+[235]
+Appendix C.
+
+
+[236
+
+]
+
+[237]
+
+[238]
+
+[239]
+Appendix D.
+(../figures/out/cql_performance_table.tex
+Underfull \hbox (badness 10000) in paragraph at lines 39--40
+[]\T1/cmr/m/n/10.95 (+20) Policy im-prove-ment cal-cu-lated as:
+ []
+
+)
+<../figures/out/cql_training_curves.png, id=5956, 860.013pt x 570.2103pt>
+File: ../figures/out/cql_training_curves.png Graphic file (type png)
+<use ../figures/out/cql_training_curves.png>
+Package pdftex.def Info: ../figures/out/cql_training_curves.png  used on input 
+line 404.
+(pdftex.def)             Requested size: 411.93768pt x 273.12358pt.
+
+
+[240
+
+]
+
+[241]
+
+[242 <../figures/out/cql_training_curves.png>]
+
+[243]
+
+[244]
+Underfull \hbox (badness 2213) in paragraph at lines 488--489
+ []\T1/cmr/bx/n/12 (+20) Realistic Sce-nario.[] \T1/cmr/m/n/12 (+20) +0.5--1% a
+c-cu-racy im-prove-ment. The base-line XG-
+ []
+
+
+Underfull \hbox (badness 1924) in paragraph at lines 488--489
+\T1/cmr/m/n/12 (+20) Boost v2 model al-ready cap-tures team strength via \T1/cm
+tt/m/n/12 prior_epa_mean_diff\T1/cmr/m/n/12 (+20) ,
+ []
+
+
+
+[245]
+
+[246]
+
+[247]
+
+[248]
+
+[249]
+Overfull \hbox (19.45703pt too wide) detected at line 665
+[]
+ []
+
+
+
+[250]
+
+[251]
+
+[252]
+
+[253]
+Overfull \hbox (16.41304pt too wide) in paragraph at lines 817--818
+\T1/cmr/m/n/12 (-20) lines). In-te-grates with port-fo-lio op-ti-mizer (\T1/cmt
+t/m/n/12 py/optimization/portfolio_optimizer.py\T1/cmr/m/n/12 (-20) )
+ []
+
+
+
+[254]
+Overfull \hbox (39.93977pt too wide) in paragraph at lines 856--857
+[]$[]$ \T1/cmr/m/n/12 (-20) Ad-vanced pri-ors im-ple-mented with em-pir-i-cal B
+ayes (R/ad-vanced_priors_elicitation.R) 
+ []
+
+
+Underfull \hbox (badness 1668) in paragraph at lines 857--858
+[]$[]$ \T1/cmr/m/n/12 (+20) Bayesian neu-ral net-work im-ple-mented and demo te
+sted (py/-mod-el-
+ []
+
+
+Overfull \hbox (64.90689pt too wide) in paragraph at lines 864--865
+[]\T1/cmr/m/n/12 (-20) Train QB-WR chem-istry model on full dataset (R/bayesian
+_receiving_with_qb_chemistry.R) 
+ []
+
+
+
+[255]
+
+[256]
+
+[257]
+Appendix E.
+
+
+[258
+
+]
+
+[259]
+
+[260]
+
+[261]
+Appendix F.
+
+
+[262
+
+]
+
+[263]
+
+[264]
+Appendix G.
+
+
+[265
+
+]
+
+[266]
+
+[267]
+Appendix H.
+
+
+[268
+
+]
+
+[269]
+
+[270] (../appendix/leakage_audit.tex
+
+[271]
+Appendix I.
+
+Overfull \hbox (33.47292pt too wide) in paragraph at lines 15--16
+[]\T1/cmr/bx/n/12 (-20) Feature Cat-a-log\T1/cmr/m/n/12 (-20) : A machine-reada
+ble YAML man-i-fest (\T1/cmtt/m/n/12 py/features/catalog.yaml\T1/cmr/m/n/12 (-2
+0) )
+ []
+
+
+Overfull \hbox (20.64554pt too wide) in paragraph at lines 19--20
+[]\T1/cmr/bx/n/12 (-20) Runtime Val-ida-tor\T1/cmr/m/n/12 (-20) : A val-i-da-ti
+on pipeline (\T1/cmtt/m/n/12 py/features/catalog_validator.py\T1/cmr/m/n/12 (-2
+0) )
+ []
+
+(../figures/out/leakage_audit_table.tex)
+
+[272
+
+]
+Underfull \hbox (badness 1314) in paragraph at lines 67--68
+[]\T1/cmr/bx/n/12 (+20) Validation Func-tions\T1/cmr/m/n/12 (+20) : Code that e
+x-plic-itly checks for leak-age (e.g.,
+ []
+
+
+
+[273]
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
+nput line 76.
+
+
+[274] (/usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
+(/usr/local/texlive/2025/texmf-dist/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
+
+[275]
+
+[276]
+
+LaTeX Warning: Reference `app:feature_catalog' on page 277 undefined on input l
+ine 225.
+
+) (../appendix/alternative_approaches.tex
+
+[277]
+Appendix J.
+
+
+[278
+
+]
+
+[279]
+
+[280]
+
+[281]
+
+[282]
+
+[283]
+Overfull \hbox (74.71213pt too wide) in paragraph at lines 210--221
+ [][] 
+ []
+
+))
+
+[284] (./main.bbl
+
+[285
+
+
+
+]
+Underfull \hbox (badness 1931) in paragraph at lines 100--106
+\T1/cmr/m/n/12 (+20) re-in-force-ment learn-ing.  \T1/cmr/m/it/12 (+20) Ad-vanc
+es in Neu-ral In-for-ma-tion Pro-cess-ing Sys-
+ []
+
+
+
+[286]
+
+[287]
+
+[288])
+
+Package natbib Warning: There were undefined citations.
+
+
+
+[289] (./main.aux)
+ ***********
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+ ***********
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: 54FF19115676D71259D5805768328751;116750.
+
+ ) 
 Here is how much of TeX's memory you used:
- 46556 strings out of 473190
- 1013330 string characters out of 5715801
- 1763625 words of memory out of 5000000
- 67628 multiletter control sequences out of 15000+600000
- 607930 words of font info for 364 fonts, out of 8000000 for 9000
+ 49005 strings out of 473190
+ 1057910 string characters out of 5715801
+ 1809658 words of memory out of 5000000
+ 68778 multiletter control sequences out of 15000+600000
+ 615591 words of font info for 435 fonts, out of 8000000 for 9000
  1151 hyphenation exceptions out of 8191
- 103i,17n,117p,1001b,2205s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 103i,19n,117p,1949b,2205s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
+></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb><
+/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></
+usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb
+></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></u
+sr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/l
+ocal/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/l
+ocal/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/loc
+al/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local
+/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/te
+xlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texli
+ve/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/
+2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2
+025/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/202
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2025/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2025/te
+xmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/202
+5/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive
+/2025/texmf-dist/fonts/type1/public/cm-super/sfbi1095.pfb></usr/local/texlive/2
+025/texmf-dist/fonts/type1/public/cm-super/sfbx0800.pfb></usr/local/texlive/202
+5/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2025/
+texmf-dist/fonts/type1/public/cm-super/sfbx1095.pfb></usr/local/texlive/2025/te
+xmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb></usr/local/texlive/2025/texm
+f-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2025/texmf-
+dist/fonts/type1/public/cm-super/sfbx1728.pfb></usr/local/texlive/2025/texmf-di
+st/fonts/type1/public/cm-super/sfbx2488.pfb></usr/local/texlive/2025/texmf-dist
+/fonts/type1/public/cm-super/sfit0800.pfb></usr/local/texlive/2025/texmf-dist/f
+onts/type1/public/cm-super/sfit1000.pfb></usr/local/texlive/2025/texmf-dist/fon
+ts/type1/public/cm-super/sfit1200.pfb></usr/local/texlive/2025/texmf-dist/fonts
+/type1/public/cm-super/sfrm0700.pfb></usr/local/texlive/2025/texmf-dist/fonts/t
+ype1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2025/texmf-dist/fonts/typ
+e1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1
+/public/cm-super/sfrm1095.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/p
+ublic/cm-super/sfrm1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/pub
+lic/cm-super/sfrm1440.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/publi
+c/cm-super/sfrm2074.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/
+cm-super/sfti1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm
+-super/sfti1095.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-s
+uper/sfti1200.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-sup
+er/sftt0800.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super
+/sftt1000.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/s
+ftt1095.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sft
+t1200.pfb>
+Output written on main.pdf (322 pages, 5275317 bytes).
+PDF statistics:
+ 6976 PDF objects out of 7423 (max. 8388607)
+ 6153 compressed objects within 62 object streams
+ 1911 named destinations out of 2073 (max. 500000)
+ 95921 words of extra memory for PDF output out of 106986 (max. 10000000)
 
-!  ==> Fatal error occurred, no output PDF file produced!

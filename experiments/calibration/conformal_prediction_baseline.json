@@ -1,0 +1,36 @@
+{
+  "experiment_name": "conformal_prediction_baseline",
+  "config": {
+    "model": "Conformal Prediction (Split Conformal + Random Forest)",
+    "features": [
+      "carries",
+      "avg_rushing_l3",
+      "season_avg",
+      "week",
+      "spread_close",
+      "total_close"
+    ],
+    "n_features": 6,
+    "coverage_target": 0.9,
+    "conformal_method": "plus",
+    "cv_folds": 5,
+    "base_model": "RandomForest",
+    "n_estimators": 100
+  },
+  "metrics": {
+    "coverage": {
+      "90pct": 0.8446866485013624,
+      "68pct": 0.6321525885558583
+    },
+    "sharpness": {
+      "width_90": 66.04940502960467
+    },
+    "point_accuracy": {
+      "mae": 19.100723068051074,
+      "rmse": 25.585959463862817,
+      "mape": 30.81614286617799
+    },
+    "n_samples": 367
+  },
+  "notes": "Conformal prediction with theoretical coverage guarantee. Uses split conformal method with Random Forest base model. Provides distribution-free prediction intervals."
+}

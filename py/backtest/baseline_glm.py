@@ -18,17 +18,16 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.preprocessing import StandardScaler
 
-
 # Default features for spread prediction
 DEFAULT_FEATURES = [
-    'prior_epa_mean_diff',
-    'epa_pp_last3_diff',
-    'rest_diff',
-    'season_win_pct_diff',
-    'win_pct_last5_diff',
-    'prior_margin_avg_diff',
-    'points_for_last3_diff',
-    'points_against_last3_diff',
+    "prior_epa_mean_diff",
+    "epa_pp_last3_diff",
+    "rest_diff",
+    "season_win_pct_diff",
+    "win_pct_last5_diff",
+    "prior_margin_avg_diff",
+    "points_for_last3_diff",
+    "points_against_last3_diff",
 ]
 
 
@@ -37,13 +36,13 @@ def load_data(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
 
     # Ensure required columns exist
-    if 'home_cover' not in df.columns:
+    if "home_cover" not in df.columns:
         raise ValueError("CSV must contain 'home_cover' column")
-    if 'season' not in df.columns:
+    if "season" not in df.columns:
         raise ValueError("CSV must contain 'season' column")
 
     # Drop rows with missing values in target
-    df = df.dropna(subset=['home_cover'])
+    df = df.dropna(subset=["home_cover"])
 
     return df
 
@@ -74,9 +73,9 @@ def train_and_predict(
 
     # Extract features and target
     X_train = train[features].fillna(0).values
-    y_train = train['home_cover'].values
+    y_train = train["home_cover"].values
     X_test = test[features].fillna(0).values
-    y_test = test['home_cover'].values
+    y_test = test["home_cover"].values
 
     # Standardize features
     scaler = StandardScaler()
@@ -103,7 +102,7 @@ def plot_reliability_diagram(
     """Create and save reliability diagram."""
     # Compute calibration curve
     prob_true, prob_pred = calibration_curve(
-        y_true, y_pred_proba, n_bins=n_bins, strategy='uniform'
+        y_true, y_pred_proba, n_bins=n_bins, strategy="uniform"
     )
 
     # Compute metrics
@@ -114,34 +113,48 @@ def plot_reliability_diagram(
     fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
 
     # Plot calibration curve
-    ax.plot(prob_pred, prob_true, 'o-', color='#2a6fbb', linewidth=2,
-            markersize=8, label=f'Model (n={len(y_true)})')
+    ax.plot(
+        prob_pred,
+        prob_true,
+        "o-",
+        color="#2a6fbb",
+        linewidth=2,
+        markersize=8,
+        label=f"Model (n={len(y_true)})",
+    )
 
     # Perfect calibration line
-    ax.plot([0, 1], [0, 1], 'k--', linewidth=1.5, alpha=0.7, label='Perfect')
+    ax.plot([0, 1], [0, 1], "k--", linewidth=1.5, alpha=0.7, label="Perfect")
 
     # Labels and formatting
-    title = f'Reliability Diagram'
+    title = "Reliability Diagram"
     if season:
-        title += f' ({season})'
+        title += f" ({season})"
     ax.set_title(title, fontsize=12, pad=10)
-    ax.set_xlabel('Predicted Probability', fontsize=11)
-    ax.set_ylabel('Observed Frequency', fontsize=11)
+    ax.set_xlabel("Predicted Probability", fontsize=11)
+    ax.set_ylabel("Observed Frequency", fontsize=11)
     ax.set_xlim(-0.05, 1.05)
     ax.set_ylim(-0.05, 1.05)
-    ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
-    ax.legend(loc='upper left', fontsize=9)
+    ax.grid(True, alpha=0.3, linestyle="--", linewidth=0.5)
+    ax.legend(loc="upper left", fontsize=9)
 
     # Add metrics as text
-    metrics_text = f'Brier: {brier:.4f}\nLogLoss: {logloss:.4f}'
-    ax.text(0.95, 0.05, metrics_text, transform=ax.transAxes,
-            fontsize=9, verticalalignment='bottom', horizontalalignment='right',
-            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.3))
+    metrics_text = f"Brier: {brier:.4f}\nLogLoss: {logloss:.4f}"
+    ax.text(
+        0.95,
+        0.05,
+        metrics_text,
+        transform=ax.transAxes,
+        fontsize=9,
+        verticalalignment="bottom",
+        horizontalalignment="right",
+        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.3),
+    )
 
     # Save
     plt.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=100, bbox_inches='tight')
+    plt.savefig(output_path, dpi=100, bbox_inches="tight")
     plt.close()
 
     print(f"✅ Saved reliability diagram: {output_path}")
@@ -150,46 +163,36 @@ def plot_reliability_diagram(
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Train baseline GLM and generate reliability diagram'
+        description="Train baseline GLM and generate reliability diagram"
     )
     parser.add_argument(
-        '--features-csv',
+        "--features-csv",
         type=Path,
-        default=Path('data/processed/features/asof_team_features.csv'),
-        help='Path to features CSV'
+        default=Path("data/processed/features/asof_team_features.csv"),
+        help="Path to features CSV",
     )
+    parser.add_argument("--start-season", type=int, required=True, help="Test season to predict")
     parser.add_argument(
-        '--start-season',
+        "--end-season",
         type=int,
-        required=True,
-        help='Test season to predict'
+        help="End season (for compatibility, uses start-season as test season)",
     )
     parser.add_argument(
-        '--end-season',
+        "--min-season",
         type=int,
-        help='End season (for compatibility, uses start-season as test season)'
+        help="Minimum training season (optional, uses all prior seasons if not set)",
     )
     parser.add_argument(
-        '--min-season',
-        type=int,
-        help='Minimum training season (optional, uses all prior seasons if not set)'
+        "--cal-plot", type=Path, help="Output path for calibration/reliability plot PNG"
     )
     parser.add_argument(
-        '--cal-plot',
-        type=Path,
-        help='Output path for calibration/reliability plot PNG'
-    )
-    parser.add_argument(
-        '--cal-bins',
+        "--cal-bins",
         type=int,
         default=10,
-        help='Number of bins for calibration curve (default: 10)'
+        help="Number of bins for calibration curve (default: 10)",
     )
     parser.add_argument(
-        '--features',
-        nargs='+',
-        default=DEFAULT_FEATURES,
-        help='Feature columns to use'
+        "--features", nargs="+", default=DEFAULT_FEATURES, help="Feature columns to use"
     )
 
     args = parser.parse_args()
@@ -212,9 +215,7 @@ def main():
     # Train and predict
     print(f"\nTraining for season {test_season}...")
     try:
-        y_true, y_pred_proba = train_and_predict(
-            df, test_season, args.features, args.min_season
-        )
+        y_true, y_pred_proba = train_and_predict(df, test_season, args.features, args.min_season)
     except ValueError as e:
         print(f"ERROR: {e}")
         return 1
@@ -222,12 +223,11 @@ def main():
     # Generate reliability diagram
     if args.cal_plot:
         plot_reliability_diagram(
-            y_true, y_pred_proba, args.cal_plot,
-            n_bins=args.cal_bins, season=test_season
+            y_true, y_pred_proba, args.cal_plot, n_bins=args.cal_bins, season=test_season
         )
 
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

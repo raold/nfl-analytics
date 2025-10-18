@@ -15,15 +15,13 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import execute_values
 import xgboost as xgb
+from psycopg2.extras import execute_values
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -36,11 +34,11 @@ logger = logging.getLogger(__name__)
 
 # Database config
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', 5544)),
-    'dbname': os.getenv('DB_NAME', 'devdb01'),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 5544)),
+    "dbname": os.getenv("DB_NAME", "devdb01"),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 # Model paths
@@ -48,49 +46,94 @@ MODELS_DIR = Path(__file__).parent.parent.parent / "models" / "props"
 
 # Prop types and their models
 PROP_MODELS = {
-    'passing_yards': 'passing_yards_v1',
-    'rushing_yards': 'rushing_yards_v1',
-    'receiving_yards': 'receiving_yards_v1',
+    "passing_yards": "passing_yards_v1",
+    "rushing_yards": "rushing_yards_v1",
+    "receiving_yards": "receiving_yards_v1",
 }
 
 # Feature columns for each position
 QB_FEATURES = [
-    'pass_attempts_last3', 'pass_completions_last3', 'passing_yards_last3',
-    'passing_tds_last3', 'interceptions_last3', 'sack_fumbles_lost_last3',
-    'pass_attempts_last5', 'pass_completions_last5', 'passing_yards_last5',
-    'passing_tds_last5', 'interceptions_last5',
-    'pass_attempts_season', 'pass_completions_season', 'passing_yards_season',
-    'opp_passing_yards_allowed_last3', 'opp_passing_tds_allowed_last3',
-    'home', 'rest_days', 'opponent_is_division',
-    'game_spread', 'game_total', 'implied_team_total',
-    'temperature', 'wind_speed', 'is_dome', 'is_turf'
+    "pass_attempts_last3",
+    "pass_completions_last3",
+    "passing_yards_last3",
+    "passing_tds_last3",
+    "interceptions_last3",
+    "sack_fumbles_lost_last3",
+    "pass_attempts_last5",
+    "pass_completions_last5",
+    "passing_yards_last5",
+    "passing_tds_last5",
+    "interceptions_last5",
+    "pass_attempts_season",
+    "pass_completions_season",
+    "passing_yards_season",
+    "opp_passing_yards_allowed_last3",
+    "opp_passing_tds_allowed_last3",
+    "home",
+    "rest_days",
+    "opponent_is_division",
+    "game_spread",
+    "game_total",
+    "implied_team_total",
+    "temperature",
+    "wind_speed",
+    "is_dome",
+    "is_turf",
 ]
 
 RB_FEATURES = [
-    'carries_last3', 'rushing_yards_last3', 'rushing_tds_last3',
-    'carries_last5', 'rushing_yards_last5', 'rushing_tds_last5',
-    'carries_season', 'rushing_yards_season', 'rushing_tds_season',
-    'opp_rushing_yards_allowed_last3', 'opp_rushing_tds_allowed_last3',
-    'home', 'rest_days', 'opponent_is_division',
-    'game_spread', 'game_total', 'implied_team_total',
-    'temperature', 'wind_speed', 'is_dome', 'is_turf'
+    "carries_last3",
+    "rushing_yards_last3",
+    "rushing_tds_last3",
+    "carries_last5",
+    "rushing_yards_last5",
+    "rushing_tds_last5",
+    "carries_season",
+    "rushing_yards_season",
+    "rushing_tds_season",
+    "opp_rushing_yards_allowed_last3",
+    "opp_rushing_tds_allowed_last3",
+    "home",
+    "rest_days",
+    "opponent_is_division",
+    "game_spread",
+    "game_total",
+    "implied_team_total",
+    "temperature",
+    "wind_speed",
+    "is_dome",
+    "is_turf",
 ]
 
 WR_TE_FEATURES = [
-    'receptions_last3', 'receiving_yards_last3', 'receiving_tds_last3',
-    'receptions_last5', 'receiving_yards_last5', 'receiving_tds_last5',
-    'receptions_season', 'receiving_yards_season', 'receiving_tds_season',
-    'opp_passing_yards_allowed_last3', 'opp_passing_tds_allowed_last3',
-    'home', 'rest_days', 'opponent_is_division',
-    'game_spread', 'game_total', 'implied_team_total',
-    'temperature', 'wind_speed', 'is_dome', 'is_turf'
+    "receptions_last3",
+    "receiving_yards_last3",
+    "receiving_tds_last3",
+    "receptions_last5",
+    "receiving_yards_last5",
+    "receiving_tds_last5",
+    "receptions_season",
+    "receiving_yards_season",
+    "receiving_tds_season",
+    "opp_passing_yards_allowed_last3",
+    "opp_passing_tds_allowed_last3",
+    "home",
+    "rest_days",
+    "opponent_is_division",
+    "game_spread",
+    "game_total",
+    "implied_team_total",
+    "temperature",
+    "wind_speed",
+    "is_dome",
+    "is_turf",
 ]
 
 
 class PropPredictionGenerator:
     """Generate prop predictions for upcoming games."""
 
-    def __init__(self, db_config: Dict = None, models_dir: Path = None):
+    def __init__(self, db_config: dict = None, models_dir: Path = None):
         self.db_config = db_config or DB_CONFIG
         self.models_dir = models_dir or MODELS_DIR
         self.models = {}
@@ -113,7 +156,7 @@ class PropPredictionGenerator:
 
                 # Load metadata from JSON
                 if model_path.exists():
-                    with open(model_path, 'r') as f:
+                    with open(model_path) as f:
                         metadata = json.load(f)
                         self.model_metadata[prop_type] = metadata
             elif model_path.exists():
@@ -123,7 +166,7 @@ class PropPredictionGenerator:
                 self.models[prop_type] = booster
 
                 # Load metadata
-                with open(model_path, 'r') as f:
+                with open(model_path) as f:
                     metadata = json.load(f)
                     self.model_metadata[prop_type] = metadata
             else:
@@ -178,12 +221,12 @@ class PropPredictionGenerator:
         df = pd.read_csv(features_file)
 
         # Filter to specified week
-        df_week = df[(df['season'] == season) & (df['week'] == week)].copy()
+        df_week = df[(df["season"] == season) & (df["week"] == week)].copy()
         logger.info(f"Loaded {len(df_week)} player-game features for {season} Week {week}")
 
         return df_week
 
-    def generate_predictions(self, season: int, week: int) -> List[Dict]:
+    def generate_predictions(self, season: int, week: int) -> list[dict]:
         """Generate predictions for all players in upcoming games."""
         # Load games and features
         games_df = self.get_upcoming_games(season, week)
@@ -203,14 +246,14 @@ class PropPredictionGenerator:
             logger.info(f"Generating {prop_type} predictions...")
 
             # Filter players by position
-            if prop_type == 'passing_yards':
-                position_filter = features_df['position'] == 'QB'
+            if prop_type == "passing_yards":
+                position_filter = features_df["position"] == "QB"
                 feature_cols = QB_FEATURES
-            elif prop_type == 'rushing_yards':
-                position_filter = features_df['position'].isin(['RB', 'QB'])
+            elif prop_type == "rushing_yards":
+                position_filter = features_df["position"].isin(["RB", "QB"])
                 feature_cols = RB_FEATURES
-            elif prop_type == 'receiving_yards':
-                position_filter = features_df['position'].isin(['WR', 'TE', 'RB'])
+            elif prop_type == "receiving_yards":
+                position_filter = features_df["position"].isin(["WR", "TE", "RB"])
                 feature_cols = WR_TE_FEATURES
             else:
                 continue
@@ -224,7 +267,9 @@ class PropPredictionGenerator:
             # Select features (only those that exist)
             available_cols = [col for col in feature_cols if col in df_position.columns]
             if len(available_cols) < len(feature_cols) * 0.7:
-                logger.warning(f"Only {len(available_cols)}/{len(feature_cols)} features available for {prop_type}")
+                logger.warning(
+                    f"Only {len(available_cols)}/{len(feature_cols)} features available for {prop_type}"
+                )
 
             # Prepare feature matrix
             X = df_position[available_cols].fillna(0).values
@@ -235,29 +280,31 @@ class PropPredictionGenerator:
 
             # Get model metadata for uncertainty
             metadata = self.model_metadata.get(prop_type, {})
-            rmse = metadata.get('test_rmse', metadata.get('rmse', 10.0))
+            rmse = metadata.get("test_rmse", metadata.get("rmse", 10.0))
 
             # Store predictions
             for idx, pred_value in enumerate(preds):
                 row = df_position.iloc[idx]
 
                 prediction = {
-                    'game_id': row['game_id'],
-                    'player_id': row['player_id'],
-                    'player_name': row.get('player_name', row.get('full_name', 'Unknown')),
-                    'player_position': row['position'],
-                    'player_team': row.get('team', row.get('recent_team', 'UNK')),
-                    'prop_type': prop_type,
-                    'predicted_value': float(pred_value),
-                    'predicted_std': float(rmse),  # Use RMSE as uncertainty proxy
-                    'model_version': 'v1',
-                    'model_name': PROP_MODELS[prop_type],
-                    'opponent_team': row.get('opponent', 'UNK'),
-                    'week': week,
-                    'season': season,
-                    'game_type': 'REG',
-                    'confidence_score': min(1.0, 0.5 + (1.0 / (1.0 + rmse / 50.0))),  # Simple confidence calc
-                    'feature_version': 'v1'
+                    "game_id": row["game_id"],
+                    "player_id": row["player_id"],
+                    "player_name": row.get("player_name", row.get("full_name", "Unknown")),
+                    "player_position": row["position"],
+                    "player_team": row.get("team", row.get("recent_team", "UNK")),
+                    "prop_type": prop_type,
+                    "predicted_value": float(pred_value),
+                    "predicted_std": float(rmse),  # Use RMSE as uncertainty proxy
+                    "model_version": "v1",
+                    "model_name": PROP_MODELS[prop_type],
+                    "opponent_team": row.get("opponent", "UNK"),
+                    "week": week,
+                    "season": season,
+                    "game_type": "REG",
+                    "confidence_score": min(
+                        1.0, 0.5 + (1.0 / (1.0 + rmse / 50.0))
+                    ),  # Simple confidence calc
+                    "feature_version": "v1",
                 }
 
                 predictions.append(prediction)
@@ -266,7 +313,7 @@ class PropPredictionGenerator:
 
         return predictions
 
-    def store_predictions(self, predictions: List[Dict]) -> int:
+    def store_predictions(self, predictions: list[dict]) -> int:
         """Store predictions in database."""
         if not predictions:
             logger.warning("No predictions to store")
@@ -276,7 +323,7 @@ class PropPredictionGenerator:
         seen = set()
         unique_predictions = []
         for pred in predictions:
-            key = (pred['game_id'], pred['player_id'], pred['prop_type'])
+            key = (pred["game_id"], pred["player_id"], pred["prop_type"])
             if key not in seen:
                 seen.add(key)
                 unique_predictions.append(pred)
@@ -297,22 +344,31 @@ class PropPredictionGenerator:
             DELETE FROM predictions.prop_predictions
             WHERE season = %s AND week = %s AND model_version = %s
             """
-            cur.execute(delete_query, (first_pred['season'], first_pred['week'], 'v1'))
+            cur.execute(delete_query, (first_pred["season"], first_pred["week"], "v1"))
             deleted = cur.rowcount
             logger.info(f"Deleted {deleted} existing predictions for this week")
 
             # Prepare values
             columns = [
-                'game_id', 'player_id', 'player_name', 'player_position', 'player_team',
-                'prop_type', 'predicted_value', 'predicted_std', 'model_version', 'model_name',
-                'opponent_team', 'week', 'season', 'game_type',
-                'confidence_score', 'feature_version'
+                "game_id",
+                "player_id",
+                "player_name",
+                "player_position",
+                "player_team",
+                "prop_type",
+                "predicted_value",
+                "predicted_std",
+                "model_version",
+                "model_name",
+                "opponent_team",
+                "week",
+                "season",
+                "game_type",
+                "confidence_score",
+                "feature_version",
             ]
 
-            values = [
-                tuple(pred.get(col) for col in columns)
-                for pred in predictions
-            ]
+            values = [tuple(pred.get(col) for col in columns) for pred in predictions]
 
             # Insert
             query = f"""
@@ -343,10 +399,10 @@ class PropPredictionGenerator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate player props predictions for dashboard')
-    parser.add_argument('--season', type=int, help='Season (e.g., 2025)')
-    parser.add_argument('--week', type=int, help='Week number (e.g., 6)')
-    parser.add_argument('--auto', action='store_true', help='Auto-detect current week')
+    parser = argparse.ArgumentParser(description="Generate player props predictions for dashboard")
+    parser.add_argument("--season", type=int, help="Season (e.g., 2025)")
+    parser.add_argument("--week", type=int, help="Week number (e.g., 6)")
+    parser.add_argument("--auto", action="store_true", help="Auto-detect current week")
 
     args = parser.parse_args()
 
@@ -354,7 +410,7 @@ def main():
     if args.auto:
         # Simple heuristic: Oct 11, 2025 = Week 6
         # In production, query database for current week
-        today = datetime.now()
+        datetime.now()
         args.season = 2025
         args.week = 6
         logger.info(f"Auto-detected: {args.season} Week {args.week}")
@@ -398,5 +454,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

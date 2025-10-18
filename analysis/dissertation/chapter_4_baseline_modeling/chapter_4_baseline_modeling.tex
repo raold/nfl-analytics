@@ -216,7 +216,7 @@ where $\alpha_i$ is team $i$'s attack strength, $\delta_i$ is defense strength, 
 We fit models on 2015--2024 regular season data (2,672 games) using 4 MCMC chains with 2,000 iterations (1,000 warmup). Computation time on Apple M4 Max: Model 1 (12 sec), Model 2 (18 sec), Model 3 (26 sec). All chains achieved $\hat{R} < 1.01$ and effective sample sizes $> 1000$ for all parameters.
 
 Model comparison via Leave-One-Out Cross-Validation (LOO-CV) \citep{vehtari2017}:
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[Bayesian model comparison]{Bayesian hierarchical model comparison via LOO-CV. Lower ELPD difference is better; ELPD SE quantifies uncertainty.}
 \label{tab:bayes-loo}
@@ -247,7 +247,7 @@ All 2024 test games showed posterior SD $\in [1.3, 1.5]$ (``medium uncertainty''
 \subsection{Predictive Performance and Economic Value}
 
 Testing on 2024 regular season (281 games, held out from training):
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[Bayesian predictive performance (2024)]{Bayesian Model 2 performance on 2024 holdout. Compares to market efficiency and XGBoost baseline.}
 \label{tab:bayes-performance}
@@ -282,7 +282,7 @@ Weighted average: $p_{\text{ensemble}} = w_B \cdot p_B + w_X \cdot p_X$, where $
 \end{equation}
 
 Testing on 2024 simulated ensemble (Bayesian + synthetic XGBoost with 5\% noise):
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[Ensemble performance (simulated)]{Ensemble vs standalone performance on 2024. Disagreement filtering boosts win rate significantly.}
 \label{tab:ensemble-performance}
@@ -329,7 +329,7 @@ Models are retrained every Tuesday using \texttt{brms::update()} with the most r
 
 \subsection{Comparison to Alternative Rating Systems}
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[Rating system comparison]{Comparison of team rating systems on 2024 NFL data.}
 \label{tab:rating-comparison}
@@ -546,7 +546,7 @@ Given modest gains and substantial complexity, we retain static copulas with reg
 
 Advanced techniques offer theoretical advantages but face practical constraints:
 
-\begin{table}[h]
+\begin{table}[!ht]
   \centering
   \small
   \caption{Advanced features cost-benefit analysis.}
@@ -657,7 +657,7 @@ Our approach estimates position-specific impacts $\Delta_p$ on win probability w
 
 Position impacts reflect both replacement-level talent gaps and positional importance:
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[Position-based injury impacts]{Position-specific win probability impacts when starter is unavailable.}
 \label{tab:injury-impacts}
@@ -745,7 +745,7 @@ We train an XGBoost gradient boosting model on 1.24M play-by-play observations f
 \paragraph{Feature Engineering.}
 Eighteen game state features capture score, time, and situational context:
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \small
 \caption[In-game WP features]{In-game win probability model features.}
@@ -771,7 +771,7 @@ Situation & \texttt{down}, \texttt{ydstogo} & Current down \& distance \\
 
 Model hyperparameters (max depth=6, learning rate=0.1, subsample=0.8) balance expressiveness with generalization. Training metrics:
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \caption[In-game WP performance]{In-game win probability model performance.}
 \label{tab:ingame-performance}
@@ -830,7 +830,7 @@ All models tested on 2024 regular season (281 games, weeks 1--18) held out from 
 
 \subsection{Comprehensive Baseline Performance}
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -914,7 +914,7 @@ Random Guessing & 13.8 & 0.2500 & 0.500 & 50.0 & 0 & 0 & 0 & No \\
 
 \subsection{Model Selection Guidelines}
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
 \small
 \caption[Model selection decision matrix]{Model selection guide: when to use each baseline model based on application requirements.}

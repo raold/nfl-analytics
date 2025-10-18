@@ -14,8 +14,8 @@ Analysis:
 
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy import stats
 from sqlalchemy import create_engine
 
@@ -74,8 +74,13 @@ def main():
     df["temp_category"] = pd.cut(
         df["temp_c"],
         bins=[-50, 0, 10, 20, 30, 50],
-        labels=["Extreme Cold (<0°C)", "Cold (0-10°C)", "Moderate (10-20°C)",
-                "Warm (20-30°C)", "Extreme Heat (>30°C)"],
+        labels=[
+            "Extreme Cold (<0°C)",
+            "Cold (0-10°C)",
+            "Moderate (10-20°C)",
+            "Warm (20-30°C)",
+            "Extreme Heat (>30°C)",
+        ],
     )
 
     # Additional binary flags
@@ -149,7 +154,9 @@ def main():
 
     # T-test for difference in means
     if len(extreme_temp) > 0:
-        t_stat, p_value = stats.ttest_ind(moderate_temp["total_points"], extreme_temp["total_points"])
+        t_stat, p_value = stats.ttest_ind(
+            moderate_temp["total_points"], extreme_temp["total_points"]
+        )
         print(f"\nT-test for total_points: t={t_stat:.3f}, p={p_value:.6f}")
         if p_value < 0.05:
             print("✓ Significant difference in scoring between extreme/moderate temps")
@@ -204,7 +211,9 @@ def main():
             f"Normal temp games:  n={len(non_extreme_heat)}, avg_temp={non_extreme_heat['temp_c'].mean():.1f}°C, avg_total={non_extreme_heat['total_points'].mean():.1f}"
         )
 
-        t_stat, p_value = stats.ttest_ind(extreme_heat["total_points"], non_extreme_heat["total_points"])
+        t_stat, p_value = stats.ttest_ind(
+            extreme_heat["total_points"], non_extreme_heat["total_points"]
+        )
         print(f"\nT-test: t={t_stat:.3f}, p={p_value:.6f}")
         if p_value < 0.05:
             print("✓ Extreme heat significantly affects scoring")
@@ -245,6 +254,7 @@ def main():
 
     # Linear model: total_points ~ temp_c
     from scipy.stats import linregress
+
     slope_linear, intercept_linear, r_linear, p_linear, se_linear = linregress(
         df["temp_c"], df["total_points"]
     )
@@ -291,7 +301,9 @@ def main():
     print(f"Mean temperature: {df['temp_c'].mean():.1f}°C")
     print(f"Overall over rate: {df['went_over'].mean():.3f}")
     print(f"\nKey Finding: Temperature correlation with total points = {corr_temp_total:.4f}")
-    print(f"             Temp extreme correlation with total points = {corr_temp_extreme_total:.4f}")
+    print(
+        f"             Temp extreme correlation with total points = {corr_temp_extreme_total:.4f}"
+    )
 
     if abs(corr_temp_extreme_total) > abs(corr_temp_total):
         print("✓ Temperature extremes (deviation from 15°C) better predictor than raw temp")
@@ -310,7 +322,7 @@ def main():
         "freezing_games": len(freezing) if len(freezing) > 0 else 0,
         "extreme_heat_games": len(extreme_heat) if len(extreme_heat) > 0 else 0,
         "r_squared_quadratic": r_squared_quadratic,
-        "optimal_temp": -coeffs[1]/(2*coeffs[0]),
+        "optimal_temp": -coeffs[1] / (2 * coeffs[0]),
     }
 
     # Save summary statistics
@@ -323,7 +335,9 @@ def main():
     with open(out_dir / "temperature_impact_stats.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n✅ Saved temperature impact statistics to {out_dir / 'temperature_impact_stats.json'}")
+    print(
+        f"\n✅ Saved temperature impact statistics to {out_dir / 'temperature_impact_stats.json'}"
+    )
 
 
 if __name__ == "__main__":

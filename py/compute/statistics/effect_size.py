@@ -191,7 +191,7 @@ class EffectSizeCalculator:
         # Combine all data
         all_data = np.concatenate(groups)
         grand_mean = np.mean(all_data)
-        n_total = len(all_data)
+        len(all_data)
 
         # Group information
         group_means = [np.mean(group) for group in groups]
