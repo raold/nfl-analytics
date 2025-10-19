@@ -1,12 +1,12 @@
 \begin{table}[t]
   \centering
-  \small
+  \footnotesize
   \caption[Multi-Model Backtest Comparison]{Multi-model backtest comparison (2004--2024, $N$=5,529 games). Models ranked by Brier score.}
   \label{tab:multimodel-comparison}
-  \setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.12}
+  \setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{1.12}
   \begin{tabular}{@{} l r r r r r @{} }
     \toprule
-    \textbf{Model} & \textbf{Games} & \textbf{Brier $\downarrow$} & \textbf{LogLoss $\downarrow$} & \textbf{Accuracy} & \textbf{ROI\%} \\
+    \textbf{Model}  & \textbf{Games}  & \textbf{Brier $\downarrow$}  & \textbf{LogLoss $\downarrow$}  & \textbf{Accuracy}  & \textbf{ROI\%} \\
     \midrule
     Stack(GLM+XGB+State) & 5,529 & 0.2515 & 0.6966 & 51.1\% & -13.5\% \\
     Stack(GLM+XGB) & 5,529 & 0.2517 & 0.6973 & 51.2\% & -11.5\% \\

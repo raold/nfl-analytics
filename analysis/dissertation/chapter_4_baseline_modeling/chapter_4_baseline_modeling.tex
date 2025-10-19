@@ -222,7 +222,7 @@ Model comparison via Leave-One-Out Cross-Validation (LOO-CV) \citep{vehtari2017}
 \label{tab:bayes-loo}
 \begin{tabular}{lrrrr}
 \toprule
-\textbf{Model} & \textbf{ELPD} & \textbf{$\Delta$ELPD} & \textbf{SE($\Delta$)} & \textbf{Weight} \\
+\textbf{Model}  & \textbf{ELPD}  & \textbf{$\Delta$ELPD}  & \textbf{SE($\Delta$)}  & \textbf{Weight} \\
 \midrule
 Model 2 (Time-Varying) & -9842.3 & 0.0 & -- & 0.94 \\
 Model 1 (Basic) & -9868.7 & -26.4 & 8.2 & 0.06 \\
@@ -253,7 +253,7 @@ Testing on 2024 regular season (281 games, held out from training):
 \label{tab:bayes-performance}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Metric} & \textbf{Bayesian} & \textbf{Market} & \textbf{XGBoost v2} \\
+\textbf{Metric}  & \textbf{Bayesian}  & \textbf{Market}  & \textbf{XGBoost v2} \\
 \midrule
 MAE (points) & 10.52 & 9.70 & 10.80 \\
 Correlation (actual, pred) & 0.307 & 0.350 & 0.290 \\
@@ -288,7 +288,7 @@ Testing on 2024 simulated ensemble (Bayesian + synthetic XGBoost with 5\% noise)
 \label{tab:ensemble-performance}
 \begin{tabular}{lccc}
 \toprule
-\textbf{System} & \textbf{Bets/Season} & \textbf{Win Rate} & \textbf{Expected ROI} \\
+\textbf{System}  & \textbf{Bets/Season}  & \textbf{Win Rate}  & \textbf{Expected ROI} \\
 \midrule
 Bayesian standalone & 163 & 54.0\% & +1.59\% \\
 Ensemble (both agree) & 120 & 55.0\% & +2.60\% \\
@@ -335,7 +335,7 @@ Models are retrained every Tuesday using \texttt{brms::update()} with the most r
 \label{tab:rating-comparison}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{System} & \textbf{MAE} & \textbf{ATS Acc.} & \textbf{Uncertainty?} & \textbf{Fit Time} \\
+\textbf{System}  & \textbf{MAE}  & \textbf{ATS Acc.}  & \textbf{Uncertainty?}  & \textbf{Fit Time} \\
 \midrule
 Elo (FiveThirtyEight) & 11.2 & 50.5\% & No & <1 sec \\
 Glicko-2 & 11.0 & 51.2\% & Yes (RD) & <1 sec \\
@@ -552,7 +552,7 @@ Advanced techniques offer theoretical advantages but face practical constraints:
   \caption{Advanced features cost-benefit analysis.}
   \begin{tabular}{lccc}
     \toprule
-    \textbf{Method} & \textbf{Brier Gain} & \textbf{Compute Cost} & \textbf{Implemented?} \\
+    \textbf{Method}  & \textbf{Brier Gain}  & \textbf{Compute Cost}  & \textbf{Implemented?} \\
     \midrule
     Current Ensemble & Baseline & 1x & Yes \\
     + Graph Neural Nets & -0.003 & 10-50x & No \\
@@ -596,7 +596,7 @@ We quantify the marginal contribution of feature families by dropping one family
     \label{tab:ablations}
     \begin{tabularx}{\linewidth}{@{} l r r r r X @{} }
       \toprule
-      \textbf{Removed family} & \(\Delta\)Brier $\downarrow$ & \(\Delta\)LogLoss $\downarrow$ & \(\Delta\)CRPS $\downarrow$ & \(\Delta\)CLV bps $\uparrow$ & Notes \\
+      \textbf{Removed family}  & \textbf{\(\Delta\)Brier $\downarrow$} & \textbf{\(\Delta\)LogLoss $\downarrow$} & \textbf{\(\Delta\)CRPS $\downarrow$} & \textbf{\(\Delta\)CLV bps $\uparrow$} & \textbf{Notes} \\
       \midrule
       Market microstructure & +0.002 & +0.004 & +0.006 & -14 & most impact in late week \\
       Team form             & +0.001 & +0.002 & +0.003 & -7  & impacts favorites more \\
@@ -663,7 +663,7 @@ Position impacts reflect both replacement-level talent gaps and positional impor
 \label{tab:injury-impacts}
 \begin{tabular}{lrl}
 \toprule
-\textbf{Position} & \textbf{Impact} & \textbf{Rationale} \\
+\textbf{Position}  & \textbf{Impact}  & \textbf{Rationale} \\
 \midrule
 Quarterback (QB) & -5.0\% & Irreplaceable; touches every play \\
 Offensive Tackle (T) & -1.2\% & Pass protection degradation \\
@@ -752,7 +752,7 @@ Eighteen game state features capture score, time, and situational context:
 \label{tab:ingame-features}
 \begin{tabular}{llp{6cm}}
 \toprule
-\textbf{Category} & \textbf{Feature} & \textbf{Description} \\
+\textbf{Category}  & \textbf{Feature}  & \textbf{Description} \\
 \midrule
 Score & \texttt{home\_score\_lead} & Current score differential (home perspective) \\
 Time & \texttt{time\_remaining} & Seconds remaining in regulation \\
@@ -777,7 +777,7 @@ Model hyperparameters (max depth=6, learning rate=0.1, subsample=0.8) balance ex
 \label{tab:ingame-performance}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Dataset} & \textbf{Brier Score} & \textbf{Accuracy} & \textbf{AUC} & \textbf{Plays} \\
+\textbf{Dataset}  & \textbf{Brier Score}  & \textbf{Accuracy}  & \textbf{AUC}  & \textbf{Plays} \\
 \midrule
 Train (2006--2021) & 0.1748 & 72.3\% & 0.851 & 1,168,392 \\
 Test (2024) & 0.1925 & 68.1\% & 0.823 & 75,410 \\
@@ -839,7 +839,7 @@ All models tested on 2024 regular season (281 games, weeks 1--18) held out from 
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}lcccccccc@{}}
 \toprule
-\textbf{Model} & \textbf{MAE} & \textbf{Brier} & \textbf{AUC} & \textbf{ATS\%} & \textbf{CLV} & \textbf{Train} & \textbf{Lat.} & \textbf{UQ?} \\
+\textbf{Model}  & \textbf{MAE}  & \textbf{Brier}  & \textbf{AUC}  & \textbf{ATS\%}  & \textbf{CLV}  & \textbf{Train}  & \textbf{Lat.}  & \textbf{UQ?} \\
 \midrule
 \multicolumn{9}{l}{\textit{Classical Baselines}} \\
 Logistic GLM & 11.2 & 0.2515 & 0.681 & 50.2 & +2.1 & <1s & <1ms & No \\
@@ -921,7 +921,7 @@ Random Guessing & 13.8 & 0.2500 & 0.500 & 50.0 & 0 & 0 & 0 & No \\
 \label{tab:model-selection-guide}
 \begin{tabularx}{\textwidth}{@{} >{\raggedright\arraybackslash}p{4.5cm} X @{}}
 \toprule
-\textbf{Use Case} & \textbf{Recommended Model(s)} \\
+\textbf{Use Case}  & \textbf{Recommended Model(s)} \\
 \midrule
 Maximum accuracy & Full ensemble: 10.1 MAE, 54.1\% ATS (91s training) \\
 Speed-critical & State-space Kalman: 10.8 MAE, 2s training, <1ms latency \\

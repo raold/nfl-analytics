@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/dro/rice/nfl-analytics/py/features/asof_features_enhanced.py", line 20, in <module>
-    import numpy as np
-ModuleNotFoundError: No module named 'numpy'

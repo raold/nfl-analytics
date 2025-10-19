@@ -134,11 +134,13 @@ Table~\ref{tab:props-models-performance} summarizes model performance across pro
 
 \begin{table}[htbp]
 \centering
+\footnotesize
 \caption{Player Props Models: Training and Validation Performance}
 \label{tab:props-models-performance}
+\setlength{\tabcolsep}{3.5pt}\renewcommand{\arraystretch}{1.12}
 \begin{tabular}{@{} l r r r r r @{}}
 \toprule
-Prop Type & Samples & Features & Train MAE & Val MAE & Val R² \\
+ \textbf{Prop Type} & \textbf{Samples} & \textbf{Features} & \textbf{Tr. MAE} & \textbf{Val MAE} & \textbf{Val R²} \\
 \midrule
 Passing Yards (QB) & 2,811 & 19 & 40.68 & 64.18 & 0.425 \\
 Rushing Yards (RB) & 9,183 & 12 & 15.98 & 16.91 & 0.406 \\
@@ -266,7 +268,7 @@ Table~\ref{tab:lanes-summary} summarizes expected ROI contribution by lane with 
 \label{tab:lanes-summary}
 \begin{tabular}{@{} l l r r @{}}
 \toprule
-Lane & Strategy & Expected ROI & Status \\
+ \textbf{Lane} & \textbf{Strategy} & \textbf{Expected ROI} & \textbf{Status} \\
 \midrule
 1 & Early Week Betting (EWB) & +8--12\% & Deployed \\
 2 & Player Props Expansion & +15--25\% & Models Trained \\

@@ -143,3 +143,27 @@ sweeps/
 # Large model files (keep only metadata)
 models/cql/*/best_checkpoint.pth
 models/cql/*/optimizer_state.pth
+
+# Analysis artifacts
+analysis/**/*.log
+analysis/**/*.aux
+analysis/**/*.out
+analysis/**/*.fls
+analysis/**/*.fdb_latexmk
+
+# Temporary/old scripts
+*_old.sh
+*_backup.sh
+check_*.sh
+
+# Temporary documentation (actual docs go in docs/)
+*_STATUS.md
+*_SUMMARY.md
+*_EXECUTION*.md
+!CLAUDE.md
+!README.md
+!SETUP.md
+!CONTRIBUTING.md
+!PROJECT_STATUS.md
+!PHASE_PLAN.md
+!AGENTS.md

@@ -57,9 +57,13 @@ Figure~\ref{fig:claude_architecture} illustrates the end‑to‑end workflow for
 \centering
 \begin{tikzpicture}[
   node distance=1.2cm,
-  box/.style={rectangle, draw, fill=accentBlue!10, text width=3.5cm, align=center, minimum height=1cm, font=\small},
-  arrow/.style={->, >=stealth, thick}
+  % Define accent color and standardized styles
+  box/.style={rectangle, draw=accent!60, rounded corners, line width=0.6pt, fill=accent!3, text width=3.5cm, align=center, minimum height=1cm, font=\small, inner ysep=6pt, inner xsep=8pt},
+  arrow/.style={->, line width=0.6pt, color=accent}
 ]
+  % Define accent color
+  \definecolor{accent}{RGB}{31,119,180}
+
   \node[box] (user) {User Query (Natural Language)};
   \node[box, below=of user] (claude) {Claude AI \\ (with CLAUDE.md context)};
   \node[box, below=of claude] (planning) {Query Planning \\ (identify data sources, tools)};

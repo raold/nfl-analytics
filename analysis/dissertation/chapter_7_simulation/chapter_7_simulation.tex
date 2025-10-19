@@ -115,7 +115,7 @@ For $B$ total simulations divided into $K$ batches of size $m = B/K$, we compute
     \label{tab:mc-convergence}
     \begin{tabular}{lccccc}
       \toprule
-      \textbf{Sample Size} & \textbf{ESS} & \textbf{Geweke p-val} & \textbf{H-W Test} & \textbf{Mean SE} & \textbf{95\% CI Width} \\
+      \textbf{Sample Size}  & \textbf{ESS}  & \textbf{Geweke p-val}  & \textbf{H-W Test}  & \textbf{Mean SE}  & \textbf{95\% CI Width} \\
       \midrule
       1,000    & 823    & 0.043 & Fail & 0.0142 & 0.0556 \\
       5,000    & 4,412  & 0.187 & Pass & 0.0063 & 0.0247 \\
@@ -181,7 +181,7 @@ We employ walk-forward analysis with expanding windows:
   \label{tab:sim-calibration}
   \begin{tabular}{lcccc}
     \toprule
-    \textbf{Metric} & \textbf{Historical} & \textbf{Simulated} & \textbf{Difference} & \textbf{Pass?} \\
+    \textbf{Metric}  & \textbf{Historical}  & \textbf{Simulated}  & \textbf{Difference}  & \textbf{Pass?} \\
     \midrule
     Mean Margin     & 0.32  & 0.31  & -0.01 & Yes \\
     Margin Std Dev  & 13.86 & 13.91 & +0.05 & Yes \\
@@ -265,7 +265,7 @@ Vig and slippage vary by book, time, and market. We parameterize friction with p
     \label{tab:sim-acceptance-placeholder}
     \begin{tabular}{lccc}
       \toprule
-      Test Category & Pass Rate & Median Deviation & Impact on ROI \\
+ \textbf{Test Category} & \textbf{Pass Rate} & \textbf{Median Deviation} & \textbf{Impact on ROI} \\
       \midrule
       Margin calibration    & \textit{pending} & \textit{pending} & \textit{pending} \\
       Key mass accuracy     & \textit{pending} & \textit{pending} & \textit{pending} \\

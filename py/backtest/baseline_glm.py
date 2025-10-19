@@ -109,34 +109,37 @@ def plot_reliability_diagram(
     brier = brier_score_loss(y_true, y_pred_proba)
     logloss = log_loss(y_true, y_pred_proba)
 
-    # Create figure
-    fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
+    # Create figure (optimized for compact display)
+    fig, ax = plt.subplots(figsize=(4.5, 4.5), dpi=150)
 
-    # Plot calibration curve
+    # Plot calibration curve (enhanced visibility)
     ax.plot(
         prob_pred,
         prob_true,
         "o-",
         color="#2a6fbb",
-        linewidth=2,
-        markersize=8,
+        linewidth=2.5,
+        markersize=10,
         label=f"Model (n={len(y_true)})",
     )
 
     # Perfect calibration line
     ax.plot([0, 1], [0, 1], "k--", linewidth=1.5, alpha=0.7, label="Perfect")
 
-    # Labels and formatting
+    # Labels and formatting (optimized for space)
     title = "Reliability Diagram"
     if season:
         title += f" ({season})"
-    ax.set_title(title, fontsize=12, pad=10)
+    ax.set_title(title, fontsize=12, pad=5)
     ax.set_xlabel("Predicted Probability", fontsize=11)
     ax.set_ylabel("Observed Frequency", fontsize=11)
-    ax.set_xlim(-0.05, 1.05)
-    ax.set_ylim(-0.05, 1.05)
-    ax.grid(True, alpha=0.3, linestyle="--", linewidth=0.5)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.grid(True, alpha=0.2, linestyle="--", linewidth=0.5)
     ax.legend(loc="upper left", fontsize=9)
+
+    # Minimize margins for better data-ink ratio
+    plt.subplots_adjust(left=0.12, right=0.95, top=0.93, bottom=0.10)
 
     # Add metrics as text
     metrics_text = f"Brier: {brier:.4f}\nLogLoss: {logloss:.4f}"
@@ -151,10 +154,9 @@ def plot_reliability_diagram(
         bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.3),
     )
 
-    # Save
-    plt.tight_layout()
+    # Save (high DPI for sharp rendering)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_path, dpi=100, bbox_inches="tight")
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close()
 
     print(f"✅ Saved reliability diagram: {output_path}")

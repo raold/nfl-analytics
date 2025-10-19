@@ -75,7 +75,8 @@ features:
     description: "Opponent-adjusted offensive EPA/play..."
 \end{lstlisting}
 
-The full feature catalog with definitions, validation rules, and importance rankings is documented in Appendix~\ref{app:feature_catalog}.
+The full feature catalog with definitions, validation rules, and importance rankings is documented in the appendix.
+% TODO: Add reference to appendix when feature catalog appendix is created: Appendix~\ref{app:feature_catalog}
 
 \subsection{Weather Features and Hypothesis Testing}
 \label{subsec:weather-features}
@@ -211,7 +212,7 @@ Alerts integrate with Slack and PagerDuty so ingest issues trigger rapid triage.
     \label{tab:missingness}
     \begin{tabularx}{\linewidth}{@{} l r r r r X @{} }
       \toprule
-      \textbf{Field} & \textbf{Rows} & \textbf{Missing} & \textbf{\%} & \textbf{Era} & \textbf{Notes} \\
+      \textbf{Field}  & \textbf{Rows}  & \textbf{Missing}  & \textbf{\%}  & \textbf{Era}  & \textbf{Notes} \\
       \midrule
       injury\_status & 120{,}000 & 3{,}420 & 2.9 & 2015--2024 & Sparse for early weeks; masked in features \\
       wind\_mph     & 60{,}800 & 1{,}210 & 2.0 & 1999--2007 & Older seasons use stadium defaults \\
@@ -316,7 +317,7 @@ I pre‑specify the decision rule: if decayed‑full does not significantly outp
     \label{tab:ess-placeholder}
     \begin{tabular}{lccc}
       \toprule
-      Half‑life $H$ & 3 & 4 & 5 \\
+ \textbf{Half‑life $H$} & \textbf{3} & \textbf{4} & \textbf{5} \\
       \midrule
       ESS (season units) & -- & -- & -- \\
       \bottomrule
@@ -339,11 +340,11 @@ To ensure reproducible evaluation, we define dataset cohorts with explicit train
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.12}
     \newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
-    \newcolumntype{S}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+    \newcolumntype{T}[1]{>{\RaggedRight\arraybackslash}p{#1}}
     % Cohort stays natural width (l); next five are fixed and tight; last two expand (X)
     \begin{tabularx}{\linewidth}{@{} l C{2.0cm} C{1.6cm} C{1.9cm} C{0.9cm} C{2.2cm} >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X @{} }
       \toprule
-      \textbf{Cohort} & \textbf{Train} & \textbf{Val} & \textbf{Test} & \textbf{Books} & \textbf{Markets} & \textbf{Features as-of} & \textbf{Leakage checks} \\
+      \textbf{Cohort}  & \textbf{Train}  & \textbf{Val}  & \textbf{Test}  & \textbf{Books}  & \textbf{Markets}  & \textbf{Features as-of}  & \textbf{Leakage checks} \\
       \midrule
       Era A & 2015--2019 & 2020 & 2021 & 5 & spread/total & Weekly snapshot; cut at decision time & As-of lineage; future-join guard \\
       Era B & 2019--2022 & 2023 H1 & 2023 H2 & 7 & spread/total/\newline ML & Rolling; late-week nowcasts allowed & Anti-leak tests; feature manifest \\
@@ -383,5 +384,6 @@ This chapter established a reproducible data foundation with five integrated lay
 
 The weather hypothesis testing (wind impact on scoring) demonstrated scientific rigor by rejecting conventional wisdom unsupported by empirical evidence ($r=0.0038$, $p=0.90$), guarding against overfitting spurious effects. The central contribution---defense-in-depth leakage prevention---is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
 }{
-With a governed data foundation ensuring temporal integrity, \Cref{chap:baseline} develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage these 170+ features to produce reliable probability estimates for spreads, totals, and moneylines.
+With a governed data foundation ensuring temporal integrity, the next chapter develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage these 170+ features to produce reliable probability estimates for spreads, totals, and moneylines.
+% TODO: Add reference when baseline chapter label is defined: \Cref{chap:baseline}
 }

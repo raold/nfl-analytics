@@ -458,17 +458,21 @@ We employed \textbf{Tree-structured Parzen Estimator (TPE)} Bayesian optimizatio
 The search space encompassed five hyperparameter dimensions:
 
 \begin{description}
-    \item[Prior standard deviation] ($\sigma_{\text{prior}} \in [0.3, 1.5]$): Weight prior strength (continuous)
-    \item[Hidden units] ($n_h \in \{8, 16, 24, 32\}$): Network capacity (discrete)
-    \item[Player effect sigma] ($\sigma_{\text{player}} \in [0.1, 0.5]$): Hierarchical variance (continuous)
-    \item[Noise sigma] ($\sigma_{\text{noise}} \in [0.2, 0.5]$): Observation noise prior (continuous)
-    \item[Feature groups] (\texttt{use\_vegas}, \texttt{use\_environment}, \texttt{use\_opponent}): Binary indicators for each feature group
+    \item[Prior std. dev.] ($\sigma_{\text{prior}} \in [0.3, 1.5]$): Weight prior strength
+    \item[Hidden units] ($n_h \in \{8, 16, 24, 32\}$): Network capacity
+    \item[Player effect $\sigma$] ($\sigma_{\text{player}} \in [0.1, 0.5]$): Hierarchical variance
+    \item[Noise $\sigma$] ($\sigma_{\text{noise}} \in [0.2, 0.5]$): Observation noise prior
+    \item[Feature groups] (vegas, environment, opponent): Binary indicators
 \end{description}
 
 This yields a mixed continuous-discrete search space with 8 feature combinations, spanning from minimal (4 baseline features) to maximal (all 13 features). The optimization objective combined three metrics:
 
 \begin{equation}
-    \text{score} = 0.7 \cdot \min\left(\frac{\text{coverage}_{90}}{90}, 1.5\right) + 0.2 \cdot \max\left(0, 1 - \frac{\text{MAE} - 18}{10}\right) + 0.1 \cdot \max\left(0, 1 - \frac{\text{width} - 17}{80}\right)
+\begin{split}
+    \text{score} = & 0.7 \cdot \min\left(\frac{\text{coverage}_{90}}{90}, 1.5\right) \\
+    & + 0.2 \cdot \max\left(0, 1 - \frac{\text{MAE} - 18}{10}\right) \\
+    & + 0.1 \cdot \max\left(0, 1 - \frac{\text{width} - 17}{80}\right)
+\end{split}
 \end{equation}
 
 The composite score prioritizes calibration (70\% weight) while maintaining point accuracy (20\%) and avoiding excessively wide intervals (10\%). The calibration component is capped at 1.5 to penalize intervals that achieve coverage by being overly conservative.
@@ -481,13 +485,14 @@ We conducted a pilot study with 10 trials to assess whether promising regions of
 
 \begin{table}[t]
 \centering
+\small
 \begin{tabular}{@{}lccccccl@{}}
 \toprule
-\textbf{Trial} & \textbf{Coverage} & \textbf{MAE} & \textbf{Width} & \textbf{Score} & \textbf{Units} & \textbf{Features} & \textbf{$\sigma_{\text{prior}}$} \\
+\textbf{Trial}  & \textbf{Cov.}  & \textbf{MAE}  & \textbf{Width}  & \textbf{Score}  & \textbf{Units}  & \textbf{Feat.}  & \textbf{$\sigma_{\text{p}}$} \\
 \midrule
 \textbf{\#0 (best)} & \textbf{34.2\%} & \textbf{19.1} & \textbf{20.6} & \textbf{0.539} & 32 & Vegas & 0.548 \\
-\#5 & 33.1\% & 25.0 & 36.5 & 0.394 & 32 & Baseline & 1.428 \\
-\#6 & 30.4\% & 25.1 & 32.4 & 0.376 & 16 & Baseline & 0.561 \\
+\#5 & 33.1\% & 25.0 & 36.5 & 0.394 & 32 & Base & 1.428 \\
+\#6 & 30.4\% & 25.1 & 32.4 & 0.376 & 16 & Base & 0.561 \\
 \#1-4, 7-9 & \multicolumn{7}{c}{\textit{Failed: database errors with environment/opponent features}} \\
 \bottomrule
 \end{tabular}
@@ -507,7 +512,8 @@ Importantly, seven of ten trials failed due to database errors when querying env
 
 \subsubsection{Comparison with Prior Phases}
 
-Figure~\ref{fig:phase_improvements_breakdown} contextualizes the optimization results within the broader investigation:
+The optimization results can be contextualized within the broader investigation:
+% TODO: Add figure reference when phase_improvements_breakdown figure is created: Figure~\ref{fig:phase_improvements_breakdown}
 
 \begin{itemize}
     \item \textbf{Phase 1 (Feature Engineering)}: +5.1pp improvement (26.2\% → 31.3\%)
@@ -565,7 +571,8 @@ Having systematically tested all four initial hypotheses—feature inadequacy, p
 
 \subsubsection{The Hierarchy of Modeling Choices}
 
-This investigation establishes a clear empirical hierarchy for improving calibration in Bayesian neural networks. Figure~\ref{fig:improvement_hierarchy} quantifies the marginal contribution of each intervention:
+This investigation establishes a clear empirical hierarchy for improving calibration in Bayesian neural networks, quantifying the marginal contribution of each intervention:
+% TODO: Add figure reference when improvement_hierarchy figure is created: Figure~\ref{fig:improvement_hierarchy}
 
 \begin{enumerate}
     \item \textbf{Architecture (multi-output BNN)}: +65.8 percentage points
@@ -606,14 +613,15 @@ Table~\ref{tab:computational_cost_summary} summarizes the computational cost and
 
 \begin{table}[t]
 \centering
+\small
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-\textbf{Phase} & \textbf{Models} & \textbf{Compute Time} & \textbf{Best Coverage} & \textbf{ROI} \\
+\textbf{Phase}  & \textbf{Models}  & \textbf{Time}  & \textbf{Best Cov.}  & \textbf{ROI (pp/hr)} \\
 \midrule
-Phase 1: Features & 3 & 2 hrs & 31.3\% & +5.1pp / 2hrs = \textbf{2.6pp/hr} \\
-Phase 2: Priors & 4 & 2 hrs & 26.7\% & $<1$pp / 2hrs = \textbf{0.5pp/hr} \\
-Phase 3: Alternatives & 3 & 5 hrs & 92.0\% & +65.8pp / 5hrs = \textbf{13.2pp/hr} \\
-Phase 4: Optimization & 10 & 1 hr & 34.2\% & +8.0pp / 1hr = \textbf{8.0pp/hr} \\
+Phase 1: Features & 3 & 2 hrs & 31.3\% & \textbf{2.6} \\
+Phase 2: Priors & 4 & 2 hrs & 26.7\% & \textbf{0.5} \\
+Phase 3: Alternatives & 3 & 5 hrs & 92.0\% & \textbf{13.2} \\
+Phase 4: Optimization & 10 & 1 hr & 34.2\% & \textbf{8.0} \\
 \midrule
 \textbf{Total} & \textbf{20} & \textbf{10 hrs} & \textbf{92.0\%} & \\
 \bottomrule
@@ -637,7 +645,7 @@ Table~\ref{tab:practitioner_decision_matrix} provides a decision matrix for sele
 \centering
 \begin{tabular}{@{}llp{6cm}@{}}
 \toprule
-\textbf{Priority} & \textbf{Method} & \textbf{Rationale} \\
+\textbf{Priority}  & \textbf{Method}  & \textbf{Rationale} \\
 \midrule
 \textbf{Calibration + Accuracy} & Multi-output BNN & Best calibration (92\%) with competitive point prediction (18.5 MAE). Justifies 3-4hr training cost. \\
 \addlinespace

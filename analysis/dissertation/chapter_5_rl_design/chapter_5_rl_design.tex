@@ -290,7 +290,7 @@ The schematic in \Cref{fig:rl-workflow} is the promotion gate we use week‑to�
     % Left-justify both columns for readability
     \begin{tabularx}{\linewidth}{@{} >{\RaggedRight\arraybackslash}p{0.33\linewidth} >{\RaggedRight\arraybackslash}X @{} }
       \toprule
-      \textbf{NFL challenge} & \textbf{RL/analytics design} \\
+      \textbf{NFL challenge}  & \textbf{RL/analytics design} \\
       \midrule
       Correlated legs (spread+total/SGP) & Composite actions with portfolio variance penalty; dependence via copula in simulator; OPE gating for multi-leg exposure \\
       Slippage and vig & Reward uses log-wealth net frictions; friction-aware Kelly; pessimistic OPE to avoid illusory edge \\
@@ -333,7 +333,7 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
     \caption{Core ablation (placeholder): RL vs stateless baseline across seasons; columns are Brier, CLV (bps), ROI (\%), Max DD (\%).}
     \begin{tabular}{lrrrr}
       \toprule
-      Policy & Brier $\downarrow$ & CLV (bps) $\uparrow$ & ROI (\%) $\uparrow$ & Max DD (\%) $\downarrow$ \\
+ \textbf{Policy} & \textbf{Brier $\downarrow$} & \textbf{CLV (bps) $\uparrow$} & \textbf{ROI (\%) $\uparrow$} & \textbf{Max DD (\%) $\downarrow$} \\
       \midrule
       Kelly‑LCB (CBV\,$>\,\tau$) & -- & -- & -- & -- \\
       RL (IQL/CQL/TD3+BC) & -- & -- & -- & -- \\
@@ -392,7 +392,7 @@ This dissertation employs offline RL algorithms that learn exclusively from logg
     \setlength{\tabcolsep}{4.5pt}\renewcommand{\arraystretch}{1.12}
     \begin{tabularx}{\linewidth}{@{} >{\RaggedRight\arraybackslash}p{0.20\linewidth} >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X >{\RaggedRight\arraybackslash}X @{} }
       \toprule
-      \textbf{Method} & \textbf{Core idea/objective} & \textbf{Regularization/safety} & \textbf{Pros / Cons} \\
+      \textbf{Method}  & \textbf{Core idea/objective}  & \textbf{Regularization/safety}  & \textbf{Pros / Cons} \\
       \midrule
       BCQ\tnote{1} & Constrain actions to a generative model of dataset support; pessimistic Q backup & Action support constraint via VAE + perturbation & + Avoids OOD actions; – May under-explore profitable rare actions \\
       BRAC\tnote{2} & Penalize deviation from behavior distribution in policy improvement & KL/\(f\)-divergence to behavior policy & + Simple; – Tuning regularizer critical \\

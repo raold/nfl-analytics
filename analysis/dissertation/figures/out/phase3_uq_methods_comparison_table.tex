@@ -1,11 +1,8 @@
-\begin{table}[t]
-  \centering
-  \caption{Phase 3: Uncertainty Quantification Methods Comparison}
-  \label{tab:phase3-uq-comparison}
-  \begin{threeparttable}
+\begin{threeparttable}
+  \small
     \begin{tabular}{lccccc}
       \toprule
-      \textbf{Method} & \textbf{90\% Coverage} & \textbf{CI Width (yds)} & \textbf{MAE (yds)} & \textbf{Training Time} & \textbf{Calibrated?} \\
+      \textbf{Method}  & \textbf{90\% Cov.}  & \textbf{Width}  & \textbf{MAE}  & \textbf{Time}  & \textbf{Cal.?} \\
       \midrule
       BNN (Baseline) & 26.2\% & 17.0 & 18.4 & 25 min & \textcolor{red}{$\times$} \\
       BNN (Vegas) & 29.7\% & 17.0 & 18.4 & 25 min & \textcolor{red}{$\times$} \\
@@ -28,4 +25,3 @@
       \item Calibrated: \textcolor{green}{$\checkmark$} = within 5pp of target, \textcolor{orange}{$\sim$} = within 10pp, \textcolor{red}{$\times$} = $>$10pp from target
     \end{tablenotes}
   \end{threeparttable}
-\end{table}

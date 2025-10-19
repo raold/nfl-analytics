@@ -272,9 +272,7 @@ Tail behavior is summarized by the upper/lower tail coefficients
 \lambda_U=\lim_{u\uparrow 1}\Pr\big(V>u\mid U>u\big),\qquad
 \lambda_L=\lim_{u\downarrow 0}\Pr\big(V\le u\mid U\le u\big),
 \]
-estimated empirically by high/low quantile counts. Gaussian copulas imply $\lambda_U=\lambda_L=0$; $t$‑copulas yield $\lambda_U=\lambda_L>0$ depending on $\nu$ and $\rho$. We report $(\hat\lambda_U,\hat\lambda_L)$ with block bootstrap intervals to decide whether heavy‑tailed dependence is required.
-
-\input{../figures/out/tail_dependence_table.tex}
+estimated empirically by high/low quantile counts. Gaussian copulas imply $\lambda_U=\lambda_L=0$; $t$‑copulas yield $\lambda_U=\lambda_L>0$ depending on $\nu$ and $\rho$. We report $(\hat\lambda_U,\hat\lambda_L)$ with block bootstrap intervals to decide whether heavy‑tailed dependence is required (see \Cref{sec:unified-baseline-comparison} for empirical results).
 
 \begin{algorithm}[t]
   \caption{Copula GOF and Tail Diagnostics}

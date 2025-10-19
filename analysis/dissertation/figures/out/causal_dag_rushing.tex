@@ -5,12 +5,15 @@
 \centering
 \begin{tikzpicture}[
   node distance=2.5cm and 3cm,
-  every node/.style={draw, rounded corners, align=center, minimum width=2.2cm, minimum height=0.8cm},
-  arrow/.style={->, >=stealth, thick},
-  confounder/.style={fill=blue!10},
-  treatment/.style={fill=green!15, thick},
-  outcome/.style={fill=orange!15, thick}
+  % Define accent color
+  every node/.style={draw=accent!60, rounded corners, line width=0.6pt, align=center, minimum width=2.2cm, minimum height=0.8cm},
+  arrow/.style={->, line width=0.6pt, >=stealth},
+  confounder/.style={fill=accent!8},
+  treatment/.style={fill=green!15, line width=0.8pt},
+  outcome/.style={fill=orange!15, line width=0.8pt}
 ]
+  % Define accent color
+  \definecolor{accent}{RGB}{31,119,180}
 
 % Nodes
 \node[confounder] (ability) {Player\\Ability};
@@ -22,17 +25,17 @@
 \node[outcome, right=of carries] (yards) {\textbf{Rushing Yards}\\(Outcome)};
 
 % Confounding arrows
-\draw[arrow, blue!60] (ability) -- (carries);
-\draw[arrow, blue!60] (ability) -- (yards);
+\draw[arrow, accent!60] (ability) -- (carries);
+\draw[arrow, accent!60] (ability) -- (yards);
 
-\draw[arrow, blue!60] (team) -- (carries);
-\draw[arrow, blue!60] (team) -- (script);
-\draw[arrow, blue!60] (team) -- (yards);
+\draw[arrow, accent!60] (team) -- (carries);
+\draw[arrow, accent!60] (team) -- (script);
+\draw[arrow, accent!60] (team) -- (yards);
 
-\draw[arrow, blue!60] (opponent) -- (carries);
-\draw[arrow, blue!60] (opponent) -- (yards);
+\draw[arrow, accent!60] (opponent) -- (carries);
+\draw[arrow, accent!60] (opponent) -- (yards);
 
-\draw[arrow, blue!60] (script) -- (carries);
+\draw[arrow, accent!60] (script) -- (carries);
 
 % Causal effect of interest
 \draw[arrow, green!60, very thick] (carries) -- node[above, draw=none, fill=white] {Causal Effect} (yards);
@@ -44,7 +47,7 @@
 
 % Legend
 \node[draw=none, below=0.3cm of yards, anchor=north east, align=left, font=\small] {
-  \textcolor{blue!80}{$\blacksquare$} Confounders \\
+  \textcolor{accent!80}{$\blacksquare$} Confounders \\
   \textcolor{green!80}{$\blacksquare$} Treatment \\
   \textcolor{orange!80}{$\blacksquare$} Outcome \\
   \textcolor{red!60}{- - -} Backdoor paths (blocked by adjustment)

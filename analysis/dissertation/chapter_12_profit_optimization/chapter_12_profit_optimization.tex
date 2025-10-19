@@ -41,7 +41,7 @@ Not all positive edges convert to profit equally. We analyze historical closing 
 \caption{CLV Percentile Performance Analysis}
 \begin{tabular}{lrrr}
 \toprule
-CLV Percentile & Bet Count & Win Rate & ROI \\
+ \textbf{CLV Percentile} & \textbf{Bet Count} & \textbf{Win Rate} & \textbf{ROI} \\
 \midrule
 0-25\% & 2,847 & 48.2\% & -8.3\% \\
 25-50\% & 2,134 & 51.3\% & -2.1\% \\
@@ -181,7 +181,7 @@ We adjust sizing based on market regime:
 \caption{Regime-Based Sizing Multipliers}
 \begin{tabular}{lcc}
 \toprule
-Volatility Regime & Multiplier & Rationale \\
+ \textbf{Volatility Regime} & \textbf{Multiplier} & \textbf{Rationale} \\
 \midrule
 Low & 1.1× & Stable conditions allow larger positions \\
 Normal & 1.0× & Standard sizing \\
@@ -250,7 +250,7 @@ where:
 \caption{Strategy Parameters by Confidence Segment}
 \begin{tabular}{lccc}
 \toprule
-Parameter & High Conf. & Medium Conf. & Low Conf. \\
+ \textbf{Parameter} & \textbf{High Conf.} & \textbf{Medium Conf.} & \textbf{Low Conf.} \\
 \midrule
 Min Edge & 2.5\% & 3.5\% & 5.0\% \\
 Max Kelly & 30\% & 20\% & 10\% \\
@@ -272,23 +272,28 @@ The profit optimization framework integrates with existing components:
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[node distance=2cm, auto]
+  % Define accent color and styles
+  \definecolor{accent}{RGB}{31,119,180}
+  \tikzstyle{flowbox}=[draw=accent!60, rounded corners, line width=0.6pt,
+    fill=accent!3, text width=3cm, align=center, inner ysep=6pt, inner xsep=8pt]
+
   % Nodes
-  \node[rectangle, draw, text width=3cm, align=center] (models) {Prediction Models};
-  \node[rectangle, draw, text width=3cm, align=center, right=of models] (edge) {Edge Calculator};
-  \node[rectangle, draw, text width=3cm, align=center, right=of edge] (market) {Market Analysis};
-  \node[rectangle, draw, text width=3cm, align=center, below=of edge] (uncertainty) {Uncertainty Segmentation};
-  \node[rectangle, draw, text width=3cm, align=center, below=of market] (kelly) {Kelly + CVaR};
-  \node[rectangle, draw, text width=3cm, align=center, below=of uncertainty] (router) {Book Router};
-  \node[rectangle, draw, text width=3cm, align=center, below=of kelly] (execution) {Execution};
+  \node[flowbox] (models) {Prediction Models};
+  \node[flowbox, right=of models] (edge) {Edge Calculator};
+  \node[flowbox, right=of edge] (market) {Market Analysis};
+  \node[flowbox, below=of edge] (uncertainty) {Uncertainty Segmentation};
+  \node[flowbox, below=of market] (kelly) {Kelly + CVaR};
+  \node[flowbox, below=of uncertainty] (router) {Book Router};
+  \node[flowbox, below=of kelly] (execution) {Execution};
 
   % Arrows
-  \draw[->] (models) -- (edge);
-  \draw[->] (edge) -- (market);
-  \draw[->] (market) -- (kelly);
-  \draw[->] (edge) -- (uncertainty);
-  \draw[->] (uncertainty) -- (kelly);
-  \draw[->] (kelly) -- (router);
-  \draw[->] (router) -- (execution);
+  \draw[->, line width=0.6pt, color=accent] (models) -- (edge);
+  \draw[->, line width=0.6pt, color=accent] (edge) -- (market);
+  \draw[->, line width=0.6pt, color=accent] (market) -- (kelly);
+  \draw[->, line width=0.6pt, color=accent] (edge) -- (uncertainty);
+  \draw[->, line width=0.6pt, color=accent] (uncertainty) -- (kelly);
+  \draw[->, line width=0.6pt, color=accent] (kelly) -- (router);
+  \draw[->, line width=0.6pt, color=accent] (router) -- (execution);
 \end{tikzpicture}
 \caption{Profit Optimization System Architecture}
 \end{figure}
@@ -302,7 +307,7 @@ Comprehensive backtesting on 2022-2024 seasons shows dramatic improvement:
 \caption{Performance Comparison: Before vs After Optimization}
 \begin{tabular}{lrr}
 \toprule
-Metric & Before & After \\
+ \textbf{Metric} & \textbf{Before} & \textbf{After} \\
 \midrule
 Total Bets & 3,247 & 1,134 \\
 Win Rate & 52.8\% & 54.2\% \\
@@ -332,7 +337,7 @@ We quantify each component's contribution through ablation:
 \caption{ROI Impact by Component}
 \begin{tabular}{lr}
 \toprule
-Component & ROI Impact \\
+ \textbf{Component} & \textbf{ROI Impact} \\
 \midrule
 Edge-based selection & +2.8\% \\
 Market timing & +1.5\% \\

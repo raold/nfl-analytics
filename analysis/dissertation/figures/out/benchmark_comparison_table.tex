@@ -1,11 +1,12 @@
 \begin{table}[t]
   \centering
-  \small
+  \footnotesize
   \caption{Model performance comparison against published benchmarks. Our stacked ensemble achieves best-in-class calibration (Brier = 0.2515) but fails to overcome market efficiency for profitability (51.0\% ATS vs 52.4\% breakeven).}
   \label{tab:benchmark-comparison}
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lccccl}
     \toprule
-    \textbf{Model} & \textbf{Brier} $\downarrow$ & \textbf{ATS \%} & \textbf{CLV (bps)} & \textbf{Years} & \textbf{Notes} \\
+    \textbf{Model}  & \textbf{Brier} $\downarrow$  & \textbf{ATS \%}  & \textbf{CLV (bps)}  & \textbf{Years}  & \textbf{Notes} \\
     \midrule
     \textbf{Our Ensemble (Stacked)} & 0.252 & 51.0 & 14.9 & 2004-2024 & Best calibration \\
     \textbf{Our Baseline (GLM)} & 0.255 & 50.8 & 6.3 & 2004-2024 & Interpretable \\

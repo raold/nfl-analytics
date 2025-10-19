@@ -108,8 +108,7 @@
   group-minimum-digits = 4,
   round-mode = places,
   round-precision = 2,
-  detect-weight = true,
-  detect-inline-weight = math
+  detect-weight = true
 }
 
 % ---------------------------------------------------
@@ -125,8 +124,8 @@
 \newcolumntype{N}{S[table-format=3.2]}
 
 % Slightly smaller table captions and content by default
-\captionsetup[table]{font=small}
-\captionsetup[figure]{font=small}
+\captionsetup[table]{font=small,labelfont=bf}
+\captionsetup[figure]{font=small,labelfont=bf}
 
 % Helper commands for consistent table formatting
 % #4: Better header command with automatic line breaks

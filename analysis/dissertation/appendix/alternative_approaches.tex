@@ -86,7 +86,7 @@ Applied to team strength evolution (2020--2024 margin predictions):
 \caption{Changepoint detection method comparison.}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Method} & \textbf{Changepoints/Team} & \textbf{Brier} & \textbf{Train Time} & \textbf{False Pos.} \\
+\textbf{Method}  & \textbf{Changepoints/Team}  & \textbf{Brier}  & \textbf{Train Time}  & \textbf{False Pos.} \\
 \midrule
 PELT ($\beta=5$) & 3.2/season & 0.2509 & 12 min & 8\% \\
 HMM ($K=3$) & 4.1 transitions & 0.2512 & 18 min & 12\% \\
@@ -163,7 +163,7 @@ Testing on 2023--2024 teaser pricing (1,408 games):
 \caption{Dynamic copula performance.}
 \begin{tabular}{lccc}
 \toprule
-\textbf{Model} & \textbf{Teaser Pricing MAE} & \textbf{Calibration Time} & \textbf{CLV Gain} \\
+\textbf{Model}  & \textbf{Teaser Pricing MAE}  & \textbf{Calibration Time}  & \textbf{CLV Gain} \\
 \midrule
 Static Gaussian & 0.018 & 2 sec & Baseline \\
 DCC-GARCH & 0.0176 & 42 sec & +0.3 bps \\
@@ -207,13 +207,14 @@ Advanced techniques offer theoretical advantages but face practical constraints 
   \centering
   \caption{Advanced features cost-benefit analysis.}
   \label{tab:advanced-cost-benefit}
+  \footnotesize
   \begin{tabular}{lcccc}
     \toprule
-    \textbf{Method} & \textbf{Brier Gain} & \textbf{Compute Cost} & \textbf{CLV Gain} & \textbf{Implemented?} \\
+    \textbf{Method}  & \textbf{Brier Gain}  & \textbf{Compute}  & \textbf{CLV Gain}  & \textbf{Impl.?} \\
     \midrule
-    Current Ensemble & Baseline (0.2517) & 1× (45 sec) & Baseline & Yes \\
+    Current Ensemble & Baseline (0.2517) & 1× (45s) & Baseline & Yes \\
     + Graph Neural Nets & -0.003 (1.2\%) & 60× & +0.2 bps & No \\
-    + Changepoint Detection & -0.001 (0.4\%) & 100× & +0.1 bps & No \\
+    + Changepoint Detect. & -0.001 (0.4\%) & 100× & +0.1 bps & No \\
     + Dynamic Copulas & -0.0005 (0.2\%) & 20× & +0.3 bps & No \\
     All Combined & -0.004 (1.6\%) & 200×+ & +0.6 bps & No \\
     \bottomrule

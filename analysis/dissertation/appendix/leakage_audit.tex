@@ -31,7 +31,7 @@ The feature catalog organizes features into 11 groups based on source tables and
 \label{tab:feature_groups}
 \begin{tabular}{@{} l c c l @{}}
 \toprule
-\textbf{Group} & \textbf{Features} & \textbf{Safe?} & \textbf{Source} \\
+\textbf{Group}  & \textbf{Features}  & \textbf{Safe?}  & \textbf{Source} \\
 \midrule
 Team History Base & 16 & \checkmark & \texttt{games}, \texttt{plays} \\
 Team Context & 9 & \checkmark & \texttt{games} \\
@@ -99,7 +99,7 @@ Table~\ref{tab:feature_safety_matrix} presents the complete mapping from feature
 \label{tab:feature_safety_matrix}
 \begin{tabular}{@{} l l l c @{}}
 \toprule
-\textbf{Feature} & \textbf{Source} & \textbf{Cutoff Mechanism} & \textbf{Test} \\
+\textbf{Feature}  & \textbf{Source}  & \textbf{Cutoff Mechanism}  & \textbf{Test} \\
 \midrule
 \texttt{prior\_epa\_mean} & \texttt{plays} & \texttt{kickoff <= cutoff} & \checkmark \\
 \texttt{rest\_days} & \texttt{games.kickoff} & Temporal diff & \checkmark \\
@@ -124,7 +124,7 @@ The test suite (\texttt{tests/unit/test\_asof\_features.py}) covers the followin
 \label{tab:leakage_tests}
 \begin{tabular}{@{} l l c @{}}
 \toprule
-\textbf{Test} & \textbf{Scenario} & \textbf{Status} \\
+\textbf{Test}  & \textbf{Scenario}  & \textbf{Status} \\
 \midrule
 \texttt{test\_no\_future\_leakage} & As-of snapshot excludes future & \checkmark \\
 \texttt{test\_validation\_catches\_leakage} & Validator detects leakage & \checkmark \\

@@ -1,0 +1,53 @@
+% tikz_diagram_style.tex - Standardized TikZ diagram styling
+
+% Define accent color if not already defined
+\@ifundefined{definecolor}{}{%
+  \definecolor{accent}{RGB}{31,119,180}
+}
+
+% Standard flowchart box style - rounded corners with light blue background
+\tikzstyle{flowbox}=[
+  draw=accent!60,
+  rounded corners,
+  line width=0.6pt,
+  fill=accent!3,
+  text width=3cm,
+  align=center,
+  inner ysep=6pt,
+  inner xsep=8pt
+]
+
+% Wide flowbox for longer text
+\tikzstyle{flowbox-wide}=[
+  flowbox,
+  text width=0.84\linewidth
+]
+
+% Standard arrow style
+\tikzstyle{arrow}=[
+  ->,
+  line width=0.6pt,
+  color=accent
+]
+
+% Note/callout style - white background with subtle border
+\tikzstyle{note}=[
+  font=\scriptsize,
+  text=black,
+  fill=white,
+  draw=accent!25,
+  rounded corners=2pt,
+  inner xsep=2pt,
+  inner ysep=1pt,
+  align=center
+]
+
+% Icon circle style
+\tikzstyle{icon}=[
+  draw=none,
+  circle,
+  fill=accent!25,
+  minimum size=13pt,
+  inner sep=0pt,
+  font=\scriptsize\bfseries
+]
