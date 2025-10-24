@@ -328,11 +328,11 @@ class HierarchicalGNN(nn.Module):
         player_to_position_edges: torch.Tensor,
         position_to_team_edges: torch.Tensor,
         chemistry_edges: Optional[torch.Tensor] = None,
-        home_team_idx: Optional[int] = None,
-        away_team_idx: Optional[int] = None,
+        home_team_idx: Optional[torch.Tensor] = None,
+        away_team_idx: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
-        Forward pass through hierarchical GNN.
+        Forward pass through hierarchical GNN with BATCH SUPPORT.
 
         Args:
             player_features: (num_players, feature_dim)
@@ -341,11 +341,11 @@ class HierarchicalGNN(nn.Module):
             player_to_position_edges: (2, num_edges)
             position_to_team_edges: (2, num_edges)
             chemistry_edges: (2, num_edges) - QB-WR connections
-            home_team_idx: Index of home team
-            away_team_idx: Index of away team
+            home_team_idx: (batch_size,) tensor of home team indices OR scalar int
+            away_team_idx: (batch_size,) tensor of away team indices OR scalar int
 
         Returns:
-            P(home_win): scalar or (batch_size, 1)
+            P(home_win): (batch_size, 1) if batched, else scalar
         """
         # Level 1: Player embeddings
         player_embeds = self.player_encoder(player_features)  # (num_players, embedding_dim)
@@ -370,19 +370,28 @@ class HierarchicalGNN(nn.Module):
                 position_embeds, team_embeds, position_to_team_edges
             )
 
-        # Level 4: Game prediction
+        # Level 4: Game prediction (now supports batching!)
         if home_team_idx is not None and away_team_idx is not None:
-            home_embed = team_embeds[home_team_idx]
-            away_embed = team_embeds[away_team_idx]
+            # Handle both scalar and batched inputs
+            if isinstance(home_team_idx, int):
+                # Original single-game path
+                home_embed = team_embeds[home_team_idx]
+                away_embed = team_embeds[away_team_idx]
+                game_embed = torch.cat([home_embed, away_embed], dim=0)
+                logit = self.game_predictor(game_embed)
+                return logit  # Return logits (sigmoid applied in loss function)
+            else:
+                # NEW: Batch-parallel path for multiple games
+                home_embeds = team_embeds[home_team_idx]  # (batch_size, embedding_dim)
+                away_embeds = team_embeds[away_team_idx]  # (batch_size, embedding_dim)
 
-            # Concatenate home and away embeddings
-            game_embed = torch.cat([home_embed, away_embed], dim=0)
+                # Concatenate for each game in batch
+                game_embeds = torch.cat([home_embeds, away_embeds], dim=1)  # (batch_size, 2*embedding_dim)
 
-            # Predict outcome
-            logit = self.game_predictor(game_embed)
-            prob = torch.sigmoid(logit)
+                # Predict all games in parallel
+                logits = self.game_predictor(game_embeds)  # (batch_size, 1)
 
-            return prob
+                return logits.squeeze(1)  # (batch_size,) - return logits
 
         return team_embeds
 

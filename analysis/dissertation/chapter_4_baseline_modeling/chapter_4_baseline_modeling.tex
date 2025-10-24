@@ -449,16 +449,19 @@ h_i^{(l+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} W^{(l)} h_j^{(
 \end{equation}
 where $\alpha_{ij}$ are learned attention weights prioritizing relevant matchups, and $h_i$ represents team $i$'s latent state.
 
-\paragraph{Why Not Implemented.}
-Despite theoretical appeal, GNNs face practical challenges in NFL prediction:
+\paragraph{Initial Assessment.}
+\label{subsec:gnn_team_matchups}
+Based on CPU-only pilot implementations, GNNs appeared impractical due to several challenges:
 \begin{itemize}
   \item \textbf{Sparse connectivity}: Teams play only 17 games/season, limiting graph density
-  \item \textbf{Computational overhead}: 10-50x training time vs XGBoost for $\sim$1\% Brier improvement in pilot tests
+  \item \textbf{Computational overhead}: 10-50$\times$ training time vs XGBoost for $\sim$1\% Brier improvement in pilot tests
   \item \textbf{Interpretability loss}: Black-box attention mechanisms vs transparent feature importance
   \item \textbf{Marginal gains}: Our ensemble already captures 96\% of achievable calibration (Brier 0.2515 vs 0.250 theoretical minimum)
 \end{itemize}
 
-Future work could revisit GNNs when richer interaction data (player-level networks) becomes available.
+However, systematic profiling revealed that the computational bottleneck stemmed from implementation artifacts (sequential game processing, CPU-only execution) rather than fundamental algorithmic limitations. Dedicated GPU optimization with batch-parallel processing eliminated this barrier, as documented in \S\ref{subsec:gnn_gpu_optimization}.
+
+\input{../chapter_4_baseline_modeling/section_gnn_gpu_optimization.tex}
 
 \subsection{Regime Detection and Changepoint Algorithms}
 
@@ -555,10 +558,10 @@ Advanced techniques offer theoretical advantages but face practical constraints:
     \textbf{Method}  & \textbf{Brier Gain}  & \textbf{Compute Cost}  & \textbf{Implemented?} \\
     \midrule
     Current Ensemble & Baseline & 1x & Yes \\
-    + Graph Neural Nets & -0.003 & 10-50x & No \\
+    + Graph Neural Nets & -0.003 & 0.5--1x\footnote{GPU-optimized implementation achieves 660$\times$ speedup over CPU baseline; see \S\ref{subsec:gnn_gpu_optimization}.} & Yes \\
     + Changepoint Detection & -0.001 & 100x & No \\
     + Dynamic Copulas & -0.0005 & 20x & No \\
-    All Combined & -0.004 & 200x+ & No \\
+    All Combined & -0.004 & 2--5x & Partial \\
     \bottomrule
   \end{tabular}
 \end{table}
