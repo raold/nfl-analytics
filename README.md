@@ -25,6 +25,9 @@ Below is a minimal local bootstrap.
 - psql (optional; script falls back to container psql)
 - R (4.x) and Python (3.10+) if you plan to run ingestors
 - Git for version control
+- **Git LFS** (for model binaries): `brew install git-lfs && git lfs install`
+  - Required to download Python (.pkl) and R (.rds) model files
+  - See **[docs/GIT_LFS_GUIDE.md](docs/GIT_LFS_GUIDE.md)** for comprehensive guide
 
 ## Quick Start
 
