@@ -66,10 +66,6 @@ renv.lock
 renv/library/
 renv/staging/
 
-# R model binaries (large files)
-*.rds
-*.RDS
-
 # Notebook/Quarto/knitr caches
 **/*_cache/
 **/*_files/
