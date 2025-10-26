@@ -1,0 +1,20 @@
+% Profit Optimization Future Work
+% Extracted from Chapter 12 for integration into Chapter 10
+
+\subsection{Profit Optimization Extensions}\label{subsec:profit-optimization-extensions}
+
+The profit optimization framework developed in this dissertation opens several research directions:
+
+\begin{itemize}
+  \item \textbf{Dynamic Edge Thresholds}: Current static thresholds could adapt based on recent performance and market conditions. Reinforcement learning could optimize threshold selection based on realized vs predicted edges, adjusting conservatism during hot/cold streaks.
+
+  \item \textbf{Multi-Sport Extension}: Frameworks developed for NFL may transfer to other sports with adjustments. NBA and MLB offer higher game volumes for statistical learning, while international soccer markets may exhibit lower efficiency due to fragmented information flows.
+
+  \item \textbf{Live Betting Integration}: In-game opportunities require real-time processing and different risk models. Bayesian updating of game state probabilities could exploit mispricing during momentum shifts, injury substitutions, and play-calling adjustments.
+
+  \item \textbf{Automated Execution}: Current semi-automated approach could benefit from full automation with appropriate safeguards. API integration with sportsbooks, coupled with circuit breakers for anomalous line movements, would reduce latency and improve fill rates on profitable opportunities.
+
+  \item \textbf{Market-Making Strategies}: Rather than purely price-taking, explore market-making on betting exchanges (Betfair, Pinnacle) to earn bid-ask spread while providing liquidity. This requires tighter spreads and faster computation but offers structural edge independent of directional predictions.
+
+  \item \textbf{Correlation Arbitrage}: Exploit mispricing in correlated markets (team totals vs game total, first-half vs full-game spreads) using copula-based joint probability models. Same-game parlay pricing inconsistencies offer particularly attractive opportunities.
+\end{itemize}

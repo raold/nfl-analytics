@@ -66,6 +66,9 @@ We report out-of-sample performance by season. Stability across 2015--2024 demon
 % Prefer auto-generated table under figures/out if present, else fallback to results/
 \IfFileExists{../figures/out/oos_record_table.tex}{\input{../figures/out/oos_record_table.tex}}{\input{../results/oos_record_table.tex}}
 
+% BNN Calibration Study for Player Props (Rushing Yards) - ELEVATED SECTION
+\input{../chapter_8_results_discussion/section_bnn_calibration_study.tex}
+
 \section{Economic Value and Risk}
 We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.
 
@@ -180,12 +183,48 @@ When books set trap lines (intentionally mispriced to balance action), our model
 \paragraph{Recency bias in EPA metrics.}
 4-week rolling EPA overweights recent performance, missing regression to mean. Visible in SHAP values showing excessive weight on last 2 games. Mitigation: Exponential decay weighting or longer windows.
 
-\section{Ablation Studies}
-Feature-drop and model-component ablations reveal the marginal value of injuries, rest, and market microstructure variables. Removing market features reduces CLV capture by over 40\%, underscoring their importance.
+\section{Failed Approaches and Negative Results}\label{sec:failed-approaches}
 
-\subsection{Weather Features: A Negative Result}\label{subsec:weather-negative}
-Comprehensive weather feature engineering (temperature, wind, precipitation, interactions) was tested across 1,408 games (2020--2025) with 92.7\% coverage via Meteostat API. Despite domain expertise and rigorous feature engineering, weather features provide \emph{no significant predictive value}:
+This section documents approaches that \textit{did not work}, providing valuable insights for future research and preventing wasted effort on unpromising directions. Publishing negative results is critical for scientific progress, as it maps the boundaries of what is feasible and guides resource allocation toward high-value innovations.
 
+\subsection{Graph Neural Networks for Game Prediction}\label{subsec:gnn-failed-approach}
+
+We investigated hierarchical Graph Neural Networks (GNNs) as an alternative to feature-engineered baselines, hypothesizing that graph-based player-position-team structures could capture compositional effects without manual feature engineering. The comprehensive empirical evaluation is documented in Section~\ref{sec:gnn_empirical_results} (detailed results), with key findings summarized here.
+
+\paragraph{Motivation.}
+GNNs offered theoretical appeal: (1) no manual feature engineering, (2) interpretable player contributions via attention mechanisms, (3) structural inductive bias encoding domain knowledge. The hierarchical graph structure (player→position→team) seemed natural for capturing roster composition effects.
+
+\paragraph{Key Findings.}
+Despite extensive experimentation (9 ablation configurations, 50 Optuna hyperparameter trials), GNNs \textbf{failed to match XGBoost baseline performance}:
+
+\begin{itemize}
+  \item \textbf{Validation Brier}: 0.2313 (GNN best) vs 0.2050 (XGBoost) — 12.8\% worse
+  \item \textbf{Test Brier}: 0.2746 (GNN) vs \textit{unavailable} (XGBoost on 2025)
+  \item \textbf{Test Accuracy}: 50.2\% (barely above coin flip) vs 68\% (XGBoost historical)
+  \item \textbf{Training Time}: 12-16 hours (CPU, MPS bug) vs 5 minutes (XGBoost)
+\end{itemize}
+
+\paragraph{Why GNNs Failed.}
+Three fundamental limitations emerged:
+
+\begin{enumerate}
+  \item \textbf{Static roster graphs miss dynamic context}: Injuries, player form, weather, and playoff motivation are not captured by game-day roster structure alone.
+  \item \textbf{Message passing adds noise}: Shallow architectures (1-2 rounds) outperformed deep propagation, suggesting higher-order player relationships are uninformative.
+  \item \textbf{Feature engineering dominates structure}: XGBoost's 63 hand-crafted features (EPA, success rates, market signals) capture game-level dynamics that graph structure cannot encode.
+\end{enumerate}
+
+\paragraph{Lessons Learned.}
+GNNs are \textit{not} a silver bullet for sports analytics. Domain-specific feature engineering (EPA, success rates, betting markets) provides more value than structural inductive biases for game-level prediction. GNNs may still offer value for player-level tasks (position optimization, injury impact analysis) where roster composition is more directly relevant.
+
+\textbf{Recommendation}: For practitioners, use XGBoost with rich feature engineering for game prediction. Reserve GNNs for interpretability-focused applications or ensemble methods combining both approaches.
+
+Full empirical details, ablation studies, and error analysis are provided in Section~\ref{sec:gnn_empirical_results}.
+
+\subsection{Weather Features: A Rigorous Negative Result}\label{subsec:weather-negative}
+
+Comprehensive weather feature engineering (temperature, wind, precipitation, interactions) was tested across 1,408 games (2020--2025) with 92.7\% coverage via Meteostat API. Despite domain expertise and rigorous feature engineering, weather features provide \emph{no significant predictive value}.
+
+\paragraph{Empirical Evidence.}
 \Cref{tab:weather-effects} presents correlation analysis for wind and temperature effects on total scoring. Neither wind speed ($r=0.004$, $p=0.90$) nor temperature ($r=0.055$, $p=0.08$) show significant correlation with scoring, contradicting common intuition about weather impact.
 
 \input{../figures/out/weather_effects_comparison_table.tex}
@@ -212,6 +251,21 @@ Adding weather features to baseline models:
 
 \paragraph{Value of Negative Results.}
 This rigorous negative result prevents data-snooping and guides resource allocation toward high-value features (EPA, rest, microstructure). Full analysis documented in \texttt{WEATHER\_INFRASTRUCTURE\_ASSESSMENT.md} and published as supplementary material. Weather features remain in the feature set for completeness but are not used in model promotion criteria.
+
+\subsection{Summary of Failed Approaches}
+
+The failed approaches documented in this section provide valuable lessons:
+
+\begin{enumerate}
+  \item \textbf{Structural inductive bias $\neq$ predictive power}: Graph structure alone cannot replace domain-specific feature engineering
+  \item \textbf{Market efficiency limits weather value}: Betting markets already price in weather information
+  \item \textbf{Publish negative results}: Documenting failures prevents redundant exploration and maps feasible solution space
+\end{enumerate}
+
+Future work should focus on architectural innovations (multi-output BNNs, attention mechanisms) and high-value features (EPA, market microstructure) rather than pursuing graph-based or weather-based approaches for game-level prediction.
+
+\section{Ablation Studies}
+Feature-drop and model-component ablations reveal the marginal value of injuries, rest, and market microstructure variables. Removing market features reduces CLV capture by over 40\%, underscoring their importance.
 
 \section{Core Ablations}\label{sec:ablations}
 We report core ablations requested by reviewers. Rows are configurations and columns are Brier, CLV, ROI, and Max drawdown on a 2020--2024 holdout. \Cref{tab:core-ablation} shows that reweighting improves Brier score from 0.2552 to 0.2515, and microstructure features contribute an additional $\sim$0.2\% ROI improvement.
@@ -297,9 +351,6 @@ Across 1999–2005, classical baselines anchored calibration while ML gains were
 
 \section{Ablation Highlights}
 Removing market features cut CLV capture substantially, confirming their role as action gates. Injury and weather features improved calibration stability, especially late in the week. Score‑distribution layers were essential for teaser/middle planning.
-
-% BNN Calibration Study for Player Props (Rushing Yards)
-\input{../chapter_8_results_discussion/section_bnn_calibration_study.tex}
 
 \section{Limitations and External Validity}
 Historical odds coverage, execution assumptions, and data revisions limit generalization. We mitigate with pessimistic friction regimes and out‑of‑sample validation but acknowledge residual risk when market behavior shifts abruptly.
