@@ -36,6 +36,10 @@ The TimescaleDB instance exposes three logical layers:
 \end{description}
 Schema migrations are version-controlled under \texttt{db/}, and every change includes smoke tests that confirm ingest scripts remain idempotent.
 
+The complete database schema with all core tables, materialized views, and relationships is shown in \Cref{fig:database-erd}. The \texttt{games} table serves as the central hub, with foreign key relationships connecting play-by-play data, weather conditions, injury reports, rosters, and time-series odds history.
+
+\input{figures/out/database_erd.tex}
+
 \subsection{Timescale Hypertables and Chunking}
 Odds and play-by-play tables are hypertables partitioned by time; chunk sizes balance insert speed with query latency. Compression policies retain recent data uncompressed for writes while compressing historical partitions for analytics.
 
