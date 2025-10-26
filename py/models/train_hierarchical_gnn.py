@@ -16,7 +16,7 @@ import logging
 import subprocess
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -120,6 +120,7 @@ class NFLGameDataset:
 
 def load_multi_season_data(
     seasons: List[int],
+    include_chemistry: bool = True,
     db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01",
 ) -> Tuple[NFLGraph, Dict[int, pd.DataFrame]]:
     """
@@ -127,6 +128,7 @@ def load_multi_season_data(
 
     Args:
         seasons: List of seasons to load
+        include_chemistry: Include QB-WR chemistry edges
         db_url: Database connection URL
 
     Returns:
@@ -135,15 +137,14 @@ def load_multi_season_data(
     db = NFLDatabase(db_url)
     builder = NFLGraphBuilder(db)
 
-    # Build graph using all seasons combined
+    # Build unified graph combining ALL seasons
     logger.info(f"Building unified graph for seasons: {seasons}")
+    logger.info(f"  Chemistry edges: {'enabled' if include_chemistry else 'disabled'}")
 
-    # For simplicity, use most recent season's graph structure
-    # In production, you might want to combine all seasons
-    latest_season = max(seasons)
-    graph = builder.build_season_graph(
-        season=latest_season,
-        include_chemistry=True,
+    # Use multi-season graph builder to include players from ALL seasons
+    graph = builder.build_multi_season_graph(
+        seasons=seasons,
+        include_chemistry=include_chemistry,
         include_matchups=False,
     )
 
@@ -193,12 +194,53 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
     src_id_to_idx = {global_id: i for i, global_id in enumerate(src_ids)}
     dst_id_to_idx = {global_id: i for i, global_id in enumerate(dst_ids)}
 
+    # DEBUG logging for first call
+    if len(remapped) == 0 and len(edges) > 0:
+        logger.info(f"\n{'='*80}")
+        logger.info(f"EDGE REMAPPING DEBUG: {src_type} → {dst_type}")
+        logger.info(f"{'='*80}")
+        logger.info(f"  Total edges to remap: {len(edges)}")
+        logger.info(f"  Num {src_type} nodes: {len(src_ids)}")
+        logger.info(f"  Num {dst_type} nodes: {len(dst_ids)}")
+        logger.info(f"  {src_type} ID range: [{min(src_ids)}, {max(src_ids)}]")
+        logger.info(f"  {dst_type} ID range: [{min(dst_ids)}, {max(dst_ids)}]")
+        logger.info(f"\n  Sample raw edges (first 5):")
+        for i, (src, dst) in enumerate(edges[:5]):
+            logger.info(f"    Edge {i}: ({src}, {dst}) [global IDs]")
+        logger.info(f"")
+
+    missing_src = 0
+    missing_dst = 0
+
     for src_global, dst_global in edges:
         src_idx = src_id_to_idx.get(src_global)
         dst_idx = dst_id_to_idx.get(dst_global)
 
         if src_idx is not None and dst_idx is not None:
             remapped.append((src_idx, dst_idx))
+        else:
+            if src_idx is None:
+                missing_src += 1
+            if dst_idx is None:
+                missing_dst += 1
+
+    # DEBUG: Log results
+    if len(edges) > 0:
+        logger.info(f"  Remapping results:")
+        logger.info(f"    Input edges: {len(edges)}")
+        logger.info(f"    Successfully remapped: {len(remapped)}")
+        logger.info(f"    Missing src nodes: {missing_src}")
+        logger.info(f"    Missing dst nodes: {missing_dst}")
+
+        if len(remapped) > 0:
+            src_remapped, dst_remapped = zip(*remapped)
+            logger.info(f"    Remapped src range: [0, {max(src_remapped)}] (expected max: {len(src_ids)-1})")
+            logger.info(f"    Remapped dst range: [0, {max(dst_remapped)}] (expected max: {len(dst_ids)-1})")
+            logger.info(f"\n  Sample remapped edges (first 5):")
+            for i, (src, dst) in enumerate(remapped[:5]):
+                logger.info(f"    Edge {i}: ({src}, {dst}) [local indices]")
+
+        logger.info(f"{'='*80}\n")
 
     return remapped
 
@@ -230,8 +272,8 @@ def train_epoch(
     if player_features is None:
         raise ValueError("No player features in graph")
 
-    # Transfer to GPU with non_blocking for async transfer (if CUDA)
-    non_blocking = (device == "cuda")
+    # Transfer to GPU with non_blocking for async transfer (CUDA and MPS)
+    non_blocking = (device in ["cuda", "mps"])
     player_features = player_features.to(device, non_blocking=non_blocking)
 
     # Position and team indices
@@ -336,8 +378,8 @@ def evaluate(
     # Prepare graph data
     graph = dataset.graph
 
-    # Transfer to GPU with non_blocking for async transfer (if CUDA)
-    non_blocking = (device == "cuda")
+    # Transfer to GPU with non_blocking for async transfer (CUDA and MPS)
+    non_blocking = (device in ["cuda", "mps"])
     player_features = graph.node_features.get("player").to(device, non_blocking=non_blocking)
     position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(device, non_blocking=non_blocking)
     team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(device, non_blocking=non_blocking)
@@ -468,6 +510,147 @@ def load_checkpoint(
 
 
 # =============================================================================
+# Reusable Training Function for Hyperparameter Search
+# =============================================================================
+
+
+def train_gnn_single_config(
+    seasons: List[int],
+    embedding_dim: int = 64,
+    hidden_dim: int = 128,
+    num_message_rounds: int = 3,
+    epochs: int = 20,
+    learning_rate: float = 1e-3,
+    batch_size: int = 128,
+    use_chemistry: bool = True,
+    device: str = "cpu",
+    output_dir: Path = None,
+) -> Dict[str, Any]:
+    """
+    Train GNN with specified hyperparameters (for Optuna search).
+
+    Args:
+        seasons: List of seasons to include
+        embedding_dim: Node embedding dimension
+        hidden_dim: Hidden layer dimension
+        num_message_rounds: Number of message passing rounds
+        epochs: Training epochs
+        learning_rate: Learning rate
+        batch_size: Batch size
+        use_chemistry: Include QB-WR chemistry edges
+        device: Device for training
+        output_dir: Output directory for results
+
+    Returns:
+        Dictionary with training results and metrics
+    """
+    logger.info(f"Training GNN config:")
+    logger.info(f"  Embedding: {embedding_dim}, Hidden: {hidden_dim}, Rounds: {num_message_rounds}")
+    logger.info(f"  Epochs: {epochs}, LR: {learning_rate}, Batch: {batch_size}")
+    logger.info(f"  Chemistry: {use_chemistry}, Device: {device}")
+
+    # Load data
+    graph, games_by_season = load_multi_season_data(seasons, include_chemistry=use_chemistry)
+
+    # Create splits (last season test, second-to-last val)
+    test_seasons = [max(seasons)]
+    val_seasons = [max(seasons) - 1] if len(seasons) > 1 else []
+    train_seasons = [s for s in seasons if s not in test_seasons + val_seasons]
+
+    train_games, val_games, test_games = create_splits(
+        games_by_season, train_seasons, val_seasons, test_seasons
+    )
+
+    # Create datasets
+    train_dataset = NFLGameDataset(graph, train_games)
+    val_dataset = NFLGameDataset(graph, val_games)
+    test_dataset = NFLGameDataset(graph, test_games)
+
+    # Initialize model
+    player_feature_dim = graph.node_features["player"].shape[1]
+    model = HierarchicalGNN(
+        player_feature_dim=player_feature_dim,
+        embedding_dim=embedding_dim,
+        hidden_dim=hidden_dim,
+        num_message_rounds=num_message_rounds,
+        use_attention=True,
+    ).to(device)
+
+    # Optimizer and loss
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
+    criterion = nn.BCEWithLogitsLoss()
+
+    # Training loop
+    best_val_brier = float("inf")
+    best_model_state = None
+    patience_counter = 0
+    patience = 5
+
+    for epoch in range(epochs):
+        # Train
+        train_loss = train_epoch(
+            model, train_dataset, optimizer, criterion, device,
+            scaler=None,  # No mixed precision for Optuna (CPU training)
+            batch_size=batch_size,
+            accumulation_steps=1,
+        )
+
+        # Validate
+        val_metrics, _, _ = evaluate(model, val_dataset, device)
+
+        # Early stopping
+        if val_metrics["brier"] < best_val_brier:
+            best_val_brier = val_metrics["brier"]
+            best_model_state = model.state_dict().copy()
+            patience_counter = 0
+        else:
+            patience_counter += 1
+
+        if patience_counter >= patience:
+            logger.info(f"  Early stopping at epoch {epoch+1}")
+            break
+
+    # Load best model and evaluate on test
+    model.load_state_dict(best_model_state)
+    test_metrics, _, _ = evaluate(model, test_dataset, device)
+
+    # Save model if output_dir provided
+    if output_dir:
+        output_dir.mkdir(parents=True, exist_ok=True)
+        model_path = output_dir / "model.pt"
+        torch.save(best_model_state, model_path)
+
+        metadata = {
+            "embedding_dim": embedding_dim,
+            "hidden_dim": hidden_dim,
+            "num_message_rounds": num_message_rounds,
+            "epochs": epochs,
+            "learning_rate": learning_rate,
+            "batch_size": batch_size,
+            "use_chemistry": use_chemistry,
+            "best_val_brier": best_val_brier,
+            "test_metrics": test_metrics,
+        }
+
+        metadata_path = output_dir / "metadata.json"
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+    return {
+        "best_val_brier": best_val_brier,
+        "test_metrics": test_metrics,
+        "config": {
+            "embedding_dim": embedding_dim,
+            "hidden_dim": hidden_dim,
+            "num_message_rounds": num_message_rounds,
+            "learning_rate": learning_rate,
+            "batch_size": batch_size,
+            "use_chemistry": use_chemistry,
+        }
+    }
+
+
+# =============================================================================
 # Main Training Script
 # =============================================================================
 
@@ -558,6 +741,12 @@ def main():
         default=True,
         help="Use automatic mixed precision (FP16) training",
     )
+    parser.add_argument(
+        "--no-chemistry",
+        action="store_true",
+        default=False,
+        help="Disable QB-WR chemistry edges",
+    )
 
     args = parser.parse_args()
 
@@ -571,9 +760,12 @@ def main():
     logger.info(f"Message rounds: {args.num_message_rounds}")
     logger.info(f"Epochs: {args.epochs}")
     logger.info(f"Learning rate: {args.lr}")
+    logger.info(f"Chemistry edges: {not args.no_chemistry}")
 
     # Load data
-    graph, games_by_season = load_multi_season_data(args.seasons)
+    graph, games_by_season = load_multi_season_data(
+        args.seasons, include_chemistry=(not args.no_chemistry)
+    )
 
     # Create splits
     if len(args.seasons) == 1:
@@ -626,23 +818,19 @@ def main():
 
     logger.info(f"\nModel: {sum(p.numel() for p in model.parameters())} parameters")
 
-    # Apply torch.compile for JIT optimization (PyTorch 2.0+, Python <3.14, Linux only)
-    import sys
-    import platform
-    if args.device == "cuda" and hasattr(torch, 'compile') and sys.version_info < (3, 14) and platform.system() != 'Windows':
-        try:
-            model = torch.compile(model, mode="max-autotune")
-            logger.info("✓ Model compiled with torch.compile (max-autotune mode)")
-            logger.info("  Expected speedup: 1.2-1.3x")
-        except Exception as e:
-            logger.warning(f"torch.compile failed: {e}")
-            logger.warning("  Continuing without torch.compile")
-    else:
-        if platform.system() == 'Windows':
-            logger.warning("⚠ torch.compile not available on Windows (requires triton/Linux)")
-        elif sys.version_info >= (3, 14):
-            logger.warning("⚠ torch.compile not supported on Python 3.14+")
-        logger.info("  Optimizations active: Batch-parallel (10-15x) + FP16 (2-3x) + Batch-128 (1.2-1.5x)")
+    # DISABLED torch.compile for GNN due to edge remapping issues
+    # torch.compile caches the computation graph with the first edge indices it sees,
+    # which breaks when we pass remapped edges. This could be fixed in the future
+    # by making edges part of the model state or using torch._dynamo.mark_dynamic.
+    logger.info("⚠ torch.compile disabled for GNN (edge remapping compatibility)")
+    logger.info("  Consider: jax.jit for faster GNN training if needed")
+
+    # Log active optimizations
+    if args.device == "cuda":
+        logger.info("  Optimizations: Batch-parallel (12x) + FP16 (2.5x) + Async transfers (1.1x) + Batch-128 (1.4x)")
+    elif args.device == "mps":
+        logger.info("  MPS Optimizations: Batch-parallel (12x) + Async transfers (1.1x) + Batch-128 (1.4x)")
+        logger.info("  Note: Mixed precision (FP16) not yet supported on MPS")
 
     # Optimizer and loss (use BCEWithLogitsLoss for FP16 autocast compatibility)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-5)

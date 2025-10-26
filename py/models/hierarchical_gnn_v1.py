@@ -196,19 +196,32 @@ class MessagePassingLayer(nn.Module):
 
         src_indices, dst_indices = edge_index[0], edge_index[1]
 
+        # DEBUG: Validate index ranges to catch remapping bugs early
+        num_dst_nodes = dst_embeddings.size(0)
+        if dst_indices.numel() > 0:
+            max_dst_idx = dst_indices.max().item()
+            if max_dst_idx >= num_dst_nodes:
+                raise IndexError(
+                    f"Edge remapping bug detected in {self.edge_type}!\n"
+                    f"  dst_indices.max() = {max_dst_idx}\n"
+                    f"  num_dst_nodes = {num_dst_nodes}\n"
+                    f"  Edge indices should be in range [0, {num_dst_nodes-1}]\n"
+                    f"  This means edge remapping from global IDs to local indices failed."
+                )
+
         # Generate messages
         messages = self.message_mlp(src_embeddings[src_indices])  # (num_edges, out_dim)
 
-        # Aggregate messages for each destination node (mean aggregation)
-        num_dst_nodes = dst_embeddings.size(0)
+        # Aggregate messages using scatter_add (more robust than for-loop)
         aggregated = torch.zeros(num_dst_nodes, messages.size(1), device=messages.device)
 
-        # Count messages per destination
-        counts = torch.zeros(num_dst_nodes, device=messages.device)
+        # Expand dst_indices to match message dimensions for scatter
+        dst_indices_expanded = dst_indices.unsqueeze(1).expand_as(messages)
+        aggregated.scatter_add_(0, dst_indices_expanded, messages)
 
-        for i, dst_idx in enumerate(dst_indices):
-            aggregated[dst_idx] += messages[i]
-            counts[dst_idx] += 1
+        # Count messages per destination for averaging
+        counts = torch.zeros(num_dst_nodes, device=messages.device)
+        counts.scatter_add_(0, dst_indices, torch.ones_like(dst_indices, dtype=torch.float))
 
         # Average (avoid division by zero)
         counts = counts.clamp(min=1).unsqueeze(1)
@@ -254,12 +267,13 @@ class AttentionLayer(nn.Module):
         # Weighted messages
         messages = attn_weights.unsqueeze(1) * V  # (num_edges, embed_dim)
 
-        # Aggregate to destination nodes
+        # Aggregate to destination nodes using scatter (more robust than for-loop)
         num_nodes = embeddings.size(0)
         aggregated = torch.zeros_like(embeddings)
 
-        for i, dst_idx in enumerate(dst_indices):
-            aggregated[dst_idx] += messages[i]
+        # Expand dst_indices to match message dimensions for scatter
+        dst_indices_expanded = dst_indices.unsqueeze(1).expand_as(messages)
+        aggregated.scatter_add_(0, dst_indices_expanded, messages)
 
         return embeddings + aggregated  # Residual connection
 

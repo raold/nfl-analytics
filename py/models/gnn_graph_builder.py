@@ -235,6 +235,141 @@ class NFLGraphBuilder:
     def __init__(self, db: NFLDatabase):
         self.db = db
 
+    def build_multi_season_graph(
+        self,
+        seasons: List[int],
+        include_chemistry: bool = True,
+        include_matchups: bool = False
+    ) -> NFLGraph:
+        """
+        Build unified graph across multiple seasons.
+
+        Args:
+            seasons: List of NFL seasons (e.g., [2016, 2017, ..., 2024])
+            include_chemistry: Add QB-WR chemistry edges
+            include_matchups: Add player matchup edges (WR vs CB, etc.)
+
+        Returns:
+            NFLGraph with all nodes and edges from ALL seasons
+        """
+        logger.info(f"Building unified graph for seasons: {seasons}")
+
+        graph = NFLGraph()
+
+        # Load player hierarchy from ALL seasons (union)
+        all_players = []
+        for season in seasons:
+            season_players = self.db.load_player_hierarchy(season=season)
+            all_players.append(season_players)
+
+        # Concatenate and deduplicate by player_id (keep most recent)
+        player_hierarchy = pd.concat(all_players, ignore_index=True)
+        logger.info(f"  Total player records before dedup: {len(player_hierarchy)}")
+
+        player_hierarchy = player_hierarchy.sort_values('current_team').drop_duplicates(
+            subset='player_id', keep='last'
+        )
+        logger.info(f"  After deduplication: {len(player_hierarchy)} unique players")
+
+        # DEBUG: Check for any duplicates
+        if player_hierarchy['player_id'].duplicated().any():
+            logger.warning(f"  ⚠ WARNING: Still have {player_hierarchy['player_id'].duplicated().sum()} duplicate player_ids!")
+            logger.warning(f"    Sample duplicates: {player_hierarchy[player_hierarchy['player_id'].duplicated()]['player_id'].head()}")
+
+        logger.info(f"  Unified player hierarchy: {len(player_hierarchy)} unique players across {len(seasons)} seasons")
+
+        # Load player stats from ALL seasons
+        all_stats = []
+        for season in seasons:
+            season_stats = self.db.load_player_game_stats(season=season)
+            all_stats.append(season_stats)
+
+        player_stats = pd.concat(all_stats, ignore_index=True)
+        logger.info(f"  Unified player stats: {len(player_stats)} player-game records")
+
+        # 1. Add player nodes (use hierarchy as source of truth for player list)
+        logger.info("Adding player nodes...")
+        player_features = self._create_player_features(player_stats)
+
+        # Add nodes for ALL players in hierarchy (with or without stats)
+        for _, player in player_hierarchy.iterrows():
+            player_id = player["player_id"]
+            features = player_features.get(
+                player_id,
+                torch.zeros(9, dtype=torch.float32)  # Zero features if no stats
+            )
+            graph.add_node("player", features=features, external_id=player_id)
+
+        # 2. Add position group nodes
+        logger.info("Adding position group nodes...")
+        for position_group, idx in self.POSITION_GROUPS.items():
+            # Position groups get learned embeddings (no input features)
+            graph.add_node("position", features=None, external_id=position_group)
+
+        # 3. Add team nodes
+        logger.info("Adding team nodes...")
+        for team in self.NFL_TEAMS:
+            # Teams get learned embeddings (no input features)
+            graph.add_node("team", features=None, external_id=team)
+
+        # 4. Add edges: Player → Position
+        logger.info("Adding player → position edges...")
+        for _, player in player_hierarchy.iterrows():
+            player_node_id = graph.player_id_map.get(player["player_id"])
+            position_node_id = graph.position_id_map.get(player["position_group"])
+
+            if player_node_id is not None and position_node_id is not None:
+                graph.add_edge("player_to_position", player_node_id, position_node_id)
+
+        # 5. Add edges: Position → Team
+        logger.info("Adding position → team edges...")
+        for _, player in player_hierarchy.iterrows():
+            if pd.isna(player["current_team"]):
+                continue
+
+            position_node_id = graph.position_id_map.get(player["position_group"])
+            team_node_id = graph.team_id_map.get(player["current_team"])
+
+            if position_node_id is not None and team_node_id is not None:
+                # Add edge if not already exists
+                edge = (position_node_id, team_node_id)
+                if edge not in graph.edges["position_to_team"]:
+                    graph.add_edge("position_to_team", position_node_id, team_node_id)
+
+        # 6. Optional: Add chemistry edges (QB-WR on same team)
+        if include_chemistry:
+            logger.info("Adding QB-WR chemistry edges...")
+            chemistry_edges = self._find_chemistry_edges(player_hierarchy)
+
+            for qb_id, wr_id in chemistry_edges:
+                qb_node = graph.player_id_map.get(qb_id)
+                wr_node = graph.player_id_map.get(wr_id)
+
+                if qb_node is not None and wr_node is not None:
+                    graph.add_edge("player_chemistry", qb_node, wr_node)
+                    # Bidirectional
+                    graph.add_edge("player_chemistry", wr_node, qb_node)
+
+        # 7. Optional: Add matchup edges (WR vs CB, etc.)
+        if include_matchups:
+            logger.info("Adding player matchup edges...")
+            # TODO: Implement matchup detection
+            # This requires game-level data to know which players faced each other
+            pass
+
+        # Finalize graph (convert lists to tensors)
+        graph.finalize()
+
+        logger.info(f"Graph built: {graph.num_nodes} nodes")
+        logger.info(f"  Players: {len(graph.node_type_to_ids['player'])}")
+        logger.info(f"  Positions: {len(graph.node_type_to_ids['position'])}")
+        logger.info(f"  Teams: {len(graph.node_type_to_ids['team'])}")
+        logger.info(f"  Player→Position edges: {len(graph.edges['player_to_position'])}")
+        logger.info(f"  Position→Team edges: {len(graph.edges['position_to_team'])}")
+        logger.info(f"  Chemistry edges: {len(graph.edges['player_chemistry'])}")
+
+        return graph
+
     def build_season_graph(
         self,
         season: int,

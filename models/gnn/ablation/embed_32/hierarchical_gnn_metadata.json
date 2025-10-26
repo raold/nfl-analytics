@@ -1,0 +1,43 @@
+{
+  "model": "HierarchicalGNN",
+  "seasons": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "train_seasons": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "val_seasons": [
+    2024
+  ],
+  "test_seasons": [
+    2025
+  ],
+  "embedding_dim": 32,
+  "hidden_dim": 128,
+  "num_message_rounds": 3,
+  "epochs": 20,
+  "learning_rate": 0.001,
+  "best_val_brier": 0.23293847114002902,
+  "test_metrics": {
+    "accuracy": 0.4981549815498155,
+    "log_loss": 0.771661774973772,
+    "auc": 0.5652615144418424,
+    "brier": 0.28386929340074385
+  }
+}

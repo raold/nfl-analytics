@@ -1,0 +1,18 @@
+{
+  "q": 2.0,
+  "r": 15.0,
+  "hfa_init": 3.0,
+  "init_variance": 100.0,
+  "hfa_variance": 4.0,
+  "train_seasons": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023
+  ],
+  "val_season": 2024,
+  "test_season": 2025,
+  "n_teams": 32,
+  "hfa_final": 3.0
+}

@@ -9,7 +9,8 @@
     2021,
     2022,
     2023,
-    2024
+    2024,
+    2025
   ],
   "train_seasons": [
     2016,
@@ -18,24 +19,25 @@
     2019,
     2020,
     2021,
-    2022
-  ],
-  "val_seasons": [
+    2022,
     2023
   ],
-  "test_seasons": [
+  "val_seasons": [
     2024
+  ],
+  "test_seasons": [
+    2025
   ],
   "embedding_dim": 64,
   "hidden_dim": 128,
   "num_message_rounds": 3,
-  "epochs": 100,
+  "epochs": 1,
   "learning_rate": 0.001,
-  "best_val_brier": 0.24445644379611262,
+  "best_val_brier": 0.24941249242321314,
   "test_metrics": {
-    "accuracy": 0.5698529411764706,
-    "log_loss": 0.7903934643664103,
-    "auc": 0.5942981265272876,
-    "brier": 0.27556397907590857
+    "accuracy": 0.24354243542435425,
+    "log_loss": 0.7029942380028035,
+    "auc": 0.4841530054644808,
+    "brier": 0.254922955070371
   }
 }

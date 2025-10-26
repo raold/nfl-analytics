@@ -36,6 +36,11 @@ We estimate Skellam and bivariate Poisson parameters via maximum likelihood with
 % Source: main.tex line 331-332
 This section documents the computation of reliability diagrams, ECE, and CRPS. We discuss binning strategies and the role of smoothing and bootstrapped confidence bands.
 
+\subsection{Per-Season Reliability Diagrams}
+% Detailed per-season reliability panels for GLM baseline (2015-2024)
+% Referenced from Chapter 4 line 583: "we report per-season panels in the appendix"
+\IfFileExists{../figures/out/glm_reliability_panel.tex}{\input{../figures/out/glm_reliability_panel.tex}}{}
+
 \subsection{Calibration Procedures}
 % Source: main.tex line 1498-1499
 Binary outcomes use isotonic regression for post-hoc calibration on a temporally held-out validation set, while distributional predictions are assessed via PIT histograms and CRPS. We report calibration slope/intercept for probability outputs and employ bootstrap aggregation to mitigate small-sample variance in weekly splits.

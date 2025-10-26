@@ -988,7 +988,8 @@ We adopt walk-forward splits by week, with hyperparameters tuned on temporally h
 Probability calibration is critical for betting applications. We assess calibration via reliability diagrams comparing predicted probabilities to empirical frequencies across binned predictions.
 
 % Auto-generated calibration figures
-\IfFileExists{../figures/out/glm_reliability_panel.tex}{\input{../figures/out/glm_reliability_panel.tex}}{}
+% Note: Per-season reliability panels moved to appendix per line 583 text
+% \IfFileExists{../figures/out/glm_reliability_panel.tex}{\input{../figures/out/glm_reliability_panel.tex}}{}
 \IfFileExists{../figures/out/glm_calibration_platt.png}{%
   \begin{figure}[t]
     \centering
@@ -1006,9 +1007,12 @@ Beyond logistic regression, we evaluate XGBoost gradient boosting and Random For
 % Auto-generated multi-model comparison table
 \IfFileExists{../figures/out/multimodel_table.tex}{\input{../figures/out/multimodel_table.tex}}{}
 
+% Include player-to-game prediction section (feature engineering approach)
+\input{../chapter_4_baseline_modeling/section_player_to_game.tex}
+
 \subsection{Transition to Advanced Ensemble Systems}
 
-The baseline models developed in preceding sections---GLMs, state-space ratings, Dixon-Coles score models, and Bayesian hierarchical frameworks---establish a solid foundation for game outcome prediction, achieving MAE 10.5--11.5 points on 2024 holdout. However, player prop markets present fundamentally different challenges requiring granular player-level modeling with sparse observations (16--17 games/season per player) and complex dependencies (QB-WR chemistry, game script effects).
+The baseline models developed in preceding sections---GLMs, state-space ratings, Dixon-Coles score models, Bayesian hierarchical frameworks, and player-to-game feature engineering---establish a solid foundation for game outcome prediction, achieving MAE 10.1--10.5 points on 2024 holdout. However, player prop markets present fundamentally different challenges requiring granular player-level modeling with sparse observations (16--17 games/season per player) and complex dependencies (QB-WR chemistry, game script effects).
 
 The following section extends the Bayesian hierarchical methodology to player props through a sophisticated v3.0 ensemble system. Building on the partial pooling and informative priors developed in \Cref{sec:bayesian-hierarchical}, this advanced system integrates:
 \begin{itemize}
@@ -1026,11 +1030,11 @@ This v3.0 ensemble achieves breakthrough 86.4\% MAE improvement over baseline (4
 \input{../chapter_4_baseline_modeling/v3_ensemble_section.tex}
 
 \chaptersummary{
-This chapter established a comprehensive baseline modeling suite grounded in classical statistical methods and modern machine learning. We developed five complementary approaches: (1) calibrated GLMs with spread-to-win consistency (MAE 11.2), (2) Kalman-filter state-space ratings with sub-second latency (MAE 10.8), (3) Dixon-Coles bivariate Poisson models for score distributions with key-number reweighting, (4) Bayesian hierarchical models with partial pooling and full posterior uncertainty (MAE 10.5), and (5) position-based injury impact adjustments.
+This chapter established a comprehensive baseline modeling suite grounded in classical statistical methods and modern machine learning. We developed six complementary approaches: (1) calibrated GLMs with spread-to-win consistency (MAE 11.2), (2) Kalman-filter state-space ratings with sub-second latency (MAE 10.8), (3) Dixon-Coles bivariate Poisson models for score distributions with key-number reweighting, (4) Bayesian hierarchical models with partial pooling and full posterior uncertainty (MAE 10.5), (5) position-based injury impact adjustments, and (6) player-to-game prediction via feature engineering (Brier 0.2439, 6.7\% improvement over state-space baseline).
 
 The unified baseline comparison (\Cref{sec:unified-baseline-comparison}) demonstrated that ensemble integration (MAE 10.1, 54.1\% ATS) outperforms individual models through complementary strengths, achieving 96\% of theoretical performance (market MAE 9.7). Key findings include: calibration matters more than sharpness for economic value, simple models remain competitive at 1/90th computational cost, and market efficiency imposes a hard ceiling (vigorish barrier) on profitability.
 
-State-space vs Bayesian analysis (\Cref{subsec:ss-vs-bayes}) clarified when to prefer speed (Kalman, 2 sec) vs full uncertainty (MCMC, 18 sec), informing production deployment decisions. The v3.0 player prop ensemble extended Bayesian foundations to granular player-level prediction, achieving 86.4\% MAE improvement (42.3 $\to$ 5.2 points) through informative priors, meta-learner stacking, QB-WR chemistry modeling, and correlation-adjusted Kelly sizing---demonstrating scalability from team baselines to player complexity while maintaining robust risk management.
+State-space vs Bayesian analysis (\Cref{subsec:ss-vs-bayes}) clarified when to prefer speed (Kalman, 2 sec) vs full uncertainty (MCMC, 18 sec), informing production deployment decisions. The player-to-game model (\Cref{sec:player-to-game}) demonstrated that simple XGBoost feature engineering (33 features) outperforms complex GNNs (140K--340K parameters) by avoiding overfitting on limited data, achieving 6.7\% Brier improvement through QB/RB/WR aggregation with interpretable feature importance. The v3.0 player prop ensemble extended Bayesian foundations to granular player-level prediction, achieving 86.4\% MAE improvement (42.3 $\to$ 5.2 points) through informative priors, meta-learner stacking, QB-WR chemistry modeling, and correlation-adjusted Kelly sizing---demonstrating scalability from team baselines to player complexity while maintaining robust risk management.
 
 These calibrated baselines provide measurable edge, quantified uncertainty, and transparent decision-making, advancing the thesis by establishing that sophisticated AI approaches theoretical limits through proper uncertainty quantification and governance rather than algorithmic complexity alone.
 }{

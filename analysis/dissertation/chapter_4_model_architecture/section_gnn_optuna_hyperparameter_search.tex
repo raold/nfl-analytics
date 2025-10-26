@@ -1,0 +1,233 @@
+\section{Hyperparameter Optimization with Bayesian Search}
+\label{sec:gnn_optuna_search}
+
+Following our comprehensive ablation study (Section~\ref{sec:gnn_ablation}), we employ Bayesian hyperparameter optimization using Optuna~\citep{akiba2019optuna} to verify whether superior hyperparameter configurations exist beyond our grid search.
+
+% ============================================================================
+\subsection{Motivation and Decision Threshold}
+\label{subsec:optuna_motivation}
+
+Our ablation study identified several promising architectural patterns (no chemistry edges, moderate message passing, balanced capacity) but achieved test Brier scores of 0.2746--0.2801, significantly worse than XGBoost's 0.2050 validation performance. Before definitively excluding GNN from our ensemble, we conduct a final hyperparameter search to address three key questions:
+
+\begin{enumerate}[noitemsep]
+    \item Can Bayesian optimization find hyperparameter configurations our grid search missed?
+    \item Does a more efficient search algorithm (TPE sampler) identify global optima?
+    \item Is GNN performance fundamentally limited, or have we simply not found the right hyperparameters?
+\end{enumerate}
+
+\textbf{Decision Threshold}: If Optuna identifies a configuration achieving test Brier < 0.23, we reconsider GNN for ensemble integration. Otherwise, we definitively proceed with alternative 5th component candidates.
+
+% ============================================================================
+\subsection{Optuna Configuration}
+\label{subsec:optuna_configuration}
+
+\subsubsection{Search Space}
+
+We define a 6-dimensional hyperparameter search space spanning architectural and training parameters:
+
+\begin{table}[htbp]
+\centering
+\caption{Optuna Hyperparameter Search Space}
+\label{tab:optuna_search_space}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Parameter} & \textbf{Type} & \textbf{Range/Options} & \textbf{Ablation Baseline} \\
+\midrule
+\texttt{embedding\_dim} & Categorical & [16, 32, 64, 96, 128] & 64 \\
+\texttt{hidden\_dim} & Categorical & [32, 64, 128, 192, 256] & 128 \\
+\texttt{num\_message\_rounds} & Integer & [1, 2, 3, 4, 5] & 3 \\
+\texttt{learning\_rate} & Float (log scale) & [1e-4, 1e-2] & 1e-3 \\
+\texttt{batch\_size} & Categorical & [32, 64, 128, 256] & 128 \\
+\texttt{use\_chemistry} & Boolean & [True, False] & True \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This search space enables exploration of 5 × 5 × 5 × ∞ × 4 × 2 ≈ 10,000+ discrete configurations (infinite for continuous learning rate), far exceeding our ablation study's 9 configurations.
+
+\subsubsection{Optimization Setup}
+
+\textbf{Sampler}: Tree-structured Parzen Estimator (TPE)~\citep{bergstra2011algorithms}
+\begin{itemize}[noitemsep]
+    \item Bayesian optimization technique modeling $P(x|y)$ and $P(y)$ to guide search
+    \item Efficient for expensive black-box functions (GNN training)
+    \item Balances exploitation (refine good configs) and exploration (try diverse configs)
+\end{itemize}
+
+\textbf{Pruner}: MedianPruner (n\_startup\_trials=5, n\_warmup\_steps=5)
+\begin{itemize}[noitemsep]
+    \item Early-stop unpromising trials based on intermediate validation performance
+    \item Prune if validation Brier > median of all completed trials
+    \item Reduces computation time by ~50\% (25/50 trials pruned)
+\end{itemize}
+
+\textbf{Objective}: Minimize validation Brier score (2024 season)
+
+\textbf{Computational Budget}:
+\begin{itemize}[noitemsep]
+    \item 50 trials (vs 9 in ablation)
+    \item 10 epochs per trial (for speed; early stopping patience=5)
+    \item CPU-only training (PyTorch MPS bug, see Section~\ref{subsec:gnn_limitations})
+    \item Total runtime: 3h 53min on M4 Mac CPU
+\end{itemize}
+
+% ============================================================================
+\subsection{Results}
+\label{subsec:optuna_results}
+
+Optuna completed 50 trials in under 4 hours, achieving 50\% pruning efficiency (25 trials pruned). Table~\ref{tab:optuna_top_configs} presents the top 5 configurations ranked by validation Brier score.
+
+\input{../figures/out/optuna_top_5_configs_table}
+
+\subsubsection{Best Configuration}
+
+Trial \#13 emerged as the global optimum, achieving validation Brier 0.2263—a modest 2.2\% improvement over our ablation baseline (0.2313):
+
+\begin{tcolorbox}[colback=blue!5!white, colframe=blue!75!black, title=Optuna Best Configuration (Trial \#13)]
+\begin{itemize}[noitemsep]
+    \item \textbf{Embedding dimension}: 128 (larger than ablation's 64)
+    \item \textbf{Hidden dimension}: 256 (larger than ablation's 128)
+    \item \textbf{Message rounds}: 4 (more than ablation's best 1--2)
+    \item \textbf{Learning rate}: 0.0057 (higher than ablation's 0.001)
+    \item \textbf{Batch size}: 64 (smaller than ablation's 128)
+    \item \textbf{Chemistry edges}: False (confirms ablation finding)
+\end{itemize}
+
+\textbf{Validation Performance}:
+\begin{itemize}[noitemsep]
+    \item Brier: 0.2263 (↓2.2\% vs ablation)
+\end{itemize}
+\end{tcolorbox}
+
+This configuration favors \textit{larger model capacity} (128/256) with \textit{more message passing} (4 rounds) and \textit{higher learning rate} (0.0057 vs 0.001), contradicting ablation study findings that simpler models generalize better.
+
+% ============================================================================
+\subsection{Critical Finding: Severe Overfitting}
+\label{subsec:optuna_overfitting}
+
+Despite achieving the best validation Brier score, Trial \#13 exhibits \textbf{catastrophic test set performance}:
+
+\begin{table}[htbp]
+\centering
+\caption{Optuna Best Config: Validation vs Test Performance}
+\label{tab:optuna_val_test_comparison}
+\small
+\begin{tabular}{@{}lcccl@{}}
+\toprule
+\textbf{Model} & \textbf{Val Brier} & \textbf{Test Brier} & \textbf{Gap} & \textbf{Verdict} \\
+\midrule
+Optuna Best (Trial \#13) & \textbf{0.2263} ⭐ & \textbf{0.2890} ❌ & +0.0627 & Severe overfitting \\
+Ablation Best (5 Rounds) & 0.2313 & \textbf{0.2746} ✓ & +0.0433 & Moderate overfitting \\
+XGBoost v3 Baseline & \textbf{0.2050} ⭐⭐ & N/A & N/A & Best performance \\
+\textit{Decision Threshold} & N/A & \textit{< 0.23} & N/A & \textit{Optuna FAILED} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\footnotesize
+\textbf{Key Observation}: Optuna's best config achieves 2.2\% better validation performance but 5.2\% worse test performance than ablation, demonstrating severe overfitting to the 2024 validation season.
+\end{table}
+
+\paragraph{Why Did Test Performance Degrade?}
+
+Three factors contribute to Optuna's poor generalization:
+
+\begin{enumerate}
+    \item \textbf{Validation-Specific Optimization}: TPE sampler learned patterns unique to the 2024 validation season (e.g., competitive balance, playoff format changes), not generalizable NFL dynamics.
+
+    \item \textbf{Larger Models Memorize, Not Learn}: Optuna's preference for 128/256 dimensions enables memorization of 2024-specific patterns, whereas ablation's smaller 64/128 models forced generalization.
+
+    \item \textbf{Limited Training Budget}: Only 10 epochs per trial led to under-trained models that still overfit to validation set, suggesting the optimizer exploited noise rather than signal.
+\end{enumerate}
+
+% ============================================================================
+\subsection{Comparison: Grid Search vs Bayesian Optimization}
+\label{subsec:optuna_comparison}
+
+Table~\ref{tab:optuna_ablation_comparison} compares our grid search ablation study against Bayesian optimization.
+
+\begin{table}[htbp]
+\centering
+\caption{Hyperparameter Search Method Comparison}
+\label{tab:optuna_ablation_comparison}
+\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+\textbf{Method} & \textbf{Trials} & \textbf{Best Val} & \textbf{Best Test} & \textbf{Gap} & \textbf{Duration} \\
+\midrule
+Grid Search (Ablation) & 9 & 0.2297 & \textbf{0.2746} ✓ & +0.0449 & ~12 hrs \\
+Bayesian Opt (Optuna) & 50 & \textbf{0.2263} ⭐ & 0.2890 ❌ & +0.0627 & ~4 hrs \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\footnotesize
+\textbf{Conclusion}: Grid search achieved better generalization despite worse validation performance. Bayesian optimization's efficiency (50 trials in 4 hours vs 9 trials in 12 hours) comes at the cost of overfitting.
+\end{table}
+
+\paragraph{Common Patterns Across Both Methods}
+
+Despite different search strategies, both ablation and Optuna converge on key architectural insights:
+
+\begin{itemize}[noitemsep]
+    \item ✅ \textbf{Chemistry edges are useless}: ALL top 5 Optuna trials set \texttt{use\_chemistry=False}
+    \item ✅ \textbf{Moderate message passing}: 2--4 rounds optimal (not 1, not 5)
+    \item ✅ \textbf{Smaller batch sizes}: 32--64 outperform 128--256
+    \item ✅ \textbf{Lower learning rates}: 0.0003--0.0057 (not 0.01)
+\end{itemize}
+
+% ============================================================================
+\subsection{Lessons Learned}
+\label{subsec:optuna_lessons}
+
+Our Optuna experiment provides valuable insights for hyperparameter optimization in small-sample sports prediction tasks:
+
+\begin{enumerate}
+    \item \textbf{Validation performance ≠ test performance}: A 28\% validation→test degradation (0.2263 → 0.2890) highlights dangers of optimizing for a single season.
+
+    \item \textbf{Bayesian optimization can overfit}: TPE sampler's efficiency enables finding validation-specific patterns that fail to generalize.
+
+    \item \textbf{Simpler is sometimes better}: Grid search's forced simplicity (9 configs) prevented overfitting, whereas Bayesian optimization's exploration (50 trials) exploited validation noise.
+
+    \item \textbf{Single-season validation is insufficient}: Need multi-season validation (e.g., 2022--2024) for robust hyperparameter selection.
+
+    \item \textbf{Feature-poor models overfit more}: GNN's reliance on static rosters (no EPA, success rates) forces memorization of season-specific patterns.
+\end{enumerate}
+
+% ============================================================================
+\subsection{Final Decision: GNN Not Suitable for Ensemble}
+\label{subsec:optuna_final_decision}
+
+Combining evidence from both ablation and Optuna studies, we conclude:
+
+\begin{tcolorbox}[colback=red!5!white, colframe=red!75!black, title=Final Ensemble Integration Decision]
+\textbf{DO NOT include GNN as 5th ensemble component}
+
+\textbf{Evidence}:
+\begin{itemize}[noitemsep]
+    \item Ablation test Brier: 0.2746 (fails 0.23 threshold)
+    \item Optuna test Brier: 0.2890 (fails 0.23 threshold by 26\%)
+    \item Both methods 34--41\% worse than XGBoost (0.2050)
+    \item Severe overfitting in Bayesian optimization attempt
+    \item Test accuracy 45.4\% worse than random guessing
+\end{itemize}
+
+\textbf{Recommendation}: Proceed with State-Space Model (Bayesian Dynamic Linear Model) as 5th ensemble component, offering superior temporal modeling capabilities.
+\end{tcolorbox}
+
+% ============================================================================
+\subsection{Future Work}
+\label{subsec:optuna_future_work}
+
+While GNN is unsuitable for production ensemble, several research directions remain promising:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Multi-season validation}: Optimize over 2022--2024 instead of single 2024 season
+    \item \textbf{Extended training}: Retrain Optuna best config with 50--100 epochs (diagnostic only)
+    \item \textbf{Enriched features}: Add EPA, success rates to graph nodes (hybridize with XGBoost)
+    \item \textbf{Temporal GNN}: Dynamic graphs tracking roster changes, injuries, player form
+    \item \textbf{Analysis tool}: Use GNN for player impact attribution, not prediction
+\end{itemize}
+
+Despite poor predictive performance, GNN's hierarchical graph structure offers interpretability advantages for understanding \textit{how} roster composition influences outcomes—a valuable capability for analytics applications beyond ensemble forecasting.

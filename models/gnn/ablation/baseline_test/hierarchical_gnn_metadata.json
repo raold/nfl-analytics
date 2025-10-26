@@ -1,0 +1,23 @@
+{
+  "model": "HierarchicalGNN",
+  "seasons": [
+    2024
+  ],
+  "train_seasons": [],
+  "val_seasons": [],
+  "test_seasons": [
+    2024
+  ],
+  "embedding_dim": 64,
+  "hidden_dim": 128,
+  "num_message_rounds": 3,
+  "epochs": 1,
+  "learning_rate": 0.001,
+  "best_val_brier": 0.24768953733188714,
+  "test_metrics": {
+    "accuracy": 0.5853658536585366,
+    "log_loss": 0.6886625541755327,
+    "auc": 0.6372549019607843,
+    "brier": 0.24775826911309629
+  }
+}

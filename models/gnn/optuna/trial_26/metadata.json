@@ -1,0 +1,16 @@
+{
+  "embedding_dim": 16,
+  "hidden_dim": 64,
+  "num_message_rounds": 3,
+  "epochs": 10,
+  "learning_rate": 0.0006985410237928879,
+  "batch_size": 64,
+  "use_chemistry": false,
+  "best_val_brier": 0.24580288709145653,
+  "test_metrics": {
+    "accuracy": 0.34317343173431736,
+    "log_loss": 0.7321366534700957,
+    "auc": 0.5160031225604996,
+    "brier": 0.2693586045106201
+  }
+}

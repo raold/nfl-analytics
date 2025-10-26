@@ -1,0 +1,231 @@
+\section{5-Component Game Outcome Ensemble}
+\label{sec:game-ensemble}
+
+While the state-space model provides a principled approach to game-level prediction, we explore whether stacking multiple complementary models can improve forecast accuracy. This section presents a 5-component ensemble that combines physics-based, statistical, and machine learning approaches via meta-learning.
+
+\subsection{Motivation}
+
+Game outcome prediction faces several challenges that suggest an ensemble approach:
+
+\begin{enumerate}
+    \item \textbf{Model diversity}: Different models capture different aspects of game dynamics (e.g., state-space captures momentum, XGBoost captures non-linear feature interactions)
+    \item \textbf{Uncertainty quantification}: Combining models with different uncertainty estimates can improve calibration
+    \item \textbf{Complementary strengths}: Statistical models (state-space) vs.\ machine learning (XGBoost, neural networks)
+    \item \textbf{Feature richness}: Team-level aggregated statistics provide signal beyond raw ratings
+\end{enumerate}
+
+\subsection{Architecture}
+
+The ensemble combines five base learners via stacking \citep{wolpert1992stacked}:
+
+\subsubsection{Component 1: State-Space Model (Kalman Filter)}
+
+As described in Section~\ref{sec:state-space-model}, the Glickman-Stern framework provides dynamic team ratings $\theta_t^{(i)}$ with native uncertainty quantification. This component contributes:
+
+\begin{itemize}
+    \item Sequential Bayesian updates incorporating all historical games
+    \item Explicit modeling of team strength evolution via process noise $q$
+    \item Interpretable home-field advantage estimate
+\end{itemize}
+
+\subsubsection{Component 2: XGBoost (Gradient Boosting)}
+
+We train an XGBoost classifier \citep{chen2016xgboost} on engineered team-level features:
+
+\begin{align*}
+\text{Features: } & \text{home\_win\_pct}, \text{away\_win\_pct}, \\
+                   & \text{home\_points\_avg}, \text{away\_points\_avg}, \\
+                   & \text{home\_points\_allowed\_avg}, \text{away\_points\_allowed\_avg}, \\
+                   & \text{home\_home\_win\_pct}, \text{away\_away\_win\_pct}, \\
+                   & \text{week}
+\end{align*}
+
+Hyperparameters:
+\begin{itemize}
+    \item Max depth: 4 (prevent overfitting)
+    \item Learning rate: 0.05
+    \item Number of estimators: 200
+    \item Subsample: 0.8 (bootstrap aggregation)
+    \item Column subsample: 0.8 (feature randomization)
+\end{itemize}
+
+The gradient boosting framework excels at capturing non-linear interactions (e.g., strong offense vs.\ weak defense) that linear models miss.
+
+\subsubsection{Component 3: Bayesian Logistic Regression}
+
+A regularized logistic regression model on the same features as XGBoost:
+
+\begin{equation}
+P(Y = 1 \mid X) = \sigma(\beta_0 + \beta^T X)
+\end{equation}
+
+with L2 regularization (Ridge penalty, $C = 1.0$). This component provides:
+
+\begin{itemize}
+    \item Probabilistic baseline calibrated to historical win frequencies
+    \item Interpretable feature weights
+    \item Complementary to non-linear XGBoost
+\end{itemize}
+
+\subsubsection{Component 4: Neural Network (Multi-Layer Perceptron)}
+
+A feedforward neural network with:
+\begin{itemize}
+    \item Architecture: Input (9 features) $\to$ Hidden (64) $\to$ Hidden (32) $\to$ Output (1)
+    \item Activation: ReLU
+    \item Regularization: L2 penalty ($\alpha = 0.001$), early stopping
+    \item Optimizer: Adam with adaptive learning rate
+\end{itemize}
+
+The neural network can learn complex non-linear decision boundaries that tree-based methods may miss.
+
+\subsubsection{Component 5: Meta-Learner (Stacking)}
+
+We train a logistic regression meta-learner on the base model predictions:
+
+\begin{equation}
+P_{\text{ensemble}}(Y = 1) = \sigma(\alpha_0 + \alpha_1 p_{\text{SS}} + \alpha_2 p_{\text{XGB}} + \alpha_3 p_{\text{LR}} + \alpha_4 p_{\text{NN}})
+\label{eq:meta-learner}
+\end{equation}
+
+where $p_{\text{SS}}, p_{\text{XGB}}, p_{\text{LR}}, p_{\text{NN}}$ are base model predictions. The meta-learner learns optimal weights for each component, automatically down-weighting poorly calibrated models.
+
+\subsection{Training Procedure}
+
+We employ a strict temporal validation strategy to prevent look-ahead bias:
+
+\begin{enumerate}
+    \item \textbf{Train set}: 2019--2023 seasons (1,390 games)
+    \item \textbf{Validation set}: 2024 season (285 games)
+    \item \textbf{Test set}: 2025 season (107 games)
+\end{enumerate}
+
+\textbf{Step 1: Train Base Learners}
+\begin{itemize}
+    \item State-Space: Fit Kalman filter on train set with optimal hyperparameters ($q=2.0, r=15.0, \text{HFA}=3.0$)
+    \item XGBoost: Train with early stopping on validation set
+    \item Logistic Regression: Fit on standardized features
+    \item Neural Network: Train with early stopping (patience = 10 epochs)
+\end{itemize}
+
+\textbf{Step 2: Generate Meta-Features}
+
+For each training game, generate predictions from all four base learners. These predictions become features for the meta-learner.
+
+\textbf{Step 3: Train Meta-Learner}
+
+Fit logistic regression on the stacked predictions to learn optimal ensemble weights.
+
+\subsection{Results}
+
+Table~\ref{tab:game-ensemble-results} presents performance across train, validation, and test sets.
+
+\begin{table}[h]
+\centering
+\caption{5-Component Game Ensemble: Performance Summary}
+\label{tab:game-ensemble-results}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Train Brier} & \textbf{Val Brier} & \textbf{Test Brier} \\
+\midrule
+\textit{Base Learners} & & & \\
+State-Space & 0.2364 & 0.2458 & 0.2615 \\
+XGBoost & 0.1337 & 0.1513 & 0.2551 \\
+Bayesian LR & 0.1681 & 0.1433 & 0.2580 \\
+Neural Network & 0.1757 & 0.1515 & 0.2450 \\
+\midrule
+\textbf{Ensemble (Stacking)} & \textbf{0.1250} & \textbf{0.1575} & \textbf{0.2684} \\
+\midrule
+\textit{Accuracy} & & & \\
+Ensemble & 81.5\% & 77.2\% & 58.9\% \\
+State-Space & 60.8\% & 58.2\% & 53.3\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis}
+
+\subsubsection{Validation Performance}
+
+On the 2024 validation set, the ensemble achieves a Brier score of 0.1575, outperforming the state-space model by 36\% (0.2458 $\to$ 0.1575). The Bayesian logistic regression surprisingly performs best among base learners (Brier 0.1433), suggesting that simple linear combinations of team statistics provide strong signal.
+
+\subsubsection{Test Performance and Overfitting}
+
+The test set (2025 season) reveals concerning overfitting:
+
+\begin{itemize}
+    \item Ensemble Brier: 0.2684 (70\% worse than validation)
+    \item Best base learner (Neural Net): 0.2450 (62\% worse than validation)
+    \item State-Space: 0.2615 (only 6\% worse than validation)
+\end{itemize}
+
+This suggests the feature-based models (XGBoost, Logistic Regression, Neural Network) learned patterns from 2019--2024 that do not generalize to 2025. The state-space model, with its simpler structure and explicit temporal dynamics, shows superior robustness.
+
+\subsubsection{Overfitting Diagnosis}
+
+Several factors contribute to overfitting:
+
+\begin{enumerate}
+    \item \textbf{Limited training data}: Only 1,390 games for training complex models (XGBoost has $\sim$200 trees, Neural Network has $\sim$2,000 parameters)
+    \item \textbf{Feature leakage}: Season-aggregated statistics (e.g., season win\%) may contain information about future games in same season
+    \item \textbf{Non-stationarity}: NFL rule changes, roster turnover, and strategic evolution create distribution shift between 2019--2024 and 2025
+    \item \textbf{Small test set}: Only 107 games in 2025 (7 weeks) limits statistical power
+\end{enumerate}
+
+\subsection{Comparison with State-Space Alone}
+
+Despite the ensemble's superior validation performance, the state-space model demonstrates better test generalization:
+
+\begin{table}[h]
+\centering
+\caption{Ensemble vs.\ State-Space: Generalization Comparison}
+\label{tab:ensemble-vs-state-space-generalization}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Val Brier} & \textbf{Test Brier} & \textbf{Degradation} & \textbf{Status} \\
+\midrule
+State-Space & 0.2458 & 0.2615 & +6.4\% & Robust \\
+Ensemble & 0.1575 & 0.2684 & +70.4\% & Overfit \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This highlights a fundamental tension in predictive modeling: in-sample fit vs.\ out-of-sample robustness. The ensemble's superior validation performance suggests it has learned real patterns, but these patterns do not extend to 2025.
+
+\subsection{Backtest Simulation}
+
+We conducted a simulated Kelly criterion betting strategy on 2022--2025 (910 trades, quarter-Kelly sizing, 5\% edge threshold). The results further confirm overfitting:
+
+\begin{itemize}
+    \item Win rate: 76.8\% (impossibly high for sports betting)
+    \item Simulated returns: Astronomical (clear sign of in-sample overfitting)
+    \item Reality check: No betting strategy achieves 76\% long-term accuracy
+\end{itemize}
+
+The backtest's unrealistic performance demonstrates that historical optimization can produce deceptively strong results that evaporate in live deployment.
+
+\subsection{Lessons Learned}
+
+\begin{enumerate}
+    \item \textbf{Simpler is better for limited data}: State-space model (33 parameters) generalizes better than complex ensemble
+    \item \textbf{Domain knowledge matters}: Explicit temporal dynamics (Kalman filter) encode NFL structure that data-driven models miss
+    \item \textbf{Validation is not enough}: Strong validation performance does not guarantee test generalization, especially with distribution shift
+    \item \textbf{Overfitting is subtle}: 70\% validation-to-test degradation occurred despite using separate validation set and early stopping
+\end{enumerate}
+
+\subsection{Recommendation}
+
+For production deployment, we recommend the \textbf{state-space model alone} over the ensemble, based on:
+
+\begin{itemize}
+    \item Superior test generalization (Brier 0.2615 vs.\ 0.2684)
+    \item Minimal overfitting (6\% degradation vs.\ 70\%)
+    \item Computational efficiency (instant inference vs.\ ensemble overhead)
+    \item Interpretability (clear team ratings vs.\ black-box ensemble)
+\end{itemize}
+
+The ensemble remains valuable as a \textit{research tool} to understand model diversity and as a potential component in a broader multi-model forecasting system with more sophisticated validation schemes (e.g., time-series cross-validation, rolling windows).
+
+\subsection{Summary}
+
+We developed a 5-component ensemble combining state-space, XGBoost, logistic regression, and neural network models via stacking. While the ensemble achieves strong validation performance (Brier 0.1575), it suffers from severe overfitting on the 2025 test set (Brier 0.2684, 70\% degradation). The simpler state-space model demonstrates superior generalization, validating the principle that model complexity should match data availability. This analysis underscores the importance of rigorous out-of-sample validation and domain-driven model design in sports analytics.
