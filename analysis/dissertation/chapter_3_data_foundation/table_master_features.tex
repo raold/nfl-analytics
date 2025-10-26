@@ -1,0 +1,77 @@
+% Master Feature Definition Table
+% Comprehensive reference for all feature families used across models
+% Cross-referenced from Chapters 4, 6, 8, and 12
+
+\begin{table}[!ht]
+\centering
+\small
+\caption[Master Feature Catalog]{Master Feature Catalog: All feature families used across baseline, ensemble, and RL models. Features marked \texttt{asof\_safe} use only pre-game information. See feature catalog (\texttt{py/features/catalog.yaml}) for complete definitions.}
+\label{tab:master-features}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}llccl@{}}
+\toprule
+\textbf{Feature Family} & \textbf{Description} & \textbf{Count} & \textbf{AS-OF Safe?} & \textbf{Source} \\
+\midrule
+\multicolumn{5}{l}{\textit{Team Performance Metrics}} \\
+Team History Base & Cumulative team performance (EPA, margin, win \%) & 15 & \checkmark & \texttt{asof\_features.py} \\
+Team Context & Rest days, travel, prev game result & 9 & \checkmark & \texttt{asof\_features.py} \\
+Team Personnel & QB/coach changes, experience & 7 & \checkmark & \texttt{asof\_features.py} \\
+Team Venue & Surface type (grass/turf), roof (dome/outdoor) & 4 & \checkmark & \texttt{asof\_features.py} \\
+\midrule
+\multicolumn{5}{l}{\textit{Advanced Efficiency Metrics}} \\
+Efficiency Advanced & Success rate, CPOE, air yards, YAC & 12 & \checkmark & \texttt{asof\_features\_enhanced.py} \\
+Turnovers \& Penalties & Turnover rate, penalty yards & 4 & \checkmark & \texttt{asof\_features\_enhanced.py} \\
+\midrule
+\multicolumn{5}{l}{\textit{Coaching \& Context}} \\
+4th Down Coaching & Go-for-it rate, conversion rate, decision quality & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
+Injury Load & Position-specific injury impact scores & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
+Playoff Context & Playoff probability, stakes, desperation & 8 & \checkmark & \texttt{merge\_advanced\_features.py} \\
+\midrule
+\multicolumn{5}{l}{\textit{Matchup Differentials}} \\
+Differentials (Home-Away) & EPA diff, rest diff, success rate diff, etc. & 10 & \checkmark & Derived from base \\
+\midrule
+\multicolumn{5}{l}{\textit{Player-Derived Features (Ch 4)}} \\
+QB Aggregates & Pass yards avg/std, TDs, completion \% & 4 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
+RB Aggregates & Rush yards avg, yards/carry, TDs & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
+WR Aggregates & Rec yards avg, receptions, TDs & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
+Composite Metrics & Total offense, star concentration, differentials & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
+\midrule
+\multicolumn{5}{l}{\textit{Model-Generated Features (Ch 4)}} \\
+Bayesian Ratings & Posterior mean strength, uncertainty (SD), quantiles & 13 & \checkmark & \texttt{bayesian\_features.py} \\
+State-Space Ratings & Kalman-filtered team strength, covariance & 6 & \checkmark & \texttt{train\_state\_space.py} \\
+\midrule
+\multicolumn{5}{l}{\textit{Market \& Betting Features (Ch 6)}} \\
+Posted Lines & Spread, total, moneyline (opening \& closing) & 6 & \checkmark & External (sportsbooks) \\
+Market Microstructure & Line velocity, cross-book deltas, steam moves & 8 & \checkmark & Betting data providers \\
+Comparative Book Value & Model prob vs market-implied prob (CBV) & 3 & \checkmark & Derived \\
+\midrule
+\multicolumn{5}{l}{\textit{Target Variables (POST-GAME ONLY)}} \\
+Game Outcomes & Final score, margin, win, cover, over/under & 7 & \ding{55} & \texttt{games} table \\
+\midrule
+\textbf{Total} & \textbf{170+ features across 19 families} & \textbf{170+} & \textbf{163 safe} & --- \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\paragraph{Feature Temporal Safety.}
+Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. These are validated by 15 unit tests and 2 runtime validators (see Appendix~\ref{app:leakage_audit}). The 7 unsafe features (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors.
+
+\paragraph{Cross-References.}
+\begin{itemize}
+    \item \textbf{Chapter 4 (Baseline Models)}: Uses team history, efficiency, player aggregates, Bayesian/state-space ratings
+    \item \textbf{Chapter 5 (RL Design)}: State representation includes model probabilities, CBV, market microstructure, bankroll state
+    \item \textbf{Chapter 6 (Uncertainty \& Betting)}: Incorporates ratings uncertainty (Bayesian SD), market features, CBV for Kelly sizing
+    \item \textbf{Chapter 8 (Results)}: Ablation studies quantify marginal contribution of each family (\Cref{tab:ablations})
+    \item \textbf{Chapter 12 (Profit Optimization)}: Feature engineering for market regimes (line velocity $\to$ steam detection)
+\end{itemize}
+
+\paragraph{Feature Engineering Rationale.}
+The feature catalog balances three principles:
+\begin{enumerate}
+    \item \textbf{Temporal safety}: Strict as-of semantics prevent leakage (validated by automated audit)
+    \item \textbf{Interpretability}: Each feature has clear definition, calculation method, and domain motivation
+    \item \textbf{Redundancy control}: Rolling windows (last 3/5 games) provide recent signal while expanding averages capture long-term trends
+\end{enumerate}
+
+For detailed definitions of all 170+ features, see the feature catalog at \texttt{py/features/catalog.yaml}. Key ablation results showing the marginal contribution of each family are presented in \Cref{tab:ablations} (Chapter 4).
