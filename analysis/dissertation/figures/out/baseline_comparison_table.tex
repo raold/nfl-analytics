@@ -1,0 +1,26 @@
+\begin{table}[!ht]
+\centering
+\caption[Baseline Model Comparison]{Baseline Model Performance Comparison: All models evaluated on identical validation (2024) and test (2025) sets. Generalization gap shows val$\to$test Brier degradation.}
+\label{tab:baseline-comparison}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Model} & \textbf{Val Brier} & \textbf{Test Brier} & \textbf{Val Acc (\%)} & \textbf{Test Acc (\%)} & \textbf{Gap} & \textbf{Rank} \\
+\midrule
+\textbf{Player-to-Game (XGB)} & 0.2304 & 0.2439 & 61.4 & 55.2 & +0.0136 & 1 \\
+Neural Network & 0.1515 & 0.2450 & 78.9 & 61.7 & \textcolor{red}{+0.0935} & 2 \\
+XGBoost & 0.1513 & 0.2551 & 77.9 & 59.8 & \textcolor{red}{+0.1037} & 3 \\
+Bayesian Logistic Regression & 0.1433 & 0.2580 & 78.9 & 57.9 & \textcolor{red}{+0.1147} & 4 \\
+State-Space (Kalman Filter) & 0.2458 & 0.2615 & 58.2 & 53.3 & +0.0157 & 5 \\
+5-Component Ensemble & 0.1575 & 0.2684 & 77.2 & 58.9 & \textcolor{red}{+0.1109} & 6 \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\begin{tablenotes}[flushleft]\footnotesize
+\item \textbf{Val:} 2024 season (272 games); \textbf{Test:} 2025 season weeks 1--7 (116 games)
+\item \textbf{Gap:} Test Brier - Val Brier (positive = overfitting, negative = improved generalization)
+\item \textbf{Rank:} Ordered by test Brier score (lower is better)
+\item Ensemble shows severe overfitting (gap +0.1109, +70.4\% relative), while Player-to-Game and Neural Net generalize best
+\item State-Space provides robust baseline with minimal overfitting (+0.0157, +6.4\%)
+\end{tablenotes}
+\end{table}
