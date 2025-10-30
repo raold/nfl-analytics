@@ -94,6 +94,7 @@ class DefensivePressureEffectivenessEngine:
             p.sack,
             p.down,
             p.ydstogo,
+            p.quarter,
             p.score_differential,
             p.success,
             0 as qb_scramble,  -- Placeholder if column doesn't exist
@@ -298,6 +299,29 @@ class DefensivePressureEffectivenessEngine:
                 "defense_team": defense_team,
                 "situation_type": "score",
                 "situation_value": score_sit,
+                "n_plays": len(group),
+                "sack_rate": group["sack"].mean() * 100,
+                "quick_pass_rate": dropbacks["quick_pass"].mean() * 100 if n_dropbacks > 0 else 0,
+                "epa_per_play_allowed": group["epa"].mean(),
+                "success_rate_allowed": dropbacks["success"].mean() * 100 if n_dropbacks > 0 else 0,
+            }
+            results.append(metrics)
+
+        # By quarter (especially important for 4th quarter pressure)
+        for (game_id, defense_team, quarter), group in plays.groupby(
+            ["game_id", "defense_team", "quarter"]
+        ):
+            if len(group) < 3:
+                continue
+
+            dropbacks = group[group["sack"] == 0]
+            n_dropbacks = len(dropbacks)
+
+            metrics = {
+                "game_id": game_id,
+                "defense_team": defense_team,
+                "situation_type": "quarter",
+                "situation_value": f"Q{int(quarter)}",
                 "n_plays": len(group),
                 "sack_rate": group["sack"].mean() * 100,
                 "quick_pass_rate": dropbacks["quick_pass"].mean() * 100 if n_dropbacks > 0 else 0,
