@@ -148,44 +148,27 @@ ggsave(
 # Figure 4: Training Convergence (from actual training data)
 # =============================================================================
 
-# Simulated training data based on actual output
-# In production, this would be read from training_full.log
-training_data <- tibble(
-  epoch = 1:100,
-  val_brier = 0.2472 + rnorm(100, 0, 0.005) %>%
-    pmin(0.2472) %>%
-    cummin() %>%
-    jitter(amount = 0.001),
-  val_acc = 0.555 + rnorm(100, 0, 0.01) %>%
-    pmax(0.555) %>%
-    cummax() %>%
-    jitter(amount = 0.002),
-  val_auc = 0.555 + rnorm(100, 0, 0.01) %>%
-    pmax(0.555) %>%
-    cummax() %>%
-    jitter(amount = 0.002)
-)
-
-# Add actual observed values from first 15 epochs
-observed_brier <- c(0.2472, 0.2462, 0.2445, 0.2463, 0.2496, 0.2506, 0.2512,
-                    0.2504, 0.2515, 0.2523, 0.2511, 0.2540, 0.2515, 0.2516, 0.2519)
-training_data$val_brier[1:15] <- observed_brier
+# Load actual training data from checkpoints
+# Extracted from GNN checkpoint files (epochs 4, 9, 14, ..., 49)
+data_dir <- file.path(dirname(script_dir), "data")
+training_data <- read.csv(file.path(data_dir, "gnn_training_history.csv"))
 
 p4 <- ggplot(training_data, aes(x = epoch, y = val_brier)) +
   geom_line(color = "#1f77b4", linewidth = 0.8, alpha = 0.6) +
-  geom_point(data = training_data[1:15, ], aes(x = epoch, y = val_brier),
+  geom_point(aes(x = epoch, y = val_brier),
              color = "#1f77b4", size = 2) +
-  geom_smooth(se = TRUE, color = "#d62728", linewidth = 1, method = "loess", span = 0.2) +
+  geom_smooth(se = TRUE, color = "#d62728", linewidth = 1, method = "loess", span = 0.4) +
   geom_hline(yintercept = 0.250, linetype = "dashed", color = "gray50", alpha = 0.5) +
-  annotate("text", x = 90, y = 0.250, label = "Theoretical minimum (0.250)",
+  annotate("text", x = 35, y = 0.250, label = "Theoretical minimum (0.250)",
            vjust = -0.5, size = 3, color = "gray40") +
-  scale_y_continuous(limits = c(0.240, 0.255)) +
+  scale_x_continuous(limits = c(0, 50), breaks = seq(0, 50, 10)) +
+  scale_y_continuous(limits = c(0.210, 0.255)) +
   labs(
     title = "GNN Training Convergence",
-    subtitle = "Validation Brier score over 100 epochs (9 seasons, 2367 games)",
+    subtitle = "Validation Brier score through epoch 49 (9 seasons, 2367 games)",
     x = "Epoch",
     y = "Validation Brier Score",
-    caption = "First 15 epochs: actual data. Remaining: simulated convergence pattern."
+    caption = "Actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49)."
   ) +
   theme(
     plot.title = element_text(face = "bold", size = 11),

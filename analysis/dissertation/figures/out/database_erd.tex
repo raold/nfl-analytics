@@ -3,7 +3,7 @@
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=\textwidth,keepaspectratio]{figures/out/database_erd.png}
+\includegraphics[width=\textwidth,keepaspectratio]{../figures/out/database_erd.png}
 \caption[Database Schema (ERD)]{Database Entity-Relationship Diagram: Core tables (\texttt{games}, \texttt{plays}, \texttt{weather}, \texttt{injuries}, \texttt{rosters}, \texttt{odds\_history}) and materialized views in the \texttt{mart} schema. The \texttt{games} table serves as the central hub, with foreign key relationships to all auxiliary tables. TimescaleDB hypertable on \texttt{odds\_history} enables efficient time-series queries for line movement tracking.}
 \label{fig:database-erd}
 \end{figure}
