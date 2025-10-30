@@ -539,7 +539,28 @@ nfl-analytics/
 - **Host**: `localhost:5544`
 - **Database**: `devdb01`
 - **User**: `dro`
-- **Schema**: See `db/001_init.sql` and `db/002_timescale.sql` (overview below)
+- **Platform**: PostgreSQL 16 + TimescaleDB (time-series optimization)
+- **Total Size**: ~2.5 GB across 56 tables
+
+### Architecture
+
+The database uses a **5-schema design** for clean separation of concerns:
+
+1. **`public`** - Source-of-truth NFL data (games, plays, rosters, injuries)
+2. **`mart`** - Analytical data mart (aggregated features, team metrics)
+3. **`predictions`** - ML predictions and feedback loop (game predictions, props, retrospectives)
+4. **`reference`** - Lookup tables (teams, stadiums, abbreviations)
+5. **`monitoring`** - Observability (model metrics, feature drift, alerts)
+
+**📋 Comprehensive Schema Audit**: See **[DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** for complete documentation including:
+- Full table inventory with sizes and row counts
+- **Critical schema standards**:
+  - Use `kickoff` (not `game_date` or `gameday`) for temporal queries
+  - Use `spread_close` and `total_close` (not `spread_line`/`total_line`) for betting lines
+  - Weather data (`temp`, `wind`) stored as TEXT - requires parsing to numeric
+  - Team abbreviations: Use `LAR` for Rams, `LAC` for Chargers
+- Data quality findings and recommendations
+- Integration patterns for feature engineering
 
 ### Schema Overview
 - public

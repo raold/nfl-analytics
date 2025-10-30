@@ -1,7 +1,7 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** October 19, 2025
-**Version:** 4.0
+**Last Updated:** October 30, 2025
+**Version:** 4.1
 **Project Status:** Dissertation complete (324 pages), Advanced Bayesian models trained, Production-ready
 
 ---
@@ -208,6 +208,12 @@ PostgreSQL 14+ database with TimescaleDB extension for time-series data.
 - Database: `devdb01`
 - User: `dro`
 - Password: `sicillionbillions` (dev only)
+
+**📋 Schema Audit**: See [docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md) for comprehensive schema documentation including:
+- Complete table inventory (56 tables across 5 schemas)
+- Team abbreviation standards (use `kickoff` not `game_date`, `spread_close` not `spread_line`)
+- Data quality findings and recommendations
+- Integration patterns for feature engineering
 
 ### Key Tables
 
@@ -756,7 +762,56 @@ Run with: `pytest tests/unit/test_my_module.py -v`
 
 ## Recent Work
 
-### October 19, 2025: Dissertation TikZ Standardization
+### October 30, 2025: Database Schema Audit & Feature Engineering Complete
+
+**Context**: Comprehensive database schema audit to ensure correct column usage across all feature engineering modules.
+
+**Work Performed**:
+1. **Database Schema Audit** (`docs/DATABASE_SCHEMA_AUDIT.md`)
+   - Comprehensive audit of all 56 tables across 5 schemas
+   - Documented team abbreviation inconsistencies (LA vs LAR/LAC)
+   - Identified correct column names: `kickoff` (not `game_date`), `spread_close` (not `spread_line`)
+   - Created integration patterns and code examples for feature engineering
+
+2. **Feature Engineering Complete**:
+   - ✅ Phase 2.4: Situational Defense Strength (7 features)
+   - ✅ Phase 2.5: Defensive Game Script Indicators (5 features)
+   - ✅ Phase 3: Vegas Line Bias + Environmental + Rivalry (ALL features)
+   - ✅ Phase 3.5: Feature Interactions for EV/ROI boost (5 interaction categories)
+   - ✅ Phase 4: Docker integration for MCP server
+
+3. **Key Feature Modules Created**:
+   - `py/features/defensive_situational_strength.py` - Red zone, goal line, down conversions, time-sensitive
+   - `py/features/defensive_game_script_indicators.py` - Game script, garbage time, high leverage
+   - `py/features/vegas_line_bias_features.py` - Betting market signals, key numbers, market vig
+   - `py/features/environmental_contextual_features.py` - Weather, travel, venue, rivalry
+   - `py/features/feature_interactions.py` - Weather×Travel×Venue, Rest×Travel, Altitude×Rest
+
+4. **Docker Integration**:
+   - Created `mcp_server/Dockerfile` with multi-stage build
+   - Updated `docker-compose.yml` with MCP service
+   - Successfully built Docker image
+
+**Files Created/Modified**:
+- `docs/DATABASE_SCHEMA_AUDIT.md` (new - comprehensive schema documentation)
+- `py/features/defensive_situational_strength.py`
+- `py/features/defensive_game_script_indicators.py`
+- `py/features/vegas_line_bias_features.py`
+- `py/features/environmental_contextual_features.py`
+- `py/features/feature_interactions.py`
+- `mcp_server/Dockerfile`
+- `docker-compose.yml`
+- `CLAUDE.md` (updated with schema audit reference)
+
+**Database Findings**:
+- Critical: Use `g.kickoff` not `g.game_date` or `g.gameday`
+- Critical: Use `g.spread_close` not `g.spread_line`
+- Weather data stored as TEXT, requires parsing
+- Team abbreviations: LA Rams should be LAR (not LA)
+
+**Result**: Complete feature engineering pipeline with 100+ features ready for model training. All schema issues documented and resolved in code.
+
+###  October 19, 2025: Dissertation TikZ Standardization
 
 **Context**: Dissertation had inconsistent TikZ figure styling (white backgrounds, blue backgrounds, square corners, rounded corners).
 
