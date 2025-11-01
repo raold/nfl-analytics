@@ -485,14 +485,14 @@ def main():
     """Test the environmental contextual engine."""
     engine = EnvironmentalContextualEngine()
 
-    # Generate ALL features for 2024-2025 seasons
+    # Generate ALL features for 2020-2025 seasons
     (
         thursday_night,
         travel_impact,
         venue_adaptation,
         rivalry
     ) = engine.generate_all_features(
-        start_season=2024,
+        start_season=2020,
         end_season=2025
     )
 

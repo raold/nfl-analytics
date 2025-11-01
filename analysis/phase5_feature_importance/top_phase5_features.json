@@ -1,0 +1,16 @@
+{
+  "top_10_phase5_features": [
+    "home_implied_prob",
+    "away_implied_prob",
+    "spread_magnitude",
+    "extreme_cold",
+    "dome_team_outdoor_wind",
+    "is_large_spread",
+    "home_is_favorite",
+    "is_conference_game",
+    "away_short_rest",
+    "high_wind"
+  ],
+  "rationale": "Selected based on composite importance score (avg of gain, weight, cover)",
+  "total_importance": 39.85009303533918
+}

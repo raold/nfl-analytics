@@ -1,7 +1,7 @@
 # NFL Analytics Project - Current Status
 
-**Last Updated:** October 19, 2025
-**Status:** Advanced Bayesian Enhancements Complete (v3.0), Dissertation Complete
+**Last Updated:** November 1, 2025
+**Status:** Phase 5 Feature Engineering Complete, 40-Experiment Framework Complete, Data Leakage Identified
 
 ---
 
@@ -49,6 +49,22 @@
 - ✅ **4-way ensemble** integration (py/ensemble/enhanced_ensemble_v3.py)
 - ✅ PyMC installed and BNN tested successfully
 - ✅ Comprehensive documentation (3 major docs)
+
+### Phase 5: Advanced Feature Engineering (Complete - Oct 30, 2025)
+- ✅ **Database Schema Audit** - Comprehensive 56-table audit (docs/DATABASE_SCHEMA_AUDIT.md)
+- ✅ **Phase 2.4:** Defensive Situational Strength (7 features)
+- ✅ **Phase 2.5:** Defensive Game Script Indicators (5 features)
+- ✅ **Phase 3:** Vegas Line Bias + Environmental + Rivalry Features (30+ features)
+- ✅ **Phase 3.5:** Feature Interactions for EV/ROI boost (5 interaction categories)
+- ✅ **Phase 4:** Docker integration for MCP server
+- ⚠️ **CRITICAL:** Data leakage identified - vegas-derived implied probabilities caused 81% win rate
+
+### Phase 6: Causal Inference + cVAE Experiment Framework (Complete - Oct 31, 2025)
+- ✅ **8-module causal inference framework** (Phase 6, Oct 16)
+- ✅ **40-experiment design** (20 cVAE + 20 Causal)
+- ✅ **ROI/EV scoring framework** for experiment prioritization
+- ✅ **Experiment executor** infrastructure (needs database connection fix)
+- ✅ **Top 10 experiments ranked** by predicted impact
 
 ---
 
@@ -213,23 +229,30 @@ hierarchical_v1.0     118           118        2025-10-12 12:57
    - Updated README.md with dissertation milestones
    - Refreshed PROJECT_STATUS.md
 
+### Critical (Immediate)
+1. ⚠️ **Fix data leakage** - Remove vegas-derived implied probability features
+2. ⚠️ Fix database imports in experiment_executor.py
+3. 🔄 Execute top 10 causal experiments empirically (real 2020-2024 data)
+4. 📊 Validate experiment rankings against actual performance
+
 ### Immediate (This Week)
-9. ⚠️ Fix database insert logging issues (both QB-WR chemistry and state-space models)
-10. 🔄 Full 4-way ensemble backtest (2022-2024)
-11. 📊 Compare v1.0 vs v2.5 vs v3.0 performance
-12. 📈 Generate final performance metrics report
+5. 🔄 Full 4-way ensemble backtest (2022-2024)
+6. 📊 Compare v1.0 vs v2.5 vs v3.0 performance
+7. 📈 Generate final performance metrics report
+8. 📚 Consolidate documentation (PROPS docs, duplicates, archives)
 
 ### Short-term (Next 2 Weeks)
-11. 🚀 Deploy v3.0 to production with A/B testing
-12. 🔧 Add rushing props BNN model
-13. 🔧 Add receiving props BNN model
-14. 💻 Build monitoring dashboard
+9. 🚀 Deploy v3.0 to production with A/B testing (without leaky features)
+10. 🔧 Add rushing props BNN model
+11. 🔧 Add receiving props BNN model
+12. 💻 Build monitoring dashboard
+13. 🧪 Integrate top experiments with RL agents for bet sizing
 
 ### Medium-term (Next Month)
-15. 🏈 Implement real-time Bayesian updating
-16. 🎯 Add O-line random effects for rushing props
-17. 📈 Live performance tracking vs baseline
-18. 🔍 Continuous model improvement pipeline
+14. 🏈 Implement real-time Bayesian updating
+15. 🎯 Add O-line random effects for rushing props
+16. 📈 Live performance tracking vs baseline
+17. 🔍 Continuous model improvement pipeline
 
 ---
 
@@ -308,11 +331,47 @@ Database: PostgreSQL 14+
 
 ---
 
+## 🔥 Recent Work (Oct 30-31, 2025)
+
+### Phase 5 Feature Engineering Complete
+- **Database Schema Audit**: Comprehensive 56-table audit documented all column standards
+- **7 new feature modules** created with 100+ advanced features
+- **Docker integration** for MCP server deployment
+- **Feature engineering files**:
+  - `py/features/defensive_situational_strength.py` (7 features)
+  - `py/features/defensive_game_script_indicators.py` (5 features)
+  - `py/features/vegas_line_bias_features.py` (10 features)
+  - `py/features/environmental_contextual_features.py` (15 features)
+  - `py/features/feature_interactions.py` (5 interaction categories)
+
+### 40-Experiment Framework Complete
+- **Expanded from 7+7 to 20+20** experiments (cVAE + Causal)
+- **ROI/EV scoring framework** created with composite metric
+- **Top 10 experiments identified**:
+  1. CVAE-014: Playoff-Bound Team Trajectories (Score: 82.9)
+  2. CAUSAL-014: Fourth Down Aggression Effect (Score: 81.9)
+  3. CAUSAL-009: Target Share Causal Effect (Score: 80.0)
+- **Files created**:
+  - `py/experiments/expanded_experiment_suite.py` (692 lines)
+  - `py/analysis/experiment_roi_evaluator.py` (404 lines)
+  - `py/experiments/experiment_executor.py` (1,154 lines)
+  - `experiments/experiment_rankings.json`
+
+### Data Leakage Discovery ⚠️
+- **Phase 5 optimized ensemble** achieved impossible 81% win rate
+- **Root cause**: Vegas-derived implied probabilities in feature set
+- **Impact**: Circular dependency with betting lines
+- **Resolution**: Remove leaky features, retrain models
+- **Documentation**: `analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md`
+
+---
+
 ## ⚠️ Known Issues
 
-1. **State-space model:** Database insert failed, needs debugging (R:state_space_player_skills.R:230)
-2. **BNN model persistence:** Load functionality needs model reference (py:bayesian_neural_network.py:231)
-3. **Calibration:** BNN demo shows 93% vs 68% target (expected for small sample)
+1. **Data Leakage (CRITICAL):** Phase 5 features include vegas-derived implied probabilities → 81% win rate (impossible)
+2. **Database imports:** experiment_executor.py needs psycopg2 connection fix
+3. **State-space model:** Database insert failed, needs debugging (R:state_space_player_skills.R:230)
+4. **BNN model persistence:** Load functionality needs model reference (py:bayesian_neural_network.py:231)
 
 ---
 

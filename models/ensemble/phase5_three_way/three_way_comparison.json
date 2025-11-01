@@ -1,0 +1,37 @@
+{
+  "baseline": {
+    "n_trades": 543,
+    "win_rate": 0.7863720073664825,
+    "final_bankroll": 1317336.5050550494,
+    "total_return": 130.73365050550495,
+    "sharpe_ratio": 2.5436504831972258,
+    "max_drawdown": -2.5909090909090793
+  },
+  "enhanced": {
+    "n_trades": 546,
+    "win_rate": 0.7619047619047619,
+    "final_bankroll": 1184467.2557077256,
+    "total_return": 117.44672557077257,
+    "sharpe_ratio": 2.2258253511807835,
+    "max_drawdown": -2.5454545454545396
+  },
+  "optimized": {
+    "n_trades": 546,
+    "win_rate": 0.7985347985347986,
+    "final_bankroll": 1387150.2660674271,
+    "total_return": 137.71502660674273,
+    "sharpe_ratio": 2.7283326539219743,
+    "max_drawdown": -1.9467184141107978
+  },
+  "comparison": {
+    "opt_vs_baseline_roi": 6.981376101237771,
+    "opt_vs_baseline_wr": 0.01216279116831609,
+    "opt_vs_baseline_sharpe": 0.18468217072474857,
+    "opt_vs_baseline_profit": 69813.76101237768,
+    "opt_vs_enhanced_roi": 20.268301035970154,
+    "opt_vs_enhanced_wr": 0.03663003663003672,
+    "opt_vs_enhanced_sharpe": 0.5025073027411908,
+    "opt_vs_enhanced_profit": 202683.01035970147,
+    "best_model": "OPTIMIZED"
+  }
+}

@@ -81,7 +81,7 @@ class FeatureInteractionEngine:
         FROM games g
         LEFT JOIN teams t_home ON g.home_team = t_home.team_abbr
         LEFT JOIN teams t_away ON g.away_team = t_away.team_abbr
-        WHERE g.season >= 2024
+        WHERE g.season >= 2020 AND g.season <= 2025
         ORDER BY g.kickoff, g.game_id
         """
 

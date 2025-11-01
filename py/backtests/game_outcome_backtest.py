@@ -28,18 +28,28 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
 
 
-def kelly_fraction(prob: float, odds: float, kelly_multiplier: float = 0.25) -> float:
+def kelly_fraction(prob: float, odds: float, kelly_multiplier: float = 0.25, max_bet_frac: float = 0.10) -> float:
     """
-    Calculate Kelly criterion bet size.
+    Calculate Kelly criterion bet size with SAFETY LIMITS.
 
     Args:
         prob: Probability of winning (0-1)
         odds: Decimal odds (e.g., 1.91 for -110)
         kelly_multiplier: Fractional Kelly (default 0.25 = quarter Kelly)
+        max_bet_frac: Maximum bet as fraction of bankroll (default 0.10 = 10%)
 
     Returns:
-        Fraction of bankroll to bet (0-1)
+        Fraction of bankroll to bet (0-1), capped at max_bet_frac
+
+    Safety Mechanisms:
+    1. Clip probability to [0.05, 0.95] to prevent extreme predictions
+    2. Cap Kelly fraction at max_bet_frac (default 10% of bankroll)
+    3. Apply fractional Kelly multiplier for additional safety
     """
+    # SAFETY: Clip probability to reasonable range
+    # Prevents overconfident predictions from causing massive bets
+    prob = np.clip(prob, 0.05, 0.95)
+
     if prob <= 0 or prob >= 1:
         return 0.0
 
@@ -52,7 +62,13 @@ def kelly_fraction(prob: float, odds: float, kelly_multiplier: float = 0.25) -> 
     kelly_frac = (prob * (net_odds + 1) - 1) / net_odds
     kelly_frac = max(0.0, kelly_frac)  # No betting on negative edge
 
-    return kelly_frac * kelly_multiplier
+    # Apply fractional Kelly
+    kelly_frac = kelly_frac * kelly_multiplier
+
+    # SAFETY: Cap at maximum bet fraction
+    kelly_frac = min(kelly_frac, max_bet_frac)
+
+    return kelly_frac
 
 
 def american_to_decimal(american_odds: float) -> float:
@@ -95,6 +111,8 @@ class GameOutcomeBacktest:
         kelly_multiplier: float = 0.25,
         edge_threshold: float = 0.05,
         vig: int = -110,
+        max_bet_frac: float = 0.10,
+        max_bet_absolute: float = 5000.0,
     ):
         """
         Args:
@@ -102,11 +120,20 @@ class GameOutcomeBacktest:
             kelly_multiplier: Fractional Kelly (0.25 = quarter Kelly for safety)
             edge_threshold: Minimum edge to place bet (5% = 0.05)
             vig: Vig on spread bets (default -110)
+            max_bet_frac: Maximum bet as fraction of bankroll (default 0.10 = 10%)
+            max_bet_absolute: Maximum bet size in dollars (default $5000)
+
+        Safety Features:
+        - Probabilities clipped to [0.05, 0.95] range
+        - Bets capped at max_bet_frac of bankroll (default 10%)
+        - Bets capped at max_bet_absolute dollars (default $5000)
         """
         self.initial_bankroll = initial_bankroll
         self.kelly_multiplier = kelly_multiplier
         self.edge_threshold = edge_threshold
         self.vig = vig
+        self.max_bet_frac = max_bet_frac
+        self.max_bet_absolute = max_bet_absolute
 
         self.bankroll = initial_bankroll
         self.trades: list[dict] = []
@@ -188,15 +215,18 @@ class GameOutcomeBacktest:
                     bet_spread = -spread  # Away team gets opposite spread
                     outcome = 1 if (-margin + (-spread)) > 0 else 0
 
-                # Calculate Kelly bet size
+                # Calculate Kelly bet size with safety limits
                 decimal_odds = american_to_decimal(self.vig)
-                kelly_frac = kelly_fraction(bet_prob, decimal_odds, self.kelly_multiplier)
+                kelly_frac = kelly_fraction(bet_prob, decimal_odds, self.kelly_multiplier, self.max_bet_frac)
 
                 if kelly_frac <= 0:
                     continue  # No bet
 
                 # Place bet
                 bet_size = self.bankroll * kelly_frac
+
+                # SAFETY: Cap at absolute maximum bet size
+                bet_size = min(bet_size, self.max_bet_absolute)
                 if outcome == 1:
                     # Win
                     profit = bet_size * (decimal_odds - 1)

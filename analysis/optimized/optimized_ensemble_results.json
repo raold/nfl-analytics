@@ -1,0 +1,49 @@
+{
+  "optimized_uncalibrated": {
+    "train_accuracy": 0.7149817295980512,
+    "test_accuracy": 0.5995316159250585,
+    "test_brier": 0.24390134464673335,
+    "test_logloss": 0.6837719260827225,
+    "calibration_error": 0.06960555349951375
+  },
+  "optimized_calibrated": {
+    "test_accuracy": 0.6065573770491803,
+    "test_brier": 0.2379777201274986,
+    "test_logloss": 0.66874510332307,
+    "calibration_error": 0.027996870880188672
+  },
+  "temporal_validation": [
+    {
+      "year": 2021,
+      "n_games": 285,
+      "accuracy": 0.6280701754385964,
+      "brier": 0.23099943629710612,
+      "logloss": 0.65760314792804,
+      "calibration_error": 0.12610971147157563
+    },
+    {
+      "year": 2022,
+      "n_games": 284,
+      "accuracy": 0.5704225352112676,
+      "brier": 0.25938169727053134,
+      "logloss": 0.7200804127289194,
+      "calibration_error": 0.0730856694486796
+    },
+    {
+      "year": 2023,
+      "n_games": 285,
+      "accuracy": 0.6140350877192983,
+      "brier": 0.2364799441887369,
+      "logloss": 0.6673197194771482,
+      "calibration_error": 0.10550491942776537
+    },
+    {
+      "year": 2024,
+      "n_games": 285,
+      "accuracy": 0.5824561403508772,
+      "brier": 0.24596990863718746,
+      "logloss": 0.6851895167350804,
+      "calibration_error": 0.09385811101530052
+    }
+  ]
+}

@@ -530,7 +530,7 @@ def main():
     """Test the situational strength engine."""
     engine = DefensiveSituationalStrengthEngine()
 
-    # Generate ALL features for 2024-2025 seasons
+    # Generate ALL features for 2020-2025 seasons
     (
         red_zone_metrics,
         goal_line_metrics,
@@ -540,7 +540,7 @@ def main():
         quarter_metrics,
         score_diff_metrics
     ) = engine.generate_all_features(
-        start_season=2024,
+        start_season=2020,
         end_season=2025
     )
 

@@ -488,7 +488,7 @@ def main():
     """Test the game script engine."""
     engine = DefensiveGameScriptEngine()
 
-    # Generate ALL features for 2024-2025 seasons
+    # Generate ALL features for 2020-2025 seasons
     (
         score_situation_metrics,
         garbage_time_metrics,
@@ -496,7 +496,7 @@ def main():
         high_leverage_metrics,
         velocity_metrics
     ) = engine.generate_all_features(
-        start_season=2024,
+        start_season=2020,
         end_season=2025
     )
 

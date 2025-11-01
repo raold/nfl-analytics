@@ -46,13 +46,18 @@ from py.models.state_space import StateSpaceRatings, fetch_games, get_connection
 
 def get_team_season_stats(season: int) -> pd.DataFrame:
     """
-    Fetch team aggregated stats for a season.
+    Fetch team aggregated stats from PREVIOUS season to avoid look-ahead bias.
+
+    IMPORTANT: Uses (season - 1) data to ensure no future information leaks.
+    For example, when predicting 2023 games, uses only 2022 season stats.
 
     Returns DataFrame with columns:
     - team, season, games_played, wins, losses
     - points_scored_avg, points_allowed_avg
-    - yards_total_avg, yards_passing_avg, yards_rushing_avg
+    - home_win_pct, away_win_pct
     """
+    prior_season = season - 1
+
     sql = """
     WITH game_stats AS (
         SELECT
@@ -97,8 +102,36 @@ def get_team_season_stats(season: int) -> pd.DataFrame:
     GROUP BY team
     """
     with get_connection() as conn:
-        df = pd.read_sql(sql, conn, params=(season, season, season))
+        df = pd.read_sql(sql, conn, params=(prior_season, prior_season, prior_season))
     return df
+
+
+def validate_no_lookahead_bias(team_stats_dict: dict[int, pd.DataFrame], game_seasons: list[int]) -> None:
+    """
+    Validate that team stats do not contain look-ahead bias.
+
+    Ensures that for games in season N, we only use stats from season N-1 or earlier.
+
+    Args:
+        team_stats_dict: Dictionary mapping season -> team stats DataFrame
+        game_seasons: List of seasons for which we're making predictions
+
+    Raises:
+        AssertionError: If look-ahead bias is detected
+    """
+    for game_season in game_seasons:
+        if game_season in team_stats_dict:
+            stats_df = team_stats_dict[game_season]
+            if not stats_df.empty:
+                # Check that stats are from previous season
+                stats_seasons = stats_df['season'].unique() if 'season' in stats_df.columns else [game_season - 1]
+                for stats_season in stats_seasons:
+                    if stats_season >= game_season:
+                        raise AssertionError(
+                            f"LOOK-AHEAD BIAS DETECTED: Using season {stats_season} stats "
+                            f"for season {game_season} games. This would leak future information!"
+                        )
+    print("✓ Look-ahead bias validation passed: All team stats use only prior season data")
 
 
 def engineer_game_features(df: pd.DataFrame, team_stats: dict[int, pd.DataFrame]) -> pd.DataFrame:
@@ -244,6 +277,9 @@ class GameOutcomeEnsemble:
         print(f"Loading team stats for seasons {seasons}...")
         for season in seasons:
             self.team_stats_cache[season] = get_team_season_stats(season)
+
+        # Validate no look-ahead bias
+        validate_no_lookahead_bias(self.team_stats_cache, seasons)
 
     def fit(
         self,

@@ -8,15 +8,24 @@ This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (g
 
 ## 📚 Documentation
 
+**📖 [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete catalog of all 267 documentation files
+
+**Quick Links:**
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive AI assistant documentation (45 KB)
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Current project status (updated Nov 1, 2025)
+- **[SETUP.md](SETUP.md)** - Environment setup instructions
+
+**Key Documentation:**
 - **[Guides](docs/guides/)**: Deployment guide, compute quickstart
 - **[Milestones](docs/milestones/)**: Project completion summaries
   - [Simulator Acceptance Tests Complete](docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md)
   - [CQL Training Complete](docs/milestones/CQL_COMPLETE_SUMMARY.md)
   - [Dissertation Compilation Success](docs/milestones/COMPILATION_SUCCESS.md)
-- **[Dissertation](analysis/dissertation/)**: 324-page dissertation (complete, PDF compiled)
+- **[Dissertation](analysis/dissertation/main/main.pdf)**: 324-page dissertation (complete, PDF compiled)
   - Comprehensive coverage: Data foundation through production deployment
   - Causal inference framework, Bayesian models, RL, risk management
   - Recent work: TikZ figure standardization (Oct 19, 2025)
+- **[Database Schema Audit](docs/DATABASE_SCHEMA_AUDIT.md)** - 56-table comprehensive audit (Oct 30, 2025)
 
 Below is a minimal local bootstrap.
 

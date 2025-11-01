@@ -1,0 +1,24 @@
+{
+  "baseline": {
+    "n_trades": 543,
+    "win_rate": 0.7863720073664825,
+    "final_bankroll": 1317336.5050550494,
+    "total_return": 130.73365050550495,
+    "sharpe_ratio": 2.5436504831972258,
+    "max_drawdown": -2.5909090909090793
+  },
+  "enhanced": {
+    "n_trades": 543,
+    "win_rate": 0.7642725598526704,
+    "final_bankroll": 1208263.9777595927,
+    "total_return": 119.82639777595926,
+    "sharpe_ratio": 2.282088718096865,
+    "max_drawdown": -2.5454545454545396
+  },
+  "improvement": {
+    "roi_improvement": -10.90725272954569,
+    "win_rate_improvement": -0.022099447513812098,
+    "sharpe_improvement": -0.2615617651003608,
+    "profit_improvement": -109072.52729545673
+  }
+}

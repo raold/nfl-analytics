@@ -9,7 +9,7 @@ services:
     ports:
       - "5544:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U dro -d devdb01"]
       interval: 10s
@@ -42,9 +42,28 @@ services:
       retries: 3
       start_period: 10s
 
-volumes:
-  pgdata:
-    name: nfl-analytics-pgdata
+  mcp-server:
+    build:
+      context: .
+      dockerfile: mcp_server/Dockerfile
+    container_name: nfl-analytics-mcp
+    environment:
+      - DATABASE_URL=postgresql://dro:sicillionbillions@nfl-analytics-pg-1:5432/devdb01
+      - MCP_LOG_LEVEL=INFO
+      - MCP_SERVER_PORT=3000
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - APIFY_API_KEY=${APIFY_API_KEY:-}
+    volumes:
+      - ./logs/mcp:/app/logs/mcp
+      - ./cache/mcp:/app/cache/mcp
+    depends_on:
+      pg-1:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - nfl-analytics
+    profiles:
+      - mcp
 
 networks:
   nfl-analytics:

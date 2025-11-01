@@ -1,0 +1,32 @@
+[
+  {
+    "model_name": "BNN Simpler v2",
+    "model_path": "models/bayesian/bnn_simpler_v2.pkl",
+    "n_test_samples": 601,
+    "mae": 28.642654037180325,
+    "rmse": 70.34952694246148,
+    "coverage_90": 0.8851913477537438,
+    "ci_width_90": 122.53395912161565,
+    "coverage_68": 0.6455906821963394,
+    "ci_width_68": 65.75849758633196,
+    "target_coverage_90": 0.9,
+    "target_coverage_68": 0.68,
+    "status_90": "PASS",
+    "status_68": "PASS"
+  },
+  {
+    "model_name": "BNN Mixture Experts v2",
+    "model_path": "models/bayesian/bnn_mixture_experts_v2.pkl",
+    "n_test_samples": 601,
+    "mae": 27.17769339241929,
+    "rmse": 65.69174080690746,
+    "coverage_90": 0.9001663893510815,
+    "ci_width_90": 98.02653070178332,
+    "coverage_68": 0.6938435940099834,
+    "ci_width_68": 57.76405421658468,
+    "target_coverage_90": 0.9,
+    "target_coverage_68": 0.68,
+    "status_90": "PASS",
+    "status_68": "PASS"
+  }
+]

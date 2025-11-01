@@ -1,0 +1,119 @@
+{
+  "baseline_only": {
+    "config_name": "Baseline Only",
+    "train_accuracy": 0.7868453105968332,
+    "train_brier": 0.15584879621164105,
+    "test_accuracy": 0.594847775175644,
+    "test_brier": 0.2604694001612102,
+    "test_logloss": 0.7297500421319978,
+    "features": [],
+    "n_features": 9
+  },
+  "current": {
+    "config_name": "Current (5 Phase 5 features)",
+    "train_accuracy": 0.7941534713763703,
+    "train_brier": 0.151461275902171,
+    "test_accuracy": 0.5901639344262295,
+    "test_brier": 0.2581414029596054,
+    "test_logloss": 0.7219573412020904,
+    "features": [
+      "extreme_cold",
+      "dome_team_outdoor_wind",
+      "is_conference_game",
+      "away_short_rest",
+      "high_wind"
+    ],
+    "n_features": 14
+  },
+  "increased_reg": {
+    "config_name": "Increased Regularization (alpha=5, lambda=5)",
+    "train_accuracy": 0.7174177831912302,
+    "train_brier": 0.19536032147229865,
+    "test_accuracy": 0.6065573770491803,
+    "test_brier": 0.2415382245222743,
+    "test_logloss": 0.6782182105357714,
+    "features": [
+      "extreme_cold",
+      "dome_team_outdoor_wind",
+      "is_conference_game",
+      "away_short_rest",
+      "high_wind"
+    ],
+    "n_features": 14
+  },
+  "ablate_extreme_cold": {
+    "config_name": "Without extreme_cold",
+    "train_accuracy": 0.7856272838002436,
+    "train_brier": 0.15217321387538404,
+    "test_accuracy": 0.5971896955503513,
+    "test_brier": 0.2555580161384603,
+    "test_logloss": 0.7160026310064054,
+    "features": [
+      "dome_team_outdoor_wind",
+      "is_conference_game",
+      "away_short_rest",
+      "high_wind"
+    ],
+    "n_features": 13
+  },
+  "ablate_dome_team_outdoor_wind": {
+    "config_name": "Without dome_team_outdoor_wind",
+    "train_accuracy": 0.7892813641900122,
+    "train_brier": 0.1513792581521731,
+    "test_accuracy": 0.5925058548009368,
+    "test_brier": 0.2555845301425706,
+    "test_logloss": 0.715894599651532,
+    "features": [
+      "extreme_cold",
+      "is_conference_game",
+      "away_short_rest",
+      "high_wind"
+    ],
+    "n_features": 13
+  },
+  "ablate_is_conference_game": {
+    "config_name": "Without is_conference_game",
+    "train_accuracy": 0.7746650426309378,
+    "train_brier": 0.15637993317083299,
+    "test_accuracy": 0.5889929742388759,
+    "test_brier": 0.25521057041527634,
+    "test_logloss": 0.7148821447505684,
+    "features": [
+      "extreme_cold",
+      "dome_team_outdoor_wind",
+      "away_short_rest",
+      "high_wind"
+    ],
+    "n_features": 13
+  },
+  "ablate_away_short_rest": {
+    "config_name": "Without away_short_rest",
+    "train_accuracy": 0.7880633373934226,
+    "train_brier": 0.15377637348175685,
+    "test_accuracy": 0.5866510538641686,
+    "test_brier": 0.25551825715165405,
+    "test_logloss": 0.7158438067224436,
+    "features": [
+      "extreme_cold",
+      "dome_team_outdoor_wind",
+      "is_conference_game",
+      "high_wind"
+    ],
+    "n_features": 13
+  },
+  "ablate_high_wind": {
+    "config_name": "Without high_wind",
+    "train_accuracy": 0.7880633373934226,
+    "train_brier": 0.1523300458425742,
+    "test_accuracy": 0.5971896955503513,
+    "test_brier": 0.2572862390410703,
+    "test_logloss": 0.7201190487960673,
+    "features": [
+      "extreme_cold",
+      "dome_team_outdoor_wind",
+      "is_conference_game",
+      "away_short_rest"
+    ],
+    "n_features": 13
+  }
+}

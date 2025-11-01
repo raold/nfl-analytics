@@ -419,13 +419,13 @@ def main():
     """Test the Vegas line bias engine."""
     engine = VegasLineBiasEngine()
 
-    # Generate ALL features for 2024-2025 seasons
+    # Generate ALL features for 2020-2025 seasons
     (
         team_line_performance,
         market_efficiency,
         key_number_performance
     ) = engine.generate_all_features(
-        start_season=2024,
+        start_season=2020,
         end_season=2025
     )
 

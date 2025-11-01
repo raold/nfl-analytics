@@ -1,0 +1,46 @@
+py/analysis/model_explainability.py:        print("Using permutation importance (fallback)")
+py/analysis/dependence_calibration.py:    If both are None, generates synthetic data matching dissertation results:
+py/analysis/dependence_calibration.py:        # Generate synthetic data matching dissertation statistics
+py/analysis/dependence_calibration.py:        "--use-synthetic", action="store_true", help="Use synthetic data instead of real CSV"
+py/analysis/dependence_calibration.py:        print("Generating synthetic data matching dissertation results...")
+py/analysis/compare_phase1_phase2.py:            print("  → Next: Implement hybrid calibration (Phase 2.3 fallback)")
+py/backtests/bayesian_props_multiyear_backtest.py:            logger.warning("No Bayesian predictions found - using fallback approach")
+py/models/bayesian_neural_network.py:    # Generate synthetic data
+py/models/calibration_test_harness.py:    # Test with dummy data
+py/models/bnn_mixture_experts_v2.py:        # Rebuild PyMC model context with dummy data (needed for predictions)
+py/models/bnn_simpler_v2.py:        Note: Rebuilds model structure with dummy data to enable predictions
+py/models/bnn_simpler_v2.py:        # Rebuild PyMC model context with dummy data (needed for predictions)
+py/models/copula_gof.py:    # Simple Kendall tau-b via numpy (O(n^2)), fallback to approx for large n
+py/predict/ensemble.py:Ensemble Predictor: v3 (primary) with v2.1 (fallback)
+py/predict/ensemble.py:    python py/predict/ensemble.py --game-ids 2025_05_KC_NO --method fallback
+py/predict/ensemble.py:        method: Literal["weighted", "fallback", "average"] = "weighted",
+py/predict/ensemble.py:                - 'fallback': Use v3, fallback to v2.1 if features missing
+py/predict/ensemble.py:        if self.method == "fallback":
+py/predict/ensemble.py:            # Use v3, fallback to v2.1 if v3 confidence is low
+py/predict/ensemble.py:                    f"Used v2.1 fallback for {low_confidence.sum()} low-confidence predictions"
+py/predict/ensemble.py:        choices=["weighted", "fallback", "average"],
+py/compute/statistics/power_analysis.py:            n = 100  # Default fallback
+py/compute/tasks/copula_fitter.py:        # Generate synthetic bivariate data
+py/compute/tasks/ope_evaluator.py:        # Generate synthetic logged data
+py/compute/tasks/rl_trainer.py:            # Generate synthetic dataset for testing
+py/compute/tasks/rl_trainer.py:            self._generate_synthetic_dataset(dataset_path)
+py/compute/tasks/rl_trainer.py:    def _generate_synthetic_dataset(self, path: Path):
+py/compute/tasks/rl_trainer.py:        """Generate synthetic RL dataset for testing."""
+py/compute/tasks/state_space_trainer.py:            outcomes = np.random.binomial(1, predictions)  # Simulated outcomes
+py/compute/tasks/model_calibrator.py:        # Generate synthetic data
+py/compute/dependency_checker.py:or usage, providing graceful fallbacks and helpful error messages.
+py/compute/dependency_checker.py:    """Smart dependency checker with caching and graceful fallbacks."""
+py/compute/performance_tracker.py:            return self._fallback_comparison(baseline_model, treatment_model, metric_name)
+py/compute/performance_tracker.py:            return self._fallback_comparison(baseline_model, treatment_model, metric_name)
+py/compute/performance_tracker.py:    def _fallback_comparison(
+py/compute/performance_tracker.py:            # Simple t-test fallback
+py/compute/performance_tracker.py:            statistical_method="Classical t-test (fallback)",
+py/compute/redis_worker.py:            # Generate synthetic data
+py/compute/sync/machine_manager.py:                # CPU fallback
+py/compute/sync/conflict_resolver.py:            # Restore backup and fallback
+py/production/uncertainty_segmentation.py:        Calculate inherent randomness/unpredictability.
+py/production/ab_test_controller.py:        actual = row["prediction"] + np.random.normal(0, 30) if row["prediction"] else 250
+py/ops/report_failure_analysis.py:        # primary gate per week by majority on zero-stake rows; fallback Unknown
+py/rl/logged_fills_backtest.py:def create_synthetic_policies(dataset: pd.DataFrame) -> dict[str, np.ndarray]:
+py/rl/logged_fills_backtest.py:    policies = create_synthetic_policies(backtest.dataset)
+py/validation/data_quality_checks.py:    # Demo with synthetic data

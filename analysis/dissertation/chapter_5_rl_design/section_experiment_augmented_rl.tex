@@ -1,0 +1,291 @@
+% !TEX root = ../main/main.tex
+\section{Experiment-Augmented Reinforcement Learning}\label{sec:experiment-augmented-rl}
+
+Building on the empirical validation of 40 experiments (\Cref{chap:experiments}), we integrate the 25 successful experiments directly into the reinforcement learning framework to enhance bet sizing decisions. This section documents the architecture, implementation, and expected improvements from augmenting the RL state space with experiment-derived features.
+
+\subsection{Motivation and Architecture}
+
+The 40-experiment suite (\Cref{chap:experiments}) identified 25 experiments (10 cVAE + 15 Causal) with positive ROI/EV scores, representing actionable betting edges ranging from +2.2\% to +9.5\%. Rather than treating these experiments as separate signals, we integrate them directly into the RL agent's state space, enabling the agent to learn optimal bet sizing policies that leverage these empirically validated insights.
+
+\paragraph{Integration architecture.}
+The experiment-augmented RL framework consists of three layers:
+\begin{enumerate}
+  \item \textbf{ExperimentFeatureExtractor}: Extracts 29 features from the 25 successful experiments, providing structured signals for injury impact, playoff resting, surface effects, and coaching dynamics.
+  \item \textbf{ExperimentAugmentedBettingEnv}: Gym-compatible environment with expanded state space (44 dimensions: 15 base + 29 experiments), Kelly criterion bet sizing, and reward shaping that incorporates experiment signals.
+  \item \textbf{DQN/PPO Agents}: Deep Q-Network and Proximal Policy Optimization agents with feature importance tracking, ablation study support, and gradient-based analysis of experiment contributions.
+\end{enumerate}
+
+This architecture enables systematic measurement of each experiment's marginal contribution to betting performance through ablation studies and feature importance analysis.
+
+\subsection{State Space Expansion}
+
+The baseline RL state space (\Cref{subsec:dqn-ppo-impl}) contains 15 features encoding market prices, team quality, and time context. The experiment-augmented state space expands to 44 dimensions by concatenating 29 experiment-derived features:
+
+\paragraph{Base features (15 dimensions).}
+\begin{itemize}
+  \item Market signals: home/away win probability, spread line, total line
+  \item Game context: season, week number (raw and normalized)
+  \item Scoring: home/away scores, actual total, margin (absolute and signed)
+  \item Market microstructure: market edge (deviation from 50/50), absolute spread
+\end{itemize}
+
+\paragraph{cVAE features (13 dimensions).}
+From the 10 successful cVAE experiments:
+\begin{itemize}
+  \item CVAE-007: Blowout probability (AUC=0.78, Edge=4.5\%)
+  \item CVAE-008: Multi-horizon Q1/Q2/Q3/Q4 predictions (ROI=6.2\%)
+  \item CVAE-010: Injury adjustment magnitude (QB impact=-8.2 points, ROI=8.5\%)
+  \item CVAE-011: Home field advantage (+2.7 points, 56.5\% win rate)
+  \item CVAE-012: Divisional rivalry variance indicator (+15\% variance)
+  \item CVAE-014: Playoff resting probability (Edge=9.5\%, Detection=74\%)
+  \item CVAE-015: Rookie QB adjustment (learning rate +0.15 per game)
+  \item CVAE-016: Two-minute drill score (Accuracy=58\%)
+  \item CVAE-017: Coordinator change effect (adaptation period 4.2 weeks)
+  \item CVAE-020: Season progression trend (R²=0.58, ROI=6.8\%)
+\end{itemize}
+
+\paragraph{Causal features (16 dimensions).}
+From the 15 successful causal experiments:
+\begin{itemize}
+  \item CAUSAL-002: Surface effect (ATE=-5.2 on artificial turf)
+  \item CAUSAL-003: Home field ATE (+2.65 points, RMSPE=2.8)
+  \item CAUSAL-005: Altitude effect (+2.8 points in Denver)
+  \item CAUSAL-006: Cross-country travel (-0.15 per 1000 miles)
+  \item CAUSAL-007: Short week recovery effect (+0.02 for rested teams)
+  \item CAUSAL-008: OL quality (Rushing -12.5 yards, Passing -18.2 yards)
+  \item CAUSAL-010: Veteran QB experience (-1.2 for rookies)
+  \item CAUSAL-012: Personnel grouping effects (Heavy -3.5, Spread -1.8)
+  \item CAUSAL-014: 4th down aggression (+3.5\% win probability, IV F=42.5)
+  \item CAUSAL-015: Conservative bias indicators (sunk cost=0.12)
+  \item CAUSAL-017: New rules effect (+0.18 for rule changes)
+  \item CAUSAL-018: Defensive scheme effect (+0.15)
+  \item CAUSAL-019: Recency bias (-0.02)
+  \item CAUSAL-020: Sunk cost fallacy (Effect=3.1)
+\end{itemize}
+
+The full state vector $s \in \mathbb{R}^{44}$ is
+\[
+s = [s_{\text{base}}; s_{\text{cVAE}}; s_{\text{causal}}],
+\]
+where each component is normalized to $[-1, 1]$ for stable training.
+
+\subsection{Kelly Criterion with Experiment Adjustments}
+
+The environment implements Kelly criterion bet sizing with experiment-based probability adjustments. For action $a \in \{\text{no\_bet}, \text{home}, \text{away}, \text{over}, \text{under}\}$, the win probability is adjusted using experiment features:
+
+\paragraph{Probability adjustment mechanism.}
+For a bet on the home team ($a=1$), the base win probability $p_{\text{base}}$ from market odds is adjusted:
+\[
+p_{\text{adjusted}} = p_{\text{base}} + \frac{s_{\text{home\_advantage}}}{100} + \frac{s_{\text{home\_ate}}}{100},
+\]
+incorporating both the cVAE home advantage feature (CVAE-011, +2.7 points) and the causal home field ATE (CAUSAL-003, +2.65 points). Similar adjustments apply for other bet types using relevant experiment features.
+
+\paragraph{Kelly sizing with fractional conservatism.}
+The optimal bet size $f^*$ follows the Kelly criterion with fractional conservatism:
+\[
+f^* = \kappa \cdot \min\left\{ \frac{b \cdot p_{\text{adjusted}} - (1 - p_{\text{adjusted}})}{b}, f_{\max} \right\},
+\]
+where $b$ are the decimal odds minus 1, $\kappa=0.25$ is the fractional Kelly multiplier (quarter-Kelly for safety), and $f_{\max}=0.10$ is the maximum bet fraction per position. This conservative sizing prevents catastrophic drawdowns even when experiment-based probability adjustments are imperfect.
+
+\subsection{Reward Function and Shaping}
+
+The reward function combines realized profit/loss with Kelly optimality bonuses to encourage both profitability and proper bet sizing:
+
+\paragraph{Base reward.}
+For bet outcome $o \in \{0, 1\}$ (loss/win), stake $s$, and odds $b$:
+\[
+r_{\text{base}} = \frac{1}{B_0} \times \begin{cases}
+s \cdot (b - 1) & \text{if } o = 1 \\
+-s & \text{if } o = 0
+\end{cases},
+\]
+where $B_0$ is the initial bankroll. This normalizes rewards to fractions of initial capital for stable learning.
+
+\paragraph{Kelly optimality bonus.}
+We augment $r_{\text{base}}$ with a shaping term that rewards bet sizes close to the optimal Kelly fraction:
+\[
+r_{\text{shaped}} = r_{\text{base}} + 0.1 \cdot \mathbb{1}_{o=1} \cdot \left(1 - \frac{|f - 0.5 \cdot f_{\max}|}{f_{\max}}\right).
+\]
+This bonus (active only on wins) encourages the agent to size bets near the midpoint of the allowed range, promoting consistent stake discipline rather than extreme sizing.
+
+\subsection{Agent Architectures}
+
+We implement two agent families adapted for the expanded state space:
+
+\paragraph{Deep Q-Network (DQN).}
+Three-layer feedforward network $(44 \to 128 \to 128 \to 64 \to 5)$ with ReLU activations, mapping the 44-dimensional state to Q-values for each of the 5 discrete actions. Training uses experience replay (buffer size 10,000), target network updates every 10 episodes, double DQN to mitigate overestimation bias, and $\varepsilon$-greedy exploration with decay from 1.0 to 0.01 over 200 episodes. Discount factor $\gamma=0.99$, Adam optimizer with learning rate $1 \times 10^{-4}$.
+
+\paragraph{Proximal Policy Optimization (PPO).}
+Actor-critic architecture with shared base network $(44 \to 128 \to 128)$ splitting into actor head (policy $\pi_\theta$) and critic head (value function $V_\phi$). The actor outputs action probabilities via softmax over the 5 discrete actions; the critic estimates state value for advantage computation. Training uses generalized advantage estimation (GAE, $\lambda=0.95$), clipped surrogate objective (clip $\varepsilon=0.2$), entropy regularization ($\beta=0.01$ to encourage exploration), and Adam optimizer ($\text{lr}=3 \times 10^{-4}$). PPO's on-policy updates and clipped objective provide more stable learning than DQN for this application, at the cost of sample efficiency.
+
+\paragraph{Feature importance tracking.}
+Both agents track feature importance via gradient analysis. During backpropagation, we compute $\nabla_{s} Q(s, a)$ (DQN) or $\nabla_{s} \pi_\theta(a \mid s)$ (PPO) and accumulate absolute gradients per feature:
+\[
+I_i = \frac{1}{T} \sum_{t=1}^T \left| \frac{\partial Q}{\partial s_i}(s_t, a_t) \right|,
+\]
+where $s_i$ is the $i$-th state dimension. After normalization $\sum_i I_i = 1$, this provides a gradient-based ranking of which features (including experiment signals) most influence decisions.
+
+\subsection{Training Protocol and Ablation Studies}
+
+\paragraph{Training dataset.}
+We use 2020--2023 seasons (850 games) for training, with 2024 (289 games) held out for validation. Games are processed chronologically in weekly batches to respect temporal structure; no shuffling across seasons.
+
+\paragraph{Training hyperparameters.}
+DQN: 1,000 episodes, batch size 64, replay buffer 10,000 transitions, target update every 10 episodes. PPO: 1,000 episodes, 4 epochs per update, batch size 64. Both agents train for approximately 200--250 episodes before convergence (\Cref{subsec:dqn-ppo-impl}), with minimal gains beyond this point.
+
+\paragraph{Ablation protocol.}
+To isolate the marginal contribution of each experiment, we implement systematic ablation studies:
+\begin{enumerate}
+  \item \textbf{Full model}: All 44 features (15 base + 29 experiments).
+  \item \textbf{No cVAE}: Remove all 13 cVAE features (features 15--27).
+  \item \textbf{No Causal}: Remove all 16 causal features (features 28--43).
+  \item \textbf{Individual removals}: Remove single top experiments (CVAE-014 playoff resting, CVAE-010 injury, CAUSAL-014 4th down aggression, CAUSAL-008 OL quality).
+  \item \textbf{Experiment-only}: Remove all 15 base features to test if experiments alone suffice.
+\end{enumerate}
+
+Each ablation configuration trains for 100 episodes (sufficient for convergence on this smaller problem), and we report mean return, ROI, Sharpe ratio, and final bankroll. The difference $\Delta \text{ROI}$ between full model and ablated variant quantifies the marginal value of the removed features.
+
+\subsection{Expected Performance Improvements}
+
+Based on the empirical ROI/EV scores from \Cref{chap:experiments}, we project the following improvements from experiment-augmented RL:
+
+\paragraph{Conservative estimate (+3--5\% ROI).}
+Assuming partial feature utilization (agent learns to use $\sim$50\% of experiment signals effectively):
+\begin{itemize}
+  \item CVAE-014 (playoff resting): +9.5\% edge $\times$ 0.5 utilization $\times$ 5\% game frequency = +0.24\% ROI
+  \item CVAE-010 (injury adjustment): +8.5\% edge $\times$ 0.5 $\times$ 12\% frequency = +0.51\% ROI
+  \item CAUSAL-014 (4th down): +3.5\% win prob $\times$ 0.5 $\times$ 20\% frequency = +0.35\% ROI
+  \item Aggregate across 25 experiments: $\sim$+3\% ROI improvement
+\end{itemize}
+
+\paragraph{Optimistic estimate (+7--10\% ROI).}
+Assuming near-perfect feature utilization (agent fully exploits all signals):
+\begin{itemize}
+  \item Sum of top-5 experiment edges weighted by frequency $\approx$ +7.2\% ROI
+  \item Interaction effects between experiments (e.g., playoff resting + injury) add +1--2\% ROI
+  \item Total improvement: $\sim$+8--10\% ROI
+\end{itemize}
+
+\paragraph{Risk reduction (15--20\% drawdown improvement).}
+Experiment features that signal uncertainty (injury magnitude, rookie QB variance, coordinator change adaptation period) enable the agent to reduce stake sizes in high-variance situations:
+\begin{itemize}
+  \item Injury-adjusted games: reduce kelly fraction by 25\% when $|s_{\text{injury}}| > 5$ points
+  \item Rookie QB starts: cap bets at 0.5$\times$ kelly when $s_{\text{rookie\_qb}} > 0.5$
+  \item Expected maximum drawdown reduction: 15--20\% relative to baseline
+\end{itemize}
+
+These projections will be validated through empirical backtesting once training completes, with results reported in \Cref{chap:results}.
+
+\subsection{Implementation and Code Organization}
+
+The experiment-augmented RL implementation consists of three core modules:
+
+\begin{itemize}
+  \item \texttt{py/rl/experiment\_feature\_extractor.py} (600+ lines): Extracts 29 features from 25 experiments with database integration, caching, and batch processing support.
+  \item \texttt{py/rl/experiment\_augmented\_env.py} (400+ lines): Gym-compatible environment implementing the 44-dimensional state space, Kelly sizing, and reward shaping.
+  \item \texttt{py/rl/experiment\_rl\_agent.py} (700+ lines): DQN and PPO agents with feature importance tracking, ablation study runner, and save/load utilities.
+  \item \texttt{py/rl/train\_experiment\_rl.py} (400+ lines): Training pipeline with command-line interface, hyperparameter sweeps, evaluation protocols, and result logging.
+\end{itemize}
+
+\paragraph{Usage example.}
+Training both DQN and PPO agents with ablation studies:
+\begin{verbatim}
+# Train DQN for 1000 episodes with periodic evaluation
+python py/rl/train_experiment_rl.py \
+  --agent dqn \
+  --episodes 1000 \
+  --eval-freq 100 \
+  --save-agents \
+  --output-dir experiments/rl
+
+# Run ablation studies (8 configurations × 100 episodes each)
+python py/rl/train_experiment_rl.py \
+  --agent dqn \
+  --ablation \
+  --ablation-episodes 100 \
+  --output-dir experiments/rl/ablation
+\end{verbatim}
+
+\paragraph{Output artifacts.}
+Training produces:
+\begin{itemize}
+  \item \texttt{experiments/rl/dqn\_TIMESTAMP.json}: Training results (episode returns, eval metrics, convergence curves)
+  \item \texttt{experiments/rl/dqn\_TIMESTAMP.pt}: Saved agent weights (policy network, target network, optimizer state)
+  \item \texttt{experiments/rl/feature\_importance\_TIMESTAMP.csv}: Normalized feature importance scores (44 rows, gradient-based ranking)
+  \item \texttt{experiments/rl/ablation\_TIMESTAMP.json}: Ablation study results (mean/std ROI, Sharpe, final bankroll per configuration)
+\end{itemize}
+
+\subsection{Integration with Offline RL Workflow}
+
+The experiment-augmented agents integrate seamlessly with the offline RL promotion workflow (\Cref{fig:rl-workflow}, \Cref{alg:ope-gate}):
+
+\begin{enumerate}
+  \item \textbf{Feature extraction}: ExperimentFeatureExtractor runs on logged games (2020--2023) to generate the 29-dimensional experiment feature matrix.
+  \item \textbf{Environment construction}: ExperimentAugmentedBettingEnv loads games and features, creating a replay buffer of $(s, a, r, s')$ tuples where $s \in \mathbb{R}^{44}$.
+  \item \textbf{Agent training}: DQN/PPO agents train offline using the replay buffer, with no online interaction.
+  \item \textbf{OPE gating}: Trained agents undergo off-policy evaluation using doubly robust (DR) estimators with importance sampling (\Cref{sec:ope}). Promotion requires DR lower bound $> 0$ with stable sensitivity to clipping ($c \in \{5, 10, 20\}$) and shrinkage ($\lambda \in \{0, 0.1, 0.2\}$).
+  \item \textbf{Simulator acceptance}: Promoted agents enter the risk simulator (\Cref{chap:risk}) with friction regimes and copula dependence. CVaR constraints and drawdown envelopes must hold under pessimistic scenarios.
+  \item \textbf{Deployment}: Only agents passing both OPE and simulator gates deploy to live betting. Feature importance logs guide ongoing monitoring of which experiments contribute most to decisions.
+\end{enumerate}
+
+This workflow ensures that experiment-augmented agents undergo the same rigorous validation as baseline RL policies, with empirical guarantees on off-policy performance and risk controls.
+
+\subsection{Feature Importance Analysis and Interpretability}
+
+Post-training feature importance analysis reveals which of the 29 experiment features most influence betting decisions:
+
+\paragraph{Expected top contributors.}
+Based on experiment ROI/EV scores (\Cref{chap:experiments}), we anticipate:
+\begin{enumerate}
+  \item CVAE-014 (playoff resting probability): Highest individual ROI (9.5\%), likely top-ranked feature
+  \item CVAE-010 (injury adjustment): High ROI (8.5\%), frequent applicability (12\% of games)
+  \item CAUSAL-014 (4th down aggression): Large win probability lift (+3.5\%), applicable to 20\% of games
+  \item CVAE-008 (multi-horizon Q1--Q4): Moderate ROI (6.2\%) but applicable to all games
+  \item CAUSAL-008 (OL quality): Mediates 65\% of rushing/passing variance, strong compositional signal
+\end{enumerate}
+
+\paragraph{Gradient-based importance interpretation.}
+Feature importance $I_i$ represents the average magnitude of the Q-function's (DQN) or policy's (PPO) sensitivity to feature $i$. High $I_i$ indicates that small changes in feature $i$ produce large changes in action values or policy probabilities, suggesting the agent learned to rely on that signal for decisions.
+
+\paragraph{Ablation validation.}
+We cross-validate gradient-based importance with ablation study results: features with high $I_i$ should produce large $\Delta \text{ROI}$ when removed. Concordance between these two measures (gradient importance vs.\ ablation impact) provides evidence that the agent is genuinely utilizing experiment signals rather than merely fitting noise.
+
+\subsection{Relationship to Baseline RL Agents}
+
+The experiment-augmented agents extend the baseline DQN/PPO implementations (\Cref{subsec:dqn-ppo-impl}) in three ways:
+
+\begin{enumerate}
+  \item \textbf{State space}: Baseline agents use 15-dimensional states; experiment-augmented agents use 44 dimensions (15 base + 29 experiments).
+  \item \textbf{Network architecture}: Baseline input layer is 15 units; experiment-augmented input layer is 44 units. Hidden layer sizes remain unchanged (128--128--64 for DQN, 128--128 for PPO) to maintain parameter efficiency.
+  \item \textbf{Reward shaping}: Baseline agents use raw profit/loss; experiment-augmented agents add Kelly optimality bonuses to encourage proper sizing.
+\end{enumerate}
+
+All other components (experience replay, target networks, GAE, clipped surrogate objective) remain identical, ensuring that performance differences isolate the value of experiment features rather than confounding architectural changes.
+
+\paragraph{Comparison protocol.}
+To rigorously assess the value of experiment augmentation, we train four agent configurations:
+\begin{itemize}
+  \item \textbf{Baseline DQN}: 15-dimensional state, no experiment features
+  \item \textbf{Experiment DQN}: 44-dimensional state, all 29 experiment features
+  \item \textbf{Baseline PPO}: 15-dimensional state, no experiment features
+  \item \textbf{Experiment PPO}: 44-dimensional state, all 29 experiment features
+\end{itemize}
+
+Each configuration trains for 1,000 episodes on 2020--2023 data, then evaluates on 2024 holdout. The ROI difference $\Delta \text{ROI}_{\text{experiments}} = \text{ROI}_{\text{experiment}} - \text{ROI}_{\text{baseline}}$ quantifies the marginal value of experiment augmentation, controlling for agent architecture and training protocol.
+
+\subsection{Limitations and Future Work}
+
+\paragraph{Database dependencies.}
+The ExperimentFeatureExtractor requires complete database tables for injury reports, coordinator changes, and team quality metrics. Currently, 15 of 40 experiments failed due to missing tables (\Cref{chap:experiments}), limiting the feature set to 29 dimensions. Future work will extend the database schema to enable all 40 experiments, potentially adding 10--15 additional features.
+
+\paragraph{Feature correlation and redundancy.}
+The 29 experiment features exhibit correlations (e.g., home advantage from CVAE-011 and home ATE from CAUSAL-003 measure overlapping effects). Future work will apply principal component analysis (PCA) or factor analysis to decorrelate features and reduce dimensionality while preserving signal.
+
+\paragraph{Continuous action space for stake sizing.}
+The current implementation uses discrete actions (no\_bet, home, away, over, under) with Kelly-determined stake sizes. Future work will explore continuous action spaces where the agent directly outputs stake fractions $f \in [0, f_{\max}]$, enabling finer-grained sizing that adapts to experiment-specific confidence levels.
+
+\paragraph{Multi-task learning across bet types.}
+Current agents learn separate policies for spread, total, and moneyline bets. Multi-task architectures with shared representations could transfer learning across bet types, leveraging experiment signals (e.g., injury impact) that affect all markets simultaneously.
+
+\paragraph{Online fine-tuning and regime adaptation.}
+The offline RL framework trains on historical data (2020--2023) and deploys frozen policies. Future work will investigate online fine-tuning protocols that adapt to regime shifts (e.g., rule changes, coaching innovations) using small amounts of recent data while maintaining safety constraints via conservative updates.

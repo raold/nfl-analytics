@@ -259,7 +259,7 @@ The transformation of GNNs from ``future work'' to ``production-ready baseline''
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.85\textwidth]{../figures/out/gnn_training_convergence.pdf}
-\caption{GNN Training Convergence Over 100 Epochs. Validation Brier score (lower is better) converges toward the theoretical minimum of 0.250 for binary classification. First 15 epochs show actual observed data (blue points); remaining epochs show simulated convergence pattern. The smoothed trend (red line) indicates steady improvement without overfitting, suggesting the hierarchical architecture successfully captures game prediction patterns.}
+\caption{GNN Training Convergence Through Epoch 49. Validation Brier score (lower is better) showing actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49) on 9 seasons (2,367 games). The smoothed trend (red line) indicates steady improvement, with early convergence observed by epoch 15, validating that the hierarchical architecture successfully captures game prediction patterns without requiring extensive training.}
 \label{fig:gnn_training_convergence}
 \end{figure}
 

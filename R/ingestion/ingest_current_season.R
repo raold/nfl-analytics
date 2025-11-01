@@ -219,18 +219,20 @@ safe_db_operation(
             pbp$quarter <- pbp$qtr
             pbp$qtr <- NULL  # Remove the non-standard column
           }
-          # Always use 'time_seconds' not 'game_seconds_remaining'
+          # Keep both time_seconds and game_seconds_remaining for backwards compatibility
+          # and new features that need game-level time tracking
           if ("game_seconds_remaining" %in% names(pbp) && !"time_seconds" %in% names(pbp)) {
             pbp$time_seconds <- pbp$game_seconds_remaining
-            pbp$game_seconds_remaining <- NULL  # Remove the non-standard column
+            # Keep game_seconds_remaining as well - DO NOT DELETE
           }
 
           # Select and transform columns
           plays_df <- pbp %>%
             select(any_of(c(
               "game_id", "play_id", "posteam", "defteam", "quarter",
-              "time_seconds", "game_seconds_remaining", "down", "ydstogo",
+              "time_seconds", "game_seconds_remaining", "half_seconds_remaining", "down", "ydstogo",
               "yardline_100", "play_type", "yards_gained", "first_down",
+              "third_down_converted", "fourth_down_converted",
               "pass", "rush", "special", "touchdown", "pass_touchdown",
               "rush_touchdown", "return_touchdown", "extra_point_attempt",
               "two_point_attempt", "field_goal_attempt", "kickoff_attempt",
@@ -247,11 +249,7 @@ safe_db_operation(
               "posteam_score_post", "defteam_score_post", "score_differential_post"
             )))
 
-          # Rename columns if needed
-          if ("game_seconds_remaining" %in% names(plays_df) && !"time_seconds" %in% names(plays_df)) {
-            plays_df <- plays_df %>% rename(time_seconds = game_seconds_remaining)
-          }
-
+          # All columns are now properly included (no renaming needed)
           plays_df
         },
         conn = conn,

@@ -254,6 +254,11 @@ class SimplerBNNv2:
             # For prediction, we sample from the likelihood
             y_pred_samples_log[i] = mu + np.random.standard_t(df=4, size=n_test) * sigma_samples[i]
 
+        # CRITICAL FIX: Clip log-space predictions to prevent expm1() overflow
+        # Max rushing yards in NFL history is ~296 (Adrian Peterson), so log1p(296) = 5.69
+        # Allow up to log1p(500) = 6.21 to be safe for outliers
+        y_pred_samples_log = np.clip(y_pred_samples_log, -5, 7)  # -5 to 7 → 0.007 to 1096 yards
+
         # Transform back to original scale
         y_pred_samples = np.expm1(y_pred_samples_log)
 
