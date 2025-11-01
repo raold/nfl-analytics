@@ -1,0 +1,187 @@
+# NFL Analytics - Docker Compose Configuration
+# Multi-service orchestration for production deployment
+
+version: '3.8'
+
+services:
+  # PostgreSQL/TimescaleDB - Time-series database for NFL data
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: nfl_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nfl} -d ${POSTGRES_DB:-nfl_analytics}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - nfl_network
+    restart: unless-stopped
+
+  # Streamlit Dashboard - Real-time monitoring UI
+  dashboard:
+    build:
+      context: ../../..
+      dockerfile: analysis/dissertation/main/Dockerfile
+      target: dashboard
+    container_name: nfl_dashboard
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+    volumes:
+      - ../../../logs:/app/logs
+      - ../../../models:/app/models:ro
+    ports:
+      - "${DASHBOARD_PORT:-8501}:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - nfl_network
+    restart: unless-stopped
+
+  # FastAPI - REST API for predictions
+  api:
+    build:
+      context: ../../..
+      dockerfile: analysis/dissertation/main/Dockerfile
+      target: api
+    container_name: nfl_api
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+      MODEL_PATH: /app/models
+    volumes:
+      - ../../../logs:/app/logs
+      - ../../../models:/app/models:ro
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - nfl_network
+    restart: unless-stopped
+
+  # Training Service - ML model training (run via profile)
+  training:
+    build:
+      context: ../../..
+      dockerfile: analysis/dissertation/main/Dockerfile
+      target: training
+    container_name: nfl_training
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+      TRAINING_EPOCHS: ${TRAINING_EPOCHS:-100}
+      BATCH_SIZE: ${BATCH_SIZE:-32}
+      LEARNING_RATE: ${LEARNING_RATE:-0.001}
+    volumes:
+      - ../../../logs:/app/logs
+      - ../../../models:/app/models
+      - ../../../experiments:/app/experiments
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nfl_network
+    profiles:
+      - training
+
+  # Backtest Service - Offline evaluation (run via profile)
+  backtest:
+    build:
+      context: ../../..
+      dockerfile: analysis/dissertation/main/Dockerfile
+      target: backtest
+    container_name: nfl_backtest
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+      BACKTEST_START_SEASON: ${BACKTEST_START_SEASON:-2020}
+      BACKTEST_END_SEASON: ${BACKTEST_END_SEASON:-2024}
+      INITIAL_BANKROLL: ${INITIAL_BANKROLL:-10000}
+    volumes:
+      - ../../../logs:/app/logs
+      - ../../../models:/app/models:ro
+      - ../../../reports:/app/reports
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nfl_network
+    profiles:
+      - backtest
+
+  # RL Training Service - Reinforcement learning agent training (run via profile)
+  rl_training:
+    build:
+      context: ../../..
+      dockerfile: analysis/dissertation/main/Dockerfile
+      target: training
+    container_name: nfl_rl_training
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-nfl_analytics}
+      POSTGRES_USER: ${POSTGRES_USER:-nfl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nfl_secure_pass}
+      RL_AGENT_TYPE: ${RL_AGENT_TYPE:-dqn}
+      RL_NUM_EPISODES: ${RL_NUM_EPISODES:-5000}
+      RL_BATCH_SIZE: ${RL_BATCH_SIZE:-64}
+      RL_LEARNING_RATE: ${RL_LEARNING_RATE:-0.0001}
+    volumes:
+      - ../../../logs:/app/logs
+      - ../../../models:/app/models
+      - ../../../experiments:/app/experiments
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - nfl_network
+    command: ["python", "-m", "py.rl.train_experiment_rl", "--agent", "${RL_AGENT_TYPE:-dqn}", "--episodes", "${RL_NUM_EPISODES:-5000}"]
+    profiles:
+      - rl_training
+
+networks:
+  nfl_network:
+    driver: bridge
+    name: nfl_analytics_network
+
+volumes:
+  postgres_data:
+    name: nfl_postgres_data

@@ -282,6 +282,28 @@ def fetch_bye_week_teams(season, week):
 
     return df['team'].tolist() if not df.empty else []
 
+@st.cache_data(ttl=300)
+def fetch_bnn_uncertainty_metrics():
+    """Fetch BNN uncertainty metrics for all predictions."""
+    query = """
+    SELECT
+        game_id,
+        predicted_margin,
+        uncertainty_margin,
+        uncertainty_total,
+        ci_lower,
+        ci_upper,
+        epistemic_uncertainty,
+        aleatoric_uncertainty
+    FROM predictions.bnn_predictions
+    WHERE uncertainty_margin IS NOT NULL
+    """
+
+    with psycopg.connect(**DB_CONFIG) as conn:
+        df = pd.read_sql_query(query, conn)
+
+    return df
+
 @st.cache_data(ttl=30)  # Cache for 30 seconds for live updates
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
@@ -311,10 +333,17 @@ def fetch_current_week_games():
         p.bet_confidence,
         r.predicted_margin,
         r.actual_margin,
-        r.margin_error
+        r.margin_error,
+        bnn.uncertainty_margin,
+        bnn.uncertainty_total,
+        bnn.ci_lower,
+        bnn.ci_upper,
+        bnn.epistemic_uncertainty,
+        bnn.aleatoric_uncertainty
     FROM games g
     LEFT JOIN predictions.game_predictions p ON g.game_id = p.game_id
     LEFT JOIN predictions.retrospectives r ON g.game_id = r.game_id
+    LEFT JOIN predictions.bnn_predictions bnn ON g.game_id = bnn.game_id
     WHERE g.season = 2025 AND g.week = 6 AND g.game_type = 'REG'
     ORDER BY g.kickoff
     """
@@ -521,6 +550,92 @@ def plot_calibration(df):
         height=400,
         xaxis=dict(range=[0, 1]),
         yaxis=dict(range=[0, 1])
+    )
+
+    return fig
+
+def plot_bnn_uncertainty_distribution(df_bnn):
+    """Plot BNN uncertainty distribution."""
+    fig = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=("Epistemic Uncertainty", "Aleatoric Uncertainty")
+    )
+
+    # Epistemic uncertainty histogram
+    fig.add_trace(go.Histogram(
+        x=df_bnn['epistemic_uncertainty'],
+        name='Epistemic',
+        marker_color='#1f77b4',
+        opacity=0.7,
+        nbinsx=30
+    ), row=1, col=1)
+
+    # Aleatoric uncertainty histogram
+    fig.add_trace(go.Histogram(
+        x=df_bnn['aleatoric_uncertainty'],
+        name='Aleatoric',
+        marker_color='#ff7f0e',
+        opacity=0.7,
+        nbinsx=30
+    ), row=1, col=2)
+
+    fig.update_layout(
+        title="BNN Uncertainty Decomposition",
+        showlegend=False,
+        height=400
+    )
+
+    fig.update_xaxes(title_text="Epistemic Uncertainty (points)", row=1, col=1)
+    fig.update_xaxes(title_text="Aleatoric Uncertainty (points)", row=1, col=2)
+    fig.update_yaxes(title_text="Count", row=1, col=1)
+    fig.update_yaxes(title_text="Count", row=1, col=2)
+
+    return fig
+
+def plot_bnn_prediction_intervals(df_bnn):
+    """Plot BNN prediction intervals."""
+    # Sort by predicted margin for better visualization
+    df_sorted = df_bnn.sort_values('predicted_margin').reset_index(drop=True)
+    df_sorted['game_index'] = range(len(df_sorted))
+
+    fig = go.Figure()
+
+    # Confidence interval
+    fig.add_trace(go.Scatter(
+        x=df_sorted['game_index'],
+        y=df_sorted['ci_upper'],
+        mode='lines',
+        name='95% CI Upper',
+        line=dict(width=0),
+        showlegend=False
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=df_sorted['game_index'],
+        y=df_sorted['ci_lower'],
+        mode='lines',
+        name='95% CI',
+        line=dict(width=0),
+        fillcolor='rgba(31, 119, 180, 0.2)',
+        fill='tonexty',
+        showlegend=True
+    ))
+
+    # Predicted margin
+    fig.add_trace(go.Scatter(
+        x=df_sorted['game_index'],
+        y=df_sorted['predicted_margin'],
+        mode='markers',
+        name='Predicted Margin',
+        marker=dict(size=6, color='#d62728')
+    ))
+
+    fig.update_layout(
+        title="BNN Prediction Intervals (95% Confidence)",
+        xaxis_title="Game Index",
+        yaxis_title="Predicted Margin (points)",
+        hovermode='x unified',
+        height=400
     )
 
     return fig
@@ -1006,6 +1121,51 @@ def main():
         st.plotly_chart(fig_calibration, use_container_width=True)
     else:
         st.info("Calibration data not available")
+
+    # BNN Uncertainty
+    st.header("📊 BNN Uncertainty Quantification")
+
+    df_bnn_metrics = fetch_bnn_uncertainty_metrics()
+
+    if not df_bnn_metrics.empty:
+        # Summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            avg_uncertainty = df_bnn_metrics['uncertainty_margin'].mean()
+            st.metric("Avg Margin Uncertainty", f"{avg_uncertainty:.2f} pts")
+
+        with col2:
+            avg_epistemic = df_bnn_metrics['epistemic_uncertainty'].mean()
+            st.metric("Avg Epistemic", f"{avg_epistemic:.2f} pts")
+
+        with col3:
+            avg_aleatoric = df_bnn_metrics['aleatoric_uncertainty'].mean()
+            st.metric("Avg Aleatoric", f"{avg_aleatoric:.2f} pts")
+
+        with col4:
+            avg_ci_width = (df_bnn_metrics['ci_upper'] - df_bnn_metrics['ci_lower']).mean()
+            st.metric("Avg CI Width (95%)", f"{avg_ci_width:.2f} pts")
+
+        # Plots
+        col1, col2 = st.columns(2)
+
+        with col1:
+            fig_uncertainty_dist = plot_bnn_uncertainty_distribution(df_bnn_metrics)
+            st.plotly_chart(fig_uncertainty_dist, use_container_width=True)
+
+        with col2:
+            fig_prediction_intervals = plot_bnn_prediction_intervals(df_bnn_metrics)
+            st.plotly_chart(fig_prediction_intervals, use_container_width=True)
+
+        st.markdown("""
+        **Understanding BNN Uncertainty:**
+        - **Epistemic Uncertainty**: Model uncertainty (reducible with more data/better models)
+        - **Aleatoric Uncertainty**: Inherent randomness in the game (irreducible)
+        - **95% Confidence Interval**: Range where we expect the true margin to fall 95% of the time
+        """)
+    else:
+        st.info("BNN uncertainty data not available")
 
     # Model comparison
     st.header("🔬 Model Comparison")
