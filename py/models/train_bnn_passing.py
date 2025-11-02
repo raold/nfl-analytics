@@ -42,28 +42,22 @@ def load_passing_data_from_db():
         pgs.player_id,
         pgs.season,
         pgs.week,
-        pgs.stat_yards as yards,
-        pgs.stat_attempts as attempts,
-        pgs.stat_completions as completions,
-        pgs.stat_touchdowns as touchdowns,
-        pgs.current_team as team,
+        pgs.passing_yards as yards,
+        pgs.passing_tds as touchdowns,
+        pgs.team,
         g.home_score,
         g.away_score,
         g.spread_close as spread_line,
         g.total_close as total_line,
-        g.temp,
-        g.wind,
-        CASE WHEN pgs.current_team = g.home_team THEN 1 ELSE 0 END as is_home
+        w.temp,
+        w.wind,
+        CASE WHEN pgs.team = g.home_team THEN 1 ELSE 0 END as is_home
     FROM mart.player_game_stats pgs
-    JOIN games g ON (
-        pgs.season = g.season
-        AND pgs.week = g.week
-        AND (pgs.current_team = g.home_team OR pgs.current_team = g.away_team)
-    )
-    WHERE pgs.stat_category = 'passing'
+    JOIN games g ON pgs.game_id = g.game_id
+    LEFT JOIN weather w ON g.game_id = w.game_id
+    WHERE pgs.passing_yards IS NOT NULL
+      AND pgs.passing_yards > 0
       AND pgs.season >= 2020
-      AND pgs.stat_attempts >= 10  -- Min attempts threshold
-      AND pgs.stat_yards IS NOT NULL
     ORDER BY pgs.season, pgs.week, pgs.player_id
     """
 
@@ -81,14 +75,14 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
     logger.info("Engineering features...")
 
-    # Basic features
-    df["log_attempts"] = np.log1p(df["attempts"])
-    df["completion_rate"] = df["completions"] / df["attempts"]
-    df["yards_per_attempt"] = df["yards"] / df["attempts"]
-    df["td_rate"] = df["touchdowns"] / df["attempts"]
+    # Note: No attempts/completions available in mart.player_game_stats
+    # Using available features only: yards, touchdowns, game context
 
     # Game context
     df["spread_abs"] = df["spread_line"].abs()
+
+    # Derive passing efficiency proxy from yards (simplified without attempts)
+    df["log_yards"] = np.log1p(df["yards"])
 
     # Convert weather columns to numeric (handle 'DOME'/'CLOSED ROOF' etc)
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")

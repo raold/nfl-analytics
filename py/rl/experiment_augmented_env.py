@@ -9,7 +9,7 @@ Action space: 5 discrete actions (no_bet, bet_home, bet_away, bet_over, bet_unde
 Bet sizing: Kelly criterion with experiment-based adjustments
 """
 
-import gym
+import gymnasium as gym
 from gym import spaces
 import numpy as np
 import pandas as pd
@@ -17,7 +17,7 @@ from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 import psycopg2
 
-from py.rl.experiment_feature_extractor import ExperimentFeatureExtractor, ExperimentFeatures
+from experiment_feature_extractor import ExperimentFeatureExtractor, ExperimentFeatures
 
 
 @dataclass

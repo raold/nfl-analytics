@@ -20,8 +20,8 @@ import json
 from datetime import datetime
 import os
 
-from py.rl.experiment_augmented_env import ExperimentAugmentedBettingEnv
-from py.rl.experiment_rl_agent import DQNAgent, PPOAgent, AblationStudyRunner
+from experiment_augmented_env import ExperimentAugmentedBettingEnv
+from experiment_rl_agent import DQNAgent, PPOAgent, AblationStudyRunner
 
 
 def train_agent(env,
