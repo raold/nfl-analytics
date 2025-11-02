@@ -10,7 +10,7 @@ Bet sizing: Kelly criterion with experiment-based adjustments
 """
 
 import gymnasium as gym
-from gym import spaces
+from gymnasium import spaces
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Tuple, Optional
