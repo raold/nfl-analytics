@@ -1,0 +1,54 @@
+{
+  "models_used": [
+    "bnn",
+    "state_space"
+  ],
+  "n_models": 2,
+  "ensemble_methods": [
+    "average",
+    "weighted",
+    "median",
+    "max_confidence"
+  ],
+  "best_method": "weighted",
+  "best_accuracy": 0.922,
+  "model_files": {
+    "xgboost": [
+      "models\\xgboost\\test_model.json",
+      "models\\xgboost\\v2_week6_validated.json",
+      "models\\xgboost\\xgboost_full_1999_2025.json"
+    ],
+    "bnn": [
+      "models\\attention_bnn_final.pth",
+      "models\\best_model.pth",
+      "models\\bnn_pytorch_gpu.pth"
+    ],
+    "state_space": [
+      "models\\state_space\\config.json",
+      "models\\state_space\\hyperparameter_search_results.json",
+      "models\\state_space\\kalman_state.json"
+    ],
+    "cvae": [
+      "models\\cvae\\decoder_0.pkl",
+      "models\\cvae\\decoder_1.pkl",
+      "models\\cvae\\decoder_2.pkl"
+    ]
+  },
+  "test_samples": 500,
+  "feature_cols": [
+    "team1_epa",
+    "team1_yards",
+    "team1_wp",
+    "team1_pass_rate",
+    "team1_td_rate",
+    "team2_epa",
+    "team2_yards",
+    "team2_wp",
+    "team2_pass_rate",
+    "team2_td_rate",
+    "epa_diff",
+    "yards_diff",
+    "wp_diff",
+    "pass_rate_diff"
+  ]
+}

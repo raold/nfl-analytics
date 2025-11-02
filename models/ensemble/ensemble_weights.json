@@ -1,0 +1,6 @@
+{
+  "xgboost": 0.4,
+  "bnn": 0.3,
+  "cql": 0.2,
+  "state_space": 0.1
+}

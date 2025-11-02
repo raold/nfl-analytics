@@ -314,6 +314,11 @@ class PPOAgent:
         """
         states, actions, rewards, old_log_probs, old_values, dones = self.buffer.get()
 
+        # Move to device first (before GAE computation)
+        states = states.to(self.device)
+        actions = actions.to(self.device)
+        old_log_probs = old_log_probs.to(self.device)
+
         # Compute GAE
         with torch.no_grad():
             _, next_value = self.policy.forward(states[-1].unsqueeze(0))
@@ -324,10 +329,7 @@ class PPOAgent:
         # Normalize advantages
         advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
-        # Move to device
-        states = states.to(self.device)
-        actions = actions.to(self.device)
-        old_log_probs = old_log_probs.to(self.device)
+        # Move remaining tensors to device
         advantages = advantages.to(self.device)
         returns = returns.to(self.device)
 
