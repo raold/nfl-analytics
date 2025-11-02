@@ -1,0 +1,12 @@
+{
+  "best_trial": 49,
+  "best_value": 58.70807588100433,
+  "best_params": {
+    "hidden_dim": 64,
+    "learning_rate": 0.0028008175711787073,
+    "dropout_rate": 0.16554340451777314,
+    "batch_size": 256
+  },
+  "n_trials": 100,
+  "timestamp": "2025-11-02 13:17:57.560857"
+}

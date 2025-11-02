@@ -125,9 +125,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
                 home_score,
                 away_score,
                 spread_close,
-                total_close,
-                home_moneyline,
-                away_moneyline
+                total_close
             FROM games
             WHERE season BETWEEN %s AND %s
                 AND home_score IS NOT NULL
@@ -151,24 +149,17 @@ class ExperimentAugmentedBettingEnv(gym.Env):
 
         Returns 15-dimensional base feature vector.
         """
-        # Compute implied probabilities from odds
-        home_ml = game_row['home_moneyline']
-        away_ml = game_row['away_moneyline']
+        # Compute implied probabilities from spread
+        # Spread to win probability approximation (logistic function)
+        # P(home wins) ≈ 1 / (1 + exp(-spread / 3.4))
+        # where 3.4 is empirically derived spread-to-probability conversion factor
+        spread = float(game_row['spread_close'])
 
-        if home_ml > 0:
-            home_prob = 100 / (home_ml + 100)
-        else:
-            home_prob = abs(home_ml) / (abs(home_ml) + 100)
-
-        if away_ml > 0:
-            away_prob = 100 / (away_ml + 100)
-        else:
-            away_prob = abs(away_ml) / (abs(away_ml) + 100)
-
-        # Normalize probabilities (remove vig)
-        total_prob = home_prob + away_prob
-        home_prob_true = home_prob / total_prob
-        away_prob_true = away_prob / total_prob
+        # Negative spread means home team is favored
+        # Convert spread to home win probability
+        import math
+        home_prob_true = 1 / (1 + math.exp(spread / 3.4))
+        away_prob_true = 1 - home_prob_true
 
         base_features = np.array([
             home_prob_true,                          # 0: Home win probability
