@@ -1,0 +1,20 @@
+{
+  "logistic": {
+    "total_bets": 1217,
+    "wins": 760,
+    "win_rate": 0.6244864420706656,
+    "final_bankroll": 5120626.327966369,
+    "total_roi": 511.0626327966369,
+    "max_drawdown": 0.27860939224788134,
+    "sharpe_ratio": 3.630021781886591
+  },
+  "xgboost": {
+    "total_bets": 1403,
+    "wins": 732,
+    "win_rate": 0.5217391304347826,
+    "final_bankroll": 25.941072463989258,
+    "total_roi": -0.9974058866500854,
+    "max_drawdown": 0.9998419880867004,
+    "sharpe_ratio": -0.005481997186350777
+  }
+}
