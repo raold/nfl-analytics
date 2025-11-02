@@ -201,6 +201,7 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
             "game_id",
         ],
         inplace=True,
+        na_position='last',  # FIX: Put NULL kickoffs at END, not alphabetically
     )
 
     team_df["epa_sum"] = team_df["epa_sum"].astype(float)
@@ -435,6 +436,20 @@ def pivot_to_games(df: pd.DataFrame) -> pd.DataFrame:
 def validate_game_features(df: pd.DataFrame) -> None:
     if df["game_id"].duplicated().any():
         raise ValueError("Duplicate game_id rows detected in wide features.")
+
+    # Check: Week 1 games should have no prior games FROM CURRENT SEASON (allow prior season data)
+    # Note: Teams can have prior_games > 0 in Week 1 if they played previous seasons
+    # We check season_games_prior instead, which is season-specific
+    if 'week' in df.columns and 'home_season_games_prior' in df.columns:
+        week1 = df[df['week'] == 1]
+        if len(week1) > 0:
+            if (week1['home_season_games_prior'] > 0).any():
+                bad_games = week1[week1['home_season_games_prior'] > 0]
+                raise ValueError(f"Week 1 home teams have season_games_prior > 0 (found {len(bad_games)}) - current season leakage!")
+            if (week1['away_season_games_prior'] > 0).any():
+                bad_games = week1[week1['away_season_games_prior'] > 0]
+                raise ValueError(f"Week 1 away teams have season_games_prior > 0 (found {len(bad_games)}) - current season leakage!")
+            print(f"[VALIDATION] ✓ Week 1 games ({len(week1)}) have no prior games from current season - no leakage")
 
 
 def write_csv(df: pd.DataFrame, path: str) -> None:

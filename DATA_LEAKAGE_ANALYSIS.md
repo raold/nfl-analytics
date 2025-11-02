@@ -1,8 +1,13 @@
-# Data Leakage Analysis - November 2, 2025
+# Data Leakage Analysis - November 2, 2025 (UPDATED)
 
 ## Executive Summary
 
-**CRITICAL FINDING**: Both the original backtest (`full_historical_backtest.py`) and cleaned version still show unrealistic ROI due to data leakage, though improved from 4,000,000% to 51,000%.
+**INVESTIGATION COMPLETE**: Through systematic analysis, we've identified and partially fixed multiple data leakage sources:
+- **Severe leakage** (post-game EPA): 4,000,000% → 51,000% ROI
+- **Moderate leakage** (NULL kickoff ordering): 62.4% → 60.2% win rate
+- **Remaining leakage** (likely season-level features): 60.2% still 5-6 pp above elite professionals
+
+**Status**: Additional investigation recommended but core findings documented.
 
 ## Original Backtest Issues (SEVERE LEAKAGE)
 
@@ -165,6 +170,131 @@ While we eliminated the OBVIOUS leakage (post-game EPA), the 62% win rate indica
 
 ---
 
+## NULL Kickoff Ordering Fix (MODERATE IMPROVEMENT)
+
+### File: `py/features/asof_features.py`
+
+**Problem Identified** (line 195-204):
+```python
+team_df.sort_values(
+    ["team", "season", "week", "kickoff", "game_id"],
+    inplace=True,
+)  # ❌ NULL kickoffs sort FIRST (alphabetically)
+```
+
+**Impact**:
+- 1999 Week 1 games have NULL kickoff times
+- Without `na_position` parameter, NULLs sort to beginning
+- Games processed in alphabetical game_id order instead of chronological
+- Later Sunday games leak to earlier games within same week
+
+**Fix Applied**:
+```python
+team_df.sort_values(
+    ["team", "season", "week", "kickoff", "game_id"],
+    inplace=True,
+    na_position='last',  # ✅ FIX: Put NULL kickoffs at END
+)
+```
+
+### Results After Fix
+
+**File**: `py/backtest/clean_backtest_FIXED.py` using `asof_FIXED_v2.csv`
+
+| Metric | Original (Leaky) | FIXED | Improvement |
+|--------|------------------|-------|-------------|
+| Test Win Rate | 62.4% | 60.2% | **-2.2 pp** |
+| Train Accuracy | N/A | 60.9% | N/A |
+| Status | Unrealistic | Still High | Partial fix |
+
+**Validation Status**: ⚠️ 60.2% is STILL > 55% threshold
+
+---
+
+## Diagnostic Test Results
+
+### Test 1: Spread-Only Baseline ✅
+
+**File**: `py/backtest/diagnostic_spread_only.py`
+**Purpose**: Verify spread_close feature is clean
+
+**Results**:
+- Train Accuracy: 50.7%
+- Test Accuracy: **52.2%**
+- Coefficient: 0.0000 (essentially no relationship)
+
+**Conclusion**: ✅ Spread_close feature itself is NOT leaky. The 62.4% (now 60.2%) win rate comes from OTHER features.
+
+---
+
+## Remaining Leakage Sources (LIKELY CULPRITS)
+
+### 1. Season-Level Features (HIGH PROBABILITY)
+
+**File**: `py/features/asof_features.py` (lines 265-279)
+
+**Issue**: `season_win_pct` uses within-season cumulative stats:
+```python
+season_group = team_df.groupby(["team", "season"], group_keys=False)
+team_df["season_wins_prior"] = season_group["_result_f"].cumsum() - team_df["_result_f"]
+```
+
+**Why Problematic**:
+- Model learns patterns like "4-5 teams desperate" vs "7-2 teams coasting"
+- These patterns overfit to 1999-2019 training period market biases
+- Market narratives may have changed by 2020-2024 test period
+
+**Estimated Impact**: -3 to -5 percentage points (would bring 60.2% → 55-57%)
+
+**Recommendation**: Remove season-level features and retest
+
+### 2. Professional Bettor Benchmarks
+
+**Research Evidence**:
+- **Billy Walters** (30-year winning streak): ~55-57% estimated win rate
+- **Haralabos Voulgaris** (NBA totals specialist): ~70% on NBA (NOT NFL spreads)
+- **Industry standard**: Elite professionals achieve 54-56% against NFL closing lines
+
+**Academic Research**:
+- Thaler & Ziemba (1988): NFL betting markets are among most efficient
+- Gray (1997): NFL spread markets are weak-form efficient
+- Expected max sustainable win rate: **54-56%**
+
+**Current Status**: 60.2% is **4-6 percentage points above elite professionals**
+
+---
+
+## Files Created During Investigation
+
+1. `py/backtest/diagnostic_spread_only.py` - Spread baseline test
+2. `py/backtest/clean_backtest_FIXED.py` - With NULL kickoff fix
+3. `data/processed/features/asof_FIXED_v2.csv` - Features with na_position='last'
+4. `logs/diagnostic_spread_only.log` - Baseline results (52.2%)
+5. `logs/fixed_backtest_results.log` - FIXED results (60.2%)
+6. `analysis/backtest/fixed_backtest_results.json` - FIXED metrics
+7. `DATA_LEAKAGE_INVESTIGATION_STATUS.md` - Comprehensive investigation summary
+
+---
+
+## Conclusion
+
+**Progress Made**:
+- ✅ Identified and fixed severe post-game EPA leakage (4M% → 51K% ROI)
+- ✅ Identified and fixed NULL kickoff ordering (62.4% → 60.2% win rate)
+- ✅ Verified spread_close feature is clean (52.2% baseline)
+- ✅ Identified likely remaining source (season-level features)
+
+**Remaining Work**:
+- ❌ Remove season-level features and retest
+- ❌ Feature ablation study to isolate exact leakage source
+- ❌ Simplify to spread + cross-season EPA only
+
+**Bottom Line**: Current 60.2% win rate is STILL unrealistic. Model is NOT ready for production use without further investigation and fixes.
+
+**Recommendation**: Continue investigation OR accept that feature set needs simplification to spread + cross-season aggregations only (expect 52-54% win rate).
+
+---
+
 **Date**: November 2, 2025
 **Author**: Claude Code (Sonnet 4.5)
-**Status**: Investigation ongoing - do not use current ROI metrics for production decisions
+**Status**: Partial fix complete - additional investigation recommended before production use
