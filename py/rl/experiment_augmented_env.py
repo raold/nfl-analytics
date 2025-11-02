@@ -124,14 +124,14 @@ class ExperimentAugmentedBettingEnv(gym.Env):
                 away_team,
                 home_score,
                 away_score,
-                spread_line,
-                total_line,
+                spread_close,
+                total_close,
                 home_moneyline,
                 away_moneyline
             FROM games
             WHERE season BETWEEN %s AND %s
                 AND home_score IS NOT NULL
-                AND spread_line IS NOT NULL
+                AND spread_close IS NOT NULL
             ORDER BY season, week, game_id
         """
 
@@ -173,16 +173,16 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         base_features = np.array([
             home_prob_true,                          # 0: Home win probability
             away_prob_true,                          # 1: Away win probability
-            float(game_row['spread_line']),          # 2: Point spread
-            float(game_row['total_line']),           # 3: Total points line
+            float(game_row['spread_close']),          # 2: Point spread
+            float(game_row['total_close']),           # 3: Total points line
             float(game_row['home_score']),           # 4: Home score (for post-game eval)
             float(game_row['away_score']),           # 5: Away score
             float(game_row['season']),               # 6: Season
             float(game_row['week']),                 # 7: Week number
             float(game_row['week']) / 18.0,          # 8: Normalized week progress
             home_prob_true - 0.5,                    # 9: Market edge (deviation from 50/50)
-            abs(float(game_row['spread_line'])),     # 10: Absolute spread (game closeness)
-            float(game_row['total_line']) / 50.0,    # 11: Normalized total
+            abs(float(game_row['spread_close'])),     # 10: Absolute spread (game closeness)
+            float(game_row['total_close']) / 50.0,    # 11: Normalized total
             float(game_row['home_score'] + game_row['away_score']),  # 12: Actual total
             float(abs(game_row['home_score'] - game_row['away_score'])),  # 13: Margin
             float(game_row['home_score'] - game_row['away_score']),  # 14: Signed margin
@@ -258,8 +258,8 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         home_score = game_row['home_score']
         away_score = game_row['away_score']
         total_score = home_score + away_score
-        spread = game_row['spread_line']
-        total_line = game_row['total_line']
+        spread = game_row['spread_close']
+        total_line = game_row['total_close']
 
         # Determine win probability and odds based on action
         if action == 1:  # Bet home
