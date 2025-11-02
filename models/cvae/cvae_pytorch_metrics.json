@@ -1,0 +1,29 @@
+{
+  "train_mse": 11.879776954650879,
+  "test_mse": 12.357518196105957,
+  "train_r2": 0.8822579383850098,
+  "test_r2": 0.870922863483429,
+  "train_coverage": 0.39359449444150346,
+  "test_coverage": 0.39344262295081966,
+  "train_uncertainty": 1.9042576551437378,
+  "test_uncertainty": 1.9736158847808838,
+  "training_time": 36.702383279800415,
+  "latent_dim": 16,
+  "hidden_dim": 64,
+  "features": [
+    "avg_epa",
+    "std_epa",
+    "avg_yards",
+    "std_yards",
+    "avg_wp",
+    "std_wp",
+    "pass_rate",
+    "td_rate",
+    "first_down_rate"
+  ],
+  "conditions": [
+    "season",
+    "plays"
+  ],
+  "architecture": "proper_pytorch_vae"
+}
