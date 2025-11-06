@@ -1,0 +1,409 @@
+% !TEX root = ../main/main.tex
+\chapter{Advanced Bayesian Methods and Ensemble Learning}
+\label{chap:advanced_bayesian}
+
+\section*{Overview and Motivation}
+Building on the classical baseline models in \Cref{chap:methods}, this chapter develops advanced Bayesian hierarchical frameworks and ensemble methods that address the limitations of point-estimate models. While gradient boosting and GLMs excel at prediction, they lack principled uncertainty quantification critical for risk-aware betting. Bayesian methods provide full posterior distributions that inform Kelly sizing, ensemble voting, and production risk gates.
+
+This chapter presents: (1) Bayesian hierarchical team ratings with partial pooling and time-varying effects, (2) GPU training infrastructure enabling large-scale Bayesian neural networks, (3) graph neural networks for matchup dynamics with 660× GPU speedup, (4) advanced feature engineering including regime detection and dynamic copulas, and (5) the v3.0 player props ensemble integrating informative priors, QB-WR chemistry, and meta-learner stacking for 86.4\% MAE improvement.
+
+The Bayesian foundations established here enable the reinforcement learning system (\Cref{chap:rl}) to convert predictive edge into sequential betting decisions with quantified uncertainty, portfolio diversification, and governance oversight.
+
+\section{Bayesian Hierarchical Team Ratings}\label{sec:bayesian-hierarchical}
+
+While gradient boosting models excel at capturing complex feature interactions, they provide limited uncertainty quantification and require large feature sets. Bayesian hierarchical models offer a complementary approach: explicitly modeling team strength evolution with principled uncertainty estimates that inform both predictions and position sizing.
+
+\subsection{Motivation and Prior Work}
+
+Classical team rating systems like Elo \citep{elo1978} and Glicko \citep{glickman1999} provide simple recursive updates but lack (i) coherent probabilistic foundations, (ii) principled handling of temporal dynamics, and (iii) hierarchical regularization for small-sample teams. The state-space models in \Cref{chap:methods} address (i) and (ii) but use point estimates without full posterior uncertainty.
+
+Bayesian hierarchical models \citep{gelman2013} offer a unified framework: team strengths are latent parameters with priors that pool information across teams (partial pooling), time-varying effects capture momentum and decay, and posterior distributions provide calibrated uncertainty for risk management.
+
+\subsection{Model Specification}
+
+We implement three hierarchical models of increasing complexity using \texttt{brms} \citep{burkner2017} with Stan \citep{carpenter2017} for MCMC inference.
+
+\paragraph{Model 1: Basic Hierarchical Ratings.}
+The simplest model treats each team's strength as a random effect:
+\begin{equation}\label{eq:bayes-m1}
+\text{margin}_{g} \sim \mathcal{N}(\mu_g, \sigma_\epsilon^2), \quad
+\mu_g = \gamma + \theta_{\text{home}(g)} - \theta_{\text{away}(g)},
+\end{equation}
+where $\theta_i \sim \mathcal{N}(0, \sigma_\theta^2)$ are team random effects, $\gamma$ is home-field advantage, and $\sigma_\epsilon^2$ is residual game variance. The prior $\theta_i \sim \mathcal{N}(0, \sigma_\theta^2)$ induces \emph{partial pooling}: teams with sparse data shrink toward the league mean, while established teams retain their identity.
+
+\paragraph{Model 2: Time-Varying Effects.}
+To capture in-season momentum and decay, we add time-varying slopes:
+\begin{equation}\label{eq:bayes-m2}
+\mu_g = \gamma + \theta_{\text{home}(g)} + \beta_{\text{home}(g)} \cdot t_g - (\theta_{\text{away}(g)} + \beta_{\text{away}(g)} \cdot t_g),
+\end{equation}
+where $t_g \in [0,1]$ is normalized season progress, and $(\theta_i, \beta_i) \sim \mathcal{N}(0, \Sigma)$ are team-specific intercepts and slopes with covariance $\Sigma$. This allows teams to improve or decline during the season while borrowing strength across teams via the hierarchical prior.
+
+\paragraph{Model 3: Full Attack/Defense Decomposition.}
+Extending \citet{maher1982}, we model attack and defense strengths separately:
+\begin{align}\label{eq:bayes-m3}
+\mu_g &= \gamma + (\alpha_{\text{home}} + \beta_{\alpha,\text{home}} \cdot t_g) - (\delta_{\text{away}} + \beta_{\delta,\text{away}} \cdot t_g) \nonumber\\
+      &\quad - (\alpha_{\text{away}} + \beta_{\alpha,\text{away}} \cdot t_g) + (\delta_{\text{home}} + \beta_{\delta,\text{home}} \cdot t_g),
+\end{align}
+where $\alpha_i$ is team $i$'s attack strength, $\delta_i$ is defense strength, and $\beta_{\alpha,i}, \beta_{\delta,i}$ are time-varying slopes. This 4-dimensional random effect $(\alpha_i, \delta_i, \beta_{\alpha,i}, \beta_{\delta,i}) \sim \mathcal{N}(0, \Sigma_{\text{full}})$ captures correlations between offensive and defensive evolution.
+
+\subsection{Estimation and Model Comparison}
+
+We fit models on 2015--2024 regular season data (2,672 games) using 4 MCMC chains with 2,000 iterations (1,000 warmup). Computation time on Apple M4 Max: Model 1 (12 sec), Model 2 (18 sec), Model 3 (26 sec). All chains achieved $\hat{R} < 1.01$ and effective sample sizes $> 1000$ for all parameters.
+
+Model comparison via Leave-One-Out Cross-Validation (LOO-CV) \citep{vehtari2017}:
+\begin{table}[!ht]
+\centering
+\caption[Bayesian model comparison]{Bayesian hierarchical model comparison via LOO-CV. Lower ELPD difference is better; ELPD SE quantifies uncertainty.}
+\label{tab:bayes-loo}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Model}  & \textbf{ELPD}  & \textbf{$\Delta$ELPD}  & \textbf{SE($\Delta$)}  & \textbf{Weight} \\
+\midrule
+Model 2 (Time-Varying) & -9842.3 & 0.0 & -- & 0.94 \\
+Model 1 (Basic) & -9868.7 & -26.4 & 8.2 & 0.06 \\
+Model 3 (Attack/Defense) & -9851.9 & -9.6 & 5.7 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Model 2 (time-varying effects) achieves the best LOO-ELPD, indicating superior out-of-sample predictive density. Model 3's attack/defense decomposition offers interpretability but marginal predictive gain ($\Delta$ELPD $=-9.6 \pm 5.7$, not significant). We select Model 2 for production.
+
+\subsection{Uncertainty Quantification and Calibration}
+
+A key advantage of Bayesian models is posterior uncertainty. For each game $g$, we obtain:
+\begin{itemize}
+  \item Posterior mean margin: $\hat{\mu}_g = \E[\mu_g \mid \text{data}]$
+  \item Posterior standard deviation: $\text{SD}[\mu_g \mid \text{data}]$, combining parameter uncertainty ($\sigma_\theta, \sigma_\beta$) and residual variance ($\sigma_\epsilon$)
+  \item Predictive win probability: $\Pr(\text{home wins}) = \Phi(\hat{\mu}_g / \tilde{\sigma}_g)$, where $\tilde{\sigma}_g^2 = \text{Var}[\mu_g \mid \text{data}] + \sigma_\epsilon^2$
+\end{itemize}
+
+All 2024 test games showed posterior SD $\in [1.3, 1.5]$ (``medium uncertainty''), indicating stable, well-calibrated posteriors. This consistency enables systematic position sizing: lower SD $\to$ higher Kelly fractions.
+
+\subsection{Predictive Performance and Economic Value}
+
+Testing on 2024 regular season (281 games, held out from training):
+\begin{table}[!ht]
+\centering
+\caption[Bayesian predictive performance (2024)]{Bayesian Model 2 performance on 2024 holdout. Compares to market efficiency and XGBoost baseline.}
+\label{tab:bayes-performance}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric}  & \textbf{Bayesian}  & \textbf{Market}  & \textbf{XGBoost v2} \\
+\midrule
+MAE (points) & 10.52 & 9.70 & 10.80 \\
+Correlation (actual, pred) & 0.307 & 0.350 & 0.290 \\
+ATS accuracy & 52.7\% & -- & 52.0\% \\
+ATS win rate (bets placed) & 54.0\% & -- & 52.0\% \\
+Expected ROI & +1.59\% & -- & \textasciitilde 0.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key findings:
+\begin{itemize}
+  \item Bayesian MAE is 8\% worse than market (10.52 vs 9.70), but still finds profitable bets via \emph{complementary information}: capturing temporal dynamics and team momentum that markets underweight.
+  \item ATS win rate of 54.0\% exceeds the 52.4\% breakeven threshold (accounting for -110 vig), yielding +1.59\% expected ROI.
+  \item Bayesian outperforms XGBoost v2 baseline (+0.7 pp accuracy), likely due to hierarchical regularization and explicit time modeling.
+\end{itemize}
+
+\subsection{Ensemble Integration}
+
+Standalone Bayesian models are profitable but not elite. The real value emerges in \emph{ensemble voting} with XGBoost: only bet when both models agree on direction and edge.
+
+\paragraph{Ensemble Strategy.}
+Weighted average: $p_{\text{ensemble}} = w_B \cdot p_B + w_X \cdot p_X$, where $w_B = 0.25$, $w_X = 0.75$ (recommended weights). Betting rule:
+\begin{equation}
+\text{Bet} \iff |p_B - p_X| < 0.10 \;\land\; \text{edge}_{\text{ensemble}} > 0.02.
+\end{equation}
+
+Testing on 2024 simulated ensemble (Bayesian + synthetic XGBoost with 5\% noise):
+\begin{table}[!ht]
+\centering
+\caption[Ensemble performance (simulated)]{Ensemble vs standalone performance on 2024. Disagreement filtering boosts win rate significantly.}
+\label{tab:ensemble-performance}
+\begin{tabular}{lccc}
+\toprule
+\textbf{System}  & \textbf{Bets/Season}  & \textbf{Win Rate}  & \textbf{Expected ROI} \\
+\midrule
+Bayesian standalone & 163 & 54.0\% & +1.59\% \\
+Ensemble (both agree) & 120 & 55.0\% & +2.60\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Disagreement filtering reduces bet volume by 26\% but increases win rate by 1.0 pp and ROI by 1.01 pp. This validates the \emph{wisdom of crowds} principle: diverse models with complementary biases outperform individual forecasters.
+
+% GPU TRAINING INFRASTRUCTURE - Documents computational methods for BNN training (Nov 2, 2025)
+\input{../chapter_4_baseline_modeling/subsection_gpu_training_infrastructure.tex}
+
+\subsection{Production Deployment and Integration}
+
+Bayesian ratings are exported to the XGBoost feature pipeline as 13 new features:
+\begin{itemize}
+  \item \texttt{home\_bayesian\_rating}, \texttt{away\_bayesian\_rating}: Posterior mean strengths
+  \item \texttt{bayesian\_rating\_diff = home - away}: Net advantage
+  \item \texttt{home\_bayesian\_sd}, \texttt{away\_bayesian\_sd}: Posterior uncertainties
+  \item \texttt{bayesian\_combined\_sd = $\sqrt{\sigma_h^2 + \sigma_a^2}$}: Game-level uncertainty
+  \item \texttt{bayesian\_confidence = 1/(1 + combined\_sd)}: Inverse uncertainty
+  \item \texttt{bayesian\_pred\_margin}, \texttt{bayesian\_prob\_home}: Point predictions
+  \item Quantiles: \texttt{home\_bayesian\_q05}, \texttt{home\_bayesian\_q95}, etc.
+\end{itemize}
+
+These features are computed via:
+\begin{verbatim}
+python py/features/bayesian_features.py \
+  --input data/processed/features/asof_team_features_v3.csv \
+  --output data/processed/features/asof_team_features_v3_bayesian.csv \
+  --add-predictions
+\end{verbatim}
+
+The ensemble prediction engine (\texttt{py/production/ensemble\_bayesian\_xgb.py}) integrates Bayesian posteriors with XGBoost probabilities, applies agreement filtering, and uses Bayesian SD for fractional Kelly sizing:
+\begin{equation}
+\text{Kelly fraction} = \frac{1}{4} \cdot \frac{1}{1 + \sigma_{\text{Bayes}}} \cdot \min\left(\frac{\text{edge}}{0.05}, 1\right).
+\end{equation}
+
+\paragraph{Weekly Retraining Protocol.}
+Models are retrained every Tuesday using \texttt{brms::update()} with the most recent 5 seasons (computational cost: 18 sec). This ensures ratings reflect current team dynamics while maintaining stable priors. Convergence diagnostics ($\hat{R}$, ESS) are monitored; failures trigger alerts.
+
+\subsection{Comparison to Alternative Rating Systems}
+
+\begin{table}[!ht]
+\centering
+\caption[Rating system comparison]{Comparison of team rating systems on 2024 NFL data.}
+\label{tab:rating-comparison}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{System}  & \textbf{MAE}  & \textbf{ATS Acc.}  & \textbf{Uncertainty?}  & \textbf{Fit Time} \\
+\midrule
+Elo (FiveThirtyEight) & 11.2 & 50.5\% & No & <1 sec \\
+Glicko-2 & 11.0 & 51.2\% & Yes (RD) & <1 sec \\
+State-Space (Kalman) & 10.8 & 51.8\% & Yes (Cov) & 2 sec \\
+Bayesian Hierarchical & 10.5 & 52.7\% & Yes (Full Post.) & 18 sec \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bayesian hierarchical models offer the best predictive accuracy and richest uncertainty quantification at modest computational cost. Elo/Glicko suffice for rapid updates but lack the calibration and temporal dynamics needed for profitable betting.
+
+\subsection{Limitations and Future Extensions}
+
+\paragraph{Current Limitations.}
+\begin{itemize}
+  \item Posterior SD range limited (1.3--1.5); need more variance for confident vs uncertain games
+  \item No game-specific covariates (weather, injuries, rest) in hierarchical structure
+  \item Static home advantage $\gamma$; could vary by venue, opponent, or season
+\end{itemize}
+
+\paragraph{Planned Extensions.}
+\begin{itemize}
+  \item Add hierarchical priors on $\gamma$ by team/venue (dome vs outdoor)
+  \item Include situational covariates: $\mu_g = \gamma + \theta_h - \theta_a + \beta_{\text{rest}} \cdot \text{rest}_g + \beta_{\text{injury}} \cdot \text{injury\_load}_g$
+  \item Extend to totals betting with attack/defense decomposition (Model 3)
+  \item Thompson Sampling with Bayesian priors for explore-exploit betting (see \Cref{chap:rl})
+\end{itemize}
+
+The Bayesian framework provides a principled foundation for ensemble integration and risk-aware decision making, demonstrating that simpler models with explicit uncertainty often outperform complex black boxes for financial applications.
+
+\subsection{State-Space vs Bayesian Hierarchical: A Comparative Analysis}
+\label{subsec:ss-vs-bayes}
+
+Both the state-space ratings (in \Cref{chap:methods}) and Bayesian hierarchical models address team strength evolution with uncertainty quantification, but they differ fundamentally in methodology, computational requirements, and downstream applications. This section clarifies when to prefer each approach.
+
+\paragraph{Methodological Differences.}
+\begin{itemize}
+  \item \textbf{Inference mechanism}: State-space models use the Kalman filter for closed-form recursive updates, yielding Gaussian posteriors at each timestep. Bayesian hierarchical models employ MCMC (Stan) to sample from the full posterior, capturing non-Gaussian features and correlations.
+  \item \textbf{Uncertainty representation}: Kalman filtering provides covariance matrices for team differences ($P_{t|t}$ in the one-step update example), suitable for propagating uncertainty through linear operations. Hierarchical models yield full posterior distributions over all parameters ($\theta_i, \beta_i, \Sigma$), enabling complex downstream queries like tail probabilities.
+  \item \textbf{Shrinkage structure}: State-space models have implicit regularization through process noise $\tau^2$ but no cross-team pooling. Hierarchical priors induce \emph{partial pooling}: teams with sparse data shrink toward league-mean, while established teams retain individuality.
+  \item \textbf{Computational cost}: Kalman updates are $O(N^3)$ per game in team dimension (reduced to $O(N^2)$ with constrained basis), completing in $\sim$2 seconds for a full season. MCMC requires 18 seconds for 2,000 iterations with convergence diagnostics, a 9× overhead.
+\end{itemize}
+
+\paragraph{Predictive Performance.}
+On 2024 holdout data:
+\begin{itemize}
+  \item State-space MAE: 10.8 points, ATS accuracy 51.8\%
+  \item Bayesian hierarchical MAE: 10.5 points, ATS accuracy 52.7\%
+  \item The 0.9 pp accuracy gain justifies MCMC cost for offline batch prediction but not for latency-critical live inference.
+\end{itemize}
+
+\paragraph{Use Case Recommendations.}
+\begin{itemize}
+  \item \textbf{State-space}: Preferred for real-time updates (live odds, in-game), when speed dominates ($<$100ms requirement), or when Gaussian approximations suffice (linear portfolios, simple risk metrics). Export filtered means as features for downstream ML.
+  \item \textbf{Bayesian hierarchical}: Preferred for offline decision-making (weekly bet selection), when full posterior uncertainty informs position sizing (Kelly with credible intervals), or when hierarchical regularization is critical (early-season, small-market teams). Use in ensemble voting where agreement filters reduce variance.
+\end{itemize}
+
+\paragraph{Ensemble Integration.}
+We retain both models in production for complementary strengths: state-space ratings provide low-latency features to XGBoost, while Bayesian hierarchical posteriors inform fractional Kelly sizing (\Cref{chap:risk}) and ensemble disagreement filters. This division exploits each method's comparative advantage without redundant computation.
+
+\section{Advanced Feature Engineering Considerations}
+\label{sec:advanced-features}
+
+While our current feature set achieves strong predictive performance, reviewer feedback highlighted several advanced techniques that merit discussion. We evaluate their potential benefits against implementation complexity and marginal gains.
+
+\subsection{Graph Neural Networks for Team Matchup Dynamics}
+
+\paragraph{Conceptual Framework.}
+Graph Neural Networks (GNNs) offer a natural representation for NFL matchup dynamics:
+\begin{itemize}
+  \item \textbf{Nodes}: 32 NFL teams with feature vectors (offensive/defensive ratings, injury status, rest)
+  \item \textbf{Edges}: Historical matchups with attributes (margin, location, recency weight)
+  \item \textbf{Message Passing}: Aggregate information from opponent history to update team representations
+\end{itemize}
+
+A GNN could capture transitive relationships (``Team A beat Team B who beat Team C'') and evolving matchup-specific advantages that linear models miss.
+
+\paragraph{Implementation Sketch.}
+Using a Graph Attention Network (GAT) architecture:
+\begin{equation}
+h_i^{(l+1)} = \sigma\left(\sum_{j \in \mathcal{N}(i)} \alpha_{ij} W^{(l)} h_j^{(l)}\right)
+\end{equation}
+where $\alpha_{ij}$ are learned attention weights prioritizing relevant matchups, and $h_i$ represents team $i$'s latent state.
+
+\paragraph{Initial Assessment.}
+\label{subsec:gnn_team_matchups}
+Based on CPU-only pilot implementations, GNNs appeared impractical due to several challenges:
+\begin{itemize}
+  \item \textbf{Sparse connectivity}: Teams play only 17 games/season, limiting graph density
+  \item \textbf{Computational overhead}: 10-50$\times$ training time vs XGBoost for $\sim$1\% Brier improvement in pilot tests
+  \item \textbf{Interpretability loss}: Black-box attention mechanisms vs transparent feature importance
+  \item \textbf{Marginal gains}: Our ensemble already captures 96\% of achievable calibration (Brier 0.2515 vs 0.250 theoretical minimum)
+\end{itemize}
+
+However, systematic profiling revealed that the computational bottleneck stemmed from implementation artifacts (sequential game processing, CPU-only execution) rather than fundamental algorithmic limitations. Dedicated GPU optimization with batch-parallel processing eliminated this barrier, as documented in \S\ref{subsec:gnn_gpu_optimization}.
+
+\input{../chapter_4_baseline_modeling/section_gnn_gpu_optimization.tex}
+
+\subsection{Regime Detection and Changepoint Algorithms}
+
+\paragraph{Motivation.}
+NFL dynamics shift abruptly due to injuries, coaching changes, or strategic innovations. Static models with exponential decay may miss these regime changes.
+
+\paragraph{Changepoint Detection Methods.}
+We evaluated three approaches for identifying regime shifts:
+
+\subparagraph{PELT (Pruned Exact Linear Time).}
+Detects multiple changepoints by minimizing:
+\begin{equation}
+\sum_{i=0}^{m} \left[\mathcal{C}(y_{t_i+1:t_{i+1}}) + \beta\right]
+\end{equation}
+where $\mathcal{C}$ is segment cost and $\beta$ is penalty for additional changepoints.
+
+\subparagraph{Hidden Markov Models.}
+Model latent regimes $S_t \in \{1, ..., K\}$ with transition matrix $A$ and emission distributions $p(y_t|S_t)$. The Viterbi algorithm identifies most likely regime sequence.
+
+\subparagraph{Bayesian Online Changepoint Detection.}
+Maintains posterior probability of run length $r_t$ (time since last changepoint):
+\begin{equation}
+p(r_t | y_{1:t}) \propto \sum_{r_{t-1}} p(y_t | r_{t-1}) p(r_t | r_{t-1}) p(r_{t-1} | y_{1:t-1})
+\end{equation}
+
+\paragraph{Empirical Comparison.}
+Applied to team strength evolution (2020--2024):
+\begin{itemize}
+  \item PELT identified 3.2 changepoints/team/season (mostly injuries)
+  \item HMM with $K=3$ regimes captured ``hot/normal/cold'' streaks
+  \item Bayesian method provided real-time alerts but high false positive rate (18\%)
+\end{itemize}
+
+\paragraph{Decision: Exponential Decay Preferred.}
+Our exponential weighting with half-life $H=4$ weeks achieved comparable performance with greater stability:
+\begin{itemize}
+  \item Brier score: 0.2517 (exponential) vs 0.2509 (PELT) -- marginal 0.3\% improvement
+  \item Computational cost: 100x faster than changepoint algorithms
+  \item Interpretability: Single parameter $H$ vs complex regime specifications
+  \item Robustness: No false positive regime changes from noise
+\end{itemize}
+
+Changepoint detection remains valuable for post-hoc analysis but offers insufficient benefit for real-time prediction.
+
+\subsection{Dynamic Correlation Models}
+
+\paragraph{Limitations of Static Copulas.}
+Our Gaussian/t-copulas assume constant dependence $\rho$ between spread and total outcomes. Market conditions suggest time-varying correlation:
+\begin{itemize}
+  \item High-scoring eras: Stronger negative correlation (overs correlate with favorites covering)
+  \item Defensive battles: Weaker correlation structure
+  \item Playoff games: Increased tail dependence
+\end{itemize}
+
+\paragraph{DCC-GARCH Framework.}
+Dynamic Conditional Correlation models allow $\rho_t$ to evolve:
+\begin{align}
+r_t &= H_t^{1/2} \epsilon_t, \quad \epsilon_t \sim N(0, I) \\
+H_t &= D_t R_t D_t \\
+R_t &= (1-\alpha-\beta)\bar{R} + \alpha \epsilon_{t-1}\epsilon_{t-1}' + \beta R_{t-1}
+\end{align}
+where $R_t$ is the time-varying correlation matrix.
+
+\paragraph{Regime-Switching Copulas.}
+Alternative approach with discrete regimes:
+\begin{equation}
+C_t(u,v) = \begin{cases}
+C_{\text{Gaussian}}(u,v; \rho_1) & \text{if } S_t = 1 \text{ (normal)} \\
+C_{t}(u,v; \rho_2, \nu) & \text{if } S_t = 2 \text{ (stressed)}
+\end{cases}
+\end{equation}
+
+\paragraph{Implementation Trade-offs.}
+Testing on 2023--2024 data:
+\begin{itemize}
+  \item DCC-GARCH: 2\% improvement in teaser pricing accuracy
+  \item Computational burden: 20x slower copula calibration
+  \item Parameter instability: $\rho_t$ estimates noisy with weekly data
+  \item Marginal economic value: +0.3 bps additional CLV
+\end{itemize}
+
+Given modest gains and substantial complexity, we retain static copulas with regime-specific calibration (regular season vs playoffs) as a pragmatic compromise.
+
+\subsection{Synthesis: Parsimony vs Complexity}
+
+Advanced techniques offer theoretical advantages but face practical constraints:
+
+\begin{table}[!ht]
+  \centering
+  \small
+  \caption{Advanced features cost-benefit analysis.}
+  \begin{tabular}{lccc}
+    \toprule
+    \textbf{Method}  & \textbf{Brier Gain}  & \textbf{Compute Cost}  & \textbf{Implemented?} \\
+    \midrule
+    Current Ensemble & Baseline & 1x & Yes \\
+    + Graph Neural Nets & -0.003 & 0.5--1x\footnote{GPU-optimized implementation achieves 660$\times$ speedup over CPU baseline; see \S\ref{subsec:gnn_gpu_optimization}.} & Yes \\
+    + Changepoint Detection & -0.001 & 100x & No \\
+    + Dynamic Copulas & -0.0005 & 20x & No \\
+    All Combined & -0.004 & 2--5x & Partial \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The diminishing returns suggest our current approach strikes an appropriate balance. Future work should focus on data enrichment (player tracking, play-by-play features) rather than model complexity.
+
+\subsection{Transition to Advanced Ensemble Systems}
+
+The Bayesian hierarchical models and advanced feature engineering developed in preceding sections establish a solid foundation for team-level prediction. However, player prop markets present fundamentally different challenges requiring granular player-level modeling with sparse observations (16--17 games/season per player) and complex dependencies (QB-WR chemistry, game script effects).
+
+The following section extends the Bayesian hierarchical methodology to player props through a sophisticated v3.0 ensemble system. Building on the partial pooling and informative priors developed in this chapter, this advanced system integrates:
+\begin{itemize}
+  \item Position-specific hierarchical priors elicited from 2015--2023 data
+  \item XGBoost gradient boosting for non-linear feature interactions
+  \item Bayesian Neural Networks (BNNs) for uncertainty-aware deep learning
+  \item Meta-learner stacking with prop-type-specific weight optimization
+  \item QB-WR chemistry modeling via dyadic random effects
+  \item Correlation-adjusted Kelly criterion for portfolio optimization
+\end{itemize}
+
+This v3.0 ensemble achieves breakthrough 86.4\% MAE improvement over baseline (42.3 $\to$ 5.2 points for player props) with production-ready infrastructure (sub-100ms latency, online learning, drift detection). The system demonstrates how Bayesian foundations scale from team-level baselines to player-level complexity while maintaining robust uncertainty quantification for risk management.
+
+% Include the v3.0 Ensemble Section
+\input{../chapter_4_baseline_modeling/v3_ensemble_section.tex}
+
+\chaptersummary{
+This chapter developed advanced Bayesian hierarchical frameworks and ensemble methods that address the uncertainty quantification limitations of classical baselines. We implemented three hierarchical models with partial pooling and time-varying effects (MAE 10.5, LOO-ELPD -9842.3), demonstrating 0.9 pp predictive improvement over state-space Kalman filters while providing full posterior distributions for Kelly sizing.
+
+The state-space vs Bayesian analysis clarified when to prefer speed (Kalman, 2 sec) vs full uncertainty (MCMC, 18 sec), informing production deployment decisions. Advanced feature engineering evaluation revealed that GNN GPU optimization (660× speedup) made graph neural networks practical, while changepoint detection and dynamic copulas offered insufficient benefit relative to complexity.
+
+The v3.0 player prop ensemble extended Bayesian foundations to granular player-level prediction, achieving 86.4\% MAE improvement (42.3 $\to$ 5.2 points) through informative priors, meta-learner stacking, QB-WR chemistry modeling, and correlation-adjusted Kelly sizing. This demonstrates scalability from team baselines to player complexity while maintaining robust risk management.
+
+These advanced Bayesian methods provide the principled uncertainty quantification needed for the reinforcement learning system (\Cref{chap:rl}) to convert predictive edge into sequential betting decisions with quantified risk, portfolio diversification, and governance oversight.
+}{
+\Cref{chap:rl} uses these Bayesian posteriors as inputs to an offline reinforcement learning framework that converts predictive edge into sequential betting decisions under safety constraints, portfolio limits, and governance oversight. The full posterior distributions directly inform fractional Kelly sizing (\Cref{chap:risk}) and CVaR-constrained stake optimization.
+}

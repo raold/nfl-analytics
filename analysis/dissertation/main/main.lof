@@ -11,55 +11,52 @@
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Rolling OOS log loss}}{47}{figure.caption.297}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Rolling OOS ECE}}{48}{figure.caption.298}%
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Reliability curves (2024 holdout)}}{49}{figure.caption.299}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Integer‑margin frequencies (holdout)}}{63}{figure.caption.388}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces GNN GPU Optimization: Marginal Speedup Contributions. Each bar represents the speedup factor contributed by a specific optimization phase, with labels showing both the speedup multiplier and resulting epoch time. The dominant contribution (12$\times $) comes from batch-parallel processing, validating the hypothesis that sequential processing was the primary bottleneck.}}{70}{figure.caption.437}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Cumulative Speedup Progression (Log Scale). The log-scale y-axis emphasizes the multiplicative nature of optimization phases. Starting from 1$\times $ baseline, optimizations compound to achieve 82.5$\times $ per-epoch speedup on 9-season dataset, reducing epoch time from 33 minutes to 24 seconds.}}{71}{figure.caption.438}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces GPU Utilization: Baseline vs Optimized. Despite processing 9$\times $ more data (2,367 games vs 272 games), the optimized implementation maintains similar GPU utilization (~33\%) with significantly better throughput. The baseline's 45\% utilization on a single season reflects hardware underutilization due to sequential processing bottlenecks.}}{71}{figure.caption.439}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces GNN Training Convergence Through Epoch 49. Validation Brier score (lower is better) showing actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49) on 9 seasons (2,367 games). The smoothed trend (red line) indicates steady improvement, with early convergence observed by epoch 15, validating that the hierarchical architecture successfully captures game prediction patterns without requiring extensive training.}}{72}{figure.caption.440}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Baseline calibration}}{77}{figure.caption.470}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Copula impact on teaser/SGP EV}}{78}{figure.caption.483}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces GLM reliability (Platt)}}{84}{figure.caption.528}%
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Model evolution performance}}{94}{figure.caption.607}%
-\contentsline {figure}{\numberline {4.13}{\ignorespaces Ensemble component performance}}{95}{figure.caption.612}%
-\contentsline {figure}{\numberline {4.14}{\ignorespaces Calibration comparison}}{96}{figure.caption.613}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Integer‑margin frequencies (holdout)}}{53}{figure.caption.329}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Baseline calibration}}{55}{figure.caption.336}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Copula impact on teaser/SGP EV}}{56}{figure.caption.349}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces GLM reliability (Platt)}}{63}{figure.caption.394}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Offline RL learning curves (median and IQR across seeds).}}{114}{figure.caption.668}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}}{115}{figure.caption.669}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces End-to-end offline RL workflow from data to promotion.}}{116}{figure.caption.677}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Sensitivity of growth/drawdown to pessimism level $\alpha $ in Kelly‑LCB and the RL policy’s calibration to $p$ uncertainty.}}{120}{figure.caption.698}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces GNN GPU Optimization: Marginal Speedup Contributions. Each bar represents the speedup factor contributed by a specific optimization phase, with labels showing both the speedup multiplier and resulting epoch time. The dominant contribution (12$\times $) comes from batch-parallel processing, validating the hypothesis that sequential processing was the primary bottleneck.}}{95}{figure.caption.561}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Cumulative Speedup Progression (Log Scale). The log-scale y-axis emphasizes the multiplicative nature of optimization phases. Starting from 1$\times $ baseline, optimizations compound to achieve 82.5$\times $ per-epoch speedup on 9-season dataset, reducing epoch time from 33 minutes to 24 seconds.}}{96}{figure.caption.562}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces GPU Utilization: Baseline vs Optimized. Despite processing 9$\times $ more data (2,367 games vs 272 games), the optimized implementation maintains similar GPU utilization (~33\%) with significantly better throughput. The baseline's 45\% utilization on a single season reflects hardware underutilization due to sequential processing bottlenecks.}}{96}{figure.caption.563}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces GNN Training Convergence Through Epoch 49. Validation Brier score (lower is better) showing actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49) on 9 seasons (2,367 games). The smoothed trend (red line) indicates steady improvement, with early convergence observed by epoch 15, validating that the hierarchical architecture successfully captures game prediction patterns without requiring extensive training.}}{97}{figure.caption.564}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Model evolution performance}}{104}{figure.caption.610}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Ensemble component performance}}{105}{figure.caption.615}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Calibration comparison}}{106}{figure.caption.616}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Final bankroll distribution}}{137}{figure.caption.800}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Fractional Kelly bankroll trajectories}}{138}{figure.caption.804}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Profit Optimization System Architecture}}{140}{figure.caption.819}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Offline RL learning curves (median and IQR across seeds).}}{117}{figure.caption.671}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}}{118}{figure.caption.672}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces End-to-end offline RL workflow from data to promotion.}}{119}{figure.caption.680}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Sensitivity of growth/drawdown to pessimism level $\alpha $ in Kelly‑LCB and the RL policy’s calibration to $p$ uncertainty.}}{123}{figure.caption.701}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Simulated teaser expected value surface as a function of leg success probabilities. The zero contour (white) marks the middle threshold that informs acceptance tests inside the simulator (\Cref {sec:teaser-math}).}}{146}{figure.caption.842}%
-\contentsline {figure}{\numberline {7.2}{\ignorespaces Acceptance pass/fail rates by season and test category (margins, key masses, dependence).}}{153}{figure.caption.892}%
-\contentsline {figure}{\numberline {7.3}{\ignorespaces Relationship between acceptance outcomes and live performance (e.g., CLV/ROI). Failing acceptance correlates with degraded live metrics, justifying the gate.}}{153}{figure.caption.893}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Final bankroll distribution}}{140}{figure.caption.803}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Fractional Kelly bankroll trajectories}}{141}{figure.caption.807}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces Profit Optimization System Architecture}}{143}{figure.caption.822}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces Comparison of 90\% credible interval coverage across all methods investigated. The horizontal dashed line indicates the target coverage of 90\%. All single-output BNN variants (baseline, with Vegas features, with opponent features, with optimized hyperparameters) remain severely under-calibrated regardless of modifications. In contrast, non-Bayesian baselines (conformal prediction, quantile regression) and the architectural innovation (multi-output BNN) achieve calibration near or exceeding the target.}}{164}{figure.caption.966}%
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Incremental impact of feature engineering on 90\% credible interval coverage. Each bar represents a cumulative feature configuration: baseline (4 features), +Vegas lines (6 features), +environment (10 features), +opponent defense (9 features, environment features removed). Error bars represent bootstrapped 95\% confidence intervals (1000 resamples). The horizontal red dashed line indicates the target 90\% coverage. Despite incorporating domain expertise and multiple information sources, the best feature set improves coverage by only 5.1 percentage points, leaving the model severely under-calibrated.}}{167}{figure.caption.975}%
-\contentsline {figure}{\numberline {8.3}{\ignorespaces Coverage-sharpness trade-off across uncertainty quantification methods. Each point represents a method, with x-axis showing average 90\% interval width (lower is sharper) and y-axis showing empirical coverage (closer to 90\% is better calibrated). The dashed horizontal line indicates target 90\% coverage; the shaded region marks acceptable calibration (85-95\%). The dashed vertical line shows the single-output BNN's interval width. Single-output BNN variants cluster in the bottom-left (narrow but under-calibrated), while quantile regression and conformal prediction achieve calibration by drastically widening intervals. The multi-output BNN achieves near-optimal balance: strong calibration without extreme interval widening.}}{175}{figure.caption.1020}%
-\contentsline {figure}{\numberline {8.4}{\ignorespaces BNN Calibration Improvement Progression}}{181}{figure.caption.1042}%
-\contentsline {figure}{\numberline {8.5}{\ignorespaces BNN Improvement Hierarchy}}{184}{figure.caption.1054}%
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Simulated teaser expected value surface as a function of leg success probabilities. The zero contour (white) marks the middle threshold that informs acceptance tests inside the simulator (\Cref {sec:teaser-math}).}}{149}{figure.caption.845}%
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Acceptance pass/fail rates by season and test category (margins, key masses, dependence).}}{156}{figure.caption.895}%
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Relationship between acceptance outcomes and live performance (e.g., CLV/ROI). Failing acceptance correlates with degraded live metrics, justifying the gate.}}{156}{figure.caption.896}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Comparison of 90\% credible interval coverage across all methods investigated. The horizontal dashed line indicates the target coverage of 90\%. All single-output BNN variants (baseline, with Vegas features, with opponent features, with optimized hyperparameters) remain severely under-calibrated regardless of modifications. In contrast, non-Bayesian baselines (conformal prediction, quantile regression) and the architectural innovation (multi-output BNN) achieve calibration near or exceeding the target.}}{186}{figure.caption.1144}%
+\contentsline {figure}{\numberline {9.2}{\ignorespaces Incremental impact of feature engineering on 90\% credible interval coverage. Each bar represents a cumulative feature configuration: baseline (4 features), +Vegas lines (6 features), +environment (10 features), +opponent defense (9 features, environment features removed). Error bars represent bootstrapped 95\% confidence intervals (1000 resamples). The horizontal red dashed line indicates the target 90\% coverage. Despite incorporating domain expertise and multiple information sources, the best feature set improves coverage by only 5.1 percentage points, leaving the model severely under-calibrated.}}{189}{figure.caption.1153}%
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Coverage-sharpness trade-off across uncertainty quantification methods. Each point represents a method, with x-axis showing average 90\% interval width (lower is sharper) and y-axis showing empirical coverage (closer to 90\% is better calibrated). The dashed horizontal line indicates target 90\% coverage; the shaded region marks acceptable calibration (85-95\%). The dashed vertical line shows the single-output BNN's interval width. Single-output BNN variants cluster in the bottom-left (narrow but under-calibrated), while quantile regression and conformal prediction achieve calibration by drastically widening intervals. The multi-output BNN achieves near-optimal balance: strong calibration without extreme interval widening.}}{197}{figure.caption.1198}%
+\contentsline {figure}{\numberline {9.4}{\ignorespaces BNN Calibration Improvement Progression}}{203}{figure.caption.1220}%
+\contentsline {figure}{\numberline {9.5}{\ignorespaces BNN Improvement Hierarchy}}{206}{figure.caption.1232}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {10.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{235}{figure.caption.1348}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {10.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{233}{figure.caption.1345}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {13.1}{\ignorespaces Profit Optimization System Architecture}}{283}{figure.caption.1584}%
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{290}{figure.caption.1610}%
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{291}{figure.caption.1611}%
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{270}{figure.caption.1476}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{271}{figure.caption.1477}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {D.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{305}{figure.caption.1713}%
+\contentsline {figure}{\numberline {D.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{285}{figure.caption.1579}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {I.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{338}{figure.caption.1949}%
+\contentsline {figure}{\numberline {I.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{318}{figure.caption.1815}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
