@@ -64,6 +64,7 @@ The optimal configuration is selected via validation Brier score on the 2024 sea
 \centering
 \caption{Top 5 State-Space Hyperparameter Configurations}
 \label{tab:state-space-hyperparameter-search}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{ccccccc}
 \toprule
 \textbf{Rank} & $q$ & $r$ & \textbf{HFA} & \textbf{Val Brier} & \textbf{Val LogLoss} & \textbf{Val Acc.} \\
@@ -75,6 +76,7 @@ The optimal configuration is selected via validation Brier score on the 2024 sea
 5 & 2.0 & 13.5 & 2.5 & 0.2495 & 0.6982 & 57.9\% \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 The optimal configuration ($q=2.0, r=15.0, \text{HFA}=3.0$) achieves a validation Brier score of 0.2458. The low process noise ($q = 2.0$) indicates that team strengths are relatively stable week-to-week, with most variation attributable to game-level randomness ($r = 15.0$). The 3-point home-field advantage aligns with empirical findings in the sports analytics literature \citep{moskowitz2011scorecasting}.

@@ -1,7 +1,7 @@
 # Documentation Index
 
-**Last Updated:** November 1, 2025
-**Total Documents:** 267 markdown files
+**Last Updated:** November 3, 2025
+**Total Documents:** 267 markdown files (reorganized and consolidated)
 **Purpose:** Central navigation for all project documentation
 
 ---
@@ -35,14 +35,15 @@
 ### Current Status
 | Document | Last Updated | Purpose |
 |----------|--------------|---------|
-| **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Nov 1, 2025 | Current project status, recent work |
-| **[RETRAINING_STATUS.md](RETRAINING_STATUS.md)** | Nov 1, 2025 | Model training status tracker |
+| **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Nov 3, 2025 | Current project status, recent work |
+| **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** | Nov 3, 2025 | ⚠️ DEPRECATED - Use PostgreSQL `ml.model_registry` |
 | **[PHASE_PLAN.md](PHASE_PLAN.md)** | Oct 17, 2025 | Causal inference phase plan (24 weeks) |
 
 ### Recent Completions
 | Document | Date | Summary |
 |----------|------|---------|
-| **[PHASE_5_COMPLETION_SUMMARY.md](PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
+| **[docs/milestones/PHASE_5_COMPLETION_SUMMARY.md](docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
+| **[docs/milestones/BNN_CALIBRATION_COMPLETE.md](docs/milestones/BNN_CALIBRATION_COMPLETE.md)** | Nov 3, 2025 | BNN calibration with T=0.75 (89.5% coverage) |
 | **[analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md](analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md)** | Oct 30, 2025 | Critical data leakage findings |
 | **[analysis/OPTIMIZED_ENSEMBLE_2025_DEPLOYMENT.md](analysis/OPTIMIZED_ENSEMBLE_2025_DEPLOYMENT.md)** | Oct 30, 2025 | Ensemble deployment plan |
 
@@ -116,12 +117,16 @@
 ### Active Reports (2025)
 | Document | Date | Topic |
 |----------|------|-------|
+| **[docs/reports/2025_nov_session_summaries.md](docs/reports/2025_nov_session_summaries.md)** ⭐ **NEW** | Nov 3, 2025 | Consolidated Nov 2-3 session work (7 sessions) |
 | **[docs/reports/feature_engineering_complete.md](docs/reports/feature_engineering_complete.md)** | Oct 2025 | Feature engineering completion |
 | **[docs/reports/database_backfill_execution_summary.md](docs/reports/database_backfill_execution_summary.md)** | Oct 2025 | Database backfill |
 | **[docs/reports/2025_season_data_ingestion.md](docs/reports/2025_season_data_ingestion.md)** | Oct 2025 | 2025 data ingestion |
+| **[docs/reports/DATA_LEAKAGE_ANALYSIS.md](docs/reports/DATA_LEAKAGE_ANALYSIS.md)** | Nov 3, 2025 | Data leakage investigation and fixes |
+| **[docs/reports/AUTOMATED_LEAKAGE_TESTS_COMPLETE.md](docs/reports/AUTOMATED_LEAKAGE_TESTS_COMPLETE.md)** | Nov 3, 2025 | Automated leakage detection tests |
+| **[docs/reports/COMPREHENSIVE_SAFE_BACKTEST_RESULTS.md](docs/reports/COMPREHENSIVE_SAFE_BACKTEST_RESULTS.md)** | Nov 3, 2025 | Full backtest with leakage-safe features |
 
-### Archived Reports (Pre-2025)
-See **[docs/archive/2024/](docs/archive/2024/)** (coming soon)
+### Archived Reports
+- **[docs/archive/2025_nov/](docs/archive/2025_nov/)** - Nov 2-3 session summaries (9 files)
 
 ---
 
@@ -129,6 +134,10 @@ See **[docs/archive/2024/](docs/archive/2024/)** (coming soon)
 
 | Document | Date | Milestone |
 |----------|------|-----------|
+| **[docs/milestones/BNN_CALIBRATION_COMPLETE.md](docs/milestones/BNN_CALIBRATION_COMPLETE.md)** ⭐ **NEW** | Nov 3, 2025 | BNN calibration achieved (T=0.75, 89.5% coverage) |
+| **[docs/milestones/PHASE_5_COMPLETION_SUMMARY.md](docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
+| **[docs/milestones/PHASES_2-4_COMPLETE.md](docs/milestones/PHASES_2-4_COMPLETE.md)** | Earlier | Phases 2-4 completion |
+| **[docs/milestones/SCHEMA_FIXES_COMPLETE.md](docs/milestones/SCHEMA_FIXES_COMPLETE.md)** | Earlier | Database schema fixes |
 | **[docs/milestones/CQL_COMPLETE_SUMMARY.md](docs/milestones/CQL_COMPLETE_SUMMARY.md)** | Oct 9, 2025 | CQL training complete (24% improvement) |
 | **[docs/milestones/COMPILATION_SUCCESS.md](docs/milestones/COMPILATION_SUCCESS.md)** | Oct 19, 2025 | Dissertation compilation success |
 | **[docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md](docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md)** | - | Simulator validation |
@@ -144,7 +153,8 @@ See **[docs/archive/2024/](docs/archive/2024/)** (coming soon)
 ### Model Training
 - **[R/](R/)** - R statistical models (50+ files)
 - **[py/models/](py/models/)** - Python ML models
-- **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** - Model inventory
+- **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** - ⚠️ DEPRECATED (use PostgreSQL `ml.model_registry`)
+- **[scripts/sync_model_registry.py](scripts/sync_model_registry.py)** ⭐ **NEW** - Database/filesystem sync tool
 
 ### Testing
 - **[tests/README.md](tests/README.md)** - Testing framework guide
@@ -298,23 +308,31 @@ All major documentation should include:
 
 ## 📊 Documentation Health
 
-**Last Audit:** November 1, 2025
-**Total Files:** 267 markdown files
-**Overall Grade:** B+ (Excellent foundation, needs consolidation)
+**Last Audit:** November 3, 2025
+**Total Files:** 267 markdown files (reorganized)
+**Overall Grade:** A- (Excellent foundation, well-organized)
 
 **Strengths:**
 - ✅ Comprehensive coverage (267 files)
-- ✅ Excellent recent updates (Oct 30-31, 2025)
+- ✅ Excellent recent updates (Oct 30-Nov 3, 2025)
 - ✅ Strong technical documentation
 - ✅ Good milestone tracking
+- ✅ Central index complete ⭐
+- ✅ Session summaries consolidated ⭐
+- ✅ Archive structure created ⭐
 
-**Areas for Improvement:**
-- ⚠️ 6+ duplicate files need consolidation
-- ⚠️ Some outdated status files
-- ❌ Missing central index (now fixed!)
-- ❌ Missing CHANGELOG and LICENSE
+**Recent Improvements (Nov 3, 2025):**
+- ✅ Consolidated 7 session files → 1 comprehensive summary
+- ✅ Moved 9 files to archive (docs/archive/2025_nov/)
+- ✅ Organized milestones, reports, guides directories
+- ✅ Migrated model registry to PostgreSQL
+- ✅ Created automation script (sync_model_registry.py)
+
+**Remaining Improvements:**
+- ⚠️ Missing CHANGELOG and LICENSE
+- ⚠️ Some module READMEs needed (py/features, py/models)
 
 ---
 
 **This index is maintained as part of the documentation cleanup initiative (Nov 2025).**
-**Last updated:** November 1, 2025 by Claude Code
+**Last updated:** November 3, 2025 by Claude Code

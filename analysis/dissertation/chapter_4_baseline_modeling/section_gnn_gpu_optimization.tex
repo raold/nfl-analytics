@@ -142,6 +142,7 @@ The validation bottleneck (sequential game processing for calibration diagnostic
 \paragraph{Computational cost comparison.} The original 10--50$\times$ XGBoost overhead has been eliminated:
 
 \begin{center}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lrr}
 \toprule
 \textbf{Method} & \textbf{Training Time} & \textbf{Speedup vs Baseline GNN} \\
@@ -152,6 +153,7 @@ GNN (baseline, CPU) & 20 days & 1$\times$ \\
 GNN (optimized, GPU) & \textbf{40 min} & \textbf{720$\times$} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{center}
 
 The optimized GNN is now \textit{faster} than traditional hierarchical Bayesian methods and competitive with gradient boosting, removing the computational barrier to adoption.

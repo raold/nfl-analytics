@@ -11,6 +11,7 @@ We performed grid search over 27 configurations on the validation set (2024 seas
 \centering
 \caption{Top 5 State-Space Hyperparameter Configurations}
 \label{tab:state-space-hyperparameter-search}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{ccccccc}
 \toprule
 \textbf{Rank} & $q$ & $r$ & \textbf{HFA} & \textbf{Val Brier} & \textbf{Val LogLoss} & \textbf{Val Acc.} \\
@@ -22,6 +23,7 @@ We performed grid search over 27 configurations on the validation set (2024 seas
 5 & 2.0 & 13.5 & 2.5 & 0.2495 & 0.6982 & 57.9\% \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 The optimal configuration ($q=2.0, r=15.0, \text{HFA}=3.0$) achieves a validation Brier score of 0.2458, indicating well-calibrated probabilistic predictions. The low process noise ($q=2.0$ points/week) suggests that team strengths are relatively stable, with most outcome variance driven by game-level randomness ($r=15.0$ points).

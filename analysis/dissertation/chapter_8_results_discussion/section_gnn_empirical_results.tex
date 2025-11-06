@@ -100,6 +100,7 @@ To understand when the GNN excels or struggles, we analyze performance across di
 \caption{GNN Performance by Home/Away Context (2025 Test Set)}
 \label{tab:gnn_home_away}
 \small
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
 \textbf{Context} & \textbf{Games} & \textbf{Brier} & \textbf{Accuracy} & \textbf{AUC} \\
@@ -109,6 +110,7 @@ Home Team Wins & 135 & 0.2512 & 0.519 & 0.5841 \\
 Away Team Wins & 136 & 0.2979 & 0.485 & 0.5428 \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 The GNN \textbf{predicts home wins more accurately} (Brier 0.2512 vs 0.2979 for away wins), reflecting the inherent home-field advantage in NFL games. However, overall accuracy remains near 50\%, indicating the model captures probabilistic uncertainty rather than deterministic outcomes.

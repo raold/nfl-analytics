@@ -331,7 +331,8 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
   \begin{table}[t]
     \centering
     \caption{Core ablation (placeholder): RL vs stateless baseline across seasons; columns are Brier, CLV (bps), ROI (\%), Max DD (\%).}
-    \begin{tabular}{lrrrr}
+    \begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{lrrrr}
       \toprule
  \textbf{Policy} & \textbf{Brier $\downarrow$} & \textbf{CLV (bps) $\uparrow$} & \textbf{ROI (\%) $\uparrow$} & \textbf{Max DD (\%) $\downarrow$} \\
       \midrule
@@ -339,6 +340,7 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
       RL (IQL/CQL/TD3+BC) & -- & -- & -- & -- \\
       \bottomrule
     \end{tabular}
+\end{adjustbox}
   \end{table}}
 
 \paragraph{Pessimism sensitivity.} Equation~8.1.2 uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.

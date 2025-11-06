@@ -69,7 +69,7 @@ p1 <- ggplot(speedup_data, aes(x = phase, y = speedup_factor)) +
 
 ggsave(
   file.path(out_dir, "gnn_speedup_waterfall.pdf"),
-  p1, width = 6, height = 4, device = cairo_pdf
+  p1, width = 6, height = 4, device = "pdf"
 )
 
 # =============================================================================
@@ -98,7 +98,7 @@ p2 <- ggplot(speedup_data, aes(x = phase, y = cumulative, group = 1)) +
 
 ggsave(
   file.path(out_dir, "gnn_cumulative_speedup.pdf"),
-  p2, width = 6, height = 4, device = cairo_pdf
+  p2, width = 6, height = 4, device = "pdf"
 )
 
 # =============================================================================
@@ -141,7 +141,7 @@ p3 <- gpu_comparison %>%
 
 ggsave(
   file.path(out_dir, "gnn_gpu_utilization_comparison.pdf"),
-  p3, width = 5, height = 4, device = cairo_pdf
+  p3, width = 5, height = 4, device = "pdf"
 )
 
 # =============================================================================
@@ -178,7 +178,7 @@ p4 <- ggplot(training_data, aes(x = epoch, y = val_brier)) +
 
 ggsave(
   file.path(out_dir, "gnn_training_convergence.pdf"),
-  p4, width = 6, height = 4, device = cairo_pdf
+  p4, width = 6, height = 4, device = "pdf"
 )
 
 # =============================================================================

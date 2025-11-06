@@ -224,6 +224,7 @@ Table~\ref{tab:feature-importance} shows the top 5 most important features learn
 \centering
 \caption{Comparison of Game Prediction Approaches (Test Brier Score)}
 \label{tab:approach-comparison}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lccl}
 \toprule
 \textbf{Model} & \textbf{Val Brier} & \textbf{Test Brier} & \textbf{Status} \\
@@ -234,6 +235,7 @@ GNN (Best config) & --- & 0.2500 & 45\% test accuracy \\
 \textbf{Player-to-Game} & \textbf{0.2304} & \textbf{0.2439} & \textbf{Best generalization} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \end{table}
 
 \textbf{Why Player-to-Game Succeeds Where GNNs Failed}:

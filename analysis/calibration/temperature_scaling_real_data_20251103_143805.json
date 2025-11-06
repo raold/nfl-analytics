@@ -1,0 +1,104 @@
+{
+  "optimal_temperature": 1.0,
+  "optimal_metrics": {
+    "temperature": 1.0,
+    "coverage_90": 0.9853420195439739,
+    "coverage_68": 0.9055374592833876,
+    "interval_width_90": 164.5,
+    "mae": 24.451356165202363,
+    "status": "\u2717 FAIL"
+  },
+  "all_results": [
+    {
+      "temperature": 1.0,
+      "coverage_90": 0.9853420195439739,
+      "coverage_68": 0.9055374592833876,
+      "interval_width_90": 164.5,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 1.2,
+      "coverage_90": 0.998371335504886,
+      "coverage_68": 0.9527687296416938,
+      "interval_width_90": 197.4,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 1.4,
+      "coverage_90": 1.0,
+      "coverage_68": 0.9739413680781759,
+      "interval_width_90": 230.3,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 1.6,
+      "coverage_90": 1.0,
+      "coverage_68": 0.9837133550488599,
+      "interval_width_90": 263.2,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 1.8,
+      "coverage_90": 1.0,
+      "coverage_68": 0.993485342019544,
+      "interval_width_90": 296.09999999999997,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 2.0,
+      "coverage_90": 1.0,
+      "coverage_68": 0.998371335504886,
+      "interval_width_90": 329.0,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 2.2,
+      "coverage_90": 1.0,
+      "coverage_68": 0.998371335504886,
+      "interval_width_90": 361.90000000000003,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 2.4,
+      "coverage_90": 1.0,
+      "coverage_68": 1.0,
+      "interval_width_90": 394.80000000000007,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 2.6,
+      "coverage_90": 1.0,
+      "coverage_68": 1.0,
+      "interval_width_90": 427.6999999999999,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 2.8,
+      "coverage_90": 1.0,
+      "coverage_68": 1.0,
+      "interval_width_90": 460.6,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    },
+    {
+      "temperature": 3.0,
+      "coverage_90": 1.0,
+      "coverage_68": 1.0,
+      "interval_width_90": 493.5,
+      "mae": 24.451356165202363,
+      "status": "\u2717 FAIL"
+    }
+  ],
+  "test_size": 614,
+  "baseline_coverage": 0.9853420195439739,
+  "recommendation": "Use temperature=1.0 for production BNN predictions"
+}

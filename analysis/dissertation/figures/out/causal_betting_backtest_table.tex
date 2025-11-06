@@ -6,6 +6,7 @@
 \caption{Betting Performance: Baseline vs Causal-Adjusted (Shock Events Only)}
 \label{tab:causal-betting-backtest}
 \small
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Model}  & \textbf{MAE}  & \textbf{RMSE}  & \textbf{Win}  & \textbf{ROI}  & \textbf{Sharpe}  & \textbf{N} \\
@@ -30,6 +31,7 @@ Weather Shocks & 15.4 & 21.9 & 58.0\% & +5.8\% & 0.91 & 23 \\
 \quad Baseline & 17.2 & 24.3 & 53.0\% & +1.9\% & 0.36 & 23 \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \begin{tablenotes}
 \small
 \item \textbf{Sample:} 147 shock events identified via causal framework (injuries: 62, coaching: 40, trades: 22, weather: 23). \textbf{Baseline:} Standard ensemble model without causal adjustments. \textbf{Causal-Adjusted:} Predictions adjusted using treatment effect estimates from \Cref{tab:treatment-effects} weighted by event severity. \textbf{ROI:} Assumes -110 odds, no slippage; breakeven win rate 52.4\%. \textbf{Statistical significance:} Win rate improvement significant at $\alpha=0.05$ for injury returns (p=0.018) and coaching changes (p=0.032); marginal for trades (p=0.091) and weather (p=0.066). \textbf{Caveats:} Small sample sizes (especially coaching changes n=40) preclude strong conclusions; wide confidence intervals on ROI; risk of overfitting to historical shock patterns; assumes real-time shock detection feasible. \textbf{Injury Returns:} Strongest signal; 62\% win rate represents +8pp improvement over baseline and +10pp over breakeven. Market systematically underprices rust effects and workload management on first-game returns.
