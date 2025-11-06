@@ -145,16 +145,16 @@
 \contentsline {section}{\numberline {3.6}As-Of Feature Generation}{43}{section.284}%
 \contentsline {section}{Chapter Summary}{44}{section*.290}%
 \contentsline {chapter}{\numberline {4}Baseline Models}{45}{chapter.291}%
-\contentsline {section}{\numberline {4.1}Logistic/Probit Baselines}{45}{section.293}%
+\contentsline {section}{\numberline {4.1}Logistic/Probit Baselines}{46}{section.293}%
 \contentsline {paragraph}{Spread-to-win consistency.}{46}{section*.295}%
 \contentsline {subsection}{\numberline {4.1.1}Temporal Weighting, Era Controls, and Validation}{46}{subsection.296}%
-\contentsline {section}{\numberline {4.2}State-Space Team Ratings}{46}{section.301}%
+\contentsline {section}{\numberline {4.2}State-Space Team Ratings}{47}{section.301}%
 \contentsline {subsection}{\numberline {4.2.1}Identifiability and operational constraints}{47}{subsection.302}%
 \contentsline {paragraph}{Schedule connectivity.}{48}{section*.303}%
 \contentsline {paragraph}{Home‑field and intercept identifiability.}{48}{section*.304}%
-\contentsline {paragraph}{Team‑specific home field (redundant representation).}{48}{section*.305}%
+\contentsline {paragraph}{Team‑specific home field (redundant representation).}{49}{section*.305}%
 \contentsline {paragraph}{Variance components.}{49}{section*.306}%
-\contentsline {paragraph}{Observation links.}{49}{section*.307}%
+\contentsline {paragraph}{Observation links.}{50}{section*.307}%
 \contentsline {section}{\numberline {4.3}Score-Distribution Models}{50}{section.309}%
 \contentsline {subsection}{\numberline {4.3.1}Estimation}{50}{subsection.310}%
 \contentsline {subsection}{\numberline {4.3.2}Dixon-Coles Bivariate Poisson}{50}{subsection.311}%
@@ -162,71 +162,71 @@
 \contentsline {paragraph}{Team Strength Parameterization.}{51}{section*.315}%
 \contentsline {paragraph}{Maximum Likelihood Estimation.}{51}{section*.318}%
 \contentsline {paragraph}{Implementation and Results.}{51}{section*.320}%
-\contentsline {paragraph}{Comparison to Skellam.}{51}{section*.322}%
+\contentsline {paragraph}{Comparison to Skellam.}{52}{section*.322}%
 \contentsline {paragraph}{Extension: Dynamic Intensities.}{52}{section*.323}%
 \contentsline {subsection}{\numberline {4.3.3}Key-number reweighting}{52}{subsection.324}%
 \contentsline {subsection}{\numberline {4.3.4}Validation: Does reweighting improve predictions and EV?}{53}{subsection.326}%
-\contentsline {section}{\numberline {4.4}Diagnostics}{53}{section.334}%
+\contentsline {section}{\numberline {4.4}Diagnostics}{54}{section.334}%
 \contentsline {subsection}{\numberline {4.4.1}Calibration diagrams}{54}{subsection.335}%
 \contentsline {subsection}{\numberline {4.4.2}Ablation studies by feature family}{54}{subsection.337}%
-\contentsline {section}{\numberline {4.5}Copula Goodness-of-Fit and Impact}{54}{section.345}%
+\contentsline {section}{\numberline {4.5}Copula Goodness-of-Fit and Impact}{55}{section.345}%
 \contentsline {section}{\numberline {4.6}Player Impact Adjustments}{55}{section.350}%
-\contentsline {subsection}{\numberline {4.6.1}Methodology}{55}{subsection.351}%
+\contentsline {subsection}{\numberline {4.6.1}Methodology}{56}{subsection.351}%
 \contentsline {subsection}{\numberline {4.6.2}Depth Chart Integration}{56}{subsection.354}%
 \contentsline {subsection}{\numberline {4.6.3}Team-Level Aggregation}{57}{subsection.356}%
 \contentsline {subsection}{\numberline {4.6.4}Empirical Validation}{57}{subsection.359}%
 \contentsline {paragraph}{Limitations and Extensions.}{57}{section*.360}%
-\contentsline {section}{\numberline {4.7}In-Game Win Probability}{57}{section.361}%
+\contentsline {section}{\numberline {4.7}In-Game Win Probability}{58}{section.361}%
 \contentsline {subsection}{\numberline {4.7.1}Model Architecture}{58}{subsection.362}%
 \contentsline {paragraph}{Feature Engineering.}{58}{section*.363}%
 \contentsline {subsection}{\numberline {4.7.2}Training and Performance}{58}{subsection.365}%
 \contentsline {subsection}{\numberline {4.7.3}Inference and Applications}{58}{subsection.367}%
 \contentsline {paragraph}{Calibration Analysis.}{58}{section*.368}%
-\contentsline {paragraph}{Integration with Pre-Game Models.}{58}{section*.369}%
+\contentsline {paragraph}{Integration with Pre-Game Models.}{59}{section*.369}%
 \contentsline {section}{\numberline {4.8}Unified Baseline Comparison}{59}{section.370}%
 \contentsline {subsection}{\numberline {4.8.1}Evaluation Protocol}{59}{subsection.371}%
-\contentsline {subsection}{\numberline {4.8.2}Comprehensive Baseline Performance}{59}{subsection.372}%
-\contentsline {subsection}{\numberline {4.8.3}Key Findings}{59}{subsection.374}%
-\contentsline {paragraph}{Accuracy Hierarchy.}{59}{section*.375}%
+\contentsline {subsection}{\numberline {4.8.2}Comprehensive Baseline Performance}{60}{subsection.372}%
+\contentsline {subsection}{\numberline {4.8.3}Key Findings}{60}{subsection.374}%
+\contentsline {paragraph}{Accuracy Hierarchy.}{60}{section*.375}%
 \contentsline {paragraph}{Calibration vs Discrimination.}{60}{section*.376}%
 \contentsline {paragraph}{Computational Tradeoffs.}{60}{section*.377}%
-\contentsline {paragraph}{Uncertainty Quantification.}{60}{section*.378}%
+\contentsline {paragraph}{Uncertainty Quantification.}{61}{section*.378}%
 \contentsline {paragraph}{Economic Value.}{61}{section*.379}%
 \contentsline {subsection}{\numberline {4.8.4}Model Selection Guidelines}{61}{subsection.380}%
 \contentsline {subsection}{\numberline {4.8.5}Ensemble Construction Insights}{61}{subsection.382}%
-\contentsline {paragraph}{Diversity Analysis.}{61}{section*.387}%
+\contentsline {paragraph}{Diversity Analysis.}{62}{section*.387}%
 \contentsline {subsection}{\numberline {4.8.6}Limitations and Market Efficiency}{62}{subsection.388}%
 \contentsline {section}{\numberline {4.9}Training and Validation Protocols}{62}{section.389}%
 \contentsline {subsection}{\numberline {4.9.1}Baseline GLM Results}{62}{subsection.390}%
-\contentsline {subsection}{\numberline {4.9.2}Calibration Validation}{62}{subsection.393}%
-\contentsline {subsection}{\numberline {4.9.3}Multi-Model Comparison}{62}{subsection.395}%
-\contentsline {section}{\numberline {4.10}Player-to-Game Prediction via Feature Engineering}{63}{section.397}%
-\contentsline {subsection}{\numberline {4.10.1}Motivation}{63}{subsection.398}%
-\contentsline {subsubsection}{Why Player-Level Data Matters}{63}{section*.399}%
+\contentsline {subsection}{\numberline {4.9.2}Calibration Validation}{63}{subsection.393}%
+\contentsline {subsection}{\numberline {4.9.3}Multi-Model Comparison}{63}{subsection.395}%
+\contentsline {section}{\numberline {4.10}Player-to-Game Prediction via Feature Engineering}{64}{section.397}%
+\contentsline {subsection}{\numberline {4.10.1}Motivation}{64}{subsection.398}%
+\contentsline {subsubsection}{Why Player-Level Data Matters}{64}{section*.399}%
 \contentsline {subsubsection}{The Feature Engineering Compromise}{64}{section*.405}%
-\contentsline {subsection}{\numberline {4.10.2}Data Sources}{64}{subsection.406}%
-\contentsline {subsubsection}{NFLverse Player Statistics}{64}{section*.407}%
+\contentsline {subsection}{\numberline {4.10.2}Data Sources}{65}{subsection.406}%
+\contentsline {subsubsection}{NFLverse Player Statistics}{65}{section*.407}%
 \contentsline {subsubsection}{Bayesian Player Projections}{65}{section*.408}%
 \contentsline {subsection}{\numberline {4.10.3}Feature Engineering}{65}{subsection.409}%
 \contentsline {subsubsection}{Team-Level Aggregation}{65}{section*.410}%
 \contentsline {subsubsection}{Feature Dimensionality}{65}{section*.412}%
-\contentsline {subsection}{\numberline {4.10.4}Model Architecture}{65}{subsection.413}%
-\contentsline {subsubsection}{XGBoost Classifier}{65}{section*.414}%
+\contentsline {subsection}{\numberline {4.10.4}Model Architecture}{66}{subsection.413}%
+\contentsline {subsubsection}{XGBoost Classifier}{66}{section*.414}%
 \contentsline {subsubsection}{Hyperparameters (Conservative for Small Data)}{66}{section*.415}%
 \contentsline {subsection}{\numberline {4.10.5}Training and Evaluation}{66}{subsection.416}%
 \contentsline {subsubsection}{Temporal Validation Strategy}{66}{section*.417}%
-\contentsline {subsubsection}{Results}{66}{section*.421}%
-\contentsline {subsubsection}{Key Findings}{66}{section*.423}%
+\contentsline {subsubsection}{Results}{67}{section*.421}%
+\contentsline {subsubsection}{Key Findings}{67}{section*.423}%
 \contentsline {subsection}{\numberline {4.10.6}Feature Importance Analysis}{67}{subsection.428}%
 \contentsline {subsection}{\numberline {4.10.7}Comparison to Alternative Approaches}{67}{subsection.430}%
-\contentsline {subsection}{\numberline {4.10.8}Limitations and Future Work}{67}{subsection.436}%
-\contentsline {subsubsection}{Current Limitations}{67}{section*.437}%
+\contentsline {subsection}{\numberline {4.10.8}Limitations and Future Work}{68}{subsection.436}%
+\contentsline {subsubsection}{Current Limitations}{68}{section*.437}%
 \contentsline {subsubsection}{Promising Extensions}{68}{section*.442}%
-\contentsline {subsection}{\numberline {4.10.9}Implications for Sports Analytics}{68}{subsection.443}%
-\contentsline {subsubsection}{Practical Takeaways}{68}{section*.444}%
+\contentsline {subsection}{\numberline {4.10.9}Implications for Sports Analytics}{69}{subsection.443}%
+\contentsline {subsubsection}{Practical Takeaways}{69}{section*.444}%
 \contentsline {subsubsection}{Betting Market Implications}{69}{section*.449}%
 \contentsline {subsection}{\numberline {4.10.10}Conclusion}{69}{subsection.450}%
-\contentsline {section}{Chapter Summary}{69}{section*.451}%
+\contentsline {section}{Chapter Summary}{70}{section*.451}%
 \contentsline {chapter}{\numberline {5}Advanced Bayesian Methods and Ensemble Learning}{78}{chapter.452}%
 \contentsline {section}{\numberline {5.1}Bayesian Hierarchical Team Ratings}{78}{section.454}%
 \contentsline {subsection}{\numberline {5.1.1}Motivation and Prior Work}{79}{subsection.455}%
@@ -340,24 +340,24 @@
 \contentsline {paragraph}{Acronym hygiene.}{110}{section*.635}%
 \contentsline {section}{\numberline {6.1}State of the Art (At a Glance)}{110}{section.636}%
 \contentsline {section}{\numberline {6.2}Foundations: MDPs, Value Functions, and Contractions}{111}{section.638}%
-\contentsline {section}{\numberline {6.3}Off-Policy Evaluation (OPE)}{111}{section.639}%
+\contentsline {section}{\numberline {6.3}Off-Policy Evaluation (OPE)}{112}{section.639}%
 \contentsline {paragraph}{Clipping and shrinkage settings (used).}{112}{section*.642}%
-\contentsline {paragraph}{Acceptance rule (concise).}{112}{section*.643}%
-\contentsline {paragraph}{Reporting defaults.}{112}{section*.644}%
+\contentsline {paragraph}{Acceptance rule (concise).}{113}{section*.643}%
+\contentsline {paragraph}{Reporting defaults.}{113}{section*.644}%
 \contentsline {subsection}{\numberline {6.3.1}Policy Gradient and Actor--Critic}{113}{subsection.645}%
 \contentsline {subsection}{\numberline {6.3.2}Value-Based Methods and Offline RL}{113}{subsection.646}%
-\contentsline {section}{\numberline {6.4}Problem Formulation for NFL Betting}{113}{section.647}%
-\contentsline {subsection}{\numberline {6.4.1}Reward Shaping and Constraints}{113}{subsection.648}%
+\contentsline {section}{\numberline {6.4}Problem Formulation for NFL Betting}{114}{section.647}%
+\contentsline {subsection}{\numberline {6.4.1}Reward Shaping and Constraints}{114}{subsection.648}%
 \contentsline {section}{\numberline {6.5}Offline RL Pipeline and Datasets}{114}{section.649}%
 \contentsline {subsection}{\numberline {6.5.1}DQN and PPO Implementation}{114}{subsection.650}%
 \contentsline {paragraph}{DQN architecture.}{114}{section*.651}%
 \contentsline {paragraph}{PPO architecture.}{114}{section*.652}%
-\contentsline {paragraph}{Training stability comparison.}{114}{section*.653}%
-\contentsline {paragraph}{Action space analysis.}{114}{section*.654}%
+\contentsline {paragraph}{Training stability comparison.}{115}{section*.653}%
+\contentsline {paragraph}{Action space analysis.}{115}{section*.654}%
 \contentsline {paragraph}{Device compatibility.}{115}{section*.655}%
 \contentsline {paragraph}{Recommendation.}{115}{section*.656}%
 \contentsline {subsection}{\numberline {6.5.2}Action Space and Policy Class}{115}{subsection.658}%
-\contentsline {section}{\numberline {6.6}Risk-Sensitive Objectives and Controls}{115}{section.659}%
+\contentsline {section}{\numberline {6.6}Risk-Sensitive Objectives and Controls}{116}{section.659}%
 \contentsline {section}{\numberline {6.7}Off-Policy Evaluation Details}{116}{section.660}%
 \contentsline {section}{\numberline {6.8}Learning curves and hyperparameter sensitivity}{117}{section.670}%
 \contentsline {section}{\numberline {6.9}Interpretability and Monitoring}{117}{section.673}%
@@ -368,44 +368,44 @@
 \contentsline {section}{\numberline {6.14}NFL-Specific Design Patterns}{118}{section.678}%
 \contentsline {section}{\numberline {6.15}Offline RL Workflow (Schematic)}{119}{section.679}%
 \contentsline {section}{\numberline {6.16}Design Choices for NFL Constraints}{120}{section.688}%
-\contentsline {section}{\numberline {6.17}Ablation: RL vs. Stateless Kelly‑LCB}{121}{section.691}%
-\contentsline {paragraph}{Metrics and setup.}{121}{section*.692}%
-\contentsline {paragraph}{Pessimism sensitivity.}{121}{section*.695}%
+\contentsline {section}{\numberline {6.17}Ablation: RL vs. Stateless Kelly‑LCB}{122}{section.691}%
+\contentsline {paragraph}{Metrics and setup.}{122}{section*.692}%
+\contentsline {paragraph}{Pessimism sensitivity.}{122}{section*.695}%
 \contentsline {subsection}{\numberline {6.17.1}Parsimony: when to prefer stateless rules}{122}{subsection.696}%
-\contentsline {paragraph}{ESS diagnostics.}{122}{section*.700}%
-\contentsline {paragraph}{Utilization‑adjusted Sharpe.}{122}{section*.702}%
-\contentsline {paragraph}{CVaR sizing complexity.}{123}{section*.703}%
-\contentsline {subsection}{\numberline {6.17.2}RL vs Strategic Responses (Bridge)}{123}{subsection.709}%
-\contentsline {section}{\numberline {6.18}Offline RL Methods at a Glance}{123}{section.710}%
-\contentsline {section}{\numberline {6.19}Dataset Cohorts and Splits}{125}{section.713}%
+\contentsline {paragraph}{ESS diagnostics.}{123}{section*.700}%
+\contentsline {paragraph}{Utilization‑adjusted Sharpe.}{123}{section*.702}%
+\contentsline {paragraph}{CVaR sizing complexity.}{124}{section*.703}%
+\contentsline {subsection}{\numberline {6.17.2}RL vs Strategic Responses (Bridge)}{124}{subsection.709}%
+\contentsline {section}{\numberline {6.18}Offline RL Methods at a Glance}{125}{section.710}%
+\contentsline {section}{\numberline {6.19}Dataset Cohorts and Splits}{126}{section.713}%
 \contentsline {paragraph}{Cohort Definition.}{126}{section*.714}%
 \contentsline {paragraph}{Walk-Forward Protocol.}{126}{section*.715}%
 \contentsline {paragraph}{Leakage Guards.}{126}{section*.716}%
 \contentsline {paragraph}{Coverage and Temporal Distribution.}{126}{section*.717}%
-\contentsline {paragraph}{ER Diagram.}{126}{section*.718}%
+\contentsline {paragraph}{ER Diagram.}{127}{section*.718}%
 \contentsline {section}{\numberline {6.20}Experiment-Augmented Reinforcement Learning}{127}{section.719}%
 \contentsline {subsection}{\numberline {6.20.1}Motivation and Architecture}{127}{subsection.720}%
 \contentsline {paragraph}{Integration architecture.}{127}{section*.721}%
-\contentsline {subsection}{\numberline {6.20.2}State Space Expansion}{127}{subsection.725}%
-\contentsline {paragraph}{Base features (15 dimensions).}{127}{section*.726}%
+\contentsline {subsection}{\numberline {6.20.2}State Space Expansion}{128}{subsection.725}%
+\contentsline {paragraph}{Base features (15 dimensions).}{128}{section*.726}%
 \contentsline {paragraph}{cVAE features (13 dimensions).}{128}{section*.727}%
 \contentsline {paragraph}{Causal features (16 dimensions).}{128}{section*.728}%
 \contentsline {subsection}{\numberline {6.20.3}Kelly Criterion with Experiment Adjustments}{129}{subsection.729}%
 \contentsline {paragraph}{Probability adjustment mechanism.}{129}{section*.730}%
 \contentsline {paragraph}{Kelly sizing with fractional conservatism.}{129}{section*.731}%
-\contentsline {subsection}{\numberline {6.20.4}Reward Function and Shaping}{129}{subsection.732}%
+\contentsline {subsection}{\numberline {6.20.4}Reward Function and Shaping}{130}{subsection.732}%
 \contentsline {paragraph}{Base reward.}{130}{section*.733}%
 \contentsline {paragraph}{Kelly optimality bonus.}{130}{section*.734}%
 \contentsline {subsection}{\numberline {6.20.5}Agent Architectures}{130}{subsection.735}%
 \contentsline {paragraph}{Deep Q-Network (DQN).}{130}{section*.736}%
 \contentsline {paragraph}{Proximal Policy Optimization (PPO).}{130}{section*.737}%
-\contentsline {paragraph}{Feature importance tracking.}{130}{section*.738}%
+\contentsline {paragraph}{Feature importance tracking.}{131}{section*.738}%
 \contentsline {subsection}{\numberline {6.20.6}Training Protocol and Ablation Studies}{131}{subsection.739}%
 \contentsline {paragraph}{Training dataset.}{131}{section*.740}%
 \contentsline {paragraph}{Training hyperparameters.}{131}{section*.741}%
 \contentsline {paragraph}{Ablation protocol.}{131}{section*.742}%
-\contentsline {subsection}{\numberline {6.20.7}Expected Performance Improvements}{131}{subsection.748}%
-\contentsline {paragraph}{Conservative estimate (+3--5\% ROI).}{131}{section*.749}%
+\contentsline {subsection}{\numberline {6.20.7}Expected Performance Improvements}{132}{subsection.748}%
+\contentsline {paragraph}{Conservative estimate (+3--5\% ROI).}{132}{section*.749}%
 \contentsline {paragraph}{Optimistic estimate (+7--10\% ROI).}{132}{section*.750}%
 \contentsline {paragraph}{Risk reduction (15--20\% drawdown improvement).}{132}{section*.751}%
 \contentsline {subsection}{\numberline {6.20.8}Implementation and Code Organization}{132}{subsection.752}%
@@ -414,737 +414,737 @@
 \contentsline {subsection}{\numberline {6.20.9}Integration with Offline RL Workflow}{133}{subsection.755}%
 \contentsline {subsection}{\numberline {6.20.10}Feature Importance Analysis and Interpretability}{134}{subsection.762}%
 \contentsline {paragraph}{Expected top contributors.}{134}{section*.763}%
-\contentsline {paragraph}{Gradient-based importance interpretation.}{134}{section*.769}%
-\contentsline {paragraph}{Ablation validation.}{134}{section*.770}%
+\contentsline {paragraph}{Gradient-based importance interpretation.}{135}{section*.769}%
+\contentsline {paragraph}{Ablation validation.}{135}{section*.770}%
 \contentsline {subsection}{\numberline {6.20.11}Relationship to Baseline RL Agents}{135}{subsection.771}%
 \contentsline {paragraph}{Comparison protocol.}{135}{section*.775}%
-\contentsline {subsection}{\numberline {6.20.12}Limitations and Future Work}{135}{subsection.776}%
-\contentsline {paragraph}{Database dependencies.}{135}{section*.777}%
-\contentsline {paragraph}{Feature correlation and redundancy.}{135}{section*.778}%
+\contentsline {subsection}{\numberline {6.20.12}Limitations and Future Work}{136}{subsection.776}%
+\contentsline {paragraph}{Database dependencies.}{136}{section*.777}%
+\contentsline {paragraph}{Feature correlation and redundancy.}{136}{section*.778}%
 \contentsline {paragraph}{Continuous action space for stake sizing.}{136}{section*.779}%
 \contentsline {paragraph}{Multi-task learning across bet types.}{136}{section*.780}%
 \contentsline {paragraph}{Online fine-tuning and regime adaptation.}{136}{section*.781}%
 \contentsline {section}{Chapter Summary}{136}{section*.782}%
-\contentsline {chapter}{\numberline {7}Uncertainty and Risk Management}{137}{chapter.783}%
-\contentsline {section}{\numberline {7.1}Kelly criterion and fractional scaling}{137}{section.785}%
-\contentsline {subsection}{\numberline {7.1.1}Parameter uncertainty: posterior–lower–bound Kelly}{137}{subsection.787}%
-\contentsline {subsection}{\numberline {7.1.2}Kelly with friction and caps}{138}{subsection.790}%
-\contentsline {subsection}{\numberline {7.1.3}Approximate ruin probability}{138}{subsection.792}%
-\contentsline {section}{\numberline {7.2}CVaR-constrained stake sizing}{138}{section.793}%
-\contentsline {subsection}{\numberline {7.2.1}Teaser Pricing and Copula Impact}{138}{subsection.797}%
-\contentsline {subsection}{\numberline {7.2.2}Computational complexity and wall-clock}{139}{subsection.800}%
-\contentsline {section}{\numberline {7.3}Uncertainty Quantification}{140}{section.801}%
-\contentsline {section}{\numberline {7.4}Drawdown Analytics}{140}{section.802}%
-\contentsline {section}{\numberline {7.5}Governance and Reporting}{140}{section.804}%
-\contentsline {section}{\numberline {7.6}Multi-Model Reliability Analysis}{141}{section.813}%
-\contentsline {subsection}{\numberline {7.6.1}Multi-Model Comparison}{141}{subsection.814}%
-\contentsline {paragraph}{Evaluation Protocol.}{141}{section*.815}%
-\contentsline {paragraph}{Reliability Calibration.}{142}{section*.816}%
-\contentsline {paragraph}{Model Class Results.}{142}{table.caption.818}%
-\contentsline {paragraph}{Reliability Panels and Diagnostic Plots.}{142}{section*.819}%
-\contentsline {section}{\numberline {7.7}Profit Optimization Results}{143}{section.820}%
-\contentsline {subsection}{\numberline {7.7.1}System Architecture}{143}{subsection.821}%
-\contentsline {subsection}{\numberline {7.7.2}Backtesting Results}{143}{subsection.823}%
-\contentsline {subsection}{\numberline {7.7.3}Component Attribution}{144}{subsection.825}%
-\contentsline {subsection}{\numberline {7.7.4}Case Studies}{144}{subsection.827}%
-\contentsline {subsubsection}{Case 1: Alternative Line Value Capture}{144}{section*.828}%
-\contentsline {subsubsection}{Case 2: Sharp Money Alignment}{144}{section*.829}%
-\contentsline {subsubsection}{Case 3: Uncertainty Segmentation in Action}{144}{section*.830}%
-\contentsline {subsection}{\numberline {7.7.5}Key Insights}{145}{subsection.831}%
-\contentsline {section}{Chapter Summary}{145}{section*.837}%
-\contentsline {chapter}{\numberline {8}Simulation and Strategy Evaluation}{148}{chapter.838}%
-\contentsline {section}{\numberline {8.1}Monte Carlo estimators: LLN and CLT}{148}{section.839}%
-\contentsline {section}{\numberline {8.2}Teaser pricing and middle thresholds}{148}{section.841}%
-\contentsline {paragraph}{Relation to Wong teasers.}{148}{section*.844}%
-\contentsline {subsection}{\numberline {8.2.1}Variance reduction}{150}{subsection.846}%
-\contentsline {subsection}{\numberline {8.2.2}Importance sampling for rare events}{150}{subsection.847}%
-\contentsline {section}{\numberline {8.3}Scenario Construction}{150}{section.848}%
-\contentsline {subsection}{\numberline {8.3.1}Dependence sanity check (Gaussian copula)}{150}{subsection.850}%
-\contentsline {subsection}{\numberline {8.3.2}Transaction Costs and Slippage}{150}{subsection.851}%
-\contentsline {paragraph}{Calibration of slippage parameters.}{150}{section*.852}%
-\contentsline {section}{\numberline {8.4}Strategy Catalogue}{151}{section.853}%
-\contentsline {section}{\numberline {8.5}Sensitivity Analysis}{151}{section.857}%
-\contentsline {section}{\numberline {8.6}Calibration and Validation}{151}{section.858}%
-\contentsline {section}{\numberline {8.7}Monte Carlo Validation Metrics}{151}{section.859}%
-\contentsline {subsection}{\numberline {8.7.1}Convergence Diagnostics}{151}{subsection.860}%
-\contentsline {paragraph}{Batch Means Method.}{151}{section*.861}%
-\contentsline {subsection}{\numberline {8.7.2}Distribution Calibration Metrics}{152}{subsection.864}%
-\contentsline {paragraph}{Marginal Distribution Tests.}{152}{section*.865}%
-\contentsline {paragraph}{Key-Number Mass Preservation.}{152}{section*.866}%
-\contentsline {paragraph}{Dependence Structure Validation.}{152}{section*.867}%
-\contentsline {subsection}{\numberline {8.7.3}Backtesting Protocol}{153}{subsection.868}%
-\contentsline {section}{\numberline {8.8}Simulation Validation Results}{153}{section.874}%
-\contentsline {paragraph}{Acceptance Test Pass Rates.}{153}{section*.876}%
-\contentsline {paragraph}{Predictive Performance Correlation.}{154}{section*.877}%
-\contentsline {section}{\numberline {8.9}Benchmarking Methodology}{154}{section.878}%
-\contentsline {section}{\numberline {8.10}Simulator Architecture}{154}{section.879}%
-\contentsline {section}{\numberline {8.11}Acceptance Tests}{154}{section.880}%
-\contentsline {section}{\numberline {8.12}Friction Models}{155}{section.889}%
-\contentsline {section}{\numberline {8.13}Simulator Acceptance Tests: Outcomes}{155}{section.892}%
-\contentsline {section}{Chapter Summary}{155}{section*.897}%
-\contentsline {chapter}{\numberline {9}Results and Discussion}{157}{chapter.898}%
-\contentsline {section}{\numberline {9.1}The Central Finding: Calibration Without Profitability}{157}{section.900}%
-\contentsline {section}{\numberline {9.2}Data Leakage Investigation: From Fantasy to Reality}{158}{section.901}%
-\contentsline {subsection}{\numberline {9.2.1}The Red Flag: Too Good to Be True}{158}{subsection.902}%
-\contentsline {subsection}{\numberline {9.2.2}Root Cause 1: Severe Post-Game EPA Contamination}{158}{subsection.903}%
-\contentsline {paragraph}{The Problem.}{158}{section*.904}%
-\contentsline {paragraph}{The Fix.}{158}{section*.909}%
-\contentsline {subsection}{\numberline {9.2.3}Root Cause 2: NULL Kickoff Ordering Artifacts}{159}{subsection.912}%
-\contentsline {paragraph}{The Problem.}{159}{section*.913}%
-\contentsline {paragraph}{Impact Quantification.}{159}{section*.914}%
-\contentsline {paragraph}{The Fix.}{159}{section*.916}%
-\contentsline {subsection}{\numberline {9.2.4}Validation: Spread-Only Baseline Proves Feature Integrity}{159}{subsection.922}%
-\contentsline {paragraph}{Results (\Cref {tab:spread-baseline}).}{159}{table.caption.924}%
-\contentsline {subsection}{\numberline {9.2.5}Recent Seasons Test: Minimal Training Window}{160}{subsection.925}%
-\contentsline {subsection}{\numberline {9.2.6}Remaining Leakage: Season-Level Features}{160}{subsection.926}%
-\contentsline {paragraph}{Hypothesis.}{160}{section*.927}%
-\contentsline {paragraph}{Expected Impact.}{160}{section*.928}%
-\contentsline {paragraph}{Next Steps.}{161}{section*.929}%
-\contentsline {subsection}{\numberline {9.2.7}Lessons for Sports Analytics Research}{161}{subsection.933}%
-\contentsline {paragraph}{1. Trust but verify extraordinary results.}{161}{section*.934}%
-\contentsline {paragraph}{2. Multiple leakage sources compound.}{161}{section*.935}%
-\contentsline {paragraph}{3. Validation baselines are essential.}{161}{section*.936}%
-\contentsline {paragraph}{4. Temporal audits must be obsessive.}{161}{section*.937}%
-\contentsline {paragraph}{5. Document negative findings prominently.}{161}{section*.938}%
-\contentsline {subsection}{\numberline {9.2.8}Impact on Dissertation Claims}{161}{subsection.939}%
-\contentsline {paragraph}{Before investigation.}{161}{section*.940}%
-\contentsline {paragraph}{After investigation.}{162}{section*.941}%
-\contentsline {paragraph}{Revised thesis claim.}{162}{section*.942}%
-\contentsline {subsection}{\numberline {9.2.9}Final Status: Partially Resolved}{162}{subsection.943}%
-\contentsline {section}{\numberline {9.3}Empirical Validation: 40 Experiments}{162}{section.944}%
-\contentsline {section}{\numberline {9.4}Experimental Framework for Model Validation}{163}{section.945}%
-\contentsline {subsection}{\numberline {9.4.1}Experimental Design Methodology}{163}{subsection.946}%
-\contentsline {subsubsection}{Experiment Selection Criteria}{163}{section*.950}%
-\contentsline {subsection}{\numberline {9.4.2}ROI/EV Scoring Methodology}{164}{subsection.951}%
-\contentsline {subsubsection}{Domain Knowledge Priors}{164}{section*.953}%
-\contentsline {subsection}{\numberline {9.4.3}Experimental Infrastructure}{164}{subsection.955}%
-\contentsline {subsubsection}{Experiment Executor}{164}{section*.956}%
-\contentsline {subsubsection}{Panel Data Constructor}{165}{section*.957}%
-\contentsline {subsubsection}{ROI Evaluator}{165}{section*.971}%
-\contentsline {subsection}{\numberline {9.4.4}Execution Results}{165}{subsection.982}%
-\contentsline {subsubsection}{Success Criteria}{166}{section*.984}%
-\contentsline {subsubsection}{Failure Analysis}{166}{section*.989}%
-\contentsline {subsection}{\numberline {9.4.5}Data Coverage}{166}{subsection.990}%
-\contentsline {subsection}{\numberline {9.4.6}Computational Performance}{166}{subsection.991}%
-\contentsline {subsection}{\numberline {9.4.7}Reproducibility}{167}{subsection.992}%
-\contentsline {section}{\numberline {9.5}Conditional VAE Experiments}{167}{section.993}%
-\contentsline {subsection}{\numberline {9.5.1}Theoretical Foundation}{167}{subsection.994}%
-\contentsline {subsection}{\numberline {9.5.2}Experiment Categories}{167}{subsection.997}%
-\contentsline {subsubsection}{Game Trajectory Synthesis (5 experiments)}{167}{section*.998}%
-\contentsline {subsubsection}{Game Context Modeling (5 experiments)}{168}{section*.1004}%
-\contentsline {subsubsection}{Situational Contexts (5 experiments)}{169}{section*.1010}%
-\contentsline {subsubsection}{Advanced Applications (5 experiments)}{170}{section*.1016}%
-\contentsline {subsection}{\numberline {9.5.3}Top Performing cVAE Experiments}{170}{subsection.1022}%
-\contentsline {subsection}{\numberline {9.5.4}Empirical Results}{170}{subsection.1024}%
-\contentsline {subsubsection}{CVAE-007: Blowout Detection}{171}{section*.1025}%
-\contentsline {subsubsection}{CVAE-011: Home Field Advantage}{171}{section*.1027}%
-\contentsline {subsubsection}{CVAE-014: Playoff-Bound Teams}{171}{section*.1028}%
-\contentsline {subsection}{\numberline {9.5.5}Implementation Details}{172}{subsection.1029}%
-\contentsline {subsection}{\numberline {9.5.6}Limitations and Future Work}{172}{subsection.1056}%
-\contentsline {subsubsection}{Data Availability}{172}{section*.1057}%
-\contentsline {subsubsection}{Model Architecture}{172}{section*.1058}%
-\contentsline {subsubsection}{Validation}{173}{section*.1059}%
-\contentsline {section}{\numberline {9.6}Causal Inference Experiments}{173}{section.1060}%
-\contentsline {subsection}{\numberline {9.6.1}Theoretical Foundation}{173}{subsection.1061}%
-\contentsline {subsection}{\numberline {9.6.2}Experiment Categories}{173}{subsection.1063}%
-\contentsline {subsubsection}{Environmental Effects (4 experiments)}{173}{section*.1064}%
-\contentsline {subsubsection}{Player and Team Effects (6 experiments)}{174}{section*.1069}%
-\contentsline {subsubsection}{Strategic Decisions (6 experiments)}{175}{section*.1076}%
-\contentsline {subsubsection}{Natural Experiments (4 experiments)}{176}{section*.1083}%
-\contentsline {subsection}{\numberline {9.6.3}Top Performing Causal Experiments}{177}{subsection.1088}%
-\contentsline {subsection}{\numberline {9.6.4}Methodological Highlights}{177}{subsection.1090}%
-\contentsline {subsubsection}{CAUSAL-014: Fourth Down Aggression}{177}{section*.1091}%
-\contentsline {subsubsection}{CAUSAL-008: Offensive Line Quality}{178}{section*.1094}%
-\contentsline {subsection}{\numberline {9.6.5}Sensitivity Analysis}{178}{subsection.1102}%
-\contentsline {subsubsection}{Parallel Trends (DiD)}{178}{section*.1103}%
-\contentsline {subsubsection}{Rosenbaum Bounds (Hidden Bias)}{179}{section*.1105}%
-\contentsline {subsubsection}{Placebo Tests (Synthetic Control)}{179}{section*.1107}%
-\contentsline {subsection}{\numberline {9.6.6}Limitations and Threats to Validity}{179}{subsection.1108}%
-\contentsline {subsubsection}{Internal Validity}{179}{section*.1109}%
-\contentsline {subsubsection}{External Validity}{179}{section*.1110}%
-\contentsline {subsubsection}{Statistical Power}{180}{section*.1111}%
-\contentsline {subsection}{\numberline {9.6.7}Betting Strategy Implications}{180}{subsection.1114}%
-\contentsline {subsubsection}{CAUSAL-014: Fourth Down Aggression}{180}{section*.1115}%
-\contentsline {subsubsection}{CAUSAL-008: OL Quality}{180}{section*.1116}%
-\contentsline {subsubsection}{CAUSAL-020: Draft Capital Bias}{180}{section*.1117}%
-\contentsline {paragraph}{Experimental Validation Summary.}{181}{section*.1118}%
-\contentsline {section}{\numberline {9.7}Predictive Performance}{181}{section.1119}%
-\contentsline {subsection}{\numberline {9.7.1}Where Models Succeed}{182}{subsection.1121}%
-\contentsline {paragraph}{Calibration.}{182}{section*.1122}%
-\contentsline {paragraph}{Temporal Stability.}{182}{section*.1125}%
-\contentsline {paragraph}{Ensemble Gains.}{182}{section*.1126}%
-\contentsline {paragraph}{Feature Engineering.}{183}{section*.1127}%
-\contentsline {subsection}{\numberline {9.7.2}Where Models Fail}{183}{subsection.1128}%
-\contentsline {subsection}{\numberline {9.7.3}Table of Record: Out-of-Sample Results}{184}{subsection.1133}%
-\contentsline {section}{\numberline {9.8}Bayesian Neural Network Calibration: A Systematic Investigation}{184}{section.1135}%
-\contentsline {subsection}{\numberline {9.8.1}Motivation and Research Questions}{184}{subsection.1136}%
-\contentsline {subsubsection}{The Central Puzzle}{184}{section*.1137}%
-\contentsline {subsubsection}{Research Questions}{185}{section*.1142}%
-\contentsline {subsubsection}{Methodological Approach}{185}{section*.1143}%
-\contentsline {subsection}{\numberline {9.8.2}Phase 1: Feature Engineering Study}{187}{subsection.1146}%
-\contentsline {subsubsection}{Hypothesis and Motivation}{187}{section*.1147}%
-\contentsline {subsubsection}{Feature Groups Investigated}{187}{section*.1148}%
-\contentsline {subsubsection}{Experimental Design}{188}{section*.1149}%
-\contentsline {subsubsection}{Results}{189}{section*.1150}%
-\contentsline {subsubsection}{Discussion and Implications}{190}{section*.1154}%
-\contentsline {subsection}{\numberline {9.8.3}Phase 2: Prior Sensitivity Analysis}{190}{subsection.1158}%
-\contentsline {subsubsection}{Hypothesis and Motivation}{190}{section*.1159}%
-\contentsline {subsubsection}{Experimental Design}{191}{section*.1160}%
-\contentsline {subsubsection}{Results}{192}{section*.1164}%
-\contentsline {subsubsection}{Discussion and Implications}{192}{section*.1169}%
-\contentsline {paragraph}{Why Does Prior Robustness Occur?}{192}{section*.1170}%
-\contentsline {paragraph}{Implications for Bayesian Deep Learning}{193}{section*.1171}%
-\contentsline {paragraph}{Ruling Out Prior Misspecification}{193}{section*.1172}%
-\contentsline {subsection}{\numberline {9.8.4}Phase 3: Alternative Uncertainty Quantification Methods}{193}{subsection.1173}%
-\contentsline {subsubsection}{Hypothesis and Motivation}{193}{section*.1174}%
-\contentsline {subsubsection}{Methods}{194}{section*.1178}%
-\contentsline {paragraph}{Quantile Regression}{194}{section*.1179}%
-\contentsline {paragraph}{Conformal Prediction}{194}{section*.1181}%
-\contentsline {paragraph}{Multi-output Bayesian Neural Network}{195}{section*.1187}%
-\contentsline {subsubsection}{Results}{196}{section*.1191}%
-\contentsline {paragraph}{Quantile Regression: Fast and Well-Calibrated}{196}{section*.1194}%
-\contentsline {paragraph}{Conformal Prediction: Distribution-Free Guarantees}{196}{section*.1195}%
-\contentsline {paragraph}{Multi-output BNN: Architectural Breakthrough}{196}{section*.1196}%
-\contentsline {subsubsection}{Coverage-Sharpness Trade-off}{197}{section*.1197}%
-\contentsline {subsubsection}{Discussion and Implications}{198}{section*.1202}%
-\contentsline {paragraph}{The Problem is Methodological, Not Fundamental}{198}{section*.1203}%
-\contentsline {paragraph}{Non-Bayesian Methods Challenge Bayesian Deep Learning}{198}{section*.1204}%
-\contentsline {paragraph}{Architecture Matters More Than Hyperparameters}{199}{section*.1205}%
-\contentsline {paragraph}{Joint Modeling as a General Solution}{199}{section*.1207}%
-\contentsline {paragraph}{Post-Hoc Calibration: Temperature Scaling}{200}{section*.1208}%
-\contentsline {subsection}{\numberline {9.8.5}Phase 4: Bayesian Hyperparameter Optimization}{201}{subsection.1213}%
-\contentsline {subsubsection}{Hypothesis and Motivation}{201}{section*.1214}%
-\contentsline {subsubsection}{Optimization Strategy}{202}{section*.1215}%
-\contentsline {subsubsection}{Results}{202}{section*.1217}%
-\contentsline {subsubsection}{Comparison with Prior Phases}{203}{section*.1219}%
-\contentsline {subsubsection}{Discussion and Implications}{204}{section*.1221}%
-\contentsline {paragraph}{Hyperparameter Tuning is Insufficient}{204}{section*.1222}%
-\contentsline {paragraph}{Architecture Dominates Hyperparameters (Quantified)}{204}{section*.1223}%
-\contentsline {paragraph}{Negative Results as Methodological Contributions}{204}{section*.1228}%
-\contentsline {paragraph}{Computational Cost vs. Benefit}{205}{section*.1229}%
-\contentsline {subsection}{\numberline {9.8.6}Synthesis and Key Findings}{205}{subsection.1230}%
-\contentsline {subsubsection}{The Hierarchy of Modeling Choices}{205}{section*.1231}%
-\contentsline {subsubsection}{Non-Bayesian Baselines are Essential}{206}{section*.1237}%
-\contentsline {subsubsection}{Joint Modeling as a General Strategy}{206}{section*.1238}%
-\contentsline {subsubsection}{Computational Investment Summary}{207}{section*.1239}%
-\contentsline {subsection}{\numberline {9.8.7}Recommendations for Practitioners}{207}{subsection.1241}%
-\contentsline {subsubsection}{Decision Framework}{207}{section*.1242}%
-\contentsline {subsubsection}{When Facing Calibration Failures}{207}{section*.1244}%
-\contentsline {subsubsection}{What NOT to Use}{208}{section*.1249}%
-\contentsline {subsection}{\numberline {9.8.8}Limitations and Future Work}{208}{subsection.1250}%
-\contentsline {subsubsection}{Limitations}{208}{section*.1251}%
-\contentsline {subsubsection}{Future Research Directions}{209}{section*.1252}%
-\contentsline {subsection}{\numberline {9.8.9}Conclusion}{209}{subsection.1259}%
-\contentsline {section}{\numberline {9.9}Economic Value and Risk}{210}{section.1264}%
-\contentsline {section}{\numberline {9.10}Failure Analysis}{210}{section.1266}%
-\contentsline {subsection}{\numberline {9.10.1}Zero-bet weeks}{210}{subsection.1267}%
-\contentsline {subsection}{\numberline {9.10.2}When the system is wrong}{210}{subsection.1269}%
-\contentsline {paragraph}{Methodology.}{211}{section*.1270}%
-\contentsline {section}{\numberline {9.11}Model Interpretability and Explainability}{211}{section.1271}%
-\contentsline {subsection}{\numberline {9.11.1}GLM Baseline: Direct Interpretability}{211}{subsection.1272}%
-\contentsline {subsection}{\numberline {9.11.2}XGBoost: Feature Importance Analysis}{212}{subsection.1273}%
-\contentsline {paragraph}{Gain-based importance.}{212}{section*.1274}%
-\contentsline {paragraph}{Permutation importance.}{212}{section*.1280}%
-\contentsline {subsection}{\numberline {9.11.3}SHAP Value Analysis}{212}{subsection.1281}%
-\contentsline {subsection}{\numberline {9.11.4}Local Interpretable Model-Agnostic Explanations (LIME)}{213}{subsection.1286}%
-\contentsline {subsection}{\numberline {9.11.5}Attention Mechanisms in State-Space Models}{213}{subsection.1287}%
-\contentsline {subsection}{\numberline {9.11.6}Failure Mode Analysis Through Explainability}{213}{subsection.1288}%
-\contentsline {paragraph}{Overreliance on market signals.}{213}{section*.1289}%
-\contentsline {paragraph}{Inability to capture narrative.}{213}{section*.1290}%
-\contentsline {paragraph}{Recency bias in EPA metrics.}{213}{section*.1291}%
-\contentsline {section}{\numberline {9.12}Failed Approaches and Negative Results}{214}{section.1292}%
-\contentsline {subsection}{\numberline {9.12.1}Graph Neural Networks for Game Prediction}{214}{subsection.1293}%
-\contentsline {paragraph}{Motivation.}{214}{section*.1294}%
-\contentsline {paragraph}{Key Findings.}{214}{section*.1295}%
-\contentsline {paragraph}{Why GNNs Failed.}{214}{section*.1296}%
-\contentsline {paragraph}{Lessons Learned.}{215}{section*.1300}%
-\contentsline {subsection}{\numberline {9.12.2}Weather Features: A Rigorous Negative Result}{215}{subsection.1301}%
-\contentsline {paragraph}{Empirical Evidence.}{215}{section*.1302}%
-\contentsline {paragraph}{Why Weather Has Minimal Impact.}{223}{section*.1305}%
-\contentsline {paragraph}{Stadium Climate Zones.}{223}{section*.1306}%
-\contentsline {paragraph}{Model Impact.}{223}{section*.1307}%
-\contentsline {paragraph}{Value of Negative Results.}{223}{section*.1308}%
-\contentsline {subsection}{\numberline {9.12.3}Summary of Failed Approaches}{223}{subsection.1309}%
-\contentsline {section}{\numberline {9.13}Ablation Studies}{224}{section.1313}%
-\contentsline {section}{\numberline {9.14}Core Ablations}{224}{section.1314}%
-\contentsline {subsection}{\numberline {9.14.1}Multiplicity Control and Pre-Specification}{224}{subsection.1316}%
-\contentsline {section}{\numberline {9.15}Operational Insights}{225}{section.1317}%
-\contentsline {section}{\numberline {9.16}Case Study: A Week of Line Movement}{225}{section.1318}%
-\contentsline {section}{\numberline {9.17}Threats to Validity}{225}{section.1319}%
-\contentsline {section}{\numberline {9.18}Computational Requirements \& Scalability}{225}{section.1320}%
-\contentsline {section}{\numberline {9.19}Backtesting Protocol \& Bias Controls}{226}{section.1321}%
-\contentsline {section}{\numberline {9.20}Statistical Testing \& Multiple Comparisons}{226}{section.1322}%
-\contentsline {subsection}{\numberline {9.20.1}Diebold-Mariano Tests for Predictive Accuracy}{226}{subsection.1323}%
-\contentsline {subsection}{\numberline {9.20.2}Bootstrap Confidence Intervals}{226}{subsection.1325}%
-\contentsline {subsection}{\numberline {9.20.3}Multiple Testing Corrections}{227}{subsection.1327}%
-\contentsline {section}{\numberline {9.21}Failure Modes \& Worst‑Case Scenarios}{228}{section.1329}%
-\contentsline {section}{\numberline {9.22}Sensitivity Analysis Summary}{228}{section.1330}%
-\contentsline {section}{\numberline {9.23}Evaluation Protocol}{228}{section.1331}%
-\contentsline {section}{\numberline {9.24}Per-Season Narratives}{228}{section.1332}%
-\contentsline {section}{\numberline {9.25}Ablation Highlights}{231}{section.1334}%
-\contentsline {section}{\numberline {9.26}Limitations and External Validity}{231}{section.1335}%
-\contentsline {section}{Chapter Summary}{231}{section*.1336}%
-\contentsline {chapter}{\numberline {10}Production Deployment and Operational Edges}{232}{chapter.1337}%
-\contentsline {section}{\numberline {10.1}Claude AI Integration for Semantic Research Exploration}{232}{section.1338}%
-\contentsline {subsection}{\numberline {10.1.1}Motivation: From Batch Analytics to Conversational Research}{233}{subsection.1339}%
-\contentsline {paragraph}{The Case for Conversational Research.}{233}{section*.1345}%
-\contentsline {paragraph}{Why This Matters for NFL Betting.}{234}{section*.1346}%
-\contentsline {subsection}{\numberline {10.1.2}Architecture: Natural Language to Actionable Insights}{234}{subsection.1347}%
-\contentsline {paragraph}{Step 1: Query Understanding and Context Loading.}{234}{section*.1349}%
-\contentsline {paragraph}{Step 2: Query Planning.}{236}{section*.1350}%
-\contentsline {paragraph}{Step 3: Code Generation.}{236}{section*.1356}%
-\contentsline {paragraph}{Step 4: Execution and Result Interpretation.}{236}{section*.1357}%
-\contentsline {paragraph}{Step 5: Statistical Validation.}{237}{section*.1358}%
-\contentsline {paragraph}{Step 6: Production Recommendations.}{237}{section*.1359}%
-\contentsline {paragraph}{Step 7: Follow‑up Suggestions.}{238}{section*.1360}%
-\contentsline {subsection}{\numberline {10.1.3}Integration Points with Existing Infrastructure}{238}{subsection.1361}%
-\contentsline {paragraph}{Database Access (TimescaleDB + PostgreSQL).}{238}{section*.1362}%
-\contentsline {paragraph}{R Ecosystem (ggplot2, dplyr, nflfastR).}{238}{section*.1363}%
-\contentsline {paragraph}{Python ML Stack (XGBoost, SHAP, Statistical Tests).}{238}{section*.1364}%
-\contentsline {paragraph}{Statistical Framework (\texttt {py/compute/statistics/}).}{239}{section*.1365}%
-\contentsline {paragraph}{Quarto Notebooks (Reproducibility).}{239}{section*.1366}%
-\contentsline {subsection}{\numberline {10.1.4}Use Case 1: Post‑Game Upset Analysis}{240}{subsection.1367}%
-\contentsline {paragraph}{Scenario.}{240}{section*.1368}%
-\contentsline {paragraph}{Conversational Workflow.}{240}{section*.1369}%
-\contentsline {subsection}{\numberline {10.1.5}Use Case 2: Narrative Validation (Rest Advantage, Primetime Effects)}{242}{subsection.1370}%
-\contentsline {paragraph}{Research Question.}{242}{section*.1371}%
-\contentsline {paragraph}{Conversational Workflow.}{242}{section*.1372}%
-\contentsline {subsection}{\numberline {10.1.6}Use Case 3: Model Debugging and Feature Discovery}{244}{subsection.1373}%
-\contentsline {paragraph}{Scenario.}{244}{section*.1374}%
-\contentsline {paragraph}{Conversational Workflow.}{244}{section*.1375}%
-\contentsline {subsection}{\numberline {10.1.7}Technical Implementation}{246}{subsection.1376}%
-\contentsline {paragraph}{Database Access.}{246}{section*.1377}%
-\contentsline {paragraph}{R Script Generation.}{246}{section*.1378}%
-\contentsline {paragraph}{Python ML and Statistical Code.}{246}{section*.1379}%
-\contentsline {paragraph}{Quarto Notebook Generation.}{247}{section*.1380}%
-\contentsline {subsection}{\numberline {10.1.8}Value Proposition and Limitations}{248}{subsection.1381}%
-\contentsline {paragraph}{High‑Value Applications.}{248}{section*.1382}%
-\contentsline {paragraph}{Limitations and Risks.}{248}{section*.1383}%
-\contentsline {paragraph}{Production Recommendations.}{249}{section*.1384}%
-\contentsline {subsection}{\numberline {10.1.9}Future Extensions: Retrieval‑Augmented Generation and Live Analysis}{249}{subsection.1385}%
-\contentsline {paragraph}{1. Retrieval‑Augmented Generation (RAG).}{249}{section*.1386}%
-\contentsline {paragraph}{2. Live Game Analysis.}{250}{section*.1387}%
-\contentsline {paragraph}{3. Automated Narrative Discovery.}{250}{section*.1388}%
-\contentsline {paragraph}{4. Cross‑Season Drift Analysis.}{250}{section*.1389}%
-\contentsline {section}{\numberline {10.2}System Architecture and Ensemble Deployment}{250}{section.1390}%
-\contentsline {paragraph}{Deployment Decision Rules.}{251}{section*.1391}%
-\contentsline {section}{\numberline {10.3}Kelly Criterion Bet Sizing}{251}{section.1392}%
-\contentsline {paragraph}{1/4 Kelly (Conservative).}{251}{section*.1393}%
-\contentsline {paragraph}{1/2 Kelly (Moderate).}{252}{section*.1394}%
-\contentsline {paragraph}{Dynamic Scaling.}{252}{section*.1395}%
-\contentsline {paragraph}{Risk Limits.}{252}{section*.1396}%
-\contentsline {section}{\numberline {10.4}Line Shopping Infrastructure}{252}{section.1397}%
-\contentsline {paragraph}{Tier 1: Sharp Books (Best Lines).}{252}{section*.1398}%
-\contentsline {paragraph}{Tier 2: Mainstream Books (Moderate Lines).}{252}{section*.1399}%
-\contentsline {paragraph}{Tier 3: Recreational Books (Soft Lines).}{253}{section*.1400}%
-\contentsline {paragraph}{Line Shopping Strategy.}{253}{section*.1401}%
-\contentsline {section}{\numberline {10.5}Early Week Betting Strategy}{253}{section.1406}%
-\contentsline {paragraph}{EWB Strategy.}{254}{section*.1407}%
-\contentsline {paragraph}{Backtest Results (2010--2024).}{254}{section*.1412}%
-\contentsline {section}{\numberline {10.6}Props Market Extension}{254}{section.1413}%
-\contentsline {paragraph}{Props Modeling Strategy.}{255}{section*.1414}%
-\contentsline {paragraph}{Expected Performance.}{255}{section*.1419}%
-\contentsline {paragraph}{Risk Management.}{255}{section*.1420}%
-\contentsline {section}{\numberline {10.7}Monitoring and Risk Management}{255}{section.1421}%
-\contentsline {paragraph}{1. Rolling Performance Tracking.}{255}{section*.1422}%
-\contentsline {paragraph}{2. Weekly Bootstrap Stress Tests.}{255}{section*.1423}%
-\contentsline {paragraph}{3. Thompson Switching Logic.}{256}{section*.1424}%
-\contentsline {paragraph}{4. Streamlit Production Dashboard.}{256}{section*.1425}%
-\contentsline {section}{\numberline {10.8}Data Sources for Signal Enhancement}{256}{section.1426}%
-\contentsline {paragraph}{NFL Pro Subscription (LOW VALUE).}{256}{section*.1427}%
-\contentsline {paragraph}{Pro Football Focus (PFF) Elite (\$300/year, +0.5--1\% EV).}{256}{section*.1428}%
-\contentsline {paragraph}{NextGen Stats API (\$5--10K/year, +1--2\% EV).}{257}{section*.1429}%
-\contentsline {paragraph}{SportsRadar NFL API (\$10--20K/year, +0.5--1\% EV).}{257}{section*.1430}%
-\contentsline {paragraph}{Data Source Roadmap.}{257}{section*.1431}%
-\contentsline {section}{\numberline {10.9}Expected Returns and Deployment Timeline}{258}{section.1436}%
-\contentsline {paragraph}{Year 1 Projections (Majority Voting, Free Data).}{258}{section*.1437}%
-\contentsline {paragraph}{Year 2 Projections (Majority + PFF Elite).}{258}{section*.1438}%
-\contentsline {paragraph}{Thompson Sampling Projections (Year 2+).}{259}{section*.1439}%
-\contentsline {paragraph}{8‑Week Deployment Timeline.}{259}{section*.1440}%
-\contentsline {section}{Chapter Summary}{260}{section*.1441}%
-\contentsline {chapter}{\numberline {11}Conclusion and Future Work}{261}{chapter.1442}%
-\contentsline {section}{\numberline {11.1}What We Learned}{261}{section.1443}%
-\contentsline {subsection}{\numberline {11.1.1}The Central Lesson: Market Efficiency}{261}{subsection.1444}%
-\contentsline {subsection}{\numberline {11.1.2}Methodological Contributions}{261}{subsection.1445}%
-\contentsline {paragraph}{1. Rigorous Negative Results (Expanded).}{262}{section*.1450}%
-\contentsline {paragraph}{2. Complete Betting System Architecture.}{262}{section*.1451}%
-\contentsline {paragraph}{3. Dependence-Aware Evaluation.}{263}{section*.1452}%
-\contentsline {paragraph}{4. Transparent Failure Analysis.}{263}{section*.1453}%
-\contentsline {section}{\numberline {11.2}Limitations and Threats to Validity}{263}{section.1454}%
-\contentsline {subsection}{\numberline {11.2.1}Data Limitations}{263}{subsection.1455}%
-\contentsline {subsection}{\numberline {11.2.2}Model Limitations}{263}{subsection.1456}%
-\contentsline {subsection}{\numberline {11.2.3}External Validity}{263}{subsection.1457}%
-\contentsline {section}{\numberline {11.3}Future Directions}{264}{section.1458}%
-\contentsline {subsection}{\numberline {11.3.1}Alternative Markets}{264}{subsection.1459}%
-\contentsline {subsection}{\numberline {11.3.2}Methodological Extensions}{264}{subsection.1460}%
-\contentsline {subsection}{\numberline {11.3.3}Operational Improvements}{264}{subsection.1461}%
-\contentsline {subsection}{\numberline {11.3.4}Profit Optimization Extensions}{265}{subsection.1462}%
-\contentsline {section}{\numberline {11.4}Broader Implications for Sports Analytics}{265}{section.1463}%
-\contentsline {paragraph}{Achievable:}{265}{section*.1464}%
-\contentsline {paragraph}{Aspirational (with public data alone):}{266}{section*.1465}%
-\contentsline {section}{\numberline {11.5}Final Reflection}{266}{section.1466}%
-\contentsline {section}{\numberline {11.6}Closing Statement}{266}{section.1467}%
-\contentsline {section}{Chapter Summary}{267}{section*.1468}%
-\contentsline {chapter}{\numberline {A}Technical Details}{268}{appendix.1469}%
-\contentsline {section}{\numberline {A.1}Notation}{268}{section.1470}%
-\contentsline {section}{\numberline {A.2}State-Space Derivations}{268}{section.1471}%
-\contentsline {section}{\numberline {A.3}Score-Distribution Details}{268}{section.1472}%
-\contentsline {subsection}{\numberline {A.3.1}Score-Distribution Fitting Pipeline}{268}{subsection.1473}%
-\contentsline {section}{\numberline {A.4}Calibration Diagnostics}{269}{section.1474}%
-\contentsline {subsection}{\numberline {A.4.1}Per-Season Reliability Diagrams}{269}{subsection.1475}%
-\contentsline {subsection}{\numberline {A.4.2}Calibration Procedures}{269}{subsection.1478}%
-\contentsline {subsection}{\numberline {A.4.3}Calibration Case Gallery}{269}{subsection.1479}%
-\contentsline {paragraph}{High-Confidence Favorites.}{269}{section*.1480}%
-\contentsline {paragraph}{Coin-Flip Matchups.}{269}{section*.1481}%
-\contentsline {paragraph}{Weather-Dominated Totals.}{269}{section*.1482}%
-\contentsline {paragraph}{Injury Uncertainty.}{269}{section*.1483}%
-\contentsline {paragraph}{Key-Number Sensitivity.}{269}{section*.1484}%
-\contentsline {paragraph}{Marquee Games.}{269}{section*.1485}%
-\contentsline {paragraph}{Late-Season Incentives.}{272}{section*.1486}%
-\contentsline {paragraph}{Extreme Pace Mismatch.}{272}{section*.1487}%
-\contentsline {section}{\numberline {A.5}Mathematical Proof Sketches}{272}{section.1488}%
-\contentsline {subsection}{\numberline {A.5.1}Skellam Mixture Moments}{272}{subsection.1489}%
-\contentsline {subsection}{\numberline {A.5.2}CRPS Consistency}{272}{subsection.1490}%
-\contentsline {section}{\numberline {A.6}Algorithms and Pseudocode}{272}{section.1491}%
-\contentsline {subsection}{\numberline {A.6.1}Conservative Q-Learning (CQL)}{272}{subsection.1492}%
-\contentsline {paragraph}{Implementation Notes.}{273}{section*.1503}%
-\contentsline {subsection}{\numberline {A.6.2}Proximal Policy Optimization (PPO)}{273}{subsection.1504}%
-\contentsline {subsection}{\numberline {A.6.3}Dueling DQN for Discrete Stakes}{273}{subsection.1515}%
-\contentsline {section}{\numberline {A.7}Uncertainty Estimation}{273}{section.1522}%
-\contentsline {section}{\numberline {A.8}Numerical Stability}{274}{section.1523}%
-\contentsline {section}{\numberline {A.9}Acronyms and Abbreviations}{274}{section.1524}%
-\contentsline {chapter}{\numberline {B}Reproducibility Guide}{275}{appendix.1525}%
-\contentsline {section}{\numberline {B.1}Overview}{275}{section.1526}%
-\contentsline {section}{\numberline {B.2}Data Packaging}{275}{section.1527}%
-\contentsline {section}{\numberline {B.3}Reproduction Guide}{275}{section.1528}%
-\contentsline {subsection}{\numberline {B.3.1}Replication Checklist}{275}{subsection.1529}%
-\contentsline {section}{\numberline {B.4}Reproducibility Trace (End-to-End)}{276}{section.1538}%
-\contentsline {subsection}{\numberline {B.4.1}Provenance}{276}{subsection.1539}%
-\contentsline {subsection}{\numberline {B.4.2}Determinism}{276}{subsection.1540}%
-\contentsline {subsection}{\numberline {B.4.3}Audit Log}{276}{subsection.1541}%
-\contentsline {section}{\numberline {B.5}Data Engineering Notes}{276}{section.1542}%
-\contentsline {subsection}{\numberline {B.5.1}Schema Migrations and Idempotency}{276}{subsection.1543}%
-\contentsline {subsection}{\numberline {B.5.2}Drift Detection}{276}{subsection.1544}%
-\contentsline {subsection}{\numberline {B.5.3}Reproducibility}{276}{subsection.1545}%
-\contentsline {section}{\numberline {B.6}Experiment Registry}{276}{section.1546}%
-\contentsline {subsection}{\numberline {B.6.1}Experiment Registry Index}{277}{subsection.1547}%
-\contentsline {section}{\numberline {B.7}CLI Reference}{277}{section.1548}%
-\contentsline {section}{\numberline {B.8}Code Organization}{278}{section.1549}%
-\contentsline {section}{\numberline {B.9}Parameter Defaults}{278}{section.1550}%
-\contentsline {chapter}{\numberline {C}Feature Engineering}{279}{appendix.1551}%
-\contentsline {section}{\numberline {C.1}Feature Catalog}{279}{section.1552}%
-\contentsline {section}{\numberline {C.2}Full Feature Dictionary}{279}{section.1553}%
-\contentsline {subsection}{\numberline {C.2.1}Situational Features}{279}{subsection.1554}%
-\contentsline {subsection}{\numberline {C.2.2}Team Form (Rolling Windows)}{279}{subsection.1555}%
-\contentsline {subsection}{\numberline {C.2.3}Market Microstructure}{280}{subsection.1556}%
-\contentsline {subsection}{\numberline {C.2.4}Roster and Availability}{280}{subsection.1557}%
-\contentsline {subsection}{\numberline {C.2.5}Environmental}{280}{subsection.1558}%
-\contentsline {section}{\numberline {C.3}Feature Examples (Extended)}{280}{section.1559}%
-\contentsline {subsection}{\numberline {C.3.1}Extended Examples}{280}{subsection.1560}%
-\contentsline {subsection}{\numberline {C.3.2}Situational Examples}{281}{subsection.1561}%
-\contentsline {subsection}{\numberline {C.3.3}Team Form Examples}{281}{subsection.1562}%
-\contentsline {subsection}{\numberline {C.3.4}Market Microstructure Examples}{281}{subsection.1563}%
-\contentsline {subsection}{\numberline {C.3.5}Roster and Availability Examples}{281}{subsection.1564}%
-\contentsline {subsection}{\numberline {C.3.6}Environmental Examples}{281}{subsection.1565}%
-\contentsline {section}{\numberline {C.4}Calibration and CLV Trajectories by Season}{281}{section.1566}%
-\contentsline {subsection}{\numberline {C.4.1}Diagnostics}{282}{subsection.1567}%
-\contentsline {subsection}{\numberline {C.4.2}Operational Learnings}{282}{subsection.1568}%
-\contentsline {section}{\numberline {C.5}Ablation and Sensitivity Notes}{282}{section.1569}%
-\contentsline {subsection}{\numberline {C.5.1}Feature Ablations}{282}{subsection.1570}%
-\contentsline {subsection}{\numberline {C.5.2}Hyperparameter Sensitivity}{282}{subsection.1571}%
-\contentsline {subsection}{\numberline {C.5.3}Simulation Assumptions}{282}{subsection.1572}%
-\contentsline {chapter}{\numberline {D}Model Implementation}{283}{appendix.1573}%
-\contentsline {section}{\numberline {D.1}Training and Validation Protocols}{283}{section.1574}%
-\contentsline {section}{\numberline {D.2}Offline RL Implementation Notes}{283}{section.1575}%
-\contentsline {section}{\numberline {D.3}Conservative Q-Learning Performance}{283}{section.1576}%
-\contentsline {section}{\numberline {D.4}Bootstrap Stress Testing}{283}{section.1580}%
-\contentsline {subsection}{\numberline {D.4.1}Methodology}{286}{subsection.1581}%
-\contentsline {subsection}{\numberline {D.4.2}Key Findings}{286}{subsection.1582}%
-\contentsline {paragraph}{Worst Case Scenario Results.}{286}{section*.1583}%
-\contentsline {paragraph}{Volume vs Resilience Trade-off.}{286}{section*.1585}%
-\contentsline {paragraph}{Tail Risk (CVaR).}{286}{section*.1586}%
-\contentsline {paragraph}{Production Recommendations.}{286}{section*.1587}%
-\contentsline {section}{\numberline {D.5}Graph Neural Networks for Team Ratings}{287}{section.1588}%
-\contentsline {subsection}{\numberline {D.5.1}Architecture and Implementation}{287}{subsection.1589}%
-\contentsline {paragraph}{Team Embeddings.}{287}{section*.1590}%
-\contentsline {paragraph}{Message Passing Layers.}{287}{section*.1591}%
-\contentsline {paragraph}{Prediction Head.}{287}{section*.1595}%
-\contentsline {subsection}{\numberline {D.5.2}Training Configuration}{287}{subsection.1596}%
-\contentsline {subsection}{\numberline {D.5.3}Theoretical Advantages}{287}{subsection.1597}%
-\contentsline {paragraph}{Transitive Strength Modeling.}{287}{section*.1598}%
-\contentsline {paragraph}{Schedule Strength.}{288}{section*.1599}%
-\contentsline {paragraph}{Conference and Division Structure.}{288}{section*.1600}%
-\contentsline {subsection}{\numberline {D.5.4}Expected Performance and Limitations}{288}{subsection.1601}%
-\contentsline {paragraph}{Optimistic Scenario.}{288}{section*.1602}%
-\contentsline {paragraph}{Realistic Scenario.}{288}{section*.1603}%
-\contentsline {paragraph}{Pessimistic Scenario.}{288}{section*.1604}%
-\contentsline {subsection}{\numberline {D.5.5}Complexity vs Value Assessment}{288}{subsection.1605}%
-\contentsline {paragraph}{Implementation Complexity.}{288}{section*.1606}%
-\contentsline {paragraph}{Maintenance Burden.}{288}{section*.1607}%
-\contentsline {paragraph}{Value Proposition.}{288}{section*.1608}%
-\contentsline {subsection}{\numberline {D.5.6}Production Recommendation}{289}{subsection.1609}%
-\contentsline {subsection}{\numberline {D.5.7}Research Recommendation}{289}{subsection.1610}%
-\contentsline {section}{\numberline {D.6}Copula Models for Parlay Pricing}{289}{section.1611}%
-\contentsline {subsection}{\numberline {D.6.1}Motivation and Framework}{289}{subsection.1612}%
-\contentsline {paragraph}{Same Week.}{289}{section*.1613}%
-\contentsline {paragraph}{Shared Teams.}{289}{section*.1614}%
-\contentsline {paragraph}{Same Division.}{290}{section*.1615}%
-\contentsline {paragraph}{Conference Dynamics.}{290}{section*.1616}%
-\contentsline {subsection}{\numberline {D.6.2}Gaussian Copula Implementation}{290}{subsection.1617}%
-\contentsline {paragraph}{Correlation Estimation.}{290}{section*.1618}%
-\contentsline {paragraph}{Monte Carlo Simulation.}{290}{section*.1619}%
-\contentsline {paragraph}{Expected Value Calculation.}{290}{section*.1624}%
-\contentsline {subsection}{\numberline {D.6.3}Expected Value Example}{290}{subsection.1625}%
-\contentsline {paragraph}{Independence Assumption.}{290}{section*.1626}%
-\contentsline {paragraph}{Copula Model (correlation = 0.15).}{290}{section*.1627}%
-\contentsline {paragraph}{Key Insight.}{291}{section*.1628}%
-\contentsline {subsection}{\numberline {D.6.4}Impact by Scenario}{291}{subsection.1629}%
-\contentsline {paragraph}{Same-Game Parlays.}{291}{section*.1630}%
-\contentsline {paragraph}{Division Games.}{291}{section*.1631}%
-\contentsline {paragraph}{Playoff-Implication Games.}{291}{section*.1632}%
-\contentsline {subsection}{\numberline {D.6.5}Expected Edge and Limitations}{291}{subsection.1633}%
-\contentsline {paragraph}{Optimistic Scenario.}{291}{section*.1634}%
-\contentsline {paragraph}{Realistic Scenario.}{291}{section*.1635}%
-\contentsline {paragraph}{Pessimistic Scenario.}{291}{section*.1636}%
-\contentsline {subsection}{\numberline {D.6.6}Teaser Pricing Application}{291}{subsection.1637}%
-\contentsline {subsection}{\numberline {D.6.7}Complexity vs Value Trade-off}{292}{subsection.1638}%
-\contentsline {paragraph}{Implementation.}{292}{section*.1639}%
-\contentsline {paragraph}{Maintenance.}{292}{section*.1640}%
-\contentsline {paragraph}{Compute Cost.}{292}{section*.1641}%
-\contentsline {subsection}{\numberline {D.6.8}Production Recommendation}{292}{subsection.1642}%
-\contentsline {subsection}{\numberline {D.6.9}Research Recommendation}{292}{subsection.1647}%
-\contentsline {subsection}{\numberline {D.6.10}Implementation Details}{293}{subsection.1653}%
-\contentsline {section}{\numberline {D.7}Advanced Bayesian Enhancements v3.0}{293}{section.1654}%
-\contentsline {subsection}{\numberline {D.7.1}Phase 1: State-Space Models for Dynamic Player Ratings}{293}{subsection.1655}%
-\contentsline {paragraph}{Motivation.}{293}{section*.1656}%
-\contentsline {paragraph}{Implementation.}{293}{section*.1657}%
-\contentsline {paragraph}{Key Features.}{294}{section*.1662}%
-\contentsline {paragraph}{Expected Impact.}{294}{section*.1663}%
-\contentsline {paragraph}{Implementation Details.}{294}{section*.1664}%
-\contentsline {subsection}{\numberline {D.7.2}Phase 2: Advanced Prior Elicitation}{294}{subsection.1665}%
-\contentsline {paragraph}{Motivation.}{294}{section*.1666}%
-\contentsline {paragraph}{Empirical Bayes Component.}{294}{section*.1667}%
-\contentsline {paragraph}{Expert-Informed Priors.}{294}{section*.1670}%
-\contentsline {paragraph}{Prior Specification Example.}{295}{section*.1671}%
-\contentsline {paragraph}{Prior Predictive Checks.}{295}{section*.1672}%
-\contentsline {paragraph}{Expected Impact.}{295}{section*.1673}%
-\contentsline {paragraph}{Implementation Details.}{295}{section*.1674}%
-\contentsline {subsection}{\numberline {D.7.3}Phase 3: Bayesian Neural Networks}{295}{subsection.1675}%
-\contentsline {paragraph}{Motivation.}{295}{section*.1676}%
-\contentsline {paragraph}{Architecture.}{295}{section*.1677}%
-\contentsline {paragraph}{Prior Specifications.}{296}{section*.1681}%
-\contentsline {paragraph}{Inference Methods.}{296}{section*.1686}%
-\contentsline {paragraph}{Uncertainty Quantification.}{296}{section*.1687}%
-\contentsline {paragraph}{Expected Impact.}{296}{section*.1689}%
-\contentsline {paragraph}{Implementation Details.}{296}{section*.1690}%
-\contentsline {subsection}{\numberline {D.7.4}Phase 4: 4-Way Ensemble Integration}{296}{subsection.1691}%
-\contentsline {paragraph}{Ensemble Components.}{296}{section*.1692}%
-\contentsline {paragraph}{Inverse Variance Weighting.}{297}{section*.1697}%
-\contentsline {paragraph}{Meta-Learning Layer.}{297}{section*.1699}%
-\contentsline {paragraph}{Expected Impact.}{297}{section*.1701}%
-\contentsline {paragraph}{Implementation Details.}{297}{section*.1702}%
-\contentsline {subsection}{\numberline {D.7.5}Performance Projections and Validation}{297}{subsection.1703}%
-\contentsline {paragraph}{Expected Performance v3.0.}{297}{section*.1704}%
-\contentsline {paragraph}{Financial Impact.}{297}{section*.1705}%
-\contentsline {paragraph}{Validation Plan.}{298}{section*.1706}%
-\contentsline {subsection}{\numberline {D.7.6}Implementation Status and Next Steps}{298}{subsection.1711}%
-\contentsline {paragraph}{Completed (v3.0).}{298}{section*.1712}%
-\contentsline {paragraph}{Pending Training.}{298}{section*.1713}%
-\contentsline {paragraph}{Deployment Timeline.}{298}{section*.1718}%
-\contentsline {subsection}{\numberline {D.7.7}Key Innovations and Contributions}{299}{subsection.1719}%
-\contentsline {paragraph}{Methodological Contributions.}{299}{section*.1720}%
-\contentsline {paragraph}{Theoretical Utilization.}{299}{section*.1721}%
-\contentsline {section}{\numberline {D.8}Off-Policy Evaluation}{299}{section.1722}%
-\contentsline {section}{\numberline {D.9}Model Evaluation Protocols (Extended)}{299}{section.1723}%
-\contentsline {subsection}{\numberline {D.9.1}Predictive Metrics}{299}{subsection.1724}%
-\contentsline {subsection}{\numberline {D.9.2}Economic Metrics}{300}{subsection.1725}%
-\contentsline {subsection}{\numberline {D.9.3}Operational Metrics}{300}{subsection.1726}%
-\contentsline {subsection}{\numberline {D.9.4}Leakage Controls}{300}{subsection.1727}%
-\contentsline {subsection}{\numberline {D.9.5}Fairness and Robustness}{300}{subsection.1728}%
-\contentsline {section}{\numberline {D.10}Model Cards}{300}{section.1729}%
-\contentsline {chapter}{\numberline {E}Case Studies}{301}{appendix.1730}%
-\contentsline {section}{\numberline {E.1}Overview}{301}{section.1731}%
-\contentsline {section}{\numberline {E.2}Regular Season Weeks 1--18}{301}{section.1732}%
-\contentsline {section}{\numberline {E.3}Playoffs}{302}{section.1733}%
-\contentsline {section}{\numberline {E.4}Extended Case Study: Weather Whiplash Week}{302}{section.1734}%
-\contentsline {section}{\numberline {E.5}Extended Case Study: QB Injury Cascade}{303}{section.1735}%
-\contentsline {section}{\numberline {E.6}Extended Case Study: Steam vs Patience}{303}{section.1736}%
-\contentsline {section}{\numberline {E.7}End-to-End Week}{303}{section.1737}%
-\contentsline {section}{\numberline {E.8}Case Studies (Extended II)}{303}{section.1738}%
-\contentsline {subsection}{\numberline {E.8.1}Late Steam and Weather Convergence}{303}{subsection.1739}%
-\contentsline {subsection}{\numberline {E.8.2}Injury Status Flip and Correlation Risk}{304}{subsection.1740}%
-\contentsline {chapter}{\numberline {F}Operations}{305}{appendix.1741}%
-\contentsline {section}{\numberline {F.1}Risk and Governance Playbook}{305}{section.1742}%
-\contentsline {section}{\numberline {F.2}Simulation Configuration}{305}{section.1743}%
-\contentsline {subsection}{\numberline {F.2.1}Extended Scenario Library}{305}{subsection.1744}%
-\contentsline {section}{\numberline {F.3}Operational Runbooks}{306}{section.1745}%
-\contentsline {subsection}{\numberline {F.3.1}Promotion Workflow}{306}{subsection.1746}%
-\contentsline {section}{\numberline {F.4}Governance Checklists}{306}{section.1747}%
-\contentsline {section}{\numberline {F.5}Data Drift Examples}{306}{section.1748}%
-\contentsline {section}{\numberline {F.6}Compute Budget and Latency}{306}{section.1749}%
-\contentsline {section}{\numberline {F.7}Operator SOPs (Extended)}{306}{section.1750}%
-\contentsline {subsection}{\numberline {F.7.1}Pre-Kick Checklist}{306}{subsection.1751}%
-\contentsline {subsection}{\numberline {F.7.2}During-Week Monitoring}{307}{subsection.1752}%
-\contentsline {subsection}{\numberline {F.7.3}Post-Week Review}{307}{subsection.1753}%
-\contentsline {section}{\numberline {F.8}Operations Playbook (Extended)}{307}{section.1754}%
-\contentsline {subsection}{\numberline {F.8.1}Weekly Cycle}{307}{subsection.1755}%
-\contentsline {subsection}{\numberline {F.8.2}Incident Response}{307}{subsection.1761}%
-\contentsline {subsection}{\numberline {F.8.3}Change Management}{307}{subsection.1766}%
-\contentsline {chapter}{\numberline {G}Risk \& Execution}{308}{appendix.1767}%
-\contentsline {section}{\numberline {G.1}Risk Envelope Design (Extended)}{308}{section.1768}%
-\contentsline {subsection}{\numberline {G.1.1}Budgeting and CVaR Targets}{308}{subsection.1769}%
-\contentsline {subsection}{\numberline {G.1.2}Correlation Estimation}{308}{subsection.1770}%
-\contentsline {subsection}{\numberline {G.1.3}Stress Testing}{308}{subsection.1771}%
-\contentsline {subsection}{\numberline {G.1.4}Case Studies}{308}{subsection.1772}%
-\contentsline {section}{\numberline {G.2}Portfolio and CVaR Optimization}{309}{section.1773}%
-\contentsline {section}{\numberline {G.3}Execution Microstructure Notes}{309}{section.1774}%
-\contentsline {subsection}{\numberline {G.3.1}Rogue Prints and Consensus}{309}{subsection.1775}%
-\contentsline {subsection}{\numberline {G.3.2}Steam vs Patience}{309}{subsection.1776}%
-\contentsline {subsection}{\numberline {G.3.3}Fill Reliability and Partial Orders}{309}{subsection.1777}%
-\contentsline {subsection}{\numberline {G.3.4}Limit Ladders}{309}{subsection.1778}%
-\contentsline {section}{\numberline {G.4}Execution Microstructure (Extended II)}{309}{section.1779}%
-\contentsline {subsection}{\numberline {G.4.1}Routing Heuristics}{309}{subsection.1780}%
-\contentsline {subsection}{\numberline {G.4.2}Order Book Patterns}{310}{subsection.1781}%
-\contentsline {subsection}{\numberline {G.4.3}Latency Histograms}{310}{subsection.1782}%
-\contentsline {subsection}{\numberline {G.4.4}Partial Fills and Retry Logic}{310}{subsection.1783}%
-\contentsline {section}{\numberline {G.5}Failure Modes and Effects Analysis (FMEA)}{310}{section.1784}%
-\contentsline {subsection}{\numberline {G.5.1}Data Failures}{310}{subsection.1785}%
-\contentsline {subsection}{\numberline {G.5.2}Model Failures}{310}{subsection.1786}%
-\contentsline {subsection}{\numberline {G.5.3}Execution Failures}{310}{subsection.1787}%
-\contentsline {subsection}{\numberline {G.5.4}Governance Failures}{310}{subsection.1788}%
-\contentsline {chapter}{\numberline {H}Dataset Documentation}{311}{appendix.1789}%
-\contentsline {section}{\numberline {H.1}Schema Reference}{311}{section.1790}%
-\contentsline {section}{\numberline {H.2}Schema DDL Snippets}{311}{section.1791}%
-\contentsline {section}{\numberline {H.3}Dataset Documentation (Extended)}{311}{section.1792}%
-\contentsline {subsection}{\numberline {H.3.1}Odds History Schema}{312}{subsection.1793}%
-\contentsline {subsection}{\numberline {H.3.2}Feature Artefacts}{312}{subsection.1794}%
-\contentsline {subsection}{\numberline {H.3.3}Quality Controls}{312}{subsection.1795}%
-\contentsline {subsection}{\numberline {H.3.4}Privacy and Ethics}{312}{subsection.1796}%
-\contentsline {section}{\numberline {H.4}Representative Team Profiles}{312}{section.1797}%
-\contentsline {paragraph}{Pass-Heavy Team}{312}{section*.1798}%
-\contentsline {paragraph}{Defense-First Team}{312}{section*.1799}%
-\contentsline {paragraph}{High-Variance Team}{312}{section*.1800}%
-\contentsline {paragraph}{Dome Team}{313}{section*.1801}%
-\contentsline {paragraph}{Balanced Team}{313}{section*.1802}%
-\contentsline {section}{\numberline {H.5}Team Profiles (Anonymous)}{313}{section.1803}%
-\contentsline {chapter}{\numberline {I}Production Deployment and Operational Edges}{315}{appendix.1804}%
-\contentsline {section}{\numberline {I.1}Claude AI Integration for Semantic Research Exploration}{315}{section.1805}%
-\contentsline {subsection}{\numberline {I.1.1}Motivation: From Batch Analytics to Conversational Research}{316}{subsection.1806}%
-\contentsline {paragraph}{The Case for Conversational Research.}{316}{section*.1812}%
-\contentsline {paragraph}{Why This Matters for NFL Betting.}{317}{section*.1813}%
-\contentsline {subsection}{\numberline {I.1.2}Architecture: Natural Language to Actionable Insights}{317}{subsection.1814}%
-\contentsline {paragraph}{Step 1: Query Understanding and Context Loading.}{317}{section*.1816}%
-\contentsline {paragraph}{Step 2: Query Planning.}{319}{section*.1817}%
-\contentsline {paragraph}{Step 3: Code Generation.}{319}{section*.1823}%
-\contentsline {paragraph}{Step 4: Execution and Result Interpretation.}{319}{section*.1824}%
-\contentsline {paragraph}{Step 5: Statistical Validation.}{320}{section*.1825}%
-\contentsline {paragraph}{Step 6: Production Recommendations.}{320}{section*.1826}%
-\contentsline {paragraph}{Step 7: Follow‑up Suggestions.}{321}{section*.1827}%
-\contentsline {subsection}{\numberline {I.1.3}Integration Points with Existing Infrastructure}{321}{subsection.1828}%
-\contentsline {paragraph}{Database Access (TimescaleDB + PostgreSQL).}{321}{section*.1829}%
-\contentsline {paragraph}{R Ecosystem (ggplot2, dplyr, nflfastR).}{321}{section*.1830}%
-\contentsline {paragraph}{Python ML Stack (XGBoost, SHAP, Statistical Tests).}{321}{section*.1831}%
-\contentsline {paragraph}{Statistical Framework (\texttt {py/compute/statistics/}).}{322}{section*.1832}%
-\contentsline {paragraph}{Quarto Notebooks (Reproducibility).}{322}{section*.1833}%
-\contentsline {subsection}{\numberline {I.1.4}Use Case 1: Post‑Game Upset Analysis}{323}{subsection.1834}%
-\contentsline {paragraph}{Scenario.}{323}{section*.1835}%
-\contentsline {paragraph}{Conversational Workflow.}{323}{section*.1836}%
-\contentsline {subsection}{\numberline {I.1.5}Use Case 2: Narrative Validation (Rest Advantage, Primetime Effects)}{325}{subsection.1837}%
-\contentsline {paragraph}{Research Question.}{325}{section*.1838}%
-\contentsline {paragraph}{Conversational Workflow.}{325}{section*.1839}%
-\contentsline {subsection}{\numberline {I.1.6}Use Case 3: Model Debugging and Feature Discovery}{327}{subsection.1840}%
-\contentsline {paragraph}{Scenario.}{327}{section*.1841}%
-\contentsline {paragraph}{Conversational Workflow.}{327}{section*.1842}%
-\contentsline {subsection}{\numberline {I.1.7}Technical Implementation}{329}{subsection.1843}%
-\contentsline {paragraph}{Database Access.}{329}{section*.1844}%
-\contentsline {paragraph}{R Script Generation.}{329}{section*.1845}%
-\contentsline {paragraph}{Python ML and Statistical Code.}{329}{section*.1846}%
-\contentsline {paragraph}{Quarto Notebook Generation.}{330}{section*.1847}%
-\contentsline {subsection}{\numberline {I.1.8}Value Proposition and Limitations}{331}{subsection.1848}%
-\contentsline {paragraph}{High‑Value Applications.}{331}{section*.1849}%
-\contentsline {paragraph}{Limitations and Risks.}{331}{section*.1850}%
-\contentsline {paragraph}{Production Recommendations.}{332}{section*.1851}%
-\contentsline {subsection}{\numberline {I.1.9}Future Extensions: Retrieval‑Augmented Generation and Live Analysis}{332}{subsection.1852}%
-\contentsline {paragraph}{1. Retrieval‑Augmented Generation (RAG).}{332}{section*.1853}%
-\contentsline {paragraph}{2. Live Game Analysis.}{333}{section*.1854}%
-\contentsline {paragraph}{3. Automated Narrative Discovery.}{333}{section*.1855}%
-\contentsline {paragraph}{4. Cross‑Season Drift Analysis.}{333}{section*.1856}%
-\contentsline {section}{\numberline {I.2}System Architecture and Ensemble Deployment}{333}{section.1857}%
-\contentsline {paragraph}{Deployment Decision Rules.}{334}{section*.1858}%
-\contentsline {section}{\numberline {I.3}Kelly Criterion Bet Sizing}{334}{section.1859}%
-\contentsline {paragraph}{1/4 Kelly (Conservative).}{334}{section*.1860}%
-\contentsline {paragraph}{1/2 Kelly (Moderate).}{335}{section*.1861}%
-\contentsline {paragraph}{Dynamic Scaling.}{335}{section*.1862}%
-\contentsline {paragraph}{Risk Limits.}{335}{section*.1863}%
-\contentsline {section}{\numberline {I.4}Line Shopping Infrastructure}{335}{section.1864}%
-\contentsline {paragraph}{Tier 1: Sharp Books (Best Lines).}{335}{section*.1865}%
-\contentsline {paragraph}{Tier 2: Mainstream Books (Moderate Lines).}{335}{section*.1866}%
-\contentsline {paragraph}{Tier 3: Recreational Books (Soft Lines).}{336}{section*.1867}%
-\contentsline {paragraph}{Line Shopping Strategy.}{336}{section*.1868}%
-\contentsline {section}{\numberline {I.5}Early Week Betting Strategy}{336}{section.1873}%
-\contentsline {paragraph}{EWB Strategy.}{337}{section*.1874}%
-\contentsline {paragraph}{Backtest Results (2010--2024).}{337}{section*.1879}%
-\contentsline {section}{\numberline {I.6}Props Market Extension}{337}{section.1880}%
-\contentsline {paragraph}{Props Modeling Strategy.}{338}{section*.1881}%
-\contentsline {paragraph}{Expected Performance.}{338}{section*.1886}%
-\contentsline {paragraph}{Risk Management.}{338}{section*.1887}%
-\contentsline {section}{\numberline {I.7}Monitoring and Risk Management}{338}{section.1888}%
-\contentsline {paragraph}{1. Rolling Performance Tracking.}{338}{section*.1889}%
-\contentsline {paragraph}{2. Weekly Bootstrap Stress Tests.}{338}{section*.1890}%
-\contentsline {paragraph}{3. Thompson Switching Logic.}{339}{section*.1891}%
-\contentsline {paragraph}{4. Streamlit Production Dashboard.}{339}{section*.1892}%
-\contentsline {section}{\numberline {I.8}Data Sources for Signal Enhancement}{339}{section.1893}%
-\contentsline {paragraph}{NFL Pro Subscription (LOW VALUE).}{339}{section*.1894}%
-\contentsline {paragraph}{Pro Football Focus (PFF) Elite (\$300/year, +0.5--1\% EV).}{339}{section*.1895}%
-\contentsline {paragraph}{NextGen Stats API (\$5--10K/year, +1--2\% EV).}{340}{section*.1896}%
-\contentsline {paragraph}{SportsRadar NFL API (\$10--20K/year, +0.5--1\% EV).}{340}{section*.1897}%
-\contentsline {paragraph}{Data Source Roadmap.}{340}{section*.1898}%
-\contentsline {section}{\numberline {I.9}Expected Returns and Deployment Timeline}{341}{section.1903}%
-\contentsline {paragraph}{Year 1 Projections (Majority Voting, Free Data).}{341}{section*.1904}%
-\contentsline {paragraph}{Year 2 Projections (Majority + PFF Elite).}{341}{section*.1905}%
-\contentsline {paragraph}{Thompson Sampling Projections (Year 2+).}{342}{section*.1906}%
-\contentsline {paragraph}{8‑Week Deployment Timeline.}{342}{section*.1907}%
-\contentsline {section}{Chapter Summary}{343}{section*.1908}%
-\contentsline {chapter}{\numberline {J}Temporal Leakage Audit}{344}{appendix.1909}%
-\contentsline {section}{\numberline {J.1}Audit Methodology}{344}{section.1910}%
-\contentsline {section}{\numberline {J.2}Feature Catalog Structure}{344}{section.1915}%
-\contentsline {section}{\numberline {J.3}Automated Audit Results}{344}{section.1917}%
-\contentsline {subsection}{\numberline {J.3.1}Findings Interpretation}{345}{subsection.1919}%
-\contentsline {section}{\numberline {J.4}Runtime Validation Examples}{346}{section.1920}%
-\contentsline {section}{\numberline {J.5}Feature Safety Matrix}{346}{section.1935}%
-\contentsline {section}{\numberline {J.6}Unit Test Coverage}{347}{section.1937}%
-\contentsline {section}{\numberline {J.7}SQL Query Audit}{347}{section.1939}%
-\contentsline {section}{\numberline {J.8}CI/CD Integration}{347}{section.1940}%
-\contentsline {section}{\numberline {J.9}Certification Statement}{348}{section.1952}%
-\contentsline {section}{\numberline {J.10}Maintenance Guidelines}{348}{section.1953}%
-\contentsline {section}{\numberline {J.11}Related Documentation}{349}{section.1959}%
-\contentsline {section}{\numberline {J.12}Summary}{349}{section.1960}%
-\contentsline {chapter}{\numberline {K}Alternative Modeling Approaches Considered}{350}{appendix.1966}%
-\contentsline {section}{\numberline {K.1}Graph Neural Networks for Team Matchup Dynamics}{350}{section.1967}%
-\contentsline {subsection}{\numberline {K.1.1}Conceptual Framework}{350}{subsection.1968}%
-\contentsline {subsection}{\numberline {K.1.2}Implementation Sketch}{350}{subsection.1969}%
-\contentsline {subsection}{\numberline {K.1.3}Evaluation Results}{351}{subsection.1971}%
-\contentsline {subsection}{\numberline {K.1.4}Why Not Implemented}{351}{subsection.1972}%
-\contentsline {subsection}{\numberline {K.1.5}Future Directions}{351}{subsection.1973}%
-\contentsline {section}{\numberline {K.2}Regime Detection and Changepoint Algorithms}{352}{section.1974}%
-\contentsline {subsection}{\numberline {K.2.1}Motivation}{352}{subsection.1975}%
-\contentsline {subsection}{\numberline {K.2.2}Changepoint Detection Methods}{352}{subsection.1976}%
-\contentsline {subsubsection}{PELT (Pruned Exact Linear Time)}{352}{section*.1977}%
-\contentsline {subsubsection}{Hidden Markov Models}{352}{section*.1979}%
-\contentsline {subsubsection}{Bayesian Online Changepoint Detection}{352}{section*.1980}%
-\contentsline {subsection}{\numberline {K.2.3}Empirical Comparison}{352}{subsection.1982}%
-\contentsline {paragraph}{Qualitative Findings.}{353}{section*.1984}%
-\contentsline {subsection}{\numberline {K.2.4}Decision: Exponential Decay Preferred}{353}{subsection.1985}%
-\contentsline {subsection}{\numberline {K.2.5}When Changepoint Detection Adds Value}{353}{subsection.1986}%
-\contentsline {section}{\numberline {K.3}Dynamic Correlation Models}{354}{section.1987}%
-\contentsline {subsection}{\numberline {K.3.1}Limitations of Static Copulas}{354}{subsection.1988}%
-\contentsline {subsection}{\numberline {K.3.2}DCC-GARCH Framework}{354}{subsection.1989}%
-\contentsline {subsection}{\numberline {K.3.3}Regime-Switching Copulas}{354}{subsection.1993}%
-\contentsline {subsection}{\numberline {K.3.4}Implementation Trade-offs}{354}{subsection.1995}%
-\contentsline {paragraph}{Findings.}{354}{section*.1997}%
-\contentsline {subsection}{\numberline {K.3.5}Decision: Static Copulas with Regime Stratification}{355}{subsection.1998}%
-\contentsline {subsection}{\numberline {K.3.6}Future Extensions}{355}{subsection.1999}%
-\contentsline {section}{\numberline {K.4}Synthesis: Parsimony vs Complexity}{356}{section.2000}%
-\contentsline {paragraph}{Key Insights.}{356}{section*.2002}%
-\contentsline {paragraph}{Recommendation.}{356}{section*.2003}%
-\contentsline {chapter}{References}{357}{section*.2008}%
+\contentsline {chapter}{\numberline {7}Uncertainty and Risk Management}{138}{chapter.783}%
+\contentsline {section}{\numberline {7.1}Kelly criterion and fractional scaling}{138}{section.785}%
+\contentsline {subsection}{\numberline {7.1.1}Parameter uncertainty: posterior–lower–bound Kelly}{138}{subsection.787}%
+\contentsline {subsection}{\numberline {7.1.2}Kelly with friction and caps}{139}{subsection.790}%
+\contentsline {subsection}{\numberline {7.1.3}Approximate ruin probability}{139}{subsection.792}%
+\contentsline {section}{\numberline {7.2}CVaR-constrained stake sizing}{139}{section.793}%
+\contentsline {subsection}{\numberline {7.2.1}Teaser Pricing and Copula Impact}{139}{subsection.797}%
+\contentsline {subsection}{\numberline {7.2.2}Computational complexity and wall-clock}{140}{subsection.800}%
+\contentsline {section}{\numberline {7.3}Uncertainty Quantification}{141}{section.801}%
+\contentsline {section}{\numberline {7.4}Drawdown Analytics}{141}{section.802}%
+\contentsline {section}{\numberline {7.5}Governance and Reporting}{141}{section.804}%
+\contentsline {section}{\numberline {7.6}Multi-Model Reliability Analysis}{142}{section.813}%
+\contentsline {subsection}{\numberline {7.6.1}Multi-Model Comparison}{142}{subsection.814}%
+\contentsline {paragraph}{Evaluation Protocol.}{142}{section*.815}%
+\contentsline {paragraph}{Reliability Calibration.}{143}{section*.816}%
+\contentsline {paragraph}{Model Class Results.}{143}{table.caption.818}%
+\contentsline {paragraph}{Reliability Panels and Diagnostic Plots.}{143}{section*.819}%
+\contentsline {section}{\numberline {7.7}Profit Optimization Results}{144}{section.820}%
+\contentsline {subsection}{\numberline {7.7.1}System Architecture}{144}{subsection.821}%
+\contentsline {subsection}{\numberline {7.7.2}Backtesting Results}{144}{subsection.823}%
+\contentsline {subsection}{\numberline {7.7.3}Component Attribution}{145}{subsection.825}%
+\contentsline {subsection}{\numberline {7.7.4}Case Studies}{145}{subsection.827}%
+\contentsline {subsubsection}{Case 1: Alternative Line Value Capture}{145}{section*.828}%
+\contentsline {subsubsection}{Case 2: Sharp Money Alignment}{145}{section*.829}%
+\contentsline {subsubsection}{Case 3: Uncertainty Segmentation in Action}{145}{section*.830}%
+\contentsline {subsection}{\numberline {7.7.5}Key Insights}{146}{subsection.831}%
+\contentsline {section}{Chapter Summary}{146}{section*.837}%
+\contentsline {chapter}{\numberline {8}Simulation and Strategy Evaluation}{149}{chapter.838}%
+\contentsline {section}{\numberline {8.1}Monte Carlo estimators: LLN and CLT}{149}{section.839}%
+\contentsline {section}{\numberline {8.2}Teaser pricing and middle thresholds}{149}{section.841}%
+\contentsline {paragraph}{Relation to Wong teasers.}{149}{section*.844}%
+\contentsline {subsection}{\numberline {8.2.1}Variance reduction}{151}{subsection.846}%
+\contentsline {subsection}{\numberline {8.2.2}Importance sampling for rare events}{151}{subsection.847}%
+\contentsline {section}{\numberline {8.3}Scenario Construction}{151}{section.848}%
+\contentsline {subsection}{\numberline {8.3.1}Dependence sanity check (Gaussian copula)}{151}{subsection.850}%
+\contentsline {subsection}{\numberline {8.3.2}Transaction Costs and Slippage}{151}{subsection.851}%
+\contentsline {paragraph}{Calibration of slippage parameters.}{151}{section*.852}%
+\contentsline {section}{\numberline {8.4}Strategy Catalogue}{152}{section.853}%
+\contentsline {section}{\numberline {8.5}Sensitivity Analysis}{152}{section.857}%
+\contentsline {section}{\numberline {8.6}Calibration and Validation}{152}{section.858}%
+\contentsline {section}{\numberline {8.7}Monte Carlo Validation Metrics}{152}{section.859}%
+\contentsline {subsection}{\numberline {8.7.1}Convergence Diagnostics}{152}{subsection.860}%
+\contentsline {paragraph}{Batch Means Method.}{152}{section*.861}%
+\contentsline {subsection}{\numberline {8.7.2}Distribution Calibration Metrics}{153}{subsection.864}%
+\contentsline {paragraph}{Marginal Distribution Tests.}{153}{section*.865}%
+\contentsline {paragraph}{Key-Number Mass Preservation.}{153}{section*.866}%
+\contentsline {paragraph}{Dependence Structure Validation.}{153}{section*.867}%
+\contentsline {subsection}{\numberline {8.7.3}Backtesting Protocol}{154}{subsection.868}%
+\contentsline {section}{\numberline {8.8}Simulation Validation Results}{154}{section.874}%
+\contentsline {paragraph}{Acceptance Test Pass Rates.}{154}{section*.876}%
+\contentsline {paragraph}{Predictive Performance Correlation.}{155}{section*.877}%
+\contentsline {section}{\numberline {8.9}Benchmarking Methodology}{155}{section.878}%
+\contentsline {section}{\numberline {8.10}Simulator Architecture}{155}{section.879}%
+\contentsline {section}{\numberline {8.11}Acceptance Tests}{155}{section.880}%
+\contentsline {section}{\numberline {8.12}Friction Models}{156}{section.889}%
+\contentsline {section}{\numberline {8.13}Simulator Acceptance Tests: Outcomes}{156}{section.892}%
+\contentsline {section}{Chapter Summary}{156}{section*.897}%
+\contentsline {chapter}{\numberline {9}Results and Discussion}{158}{chapter.898}%
+\contentsline {section}{\numberline {9.1}The Central Finding: Calibration Without Profitability}{158}{section.900}%
+\contentsline {section}{\numberline {9.2}Data Leakage Investigation: From Fantasy to Reality}{159}{section.901}%
+\contentsline {subsection}{\numberline {9.2.1}The Red Flag: Too Good to Be True}{159}{subsection.902}%
+\contentsline {subsection}{\numberline {9.2.2}Root Cause 1: Severe Post-Game EPA Contamination}{159}{subsection.903}%
+\contentsline {paragraph}{The Problem.}{159}{section*.904}%
+\contentsline {paragraph}{The Fix.}{159}{section*.909}%
+\contentsline {subsection}{\numberline {9.2.3}Root Cause 2: NULL Kickoff Ordering Artifacts}{160}{subsection.912}%
+\contentsline {paragraph}{The Problem.}{160}{section*.913}%
+\contentsline {paragraph}{Impact Quantification.}{160}{section*.914}%
+\contentsline {paragraph}{The Fix.}{160}{section*.916}%
+\contentsline {subsection}{\numberline {9.2.4}Validation: Spread-Only Baseline Proves Feature Integrity}{160}{subsection.922}%
+\contentsline {paragraph}{Results (\Cref {tab:spread-baseline}).}{160}{table.caption.924}%
+\contentsline {subsection}{\numberline {9.2.5}Recent Seasons Test: Minimal Training Window}{161}{subsection.925}%
+\contentsline {subsection}{\numberline {9.2.6}Remaining Leakage: Season-Level Features}{161}{subsection.926}%
+\contentsline {paragraph}{Hypothesis.}{161}{section*.927}%
+\contentsline {paragraph}{Expected Impact.}{161}{section*.928}%
+\contentsline {paragraph}{Next Steps.}{162}{section*.929}%
+\contentsline {subsection}{\numberline {9.2.7}Lessons for Sports Analytics Research}{162}{subsection.933}%
+\contentsline {paragraph}{1. Trust but verify extraordinary results.}{162}{section*.934}%
+\contentsline {paragraph}{2. Multiple leakage sources compound.}{162}{section*.935}%
+\contentsline {paragraph}{3. Validation baselines are essential.}{162}{section*.936}%
+\contentsline {paragraph}{4. Temporal audits must be obsessive.}{162}{section*.937}%
+\contentsline {paragraph}{5. Document negative findings prominently.}{162}{section*.938}%
+\contentsline {subsection}{\numberline {9.2.8}Impact on Dissertation Claims}{162}{subsection.939}%
+\contentsline {paragraph}{Before investigation.}{162}{section*.940}%
+\contentsline {paragraph}{After investigation.}{163}{section*.941}%
+\contentsline {paragraph}{Revised thesis claim.}{163}{section*.942}%
+\contentsline {subsection}{\numberline {9.2.9}Final Status: Partially Resolved}{163}{subsection.943}%
+\contentsline {section}{\numberline {9.3}Empirical Validation: 40 Experiments}{163}{section.944}%
+\contentsline {section}{\numberline {9.4}Experimental Framework for Model Validation}{164}{section.945}%
+\contentsline {subsection}{\numberline {9.4.1}Experimental Design Methodology}{164}{subsection.946}%
+\contentsline {subsubsection}{Experiment Selection Criteria}{164}{section*.950}%
+\contentsline {subsection}{\numberline {9.4.2}ROI/EV Scoring Methodology}{165}{subsection.951}%
+\contentsline {subsubsection}{Domain Knowledge Priors}{165}{section*.953}%
+\contentsline {subsection}{\numberline {9.4.3}Experimental Infrastructure}{165}{subsection.955}%
+\contentsline {subsubsection}{Experiment Executor}{165}{section*.956}%
+\contentsline {subsubsection}{Panel Data Constructor}{166}{section*.957}%
+\contentsline {subsubsection}{ROI Evaluator}{166}{section*.971}%
+\contentsline {subsection}{\numberline {9.4.4}Execution Results}{166}{subsection.982}%
+\contentsline {subsubsection}{Success Criteria}{167}{section*.984}%
+\contentsline {subsubsection}{Failure Analysis}{167}{section*.989}%
+\contentsline {subsection}{\numberline {9.4.5}Data Coverage}{167}{subsection.990}%
+\contentsline {subsection}{\numberline {9.4.6}Computational Performance}{167}{subsection.991}%
+\contentsline {subsection}{\numberline {9.4.7}Reproducibility}{168}{subsection.992}%
+\contentsline {section}{\numberline {9.5}Conditional VAE Experiments}{168}{section.993}%
+\contentsline {subsection}{\numberline {9.5.1}Theoretical Foundation}{168}{subsection.994}%
+\contentsline {subsection}{\numberline {9.5.2}Experiment Categories}{168}{subsection.997}%
+\contentsline {subsubsection}{Game Trajectory Synthesis (5 experiments)}{168}{section*.998}%
+\contentsline {subsubsection}{Game Context Modeling (5 experiments)}{169}{section*.1004}%
+\contentsline {subsubsection}{Situational Contexts (5 experiments)}{170}{section*.1010}%
+\contentsline {subsubsection}{Advanced Applications (5 experiments)}{171}{section*.1016}%
+\contentsline {subsection}{\numberline {9.5.3}Top Performing cVAE Experiments}{171}{subsection.1022}%
+\contentsline {subsection}{\numberline {9.5.4}Empirical Results}{171}{subsection.1024}%
+\contentsline {subsubsection}{CVAE-007: Blowout Detection}{172}{section*.1025}%
+\contentsline {subsubsection}{CVAE-011: Home Field Advantage}{172}{section*.1027}%
+\contentsline {subsubsection}{CVAE-014: Playoff-Bound Teams}{172}{section*.1028}%
+\contentsline {subsection}{\numberline {9.5.5}Implementation Details}{173}{subsection.1029}%
+\contentsline {subsection}{\numberline {9.5.6}Limitations and Future Work}{173}{subsection.1056}%
+\contentsline {subsubsection}{Data Availability}{173}{section*.1057}%
+\contentsline {subsubsection}{Model Architecture}{173}{section*.1058}%
+\contentsline {subsubsection}{Validation}{174}{section*.1059}%
+\contentsline {section}{\numberline {9.6}Causal Inference Experiments}{174}{section.1060}%
+\contentsline {subsection}{\numberline {9.6.1}Theoretical Foundation}{174}{subsection.1061}%
+\contentsline {subsection}{\numberline {9.6.2}Experiment Categories}{174}{subsection.1063}%
+\contentsline {subsubsection}{Environmental Effects (4 experiments)}{174}{section*.1064}%
+\contentsline {subsubsection}{Player and Team Effects (6 experiments)}{175}{section*.1069}%
+\contentsline {subsubsection}{Strategic Decisions (6 experiments)}{176}{section*.1076}%
+\contentsline {subsubsection}{Natural Experiments (4 experiments)}{177}{section*.1083}%
+\contentsline {subsection}{\numberline {9.6.3}Top Performing Causal Experiments}{178}{subsection.1088}%
+\contentsline {subsection}{\numberline {9.6.4}Methodological Highlights}{178}{subsection.1090}%
+\contentsline {subsubsection}{CAUSAL-014: Fourth Down Aggression}{178}{section*.1091}%
+\contentsline {subsubsection}{CAUSAL-008: Offensive Line Quality}{179}{section*.1094}%
+\contentsline {subsection}{\numberline {9.6.5}Sensitivity Analysis}{179}{subsection.1102}%
+\contentsline {subsubsection}{Parallel Trends (DiD)}{179}{section*.1103}%
+\contentsline {subsubsection}{Rosenbaum Bounds (Hidden Bias)}{180}{section*.1105}%
+\contentsline {subsubsection}{Placebo Tests (Synthetic Control)}{180}{section*.1107}%
+\contentsline {subsection}{\numberline {9.6.6}Limitations and Threats to Validity}{180}{subsection.1108}%
+\contentsline {subsubsection}{Internal Validity}{180}{section*.1109}%
+\contentsline {subsubsection}{External Validity}{180}{section*.1110}%
+\contentsline {subsubsection}{Statistical Power}{181}{section*.1111}%
+\contentsline {subsection}{\numberline {9.6.7}Betting Strategy Implications}{181}{subsection.1114}%
+\contentsline {subsubsection}{CAUSAL-014: Fourth Down Aggression}{181}{section*.1115}%
+\contentsline {subsubsection}{CAUSAL-008: OL Quality}{181}{section*.1116}%
+\contentsline {subsubsection}{CAUSAL-020: Draft Capital Bias}{181}{section*.1117}%
+\contentsline {paragraph}{Experimental Validation Summary.}{182}{section*.1118}%
+\contentsline {section}{\numberline {9.7}Predictive Performance}{182}{section.1119}%
+\contentsline {subsection}{\numberline {9.7.1}Where Models Succeed}{183}{subsection.1121}%
+\contentsline {paragraph}{Calibration.}{183}{section*.1122}%
+\contentsline {paragraph}{Temporal Stability.}{183}{section*.1125}%
+\contentsline {paragraph}{Ensemble Gains.}{183}{section*.1126}%
+\contentsline {paragraph}{Feature Engineering.}{184}{section*.1127}%
+\contentsline {subsection}{\numberline {9.7.2}Where Models Fail}{184}{subsection.1128}%
+\contentsline {subsection}{\numberline {9.7.3}Table of Record: Out-of-Sample Results}{185}{subsection.1133}%
+\contentsline {section}{\numberline {9.8}Bayesian Neural Network Calibration: A Systematic Investigation}{185}{section.1135}%
+\contentsline {subsection}{\numberline {9.8.1}Motivation and Research Questions}{185}{subsection.1136}%
+\contentsline {subsubsection}{The Central Puzzle}{185}{section*.1137}%
+\contentsline {subsubsection}{Research Questions}{186}{section*.1142}%
+\contentsline {subsubsection}{Methodological Approach}{186}{section*.1143}%
+\contentsline {subsection}{\numberline {9.8.2}Phase 1: Feature Engineering Study}{188}{subsection.1146}%
+\contentsline {subsubsection}{Hypothesis and Motivation}{188}{section*.1147}%
+\contentsline {subsubsection}{Feature Groups Investigated}{188}{section*.1148}%
+\contentsline {subsubsection}{Experimental Design}{189}{section*.1149}%
+\contentsline {subsubsection}{Results}{190}{section*.1150}%
+\contentsline {subsubsection}{Discussion and Implications}{191}{section*.1154}%
+\contentsline {subsection}{\numberline {9.8.3}Phase 2: Prior Sensitivity Analysis}{191}{subsection.1158}%
+\contentsline {subsubsection}{Hypothesis and Motivation}{191}{section*.1159}%
+\contentsline {subsubsection}{Experimental Design}{192}{section*.1160}%
+\contentsline {subsubsection}{Results}{193}{section*.1164}%
+\contentsline {subsubsection}{Discussion and Implications}{193}{section*.1169}%
+\contentsline {paragraph}{Why Does Prior Robustness Occur?}{193}{section*.1170}%
+\contentsline {paragraph}{Implications for Bayesian Deep Learning}{194}{section*.1171}%
+\contentsline {paragraph}{Ruling Out Prior Misspecification}{194}{section*.1172}%
+\contentsline {subsection}{\numberline {9.8.4}Phase 3: Alternative Uncertainty Quantification Methods}{194}{subsection.1173}%
+\contentsline {subsubsection}{Hypothesis and Motivation}{194}{section*.1174}%
+\contentsline {subsubsection}{Methods}{195}{section*.1178}%
+\contentsline {paragraph}{Quantile Regression}{195}{section*.1179}%
+\contentsline {paragraph}{Conformal Prediction}{195}{section*.1181}%
+\contentsline {paragraph}{Multi-output Bayesian Neural Network}{196}{section*.1187}%
+\contentsline {subsubsection}{Results}{197}{section*.1191}%
+\contentsline {paragraph}{Quantile Regression: Fast and Well-Calibrated}{197}{section*.1194}%
+\contentsline {paragraph}{Conformal Prediction: Distribution-Free Guarantees}{197}{section*.1195}%
+\contentsline {paragraph}{Multi-output BNN: Architectural Breakthrough}{197}{section*.1196}%
+\contentsline {subsubsection}{Coverage-Sharpness Trade-off}{198}{section*.1197}%
+\contentsline {subsubsection}{Discussion and Implications}{199}{section*.1202}%
+\contentsline {paragraph}{The Problem is Methodological, Not Fundamental}{199}{section*.1203}%
+\contentsline {paragraph}{Non-Bayesian Methods Challenge Bayesian Deep Learning}{199}{section*.1204}%
+\contentsline {paragraph}{Architecture Matters More Than Hyperparameters}{200}{section*.1205}%
+\contentsline {paragraph}{Joint Modeling as a General Solution}{200}{section*.1207}%
+\contentsline {paragraph}{Post-Hoc Calibration: Temperature Scaling}{201}{section*.1208}%
+\contentsline {subsection}{\numberline {9.8.5}Phase 4: Bayesian Hyperparameter Optimization}{202}{subsection.1213}%
+\contentsline {subsubsection}{Hypothesis and Motivation}{202}{section*.1214}%
+\contentsline {subsubsection}{Optimization Strategy}{203}{section*.1215}%
+\contentsline {subsubsection}{Results}{203}{section*.1217}%
+\contentsline {subsubsection}{Comparison with Prior Phases}{204}{section*.1219}%
+\contentsline {subsubsection}{Discussion and Implications}{205}{section*.1221}%
+\contentsline {paragraph}{Hyperparameter Tuning is Insufficient}{205}{section*.1222}%
+\contentsline {paragraph}{Architecture Dominates Hyperparameters (Quantified)}{205}{section*.1223}%
+\contentsline {paragraph}{Negative Results as Methodological Contributions}{205}{section*.1228}%
+\contentsline {paragraph}{Computational Cost vs. Benefit}{206}{section*.1229}%
+\contentsline {subsection}{\numberline {9.8.6}Synthesis and Key Findings}{206}{subsection.1230}%
+\contentsline {subsubsection}{The Hierarchy of Modeling Choices}{206}{section*.1231}%
+\contentsline {subsubsection}{Non-Bayesian Baselines are Essential}{207}{section*.1237}%
+\contentsline {subsubsection}{Joint Modeling as a General Strategy}{207}{section*.1238}%
+\contentsline {subsubsection}{Computational Investment Summary}{208}{section*.1239}%
+\contentsline {subsection}{\numberline {9.8.7}Recommendations for Practitioners}{208}{subsection.1241}%
+\contentsline {subsubsection}{Decision Framework}{208}{section*.1242}%
+\contentsline {subsubsection}{When Facing Calibration Failures}{208}{section*.1244}%
+\contentsline {subsubsection}{What NOT to Use}{209}{section*.1249}%
+\contentsline {subsection}{\numberline {9.8.8}Limitations and Future Work}{209}{subsection.1250}%
+\contentsline {subsubsection}{Limitations}{209}{section*.1251}%
+\contentsline {subsubsection}{Future Research Directions}{210}{section*.1252}%
+\contentsline {subsection}{\numberline {9.8.9}Conclusion}{210}{subsection.1259}%
+\contentsline {section}{\numberline {9.9}Economic Value and Risk}{211}{section.1264}%
+\contentsline {section}{\numberline {9.10}Failure Analysis}{211}{section.1266}%
+\contentsline {subsection}{\numberline {9.10.1}Zero-bet weeks}{211}{subsection.1267}%
+\contentsline {subsection}{\numberline {9.10.2}When the system is wrong}{211}{subsection.1269}%
+\contentsline {paragraph}{Methodology.}{212}{section*.1270}%
+\contentsline {section}{\numberline {9.11}Model Interpretability and Explainability}{212}{section.1271}%
+\contentsline {subsection}{\numberline {9.11.1}GLM Baseline: Direct Interpretability}{212}{subsection.1272}%
+\contentsline {subsection}{\numberline {9.11.2}XGBoost: Feature Importance Analysis}{213}{subsection.1273}%
+\contentsline {paragraph}{Gain-based importance.}{213}{section*.1274}%
+\contentsline {paragraph}{Permutation importance.}{213}{section*.1280}%
+\contentsline {subsection}{\numberline {9.11.3}SHAP Value Analysis}{213}{subsection.1281}%
+\contentsline {subsection}{\numberline {9.11.4}Local Interpretable Model-Agnostic Explanations (LIME)}{214}{subsection.1286}%
+\contentsline {subsection}{\numberline {9.11.5}Attention Mechanisms in State-Space Models}{214}{subsection.1287}%
+\contentsline {subsection}{\numberline {9.11.6}Failure Mode Analysis Through Explainability}{214}{subsection.1288}%
+\contentsline {paragraph}{Overreliance on market signals.}{214}{section*.1289}%
+\contentsline {paragraph}{Inability to capture narrative.}{214}{section*.1290}%
+\contentsline {paragraph}{Recency bias in EPA metrics.}{214}{section*.1291}%
+\contentsline {section}{\numberline {9.12}Failed Approaches and Negative Results}{215}{section.1292}%
+\contentsline {subsection}{\numberline {9.12.1}Graph Neural Networks for Game Prediction}{215}{subsection.1293}%
+\contentsline {paragraph}{Motivation.}{215}{section*.1294}%
+\contentsline {paragraph}{Key Findings.}{215}{section*.1295}%
+\contentsline {paragraph}{Why GNNs Failed.}{215}{section*.1296}%
+\contentsline {paragraph}{Lessons Learned.}{216}{section*.1300}%
+\contentsline {subsection}{\numberline {9.12.2}Weather Features: A Rigorous Negative Result}{216}{subsection.1301}%
+\contentsline {paragraph}{Empirical Evidence.}{216}{section*.1302}%
+\contentsline {paragraph}{Why Weather Has Minimal Impact.}{224}{section*.1305}%
+\contentsline {paragraph}{Stadium Climate Zones.}{224}{section*.1306}%
+\contentsline {paragraph}{Model Impact.}{224}{section*.1307}%
+\contentsline {paragraph}{Value of Negative Results.}{224}{section*.1308}%
+\contentsline {subsection}{\numberline {9.12.3}Summary of Failed Approaches}{224}{subsection.1309}%
+\contentsline {section}{\numberline {9.13}Ablation Studies}{225}{section.1313}%
+\contentsline {section}{\numberline {9.14}Core Ablations}{225}{section.1314}%
+\contentsline {subsection}{\numberline {9.14.1}Multiplicity Control and Pre-Specification}{225}{subsection.1316}%
+\contentsline {section}{\numberline {9.15}Operational Insights}{226}{section.1317}%
+\contentsline {section}{\numberline {9.16}Case Study: A Week of Line Movement}{226}{section.1318}%
+\contentsline {section}{\numberline {9.17}Threats to Validity}{226}{section.1319}%
+\contentsline {section}{\numberline {9.18}Computational Requirements \& Scalability}{226}{section.1320}%
+\contentsline {section}{\numberline {9.19}Backtesting Protocol \& Bias Controls}{227}{section.1321}%
+\contentsline {section}{\numberline {9.20}Statistical Testing \& Multiple Comparisons}{227}{section.1322}%
+\contentsline {subsection}{\numberline {9.20.1}Diebold-Mariano Tests for Predictive Accuracy}{227}{subsection.1323}%
+\contentsline {subsection}{\numberline {9.20.2}Bootstrap Confidence Intervals}{227}{subsection.1325}%
+\contentsline {subsection}{\numberline {9.20.3}Multiple Testing Corrections}{228}{subsection.1327}%
+\contentsline {section}{\numberline {9.21}Failure Modes \& Worst‑Case Scenarios}{229}{section.1329}%
+\contentsline {section}{\numberline {9.22}Sensitivity Analysis Summary}{229}{section.1330}%
+\contentsline {section}{\numberline {9.23}Evaluation Protocol}{229}{section.1331}%
+\contentsline {section}{\numberline {9.24}Per-Season Narratives}{229}{section.1332}%
+\contentsline {section}{\numberline {9.25}Ablation Highlights}{232}{section.1334}%
+\contentsline {section}{\numberline {9.26}Limitations and External Validity}{232}{section.1335}%
+\contentsline {section}{Chapter Summary}{232}{section*.1336}%
+\contentsline {chapter}{\numberline {10}Production Deployment and Operational Edges}{233}{chapter.1337}%
+\contentsline {section}{\numberline {10.1}Claude AI Integration for Semantic Research Exploration}{233}{section.1338}%
+\contentsline {subsection}{\numberline {10.1.1}Motivation: From Batch Analytics to Conversational Research}{234}{subsection.1339}%
+\contentsline {paragraph}{The Case for Conversational Research.}{234}{section*.1345}%
+\contentsline {paragraph}{Why This Matters for NFL Betting.}{235}{section*.1346}%
+\contentsline {subsection}{\numberline {10.1.2}Architecture: Natural Language to Actionable Insights}{235}{subsection.1347}%
+\contentsline {paragraph}{Step 1: Query Understanding and Context Loading.}{235}{section*.1349}%
+\contentsline {paragraph}{Step 2: Query Planning.}{237}{section*.1350}%
+\contentsline {paragraph}{Step 3: Code Generation.}{237}{section*.1356}%
+\contentsline {paragraph}{Step 4: Execution and Result Interpretation.}{237}{section*.1357}%
+\contentsline {paragraph}{Step 5: Statistical Validation.}{238}{section*.1358}%
+\contentsline {paragraph}{Step 6: Production Recommendations.}{238}{section*.1359}%
+\contentsline {paragraph}{Step 7: Follow‑up Suggestions.}{239}{section*.1360}%
+\contentsline {subsection}{\numberline {10.1.3}Integration Points with Existing Infrastructure}{239}{subsection.1361}%
+\contentsline {paragraph}{Database Access (TimescaleDB + PostgreSQL).}{239}{section*.1362}%
+\contentsline {paragraph}{R Ecosystem (ggplot2, dplyr, nflfastR).}{239}{section*.1363}%
+\contentsline {paragraph}{Python ML Stack (XGBoost, SHAP, Statistical Tests).}{239}{section*.1364}%
+\contentsline {paragraph}{Statistical Framework (\texttt {py/compute/statistics/}).}{240}{section*.1365}%
+\contentsline {paragraph}{Quarto Notebooks (Reproducibility).}{240}{section*.1366}%
+\contentsline {subsection}{\numberline {10.1.4}Use Case 1: Post‑Game Upset Analysis}{241}{subsection.1367}%
+\contentsline {paragraph}{Scenario.}{241}{section*.1368}%
+\contentsline {paragraph}{Conversational Workflow.}{241}{section*.1369}%
+\contentsline {subsection}{\numberline {10.1.5}Use Case 2: Narrative Validation (Rest Advantage, Primetime Effects)}{243}{subsection.1370}%
+\contentsline {paragraph}{Research Question.}{243}{section*.1371}%
+\contentsline {paragraph}{Conversational Workflow.}{243}{section*.1372}%
+\contentsline {subsection}{\numberline {10.1.6}Use Case 3: Model Debugging and Feature Discovery}{245}{subsection.1373}%
+\contentsline {paragraph}{Scenario.}{245}{section*.1374}%
+\contentsline {paragraph}{Conversational Workflow.}{245}{section*.1375}%
+\contentsline {subsection}{\numberline {10.1.7}Technical Implementation}{247}{subsection.1376}%
+\contentsline {paragraph}{Database Access.}{247}{section*.1377}%
+\contentsline {paragraph}{R Script Generation.}{247}{section*.1378}%
+\contentsline {paragraph}{Python ML and Statistical Code.}{247}{section*.1379}%
+\contentsline {paragraph}{Quarto Notebook Generation.}{248}{section*.1380}%
+\contentsline {subsection}{\numberline {10.1.8}Value Proposition and Limitations}{249}{subsection.1381}%
+\contentsline {paragraph}{High‑Value Applications.}{249}{section*.1382}%
+\contentsline {paragraph}{Limitations and Risks.}{249}{section*.1383}%
+\contentsline {paragraph}{Production Recommendations.}{250}{section*.1384}%
+\contentsline {subsection}{\numberline {10.1.9}Future Extensions: Retrieval‑Augmented Generation and Live Analysis}{250}{subsection.1385}%
+\contentsline {paragraph}{1. Retrieval‑Augmented Generation (RAG).}{250}{section*.1386}%
+\contentsline {paragraph}{2. Live Game Analysis.}{251}{section*.1387}%
+\contentsline {paragraph}{3. Automated Narrative Discovery.}{251}{section*.1388}%
+\contentsline {paragraph}{4. Cross‑Season Drift Analysis.}{251}{section*.1389}%
+\contentsline {section}{\numberline {10.2}System Architecture and Ensemble Deployment}{251}{section.1390}%
+\contentsline {paragraph}{Deployment Decision Rules.}{252}{section*.1391}%
+\contentsline {section}{\numberline {10.3}Kelly Criterion Bet Sizing}{252}{section.1392}%
+\contentsline {paragraph}{1/4 Kelly (Conservative).}{252}{section*.1393}%
+\contentsline {paragraph}{1/2 Kelly (Moderate).}{253}{section*.1394}%
+\contentsline {paragraph}{Dynamic Scaling.}{253}{section*.1395}%
+\contentsline {paragraph}{Risk Limits.}{253}{section*.1396}%
+\contentsline {section}{\numberline {10.4}Line Shopping Infrastructure}{253}{section.1397}%
+\contentsline {paragraph}{Tier 1: Sharp Books (Best Lines).}{253}{section*.1398}%
+\contentsline {paragraph}{Tier 2: Mainstream Books (Moderate Lines).}{253}{section*.1399}%
+\contentsline {paragraph}{Tier 3: Recreational Books (Soft Lines).}{254}{section*.1400}%
+\contentsline {paragraph}{Line Shopping Strategy.}{254}{section*.1401}%
+\contentsline {section}{\numberline {10.5}Early Week Betting Strategy}{254}{section.1406}%
+\contentsline {paragraph}{EWB Strategy.}{255}{section*.1407}%
+\contentsline {paragraph}{Backtest Results (2010--2024).}{255}{section*.1412}%
+\contentsline {section}{\numberline {10.6}Props Market Extension}{255}{section.1413}%
+\contentsline {paragraph}{Props Modeling Strategy.}{256}{section*.1414}%
+\contentsline {paragraph}{Expected Performance.}{256}{section*.1419}%
+\contentsline {paragraph}{Risk Management.}{256}{section*.1420}%
+\contentsline {section}{\numberline {10.7}Monitoring and Risk Management}{256}{section.1421}%
+\contentsline {paragraph}{1. Rolling Performance Tracking.}{256}{section*.1422}%
+\contentsline {paragraph}{2. Weekly Bootstrap Stress Tests.}{256}{section*.1423}%
+\contentsline {paragraph}{3. Thompson Switching Logic.}{257}{section*.1424}%
+\contentsline {paragraph}{4. Streamlit Production Dashboard.}{257}{section*.1425}%
+\contentsline {section}{\numberline {10.8}Data Sources for Signal Enhancement}{257}{section.1426}%
+\contentsline {paragraph}{NFL Pro Subscription (LOW VALUE).}{257}{section*.1427}%
+\contentsline {paragraph}{Pro Football Focus (PFF) Elite (\$300/year, +0.5--1\% EV).}{257}{section*.1428}%
+\contentsline {paragraph}{NextGen Stats API (\$5--10K/year, +1--2\% EV).}{258}{section*.1429}%
+\contentsline {paragraph}{SportsRadar NFL API (\$10--20K/year, +0.5--1\% EV).}{258}{section*.1430}%
+\contentsline {paragraph}{Data Source Roadmap.}{258}{section*.1431}%
+\contentsline {section}{\numberline {10.9}Expected Returns and Deployment Timeline}{259}{section.1436}%
+\contentsline {paragraph}{Year 1 Projections (Majority Voting, Free Data).}{259}{section*.1437}%
+\contentsline {paragraph}{Year 2 Projections (Majority + PFF Elite).}{259}{section*.1438}%
+\contentsline {paragraph}{Thompson Sampling Projections (Year 2+).}{260}{section*.1439}%
+\contentsline {paragraph}{8‑Week Deployment Timeline.}{260}{section*.1440}%
+\contentsline {section}{Chapter Summary}{261}{section*.1441}%
+\contentsline {chapter}{\numberline {11}Conclusion and Future Work}{262}{chapter.1442}%
+\contentsline {section}{\numberline {11.1}What We Learned}{262}{section.1443}%
+\contentsline {subsection}{\numberline {11.1.1}The Central Lesson: Market Efficiency}{262}{subsection.1444}%
+\contentsline {subsection}{\numberline {11.1.2}Methodological Contributions}{262}{subsection.1445}%
+\contentsline {paragraph}{1. Rigorous Negative Results (Expanded).}{263}{section*.1450}%
+\contentsline {paragraph}{2. Complete Betting System Architecture.}{263}{section*.1451}%
+\contentsline {paragraph}{3. Dependence-Aware Evaluation.}{264}{section*.1452}%
+\contentsline {paragraph}{4. Transparent Failure Analysis.}{264}{section*.1453}%
+\contentsline {section}{\numberline {11.2}Limitations and Threats to Validity}{264}{section.1454}%
+\contentsline {subsection}{\numberline {11.2.1}Data Limitations}{264}{subsection.1455}%
+\contentsline {subsection}{\numberline {11.2.2}Model Limitations}{264}{subsection.1456}%
+\contentsline {subsection}{\numberline {11.2.3}External Validity}{264}{subsection.1457}%
+\contentsline {section}{\numberline {11.3}Future Directions}{265}{section.1458}%
+\contentsline {subsection}{\numberline {11.3.1}Alternative Markets}{265}{subsection.1459}%
+\contentsline {subsection}{\numberline {11.3.2}Methodological Extensions}{265}{subsection.1460}%
+\contentsline {subsection}{\numberline {11.3.3}Operational Improvements}{265}{subsection.1461}%
+\contentsline {subsection}{\numberline {11.3.4}Profit Optimization Extensions}{266}{subsection.1462}%
+\contentsline {section}{\numberline {11.4}Broader Implications for Sports Analytics}{266}{section.1463}%
+\contentsline {paragraph}{Achievable:}{266}{section*.1464}%
+\contentsline {paragraph}{Aspirational (with public data alone):}{267}{section*.1465}%
+\contentsline {section}{\numberline {11.5}Final Reflection}{267}{section.1466}%
+\contentsline {section}{\numberline {11.6}Closing Statement}{267}{section.1467}%
+\contentsline {section}{Chapter Summary}{268}{section*.1468}%
+\contentsline {chapter}{\numberline {A}Technical Details}{269}{appendix.1469}%
+\contentsline {section}{\numberline {A.1}Notation}{269}{section.1470}%
+\contentsline {section}{\numberline {A.2}State-Space Derivations}{269}{section.1471}%
+\contentsline {section}{\numberline {A.3}Score-Distribution Details}{269}{section.1472}%
+\contentsline {subsection}{\numberline {A.3.1}Score-Distribution Fitting Pipeline}{269}{subsection.1473}%
+\contentsline {section}{\numberline {A.4}Calibration Diagnostics}{270}{section.1474}%
+\contentsline {subsection}{\numberline {A.4.1}Per-Season Reliability Diagrams}{270}{subsection.1475}%
+\contentsline {subsection}{\numberline {A.4.2}Calibration Procedures}{270}{subsection.1478}%
+\contentsline {subsection}{\numberline {A.4.3}Calibration Case Gallery}{270}{subsection.1479}%
+\contentsline {paragraph}{High-Confidence Favorites.}{270}{section*.1480}%
+\contentsline {paragraph}{Coin-Flip Matchups.}{270}{section*.1481}%
+\contentsline {paragraph}{Weather-Dominated Totals.}{270}{section*.1482}%
+\contentsline {paragraph}{Injury Uncertainty.}{270}{section*.1483}%
+\contentsline {paragraph}{Key-Number Sensitivity.}{270}{section*.1484}%
+\contentsline {paragraph}{Marquee Games.}{270}{section*.1485}%
+\contentsline {paragraph}{Late-Season Incentives.}{273}{section*.1486}%
+\contentsline {paragraph}{Extreme Pace Mismatch.}{273}{section*.1487}%
+\contentsline {section}{\numberline {A.5}Mathematical Proof Sketches}{273}{section.1488}%
+\contentsline {subsection}{\numberline {A.5.1}Skellam Mixture Moments}{273}{subsection.1489}%
+\contentsline {subsection}{\numberline {A.5.2}CRPS Consistency}{273}{subsection.1490}%
+\contentsline {section}{\numberline {A.6}Algorithms and Pseudocode}{273}{section.1491}%
+\contentsline {subsection}{\numberline {A.6.1}Conservative Q-Learning (CQL)}{273}{subsection.1492}%
+\contentsline {paragraph}{Implementation Notes.}{274}{section*.1503}%
+\contentsline {subsection}{\numberline {A.6.2}Proximal Policy Optimization (PPO)}{274}{subsection.1504}%
+\contentsline {subsection}{\numberline {A.6.3}Dueling DQN for Discrete Stakes}{274}{subsection.1515}%
+\contentsline {section}{\numberline {A.7}Uncertainty Estimation}{274}{section.1522}%
+\contentsline {section}{\numberline {A.8}Numerical Stability}{275}{section.1523}%
+\contentsline {section}{\numberline {A.9}Acronyms and Abbreviations}{275}{section.1524}%
+\contentsline {chapter}{\numberline {B}Reproducibility Guide}{276}{appendix.1525}%
+\contentsline {section}{\numberline {B.1}Overview}{276}{section.1526}%
+\contentsline {section}{\numberline {B.2}Data Packaging}{276}{section.1527}%
+\contentsline {section}{\numberline {B.3}Reproduction Guide}{276}{section.1528}%
+\contentsline {subsection}{\numberline {B.3.1}Replication Checklist}{276}{subsection.1529}%
+\contentsline {section}{\numberline {B.4}Reproducibility Trace (End-to-End)}{277}{section.1538}%
+\contentsline {subsection}{\numberline {B.4.1}Provenance}{277}{subsection.1539}%
+\contentsline {subsection}{\numberline {B.4.2}Determinism}{277}{subsection.1540}%
+\contentsline {subsection}{\numberline {B.4.3}Audit Log}{277}{subsection.1541}%
+\contentsline {section}{\numberline {B.5}Data Engineering Notes}{277}{section.1542}%
+\contentsline {subsection}{\numberline {B.5.1}Schema Migrations and Idempotency}{277}{subsection.1543}%
+\contentsline {subsection}{\numberline {B.5.2}Drift Detection}{277}{subsection.1544}%
+\contentsline {subsection}{\numberline {B.5.3}Reproducibility}{277}{subsection.1545}%
+\contentsline {section}{\numberline {B.6}Experiment Registry}{277}{section.1546}%
+\contentsline {subsection}{\numberline {B.6.1}Experiment Registry Index}{278}{subsection.1547}%
+\contentsline {section}{\numberline {B.7}CLI Reference}{278}{section.1548}%
+\contentsline {section}{\numberline {B.8}Code Organization}{279}{section.1549}%
+\contentsline {section}{\numberline {B.9}Parameter Defaults}{279}{section.1550}%
+\contentsline {chapter}{\numberline {C}Feature Engineering}{280}{appendix.1551}%
+\contentsline {section}{\numberline {C.1}Feature Catalog}{280}{section.1552}%
+\contentsline {section}{\numberline {C.2}Full Feature Dictionary}{280}{section.1553}%
+\contentsline {subsection}{\numberline {C.2.1}Situational Features}{280}{subsection.1554}%
+\contentsline {subsection}{\numberline {C.2.2}Team Form (Rolling Windows)}{280}{subsection.1555}%
+\contentsline {subsection}{\numberline {C.2.3}Market Microstructure}{281}{subsection.1556}%
+\contentsline {subsection}{\numberline {C.2.4}Roster and Availability}{281}{subsection.1557}%
+\contentsline {subsection}{\numberline {C.2.5}Environmental}{281}{subsection.1558}%
+\contentsline {section}{\numberline {C.3}Feature Examples (Extended)}{281}{section.1559}%
+\contentsline {subsection}{\numberline {C.3.1}Extended Examples}{281}{subsection.1560}%
+\contentsline {subsection}{\numberline {C.3.2}Situational Examples}{282}{subsection.1561}%
+\contentsline {subsection}{\numberline {C.3.3}Team Form Examples}{282}{subsection.1562}%
+\contentsline {subsection}{\numberline {C.3.4}Market Microstructure Examples}{282}{subsection.1563}%
+\contentsline {subsection}{\numberline {C.3.5}Roster and Availability Examples}{282}{subsection.1564}%
+\contentsline {subsection}{\numberline {C.3.6}Environmental Examples}{282}{subsection.1565}%
+\contentsline {section}{\numberline {C.4}Calibration and CLV Trajectories by Season}{282}{section.1566}%
+\contentsline {subsection}{\numberline {C.4.1}Diagnostics}{283}{subsection.1567}%
+\contentsline {subsection}{\numberline {C.4.2}Operational Learnings}{283}{subsection.1568}%
+\contentsline {section}{\numberline {C.5}Ablation and Sensitivity Notes}{283}{section.1569}%
+\contentsline {subsection}{\numberline {C.5.1}Feature Ablations}{283}{subsection.1570}%
+\contentsline {subsection}{\numberline {C.5.2}Hyperparameter Sensitivity}{283}{subsection.1571}%
+\contentsline {subsection}{\numberline {C.5.3}Simulation Assumptions}{283}{subsection.1572}%
+\contentsline {chapter}{\numberline {D}Model Implementation}{284}{appendix.1573}%
+\contentsline {section}{\numberline {D.1}Training and Validation Protocols}{284}{section.1574}%
+\contentsline {section}{\numberline {D.2}Offline RL Implementation Notes}{284}{section.1575}%
+\contentsline {section}{\numberline {D.3}Conservative Q-Learning Performance}{284}{section.1576}%
+\contentsline {section}{\numberline {D.4}Bootstrap Stress Testing}{284}{section.1580}%
+\contentsline {subsection}{\numberline {D.4.1}Methodology}{287}{subsection.1581}%
+\contentsline {subsection}{\numberline {D.4.2}Key Findings}{287}{subsection.1582}%
+\contentsline {paragraph}{Worst Case Scenario Results.}{287}{section*.1583}%
+\contentsline {paragraph}{Volume vs Resilience Trade-off.}{287}{section*.1585}%
+\contentsline {paragraph}{Tail Risk (CVaR).}{287}{section*.1586}%
+\contentsline {paragraph}{Production Recommendations.}{287}{section*.1587}%
+\contentsline {section}{\numberline {D.5}Graph Neural Networks for Team Ratings}{288}{section.1588}%
+\contentsline {subsection}{\numberline {D.5.1}Architecture and Implementation}{288}{subsection.1589}%
+\contentsline {paragraph}{Team Embeddings.}{288}{section*.1590}%
+\contentsline {paragraph}{Message Passing Layers.}{288}{section*.1591}%
+\contentsline {paragraph}{Prediction Head.}{288}{section*.1595}%
+\contentsline {subsection}{\numberline {D.5.2}Training Configuration}{288}{subsection.1596}%
+\contentsline {subsection}{\numberline {D.5.3}Theoretical Advantages}{288}{subsection.1597}%
+\contentsline {paragraph}{Transitive Strength Modeling.}{288}{section*.1598}%
+\contentsline {paragraph}{Schedule Strength.}{289}{section*.1599}%
+\contentsline {paragraph}{Conference and Division Structure.}{289}{section*.1600}%
+\contentsline {subsection}{\numberline {D.5.4}Expected Performance and Limitations}{289}{subsection.1601}%
+\contentsline {paragraph}{Optimistic Scenario.}{289}{section*.1602}%
+\contentsline {paragraph}{Realistic Scenario.}{289}{section*.1603}%
+\contentsline {paragraph}{Pessimistic Scenario.}{289}{section*.1604}%
+\contentsline {subsection}{\numberline {D.5.5}Complexity vs Value Assessment}{289}{subsection.1605}%
+\contentsline {paragraph}{Implementation Complexity.}{289}{section*.1606}%
+\contentsline {paragraph}{Maintenance Burden.}{289}{section*.1607}%
+\contentsline {paragraph}{Value Proposition.}{289}{section*.1608}%
+\contentsline {subsection}{\numberline {D.5.6}Production Recommendation}{290}{subsection.1609}%
+\contentsline {subsection}{\numberline {D.5.7}Research Recommendation}{290}{subsection.1610}%
+\contentsline {section}{\numberline {D.6}Copula Models for Parlay Pricing}{290}{section.1611}%
+\contentsline {subsection}{\numberline {D.6.1}Motivation and Framework}{290}{subsection.1612}%
+\contentsline {paragraph}{Same Week.}{290}{section*.1613}%
+\contentsline {paragraph}{Shared Teams.}{290}{section*.1614}%
+\contentsline {paragraph}{Same Division.}{291}{section*.1615}%
+\contentsline {paragraph}{Conference Dynamics.}{291}{section*.1616}%
+\contentsline {subsection}{\numberline {D.6.2}Gaussian Copula Implementation}{291}{subsection.1617}%
+\contentsline {paragraph}{Correlation Estimation.}{291}{section*.1618}%
+\contentsline {paragraph}{Monte Carlo Simulation.}{291}{section*.1619}%
+\contentsline {paragraph}{Expected Value Calculation.}{291}{section*.1624}%
+\contentsline {subsection}{\numberline {D.6.3}Expected Value Example}{291}{subsection.1625}%
+\contentsline {paragraph}{Independence Assumption.}{291}{section*.1626}%
+\contentsline {paragraph}{Copula Model (correlation = 0.15).}{291}{section*.1627}%
+\contentsline {paragraph}{Key Insight.}{292}{section*.1628}%
+\contentsline {subsection}{\numberline {D.6.4}Impact by Scenario}{292}{subsection.1629}%
+\contentsline {paragraph}{Same-Game Parlays.}{292}{section*.1630}%
+\contentsline {paragraph}{Division Games.}{292}{section*.1631}%
+\contentsline {paragraph}{Playoff-Implication Games.}{292}{section*.1632}%
+\contentsline {subsection}{\numberline {D.6.5}Expected Edge and Limitations}{292}{subsection.1633}%
+\contentsline {paragraph}{Optimistic Scenario.}{292}{section*.1634}%
+\contentsline {paragraph}{Realistic Scenario.}{292}{section*.1635}%
+\contentsline {paragraph}{Pessimistic Scenario.}{292}{section*.1636}%
+\contentsline {subsection}{\numberline {D.6.6}Teaser Pricing Application}{292}{subsection.1637}%
+\contentsline {subsection}{\numberline {D.6.7}Complexity vs Value Trade-off}{293}{subsection.1638}%
+\contentsline {paragraph}{Implementation.}{293}{section*.1639}%
+\contentsline {paragraph}{Maintenance.}{293}{section*.1640}%
+\contentsline {paragraph}{Compute Cost.}{293}{section*.1641}%
+\contentsline {subsection}{\numberline {D.6.8}Production Recommendation}{293}{subsection.1642}%
+\contentsline {subsection}{\numberline {D.6.9}Research Recommendation}{293}{subsection.1647}%
+\contentsline {subsection}{\numberline {D.6.10}Implementation Details}{294}{subsection.1653}%
+\contentsline {section}{\numberline {D.7}Advanced Bayesian Enhancements v3.0}{294}{section.1654}%
+\contentsline {subsection}{\numberline {D.7.1}Phase 1: State-Space Models for Dynamic Player Ratings}{294}{subsection.1655}%
+\contentsline {paragraph}{Motivation.}{294}{section*.1656}%
+\contentsline {paragraph}{Implementation.}{294}{section*.1657}%
+\contentsline {paragraph}{Key Features.}{295}{section*.1662}%
+\contentsline {paragraph}{Expected Impact.}{295}{section*.1663}%
+\contentsline {paragraph}{Implementation Details.}{295}{section*.1664}%
+\contentsline {subsection}{\numberline {D.7.2}Phase 2: Advanced Prior Elicitation}{295}{subsection.1665}%
+\contentsline {paragraph}{Motivation.}{295}{section*.1666}%
+\contentsline {paragraph}{Empirical Bayes Component.}{295}{section*.1667}%
+\contentsline {paragraph}{Expert-Informed Priors.}{295}{section*.1670}%
+\contentsline {paragraph}{Prior Specification Example.}{296}{section*.1671}%
+\contentsline {paragraph}{Prior Predictive Checks.}{296}{section*.1672}%
+\contentsline {paragraph}{Expected Impact.}{296}{section*.1673}%
+\contentsline {paragraph}{Implementation Details.}{296}{section*.1674}%
+\contentsline {subsection}{\numberline {D.7.3}Phase 3: Bayesian Neural Networks}{296}{subsection.1675}%
+\contentsline {paragraph}{Motivation.}{296}{section*.1676}%
+\contentsline {paragraph}{Architecture.}{296}{section*.1677}%
+\contentsline {paragraph}{Prior Specifications.}{297}{section*.1681}%
+\contentsline {paragraph}{Inference Methods.}{297}{section*.1686}%
+\contentsline {paragraph}{Uncertainty Quantification.}{297}{section*.1687}%
+\contentsline {paragraph}{Expected Impact.}{297}{section*.1689}%
+\contentsline {paragraph}{Implementation Details.}{297}{section*.1690}%
+\contentsline {subsection}{\numberline {D.7.4}Phase 4: 4-Way Ensemble Integration}{297}{subsection.1691}%
+\contentsline {paragraph}{Ensemble Components.}{297}{section*.1692}%
+\contentsline {paragraph}{Inverse Variance Weighting.}{298}{section*.1697}%
+\contentsline {paragraph}{Meta-Learning Layer.}{298}{section*.1699}%
+\contentsline {paragraph}{Expected Impact.}{298}{section*.1701}%
+\contentsline {paragraph}{Implementation Details.}{298}{section*.1702}%
+\contentsline {subsection}{\numberline {D.7.5}Performance Projections and Validation}{298}{subsection.1703}%
+\contentsline {paragraph}{Expected Performance v3.0.}{298}{section*.1704}%
+\contentsline {paragraph}{Financial Impact.}{298}{section*.1705}%
+\contentsline {paragraph}{Validation Plan.}{299}{section*.1706}%
+\contentsline {subsection}{\numberline {D.7.6}Implementation Status and Next Steps}{299}{subsection.1711}%
+\contentsline {paragraph}{Completed (v3.0).}{299}{section*.1712}%
+\contentsline {paragraph}{Pending Training.}{299}{section*.1713}%
+\contentsline {paragraph}{Deployment Timeline.}{299}{section*.1718}%
+\contentsline {subsection}{\numberline {D.7.7}Key Innovations and Contributions}{300}{subsection.1719}%
+\contentsline {paragraph}{Methodological Contributions.}{300}{section*.1720}%
+\contentsline {paragraph}{Theoretical Utilization.}{300}{section*.1721}%
+\contentsline {section}{\numberline {D.8}Off-Policy Evaluation}{300}{section.1722}%
+\contentsline {section}{\numberline {D.9}Model Evaluation Protocols (Extended)}{300}{section.1723}%
+\contentsline {subsection}{\numberline {D.9.1}Predictive Metrics}{300}{subsection.1724}%
+\contentsline {subsection}{\numberline {D.9.2}Economic Metrics}{301}{subsection.1725}%
+\contentsline {subsection}{\numberline {D.9.3}Operational Metrics}{301}{subsection.1726}%
+\contentsline {subsection}{\numberline {D.9.4}Leakage Controls}{301}{subsection.1727}%
+\contentsline {subsection}{\numberline {D.9.5}Fairness and Robustness}{301}{subsection.1728}%
+\contentsline {section}{\numberline {D.10}Model Cards}{301}{section.1729}%
+\contentsline {chapter}{\numberline {E}Case Studies}{302}{appendix.1730}%
+\contentsline {section}{\numberline {E.1}Overview}{302}{section.1731}%
+\contentsline {section}{\numberline {E.2}Regular Season Weeks 1--18}{302}{section.1732}%
+\contentsline {section}{\numberline {E.3}Playoffs}{303}{section.1733}%
+\contentsline {section}{\numberline {E.4}Extended Case Study: Weather Whiplash Week}{303}{section.1734}%
+\contentsline {section}{\numberline {E.5}Extended Case Study: QB Injury Cascade}{304}{section.1735}%
+\contentsline {section}{\numberline {E.6}Extended Case Study: Steam vs Patience}{304}{section.1736}%
+\contentsline {section}{\numberline {E.7}End-to-End Week}{304}{section.1737}%
+\contentsline {section}{\numberline {E.8}Case Studies (Extended II)}{304}{section.1738}%
+\contentsline {subsection}{\numberline {E.8.1}Late Steam and Weather Convergence}{304}{subsection.1739}%
+\contentsline {subsection}{\numberline {E.8.2}Injury Status Flip and Correlation Risk}{305}{subsection.1740}%
+\contentsline {chapter}{\numberline {F}Operations}{306}{appendix.1741}%
+\contentsline {section}{\numberline {F.1}Risk and Governance Playbook}{306}{section.1742}%
+\contentsline {section}{\numberline {F.2}Simulation Configuration}{306}{section.1743}%
+\contentsline {subsection}{\numberline {F.2.1}Extended Scenario Library}{306}{subsection.1744}%
+\contentsline {section}{\numberline {F.3}Operational Runbooks}{307}{section.1745}%
+\contentsline {subsection}{\numberline {F.3.1}Promotion Workflow}{307}{subsection.1746}%
+\contentsline {section}{\numberline {F.4}Governance Checklists}{307}{section.1747}%
+\contentsline {section}{\numberline {F.5}Data Drift Examples}{307}{section.1748}%
+\contentsline {section}{\numberline {F.6}Compute Budget and Latency}{307}{section.1749}%
+\contentsline {section}{\numberline {F.7}Operator SOPs (Extended)}{307}{section.1750}%
+\contentsline {subsection}{\numberline {F.7.1}Pre-Kick Checklist}{307}{subsection.1751}%
+\contentsline {subsection}{\numberline {F.7.2}During-Week Monitoring}{308}{subsection.1752}%
+\contentsline {subsection}{\numberline {F.7.3}Post-Week Review}{308}{subsection.1753}%
+\contentsline {section}{\numberline {F.8}Operations Playbook (Extended)}{308}{section.1754}%
+\contentsline {subsection}{\numberline {F.8.1}Weekly Cycle}{308}{subsection.1755}%
+\contentsline {subsection}{\numberline {F.8.2}Incident Response}{308}{subsection.1761}%
+\contentsline {subsection}{\numberline {F.8.3}Change Management}{308}{subsection.1766}%
+\contentsline {chapter}{\numberline {G}Risk \& Execution}{309}{appendix.1767}%
+\contentsline {section}{\numberline {G.1}Risk Envelope Design (Extended)}{309}{section.1768}%
+\contentsline {subsection}{\numberline {G.1.1}Budgeting and CVaR Targets}{309}{subsection.1769}%
+\contentsline {subsection}{\numberline {G.1.2}Correlation Estimation}{309}{subsection.1770}%
+\contentsline {subsection}{\numberline {G.1.3}Stress Testing}{309}{subsection.1771}%
+\contentsline {subsection}{\numberline {G.1.4}Case Studies}{309}{subsection.1772}%
+\contentsline {section}{\numberline {G.2}Portfolio and CVaR Optimization}{310}{section.1773}%
+\contentsline {section}{\numberline {G.3}Execution Microstructure Notes}{310}{section.1774}%
+\contentsline {subsection}{\numberline {G.3.1}Rogue Prints and Consensus}{310}{subsection.1775}%
+\contentsline {subsection}{\numberline {G.3.2}Steam vs Patience}{310}{subsection.1776}%
+\contentsline {subsection}{\numberline {G.3.3}Fill Reliability and Partial Orders}{310}{subsection.1777}%
+\contentsline {subsection}{\numberline {G.3.4}Limit Ladders}{310}{subsection.1778}%
+\contentsline {section}{\numberline {G.4}Execution Microstructure (Extended II)}{310}{section.1779}%
+\contentsline {subsection}{\numberline {G.4.1}Routing Heuristics}{310}{subsection.1780}%
+\contentsline {subsection}{\numberline {G.4.2}Order Book Patterns}{311}{subsection.1781}%
+\contentsline {subsection}{\numberline {G.4.3}Latency Histograms}{311}{subsection.1782}%
+\contentsline {subsection}{\numberline {G.4.4}Partial Fills and Retry Logic}{311}{subsection.1783}%
+\contentsline {section}{\numberline {G.5}Failure Modes and Effects Analysis (FMEA)}{311}{section.1784}%
+\contentsline {subsection}{\numberline {G.5.1}Data Failures}{311}{subsection.1785}%
+\contentsline {subsection}{\numberline {G.5.2}Model Failures}{311}{subsection.1786}%
+\contentsline {subsection}{\numberline {G.5.3}Execution Failures}{311}{subsection.1787}%
+\contentsline {subsection}{\numberline {G.5.4}Governance Failures}{311}{subsection.1788}%
+\contentsline {chapter}{\numberline {H}Dataset Documentation}{312}{appendix.1789}%
+\contentsline {section}{\numberline {H.1}Schema Reference}{312}{section.1790}%
+\contentsline {section}{\numberline {H.2}Schema DDL Snippets}{312}{section.1791}%
+\contentsline {section}{\numberline {H.3}Dataset Documentation (Extended)}{312}{section.1792}%
+\contentsline {subsection}{\numberline {H.3.1}Odds History Schema}{313}{subsection.1793}%
+\contentsline {subsection}{\numberline {H.3.2}Feature Artefacts}{313}{subsection.1794}%
+\contentsline {subsection}{\numberline {H.3.3}Quality Controls}{313}{subsection.1795}%
+\contentsline {subsection}{\numberline {H.3.4}Privacy and Ethics}{313}{subsection.1796}%
+\contentsline {section}{\numberline {H.4}Representative Team Profiles}{313}{section.1797}%
+\contentsline {paragraph}{Pass-Heavy Team}{313}{section*.1798}%
+\contentsline {paragraph}{Defense-First Team}{313}{section*.1799}%
+\contentsline {paragraph}{High-Variance Team}{313}{section*.1800}%
+\contentsline {paragraph}{Dome Team}{314}{section*.1801}%
+\contentsline {paragraph}{Balanced Team}{314}{section*.1802}%
+\contentsline {section}{\numberline {H.5}Team Profiles (Anonymous)}{314}{section.1803}%
+\contentsline {chapter}{\numberline {I}Production Deployment and Operational Edges}{316}{appendix.1804}%
+\contentsline {section}{\numberline {I.1}Claude AI Integration for Semantic Research Exploration}{316}{section.1805}%
+\contentsline {subsection}{\numberline {I.1.1}Motivation: From Batch Analytics to Conversational Research}{317}{subsection.1806}%
+\contentsline {paragraph}{The Case for Conversational Research.}{317}{section*.1812}%
+\contentsline {paragraph}{Why This Matters for NFL Betting.}{318}{section*.1813}%
+\contentsline {subsection}{\numberline {I.1.2}Architecture: Natural Language to Actionable Insights}{318}{subsection.1814}%
+\contentsline {paragraph}{Step 1: Query Understanding and Context Loading.}{318}{section*.1816}%
+\contentsline {paragraph}{Step 2: Query Planning.}{320}{section*.1817}%
+\contentsline {paragraph}{Step 3: Code Generation.}{320}{section*.1823}%
+\contentsline {paragraph}{Step 4: Execution and Result Interpretation.}{320}{section*.1824}%
+\contentsline {paragraph}{Step 5: Statistical Validation.}{321}{section*.1825}%
+\contentsline {paragraph}{Step 6: Production Recommendations.}{321}{section*.1826}%
+\contentsline {paragraph}{Step 7: Follow‑up Suggestions.}{322}{section*.1827}%
+\contentsline {subsection}{\numberline {I.1.3}Integration Points with Existing Infrastructure}{322}{subsection.1828}%
+\contentsline {paragraph}{Database Access (TimescaleDB + PostgreSQL).}{322}{section*.1829}%
+\contentsline {paragraph}{R Ecosystem (ggplot2, dplyr, nflfastR).}{322}{section*.1830}%
+\contentsline {paragraph}{Python ML Stack (XGBoost, SHAP, Statistical Tests).}{322}{section*.1831}%
+\contentsline {paragraph}{Statistical Framework (\texttt {py/compute/statistics/}).}{323}{section*.1832}%
+\contentsline {paragraph}{Quarto Notebooks (Reproducibility).}{323}{section*.1833}%
+\contentsline {subsection}{\numberline {I.1.4}Use Case 1: Post‑Game Upset Analysis}{324}{subsection.1834}%
+\contentsline {paragraph}{Scenario.}{324}{section*.1835}%
+\contentsline {paragraph}{Conversational Workflow.}{324}{section*.1836}%
+\contentsline {subsection}{\numberline {I.1.5}Use Case 2: Narrative Validation (Rest Advantage, Primetime Effects)}{326}{subsection.1837}%
+\contentsline {paragraph}{Research Question.}{326}{section*.1838}%
+\contentsline {paragraph}{Conversational Workflow.}{326}{section*.1839}%
+\contentsline {subsection}{\numberline {I.1.6}Use Case 3: Model Debugging and Feature Discovery}{328}{subsection.1840}%
+\contentsline {paragraph}{Scenario.}{328}{section*.1841}%
+\contentsline {paragraph}{Conversational Workflow.}{328}{section*.1842}%
+\contentsline {subsection}{\numberline {I.1.7}Technical Implementation}{330}{subsection.1843}%
+\contentsline {paragraph}{Database Access.}{330}{section*.1844}%
+\contentsline {paragraph}{R Script Generation.}{330}{section*.1845}%
+\contentsline {paragraph}{Python ML and Statistical Code.}{330}{section*.1846}%
+\contentsline {paragraph}{Quarto Notebook Generation.}{331}{section*.1847}%
+\contentsline {subsection}{\numberline {I.1.8}Value Proposition and Limitations}{332}{subsection.1848}%
+\contentsline {paragraph}{High‑Value Applications.}{332}{section*.1849}%
+\contentsline {paragraph}{Limitations and Risks.}{332}{section*.1850}%
+\contentsline {paragraph}{Production Recommendations.}{333}{section*.1851}%
+\contentsline {subsection}{\numberline {I.1.9}Future Extensions: Retrieval‑Augmented Generation and Live Analysis}{333}{subsection.1852}%
+\contentsline {paragraph}{1. Retrieval‑Augmented Generation (RAG).}{333}{section*.1853}%
+\contentsline {paragraph}{2. Live Game Analysis.}{334}{section*.1854}%
+\contentsline {paragraph}{3. Automated Narrative Discovery.}{334}{section*.1855}%
+\contentsline {paragraph}{4. Cross‑Season Drift Analysis.}{334}{section*.1856}%
+\contentsline {section}{\numberline {I.2}System Architecture and Ensemble Deployment}{334}{section.1857}%
+\contentsline {paragraph}{Deployment Decision Rules.}{335}{section*.1858}%
+\contentsline {section}{\numberline {I.3}Kelly Criterion Bet Sizing}{335}{section.1859}%
+\contentsline {paragraph}{1/4 Kelly (Conservative).}{335}{section*.1860}%
+\contentsline {paragraph}{1/2 Kelly (Moderate).}{336}{section*.1861}%
+\contentsline {paragraph}{Dynamic Scaling.}{336}{section*.1862}%
+\contentsline {paragraph}{Risk Limits.}{336}{section*.1863}%
+\contentsline {section}{\numberline {I.4}Line Shopping Infrastructure}{336}{section.1864}%
+\contentsline {paragraph}{Tier 1: Sharp Books (Best Lines).}{336}{section*.1865}%
+\contentsline {paragraph}{Tier 2: Mainstream Books (Moderate Lines).}{336}{section*.1866}%
+\contentsline {paragraph}{Tier 3: Recreational Books (Soft Lines).}{337}{section*.1867}%
+\contentsline {paragraph}{Line Shopping Strategy.}{337}{section*.1868}%
+\contentsline {section}{\numberline {I.5}Early Week Betting Strategy}{337}{section.1873}%
+\contentsline {paragraph}{EWB Strategy.}{338}{section*.1874}%
+\contentsline {paragraph}{Backtest Results (2010--2024).}{338}{section*.1879}%
+\contentsline {section}{\numberline {I.6}Props Market Extension}{338}{section.1880}%
+\contentsline {paragraph}{Props Modeling Strategy.}{339}{section*.1881}%
+\contentsline {paragraph}{Expected Performance.}{339}{section*.1886}%
+\contentsline {paragraph}{Risk Management.}{339}{section*.1887}%
+\contentsline {section}{\numberline {I.7}Monitoring and Risk Management}{339}{section.1888}%
+\contentsline {paragraph}{1. Rolling Performance Tracking.}{339}{section*.1889}%
+\contentsline {paragraph}{2. Weekly Bootstrap Stress Tests.}{339}{section*.1890}%
+\contentsline {paragraph}{3. Thompson Switching Logic.}{340}{section*.1891}%
+\contentsline {paragraph}{4. Streamlit Production Dashboard.}{340}{section*.1892}%
+\contentsline {section}{\numberline {I.8}Data Sources for Signal Enhancement}{340}{section.1893}%
+\contentsline {paragraph}{NFL Pro Subscription (LOW VALUE).}{340}{section*.1894}%
+\contentsline {paragraph}{Pro Football Focus (PFF) Elite (\$300/year, +0.5--1\% EV).}{340}{section*.1895}%
+\contentsline {paragraph}{NextGen Stats API (\$5--10K/year, +1--2\% EV).}{341}{section*.1896}%
+\contentsline {paragraph}{SportsRadar NFL API (\$10--20K/year, +0.5--1\% EV).}{341}{section*.1897}%
+\contentsline {paragraph}{Data Source Roadmap.}{341}{section*.1898}%
+\contentsline {section}{\numberline {I.9}Expected Returns and Deployment Timeline}{342}{section.1903}%
+\contentsline {paragraph}{Year 1 Projections (Majority Voting, Free Data).}{342}{section*.1904}%
+\contentsline {paragraph}{Year 2 Projections (Majority + PFF Elite).}{342}{section*.1905}%
+\contentsline {paragraph}{Thompson Sampling Projections (Year 2+).}{343}{section*.1906}%
+\contentsline {paragraph}{8‑Week Deployment Timeline.}{343}{section*.1907}%
+\contentsline {section}{Chapter Summary}{344}{section*.1908}%
+\contentsline {chapter}{\numberline {J}Temporal Leakage Audit}{345}{appendix.1909}%
+\contentsline {section}{\numberline {J.1}Audit Methodology}{345}{section.1910}%
+\contentsline {section}{\numberline {J.2}Feature Catalog Structure}{345}{section.1915}%
+\contentsline {section}{\numberline {J.3}Automated Audit Results}{345}{section.1917}%
+\contentsline {subsection}{\numberline {J.3.1}Findings Interpretation}{346}{subsection.1919}%
+\contentsline {section}{\numberline {J.4}Runtime Validation Examples}{347}{section.1920}%
+\contentsline {section}{\numberline {J.5}Feature Safety Matrix}{347}{section.1935}%
+\contentsline {section}{\numberline {J.6}Unit Test Coverage}{348}{section.1937}%
+\contentsline {section}{\numberline {J.7}SQL Query Audit}{348}{section.1939}%
+\contentsline {section}{\numberline {J.8}CI/CD Integration}{348}{section.1940}%
+\contentsline {section}{\numberline {J.9}Certification Statement}{349}{section.1952}%
+\contentsline {section}{\numberline {J.10}Maintenance Guidelines}{349}{section.1953}%
+\contentsline {section}{\numberline {J.11}Related Documentation}{350}{section.1959}%
+\contentsline {section}{\numberline {J.12}Summary}{350}{section.1960}%
+\contentsline {chapter}{\numberline {K}Alternative Modeling Approaches Considered}{351}{appendix.1966}%
+\contentsline {section}{\numberline {K.1}Graph Neural Networks for Team Matchup Dynamics}{351}{section.1967}%
+\contentsline {subsection}{\numberline {K.1.1}Conceptual Framework}{351}{subsection.1968}%
+\contentsline {subsection}{\numberline {K.1.2}Implementation Sketch}{351}{subsection.1969}%
+\contentsline {subsection}{\numberline {K.1.3}Evaluation Results}{352}{subsection.1971}%
+\contentsline {subsection}{\numberline {K.1.4}Why Not Implemented}{352}{subsection.1972}%
+\contentsline {subsection}{\numberline {K.1.5}Future Directions}{352}{subsection.1973}%
+\contentsline {section}{\numberline {K.2}Regime Detection and Changepoint Algorithms}{353}{section.1974}%
+\contentsline {subsection}{\numberline {K.2.1}Motivation}{353}{subsection.1975}%
+\contentsline {subsection}{\numberline {K.2.2}Changepoint Detection Methods}{353}{subsection.1976}%
+\contentsline {subsubsection}{PELT (Pruned Exact Linear Time)}{353}{section*.1977}%
+\contentsline {subsubsection}{Hidden Markov Models}{353}{section*.1979}%
+\contentsline {subsubsection}{Bayesian Online Changepoint Detection}{353}{section*.1980}%
+\contentsline {subsection}{\numberline {K.2.3}Empirical Comparison}{353}{subsection.1982}%
+\contentsline {paragraph}{Qualitative Findings.}{354}{section*.1984}%
+\contentsline {subsection}{\numberline {K.2.4}Decision: Exponential Decay Preferred}{354}{subsection.1985}%
+\contentsline {subsection}{\numberline {K.2.5}When Changepoint Detection Adds Value}{354}{subsection.1986}%
+\contentsline {section}{\numberline {K.3}Dynamic Correlation Models}{355}{section.1987}%
+\contentsline {subsection}{\numberline {K.3.1}Limitations of Static Copulas}{355}{subsection.1988}%
+\contentsline {subsection}{\numberline {K.3.2}DCC-GARCH Framework}{355}{subsection.1989}%
+\contentsline {subsection}{\numberline {K.3.3}Regime-Switching Copulas}{355}{subsection.1993}%
+\contentsline {subsection}{\numberline {K.3.4}Implementation Trade-offs}{355}{subsection.1995}%
+\contentsline {paragraph}{Findings.}{355}{section*.1997}%
+\contentsline {subsection}{\numberline {K.3.5}Decision: Static Copulas with Regime Stratification}{356}{subsection.1998}%
+\contentsline {subsection}{\numberline {K.3.6}Future Extensions}{356}{subsection.1999}%
+\contentsline {section}{\numberline {K.4}Synthesis: Parsimony vs Complexity}{357}{section.2000}%
+\contentsline {paragraph}{Key Insights.}{357}{section*.2002}%
+\contentsline {paragraph}{Recommendation.}{357}{section*.2003}%
+\contentsline {chapter}{References}{358}{section*.2008}%

@@ -1,11 +1,11 @@
 % !TEX root = ../main/main.tex
 \section{Experiment-Augmented Reinforcement Learning}\label{sec:experiment-augmented-rl}
 
-Building on the empirical validation of 40 experiments (\Cref{chap:experiments}), we integrate the 25 successful experiments directly into the reinforcement learning framework to enhance bet sizing decisions. This section documents the architecture, implementation, and expected improvements from augmenting the RL state space with experiment-derived features.
+Building on the empirical validation of 40 experiments (\Cref{sec:experiments}), we integrate the 25 successful experiments directly into the reinforcement learning framework to enhance bet sizing decisions. This section documents the architecture, implementation, and expected improvements from augmenting the RL state space with experiment-derived features.
 
 \subsection{Motivation and Architecture}
 
-The 40-experiment suite (\Cref{chap:experiments}) identified 25 experiments (10 cVAE + 15 Causal) with positive ROI/EV scores, representing actionable betting edges ranging from +2.2\% to +9.5\%. Rather than treating these experiments as separate signals, we integrate them directly into the RL agent's state space, enabling the agent to learn optimal bet sizing policies that leverage these empirically validated insights.
+The 40-experiment suite (\Cref{sec:experiments}) identified 25 experiments (10 cVAE + 15 Causal) with positive ROI/EV scores, representing actionable betting edges ranging from +2.2\% to +9.5\%. Rather than treating these experiments as separate signals, we integrate them directly into the RL agent's state space, enabling the agent to learn optimal bet sizing policies that leverage these empirically validated insights.
 
 \paragraph{Integration architecture.}
 The experiment-augmented RL framework consists of three layers:
@@ -147,7 +147,7 @@ Each ablation configuration trains for 100 episodes (sufficient for convergence 
 
 \subsection{Expected Performance Improvements}
 
-Based on the empirical ROI/EV scores from \Cref{chap:experiments}, we project the following improvements from experiment-augmented RL:
+Based on the empirical ROI/EV scores from \Cref{sec:experiments}, we project the following improvements from experiment-augmented RL:
 
 \paragraph{Conservative estimate (+3--5\% ROI).}
 Assuming partial feature utilization (agent learns to use $\sim$50\% of experiment signals effectively):
@@ -235,7 +235,7 @@ This workflow ensures that experiment-augmented agents undergo the same rigorous
 Post-training feature importance analysis reveals which of the 29 experiment features most influence betting decisions:
 
 \paragraph{Expected top contributors.}
-Based on experiment ROI/EV scores (\Cref{chap:experiments}), we anticipate:
+Based on experiment ROI/EV scores (\Cref{sec:experiments}), we anticipate:
 \begin{enumerate}
   \item CVAE-014 (playoff resting probability): Highest individual ROI (9.5\%), likely top-ranked feature
   \item CVAE-010 (injury adjustment): High ROI (8.5\%), frequent applicability (12\% of games)
@@ -276,7 +276,7 @@ Each configuration trains for 1,000 episodes on 2020--2023 data, then evaluates 
 \subsection{Limitations and Future Work}
 
 \paragraph{Database dependencies.}
-The ExperimentFeatureExtractor requires complete database tables for injury reports, coordinator changes, and team quality metrics. Currently, 15 of 40 experiments failed due to missing tables (\Cref{chap:experiments}), limiting the feature set to 29 dimensions. Future work will extend the database schema to enable all 40 experiments, potentially adding 10--15 additional features.
+The ExperimentFeatureExtractor requires complete database tables for injury reports, coordinator changes, and team quality metrics. Currently, 15 of 40 experiments failed due to missing tables (\Cref{sec:experiments}), limiting the feature set to 29 dimensions. Future work will extend the database schema to enable all 40 experiments, potentially adding 10--15 additional features.
 
 \paragraph{Feature correlation and redundancy.}
 The 29 experiment features exhibit correlations (e.g., home advantage from CVAE-011 and home ATE from CAUSAL-003 measure overlapping effects). Future work will apply principal component analysis (PCA) or factor analysis to decorrelate features and reduce dimensionality while preserving signal.
