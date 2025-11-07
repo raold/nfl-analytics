@@ -143,6 +143,25 @@ Our CQL agent uses a 3-layer MLP with hidden dimensions [128, 64, 32], ReLU acti
 \end{algorithmic}
 \end{algorithm}
 
+\subsection{KL-Tilted Integer-Margin Reweighting}
+\begin{algorithm}[H]
+\caption{KL-Tilted Integer-Margin Reweighting}
+\label{alg:kl-tilt}
+\begin{algorithmic}[1]
+\Require baseline pmf $q(d)$, keys $\mathcal{K}$, targets $m_k$, target $(\mu,\sigma^2)$
+\Ensure $\tilde{q}(d) \propto q(d)\exp\{\alpha_0+\alpha_1 d+\alpha_2 (d-\mu)^2+\sum_{k\in\mathcal{K}}\delta_k\,\mathbb{1}\{d=k\}\}$
+\State Initialize multipliers $\alpha,\delta \leftarrow 0$
+\Repeat
+  \State Compute $\tilde{q}$; evaluate constraint residuals (norm, mean, variance, key masses)
+  \State Take Newton/gradient step on the dual; backtrack to ensure residual decrease
+\Until residuals $< \varepsilon$ or max iters
+\State Return normalized $\tilde{q}$
+\end{algorithmic}
+\end{algorithm}
+
+\paragraph{Implementation Notes.}
+This algorithm implements moment-preserving reweighting for discrete margin distributions to match empirical key-number masses (3, 6, 7, 10) while maintaining specified mean and variance. The KL divergence minimization ensures minimal distortion from the baseline distribution. Used as a fallback when constrained least-squares reweighting is infeasible.
+
 \section{Uncertainty Estimation}\label{app:uncertainty}
 % Source: main.tex line 1501-1502
 We combine analytic posteriors (for linear-Gaussian components) with bootstrap ensembles (for ML models). Posterior predictive draws propagate uncertainty into stake sizing and portfolio variance. Wider posterior intervals reduce Kelly fractions automatically, and correlation estimates temper multi-leg exposure.
@@ -1284,8 +1303,9 @@ We summarize archetypal team profiles used for sensitivity analysis. These profi
 % - Open Questions and Future Experiments (line 1466) → Chapter 10
 %
 % =============================================================================
-% Production Deployment and Operational Edges (formerly Chapter 9)
-\input{../chapter_9_production_deployment/chapter_9_production_deployment.tex}
+% NOTE: Chapter 9 (Production Deployment) is now a proper chapter in main.tex,
+% not part of the appendix. It was previously duplicated here but has been removed.
+% =============================================================================
 
 % Leakage Audit Chapter
 \input{../appendix/leakage_audit.tex}

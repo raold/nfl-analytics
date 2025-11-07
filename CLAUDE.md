@@ -1064,3 +1064,4 @@ Run with: `pytest tests/unit/test_my_module.py -v`
 **Last Updated**: November 3, 2025
 **Maintainer**: Claude Code (Sonnet 4.5)
 **Repository**: https://github.com/raold/nfl-analytics
+- never take shortcuts. never use synthetic data. never abandon something hard. when in doubt think longer and expand you aperature. surevy, read, audi, and synthesize before writing any code or executing any commands. this is ironclad, non-negotiable project requirement. we are gambling with actual dollars.

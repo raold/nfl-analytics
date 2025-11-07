@@ -327,7 +327,7 @@ class PropOddsFetcher:
             # Query database for player info
             # Use fuzzy matching since API names might differ slightly
             query = """
-                SELECT DISTINCT
+                SELECT DISTINCT ON (full_name)
                     full_name,
                     gsis_id,
                     position,

@@ -285,30 +285,16 @@ def fetch_bye_week_teams(season, week):
 @st.cache_data(ttl=300)
 def fetch_bnn_uncertainty_metrics():
     """Fetch BNN uncertainty metrics for all predictions."""
-    query = """
-    SELECT
-        game_id,
-        predicted_margin,
-        uncertainty_margin,
-        uncertainty_total,
-        ci_lower,
-        ci_upper,
-        epistemic_uncertainty,
-        aleatoric_uncertainty
-    FROM predictions.bnn_predictions
-    WHERE uncertainty_margin IS NOT NULL
-    """
-
-    with psycopg.connect(**DB_CONFIG) as conn:
-        df = pd.read_sql_query(query, conn)
-
-    return df
+    # Return empty DataFrame - predictions.bnn_predictions table doesn't exist yet
+    return pd.DataFrame(columns=[
+        'game_id', 'predicted_margin', 'uncertainty_margin', 'uncertainty_total',
+        'ci_lower', 'ci_upper', 'epistemic_uncertainty', 'aleatoric_uncertainty'
+    ])
 
 @st.cache_data(ttl=30)  # Cache for 30 seconds for live updates
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
-    # Dynamically determine current week based on today's date
-    # Oct 11, 2025 is Week 6
+    # 2025 NFL season, Week 10 (November 6, 2025)
     query = """
     SELECT
         g.game_id,
@@ -326,25 +312,9 @@ def fetch_current_week_games():
             WHEN g.home_score IS NOT NULL THEN 'completed'
             WHEN g.kickoff < NOW() THEN 'in_progress'
             ELSE 'scheduled'
-        END as game_status,
-        p.home_win_prob,
-        p.predicted_spread,
-        p.recommended_bet,
-        p.bet_confidence,
-        r.predicted_margin,
-        r.actual_margin,
-        r.margin_error,
-        bnn.uncertainty_margin,
-        bnn.uncertainty_total,
-        bnn.ci_lower,
-        bnn.ci_upper,
-        bnn.epistemic_uncertainty,
-        bnn.aleatoric_uncertainty
+        END as game_status
     FROM games g
-    LEFT JOIN predictions.game_predictions p ON g.game_id = p.game_id
-    LEFT JOIN predictions.retrospectives r ON g.game_id = r.game_id
-    LEFT JOIN predictions.bnn_predictions bnn ON g.game_id = bnn.game_id
-    WHERE g.season = 2025 AND g.week = 6 AND g.game_type = 'REG'
+    WHERE g.season = 2025 AND g.week = 10 AND g.game_type = 'REG'
     ORDER BY g.kickoff
     """
 
@@ -935,18 +905,18 @@ def main():
 
                     # Our model predictions
                     prediction_lines = []
-                    if pd.notna(game['home_win_prob']):
+                    if 'home_win_prob' in game and pd.notna(game['home_win_prob']):
                         home_prob = float(game['home_win_prob']) * 100
                         away_prob = (1 - float(game['home_win_prob'])) * 100
                         predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
                         prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    if pd.notna(game['predicted_spread']):
+                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
                         pred_spread = float(game['predicted_spread'])
                         prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
 
                     # Calculate predicted total from predicted margin (rough estimate)
-                    if pd.notna(game['predicted_margin']):
+                    if 'predicted_margin' in game and pd.notna(game['predicted_margin']):
                         pred_total_estimate = 45.0
                         prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
 
@@ -1014,18 +984,18 @@ def main():
 
                     # Our model predictions
                     prediction_lines = []
-                    if pd.notna(game['home_win_prob']):
+                    if 'home_win_prob' in game and pd.notna(game['home_win_prob']):
                         home_prob = float(game['home_win_prob']) * 100
                         away_prob = (1 - float(game['home_win_prob'])) * 100
                         predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
                         prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    if pd.notna(game['predicted_spread']):
+                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
                         pred_spread = float(game['predicted_spread'])
                         prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
 
                     # Calculate predicted total from predicted margin (rough estimate)
-                    if pd.notna(game['predicted_margin']):
+                    if 'predicted_margin' in game and pd.notna(game['predicted_margin']):
                         pred_total_estimate = 45.0
                         prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
 

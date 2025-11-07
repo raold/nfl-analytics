@@ -244,45 +244,49 @@ class VegasLineBiasEngine:
         # Add rolling performance metrics
         df = df.sort_values(["team", "game_id"])
 
+        # TEMPORAL SAFETY FIX (Nov 7, 2025): Add .shift(1) to avoid leakage
+        # These features were using current game outcome in rolling stats
+        # This gave models "knowledge" of betting results before prediction
+
         # 4-game rolling ATS record
         df["ats_pct_last4"] = (
             df.groupby("team")["covered_spread"]
-            .transform(lambda x: x.rolling(4, min_periods=1).mean() * 100)
+            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100)
         )
 
         # 8-game rolling ATS record
         df["ats_pct_last8"] = (
             df.groupby("team")["covered_spread"]
-            .transform(lambda x: x.rolling(8, min_periods=1).mean() * 100)
+            .transform(lambda x: x.shift(1).rolling(8, min_periods=1).mean() * 100)
         )
 
         # Season-to-date ATS record
         df["ats_pct_season"] = (
             df.groupby(["team"])["covered_spread"]
-            .transform(lambda x: x.expanding().mean() * 100)
+            .transform(lambda x: x.shift(1).expanding().mean() * 100)
         )
 
         # Over/under trends
         df["over_pct_last4"] = (
             df.groupby("team")["over_hit"]
-            .transform(lambda x: x.rolling(4, min_periods=1).mean() * 100)
+            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100)
         )
 
         # Average margin vs spread (last 4 games)
         df["avg_margin_vs_spread_last4"] = (
             df.groupby("team")["margin_vs_spread"]
-            .transform(lambda x: x.rolling(4, min_periods=1).mean())
+            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean())
         )
 
         # Favorite/underdog splits
         df["as_favorite_ats_pct"] = (
             df[df["is_favorite"]].groupby("team")["covered_spread"]
-            .transform(lambda x: x.expanding().mean() * 100)
+            .transform(lambda x: x.shift(1).expanding().mean() * 100)
         )
 
         df["as_underdog_ats_pct"] = (
             df[~df["is_favorite"]].groupby("team")["covered_spread"]
-            .transform(lambda x: x.expanding().mean() * 100)
+            .transform(lambda x: x.shift(1).expanding().mean() * 100)
         )
 
         logger.info(f"Generated {len(df):,} team-game line performance records")

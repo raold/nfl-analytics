@@ -24,6 +24,9 @@ Usage:
     # Test mode (no database writes)
     python py/production/props_production_pipeline.py --test-mode
 
+    # Paper trading mode (no real money, track performance)
+    python py/production/props_production_pipeline.py --paper-trade --bankroll 10000
+
 Schedule via cron (daily at 10am):
     0 10 * * * cd /Users/dro/rice/nfl-analytics && uv run python py/production/props_production_pipeline.py --api-key $ODDS_API_KEY
 """
@@ -46,6 +49,7 @@ from data.fetch_prop_odds import PropOddsFetcher
 from features.player_features import PlayerFeatureEngineer
 from models.props_predictor import PropsPredictor
 from production.props_ev_selector import PropsEVSelector
+from production.paper_trader import PaperTradingEngine
 
 logging.basicConfig(
     level=logging.INFO,
@@ -103,12 +107,16 @@ class PropsPipeline:
         prop_types: list[str] = None,
         bankroll: float = 10000.0,
         test_mode: bool = False,
+        paper_trade: bool = False,
+        paper_session_id: str = None,
     ):
         self.api_key = api_key
         self.db_config = db_config or DB_CONFIG
         self.prop_types = prop_types or DEFAULT_PROP_TYPES
         self.bankroll = bankroll
         self.test_mode = test_mode
+        self.paper_trade = paper_trade
+        self.paper_session_id = paper_session_id
 
         # Initialize components
         self.fetcher = PropOddsFetcher(api_key=api_key, db_config=db_config) if api_key else None
@@ -117,6 +125,15 @@ class PropsPipeline:
         self.selector = PropsEVSelector(
             min_edge=0.03, kelly_fraction=0.15, max_bet_pct=0.03, check_injuries=True
         )
+
+        # Initialize paper trading engine if in paper trade mode
+        self.paper_trader = None
+        if paper_trade:
+            self.paper_trader = PaperTradingEngine(
+                initial_bankroll=bankroll,
+                session_id=paper_session_id,
+                strategy='props_production_pipeline'
+            )
 
         # Create output directory
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -489,6 +506,84 @@ class PropsPipeline:
             logger.error(f"Error saving recommendations: {e}", exc_info=True)
             return output_files
 
+    def step_8_place_paper_trades(self, selected_bets: pd.DataFrame) -> dict:
+        """
+        Step 8 (Paper Trading Only): Place paper trades for selected bets.
+
+        Args:
+            selected_bets: Selected bets DataFrame
+
+        Returns:
+            Dict with paper trading results
+        """
+        logger.info("=" * 80)
+        logger.info("STEP 8: Placing paper trades")
+        logger.info("=" * 80)
+
+        if not self.paper_trade or self.paper_trader is None:
+            logger.warning("Not in paper trade mode - skipping")
+            return {"paper_trades_placed": 0}
+
+        if selected_bets.empty:
+            logger.info("No bets to place")
+            return {"paper_trades_placed": 0}
+
+        trades_placed = 0
+        trades_failed = 0
+
+        for idx, bet in selected_bets.iterrows():
+            try:
+                # Place paper trade
+                paper_trade_id = self.paper_trader.place_paper_bet(
+                    game_id=bet.get('game_id', 'unknown'),
+                    player_id=bet['player_id'],
+                    player_name=bet['player_name'],
+                    prop_type=bet['prop_type'],
+                    line_value=bet['line_value'],
+                    bet_side=bet['bet_side'],
+                    odds=bet['odds'],
+                    bookmaker_key=bet.get('bookmaker', 'unknown'),
+                    bet_amount=bet['bet_amount'],
+                    edge=bet.get('edge'),
+                    model_prediction=bet.get('prediction'),
+                    model_std=bet.get('prediction_std'),
+                    confidence=bet.get('confidence'),
+                    model_version='production_v1'
+                )
+
+                trades_placed += 1
+
+                logger.info(
+                    f"  ✓ Placed paper trade #{paper_trade_id}: "
+                    f"{bet['player_name']} {bet['prop_type']} "
+                    f"{bet['bet_side'].upper()} {bet['line_value']} "
+                    f"@ {bet['odds']:+d} for ${bet['bet_amount']:.2f}"
+                )
+
+            except Exception as e:
+                trades_failed += 1
+                logger.error(
+                    f"  ✗ Failed to place paper trade for {bet['player_name']}: {e}"
+                )
+
+        logger.info(
+            f"✅ Placed {trades_placed} paper trades "
+            f"({trades_failed} failed)"
+        )
+
+        # Get current session metrics
+        metrics = self.paper_trader.get_performance_metrics()
+        logger.info(f"   Session metrics:")
+        logger.info(f"     Total bets: {metrics['total_bets']}")
+        logger.info(f"     Pending: {metrics['pending_bets']}")
+        logger.info(f"     Bankroll: ${metrics['current_bankroll']:,.2f}")
+
+        return {
+            "paper_trades_placed": trades_placed,
+            "paper_trades_failed": trades_failed,
+            "session_metrics": metrics
+        }
+
     def run_full_pipeline(self, skip_fetch: bool = False, max_events: int = None) -> dict:
         """
         Run the complete end-to-end pipeline.
@@ -506,6 +601,9 @@ class PropsPipeline:
         logger.info(f"Bankroll: ${self.bankroll:,.2f}")
         logger.info(f"Prop types: {', '.join(self.prop_types)}")
         logger.info(f"Test mode: {self.test_mode}")
+        logger.info(f"Paper trade mode: {self.paper_trade}")
+        if self.paper_trade:
+            logger.info(f"Paper session ID: {self.paper_trader.session_id}")
         logger.info("=" * 80 + "\n")
 
         start_time = datetime.now()
@@ -550,6 +648,12 @@ class PropsPipeline:
         # Step 7: Save recommendations
         output_files = self.step_7_save_recommendations(selected_bets, predictions, prop_lines)
 
+        # Step 8: Place paper trades (if in paper trade mode)
+        paper_results = {}
+        if self.paper_trade:
+            paper_results = self.step_8_place_paper_trades(selected_bets)
+            self.stats.update(paper_results)
+
         # Final summary
         duration = (datetime.now() - start_time).total_seconds()
 
@@ -566,7 +670,16 @@ class PropsPipeline:
             logger.info(f"Total to wager: ${self.stats['total_to_wager']:,.2f}")
             logger.info(f"Average edge: {self.stats['avg_edge']*100:.2f}%")
             logger.info(f"Average EV: ${self.stats['avg_ev']:.2f}")
+
+        if self.paper_trade and "paper_trades_placed" in self.stats:
+            logger.info(f"Paper trades placed: {self.stats['paper_trades_placed']}")
+            logger.info(f"View dashboard: http://localhost:8501 (Paper Trading page)")
+
         logger.info("=" * 80 + "\n")
+
+        # Close paper trader if active
+        if self.paper_trader:
+            self.paper_trader.close_session()
 
         return {
             "success": True,
@@ -611,6 +724,18 @@ def main():
     # Testing
     parser.add_argument("--test-mode", action="store_true", help="Test mode (no database writes)")
 
+    # Paper trading
+    parser.add_argument(
+        "--paper-trade",
+        action="store_true",
+        help="Paper trading mode (simulate bets without real money)"
+    )
+    parser.add_argument(
+        "--paper-session-id",
+        type=str,
+        help="Paper trading session ID (auto-generated if not provided)"
+    )
+
     args = parser.parse_args()
 
     # Validate API key if not skipping fetch
@@ -627,6 +752,8 @@ def main():
         prop_types=args.prop_types,
         bankroll=args.bankroll,
         test_mode=args.test_mode,
+        paper_trade=args.paper_trade,
+        paper_session_id=args.paper_session_id,
     )
 
     # Run pipeline

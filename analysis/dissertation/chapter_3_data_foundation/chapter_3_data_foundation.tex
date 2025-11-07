@@ -115,7 +115,9 @@ The traditional belief that wind suppresses scoring is \textit{not supported by 
 
 This negative result is methodologically important: it demonstrates scientific rigor by rejecting conventional wisdom unsupported by empirical evidence, guards against overfitting spurious weather effects, and shows that not all domain intuitions survive scrutiny. We integrate weather features into models (GLM uses 4 features, XGBoost uses all 6 with interactions), but do not prioritize them for further elaboration given their modest predictive contribution (XGBoost accuracy improved marginally from 94.9\% to 95.3\%, +0.4\%). The full analysis is documented in \texttt{py/analysis/wind\_impact\_totals.py}.
 
-\subsection{Leakage Prevention Architecture}\label{subsec:leakage-arch}
+\subsection{Leakage Prevention Architecture}
+\label{subsec:leakage-arch}
+\label{sec:leakage-architecture}  % Alternative label for backward compatibility
 Temporal leakage—the inadvertent use of information unavailable at decision time—is the most insidious threat to predictive validity. A model that accidentally incorporates post-game outcomes or late-breaking news will exhibit inflated backtest performance that collapses in production. We implement a multi-layered defense-in-depth architecture:
 
 \paragraph{1. As-of snapshot mechanism.}
@@ -283,6 +285,7 @@ Quality monitoring ensures data integrity, but temporal considerations require e
 
 \subsection{Era Effects and Time Decay Weighting}
 \label{subsec:era-effects}
+\label{sec:timeframe-lookback}  % Alternative label for backward compatibility
 The NFL has undergone material structural changes since 1999, including officiating emphases on defensive contact, kickoff/PAT rule changes, quarterback protection, and a secular increase in pass rate and scoring. Betting markets have also evolved substantially with increased liquidity and pricing sophistication. These shifts raise the risk that long lookbacks contaminate modern estimates if older observations are weighted equally.
 
 I adopt a pragmatic two‑tier scope. The core analysis window is \textbf{2015--2025}, which reflects the contemporary rules environment (post‑PAT change) and the current market microstructure. Earlier seasons (1999--2014) are retained only as weak information through an explicit time‑decay weighting scheme and era controls. This approach preserves useful signal in low‑frequency contexts while protecting the model from regime drift.
