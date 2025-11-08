@@ -342,22 +342,78 @@ safe_db_operation(
             "out_of_bounds",     # Clock management context
             "order_sequence",    # Play number within drive
             "play_type_nfl",     # NFL official play categorization
-            "tackled_for_loss"   # Defensive disruption
+            "tackled_for_loss",  # Defensive disruption
+
+            # ============================================================
+            # PHASE 2: DEFENSIVE & PLAYER TRACKING (Migration 028 - Nov 7 2025)
+            # Expected ROI impact: +0.5-1.5%
+            # ============================================================
+
+            # Attempt flags
+            "rush_attempt", "pass_attempt", "field_goal_attempt",
+            "punt_attempt", "kickoff_attempt",
+
+            # Defensive player tracking
+            "solo_tackle_1_player_id", "solo_tackle_1_player_name",
+            "assist_tackle_1_player_id", "assist_tackle_1_player_name",
+            "pass_defense_1_player_id", "pass_defense_1_player_name",
+            "tackle_for_loss_1_player_id", "tackle_for_loss_1_player_name",
+
+            # Two-point conversion
+            "two_point_conv_result",
+
+            # ============================================================
+            # PHASE 3: SITUATIONAL & DRIVE CONTEXT (Migration 029 - Nov 7 2025)
+            # Expected ROI impact: +0.3-1.0%
+            # ============================================================
+
+            # Drive-level context
+            "drive_play_count", "drive_time_of_possession", "drive_first_downs",
+            "drive_inside20", "drive_ended_with_score", "drive_yards_penalized",
+
+            # Weather conditions
+            "temp", "wind", "weather",
+
+            # Game situation
+            "no_score_prob", "def_wp", "game_half"
           )
 
           # Defensive column selection - only selects columns that exist in nflreadr
           plays_df <- pbp %>%
             select(any_of(CANONICAL_COLUMNS))
 
-          # Type conversion for Phase 1 BOOLEAN columns
+          # Type conversion for BOOLEAN columns (Phases 1-3)
           # nflreadr sometimes provides probabilities (0.0-1.0) for boolean flags
           # Convert to proper boolean type for database insertion
-          boolean_cols <- c("xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss")
+          boolean_cols <- c(
+            # Phase 1
+            "xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss",
+            # Phase 2
+            "rush_attempt", "pass_attempt", "field_goal_attempt", "punt_attempt", "kickoff_attempt",
+            # Phase 3
+            "drive_inside20", "drive_ended_with_score"
+          )
           for (col in boolean_cols) {
             if (col %in% names(plays_df) && !is.logical(plays_df[[col]])) {
               # Convert numeric/character to logical
               plays_df[[col]] <- as.logical(plays_df[[col]])
               log_message(sprintf("Converted %s to boolean type", col), level = "INFO")
+            }
+          }
+
+          # Type conversion for INTEGER columns (Phases 1-3)
+          # Some nflreadr columns come as numeric/character but database expects integer
+          integer_cols <- c(
+            # Phase 1
+            "order_sequence",
+            # Phase 3
+            "drive_play_count", "drive_first_downs", "drive_yards_penalized",
+            "temp", "wind"
+          )
+          for (col in integer_cols) {
+            if (col %in% names(plays_df) && !is.integer(plays_df[[col]])) {
+              plays_df[[col]] <- as.integer(plays_df[[col]])
+              log_message(sprintf("Converted %s to integer type", col), level = "INFO")
             }
           }
 
