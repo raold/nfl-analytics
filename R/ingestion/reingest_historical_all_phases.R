@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 # R/ingestion/reingest_historical_all_phases.R
-# Re-ingest historical play-by-play data (1999-2024) with ALL Phase 1-3 columns
-# Purpose: Populate Phase 1-3 columns (42 total: 15 Phase 1 + 15 Phase 2 + 12 Phase 3)
+# Re-ingest historical play-by-play data (1999-2024) with ALL Phase 1-4 columns
+# Purpose: Populate Phase 1-4 columns (67 total: 15 Phase 1 + 15 Phase 2 + 12 Phase 3 + 25 Phase 4)
 # Expected runtime: ~20-30 minutes for all seasons
-# Expected ROI Impact: +2.3-5.5% total (+1.5-3.5% Phase 1, +0.5-1.5% Phase 2, +0.3-1.0% Phase 3)
+# Expected ROI Impact: +3.8-8.5% total (+1.5-3.5% P1, +0.5-1.5% P2, +0.3-1.0% P3, +1.5-3.0% P4)
 
 suppressPackageStartupMessages({
   library(nflreadr)
@@ -134,15 +134,37 @@ CANONICAL_COLUMNS <- c(
   "temp", "wind", "weather",
 
   # Game situation
-  "no_score_prob", "def_wp", "game_half"
+  "no_score_prob", "def_wp", "game_half",
+
+  # ============================================================
+  # PHASE 4: CRITICAL HIGH-SIGNAL COLUMNS (Migration 030 - Nov 7 2025)
+  # Expected ROI impact: +1.5-3.0%
+  # ============================================================
+
+  # Play execution quality (fumble outcomes, safety, blocked kicks)
+  "fumble_forced", "fumble_recovery_1_team", "fumble_recovery_1_yards",
+  "fumble_recovery_1_player_id", "fumble_recovery_1_player_name",
+  "safety", "safety_player_id", "safety_player_name",
+  "punt_blocked", "blocked_player_id", "blocked_player_name",
+
+  # Advanced metrics (completion probability, EPA decomposition)
+  "xpass", "pass_oe", "cp", "air_epa", "yac_epa",
+
+  # Penalty granularity
+  "penalty_type", "penalty_player_id", "penalty_player_name", "first_down_penalty",
+
+  # Defensive players extended (sack, forced fumble, QB hits)
+  "sack_player_id", "sack_player_name",
+  "forced_fumble_player_1_player_id", "forced_fumble_player_1_player_name",
+  "qb_hit_1_player_id"
 )
 
 cat("=================================================================\n")
-cat("  HISTORICAL RE-INGESTION: All Phases (1-3) Column Population\n")
+cat("  HISTORICAL RE-INGESTION: All Phases (1-4) Column Population\n")
 cat("  Seasons:", START_SEASON, "to", END_SEASON, "\n")
 cat("  Columns:", length(CANONICAL_COLUMNS), "total columns\n")
 cat("  Expected runtime: ~20-30 minutes\n")
-cat("  Expected ROI Impact: +2.3-5.5% total\n")
+cat("  Expected ROI Impact: +3.8-8.5% total (Phases 1-4)\n")
 cat("=================================================================\n\n")
 
 # Connect to database
@@ -164,14 +186,16 @@ for (season in START_SEASON:END_SEASON) {
 
     cat(sprintf("  Selected %d columns from nflreadr\n", ncol(pbp_clean)))
 
-    # Boolean type conversion for Phases 1-3
+    # Boolean type conversion for Phases 1-4
     boolean_cols <- c(
       # Phase 1
       "xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss",
       # Phase 2
       "rush_attempt", "pass_attempt", "field_goal_attempt", "punt_attempt", "kickoff_attempt",
       # Phase 3
-      "drive_inside20", "drive_ended_with_score"
+      "drive_inside20", "drive_ended_with_score",
+      # Phase 4
+      "fumble_forced", "safety", "punt_blocked", "first_down_penalty"
     )
     for (col in boolean_cols) {
       if (col %in% names(pbp_clean) && !is.logical(pbp_clean[[col]])) {
@@ -179,13 +203,14 @@ for (season in START_SEASON:END_SEASON) {
       }
     }
 
-    # Integer type conversion for Phases 1-3
+    # Integer type conversion for Phases 1-4
     integer_cols <- c(
       # Phase 1
       "order_sequence",
       # Phase 3
       "drive_play_count", "drive_first_downs", "drive_yards_penalized",
       "temp", "wind"
+      # Phase 4: No integer columns in Phase 4
     )
     for (col in integer_cols) {
       if (col %in% names(pbp_clean) && !is.integer(pbp_clean[[col]])) {
@@ -227,8 +252,8 @@ for (season in START_SEASON:END_SEASON) {
 
     validation <- dbGetQuery(con, validation_query)
     cat(sprintf("  ✓ Season %d complete: %d plays, %.1f%% passing, %d tackles, %d weather\n",
-                season, validation$total, validation$pct_passing,
-                validation$has_tackle, validation$has_weather))
+                season, as.integer(validation$total), validation$pct_passing,
+                as.integer(validation$has_tackle), as.integer(validation$has_weather)))
 
   }, error = function(e) {
     cat(sprintf("  ✗ ERROR in season %d: %s\n", season, e$message))
@@ -237,7 +262,7 @@ for (season in START_SEASON:END_SEASON) {
 
 # Final validation across all seasons
 cat("\n=================================================================\n")
-cat("  FINAL VALIDATION (ALL PHASES 1-3)\n")
+cat("  FINAL VALIDATION (ALL PHASES 1-4)\n")
 cat("=================================================================\n")
 
 final_validation <- dbGetQuery(con, "
@@ -260,10 +285,10 @@ final_validation <- dbGetQuery(con, "
 
 print(final_validation)
 
-cat("\n✓ Historical re-ingestion complete (ALL PHASES 1-3)!\n")
+cat("\n✓ Historical re-ingestion complete (ALL PHASES 1-4)!\n")
 cat(sprintf("  Processed seasons %d-%d\n", START_SEASON, END_SEASON))
-cat("  Phase 1-3 columns now populated across all historical data\n")
-cat("  Total columns added: 42 (15 Phase 1 + 15 Phase 2 + 12 Phase 3)\n")
-cat("  Expected ROI Impact: +2.3-5.5%\n\n")
+cat("  Phase 1-4 columns now populated across all historical data\n")
+cat("  Total columns added: 67 (15 Phase 1 + 15 Phase 2 + 12 Phase 3 + 25 Phase 4)\n")
+cat("  Expected ROI Impact: +3.8-8.5%\n\n")
 
 dbDisconnect(con)

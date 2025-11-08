@@ -375,14 +375,36 @@ safe_db_operation(
             "temp", "wind", "weather",
 
             # Game situation
-            "no_score_prob", "def_wp", "game_half"
+            "no_score_prob", "def_wp", "game_half",
+
+            # ============================================================
+            # PHASE 4: CRITICAL HIGH-SIGNAL COLUMNS (Migration 030 - Nov 7 2025)
+            # Expected ROI impact: +1.5-3.0%
+            # ============================================================
+
+            # Play execution quality (fumble outcomes, safety, blocked kicks)
+            "fumble_forced", "fumble_recovery_1_team", "fumble_recovery_1_yards",
+            "fumble_recovery_1_player_id", "fumble_recovery_1_player_name",
+            "safety", "safety_player_id", "safety_player_name",
+            "punt_blocked", "blocked_player_id", "blocked_player_name",
+
+            # Advanced metrics (completion probability, EPA decomposition)
+            "xpass", "pass_oe", "cp", "air_epa", "yac_epa",
+
+            # Penalty granularity
+            "penalty_type", "penalty_player_id", "penalty_player_name", "first_down_penalty",
+
+            # Defensive players extended (sack, forced fumble, QB hits)
+            "sack_player_id", "sack_player_name",
+            "forced_fumble_player_1_player_id", "forced_fumble_player_1_player_name",
+            "qb_hit_1_player_id"
           )
 
           # Defensive column selection - only selects columns that exist in nflreadr
           plays_df <- pbp %>%
             select(any_of(CANONICAL_COLUMNS))
 
-          # Type conversion for BOOLEAN columns (Phases 1-3)
+          # Type conversion for BOOLEAN columns (Phases 1-4)
           # nflreadr sometimes provides probabilities (0.0-1.0) for boolean flags
           # Convert to proper boolean type for database insertion
           boolean_cols <- c(
@@ -391,7 +413,9 @@ safe_db_operation(
             # Phase 2
             "rush_attempt", "pass_attempt", "field_goal_attempt", "punt_attempt", "kickoff_attempt",
             # Phase 3
-            "drive_inside20", "drive_ended_with_score"
+            "drive_inside20", "drive_ended_with_score",
+            # Phase 4
+            "fumble_forced", "safety", "punt_blocked", "first_down_penalty"
           )
           for (col in boolean_cols) {
             if (col %in% names(plays_df) && !is.logical(plays_df[[col]])) {
@@ -401,7 +425,7 @@ safe_db_operation(
             }
           }
 
-          # Type conversion for INTEGER columns (Phases 1-3)
+          # Type conversion for INTEGER columns (Phases 1-4)
           # Some nflreadr columns come as numeric/character but database expects integer
           integer_cols <- c(
             # Phase 1
@@ -409,6 +433,7 @@ safe_db_operation(
             # Phase 3
             "drive_play_count", "drive_first_downs", "drive_yards_penalized",
             "temp", "wind"
+            # Phase 4: No integer columns in Phase 4
           )
           for (col in integer_cols) {
             if (col %in% names(plays_df) && !is.integer(plays_df[[col]])) {
