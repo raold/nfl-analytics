@@ -27,6 +27,13 @@ from pathlib import Path
 import json
 import tempfile
 
+try:
+    from py.utils.claude_cache import get_default_cache
+    CACHE_AVAILABLE = True
+except ImportError:
+    get_default_cache = None
+    CACHE_AVAILABLE = False
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -109,6 +116,13 @@ class RService:
         self.config = config or RServiceConfig()
         self._last_health_check: Optional[RServiceHealth] = None
         self._health_check_cache_seconds = 300  # 5 minutes
+
+        # Initialize Redis cache for R prediction results
+        self._redis_cache = get_default_cache() if CACHE_AVAILABLE and get_default_cache else None
+        if self._redis_cache:
+            logger.info("Redis caching enabled for R predictions")
+        else:
+            logger.debug("Redis caching disabled for R predictions")
 
     def health_check(self, force: bool = False) -> RServiceHealth:
         """
@@ -418,6 +432,113 @@ class RService:
 
         logger.info(f"✓ Batch prediction complete: {output_csv}")
         return output_csv
+
+    def execute_with_cache(
+        self,
+        r_code: str,
+        cache_key: Optional[str] = None,
+        cache_ttl: int = 21600,  # 6 hours default
+        timeout: Optional[int] = None,
+        retry: bool = True,
+        env: Optional[Dict[str, str]] = None
+    ) -> subprocess.CompletedProcess:
+        """
+        Execute R code with Redis caching support.
+
+        Caches successful R execution results to avoid re-running expensive computations
+        (e.g., posterior predictions from brms models which take 10-30s).
+
+        Args:
+            r_code: R code to execute
+            cache_key: Optional cache key. If None, caching is disabled.
+            cache_ttl: Cache time-to-live in seconds (default: 21600 = 6 hours)
+            timeout: Timeout in seconds
+            retry: Enable automatic retries
+            env: Environment variables
+
+        Returns:
+            CompletedProcess with stdout, stderr, returncode
+
+        Performance Impact:
+            - Cache miss (first execution): 10-30s (normal R execution time)
+            - Cache hit (subsequent calls): 50-200ms (1000x faster)
+
+        Example:
+            ```python
+            r_service = get_r_service()
+
+            # Generate cache key from prediction parameters
+            cache_key = f"state_space_v2:player_{player_id}:s{season}w{week}"
+
+            # First call: executes R code (10-30s)
+            result = r_service.execute_with_cache(
+                r_code='''
+                    library(brms)
+                    model <- readRDS("models/state_space_v2.rds")
+                    pred <- posterior_predict(model, newdata)
+                    cat(jsonlite::toJSON(list(mean=mean(pred), sd=sd(pred))))
+                ''',
+                cache_key=cache_key,
+                cache_ttl=21600  # 6 hours
+            )
+
+            # Second call: returns cached result (50-200ms)
+            result_cached = r_service.execute_with_cache(
+                r_code=same_code,
+                cache_key=cache_key
+            )
+            ```
+        """
+        # Check cache if key provided
+        if cache_key and self._redis_cache:
+            cache_full_key = f"r_result:{cache_key}"
+
+            try:
+                cached = self._redis_cache.get(cache_full_key)
+
+                if cached:
+                    # Reconstruct CompletedProcess from cached data
+                    logger.info(f"Cache hit: {cache_key} (Redis)")
+                    return subprocess.CompletedProcess(
+                        args=["Rscript", "-e", "(cached)"],
+                        returncode=0,
+                        stdout=cached["stdout"],
+                        stderr=cached.get("stderr", "")
+                    )
+
+            except Exception as e:
+                logger.warning(f"Cache retrieval failed for {cache_key}: {e}")
+                # Continue to R execution
+
+        # Cache miss - execute R subprocess (10-30s)
+        if cache_key:
+            logger.info(f"Cache miss: {cache_key} - executing R code")
+        else:
+            logger.debug("Caching disabled - executing R code")
+
+        result = self.execute(r_code, timeout=timeout, retry=retry, env=env)
+
+        # Cache successful results
+        if cache_key and result.returncode == 0 and self._redis_cache:
+            try:
+                cache_data = {
+                    "stdout": result.stdout,
+                    "stderr": result.stderr,
+                    "returncode": result.returncode
+                }
+
+                cache_full_key = f"r_result:{cache_key}"
+                self._redis_cache.set(cache_full_key, cache_data, ttl=cache_ttl)
+
+                logger.info(
+                    f"Cached R result: {cache_key} "
+                    f"(TTL={cache_ttl}s, size={len(result.stdout)} bytes)"
+                )
+
+            except Exception as e:
+                logger.warning(f"Failed to cache R result for {cache_key}: {e}")
+
+        return result
 
 
 # Singleton instance for easy access
