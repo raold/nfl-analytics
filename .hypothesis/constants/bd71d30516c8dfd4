@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/py/causal/treatment_definitions.py
+# hypothesis_version: 6.147.0
+
+[1.5, 'carries_l4', 'carries_lag1', 'coaching_change', 'game_date', 'in_treatment_window', 'injury_treatment', 'player_game_number', 'player_id', 'player_name', 'rushing_attempts', 'rushing_yards', 'season', 'team', 'treatment_game', 'treatment_period', 'usage_increase', 'week']

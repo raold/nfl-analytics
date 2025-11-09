@@ -40,7 +40,7 @@ class PanelConstructor:
         self.db_params = db_params or {
             'dbname': 'nfl_data',
             'user': 'nfl_user',
-            'password': 'sicillionbillions',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
             'host': 'localhost',
             'port': 5544
         }

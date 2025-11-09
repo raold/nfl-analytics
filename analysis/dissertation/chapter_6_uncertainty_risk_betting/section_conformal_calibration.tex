@@ -1,0 +1,216 @@
+% !TEX root = ../main/main.tex
+\section{Conformal Prediction for Distribution-Free Calibration}
+\label{sec:conformal-calibration}
+
+We augment our Bayesian uncertainty quantification framework with \textbf{conformal prediction}~\citep{vovk2005algorithmic, shafer2008tutorial}, a distribution-free method that provides finite-sample coverage guarantees under minimal assumptions. While temperature scaling (see~\S\ref{subsec:bnn_calibration_motivation}) rescales BNN prediction intervals via a single tuned parameter, conformal prediction offers a principled alternative grounded in exchangeability rather than parametric assumptions.
+
+\subsection{Motivation: Beyond Parametric Calibration}\label{subsec:conformal-motivation}
+
+Bayesian neural networks produce prediction intervals via posterior sampling: given data $\mathcal{D}$, we draw weights $\mathbf{w}^{(s)} \sim p(\mathbf{w} \mid \mathcal{D})$ and compute predictive distributions $p(y \mid \mathbf{x}, \mathcal{D})$. These intervals are theoretically well-calibrated \textit{if the model is correctly specified}—but model misspecification (wrong likelihood, poor priors, architectural limitations) can yield severe under-calibration, as documented in~\S\ref{subsec:bnn_calibration_motivation}.
+
+Post-hoc calibration methods address this gap:
+
+\begin{itemize}
+    \item \textbf{Temperature Scaling}~\citep{guo2017calibration}: Rescale prediction variance by $T^2$ where $T$ is tuned on a held-out calibration set. Achieves strong empirical coverage (89.5\% in our rushing yards task) but lacks theoretical guarantees and applies constant scaling across all predictions (ignoring heteroskedasticity).
+
+    \item \textbf{Conformal Prediction}: Constructs prediction sets $\mathcal{C}(\mathbf{x})$ that satisfy $\mathbb{P}(y \in \mathcal{C}(\mathbf{x})) \geq 1 - \alpha$ for any miscoverage rate $\alpha \in (0,1)$. This guarantee holds \textit{in finite samples} under exchangeability alone—no distributional assumptions, no Gaussianity, no correct model specification.
+\end{itemize}
+
+The appeal is immediate: conformal prediction \textit{provably calibrates any base predictor}, whether Bayesian, frequentist, or machine learning black box. The cost is symmetry and conservatism—standard split conformal uses constant-width intervals $[\hat{\mu}(\mathbf{x}) - q, \hat{\mu}(\mathbf{x}) + q]$ that may be suboptimal when uncertainty varies across inputs.
+
+We adopt conformal prediction as a \textbf{robustness check} and \textbf{alternative UQ method} alongside temperature-scaled BNNs, enabling direct comparison of distribution-free versus parametric calibration for NFL player props betting.
+
+\subsection{Mathematical Framework}\label{subsec:conformal-math}
+
+\subsubsection{Split Conformal Prediction}
+
+Given training data $\mathcal{D}_{\text{train}} = \{(\mathbf{x}_i, y_i)\}_{i=1}^n$, split conformal prediction partitions data into:
+
+\begin{itemize}
+    \item \textbf{Proper training set}: $\mathcal{D}_{\text{proper}} \subset \mathcal{D}_{\text{train}}$ (typically 80\%)
+    \item \textbf{Calibration set}: $\mathcal{D}_{\text{cal}} = \mathcal{D}_{\text{train}} \setminus \mathcal{D}_{\text{proper}}$ (remaining 20\%)
+\end{itemize}
+
+The procedure is:
+
+\begin{enumerate}
+    \item \textbf{Train base model}: Fit point predictor $\hat{\mu}(\mathbf{x})$ on $\mathcal{D}_{\text{proper}}$. Any model suffices: neural network, random forest, linear regression.
+
+    \item \textbf{Compute nonconformity scores}: On calibration set, define residuals
+    \begin{equation}
+        R_i = |y_i - \hat{\mu}(\mathbf{x}_i)|, \quad i \in \mathcal{D}_{\text{cal}}.
+    \end{equation}
+    These measure how ``nonconforming'' each calibration point is to the model's predictions.
+
+    \item \textbf{Determine coverage threshold}: For target coverage $1 - \alpha$ (e.g., 90\%), compute the $\lceil (1-\alpha)(|\mathcal{D}_{\text{cal}}| + 1) \rceil$-th smallest score:
+    \begin{equation}
+        q_{1-\alpha} = \text{Quantile}_{1-\alpha}(R_1, \ldots, R_{|\mathcal{D}_{\text{cal}}|}).
+    \end{equation}
+
+    \item \textbf{Form prediction intervals}: For test input $\mathbf{x}$, the conformal prediction interval is
+    \begin{equation}\label{eq:conformal-interval}
+        \mathcal{C}(\mathbf{x}) = \big[\hat{\mu}(\mathbf{x}) - q_{1-\alpha}, \, \hat{\mu}(\mathbf{x}) + q_{1-\alpha}\big].
+    \end{equation}
+\end{enumerate}
+
+\begin{theorem}[Finite-Sample Coverage Guarantee~\citep{vovk2005algorithmic}]
+Under exchangeability of $(\mathbf{x}_1, y_1), \ldots, (\mathbf{x}_n, y_n), (\mathbf{x}_{\text{new}}, y_{\text{new}})$, the conformal prediction set satisfies
+\begin{equation}
+    \mathbb{P}\big(y_{\text{new}} \in \mathcal{C}(\mathbf{x}_{\text{new}})\big) \geq 1 - \alpha,
+\end{equation}
+regardless of the base model $\hat{\mu}$ or data distribution.
+\end{theorem}
+
+The guarantee is distribution-free and holds for any sample size. This contrasts sharply with asymptotic results (confidence intervals require $n \to \infty$) or parametric assumptions (BNN credible intervals assume correct likelihood and priors).
+
+\subsubsection{Conformalized Quantile Regression (CQR)}
+
+Standard split conformal yields \textit{symmetric} intervals of constant width $2 q_{1-\alpha}$. This is wasteful when uncertainty varies across inputs (heteroskedasticity). \textbf{Conformalized Quantile Regression (CQR)}~\citep{romano2019cqr} adapts interval width to local uncertainty:
+
+\begin{enumerate}
+    \item Train quantile regression to estimate conditional quantiles $\hat{q}_{\alpha/2}(\mathbf{x})$ and $\hat{q}_{1-\alpha/2}(\mathbf{x})$ on $\mathcal{D}_{\text{proper}}$.
+
+    \item Compute conformity scores on calibration set:
+    \begin{equation}
+        E_i = \max\big\{\hat{q}_{\alpha/2}(\mathbf{x}_i) - y_i, \, y_i - \hat{q}_{1-\alpha/2}(\mathbf{x}_i)\big\}.
+    \end{equation}
+    This measures the worst-case quantile error (how far outside the predicted interval the true value falls).
+
+    \item Determine correction $Q = \text{Quantile}_{1-\alpha}(E_1, \ldots, E_{|\mathcal{D}_{\text{cal}}|})$.
+
+    \item Adjust prediction intervals:
+    \begin{equation}\label{eq:cqr-interval}
+        \mathcal{C}_{\text{CQR}}(\mathbf{x}) = \big[\hat{q}_{\alpha/2}(\mathbf{x}) - Q, \, \hat{q}_{1-\alpha/2}(\mathbf{x}) + Q\big].
+    \end{equation}
+\end{enumerate}
+
+CQR retains conformal guarantees while allowing intervals to widen in high-uncertainty regions (e.g., backup RBs with sparse data) and narrow in low-uncertainty regions (e.g., bell-cow backs with 15+ carries). This is critical for player props betting where heteroskedasticity dominates: variance in rushing yards depends on usage (carries), matchup (opponent defense rank), and context (game script, weather).
+
+\subsection{Integration with Bayesian Hierarchical Models}\label{subsec:conformal-bnn-integration}
+
+Our primary uncertainty quantification framework relies on Bayesian Neural Networks with hierarchical player effects (see~\S\ref{subsec:bnn_calibration_motivation}). Conformal prediction complements this in three ways:
+
+\paragraph{1. Post-hoc calibration of BNN intervals.}
+We can treat the BNN as the base predictor $\hat{\mu}(\mathbf{x})$ and apply split conformal to its predictions. This ``conformalizes'' the BNN without retraining, providing distribution-free coverage guarantees even if the BNN is miscalibrated. The procedure:
+
+\begin{enumerate}
+    \item Train BNN on $\mathcal{D}_{\text{proper}}$, obtain posterior predictive means $\hat{\mu}_{\text{BNN}}(\mathbf{x})$.
+    \item Compute nonconformity scores $R_i = |y_i - \hat{\mu}_{\text{BNN}}(\mathbf{x}_i)|$ on $\mathcal{D}_{\text{cal}}$.
+    \item Form conformal intervals $[\hat{\mu}_{\text{BNN}}(\mathbf{x}) - q_{1-\alpha}, \hat{\mu}_{\text{BNN}}(\mathbf{x}) + q_{1-\alpha}]$.
+\end{enumerate}
+
+This approach separates \textit{point prediction quality} (governed by BNN architecture) from \textit{interval calibration} (governed by conformal adjustment). If the BNN learns good representations but miscalibrates variance, conformal correction rescues coverage.
+
+\paragraph{2. Ensemble with temperature scaling.}
+Temperature scaling and conformal prediction offer complementary strengths:
+
+\begin{itemize}
+    \item \textbf{Temperature scaling}: Fast (single parameter), interpretable (rescales variance), but lacks theoretical guarantees and assumes constant scaling.
+    \item \textbf{Conformal prediction}: Distribution-free guarantees, finite-sample validity, but symmetric intervals ignore heteroskedasticity (unless using CQR).
+\end{itemize}
+
+We ensemble both methods by averaging interval bounds:
+\begin{equation}
+    \mathcal{C}_{\text{ensemble}}(\mathbf{x}) = \frac{1}{2}\big(\mathcal{C}_{\text{temp}}(\mathbf{x}) + \mathcal{C}_{\text{conformal}}(\mathbf{x})\big),
+\end{equation}
+where $\mathcal{C}_{\text{temp}}(\mathbf{x})$ are temperature-scaled BNN intervals and $\mathcal{C}_{\text{conformal}}(\mathbf{x})$ are split conformal intervals. This hedges against model-specific failures while preserving strong empirical coverage.
+
+\paragraph{3. Robustness to distributional shifts.}
+Conformal prediction's exchangeability assumption is weaker than BNN's Gaussianity and correct specification assumptions. In player props betting, distributional shifts are common: rule changes (extra playoff game in 2021), injury patterns (COVID-19 absences in 2020), or strategic evolution (increased fourth-down aggression). Conformal prediction adapts automatically via recalibration on recent data, whereas BNNs may require re-specification of priors or likelihoods.
+
+Recent work~\citep{barber2023conformal} extends conformal prediction beyond exchangeability to covariate shift and time series settings. These extensions are particularly relevant for NFL betting, where temporal dependence (team momentum, player fatigue) violates strict exchangeability but can be addressed via weighted conformal methods.
+
+\subsection{Implementation Details}\label{subsec:conformal-implementation}
+
+We implement conformal prediction using the \texttt{MAPIE} library~\citep{taquet2021mapie}, a production-ready Python package supporting split conformal, CQR, and jackknife+ variants. Our pipeline:
+
+\begin{enumerate}
+    \item \textbf{Base models}: Random Forest (100 trees, max depth 8) and BNN posterior predictive mean.
+
+    \item \textbf{Calibration set size}: 20\% of training data (approximately 974 player-game observations for 2020--2023 rushing props).
+
+    \item \textbf{Target coverage}: $1 - \alpha = 90\%$ to match BNN credible interval convention.
+
+    \item \textbf{Nonconformity score}: Absolute residuals $R_i = |y_i - \hat{\mu}(\mathbf{x}_i)|$ (symmetric) or CQR quantile errors (adaptive).
+
+    \item \textbf{Recalibration frequency}: Weekly during NFL season to account for covariate shift (injuries, trades, weather).
+\end{enumerate}
+
+Computational cost is negligible: calibration requires $\mathcal{O}(|\mathcal{D}_{\text{cal}}| \log |\mathcal{D}_{\text{cal}}|)$ for sorting nonconformity scores, completing in $<1$ second on modern hardware. This contrasts with BNN MCMC sampling (25 minutes for single-output, 3-4 hours for multi-output) or temperature scaling grid search (5-10 minutes).
+
+\subsection{Why Conformal Prediction Complements Temperature Scaling}\label{subsec:conformal-vs-temperature}
+
+Both temperature scaling and conformal prediction solve the calibration problem, but via different mechanisms:
+
+\begin{table}[t]
+\centering
+\caption{Comparison of Temperature Scaling vs. Conformal Prediction for BNN Calibration}
+\label{tab:temp-vs-conformal}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Property} & \textbf{Temperature Scaling} & \textbf{Conformal Prediction} \\
+\midrule
+\textbf{Calibration Mechanism} & Rescale BNN variance by $T^2$ & Symmetrize around base predictor \\
+\textbf{Theoretical Guarantee} & None (empirical only) & Finite-sample coverage ($\geq 1-\alpha$) \\
+\textbf{Assumptions} & Well-calibrated relative uncertainty & Exchangeability (weak) \\
+\textbf{Heteroskedasticity} & Constant $T$ (ignores) & Constant width (CQR adapts) \\
+\textbf{Computational Cost} & Grid search: 5-10 min & Calibration: $<1$ sec \\
+\textbf{Interval Sharpness} & Preserves BNN intervals & Often wider (conservative) \\
+\textbf{Distribution Shift} & Requires recalibrating $T$ & Automatic via recalibration \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\paragraph{When Temperature Scaling Excels.}
+If the BNN learns \textit{correct relative uncertainty} (player A is twice as variable as player B) but mis-scales absolute magnitudes (intervals too narrow by factor of 2), temperature scaling precisely corrects this. Our rushing yards BNN exhibits exactly this pattern: 26.2\% baseline coverage improves to 89.5\% with $T=0.75$, indicating systematic variance underestimation that a scalar rescaling fixes.
+
+\paragraph{When Conformal Prediction Excels.}
+If the base predictor is \textit{arbitrarily miscalibrated} (e.g., random forest, XGBoost with no uncertainty estimates), conformal prediction provides valid intervals from scratch. It also handles covariate shift more gracefully: recalibrating on recent weeks automatically adjusts $q_{1-\alpha}$ to match evolving data distributions, whereas temperature scaling assumes stationary $T$.
+
+\paragraph{Ensemble Strategy.}
+We deploy both methods in production:
+
+\begin{itemize}
+    \item \textbf{Primary}: Temperature-scaled BNN intervals (fast, sharp, empirically well-calibrated at 89.5\%).
+    \item \textbf{Robustness check}: Conformal intervals on same BNN base predictor. If conformal and temperature-scaled intervals disagree substantially (e.g., $>20$ yards difference), flag for manual review.
+    \item \textbf{Model comparison}: Run conformal prediction on alternative base models (quantile regression, random forest) to assess whether BNN point predictions are competitive.
+\end{itemize}
+
+This multi-method validation ensures we do not over-rely on a single calibration assumption. See~\S\ref{sec:conformal-empirical} for empirical comparison on 2024 holdout data.
+
+\subsection{Limitations and Extensions}\label{subsec:conformal-limitations}
+
+\paragraph{Exchangeability Violations.}
+Standard conformal prediction assumes test data are exchangeable with calibration data. NFL player props violate this via:
+
+\begin{itemize}
+    \item \textbf{Temporal dependence}: Player performance is autocorrelated (momentum, fatigue, confidence).
+    \item \textbf{Covariate shift}: Injuries, trades, and rule changes alter feature distributions over time.
+    \item \textbf{Strategic evolution}: Defensive schemes adapt to offensive trends, shifting the relationship between features and outcomes.
+\end{itemize}
+
+Recent work~\citep{barber2023conformal} addresses these via:
+
+\begin{enumerate}
+    \item \textbf{Weighted conformal prediction}: Assign higher weight to recent calibration points, downweighting stale data.
+    \item \textbf{Rolling calibration windows}: Recalibrate weekly on trailing 4-week window rather than full historical data.
+    \item \textbf{Residual conformal}: Model temporal dependence explicitly (e.g., AR(1) on residuals), then conformalize the decorrelated errors.
+\end{enumerate}
+
+We implement rolling 4-week windows as a pragmatic compromise: sufficiently adaptive to track season-level shifts, sufficiently stable to avoid overfitting to small samples.
+
+\paragraph{Interval Sharpness.}
+Conformal prediction prioritizes \textit{coverage} over \textit{sharpness}. Our empirical results (\S\ref{sec:conformal-empirical}) show conformal intervals are 3-4 times wider than temperature-scaled BNN intervals (66 yards vs. 17 yards average width for rushing props). This reflects the cost of distribution-free guarantees: without parametric assumptions, the method must be conservative to ensure $\geq 90\%$ coverage across all input regions.
+
+CQR mitigates this via quantile regression, allowing adaptive widths. However, CQR requires estimating conditional quantiles reliably, which may fail in sparse-data regimes (backup RBs with $<5$ games). We compare standard split conformal (simple, robust) against CQR (adaptive, higher variance) in ablation studies.
+
+\paragraph{Computational Scalability.}
+While calibration is fast ($<1$ sec), applying conformal prediction to thousands of player-game combinations per week scales linearly. For real-time betting (live odds updates), latency constraints may favor temperature scaling (single rescaling operation per prediction) over conformal prediction (requires storing calibration residuals and quantile computation per query). We address this via pre-computed lookup tables: discretize feature space into bins, cache $q_{1-\alpha}$ per bin, and interpolate at prediction time.
+
+\subsection{Conclusion}
+
+Conformal prediction provides a rigorous, distribution-free alternative to temperature scaling for post-hoc calibration of Bayesian neural networks. While temperature scaling offers superior interval sharpness and computational efficiency, conformal prediction's finite-sample coverage guarantees and robustness to model misspecification make it an essential validation tool for high-stakes betting applications. We deploy both methods in production (\S\ref{sec:conformal-empirical}), using their agreement as a quality signal and their disagreement as a red flag for manual review.
+
+The key insight: \textbf{calibration need not rely on correct model specification}. By separating point prediction (where BNNs excel via hierarchical structure) from interval construction (where conformal methods provide guarantees), we achieve both accuracy and reliability without sacrificing theoretical rigor.

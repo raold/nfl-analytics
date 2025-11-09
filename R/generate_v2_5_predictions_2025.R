@@ -16,7 +16,7 @@ con <- dbConnect(
   host = "localhost",
   port = 5544,
   user = "dro",
-  password = "sicillionbillions"
+  password = Sys.getenv("DB_PASSWORD", "sicillionbillions")
 )
 
 # Load the v2.5 informative priors model

@@ -47,7 +47,7 @@ con <- dbConnect(
   port = 5544,
   dbname = "devdb01",
   user = "dro",
-  password = "sicillionbillions"
+  password = Sys.getenv("DB_PASSWORD", "sicillionbillions")
 )
 
 query <- "

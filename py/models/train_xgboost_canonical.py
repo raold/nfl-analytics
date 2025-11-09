@@ -43,11 +43,11 @@ logger = logging.getLogger(__name__)
 
 # Database connection
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'user': 'dro',
-    'password': 'sicillionbillions',
-    'database': 'devdb01'
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': int(os.getenv('DB_PORT', '5544')),
+    'user': os.getenv('DB_USER', 'dro'),
+    'password': os.getenv('DB_PASSWORD'),  # Set DB_PASSWORD env variable
+    'database': os.getenv('DB_NAME', 'devdb01')
 }
 
 # Canonical training window configuration

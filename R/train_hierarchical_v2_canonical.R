@@ -36,7 +36,7 @@ conn <- dbConnect(
   port = 5544,
   dbname = "devdb01",
   user = "dro",
-  password = "sicillionbillions"
+  password = Sys.getenv("DB_PASSWORD", "sicillionbillions")
 )
 
 # ============================================================================
@@ -162,8 +162,8 @@ model <- brm(
   family = gaussian(),
   prior = priors,
   chains = 4,
-  iter = 2000,
-  warmup = 1000,
+  iter = 4000,
+  warmup = 2000,
   cores = 4,
   threads = threading(2),
   backend = "cmdstanr",
@@ -190,11 +190,20 @@ min_ess <- min(ess_values, na.rm = TRUE)
 cat(sprintf("  Max Rhat: %.4f (threshold: < 1.01)\n", max_rhat))
 cat(sprintf("  Min ESS: %.0f (threshold: > 400)\n", min_ess))
 
+# Check convergence (stop execution if failed)
+convergence_failed <- FALSE
 if (max_rhat > 1.01) {
-  stop("❌ CONVERGENCE FAILURE: Rhat > 1.01")
+  cat("\n❌ CONVERGENCE FAILURE: Rhat > 1.01\n")
+  convergence_failed <- TRUE
 }
 if (min_ess < 400) {
-  stop("❌ CONVERGENCE FAILURE: ESS < 400")
+  cat("\n❌ CONVERGENCE FAILURE: ESS < 400\n")
+  convergence_failed <- TRUE
+}
+
+if (convergence_failed) {
+  dbDisconnect(conn)
+  stop("Model training failed convergence diagnostics. Increase iterations or adjust adapt_delta.")
 }
 
 cat("\n✅ CONVERGENCE SUCCESS!\n\n")

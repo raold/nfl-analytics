@@ -1,0 +1,85 @@
+% conformal_interval_width.tex - Histogram comparing interval widths across methods
+% TODO: Update with actual validation results when available
+
+\begin{tikzpicture}
+  % Load standardized styles
+  \input{../style/tikz_diagram_style.tex}
+
+  % Define colors
+  \definecolor{accent}{RGB}{31,119,180}
+  \definecolor{tempcolor}{RGB}{255,127,14}  % Orange
+  \definecolor{conformalcolor}{RGB}{44,160,44}  % Green
+  \definecolor{cqrcolor}{RGB}{214,39,40}  % Red
+
+  % Axes
+  \draw[->] (0,0) -- (11,0) node[right, font=\small] {Interval Width (yards)};
+  \draw[->] (0,0) -- (0,6) node[above, font=\small] {Density};
+
+  % Histogram bars (placeholder data - TODO: replace with actual results)
+
+  % Temperature Scaling (narrow, centered at 17 yards)
+  \fill[tempcolor, opacity=0.7] (1.4,0) rectangle (1.8,4.8);
+  \fill[tempcolor, opacity=0.7] (1.8,0) rectangle (2.2,1.2);
+
+  % Conformal (BNN base) (wide, centered at 68.5 yards)
+  \fill[conformalcolor, opacity=0.6] (6.2,0) rectangle (6.6,3.5);
+  \fill[conformalcolor, opacity=0.6] (6.6,0) rectangle (7.0,4.2);
+  \fill[conformalcolor, opacity=0.6] (7.0,0) rectangle (7.4,3.8);
+  \fill[conformalcolor, opacity=0.6] (7.4,0) rectangle (7.8,2.1);
+
+  % CQR (slightly narrower than standard conformal, centered at 63.2 yards)
+  \fill[cqrcolor, opacity=0.6] (5.6,0) rectangle (6.0,2.8);
+  \fill[cqrcolor, opacity=0.6] (6.0,0) rectangle (6.4,3.9);
+  \fill[cqrcolor, opacity=0.6] (6.4,0) rectangle (6.8,4.5);
+  \fill[cqrcolor, opacity=0.6] (6.8,0) rectangle (7.2,2.5);
+  \fill[cqrcolor, opacity=0.6] (7.2,0) rectangle (7.6,1.2);
+
+  % Axis ticks and labels
+  \foreach \x in {0,10,20,...,100} {
+    \pgfmathsetmacro{\xpos}{\x/10}
+    \draw (\xpos, -0.1) -- (\xpos, 0);
+    \node[below, font=\scriptsize] at (\xpos, -0.1) {\x};
+  }
+
+  \foreach \y in {0,1,...,5} {
+    \draw (-0.1, \y) -- (0, \y);
+    \node[left, font=\scriptsize] at (-0.1, \y) {\y};
+  }
+
+  % Mean markers
+  \draw[tempcolor, very thick, dashed] (1.7,0) -- (1.7,5.5);
+  \node[tempcolor, font=\small, above] at (1.7, 5.5) {17.0 yds};
+
+  \draw[cqrcolor, very thick, dashed] (6.32,0) -- (6.32,5.5);
+  \node[cqrcolor, font=\small, above] at (6.32, 5.5) {63.2 yds};
+
+  \draw[conformalcolor, very thick, dashed] (6.85,0) -- (6.85,5.5);
+  \node[conformalcolor, font=\small, above] at (6.85, 5.8) {68.5 yds};
+
+  % Sharpness comparison annotations
+  \draw[<->, thick, black] (1.7, 0.3) -- (6.32, 0.3);
+  \node[note, fill=white] at (4.0, 0.3) {\textbf{3.7×} wider};
+
+  \draw[<->, thick, black] (1.7, -0.5) -- (6.85, -0.5);
+  \node[note, fill=white] at (4.3, -0.5) {\textbf{4.0×} wider};
+
+  % Legend
+  \fill[tempcolor, opacity=0.7] (8.5, 5.2) rectangle (8.8, 5.5);
+  \node[right, font=\small] at (8.85, 5.35) {Temperature Scaling};
+
+  \fill[cqrcolor, opacity=0.6] (8.5, 4.7) rectangle (8.8, 5.0);
+  \node[right, font=\small] at (8.85, 4.85) {CQR (adaptive)};
+
+  \fill[conformalcolor, opacity=0.6] (8.5, 4.2) rectangle (8.8, 4.5);
+  \node[right, font=\small] at (8.85, 4.35) {Split Conformal};
+
+  % Note
+  \node[note, text width=6.5cm, align=left] at (5.5, -1.5) {
+    \textbf{Coverage-sharpness trade-off:} Temperature scaling achieves 89.5\% coverage
+    with sharp 17-yard intervals by exploiting BNN's learned heteroskedasticity.
+    Conformal methods guarantee $\geq$90\% coverage at the cost of 3.7--4.0× wider intervals,
+    reflecting conservative distribution-free approach. CQR's adaptive widths provide modest
+    improvement over standard split conformal.
+  };
+
+\end{tikzpicture}

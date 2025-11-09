@@ -53,7 +53,7 @@ class ExperimentExecutor:
         self.db_params = {
             'dbname': 'devdb01',
             'user': 'dro',
-            'password': 'sicillionbillions',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
             'host': 'localhost',
             'port': 5544
         }

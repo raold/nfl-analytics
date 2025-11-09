@@ -53,7 +53,7 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
   con <- dbConnect(
     RPostgres::Postgres(),
     host = "localhost", port = 5544,
-    dbname = "devdb01", user = "dro", password = "sicillionbillions"
+    dbname = "devdb01", user = "dro", password = Sys.getenv("DB_PASSWORD", "sicillionbillions")
   )
 
   query <- "
@@ -219,7 +219,7 @@ predict_2025 <- function(model_result) {
   con <- dbConnect(
     RPostgres::Postgres(),
     host = "localhost", port = 5544,
-    dbname = "devdb01", user = "dro", password = "sicillionbillions"
+    dbname = "devdb01", user = "dro", password = Sys.getenv("DB_PASSWORD", "sicillionbillions")
   )
 
   query_2025 <- "

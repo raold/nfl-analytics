@@ -32,7 +32,7 @@ DB_CONFIG = {
     'port': 5544,
     'database': 'devdb01',
     'user': 'dro',
-    'password': 'sicillionbillions'
+    'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
 }
 
 # Paths

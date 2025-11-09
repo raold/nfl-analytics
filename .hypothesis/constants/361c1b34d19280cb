@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/py/ensemble/stacked_meta_learner.py
+# hypothesis_version: 6.147.0
+
+[1e-06, 0.05, 0.1, 0.15, 0.5, 1.0, 100, 1000, '\nTop features:', 'StackedMetaLearner', '__main__', 'balanced', 'bayesian_confidence', 'bayesian_pred', 'bayesian_uncertainty', 'coef_', 'context_features', 'cv_mean', 'cv_std', 'feature', 'feature_importances_', 'gbm', 'importance', 'is_fitted', 'l2', 'logistic', 'max_confidence', 'meta_model', 'meta_model_type', 'min_confidence', 'models_agree', 'n_features', 'pred_agreement', 'pred_diff', 'pred_ratio', 'predict_proba', 'ridge', 'scaler', 'use_uncertainty', 'xgb_confidence', 'xgb_pred']

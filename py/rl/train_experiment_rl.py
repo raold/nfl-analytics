@@ -254,7 +254,7 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
     db_params = {
         'dbname': 'devdb01',
         'user': 'dro',
-        'password': 'sicillionbillions',
+        'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
         'host': 'localhost',
         'port': 5544
     }
@@ -417,7 +417,7 @@ def main():
         db_params = {
             'dbname': 'devdb01',
             'user': 'dro',
-            'password': 'sicillionbillions',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
             'host': 'localhost',
             'port': 5544
         }

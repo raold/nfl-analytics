@@ -392,6 +392,15 @@ The figure reveals three distinct clusters:
 
 This visualization makes clear that \textit{there exists no free lunch}: achieving calibration requires either sacrificing interval sharpness (quantile regression, conformal prediction) or fundamentally rethinking model architecture (multi-output BNN). Single-output BNNs achieve neither calibration nor superior sharpness relative to well-tuned alternatives.
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../figures/out/bnn_calibration_reliability.pdf}
+  \caption{BNN calibration reliability diagram comparing predicted probabilities to observed frequencies across different confidence levels. The multi-output BNN (blue line) closely tracks the perfect calibration diagonal, while the single-output BNN baseline (orange line) shows systematic under-calibration. Each point represents a binned confidence level, with error bars showing 95\% confidence intervals from bootstrapping.}
+  \label{fig:bnn-calibration-reliability}
+\end{figure}
+
+Figure~\ref{fig:bnn-calibration-reliability} provides a reliability diagram visualizing calibration quality across all confidence levels. The multi-output BNN's close adherence to the perfect calibration diagonal confirms well-calibrated probabilistic predictions, while the single-output baseline's systematic deviation below the diagonal demonstrates under-confidence.
+
 \subsubsection{Discussion and Implications}
 
 The alternative UQ methods investigation yields several insights that reshape our understanding of Bayesian deep learning for uncertainty quantification:

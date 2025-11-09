@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/py/utils/data_leakage_detector.py
+# hypothesis_version: 6.147.0
+
+[0.95, 0.99, 100, 400, 1000, '-', '2024-01-01', '=', 'CRITICAL', 'HIGH', 'INFO', 'LOW', 'MEDIUM', 'X.*=.*y\\b', '\\.iloc\\[.*\\+.*\\]', '\\.shift\\(-\\d+\\)', '__main__', '_final', '_margin', '_result', 'actual_', 'asof', 'expanding', 'feature_1', 'feature_2', 'features.*actual_', 'future_data', 'group', 'inner', 'kickoff', 'merge', 'passing_yards', 'player', 'player_id', 'rolling', 'shift', 'statistical', 'suspicious_feature', 'target', 'target_in_features', 'temporal', 'unsafe_merge', 'winner']
