@@ -1,7 +1,7 @@
 # Documentation Index
 
-**Last Updated:** November 3, 2025
-**Total Documents:** 267 markdown files (reorganized and consolidated)
+**Last Updated:** November 8, 2025
+**Total Documents:** 274 markdown files (reorganized and consolidated)
 **Purpose:** Central navigation for all project documentation
 
 ---
@@ -51,6 +51,13 @@
 
 ## 🔬 Technical Documentation
 
+### Architecture & Reference
+
+| Document | Last Updated | Focus |
+|----------|--------------|-------|
+| **[docs/ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md)** | Nov 8, 2025 | Complete directory structure and module organization |
+| **[docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md)** | Nov 8, 2025 | Detailed component usage, APIs, and integration patterns |
+
 ### Core Systems
 
 #### Bayesian Modeling
@@ -70,6 +77,7 @@
 | Document | Last Updated | Focus |
 |----------|--------------|-------|
 | **[docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** ⭐ | Oct 30, 2025 | Comprehensive 56-table audit |
+| **[docs/database/DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md)** ⭐ **NEW** | Nov 8, 2025 | Quick lookup for common queries and column references |
 | **[docs/database/schema.md](docs/database/schema.md)** | - | Full schema documentation |
 | **[docs/database/erd.md](docs/database/erd.md)** | - | Entity-relationship diagram |
 
@@ -134,6 +142,7 @@
 
 | Document | Date | Milestone |
 |----------|------|-----------|
+| **[docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)** ⭐ **NEW** | Nov 8, 2025 | Consolidated historical work log (Nov 2025-Oct 2025) |
 | **[docs/milestones/BNN_CALIBRATION_COMPLETE.md](docs/milestones/BNN_CALIBRATION_COMPLETE.md)** ⭐ **NEW** | Nov 3, 2025 | BNN calibration achieved (T=0.75, 89.5% coverage) |
 | **[docs/milestones/PHASE_5_COMPLETION_SUMMARY.md](docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
 | **[docs/milestones/PHASES_2-4_COMPLETE.md](docs/milestones/PHASES_2-4_COMPLETE.md)** | Earlier | Phases 2-4 completion |
@@ -150,15 +159,23 @@
 - **[py/features/](py/features/)** - Feature engineering modules (15+ files)
 - **[docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** - Schema integration patterns
 
-### Model Training
+### Model Training & Validation
 - **[R/](R/)** - R statistical models (50+ files)
 - **[py/models/](py/models/)** - Python ML models
 - **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** - ⚠️ DEPRECATED (use PostgreSQL `ml.model_registry`)
-- **[scripts/sync_model_registry.py](scripts/sync_model_registry.py)** ⭐ **NEW** - Database/filesystem sync tool
+- **[scripts/sync_model_registry.py](scripts/sync_model_registry.py)** - Database/filesystem sync tool
+- **[docs/TRAINING_WINDOW_ABLATION_RESULTS.md](docs/TRAINING_WINDOW_ABLATION_RESULTS.md)** ⭐ **NEW** - Ablation study results (500+ lines, Nov 8, 2025)
+- **[docs/STATE_SPACE_FINAL_DECISION.md](docs/STATE_SPACE_FINAL_DECISION.md)** ⭐ **NEW** - GO/NO-GO decision analysis (400+ lines, Nov 8, 2025)
+- **[docs/STATE_SPACE_2025_HOLDOUT_VALIDATION.md](docs/STATE_SPACE_2025_HOLDOUT_VALIDATION.md)** - 2025 hold-out validation results
+- **[docs/STATE_SPACE_MODELING_COMPLETE_JOURNEY.md](docs/STATE_SPACE_MODELING_COMPLETE_JOURNEY.md)** - Complete modeling journey (4 attempts)
 
 ### Testing
 - **[tests/README.md](tests/README.md)** - Testing framework guide
 - **[scripts/setup_testing.sh](scripts/setup_testing.sh)** - Test environment setup
+
+### Common Tasks & Workflows
+- **[docs/guides/COMMON_TASKS_REFERENCE.md](docs/guides/COMMON_TASKS_REFERENCE.md)** ⭐ **NEW** - Cookbook of frequent development tasks and workflows
+- **[docs/guides/PRODUCTION_DEPLOYMENT_PLAN.md](docs/guides/PRODUCTION_DEPLOYMENT_PLAN.md)** - Production deployment checklist
 
 ---
 

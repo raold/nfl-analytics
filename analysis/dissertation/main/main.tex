@@ -27,6 +27,7 @@
 \algrenewcommand\algorithmicensure{\textbf{Ensure:}}
 \usepackage{booktabs}          % Professional-quality tables
 \usepackage{tabularx}          % Flexible tables with automatic column widths
+\usepackage{multirow}          % Multi-row cells in tables
 \usepackage{adjustbox}         % Constrain table/figure width to \linewidth
 \usepackage{ragged2e}          % Better ragged-right for X columns
 \usepackage{array}             % Column helpers (newcolumntype)
@@ -39,6 +40,8 @@
 \usepackage{xcolor}            % Colors (required by todonotes)
 % Global accent palette (colorblind-safe blue)
 \definecolor{accentBlue}{RGB}{31,119,180}
+\definecolor{accent_blue}{RGB}{31,119,180}  % Alias for consistency
+\usepackage{tcolorbox}          % Colored boxes for highlights
 \usepackage[disable]{todonotes} % Disable todo notes for clean builds
 \usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization
 \usepackage{alphalph}          % Multi-letter counters (e.g., AA, AB) for many appendices
@@ -398,6 +401,9 @@ The code is released under the MIT License for academic and research use. Commer
 
 % Include consolidated appendix (8 chapters, 1283 lines)
 \input{../appendix/appendix_consolidated.tex}
+
+% Appendix C: Ensemble Ablation Studies (NEW - November 9, 2025)
+\input{../appendix/appendix_c_ensemble_ablation.tex}
 
 % ---------------------------------------------------
 % Back Matter and References

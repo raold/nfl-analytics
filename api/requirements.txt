@@ -1,0 +1,22 @@
+# FastAPI and ASGI server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+
+# Database
+psycopg[binary]>=3.1.0
+SQLAlchemy>=2.0.0
+
+# Redis
+redis>=5.0.0
+
+# Monitoring
+prometheus-client>=0.19.0
+
+# ML/Prediction (lightweight subset)
+numpy>=1.24.0
+torch>=2.0.0
+
+# Environment
+python-dotenv>=1.0.0

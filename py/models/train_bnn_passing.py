@@ -12,8 +12,10 @@ Expected:
 """
 
 import sys
+import os
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+# Add project root to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
 from pathlib import Path
@@ -42,22 +44,30 @@ def load_passing_data_from_db():
         pgs.player_id,
         pgs.season,
         pgs.week,
-        pgs.passing_yards as yards,
-        pgs.passing_tds as touchdowns,
-        pgs.team,
+        pgs.stat_yards as yards,
+        pgs.stat_touchdowns as touchdowns,
+        pgs.stat_attempts as attempts,
+        pgs.current_team as team,
         g.home_score,
         g.away_score,
         g.spread_close as spread_line,
         g.total_close as total_line,
-        w.temp,
-        w.wind,
-        CASE WHEN pgs.team = g.home_team THEN 1 ELSE 0 END as is_home
+        g.temp,
+        g.wind,
+        CASE WHEN pgs.current_team = g.home_team THEN 1 ELSE 0 END as is_home
     FROM mart.player_game_stats pgs
-    JOIN games g ON pgs.game_id = g.game_id
-    LEFT JOIN weather w ON g.game_id = w.game_id
-    WHERE pgs.passing_yards IS NOT NULL
-      AND pgs.passing_yards > 0
-      AND pgs.season >= 2020
+    JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+    LEFT JOIN games g ON
+      g.season = pgs.season
+      AND g.week = pgs.week
+      AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
+    WHERE pgs.stat_category = 'passing'
+      AND pgs.stat_yards IS NOT NULL
+      AND pgs.stat_yards > 0
+      AND pgs.stat_attempts >= 10
+      AND pgs.season >= 2015
+      AND pgs.season <= 2024
+      AND ph.position_group = 'QB'
     ORDER BY pgs.season, pgs.week, pgs.player_id
     """
 
@@ -75,13 +85,13 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
     logger.info("Engineering features...")
 
-    # Note: No attempts/completions available in mart.player_game_stats
-    # Using available features only: yards, touchdowns, game context
+    # Derive efficiency metrics from attempts
+    df["log_attempts"] = np.log1p(df["attempts"])
+    df["yards_per_attempt"] = df["yards"] / df["attempts"].replace(0, np.nan)
+    df["td_rate"] = df["touchdowns"] / df["attempts"].replace(0, np.nan)
 
     # Game context
     df["spread_abs"] = df["spread_line"].abs()
-
-    # Derive passing efficiency proxy from yards (simplified without attempts)
     df["log_yards"] = np.log1p(df["yards"])
 
     # Convert weather columns to numeric (handle 'DOME'/'CLOSED ROOF' etc)
@@ -95,7 +105,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
 
-    for col in ["yards", "completion_rate", "yards_per_attempt"]:
+    for col in ["yards", "yards_per_attempt", "td_rate"]:
         df[f"{col}_L3"] = (
             df.groupby("player_id")[col]
             .transform(lambda x: x.rolling(window=3, min_periods=1).mean())
@@ -125,7 +135,6 @@ def prepare_train_test_split(df: pd.DataFrame):
     # Feature columns
     feature_cols = [
         "log_attempts",
-        "completion_rate",
         "yards_per_attempt",
         "td_rate",
         "is_home",
@@ -133,8 +142,8 @@ def prepare_train_test_split(df: pd.DataFrame):
         "total_line",
         "is_bad_weather",
         "yards_L3",
-        "completion_rate_L3",
         "yards_per_attempt_L3",
+        "td_rate_L3",
         "week_in_season",
         "temp",
         "wind",

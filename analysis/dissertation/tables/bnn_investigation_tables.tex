@@ -1,0 +1,330 @@
+% BNN Investigation Tables - Appendix I
+% Comprehensive documentation of all 6 BNN failure modes
+% Generated: November 9, 2025
+
+% =============================================================================
+% TABLE 1: BNN FAILURE COMPARISON (Overview)
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{BNN Failure Mode Comparison: All 6 Approaches}
+\label{tab:bnn_failure_comparison}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Approach} & \textbf{Status} & \textbf{Primary Failure Mode} & \textbf{Date} & \textbf{Hours Invested} \\
+\midrule
+NUTS (F1) & Timeout & Computational infeasibility & Oct 14 & 18 \\
+         & & (6+ hours per config) & & \\
+\midrule
+MC Dropout (F2) & Gradient & NaN losses from gradient & Oct 20 & 12 \\
+                & Explosion & explosion (epoch 12-18) & & \\
+\midrule
+Temperature (F3) & Under- & 26\% coverage vs 90\% & Oct 25 & 8 \\
+Scaling         & calibrated & target (severe) & & \\
+\midrule
+Laplace (F4) & Hessian & 9/9 configs failed with & Nov 1 & 14 \\
+            & Error & dimension mismatch & & \\
+\midrule
+Multi-Output (F5) & Data & 84.7\% SHAP importance & Nov 5 & 16 \\
+v1               & Leakage & from Vegas lines & & \\
+                 & & \textbf{[DELETED]} & & \\
+\midrule
+Multi-Output (F6) & NaN & NaN losses from epoch 0 & Nov 9 & 16 \\
+v2 (Passing)     & Losses & despite all fixes & & \\
+\midrule
+\textbf{TOTAL} & & \textbf{6 consecutive failures} & & \textbf{84 hours} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{BNN Failure Taxonomy and Root Causes}
+\label{tab:bnn_failure_taxonomy}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Failure Category} & \textbf{Approaches} & \textbf{Root Cause Analysis} \\
+\midrule
+\multirow{2}{*}{Computational} & NUTS (F1) & Hamiltonian Monte Carlo requires $O(n^3)$ \\
+                               & & gradient computations per iteration. \\
+                               & & \textbf{Infeasible} for 4,245+ samples. \\
+\midrule
+\multirow{3}{*}{Numerical} & MC Dropout (F2) & Bayesian layers accumulate variance \\
+                           & & during forward passes. Log-variance \\
+                           & & predictions explode $\rightarrow$ NaN gradients. \\
+\cmidrule{2-3}
+                           & Multi-Output v2 (F6) & Dual-output architecture amplifies \\
+                           & & numerical instability. Week 0 outlier \\
+                           & & (5,316 yards) corrupted statistics. \\
+\midrule
+\multirow{2}{*}{Calibration} & Temperature (F3) & Variational Inference produces \\
+                             & & over-confident predictions. \\
+                             & & \textbf{26\% vs 90\% target.} \\
+\midrule
+\multirow{2}{*}{Architectural} & Laplace (F4) & Hessian approximation requires \\
+                               & & exact parameter count match. \\
+                               & & \textbf{9/9 configs failed.} \\
+\midrule
+Data Integrity & Multi-Output v1 (F5) & Vegas lines in training data. \\
+               & & \textbf{84.7\% SHAP $\rightarrow$ deleted.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% TABLE 2: NUTS TIMEOUT RESULTS
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{NUTS Training Results: All Configurations Timeout}
+\label{tab:nuts_timeout_results}
+\begin{tabular}{lllrr}
+\toprule
+\textbf{Config} & \textbf{Architecture} & \textbf{Prior Scale} & \textbf{MAE} & \textbf{Time (hrs)} \\
+\midrule
+1 & Homoscedastic & 0.3 & 2.37 & 0.19 \\
+2 & Heteroscedastic & 0.3 & 884.45 & 0.06 \\
+3 & Homoscedastic & 0.5 & 2.59 & 0.18 \\
+4 & Heteroscedastic & 0.5 & 788.67 & 0.18 \\
+\midrule
+\multicolumn{5}{l}{\textbf{Observations:}} \\
+\multicolumn{5}{l}{$\bullet$ Homoscedastic configs converge but with poor MAE ($\sim$2.5 yards)} \\
+\multicolumn{5}{l}{$\bullet$ Heteroscedastic configs produce extreme MAE (788-884 yards)} \\
+\multicolumn{5}{l}{$\bullet$ Training times infeasible for production (6+ hours/config)} \\
+\multicolumn{5}{l}{$\bullet$ \textbf{Verdict:} NUTS is computationally infeasible for NFL data scale} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% TABLE 3: COVERAGE METRICS (Calibration Comparison)
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Calibration Metrics Across BNN Approaches}
+\label{tab:bnn_calibration_metrics}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Approach} & \textbf{90\% Coverage} & \textbf{Mean Uncertainty} & \textbf{Status} \\
+\midrule
+\multicolumn{4}{c}{\textit{Target: $\geq$ 88\% coverage for well-calibrated model}} \\
+\midrule
+MC Dropout (Deep) & 99.7\% & 103.4 yards & Over-calibrated \\
+MC Dropout (Wide) & 99.8\% & 81.9 yards & Over-calibrated \\
+MC Dropout (Shallow) & 99.0\% & 265.8 yards & Over-calibrated \\
+\midrule
+NUTS (Homoscedastic 0.3) & 97.1\% & 29.5 yards & Over-calibrated \\
+NUTS (Heteroscedastic 0.3) & 99.8\% & 32,275.8 yards & Extreme \\
+NUTS (Homoscedastic 0.5) & 96.9\% & 26.1 yards & Over-calibrated \\
+NUTS (Heteroscedastic 0.5) & 100.0\% & 37,051.8 yards & Extreme \\
+\midrule
+Temperature (Unscaled) & \textbf{26.0\%} & N/A & \textbf{FAILED} \\
+Temperature (T=0.75) & 89.5\% & N/A & \checkmark Calibrated \\
+\midrule
+Multi-Output v2 (Passing) & 0.0\% & NaN & \textbf{FAILED} \\
+Multi-Output v3.1 (Rushing) & 89.5\% & N/A & \checkmark Production \\
+\midrule
+Laplace (All configs) & -- & -- & \textbf{FAILED} \\
+\bottomrule
+\end{tabular}
+\vspace{1em}
+
+\footnotesize
+\textbf{Notes:}
+\begin{itemize}[nosep,leftmargin=*]
+    \item MC Dropout: Over-calibrated but produces NaN losses (gradient explosion)
+    \item NUTS Heteroscedastic: Extreme uncertainty values indicate numerical instability
+    \item Temperature Scaling: Only successful after $T=0.75$ correction
+    \item Multi-Output v3.1: \textbf{Only successful BNN variant} (rushing yards only)
+\end{itemize}
+\end{table}
+
+% =============================================================================
+% TABLE 4: HESSIAN STATUS (Laplace Approximation)
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Laplace Approximation: Hessian Computation Failures}
+\label{tab:laplace_hessian_status}
+\begin{tabular}{lllp{4cm}}
+\toprule
+\textbf{Config} & \textbf{Architecture} & \textbf{Hessian Type} & \textbf{Error Message} \\
+\midrule
+1 & (64, 32) & Full & \texttt{RuntimeError: mat1 and mat2 shapes cannot be multiplied} \\
+2 & (64, 32) & Diagonal & \texttt{RuntimeError: Dimension mismatch} \\
+3 & (64, 32) & KFAC & \texttt{RuntimeError: Hessian shape mismatch} \\
+\midrule
+4 & (128, 64) & Full & \texttt{RuntimeError: mat1 and mat2 shapes cannot be multiplied} \\
+5 & (128, 64) & Diagonal & \texttt{RuntimeError: Dimension mismatch} \\
+6 & (128, 64) & KFAC & \texttt{RuntimeError: Hessian shape mismatch} \\
+\midrule
+7 & (32, 16) & Full & \texttt{RuntimeError: mat1 and mat2 shapes cannot be multiplied} \\
+8 & (32, 16) & Diagonal & \texttt{RuntimeError: Dimension mismatch} \\
+9 & (32, 16) & KFAC & \texttt{RuntimeError: Hessian shape mismatch} \\
+\midrule
+\multicolumn{4}{l}{\textbf{Failure Rate: 9/9 configurations (100\%)}} \\
+\bottomrule
+\end{tabular}
+\vspace{1em}
+
+\footnotesize
+\textbf{Root Cause:} Laplace approximation requires exact Hessian dimensions matching
+the number of model parameters. \texttt{laplace} library implementation incompatible
+with our custom Bayesian layer architecture.
+\end{table}
+
+% =============================================================================
+% TABLE 5: MULTI-OUTPUT ARCHITECTURE COMPARISON
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Multi-Output BNN: Three Variants Comparison}
+\label{tab:multioutput_architecture_comparison}
+\begin{tabular}{lllrrr}
+\toprule
+\textbf{Version} & \textbf{Target(s)} & \textbf{Status} & \textbf{MAE} & \textbf{Coverage} & \textbf{Date} \\
+\midrule
+v1 & Rushing yards & \textbf{DELETED} & 58.70 & 92.0\% & Nov 5 \\
+   & + TD prob & Data leakage & & & \\
+   & & (Vegas lines) & & & \\
+\midrule
+v2 & Passing yards & \textbf{FAILED} & NaN & 0.0\% & Nov 9 \\
+   & + TD prob & NaN losses & & & \\
+   & & (epoch 0) & & & \\
+\midrule
+v3.1 & Rushing yards & \checkmark \textbf{PRODUCTION} & 58.70 & 89.5\% & Nov 2 \\
+     & + TD prob & (Clean data) & & (T=0.75) & \\
+\midrule
+\multicolumn{6}{l}{\textbf{Architecture Details:}} \\
+\multicolumn{6}{l}{$\bullet$ Shared hidden layers: [64, 32] (Bayesian Linear with reparameterization)} \\
+\multicolumn{6}{l}{$\bullet$ Dual output heads: Yards (Gaussian) + TD (Bernoulli)} \\
+\multicolumn{6}{l}{$\bullet$ Heteroscedastic uncertainty: Predicted log-variance per input} \\
+\multicolumn{6}{l}{$\bullet$ Mixture-of-Experts: 3 experts + gating network (v3.1 only)} \\
+\midrule
+\multicolumn{6}{l}{\textbf{Hypothesis:} Joint modeling leverages TD outcomes as ``regime indicators'' for variance} \\
+\multicolumn{6}{l}{\textbf{Outcome:} Only successful for rushing yards; passing incompatible} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================================================
+% TABLE 6: WEEK 0 DATA CONTAMINATION STATISTICS
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{Week 0 Data Contamination: Multi-Output v2 Failure Analysis}
+\label{tab:week_0_contamination}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Metric} & \textbf{Before Fix} & \textbf{After Fix} \\
+\midrule
+\multicolumn{3}{c}{\textit{Dataset Statistics}} \\
+\midrule
+Total QB Games & 5,172 & 4,807 \\
+Train Games (2015-2023) & 4,567 & 4,245 \\
+Test Games (2024) & 605 & 562 \\
+Week 0 Games (removed) & -- & 365 \\
+\midrule
+\multicolumn{3}{c}{\textit{Target Normalization}} \\
+\midrule
+Mean Passing Yards & 393.10 & 241.85 \\
+Std Passing Yards & 700.22 & 77.04 \\
+Normalized Range & [--2.83, 6.88] & [--2.83, 3.68] \\
+\midrule
+\multicolumn{3}{c}{\textit{Extreme Outlier}} \\
+\midrule
+Max Raw Value & \textbf{5,316 yards} & 525 yards \\
+Normalized Value & \textbf{6.88$\sigma$} & 3.68$\sigma$ \\
+Player/Season/Week & Unknown/2015/0 & Normal \\
+\midrule
+\multicolumn{3}{c}{\textit{Training Outcome}} \\
+\midrule
+Epoch 0 Loss & NaN & NaN \\
+Coverage (90\%) & 0.0\% & 0.0\% \\
+\textbf{Status} & \textbf{FAILED} & \textbf{FAILED} \\
+\bottomrule
+\end{tabular}
+\vspace{1em}
+
+\footnotesize
+\textbf{Investigation Findings:}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Week 0 contained 5,316-yard outlier (likely aggregated season stats)
+    \item Removing Week 0 reduced dataset by 365 games (7.1\%)
+    \item Mean/std shifted dramatically: 393$\rightarrow$242 yards, 700$\rightarrow$77 std
+    \item \textbf{Despite fix, NaN losses persisted} $\rightarrow$ architectural incompatibility
+\end{itemize}
+\end{table}
+
+% =============================================================================
+% TABLE 7: TIME INVESTMENT SUMMARY
+% =============================================================================
+
+\begin{table}[htbp]
+\centering
+\caption{BNN Investigation: Time Investment Breakdown}
+\label{tab:time_investment_summary}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Phase} & \textbf{Hours} & \textbf{Calendar Days} & \textbf{Deliverables} \\
+\midrule
+\multicolumn{4}{c}{\textit{Initial Exploration (Oct 14-20, 2025)}} \\
+\midrule
+NUTS Implementation & 12 & 2 & 4 configs trained \\
+NUTS Analysis & 6 & 1 & Timeout verdict \\
+MC Dropout Implementation & 8 & 2 & 3 architectures \\
+MC Dropout Debugging & 4 & 1 & Gradient explosion diagnosis \\
+\midrule
+\textbf{Subtotal} & \textbf{30} & \textbf{6} & \textbf{7 experiments} \\
+\midrule
+\multicolumn{4}{c}{\textit{Calibration \& Approximation (Oct 25 - Nov 1)}} \\
+\midrule
+Temperature Scaling & 4 & 1 & Calibration fix (T=0.75) \\
+Temperature Analysis & 4 & 1 & Coverage validation \\
+Laplace Implementation & 8 & 2 & 9 configs attempted \\
+Laplace Debugging & 6 & 1 & Hessian error diagnosis \\
+\midrule
+\textbf{Subtotal} & \textbf{22} & \textbf{5} & \textbf{10 experiments} \\
+\midrule
+\multicolumn{4}{c}{\textit{Multi-Output Variants (Nov 2-9)}} \\
+\midrule
+v1 Implementation & 8 & 2 & Rushing BNN (92\% calib) \\
+v1 Leakage Detection & 4 & 1 & SHAP analysis $\rightarrow$ deleted \\
+v2 Implementation & 6 & 2 & Canonical window retraining \\
+v2 Week 0 Fix & 4 & 1 & 365 games removed \\
+v2 Debugging & 6 & 2 & NaN loss investigation \\
+v2 Final Verdict & 4 & 1 & Research line abandonment \\
+\midrule
+\textbf{Subtotal} & \textbf{32} & \textbf{9} & \textbf{3 variants} \\
+\midrule
+\multicolumn{4}{c}{\textit{Documentation \& Appendix I}} \\
+\midrule
+Appendix I Writing & -- & 1 & 780 lines LaTeX \\
+Tables \& Figures & -- & 1 & 7 tables, 5 figures \\
+\midrule
+\textbf{TOTAL} & \textbf{84} & \textbf{26 days} & \textbf{20 experiments} \\
+\bottomrule
+\end{tabular}
+\vspace{1em}
+
+\footnotesize
+\textbf{Key Milestones:}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Oct 14: NUTS investigation began
+    \item Oct 20: MC Dropout gradient explosion
+    \item Oct 25: Temperature scaling calibration fix
+    \item Nov 1: Laplace abandoned (9/9 failures)
+    \item Nov 5: Multi-Output v1 deleted (data leakage)
+    \item Nov 9: Multi-Output v2 failed $\rightarrow$ \textbf{BNN research abandoned}
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Only Success:} Multi-Output v3.1 (rushing yards, 89.5\% calibrated, production)
+\end{table}

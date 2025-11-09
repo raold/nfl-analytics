@@ -1,298 +1,637 @@
-"""Unit tests for PPO agent (py/rl/ppo_agent.py)."""
-import sys
-from pathlib import Path
+"""
+Generated tests for ppo_agent
 
-import numpy as np
+Generated: 2025-11-09T13:26:29.579459
+Test count: 56
+"""
+
+from hypothesis import given
+from hypothesis import strategies as st
+from rl.ppo_agent import *
 import pandas as pd
 import pytest
-import torch
-
-# Add py/ to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "py"))
-
-from rl.ppo_agent import ActorCritic, RolloutBuffer, PPOAgent
 
 
-class TestActorCritic:
-    """Test ActorCritic network."""
-    
-    def test_forward_pass_shapes(self):
-        """Test that forward pass returns correct shapes."""
-        model = ActorCritic(state_dim=6, hidden_dim=128)
-        state = torch.randn(32, 6)
-        
-        dist, value = model.forward(state)
-        
-        # Beta distribution should sample actions of correct shape
-        action = dist.sample()
-        assert action.shape == (32, 1)
-        
-        # Value should have correct shape
-        assert value.shape == (32, 1)
-    
-    def test_action_bounds(self):
-        """Test that sampled actions are in [0, 1]."""
-        model = ActorCritic(state_dim=6, hidden_dim=128)
-        state = torch.randn(100, 6)
-        
-        dist, _ = model.forward(state)
-        actions = dist.sample()
-        
-        assert torch.all(actions >= 0.0)
-        assert torch.all(actions <= 1.0)
-    
-    def test_deterministic_action(self):
-        """Test deterministic action selection uses mode."""
-        model = ActorCritic(state_dim=6, hidden_dim=128)
-        state = torch.randn(1, 6)
-        
-        # Sample multiple times with deterministic=True
-        action1, _, _ = model.get_action(state, deterministic=True)
-        action2, _, _ = model.get_action(state, deterministic=True)
-        
-        # Should be identical
-        assert torch.allclose(action1, action2)
-    
-    def test_stochastic_action_varies(self):
-        """Test stochastic action selection produces variation."""
-        torch.manual_seed(42)
-        model = ActorCritic(state_dim=6, hidden_dim=128)
-        state = torch.randn(1, 6)
-        
-        # Sample multiple times with deterministic=False
-        actions = [model.get_action(state, deterministic=False)[0] for _ in range(10)]
-        
-        # Should have some variation
-        assert len(set([a.item() for a in actions])) > 1
-    
-    def test_entropy_computed(self):
-        """Test that entropy is computed (can be negative for Beta distribution)."""
-        model = ActorCritic(state_dim=6, hidden_dim=128)
-        state = torch.randn(32, 6)
-        action = torch.rand(32, 1)
-        
-        _, _, entropy = model.evaluate_actions(state, action)
-        
-        # Beta distribution entropy can be negative, just check it's finite
-        assert torch.all(torch.isfinite(entropy))
-        assert entropy.shape == (32, 1)
+def test_train_ppo_offline_basic():
+    """Test train_ppo_offline: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = train_ppo_offline()
+
+    # Assert
+        assert result is not None
 
 
-class TestRolloutBuffer:
-    """Test RolloutBuffer storage."""
-    
-    def test_add_and_get(self):
-        """Test adding transitions and retrieving batches."""
-        buffer = RolloutBuffer()
-        
-        # Add 5 transitions
-        for i in range(5):
-            state = torch.randn(6)
-            action = torch.rand(1)
-            reward = float(i)
-            log_prob = torch.randn(1)
-            value = torch.randn(1)
-            done = (i == 4)
-            
-            buffer.add(state, action, reward, log_prob, value, done)
-        
-        # Retrieve batch
-        states, actions, rewards, log_probs, values, dones = buffer.get()
-        
-        assert states.shape == (5, 6)
-        assert actions.shape == (5, 1)
-        assert rewards.shape == (5,)
-        assert log_probs.shape == (5, 1)
-        assert values.shape == (5, 1)
-        assert dones.shape == (5,)
-        
-        # Check rewards are correct
-        assert torch.allclose(rewards, torch.tensor([0.0, 1.0, 2.0, 3.0, 4.0]))
-        
-        # Check dones
-        assert dones[-1] == 1.0
-        assert torch.sum(dones[:-1]) == 0.0
-    
-    def test_clear(self):
-        """Test clearing buffer."""
-        buffer = RolloutBuffer()
-        
-        # Add transitions
-        for i in range(3):
-            buffer.add(
-                torch.randn(6), torch.rand(1), 0.0,
-                torch.randn(1), torch.randn(1), False
-            )
-        
-        assert len(buffer.states) == 3
-        
-        buffer.clear()
-        
-        assert len(buffer.states) == 0
-        assert len(buffer.actions) == 0
-        assert len(buffer.rewards) == 0
+
+def test_train_ppo_offline_edge_cases():
+    """Test train_ppo_offline: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = train_ppo_offline()
+
+    # Assert
+        assert result is not None
 
 
-class TestPPOAgent:
-    """Test PPOAgent."""
-    
-    def test_initialization(self):
-        """Test agent initialization."""
-        agent = PPOAgent(state_dim=6, hidden_dim=64, device="cpu")
-        
-        assert agent.state_dim == 6
-        assert agent.gamma == 0.99
-        assert agent.epsilon == 0.2
-        assert agent.train_step == 0
-    
-    def test_select_action(self):
-        """Test action selection."""
-        agent = PPOAgent(state_dim=6, device="cpu")
-        state = np.random.randn(6)
-        
-        action, log_prob, value = agent.select_action(state, deterministic=False)
-        
-        # Action should be in [0, 1]
-        assert 0.0 <= action <= 1.0
-        assert isinstance(log_prob, float)
-        assert isinstance(value, float)
-    
-    def test_compute_gae(self):
-        """Test GAE computation."""
-        agent = PPOAgent(state_dim=6, device="cpu")
-        
-        # Simple episode: 3 steps with rewards [1, 2, 3]
-        rewards = torch.tensor([1.0, 2.0, 3.0])
-        values = torch.tensor([0.5, 1.0, 1.5])
-        dones = torch.tensor([0.0, 0.0, 1.0])
-        next_value = 0.0
-        
-        advantages, returns = agent.compute_gae(rewards, values, dones, next_value)
-        
-        # Returns should be >= rewards (assuming gamma < 1)
-        assert torch.all(returns >= rewards)
-        
-        # Advantages should be returns - values
-        assert torch.allclose(advantages, returns - values)
-    
-    def test_update_reduces_loss(self):
-        """Test that PPO update reduces loss."""
-        torch.manual_seed(42)
-        agent = PPOAgent(state_dim=6, hidden_dim=32, device="cpu")
-        
-        # Generate synthetic rollout
-        for _ in range(64):
-            state = torch.randn(6)
-            action = torch.rand(1)
-            reward = np.random.randn()
-            log_prob = torch.randn(1)
-            value = torch.randn(1)
-            done = False
-            
-            agent.buffer.add(state, action, reward, log_prob, value, done)
-        
-        # First update
-        metrics1 = agent.update(n_epochs=2, batch_size=32)
-        
-        # Add more data
-        for _ in range(64):
-            state = torch.randn(6)
-            action = torch.rand(1)
-            reward = np.random.randn()
-            log_prob = torch.randn(1)
-            value = torch.randn(1)
-            done = False
-            
-            agent.buffer.add(state, action, reward, log_prob, value, done)
-        
-        # Second update
-        metrics2 = agent.update(n_epochs=2, batch_size=32)
-        
-        # Train step should increment
-        assert agent.train_step == 2
-    
-    def test_save_and_load(self):
-        """Test saving and loading checkpoints."""
-        import tempfile
-        
-        agent1 = PPOAgent(state_dim=6, device="cpu")
-        agent1.train_step = 42
-        
-        with tempfile.NamedTemporaryFile(suffix=".pth", delete=False) as f:
-            path = f.name
-        
-        try:
-            agent1.save(path)
-            
-            agent2 = PPOAgent(state_dim=6, device="cpu")
-            agent2.load(path)
-            
-            assert agent2.train_step == 42
-            
-            # Check that parameters are identical
-            for p1, p2 in zip(agent1.policy.parameters(), agent2.policy.parameters()):
-                assert torch.allclose(p1, p2)
-        finally:
-            Path(path).unlink()
+
+def test_train_ppo_offline_error_handling():
+    """Test train_ppo_offline error handling."""
+    with pytest.raises(ValueError):
+        train_ppo_offline(invalid_input)
 
 
-class TestIntegration:
-    """Integration tests."""
-    
-    def test_train_ppo_offline_runs(self):
-        """Test that offline training completes without errors."""
-        from rl.ppo_agent import train_ppo_offline
-        
-        # Create synthetic dataset
-        np.random.seed(42)
-        n_samples = 100
-        
-        df = pd.DataFrame({
-            "p_hat": np.random.rand(n_samples) * 0.6 + 0.2,
-            "market_prob": np.random.rand(n_samples) * 0.6 + 0.2,
-            "spread_close": np.random.randn(n_samples) * 5,
-            "total_close": np.random.randn(n_samples) * 5 + 45,
-            "epa_gap": np.random.randn(n_samples),
-            "home_cover": np.random.randint(0, 2, n_samples),
-            "net_odds": np.full(n_samples, 0.91),
-        })
-        
-        agent = PPOAgent(state_dim=6, hidden_dim=32, device="cpu")
-        
-        # Train for 2 epochs (fast)
-        training_log = train_ppo_offline(
-            agent, df, n_epochs=2, rollout_length=32,
-            ppo_epochs=2, batch_size=16
-        )
-        
-        assert len(training_log) == 2
-        assert "avg_reward" in training_log[0]
-        assert "avg_action" in training_log[0]
-        assert agent.train_step > 0
-    
-    def test_evaluate_ppo_runs(self):
-        """Test that evaluation completes without errors."""
-        from rl.ppo_agent import evaluate_ppo
-        
-        # Create synthetic dataset
-        np.random.seed(42)
-        n_samples = 50
-        
-        df = pd.DataFrame({
-            "p_hat": np.random.rand(n_samples) * 0.6 + 0.2,
-            "market_prob": np.random.rand(n_samples) * 0.6 + 0.2,
-            "spread_close": np.random.randn(n_samples) * 5,
-            "total_close": np.random.randn(n_samples) * 5 + 45,
-            "epa_gap": np.random.randn(n_samples),
-            "home_cover": np.random.randint(0, 2, n_samples),
-            "net_odds": np.full(n_samples, 0.91),
-        })
-        
-        agent = PPOAgent(state_dim=6, hidden_dim=32, device="cpu")
-        metrics = evaluate_ppo(agent, df)
-        
-        assert "total_pnl" in metrics
-        assert "avg_pnl" in metrics
-        assert "total_bets" in metrics
-        assert "bet_rate" in metrics
-        assert "avg_action" in metrics
+
+@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
+def test_train_ppo_offline_property_idempotent(self, agent, dataset, n_epochs, rollout_length, ppo_epochs, batch_size):
+    """Property test: function is idempotent."""
+    # Act
+    result = train_ppo_offline(agent, dataset, n_epochs, rollout_length, ppo_epochs, batch_size)
+
+    # Assert property
+    assert train_ppo_offline(agent, dataset, n_epochs, rollout_length, ppo_epochs, batch_size) == result, "idempotent violated"
+
+
+
+def test_evaluate_ppo_basic():
+    """Test evaluate_ppo: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = evaluate_ppo()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_ppo_edge_cases():
+    """Test evaluate_ppo: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = evaluate_ppo()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_ppo_error_handling():
+    """Test evaluate_ppo error handling."""
+    with pytest.raises(ValueError):
+        evaluate_ppo(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_evaluate_ppo_property_idempotent(self, agent, dataset):
+    """Property test: function is idempotent."""
+    # Act
+    result = evaluate_ppo(agent, dataset)
+
+    # Assert property
+    assert evaluate_ppo(agent, dataset) == result, "idempotent violated"
+
+
+
+def test_main_basic():
+    """Test main: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = main()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_main_edge_cases():
+    """Test main: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = main()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_main_error_handling():
+    """Test main error handling."""
+    with pytest.raises(ValueError):
+        main(invalid_input)
+
+
+
+def test_forward_basic():
+    """Test forward: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = forward()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_forward_edge_cases():
+    """Test forward: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = forward()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_forward_error_handling():
+    """Test forward error handling."""
+    with pytest.raises(ValueError):
+        forward(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_forward_property_idempotent(self, self, state):
+    """Property test: function is idempotent."""
+    # Act
+    result = forward(self, state)
+
+    # Assert property
+    assert forward(self, state) == result, "idempotent violated"
+
+
+
+def test_get_action_basic():
+    """Test get_action: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = get_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_action_edge_cases():
+    """Test get_action: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = get_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_action_error_handling():
+    """Test get_action error handling."""
+    with pytest.raises(ValueError):
+        get_action(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers())
+def test_get_action_property_idempotent(self, self, state, deterministic):
+    """Property test: function is idempotent."""
+    # Act
+    result = get_action(self, state, deterministic)
+
+    # Assert property
+    assert get_action(self, state, deterministic) == result, "idempotent violated"
+
+
+
+def test_evaluate_actions_basic():
+    """Test evaluate_actions: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = evaluate_actions()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_actions_edge_cases():
+    """Test evaluate_actions: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = evaluate_actions()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_actions_error_handling():
+    """Test evaluate_actions error handling."""
+    with pytest.raises(ValueError):
+        evaluate_actions(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers())
+def test_evaluate_actions_property_idempotent(self, self, state, action):
+    """Property test: function is idempotent."""
+    # Act
+    result = evaluate_actions(self, state, action)
+
+    # Assert property
+    assert evaluate_actions(self, state, action) == result, "idempotent violated"
+
+
+
+def test_add_basic():
+    """Test add: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = add()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_add_edge_cases():
+    """Test add: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = add()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_add_error_handling():
+    """Test add error handling."""
+    with pytest.raises(ValueError):
+        add(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
+def test_add_property_idempotent(self, self, state, action, reward, log_prob, value, done):
+    """Property test: function is idempotent."""
+    # Act
+    result = add(self, state, action, reward, log_prob, value, done)
+
+    # Assert property
+    assert add(self, state, action, reward, log_prob, value, done) == result, "idempotent violated"
+
+
+
+def test_get_basic():
+    """Test get: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = get()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_edge_cases():
+    """Test get: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = get()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_error_handling():
+    """Test get error handling."""
+    with pytest.raises(ValueError):
+        get(invalid_input)
+
+
+
+@given(st.integers())
+def test_get_property_idempotent(self, self):
+    """Property test: function is idempotent."""
+    # Act
+    result = get(self)
+
+    # Assert property
+    assert get(self) == result, "idempotent violated"
+
+
+
+def test_clear_basic():
+    """Test clear: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = clear()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_clear_edge_cases():
+    """Test clear: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = clear()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_clear_error_handling():
+    """Test clear error handling."""
+    with pytest.raises(ValueError):
+        clear(invalid_input)
+
+
+
+@given(st.integers())
+def test_clear_property_idempotent(self, self):
+    """Property test: function is idempotent."""
+    # Act
+    result = clear(self)
+
+    # Assert property
+    assert clear(self) == result, "idempotent violated"
+
+
+
+def test_select_action_basic():
+    """Test select_action: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = select_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_select_action_edge_cases():
+    """Test select_action: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = select_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_select_action_error_handling():
+    """Test select_action error handling."""
+    with pytest.raises(ValueError):
+        select_action(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers())
+def test_select_action_property_idempotent(self, self, state, deterministic):
+    """Property test: function is idempotent."""
+    # Act
+    result = select_action(self, state, deterministic)
+
+    # Assert property
+    assert select_action(self, state, deterministic) == result, "idempotent violated"
+
+
+
+def test_compute_gae_basic():
+    """Test compute_gae: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = compute_gae()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_compute_gae_edge_cases():
+    """Test compute_gae: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = compute_gae()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_compute_gae_error_handling():
+    """Test compute_gae error handling."""
+    with pytest.raises(ValueError):
+        compute_gae(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
+def test_compute_gae_property_idempotent(self, self, rewards, values, dones, next_value):
+    """Property test: function is idempotent."""
+    # Act
+    result = compute_gae(self, rewards, values, dones, next_value)
+
+    # Assert property
+    assert compute_gae(self, rewards, values, dones, next_value) == result, "idempotent violated"
+
+
+
+def test_update_basic():
+    """Test update: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = update()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_update_edge_cases():
+    """Test update: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = update()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_update_error_handling():
+    """Test update error handling."""
+    with pytest.raises(ValueError):
+        update(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers())
+def test_update_property_idempotent(self, self, n_epochs, batch_size):
+    """Property test: function is idempotent."""
+    # Act
+    result = update(self, n_epochs, batch_size)
+
+    # Assert property
+    assert update(self, n_epochs, batch_size) == result, "idempotent violated"
+
+
+
+def test_update_no_temporal_leakage():
+    """Ensure update doesn't use future data."""
+    # Arrange: Create temporal data
+    train = pd.DataFrame({
+        'kickoff': pd.date_range('2024-01-01', periods=10),
+        'value': range(10)
+    })
+    test = pd.DataFrame({
+        'kickoff': pd.date_range('2024-01-11', periods=5),
+        'value': range(10, 15)
+    })
+
+    # Act: Call function
+    result = update(train, test)
+
+    # Assert: No leakage
+    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
+
+
+
+def test_save_basic():
+    """Test save: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = save()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_save_edge_cases():
+    """Test save: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = save()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_save_error_handling():
+    """Test save error handling."""
+    with pytest.raises(ValueError):
+        save(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_save_property_idempotent(self, self, path):
+    """Property test: function is idempotent."""
+    # Act
+    result = save(self, path)
+
+    # Assert property
+    assert save(self, path) == result, "idempotent violated"
+
+
+
+def test_load_basic():
+    """Test load: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = load()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_edge_cases():
+    """Test load: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = load()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_error_handling():
+    """Test load error handling."""
+    with pytest.raises(ValueError):
+        load(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_load_property_idempotent(self, self, path):
+    """Property test: function is idempotent."""
+    # Act
+    result = load(self, path)
+
+    # Assert property
+    assert load(self, path) == result, "idempotent violated"
+

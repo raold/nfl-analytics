@@ -1,0 +1,10 @@
+=== Training 5-Way Ensemble ===
+Training window: 2018-2024
+
+Models:
+  1. Bayesian Hierarchical (brms/Stan)
+  2. XGBoost (Python)
+  3. Bayesian Neural Network (PyMC/PyTorch)
+  4. State-Space Model (Stan)
+  5. CQL Reinforcement Learning (PyTorch)
+

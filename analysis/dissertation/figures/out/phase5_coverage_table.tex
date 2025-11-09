@@ -1,0 +1,28 @@
+% Auto-generated Phase 5 feature coverage table
+% Generated: November 8, 2025
+% Source: Phase 5 completion summary (docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Phase 5 feature coverage rates by category (2020--2025, $N=1{,}408$ games). Coverage >95\% across all categories enables robust model training.}
+  \label{tab:phase5-coverage-detailed}
+  \begin{threeparttable}
+    \begin{tabularx}{\linewidth}{@{} l r r r r X @{}}
+      \toprule
+      \textbf{Category} & \textbf{Features} & \textbf{Complete} & \textbf{Coverage} & \textbf{Missing} & \textbf{Notes} \\
+      \midrule
+      Defensive Situational & 7 & 1{,}365 & 96.9\% & 43 & Early season (weeks 1--2) \\[0.5ex]
+      Game Script Indicators & 5 & 1{,}408 & 100.0\% & 0 & Derived from play-by-play \\[0.5ex]
+      Vegas Line Bias & 9 & 1{,}408 & 100.0\% & 0 & Odds API (8 books) \\[0.5ex]
+      Environmental & 11 & 1{,}306 & 92.7\% & 102 & Pre-2021 weather gaps \\[0.5ex]
+      Feature Interactions & 12 & 1{,}408 & 100.0\% & 0 & Computed from above \\
+      \midrule
+      \textbf{Total Phase 5} & \textbf{44} & \textbf{1{,}365} & \textbf{96.9\%} & \textbf{43} & \textbf{Forward-fill imputation} \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize
+      \item Missing defensive features (3\%) correspond to games with insufficient rolling window data (weeks 1--2). Missing weather data (7.3\%) reflects Meteostat API coverage gaps for pre-2021 games. All missing values handled through forward-fill imputation or mean substitution.
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}

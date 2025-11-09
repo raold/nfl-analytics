@@ -610,11 +610,558 @@ def plot_bnn_prediction_intervals(df_bnn):
 
     return fig
 
+def check_service_health(host, port, service_name):
+    """Check if a service is healthy by attempting to connect."""
+    import socket
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2)
+        result = sock.connect_ex((host, port))
+        sock.close()
+        return result == 0
+    except Exception as e:
+        return False
+
+def fetch_database_stats():
+    """Fetch database statistics."""
+    try:
+        with psycopg.connect(**DB_CONFIG) as conn:
+            stats = {}
+
+            # Total games
+            result = conn.execute("SELECT COUNT(*) FROM games").fetchone()
+            stats['total_games'] = result[0] if result else 0
+
+            # Total plays
+            result = conn.execute("SELECT COUNT(*) FROM plays").fetchone()
+            stats['total_plays'] = result[0] if result else 0
+
+            # Season coverage
+            result = conn.execute("SELECT MIN(season), MAX(season) FROM games").fetchone()
+            stats['season_min'] = result[0] if result and result[0] else 0
+            stats['season_max'] = result[1] if result and result[1] else 0
+
+            # Database size
+            result = conn.execute("""
+                SELECT pg_size_pretty(pg_database_size('devdb01'))
+            """).fetchone()
+            stats['db_size'] = result[0] if result else 'N/A'
+
+            # Recent data timestamp
+            result = conn.execute("""
+                SELECT MAX(kickoff) FROM games WHERE kickoff IS NOT NULL
+            """).fetchone()
+            stats['latest_game'] = result[0] if result and result[0] else None
+
+            return stats
+    except Exception as e:
+        st.error(f"Database error: {str(e)}")
+        return None
+
+def fetch_model_registry():
+    """Fetch models from ml.model_registry."""
+    try:
+        query = """
+        SELECT
+            model_id,
+            model_name,
+            model_version,
+            model_type,
+            framework,
+            status,
+            created_at,
+            updated_at,
+            description,
+            performance_summary
+        FROM ml.model_registry
+        ORDER BY updated_at DESC
+        """
+        with psycopg.connect(**DB_CONFIG) as conn:
+            df = pd.read_sql_query(query, conn)
+        return df
+    except Exception as e:
+        return pd.DataFrame()
+
+def fetch_training_runs():
+    """Fetch recent training runs."""
+    try:
+        query = """
+        SELECT
+            run_id,
+            model_id,
+            started_at,
+            completed_at,
+            status,
+            final_metrics,
+            training_duration_seconds
+        FROM ml.training_runs
+        ORDER BY started_at DESC
+        LIMIT 10
+        """
+        with psycopg.connect(**DB_CONFIG) as conn:
+            df = pd.read_sql_query(query, conn)
+        return df
+    except Exception as e:
+        return pd.DataFrame()
+
+def render_system_status_page():
+    """Render the system status page."""
+    st.header("🖥️ System Status")
+
+    col1, col2 = st.columns([2, 1])
+
+    with col2:
+        if st.button("🔄 Refresh Status", type="primary"):
+            st.cache_data.clear()
+            st.rerun()
+
+    # Docker services health
+    st.subheader("🐳 Docker Services")
+
+    services = [
+        ("PostgreSQL", "localhost", 5544),
+        ("Redis", "localhost", 6379),
+        ("Prometheus", "localhost", 9090),
+        ("Grafana", "localhost", 3000),
+        ("Streamlit", "localhost", 8501),
+        ("Postgres Exporter", "localhost", 9187),
+        ("Node Exporter", "localhost", 9100),
+    ]
+
+    cols = st.columns(len(services))
+    for idx, (name, host, port) in enumerate(services):
+        with cols[idx]:
+            is_healthy = check_service_health(host, port, name)
+            status_icon = "✅" if is_healthy else "❌"
+            status_color = "#28a745" if is_healthy else "#dc3545"
+            st.markdown(f"""
+            <div style="text-align: center; padding: 15px; background-color: {'#d4edda' if is_healthy else '#f8d7da'};
+                        border-radius: 10px; border: 2px solid {status_color};">
+                <div style="font-size: 32px;">{status_icon}</div>
+                <div style="font-size: 14px; font-weight: bold; color: #212529; margin-top: 5px;">{name}</div>
+                <div style="font-size: 12px; color: #666;">:{port}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Database statistics
+    st.subheader("💾 Database Statistics")
+    db_stats = fetch_database_stats()
+
+    if db_stats:
+        col1, col2, col3, col4, col5 = st.columns(5)
+
+        with col1:
+            st.metric("Total Games", f"{db_stats['total_games']:,}")
+
+        with col2:
+            st.metric("Total Plays", f"{db_stats['total_plays']:,}")
+
+        with col3:
+            st.metric("Season Coverage", f"{db_stats['season_min']}-{db_stats['season_max']}")
+
+        with col4:
+            st.metric("Database Size", db_stats['db_size'])
+
+        with col5:
+            if db_stats['latest_game']:
+                latest = pd.to_datetime(db_stats['latest_game'])
+                days_ago = (datetime.now(latest.tzinfo) - latest).days
+                st.metric("Latest Game", f"{days_ago} days ago")
+            else:
+                st.metric("Latest Game", "N/A")
+    else:
+        st.error("Could not fetch database statistics")
+
+    st.markdown("---")
+
+    # Training window information
+    st.subheader("📊 Canonical Training Window")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        **Current Configuration:**
+        - **Core years**: 2018-2024 (full weight)
+        - **Decay years**: 2015-2017 (exponential decay, H=4)
+        - **Formula**: w(s; 2025, 4) = 0.5^((2025-s)/4)
+
+        **Effective Weights:**
+        - 2017: 0.297
+        - 2016: 0.250
+        - 2015: 0.210
+        """)
+
+    with col2:
+        st.markdown("""
+        **Validation Results:**
+        - **Test Set**: 2025 weeks 1-6 (148 games, 37 QBs)
+        - **MAE**: 47.77 yards
+        - **Coverage**: 86.5%
+        - **Statistical Significance**: p=0.0069 (vs baseline)
+        - **Status**: ✅ Approved for production
+        """)
+
+    st.markdown("---")
+
+    # External monitoring links
+    st.subheader("🔗 Monitoring Links")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.markdown("""
+        ### Grafana
+        [Open Grafana Dashboard →](http://localhost:3000)
+
+        **Credentials:**
+        - Username: `admin`
+        - Password: `sicillionbillions`
+        """)
+
+    with col2:
+        st.markdown("""
+        ### Prometheus
+        [Open Prometheus →](http://localhost:9090)
+
+        **Features:**
+        - Metrics queries
+        - Alert rules
+        - Target health
+        """)
+
+    with col3:
+        st.markdown("""
+        ### Database
+        [localhost:5544](postgresql://localhost:5544/devdb01)
+
+        **Connection:**
+        ```
+        psql postgresql://dro:***@localhost:5544/devdb01
+        ```
+        """)
+
+def render_model_status_page():
+    """Render the model status page."""
+    st.header("🤖 Model Status")
+
+    # Model registry
+    st.subheader("📋 Model Registry")
+    df_models = fetch_model_registry()
+
+    if not df_models.empty:
+        # Summary metrics
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            st.metric("Total Models", len(df_models))
+
+        with col2:
+            active_models = len(df_models[df_models['status'] == 'active'])
+            st.metric("Active Models", active_models)
+
+        with col3:
+            in_production = len(df_models[df_models['status'] == 'production'])
+            st.metric("In Production", in_production)
+
+        with col4:
+            archived = len(df_models[df_models['status'] == 'archived'])
+            st.metric("Archived", archived)
+
+        # Model table
+        st.dataframe(
+            df_models[[
+                'model_id', 'model_name', 'model_version', 'model_type',
+                'framework', 'status', 'updated_at', 'description'
+            ]],
+            use_container_width=True,
+            height=400
+        )
+    else:
+        st.info("No models found in registry. Models will appear here after training.")
+
+    st.markdown("---")
+
+    # Trained model files
+    st.subheader("📦 Model Files")
+
+    # Check models directory (handle both local and Docker paths)
+    try:
+        import os
+        import glob
+
+        # Try multiple possible model directory locations
+        possible_dirs = [
+            "/app/models",  # Docker mount
+            "/Users/dro/rice/nfl-analytics/models",  # Local development
+            "../models",  # Relative path
+        ]
+
+        models_dir = None
+        for d in possible_dirs:
+            if os.path.exists(d):
+                models_dir = d
+                break
+
+        if not models_dir:
+            st.warning("Models directory not found. Make sure models directory is mounted in Docker.")
+            st.info("Expected paths: /app/models (Docker) or /Users/dro/rice/nfl-analytics/models (local)")
+        else:
+            model_files = []
+
+            # Find all model files
+            for ext in ['*.rds', '*.pkl', '*.pt', '*.pth']:
+                for filepath in glob.glob(os.path.join(models_dir, '**', ext), recursive=True):
+                    try:
+                        stat = os.stat(filepath)
+                        model_files.append({
+                            'filename': os.path.relpath(filepath, models_dir),
+                            'size_mb': stat.st_size / (1024 * 1024),
+                            'modified': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+                        })
+                    except Exception as e:
+                        continue
+
+            if model_files:
+                df_files = pd.DataFrame(model_files)
+                df_files = df_files.sort_values('modified', ascending=False)
+
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("Total Model Files", len(df_files))
+                with col2:
+                    total_size = df_files['size_mb'].sum()
+                    st.metric("Total Size", f"{total_size:.1f} MB")
+                with col3:
+                    largest = df_files['size_mb'].max()
+                    st.metric("Largest File", f"{largest:.1f} MB")
+
+                st.dataframe(
+                    df_files.style.format({'size_mb': '{:.2f}'}),
+                    use_container_width=True,
+                    height=400
+                )
+            else:
+                st.info(f"No model files found in {models_dir}")
+    except Exception as e:
+        st.error(f"Error scanning model files: {str(e)}")
+
+    st.markdown("---")
+
+    # Recent training runs
+    st.subheader("🏃 Recent Training Runs")
+    df_runs = fetch_training_runs()
+
+    if not df_runs.empty:
+        st.dataframe(
+            df_runs,
+            use_container_width=True,
+            height=300
+        )
+    else:
+        st.info("No training runs found")
+
+    st.markdown("---")
+
+    # Ensemble configuration
+    st.subheader("🎯 4-Way Ensemble Configuration")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        **Components:**
+        1. ✅ **Hierarchical Bayesian** (brms/Stan)
+           - Status: Production ready
+           - Framework: R, cmdstanr
+
+        2. ✅ **XGBoost** (GPU-accelerated)
+           - Status: Production ready
+           - Framework: Python, xgboost
+
+        3. ✅ **Bayesian Neural Network** (PyMC)
+           - Status: Calibrated (89.5% coverage)
+           - Framework: Python, PyMC
+
+        4. ✅ **State-Space Random Walk v2** ⭐
+           - Status: **APPROVED** (Nov 8, 2025)
+           - MAE: 47.77 yards
+           - Coverage: 86.5%
+        """)
+
+    with col2:
+        st.markdown("""
+        **Combination Method:**
+        - **Default**: Inverse variance weighting
+        - **Advanced**: Stacked meta-learner with CV
+        - **Portfolio**: Correlation-adjusted Kelly criterion
+
+        **Expected Performance:**
+        - **Target ROI**: +5-7%
+        - **Win Rate**: 59-61%
+        - **Sharpe Ratio**: 2.2-2.6
+        - **Max Drawdown**: -8 to -10%
+        """)
+
+def render_data_summary_page():
+    """Render the data summary page."""
+    st.header("📊 Data Summary")
+
+    db_stats = fetch_database_stats()
+
+    if not db_stats:
+        st.error("Could not connect to database")
+        return
+
+    # Overview metrics
+    st.subheader("📈 Overview")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric(
+            "Total Games",
+            f"{db_stats['total_games']:,}",
+            help="Total games in database"
+        )
+
+    with col2:
+        st.metric(
+            "Total Plays",
+            f"{db_stats['total_plays']:,}",
+            help="Total play-by-play records"
+        )
+
+    with col3:
+        st.metric(
+            "Season Coverage",
+            f"{db_stats['season_min']}-{db_stats['season_max']}",
+            help="Range of seasons in database"
+        )
+
+    st.markdown("---")
+
+    # Schema statistics
+    st.subheader("🗄️ Schema Statistics")
+
+    try:
+        with psycopg.connect(**DB_CONFIG) as conn:
+            # Count tables by schema
+            schema_query = """
+            SELECT
+                schemaname,
+                COUNT(*) as table_count
+            FROM pg_tables
+            WHERE schemaname NOT IN ('pg_catalog', 'information_schema')
+            GROUP BY schemaname
+            ORDER BY table_count DESC
+            """
+            df_schemas = pd.read_sql_query(schema_query, conn)
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.dataframe(
+                    df_schemas,
+                    use_container_width=True,
+                    height=200
+                )
+
+            with col2:
+                # Schema breakdown
+                for _, row in df_schemas.iterrows():
+                    st.metric(
+                        f"{row['schemaname']} schema",
+                        f"{row['table_count']} tables"
+                    )
+    except Exception as e:
+        st.error(f"Error fetching schema stats: {str(e)}")
+
+    st.markdown("---")
+
+    # Recent data ingestion
+    st.subheader("📥 Recent Data Ingestion")
+
+    try:
+        with psycopg.connect(**DB_CONFIG) as conn:
+            # Get recent games by season and week
+            recent_query = """
+            SELECT
+                season,
+                week,
+                game_type,
+                COUNT(*) as games,
+                MAX(kickoff) as latest_kickoff
+            FROM games
+            WHERE season >= 2024
+            GROUP BY season, week, game_type
+            ORDER BY season DESC, week DESC
+            LIMIT 10
+            """
+            df_recent = pd.read_sql_query(recent_query, conn)
+
+            st.dataframe(
+                df_recent,
+                use_container_width=True,
+                height=300
+            )
+    except Exception as e:
+        st.error(f"Error fetching recent data: {str(e)}")
+
+    st.markdown("---")
+
+    # Data quality notes
+    st.subheader("✅ Data Quality")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("""
+        **Key Findings:**
+        - ✅ All games have valid kickoff timestamps
+        - ✅ Betting lines (spread, total) available for 99%+ of games
+        - ✅ Play-by-play data includes EPA calculations
+        - ✅ Weather data available for outdoor venues
+        - ✅ Injury reports tracked by week
+        """)
+
+    with col2:
+        st.markdown("""
+        **Important Notes:**
+        - Use `kickoff` column (not `game_date` or `gameday`)
+        - Use `spread_close` and `total_close` (not `spread_line`, `total_line`)
+        - Team abbreviations: LA Rams = `LAR` (not `LA`)
+        - Weather stored as TEXT, requires parsing
+        - See `docs/DATABASE_SCHEMA_AUDIT.md` for details
+        """)
+
 def main():
     st.title("🏈 NFL Analytics Monitoring Dashboard")
     st.markdown("Real-time monitoring of prediction performance and model metrics")
 
-    # Sidebar filters
+    # Sidebar navigation
+    st.sidebar.header("Navigation")
+
+    page = st.sidebar.radio(
+        "Select Page",
+        ["Predictions", "System Status", "Model Status", "Data Summary"],
+        index=0
+    )
+
+    # Route to appropriate page
+    if page == "System Status":
+        render_system_status_page()
+        return
+    elif page == "Model Status":
+        render_model_status_page()
+        return
+    elif page == "Data Summary":
+        render_data_summary_page()
+        return
+
+    # Sidebar filters (for Predictions page)
     st.sidebar.header("Filters")
 
     # Season filter
@@ -866,7 +1413,8 @@ def main():
                     game = completed_games.iloc[game_idx]
                     away_score = int(game['away_score']) if pd.notna(game['away_score']) else 0
                     home_score = int(game['home_score']) if pd.notna(game['home_score']) else 0
-                    actual_margin = game['actual_margin'] if pd.notna(game['actual_margin']) else 0
+                    # Calculate actual margin (home - away)
+                    actual_margin = home_score - away_score
 
                     # Determine winner
                     if actual_margin > 0:

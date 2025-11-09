@@ -1,0 +1,26 @@
+% Auto-generated schema evolution table
+% Generated: November 8, 2025
+% Source: Database schema audit (docs/DATABASE_SCHEMA_AUDIT.md)
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Database schema evolution across feature engineering phases (2020--2025). Each phase represents a systematic expansion of the feature catalog while maintaining backward compatibility through version-controlled migrations.}
+  \label{tab:schema-evolution-detailed}
+  \begin{threeparttable}
+    \begin{tabularx}{\linewidth}{@{} l r r r r X @{}}
+      \toprule
+      \textbf{Phase} & \textbf{Columns} & \textbf{Tables} & \textbf{Size (MB)} & \textbf{$\Delta$\%} & \textbf{Key Features Added} \\
+      \midrule
+      Baseline (v1.0) & 75 & 12 & 854 & -- & Core PBP, basic team stats, game metadata \\[0.5ex]
+      Enhanced (v2.5) & 142 & 18 & 1{,}245 & +89\% & EPA metrics, rolling windows, market signals, weather \\[0.5ex]
+      Advanced (v3.0) & 257 & 28 & 2{,}503 & +81\% & Situational defense, interactions, QB-WR chemistry \\
+      \midrule
+      \textbf{Total Growth} & \textbf{+242\%} & \textbf{+133\%} & \textbf{+193\%} & & \textbf{3.4× expansion over 3 phases} \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize
+      \item All migrations executed via version-controlled SQL scripts (\texttt{db/migrations/}) with idempotency guarantees and validation checks. Size measurements reflect PostgreSQL database size after VACUUM FULL.
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}
