@@ -16,24 +16,26 @@ logger = logging.getLogger(__name__)
 
 def insert_model_metadata(
     model_name: str,
-    model_version: str,
+    version: str,
     model_type: str,
-    framework: str,
-    description: str,
-    performance_summary: dict,
-    training_config: Optional[dict] = None
+    model_family: str,
+    model_path: str,
+    description: Optional[str] = None,
+    notes: Optional[str] = None,
+    **kwargs
 ) -> Dict[str, Any]:
     """
     Insert model metadata into ml.model_registry.
 
     Args:
         model_name: Name of the model (e.g., "bnn_passing_v3.1")
-        model_version: Version string (e.g., "3.1.0")
+        version: Version string (e.g., "3.1.0")
         model_type: Type of model (e.g., "bayesian_neural_network")
-        framework: Framework used (e.g., "pymc", "brms", "xgboost")
+        model_family: Framework/family (e.g., "pymc", "brms", "xgboost")
+        model_path: Path to model file
         description: Human-readable description
-        performance_summary: Dict with metrics (mae, calibration, etc.)
-        training_config: Optional training configuration dict
+        notes: Additional notes (can include JSON for metrics)
+        **kwargs: Additional fields (metadata_path, checkpoint_dir, etc.)
 
     Returns:
         Dictionary with:
@@ -42,26 +44,26 @@ def insert_model_metadata(
             - error: error message (if failed)
     """
     try:
-        logger.info(f"Inserting model metadata: {model_name} v{model_version}")
+        logger.info(f"Inserting model metadata: {model_name} v{version}")
 
         with get_db_connection() as conn:
             with conn.cursor() as cursor:
                 sql = """
                 INSERT INTO ml.model_registry
-                (model_name, model_version, model_type, framework, description,
-                 performance_summary, training_config, status, created_at, updated_at)
+                (model_name, version, model_type, model_family, model_path,
+                 description, notes, status, created_at, updated_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, 'trained', NOW(), NOW())
                 RETURNING model_id
                 """
 
                 params = (
                     model_name,
-                    model_version,
+                    version,
                     model_type,
-                    framework,
+                    model_family,
+                    model_path,
                     description,
-                    json.dumps(performance_summary),
-                    json.dumps(training_config) if training_config else None
+                    notes
                 )
 
                 cursor.execute(sql, params)
@@ -73,11 +75,11 @@ def insert_model_metadata(
                 return {
                     "success": True,
                     "model_id": model_id,
-                    "message": f"Model {model_name} v{model_version} registered with ID {model_id}"
+                    "message": f"Model {model_name} v{version} registered with ID {model_id}"
                 }
 
     except psycopg2.errors.UniqueViolation:
-        error_msg = f"Model {model_name} v{model_version} already exists"
+        error_msg = f"Model {model_name} v{version} already exists"
         logger.warning(error_msg)
         return {
             "success": False,
@@ -135,7 +137,7 @@ def update_model_status(
                 UPDATE ml.model_registry
                 SET status = %s, updated_at = NOW()
                 WHERE model_id = %s
-                RETURNING model_name, model_version
+                RETURNING model_name, version
                 """
 
                 cursor.execute(sql_update, (status, model_id))
@@ -147,7 +149,7 @@ def update_model_status(
                         "error": f"Model ID {model_id} not found"
                     }
 
-                model_name, model_version = result
+                model_name, version = result
 
                 # Log status change if notes provided
                 if notes:
@@ -164,11 +166,11 @@ def update_model_status(
 
                 conn.commit()
 
-                logger.info(f"Model {model_name} v{model_version} status updated to: {status}")
+                logger.info(f"Model {model_name} v{version} status updated to: {status}")
 
                 return {
                     "success": True,
-                    "message": f"Model {model_name} v{model_version} status updated to {status}"
+                    "message": f"Model {model_name} v{version} status updated to {status}"
                 }
 
     except psycopg2.Error as e:

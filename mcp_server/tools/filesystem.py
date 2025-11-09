@@ -12,12 +12,16 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 # Allowed directories for file operations
+# Auto-detect if running in Docker or locally
+import os
+BASE_DIR = '/app' if os.path.exists('/app/models') else os.getcwd()
+
 ALLOWED_DIRS = {
-    'models': '/app/models',
-    'logs': '/app/logs',
-    'data': '/app/data',
-    'cache': '/app/cache',
-    'results': '/app/results'
+    'models': os.path.join(BASE_DIR, 'models'),
+    'logs': os.path.join(BASE_DIR, 'logs'),
+    'data': os.path.join(BASE_DIR, 'data'),
+    'cache': os.path.join(BASE_DIR, 'cache'),
+    'results': os.path.join(BASE_DIR, 'results')
 }
 
 # File size limits (10 MB for read operations)
