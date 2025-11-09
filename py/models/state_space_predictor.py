@@ -230,18 +230,42 @@ class StateSpacePredictor:
         # Add measurement noise
         log_yards_pred += np.random.normal(0, R_samp)
 
+        # CRITICAL FIX: Clip in log-space BEFORE exponentiating to prevent extreme outliers
+        # log(600 + 1) ≈ 6.4, so clip to [0, 7] gives max ~1000 yards (safety margin)
+        log_yards_pred = np.clip(log_yards_pred, 0, 7.0)
+
         # Transform back to yards: exp(log(yards + 1)) - 1 ≈ exp(log(yards))
         # (Model uses log(yards + 1), so need to subtract 1 after exp)
         yards_pred = np.exp(log_yards_pred) - 1
 
-        # Clip to reasonable range
+        # Additional safety: clip to reasonable NFL passing yards range
         yards_pred = np.clip(yards_pred, 0, 600)
 
-        pred_mean = yards_pred.mean()
-        pred_std = yards_pred.std()
+        # Remove outliers using IQR method for robust mean calculation
+        q25, q75 = np.percentile(yards_pred, [25, 75])
+        iqr = q75 - q25
+        lower_bound = q25 - 3 * iqr  # 3x IQR (more lenient than 1.5x)
+        upper_bound = q75 + 3 * iqr
+
+        # Filter outliers
+        mask = (yards_pred >= lower_bound) & (yards_pred <= upper_bound)
+        yards_pred_filtered = yards_pred[mask]
+
+        # Use filtered samples for mean/std if we have enough samples
+        if len(yards_pred_filtered) > n_samples * 0.5:  # At least 50% of samples retained
+            pred_mean = yards_pred_filtered.mean()
+            pred_std = yards_pred_filtered.std()
+            n_outliers = n_samples - len(yards_pred_filtered)
+            if n_outliers > 0:
+                logger.debug(f"  Removed {n_outliers} outliers (>{upper_bound:.0f} or <{lower_bound:.0f} yards)")
+        else:
+            # Too many outliers removed, fall back to clipped samples
+            pred_mean = yards_pred.mean()
+            pred_std = yards_pred.std()
+            logger.warning(f"  Too many outliers detected ({n_samples - len(yards_pred_filtered)}), using all clipped samples")
 
         logger.info(f"  State-space prediction for {player_id} (W{week}, {season}): "
-                   f"{pred_mean:.1f} ± {pred_std:.1f} yards")
+                   f"{pred_mean:.1f} ± {pred_std:.1f} yards (n_samples={len(yards_pred_filtered) if len(yards_pred_filtered) > n_samples * 0.5 else n_samples})")
 
         return pred_mean, pred_std
 
