@@ -188,4 +188,13 @@ The Phase 5 feature expansion enabled significant modeling improvements:
   \item \textbf{Feature importance}: Defensive situational features contributed 12\% of XGBoost gain
 \end{itemize}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../figures/out/feature_importance_comparison.pdf}
+  \caption{Feature importance comparison between XGBoost and BNN models across the top 15 features. Defensive situational features (dark blue) dominate XGBoost importance rankings, while BNN assigns more weight to vegas line bias and environmental factors. The divergence reflects differing model architectures: XGBoost captures non-linear interactions while BNN emphasizes uncertainty-informative features.}
+  \label{fig:feature-importance-comparison}
+\end{figure}
+
+Figure~\ref{fig:feature-importance-comparison} reveals complementary feature utilization across models. XGBoost prioritizes defensive metrics and game script indicators (high gain from non-linear splits), while the BNN emphasizes market signals and environmental factors (high information for uncertainty quantification). This divergence justifies the ensemble approach: different models extract different signals from the same feature space.
+
 Full backtest results comparing baseline vs enhanced ensembles are presented in \Cref{chap:results}.

@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/py/models/bayesian_neural_network.py
+# hypothesis_version: 6.147.0
+
+[-5.0, -2.0, 1e-06, 0.0001, 0.1, 0.2, 0.5, 0.6, 0.75, 0.95, 1.0, 2.0, 3.0, 5.0, 500, 1000, 2000, 20000, '=', 'Test Set Performance', 'X', '__main__', 'advi', 'b1', 'b2', 'b_out_mu', 'b_out_sigma', 'heteroscedastic', 'hidden_dims', 'inference_method', 'nuts', 'prior_scale', 'scaler', 'sigma', 'sigma_pred', 'trace', 'w1', 'w1_sd', 'w2', 'w2_sd', 'w_out_mu', 'w_out_mu_sd', 'w_out_sigma', 'w_out_sigma_sd', 'y', 'y_obs', 'y_pred', '✓ Good calibration']

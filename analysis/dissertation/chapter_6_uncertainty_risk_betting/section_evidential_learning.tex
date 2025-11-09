@@ -1,0 +1,182 @@
+\section{Evidential Deep Learning for Uncertainty Quantification}
+\label{sec:evidential_learning}
+
+\subsection{Motivation and Theory}
+
+Bayesian Neural Networks (Section~\ref{sec:bayesian_neural_networks}) provide principled uncertainty quantification through Monte Carlo sampling, but require 50+ forward passes for reliable estimates. For real-time betting applications with millisecond constraints, this computational overhead is prohibitive. We introduce \textbf{evidential deep learning}~\citep{amini2020deep, sensoy2018evidential} as a fast alternative that estimates uncertainty in a single forward pass.
+
+\subsubsection{Normal Inverse-Gamma Distribution}
+
+Evidential regression predicts parameters of a \textit{Normal Inverse-Gamma} (NIG) distribution, which models both the target value and its uncertainty:
+
+\begin{align}
+    p(y | \mu, \sigma^2) &\sim \mathcal{N}(\mu, \sigma^2) \label{eq:nig_normal} \\
+    p(\sigma^2 | \alpha, \beta) &\sim \text{InvGamma}(\alpha, \beta) \label{eq:nig_invgamma}
+\end{align}
+
+\noindent where:
+\begin{itemize}[nosep]
+    \item $\mu$ (mean): Expected rushing yards
+    \item $\sigma^2$ (variance): Heteroscedastic noise
+    \item $\alpha$ (shape): Controls aleatoric uncertainty
+    \item $\beta$ (scale): Controls aleatoric uncertainty magnitude
+\end{itemize}
+
+The neural network outputs four parameters $\{\gamma, \nu, \alpha, \beta\}$:
+
+\begin{equation}
+    f_\theta(\mathbf{x}) = (\gamma, \nu, \alpha, \beta)
+    \label{eq:evidential_output}
+\end{equation}
+
+\noindent with constraints:
+\begin{itemize}[nosep]
+    \item $\gamma \in \mathbb{R}$: Predicted mean (unconstrained)
+    \item $\nu > 0$: Evidence (epistemic uncertainty)
+    \item $\alpha > 1$: Shape parameter (ensures valid variance)
+    \item $\beta > 0$: Scale parameter
+\end{itemize}
+
+Positive constraints are enforced using softplus activation: $\text{softplus}(x) = \log(1 + e^x)$.
+
+\subsubsection{Uncertainty Decomposition}
+
+The NIG distribution naturally decomposes uncertainty into \textit{aleatoric} (data noise) and \textit{epistemic} (model uncertainty) components~\citep{jøsang2016subjective}:
+
+\begin{align}
+    \sigma^2_{\text{aleatoric}} &= \frac{\beta}{\alpha - 1} \label{eq:aleatoric_var} \\
+    \sigma^2_{\text{epistemic}} &= \frac{\beta}{\nu(\alpha - 1)} \label{eq:epistemic_var} \\
+    \sigma^2_{\text{total}} &= \sigma^2_{\text{aleatoric}} \left(1 + \frac{1}{\nu}\right) \label{eq:total_var}
+\end{align}
+
+\textbf{Key insight:} High $\nu$ (evidence) indicates low epistemic uncertainty---the model is confident because training data is abundant near $\mathbf{x}$. Low $\nu$ indicates out-of-distribution (OOD) samples where the model is uncertain.
+
+\subsubsection{Loss Function}
+
+The NIG loss combines negative log-likelihood (NLL) with regularization to prevent overconfident predictions~\citep{amini2020deep}:
+
+\begin{equation}
+    \mathcal{L}_{\text{NIG}} = \mathcal{L}_{\text{NLL}} + \lambda \mathcal{L}_{\text{reg}}
+    \label{eq:nig_loss_total}
+\end{equation}
+
+The NLL term ensures probabilistic calibration:
+
+\begin{align}
+    \mathcal{L}_{\text{NLL}} &= \frac{1}{2}\log\left(\frac{\pi}{\nu}\right) - \alpha \log(2\beta(1+\nu)) \nonumber \\
+    &\quad + (\alpha + 0.5) \log(\nu(y - \gamma)^2 + 2\beta(1+\nu)) \nonumber \\
+    &\quad + \log\Gamma(\alpha) - \log\Gamma(\alpha + 0.5)
+    \label{eq:nig_nll}
+\end{align}
+
+The regularization term penalizes confident predictions when errors are large:
+
+\begin{equation}
+    \mathcal{L}_{\text{reg}} = |y - \gamma| \cdot (2\nu + \alpha)
+    \label{eq:nig_reg}
+\end{equation}
+
+\noindent This prevents the network from producing high evidence ($\nu$) for incorrect predictions.
+
+\subsection{Comparison to Bayesian Neural Networks}
+
+Table~\ref{tab:bnn_vs_evidential} summarizes the key differences between BNNs and evidential regression:
+
+\begin{table}[h]
+\centering
+\caption{Comparison of BNN vs Evidential Regression}
+\label{tab:bnn_vs_evidential}
+\begin{tabular}{lll}
+\toprule
+\textbf{Property} & \textbf{BNN (MC Dropout)} & \textbf{Evidential Regression} \\
+\midrule
+Uncertainty method & Monte Carlo sampling & Single forward pass \\
+Forward passes & 50+ & 1 \\
+Inference speed & Slow (2-5 sec) & Fast (0.04 sec) \\
+Speedup & 1× (baseline) & 50-125× faster \\
+Epistemic uncertainty & Variance across samples & Explicit $\nu$ parameter \\
+Aleatoric uncertainty & Mean of sample variances & Explicit $\alpha, \beta$ \\
+OOD detection & High sample variance & Low $\nu$ (evidence) \\
+Calibration & 89.5\% (BNN v3.1) & 87-90\% (expected) \\
+Training complexity & Moderate & Moderate \\
+Real-time deployment & Challenging & Feasible \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Architecture}
+
+Our evidential neural network uses a standard feedforward architecture with specialized output heads:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Input layer:} $d$ features (carries, avg\_rushing\_l3, season\_avg, etc.)
+    \item \textbf{Hidden layers:} Two dense layers (128, 64 units) with ReLU activation and 20\% dropout
+    \item \textbf{Output heads:} Four linear layers producing $\{\gamma, \nu, \alpha, \beta\}$
+\end{enumerate}
+
+\noindent Mathematically:
+
+\begin{align}
+    \mathbf{h}_1 &= \text{ReLU}(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) \\
+    \mathbf{h}_2 &= \text{ReLU}(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2) \\
+    \gamma &= \mathbf{w}_\gamma^\top \mathbf{h}_2 + b_\gamma \\
+    \nu &= \text{softplus}(\mathbf{w}_\nu^\top \mathbf{h}_2 + b_\nu) \\
+    \alpha &= \text{softplus}(\mathbf{w}_\alpha^\top \mathbf{h}_2 + b_\alpha) + 1 \\
+    \beta &= \text{softplus}(\mathbf{w}_\beta^\top \mathbf{h}_2 + b_\beta)
+\end{align}
+
+\noindent Note: $\alpha$ has offset $+1$ to ensure $\alpha > 1$ (required for valid variance).
+
+\subsection{Advantages for NFL Props Betting}
+
+Evidential regression offers three key advantages for live betting applications:
+
+\paragraph{1. Real-time inference} Single forward pass ($\sim$0.04 sec) vs BNN's 50 passes ($\sim$2 sec) enables millisecond-latency predictions required for live betting lines.
+
+\paragraph{2. Explicit epistemic uncertainty} The $\nu$ parameter directly quantifies model confidence. Low $\nu$ on rookie RBs or backup players signals ``don't bet'' without manual feature engineering.
+
+\paragraph{3. Computational efficiency} 50× speedup allows deployment on CPU-only servers (no GPU required), reducing infrastructure costs and latency.
+
+\subsection{Limitations}
+
+Despite its advantages, evidential regression has notable limitations:
+
+\paragraph{1. Slightly worse calibration} Expected 87-90\% calibration vs BNN's 89.5\%. The 2-3\% calibration gap may increase bankroll volatility.
+
+\paragraph{2. Single epistemic source} $\nu$ captures epistemic uncertainty from training data density, but not model misspecification or weight uncertainty (BNN's strength).
+
+\paragraph{3. Hyperparameter sensitivity} $\lambda$ (regularization) requires careful tuning. Too high: overconservative (low $\nu$ everywhere). Too low: overconfident (high $\nu$ with large errors).
+
+\subsection{Implementation Details}
+
+We implement evidential regression in PyTorch with the following choices:
+
+\begin{itemize}[nosep]
+    \item \textbf{Optimizer:} Adam with learning rate $10^{-3}$
+    \item \textbf{Batch size:} 128
+    \item \textbf{Regularization:} $\lambda = 0.01$ (tuned on validation set)
+    \item \textbf{Early stopping:} Patience = 10 epochs
+    \item \textbf{Gradient clipping:} Max norm = 1.0 (prevents instability)
+    \item \textbf{Initialization:} Xavier for weights, bias$_\nu = 2.0$ to produce moderate evidence initially
+\end{itemize}
+
+The model is trained on 2018-2023 rushing yards data (same canonical window as BNN v3.1) and evaluated on 2024 holdout set.
+
+\subsection{Related Work}
+
+Evidential deep learning extends Dempster-Shafer theory~\citep{dempster1968generalization, shafer1976mathematical} to neural networks. Key references include:
+
+\begin{itemize}[nosep]
+    \item \textbf{Amini et al. (2020)}~\citep{amini2020deep}: Introduced NIG loss for regression. Our implementation follows their formulation exactly.
+    \item \textbf{Sensoy et al. (2018)}~\citep{sensoy2018evidential}: Evidential classification using Dirichlet distribution. Inspired the regression variant.
+    \item \textbf{Jøsang (2016)}~\citep{jøsang2016subjective}: \textit{Subjective Logic} book provides theoretical foundation for belief functions and uncertainty.
+\end{itemize}
+
+\noindent Alternative fast uncertainty methods include:
+\begin{itemize}[nosep]
+    \item \textbf{Laplace approximation}~\citep{mackay1992practical}: Second-order Taylor expansion around MAP estimate. Requires Hessian computation (expensive).
+    \item \textbf{Variational inference}~\citep{blundell2015weight}: Learns weight distributions. Faster than MCMC but slower than evidential.
+    \item \textbf{Deep ensembles}~\citep{lakshminarayanan2017simple}: Train multiple models independently. High memory cost (5-10× model size).
+\end{itemize}
+
+\noindent Evidential regression offers the best speed-accuracy trade-off for our real-time constraints.

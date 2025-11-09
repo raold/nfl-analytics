@@ -6,7 +6,7 @@ con <- dbConnect(
   dbname   = "devdb01",
   host     = "localhost",
   user     = "dro",
-  password = "sicillionbillions",
+  password = Sys.getenv("DB_PASSWORD", "sicillionbillions"),
   port     = 5544
 )
 

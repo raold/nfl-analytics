@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v3.py
+# hypothesis_version: 6.147.0
+
+[1e-06, 0.02, 0.05, 0.1, 0.25, 0.8, 1.0, 1000.0, 2000, 2022, 2024, 5544, '1.59%', '2.0-2.5%', '2.3-2.8%', '2.5-3.3%', '2.8-4.0%', '3.0-4.5%', '5.0-7.0%', '=', 'Expected_ROI', 'Key_Innovation', 'QB-WR dyadic effects', 'Sigma ~ log_targets', 'Status', 'Version', '__main__', '_bayesian', '_xgb', 'advi', 'bayesian_bnn_diff', 'bayesian_pred', 'bayesian_uncertainty', 'bayesian_weight', 'bayesian_xgb_diff', 'bnn_pred', 'bnn_uncertainty', 'bnn_weight', 'devdb01', 'dro', 'ensemble_pred', 'ensemble_uncertainty', 'gbm', 'inner', 'localhost', 'max_drawdown', 'mean_pred', 'method', 'n_bets', 'player_id', 'pred', 'qb_chemistry_v1.0', 'roi', 'sharpe_ratio', 'sicillionbillions', 'stacked_4way', 'stat_type', 'std_pred', 'uncertainty', 'v1.0 Baseline', 'v2.0 QB-WR Chemistry', 'win_rate', 'xgb_bnn_diff', 'xgb_pred', '✅ Complete']

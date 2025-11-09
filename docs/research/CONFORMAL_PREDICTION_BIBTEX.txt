@@ -1,0 +1,114 @@
+% ============================================================================
+% CONFORMAL PREDICTION REFERENCES
+% Ready to add to analysis/dissertation/references.bib
+% Date: November 9, 2025
+% ============================================================================
+
+% Paper 1: Foundational Tutorial (MUST READ FIRST)
+% - Best starting point with Python code examples
+% - GitHub: https://github.com/aangelopoulos/conformal-prediction
+@article{angelopoulos2022conformal,
+  title={A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification},
+  author={Angelopoulos, Anastasios N. and Bates, Stephen},
+  journal={arXiv preprint arXiv:2107.07511},
+  year={2022},
+  note={Updated December 2022},
+  url={https://arxiv.org/abs/2107.07511}
+}
+
+% Paper 2: Split Conformal for Regression (JASA - Top Statistics Journal)
+% - Foundational theory for split conformal
+% - R package: conformalInference
+@article{lei2018conformal,
+  title={Distribution-Free Predictive Inference for Regression},
+  author={Lei, Jing and G'Sell, Max and Rinaldo, Alessandro and Tibshirani, Ryan J. and Wasserman, Larry},
+  journal={Journal of the American Statistical Association},
+  volume={113},
+  number={523},
+  pages={1094--1111},
+  year={2018},
+  publisher={Taylor \& Francis},
+  doi={10.1080/01621459.2017.1307116}
+}
+
+% Paper 3: Conformalized Quantile Regression (NeurIPS 2019)
+% - Adaptive intervals for heteroscedastic data (KEY FOR NFL)
+% - GitHub: https://github.com/yromano/cqr
+@inproceedings{romano2019cqr,
+  title={Conformalized Quantile Regression},
+  author={Romano, Yaniv and Patterson, Evan and Cand{\`e}s, Emmanuel J.},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={32},
+  year={2019},
+  url={https://arxiv.org/abs/1905.03222}
+}
+
+% Paper 4: Non-Exchangeable Data (Annals of Statistics - Top Journal)
+% - Distribution shift handling (KEY FOR NFL ROSTER CHANGES)
+% - Weighted conformal prediction
+@article{barber2023conformal,
+  title={Conformal Prediction Beyond Exchangeability},
+  author={Barber, Rina Foygel and Cand{\`e}s, Emmanuel J. and Ramdas, Aaditya and Tibshirani, Ryan J.},
+  journal={The Annals of Statistics},
+  volume={51},
+  number={2},
+  pages={816--845},
+  year={2023},
+  publisher={Institute of Mathematical Statistics},
+  doi={10.1214/23-AOS2276},
+  url={https://arxiv.org/abs/2202.13415}
+}
+
+% ============================================================================
+% BONUS: Online Conformal (JMLR 2024) - For Phase 2
+% - Arbitrary distribution shifts with adaptive step-size
+% - More advanced than needed initially
+@article{gibbs2024online,
+  title={Conformal Inference for Online Prediction with Arbitrary Distribution Shifts},
+  author={Gibbs, Isaac and Cand{\`e}s, Emmanuel J.},
+  journal={Journal of Machine Learning Research},
+  volume={25},
+  number={162},
+  pages={1--36},
+  year={2024},
+  url={http://www.jmlr.org/papers/v25/22-1218.html}
+}
+
+% ============================================================================
+% RELATED FOUNDATIONAL WORK (Already in your references.bib?)
+% ============================================================================
+
+% Original NeurIPS 2021 paper on adaptive conformal
+@inproceedings{gibbs2021adaptive,
+  title={Adaptive Conformal Inference Under Distribution Shift},
+  author={Gibbs, Isaac and Cand{\`e}s, Emmanuel J.},
+  booktitle={Advances in Neural Information Processing Systems},
+  volume={34},
+  year={2021},
+  url={https://arxiv.org/abs/2106.00170}
+}
+
+% Jackknife+ method (Annals of Statistics 2021)
+@article{barber2021jackknife,
+  title={Predictive Inference with the Jackknife+},
+  author={Barber, Rina Foygel and Cand{\`e}s, Emmanuel J. and Ramdas, Aaditya and Tibshirani, Ryan J.},
+  journal={The Annals of Statistics},
+  volume={49},
+  number={1},
+  pages={486--507},
+  year={2021},
+  publisher={Institute of Mathematical Statistics},
+  doi={10.1214/20-AOS1965}
+}
+
+% ============================================================================
+% IMPLEMENTATION PRIORITY
+% ============================================================================
+%
+% Week 1: Paper 1 (Angelopoulos) - Tutorial + basic split conformal
+% Week 2: Paper 3 (Romano) - CQR for adaptive intervals
+% Week 3: Paper 4 (Barber) - Weighted conformal for distribution shift
+% Week 4: Paper 2 (Lei) - Deep dive on theory
+%
+% SKIP initially: Paper 5 (Gibbs 2024) - too advanced for Phase 1
+% ============================================================================

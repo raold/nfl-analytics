@@ -94,6 +94,15 @@ D: 2015--2024 dissertation & 47.8 & 58.2 & 86.5\% & 0.744 \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{../figures/out/training_window_ablation.pdf}
+  \caption{Training window ablation study results comparing four scenarios on the 2025 hold-out set. Scenario B (2018--2024 with H=4 exponential decay on 2015--2017) achieves the best MAE (47.77 yards) and is statistically superior to both strict 2018--2024 ($p=0.003$) and current 2020--2024 ($p=0.007$) windows. Error bars represent 95\% bootstrap confidence intervals.}
+  \label{fig:training-window-ablation}
+\end{figure}
+
+Figure~\ref{fig:training-window-ablation} visualizes the performance differences across training window scenarios. Scenario B's combination of recent data emphasis with exponentially-weighted historical context provides optimal balance between recency bias and empirical Bayes benefits.
+
 \paragraph{Key Findings.}
 \begin{itemize}
     \item \textbf{Best MAE:} Scenario B (2018--2024 + H=4 decay) achieves 47.77 yards

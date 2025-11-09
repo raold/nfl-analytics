@@ -1,0 +1,241 @@
+\section{Online Learning and Concept Drift}
+\label{sec:online-learning}
+
+\subsection{Motivation}
+
+Traditional machine learning models assume a \textit{stationary} data distribution: the joint probability $P(X, Y)$ remains constant over time. However, in sports betting markets, this assumption is systematically violated due to:
+
+\begin{enumerate}
+    \item \textbf{Rule changes}: NFL modifies rules annually (e.g., 2018 helmet hit rule, 2023 kickoff changes), directly altering player behavior and game dynamics.
+    \item \textbf{Injury events}: High-impact injuries (e.g., starting quarterback) create distributional shifts in team performance.
+    \item \textbf{Coaching changes}: Mid-season coaching transitions alter offensive/defensive strategies.
+    \item \textbf{Market efficiency}: Sportsbooks continuously refine pricing models, reducing edge for static predictors.
+\end{enumerate}
+
+These phenomena constitute \textbf{concept drift} \citep{gama2014survey}: changes in the underlying data-generating process that degrade model performance over time. Static models trained once on historical data (e.g., 2018--2024) cannot adapt to these shifts without full retraining---a computationally expensive and delayed response.
+
+\textbf{Online learning} addresses this challenge through \textit{incremental updates}: the model continuously learns from new observations, adapting to distributional changes in real-time \citep{bifet2018machine}. This section introduces our online learning framework, integrating:
+
+\begin{itemize}
+    \item \textbf{Prequential evaluation}: Test-then-train protocol for realistic performance assessment
+    \item \textbf{Drift detection}: Automated identification of distributional shifts (ADWIN, KSWIN, Page-Hinkley)
+    \item \textbf{Adaptive retraining}: Hybrid strategy combining online updates with triggered batch retraining
+\end{itemize}
+
+\subsection{Concept Drift Taxonomy}
+
+We adopt the taxonomy of \citet{gama2014survey} to classify drift patterns in NFL data:
+
+\begin{definition}[Concept Drift]
+Let $X_t \in \mathcal{X}$ denote features and $Y_t \in \mathcal{Y}$ the target at time $t$. A \textbf{concept drift} occurs when the joint distribution changes: $P_t(X, Y) \neq P_{t'}(X, Y)$ for $t \neq t'$.
+\end{definition}
+
+\noindent \textbf{Types of Drift:}
+
+\begin{enumerate}
+    \item \textbf{Sudden (Abrupt) Drift}: Instantaneous change at time $\tau$:
+    \[
+    P_t(X, Y) = \begin{cases}
+        P_1(X, Y) & t < \tau \\
+        P_2(X, Y) & t \geq \tau
+    \end{cases}
+    \]
+    \textit{Example}: COVID-19 pandemic (September 2020) eliminated stadium attendance, creating abrupt shift in home-field advantage.
+
+    \item \textbf{Gradual Drift}: Smooth transition over interval $[\tau_1, \tau_2]$:
+    \[
+    P_t(X, Y) = \alpha(t) P_1(X, Y) + (1 - \alpha(t)) P_2(X, Y), \quad t \in [\tau_1, \tau_2]
+    \]
+    where $\alpha(t)$ decreases from 1 to 0.
+    \textit{Example}: Offensive strategy evolution over multiple seasons (e.g., RPO adoption 2015--2019).
+
+    \item \textbf{Incremental Drift}: Continuous small changes:
+    \[
+    P_{t+1}(X, Y) = P_t(X, Y) + \epsilon_t, \quad \|\epsilon_t\| \text{ small}
+    \]
+    \textit{Example}: Gradual improvement in defensive schemes adapting to modern passing offenses.
+
+    \item \textbf{Recurring Concepts}: Periodic return to previous distributions.
+    \textit{Example}: Seasonal effects (weather, playoff intensity) that recur annually.
+\end{enumerate}
+
+\subsection{Prequential Evaluation}
+
+The gold standard for evaluating online learning is \textbf{prequential evaluation} \citep{dawid1984present}: a test-then-train protocol that mirrors real-world deployment:
+
+\begin{algorithm}[H]
+\caption{Prequential Evaluation Protocol}
+\label{alg:prequential}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Stream of examples $(x_1, y_1), (x_2, y_2), \ldots, (x_T, y_T)$
+\State \textbf{Initialize:} Online model $f_0$, metric $M = \emptyset$
+\For{$t = 1, 2, \ldots, T$}
+    \State \textbf{Test}: Predict $\hat{y}_t = f_{t-1}(x_t)$
+    \State \textbf{Evaluate}: Compute error $e_t = \text{loss}(y_t, \hat{y}_t)$
+    \State \textbf{Train}: Update model $f_t \gets \text{PartialFit}(f_{t-1}, x_t, y_t)$
+    \State $M \gets M \cup \{e_t\}$
+\EndFor
+\State \textbf{Return:} Performance metrics over $M$
+\end{algorithmic}
+\end{algorithm}
+
+\noindent \textbf{Key Properties:}
+\begin{itemize}
+    \item \textbf{No data leakage}: Test examples never used for training before prediction.
+    \item \textbf{Realistic deployment}: Simulates sequential arrival of game outcomes.
+    \item \textbf{Temporal ordering}: Respects chronological game sequence (critical for sports betting).
+\end{itemize}
+
+\subsection{Drift Detection Algorithms}
+
+We implement an \textit{ensemble} of three complementary drift detectors, requiring $\geq 2$ detectors to agree before triggering retraining (reduces false positives).
+
+\subsubsection{ADWIN (Adaptive Windowing)}
+
+ADWIN \citep{bifet2007learning} maintains a sliding window of recent prediction errors, automatically adjusting window size when drift is detected.
+
+\begin{algorithm}[H]
+\caption{ADWIN Drift Detection}
+\label{alg:adwin}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Error stream $e_1, e_2, \ldots$, confidence $\delta$
+\State \textbf{Initialize:} Window $W = \emptyset$
+\For{each new error $e_t$}
+    \State Add $e_t$ to window $W$
+    \For{all splits $W = W_0 \cup W_1$}
+        \If{$|\mu(W_0) - \mu(W_1)| > \epsilon_{\text{cut}}$}
+            \State \textbf{Drift detected}: Drop old subwindow $W_0$
+            \State \textbf{Break}
+        \EndIf
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+where $\epsilon_{\text{cut}} = \sqrt{\frac{1}{2m} \ln \frac{4}{\delta}}$ with $m = \text{harmonic mean of } |W_0|, |W_1|$.
+
+\textbf{Strengths}: Provable false positive rate, adaptive window size. \\
+\textbf{Weaknesses}: Sensitive to variance (may fire on noise).
+
+\subsubsection{KSWIN (Kolmogorov-Smirnov Windowing)}
+
+KSWIN \citep{raab2020reactive} uses the Kolmogorov-Smirnov test to detect distribution changes between recent and reference windows.
+
+\begin{algorithm}[H]
+\caption{KSWIN Drift Detection}
+\label{alg:kswin}
+\begin{algorithmic}[1]
+\State \textbf{Input:} Error stream, window size $w$, significance $\alpha$
+\State \textbf{Maintain:} Reference window $R$ (size $w$), sliding window $S$ (size $w$)
+\For{each new error $e_t$}
+    \State Add $e_t$ to $S$, remove oldest from $S$
+    \State Compute KS statistic: $D = \sup_x |F_R(x) - F_S(x)|$
+    \State Compute $p$-value from KS distribution
+    \If{$p < \alpha$}
+        \State \textbf{Drift detected}: Update $R \gets S$
+    \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\textbf{Strengths}: Detects distribution shape changes (not just mean). \\
+\textbf{Weaknesses}: Requires larger window size ($w \geq 100$).
+
+\subsubsection{Page-Hinkley Test}
+
+The Page-Hinkley (PH) test \citep{page1954continuous} detects changes in sequential data using cumulative sums.
+
+\begin{align}
+m_t &= \sum_{i=1}^t (e_i - \bar{e}_t - \delta) \\
+M_t &= \max_{1 \leq s \leq t} m_s
+\end{align}
+
+Drift is detected when $M_t - m_t > \lambda$ (threshold).
+
+\textbf{Strengths}: Fast detection of mean shifts, low computational cost. \\
+\textbf{Weaknesses}: Requires manual threshold tuning.
+
+\subsection{Online Learning Algorithms}
+
+We evaluate three online learning algorithms from the \texttt{river} library \citep{montiel2021river}:
+
+\subsubsection{Adaptive Random Forest (ARF)}
+
+ARtextbf{F} \citep{gomes2017adaptive} extends random forests to data streams:
+
+\begin{itemize}
+    \item \textbf{Base learner}: Hoeffding trees (incremental decision trees)
+    \item \textbf{Drift handling}: ADWIN on each tree's error; replace tree if drift detected
+    \item \textbf{Ensemble}: Bagging with online bootstrap sampling
+\end{itemize}
+
+\noindent \textbf{Advantages}: State-of-the-art accuracy, automatic drift adaptation. \\
+\textbf{Disadvantages}: Higher memory footprint (maintains $n$ trees).
+
+\subsubsection{Adaptive Model Rules (AMRules)}
+
+AMRules \citep{duarte2016adaptive} learns interpretable rule sets:
+
+\begin{itemize}
+    \item \textbf{Rule induction}: Expands/prunes rules based on observed data
+    \item \textbf{Prediction}: Weighted average of matching rules
+    \item \textbf{Drift handling}: Removes stale rules, induces new rules
+\end{itemize}
+
+\noindent \textbf{Advantages}: Interpretable (rule-based), fast updates. \\
+\textbf{Disadvantages}: Lower accuracy than ARF on complex patterns.
+
+\subsubsection{Adaptive Forest Trees (AFT)}
+
+AFT combines multiple adaptive decision trees with online bagging. Similar to ARF but optimized for regression tasks.
+
+\subsection{Hybrid Ensemble Architecture}
+
+Our production system combines batch models (State-Space, Hierarchical, BNN, XGBoost) with online models:
+
+\begin{equation}
+\hat{y}_t = w_{\text{batch}}(t) \cdot \hat{y}_{\text{batch}} + w_{\text{online}}(t) \cdot \hat{y}_{\text{online}}
+\end{equation}
+
+where weights decay batch contribution as online model accumulates samples:
+
+\begin{equation}
+w_{\text{batch}}(t) = \max\left(0.5, 1 - \frac{n_{\text{online}}}{500}\right)
+\end{equation}
+
+This strategy:
+\begin{itemize}
+    \item \textbf{Warm-start}: Leverages batch model accuracy initially
+    \item \textbf{Gradual transition}: Shifts to online model as it learns
+    \item \textbf{Robustness}: Batch model provides baseline during drift recovery
+\end{itemize}
+
+\subsection{Adaptive Retraining Strategy}
+
+Full batch model retraining is triggered when \textit{any} of three conditions occur:
+
+\begin{enumerate}
+    \item \textbf{Periodic}: Every 8 weeks (half-season)
+    \item \textbf{Performance}: MAE degrades $>15\%$ from baseline
+    \item \textbf{Drift}: $\geq 3$ drift events detected within 4-week window
+\end{enumerate}
+
+This hybrid strategy balances:
+\begin{itemize}
+    \item \textbf{Responsiveness}: Online updates adapt immediately to new data
+    \item \textbf{Stability}: Batch retraining prevents catastrophic forgetting
+    \item \textbf{Efficiency}: Avoids unnecessary retraining (costly for Bayesian models)
+\end{itemize}
+
+\subsection{Summary}
+
+Online learning enables our betting system to adapt to concept drift in real-time, addressing fundamental limitations of static models. Key innovations:
+
+\begin{itemize}
+    \item \textbf{Multi-detector ensemble}: ADWIN + KSWIN + Page-Hinkley (reduces false positives)
+    \item \textbf{Prequential evaluation}: Realistic performance assessment without data leakage
+    \item \textbf{Hybrid architecture}: Combines batch model stability with online adaptability
+    \item \textbf{Adaptive retraining}: Intelligent triggers balance responsiveness and efficiency
+\end{itemize}
+
+Chapter \ref{ch:results} validates these methods on the 2024 NFL season, demonstrating $<5$ game recovery from known drift events and $90\%+$ drift detection accuracy.

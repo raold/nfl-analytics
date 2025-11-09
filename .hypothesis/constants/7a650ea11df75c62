@@ -1,0 +1,4 @@
+# file: /Users/dro/rice/nfl-analytics/scripts/sync_model_registry.py
+# hypothesis_version: 6.147.0
+
+[1024, 5544, '--check', '--export-md', '--populate-all', '--scan', '.', '...', '.DS_Store', '.csv', '.git', '.json', '.pkl', '.pt', '.pth', '.rds', '=', 'COMPARISON RESULTS', 'Check sync status', 'README.md', 'Scan filesystem only', '_', '__main__', '__pycache__', '_v', 'bnn', 'bnn_', 'conditional_vae', 'cql_', 'cvae', 'database', 'db_count', 'description', 'devdb01', 'dro', 'file_extension', 'file_size_mb', 'fs_count', 'gradient_boosting', 'hierarchical', 'host', 'in_both', 'informative_priors', 'is_production', 'kalman_filter', 'localhost', 'logs', 'model_family', 'model_name', 'model_path', 'model_type', 'models', 'modified_at', 'only_in_db', 'only_in_fs', 'passing_yards', 'password', 'port', 'receiving', 'rl', 'sicillionbillions', 'state_space', 'store_true', 'unknown', 'user', 'v', 'v1.0', 'version', 'w', 'xgb', 'xgboost']

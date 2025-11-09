@@ -27,7 +27,7 @@ def extract_conditions_from_database():
         'port': 5544,
         'database': 'devdb01',
         'user': 'dro',
-        'password': 'sicillionbillions'
+        'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
     }
 
     conn = psycopg2.connect(**db_config)

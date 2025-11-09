@@ -55,7 +55,7 @@ class CausalInferenceExperimentSuite:
         self.db_params = {
             'dbname': 'nfl_data',
             'user': 'nfl_user',
-            'password': 'sicillionbillions',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
             'host': 'localhost',
             'port': 5544
         }

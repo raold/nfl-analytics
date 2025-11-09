@@ -8,6 +8,23 @@ This file is automatically loaded by pytest and provides:
 - Environment setup
 """
 
+import sys
+from pathlib import Path
+
+# Ensure project root is first in sys.path so local py/ package imports work
+# This prevents conflicts with pytest's legacy 'py' package dependency
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+# Remove pytest's 'py' package from sys.modules to allow our local 'py' package
+# to be imported. Store it temporarily so pytest can still use it if needed.
+_pytest_py = sys.modules.get('py')
+if _pytest_py is not None:
+    # Save pytest's py module under a different name
+    sys.modules['_pytest_py_original'] = _pytest_py
+    # Remove the 'py' module so our local package takes precedence
+    del sys.modules['py']
+
 import os
 import datetime as dt
 from typing import Generator

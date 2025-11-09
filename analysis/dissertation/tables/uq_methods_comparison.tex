@@ -1,0 +1,100 @@
+% !TEX root = ../main/main.tex
+% uq_methods_comparison.tex
+% Comprehensive comparison of 6 UQ methods across 6 dimensions
+% Created: November 9, 2025
+
+\begin{table}[p]
+  \centering
+  \caption[Uncertainty quantification methods comparison]{Uncertainty quantification methods: comprehensive comparison across six dimensions. Methods are ranked by computational cost (MCMC slowest, evidential fastest) and evaluated on coverage guarantees, assumptions, interpretability, and suitability for temporal drift.}
+  \label{tab:uq-comparison}
+  \begin{threeparttable}
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabularx}{\linewidth}{@{} l X X X X X @{}}
+    \toprule
+    \textbf{Method} & \textbf{Coverage Guarantee} & \textbf{Assumptions} & \textbf{Computation} & \textbf{Interpretability} & \textbf{Temporal Drift} \\
+    \midrule
+
+    \textbf{Bayesian MCMC}
+    & Exact posterior (asymptotic); credible intervals calibrated if model correct
+    & Parametric likelihood + prior; stationarity
+    & $\mathcal{O}(IT \cdot n^3)$\tnote{a} per chain; 10--60s
+    & High: priors, shrinkage, parameter interpretability
+    & Poor: requires full retraining on drift; no online updates \\
+
+    \midrule
+
+    \textbf{MC Dropout}
+    & Approximate Bayesian (variational); empirical calibration via sampling
+    & Dropout $\approx$ Gaussian process prior; i.i.d.\ data
+    & $\mathcal{O}(T \cdot \text{forward})$; 50--100 samples; 200--500ms
+    & Low: black-box NN; dropout rate tuning unclear
+    & Fair: incremental updates via SGD; prone to catastrophic forgetting \\
+
+    \midrule
+
+    \textbf{Conformal (CQR)}
+    & Finite-sample coverage $\ge 1-\alpha$ (distribution-free)
+    & Exchangeability (or weighted for covariate shift)
+    & $\mathcal{O}(m \log m)$\tnote{b} calibration; <1ms per prediction
+    & Medium: post-hoc correction; base model agnostic
+    & Excellent: weighted conformal adapts to drift via time decay \\
+
+    \midrule
+
+    \textbf{Bayesian Stacking}
+    & Ensemble coverage; empirical validation on LOO-CV
+    & M-open (no model is "true"); proper scoring rule
+    & $\mathcal{O}(K \cdot \text{model})$ + QP for weights\tnote{c}; 2--10s
+    & Medium: interpretable weights; model-specific priors
+    & Good: weight recomputation on new data; no full refit \\
+
+    \midrule
+
+    \textbf{Online Learning}
+    & Asymptotic (PAC-style bounds); empirical coverage monitored
+    & Incremental updates; drift detection (ADWIN)
+    & $\mathcal{O}(1)$ per sample; $\mathcal{O}(w)$ drift detection\tnote{d}; <10ms
+    & Medium: EWMA weights, drift thresholds interpretable
+    & Excellent: designed for concept drift; adaptive windowing \\
+
+    \midrule
+
+    \textbf{Evidential}
+    & Heuristic (NIG/Dirichlet prior); empirical calibration
+    & Parametric higher-order distribution (NIG for regression)
+    & $\mathcal{O}(1)$ forward pass; 5--10ms
+    & Low: evidence parameters abstract; epistemic/aleatoric decomposition
+    & Fair: single-pass efficiency; requires periodic recalibration \\
+
+    \bottomrule
+  \end{tabularx}
+
+  \begin{tablenotes}[flushleft]
+    \footnotesize
+    \item[a] $I$ iterations, $T$ MCMC samples, $n$ data points; matrix inversions dominate for hierarchical models.
+    \item[b] $m$ calibration samples; sorting residuals for quantile computation.
+    \item[c] $K$ models in ensemble; quadratic programming (QP) for stacking weights via PSIS-LOO.
+    \item[d] $w$ window size for drift detection (e.g., ADWIN maintains $O(w)$ statistics).
+    \item \textbf{Notes:}
+      \begin{itemize}[leftmargin=*, itemsep=1pt, parsep=0pt]
+        \item \emph{Coverage Guarantee}: Formal properties (finite-sample, asymptotic, heuristic).
+        \item \emph{Assumptions}: Data requirements (i.i.d., parametric, exchangeability).
+        \item \emph{Computation}: Time complexity and typical wall-clock time (NFL dataset, 5,000+ games).
+        \item \emph{Interpretability}: Transparency of uncertainty sources and tuning parameters.
+        \item \emph{Temporal Drift}: Suitability for non-stationary data (roster changes, rule evolution).
+      \end{itemize}
+    \item \textbf{Empirical Results} (Chapters~\ref{chap:baseline}--\ref{chap:results}, 2022--2024 test seasons):
+      \begin{itemize}[leftmargin=*, itemsep=1pt, parsep=0pt]
+        \item \textbf{Bayesian MCMC}: 91.2\% coverage (target 90\%), 18$\times$ slowest; gold standard for pre-game.
+        \item \textbf{MC Dropout}: 90.1\% coverage, 410ms; abandoned for multi-output tasks (Appendix~\ref{app:bnn-investigation}).
+        \item \textbf{Conformal CQR}: 89.2\% coverage, <1ms overhead; works with any base model.
+        \item \textbf{Bayesian Stacking}: 89.5\% coverage, 2$\times$ MCMC speed; best ensemble method.
+        \item \textbf{Online Learning}: 88.7\% coverage on late-season games (vs.\ 84.5\% static models); 4.2\% Brier improvement.
+        \item \textbf{Evidential}: 87.3\% coverage, 8ms; 51$\times$ faster than MC Dropout; acceptable for live betting.
+      \end{itemize}
+    \item \textbf{Recommendation}: Use MCMC for pre-game analysis (interpretability, gold-standard coverage); conformal for model-agnostic calibration; stacking for ensemble diversity; online learning for weekly updates; evidential for real-time inference (<10ms latency constraint).
+  \end{tablenotes}
+  \end{threeparttable}
+\end{table}

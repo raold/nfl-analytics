@@ -77,7 +77,7 @@ class PinnacleSimulator:
                 'port': 5544,
                 'database': 'devdb01',
                 'user': 'dro',
-                'password': 'sicillionbillions'
+                'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
             }
         self.db_config = db_config
 

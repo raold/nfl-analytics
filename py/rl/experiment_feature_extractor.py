@@ -159,7 +159,7 @@ class ExperimentFeatureExtractor:
         self.db_params = db_params or {
             'dbname': 'devdb01',
             'user': 'dro',
-            'password': 'sicillionbillions',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
             'host': 'localhost',
             'port': 5544
         }
