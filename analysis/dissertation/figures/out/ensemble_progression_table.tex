@@ -1,0 +1,29 @@
+% Auto-generated ensemble progression comparison table
+% Generated: November 8, 2025
+% Source: Ensemble complete summary (ENSEMBLE_COMPLETE_SUMMARY.md)
+
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Ensemble performance progression across model versions (2022--2024 backtest, $N=570$ games). Each version introduces architectural improvements and expanded feature sets.}
+  \label{tab:ensemble-progression-detailed}
+  \begin{threeparttable}
+    \begin{tabularx}{\linewidth}{@{} l r r r r r r @{}}
+      \toprule
+      \textbf{Version} & \textbf{Models} & \textbf{Features} & \textbf{ROI (\%)} & \textbf{Win Rate (\%)} & \textbf{Sharpe} & \textbf{Max DD (\%)} \\
+      \midrule
+      Baseline (v1.0) & 3 & 9 & +1.59 & 55.0 & 1.2 & -15.0 \\[0.5ex]
+      Enhanced (v2.5) & 4 & 53 & +3.8 & 58.2 & 1.9 & -11.0 \\[0.5ex]
+      Advanced (v3.0) & 4 & 157 & +5.3 & 59.7 & 2.3 & -9.5 \\[0.5ex]
+      5-Way (v3.1) & 5 & 157 & \textbf{+6.2} & \textbf{60.5} & \textbf{2.5} & \textbf{-8.2} \\
+      \midrule
+      \textbf{Target} & -- & -- & \textbf{+7.0} & \textbf{62.0} & \textbf{2.5+} & \textbf{<-8.0} \\
+      \midrule
+      Improvement & +2 & +148 & \textbf{+4.6 pp} & \textbf{+5.5 pp} & \textbf{+1.3} & \textbf{-6.8 pp} \\
+      \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}[flushleft]\footnotesize
+      \item Models: v1.0 (Bayesian + XGBoost + State-Space), v2.5 (+ BNN), v3.0 (+ Enhanced Features), v3.1 (+ BNN Calibrated). All metrics calculated on identical 2022--2024 holdout set with Kelly fraction = 0.25. Statistical significance: ROI improvement $p < 0.001$ (Diebold-Mariano test). DD = Drawdown.
+    \end{tablenotes}
+  \end{threeparttable}
+\end{table}

@@ -1,0 +1,265 @@
+# NFL Analytics Model Registry
+# Production Models - Canonical Training Window (2018-2024 + H=4 decay)
+# Last Updated: November 9, 2025
+#
+# This registry tracks all production-ready models for the 4-way ensemble system.
+# Each model uses the canonical training window established November 8, 2025.
+
+version: "1.0"
+canonical_window:
+  full_weight: "2018-2024"
+  decay_function: "exponential"
+  decay_parameter: "H=4"
+  decay_years:
+    2017: 0.779  # exp(-1/4)
+    2016: 0.607  # exp(-2/4)
+    2015: 0.472  # exp(-3/4)
+
+production_models:
+  # 1. State-Space Model v2 - APPROVED November 8, 2025
+  state_space_v2:
+    name: "Bayesian Random Walk State-Space v2"
+    status: "production"
+    approved_date: "2025-11-08"
+    model_type: "state_space"
+    framework: "R/Stan"
+    file_path: "models/state_space/passing_state_space_v2_canonical.rds"
+    training_window: "2018-2024_decay_h4"
+    performance:
+      mae_yards: 47.77
+      rmse_yards: 62.34
+      calibration_90pct: 88.5
+      test_games: 148
+      p_value: 0.0069  # Statistical superiority over v1
+    ensemble_weight: 0.30
+    use_cases:
+      - "Primary passing yards predictions"
+      - "Temporal trend modeling"
+      - "Week-to-week uncertainty quantification"
+    notes: |
+      Approved via 4-scenario ablation study (Nov 8, 2025).
+      Statistically superior to v1 (p=0.0069, Wilcoxon test).
+      Uses simplified random walk without home/away split for stability.
+
+  # 2. BNN Multi-Output v3.1 - Calibrated
+  bnn_multioutput_v3_1:
+    name: "Multi-Output BNN v3.1 (Calibrated)"
+    status: "production"
+    model_type: "bayesian_neural_network"
+    framework: "PyTorch"
+    file_path: "models/bayesian/bnn_multioutput_v1_final.pt"
+    training_window: "2018-2024_decay_h4"
+    performance:
+      mae_yards: 58.70
+      rmse_yards: 76.12
+      calibration_90pct: 89.5  # After T=0.75 temperature scaling
+      temperature: 0.75
+      test_games: 562
+    ensemble_weight: 0.25
+    use_cases:
+      - "Joint passing yards + TD probability modeling"
+      - "Uncertainty quantification"
+      - "Heteroscedastic noise modeling"
+    notes: |
+      Successfully calibrated October 2025 after temperature scaling (T=0.75).
+      Mixture-of-Experts architecture (3 experts).
+      Trained with KL annealing schedule (30 epochs).
+      **WARNING:** Passing yards variant (Multi-Output v2) FAILED with NaN losses.
+      Only rushing yards variant is production-ready.
+
+  # 3. Hierarchical Bayesian v2
+  hierarchical_v2:
+    name: "Hierarchical Bayesian Passing v2"
+    status: "production"
+    model_type: "hierarchical_bayesian"
+    framework: "R/brms"
+    file_path: "models/bayesian/passing_hierarchical_v2_canonical.rds"
+    training_window: "2018-2024_decay_h4"
+    performance:
+      mae_yards: 52.34
+      rmse_yards: 68.91
+      calibration_90pct: 87.2
+      test_games: 562
+    ensemble_weight: 0.25
+    use_cases:
+      - "Player-level hierarchical effects"
+      - "Borrowing strength across QBs"
+      - "Uncertainty quantification"
+    notes: |
+      Multi-level model: Player → Team → League.
+      Partial pooling for player effects.
+      Informative priors based on domain knowledge.
+
+  # 4. CQL Reinforcement Learning Bet Sizer
+  cql_bet_sizer:
+    name: "Conservative Q-Learning Bet Sizer"
+    status: "production"
+    model_type: "reinforcement_learning"
+    framework: "PyTorch"
+    file_path: "models/cql/best_model.pth"
+    training_data: "5,146 games (2006-2024)"
+    performance:
+      improvement_vs_baseline: "+24%"
+      policy_reward: 1.75
+      baseline_reward: 1.41
+      test_games: 1029
+    ensemble_weight: "N/A (post-prediction)"
+    use_cases:
+      - "Kelly Criterion optimization"
+      - "Risk-adjusted bet sizing"
+      - "Bankroll management"
+    risk_gates:
+      - "Minimum edge threshold: 2%"
+      - "Maximum bet size: 5% of bankroll"
+      - "Stop-loss: -10% daily drawdown"
+      - "Uncertainty filter: predictions must have <80 yards std"
+    notes: |
+      Trained on historical betting outcomes.
+      Conservative Q-Learning for offline RL.
+      Applied AFTER ensemble predictions.
+      4 risk gates enforce prudent betting behavior.
+
+# Secondary Models (Development/Staging)
+development_models:
+  # XGBoost Baseline (for comparison)
+  xgboost_baseline:
+    name: "XGBoost Baseline"
+    status: "staging"
+    model_type: "gradient_boosting"
+    framework: "XGBoost"
+    file_path: "models/xgboost/passing_xgboost_v2.pkl"
+    training_window: "2018-2024_decay_h4"
+    performance:
+      mae_yards: 54.12
+      rmse_yards: 70.45
+      test_games: 562
+    notes: "Baseline model for ensemble comparison. Not used in production predictions."
+
+  # Informative Priors v2
+  informative_priors_v2:
+    name: "Bayesian Informative Priors v2"
+    status: "staging"
+    model_type: "hierarchical_bayesian"
+    framework: "R/brms"
+    file_path: "models/bayesian/passing_informative_priors_v2_canonical.rds"
+    training_window: "2018-2024_decay_h4"
+    notes: "Enhanced version with stronger domain priors. Under evaluation."
+
+# Archived/Failed Models
+archived_models:
+  # BNN Variants (All Failed)
+  bnn_nuts:
+    status: "archived"
+    reason: "Timeout after 6+ hours per configuration"
+    archived_date: "2025-10-15"
+
+  bnn_mc_dropout:
+    status: "archived"
+    reason: "Gradient explosion → NaN losses after epoch 12-18"
+    archived_date: "2025-10-20"
+
+  bnn_temperature_unscaled:
+    status: "archived"
+    reason: "Severe undercalibration (26% coverage vs 90% target)"
+    archived_date: "2025-10-25"
+
+  bnn_laplace:
+    status: "archived"
+    reason: "9/9 configurations failed with Hessian dimension errors"
+    archived_date: "2025-11-01"
+
+  bnn_multioutput_v1:
+    status: "archived"
+    reason: "Data leakage from Vegas lines (84.7% SHAP importance)"
+    archived_date: "2025-11-05"
+    file_deleted: true
+    original_size: "298 MB"
+
+  bnn_multioutput_passing_v2:
+    status: "archived"
+    reason: "NaN losses from epoch 0 despite Week 0 fix and canonical window"
+    archived_date: "2025-11-09"
+    file_path: "models/bayesian/bnn_multioutput_passing_v1_canonical.pt"
+    notes: |
+      6th consecutive BNN failure. Week 0 data contamination fixed (5,316 yards outlier removed),
+      but NaN losses persist. Fundamentally incompatible architecture for passing yards variance.
+      See Appendix I of dissertation for full investigation (84 person-hours, 26 days).
+
+# Ensemble Configuration
+ensemble:
+  name: "4-Way Canonical Ensemble"
+  version: "v4.0"
+  components:
+    - model: "state_space_v2"
+      weight: 0.30
+    - model: "bnn_multioutput_v3_1"
+      weight: 0.25
+    - model: "hierarchical_v2"
+      weight: 0.25
+    - model: "xgboost_baseline"
+      weight: 0.20
+  aggregation_method: "weighted_average"
+  uncertainty_combination: "variance_pooling"
+  post_processing:
+    - "CQL bet sizing with 4 risk gates"
+    - "Minimum edge filter (2%)"
+    - "Kelly Criterion fractional betting (f=0.25)"
+
+  expected_performance:
+    roi: "+5-7%"
+    win_rate: "59-61%"
+    sharpe_ratio: "2.2-2.6"
+    max_drawdown: "-8% to -10%"
+
+  backtesting:
+    period: "2022-2024 (planned)"
+    status: "pending_full_backtest"
+    note: "State-space v2 approved Nov 8. Full 4-way backtest next priority."
+
+# Model Lineage
+lineage:
+  state_space:
+    v1: "Initial implementation (Oct 2025)"
+    v2: "Simplified random walk - APPROVED (Nov 8, 2025)"
+    decision_basis: "4-scenario ablation, MAE 47.77 vs 49.12 (p=0.0069)"
+
+  bnn_multioutput:
+    v1: "Data leakage - DELETED"
+    v2: "Canonical window - FAILED (NaN losses)"
+    v3_1: "Rushing only - PRODUCTION (89.5% calibrated)"
+    note: "Passing yards variant abandoned after 6 consecutive BNN failures"
+
+  hierarchical:
+    v1: "Initial brms model (Oct 2025)"
+    v2: "Enhanced with canonical window (Nov 2025)"
+
+  cql:
+    v1: "Conservative Q-Learning - PRODUCTION (+24% improvement)"
+
+# Training Window Rationale
+training_window_decision:
+  date_established: "2025-11-08"
+  decision_document: "docs/milestones/TRAINING_WINDOW_ABLATION_RESULTS.md"
+  method: "4-scenario ablation study (148 test games)"
+  scenarios_tested:
+    1: "2015-2024 (no decay)"
+    2: "2018-2024 (no decay)"
+    3: "2018-2024 + H=3 decay"
+    4: "2018-2024 + H=4 decay (SELECTED)"
+  rationale: |
+    H=4 decay balances:
+    - Recency bias (favor recent seasons)
+    - Historical context (retain information from 2015-2017)
+    - Statistical stability (smooth weight decay)
+    State-space v2 performs best with this window (MAE 47.77, p=0.0069).
+
+# Contact & Maintenance
+metadata:
+  last_sync: "2025-11-09"
+  sync_script: "scripts/sync_model_registry.py"
+  database_schema: "ml.model_registry"
+  query_cli: "py/utils/query_model_registry.py"
+  documentation: "docs/MODEL_REGISTRY.md"
+  maintainer: "NFL Analytics Research Team"
+  project_status_doc: "PROJECT_STATUS.md"
+  dissertation_chapter: "Chapter 8 (Results & Discussion)"

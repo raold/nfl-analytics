@@ -1,0 +1,254 @@
+# docker-compose.gpu.yml - GPU Training Environment
+# Purpose: Orchestrate GPU training container with proper resource allocation
+# Usage: docker-compose -f docker-compose.gpu.yml up -d
+
+version: '3.8'
+
+services:
+  # ====================================================================
+  # GPU TRAINING CONTAINER
+  # ====================================================================
+  gpu-trainer:
+    build:
+      context: .
+      dockerfile: containers/Dockerfile.gpu-trainer
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: nfl-analytics-gpu-trainer:latest
+    container_name: nfl-analytics-gpu-trainer
+
+    # GPU resource allocation
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1  # Reserve 1 GPU (RTX 4090)
+              capabilities: [gpu, compute, utility]
+
+    # Runtime configuration
+    runtime: nvidia
+
+    # Environment variables
+    environment:
+      # CUDA configuration
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+      # Database connection
+      - DATABASE_URL=postgresql://dro:sicillionbillions@pg-1:5432/devdb01
+      - DB_HOST=pg-1
+      - DB_PORT=5432
+      - DB_NAME=devdb01
+      - DB_USER=dro
+      - DB_PASSWORD=sicillionbillions
+
+      # Redis connection (for distributed compute sync)
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+      # Training configuration
+      - TRAINING_BATCH_SIZE=256
+      - TRAINING_WORKERS=4
+      - TRAINING_EPOCHS=500
+      - TRAINING_LEARNING_RATE=0.001
+
+      # Logging
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+
+      # PyTorch settings
+      - TORCH_HOME=/app/cache/torch
+      - OMP_NUM_THREADS=16
+      - MKL_NUM_THREADS=16
+
+      # XGBoost GPU settings
+      - XGBOOST_ENABLE_GPU=1
+
+    # Volume mounts
+    volumes:
+      # Training data (read-only)
+      - ./data:/app/data:ro
+
+      # Models output directory (read-write)
+      - ./models:/app/models:rw
+
+      # Training logs
+      - ./logs:/app/logs:rw
+
+      # Source code (for development/debugging)
+      - ./py:/app/py:ro
+      - ./R:/app/R:ro
+      - ./scripts:/app/scripts:ro
+
+      # Cache directories
+      - gpu_trainer_cache:/app/cache
+      - gpu_trainer_torch_cache:/root/.cache/torch
+
+      # Stan models cache
+      - gpu_trainer_cmdstan:/root/.cmdstan
+
+    # Network configuration
+    networks:
+      - nfl-analytics
+
+    # Dependencies
+    depends_on:
+      pg-1:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    # Resource limits (optional, for Docker without GPU allocation)
+    # Commented out because GPU allocation is handled by deploy.resources
+    # mem_limit: 32g
+    # cpus: '16'
+
+    # Security options
+    security_opt:
+      - seccomp:unconfined  # Required for some CUDA operations
+
+    # IPC mode for shared memory (improves PyTorch DataLoader performance)
+    ipc: host
+
+    # Keep container running
+    command: tail -f /dev/null
+
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "nvidia-smi && python -c 'import torch; assert torch.cuda.is_available()' || exit 1"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+
+    # Restart policy
+    restart: unless-stopped
+
+  # ====================================================================
+  # DATABASE (from main docker-compose.yml)
+  # ====================================================================
+  pg-1:
+    image: timescale/timescaledb:latest-pg16
+    container_name: nfl-analytics-pg-1
+    environment:
+      - POSTGRES_USER=dro
+      - POSTGRES_PASSWORD=sicillionbillions
+      - POSTGRES_DB=devdb01
+    ports:
+      - "5544:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dro -d devdb01"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - nfl-analytics
+
+  # ====================================================================
+  # REDIS (from main docker-compose.yml)
+  # ====================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: nfl-analytics-redis
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --maxmemory
+      - "2gb"
+      - --maxmemory-policy
+      - "allkeys-lru"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - nfl-analytics
+
+# ====================================================================
+# NETWORKS
+# ====================================================================
+networks:
+  nfl-analytics:
+    name: nfl-analytics
+    driver: bridge
+
+# ====================================================================
+# VOLUMES
+# ====================================================================
+volumes:
+  redis_data:
+    driver: local
+  gpu_trainer_cache:
+    driver: local
+  gpu_trainer_torch_cache:
+    driver: local
+  gpu_trainer_cmdstan:
+    driver: local
+
+# ====================================================================
+# USAGE INSTRUCTIONS
+# ====================================================================
+#
+# Prerequisites:
+#   1. NVIDIA GPU with compute capability 8.0+ (RTX 4090 = 8.9)
+#   2. NVIDIA Driver 525+ installed on host
+#   3. Docker with NVIDIA Container Toolkit:
+#      - Install: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+#      - Verify: docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
+#
+# Start GPU training environment:
+#   docker-compose -f docker-compose.gpu.yml up -d
+#
+# Check GPU training container status:
+#   docker-compose -f docker-compose.gpu.yml ps
+#   docker exec -it nfl-analytics-gpu-trainer nvidia-smi
+#
+# Run training job:
+#   # BNN Multi-Output
+#   docker exec -it nfl-analytics-gpu-trainer \
+#     python py/models/bnn_multioutput_pytorch.py \
+#     --device cuda --epochs 500 --batch-size 256
+#
+#   # XGBoost GPU
+#   docker exec -it nfl-analytics-gpu-trainer \
+#     python py/models/xgboost_gpu_v3.py \
+#     --device cuda --sweep
+#
+#   # Run full orchestration script
+#   docker exec -it nfl-analytics-gpu-trainer \
+#     bash scripts/docker_gpu_train.sh --phase 1
+#
+# Monitor training:
+#   # GPU utilization
+#   docker exec -it nfl-analytics-gpu-trainer watch nvidia-smi
+#
+#   # Training logs
+#   docker exec -it nfl-analytics-gpu-trainer tail -f /app/logs/training/bnn_multioutput.log
+#
+#   # Container logs
+#   docker-compose -f docker-compose.gpu.yml logs -f gpu-trainer
+#
+# Interactive shell:
+#   docker exec -it nfl-analytics-gpu-trainer bash
+#
+# Stop GPU training environment:
+#   docker-compose -f docker-compose.gpu.yml down
+#
+# Clean up volumes:
+#   docker-compose -f docker-compose.gpu.yml down -v
+#
+# Rebuild after changes:
+#   docker-compose -f docker-compose.gpu.yml build --no-cache gpu-trainer
+#   docker-compose -f docker-compose.gpu.yml up -d
+# ====================================================================

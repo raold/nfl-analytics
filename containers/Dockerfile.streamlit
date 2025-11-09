@@ -1,0 +1,61 @@
+# Dockerfile.streamlit - NFL Analytics Streamlit Dashboard
+# Purpose: Real-time betting dashboard with predictions and performance monitoring
+# Build: docker build -f containers/Dockerfile.streamlit -t nfl-analytics-dashboard .
+# Run: docker run -p 8501:8501 nfl-analytics-dashboard
+
+FROM python:3.12-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv package manager for fast dependency installation
+RUN pip install --no-cache-dir uv
+
+# Copy requirements files
+COPY requirements.txt .
+COPY pyproject.toml . 2>/dev/null || true
+
+# Install Python dependencies using uv
+# This is much faster than pip and handles dependency resolution better
+RUN uv pip install --system --no-cache \
+    -r requirements.txt \
+    streamlit>=1.28.0 \
+    plotly>=5.18.0 \
+    altair>=5.1.0 \
+    pandas>=2.0.0 \
+    numpy>=2.0.0
+
+# Copy application code
+COPY . .
+
+# Create non-root user for security
+RUN useradd -m -u 1000 streamlit && chown -R streamlit:streamlit /app
+USER streamlit
+
+# Streamlit configuration
+# Disable analytics and telemetry
+ENV STREAMLIT_LOGGER_LEVEL=warning
+ENV STREAMLIT_CLIENT_LOGGER_LEVEL=warning
+ENV STREAMLIT_LOGGER_MESSAGE_FORMAT=false
+ENV PYTHONUNBUFFERED=1
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import streamlit" || exit 1
+
+# Expose Streamlit port
+EXPOSE 8501
+
+# Run Streamlit app
+# The app should be in dashboard/ or scripts/ directory
+CMD ["streamlit", "run", "dashboard/app.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0", \
+     "--server.headless=true", \
+     "--logger.level=warning"]

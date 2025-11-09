@@ -55,10 +55,14 @@ class BayesianNeuralNetwork:
         hidden_dims: tuple[int] = (64, 32),
         inference_method: str = "advi",  # "advi" or "nuts"
         n_samples: int = 2000,
+        prior_scale: float = 1.0,  # Prior scale for weights/biases
+        heteroscedastic: bool = True,  # Use input-dependent uncertainty
     ):
         self.hidden_dims = hidden_dims
         self.inference_method = inference_method
         self.n_samples = n_samples
+        self.prior_scale = prior_scale
+        self.heteroscedastic = heteroscedastic
         self.scaler = StandardScaler()
         self.model = None
         self.trace = None
@@ -66,7 +70,8 @@ class BayesianNeuralNetwork:
 
         logger.info(
             f"Initialized BNN: hidden={hidden_dims}, "
-            f"inference={inference_method}, samples={n_samples}"
+            f"inference={inference_method}, samples={n_samples}, prior_scale={prior_scale}, "
+            f"heteroscedastic={heteroscedastic}"
         )
 
     def _build_network(self, X: np.ndarray, y: np.ndarray) -> pm.Model:
@@ -90,31 +95,46 @@ class BayesianNeuralNetwork:
             y_data = pm.Data("y", y)
 
             # Layer 1: Input → Hidden1
-            w1_sd = pm.HalfNormal("w1_sd", sigma=1.0)
+            w1_sd = pm.HalfNormal("w1_sd", sigma=self.prior_scale)
             w1 = pm.Normal("w1", mu=0, sigma=w1_sd, shape=(n_features, self.hidden_dims[0]))
-            b1 = pm.Normal("b1", mu=0, sigma=1, shape=self.hidden_dims[0])
+            b1 = pm.Normal("b1", mu=0, sigma=self.prior_scale, shape=self.hidden_dims[0])
 
             h1 = pm.math.maximum(X_data @ w1 + b1, 0)  # ReLU activation
 
             # Layer 2: Hidden1 → Hidden2
-            w2_sd = pm.HalfNormal("w2_sd", sigma=1.0)
+            w2_sd = pm.HalfNormal("w2_sd", sigma=self.prior_scale)
             w2 = pm.Normal(
                 "w2", mu=0, sigma=w2_sd, shape=(self.hidden_dims[0], self.hidden_dims[1])
             )
-            b2 = pm.Normal("b2", mu=0, sigma=1, shape=self.hidden_dims[1])
+            b2 = pm.Normal("b2", mu=0, sigma=self.prior_scale, shape=self.hidden_dims[1])
 
             h2 = pm.math.maximum(h1 @ w2 + b2, 0)  # ReLU activation
 
-            # Output layer: Hidden2 → Output
-            w_out_sd = pm.HalfNormal("w_out_sd", sigma=1.0)
-            w_out = pm.Normal("w_out", mu=0, sigma=w_out_sd, shape=(self.hidden_dims[1], 1))
-            b_out = pm.Normal("b_out", mu=0, sigma=1)
+            # Output layer: Hidden2 → Mean (1 output)
+            w_out_mu_sd = pm.HalfNormal("w_out_mu_sd", sigma=self.prior_scale)
+            w_out_mu = pm.Normal("w_out_mu", mu=0, sigma=w_out_mu_sd, shape=(self.hidden_dims[1], 1))
+            b_out_mu = pm.Normal("b_out_mu", mu=0, sigma=self.prior_scale)
 
-            y_pred_mu = pm.Deterministic("y_pred", (h2 @ w_out + b_out).flatten())
+            y_pred_mu = pm.Deterministic("y_pred", (h2 @ w_out_mu + b_out_mu).flatten())
 
-            # Likelihood with learned noise
-            sigma = pm.HalfNormal("sigma", sigma=1.0)
-            pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
+            if self.heteroscedastic:
+                # Heteroscedastic: Input-dependent uncertainty
+                # Output layer: Hidden2 → Log-Std
+                # Use SMALLER prior scale for sigma head to prevent explosion
+                w_out_sigma_sd = pm.HalfNormal("w_out_sigma_sd", sigma=self.prior_scale * 0.1)
+                w_out_sigma = pm.Normal("w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(self.hidden_dims[1], 1))
+                b_out_sigma = pm.Normal("b_out_sigma", mu=-2.0, sigma=self.prior_scale * 0.5)  # Prior mean at log(0.135)
+
+                # Learn log(sigma) to ensure sigma > 0, with clipping to prevent explosion
+                log_sigma_pred = pm.math.clip((h2 @ w_out_sigma + b_out_sigma).flatten(), -5.0, 3.0)
+                sigma_pred = pm.Deterministic("sigma_pred", pm.math.exp(log_sigma_pred) + 1e-6)
+
+                # Likelihood with input-dependent noise
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
+            else:
+                # Homoscedastic: Single scalar noise parameter
+                sigma = pm.HalfNormal("sigma", sigma=self.prior_scale)
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
 
         return model
 
@@ -164,8 +184,12 @@ class BayesianNeuralNetwork:
 
                 logger.info(f"✓ NUTS complete: {self.n_samples} posterior samples")
 
-                # Diagnostics
-                summary = az.summary(self.trace, var_names=["w1_sd", "w2_sd", "sigma"])
+                # Diagnostics (conditional on architecture)
+                if self.heteroscedastic:
+                    diag_vars = ["w1_sd", "w2_sd", "w_out_sigma_sd"]
+                else:
+                    diag_vars = ["w1_sd", "w2_sd", "sigma"]
+                summary = az.summary(self.trace, var_names=diag_vars)
                 logger.info(f"\nDiagnostics:\n{summary}")
 
             else:
@@ -232,6 +256,8 @@ class BayesianNeuralNetwork:
             "scaler": self.scaler,
             "hidden_dims": self.hidden_dims,
             "inference_method": self.inference_method,
+            "heteroscedastic": self.heteroscedastic,
+            "prior_scale": self.prior_scale,
         }
 
         joblib.dump(save_dict, path)
@@ -242,13 +268,68 @@ class BayesianNeuralNetwork:
         """Load fitted BNN"""
         save_dict = joblib.load(path)
 
+        # Handle legacy models without heteroscedastic parameter
+        heteroscedastic = save_dict.get("heteroscedastic", True)
+        prior_scale = save_dict.get("prior_scale", 1.0)
+
         bnn = cls(
-            hidden_dims=save_dict["hidden_dims"], inference_method=save_dict["inference_method"]
+            hidden_dims=save_dict["hidden_dims"],
+            inference_method=save_dict["inference_method"],
+            heteroscedastic=heteroscedastic,
+            prior_scale=prior_scale
         )
 
         bnn.trace = save_dict["trace"]
         bnn.scaler = save_dict["scaler"]
         bnn.is_fitted = True
+
+        # Recreate the model (needed for predictions with context manager)
+        # Get input dimension from scaler
+        n_features = bnn.scaler.n_features_in_
+
+        # Recreate model architecture (MUST match _build_network exactly!)
+        with pm.Model() as model:
+            # Data containers (PyMC 5.x uses pm.Data, mutable by default)
+            X_data = pm.Data("X", np.zeros((1, n_features)))
+            y_data = pm.Data("y", np.zeros(1))
+
+            # Layer 1: Input → Hidden1 (hierarchical priors + ReLU)
+            w1_sd = pm.HalfNormal("w1_sd", sigma=1.0)
+            w1 = pm.Normal("w1", mu=0, sigma=w1_sd, shape=(n_features, bnn.hidden_dims[0]))
+            b1 = pm.Normal("b1", mu=0, sigma=1, shape=bnn.hidden_dims[0])
+            h1 = pm.math.maximum(X_data @ w1 + b1, 0)  # ReLU activation
+
+            # Layer 2: Hidden1 → Hidden2 (hierarchical priors + ReLU)
+            w2_sd = pm.HalfNormal("w2_sd", sigma=1.0)
+            w2 = pm.Normal("w2", mu=0, sigma=w2_sd, shape=(bnn.hidden_dims[0], bnn.hidden_dims[1]))
+            b2 = pm.Normal("b2", mu=0, sigma=1, shape=bnn.hidden_dims[1])
+            h2 = pm.math.maximum(h1 @ w2 + b2, 0)  # ReLU activation
+
+            # Output layer: Hidden2 → Mean
+            w_out_mu_sd = pm.HalfNormal("w_out_mu_sd", sigma=1.0)
+            w_out_mu = pm.Normal("w_out_mu", mu=0, sigma=w_out_mu_sd, shape=(bnn.hidden_dims[1], 1))
+            b_out_mu = pm.Normal("b_out_mu", mu=0, sigma=1)
+            y_pred_mu = pm.Deterministic("y_pred", (h2 @ w_out_mu + b_out_mu).flatten())
+
+            if heteroscedastic:
+                # Heteroscedastic: Input-dependent uncertainty
+                # Output layer: Hidden2 → Log-Std
+                w_out_sigma_sd = pm.HalfNormal("w_out_sigma_sd", sigma=1.0)
+                w_out_sigma = pm.Normal("w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(bnn.hidden_dims[1], 1))
+                b_out_sigma = pm.Normal("b_out_sigma", mu=0, sigma=1)
+
+                # Learn log(sigma) to ensure sigma > 0, with floor to prevent collapse
+                log_sigma_pred = (h2 @ w_out_sigma + b_out_sigma).flatten()
+                sigma_pred = pm.Deterministic("sigma_pred", pm.math.exp(log_sigma_pred) + 1e-6)
+
+                # Likelihood with input-dependent noise
+                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
+            else:
+                # Homoscedastic: Single scalar noise parameter
+                sigma = pm.HalfNormal("sigma", sigma=1.0)
+                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
+
+        bnn.model = model
 
         logger.info(f"✓ BNN loaded from {path}")
         return bnn

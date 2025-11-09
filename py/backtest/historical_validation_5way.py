@@ -69,13 +69,13 @@ class HistoricalValidator:
         # Initialize ensemble
         from py.models.player_props_ensemble import PlayerPropsEnsemble
 
-        logger.info("Initializing 4-way ensemble (state-space disabled due to units bug)...")
+        logger.info("Initializing 5-way ensemble (state-space ENABLED with log→yards fix)...")
         self.ensemble = PlayerPropsEnsemble(
             use_bayesian=True,
             use_xgboost=True,
             use_bnn=True,
             use_bnn_calibrated=True,  # 4th model
-            use_state_space=False,  # DISABLED: Returns log-scale (5-7) not yards (200-300)
+            use_state_space=True,  # ENABLED (Nov 8, 2025): Fixed log→yards transformation
             use_qb_wr_chemistry=False,  # Only for receiving
             use_cql_sizer=use_cql,
             min_edge=min_edge,

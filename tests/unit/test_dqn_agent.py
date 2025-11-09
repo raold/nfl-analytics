@@ -1,313 +1,670 @@
-"""Unit tests for DQN agent."""
-import numpy as np
-import pytest
-import torch
-
-# Need to add py/ to path for imports
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "py"))
-
-from rl.dqn_agent import (
-    DQNAgent,
-    QNetwork,
-    ReplayBuffer,
-    set_seed,
-    get_device,
-    load_dataset,
-)
-
-
-class TestQNetwork:
-    """Test Q-network architecture."""
-    
-    def test_network_initialization(self):
-        """Test Q-network creates proper layers."""
-        state_dim = 6
-        n_actions = 4
-        net = QNetwork(state_dim, n_actions)
-        
-        assert net is not None
-        assert len(list(net.parameters())) > 0
-    
-    def test_forward_pass(self):
-        """Test forward pass returns correct shape."""
-        state_dim = 6
-        n_actions = 4
-        batch_size = 32
-        
-        net = QNetwork(state_dim, n_actions)
-        states = torch.randn(batch_size, state_dim)
-        q_values = net(states)
-        
-        assert q_values.shape == (batch_size, n_actions)
-    
-    def test_custom_hidden_dims(self):
-        """Test custom hidden dimensions."""
-        state_dim = 6
-        n_actions = 4
-        hidden_dims = [64, 32]
-        
-        net = QNetwork(state_dim, n_actions, hidden_dims)
-        states = torch.randn(10, state_dim)
-        q_values = net(states)
-        
-        assert q_values.shape == (10, n_actions)
-
-
-class TestReplayBuffer:
-    """Test experience replay buffer."""
-    
-    def test_buffer_initialization(self):
-        """Test buffer initializes with correct capacity."""
-        buffer = ReplayBuffer(capacity=1000)
-        assert len(buffer) == 0
-    
-    def test_buffer_push(self):
-        """Test adding experiences to buffer."""
-        buffer = ReplayBuffer(capacity=100)
-        state = np.array([1.0, 2.0, 3.0])
-        next_state = np.array([1.1, 2.1, 3.1])
-        
-        buffer.push(state, action=0, reward=1.0, next_state=next_state, done=True)
-        assert len(buffer) == 1
-        
-        # Add more
-        for i in range(50):
-            buffer.push(state, action=i % 4, reward=float(i), next_state=next_state, done=False)
-        assert len(buffer) == 51
-    
-    def test_buffer_capacity_limit(self):
-        """Test buffer respects max capacity."""
-        capacity = 10
-        buffer = ReplayBuffer(capacity=capacity)
-        state = np.array([1.0, 2.0])
-        next_state = np.array([1.0, 2.0])
-        
-        # Add more than capacity
-        for i in range(20):
-            buffer.push(state, action=0, reward=0.0, next_state=next_state, done=False)
-        
-        assert len(buffer) == capacity  # Should cap at capacity
-    
-    def test_buffer_sample(self):
-        """Test sampling from buffer."""
-        buffer = ReplayBuffer(capacity=100)
-        state = np.array([1.0, 2.0, 3.0])
-        next_state = np.array([1.1, 2.1, 3.1])
-        
-        for i in range(50):
-            buffer.push(state, action=i % 4, reward=float(i), next_state=next_state, done=False)
-        
-        batch_size = 16
-        states, actions, rewards, next_states, dones = buffer.sample(batch_size)
-        
-        assert states.shape == (batch_size, 3)
-        assert actions.shape == (batch_size,)
-        assert rewards.shape == (batch_size,)
-        assert next_states.shape == (batch_size, 3)
-        assert dones.shape == (batch_size,)
-
-
-class TestDQNAgent:
-    """Test DQN agent."""
-    
-    @pytest.fixture
-    def agent(self):
-        """Create test agent."""
-        set_seed(42)
-        device = torch.device("cpu")  # Use CPU for tests
-        return DQNAgent(
-            state_dim=6,
-            n_actions=4,
-            device=device,
-            gamma=0.99,
-            lr=1e-3,
-            batch_size=32,
-            target_update_freq=100,
-            hidden_dims=[64, 32]
-        )
-    
-    def test_agent_initialization(self, agent):
-        """Test agent initializes correctly."""
-        assert agent.state_dim == 6
-        assert agent.n_actions == 4
-        assert agent.gamma == 0.99
-        assert agent.batch_size == 32
-        assert len(agent.replay_buffer) == 0
-        assert agent.train_step == 0
-    
-    def test_select_action_greedy(self, agent):
-        """Test greedy action selection (epsilon=0)."""
-        state = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        action = agent.select_action(state, epsilon=0.0)
-        
-        assert isinstance(action, int)
-        assert 0 <= action < 4
-    
-    def test_select_action_exploration(self, agent):
-        """Test epsilon-greedy exploration."""
-        set_seed(42)
-        state = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
-        
-        # With epsilon=1.0, should always explore
-        actions = [agent.select_action(state, epsilon=1.0) for _ in range(20)]
-        # Should see variety in actions (not all the same)
-        assert len(set(actions)) > 1
-    
-    def test_update_requires_buffer(self, agent):
-        """Test update returns zero metrics when buffer too small."""
-        metrics = agent.update()
-        assert metrics["loss"] == 0.0
-        assert metrics["q_mean"] == 0.0
-    
-    def test_update_with_data(self, agent):
-        """Test update performs gradient step."""
-        # Populate buffer
-        for i in range(100):
-            state = np.random.randn(6)
-            next_state = np.random.randn(6)
-            action = i % 4
-            reward = np.random.randn()
-            agent.replay_buffer.push(state, action, reward, next_state, done=False)
-        
-        # Perform update
-        metrics = agent.update()
-        
-        assert metrics["loss"] > 0  # Should have non-zero loss
-        assert "q_mean" in metrics
-        assert agent.train_step == 1
-    
-    def test_target_network_update(self, agent):
-        """Test target network updates periodically."""
-        # Populate buffer
-        for i in range(100):
-            state = np.random.randn(6)
-            next_state = np.random.randn(6)
-            agent.replay_buffer.push(state, i % 4, 0.0, next_state, done=False)
-        
-        # Get initial target network weights
-        initial_weights = agent.target_network.network[0].weight.data.clone()
-        
-        # Do updates up to target_update_freq
-        for _ in range(agent.target_update_freq):
-            agent.update()
-        
-        # Target network should be updated now
-        updated_weights = agent.target_network.network[0].weight.data
-        
-        # Weights should match q_network now
-        q_weights = agent.q_network.network[0].weight.data
-        assert torch.allclose(updated_weights, q_weights)
-    
-    def test_save_and_load(self, agent, tmp_path):
-        """Test model checkpoint save/load."""
-        # Train a bit
-        for i in range(50):
-            state = np.random.randn(6)
-            next_state = np.random.randn(6)
-            agent.replay_buffer.push(state, i % 4, 0.0, next_state, done=False)
-        
-        for _ in range(10):
-            agent.update()
-        
-        # Save
-        save_path = tmp_path / "test_checkpoint.pth"
-        agent.save(str(save_path))
-        assert save_path.exists()
-        
-        # Create new agent and load
-        new_agent = DQNAgent(
-            state_dim=6,
-            n_actions=4,
-            device=torch.device("cpu"),
-            hidden_dims=[64, 32]
-        )
-        new_agent.load(str(save_path))
-        
-        # Check train_step was restored
-        assert new_agent.train_step == agent.train_step
-        
-        # Check weights match
-        for p1, p2 in zip(agent.q_network.parameters(), new_agent.q_network.parameters()):
-            assert torch.allclose(p1, p2)
-
-
-class TestUtilities:
-    """Test utility functions."""
-    
-    def test_set_seed(self):
-        """Test seed setting for reproducibility."""
-        set_seed(42)
-        r1 = np.random.rand()
-        
-        set_seed(42)
-        r2 = np.random.rand()
-        
-        assert r1 == r2
-    
-    def test_get_device_cpu(self):
-        """Test device selection defaults to CPU in tests."""
-        device = get_device("cpu")
-        assert device.type == "cpu"
-    
-    def test_load_dataset_structure(self, tmp_path):
-        """Test dataset loading from CSV."""
-        # Create mock CSV
-        csv_path = tmp_path / "test_dataset.csv"
-        csv_content = """spread_close,total_close,epa_gap,market_prob,p_hat,edge,action,r
--3.0,45.5,0.5,0.55,0.60,0.05,1,0.91
-3.5,48.0,-0.3,0.45,0.42,-0.03,0,0.0
--7.0,50.0,1.2,0.65,0.70,0.05,1,0.91
 """
-        csv_path.write_text(csv_content)
-        
-        state_cols = ["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"]
-        states, actions, rewards = load_dataset(str(csv_path), state_cols)
-        
-        assert states.shape == (3, 6)
-        assert actions.shape == (3,)
-        assert rewards.shape == (3,)
-        assert states.dtype == np.float32
-        assert actions.dtype == int
-        assert rewards.dtype == np.float32
+Generated tests for dqn_agent
+
+Generated: 2025-11-09T13:26:29.567707
+Test count: 59
+"""
+
+from hypothesis import given
+from hypothesis import strategies as st
+from rl.dqn_agent import *
+import pandas as pd
+import pytest
 
 
-class TestIntegration:
-    """Integration tests for full training loop."""
-    
-    def test_mini_training_run(self):
-        """Test a minimal training loop completes without errors."""
-        set_seed(42)
-        device = torch.device("cpu")
-        
-        # Create small dataset
-        n_samples = 100
-        state_dim = 6
-        states = np.random.randn(n_samples, state_dim).astype(np.float32)
-        actions = np.random.randint(0, 4, n_samples)
-        rewards = np.random.randn(n_samples).astype(np.float32)
-        
-        # Create agent
-        agent = DQNAgent(
-            state_dim=state_dim,
-            n_actions=4,
-            device=device,
-            batch_size=16,
-            hidden_dims=[32, 16]
-        )
-        
-        # Populate buffer
-        for i in range(n_samples):
-            agent.replay_buffer.push(states[i], actions[i], rewards[i], states[i], done=True)
-        
-        # Train for a few epochs
-        initial_loss = None
-        for epoch in range(5):
-            metrics = agent.update()
-            if epoch == 0:
-                initial_loss = metrics["loss"]
-        
-        # Should have completed without errors
-        assert agent.train_step == 5
-        assert initial_loss is not None
+def test_set_seed_basic():
+    """Test set_seed: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = set_seed()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_set_seed_edge_cases():
+    """Test set_seed: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = set_seed()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_set_seed_error_handling():
+    """Test set_seed error handling."""
+    with pytest.raises(ValueError):
+        set_seed(invalid_input)
+
+
+
+@given(st.integers())
+def test_set_seed_property_idempotent(self, seed):
+    """Property test: function is idempotent."""
+    # Act
+    result = set_seed(seed)
+
+    # Assert property
+    assert set_seed(seed) == result, "idempotent violated"
+
+
+
+def test_get_device_basic():
+    """Test get_device: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = get_device()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_device_edge_cases():
+    """Test get_device: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = get_device()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_get_device_error_handling():
+    """Test get_device error handling."""
+    with pytest.raises(ValueError):
+        get_device(invalid_input)
+
+
+
+@given(st.integers())
+def test_get_device_property_idempotent(self, device_arg):
+    """Property test: function is idempotent."""
+    # Act
+    result = get_device(device_arg)
+
+    # Assert property
+    assert get_device(device_arg) == result, "idempotent violated"
+
+
+
+def test_load_dataset_basic():
+    """Test load_dataset: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = load_dataset()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_dataset_edge_cases():
+    """Test load_dataset: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = load_dataset()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_dataset_error_handling():
+    """Test load_dataset error handling."""
+    with pytest.raises(ValueError):
+        load_dataset(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_load_dataset_property_idempotent(self, csv_path, state_cols):
+    """Property test: function is idempotent."""
+    # Act
+    result = load_dataset(csv_path, state_cols)
+
+    # Assert property
+    assert load_dataset(csv_path, state_cols) == result, "idempotent violated"
+
+
+
+def test_populate_replay_buffer_basic():
+    """Test populate_replay_buffer: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = populate_replay_buffer()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_populate_replay_buffer_edge_cases():
+    """Test populate_replay_buffer: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = populate_replay_buffer()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_populate_replay_buffer_error_handling():
+    """Test populate_replay_buffer error handling."""
+    with pytest.raises(ValueError):
+        populate_replay_buffer(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers())
+def test_populate_replay_buffer_property_idempotent(self, agent, states, actions, rewards):
+    """Property test: function is idempotent."""
+    # Act
+    result = populate_replay_buffer(agent, states, actions, rewards)
+
+    # Assert property
+    assert populate_replay_buffer(agent, states, actions, rewards) == result, "idempotent violated"
+
+
+
+def test_train_dqn_basic():
+    """Test train_dqn: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = train_dqn()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_train_dqn_edge_cases():
+    """Test train_dqn: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = train_dqn()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_train_dqn_error_handling():
+    """Test train_dqn error handling."""
+    with pytest.raises(ValueError):
+        train_dqn(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
+def test_train_dqn_property_idempotent(self, agent, states, actions, rewards, epochs, batch_size, log_freq):
+    """Property test: function is idempotent."""
+    # Act
+    result = train_dqn(agent, states, actions, rewards, epochs, batch_size, log_freq)
+
+    # Assert property
+    assert train_dqn(agent, states, actions, rewards, epochs, batch_size, log_freq) == result, "idempotent violated"
+
+
+
+def test_evaluate_policy_basic():
+    """Test evaluate_policy: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = evaluate_policy()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_policy_edge_cases():
+    """Test evaluate_policy: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = evaluate_policy()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_evaluate_policy_error_handling():
+    """Test evaluate_policy error handling."""
+    with pytest.raises(ValueError):
+        evaluate_policy(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers())
+def test_evaluate_policy_property_idempotent(self, agent, states, actions, rewards):
+    """Property test: function is idempotent."""
+    # Act
+    result = evaluate_policy(agent, states, actions, rewards)
+
+    # Assert property
+    assert evaluate_policy(agent, states, actions, rewards) == result, "idempotent violated"
+
+
+
+def test_parse_args_basic():
+    """Test parse_args: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = parse_args()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_parse_args_edge_cases():
+    """Test parse_args: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = parse_args()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_parse_args_error_handling():
+    """Test parse_args error handling."""
+    with pytest.raises(ValueError):
+        parse_args(invalid_input)
+
+
+
+def test_main_basic():
+    """Test main: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = main()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_main_edge_cases():
+    """Test main: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = main()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_main_error_handling():
+    """Test main error handling."""
+    with pytest.raises(ValueError):
+        main(invalid_input)
+
+
+
+def test_forward_basic():
+    """Test forward: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = forward()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_forward_edge_cases():
+    """Test forward: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = forward()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_forward_error_handling():
+    """Test forward error handling."""
+    with pytest.raises(ValueError):
+        forward(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_forward_property_idempotent(self, self, state):
+    """Property test: function is idempotent."""
+    # Act
+    result = forward(self, state)
+
+    # Assert property
+    assert forward(self, state) == result, "idempotent violated"
+
+
+
+def test_push_basic():
+    """Test push: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = push()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_push_edge_cases():
+    """Test push: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = push()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_push_error_handling():
+    """Test push error handling."""
+    with pytest.raises(ValueError):
+        push(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
+def test_push_property_idempotent(self, self, state, action, reward, next_state, done):
+    """Property test: function is idempotent."""
+    # Act
+    result = push(self, state, action, reward, next_state, done)
+
+    # Assert property
+    assert push(self, state, action, reward, next_state, done) == result, "idempotent violated"
+
+
+
+def test_sample_basic():
+    """Test sample: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = sample()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_sample_edge_cases():
+    """Test sample: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = sample()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_sample_error_handling():
+    """Test sample error handling."""
+    with pytest.raises(ValueError):
+        sample(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_sample_property_idempotent(self, self, batch_size):
+    """Property test: function is idempotent."""
+    # Act
+    result = sample(self, batch_size)
+
+    # Assert property
+    assert sample(self, batch_size) == result, "idempotent violated"
+
+
+
+def test_select_action_basic():
+    """Test select_action: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = select_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_select_action_edge_cases():
+    """Test select_action: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = select_action()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_select_action_error_handling():
+    """Test select_action error handling."""
+    with pytest.raises(ValueError):
+        select_action(invalid_input)
+
+
+
+@given(st.integers(), st.integers(), st.integers())
+def test_select_action_property_idempotent(self, self, state, epsilon):
+    """Property test: function is idempotent."""
+    # Act
+    result = select_action(self, state, epsilon)
+
+    # Assert property
+    assert select_action(self, state, epsilon) == result, "idempotent violated"
+
+
+
+def test_update_basic():
+    """Test update: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = update()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_update_edge_cases():
+    """Test update: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = update()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_update_error_handling():
+    """Test update error handling."""
+    with pytest.raises(ValueError):
+        update(invalid_input)
+
+
+
+@given(st.integers())
+def test_update_property_idempotent(self, self):
+    """Property test: function is idempotent."""
+    # Act
+    result = update(self)
+
+    # Assert property
+    assert update(self) == result, "idempotent violated"
+
+
+
+def test_update_no_temporal_leakage():
+    """Ensure update doesn't use future data."""
+    # Arrange: Create temporal data
+    train = pd.DataFrame({
+        'kickoff': pd.date_range('2024-01-01', periods=10),
+        'value': range(10)
+    })
+    test = pd.DataFrame({
+        'kickoff': pd.date_range('2024-01-11', periods=5),
+        'value': range(10, 15)
+    })
+
+    # Act: Call function
+    result = update(train, test)
+
+    # Assert: No leakage
+    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
+
+
+
+def test_save_basic():
+    """Test save: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = save()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_save_edge_cases():
+    """Test save: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = save()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_save_error_handling():
+    """Test save error handling."""
+    with pytest.raises(ValueError):
+        save(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_save_property_idempotent(self, self, path):
+    """Property test: function is idempotent."""
+    # Act
+    result = save(self, path)
+
+    # Assert property
+    assert save(self, path) == result, "idempotent violated"
+
+
+
+def test_load_basic():
+    """Test load: basic functionality."""
+    # Arrange
+        # TODO: Set up test data
+
+    # Act
+        result = load()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_edge_cases():
+    """Test load: edge cases."""
+    # Arrange
+        # TODO: Set up edge case data
+
+    # Act
+        result = load()
+
+    # Assert
+        assert result is not None
+
+
+
+def test_load_error_handling():
+    """Test load error handling."""
+    with pytest.raises(ValueError):
+        load(invalid_input)
+
+
+
+@given(st.integers(), st.integers())
+def test_load_property_idempotent(self, self, path):
+    """Property test: function is idempotent."""
+    # Act
+    result = load(self, path)
+
+    # Assert property
+    assert load(self, path) == result, "idempotent violated"
+

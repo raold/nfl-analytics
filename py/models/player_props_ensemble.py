@@ -380,16 +380,26 @@ class PlayerPropsEnsemble:
             self.use_qb_wr_chemistry = False
 
     def _load_state_space_data(self):
-        """Load state-space player trajectories (v2 with proper Kalman filter)."""
+        """Load state-space player trajectories (v2 with proper Kalman filter).
+
+        BUG FIX (Nov 8, 2025): Filter out week=0 records which contain season totals
+        that contaminate the Kalman filter. Week=0 has cumulative season stats (e.g.,
+        4633 yards) instead of per-game stats, causing inflated dynamic_skill values.
+
+        See: STATE_SPACE_FAILURE_POSTMORTEM_NOV8.md
+        """
         # Try v2 first (proper Kalman filter), fall back to v1
         ss_path_v2 = self.models_dir / "bayesian" / "player_skill_trajectories_v2.csv"
         ss_path_v1 = self.models_dir / "bayesian" / "player_skill_trajectories_v1.csv"
 
         if ss_path_v2.exists():
-            self.state_space_data = pd.read_csv(ss_path_v2)
-            logger.info(f"  ✓ Loaded State-Space v2: {len(self.state_space_data)} trajectories")
+            df = pd.read_csv(ss_path_v2)
+            # CRITICAL: Remove week=0 (season totals) before Kalman filtering
+            self.state_space_data = df[df['week'] > 0].copy()
+            logger.info(f"  ✓ Loaded State-Space v2: {len(self.state_space_data)} trajectories (week>0 filtered)")
         elif ss_path_v1.exists():
-            self.state_space_data = pd.read_csv(ss_path_v1)
+            df = pd.read_csv(ss_path_v1)
+            self.state_space_data = df[df['week'] > 0].copy() if 'week' in df.columns else df
             logger.info(f"  ✓ Loaded State-Space v1: {len(self.state_space_data)} trajectories")
         else:
             logger.warning(f"  ✗ State-space data not found: {ss_path_v2}")
@@ -410,6 +420,9 @@ class PlayerPropsEnsemble:
         - See: BNN_CALIBRATION_COMPLETE.md
         - See: docs/milestones/BACKTEST_FAILURE_ANALYSIS_NOV7.md
 
+        FIXED (Nov 8, 2025): Added zero-check to prevent division by zero for players
+        with insufficient data (e.g., T.McSorley, M.Willis).
+
         Args:
             mean: Raw model prediction mean
             std: Raw model prediction standard deviation
@@ -418,6 +431,15 @@ class PlayerPropsEnsemble:
         Returns:
             (mean, calibrated_std): Mean unchanged, std scaled by temperature
         """
+        # DEFENSIVE CHECK: Handle zero/near-zero std (insufficient data for player)
+        MIN_STD_THRESHOLD = 1e-6  # Numerical stability threshold
+        if std < MIN_STD_THRESHOLD:
+            logger.warning(
+                f"Temperature scaling ({model_name}): std={std:.2e} < {MIN_STD_THRESHOLD:.0e} "
+                f"(insufficient data) → returning default std=50.0"
+            )
+            return mean, 50.0  # Default high uncertainty for players with no variance
+
         # Temperature values AGGRESSIVELY RECALIBRATED (Nov 7, 2025)
         # Based on diagnostic showing 18.61% coverage (need 85-95%)
         # Requires ~4-5x wider intervals → much lower T values
@@ -427,25 +449,20 @@ class PlayerPropsEnsemble:
             "xgboost": 0.40,       # Was 0.80, now 2.5x widening (std*2.5)
             "bnn": 0.35,           # Was 0.75, now 2.86x widening (similar to Bayesian)
             "bnn_calibrated": 0.50, # Was 1.0, now 2x widening (even "calibrated" model needs help)
-            "state_space": 0.85    # Slight widening for state-space (std*1.18)
+            "state_space": 1.0     # Nov 8: Reset to 1.0 (NO scaling) after log→yards fix
         }
 
         temperature = temperature_map.get(model_name, 1.0)
 
         if temperature != 1.0:
             calibrated_std = std / temperature  # Divide by T < 1 widens interval
-            if std > 0:
-                pct_change = (calibrated_std/std - 1)*100
-                logger.debug(
-                    f"Temperature scaling ({model_name}): T={temperature:.2f}, "
-                    f"raw_std={std:.2f} → calibrated_std={calibrated_std:.2f} "
-                    f"({pct_change:+.1f}% change)"
-                )
-            else:
-                logger.debug(
-                    f"Temperature scaling ({model_name}): T={temperature:.2f}, "
-                    f"raw_std={std:.2f} → calibrated_std={calibrated_std:.2f}"
-                )
+            # FIXED: Safe percentage calculation (std already checked > MIN_STD_THRESHOLD)
+            pct_change = (calibrated_std/std - 1)*100  # Safe because std > MIN_STD_THRESHOLD
+            logger.debug(
+                f"Temperature scaling ({model_name}): T={temperature:.2f}, "
+                f"raw_std={std:.2f} → calibrated_std={calibrated_std:.2f} "
+                f"({pct_change:+.1f}% change)"
+            )
         else:
             calibrated_std = std
             logger.debug(f"Temperature scaling ({model_name}): skipped (T=1.0)")
@@ -526,7 +543,16 @@ class PlayerPropsEnsemble:
 
             if row:
                 mean, std = float(row[0]), float(row[1])
-                # Apply temperature scaling for calibration
+
+                # DEFENSIVE CHECK: Validate std before temperature scaling
+                if np.isnan(std) or np.isinf(std) or std < 0:
+                    logger.warning(
+                        f"Bayesian invalid std: {player_id} {prop_type} "
+                        f"std={std} (invalid) → skipping Bayesian model"
+                    )
+                    return None, None
+
+                # Apply temperature scaling for calibration (handles zero std internally)
                 mean, std = self._apply_temperature_scaling(mean, std, "bayesian")
                 logger.debug(f"Bayesian prediction for {player_id}: "
                            f"{mean:.1f} ± {std:.1f} (model: {row[2]})")
@@ -587,7 +613,15 @@ class PlayerPropsEnsemble:
             # Assume 15% coefficient of variation (typical for player props)
             std_estimate = pred * 0.15
 
-            # Apply temperature scaling for calibration
+            # DEFENSIVE CHECK: Validate prediction before temperature scaling
+            if np.isnan(pred) or np.isinf(pred) or pred < 0:
+                logger.warning(
+                    f"XGBoost invalid prediction: {player_id} pred={pred} "
+                    f"(invalid) → skipping XGBoost model"
+                )
+                return None, None
+
+            # Apply temperature scaling for calibration (handles zero std internally)
             mean, std = self._apply_temperature_scaling(float(pred), float(std_estimate), "xgboost")
 
             logger.debug(f"XGBoost prediction for {player_id}: {mean:.1f} ± {std:.1f}")
@@ -667,7 +701,22 @@ class PlayerPropsEnsemble:
                     mean = yards_pred[0].item()
                     std = mean * 0.12  # Default uncertainty
 
-            # Apply temperature scaling for calibration
+            # DEFENSIVE CHECK: Validate prediction before temperature scaling
+            if np.isnan(mean) or np.isinf(mean) or mean < 0:
+                logger.warning(
+                    f"BNN invalid prediction: {player_id} mean={mean} "
+                    f"(invalid) → skipping BNN model"
+                )
+                return None, None
+
+            if np.isnan(std) or np.isinf(std) or std < 0:
+                logger.warning(
+                    f"BNN invalid std: {player_id} std={std} "
+                    f"(invalid) → skipping BNN model"
+                )
+                return None, None
+
+            # Apply temperature scaling for calibration (handles zero std internally)
             mean, std = self._apply_temperature_scaling(float(mean), float(std), "bnn")
 
             logger.debug(f"BNN prediction for {player_id}: {mean:.1f} ± {std:.1f}")
@@ -720,6 +769,21 @@ class PlayerPropsEnsemble:
             # Call the calibrated model's predict method
             mean, std = self.bnn_calibrated.predict(feature_array)
 
+            # DEFENSIVE CHECK: Validate prediction before returning
+            if np.isnan(mean) or np.isinf(mean) or mean < 0:
+                logger.warning(
+                    f"BNN Calibrated invalid prediction: {player_id} mean={mean} "
+                    f"(invalid) → skipping BNN Calibrated model"
+                )
+                return None, None
+
+            if np.isnan(std) or np.isinf(std) or std < 0:
+                logger.warning(
+                    f"BNN Calibrated invalid std: {player_id} std={std} "
+                    f"(invalid) → skipping BNN Calibrated model"
+                )
+                return None, None
+
             logger.debug(f"BNN Calibrated prediction for {player_id}: {mean:.1f} ± {std:.1f}")
             return float(mean), float(std)
 
@@ -742,6 +806,9 @@ class PlayerPropsEnsemble:
         FIXED (Nov 7, 2025): Previously queried database for season=2025 (doesn't exist),
         now uses CSV file with seasons 2020-2023. Falls back to most recent season if
         exact match not found.
+
+        FIXED (Nov 8, 2025): Added defensive checks for zero/NaN std to prevent division
+        by zero errors for players with insufficient data.
 
         See: docs/milestones/BACKTEST_FAILURE_ANALYSIS_NOV7.md (Bug 2)
 
@@ -769,8 +836,30 @@ class PlayerPropsEnsemble:
 
             if len(result) > 0:
                 row = result.iloc[0]
-                mean = float(row['dynamic_skill'])
-                std = float(row['skill_sd'])
+                log_mean = float(row['dynamic_skill'])
+                log_std = float(row['skill_sd'])
+
+                # BUG FIX (Nov 8, 2025): Correct transformation for log(yards+1) → yards
+                # R script uses: log_yards = log(yards + 1)  (line 98 in state_space_player_skills_v2.R)
+                # Inverse transformation: yards = exp(log_yards) - 1
+                #
+                # INCORRECT (previous attempt): mean = np.exp(log_mean + 0.5*log_std^2)
+                # CORRECT: mean = exp(log_mean) - 1 (direct inverse of log(yards+1))
+                #
+                # See: STATE_SPACE_FAILURE_POSTMORTEM_NOV8.md
+                mean = np.exp(log_mean) - 1  # Inverse of log(yards + 1)
+
+                # Standard deviation via delta method: d/dx[exp(x)-1] = exp(x)
+                std = np.exp(log_mean) * log_std  # Delta method: std_yards ≈ exp(log_mean) × std_log
+
+                # DEFENSIVE CHECK: Validate mean and std after transformation
+                if np.isnan(mean) or np.isnan(std) or np.isinf(mean) or np.isinf(std) or std <= 0 or mean < 0:
+                    logger.warning(
+                        f"State-space invalid after transformation: {player_id} S{season}W{week} "
+                        f"log_mean={log_mean:.2f} log_std={log_std:.2f} → mean={mean:.1f} std={std:.1f} "
+                        f"(invalid) → skipping state-space model"
+                    )
+                    return None, None
 
                 # Apply temperature scaling for calibration
                 mean, std = self._apply_temperature_scaling(mean, std, "state_space")
@@ -788,10 +877,23 @@ class PlayerPropsEnsemble:
 
             if len(player_data) > 0:
                 row = player_data.iloc[0]
-                mean = float(row['dynamic_skill'])
-                std = float(row['skill_sd'])
+                log_mean = float(row['dynamic_skill'])
+                log_std = float(row['skill_sd'])
 
-                # Apply temperature scaling for calibration
+                # BUG FIX (Nov 8, 2025): Correct transformation for log(yards+1) → yards (fallback)
+                mean = np.exp(log_mean) - 1  # Inverse of log(yards + 1)
+                std = np.exp(log_mean) * log_std  # Delta method
+
+                # DEFENSIVE CHECK: Validate mean and std after transformation
+                if np.isnan(mean) or np.isnan(std) or np.isinf(mean) or np.isinf(std) or std <= 0 or mean < 0:
+                    logger.warning(
+                        f"State-space fallback invalid after transformation: {player_id} S{season}W{week} "
+                        f"log_mean={log_mean:.2f} log_std={log_std:.2f} → mean={mean:.1f} std={std:.1f} "
+                        f"(invalid) → skipping state-space model"
+                    )
+                    return None, None
+
+                # Apply temperature scaling for calibration (T=1.0 initially, re-calibrate later)
                 mean, std = self._apply_temperature_scaling(mean, std, "state_space")
 
                 logger.debug(
@@ -805,7 +907,7 @@ class PlayerPropsEnsemble:
             return None, None
 
         except Exception as e:
-            logger.error(f"State-space prediction failed: {e}", exc_info=True)
+            logger.error(f"State-space prediction failed for {player_id}: {e}", exc_info=True)
             return None, None
 
     def predict(
