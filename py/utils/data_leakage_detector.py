@@ -138,6 +138,7 @@ class DataLeakageDetector:
     # Feature engineering patterns that often leak
     LEAKAGE_PATTERNS = {
         "target_in_features": [
+            r"df\[.*\]\s*=\s*df\['passing_yards'\]",  # Target column assigned to another column
             r"feature.*=.*df\['passing_yards'\]",  # Target used directly
             r"X.*=.*y\b",  # Target assigned to features
             r"features.*actual_",  # Actual outcomes
@@ -181,6 +182,9 @@ class DataLeakageDetector:
             Leakage report with findings
         """
         logger.info(f"Checking DataFrame: {df.shape}")
+
+        # Reset report for fresh analysis
+        self.report = LeakageReport()
 
         # Check for suspicious column names
         self._check_column_names(df, target_col)
@@ -320,7 +324,7 @@ class DataLeakageDetector:
 
             # Check for extreme skewness
             skew = df[col].skew()
-            if abs(skew) > 10:
+            if abs(skew) >= 10:
                 self.report.add_issue(LeakageIssue(
                     severity=LeakageSeverity.LOW,
                     leakage_type=LeakageType.STATISTICAL,
@@ -423,6 +427,9 @@ class DataLeakageDetector:
         """
         logger.info("Checking feature engineering code for leakage")
 
+        # Reset report for fresh analysis
+        self.report = LeakageReport()
+
         lines = code.split("\n")
 
         for i, line in enumerate(lines, 1):
@@ -457,7 +464,9 @@ class DataLeakageDetector:
             # Check for unsafe merges
             for pattern in self.LEAKAGE_PATTERNS["unsafe_merge"]:
                 if re.search(pattern, line):
-                    if "asof" not in line.lower():
+                    # Check only code part (before comment)
+                    code_part = line.split('#')[0].lower()
+                    if "asof" not in code_part:
                         self.report.add_issue(LeakageIssue(
                             severity=LeakageSeverity.HIGH,
                             leakage_type=LeakageType.TEMPORAL,

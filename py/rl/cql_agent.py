@@ -312,20 +312,23 @@ class CQLAgent:
             "q_target_mean": q_target.mean().item(),
         }
 
-    def save(self, path: str):
-        """Save model checkpoint."""
-        torch.save(
-            {
-                "q_network": self.q_network.state_dict(),
-                "target_network": self.target_network.state_dict(),
-                "optimizer": self.optimizer.state_dict(),
-                "train_step": self.train_step,
-                "state_dim": self.state_dim,
-                "n_actions": self.n_actions,
-                "alpha": self.alpha,
-            },
-            path,
-        )
+    def save(self, path: str, metadata: dict = None):
+        """Save model checkpoint with optional metadata."""
+        checkpoint = {
+            "q_network": self.q_network.state_dict(),
+            "target_network": self.target_network.state_dict(),
+            "optimizer": self.optimizer.state_dict(),
+            "train_step": self.train_step,
+            "state_dim": self.state_dim,
+            "n_actions": self.n_actions,
+            "alpha": self.alpha,
+        }
+
+        # Add metadata if provided
+        if metadata is not None:
+            checkpoint["metadata"] = metadata
+
+        torch.save(checkpoint, path)
 
     def load(self, path: str):
         """Load model checkpoint."""
