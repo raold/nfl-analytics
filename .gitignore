@@ -167,3 +167,6 @@ check_*.sh
 !PROJECT_STATUS.md
 !PHASE_PLAN.md
 !AGENTS.md
+
+# Hypothesis testing cache
+.hypothesis/
