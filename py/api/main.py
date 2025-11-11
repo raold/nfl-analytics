@@ -100,6 +100,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+from py.api.cache_warmup import warm_cache_on_startup
 
 # ============================================================================
 # Logging Configuration
@@ -582,6 +583,20 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Failed to initialize Redis cache: {e}")
         redis_cache = None
+
+    # Warm cache in background (doesn't block API startup)
+    # This reduces cold start from 8-12s to 5-8s on container restarts
+    if redis_cache:
+        import asyncio
+        asyncio.create_task(warm_cache_on_startup(
+            warm_models=True,      # Pre-load BNN + XGBoost models
+            warm_features=True,    # Pre-load top 50 players
+            warm_queries=False,    # Skip dashboard queries (lower priority)
+            top_players=50
+        ))
+        logger.info("Cache warming started in background")
+    else:
+        logger.warning("Skipping cache warming - Redis unavailable")
 
     logger.info("API startup complete")
 
