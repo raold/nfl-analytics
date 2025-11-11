@@ -17,6 +17,20 @@ import os
 from zoneinfo import ZoneInfo
 import requests
 import time
+import hashlib
+import sys
+from pathlib import Path
+
+# Add project root to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Import Redis cache
+try:
+    from py.utils.claude_cache import get_default_cache
+    REDIS_AVAILABLE = True
+except ImportError:
+    get_default_cache = None
+    REDIS_AVAILABLE = False
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -24,8 +38,94 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+    "password": os.getenv("DB_PASSWORD")  # Required: Set DB_PASSWORD environment variable
 }
+
+# Initialize Redis cache for dashboard queries
+_redis_cache = get_default_cache() if REDIS_AVAILABLE and get_default_cache else None
+
+def cache_data(ttl=300):
+    """
+    Redis-backed caching decorator to replace @st.cache_data.
+
+    Falls back to @st.cache_data if Redis is unavailable.
+
+    Args:
+        ttl: Time-to-live in seconds (default: 300 = 5 minutes)
+
+    Usage:
+        @cache_data(ttl=300)
+        def fetch_data(param):
+            return query_database(param)
+
+    Performance:
+        - Redis cache hit: 5-20ms (shared across containers)
+        - @st.cache_data hit: 1-5ms (in-memory, container-local)
+        - Database query: 100-500ms
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # Generate cache key from function name and arguments
+            # Hash args/kwargs for consistent, collision-resistant keys
+            args_str = str(args) + str(sorted(kwargs.items()))
+            args_hash = hashlib.md5(args_str.encode()).hexdigest()[:16]
+            cache_key = f"streamlit:{func.__name__}:{args_hash}"
+
+            # Try Redis cache first
+            if _redis_cache:
+                try:
+                    cached = _redis_cache.get(cache_key)
+                    if cached is not None:
+                        # Reconstruct DataFrame if it's a dict with records
+                        if isinstance(cached, dict) and 'type' in cached:
+                            if cached['type'] == 'dataframe':
+                                return pd.DataFrame(cached['data'])
+                            elif cached['type'] == 'list':
+                                return cached['data']
+                            elif cached['type'] == 'dict':
+                                return cached['data']
+                        return cached
+                except Exception as e:
+                    st.warning(f"Redis cache error: {e}")
+
+            # Cache miss - execute function
+            result = func(*args, **kwargs)
+
+            # Cache result in Redis
+            if _redis_cache:
+                try:
+                    # Serialize DataFrames to dict for JSON compatibility
+                    if isinstance(result, pd.DataFrame):
+                        cache_data_value = {
+                            'type': 'dataframe',
+                            'data': result.to_dict('records')
+                        }
+                    elif isinstance(result, list):
+                        cache_data_value = {
+                            'type': 'list',
+                            'data': result
+                        }
+                    elif isinstance(result, dict):
+                        cache_data_value = {
+                            'type': 'dict',
+                            'data': result
+                        }
+                    else:
+                        # Fallback for other types
+                        cache_data_value = result
+
+                    _redis_cache.set(cache_key, cache_data_value, ttl=ttl)
+                except Exception as e:
+                    st.warning(f"Redis cache set error: {e}")
+
+            return result
+
+        # Fallback: If Redis unavailable, use Streamlit's native caching
+        if not _redis_cache:
+            return st.cache_data(ttl=ttl)(func)
+
+        return wrapper
+    return decorator
 
 # Page configuration
 st.set_page_config(
@@ -56,12 +156,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def get_database_connection():
     """Get database connection."""
     return psycopg.connect(**DB_CONFIG)
 
-@st.cache_data(ttl=300)
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_retrospective_metrics(model_version=None, season=None):
     """Fetch retrospective analysis metrics."""
     query = """
@@ -106,7 +206,7 @@ def fetch_retrospective_metrics(model_version=None, season=None):
 
     return df
 
-@st.cache_data(ttl=300)
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_performance_over_time():
     """Fetch rolling performance metrics."""
     query = """
@@ -140,7 +240,7 @@ def fetch_performance_over_time():
 
     return df
 
-@st.cache_data(ttl=300)
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_model_comparison():
     """Compare different model versions."""
     query = """
@@ -166,7 +266,7 @@ def fetch_model_comparison():
 
     return df
 
-@st.cache_data(ttl=30)  # Cache for 30 seconds for live data
+@cache_data(ttl=30)  # Redis cache for 30 seconds (live data)
 def fetch_live_scores(season, week):
     """Fetch live scores from ESPN API."""
     try:
@@ -252,7 +352,7 @@ def fetch_live_scores(season, week):
         st.warning(f"Could not fetch live scores: {str(e)}")
         return {}
 
-@st.cache_data(ttl=300)  # Cache for 5 minutes
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_bye_week_teams(season, week):
     """Fetch teams on bye for a specific week."""
     # Convert numpy int64 to Python int for psycopg3 compatibility
@@ -282,7 +382,7 @@ def fetch_bye_week_teams(season, week):
 
     return df['team'].tolist() if not df.empty else []
 
-@st.cache_data(ttl=300)
+@cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_bnn_uncertainty_metrics():
     """Fetch BNN uncertainty metrics for all predictions."""
     # Return empty DataFrame - predictions.bnn_predictions table doesn't exist yet
@@ -291,7 +391,7 @@ def fetch_bnn_uncertainty_metrics():
         'ci_lower', 'ci_upper', 'epistemic_uncertainty', 'aleatoric_uncertainty'
     ])
 
-@st.cache_data(ttl=30)  # Cache for 30 seconds for live updates
+@cache_data(ttl=30)  # Redis cache for 30 seconds (live updates)
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
     # 2025 NFL season, Week 10 (November 6, 2025)
@@ -818,7 +918,7 @@ def render_system_status_page():
 
         **Credentials:**
         - Username: `admin`
-        - Password: `sicillionbillions`
+        - Password: See `.env` file or `GRAFANA_PASSWORD` environment variable
         """)
 
     with col2:
