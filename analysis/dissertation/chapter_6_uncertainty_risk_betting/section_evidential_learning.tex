@@ -41,7 +41,7 @@ Positive constraints are enforced using softplus activation: $\text{softplus}(x)
 
 \subsubsection{Uncertainty Decomposition}
 
-The NIG distribution naturally decomposes uncertainty into \textit{aleatoric} (data noise) and \textit{epistemic} (model uncertainty) components~\citep{jøsang2016subjective}:
+The NIG distribution naturally decomposes uncertainty into \textit{aleatoric} (data noise) and \textit{epistemic} (model uncertainty) components~\citep{josang2016subjective}:
 
 \begin{align}
     \sigma^2_{\text{aleatoric}} &= \frac{\beta}{\alpha - 1} \label{eq:aleatoric_var} \\
@@ -169,7 +169,7 @@ Evidential deep learning extends Dempster-Shafer theory~\citep{dempster1968gener
 \begin{itemize}[nosep]
     \item \textbf{Amini et al. (2020)}~\citep{amini2020deep}: Introduced NIG loss for regression. Our implementation follows their formulation exactly.
     \item \textbf{Sensoy et al. (2018)}~\citep{sensoy2018evidential}: Evidential classification using Dirichlet distribution. Inspired the regression variant.
-    \item \textbf{Jøsang (2016)}~\citep{jøsang2016subjective}: \textit{Subjective Logic} book provides theoretical foundation for belief functions and uncertainty.
+    \item \textbf{Jøsang (2016)}~\citep{josang2016subjective}: \textit{Subjective Logic} book provides theoretical foundation for belief functions and uncertainty.
 \end{itemize}
 
 \noindent Alternative fast uncertainty methods include:
