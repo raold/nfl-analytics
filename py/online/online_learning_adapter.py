@@ -337,7 +337,8 @@ class OnlineModelAdapter:
         """
         predictions = []
         for _, row in X.iterrows():
-            x_dict = row.to_dict()
+            # Convert to dict and ensure all values are native Python floats
+            x_dict = {k: float(v) if pd.notna(v) else 0.0 for k, v in row.to_dict().items()}
             pred = self.predict(x_dict)
             predictions.append(pred)
         return np.array(predictions)
@@ -351,8 +352,9 @@ class OnlineModelAdapter:
             y: Series with targets
         """
         for (_, row), target in zip(X.iterrows(), y):
-            x_dict = row.to_dict()
-            self.partial_fit(x_dict, target)
+            # Convert to dict and ensure all values are native Python floats
+            x_dict = {k: float(v) if pd.notna(v) else 0.0 for k, v in row.to_dict().items()}
+            self.partial_fit(x_dict, float(target))
 
     def get_metrics(self) -> Dict[str, float]:
         """Get current performance metrics"""
@@ -399,7 +401,7 @@ class OnlinePredictionPipeline:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: str = "sicillionbillions",
+        db_password: str = None,
     ):
         """
         Initialize online prediction pipeline
@@ -419,7 +421,7 @@ class OnlinePredictionPipeline:
             'port': db_port,
             'dbname': db_name,
             'user': db_user,
-            'password': db_password,
+            'password': db_password or os.getenv('DB_PASSWORD', 'sicillionbillions'),
         }
 
         # Set drift detector sensitivity
@@ -591,7 +593,10 @@ class OnlinePredictionPipeline:
         """
         df = df.sort_values(date_col).reset_index(drop=True)
 
-        feature_cols = [c for c in df.columns if c not in [target_col, date_col]]
+        # Select only numeric features, excluding identifiers and dates
+        exclude_cols = [target_col, date_col, 'player_id', 'player_name', 'game_id', 'season', 'week',
+                       'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
+        feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
         X = df[feature_cols]
         y = df[target_col]
 
@@ -807,24 +812,27 @@ def detect_known_drift_events(
     """
     df[date_col] = pd.to_datetime(df[date_col])
 
+    # Get timezone from data if present
+    tz = df[date_col].dt.tz if hasattr(df[date_col].dt, 'tz') else None
+
     known_events = [
         {
-            'date': pd.Timestamp('2020-09-10'),
+            'date': pd.Timestamp('2020-09-10', tz=tz),
             'name': 'COVID-19 Season Start',
             'description': 'No fans, schedule disruptions',
         },
         {
-            'date': pd.Timestamp('2018-09-06'),
+            'date': pd.Timestamp('2018-09-06', tz=tz),
             'name': 'Helmet Hit Rule Changes',
             'description': 'New targeting rules, more penalties',
         },
         {
-            'date': pd.Timestamp('2021-09-09'),
+            'date': pd.Timestamp('2021-09-09', tz=tz),
             'name': '17-Game Season Expansion',
             'description': 'Schedule length change',
         },
         {
-            'date': pd.Timestamp('2023-09-07'),
+            'date': pd.Timestamp('2023-09-07', tz=tz),
             'name': 'New Kickoff Rules',
             'description': 'Fair catch changes',
         },

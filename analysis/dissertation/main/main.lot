@@ -78,98 +78,96 @@
 \contentsline {table}{\numberline {9.8}{\ignorespaces Model performance comparison against published benchmarks. Our stacked ensemble achieves best-in-class calibration (Brier = 0.2515) but fails to overcome market efficiency for profitability (51.0\% ATS vs 52.4\% breakeven).}}{206}{table.caption.1293}%
 \contentsline {table}{\numberline {9.9}{\ignorespaces Statistical significance of calibration improvements (Brier score differences).}}{206}{table.caption.1294}%
 \contentsline {table}{\numberline {9.10}{\ignorespaces Betting performance metrics}}{207}{table.caption.1302}%
-\contentsline {table}{\numberline {9.11}{\ignorespaces Out-of-sample results by season}}{276}{table.caption.1304}%
-\contentsline {table}{\numberline {9.12}{\ignorespaces Comprehensive comparison of all uncertainty quantification methods investigated. The ``Gap to 90\%'' column quantifies the calibration shortfall relative to the nominal 90\% coverage target. Training times reflect wall-clock duration on a single machine with Apple Silicon (M1). Methods are ordered by their underlying approach: single-output BNN variants (rows 1-4), non-Bayesian baselines (rows 5-6), and architectural innovation (row 7).}}{277}{table.caption.1315}%
-\contentsline {table}{\numberline {9.13}{\ignorespaces Phase 1: Feature Ablation Study for BNN Calibration}}{277}{table.caption.1321}%
-\contentsline {table}{\numberline {9.14}{\ignorespaces Bayesian Neural Network Prior Sensitivity Analysis}}{278}{table.caption.1335}%
-\contentsline {table}{\numberline {9.15}{\ignorespaces Phase 3: Uncertainty Quantification Methods Comparison}}{278}{table.caption.1362}%
-\contentsline {table}{\numberline {9.16}{\ignorespaces Bayesian optimization results for single-output BNN hyperparameters (10-trial pilot study). Only 3 of 10 trials completed successfully; the remainder failed due to database query errors when using environment or opponent features. The best configuration (Trial \#0) achieved 34.2\% coverage with Vegas features, 32 hidden units, and $\sigma _{\text {prior}} = 0.548$. This represents only an 8 percentage point improvement over the 26.2\% baseline, leaving a 55.8 percentage point gap to the 90\% target.}}{279}{table.caption.1389}%
-\contentsline {table}{\numberline {9.17}{\ignorespaces Computational cost and return on investment (coverage improvement per compute hour) for each investigation phase. Phase 3 (architectural exploration) provides the highest ROI at 13.2 percentage points per hour, more than 5 times better than feature engineering and 26 times better than prior tuning. This quantifies the efficiency advantage of architectural innovation over hyperparameter engineering.}}{279}{table.caption.1411}%
-\contentsline {table}{\numberline {9.18}{\ignorespaces Decision matrix for practitioners selecting uncertainty quantification methods. No single method dominates across all criteria; choice depends on application priorities. Avoid single-output BNNs for applications requiring calibrated intervals.}}{280}{table.caption.1414}%
-\contentsline {table}{\numberline {9.19}{\ignorespaces 5-way ensemble predictions for Patrick Mahomes passing yards (Week 10, 2025).}}{280}{table.caption.1445}%
-\contentsline {table}{\numberline {9.20}{\ignorespaces Ensemble calibration metrics on 2024 holdout set ($N=200$ player-games).}}{280}{table.caption.1448}%
-\contentsline {table}{\numberline {9.21}{\ignorespaces Ensemble performance progression (2022--2024 backtest, $N=570$ games).}}{281}{table.caption.1450}%
-\contentsline {table}{\numberline {9.22}{\ignorespaces Expected performance with CQL bet sizing integration.}}{281}{table.caption.1454}%
-\contentsline {table}{\numberline {9.23}{\ignorespaces Training Window Ablation Scenarios}}{281}{table.caption.1468}%
-\contentsline {table}{\numberline {9.24}{\ignorespaces Training Window Ablation Results (2025 Hold-Out)}}{281}{table.caption.1473}%
-\contentsline {table}{\numberline {9.25}{\ignorespaces Diebold-Mariano Tests (Scenario B vs. Others)}}{281}{table.caption.1477}%
-\contentsline {table}{\numberline {9.26}{\ignorespaces Production Approval Criteria for State-Space v2}}{282}{table.caption.1491}%
-\contentsline {table}{\numberline {9.27}{\ignorespaces State-Space v2 Performance (2025 Hold-Out, 148 Games)}}{282}{table.caption.1493}%
-\contentsline {table}{\numberline {9.28}{\ignorespaces Final 4-Way Ensemble Configuration (November 8, 2025)}}{282}{table.caption.1512}%
-\contentsline {table}{\numberline {9.29}{\ignorespaces 5-Way Ensemble: Per-Model Training Results}}{282}{table.caption.1529}%
-\contentsline {table}{\numberline {9.30}{\ignorespaces Ensemble Weighting Method Comparison (2022 Validation Set)}}{283}{table.caption.1538}%
-\contentsline {table}{\numberline {9.31}{\ignorespaces 5-Way Ensemble: Full Backtest Results (2022--2024)}}{283}{table.caption.1543}%
-\contentsline {table}{\numberline {9.32}{\ignorespaces Diebold-Mariano Tests for Predictive Accuracy (2022--2024)}}{284}{table.caption.1557}%
-\contentsline {table}{\numberline {9.33}{\ignorespaces Conformal Prediction vs. Temperature Scaling: Empirical Comparison (2024 Holdout)}}{284}{table.caption.1595}%
-\contentsline {table}{\numberline {9.34}{\ignorespaces Coverage Robustness by Subgroup (2024 Holdout)}}{284}{table.caption.1611}%
-\contentsline {table}{\numberline {9.35}{\ignorespaces Computational Cost Comparison (MacBook M1, single core)}}{284}{table.caption.1615}%
-\contentsline {table}{\numberline {9.36}{\ignorespaces McNemar's Test for Coverage Equality (2024 Holdout, $n=1{,}360$)}}{285}{table.caption.1620}%
-\contentsline {table}{\numberline {9.37}{\ignorespaces Prequential Evaluation Results (2024 Season)}}{285}{table.caption.1642}%
-\contentsline {table}{\numberline {9.38}{\ignorespaces Known Concept Drift Events (2018--2024)}}{285}{table.caption.1645}%
-\contentsline {table}{\numberline {9.39}{\ignorespaces Drift Detection Accuracy}}{285}{table.caption.1646}%
-\contentsline {table}{\numberline {9.40}{\ignorespaces Adaptation Speed After Drift Events}}{285}{table.caption.1648}%
-\contentsline {table}{\numberline {9.41}{\ignorespaces Betting Performance (2024 Season)}}{286}{table.caption.1650}%
-\contentsline {table}{\numberline {9.42}{\ignorespaces Calibration Metrics (2024 Season)}}{287}{table.caption.1652}%
-\contentsline {table}{\numberline {9.43}{\ignorespaces Prediction Time Comparison}}{287}{table.caption.1663}%
-\contentsline {table}{\numberline {9.44}{\ignorespaces Evidential Regression Calibration Results (2024 Test Set)}}{287}{table.caption.1677}%
-\contentsline {table}{\numberline {9.45}{\ignorespaces Inference Speed Comparison (1,142 predictions, Apple M4 Pro)}}{287}{table.caption.1681}%
-\contentsline {table}{\numberline {9.46}{\ignorespaces Top 10 OOD Samples (Highest Epistemic Uncertainty, 2024 Test Set)}}{287}{table.caption.1687}%
-\contentsline {table}{\numberline {9.47}{\ignorespaces Point Prediction Performance (2024 Test Set)}}{288}{table.caption.1695}%
-\contentsline {table}{\numberline {9.48}{\ignorespaces Comprehensive Comparison: BNN v3.1 vs Evidential Regression}}{290}{table.caption.1697}%
-\contentsline {table}{\numberline {9.49}{\ignorespaces CLV distribution by model}}{290}{table.caption.1705}%
-\contentsline {table}{\numberline {9.50}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{291}{table.caption.1708}%
-\contentsline {table}{\numberline {9.51}{\ignorespaces Top 15 Features by Mean |SHAP| (XGBoost Model)}}{291}{table.caption.1722}%
-\contentsline {table}{\numberline {9.52}{\ignorespaces Local SHAP Explanations for Example Games}}{291}{table.caption.1724}%
-\contentsline {table}{\numberline {9.53}{\ignorespaces Weather effects on scoring}}{292}{table.caption.1743}%
-\contentsline {table}{\numberline {9.54}{\ignorespaces Extreme weather conditions}}{294}{table.caption.1744}%
-\contentsline {table}{\numberline {9.55}{\ignorespaces Core ablation grid}}{295}{table.caption.1755}%
-\contentsline {table}{\numberline {9.56}{\ignorespaces Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}}{297}{table.caption.1764}%
-\contentsline {table}{\numberline {9.57}{\ignorespaces Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}}{298}{table.caption.1766}%
-\contentsline {table}{\numberline {9.58}{\ignorespaces Multiple testing corrections for key hypothesis tests.}}{299}{table.caption.1768}%
-\contentsline {table}{\numberline {9.59}{\ignorespaces Per-season performance (top 3 models)}}{301}{table.caption.1773}%
+\contentsline {table}{\numberline {9.11}{\ignorespaces Out-of-sample results by season}}{277}{table.caption.1304}%
+\contentsline {table}{\numberline {9.12}{\ignorespaces Comprehensive comparison of all uncertainty quantification methods investigated. The ``Gap to 90\%'' column quantifies the calibration shortfall relative to the nominal 90\% coverage target. Training times reflect wall-clock duration on a single machine with Apple Silicon (M1). Methods are ordered by their underlying approach: single-output BNN variants (rows 1-4), non-Bayesian baselines (rows 5-6), and architectural innovation (row 7).}}{278}{table.caption.1315}%
+\contentsline {table}{\numberline {9.13}{\ignorespaces Phase 1: Feature Ablation Study for BNN Calibration}}{278}{table.caption.1321}%
+\contentsline {table}{\numberline {9.14}{\ignorespaces Bayesian Neural Network Prior Sensitivity Analysis}}{279}{table.caption.1335}%
+\contentsline {table}{\numberline {9.15}{\ignorespaces Phase 3: Uncertainty Quantification Methods Comparison}}{279}{table.caption.1362}%
+\contentsline {table}{\numberline {9.16}{\ignorespaces Bayesian optimization results for single-output BNN hyperparameters (10-trial pilot study). Only 3 of 10 trials completed successfully; the remainder failed due to database query errors when using environment or opponent features. The best configuration (Trial \#0) achieved 34.2\% coverage with Vegas features, 32 hidden units, and $\sigma _{\text {prior}} = 0.548$. This represents only an 8 percentage point improvement over the 26.2\% baseline, leaving a 55.8 percentage point gap to the 90\% target.}}{280}{table.caption.1389}%
+\contentsline {table}{\numberline {9.17}{\ignorespaces Computational cost and return on investment (coverage improvement per compute hour) for each investigation phase. Phase 3 (architectural exploration) provides the highest ROI at 13.2 percentage points per hour, more than 5 times better than feature engineering and 26 times better than prior tuning. This quantifies the efficiency advantage of architectural innovation over hyperparameter engineering.}}{280}{table.caption.1411}%
+\contentsline {table}{\numberline {9.18}{\ignorespaces Decision matrix for practitioners selecting uncertainty quantification methods. No single method dominates across all criteria; choice depends on application priorities. Avoid single-output BNNs for applications requiring calibrated intervals.}}{281}{table.caption.1414}%
+\contentsline {table}{\numberline {9.19}{\ignorespaces 5-way ensemble predictions for Patrick Mahomes passing yards (Week 10, 2025).}}{281}{table.caption.1445}%
+\contentsline {table}{\numberline {9.20}{\ignorespaces Ensemble calibration metrics on 2024 holdout set ($N=200$ player-games).}}{281}{table.caption.1448}%
+\contentsline {table}{\numberline {9.21}{\ignorespaces Ensemble performance progression (2022--2024 backtest, $N=570$ games).}}{282}{table.caption.1450}%
+\contentsline {table}{\numberline {9.22}{\ignorespaces Expected performance with CQL bet sizing integration.}}{282}{table.caption.1454}%
+\contentsline {table}{\numberline {9.23}{\ignorespaces Training Window Ablation Scenarios}}{282}{table.caption.1468}%
+\contentsline {table}{\numberline {9.24}{\ignorespaces Training Window Ablation Results (2025 Hold-Out)}}{282}{table.caption.1473}%
+\contentsline {table}{\numberline {9.25}{\ignorespaces Diebold-Mariano Tests (Scenario B vs. Others)}}{282}{table.caption.1477}%
+\contentsline {table}{\numberline {9.26}{\ignorespaces Production Approval Criteria for State-Space v2}}{283}{table.caption.1491}%
+\contentsline {table}{\numberline {9.27}{\ignorespaces State-Space v2 Performance (2025 Hold-Out, 148 Games)}}{283}{table.caption.1493}%
+\contentsline {table}{\numberline {9.28}{\ignorespaces Final 4-Way Ensemble Configuration (November 8, 2025)}}{283}{table.caption.1512}%
+\contentsline {table}{\numberline {9.29}{\ignorespaces 5-Way Ensemble: Per-Model Training Results}}{283}{table.caption.1529}%
+\contentsline {table}{\numberline {9.30}{\ignorespaces Ensemble Weighting Method Comparison (2022 Validation Set)}}{284}{table.caption.1538}%
+\contentsline {table}{\numberline {9.31}{\ignorespaces 5-Way Ensemble: Full Backtest Results (2022--2024)}}{284}{table.caption.1543}%
+\contentsline {table}{\numberline {9.32}{\ignorespaces Diebold-Mariano Tests for Predictive Accuracy (2022--2024)}}{285}{table.caption.1557}%
+\contentsline {table}{\numberline {9.33}{\ignorespaces Conformal Prediction vs. Temperature Scaling: Empirical Comparison (2024 Holdout)}}{285}{table.caption.1595}%
+\contentsline {table}{\numberline {9.34}{\ignorespaces Coverage Robustness by Subgroup (2024 Holdout)}}{285}{table.caption.1611}%
+\contentsline {table}{\numberline {9.35}{\ignorespaces Computational Cost Comparison (MacBook M1, single core)}}{285}{table.caption.1615}%
+\contentsline {table}{\numberline {9.36}{\ignorespaces McNemar's Test for Coverage Equality (2024 Holdout, $n=1{,}360$)}}{286}{table.caption.1620}%
+\contentsline {table}{\numberline {9.37}{\ignorespaces Online Learning Prequential Evaluation (2024 Season)}}{286}{table.caption.1639}%
+\contentsline {table}{\numberline {9.38}{\ignorespaces Static Baseline vs Online Learning Performance}}{286}{table.caption.1641}%
+\contentsline {table}{\numberline {9.39}{\ignorespaces Drift Detection Performance (2024 Season)}}{286}{table.caption.1644}%
+\contentsline {table}{\numberline {9.40}{\ignorespaces Adaptation Speed After Drift Events}}{286}{table.caption.1652}%
+\contentsline {table}{\numberline {9.41}{\ignorespaces Online Learning Validation Acceptance Criteria}}{287}{table.caption.1654}%
+\contentsline {table}{\numberline {9.42}{\ignorespaces Evidential Regression Point Prediction Performance (2024 Test Set)}}{287}{table.caption.1681}%
+\contentsline {table}{\numberline {9.43}{\ignorespaces Evidential Regression Calibration Results (2024 Test Set)}}{287}{table.caption.1683}%
+\contentsline {table}{\numberline {9.44}{\ignorespaces Prediction Interval Widths (90\% Confidence, 2024 Test Set)}}{287}{table.caption.1686}%
+\contentsline {table}{\numberline {9.45}{\ignorespaces Inference Speed Performance (929 predictions, Apple M4 Pro CPU)}}{287}{table.caption.1689}%
+\contentsline {table}{\numberline {9.46}{\ignorespaces Evidential Regression Validation Acceptance Criteria}}{288}{table.caption.1701}%
+\contentsline {table}{\numberline {9.47}{\ignorespaces CLV distribution by model}}{288}{table.caption.1713}%
+\contentsline {table}{\numberline {9.48}{\ignorespaces Share of zero-bet weeks by season and primary gate}}{288}{table.caption.1716}%
+\contentsline {table}{\numberline {9.49}{\ignorespaces Top 15 Features by Mean |SHAP| (XGBoost Model)}}{289}{table.caption.1730}%
+\contentsline {table}{\numberline {9.50}{\ignorespaces Local SHAP Explanations for Example Games}}{289}{table.caption.1732}%
+\contentsline {table}{\numberline {9.51}{\ignorespaces Weather effects on scoring}}{289}{table.caption.1751}%
+\contentsline {table}{\numberline {9.52}{\ignorespaces Extreme weather conditions}}{291}{table.caption.1752}%
+\contentsline {table}{\numberline {9.53}{\ignorespaces Core ablation grid}}{292}{table.caption.1763}%
+\contentsline {table}{\numberline {9.54}{\ignorespaces Diebold-Mariano tests for predictive accuracy comparison (5,529 games).}}{294}{table.caption.1772}%
+\contentsline {table}{\numberline {9.55}{\ignorespaces Bootstrap confidence intervals for Brier scores (95\% CI, 5,000 bootstrap samples).}}{295}{table.caption.1774}%
+\contentsline {table}{\numberline {9.56}{\ignorespaces Multiple testing corrections for key hypothesis tests.}}{296}{table.caption.1776}%
+\contentsline {table}{\numberline {9.57}{\ignorespaces Per-season performance (top 3 models)}}{298}{table.caption.1781}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {D.1}{\ignorespaces Conservative Q-Learning (CQL) Training Performance}}{355}{table.caption.2026}%
-\contentsline {table}{\numberline {D.2}{\ignorespaces Bootstrap Stress Test Results: Worst Case Scenario}}{357}{table.caption.2033}%
+\contentsline {table}{\numberline {D.1}{\ignorespaces Conservative Q-Learning (CQL) Training Performance}}{352}{table.caption.2034}%
+\contentsline {table}{\numberline {D.2}{\ignorespaces Bootstrap Stress Test Results: Worst Case Scenario}}{354}{table.caption.2041}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {I.1}{\ignorespaces Feature Groups in Catalog}}{387}{table.caption.2260}%
-\contentsline {table}{\numberline {I.2}{\ignorespaces Temporal Leakage Audit Summary}}{387}{table.caption.2262}%
-\contentsline {table}{\numberline {I.3}{\ignorespaces Feature → Source → Cutoff Safety Matrix (Partial)}}{388}{table.caption.2280}%
-\contentsline {table}{\numberline {I.4}{\ignorespaces Temporal Leakage Unit Tests}}{389}{table.caption.2282}%
+\contentsline {table}{\numberline {I.1}{\ignorespaces Feature Groups in Catalog}}{384}{table.caption.2268}%
+\contentsline {table}{\numberline {I.2}{\ignorespaces Temporal Leakage Audit Summary}}{384}{table.caption.2270}%
+\contentsline {table}{\numberline {I.3}{\ignorespaces Feature → Source → Cutoff Safety Matrix (Partial)}}{385}{table.caption.2288}%
+\contentsline {table}{\numberline {I.4}{\ignorespaces Temporal Leakage Unit Tests}}{386}{table.caption.2290}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {J.1}{\ignorespaces Changepoint detection method comparison.}}{395}{table.caption.2327}%
-\contentsline {table}{\numberline {J.2}{\ignorespaces Dynamic copula performance.}}{397}{table.caption.2340}%
-\contentsline {table}{\numberline {J.3}{\ignorespaces Advanced features cost-benefit analysis.}}{398}{table.caption.2345}%
+\contentsline {table}{\numberline {J.1}{\ignorespaces Changepoint detection method comparison.}}{392}{table.caption.2335}%
+\contentsline {table}{\numberline {J.2}{\ignorespaces Dynamic copula performance.}}{394}{table.caption.2348}%
+\contentsline {table}{\numberline {J.3}{\ignorespaces Advanced features cost-benefit analysis.}}{395}{table.caption.2353}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {K.1}{\ignorespaces BNN Failure Mode Comparison: All 6 Approaches}}{399}{table.caption.2353}%
-\contentsline {table}{\numberline {K.2}{\ignorespaces BNN Failure Taxonomy and Root Causes}}{400}{table.caption.2354}%
-\contentsline {table}{\numberline {K.3}{\ignorespaces NUTS Training Results: All Configurations Timeout}}{400}{table.caption.2355}%
-\contentsline {table}{\numberline {K.4}{\ignorespaces Calibration Metrics Across BNN Approaches}}{401}{table.caption.2356}%
-\contentsline {table}{\numberline {K.5}{\ignorespaces Laplace Approximation: Hessian Computation Failures}}{402}{table.caption.2357}%
-\contentsline {table}{\numberline {K.6}{\ignorespaces Multi-Output BNN: Three Variants Comparison}}{403}{table.caption.2358}%
-\contentsline {table}{\numberline {K.7}{\ignorespaces Week 0 Data Contamination: Multi-Output v2 Failure Analysis}}{404}{table.caption.2359}%
-\contentsline {table}{\numberline {K.8}{\ignorespaces BNN Investigation: Time Investment Breakdown}}{405}{table.caption.2360}%
-\contentsline {table}{\numberline {K.9}{\ignorespaces BNN Investigation Timeline (October 14 -- November 9, 2025)}}{407}{table.caption.2369}%
-\contentsline {table}{\numberline {K.10}{\ignorespaces NUTS Timeout Projections}}{409}{table.caption.2384}%
-\contentsline {table}{\numberline {K.11}{\ignorespaces Temperature Scaling Coverage Metrics}}{414}{table.caption.2415}%
-\contentsline {table}{\numberline {K.12}{\ignorespaces Laplace Approximation Configuration Grid}}{416}{table.caption.2435}%
-\contentsline {table}{\numberline {K.13}{\ignorespaces Multi-Output v1 Feature Importance (SHAP)}}{418}{table.caption.2457}%
-\contentsline {table}{\numberline {K.14}{\ignorespaces Week 0 Data Contamination Statistics}}{421}{table.caption.2474}%
-\contentsline {table}{\numberline {K.15}{\ignorespaces BNN Investigation Time Investment Summary}}{424}{table.caption.2516}%
+\contentsline {table}{\numberline {K.1}{\ignorespaces BNN Failure Mode Comparison: All 6 Approaches}}{396}{table.caption.2361}%
+\contentsline {table}{\numberline {K.2}{\ignorespaces BNN Failure Taxonomy and Root Causes}}{397}{table.caption.2362}%
+\contentsline {table}{\numberline {K.3}{\ignorespaces NUTS Training Results: All Configurations Timeout}}{397}{table.caption.2363}%
+\contentsline {table}{\numberline {K.4}{\ignorespaces Calibration Metrics Across BNN Approaches}}{398}{table.caption.2364}%
+\contentsline {table}{\numberline {K.5}{\ignorespaces Laplace Approximation: Hessian Computation Failures}}{399}{table.caption.2365}%
+\contentsline {table}{\numberline {K.6}{\ignorespaces Multi-Output BNN: Three Variants Comparison}}{400}{table.caption.2366}%
+\contentsline {table}{\numberline {K.7}{\ignorespaces Week 0 Data Contamination: Multi-Output v2 Failure Analysis}}{401}{table.caption.2367}%
+\contentsline {table}{\numberline {K.8}{\ignorespaces BNN Investigation: Time Investment Breakdown}}{402}{table.caption.2368}%
+\contentsline {table}{\numberline {K.9}{\ignorespaces BNN Investigation Timeline (October 14 -- November 9, 2025)}}{404}{table.caption.2377}%
+\contentsline {table}{\numberline {K.10}{\ignorespaces NUTS Timeout Projections}}{406}{table.caption.2392}%
+\contentsline {table}{\numberline {K.11}{\ignorespaces Temperature Scaling Coverage Metrics}}{411}{table.caption.2423}%
+\contentsline {table}{\numberline {K.12}{\ignorespaces Laplace Approximation Configuration Grid}}{413}{table.caption.2443}%
+\contentsline {table}{\numberline {K.13}{\ignorespaces Multi-Output v1 Feature Importance (SHAP)}}{415}{table.caption.2465}%
+\contentsline {table}{\numberline {K.14}{\ignorespaces Week 0 Data Contamination Statistics}}{418}{table.caption.2482}%
+\contentsline {table}{\numberline {K.15}{\ignorespaces BNN Investigation Time Investment Summary}}{421}{table.caption.2524}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {L.1}{\ignorespaces Training Window Ablation: Performance Metrics (2025 Holdout)}}{430}{table.caption.2566}%
-\contentsline {table}{\numberline {L.2}{\ignorespaces Training Window Ablation: Diebold-Mariano Tests}}{431}{table.caption.2572}%
-\contentsline {table}{\numberline {L.3}{\ignorespaces Ensemble Composition Ablation: Selected Configurations}}{434}{table.caption.2599}%
-\contentsline {table}{\numberline {L.4}{\ignorespaces Weighting Method Ablation: Performance Comparison}}{437}{table.caption.2624}%
-\contentsline {table}{\numberline {L.5}{\ignorespaces Weighting Sensitivity Analysis: Impact of $\pm 10\%$ Weight Changes}}{438}{table.caption.2630}%
-\contentsline {table}{\numberline {L.6}{\ignorespaces XGBoost Top 20 Features by SHAP Importance}}{440}{table.caption.2647}%
-\contentsline {table}{\numberline {L.7}{\ignorespaces XGBoost Feature Ablation: Cumulative Removal}}{441}{table.caption.2649}%
-\contentsline {table}{\numberline {L.8}{\ignorespaces XGBoost Category Ablation: Impact of Removing Each Category}}{442}{table.caption.2655}%
+\contentsline {table}{\numberline {L.1}{\ignorespaces Training Window Ablation: Performance Metrics (2025 Holdout)}}{427}{table.caption.2574}%
+\contentsline {table}{\numberline {L.2}{\ignorespaces Training Window Ablation: Diebold-Mariano Tests}}{428}{table.caption.2580}%
+\contentsline {table}{\numberline {L.3}{\ignorespaces Ensemble Composition Ablation: Selected Configurations}}{431}{table.caption.2607}%
+\contentsline {table}{\numberline {L.4}{\ignorespaces Weighting Method Ablation: Performance Comparison}}{434}{table.caption.2632}%
+\contentsline {table}{\numberline {L.5}{\ignorespaces Weighting Sensitivity Analysis: Impact of $\pm 10\%$ Weight Changes}}{435}{table.caption.2638}%
+\contentsline {table}{\numberline {L.6}{\ignorespaces XGBoost Top 20 Features by SHAP Importance}}{437}{table.caption.2655}%
+\contentsline {table}{\numberline {L.7}{\ignorespaces XGBoost Feature Ablation: Cumulative Removal}}{438}{table.caption.2657}%
+\contentsline {table}{\numberline {L.8}{\ignorespaces XGBoost Category Ablation: Impact of Removing Each Category}}{439}{table.caption.2663}%

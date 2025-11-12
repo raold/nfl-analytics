@@ -49,12 +49,14 @@ Date: November 9, 2025
 
 import json
 import logging
+import os
 import pickle
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
 import numpy as np
+import pandas as pd
 import psycopg2
 import torch
 import torch.nn as nn
@@ -421,8 +423,7 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
             optimizer,
             mode='min',
             factor=0.5,
-            patience=5,
-            verbose=verbose
+            patience=5
         )
 
         # Create data loaders
@@ -682,44 +683,57 @@ def load_rushing_data_from_db(
         port=5544,
         dbname='devdb01',
         user='dro',
-        password='sicillionbillions'
+        password=os.getenv('DB_PASSWORD', 'sicillionbillions')
     )
 
     query = """
+    WITH game_rushing AS (
+        SELECT
+            p.rusher_player_id as player_id,
+            p.rusher_player_name as player_name,
+            g.season,
+            g.week,
+            p.game_id,
+            SUM(p.rushing_yards) as rushing_yards,
+            SUM(CASE WHEN p.rush THEN 1 ELSE 0 END) as carries,
+            SUM(CASE WHEN p.touchdown = 1 AND p.rush THEN 1 ELSE 0 END) as rushing_tds
+        FROM plays p
+        JOIN games g ON p.game_id = g.game_id
+        WHERE g.season BETWEEN %s AND %s
+            AND p.rusher_player_id IS NOT NULL
+            AND p.season_type = 'REG'
+            AND p.rush = TRUE
+        GROUP BY p.rusher_player_id, p.rusher_player_name, g.season, g.week, p.game_id
+        HAVING SUM(p.rushing_yards) > 0
+    )
     SELECT
-        pgs.player_id,
-        pgs.player_display_name as player_name,
-        pgs.season,
-        pgs.week,
-        pgs.current_team as team,
-        pgs.position_group as position,
-        pgs.stat_yards as rushing_yards,
-        pgs.stat_attempts as carries,
-        pgs.stat_touchdowns as rushing_tds,
+        player_id,
+        player_name,
+        season,
+        week,
+        rushing_yards,
+        carries,
+        rushing_tds,
         -- Rolling averages (lag 3 games)
-        AVG(pgs.stat_yards) OVER (
-            PARTITION BY pgs.player_id
-            ORDER BY pgs.season, pgs.week
+        AVG(rushing_yards) OVER (
+            PARTITION BY player_id
+            ORDER BY season, week
             ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
         ) as avg_rushing_l3,
-        AVG(pgs.stat_attempts) OVER (
-            PARTITION BY pgs.player_id
-            ORDER BY pgs.season, pgs.week
+        AVG(carries) OVER (
+            PARTITION BY player_id
+            ORDER BY season, week
             ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
         ) as avg_carries_l3,
         -- Season average
-        AVG(pgs.stat_yards) OVER (
-            PARTITION BY pgs.player_id, pgs.season
-            ORDER BY pgs.week
+        AVG(rushing_yards) OVER (
+            PARTITION BY player_id, season
+            ORDER BY week
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         ) as season_avg
-    FROM mart.player_game_stats pgs
-    WHERE pgs.season BETWEEN %s AND %s
-      AND pgs.stat_category = 'rushing'
-      AND pgs.position_group IN ('RB', 'FB', 'HB')
-      AND pgs.stat_attempts >= 5
-      AND pgs.stat_yards IS NOT NULL
-    ORDER BY pgs.season, pgs.week, pgs.stat_yards DESC
+    FROM game_rushing
+    WHERE carries >= 5
+    ORDER BY season, week, rushing_yards DESC
     """
 
     df = pd.read_sql(query, conn, params=[start_season, end_season])

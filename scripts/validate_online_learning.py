@@ -91,20 +91,20 @@ def load_player_stats_by_week(
                 g.season,
                 g.week,
                 g.kickoff,
-                p.passer_id AS player_id,
-                p.passer_name AS player_name,
+                p.passer_player_id AS player_id,
+                p.passer_player_name AS player_name,
                 SUM(p.passing_yards) AS passing_yards,
                 COUNT(*) AS num_plays,
-                SUM(CASE WHEN p.pass_attempt = 1 THEN 1 ELSE 0 END) AS attempts,
+                SUM(CASE WHEN p.pass_attempt THEN 1 ELSE 0 END) AS attempts,
                 SUM(CASE WHEN p.complete_pass = 1 THEN 1 ELSE 0 END) AS completions,
                 SUM(CASE WHEN p.interception = 1 THEN 1 ELSE 0 END) AS interceptions,
                 SUM(CASE WHEN p.touchdown = 1 THEN 1 ELSE 0 END) AS touchdowns
             FROM plays p
             JOIN games g ON p.game_id = g.game_id
             WHERE g.season = %s
-                AND p.passer_id IS NOT NULL
+                AND p.passer_player_id IS NOT NULL
                 AND p.season_type = 'REG'
-            GROUP BY p.game_id, g.season, g.week, g.kickoff, p.passer_id, p.passer_name
+            GROUP BY p.game_id, g.season, g.week, g.kickoff, p.passer_player_id, p.passer_player_name
             HAVING SUM(p.passing_yards) >= %s
         )
         SELECT
@@ -335,7 +335,10 @@ def compare_static_vs_online(
     """
     logger.info("Comparing static vs online models...")
 
-    feature_cols = [c for c in df.columns if c not in ['passing_yards', 'kickoff', 'player_id', 'player_name']]
+    # Select only numeric feature columns, excluding target and identifiers
+    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id', 'season', 'week',
+                    'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
+    feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
     X = df[feature_cols]
     y = df['passing_yards']
 

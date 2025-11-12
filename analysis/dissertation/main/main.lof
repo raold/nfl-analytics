@@ -49,31 +49,31 @@
 \contentsline {figure}{\numberline {9.9}{\ignorespaces Training window ablation study results comparing four scenarios on the 2025 hold-out set. Scenario B (2018--2024 with H=4 exponential decay on 2015--2017) achieves the best MAE (47.77 yards) and is statistically superior to both strict 2018--2024 ($p=0.003$) and current 2020--2024 ($p=0.007$) windows. Error bars represent 95\% bootstrap confidence intervals.}}{242}{figure.caption.1474}%
 \contentsline {figure}{\numberline {9.10}{\ignorespaces Coverage-sharpness trade-off for uncertainty quantification methods. Each point represents a method, with x-axis showing average 90\% interval width (lower is sharper) and y-axis showing empirical coverage on 2024 holdout (closer to 90\% is better calibrated). The shaded region marks acceptable calibration (85--95\%). Temperature scaling achieves near-optimal balance: strong calibration (89.5\%) with sharp intervals (17 yards). Conformal methods guarantee coverage at the cost of 4-fold wider intervals.}}{257}{figure.caption.1600}%
 \contentsline {figure}{\numberline {9.11}{\ignorespaces Coverage stability over time (2024 season, weeks 1--18). Conformal prediction maintains near-constant coverage (90--92\%) across all weeks, validating distribution-free guarantees under mild covariate shift. Temperature scaling exhibits slight drift (87--91\%), reflecting sensitivity to distributional changes not captured by fixed $T=0.75$.}}{258}{figure.caption.1607}%
-\contentsline {figure}{\numberline {9.12}{\ignorespaces Week-by-week prequential MAE for 2024 NFL season. Hybrid ensemble (blue) maintains lower error than static baseline (red), especially after Week 8 when online model has accumulated sufficient training data. Vertical dashed lines indicate detected drift events.}}{286}{figure.caption.1643}%
-\contentsline {figure}{\numberline {9.13}{\ignorespaces Evidential regression calibration curve (left) and normalized residual plot (right). Empirical coverage closely tracks expected coverage, with slight under-calibration at extreme confidence levels (95\%). Normalized residuals centered at zero with 68\% within ±1$\sigma $ (target: 68\%).}}{288}{figure.caption.1678}%
-\contentsline {figure}{\numberline {9.14}{\ignorespaces Uncertainty decomposition for evidential regression. Top left: Aleatoric uncertainty (data noise, mean 18.2 yards). Top right: Epistemic uncertainty (model uncertainty, mean 5.7 yards). Bottom left: Scatter plot shows low correlation ($\rho =0.12$) between aleatoric and epistemic. Bottom right: Total uncertainty distribution (mean 19.1 yards).}}{289}{figure.caption.1684}%
+\contentsline {figure}{\numberline {9.12}{\ignorespaces Week-by-week prequential MAE for 2024 NFL season. Online ARF (blue) exhibits extreme variance and fails to converge to reasonable error levels. Static baseline (orange) maintains stable ~56 yard MAE.}}{264}{figure.caption.1642}%
+\contentsline {figure}{\numberline {9.13}{\ignorespaces Evidential regression calibration curve (left) and normalized residual plot (right). The calibration curve reveals severe over-calibration: all predictions fall within even narrow confidence intervals. This indicates the model is too conservative with uncertainty estimates.}}{268}{figure.caption.1684}%
+\contentsline {figure}{\numberline {9.14}{\ignorespaces Uncertainty decomposition for evidential regression. Top left: Aleatoric uncertainty (irreducible data noise, mean 2,359 yards). Top right: Epistemic uncertainty (model uncertainty, mean 11,391 yards). Bottom left: Scatter plot shows epistemic dominates aleatoric. Bottom right: Total uncertainty distribution (mean 11,638 yards).}}{269}{figure.caption.1692}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {10.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{306}{figure.caption.1788}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
-\contentsline {figure}{\numberline {A.1}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{341}{figure.caption.1916}%
-\contentsline {figure}{\numberline {A.2}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{342}{figure.caption.1917}%
+\contentsline {figure}{\numberline {10.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{303}{figure.caption.1796}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{338}{figure.caption.1924}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{339}{figure.caption.1925}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {D.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{356}{figure.caption.2028}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {D.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{353}{figure.caption.2036}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {K.1}{\ignorespaces BNN Investigation Timeline: 6 Failures Over 26 Days (October 14 -- November 9, 2025)}}{401}{figure.caption.2361}%
-\contentsline {figure}{\numberline {K.2}{\ignorespaces 90\% Coverage Calibration: Temperature Scaling (T=0.75) Only Success}}{403}{figure.caption.2362}%
-\contentsline {figure}{\numberline {K.3}{\ignorespaces BNN Failure Taxonomy: Root Causes by Category}}{404}{figure.caption.2363}%
-\contentsline {figure}{\numberline {K.4}{\ignorespaces MC Dropout Gradient Explosion: NaN Losses from Epoch 12}}{406}{figure.caption.2364}%
-\contentsline {figure}{\numberline {K.5}{\ignorespaces Time Investment Waterfall: 84 Hours Across 6 Failures}}{406}{figure.caption.2365}%
-\contentsline {figure}{\numberline {K.6}{\ignorespaces MC Dropout gradient explosion pattern (typical across 5 seeds)}}{411}{figure.caption.2396}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {L.1}{\ignorespaces Ensemble Composition: Performance-Complexity Trade-Off}}{435}{figure.caption.2605}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {K.1}{\ignorespaces BNN Investigation Timeline: 6 Failures Over 26 Days (October 14 -- November 9, 2025)}}{398}{figure.caption.2369}%
+\contentsline {figure}{\numberline {K.2}{\ignorespaces 90\% Coverage Calibration: Temperature Scaling (T=0.75) Only Success}}{400}{figure.caption.2370}%
+\contentsline {figure}{\numberline {K.3}{\ignorespaces BNN Failure Taxonomy: Root Causes by Category}}{401}{figure.caption.2371}%
+\contentsline {figure}{\numberline {K.4}{\ignorespaces MC Dropout Gradient Explosion: NaN Losses from Epoch 12}}{403}{figure.caption.2372}%
+\contentsline {figure}{\numberline {K.5}{\ignorespaces Time Investment Waterfall: 84 Hours Across 6 Failures}}{403}{figure.caption.2373}%
+\contentsline {figure}{\numberline {K.6}{\ignorespaces MC Dropout gradient explosion pattern (typical across 5 seeds)}}{408}{figure.caption.2404}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {L.1}{\ignorespaces Ensemble Composition: Performance-Complexity Trade-Off}}{432}{figure.caption.2613}%
