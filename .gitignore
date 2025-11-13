@@ -2,7 +2,7 @@
 /data/nflverse-data/
 pgdata/
 .env
-.env.example
+# Note: .env.example IS tracked - it's the template for configuration
 .tmp.driveupload/
 
 # Worker logs
