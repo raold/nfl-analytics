@@ -265,7 +265,7 @@ class AgentCoordinator:
             AgentType.DATA_LAYER: AgentCapability(
                 agent_type=AgentType.DATA_LAYER,
                 name="Data Layer Agent",
-                description="Manages database schema, migrations, queries, data integrity, leakage detection, and SQL performance optimization",
+                description="Manages database schema, migrations, queries, data integrity, leakage detection, SQL performance optimization, and column lineage tracking",
                 responsibilities=[
                     "Create database migrations",
                     "Update schema definitions",
@@ -284,6 +284,15 @@ class AgentCoordinator:
                     "Recommend database indexes",
                     "Optimize PostgreSQL queries",
                     "Identify slow query patterns",
+                    # Phase 4: Data Layer Analyzer (Column Lineage)
+                    "Track column usage across codebase",
+                    "Build column lineage (column → consumers)",
+                    "Analyze impact of schema changes (add/modify/remove)",
+                    "Detect unused/dead columns",
+                    "Identify feature opportunities for new columns",
+                    "Validate migrations before deployment",
+                    "Generate dependency graphs (column dependencies)",
+                    "Prevent breaking changes in production",
                 ],
                 file_patterns=[
                     "db/",
@@ -294,6 +303,8 @@ class AgentCoordinator:
                     "ingest_",
                     "py/utils/data_leakage_detector.py",
                     "py/utils/performance_optimizer.py",
+                    "py/utils/data_layer_analyzer.py",
+                    "scripts/analyze_data_layer.sh",
                 ],
                 keywords={
                     "database", "schema", "migration", "query", "sql", "postgres",
@@ -304,6 +315,12 @@ class AgentCoordinator:
                     # Phase 2: Performance
                     "query performance", "slow query", "database optimization",
                     "sql optimization", "index recommendation", "explain analyze",
+                    # Phase 4: Column Lineage & Impact Analysis
+                    "column lineage", "impact analysis", "schema change", "breaking changes",
+                    "unused columns", "dead columns", "column usage", "column tracking",
+                    "dependency graph", "column dependencies", "feature opportunities",
+                    "add column", "remove column", "drop column", "alter column",
+                    "migration validation", "trace column", "column consumers",
                 },
                 dependencies=[],
             ),

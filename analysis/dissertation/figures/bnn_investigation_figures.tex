@@ -119,23 +119,24 @@
 
 \begin{figure}[htbp]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1.5cm and 2cm,
+    node distance=1.5cm and 1.2cm,
     category/.style={rectangle, rounded corners, draw=accent_blue, fill=accent_blue!10,
-                    minimum height=1cm, minimum width=3.5cm, align=center, font=\small},
+                    minimum height=1cm, minimum width=3cm, align=center, font=\small},
     failure/.style={rectangle, draw=red!70!black, fill=red!10,
-                   minimum height=0.7cm, minimum width=2.8cm, align=center, font=\scriptsize},
+                   minimum height=0.7cm, minimum width=2.5cm, align=center, font=\scriptsize},
     arrow/.style={->,>=stealth, thick}
 ]
 
 % Root node
 \node[category, fill=accent_blue!30] (root) {6 BNN Failures\\(Oct 14 - Nov 9)};
 
-% Categories
-\node[category, below left=of root, xshift=-2cm] (comp) {Computational\\(1 failure)};
-\node[category, below=of root, xshift=-1cm] (num) {Numerical\\(2 failures)};
-\node[category, below=of root, xshift=1cm] (calib) {Calibration\\(1 failure)};
-\node[category, below right=of root, xshift=2cm] (arch) {Architectural\\(2 failures)};
+% Categories (reduced xshift to bring nodes closer)
+\node[category, below left=of root, xshift=-1.5cm] (comp) {Computational\\(1 failure)};
+\node[category, below=of root, xshift=-0.5cm] (num) {Numerical\\(2 failures)};
+\node[category, below=of root, xshift=0.5cm] (calib) {Calibration\\(1 failure)};
+\node[category, below right=of root, xshift=1.5cm] (arch) {Architectural\\(2 failures)};
 
 % Specific failures
 \node[failure, below=of comp] (nuts) {NUTS\\Timeout};
@@ -158,15 +159,16 @@
 \draw[arrow] (arch) -- (laplace);
 \draw[arrow] (arch) -- (multiout1);
 
-% Root cause annotations
-\node[font=\tiny, text width=2.5cm, align=center] at (-6, -5) {6+ hours\\per config};
-\node[font=\tiny, text width=2.5cm, align=center] at (-2.5, -5) {Gradient\\explosion};
-\node[font=\tiny, text width=2.5cm, align=center] at (0, -5) {5,316-yard\\outlier};
-\node[font=\tiny, text width=2.5cm, align=center] at (2.5, -5) {VI over-\\confident};
-\node[font=\tiny, text width=2.5cm, align=center] at (4, -5) {9/9 configs\\failed};
-\node[font=\tiny, text width=2.5cm, align=center] at (6.5, -5) {Vegas lines\\84.7\% SHAP};
+% Root cause annotations (adjusted positions)
+\node[font=\tiny, text width=2.2cm, align=center] at (-5, -5) {6+ hours\\per config};
+\node[font=\tiny, text width=2.2cm, align=center] at (-2, -5) {Gradient\\explosion};
+\node[font=\tiny, text width=2.2cm, align=center] at (0, -5) {5,316-yard\\outlier};
+\node[font=\tiny, text width=2.2cm, align=center] at (2, -5) {VI over-\\confident};
+\node[font=\tiny, text width=2.2cm, align=center] at (3.5, -5) {9/9 configs\\failed};
+\node[font=\tiny, text width=2.2cm, align=center] at (5.5, -5) {Vegas lines\\84.7\% SHAP};
 
 \end{tikzpicture}
+}% end resizebox
 \caption{BNN Failure Taxonomy: Root Causes by Category}
 \label{fig:bnn_failure_taxonomy}
 \end{figure}

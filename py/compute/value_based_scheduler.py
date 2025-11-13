@@ -74,8 +74,16 @@ class ValueBasedScheduler:
     5. Dependencies (can't run until other tasks complete)
     """
 
-    def __init__(self, redis_host: str = "localhost", redis_port: int = 6379):
-        self.redis_client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+    def __init__(
+        self, redis_host: str = "localhost", redis_port: int = 6379, redis_password: str = None
+    ):
+        self.redis_client = redis.Redis(
+            host=redis_host,
+            port=redis_port,
+            username="default" if redis_password else None,
+            password=redis_password,
+            decode_responses=True
+        )
 
         # Value estimation models (can be ML models later)
         self.value_estimators = {

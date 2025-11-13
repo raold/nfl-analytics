@@ -1,0 +1,141 @@
+# ============================================================
+# POSTGRESQL CONFIGURATION FOR NFL ANALYTICS
+# Production-optimized settings for query monitoring and performance
+# ============================================================
+#
+# USAGE:
+# 1. Copy to Docker volume: docker cp postgresql.conf.template <container>:/var/lib/postgresql/data/postgresql.conf
+# 2. OR mount as volume in docker-compose.yml:
+#    volumes:
+#      - ./db/docker/postgresql.conf.template:/var/lib/postgresql/data/postgresql.conf
+# 3. Restart PostgreSQL: docker restart <container>
+#
+# Author: NFL Analytics DevOps Team
+# Date: November 13, 2025
+# ============================================================
+
+# ------------------------------------------------------------
+# EXTENSIONS & SHARED LIBRARIES
+# ------------------------------------------------------------
+# CRITICAL: Load TimescaleDB and pg_stat_statements at startup
+shared_preload_libraries = 'timescaledb,pg_stat_statements'
+
+# ------------------------------------------------------------
+# QUERY PERFORMANCE MONITORING (pg_stat_statements)
+# ------------------------------------------------------------
+# Track all queries (including those called from functions)
+pg_stat_statements.track = all
+
+# Maximum number of distinct queries to track
+pg_stat_statements.max = 10000
+
+# Track utility commands (CREATE, ALTER, etc.)
+pg_stat_statements.track_utility = on
+
+# Save statistics across server shutdowns (requires pg_stat_statements 1.8+)
+pg_stat_statements.save = on
+
+# ------------------------------------------------------------
+# MEMORY SETTINGS (for 16GB RAM system)
+# ------------------------------------------------------------
+# Total memory for caching data (25% of RAM)
+shared_buffers = 4GB
+
+# Memory for complex operations (sorting, hashing)
+work_mem = 64MB
+
+# Memory for maintenance operations (VACUUM, CREATE INDEX)
+maintenance_work_mem = 1GB
+
+# Memory for WAL writes
+wal_buffers = 16MB
+
+# Maximum memory for all connections combined
+effective_cache_size = 12GB
+
+# ------------------------------------------------------------
+# QUERY PLANNER SETTINGS
+# ------------------------------------------------------------
+# Cost of random page fetch (SSD optimized)
+random_page_cost = 1.1
+
+# Cost of sequential page fetch
+seq_page_cost = 1.0
+
+# Planner's assumption of effective cache
+effective_io_concurrency = 200
+
+# Number of simultaneous requests
+max_worker_processes = 8
+
+# Parallel query workers
+max_parallel_workers_per_gather = 4
+max_parallel_workers = 8
+
+# ------------------------------------------------------------
+# WRITE AHEAD LOG (WAL) SETTINGS
+# ------------------------------------------------------------
+# Synchronous commit (faster, less durable)
+synchronous_commit = off
+
+# WAL checkpoint settings
+checkpoint_completion_target = 0.9
+wal_compression = on
+
+# ------------------------------------------------------------
+# LOGGING
+# ------------------------------------------------------------
+# Log slow queries (> 1 second)
+log_min_duration_statement = 1000
+
+# Log lines
+log_line_prefix = '%m [%p] %q%u@%d '
+
+# Log query execution times
+log_duration = off
+
+# Log checkpoints for monitoring
+log_checkpoints = on
+
+# Log autovacuum activity
+log_autovacuum_min_duration = 0
+
+# ------------------------------------------------------------
+# AUTOVACUUM (Critical for large tables)
+# ------------------------------------------------------------
+autovacuum = on
+autovacuum_max_workers = 4
+autovacuum_naptime = 30s
+
+# Aggressive autovacuum for plays table (1.2M+ rows)
+autovacuum_vacuum_scale_factor = 0.05
+autovacuum_analyze_scale_factor = 0.02
+
+# ------------------------------------------------------------
+# STATISTICS COLLECTION
+# ------------------------------------------------------------
+track_activities = on
+track_counts = on
+track_io_timing = on
+track_functions = all
+
+# Statistics target (higher = better estimates, slower ANALYZE)
+default_statistics_target = 100
+
+# ------------------------------------------------------------
+# CONNECTION POOLING
+# ------------------------------------------------------------
+max_connections = 100
+
+# ------------------------------------------------------------
+# TIMESCALEDB SPECIFIC SETTINGS
+# ------------------------------------------------------------
+# Enable compression for hypertables
+timescaledb.max_background_workers = 8
+
+# Chunk time interval (7 days for odds_history)
+# Set via: SELECT set_chunk_time_interval('odds_history', INTERVAL '7 days');
+
+# ============================================================
+# END OF CONFIGURATION
+# ============================================================

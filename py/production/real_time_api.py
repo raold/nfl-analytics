@@ -49,11 +49,21 @@ db_pool = SimpleConnectionPool(
 # Redis cache (for sub-100ms latency)
 redis_client = None
 try:
-    redis_client = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
+    import os
+
+    redis_password = os.getenv("REDIS_PASSWORD")
+    redis_client = redis.Redis(
+        host="localhost",
+        port=6379,
+        db=0,
+        username="default" if redis_password else None,
+        password=redis_password,
+        decode_responses=True
+    )
     redis_client.ping()
     logger.info("✓ Redis connected for caching")
-except:
-    logger.warning("Redis not available - caching disabled")
+except Exception as e:
+    logger.warning(f"Redis not available - caching disabled: {e}")
     redis_client = None
 
 # Initialize models

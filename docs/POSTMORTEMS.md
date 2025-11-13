@@ -276,7 +276,275 @@ CLAIM DOCUMENTATION REQUIREMENTS:
 
 ---
 
-**Last Updated:** November 12, 2025
+## 2. State-Space v2 Model Loading Bug (November 13, 2025)
+
+### Timeline
+
+**Nov 10, 18:00:** Hierarchical v2 "new levels" fix created
+- Added `allow_new_levels=TRUE` and `sample_new_levels="gaussian"` to prediction scripts
+- Fix successfully applied to Hierarchical v2 and Informative Priors v2
+- State-Space v2 validation deferred (not yet attempted)
+
+**Nov 13, 10:00:** Full validation of all three models executed
+- Command: `Rscript R/generate_2025_predictions_all_v2.R`
+- Hierarchical v2: ✅ SUCCESS (148 predictions, MAE 42.30)
+- Informative Priors v2: ✅ SUCCESS (148 predictions, MAE 42.24)
+- State-Space v2: ❌ FAILED (dimension mismatch error)
+
+**Nov 13, 10:15:** Error investigation
+- Error message: "incorrect number of dimensions" in bracket indexing
+- Location: Line 203 attempting `mean(fit_ss[, "mu_league"])`
+- Root cause: Incorrect handling of `CmdStanFit` object structure
+
+**Nov 13, 10:30:** Root cause identified
+- Script was calling `.draws()` on already-loaded `CmdStanFit` object
+- Line 200: `fit_ss <- readRDS(...model.rds")$draws()`
+- Problem: `.draws()` returns wrong structure for bracket notation
+- Solution: Convert to array format using `as_draws_array()`
+
+**Nov 13, 10:45:** Fix applied and validated
+- Updated 7 lines of code (200-216)
+- Added conditional type checking
+- Added array conversion step
+- Re-ran validation: ✅ ALL MODELS SUCCESSFUL
+
+---
+
+### What Went Wrong
+
+**1. Object Type Mismatch**
+- Saved model is `CmdStanFit` object
+- Script assumed result of `.draws()` is 2D indexable array
+- Actual `.draws()` returns `posterior_draws` object (3D structure)
+
+**2. Bracket Notation Incompatibility**
+```r
+# BROKEN - Works for arrays, fails for draws objects
+fit_ss <- readRDS("model.rds")$draws()
+mu_league <- mean(fit_ss[, "mu_league"])  # ❌ Dimension error
+```
+
+**3. No Error Handling**
+- Script assumed object structure without defensive coding
+- No `tryCatch` wrapper for critical model operations
+- No type checking before attempting extraction
+
+**4. Inconsistent Testing**
+- Hierarchical v2 tested and working before Nov 13
+- State-Space validation was deferred (different model type)
+- When tested for first time, assumed similar structure to BRMS models
+- BRMS models support posterior_predict(); State-Space uses manual Stan code
+
+---
+
+### Impact
+
+**Time Cost:**
+- 15 minutes to identify root cause
+- 5 minutes to implement fix
+- 45 seconds to re-run validation (full success)
+- **Total: 20 minutes**
+
+**Code Impact:**
+- 7 lines modified in critical prediction script
+- 1 bug fix in production-path code
+- No logic changes, only object handling correction
+
+**Production Impact:**
+- **ZERO** - Caught before deployment during validation
+- State-Space model was not yet integrated into ensemble
+- Fix applied before any live predictions generated
+
+---
+
+### Root Cause
+
+**File:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`
+**Lines:** 200-206 (broken), replaced with 200-216 (fixed)
+
+```r
+# BROKEN (Nov 13, 10:00)
+fit_ss <- readRDS("models/bayesian/simplified_random_walk_v2.rds")$draws()
+mu_league <- mean(fit_ss[, "mu_league"])
+beta_attempts <- mean(fit_ss[, "beta_attempts"])
+beta_home <- mean(fit_ss[, "beta_home"])
+R <- mean(fit_ss[, "R"])
+
+# FIXED (Nov 13, 10:45)
+fit_ss_raw <- readRDS("models/bayesian/simplified_random_walk_v2.rds")
+
+if (inherits(fit_ss_raw, "CmdStanFit")) {
+  fit_ss <- fit_ss_raw$draws()
+} else {
+  fit_ss <- fit_ss_raw
+}
+
+fit_ss_array <- as_draws_array(fit_ss)
+mu_league <- mean(fit_ss_array[,, "mu_league"])
+beta_attempts <- mean(fit_ss_array[,, "beta_attempts"])
+beta_home <- mean(fit_ss_array[,, "beta_home"])
+R <- mean(fit_ss_array[,, "R"])
+```
+
+**Why This Happened:**
+1. Different model types (BRMS vs Stan) have different serialization formats
+2. Hierarchical v2 uses `brms::posterior_predict()` (automatic handling)
+3. State-Space v2 uses manual Stan code requiring custom extraction
+4. Script assumed uniform handling without type checking
+5. Single validation path tested only one model before first production use
+
+---
+
+### Resolution
+
+**1. Applied Type-Safe Extraction**
+- Added conditional type checking
+- Handles both `CmdStanFit` and raw `draws` objects
+- Converts to array format for reliable 3D indexing
+
+**2. Validated All Three Models**
+- Hierarchical v2: ✅ MAE 42.30, Coverage 92.6%
+- Informative Priors v2: ✅ MAE 42.24, Coverage 93.2%
+- State-Space v2: ✅ MAE 48.09, Coverage 83.8%
+- All 148 games across 37 QBs validated
+
+**3. Documented Results**
+- Created `HIERARCHICAL_V2_VERIFICATION_COMPLETE.md`
+- Detailed metrics, calibration analysis, ensemble integration plan
+- Production readiness assessment with monitoring recommendations
+
+---
+
+### Lessons Learned
+
+**1. Object Type Heterogeneity is a Risk**
+- Different model backends (BRMS, Stan, scikit-learn) have different serialization
+- Defensive programming essential when handling multiple model types
+- Type checking should precede assumption-based operations
+
+**Prevention:**
+```r
+# Always check object type before assumptions
+if (!inherits(model, "expected_class")) {
+  stop(sprintf("Expected %s, got %s", "expected_class", class(model)))
+}
+```
+
+**2. Validation Should Be Comprehensive, Not Sequential**
+- Testing Hierarchical v2 first gave false confidence
+- Assumption: "Similar code will work for similar models"
+- Reality: State-Space v2 has completely different extraction logic
+- Solution: Validate all model types together in single pass
+
+**Prevention:**
+```markdown
+MULTI-MODEL VALIDATION:
+- [ ] All models tested in single validation run
+- [ ] Results compared across all variants
+- [ ] Type-specific extraction validated explicitly
+- [ ] Error handling tested for each model path
+```
+
+**3. Array Indexing Conventions Matter**
+- 2D indexing: `array[row, col]`
+- 3D indexing: `array[chain, iteration, parameter]`
+- Mixing conventions leads to dimension errors
+- Always verify dimensionality before indexing
+
+**Prevention:**
+```r
+# Always check dimensions before indexing
+cat(sprintf("Draws object dimensions: %s\n", paste(dim(fit_ss), collapse=" x ")))
+# Use appropriate indexing based on observed dimensions
+```
+
+---
+
+### Prevention Measures Implemented
+
+**1. Type-Safe Model Loading Template**
+```r
+# Template for robust model loading
+load_stan_model_safe <- function(filepath) {
+  obj <- readRDS(filepath)
+
+  # Type checking
+  if (inherits(obj, "CmdStanFit")) {
+    draws <- obj$draws()
+  } else if (inherits(obj, "draws")) {
+    draws <- obj
+  } else {
+    stop(sprintf("Unknown model type: %s", class(obj)))
+  }
+
+  # Convert to standard format
+  draws_array <- as_draws_array(draws)
+  return(draws_array)
+}
+```
+
+**2. Multi-Model Validation Template**
+```r
+# Validate all models together, not sequentially
+validate_all_models <- function(test_data) {
+  models <- c("hierarchical", "priors", "state_space")
+  results <- list()
+
+  for (model_name in models) {
+    cat(sprintf("Validating %s...\n", model_name))
+    results[[model_name]] <- validate_single_model(model_name, test_data)
+  }
+
+  # Compare all results
+  comparison <- bind_rows(lapply(results, `$`, "metrics"))
+  return(comparison)
+}
+```
+
+**3. Dimension Verification Step**
+```r
+# Always verify dimensions before indexing
+verify_and_extract <- function(draws_obj, param_name) {
+  if (length(dim(draws_obj)) != 3) {
+    stop(sprintf("Expected 3D array, got %dD (%s)",
+                 length(dim(draws_obj)),
+                 paste(dim(draws_obj), collapse="x")))
+  }
+
+  # Safe extraction with error handling
+  tryCatch({
+    values <- draws_obj[,, param_name]
+    return(mean(as.numeric(values)))
+  }, error = function(e) {
+    stop(sprintf("Failed to extract %s: %s", param_name, e$message))
+  })
+}
+```
+
+---
+
+### Status
+
+**Bug Status:** ✅ FIXED (Nov 13, 2025, 10:45)
+**Root Cause:** Identified and documented
+**Validation:** All three models now validated successfully
+**Production Impact:** None (caught during development validation phase)
+
+**Model Status after Fix:**
+- ✅ Hierarchical v2: Production-ready (MAE 42.30)
+- ✅ Informative Priors v2: Production-ready (MAE 42.24)
+- ⚠️ State-Space v2: Production-ready with monitoring (MAE 48.09, Coverage 83.8%)
+
+**Next Steps:**
+1. ✅ Update R script with fix
+2. ✅ Validate all models together
+3. Commit fix to git repository
+4. Update ensemble integration plan
+5. Begin A/B testing with 2025 season data
+
+---
+
+**Last Updated:** November 13, 2025
 **Author:** NFL Analytics Research Team
-**Reviewers:** Claude Code (Sonnet 4.5)
-**Next Review:** After hybrid model A/B test completion
+**Reviewers:** Claude Code (Haiku 4.5)
+**Next Review:** After ensemble integration completion

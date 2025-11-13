@@ -607,6 +607,24 @@ Phase 1+2+3 agents distributed across coordinator:
 - **Data files**: `descriptive_name_{version}.{csv,pkl,rds}`
 - **Models**: `{stat_type}_{method}_v{version}.{pkl,rds}`
 
+### File Organization
+
+**⚠️ IMPORTANT:** See [FILE_ORGANIZATION.md](FILE_ORGANIZATION.md) for complete file placement rules.
+
+**Key Rules:**
+- **Root directory:** ONLY README.md, CLAUDE.md, SETUP.md, CONTRIBUTING.md, LICENSE, .gitignore, .env.example, FILE_ORGANIZATION.md
+- **Documentation:** ALL .md/.txt files go in `docs/` subdirectories (never root)
+- **Session summaries:** `docs/archive/YYYY_MMM/`
+- **Milestones:** `docs/milestones/`
+- **Deployment guides:** `docs/deployment/`
+- **Performance reports:** `docs/performance/`
+- **Postmortems:** `docs/fixes/`
+
+**Before creating ANY documentation file:**
+1. Check [FILE_ORGANIZATION.md](FILE_ORGANIZATION.md) Quick Reference Table
+2. Use correct `docs/` subdirectory
+3. Never put .md or .txt files in root directory (except permitted list)
+
 ### Code Style
 
 **Python**:

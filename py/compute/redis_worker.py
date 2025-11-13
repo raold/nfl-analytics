@@ -34,6 +34,7 @@ class RedisComputeWorker(ComputeWorker):
         hardware_profile: str | None = None,
         redis_host: str = "localhost",
         redis_port: int = 6379,
+        redis_password: str | None = None,
     ):
         """Initialize Redis compute worker."""
 
@@ -43,6 +44,7 @@ class RedisComputeWorker(ComputeWorker):
         # Redis configuration
         self.redis_host = redis_host
         self.redis_port = redis_port
+        self.redis_password = redis_password
         self.machine_id = machine_id
 
         # Hardware capabilities
@@ -52,7 +54,9 @@ class RedisComputeWorker(ComputeWorker):
         self.redis_queue = None
 
         # Compute odometer for lifetime tracking
-        self.odometer = ComputeOdometer(redis_host=redis_host, redis_port=redis_port)
+        self.odometer = ComputeOdometer(
+            redis_host=redis_host, redis_port=redis_port, redis_password=redis_password
+        )
 
         # Performance tracking
         self.tasks_completed = 0
@@ -207,7 +211,10 @@ class RedisComputeWorker(ComputeWorker):
         try:
             # Connect to Redis
             self.redis_queue = RedisTaskQueue(
-                redis_host=self.redis_host, redis_port=self.redis_port, machine_id=self.machine_id
+                redis_host=self.redis_host,
+                redis_port=self.redis_port,
+                redis_password=self.redis_password,
+                machine_id=self.machine_id,
             )
 
             # Register machine capabilities

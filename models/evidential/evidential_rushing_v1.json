@@ -1,0 +1,13 @@
+{
+  "architecture": "evidential_regression",
+  "hidden_dims": [
+    128,
+    64
+  ],
+  "dropout_rate": 0.2,
+  "lambda_reg": 0.01,
+  "n_epochs_trained": 38,
+  "final_train_loss": 4.672231127234066,
+  "timestamp": "2025-11-10T20:45:06.495148",
+  "final_val_loss": 4.491365432739258
+}

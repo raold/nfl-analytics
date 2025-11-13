@@ -100,8 +100,12 @@ test_data_2025 <- test_data_2025 %>%
       years_exp <= 10 ~ "veteran",
       TRUE ~ "experienced"
     ),
-    player_season = paste0(player_id, "_", 2024),  # Use 2024 as last training season
-    position_season = paste0(position_group, "_", 2024)
+    # FIXED: Use actual season (2025) instead of hardcoded 2024
+    # This creates new factor levels that weren't seen during training (2015-2024)
+    # The allow_new_levels=TRUE parameter in posterior_predict() will handle this
+    # by using population-level parameters for new player_season combinations
+    player_season = paste0(player_id, "_", season),
+    position_season = paste0(position_group, "_", season)
   ) %>%
   mutate(experience_cat = droplevels(factor(experience_cat)))
 
@@ -117,7 +121,16 @@ cat("STEP 2: Hierarchical Bayesian v2 predictions...\n")
 model_hier <- readRDS("models/bayesian/passing_yards_hierarchical_v2.rds")
 
 # Generate posterior predictive samples
-pred_hier_draws <- posterior_predict(model_hier, newdata = test_data_2025, allow_new_levels = TRUE)
+# allow_new_levels=TRUE: Handles new player_season combinations in 2025 holdout data
+#                         that weren't present during training (2015-2024).
+# sample_new_levels="gaussian": Uses population-level estimates for new factor levels,
+#                               which is the correct behavior for true out-of-sample validation.
+pred_hier_draws <- posterior_predict(
+  model_hier,
+  newdata = test_data_2025,
+  allow_new_levels = TRUE,
+  sample_new_levels = "gaussian"
+)
 
 # Calculate summaries
 hierarchical_preds <- test_data_2025 %>%
@@ -148,7 +161,14 @@ cat("STEP 3: Informative Priors v2 predictions...\n")
 model_priors <- readRDS("models/bayesian/passing_informative_priors_v2.rds")
 
 # Generate posterior predictive samples
-pred_priors_draws <- posterior_predict(model_priors, newdata = test_data_2025, allow_new_levels = TRUE)
+# allow_new_levels=TRUE: Handles new player_season combinations in 2025 holdout data
+# sample_new_levels="gaussian": Uses population-level estimates for new factor levels
+pred_priors_draws <- posterior_predict(
+  model_priors,
+  newdata = test_data_2025,
+  allow_new_levels = TRUE,
+  sample_new_levels = "gaussian"
+)
 
 # Calculate summaries
 priors_preds <- test_data_2025 %>%
@@ -177,13 +197,23 @@ cat(sprintf("✓ Generated %d predictions\n\n", nrow(priors_preds)))
 cat("STEP 4: State-Space v2 predictions...\n")
 
 # Load model
-fit_ss <- readRDS("models/bayesian/simplified_random_walk_v2.rds")$draws()
+fit_ss_raw <- readRDS("models/bayesian/simplified_random_walk_v2.rds")
+
+# Extract draws (handles both CmdStanFit and raw draws objects)
+if (inherits(fit_ss_raw, "CmdStanFit")) {
+  fit_ss <- fit_ss_raw$draws()
+} else {
+  fit_ss <- fit_ss_raw
+}
+
+# Convert to array format for proper indexing
+fit_ss_array <- as_draws_array(fit_ss)
 
 # Extract global parameters
-mu_league <- mean(fit_ss[, "mu_league"])
-beta_attempts <- mean(fit_ss[, "beta_attempts"])
-beta_home <- mean(fit_ss[, "beta_home"])
-R <- mean(fit_ss[, "R"])
+mu_league <- mean(fit_ss_array[,, "mu_league"])
+beta_attempts <- mean(fit_ss_array[,, "beta_attempts"])
+beta_home <- mean(fit_ss_array[,, "beta_home"])
+R <- mean(fit_ss_array[,, "R"])
 
 # Load skill trajectories
 skills <- read_csv("models/bayesian/simplified_random_walk_skills_v2.csv", show_col_types = FALSE)
@@ -195,6 +225,7 @@ skills_final <- skills %>%
   select(player_id, skill_final = skill_mean)
 
 # Generate predictions
+# For new players not in training data, use mu_league as baseline skill
 state_space_preds <- test_data_2025 %>%
   left_join(skills_final, by = "player_id") %>%
   mutate(

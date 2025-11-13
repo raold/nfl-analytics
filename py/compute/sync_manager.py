@@ -70,7 +70,11 @@ class SyncConflictResolver:
         logger.info("🔄 Resolving Redis data conflicts...")
 
         # Create temporary Redis instance for merging
-        temp_redis = redis.Redis(host="localhost", port=6380, decode_responses=True)
+        # Note: This connects to a secondary Redis instance (port 6380) for merging
+        # Password can be passed if secondary Redis also requires authentication
+        temp_redis = redis.Redis(
+            host="localhost", port=6380, password=None, decode_responses=True
+        )
 
         try:
             # Start with local data
@@ -430,8 +434,17 @@ if __name__ == "__main__":
     # Test sync manager
     print("🧪 Testing Google Drive Sync Manager")
 
-    # Connect to Redis
-    redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
+    # Connect to Redis (with optional password from environment)
+    import os
+
+    redis_password = os.getenv("REDIS_PASSWORD")
+    redis_client = redis.Redis(
+        host="localhost",
+        port=6379,
+        username="default" if redis_password else None,
+        password=redis_password,
+        decode_responses=True
+    )
 
     # Initialize sync manager
     sync_manager = GoogleDriveSyncManager(

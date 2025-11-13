@@ -41,6 +41,19 @@ Each ADR follows a standard template:
   - **Impact**: +0.5-1.0 pp ROI improvement, fair model comparison, 47.77 yards MAE
   - **Related**: State-Space v2 approval, ensemble weight optimization
 
+- **[ADR-002: Relaxed Convergence Threshold](ADR-002-relaxed-convergence-threshold.md)** (Nov 9, 2025)
+  - **Decision**: Accept Rhat < 1.02 for complex hierarchical models (from strict < 1.01)
+  - **Impact**: Enables 4-way ensemble, +1-1.5% ROI improvement, Hierarchical v2 and Informative Priors v2 approved
+  - **Related**: ADR-001 (canonical window), 4-way ensemble deployment
+
+### In Progress
+
+- **[ADR-003: Ensemble Calibration Validation and Production Deployment](ADR-003-ensemble-calibration-production.md)** (Nov 10, 2025)
+  - **Decision**: Deploy 4-way ensemble after fixing Bayesian models for 2025 player-season levels
+  - **Impact**: Expected +5.5-7.0% ROI, 85-95% calibration coverage target
+  - **Status**: Awaiting calibration validation results
+  - **Related**: ADR-001 (canonical window), ADR-002 (convergence threshold)
+
 ### Proposed
 
 *(No proposed ADRs)*
@@ -79,7 +92,8 @@ Proposed → Accepted → [Deprecated OR Superseded]
 ```
 
 - **Proposed**: Under discussion, not yet implemented
-- **Accepted**: Approved and being implemented
+- **In Progress**: Decision approved, implementation ongoing
+- **Accepted**: Approved and fully implemented
 - **Deprecated**: No longer recommended, but still in use
 - **Superseded**: Replaced by a newer ADR
 - **Rejected**: Considered but not accepted

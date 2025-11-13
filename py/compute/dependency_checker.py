@@ -88,14 +88,22 @@ class DependencyChecker:
             self._save_cache()
             return False, message
 
-    def check_redis_connection(self, host: str = "localhost", port: int = 6379) -> tuple[bool, str]:
+    def check_redis_connection(
+        self, host: str = "localhost", port: int = 6379, password: str = None
+    ) -> tuple[bool, str]:
         """Check Redis connection."""
 
         # Don't cache Redis connections (they can change)
         try:
             import redis
 
-            r = redis.Redis(host=host, port=port, socket_timeout=2)
+            r = redis.Redis(
+                host=host,
+                port=port,
+                username="default" if password else None,
+                password=password,
+                socket_timeout=2
+            )
             r.ping()
             return True, f"Redis connected at {host}:{port}"
         except ImportError:
