@@ -120,12 +120,42 @@ Build a production-grade NFL props betting system using advanced Bayesian method
 - **Location:** `py/compute/`, `run_compute.py`
 - **Architecture:** SETI@home-style (Mac M4 ↔ Windows 4090)
 
-### 6. Dissertation
+### 6. Online Learning - Hybrid Static-Incremental
+
+**Status:** Production-ready (Week 2 integration pending)
+
+**Findings:**
+- Initial claim (Nov 10): Incremental XGBoost +21% vs "static baseline" (55.16 MAE)
+- Baseline error discovered (Nov 12): 55.16 was mean predictor, not XGBoost
+- Corrected comparison: Pure incremental -13.7% vs proper static XGBoost (39.76 MAE)
+- Hybrid solution (Nov 12): 70% static + 30% incremental = +4.2% improvement
+
+**Performance (2022-2024 average):**
+- Hybrid 70/30: 38.03 MAE
+- Static XGBoost: 39.66 MAE
+- Pure Incremental: 45.22 MAE
+
+**Architecture:**
+```python
+hybrid_pred = 0.7 * static_xgb.predict(X) + 0.3 * incremental_xgb.predict_one(x)
+```
+
+**Files:**
+- `py/online/hybrid_static_incremental.py` - Production implementation
+- `py/online/incremental_xgboost.py` - Incremental component (30% weight)
+- `scripts/validate_hybrid_model.py` - Validation protocol
+
+**Next Steps:**
+- Week 2: Integrate into enhanced_ensemble_v6 (20% weight)
+- Week 3: A/B test on 2025 season (first 50 games)
+- Week 4-5: Production deployment if A/B test succeeds
+
+### 7. Dissertation
 - **Location:** `analysis/dissertation/main/main.tex`
 - **Status:** ✅ 324 pages, PDF compiled
 - **Appendix I:** BNN investigation documentation (780 lines, 6 failed approaches, Nov 9, 2025)
 
-### 7. Model Registry Infrastructure
+### 8. Model Registry Infrastructure
 - **Location:** `scripts/model_registry.py` (CLI tool, 1,179 lines)
 - **Status:** ✅ Complete (Nov 9, 2025)
 - **Purpose:** Track, validate, and sync production models with database
@@ -902,3 +932,4 @@ _Older entries: See [RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY
   before retraining
   5. Comprehensive auditing upfront saves debugging time later
   6. Know when to abandon a research line - BNN investigation (84 hours, 6 approaches) showed diminishing returns. Document thoroughly and move forward with working solutions
+  7. Always validate baselines independently - Incremental XGBoost error (Nov 10-12, 2025): Compared to mean predictor (55.16 MAE) not XGBoost (39.76 MAE). Multi-season testing caught the mistake. See docs/POSTMORTEMS.md

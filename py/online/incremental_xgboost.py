@@ -147,6 +147,52 @@ class IncrementalXGBoost:
             'retrains': self.counter // self.retrain_every,
         }
 
+    def save(self, path: str):
+        """
+        Save incremental model to disk
+
+        Args:
+            path: File path to save model
+        """
+        import pickle
+
+        state = {
+            'window_size': self.window_size,
+            'retrain_every': self.retrain_every,
+            'params': self.params,
+            'window': list(self.window),
+            'counter': self.counter,
+            'is_trained': self.is_trained,
+            'model': self.model,
+        }
+
+        with open(path, 'wb') as f:
+            pickle.dump(state, f)
+
+        logger.info(f"IncrementalXGBoost saved to {path}")
+
+    def load(self, path: str):
+        """
+        Load incremental model from disk
+
+        Args:
+            path: File path to load model from
+        """
+        import pickle
+
+        with open(path, 'rb') as f:
+            state = pickle.load(f)
+
+        self.window_size = state['window_size']
+        self.retrain_every = state['retrain_every']
+        self.params = state['params']
+        self.window = deque(state['window'], maxlen=self.window_size)
+        self.counter = state['counter']
+        self.is_trained = state['is_trained']
+        self.model = state['model']
+
+        logger.info(f"IncrementalXGBoost loaded from {path}")
+
 
 if __name__ == "__main__":
     # Example usage
