@@ -68,6 +68,17 @@ repos:
   #     - id: sqlfluff-fix
   #       files: ^db/.*\.sql$
 
+  # Data Layer Analyzer - Column lineage and impact analysis
+  - repo: local
+    hooks:
+      - id: validate-schema-changes
+        name: Data Layer Impact Analysis
+        entry: ./scripts/analyze_data_layer.sh validate
+        language: system
+        files: ^db/migrations/.*\.sql$
+        pass_filenames: true
+        description: Validate database migrations for breaking changes
+
 # Global settings
 default_language_version:
   python: python3.10
