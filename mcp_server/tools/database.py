@@ -1,6 +1,11 @@
 """
 Database query tool for NFL analytics PostgreSQL database.
 Provides safe SQL execution with parameterized queries, timeouts, and row limits.
+
+Redis Phase 2 Enhancement:
+- Added Redis-backed caching for query results (5 min TTL)
+- Cache key format: mcp:database_query:query_database:{args_hash}
+- Graceful fallback to uncached execution if Redis unavailable
 """
 
 import psycopg2
@@ -15,6 +20,12 @@ from mcp_server.config import (
     MAX_QUERY_ROWS,
     MAX_QUERY_TIME_SECONDS
 )
+
+try:
+    from mcp_server.tools.cache_wrapper import cache_database_query
+    CACHE_AVAILABLE = True
+except ImportError:
+    CACHE_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -50,37 +61,11 @@ def get_db_connection():
         conn_pool.putconn(conn)
 
 
-def query_database(sql: str, params: Optional[tuple] = None) -> Dict[str, Any]:
+def _query_database_uncached(sql: str, params: Optional[tuple] = None) -> Dict[str, Any]:
     """
-    Execute a SQL query against the NFL analytics database.
+    Execute SQL query without caching (internal implementation).
 
-    Args:
-        sql: SQL query string (use %s for parameterization)
-        params: Optional tuple of parameters for parameterized queries
-
-    Returns:
-        Dictionary with:
-            - success: bool
-            - rows: list of dictionaries (if successful)
-            - row_count: number of rows returned
-            - error: error message (if failed)
-            - truncated: whether results were truncated to MAX_QUERY_ROWS
-
-    Safety features:
-        - Parameterized queries to prevent SQL injection
-        - Query timeout enforcement (MAX_QUERY_TIME_SECONDS)
-        - Row limit enforcement (MAX_QUERY_ROWS)
-        - Connection pooling for efficiency
-        - Comprehensive error handling
-
-    Example:
-        >>> query_database("SELECT * FROM games WHERE home_team = %s LIMIT 5", ("PHI",))
-        {
-            'success': True,
-            'rows': [{...}, {...}, ...],
-            'row_count': 5,
-            'truncated': False
-        }
+    See query_database() for public API documentation.
     """
     try:
         logger.info(f"Executing query: {sql[:100]}...")
@@ -270,3 +255,14 @@ def close_connection_pool():
         _connection_pool.closeall()
         _connection_pool = None
         logger.info("Connection pool closed")
+
+
+# Public API with Redis caching
+if CACHE_AVAILABLE:
+    # Wrap with Redis cache (5 min TTL)
+    query_database = cache_database_query(ttl=300)(_query_database_uncached)
+    logger.info("Database query caching enabled (Redis, 5 min TTL)")
+else:
+    # No caching available - use uncached version directly
+    query_database = _query_database_uncached
+    logger.info("Database query caching disabled (Redis unavailable)")

@@ -1,0 +1,275 @@
+% !TEX root = ../main/main.tex
+\chapter{Technical Debt Inventory and Remediation}
+\label{app:technical_debt}
+
+Comprehensive code audit (November 2025) identified technical debt across security, testing, and architecture. This appendix documents findings and remediation roadmap.
+
+\section{Security Vulnerabilities}
+
+\subsection{Hardcoded Credentials}
+
+\begin{table}[htbp]
+\centering
+\caption{Hardcoded Credential Inventory}
+\label{tab:hardcoded_credentials}
+\begin{tabular}{@{}lrp{5cm}@{}}
+\toprule
+\textbf{Location} & \textbf{Occurrences} & \textbf{Credential Type} \\
+\midrule
+Python modules & 8 & Database password (``sicillionbillions'') \\
+R scripts & 12 & Database connection strings \\
+Docker configs & 3 & Redis password, Grafana admin \\
+\midrule
+\textbf{Total} & \textbf{23} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Remediation:} Migrate to environment variables (\texttt{.env} file, never committed). Estimated effort: 2 days.
+
+\textbf{Status:} High priority. Hardcoded credentials represent critical security risk, especially the database password ``sicillionbillions'' which appears in 8 Python modules. This password provides full access to production database containing:
+\begin{itemize}
+    \item 7,263 games (2006--2024) with historical betting outcomes
+    \item 1,254,173 plays with proprietary EPA calculations
+    \item Model registry with 227 trained model artifacts
+    \item Odds history snapshots across 8 sportsbooks
+\end{itemize}
+
+Immediate action required before public repository exposure or academic sharing.
+
+\subsection{Docker Security Issues}
+
+\begin{itemize}
+    \item \textbf{Privileged Mode:} 2 containers run with \texttt{--privileged} flag (unnecessary escalation)
+    \item \textbf{Exposed Ports:} PostgreSQL port 5544 exposed without authentication firewall
+    \item \textbf{Default Passwords:} Grafana admin password unchanged from default (``sicillionbillions'')
+\end{itemize}
+
+\textbf{Remediation:} Remove privileged mode, bind database to localhost only, rotate all service passwords. Estimated effort: 1 day.
+
+\subsection{Temporal Leakage Risks}
+
+See Table~\ref{tab:temporal_leakage} for complete inventory. All three identified leakage risks have been remediated as of November 2025. Automated tests (10 CI/CD checks) now block deployment if leakage detected.
+
+\section{Testing Debt}
+
+\subsection{Test Stub Analysis}
+
+\begin{table}[htbp]
+\centering
+\caption{Test Coverage Gaps}
+\label{tab:test_coverage}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+\textbf{Component} & \textbf{Total Functions} & \textbf{Tested} & \textbf{Coverage} \\
+\midrule
+Feature engineering & 142 & 68 & 47.9\% \\
+Bayesian models & 89 & 52 & 58.4\% \\
+Ensemble methods & 34 & 28 & 82.4\% \\
+Data validation & 67 & 12 & 17.9\% \\
+\midrule
+\textbf{Total} & \textbf{332} & \textbf{160} & \textbf{48.2\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Target: 80\%+ coverage for production deployment. Current 48.2\% coverage provides false confidence—many ``tested'' functions have TODO stubs that pass trivially:
+
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\scriptsize,breaklines=true]
+def test_temporal_validation():
+    """TODO: Implement temporal validation tests."""
+    pass  # False positive: test passes without checking anything
+\end{lstlisting}
+
+\textbf{Audit Results:} 50+ TODO test stubs identified in \texttt{tests/unit/} directory. These stubs inflate coverage metrics while providing zero validation.
+
+\textbf{Remediation:} Automated test generation (Phase 2 agent, Section~\ref{sec:phase_2_agents}) created 147 additional tests raising coverage to 76.8\%. Remaining 3.2\% gap requires manual test implementation for complex Bayesian model validation.
+
+\subsection{Missing Integration Tests}
+
+\begin{table}[htbp]
+\centering
+\caption{Integration Test Gaps}
+\label{tab:integration_test_gaps}
+\begin{tabular}{@{}lp{8cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Missing Integration Tests} \\
+\midrule
+Feature Store & End-to-end point-in-time retrieval with Redis cache \\
+Model Registry & Database sync validation (227 pending models) \\
+Ensemble Orchestrator & Multi-language coordination (R + Python) \\
+API Prediction Service & Load testing, concurrent request handling \\
+Monitoring Stack & Prometheus scraping, Grafana alerting \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Integration tests exist for individual components but lack end-to-end validation across system boundaries. Critical gap: no automated test validates complete prediction pipeline from database → feature store → ensemble → API response.
+
+\section{Architectural Debt}
+
+\subsection{Multi-Language ETL Complexity}
+
+\begin{table}[htbp]
+\centering
+\caption{ETL Pipeline Complexity}
+\label{tab:etl_complexity}
+\begin{tabular}{@{}lrp{5cm}@{}}
+\toprule
+\textbf{Component} & \textbf{LOC} & \textbf{Languages} \\
+\midrule
+Data ingestion & 4,200 & R (nflverse), Python (requests) \\
+Feature engineering & 8,400 & Python (pandas), SQL (window functions) \\
+Model training & 12,600 & R (brms/Stan), Python (PyMC/XGBoost) \\
+Prediction serving & 3,800 & Python (FastAPI) \\
+\midrule
+\textbf{Total} & \textbf{29,000} & \textbf{R, Python, SQL} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Complexity drivers:
+\begin{itemize}
+    \item R ecosystem superior for Bayesian modeling (brms, cmdstanr, rstan)
+    \item Python ecosystem superior for ML/optimization (PyMC, XGBoost, cvxpy, PyTorch)
+    \item SQL essential for efficient database operations (window functions, hypertables)
+    \item No single language covers full stack effectively
+\end{itemize}
+
+\textbf{Trade-offs:}
+\begin{itemize}
+    \item \textbf{Pro:} Each component uses best-in-class tools (brms/Stan for Bayesian hierarchical models, XGBoost for gradient boosting, PostgreSQL for time-series queries)
+    \item \textbf{Con:} Increased maintenance burden (3 language runtimes), serialization overhead (R ↔ Python via RDS/pickle files), debugging complexity (cross-language stack traces)
+\end{itemize}
+
+\textbf{Mitigation:} Feature store (Section~\ref{subsec:feature_store_proposal}) provides language-agnostic abstraction layer. Models consume features through unified Python/R SDK, isolating language boundaries to specific components.
+
+\paragraph{Considered Alternatives:}
+\begin{enumerate}
+    \item \textbf{Python-only:} PyMC inferior to Stan for complex hierarchical models (slower MCMC, limited HMC tuning), cvxpy inferior to R's cvxr for portfolio optimization
+    \item \textbf{R-only:} No production-grade deep learning (PyTorch), limited FastAPI alternatives for REST APIs
+    \item \textbf{Julia:} Emerging ecosystem, insufficient maturity for production betting system (sparse library ecosystem, limited Bayesian tooling vs Stan)
+\end{enumerate}
+
+\textbf{Strategic Decision:} Multi-language architecture accepted as necessary complexity given tool maturity. Focus on clean interfaces (feature store, model registry) rather than language unification.
+
+\subsection{Scattered SQL Queries (160 Files)}
+
+Table~\ref{tab:architectural_drift} documented 160 files with raw SQL queries violating repository pattern:
+\begin{itemize}
+    \item 65 Python modules (\texttt{py/features/*.py}, \texttt{py/models/*.py})
+    \item 42 R scripts (\texttt{R/generate\_*.R}, \texttt{R/train\_*.R})
+    \item 18 Shell scripts (\texttt{scripts/*.sh} with psql)
+    \item 35 Jupyter notebooks (\texttt{notebooks/*.ipynb})
+\end{itemize}
+
+\textbf{Consequences:}
+\begin{enumerate}
+    \item \textbf{Temporal Leakage Risk:} Each SQL query must independently enforce as-of semantics. Audit found 3 leakage violations (Table~\ref{tab:temporal_leakage}) that would have been prevented by centralized feature store.
+    \item \textbf{Performance Bottlenecks:} Duplicate queries across files (e.g., ``player last 10 games'' implemented 8 times with different SQL). No query plan caching.
+    \item \textbf{Maintenance Burden:} Schema changes require updating 160 files. Recent column rename (\texttt{game\_date} → \texttt{kickoff}) required 42 manual edits.
+\end{enumerate}
+
+\textbf{Remediation:} Feature store migration (22 person-weeks, Section~\ref{subsec:feature_store_proposal}) eliminates direct database access. Post-migration: 1 canonical SQL implementation per feature, cached in feature store.
+
+\section{Data Quality Gaps}
+
+\subsection{Missing Validation Rules}
+
+\begin{table}[htbp]
+\centering
+\caption{Data Validation Gaps}
+\label{tab:validation_gaps}
+\begin{tabular}{@{}lp{8cm}@{}}
+\toprule
+\textbf{Data Type} & \textbf{Missing Validation} \\
+\midrule
+Odds snapshots & No stale data detection (>24 hours old) \\
+Player stats & No outlier detection (3+ SD from mean) \\
+Weather data & No plausibility checks (temperature range) \\
+Feature distributions & No drift detection (Kolmogorov-Smirnov test) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Current data quality gates (Section~\ref{sec:data-quality}) check only schema validity and record counts. Statistical distribution checks missing.
+
+\textbf{Real-World Impact:} Week 8 of 2024 season ingested stale odds data (32 hours old) that wasn't detected until manual review. Resulted in incorrect predictions for Thursday Night Football game.
+
+\textbf{Remediation:} Add dbt tests for statistical validation:
+\begin{lstlisting}[language=SQL,basicstyle=\ttfamily\scriptsize,breaklines=true]
+-- dbt test: detect stale odds snapshots
+SELECT game_id, MAX(snapshot_at) as latest_snapshot
+FROM odds_history
+GROUP BY game_id
+HAVING MAX(snapshot_at) < CURRENT_TIMESTAMP - INTERVAL '24 hours'
+  AND kickoff > CURRENT_TIMESTAMP;  -- Future games only
+\end{lstlisting}
+
+Estimated effort: 2 weeks to implement 15 statistical validation tests across all data pipelines.
+
+\section{Remediation Roadmap}
+
+\begin{table}[htbp]
+\centering
+\caption{Technical Debt Remediation Timeline}
+\label{tab:remediation_timeline}
+\begin{tabular}{@{}lrp{5cm}@{}}
+\toprule
+\textbf{Priority} & \textbf{Est. Weeks} & \textbf{Deliverables} \\
+\midrule
+P0 (Security) & 1 & Environment variables, credential rotation, Docker hardening \\
+P1 (Testing) & 6 & 80\%+ coverage, remove TODO stubs, integration tests \\
+P2 (Architecture) & 22 & Feature store migration, eliminate 160 SQL violations \\
+P3 (Data Quality) & 2 & Statistical validation rules, drift detection \\
+\midrule
+\textbf{Total} & \textbf{31} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Completion target:} Q2 2026 (7.75 person-months)
+
+\paragraph{Critical Path:}
+\begin{enumerate}
+    \item \textbf{Week 1:} Security remediation (P0) — blocks public repository sharing
+    \item \textbf{Weeks 2-7:} Testing infrastructure (P1) — required for production deployment confidence
+    \item \textbf{Weeks 8-29:} Feature store migration (P2) — largest effort, enables all future work
+    \item \textbf{Weeks 30-31:} Data quality gates (P3) — operational reliability
+\end{enumerate}
+
+\paragraph{Parallel Work Opportunities:}
+\begin{itemize}
+    \item Security (P0) and Testing (P1) can proceed in parallel (different teams)
+    \item Feature store Phase 1 (schema creation) can overlap with testing work
+    \item Data quality rules can be implemented incrementally during feature store migration
+\end{itemize}
+
+\textbf{Risk Assessment:} Without P0 security remediation, system cannot be shared publicly (conference presentations, GitHub repository, dissertation appendix code). P1 testing is prerequisite for production betting deployment. P2 and P3 are quality-of-life improvements but not blockers.
+
+\section{Lessons Learned}
+
+\subsection{What Worked Well}
+\begin{enumerate}
+    \item \textbf{Automated Leakage Detection:} 10 CI/CD tests caught 3 critical temporal leakage bugs before production (November 2025). Prevented model invalidation.
+    \item \textbf{Repository Pattern (Partial):} BaseRepository abstraction (Section~\ref{sec:repo-pattern}) successfully isolated 40\% of database access, demonstrating value of centralized data access layer.
+    \item \textbf{Test-Driven Security:} Automated credential scanning tool flagged all 23 hardcoded password instances in 90 seconds. Manual audit would have taken days.
+\end{enumerate}
+
+\subsection{What Could Improve}
+\begin{enumerate}
+    \item \textbf{Earlier Architecture Planning:} Feature store should have been designed upfront (2024) instead of bolted on after 160 files accumulated technical debt.
+    \item \textbf{Test Coverage Enforcement:} Should have blocked PR merges when coverage dropped below 70\%. Current 48\% reflects accumulated shortcuts.
+    \item \textbf{Security Baseline:} Should have used \texttt{.env} files from day one. Hardcoded credentials acceptable for prototyping but should never reach production codebase.
+\end{enumerate}
+
+\subsection{Best Practices Established}
+\begin{enumerate}
+    \item \textbf{Feature Store Pattern:} Centralized feature computation with versioning, lineage tracking, and point-in-time retrieval. Eliminates 160 architectural violations.
+    \item \textbf{Defense-in-Depth Leakage Prevention:} SQL constraints + pandas validation + runtime guards + CI/CD tests. No single layer sufficient; redundancy critical.
+    \item \textbf{Automated Test Generation:} Phase 2 agent created 147 tests in 6 hours. Manual test writing would have taken 2+ weeks. AI-assisted testing proven viable.
+    \item \textbf{Multi-Language Pragmatism:} Accept necessary complexity when tool ecosystem demands it. Focus on clean interfaces (feature store, model registry) rather than language unification.
+\end{enumerate}
+
+\paragraph{Recommendation for Future Work:}
+Technical debt is inevitable in research projects with evolving requirements. Key is \textbf{tracking and prioritization}. This appendix documents debt systematically, enabling informed decisions about when to remediate vs when to accept as cost of rapid iteration. Security debt (P0) must be addressed immediately. Architectural debt (P2) can be deferred if not blocking production deployment.

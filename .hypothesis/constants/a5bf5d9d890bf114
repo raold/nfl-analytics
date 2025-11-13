@@ -1,4 +1,0 @@
-# file: /Users/dro/rice/nfl-analytics/py/optimization/portfolio_optimizer.py
-# hypothesis_version: 6.147.0
-
-[0.0, 0.0001, 0.02, 0.05, 0.1, 0.25, 0.3, 0.5, 0.55, 0.58, 0.6, 0.7, 1.0, 1.9, 1.91, 1.95, 10.0, 25.0, 30.0, 35.0, 65.5, 72.0, 85.5, 95.0, 275.5, 290.0, 2024, '\nPortfolio metrics:', '-', '2024_06_KC_BUF', '2024_06_MIA_NE', '__main__', 'avg_correlation', 'bet_amount', 'edge', 'expected_profit', 'expected_return', 'game_id', 'hill', 'kelce', 'kelly_fraction', 'line', 'mahomes', 'max_bet_size', 'n_bets', 'odds', 'passing_yards', 'player_id', 'portfolio_std', 'predicted_prob', 'prop_type', 'receiving_yards', 'sharpe_ratio', 'status', 'total_exposure', 'week']

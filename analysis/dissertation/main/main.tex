@@ -41,6 +41,7 @@
 % Global accent palette (colorblind-safe blue)
 \definecolor{accentBlue}{RGB}{31,119,180}
 \definecolor{accent_blue}{RGB}{31,119,180}  % Alias for consistency
+\definecolor{accentblue}{RGB}{31,119,180}  % Alias for TikZ diagrams (lowercase)
 \usepackage{tcolorbox}          % Colored boxes for highlights
 \usepackage[disable]{todonotes} % Disable todo notes for clean builds
 \usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization
@@ -51,7 +52,7 @@
 % This provides the classic LaTeX appearance with superior math typesetting
 % (mathpazo removed to use default Computer Modern fonts)
 \usepackage{tikz}                % TikZ for diagrams/flowcharts
-\usetikzlibrary{arrows.meta,positioning,calc}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
 \usepackage{pgfplots}            % Vector plots for inline charts (e.g., feature importance)
 \pgfplotsset{compat=1.18}
 % Default, slightly smaller pgfplots text for figures
@@ -407,6 +408,9 @@ The code is released under the MIT License for academic and research use. Commer
 
 % Appendix D: Incremental XGBoost Investigation (NEW - November 12, 2025)
 \input{../appendix/appendix_incremental_xgb_investigation.tex}
+
+% Appendix E: Technical Debt Inventory (NEW - November 13, 2025)
+\input{../appendix/appendix_technical_debt.tex}
 
 % ---------------------------------------------------
 % Back Matter and References

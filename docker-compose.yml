@@ -34,6 +34,8 @@ services:
       - "6379:6379"
     command:
       - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD:-changeme_redis_password}
       - --maxmemory
       - "2gb"
       - --maxmemory-policy
@@ -41,7 +43,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme_redis_password}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,7 +62,10 @@ services:
     container_name: nfl-analytics-api
     environment:
       - DATABASE_URL=postgresql://dro:sicillionbillions@nfl-analytics-pg-1:5432/devdb01
-      - REDIS_URL=redis://nfl-analytics-redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme_redis_password}@nfl-analytics-redis:6379
+      - REDIS_HOST=nfl-analytics-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-changeme_redis_password}
       - API_HOST=0.0.0.0
       - API_PORT=8000
       - LOG_LEVEL=INFO
@@ -104,6 +109,7 @@ services:
       - DB_PASSWORD=sicillionbillions
       - REDIS_HOST=nfl-analytics-redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-changeme_redis_password}
       - LOG_LEVEL=INFO
     ports:
       - "8501:8501"
@@ -202,7 +208,10 @@ services:
     container_name: nfl-analytics-mcp
     environment:
       - DATABASE_URL=postgresql://dro:sicillionbillions@nfl-analytics-pg-1:5432/devdb01
-      - REDIS_URL=redis://nfl-analytics-redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme_redis_password}@nfl-analytics-redis:6379
+      - REDIS_HOST=nfl-analytics-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-changeme_redis_password}
       - MCP_LOG_LEVEL=INFO
       - MCP_SERVER_PORT=3000
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}

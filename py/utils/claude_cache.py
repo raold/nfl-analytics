@@ -88,11 +88,12 @@ class ClaudeRedisCache:
             "created_at": datetime.now().isoformat(),
         }
 
-        # Initialize Redis connection with connection pooling
+        # Initialize Redis connection with connection pooling (with ACL support for Redis 6+)
         self.redis_client = redis.Redis(
             host=host,
             port=port,
             db=db,
+            username="default" if password else None,
             password=password,
             decode_responses=True,  # Auto-decode responses to strings
             socket_keepalive=True,

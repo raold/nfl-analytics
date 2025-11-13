@@ -1,6 +1,12 @@
 """
 ESPN news fetcher for NFL teams.
 Provides real-time news and updates with caching and rate limiting.
+
+Redis Phase 2 Enhancement:
+- Migrated from file-based caching to Redis-backed caching
+- Cache key format: mcp:team_news:fetch_espn_news:{args_hash}
+- TTL: 1 hour (configurable)
+- Graceful fallback to uncached execution if Redis unavailable
 """
 
 import requests
@@ -18,6 +24,12 @@ from mcp_server.config import (
     NEWS_CACHE_SECONDS,
     MCP_CACHE_DIR
 )
+
+try:
+    from mcp_server.tools.cache_wrapper import cache_news
+    CACHE_AVAILABLE = True
+except ImportError:
+    CACHE_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -144,40 +156,15 @@ def _rate_limit() -> None:
     _last_request_time = time.time()
 
 
-def fetch_espn_news(team: str, limit: int = 10) -> List[Dict[str, Any]]:
+def _fetch_espn_news_uncached(team: str, limit: int = 10) -> List[Dict[str, Any]]:
     """
-    Fetch recent ESPN news for an NFL team.
+    Fetch ESPN news without caching (internal implementation).
 
-    Args:
-        team: Team abbreviation (e.g., "PHI") or full name (e.g., "Eagles")
-        limit: Maximum number of articles to return (default 10)
-
-    Returns:
-        List of article dictionaries with keys:
-            - title: Article headline
-            - url: Link to full article
-            - published: Publication timestamp (if available)
-            - description: Article summary (if available)
-
-    Features:
-        - Automatic team name normalization
-        - 1-hour cache to reduce API calls
-        - Rate limiting (1 request/second)
-        - Fallback to HTML scraping if API fails
-
-    Example:
-        >>> articles = fetch_espn_news("PHI", limit=5)
-        >>> for article in articles:
-        ...     print(article['title'])
+    See fetch_espn_news() for public API documentation.
     """
     # Normalize team name
     team_normalized = _normalize_team_name(team)
     logger.info(f"Fetching news for {team_normalized} (limit: {limit})")
-
-    # Check cache first
-    cached = _load_cache(team_normalized)
-    if cached:
-        return cached[:min(limit, MAX_NEWS_ARTICLES)]
 
     # Enforce limit
     limit = min(limit, MAX_NEWS_ARTICLES)
@@ -239,10 +226,6 @@ def fetch_espn_news(team: str, limit: int = 10) -> List[Dict[str, Any]]:
 
         logger.info(f"Found {len(articles)} articles for {team_normalized}")
 
-        # Save to cache
-        if articles:
-            _save_cache(team_normalized, articles)
-
         return articles
 
     except Exception as e:
@@ -251,6 +234,45 @@ def fetch_espn_news(team: str, limit: int = 10) -> List[Dict[str, Any]]:
 
         # Return empty list on error
         return []
+
+
+# Public API with Redis caching
+if CACHE_AVAILABLE:
+    # Wrap with Redis cache (1 hour TTL)
+    fetch_espn_news = cache_news(ttl=3600)(_fetch_espn_news_uncached)
+    logger.info("ESPN news caching enabled (Redis, 1 hour TTL)")
+else:
+    # No caching available - use uncached version directly
+    fetch_espn_news = _fetch_espn_news_uncached
+    logger.info("ESPN news caching disabled (Redis unavailable)")
+
+# Add docstring to public function
+fetch_espn_news.__doc__ = """
+Fetch recent ESPN news for an NFL team.
+
+Args:
+    team: Team abbreviation (e.g., "PHI") or full name (e.g., "Eagles")
+    limit: Maximum number of articles to return (default 10)
+
+Returns:
+    List of article dictionaries with keys:
+        - title: Article headline
+        - url: Link to full article
+        - published: Publication timestamp (if available)
+        - description: Article summary (if available)
+
+Features:
+    - Automatic team name normalization
+    - Redis-backed caching (1 hour TTL)
+    - Rate limiting (1 request/second)
+    - Fallback to HTML scraping if API fails
+    - Graceful fallback to uncached execution if Redis unavailable
+
+Example:
+    >>> articles = fetch_espn_news("PHI", limit=5)
+    >>> for article in articles:
+    ...     print(article['title'])
+"""
 
 
 def _get_team_slug(team_name: str) -> str:

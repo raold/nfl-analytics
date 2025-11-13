@@ -94,6 +94,7 @@ class EnhancedEnsemble4Way:
         informative_path: str = "models/bayesian/passing_informative_priors_v2.rds",
         xgboost_path: str = "models/xgboost/passing_xgboost_v2_canonical.pkl",
         weights: Optional[Dict[str, float]] = None,
+        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_4way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -109,6 +110,7 @@ class EnhancedEnsemble4Way:
             informative_path: Path to informative priors v2 RDS model
             xgboost_path: Path to XGBoost v2 PKL model
             weights: Custom weights (if None, uses DEFAULT_WEIGHTS)
+            temperature_scaler_path: Path to temperature scaler (if None, no calibration)
             db_host, db_port, db_name, db_user, db_password: Database config
         """
         self.project_root = Path(__file__).parent.parent.parent
@@ -137,6 +139,22 @@ class EnhancedEnsemble4Way:
         self.models_loaded = False
         self.xgboost_model = None
         self.skills_df = None  # For state-space predictions
+
+        # Temperature scaling for calibration
+        self.temperature_scaler = None
+        self.temperature = 1.0  # Default: no scaling
+        if temperature_scaler_path:
+            temp_path = self._resolve_path(temperature_scaler_path)
+            if temp_path.exists():
+                import pickle
+                with open(temp_path, 'rb') as f:
+                    scaler_data = pickle.load(f)
+                    self.temperature = scaler_data['temperature']
+                    self.temperature_scaler = scaler_data
+                logger.info(f"Loaded temperature scaler: T = {self.temperature:.4f}")
+            else:
+                logger.warning(f"Temperature scaler not found: {temp_path}")
+                logger.warning("Predictions will be UNCALIBRATED (overcalibrated)")
 
         logger.info(f"Initialized 4-way ensemble with weights: {self.weights}")
 
@@ -277,7 +295,8 @@ class EnhancedEnsemble4Way:
             # Generate posterior predictions
             ro.r.assign('new_data', r_df)
             ro.r('new_data$log_attempts <- log(pmax(new_data$attempts, 1))')
-            ro.r('posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000)')
+            # CRITICAL: allow_new_levels=TRUE for 2025 holdout (new player_season levels)
+            ro.r('posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)')
 
             # CRITICAL: R models predict log_yards, must exponentiate
             ro.r('posterior_preds_exp <- exp(posterior_preds)')
@@ -592,7 +611,11 @@ class EnhancedEnsemble4Way:
         within_var = np.sum(active_weights * (stds ** 2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
-        ensemble_std = np.sqrt(ensemble_var)
+        ensemble_std_raw = np.sqrt(ensemble_var)
+
+        # Apply temperature scaling for calibration
+        # σ_calibrated = σ_raw × √T
+        ensemble_std = ensemble_std_raw * np.sqrt(self.temperature)
 
         # 90% prediction interval (assuming normal)
         quantile_10 = ensemble_mean - 1.645 * ensemble_std

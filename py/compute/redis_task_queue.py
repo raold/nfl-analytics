@@ -111,6 +111,7 @@ class RedisTaskQueue:
         redis_host: str = "localhost",
         redis_port: int = 6379,
         redis_db: int = 0,
+        redis_password: str = None,
         machine_id: str = None,
     ):
         """Initialize Redis task queue."""
@@ -119,11 +120,13 @@ class RedisTaskQueue:
         self.redis_db = redis_db
         self.machine_id = machine_id or self._generate_machine_id()
 
-        # Connect to Redis
+        # Connect to Redis (with ACL support for Redis 6+)
         self.redis_client = redis.Redis(
             host=redis_host,
             port=redis_port,
             db=redis_db,
+            username="default" if redis_password else None,
+            password=redis_password,
             decode_responses=True,
             socket_connect_timeout=5,
             socket_timeout=5,
