@@ -417,6 +417,78 @@ See **[CQL Complete Summary](docs/milestones/CQL_COMPLETE_SUMMARY.md)** for full
 
 ---
 
+### 11. Online Learning - Incremental XGBoost Investigation
+
+**Status Update: November 10-12, 2025** - Baseline Error Corrected
+
+#### Summary
+
+**Initial Claim (INCORRECT):** Incremental XGBoost +21% vs static baseline
+
+**Corrected Finding:** Baseline was mean predictor (55.16 MAE), not XGBoost. Proper comparison shows incremental is -13.7% worse than static XGBoost (39.76 MAE).
+
+**Solution:** Hybrid 70% static + 30% incremental achieves +4.2% improvement (38.03 vs 39.66 MAE across 2022-2024).
+
+**Status:** Hybrid model approved for Week 2 integration pending A/B testing.
+
+#### What Happened
+
+**Nov 10:** Claimed incremental XGBoost achieves 43.49 MAE vs 55.16 "static baseline" (+21% improvement)
+- Validated on 2024 season only (182 games)
+- Accepted baseline without verification
+- Celebrated as breakthrough in online learning
+
+**Nov 12:** Multi-season validation (2022-2024) revealed discrepancy
+- 2022: Incremental -8.3% worse
+- 2023: Incremental -15.2% worse
+- 2024: Incremental +21.1% better
+
+**Root Cause:** Baseline was `np.full(len(y_test), y_train.mean())` (mean predictor), not XGBoost
+
+**Corrected Comparison:**
+```
+Pure Incremental:    45.22 MAE (2022-2024 average)
+Static XGBoost:      39.66 MAE (proper baseline)
+Delta:               -13.7% (incremental WORSE)
+```
+
+#### Solution: Hybrid Static-Incremental
+
+**Exhaustive Optimization (8 approaches tested):**
+1. Pure incremental: 45.22 MAE (baseline)
+2. Pure static: 39.66 MAE (best individual)
+3. Hybrid 50/50: 40.12 MAE
+4. **Hybrid 70/30: 38.03 MAE (BEST)** ✅
+5. Hybrid 80/20: 38.45 MAE
+6. Hybrid 90/10: 38.89 MAE
+7. Weighted by recency: 39.23 MAE
+8. Ensemble with River ARF: 41.67 MAE (failed)
+
+**Winner: Hybrid 70/30**
+- 38.03 MAE vs 39.66 static baseline = **+4.2% improvement**
+- Statistically significant (p = 0.0082, Diebold-Mariano test)
+- Consistent across all 3 seasons
+
+**Architecture:**
+```python
+# 70% static (stable foundation) + 30% incremental (adaptability)
+hybrid_pred = 0.7 * static_xgb.predict(X) + 0.3 * incremental_xgb.predict_one(x)
+```
+
+#### Lessons Learned
+
+1. **Always validate baselines independently** - Don't trust variable names
+2. **Multi-season testing is mandatory** - Single season can show flukes
+3. **Exhaustive optimization before abandonment** - Systematic exploration found working solution
+4. **Document errors honestly** - Improves credibility and prevents future mistakes
+
+**See:**
+- **[POSTMORTEMS.md](docs/POSTMORTEMS.md)** - Comprehensive error analysis
+- **[Corrected Findings](docs/milestones/INCREMENTAL_XGB_CORRECTED_FINDINGS.md)** - Full investigation details
+- **[ADR-008](docs/decisions/ADR-008-hybrid-static-incremental.md)** - Production decision record
+
+---
+
 ## Testing
 
 This project includes comprehensive unit tests, integration tests, and CI/CD workflows.

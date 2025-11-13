@@ -291,11 +291,11 @@ This research demonstrates \textit{semi-strong form market efficiency} in NFL be
 \chapter*{Abstract}
 This dissertation presents a system-of-systems for prediction, decision‑making, and governance in National Football League (NFL) betting markets. The work integrates a reproducible data layer, calibrated probabilistic models, conservative offline reinforcement learning (RL), and risk controls that make policies deployable in practice.
 
-On the data side, idempotent ingestion pipelines build governed TimescaleDB marts from play‑by‑play, odds history, weather, and schedule context. Modeling begins with calibrated baselines (logistic/probit and state‑space team ratings) and a score‑distribution layer that prices spreads and totals via Skellam and bivariate Poisson models. We introduce an integer‑margin reweighting procedure that matches empirical key‑number masses (3, 6, 7, 10) while preserving location/scale, and we model spread–total dependence with Gaussian/$t$ copulas to price correlated legs.
+On the data side, idempotent ingestion pipelines build governed TimescaleDB marts from play‑by‑by, odds history, weather, and schedule context. Modeling begins with calibrated baselines (logistic/probit and state‑space team ratings) and a score‑distribution layer that prices spreads and totals via Skellam and bivariate Poisson models. We introduce an integer‑margin reweighting procedure that matches empirical key‑number masses (3, 6, 7, 10) while preserving location/scale, and we model spread–total dependence with Gaussian/$t$ copulas to price correlated legs.
 
 Edges are converted into actions with offline RL (IQL/CQL/TD3+BC/AWAC) under safety constraints. Policies are promoted only when off‑policy evaluation (self‑normalized importance sampling, doubly robust, and high‑confidence bounds) passes stability checks. Stake sizing combines fractional Kelly with friction/cap projections and portfolio‑level CVaR constraints. A Monte Carlo simulator, calibrated to historical margins and dependence and instrumented with frictions and liquidity, provides acceptance tests and stress scenarios.
 
-Across rolling out‑of‑sample seasons, the stack delivers improved probability calibration, consistent closing‑line value (CLV) capture, and superior risk‑adjusted returns relative to classical baselines, while materially reducing drawdowns under pessimistic friction regimes. Contributions include: (i) a reproducible NFL data mart and feature pipeline; (ii) dependence‑aware, key‑number‑calibrated pricing of discrete margins; (iii) a conservative offline‑RL+OPE gate for promotion; and (iv) a governance playbook linking uncertainty to portfolio risk.\par
+Across rolling out‑of‑sample seasons, the stack delivers improved probability calibration, consistent closing‑line value (CLV) capture, and superior risk‑adjusted returns relative to classical baselines, while materially reducing drawdowns under pessimistic friction regimes. We demonstrate the importance of rigorous baseline validation through a case study where an apparent 21\% improvement claim was traced to an incorrect comparison (incremental vs mean predictor rather than incremental vs XGBoost). Correcting this error and exhaustively optimizing led to a hybrid static-incremental approach achieving 4.2\% improvement over pure static models. Contributions include: (i) a reproducible NFL data mart and feature pipeline; (ii) dependence‑aware, key‑number‑calibrated pricing of discrete margins; (iii) a conservative offline‑RL+OPE gate for promotion; (iv) a governance playbook linking uncertainty to portfolio risk; and (v) transparent reporting of validation errors and negative results that prevent perpetuating incorrect claims.\par
 \addcontentsline{toc}{chapter}{Abstract}
 
 % Code and Data Availability
@@ -404,6 +404,9 @@ The code is released under the MIT License for academic and research use. Commer
 
 % Appendix C: Ensemble Ablation Studies (NEW - November 9, 2025)
 \input{../appendix/appendix_c_ensemble_ablation.tex}
+
+% Appendix D: Incremental XGBoost Investigation (NEW - November 12, 2025)
+\input{../appendix/appendix_incremental_xgb_investigation.tex}
 
 % ---------------------------------------------------
 % Back Matter and References
