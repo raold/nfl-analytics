@@ -270,6 +270,18 @@ class OnlineModelAdapter:
                 grace_period=self.grace_period,
                 seed=42,
             )
+        elif self.model_type == 'adaptive_random_forest_nfl':
+            # NFL-optimized ARF: Tuned for small datasets (373 samples)
+            return forest.ARFRegressor(
+                n_models=3,           # Fewer models, more samples each (124 per model)
+                max_features='sqrt',  # Use sqrt(features) for each split
+                lambda_value=2,       # Faster adaptation
+                grace_period=10,      # Quick splits (2.7% of dataset)
+                delta=0.10,          # Less conservative split decisions (higher = faster splits)
+                tau=0.10,            # Tie-breaking threshold (higher = faster splits)
+                drift_detector=ADWIN(delta=0.01),  # More sensitive
+                seed=42,
+            )
         elif self.model_type == 'amrules':
             # Adaptive Model Rules: Fast rule-based learner
             return forest.AMFRegressor(
