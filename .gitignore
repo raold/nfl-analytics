@@ -34,8 +34,8 @@ machine_info.json
 .dockerignore
 .gitattributes
 
-# GitHub workflows (sensitive automation)
-.github/workflows/
+# GitHub workflows (sensitive automation) - REMOVED to allow CI/CD workflows
+# .github/workflows/
 
 # Claude local context
 .claude/
