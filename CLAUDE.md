@@ -374,15 +374,17 @@ workflow = coordinator.suggest_workflow(routing.primary_agent)
 
 ---
 
-## Agent Infrastructure (Phases 1, 2, 3 + Research Coordinator)
+## Agent Infrastructure (Phases 1, 2, 3 + Research Coordinator + Nov 14 Additions)
 
-**✅ ALL PHASES COMPLETE** (November 9, 2025)
+**✅ ALL PHASES COMPLETE + 3 NEW AGENTS** (November 14, 2025)
 
-**Total:** 8 specialized agents integrated into 7-agent coordinator architecture
-**CLI Tools:** 8 shell scripts for immediate use
-**Code:** ~5,070 lines across 8 agent modules
+**Total:** 11 specialized agents (8 Phase 1-3 + 3 Nov 14 additions)
+**CLI Tools:** 11 shell scripts for immediate use
+**Code:** ~7,996 lines across 11 agent modules (25 files in py/utils/)
 
-**Integration Guide:** [docs/PHASE_2_3_INTEGRATION_COMPLETE.md](docs/PHASE_2_3_INTEGRATION_COMPLETE.md)
+**Integration Guides:**
+- [docs/PHASE_2_3_INTEGRATION_COMPLETE.md](docs/PHASE_2_3_INTEGRATION_COMPLETE.md) - Phases 1-3
+- [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md) - Nov 14 additions
 
 ### Phase 1: Security & Quality (3 agents)
 
@@ -663,7 +665,195 @@ Phase 1+2+3 agents distributed across coordinator:
 - `py/utils/data_leakage_detector.py` (720 lines)
 - `scripts/review_code.sh`, `scripts/security_audit.sh`, `scripts/check_leakage.sh`
 
-**Next:** Phase 1.6 (CI/CD integration) → Phase 2 (Performance & Testing)
+### November 14, 2025 Additions (3 agents)
+
+**Context:** Audit identified 3 critical missing agents addressing documented pain points (Nov 13 R integration failure, 337 pending model registrations, recurring SQL schema bugs).
+
+**Implementation:** All 3 agents implemented in parallel using Task tool (6,521 lines total)
+
+**Status:** ✅ COMPLETE (November 14, 2025)
+
+#### 9. Ensemble Health Monitor (P0 CRITICAL)
+
+**Purpose:** Pre-backtest validation to prevent expensive R integration failures (Nov 13: 3.5 hours lost)
+
+**Capabilities:**
+- Real-time component drift detection (4-way ensemble)
+- R model health checks (detects rpy2 failures BEFORE backtest)
+- Weight rebalancing alerts (monitors 30/30/25/15% weights)
+- Prediction agreement monitoring (flags high uncertainty for CQL bet sizing)
+- Ensemble calibration tracking (90% coverage target)
+
+**Usage:**
+```bash
+# Pre-backtest validation
+./scripts/check_ensemble_health.sh
+if [ $? -eq 0 ]; then
+    python py/backtest/historical_validation_4way.py  # Safe to run 18-hour backtest
+fi
+```
+
+**Python API:**
+```python
+from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+
+monitor = EnsembleHealthMonitor()
+report = monitor.check_ensemble_health()
+
+if not report.is_healthy:
+    print(f"⛔ {len(report.critical_issues)} critical issues")
+    for issue in report.critical_issues:
+        print(f"  - {issue}")
+    exit(1)  # Block backtest
+
+# All checks passed
+print("✅ Ensemble healthy - safe to run backtest")
+```
+
+**ROI:** Would have saved 3.5 hours on Nov 13 + prevents future backtest failures
+
+**Files:**
+- `py/utils/ensemble_health_monitor.py` (850 lines)
+- `scripts/check_ensemble_health.sh` (105 lines)
+- `docs/tools/ENSEMBLE_HEALTH_MONITOR.md` (18KB guide)
+- `examples/ensemble_health_integration.py` (256 lines, 4 patterns)
+
+#### 10. Model Registry Auditor (P1 HIGH)
+
+**Purpose:** Automate model registration workflow (337 pending registrations identified Nov 14)
+
+**Capabilities:**
+- Automated registration workflow (scan models/, compare to database, register pending)
+- Convergence audits (Rhat < 1.02, ESS > 400, calibration > 85%)
+- File integrity checks (detect corrupted .rds/.pkl/.pth files)
+- Dependency graph validation (ensemble v5.1 requires 4 models all registered)
+- Canonical window compliance (2018-2024 + H=4 decay)
+- Database sync monitoring (alerts when YAML diverges from ml.model_metadata)
+
+**Usage:**
+```bash
+# Scan for pending registrations
+./scripts/model_registry_auditor.sh --scan
+
+# Auto-register pending models (dry run first)
+./scripts/model_registry_auditor.sh --register --dry-run
+./scripts/model_registry_auditor.sh --register
+
+# Full audit report
+./scripts/model_registry_auditor.sh --audit
+```
+
+**Python API:**
+```python
+from py.utils.model_registry_auditor import ModelRegistryAuditor
+
+auditor = ModelRegistryAuditor()
+report = auditor.audit_full()
+
+print(f"Filesystem models: {report.models_on_disk}")      # 361
+print(f"Database models: {report.models_in_db}")          # 25
+print(f"Pending registrations: {report.pending_count}")   # 337
+print(f"Critical issues: {report.critical_issues}")       # 10
+
+# Auto-register pending models
+results = auditor.auto_register(dry_run=False)
+print(f"Registered {results.success_count} models")
+```
+
+**ROI:** Automates 337 registrations @ 5-10 min each = **28-56 hours saved**
+
+**Files:**
+- `py/utils/model_registry_auditor.py` (1,284 lines)
+- `scripts/model_registry_auditor.sh` (207 lines)
+- `docs/MODEL_REGISTRY_AUDITOR.md` (comprehensive guide)
+
+#### 11. Sports Analytics Validator (P1 HIGH)
+
+**Purpose:** Enforce NFL domain rules to prevent recurring SQL schema bugs (documented "DOZENS of times")
+
+**Capabilities:**
+- **Position eligibility:** QB stats (passing), RB stats (rushing/receiving), WR/TE (receiving only)
+- **Stat range validation:** Passing 0-600 yards, rushing 0-300 yards, receiving 0-350 yards, attempts 0-70
+- **Schedule constraints:** Week 1-18, teams play 17 games, bye weeks
+- **Team abbreviation validation:** LAR/LAC (not "LA"), enforce 32-team roster
+- **Game result consistency:** home_score + away_score = total_points
+- **Player-team temporal logic:** Players can't play for multiple teams in same week
+- **SQL query validation:** Catches `mart.player_game_stats.game_id` errors (column doesn't exist)
+
+**Usage:**
+```bash
+# Validate training data
+./scripts/validate_sports_analytics.sh --validate-df data/train.csv
+
+# Check SQL query for domain violations
+./scripts/validate_sports_analytics.sh --check-query query.sql
+
+# Generate full validation report
+./scripts/validate_sports_analytics.sh --report
+```
+
+**Python API:**
+```python
+from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+
+validator = SportsAnalyticsValidator()
+
+# Validate DataFrame (BEFORE training)
+report = validator.validate_dataframe(df)
+
+if report.has_errors():
+    print("❌ NFL domain violations detected:")
+    print(report.generate_report())
+    exit(1)  # Block training
+
+# Validate SQL query
+query = "SELECT pgs.game_id FROM mart.player_game_stats pgs"  # ERROR: game_id doesn't exist
+issues = validator.validate_sql_query(query)
+# Returns: ['Column game_id does not exist in player_game_stats']
+```
+
+**Example Violations Caught:**
+```python
+# ❌ QB with rushing_yards > 200 (impossible per NFL rules)
+# ❌ WHERE home_team = 'LA' (ambiguous - use LAR or LAC)
+# ❌ WHERE week = 25 (invalid - must be 1-22)
+# ❌ SELECT pgs.game_id (column doesn't exist in player_game_stats)
+# ❌ Passing yards = 700 (exceeds NFL record of 554)
+```
+
+**ROI:** Prevents recurring SQL bugs, enforces domain knowledge, catches data quality issues early
+
+**Files:**
+- `py/utils/sports_analytics_validator.py` (792 lines)
+- `scripts/validate_sports_analytics.sh` (101 lines)
+- `tests/unit/test_sports_analytics_validator.py` (513 lines, 30+ tests)
+- `docs/SPORTS_ANALYTICS_VALIDATOR_GUIDE.md` (829 lines)
+- `examples/sports_analytics_validator_demo.py` (260 lines)
+
+### Summary: November 14 Agent Additions
+
+**Investment:** 24-30 hours implementation (COMPLETE in 1 session via parallel Task tool agents)
+
+**Deliverables:**
+- 3 Python utility modules (2,926 lines core code)
+- 3 CLI wrapper scripts (413 lines)
+- 6 documentation files (comprehensive guides, examples, milestones)
+- 1 test suite (513 lines, 30+ test methods)
+- **Grand Total:** 6,521 lines of production-ready code and documentation
+
+**ROI:**
+1. **ensemble-health-monitor:** Prevents Nov 13-style failures (3.5 hours saved per incident)
+2. **model-registry-auditor:** Automates 337 registrations (28-56 hours saved)
+3. **sports-analytics-validator:** Prevents recurring SQL bugs (documented "DOZENS of times")
+
+**Total ROI:** 31-59 hours saved + critical production reliability improvements
+
+**Status:** ✅ All agents production-ready, CLI wrappers tested, comprehensive documentation complete
+
+**Documentation:**
+- [docs/AGENT_AUDIT_NOV14.md](docs/AGENT_AUDIT_NOV14.md) - Audit findings and gaps analysis
+- [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md) - Integration guide
+- Agent-specific docs: ENSEMBLE_HEALTH_MONITOR.md, MODEL_REGISTRY_AUDITOR.md, SPORTS_ANALYTICS_VALIDATOR_GUIDE.md
 
 ---
 
