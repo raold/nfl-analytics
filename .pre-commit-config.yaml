@@ -4,7 +4,7 @@ repos:
     rev: 23.7.0
     hooks:
       - id: black
-        language_version: python3.10
+        language_version: python3.11
         files: ^py/
 
   # Python linting & auto-fixing
@@ -88,7 +88,7 @@ repos:
 
 # Global settings
 default_language_version:
-  python: python3.10
+  python: python3.11
 
 # CI settings
 ci:
