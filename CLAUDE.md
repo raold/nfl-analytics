@@ -613,6 +613,126 @@ model.fit(X_train, y_train)
 
 **⛔ Blocks deployment if validation fails**
 
+### Phase 4: Critical Infrastructure (3 agents - Nov 14, 2025)
+
+#### 9. Ensemble Health Monitor
+
+**Purpose:** P0 pre-backtest validation to prevent R model integration failures (Nov 13, 2025: 3.5 hours lost)
+
+**Usage:**
+```bash
+# Check ensemble health before backtest
+./scripts/check_ensemble_health.sh
+
+# Exit code 0 = healthy, 1 = critical issues found
+if [ $? -eq 0 ]; then
+    python py/backtest/historical_validation_4way.py
+fi
+```
+
+**Validates:**
+- All 4 ensemble components load successfully
+- R model integration (rpy2, state-space v2, hierarchical v2)
+- Component drift vs last validation
+- Calibration coverage (90% target)
+- Inter-model prediction agreement
+
+**Python API:**
+```python
+from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+
+monitor = EnsembleHealthMonitor()
+report = monitor.check_ensemble_health()
+if not report.is_healthy:
+    print(f"⛔ Critical issues: {report.critical_issues}")
+    exit(1)  # Block 18-hour backtest
+```
+
+**ROI:** Would have saved 3.5 hours on Nov 13 + prevents future failures
+
+#### 10. Model Registry Auditor
+
+**Purpose:** Automate 337 pending model registrations (19-38 hours manual work saved)
+
+**Usage:**
+```bash
+# Scan for pending registrations
+./scripts/model_registry_auditor.sh --scan
+
+# Auto-register models that pass convergence
+./scripts/model_registry_auditor.sh --register
+
+# Generate audit report
+./scripts/model_registry_auditor.sh --audit
+```
+
+**Audits:**
+- Filesystem models: 361 files
+- Database models: 25 registered
+- Pending registrations: 337 models
+- Convergence validation (Rhat < 1.02, ESS > 400)
+- File integrity and dependency graphs
+
+**Python API:**
+```python
+from py.utils.model_registry_auditor import ModelRegistryAuditor
+
+auditor = ModelRegistryAuditor()
+report = auditor.audit_full()
+print(f"Pending: {report.pending_registrations}")
+
+# Auto-register passing models
+auditor.register_pending_models()
+```
+
+**ROI:** 28-56 hours saved (337 models @ 5-10 min each)
+
+#### 11. Sports Analytics Validator
+
+**Purpose:** Prevent recurring SQL schema bugs violating NFL domain rules (documented "DOZENS of times")
+
+**Usage:**
+```bash
+# Validate DataFrame against NFL rules
+./scripts/validate_sports_analytics.sh --validate-df data/features.csv
+
+# Check SQL query logic
+./scripts/validate_sports_analytics.sh --check-query queries/player_stats.sql
+
+# Generate validation report
+./scripts/validate_sports_analytics.sh --report
+```
+
+**Validates:**
+- Position eligibility (QB/RB/WR/TE stats)
+- Stat ranges (passing 0-600, rushing 0-300 yards)
+- Schedule constraints (weeks 1-18, 17 games/team)
+- Team abbreviations (LAR/LAC enforcement, not "LA")
+- Game results consistency
+
+**Python API:**
+```python
+from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+
+validator = SportsAnalyticsValidator()
+report = validator.validate_dataframe(df)
+if report.has_errors():
+    print(report.generate_report())
+    exit(1)  # Block model training
+```
+
+**Critical Example (Nov 14, 2025):**
+```sql
+-- ❌ WRONG - mart.player_game_stats has NO game_id column
+SELECT * FROM mart.player_game_stats WHERE game_id = 123;
+
+-- ✅ CORRECT - Use composite key (season, week, team)
+SELECT * FROM mart.player_game_stats
+WHERE season = 2024 AND week = 10 AND team = 'KC';
+```
+
+**ROI:** Prevents recurring production bugs (SQL schema errors occurred "DOZENS of times")
+
 ### Research Coordinator (NEW)
 
 **Purpose:** Track experiments, maintain dissertation, tell research story
@@ -635,7 +755,7 @@ model.fit(X_train, y_train)
 
 ### Agent Integration
 
-Phase 1+2+3 agents distributed across coordinator:
+Phase 1+2+3+4 agents distributed across coordinator:
 
 | Agent Module | Integrated Into | Capabilities |
 |-------------|-----------------|-------------|
@@ -649,29 +769,51 @@ Phase 1+2+3 agents distributed across coordinator:
 | Statistical Validator | MODEL_MANAGEMENT | MCMC diagnostics, calibration |
 | Ensemble Orchestrator | PREDICTION_ENGINE | Multi-model coordination, R+Python |
 | Betting Validator | PREDICTION_ENGINE | Risk gates, Kelly criterion |
+| **Ensemble Health Monitor** | **PREDICTION_ENGINE** | **Pre-backtest validation, R model integration** |
+| **Model Registry Auditor** | **MODEL_MANAGEMENT** | **Auto-registration, convergence audits** |
+| **Sports Analytics Validator** | **DATA_LAYER** | **NFL domain rules, SQL schema validation** |
 | Research Coordinator | (STANDALONE) | Experiment tracking, dissertation, R guidance |
 
-**Result:** 7 agents in coordinator (not 11) via distributed integration
+**Result:** 10 agents in coordinator (not 14) via distributed integration
 
 ### Documentation
 
 **Phase 1 Guide:** [docs/PHASE_1_AGENT_ENHANCEMENTS.md](docs/PHASE_1_AGENT_ENHANCEMENTS.md)
 **Phase 2+3 Guide:** [docs/PHASE_2_3_INTEGRATION_COMPLETE.md](docs/PHASE_2_3_INTEGRATION_COMPLETE.md)
+**Phase 4 Guide:** [docs/AGENT_AUDIT_NOV14.md](docs/AGENT_AUDIT_NOV14.md) | [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md)
 **Coordinator Guide:** [docs/AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md)
 
-**Files Created:**
+**Phase 1-3 Files Created:**
 - `py/utils/code_reviewer.py` (680 lines)
 - `py/utils/security_auditor.py` (590 lines)
 - `py/utils/data_leakage_detector.py` (720 lines)
 - `scripts/review_code.sh`, `scripts/security_audit.sh`, `scripts/check_leakage.sh`
 
-### November 14, 2025 Additions (3 agents)
+**Phase 4 Files Created (November 14, 2025):**
+- `py/utils/ensemble_health_monitor.py` (850 lines)
+- `py/utils/model_registry_auditor.py` (1,284 lines)
+- `py/utils/sports_analytics_validator.py` (792 lines)
+- `scripts/check_ensemble_health.sh` (105 lines)
+- `scripts/model_registry_auditor.sh` (207 lines)
+- `scripts/validate_sports_analytics.sh` (101 lines)
+- `tests/unit/test_sports_analytics_validator.py` (513 lines)
+- `docs/guides/TASK_TOOL_INTEGRATION.md` (403 lines)
+
+**Total Agent Infrastructure:** 14 agents (11 distributed + 3 standalone), ~10,922 lines core code + 3,300 lines documentation
+
+### November 14, 2025: Phase 4 Implementation Complete
 
 **Context:** Audit identified 3 critical missing agents addressing documented pain points (Nov 13 R integration failure, 337 pending model registrations, recurring SQL schema bugs).
 
-**Implementation:** All 3 agents implemented in parallel using Task tool (6,521 lines total)
+**Implementation:** All 3 agents implemented in parallel using Task tool (3,926 lines core code + 413 lines CLI wrappers + 513 lines tests)
 
 **Status:** ✅ COMPLETE (November 14, 2025)
+
+**ROI Analysis:**
+- **Ensemble Health Monitor:** Saves 3.5+ hours per R integration failure (P0 blocker prevention)
+- **Model Registry Auditor:** Saves 28-56 hours (337 models @ 5-10 min each)
+- **Sports Analytics Validator:** Prevents recurring SQL bugs (documented "DOZENS of times")
+- **Total ROI:** 31-59 hours saved + critical production reliability
 
 #### 9. Ensemble Health Monitor (P0 CRITICAL)
 
