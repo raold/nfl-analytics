@@ -1,0 +1,185 @@
+# A/B Test Configuration: Ensemble v5 vs v6 (XGBoost Ridge Residuals)
+# =========================================================================
+# Test Name: ensemble_v5_vs_v6_xgboost_ridge
+# Start Date: 2025-11-14
+# Duration: 4 weeks (first 50 games of 2025 season)
+# Decision Criteria: v6 beats v5 by 5+ yards MAE
+
+# Test Configuration
+test:
+  name: ensemble_v5_vs_v6_xgboost_ridge
+  enabled: true
+  start_date: "2025-11-14"
+  end_date: "2025-12-12"  # 4 weeks
+  minimum_samples: 100  # games per group before analysis
+
+# Traffic Allocation
+allocation:
+  control_group: ensemble_v5  # 4-way: State-Space, Hierarchical, XGBoost v2, Informative Priors
+  treatment_group: ensemble_v6  # 4-way: State-Space, Hierarchical, XGBoost v4 Ridge, Informative Priors
+  split_ratio: 0.5  # 50/50 split
+  hash_seed: 42  # For deterministic assignment
+
+# Model Versions
+models:
+  control:
+    name: enhanced_ensemble_v5
+    version: "5.0"
+    weights:
+      state_space_v2: 0.30
+      hierarchical_v2: 0.25
+      xgboost_v2_baseline: 0.20
+      informative_priors_v2: 0.25
+    expected_mae: 40.0  # yards
+    expected_roi: 5.0  # percent
+
+  treatment:
+    name: enhanced_ensemble_v6
+    version: "6.0"
+    weights:
+      state_space_v2: 0.30
+      hierarchical_v2: 0.25
+      xgboost_v4_ridge: 0.20  # UPGRADED: XGBoost v4 (Ridge Residuals)
+      informative_priors_v2: 0.25
+    expected_mae: 33.0  # yards (7 yard improvement)
+    expected_roi: 6.0  # percent (+1% improvement)
+
+# Success Criteria
+success_criteria:
+  primary_metric: mae  # Mean Absolute Error
+  minimum_improvement: 5.0  # yards MAE improvement required
+  statistical_significance: 0.05  # p-value threshold
+  minimum_win_rate_improvement: 0.02  # 2 percentage points
+  minimum_roi_improvement: 0.01  # 1% ROI improvement
+
+# Monitoring
+monitoring:
+  log_predictions: true  # Log all predictions to ml.predictions table
+  log_actuals: true  # Update with actual results after games
+  metrics_refresh_interval: 3600  # seconds (1 hour)
+  alert_on_degradation: true  # Alert if MAE > expected by 10%
+  alert_email: "dro@example.com"
+
+# Guardrails
+guardrails:
+  max_mae_degradation: 0.10  # Stop test if MAE degrades by 10%
+  max_roi_degradation: -0.02  # Stop test if ROI drops by 2%
+  auto_stop_on_critical_failure: true  # Auto-stop if guardrails violated
+
+# Data Collection
+data:
+  predictions_table: ml.predictions
+  actuals_table: mart.player_game_stats
+  ab_group_field: ab_group  # 'control' or 'treatment'
+  model_version_field: model_version  # 'v5.0' or 'v6.0'
+  test_name_field: ab_test_name
+
+# Analysis Schedule
+analysis:
+  interim_analysis:
+    - week: 1
+      minimum_samples: 25
+      decision: monitor_only
+    - week: 2
+      minimum_samples: 50
+      decision: early_stop_if_clear_winner  # Stop if p < 0.01 and improvement > 7 yards
+    - week: 3
+      minimum_samples: 75
+      decision: monitor_only
+    - week: 4
+      minimum_samples: 100
+      decision: final_decision
+
+  final_analysis:
+    week: 4
+    minimum_samples: 100
+    metrics:
+      - mae  # Primary
+      - rmse
+      - win_rate
+      - roi
+      - sharpe_ratio
+      - calibration_90pct
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5544
+  name: devdb01
+  user: dro
+  password_env_var: DB_PASSWORD  # Read from environment  # pragma: allowlist secret
+
+# Grafana Dashboard
+grafana:
+  dashboard_name: AB Test - Ensemble v5 vs v6
+  refresh_interval: 5m
+  panels:
+    - name: MAE by Group
+      query: |
+        SELECT
+          ab_group,
+          AVG(ABS(prediction - actual)) as mae
+        FROM ml.predictions
+        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
+          AND actual IS NOT NULL
+        GROUP BY ab_group
+    - name: Cumulative Predictions
+      query: |
+        SELECT
+          ab_group,
+          COUNT(*) as predictions
+        FROM ml.predictions
+        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
+        GROUP BY ab_group
+    - name: Win Rate by Group
+      query: |
+        SELECT
+          ab_group,
+          SUM(CASE WHEN won = 1 THEN 1 ELSE 0 END)::float / COUNT(*) as win_rate
+        FROM ml.predictions
+        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
+          AND actual IS NOT NULL
+        GROUP BY ab_group
+
+# Notes
+notes: |
+  ## Key Differences v5 vs v6
+
+  **Ensemble v5 (Control):**
+  - XGBoost v2 baseline (40.20 MAE)
+  - 4-way ensemble
+  - Expected MAE: ~40 yards
+
+  **Ensemble v6 (Treatment):**
+  - XGBoost v4 Ridge Residuals (4.27 MAE on 2024 backtest)
+  - Two-stage architecture (Ridge opponent baseline + XGBoost residual learning)
+  - 88.31% improvement on XGBoost component
+  - Expected MAE: ~33 yards (7 yard improvement)
+  - Expected ROI: +1% improvement (5% → 6%)
+
+  ## Validation Results (Pre-A/B Test)
+
+  **Multi-Season Validation (2022-2024):**
+  - 2022: 5.06 MAE (+87.40% improvement)
+  - 2023: 4.76 MAE (+88.15% improvement)
+  - 2024: 4.27 MAE (+89.38% improvement)
+  - Mean: 4.70 ± 0.40 MAE
+  - All Diebold-Mariano tests: p < 0.000001
+
+  ## Decision Framework
+
+  **Success (Deploy v6):**
+  - MAE improvement > 5 yards
+  - Statistical significance: p < 0.05
+  - Win rate improvement > 2 pp
+  - No guardrail violations
+
+  **Failure (Keep v5):**
+  - MAE improvement < 5 yards
+  - p > 0.05 (not statistically significant)
+  - Guardrails violated
+
+  **Inconclusive (Extend Test):**
+  - 3 < MAE improvement < 5 yards
+  - 0.05 < p < 0.10
+  - Need more data
