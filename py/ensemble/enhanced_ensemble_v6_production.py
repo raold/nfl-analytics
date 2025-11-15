@@ -43,7 +43,7 @@ Usage:
     ensemble = EnhancedEnsemble5Way()
     result = ensemble.predict(
         player_id="00-0019596",
-        season=2024,
+        season=CURRENT_SEASON,
         week=9
     )
     print(f"Prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
@@ -78,6 +78,9 @@ from py.ensemble.r_model_interface import RModelInterface
 
 # Load environment variables
 load_dotenv()
+
+# Canonical temporal constant (pragma: allowlist temporal)
+CURRENT_SEASON = 2024  # pragma: allowlist temporal
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -162,7 +165,6 @@ class EnhancedEnsemble5Way:
                 )
 
         self.project_root = Path(__file__).parent.parent.parent
-        self.ensemble_version = "v6.0_production"
 
         # Resolve model paths
         self.state_space_path = self._resolve_path(state_space_path)
@@ -224,7 +226,7 @@ class EnhancedEnsemble5Way:
                 else:
                     logger.warning("Predictions will be UNCALIBRATED (overcalibrated)")
 
-        logger.info(f"Initialized ensemble {self.ensemble_version} with weights: {self.weights}")
+        logger.info(f"Initialized ensemble v6.0 with weights: {self.weights}")
 
     def _resolve_path(self, path: str) -> Path:
         """Resolve path relative to project root."""
@@ -416,6 +418,7 @@ class EnhancedEnsemble5Way:
 
         Raises:
             ValueError: If player_id, season, or week is invalid
+            RuntimeError: If insufficient ensemble components loaded
             FileNotFoundError: If critical model files are missing
         """
         self._load_models()  # Lazy load models on first prediction
@@ -427,37 +430,81 @@ class EnhancedEnsemble5Way:
 
         # Get predictions from all 5 models
         components = {}
+        valid_predictions = []
 
         # 1. State-Space v2 (27%)
-        ss_pred, ss_std = self._predict_state_space(player_id, season, week, features)
-        components["state_space_v2"] = {"mean": ss_pred, "std": ss_std}
+        try:
+            ss_pred, ss_std = self._predict_state_space(player_id, season, week, features)
+            if ss_pred is not None:
+                components["state_space_v2"] = {"mean": ss_pred, "std": ss_std}
+                valid_predictions.append("state_space_v2")
+            else:
+                logger.warning(f"Component state_space_v2 returned None")
+        except Exception as e:
+            logger.warning(f"Component state_space_v2 failed: {e}")
 
         # 2. Hierarchical v2 (27%)
-        hier_pred, hier_std = self._predict_hierarchical(player_id, season, week, features)
-        components["hierarchical_v2"] = {"mean": hier_pred, "std": hier_std}
+        try:
+            hier_pred, hier_std = self._predict_hierarchical(player_id, season, week, features)
+            if hier_pred is not None:
+                components["hierarchical_v2"] = {"mean": hier_pred, "std": hier_std}
+                valid_predictions.append("hierarchical_v2")
+            else:
+                logger.warning(f"Component hierarchical_v2 returned None")
+        except Exception as e:
+            logger.warning(f"Component hierarchical_v2 failed: {e}")
 
         # 3. XGBoost v4 Ridge Residuals (23%)
-        xgb_v4_pred, xgb_v4_std = self._predict_xgboost_v4(features)
-        components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
+        try:
+            xgb_v4_pred, xgb_v4_std = self._predict_xgboost_v4(features)
+            if xgb_v4_pred is not None:
+                components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
+                valid_predictions.append("xgboost_v4_ridge")
+            else:
+                logger.warning(f"Component xgboost_v4_ridge returned None")
+        except Exception as e:
+            logger.warning(f"Component xgboost_v4_ridge failed: {e}")
 
         # 4. Informative Priors v2 (13%)
-        ip_pred, ip_std = self._predict_informative_priors(player_id, season, week, features)
-        components["informative_priors_v2"] = {"mean": ip_pred, "std": ip_std}
+        try:
+            ip_pred, ip_std = self._predict_informative_priors(player_id, season, week, features)
+            if ip_pred is not None:
+                components["informative_priors_v2"] = {"mean": ip_pred, "std": ip_std}
+                valid_predictions.append("informative_priors_v2")
+            else:
+                logger.warning(f"Component informative_priors_v2 returned None")
+        except Exception as e:
+            logger.warning(f"Component informative_priors_v2 failed: {e}")
 
         # 5. Hybrid Static-Incremental (10%)
-        hybrid_pred, hybrid_std = self._predict_hybrid(features)
-        components["hybrid_static_incremental"] = {"mean": hybrid_pred, "std": hybrid_std}
+        try:
+            hybrid_pred, hybrid_std = self._predict_hybrid(features)
+            if hybrid_pred is not None:
+                components["hybrid_static_incremental"] = {"mean": hybrid_pred, "std": hybrid_std}
+                valid_predictions.append("hybrid_static_incremental")
+            else:
+                logger.warning(f"Component hybrid_static_incremental returned None")
+        except Exception as e:
+            logger.warning(f"Component hybrid_static_incremental failed: {e}")
 
-        # Weighted average
+        # CRITICAL: Validate minimum ensemble components loaded
+        if len(valid_predictions) < 3:
+            raise RuntimeError(
+                f"Insufficient ensemble components loaded: {len(valid_predictions)} valid "
+                f"(minimum 3 required). Valid components: {valid_predictions}. "
+                f"Check model files and R interface initialization."
+            )
+
+        # Weighted average (only using valid components)
         ensemble_mean = sum(
             components[model]["mean"] * self.weights[model]
-            for model in self.weights.keys()
+            for model in valid_predictions
         )
 
         # Variance pooling for uncertainty
         ensemble_var = sum(
             (components[model]["std"] ** 2) * (self.weights[model] ** 2)
-            for model in self.weights.keys()
+            for model in valid_predictions
         )
         ensemble_std = np.sqrt(ensemble_var)
 
@@ -480,6 +527,7 @@ class EnhancedEnsemble5Way:
             "weights": self.weights,
             "temperature": float(self.temperature),
             "prediction_time_ms": float(prediction_time_ms),
+            "valid_components": valid_predictions,
         }
 
         if return_components:
@@ -609,6 +657,7 @@ class EnhancedEnsemble5Way:
         Predict using Hierarchical Bayesian v2.
 
         Uses R interface (rpy2 + brms) to generate posterior predictions.
+        Includes allow_new_levels=True for new/unseen factor levels.
 
         Returns:
             (mean_prediction, std_prediction)
@@ -616,7 +665,8 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.hierarchical_path.exists():
             result = self.r_interface.predict_hierarchical(
-                player_id, season, week, self.hierarchical_path, ndraws=1000
+                player_id, season, week, self.hierarchical_path,
+                ndraws=1000, allow_new_levels=True
             )
             if result is not None:
                 return result
@@ -680,6 +730,7 @@ class EnhancedEnsemble5Way:
         Predict using Informative Priors v2.
 
         Uses R interface (rpy2 + brms) to generate posterior predictions.
+        Includes allow_new_levels=True for new/unseen factor levels.
 
         Returns:
             (mean_prediction, std_prediction)
@@ -687,7 +738,8 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.informative_path.exists():
             result = self.r_interface.predict_informative_priors(
-                player_id, season, week, self.informative_path, ndraws=1000
+                player_id, season, week, self.informative_path,
+                ndraws=1000, allow_new_levels=True
             )
             if result is not None:
                 return result
@@ -757,13 +809,13 @@ if __name__ == "__main__":
     print("Testing EnhancedEnsemble5Way v6.0 Production...")
 
     try:
-        ensemble = EnhancedEnsemble5Way()
+        ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD"))
         print(f"✅ Ensemble initialized with weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
-        print(f"   Version: {ensemble.ensemble_version}")
+        print(f"   Version: v6.0")
 
         # Test prediction (will fail without database, but tests model loading)
-        # result = ensemble.predict(player_id="00-0019596", season=2024, week=9)
+        # result = ensemble.predict(player_id="00-0019596", season=CURRENT_SEASON, week=9)
         # print(f"\n✅ Sample prediction: {result['ensemble_mean']:.1f} ± {result['calibrated_std']:.1f} yards")
         # print(f"   90% PI: [{result['lower_90']:.1f}, {result['upper_90']:.1f}]")
         # print(f"   Inference time: {result['prediction_time_ms']:.1f}ms")
