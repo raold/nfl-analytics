@@ -28,6 +28,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import os
 import pytest
 import numpy as np
 import logging
@@ -53,7 +54,7 @@ def ensemble():
     Returns:
         EnhancedEnsemble4Way instance
     """
-    return EnhancedEnsemble4Way()
+    return EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
 
 @pytest.fixture(scope="module")
@@ -118,8 +119,23 @@ def test_all_components_load(loaded_ensemble):
     assert ensemble.skills_df is not None, "State-space skills is None"
     assert len(ensemble.skills_df) > 0, "State-space skills is empty"
 
+    # Count valid components (Nov 15 fix: Validate minimum 3 components)
+    valid_components = []
+    if ensemble.xgboost_model is not None:
+        valid_components.append("xgboost")
+    if ensemble.skills_df is not None and len(ensemble.skills_df) > 0:
+        valid_components.append("state_space")
+    # Add checks for hierarchical and informative priors if they have explicit attributes
+
+    if len(valid_components) < 3:
+        raise RuntimeError(
+            f"Insufficient ensemble components: Only {len(valid_components)} loaded "
+            f"({valid_components}). Minimum 3 required. "
+            f"Bug found Nov 15: Only 2/4 models loaded, poor predictions."
+        )
+
     # Log success
-    logger.info("✅ All 4 ensemble components loaded successfully")
+    logger.info(f"✅ All ensemble components loaded successfully: {valid_components}")
 
 
 # ============================================================================
@@ -141,6 +157,7 @@ def test_minimum_components_validation():
         hierarchical_path="models/bayesian/passing_yards_hierarchical_v2.rds",
         informative_path="models/bayesian/passing_informative_priors_v2.rds",
         xgboost_path="models/xgboost/passing_xgboost_v2_canonical.pkl",
+        db_password=os.getenv("DB_PASSWORD"),
     )
 
     # Loading should succeed but log warning
@@ -304,7 +321,7 @@ def test_batch_prediction_smoke():
 
     Prevents: Batch prediction failures during backtest
     """
-    ensemble = EnhancedEnsemble4Way()
+    ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
     ensemble.load_models()
 
     # Test with 10 sample games (Patrick Mahomes, Josh Allen)
@@ -333,6 +350,7 @@ def test_batch_prediction_smoke():
 
         if result is None:
             errors.append(f"No prediction for {case}")
+            logger.warning(f"Component returned None for {case}")
             continue
 
         mean = result["ensemble_mean"]
@@ -340,6 +358,7 @@ def test_batch_prediction_smoke():
 
         if np.isnan(mean) or np.isnan(std):
             errors.append(f"NaN prediction for {case}")
+            logger.warning(f"Component returned NaN for {case}")
             continue
 
         predictions.append({"mean": mean, "std": std})
@@ -368,7 +387,7 @@ def test_weight_validation():
 
     Prevents: Incorrect ensemble weighting
     """
-    ensemble = EnhancedEnsemble4Way()
+    ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
     weights = ensemble.weights
     total = sum(weights.values())
@@ -396,7 +415,7 @@ def test_database_connection():
 
     Prevents: Database connection errors during production
     """
-    ensemble = EnhancedEnsemble4Way()
+    ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
     try:
         conn = ensemble._get_db_connection()
@@ -425,7 +444,7 @@ def test_ensemble_load_time(benchmark):
     Target: < 10 seconds
     """
     def load_ensemble():
-        ensemble = EnhancedEnsemble4Way()
+        ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
         ensemble.load_models()
         return ensemble
 
