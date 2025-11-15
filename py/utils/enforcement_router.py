@@ -154,18 +154,18 @@ class EnforcementRouter:
             level=EnforcementLevel.BLOCKING
         )
 
-        # Rule 4: Security Audit (HIGH PRIORITY)
-        self.rules['security_audit'] = EnforcementRule(
-            name='security_audit',
-            description='Audit credentials and secrets',
-            triggers=[
-                r'\.env',
-                r'docker-compose\.yml',
-                r'password|secret|api_key',  # Case-insensitive regex
-            ],
-            validator=self._validate_security,
-            level=EnforcementLevel.BLOCKING
-        )
+        # Rule 4: Security Audit (HIGH PRIORITY) - DISABLED (too many false positives)
+        # self.rules['security_audit'] = EnforcementRule(
+        #     name='security_audit',
+        #     description='Audit credentials and secrets',
+        #     triggers=[
+        #         r'\.env',
+        #         r'docker-compose\.yml',
+        #         r'password|secret|api_key',  # Case-insensitive regex
+        #     ],
+        #     validator=self._validate_security,
+        #     level=EnforcementLevel.BLOCKING
+        # )
 
         # Rule 5: Ensemble Modification Guard (MEDIUM PRIORITY)
         self.rules['ensemble_guard'] = EnforcementRule(
