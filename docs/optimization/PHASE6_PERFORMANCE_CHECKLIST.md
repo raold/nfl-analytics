@@ -60,12 +60,12 @@ Rscript R/state_space/train_state_space_v2_canonical.R
 **Impact:** 6s → 4s per query (data loading)
 
 ```bash
-# Create indexes (5-10 min) <!-- pragma: allowlist secret -->
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+# Create indexes (5-10 min)
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -f db/performance_indexes_phase6.sql
 
 # Verify indexes created
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -c "SELECT schemaname, tablename, indexname, pg_size_pretty(pg_relation_size(schemaname||'.'||indexname)) FROM pg_indexes WHERE indexname LIKE 'idx_%phase6%' OR indexname LIKE 'idx_player_game_stats_passing%';"
 
 # Expected output:

@@ -1,0 +1,160 @@
+
+============================================================
+NFL ANALYTICS DATABASE HEALTH CHECK
+============================================================
+
+1. TABLE BLOAT (Top 10 bloated tables)
+------------------------------------------------------------
+psql:db/health_check.sql:46: ERROR:  function round(double precision, integer) does not exist
+LINE 7:     ROUND(100.0 * (1 - (n_live_tup::float / NULLIF(n_live_tu...
+            ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+2. INDEX USAGE (Unused indexes - candidates for removal)
+------------------------------------------------------------
+ schemaname |   tablename    |             indexname             | scans | index_size |    status    
+------------+----------------+-----------------------------------+-------+------------+--------------
+ public     | plays          | idx_plays_drive_metrics           |     0 | 169 MB     | ✗ NEVER USED
+ public     | plays          | idx_plays_win_prob                |     0 | 156 MB     | ✗ NEVER USED
+ public     | plays          | idx_plays_drive                   |     0 | 140 MB     | ✗ NEVER USED
+ public     | plays          | idx_plays_home_wp                 |     0 | 85 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_ep                      |     0 | 85 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_qb_epa                  |     0 | 81 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_xpass                   |     0 | 80 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_game_type_epa           |     0 | 42 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_defensive_player_stats  |     0 | 39 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_rushing_yards           |     0 | 32 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_receiver_yards_v2       |     0 | 25 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_xyac_epa                |     0 | 25 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_receiving_yards         |     0 | 22 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_play_type_nfl           |     0 | 22 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_rusher_rushing_yards_v2 |     0 | 21 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_play_type               |     0 | 21 MB      | ✗ NEVER USED
+ public     | rosters_weekly | idx_rosters_weekly_team           |     0 | 21 MB      | ✗ NEVER USED
+ public     | plays          | idx_plays_weather                 |     0 | 20 MB      | ✗ NEVER USED
+ public     | rosters_weekly | idx_rosters_weekly_position       |     0 | 17 MB      | ✗ NEVER USED
+ public     | rosters_weekly | idx_rosters_weekly_player         |     0 | 16 MB      | ✗ NEVER USED
+(20 rows)
+
+
+3. CACHE HIT RATIO (Target: >99%)
+------------------------------------------------------------
+ cache_type  | disk_reads | cache_hits | hit_ratio_pct |    status    
+-------------+------------+------------+---------------+--------------
+ Table Cache |   19372688 |  190702387 |         90.78 | ⚠ ACCEPTABLE
+ Index Cache |     886002 |  251268218 |         99.65 | ✓ EXCELLENT
+(2 rows)
+
+
+4. SEQUENTIAL SCANS (Large tables without proper indexes)
+------------------------------------------------------------
+ schemaname |         tablename         | sequential_scans | rows_read  | index_scans | live_rows | table_size |    status     
+------------+---------------------------+------------------+------------+-------------+-----------+------------+---------------
+ public     | games                     |             8348 |   60050502 |     7159631 |      7263 | 11 MB      | ✓ OK
+ public     | plays                     |             4641 | 1668841933 |      217268 |   1252835 | 1612 MB    | ⚠ REVIEW
+ mart       | player_hierarchy          |              901 |   13706913 |      977092 |     15213 | 1592 kB    | ✓ OK
+ ml         | predictions               |               22 |      12483 |        1390 |      1387 | 416 kB     | ✓ OK
+ mart       | team_epa                  |               18 |     255096 |          36 |     14172 | 1176 kB    | ✓ OK
+ mart       | game_summary              |               16 |     115118 |           1 |      7263 | 2128 kB    | ✓ OK
+ public     | mv_team_rolling_stats     |               14 |     195048 |          17 |     13932 | 9408 kB    | ✓ OK
+ public     | mv_game_aggregates        |               14 |      99372 |          15 |      7098 | 6568 kB    | ✓ OK
+ mart       | player_game_stats         |                9 |     174656 |       97949 |     24950 | 4096 kB    | ✓ OK
+ public     | weather                   |                9 |      11835 |          16 |      1315 | 104 kB     | ✓ OK
+ public     | mv_player_season_stats    |                6 |     706376 |           0 |    177132 | 48 MB      | ⚠ NEEDS INDEX
+ public     | rosters_weekly            |                5 |     857277 |          38 |    857149 | 272 MB     | ✓ OK
+ mart       | game_features_enhanced    |                4 |       6720 |           0 |      1680 | 432 kB     | ✓ OK
+ public     | mv_betting_features       |                3 |      21246 |          17 |      7082 | 2296 kB    | ✓ OK
+ public     | mv_venue_weather_features |                3 |      21294 |          17 |      7098 | 2776 kB    | ✓ OK
+(15 rows)
+
+
+5. TABLE SIZE BREAKDOWN (Top 15 tables)
+------------------------------------------------------------
+ schemaname |       tablename        | total_size | table_size | indexes_size | index_pct | row_count 
+------------+------------------------+------------+------------+--------------+-----------+-----------
+ public     | plays                  | 3203 MB    | 1612 MB    | 1590 MB      |      49.6 |   1252835
+ public     | rosters_weekly         | 414 MB     | 272 MB     | 142 MB       |      34.3 |    857149
+ public     | participation          | 335 MB     | 266 MB     | 69 MB        |      20.6 |    433385
+ public     | depth_charts           | 207 MB     | 96 MB      | 110 MB       |      53.4 |    859593
+ public     | snap_counts            | 102 MB     | 43 MB      | 59 MB        |      58.0 |    305373
+ public     | mv_player_season_stats | 72 MB      | 48 MB      | 23 MB        |      32.7 |    177132
+ public     | injuries               | 39 MB      | 16 MB      | 23 MB        |      59.8 |     84682
+ public     | ftn_charting           | 35 MB      | 18 MB      | 16 MB        |      47.4 |    150988
+ public     | pfr_defense            | 22 MB      | 11 MB      | 11 MB        |      50.2 |     56620
+ public     | games                  | 14 MB      | 11 MB      | 3312 kB      |      23.0 |      7263
+ public     | mv_team_rolling_stats  | 11 MB      | 9408 kB    | 2280 kB      |      19.4 |     13932
+ public     | rosters                | 10 MB      | 5240 kB    | 5272 kB      |      50.0 |     57174
+ public     | mv_game_aggregates     | 8304 kB    | 6568 kB    | 1696 kB      |      20.4 |      7098
+ mart       | player_game_stats      | 7144 kB    | 4096 kB    | 3008 kB      |      42.1 |     24950
+ mart       | asof_team_features     | 6448 kB    | 6208 kB    | 200 kB       |       3.1 |      5947
+(15 rows)
+
+
+6. AUTOVACUUM STATUS (Tables needing vacuum)
+------------------------------------------------------------
+ schemaname |        tablename        | live_rows | dead_rows | dead_pct | last_vacuum |        last_autovacuum        |      status      
+------------+-------------------------+-----------+-----------+----------+-------------+-------------------------------+------------------
+ public     | games                   |      7263 |      1360 |    18.73 |             | 2025-11-08 00:45:18.224095+00 | ✓ OK
+ mart       | bayesian_player_ratings |       470 |       117 |    24.89 |             |                               | ✓ OK
+ mart       | position_groups         |        28 |        28 |   100.00 |             |                               | ✓ OK
+ public     | mv_refresh_log          |        12 |        19 |   158.33 |             |                               | ✓ OK
+ ml         | model_registry          |        24 |        14 |    58.33 |             |                               | ✓ OK
+ public     | data_quality_log        |        12 |         2 |    16.67 |             |                               | ✓ OK
+ public     | dba_audit_log           |         2 |         1 |    50.00 |             |                               | ✓ OK
+ mart       | team_4th_down_features  |     13972 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+ mart       | game_weather            |      1680 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+ public     | odds_history            |         0 |         0 |          |             |                               | ✓ OK
+ public     | games_weather_backup    |      5016 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+ public     | api_usage_tracker       |         1 |         0 |     0.00 |             |                               | ✓ OK
+ public     | players                 |     15225 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+ public     | nextgen_passing         |      5521 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+ mart       | asof_team_features      |      5947 |         0 |     0.00 |             |                               | ⚠ NEVER VACUUMED
+(15 rows)
+
+
+7. CONNECTION COUNT (max_connections = 100)
+------------------------------------------------------------
+ total_connections | active | idle | idle_in_transaction | status 
+-------------------+--------+------+---------------------+--------
+                 4 |      1 |    2 |                   1 | ✓ OK
+(1 row)
+
+
+8. LONG-RUNNING QUERIES (>30 seconds)
+------------------------------------------------------------
+ pid | usename | duration | state | query_preview 
+-----+---------+----------+-------+---------------
+(0 rows)
+
+
+9. MATERIALIZED VIEW FRESHNESS (mart schema)
+------------------------------------------------------------
+ schemaname |      matviewname       |       recommended_refresh        
+------------+------------------------+----------------------------------
+ mart       | game_features_enhanced | Review refresh schedule
+ mart       | game_summary           | Refresh daily
+ mart       | game_weather           | Review refresh schedule
+ mart       | player_game_stats      | Refresh before each training run
+ mart       | player_hierarchy       | Review refresh schedule
+(5 rows)
+
+
+10. DATABASE SIZE SUMMARY
+------------------------------------------------------------
+ database | total_size | table_count | index_count | matview_count 
+----------+------------+-------------+-------------+---------------
+ devdb01  | 4914 MB    |          66 |         304 |            12
+(1 row)
+
+
+============================================================
+HEALTH CHECK COMPLETE
+============================================================
+
+RECOMMENDATIONS:
+1. Run VACUUM ANALYZE on tables with >10% dead tuples
+2. Drop unused indexes (scans < 100 and size > 100MB)
+3. Create missing indexes on large tables with high seq_scan
+4. Refresh materialized views before training runs
+5. If cache hit ratio < 99%, increase shared_buffers in postgresql.conf
+

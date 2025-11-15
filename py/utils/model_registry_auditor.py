@@ -14,7 +14,7 @@ Purpose:
 Critical Context:
     - 227 models pending registration (as of Nov 9, 2025)
     - Canonical window: 2018-2024 + H=4 decay (established Nov 8, 2025)
-    - Database: postgresql://dro:sicillionbillions@localhost:5544/devdb01
+    - Database: postgresql://dro:<password>@localhost:5544/devdb01  # pragma: allowlist secret
     - Registry: models/MODEL_REGISTRY.yaml
     - Schema: ml.model_registry (25 models registered, 37 latest ID)
 
@@ -66,28 +66,30 @@ import json
 import logging
 import os
 import pickle
-import psycopg2
-import yaml
 from collections import defaultdict
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import pandas as pd
+import psycopg2
+import yaml  # type: ignore
 from psycopg2.extras import DictCursor
 
 # Optional dependencies for CLI
 try:
     import click
+
     CLICK_AVAILABLE = True
 except ImportError:
     CLICK_AVAILABLE = False
     click = None
 
 try:
-    from tabulate import tabulate
+    from tabulate import tabulate  # type: ignore
+
     TABULATE_AVAILABLE = True
 except ImportError:
     TABULATE_AVAILABLE = False
@@ -96,6 +98,7 @@ except ImportError:
 # Try to import torch for .pth files
 try:
     import torch
+
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
@@ -104,6 +107,7 @@ except ImportError:
 # Try to import rpy2 for .rds files
 try:
     import rpy2.robjects as ro
+
     RDS_AVAILABLE = True
 except (ImportError, Exception):
     # Catch any exception during rpy2 import (including R initialization errors)
@@ -120,7 +124,7 @@ DB_CONFIG = {
     "port": 5544,
     "database": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions",
+    "password": os.getenv("DB_PASSWORD", ""),
 }
 
 # Canonical training window (established Nov 8, 2025)
@@ -152,6 +156,7 @@ FILE_SIZE_THRESHOLDS = {
 @dataclass
 class ModelFile:
     """Represents a model file on filesystem."""
+
     file_path: Path
     file_name: str
     file_type: str  # pkl, pth, rds
@@ -167,6 +172,7 @@ class ModelFile:
 @dataclass
 class DatabaseModel:
     """Represents a model in ml.model_registry."""
+
     model_id: int
     model_name: str
     model_type: str
@@ -181,6 +187,7 @@ class DatabaseModel:
 @dataclass
 class RegistryModel:
     """Represents a model in MODEL_REGISTRY.yaml."""
+
     registry_key: str
     model_name: str
     model_type: str
@@ -195,6 +202,7 @@ class RegistryModel:
 @dataclass
 class ConvergenceReport:
     """Bayesian model convergence report."""
+
     model_name: str
     converged: bool
     rhat_max: Optional[float]
@@ -207,6 +215,7 @@ class ConvergenceReport:
 @dataclass
 class CalibrationReport:
     """Model calibration report."""
+
     model_name: str
     calibrated: bool
     coverage_90pct: Optional[float]
@@ -217,6 +226,7 @@ class CalibrationReport:
 @dataclass
 class RegistrationCandidate:
     """Model candidate for registration."""
+
     file_path: Path
     model_name: str
     model_type: str
@@ -230,6 +240,7 @@ class RegistrationCandidate:
 @dataclass
 class AuditReport:
     """Full audit report."""
+
     audit_date: str = field(default_factory=lambda: datetime.now().isoformat())
     total_files: int = 0
     total_db_models: int = 0
@@ -329,6 +340,13 @@ class ModelRegistryAuditor:
         if not self.registry_path.exists():
             raise FileNotFoundError(f"Registry not found: {self.registry_path}")
 
+        # Validate DB_PASSWORD
+        if not DB_CONFIG["password"]:
+            raise ValueError(
+                "DB_PASSWORD environment variable is required. "
+                "Set it in .env or export DB_PASSWORD=your_password"
+            )
+
         logger.info(f"Initialized auditor for project: {self.project_root}")
         logger.info(f"Models directory: {self.models_dir}")
         logger.info(f"Registry file: {self.registry_path}")
@@ -385,7 +403,9 @@ class ModelRegistryAuditor:
                                     metadata = obj["metadata"]
                             except Exception as e:
                                 # File readable but not standard format
-                                logger.debug(f"Could not extract metadata from {file_path.name}: {e}")
+                                logger.debug(
+                                    f"Could not extract metadata from {file_path.name}: {e}"
+                                )
 
                     elif file_path.suffix in [".pth", ".pt"]:
                         if TORCH_AVAILABLE:
@@ -630,7 +650,9 @@ class ModelRegistryAuditor:
                 blocking_issues.append(f"File not readable: {file_model.read_error}")
 
             if file_model.size_kb < FILE_SIZE_THRESHOLDS["min_kb"]:
-                blocking_issues.append(f"File too small ({file_model.size_kb:.1f} KB), likely corrupted")
+                blocking_issues.append(
+                    f"File too small ({file_model.size_kb:.1f} KB), likely corrupted"
+                )
 
             if file_model.size_kb > FILE_SIZE_THRESHOLDS["warn_mb"] * 1024:
                 warnings.append(f"Large file ({file_model.size_kb / 1024:.1f} MB)")
@@ -676,7 +698,11 @@ class ModelRegistryAuditor:
 
         for model in registry_models:
             # Only check Bayesian models
-            if model.model_type not in ["hierarchical_bayesian", "state_space", "bayesian_neural_network"]:
+            if model.model_type not in [
+                "hierarchical_bayesian",
+                "state_space",
+                "bayesian_neural_network",
+            ]:
                 continue
 
             if not model.convergence:
@@ -714,9 +740,7 @@ class ModelRegistryAuditor:
             # Check ESS
             if ess_min is not None:
                 if ess_min < CONVERGENCE_THRESHOLDS["ess_min"]:
-                    issues.append(
-                        f"ESS too low: {ess_min} < {CONVERGENCE_THRESHOLDS['ess_min']}"
-                    )
+                    issues.append(f"ESS too low: {ess_min} < {CONVERGENCE_THRESHOLDS['ess_min']}")
                     converged = False
 
             # Check divergences
@@ -795,9 +819,7 @@ class ModelRegistryAuditor:
                     )
                     calibrated = False
                 elif abs(coverage_90pct - CALIBRATION_THRESHOLDS["coverage_90pct_target"]) > 0.05:
-                    issues.append(
-                        f"Calibration off target: {coverage_90pct:.1%} (target: 90%)"
-                    )
+                    issues.append(f"Calibration off target: {coverage_90pct:.1%} (target: 90%)")
             else:
                 issues.append("No calibration data available")
                 calibrated = False
@@ -838,7 +860,9 @@ class ModelRegistryAuditor:
 
             # Check size
             if model.size_kb < FILE_SIZE_THRESHOLDS["min_kb"]:
-                issues.append(f"⛔ {model.file_name}: Too small ({model.size_kb:.1f} KB), likely corrupted")
+                issues.append(
+                    f"⛔ {model.file_name}: Too small ({model.size_kb:.1f} KB), likely corrupted"
+                )
 
             if model.size_kb > FILE_SIZE_THRESHOLDS["warn_mb"] * 1024:
                 issues.append(f"⚠️  {model.file_name}: Large file ({model.size_kb / 1024:.1f} MB)")
@@ -884,7 +908,9 @@ class ModelRegistryAuditor:
         # Check: Production models in database but not in registry
         for db_model in database_models:
             if db_model.is_production and db_model.model_name not in registry_by_name:
-                mismatches.append(f"⚠️  Production database model '{db_model.model_name}' not in registry")
+                mismatches.append(
+                    f"⚠️  Production database model '{db_model.model_name}' not in registry"
+                )
 
         # Check: Status mismatches
         for name in set(db_by_name.keys()) & set(registry_by_name.keys()):
@@ -956,9 +982,13 @@ class ModelRegistryAuditor:
         for conv_report in convergence_reports:
             if not conv_report.converged:
                 # Check if production
-                reg_model = next((m for m in registry_models if m.model_name == conv_report.model_name), None)
+                reg_model = next(
+                    (m for m in registry_models if m.model_name == conv_report.model_name), None
+                )
                 if reg_model and reg_model.status == "production":
-                    critical.append(f"Production model '{conv_report.model_name}' failed convergence")
+                    critical.append(
+                        f"Production model '{conv_report.model_name}' failed convergence"
+                    )
 
         # Critical: File integrity issues
         for issue in file_integrity_issues:
@@ -1044,7 +1074,11 @@ class ModelRegistryAuditor:
                     version = "v3"
 
                 # Infer model family
-                family = candidate.model_type.split("_")[0] if "_" in candidate.model_type else candidate.model_type
+                family = (
+                    candidate.model_type.split("_")[0]
+                    if "_" in candidate.model_type
+                    else candidate.model_type
+                )
 
                 cursor.execute(
                     query,
@@ -1088,6 +1122,7 @@ class ModelRegistryAuditor:
 
 # CLI (only available if click installed)
 if CLICK_AVAILABLE:
+
     @click.group()
     def cli():
         """Model Registry Auditor for NFL Analytics."""
@@ -1265,7 +1300,9 @@ if CLICK_AVAILABLE:
                 click.echo(f"  {mismatch}")
         else:
             click.echo("  ✅ All models in sync")
+
 else:
+
     def cli():
         """Placeholder when click not available."""
         print("Error: click library required for CLI. Install with: pip install click")

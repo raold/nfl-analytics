@@ -117,34 +117,36 @@
 % FIGURE 3: FAILURE TAXONOMY DIAGRAM
 % =============================================================================
 
-\begin{figure}[htbp]
+\begin{landscape}
+\begin{figure}[p]
 \centering
-\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1.5cm and 1.2cm,
-    category/.style={rectangle, rounded corners, draw=accent_blue, fill=accent_blue!10,
-                    minimum height=1cm, minimum width=3cm, align=center, font=\small},
-    failure/.style={rectangle, draw=red!70!black, fill=red!10,
-                   minimum height=0.7cm, minimum width=2.5cm, align=center, font=\scriptsize},
+    node distance=2cm and 3cm,
+    category/.style={rectangle, rounded corners, draw=accent_blue, thick, fill=accent_blue!10,
+                    minimum height=1.2cm, minimum width=4cm, align=center, font=\normalsize},
+    failure/.style={rectangle, rounded corners, draw=red!70!black, thick, fill=red!10,
+                   minimum height=1cm, minimum width=3.2cm, align=center, font=\small},
+    rootcause/.style={rectangle, draw=gray!50, fill=gray!5, text width=3cm, align=left,
+                     font=\scriptsize, minimum height=1.5cm},
     arrow/.style={->,>=stealth, thick}
 ]
 
 % Root node
-\node[category, fill=accent_blue!30] (root) {6 BNN Failures\\(Oct 14 - Nov 9)};
+\node[category, fill=accent_blue!30, font=\large] (root) {6 BNN Failures\\(Oct 14 - Nov 9, 2025)};
 
-% Categories (reduced xshift to bring nodes closer)
-\node[category, below left=of root, xshift=-1.5cm] (comp) {Computational\\(1 failure)};
-\node[category, below=of root, xshift=-0.5cm] (num) {Numerical\\(2 failures)};
-\node[category, below=of root, xshift=0.5cm] (calib) {Calibration\\(1 failure)};
-\node[category, below right=of root, xshift=1.5cm] (arch) {Architectural\\(2 failures)};
+% Categories (generous horizontal spacing)
+\node[category, below left=of root, xshift=-4cm] (comp) {Computational\\(1 failure)};
+\node[category, below=of root, xshift=-2cm] (num) {Numerical\\(2 failures)};
+\node[category, below=of root, xshift=2cm] (calib) {Calibration\\(1 failure)};
+\node[category, below right=of root, xshift=4cm] (arch) {Architectural\\(2 failures)};
 
-% Specific failures
-\node[failure, below=of comp] (nuts) {NUTS\\Timeout};
-\node[failure, below left=of num] (dropout) {MC Dropout\\NaN Losses};
-\node[failure, below right=of num] (multiout2) {Multi-Out v2\\Week 0 Outlier};
-\node[failure, below=of calib] (temp) {Temperature\\26\% Coverage};
-\node[failure, below left=of arch] (laplace) {Laplace\\Hessian Error};
-\node[failure, below right=of arch] (multiout1) {Multi-Out v1\\Data Leakage};
+% Specific failures (generous vertical spacing)
+\node[failure, below=2.5cm of comp] (nuts) {NUTS\\Timeout};
+\node[failure, below=2.5cm of num, xshift=-1.8cm] (dropout) {MC Dropout\\NaN Losses};
+\node[failure, below=2.5cm of num, xshift=1.8cm] (multiout2) {Multi-Out v2\\Week 0 Outlier};
+\node[failure, below=2.5cm of calib] (temp) {Temperature\\26\% Coverage};
+\node[failure, below=2.5cm of arch, xshift=-1.8cm] (laplace) {Laplace\\Hessian Error};
+\node[failure, below=2.5cm of arch, xshift=1.8cm] (multiout1) {Multi-Out v1\\Data Leakage};
 
 % Connections
 \draw[arrow] (root) -- (comp);
@@ -159,19 +161,62 @@
 \draw[arrow] (arch) -- (laplace);
 \draw[arrow] (arch) -- (multiout1);
 
-% Root cause annotations (adjusted positions)
-\node[font=\tiny, text width=2.2cm, align=center] at (-5, -5) {6+ hours\\per config};
-\node[font=\tiny, text width=2.2cm, align=center] at (-2, -5) {Gradient\\explosion};
-\node[font=\tiny, text width=2.2cm, align=center] at (0, -5) {5,316-yard\\outlier};
-\node[font=\tiny, text width=2.2cm, align=center] at (2, -5) {VI over-\\confident};
-\node[font=\tiny, text width=2.2cm, align=center] at (3.5, -5) {9/9 configs\\failed};
-\node[font=\tiny, text width=2.2cm, align=center] at (5.5, -5) {Vegas lines\\84.7\% SHAP};
+% Root cause detail boxes
+\node[rootcause, below=0.5cm of nuts] {
+    \textbf{Root Cause:}\\
+    \textbullet\ 6+ hours per config\\
+    \textbullet\ MCMC sampling\\
+    \textbullet\ Computational limit
+};
+
+\node[rootcause, below=0.5cm of dropout] {
+    \textbf{Root Cause:}\\
+    \textbullet\ Gradient explosion\\
+    \textbullet\ Epoch 12+ NaN\\
+    \textbullet\ Bayesian variance
+};
+
+\node[rootcause, below=0.5cm of multiout2] {
+    \textbf{Root Cause:}\\
+    \textbullet\ 5,316-yard outlier\\
+    \textbullet\ Week 0 error\\
+    \textbullet\ Data quality
+};
+
+\node[rootcause, below=0.5cm of temp] {
+    \textbf{Root Cause:}\\
+    \textbullet\ VI over-confident\\
+    \textbullet\ 26\% coverage\\
+    \textbullet\ T=0.75 fixed
+};
+
+\node[rootcause, below=0.5cm of laplace] {
+    \textbf{Root Cause:}\\
+    \textbullet\ Hessian singular\\
+    \textbullet\ 9/9 configs failed\\
+    \textbullet\ Architectural issue
+};
+
+\node[rootcause, below=0.5cm of multiout1] {
+    \textbf{Root Cause:}\\
+    \textbullet\ Vegas lines leak\\
+    \textbullet\ 84.7\% SHAP\\
+    \textbullet\ Model deleted
+};
+
+% Summary box at bottom
+\node[draw=green!70!black, thick, fill=green!5, text width=18cm, align=center, font=\small]
+      at (0, -11) {
+    \textbf{Investigation Summary:} 84 person-hours over 26 days (Oct 14 -- Nov 9, 2025).
+    Only Multi-Output v3.1 with rushing targets achieved 89.5\% calibration coverage.
+    All passing yard models failed due to computational, numerical, calibration, or architectural issues.
+};
 
 \end{tikzpicture}
-}% end resizebox
 \caption{BNN Failure Taxonomy: Root Causes by Category}
 \label{fig:bnn_failure_taxonomy}
 \end{figure}
+\end{landscape}
 
 % =============================================================================
 % FIGURE 4: GRADIENT EXPLOSION VISUALIZATION (MC Dropout)

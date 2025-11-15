@@ -603,7 +603,7 @@ class XGBoostV4MultiSeasonValidator:
         for season in self.test_seasons:
             season_path = results_dir / f"xgb_v4_season_{season}_full_{timestamp}.json"
             with open(season_path, 'w') as f:
-                json.dump(self.season_results[season], f, indent=2)
+                json.dump(convert_numpy_types(self.season_results[season]), f, indent=2)
             logger.info(f"✅ Saved {season} full results: {season_path}")
 
         logger.info(f"\n📊 Validation Summary:")

@@ -1,0 +1,121 @@
+Timing is on.
+
+============================================================
+BENCHMARK 1: Player stats by season/week
+============================================================
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=51.64..51.65 rows=1 width=8) (actual time=0.409..0.410 rows=1 loops=1)
+   Buffers: shared hit=4
+   ->  Index Only Scan using idx_player_game_stats_season_week on player_game_stats  (cost=0.29..48.27 rows=1346 width=0) (actual time=0.198..0.323 rows=1285 loops=1)
+         Index Cond: ((season = 2024) AND (week >= 1) AND (week <= 10))
+         Heap Fetches: 0
+         Buffers: shared hit=4
+ Planning:
+   Buffers: shared hit=563
+ Planning Time: 3.581 ms
+ Execution Time: 0.445 ms
+(10 rows)
+
+Time: 7.805 ms
+
+============================================================
+BENCHMARK 2: Games with completed status (backtest range)
+============================================================
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=151.24..151.25 rows=1 width=8) (actual time=0.920..0.920 rows=1 loops=1)
+   Buffers: shared hit=127
+   ->  Index Only Scan using idx_games_season_week_kickoff on games  (cost=0.28..145.80 rows=2173 width=0) (actual time=0.170..0.775 rows=2078 loops=1)
+         Index Cond: (season >= 2018)
+         Heap Fetches: 901
+         Buffers: shared hit=127
+ Planning:
+   Buffers: shared hit=272
+ Planning Time: 3.856 ms
+ Execution Time: 0.965 ms
+(10 rows)
+
+Time: 5.752 ms
+
+============================================================
+BENCHMARK 3: Play-by-play aggregation (QB EPA)
+============================================================
+                                                                      QUERY PLAN                                                                      
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..374.31 rows=10 width=31) (actual time=458.664..459.090 rows=10 loops=1)
+   Buffers: shared hit=159254
+   ->  GroupAggregate  (cost=0.43..253044.74 rows=6768 width=31) (actual time=458.663..459.089 rows=10 loops=1)
+         Group Key: game_id
+         Buffers: shared hit=159254
+         ->  Index Scan using idx_plays_game_id on plays  (cost=0.43..252588.54 rows=49546 width=23) (actual time=458.608..458.992 rows=1745 loops=1)
+               Filter: ((epa IS NOT NULL) AND (game_id ~~ '2024%'::text))
+               Rows Removed by Filter: 1181385
+               Buffers: shared hit=159254
+ Planning:
+   Buffers: shared hit=855
+ Planning Time: 5.316 ms
+ Execution Time: 459.112 ms
+(13 rows)
+
+Time: 465.967 ms
+
+============================================================
+BENCHMARK 4: QB performance query (covering index test)
+============================================================
+                                                                     QUERY PLAN                                                                      
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=0.42..39.21 rows=1 width=31) (actual time=0.570..0.570 rows=1 loops=1)
+   Buffers: shared hit=33 read=1
+   ->  Index Only Scan using idx_plays_passer_epa_yards on plays  (cost=0.42..30.86 rows=1111 width=23) (actual time=0.244..0.470 rows=3065 loops=1)
+         Index Cond: (passer_player_id = '00-0036442'::text)
+         Heap Fetches: 0
+         Buffers: shared hit=33 read=1
+ Planning:
+   Buffers: shared hit=16
+ Planning Time: 0.166 ms
+ Execution Time: 0.583 ms
+(10 rows)
+
+Time: 1.335 ms
+
+============================================================
+BENCHMARK 5: Team matchup history (composite index test)
+============================================================
+                                                                       QUERY PLAN                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.28..180.27 rows=20 width=22) (actual time=0.013..0.123 rows=20 loops=1)
+   Buffers: shared hit=159
+   ->  Index Scan Backward using idx_games_season_week_status on games  (cost=0.28..927.24 rows=103 width=22) (actual time=0.012..0.121 rows=20 loops=1)
+         Index Cond: (season >= 2020)
+         Filter: ((home_team = 'BUF'::text) OR (away_team = 'BUF'::text))
+         Rows Removed by Filter: 260
+         Buffers: shared hit=159
+ Planning:
+   Buffers: shared hit=17
+ Planning Time: 0.095 ms
+ Execution Time: 0.139 ms
+(11 rows)
+
+Time: 0.585 ms
+
+============================================================
+BENCHMARK 6: Betting context query (covering index test)
+============================================================
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=147.42..148.11 rows=277 width=33) (actual time=0.209..0.215 rows=285 loops=1)
+   Sort Key: week DESC
+   Sort Method: quicksort  Memory: 42kB
+   Buffers: shared hit=67
+   ->  Index Only Scan using idx_games_betting_context on games  (cost=0.28..136.18 rows=277 width=33) (actual time=0.138..0.176 rows=285 loops=1)
+         Index Cond: (season = 2024)
+         Heap Fetches: 114
+         Buffers: shared hit=64
+ Planning:
+   Buffers: shared hit=13
+ Planning Time: 0.057 ms
+ Execution Time: 0.230 ms
+(12 rows)
+
+Time: 0.524 ms

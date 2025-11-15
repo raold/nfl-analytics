@@ -12,13 +12,15 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /build
 
-# Install build dependencies
+# Install build dependencies (including R for rpy2)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         gcc \
         g++ \
         libpq-dev \
         curl \
+        r-base \
+        r-base-dev \
         && rm -rf /var/lib/apt/lists/*
 
 # Copy API requirements
@@ -38,14 +40,20 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    LOG_LEVEL=info
+    LOG_LEVEL=info \
+    PYTHONPATH=/app
 
-# Install runtime dependencies
+# Install runtime dependencies (including R for rpy2)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
         libpq5 \
+        r-base \
+        r-base-dev \
         && rm -rf /var/lib/apt/lists/*
+
+# Install R packages needed by ensemble
+RUN R -e "install.packages(c('brms', 'cmdstanr'), repos='https://cloud.r-project.org/')"
 
 # Create app user (non-root)
 RUN useradd -m -u 1000 -s /bin/bash appuser

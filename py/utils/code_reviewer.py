@@ -8,7 +8,8 @@ the NFL analytics betting system, with emphasis on:
 2. Data leakage detection (temporal validation, future data usage)
 3. Bayesian modeling patterns (prior validation, MCMC diagnostics)
 4. Security vulnerabilities (API keys, credentials, SQL injection)
-5. Code quality (type hints, docstrings, conventions)
+5. SQL schema validation (mart.player_game_stats.game_id bug detection)
+6. Code quality (type hints, docstrings, conventions)
 
 Usage:
     from py.utils.code_reviewer import CodeReviewer
@@ -24,10 +25,23 @@ Usage:
     # Generate review report
     report = reviewer.generate_report()
 
+SQL Schema Validation:
+    The reviewer detects recurring database schema bugs, particularly:
+    - mart.player_game_stats.game_id (DOES NOT EXIST - use season+week composite key)
+    - Slow JOIN patterns (OR conditions in JOIN predicates)
+    - Missing indexes on date columns
+
+    Example:
+        # This will be flagged as CRITICAL error:
+        query = "SELECT * FROM mart.player_game_stats pgs JOIN games g ON g.game_id = pgs.game_id"
+
+        # Correct pattern:
+        query = "SELECT * FROM mart.player_game_stats pgs JOIN games g ON g.season = pgs.season AND g.week = pgs.week"
+
 Integration:
     - Pre-commit hook: Blocks commits with critical issues
     - CI/CD: GitHub Actions runs on all PRs
-    - Manual: CLI tool for on-demand reviews
+    - Manual: CLI tool for on-demand reviews (./scripts/review_code.sh --check-sql)
 """
 
 import ast
@@ -159,6 +173,41 @@ class CodeReviewer:
         ],
     }
 
+    # SQL schema-specific anti-patterns (project-specific)
+    SQL_ANTI_PATTERNS = [
+        {
+            "pattern": r"player_game_stats.*\.game_id|game_id.*player_game_stats|pgs\.game_id",
+            "severity": Severity.CRITICAL,
+            "message": "mart.player_game_stats does NOT have game_id column",
+            "description": (
+                "RECURRING BUG: mart.player_game_stats only has (season, week) keys, not game_id. "
+                "This error has occurred DOZENS of times in this project."
+            ),
+            "fix": (
+                "Use composite join: JOIN games g ON g.season = pgs.season AND g.week = pgs.week "
+                "AND g.home_team = pgs.current_team (or similar team matching)"
+            ),
+            "examples": [
+                "❌ BAD:  JOIN games g ON g.game_id = pgs.game_id",
+                "✅ GOOD: JOIN games g ON g.season = pgs.season AND g.week = pgs.week",
+            ],
+        },
+        {
+            "pattern": r"SELECT\s+COUNT\(\*\)\s+FROM.*WHERE.*=.*AND.*=",
+            "severity": Severity.MEDIUM,
+            "message": "Consider using COUNT(*) with proper indexes",
+            "description": "COUNT(*) on large tables can be slow without proper indexes",
+            "fix": "Ensure indexes exist on filter columns or use EXPLAIN ANALYZE",
+        },
+        {
+            "pattern": r"LEFT\s+JOIN.*ON.*OR|RIGHT\s+JOIN.*ON.*OR",
+            "severity": Severity.HIGH,
+            "message": "OR conditions in JOIN can be extremely slow",
+            "description": "OR in JOIN predicates prevents index usage and causes table scans",
+            "fix": "Split into UNION of two joins or restructure query",
+        },
+    ]
+
     # Bayesian modeling patterns
     BAYESIAN_PATTERNS = {
         "prior_issues": [
@@ -248,6 +297,10 @@ class CodeReviewer:
 
             # Check security vulnerabilities
             issues.extend(self._check_security(path, content, lines))
+
+            # Check SQL queries embedded in Python
+            if "SELECT" in content or "FROM" in content or "JOIN" in content:
+                issues.extend(self._check_sql_schema_errors(path, content, lines))
 
             # Check Bayesian modeling patterns
             if "models/" in str(path) or "pymc" in content.lower() or "stan" in content.lower():
@@ -541,6 +594,9 @@ class CodeReviewer:
             content = path.read_text()
             lines = content.split("\n")
 
+            # Check SQL anti-patterns (schema-specific)
+            issues.extend(self._check_sql_schema_errors(path, content, lines))
+
             for i, line in enumerate(lines, 1):
                 # Check for SELECT *
                 if re.search(r"SELECT\s+\*", line, re.IGNORECASE):
@@ -569,6 +625,57 @@ class CodeReviewer:
 
         except Exception as e:
             logger.error(f"Error reviewing SQL file {path}: {e}")
+
+        return issues
+
+    def _check_sql_schema_errors(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+        """
+        Check for project-specific SQL schema errors.
+
+        This function detects recurring bugs specific to the NFL analytics database schema,
+        particularly the mart.player_game_stats table which DOES NOT have a game_id column.
+
+        Args:
+            path: Path to SQL file
+            content: Full file content
+            lines: List of lines
+
+        Returns:
+            List of schema-related issues found
+
+        Example:
+            >>> reviewer = CodeReviewer()
+            >>> # This will be flagged as CRITICAL error:
+            >>> bad_sql = "SELECT * FROM mart.player_game_stats pgs JOIN games g ON g.game_id = pgs.game_id"
+            >>> issues = reviewer._check_sql_schema_errors(Path("test.sql"), bad_sql, bad_sql.split("\\n"))
+            >>> assert len(issues) > 0
+            >>> assert issues[0].severity == Severity.CRITICAL
+        """
+        issues = []
+
+        for i, line in enumerate(lines, 1):
+            # Check each anti-pattern
+            for anti_pattern in self.SQL_ANTI_PATTERNS:
+                pattern = anti_pattern["pattern"]
+                if re.search(pattern, line, re.IGNORECASE):
+                    # Build detailed error message
+                    error_msg = anti_pattern["description"]
+
+                    # Add examples if available
+                    suggestion_parts = [anti_pattern["fix"]]
+                    if "examples" in anti_pattern:
+                        suggestion_parts.append("\n\n" + "\n".join(anti_pattern["examples"]))
+
+                    issues.append(ReviewIssue(
+                        file_path=str(path),
+                        line_number=i,
+                        severity=anti_pattern["severity"],
+                        category=IssueCategory.DATA_LEAKAGE,  # Schema errors can cause data issues
+                        title=anti_pattern["message"],
+                        description=error_msg,
+                        suggestion="\n".join(suggestion_parts),
+                        code_snippet=line.strip(),
+                    ))
 
         return issues
 

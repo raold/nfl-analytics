@@ -1,0 +1,809 @@
+{
+  "title": "NFL Analytics - Predictions Monitoring",
+  "tags": [
+    "nfl",
+    "predictions",
+    "ensemble",
+    "performance"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 16,
+  "version": 1,
+  "refresh": "1m",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h"
+    ]
+  },
+  "panels": [
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Ensemble Performance Overview",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "collapsed": false
+    },
+    {
+      "id": 1,
+      "title": "Overall MAE (Passing Yards)",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT AVG(abs_prediction_error) as mae FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 40,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "value_and_name",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Win Rate (%)",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT 100.0 * AVG(CASE WHEN status = 'win' THEN 1.0 ELSE 0.0 END) as win_rate FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 55,
+                "color": "yellow"
+              },
+              {
+                "value": 59,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Calibration Coverage (90% Target)",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT 100.0 * AVG(CASE WHEN calibrated THEN 1.0 ELSE 0.0 END) as calibration_coverage FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 85,
+                "color": "yellow"
+              },
+              {
+                "value": 88,
+                "color": "green"
+              },
+              {
+                "value": 92,
+                "color": "yellow"
+              },
+              {
+                "value": 95,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 4,
+      "title": "Total P&L (Last 7 Days)",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT SUM(pnl) as total_pnl FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": -1000,
+                "color": "red"
+              },
+              {
+                "value": 0,
+                "color": "yellow"
+              },
+              {
+                "value": 500,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "value_and_name"
+      }
+    },
+    {
+      "id": 200,
+      "type": "row",
+      "title": "Ensemble Component Performance",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "collapsed": false
+    },
+    {
+      "id": 5,
+      "title": "Component MAE Comparison (Yards)",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT 'State-Space v2' as component, AVG(ABS(state_space_mean - actual_value)) as mae FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND state_space_mean IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days' UNION ALL SELECT 'Hierarchical v2', AVG(ABS(bayesian_mean - actual_value)) FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND bayesian_mean IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days' UNION ALL SELECT 'Hybrid XGBoost', AVG(ABS(xgboost_mean - actual_value)) FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND xgboost_mean IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days' UNION ALL SELECT 'Informative Priors', AVG(ABS(bnn_calibrated_mean - actual_value)) FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND bnn_calibrated_mean IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days' UNION ALL SELECT 'Ensemble', AVG(abs_prediction_error) FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '7 days';",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 40,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    },
+    {
+      "id": 6,
+      "title": "Ensemble Weight Distribution",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT 'State-Space v2' as component, 30.0 as weight UNION ALL SELECT 'Hierarchical v2', 30.0 UNION ALL SELECT 'Hybrid XGBoost', 25.0 UNION ALL SELECT 'Informative Priors v2', 15.0;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        }
+      }
+    },
+    {
+      "id": 300,
+      "type": "row",
+      "title": "Time Series Performance",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "collapsed": false
+    },
+    {
+      "id": 7,
+      "title": "MAE by Week (Yards)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 19
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT DATE_TRUNC('day', predicted_at) as time, AVG(abs_prediction_error) as mae FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '30 days' GROUP BY DATE_TRUNC('day', predicted_at) ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "auto",
+            "axisPlacement": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 40,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Cumulative P&L (Yards)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 19
+      },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawSql": "SELECT DATE_TRUNC('day', predicted_at) as time, SUM(SUM(pnl)) OVER (ORDER BY DATE_TRUNC('day', predicted_at)) as cumulative_pnl FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL AND predicted_at > NOW() - INTERVAL '30 days' GROUP BY DATE_TRUNC('day', predicted_at) ORDER BY time;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "auto",
+            "axisPlacement": "auto"
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 400,
+      "type": "row",
+      "title": "Prediction Details",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "collapsed": false
+    },
+    {
+      "id": 9,
+      "title": "Recent Player Predictions (Last 24h)",
+      "type": "table",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT player_name, team, opponent, is_home, ROUND(prediction_mean::numeric, 1) as pred_yards, ROUND(actual_value::numeric, 1) as actual_yards, ROUND(abs_prediction_error::numeric, 1) as mae, CASE WHEN calibrated THEN 'Yes' ELSE 'No' END as calibrated_90, status, ROUND(pnl::numeric, 2) as pnl_usd, predicted_at FROM ml.predictions WHERE stat_type = 'passing_yards' AND predicted_at > NOW() - INTERVAL '24 hours' ORDER BY predicted_at DESC LIMIT 50;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pred_yards"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "actual_yards"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "mae"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "value": 0,
+                      "color": "green"
+                    },
+                    {
+                      "value": 40,
+                      "color": "yellow"
+                    },
+                    {
+                      "value": 50,
+                      "color": "red"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "value": "win",
+                    "text": "Win"
+                  },
+                  {
+                    "type": "value",
+                    "value": "loss",
+                    "text": "Loss"
+                  },
+                  {
+                    "type": "value",
+                    "value": "push",
+                    "text": "Push"
+                  },
+                  {
+                    "type": "value",
+                    "value": "pending",
+                    "text": "Pending"
+                  }
+                ]
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "value": "loss",
+                      "color": "red"
+                    },
+                    {
+                      "value": "win",
+                      "color": "green"
+                    },
+                    {
+                      "value": "push",
+                      "color": "yellow"
+                    },
+                    {
+                      "value": "pending",
+                      "color": "blue"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      }
+    },
+    {
+      "id": 500,
+      "type": "row",
+      "title": "Model Performance by Season",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "collapsed": false
+    },
+    {
+      "id": 10,
+      "title": "MAE by Season (Yards)",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 39
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT season::text as season, AVG(abs_prediction_error) as mae FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL GROUP BY season ORDER BY season;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 40,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true
+      }
+    },
+    {
+      "id": 11,
+      "title": "Win Rate by Season (%)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 39
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT season, 100.0 * AVG(CASE WHEN status = 'win' THEN 1.0 ELSE 0.0 END) as win_rate FROM ml.predictions WHERE stat_type = 'passing_yards' AND actual_value IS NOT NULL GROUP BY season ORDER BY season;",
+          "refId": "A"
+        }
+      ],
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres_nfl"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 1,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "showPoints": "auto",
+            "axisPlacement": "auto"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": 0,
+                "color": "red"
+              },
+              {
+                "value": 55,
+                "color": "yellow"
+              },
+              {
+                "value": 59,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "tooltip": {
+          "mode": "single"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    }
+  ]
+}

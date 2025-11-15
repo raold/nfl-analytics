@@ -322,7 +322,14 @@ class EnhancedEnsemble4Way:
         """
         Get state-space prediction using player skills.
 
-        Uses simplified formula: yards = exp(skill + log(attempts) + home_effect)
+        Model formula (from simplified_random_walk_weighted.stan):
+            log(yards + 1) = theta + beta_attempts * log(attempts) + beta_home * is_home + noise
+            where theta is the time-varying skill, noise ~ N(0, R)
+
+        Learned parameters (from trained model):
+            beta_attempts = 0.810
+            beta_home = 0.0186
+            R = 0.214
 
         Returns:
             (mean, std) tuple or None if prediction fails
@@ -368,19 +375,26 @@ class EnhancedEnsemble4Way:
                 return None
 
             # Use most recent skill
-            latest_skill = player_skills.iloc[-1]['skill_mean']
+            theta = player_skills.iloc[-1]['skill_mean']
 
-            # State-space model formula: log(yards) ~ skill + log(attempts) + home_effect + noise
-            # From model training: home_effect ≈ 0.05, sigma ≈ 0.35
-            home_effect = 0.05 if is_home else 0.0
-            sigma = 0.35  # Learned noise parameter
+            # Learned parameters from Stan model
+            beta_attempts = 0.810
+            beta_home = 0.0186
+            R = 0.214  # Measurement noise SD
 
-            log_yards_mean = latest_skill + np.log(attempts) + home_effect
-            log_yards_std = sigma
+            # Model prediction: log(yards + 1) ~ N(theta + beta_attempts * log(attempts) + beta_home * is_home, R)
+            log_yards_plus_1_mean = theta + beta_attempts * np.log(attempts) + beta_home * is_home
+            log_yards_plus_1_std = R
 
-            # Convert to yards scale
-            yards_mean = np.exp(log_yards_mean + 0.5 * sigma**2)  # Lognormal correction
-            yards_std = yards_mean * np.sqrt(np.exp(sigma**2) - 1)  # Lognormal SD
+            # Transform to yards scale: yards = exp(log(yards + 1)) - 1
+            # For lognormal: if X ~ N(μ, σ²), then exp(X) has mean exp(μ + σ²/2)
+            # Here: log(yards + 1) ~ N(μ, σ²) so yards + 1 ~ Lognormal(μ, σ²)
+            yards_plus_1_mean = np.exp(log_yards_plus_1_mean + 0.5 * R**2)
+            yards_plus_1_std = np.sqrt((np.exp(R**2) - 1) * np.exp(2 * log_yards_plus_1_mean + R**2))
+
+            # Final yards prediction
+            yards_mean = yards_plus_1_mean - 1
+            yards_std = yards_plus_1_std  # SD unchanged by constant shift
 
             logger.debug(f"State-space: {yards_mean:.1f} ± {yards_std:.1f} yards")
             return (yards_mean, yards_std)

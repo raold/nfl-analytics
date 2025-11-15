@@ -14,12 +14,17 @@ import psycopg
 from datetime import datetime, timedelta
 import numpy as np
 import os
+import logging
 from zoneinfo import ZoneInfo
 import requests
 import time
 import hashlib
 import sys
 from pathlib import Path
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add project root to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -163,40 +168,43 @@ def get_database_connection():
 
 @cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_retrospective_metrics(model_version=None, season=None):
-    """Fetch retrospective analysis metrics."""
+    """Fetch player passing yards predictions and performance metrics."""
     query = """
     SELECT
-        r.game_id,
-        g.season,
-        g.week,
-        g.home_team,
-        g.away_team,
-        g.home_score,
-        g.away_score,
-        r.actual_margin,
-        r.predicted_margin,
-        r.margin_error,
-        r.abs_margin_error,
-        r.outcome_type,
-        r.surprise_factor,
-        p.model_version,
-        p.home_win_prob,
-        p.predicted_spread,
-        p.bet_confidence,
+        p.game_id,
+        p.season,
+        p.week,
+        p.player_id,
+        p.player_name,
+        p.team,
+        p.opponent,
+        p.is_home,
+        p.stat_type,
+        p.prediction_mean as predicted_value,
+        p.actual_value,
+        p.abs_prediction_error as mae,
+        p.status,
+        p.pnl,
+        p.edge,
+        p.prob_win,
+        p.calibrated,
+        mr.model_name,
+        mr.model_version,
+        g.kickoff,
         g.spread_close,
-        g.kickoff
-    FROM predictions.retrospectives r
-    JOIN games g ON r.game_id = g.game_id
-    LEFT JOIN predictions.game_predictions p ON r.game_id = p.game_id
-    WHERE 1=1
+        g.total_close
+    FROM ml.predictions p
+    JOIN games g ON p.game_id = g.game_id
+    JOIN ml.model_registry mr ON p.model_id = mr.model_id
+    WHERE p.stat_type = 'passing_yards'
     """
 
     params = []
     if model_version:
-        query += " AND p.model_version = %s"
+        query += " AND mr.model_version = %s"
         params.append(model_version)
     if season:
-        query += " AND g.season = %s"
+        query += " AND p.season = %s"
         params.append(season)
 
     query += " ORDER BY g.kickoff DESC LIMIT 1000"
@@ -208,29 +216,23 @@ def fetch_retrospective_metrics(model_version=None, season=None):
 
 @cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_performance_over_time():
-    """Fetch rolling performance metrics."""
+    """Fetch rolling performance metrics for player passing yards predictions."""
     query = """
     WITH weekly_metrics AS (
         SELECT
-            g.season,
-            g.week,
-            COUNT(*) as total_games,
-            AVG(r.abs_margin_error) as mae,
-            AVG(CASE
-                WHEN (r.actual_margin > 0 AND r.predicted_margin > 0) OR
-                     (r.actual_margin < 0 AND r.predicted_margin < 0)
-                THEN 1.0 ELSE 0.0
-            END) as win_rate,
-            AVG(CASE
-                WHEN g.spread_close IS NOT NULL THEN
-                    CASE WHEN (r.actual_margin + g.spread_close) > 0 THEN 1.0 ELSE 0.0 END
-                ELSE NULL
-            END) as ats_accuracy
-        FROM predictions.retrospectives r
-        JOIN games g ON r.game_id = g.game_id
-        WHERE g.season >= 2022
-        GROUP BY g.season, g.week
-        ORDER BY g.season, g.week
+            p.season,
+            p.week,
+            COUNT(DISTINCT (p.player_id, p.game_id)) as total_player_games,
+            ROUND(AVG(p.abs_prediction_error)::numeric, 2) as mae,
+            ROUND(AVG(CASE WHEN p.status = 'win' THEN 1.0 ELSE 0.0 END)::numeric, 3) as win_rate,
+            ROUND(AVG(CASE WHEN p.calibrated THEN 1.0 ELSE 0.0 END)::numeric, 3) as calibration_rate,
+            ROUND(SUM(p.pnl)::numeric, 2) as weekly_pnl
+        FROM ml.predictions p
+        WHERE p.stat_type = 'passing_yards'
+          AND p.actual_value IS NOT NULL
+          AND p.season >= 2022
+        GROUP BY p.season, p.week
+        ORDER BY p.season, p.week
     )
     SELECT * FROM weekly_metrics
     """
@@ -242,23 +244,24 @@ def fetch_performance_over_time():
 
 @cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_model_comparison():
-    """Compare different model versions."""
+    """Compare different model versions for player passing yards predictions."""
     query = """
     SELECT
-        p.model_version,
-        COUNT(*) as total_predictions,
-        AVG(r.abs_margin_error) as mae,
-        STDDEV(r.margin_error) as std_error,
-        AVG(CASE
-            WHEN (r.actual_margin > 0 AND r.predicted_margin > 0) OR
-                 (r.actual_margin < 0 AND r.predicted_margin < 0)
-            THEN 1.0 ELSE 0.0
-        END) as accuracy,
-        AVG(p.bet_confidence) as avg_confidence
-    FROM predictions.game_predictions p
-    JOIN predictions.retrospectives r ON p.game_id = r.game_id
-    GROUP BY p.model_version
-    ORDER BY accuracy DESC
+        mr.model_name,
+        mr.model_version,
+        mr.status as model_status,
+        COUNT(p.prediction_id) as total_predictions,
+        ROUND(AVG(p.abs_prediction_error)::numeric, 2) as mae,
+        ROUND(STDDEV(p.prediction_error)::numeric, 2) as std_error,
+        ROUND(AVG(CASE WHEN p.status = 'win' THEN 1.0 ELSE 0.0 END)::numeric, 3) as win_rate,
+        ROUND(AVG(CASE WHEN p.calibrated THEN 1.0 ELSE 0.0 END)::numeric, 3) as calibration_rate,
+        ROUND(SUM(p.pnl)::numeric, 2) as total_pnl,
+        ROUND(AVG(p.edge)::numeric, 4) as avg_edge
+    FROM ml.model_registry mr
+    LEFT JOIN ml.predictions p ON mr.model_id = p.model_id AND p.stat_type = 'passing_yards' AND p.actual_value IS NOT NULL
+    WHERE mr.status IN ('production', 'staging', 'active')
+    GROUP BY mr.model_id, mr.model_name, mr.model_version, mr.status
+    ORDER BY mae ASC NULLS LAST
     """
 
     with psycopg.connect(**DB_CONFIG) as conn:
@@ -394,7 +397,8 @@ def fetch_bnn_uncertainty_metrics():
 @cache_data(ttl=30)  # Redis cache for 30 seconds (live updates)
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
-    # 2025 NFL season, Week 10 (November 6, 2025)
+    # Use most recent completed week for demonstration (2024 Week 12)
+    # In production, this would query current week (2025 Week 10+)
     query = """
     SELECT
         g.game_id,
@@ -414,14 +418,15 @@ def fetch_current_week_games():
             ELSE 'scheduled'
         END as game_status
     FROM games g
-    WHERE g.season = 2025 AND g.week = 10 AND g.game_type = 'REG'
-    ORDER BY g.kickoff
+    WHERE g.season = 2024 AND g.week = 12 AND g.game_type = 'REG'
+    ORDER BY g.kickoff DESC
+    LIMIT 10
     """
 
     with psycopg.connect(**DB_CONFIG) as conn:
         df = pd.read_sql_query(query, conn)
 
-    # Fetch live scores for in-progress games
+    # Fetch live scores and predictions
     if not df.empty:
         # Add display columns (LA -> LAR for clarity)
         df['away_team_display'] = df['away_team'].apply(normalize_team_display)
@@ -451,6 +456,16 @@ def fetch_current_week_games():
                     df.at[idx, 'away_score'] = live_data['away_score']
                     df.at[idx, 'home_score'] = live_data['home_score']
 
+            # Fetch predictions from FastAPI
+            predictions = get_game_predictions(row['game_id'], season, week)
+            if predictions:
+                df.at[idx, 'predicted_home_qb_yards'] = predictions.get('home_qb_yards')
+                df.at[idx, 'predicted_home_qb_std'] = predictions.get('home_qb_yards_std')
+                df.at[idx, 'predicted_away_qb_yards'] = predictions.get('away_qb_yards')
+                df.at[idx, 'predicted_away_qb_std'] = predictions.get('away_qb_yards_std')
+                df.at[idx, 'predicted_total_yards'] = predictions.get('total_yards')
+                df.at[idx, 'predicted_home_win_prob'] = predictions.get('home_win_prob')
+
     return df
 
 def normalize_team_display(team_abbr):
@@ -458,6 +473,77 @@ def normalize_team_display(team_abbr):
     if team_abbr == 'LA':
         return 'LAR'  # Display as LAR to distinguish from LAC
     return team_abbr
+
+def get_game_predictions(game_id: str, season: int, week: int) -> dict:
+    """
+    Fetch real predictions from FastAPI ensemble v5.1.
+
+    Args:
+        game_id: Game ID (e.g., '2024_12_BAL_LAC')
+        season: NFL season year
+        week: NFL week number
+
+    Returns:
+        dict with game predictions or None if failed
+        {
+            'home_qb_yards': float,
+            'home_qb_yards_std': float,
+            'away_qb_yards': float,
+            'away_qb_yards_std': float,
+            'total_yards': float,
+            'home_win_prob': float (estimated),
+            'inference_time_ms': float
+        }
+    """
+    try:
+        api_url = os.getenv("FASTAPI_URL", "http://localhost:8000")
+        response = requests.post(
+            f"{api_url}/predict/game",
+            json={"game_id": game_id, "season": season, "week": week},
+            timeout=10
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+
+            # Extract predictions
+            home_yards = data['home_prediction']['predicted_passing_yards']
+            home_std = data['home_prediction']['predicted_passing_yards_std']
+            away_yards = data['away_prediction']['predicted_passing_yards']
+            away_std = data['away_prediction']['predicted_passing_yards_std']
+            total_yards = data.get('total_predicted_yards')
+
+            # Estimate win probability based on QB passing yards advantage
+            # Simple heuristic: team with higher QB yards has higher win prob
+            # More sophisticated version would use game outcome models
+            if home_yards and away_yards:
+                yards_diff = home_yards - away_yards
+                # Convert yards difference to win probability (sigmoid-like)
+                # Each 50 yards ≈ 10% win prob advantage
+                home_win_prob = 0.5 + (yards_diff / 500.0)
+                home_win_prob = max(0.1, min(0.9, home_win_prob))  # Clamp to [0.1, 0.9]
+            else:
+                home_win_prob = 0.5
+
+            return {
+                'home_qb_yards': home_yards,
+                'home_qb_yards_std': home_std,
+                'away_qb_yards': away_yards,
+                'away_qb_yards_std': away_std,
+                'total_yards': total_yards,
+                'home_win_prob': home_win_prob,
+                'inference_time_ms': data.get('processing_ms', 0)
+            }
+        else:
+            logger.warning(f"FastAPI returned {response.status_code} for {game_id}")
+            return None
+
+    except requests.exceptions.RequestException as e:
+        logger.warning(f"Failed to fetch predictions from FastAPI: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error parsing prediction response: {e}")
+        return None
 
 def get_team_logo_url(team_abbr):
     """Get team logo URL from nflverse."""
@@ -517,9 +603,9 @@ def plot_mae_over_time(df):
     ))
 
     fig.update_layout(
-        title="Mean Absolute Error Over Time",
+        title="Mean Absolute Error Over Time (Passing Yards)",
         xaxis_title="Season-Week",
-        yaxis_title="MAE (points)",
+        yaxis_title="MAE (yards)",
         hovermode='x unified',
         height=400
     )
@@ -527,40 +613,70 @@ def plot_mae_over_time(df):
     return fig
 
 def plot_ats_accuracy(df):
-    """Plot ATS (Against the Spread) accuracy."""
+    """Plot calibration rate over time."""
     df['week_label'] = df['season'].astype(str) + '-W' + df['week'].astype(str)
 
     fig = go.Figure()
 
-    fig.add_trace(go.Scatter(
-        x=df['week_label'],
-        y=df['ats_accuracy'] * 100,
-        mode='lines+markers',
-        name='ATS Accuracy',
-        line=dict(color='#2ca02c', width=3),
-        marker=dict(size=8)
-    ))
+    # Check if calibration_rate column exists
+    if 'calibration_rate' in df.columns:
+        fig.add_trace(go.Scatter(
+            x=df['week_label'],
+            y=df['calibration_rate'] * 100,
+            mode='lines+markers',
+            name='Calibration Rate',
+            line=dict(color='#2ca02c', width=3),
+            marker=dict(size=8)
+        ))
 
-    # Add 52.4% breakeven line
-    fig.add_hline(y=52.4, line_dash="dash", line_color="red",
-                  annotation_text="52.4% (Breakeven)", annotation_position="right")
+        # Add 90% target line
+        fig.add_hline(y=90, line_dash="dash", line_color="green",
+                      annotation_text="90% (Target)", annotation_position="right")
 
-    fig.update_layout(
-        title="ATS Accuracy Over Time",
-        xaxis_title="Season-Week",
-        yaxis_title="ATS Accuracy (%)",
-        hovermode='x unified',
-        height=400
-    )
+        fig.update_layout(
+            title="Calibration Rate Over Time",
+            xaxis_title="Season-Week",
+            yaxis_title="Calibration Rate (%)",
+            hovermode='x unified',
+            height=400
+        )
+    else:
+        fig.update_layout(
+            title="Calibration Rate Over Time (No Data)",
+            xaxis_title="Season-Week",
+            yaxis_title="Calibration Rate (%)",
+            height=400
+        )
 
     return fig
 
 def plot_error_distribution(df):
-    """Plot distribution of prediction errors."""
+    """Plot distribution of prediction errors for passing yards."""
     fig = go.Figure()
 
+    # Use mae column which is abs_prediction_error from ml.predictions
+    # Calculate signed error if actual_value and predicted_value exist
+    if 'actual_value' in df.columns and 'predicted_value' in df.columns:
+        error_col = df['actual_value'] - df['predicted_value']
+        xlabel = "Prediction Error (yards)"
+    elif 'mae' in df.columns:
+        # If only MAE available, we can't show signed errors
+        # Skip this plot or show absolute errors
+        error_col = df['mae']
+        xlabel = "Absolute Error (yards)"
+    else:
+        # No error data available
+        fig.update_layout(
+            title="Prediction Error Distribution (No Data)",
+            xaxis_title="Error (yards)",
+            yaxis_title="Count",
+            height=400,
+            showlegend=False
+        )
+        return fig
+
     fig.add_trace(go.Histogram(
-        x=df['margin_error'],
+        x=error_col,
         nbinsx=40,
         name='Error Distribution',
         marker_color='#9467bd',
@@ -571,8 +687,8 @@ def plot_error_distribution(df):
                   annotation_text="Perfect Prediction", annotation_position="top")
 
     fig.update_layout(
-        title="Prediction Error Distribution",
-        xaxis_title="Margin Error (points)",
+        title="Prediction Error Distribution (Passing Yards)",
+        xaxis_title=xlabel,
         yaxis_title="Count",
         height=400,
         showlegend=False
@@ -581,13 +697,43 @@ def plot_error_distribution(df):
     return fig
 
 def plot_calibration(df):
-    """Plot calibration curve."""
-    # Bin predictions by probability
-    df['prob_bin'] = pd.cut(df['home_win_prob'], bins=10, labels=False)
+    """Plot calibration curve for player props (over/under)."""
+    # For player props, we need to check if predictions fall within confidence intervals
+    # This is different from game outcome probability calibration
 
-    calibration = df.groupby('prob_bin').agg({
-        'home_win_prob': 'mean',
-        'actual_margin': lambda x: (x > 0).mean()
+    if 'prob_win' not in df.columns or 'status' not in df.columns:
+        fig = go.Figure()
+        fig.update_layout(
+            title="Calibration Curve (No Data)",
+            xaxis_title="Predicted Probability",
+            yaxis_title="Actual Win Rate",
+            height=400,
+            xaxis=dict(range=[0, 1]),
+            yaxis=dict(range=[0, 1])
+        )
+        return fig
+
+    # Filter valid probabilities
+    valid_df = df[df['prob_win'].notna() & df['status'].notna()].copy()
+
+    if len(valid_df) == 0:
+        fig = go.Figure()
+        fig.update_layout(
+            title="Calibration Curve (No Data)",
+            xaxis_title="Predicted Probability",
+            yaxis_title="Actual Win Rate",
+            height=400,
+            xaxis=dict(range=[0, 1]),
+            yaxis=dict(range=[0, 1])
+        )
+        return fig
+
+    # Bin predictions by probability
+    valid_df['prob_bin'] = pd.cut(valid_df['prob_win'], bins=10, labels=False)
+
+    calibration = valid_df.groupby('prob_bin').agg({
+        'prob_win': 'mean',
+        'status': lambda x: (x == 'win').mean()
     }).reset_index()
 
     calibration.columns = ['bin', 'predicted_prob', 'actual_freq']
@@ -614,9 +760,9 @@ def plot_calibration(df):
     ))
 
     fig.update_layout(
-        title="Calibration Curve",
-        xaxis_title="Predicted Probability",
-        yaxis_title="Actual Frequency",
+        title="Calibration Curve (Player Props)",
+        xaxis_title="Predicted Win Probability",
+        yaxis_title="Actual Win Rate",
         height=400,
         xaxis=dict(range=[0, 1]),
         yaxis=dict(range=[0, 1])
@@ -1276,7 +1422,7 @@ def main():
     try:
         with psycopg.connect(**DB_CONFIG) as conn:
             model_versions_df = pd.read_sql_query(
-                "SELECT DISTINCT model_version FROM predictions.game_predictions ORDER BY model_version",
+                "SELECT DISTINCT model_version FROM ml.model_registry WHERE status IN ('production', 'staging', 'active') ORDER BY model_version",
                 conn
             )
             model_versions = model_versions_df['model_version'].tolist()
@@ -1299,14 +1445,8 @@ def main():
             season=season_filter
         )
 
-        # Derive winner columns from margin data (only if we have data)
-        if not df_retrospectives.empty:
-            df_retrospectives['actual_winner'] = df_retrospectives['actual_margin'].apply(
-                lambda x: 'home' if x > 0 else ('away' if x < 0 else 'push')
-            )
-            df_retrospectives['predicted_winner'] = df_retrospectives['predicted_margin'].apply(
-                lambda x: 'home' if x > 0 else ('away' if x < 0 else 'push')
-            )
+        # Note: df_retrospectives now contains player-level predictions (passing yards)
+        # No need to derive winner columns since we're tracking individual player prop bets
 
         df_performance = fetch_performance_over_time()
         df_model_comparison = fetch_model_comparison()
@@ -1317,37 +1457,32 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        total_games = len(df_retrospectives)
-        st.metric("Total Games", f"{total_games:,}")
+        total_predictions = len(df_retrospectives)
+        st.metric("Total Player-Games", f"{total_predictions:,}")
 
     with col2:
-        if not df_retrospectives.empty and 'actual_winner' in df_retrospectives.columns:
-            win_rate = (df_retrospectives['actual_winner'] == df_retrospectives['predicted_winner']).mean()
+        if not df_retrospectives.empty and 'status' in df_retrospectives.columns:
+            win_rate = (df_retrospectives['status'] == 'win').mean()
             st.metric("Win Rate", f"{win_rate*100:.1f}%",
                       delta=f"{(win_rate-0.5)*100:.1f}% vs 50%")
         else:
             st.metric("Win Rate", "N/A")
 
     with col3:
-        if not df_retrospectives.empty:
-            mae = df_retrospectives['abs_margin_error'].mean()
-            st.metric("Mean Absolute Error", f"{mae:.2f} pts")
+        if not df_retrospectives.empty and 'mae' in df_retrospectives.columns:
+            mae = df_retrospectives['mae'].mean()
+            st.metric("Mean Absolute Error", f"{mae:.2f} yards")
         else:
             st.metric("Mean Absolute Error", "N/A")
 
     with col4:
-        if not df_retrospectives.empty and 'spread_close' in df_retrospectives.columns:
-            ats_mask = df_retrospectives['spread_close'].notna()
-            if ats_mask.any():
-                ats_correct = ((df_retrospectives.loc[ats_mask, 'actual_margin'] +
-                               df_retrospectives.loc[ats_mask, 'spread_close']) > 0)
-                ats_accuracy = ats_correct.mean()
-                st.metric("ATS Accuracy", f"{ats_accuracy*100:.1f}%",
-                         delta=f"{(ats_accuracy-0.524)*100:.1f}% vs BE")
-            else:
-                st.metric("ATS Accuracy", "N/A")
+        if not df_retrospectives.empty and 'pnl' in df_retrospectives.columns:
+            total_pnl = df_retrospectives['pnl'].sum()
+            avg_pnl = df_retrospectives['pnl'].mean()
+            st.metric("Total P&L", f"${total_pnl:,.2f}",
+                     delta=f"${avg_pnl:.2f} avg")
         else:
-            st.metric("ATS Accuracy", "N/A")
+            st.metric("Total P&L", "N/A")
 
     # Fetch current week games data
     df_current_week = fetch_current_week_games()
@@ -1438,25 +1573,37 @@ def main():
                     else:
                         total_text = "Total: N/A"
 
-                    # Our model predictions
+                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
                     prediction_lines = []
-                    if pd.notna(game['home_win_prob']):
-                        home_prob = float(game['home_win_prob']) * 100
-                        away_prob = (1 - float(game['home_win_prob'])) * 100
-                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
-                        prediction_lines.append(f"<strong>Winner:</strong> {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    if pd.notna(game['predicted_spread']):
-                        pred_spread = float(game['predicted_spread'])
-                        prediction_lines.append(f"<strong>Spread:</strong> {game['home_team_display']} {pred_spread:+.1f}")
+                    # QB passing yards predictions
+                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
+                        home_qb_yards = float(game['predicted_home_qb_yards'])
+                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
+                        prediction_lines.append(
+                            f"<strong>{game['home_team_display']} QB:</strong> {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
+                        )
 
-                    # Calculate predicted total from predicted margin and average score
-                    if pd.notna(game['predicted_margin']):
-                        # Estimate total based on predicted margin (rough estimate assuming avg 45 pts total)
-                        pred_total_estimate = 45.0  # You could make this more sophisticated
-                        prediction_lines.append(f"<strong>Total:</strong> ~{pred_total_estimate:.0f}")
+                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
+                        away_qb_yards = float(game['predicted_away_qb_yards'])
+                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
+                        prediction_lines.append(
+                            f"<strong>{game['away_team_display']} QB:</strong> {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
+                        )
 
-                    prediction_info = "<div style='font-size: 14px; color: #333;'>" + " | ".join(prediction_lines) + "</div>" if prediction_lines else ""
+                    # Total passing yards
+                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
+                        total_pred = float(game['predicted_total_yards'])
+                        prediction_lines.append(f"<strong>Total Passing:</strong> {total_pred:.0f} yds")
+
+                    # Win probability
+                    if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
+                        home_win_prob = float(game['predicted_home_win_prob'])
+                        predicted_winner = game['home_team_display'] if home_win_prob > 0.5 else game['away_team_display']
+                        win_prob_pct = max(home_win_prob, 1 - home_win_prob) * 100
+                        prediction_lines.append(f"<strong>Winner:</strong> {predicted_winner} ({win_prob_pct:.1f}%)")
+
+                    prediction_info = "<div style='font-size: 14px; color: #333;'>" + " | ".join(prediction_lines) + "</div>" if prediction_lines else "<div style='font-size: 14px; color: #666; font-style: italic;'>Fetching predictions...</div>"
 
                     with col:
                         st.markdown(f"""
@@ -1495,7 +1642,13 @@ def main():
             st.markdown("---")  # Separator after live games
 
     # This Week's Games Section
-    st.header("📅 Week 6")
+    # Display actual week from data
+    if not df_current_week.empty:
+        display_week = df_current_week['week'].iloc[0]
+        display_season = df_current_week['season'].iloc[0]
+        st.header(f"📅 {display_season} Week {display_week}")
+    else:
+        st.header("📅 This Week's Games")
 
     if not df_current_week.empty:
         # Completed Games
@@ -1528,14 +1681,9 @@ def main():
                         loser = game['home_team']
                         loser_score = home_score
 
-                    # Check prediction accuracy
-                    prediction_correct = False
+                    # Note: We're now showing player passing yards predictions (not game outcomes)
+                    # Game outcome prediction accuracy is tracked separately in ml.predictions
                     prediction_text = ""
-                    if pd.notna(game['predicted_margin']):
-                        predicted_winner = game['home_team'] if game['predicted_margin'] > 0 else game['away_team']
-                        prediction_correct = (predicted_winner == winner)
-                        margin_error = abs(game['margin_error']) if pd.notna(game['margin_error']) else 0
-                        prediction_text = f"{'✅ CORRECT' if prediction_correct else '❌ WRONG'} (Error: {margin_error:.1f} pts)"
 
                     # Sportsbook info
                     spread = game['spread_close'] if pd.notna(game['spread_close']) else None
@@ -1551,24 +1699,37 @@ def main():
                     else:
                         total_text = "Total: N/A"
 
-                    # Our model predictions
+                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
                     prediction_lines = []
-                    if 'home_win_prob' in game and pd.notna(game['home_win_prob']):
-                        home_prob = float(game['home_win_prob']) * 100
-                        away_prob = (1 - float(game['home_win_prob'])) * 100
-                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
-                        prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
-                        pred_spread = float(game['predicted_spread'])
-                        prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
+                    # QB passing yards predictions
+                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
+                        home_qb_yards = float(game['predicted_home_qb_yards'])
+                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
+                        prediction_lines.append(
+                            f"{game['home_team_display']} QB: {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
+                        )
 
-                    # Calculate predicted total from predicted margin (rough estimate)
-                    if 'predicted_margin' in game and pd.notna(game['predicted_margin']):
-                        pred_total_estimate = 45.0
-                        prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
+                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
+                        away_qb_yards = float(game['predicted_away_qb_yards'])
+                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
+                        prediction_lines.append(
+                            f"{game['away_team_display']} QB: {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
+                        )
 
-                    prediction_info = " | ".join(prediction_lines) if prediction_lines else ""
+                    # Total passing yards
+                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
+                        total_pred = float(game['predicted_total_yards'])
+                        prediction_lines.append(f"Total Passing: {total_pred:.0f} yds")
+
+                    # Win probability
+                    if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
+                        home_win_prob = float(game['predicted_home_win_prob'])
+                        predicted_winner = game['home_team_display'] if home_win_prob > 0.5 else game['away_team_display']
+                        win_prob_pct = max(home_win_prob, 1 - home_win_prob) * 100
+                        prediction_lines.append(f"Winner: {predicted_winner} ({win_prob_pct:.1f}%)")
+
+                    prediction_info = " | ".join(prediction_lines) if prediction_lines else "No predictions available"
 
                     with col:
                         st.markdown(f"""
@@ -1630,24 +1791,37 @@ def main():
                     spread_text = f"Spread: {game['home_team_display']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
                     total_text = f"Total: O/U {total:.1f}"
 
-                    # Our model predictions
+                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
                     prediction_lines = []
-                    if 'home_win_prob' in game and pd.notna(game['home_win_prob']):
-                        home_prob = float(game['home_win_prob']) * 100
-                        away_prob = (1 - float(game['home_win_prob'])) * 100
-                        predicted_winner = game['home_team_display'] if game['home_win_prob'] > 0.5 else game['away_team_display']
-                        prediction_lines.append(f"Winner: {predicted_winner} ({max(home_prob, away_prob):.1f}%)")
 
-                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
-                        pred_spread = float(game['predicted_spread'])
-                        prediction_lines.append(f"Spread: {game['home_team_display']} {pred_spread:+.1f}")
+                    # QB passing yards predictions
+                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
+                        home_qb_yards = float(game['predicted_home_qb_yards'])
+                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
+                        prediction_lines.append(
+                            f"{game['home_team_display']} QB: {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
+                        )
 
-                    # Calculate predicted total from predicted margin (rough estimate)
-                    if 'predicted_margin' in game and pd.notna(game['predicted_margin']):
-                        pred_total_estimate = 45.0
-                        prediction_lines.append(f"Total: ~{pred_total_estimate:.0f}")
+                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
+                        away_qb_yards = float(game['predicted_away_qb_yards'])
+                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
+                        prediction_lines.append(
+                            f"{game['away_team_display']} QB: {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
+                        )
 
-                    prediction_info = " | ".join(prediction_lines) if prediction_lines else ""
+                    # Total passing yards
+                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
+                        total_pred = float(game['predicted_total_yards'])
+                        prediction_lines.append(f"Total Passing: {total_pred:.0f} yds")
+
+                    # Win probability
+                    if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
+                        home_win_prob = float(game['predicted_home_win_prob'])
+                        predicted_winner = game['home_team_display'] if home_win_prob > 0.5 else game['away_team_display']
+                        win_prob_pct = max(home_win_prob, 1 - home_win_prob) * 100
+                        prediction_lines.append(f"Winner: {predicted_winner} ({win_prob_pct:.1f}%)")
+
+                    prediction_info = " | ".join(prediction_lines) if prediction_lines else "Fetching predictions..."
 
                     with col:
                         st.markdown(f"""
@@ -1820,10 +1994,10 @@ def main():
                 )
 
         with col2:
-            # Team filter
-            if 'home_team' in df_retrospectives.columns:
-                teams = sorted(set(df_retrospectives['home_team'].unique()) |
-                             set(df_retrospectives['away_team'].unique()))
+            # Team filter (player's team or opponent)
+            if 'team' in df_retrospectives.columns:
+                teams = sorted(set(df_retrospectives['team'].unique()) |
+                             set(df_retrospectives['opponent'].unique()))
                 selected_teams = st.multiselect(
                     "Filter by Team",
                     options=teams,
@@ -1832,14 +2006,14 @@ def main():
                 )
 
         with col3:
-            # Outcome type filter
-            if 'outcome_type' in df_retrospectives.columns:
-                outcome_types = sorted(df_retrospectives['outcome_type'].dropna().unique())
-                selected_outcomes = st.multiselect(
-                    "Filter by Outcome",
-                    options=outcome_types,
+            # Status filter (win/loss/push/pending)
+            if 'status' in df_retrospectives.columns:
+                statuses = sorted(df_retrospectives['status'].dropna().unique())
+                selected_statuses = st.multiselect(
+                    "Filter by Result",
+                    options=statuses,
                     default=[],
-                    key="outcome_filter"
+                    key="status_filter"
                 )
 
         # Apply filters
@@ -1850,12 +2024,12 @@ def main():
 
         if selected_teams:
             filtered_df = filtered_df[
-                (filtered_df['home_team'].isin(selected_teams)) |
-                (filtered_df['away_team'].isin(selected_teams))
+                (filtered_df['team'].isin(selected_teams)) |
+                (filtered_df['opponent'].isin(selected_teams))
             ]
 
-        if selected_outcomes:
-            filtered_df = filtered_df[filtered_df['outcome_type'].isin(selected_outcomes)]
+        if selected_statuses:
+            filtered_df = filtered_df[filtered_df['status'].isin(selected_statuses)]
 
         # Sort by most recent before selecting display columns
         if 'kickoff' in filtered_df.columns:
@@ -1864,53 +2038,58 @@ def main():
         # Display count
         st.markdown(f"**Showing {len(filtered_df)} predictions**")
 
-        # Prepare display dataframe
+        # Prepare display dataframe for player-level predictions
         display_cols = [
-            'season', 'week', 'home_team', 'away_team',
-            'home_score', 'away_score', 'actual_margin',
-            'predicted_margin', 'margin_error', 'abs_margin_error',
-            'home_win_prob', 'predicted_spread', 'spread_close',
-            'outcome_type', 'model_version'
+            'season', 'week', 'player_name', 'team', 'opponent', 'is_home',
+            'predicted_value', 'actual_value', 'mae',
+            'status', 'pnl', 'edge', 'prob_win', 'calibrated',
+            'model_name', 'model_version'
         ]
 
         # Only include columns that exist
         available_cols = [col for col in display_cols if col in filtered_df.columns]
         predictions_display = filtered_df[available_cols].copy()
 
-        # Add result column
-        if 'actual_winner' in filtered_df.columns and 'predicted_winner' in filtered_df.columns:
-            predictions_display['correct'] = (
-                filtered_df['actual_winner'] == filtered_df['predicted_winner']
-            ).map({True: '✓', False: '✗'})
+        # Add result column based on status
+        if 'status' in filtered_df.columns:
+            predictions_display['result'] = filtered_df['status'].map({
+                'win': '✓ Win',
+                'loss': '✗ Loss',
+                'push': '~ Push',
+                'pending': '⏳ Pending'
+            })
 
         # Format and display
         format_dict = {}
-        if 'actual_margin' in predictions_display.columns:
-            format_dict['actual_margin'] = '{:.1f}'
-        if 'predicted_margin' in predictions_display.columns:
-            format_dict['predicted_margin'] = '{:.1f}'
-        if 'margin_error' in predictions_display.columns:
-            format_dict['margin_error'] = '{:.1f}'
-        if 'abs_margin_error' in predictions_display.columns:
-            format_dict['abs_margin_error'] = '{:.1f}'
-        if 'home_win_prob' in predictions_display.columns:
-            format_dict['home_win_prob'] = '{:.1%}'
-        if 'predicted_spread' in predictions_display.columns:
-            format_dict['predicted_spread'] = '{:.1f}'
-        if 'spread_close' in predictions_display.columns:
-            format_dict['spread_close'] = '{:.1f}'
+        if 'predicted_value' in predictions_display.columns:
+            format_dict['predicted_value'] = '{:.1f}'
+        if 'actual_value' in predictions_display.columns:
+            format_dict['actual_value'] = '{:.1f}'
+        if 'mae' in predictions_display.columns:
+            format_dict['mae'] = '{:.1f}'
+        if 'pnl' in predictions_display.columns:
+            format_dict['pnl'] = '${:.2f}'
+        if 'edge' in predictions_display.columns:
+            format_dict['edge'] = '{:.4f}'
+        if 'prob_win' in predictions_display.columns:
+            format_dict['prob_win'] = '{:.1%}'
 
-        # Display with highlighting for correct/incorrect
-        if 'correct' in predictions_display.columns:
-            def highlight_correct(row):
-                if row['correct'] == '✓':
+        # Display with highlighting for win/loss
+        if 'status' in predictions_display.columns:
+            def highlight_status(row):
+                if 'status' not in row:
+                    return [''] * len(row)
+                status = row['status']
+                if status == 'win':
                     return ['background-color: #d4edda; color: #155724'] * len(row)
-                elif row['correct'] == '✗':
+                elif status == 'loss':
                     return ['background-color: #f8d7da; color: #721c24'] * len(row)
+                elif status == 'push':
+                    return ['background-color: #fff3cd; color: #856404'] * len(row)
                 return [''] * len(row)
 
             st.dataframe(
-                predictions_display.style.format(format_dict).apply(highlight_correct, axis=1),
+                predictions_display.style.format(format_dict).apply(highlight_status, axis=1),
                 use_container_width=True,
                 height=600
             )
