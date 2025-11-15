@@ -1,0 +1,609 @@
+openapi: 3.0.3
+info:
+  title: NFL Analytics Prediction API
+  description: |
+    Production API for ensemble NFL player props predictions with authentication.
+
+    ## Features
+    - Bayesian ensemble predictions (State-Space, Hierarchical, XGBoost, Informative Priors)
+    - API key authentication
+    - Rate limiting (100 req/hour default)
+    - Confidence intervals and uncertainty quantification
+    - Audit logging
+
+    ## Authentication
+    All prediction endpoints require API key authentication via the `X-API-Key` header.
+
+    ### Obtaining an API Key
+    Contact your administrator to provision an API key. Each key has:
+    - Unique identifier (64 characters)
+    - Descriptive name
+    - Rate limits (hourly and daily)
+    - Expiration date (optional)
+
+    ### Using Your API Key
+    ```bash
+    curl -X POST "https://api.nfl-analytics.com/predict" \
+      -H "X-API-Key: your_api_key_here" \
+      -H "Content-Type: application/json" \
+      -d '{"game_id": "2024_10_KC_LV", "player_id": "00-0033873", "stat_type": "passing_yards"}'
+    ```
+
+    ## Rate Limiting
+    - Default: 100 requests per hour
+    - Sliding window algorithm
+    - Rate limit headers included in all responses
+    - 429 status code when exceeded
+
+    Check rate limit headers:
+    - `X-RateLimit-Limit`: Total requests allowed per window
+    - `X-RateLimit-Remaining`: Requests remaining in current window
+    - `X-RateLimit-Reset`: Unix timestamp when window resets
+
+  version: 1.1.0
+  contact:
+    name: NFL Analytics API Support
+    email: support@nfl-analytics.com
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.nfl-analytics.com
+    description: Production server
+  - url: http://localhost:8000
+    description: Development server
+
+tags:
+  - name: Health
+    description: Service health and status
+  - name: Predictions
+    description: Ensemble predictions (authentication required)
+  - name: Models
+    description: Model information (authentication required)
+  - name: Monitoring
+    description: Metrics and monitoring
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: |
+        Returns service health status including database, Redis, and model availability.
+        This endpoint does not require authentication.
+      operationId: healthCheck
+      tags:
+        - Health
+      security: []  # No authentication required
+      responses:
+        '200':
+          description: Health status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                timestamp: '2025-11-15T12:00:00Z'
+                database_connected: true
+                redis_connected: true
+                models_loaded: 4
+                uptime_seconds: 3600.5
+                version: '1.1.0'
+
+  /predict:
+    post:
+      summary: Generate ensemble prediction
+      description: |
+        Generate ensemble prediction for a player's performance in a game.
+
+        Combines predictions from 4 models:
+        - State-Space v2 (30% weight)
+        - Hierarchical v2 (30% weight)
+        - Hybrid XGBoost (25% weight)
+        - Informative Priors v2 (15% weight)
+
+        Returns prediction with 90% credible interval and individual model contributions.
+
+        **Requires API key authentication.**
+      operationId: predict
+      tags:
+        - Predictions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictionRequest'
+            example:
+              game_id: '2024_10_KC_LV'
+              player_id: '00-0033873'
+              stat_type: passing_yards
+      responses:
+        '200':
+          description: Ensemble prediction generated
+          headers:
+            X-RateLimit-Limit:
+              description: Total requests allowed per hour
+              schema:
+                type: integer
+                example: 100
+            X-RateLimit-Remaining:
+              description: Requests remaining in current window
+              schema:
+                type: integer
+                example: 95
+            X-RateLimit-Reset:
+              description: Unix timestamp when rate limit resets
+              schema:
+                type: integer
+                example: 1731678000
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictionResponse'
+              example:
+                game_id: '2024_10_KC_LV'
+                player_id: '00-0033873'
+                stat_type: passing_yards
+                prediction: 285.3
+                confidence: 0.78
+                lower_bound: 215.1
+                upper_bound: 355.5
+                models_used:
+                  - model_name: state_space_v2
+                    prediction: 290.5
+                    uncertainty: 47.8
+                    weight: 0.30
+                  - model_name: hierarchical_v2
+                    prediction: 275.2
+                    uncertainty: 52.3
+                    weight: 0.30
+                  - model_name: hybrid_xgboost
+                    prediction: 288.7
+                    uncertainty: 45.1
+                    weight: 0.25
+                  - model_name: informative_priors_v2
+                    prediction: 282.1
+                    uncertainty: 50.2
+                    weight: 0.15
+                timestamp: '2025-11-15T12:00:00Z'
+                ensemble_method: inverse_variance_weighted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ValidationError
+                message: Invalid stat_type
+                details:
+                  stat_type: Must be one of [passing_yards, rushing_yards, receiving_yards, passing_tds, rushing_tds]
+                timestamp: '2025-11-15T12:00:00Z'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: ServiceUnavailable
+                message: Predictor not initialized
+                timestamp: '2025-11-15T12:00:00Z'
+
+  /models:
+    get:
+      summary: List loaded models
+      description: |
+        Returns information about all loaded models including status, version, and metadata.
+
+        **Requires API key authentication.**
+      operationId: listModels
+      tags:
+        - Models
+      responses:
+        '200':
+          description: List of models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsListResponse'
+              example:
+                models:
+                  - model_name: state_space_v2
+                    model_type: bayesian_state_space
+                    version: '2.0'
+                    file_path: /app/models/bayesian/state_space_v2.rds
+                    file_size_mb: 12.5
+                    loaded_at: '2025-11-15T10:00:00Z'
+                    status: loaded
+                  - model_name: hierarchical_v2
+                    model_type: bayesian_hierarchical
+                    version: '2.0'
+                    file_path: /app/models/bayesian/hierarchical_v2.rds
+                    file_size_mb: 18.3
+                    loaded_at: '2025-11-15T10:00:05Z'
+                    status: loaded
+                  - model_name: hybrid_xgboost
+                    model_type: xgboost
+                    version: '4.0'
+                    file_path: /app/models/xgboost/xgb_ridge_v4.pkl
+                    file_size_mb: 3.2
+                    loaded_at: '2025-11-15T10:00:10Z'
+                    status: loaded
+                  - model_name: informative_priors_v2
+                    model_type: bayesian_informative_priors
+                    version: '2.0'
+                    file_path: /app/models/bayesian/informative_priors_v2.rds
+                    file_size_mb: 15.7
+                    loaded_at: '2025-11-15T10:00:15Z'
+                    status: loaded
+                total_models: 4
+                loaded_models: 4
+                ensemble_ready: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      description: |
+        Exports application metrics in Prometheus format.
+        This endpoint does not require authentication.
+
+        Metrics include:
+        - `predictions_total`: Total predictions by stat type and status
+        - `prediction_latency_seconds`: Prediction latency histogram
+        - `models_loaded_total`: Number of models loaded
+        - `api_requests_total`: Total API requests by endpoint
+        - `auth_failures_total`: Authentication failures by reason
+      operationId: metrics
+      tags:
+        - Monitoring
+      security: []  # No authentication required
+      responses:
+        '200':
+          description: Prometheus metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: |
+                # HELP predictions_total Total number of predictions made
+                # TYPE predictions_total counter
+                predictions_total{stat_type="passing_yards",status="success"} 1234
+                # HELP prediction_latency_seconds Time to generate prediction
+                # TYPE prediction_latency_seconds histogram
+                prediction_latency_seconds_bucket{le="0.1"} 890
+                prediction_latency_seconds_bucket{le="0.5"} 1200
+                # HELP models_loaded_total Number of models successfully loaded
+                # TYPE models_loaded_total gauge
+                models_loaded_total 4
+
+  /:
+    get:
+      summary: API root
+      description: Returns API information and links to documentation
+      operationId: root
+      tags:
+        - Health
+      security: []  # No authentication required
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  version:
+                    type: string
+                  status:
+                    type: string
+                  authentication:
+                    type: string
+                  docs:
+                    type: string
+                  health:
+                    type: string
+                  metrics:
+                    type: string
+              example:
+                name: NFL Analytics Prediction API
+                version: '1.1.0'
+                status: running
+                authentication: required
+                docs: /docs
+                health: /health
+                metrics: /metrics
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        API key for authentication. Include in all requests to protected endpoints.
+
+        Example:
+        ```
+        X-API-Key: your_64_character_api_key_here
+        ```
+
+  schemas:
+    StatType:
+      type: string
+      enum:
+        - passing_yards
+        - rushing_yards
+        - receiving_yards
+        - passing_tds
+        - rushing_tds
+      description: Type of stat to predict
+
+    PredictionRequest:
+      type: object
+      required:
+        - game_id
+        - player_id
+        - stat_type
+      properties:
+        game_id:
+          type: string
+          description: Game identifier (format YYYY_WW_HOME_AWAY)
+          example: '2024_10_KC_LV'
+        player_id:
+          type: string
+          description: NFL player ID (nflverse format)
+          example: '00-0033873'
+        stat_type:
+          $ref: '#/components/schemas/StatType'
+
+    ModelContribution:
+      type: object
+      properties:
+        model_name:
+          type: string
+          description: Model identifier
+        prediction:
+          type: number
+          format: float
+          description: Model prediction value
+        uncertainty:
+          type: number
+          format: float
+          nullable: true
+          description: Prediction uncertainty (standard deviation)
+        weight:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Weight in ensemble (0-1)
+
+    PredictionResponse:
+      type: object
+      properties:
+        game_id:
+          type: string
+        player_id:
+          type: string
+        stat_type:
+          $ref: '#/components/schemas/StatType'
+        prediction:
+          type: number
+          format: float
+          description: Ensemble mean prediction
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Model confidence (0-1)
+        lower_bound:
+          type: number
+          format: float
+          description: 90% credible interval lower bound
+        upper_bound:
+          type: number
+          format: float
+          description: 90% credible interval upper bound
+        models_used:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelContribution'
+        timestamp:
+          type: string
+          format: date-time
+          description: Prediction timestamp (UTC)
+        ensemble_method:
+          type: string
+          default: inverse_variance_weighted
+          description: Ensemble combination method
+
+    ModelInfo:
+      type: object
+      properties:
+        model_name:
+          type: string
+        model_type:
+          type: string
+          description: Model architecture
+        version:
+          type: string
+        file_path:
+          type: string
+        file_size_mb:
+          type: number
+          format: float
+        loaded_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [loaded, failed, unavailable]
+        metadata:
+          type: object
+          nullable: true
+          description: Additional model metadata
+
+    ModelsListResponse:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelInfo'
+        total_models:
+          type: integer
+          description: Total number of models
+        loaded_models:
+          type: integer
+          description: Successfully loaded models
+        ensemble_ready:
+          type: boolean
+          description: Whether ensemble is ready for predictions
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        database_connected:
+          type: boolean
+        redis_connected:
+          type: boolean
+        models_loaded:
+          type: integer
+        uptime_seconds:
+          type: number
+          format: float
+        version:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error type
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: Unauthorized
+            message: API key required. Include 'X-API-Key' header in request.
+            timestamp: '2025-11-15T12:00:00Z'
+      headers:
+        WWW-Authenticate:
+          description: Authentication challenge
+          schema:
+            type: string
+            example: ApiKey
+
+    Forbidden:
+      description: API key is inactive, revoked, or lacks permission
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            inactive:
+              value:
+                error: Forbidden
+                message: API key is inactive or revoked. Contact administrator.
+                timestamp: '2025-11-15T12:00:00Z'
+            expired:
+              value:
+                error: Forbidden
+                message: API key expired on 2025-11-01. Please rotate your key.
+                timestamp: '2025-11-15T12:00:00Z'
+            no_permission:
+              value:
+                error: Forbidden
+                message: 'API key does not have permission for endpoint: /predict'
+                timestamp: '2025-11-15T12:00:00Z'
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: RateLimitExceeded
+            message: 'Rate limit exceeded. Limit: 100 requests per 1 hour(s). Try again in 3456 seconds.'
+            details:
+              limit: 100
+              remaining: 0
+              reset_at: '2025-11-15T13:00:00Z'
+            timestamp: '2025-11-15T12:00:00Z'
+      headers:
+        Retry-After:
+          description: Seconds until rate limit resets
+          schema:
+            type: integer
+            example: 3456
+        X-RateLimit-Limit:
+          description: Total requests allowed per window
+          schema:
+            type: integer
+            example: 100
+        X-RateLimit-Remaining:
+          description: Requests remaining (always 0 for 429)
+          schema:
+            type: integer
+            example: 0
+        X-RateLimit-Reset:
+          description: Unix timestamp when window resets
+          schema:
+            type: integer
+            example: 1731678000
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: InternalServerError
+            message: Prediction failed
+            timestamp: '2025-11-15T12:00:00Z'
