@@ -3,7 +3,7 @@
 **Last Updated:** November 15, 2025
 **Project:** NFL Analytics Platform
 **Documentation Type:** C4 Model (Context, Container, Component, Code)
-**Total Diagrams:** 5 (Phase 2 Complete)
+**Total Diagrams:** 8 (Phase 3 Complete)
 
 ---
 
@@ -14,12 +14,14 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 **C4 Model Levels:**
 - **Level 1: Context** - System boundaries and external dependencies (TBD)
 - **Level 2: Container** - High-level architecture (TBD)
-- **Level 3: Component** - Detailed component design (3 diagrams) ✅
+- **Level 3: Component** - Detailed component design (6 diagrams) ✅
 - **Level 4: Code** - Sequence diagrams for critical workflows (2 diagrams) ✅
+
+**Progress:** 8/14 diagrams complete (57%)
 
 ---
 
-## Phase 2 Diagrams (November 15, 2025)
+## Phase 3 Diagrams (November 15, 2025)
 
 ### Component Diagrams (Level 3)
 
@@ -92,9 +94,93 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
+#### 4. Backtest Flow ✨ NEW
+**File:** [c4_component_backtest_flow.md](c4_component_backtest_flow.md)
+**Purpose:** Document backtest execution flow and risk gate validation
+
+**Key Components:**
+- Walk-Forward Validator - Rolling origin CV (2022-2024, 148 games)
+- Database Pool Manager - 2-10 connections (50-100x faster queries)
+- Feature Cache Manager - Redis/LRU (70-85% hit rate)
+- 4-Way Ensemble Prediction - Parallel (200ms max latency)
+- Risk Gates - 7 validation checks (ROI, win rate, Sharpe, drawdown, calibration, leakage, health)
+- Metric Calculators - ROI, win rate, Sharpe ratio, max drawdown, calibration
+- Deployment Decision - PASS/FAIL based on risk gates
+
+**Performance Metrics:**
+- Baseline Time: 45-65 minutes (unoptimized)
+- Optimized Time: 18 minutes (2.7x speedup)
+- Database Pooling: 50-100ms → <1ms per query
+- Feature Cache Hit Rate: 70-85%
+- Backtest Results (2024): ROI 6.2%, Win Rate 61.3%, Sharpe 2.4, Drawdown -6.8%
+
+**Diagram Type:** Component flow with optimization techniques
+
+---
+
+#### 5. Database ERD ✨ NEW
+**File:** [database_erd.md](database_erd.md)
+**Purpose:** Document database schema relationships and entity structure
+
+**Key Entities:**
+- **public schema** - Raw data (games, plays, weather, injuries, odds_history)
+- **mart schema** - Derived data (game_summary, player_game_stats, game_features_enhanced)
+- **ml schema** - Model registry (model_metadata, training_runs, predictions)
+- **staging schema** - ETL (staging_games, staging_plays)
+- **metadata schema** - Admin (schema_version, refresh_log)
+
+**Critical Relationships:**
+- games → plays (one-to-many via game_id)
+- games → player_game_stats (many-to-many via (season, week) composite key)
+- player_hierarchy → player_game_stats (one-to-many via player_id)
+- games → odds_history (one-to-many via game_id, TimescaleDB hypertable)
+- model_metadata → predictions (one-to-many via model_id)
+
+**Performance Metrics:**
+- Total Tables: 56 across 5 schemas
+- Total Columns: 257 (core tables)
+- Data Volume: 1.25M plays, 7,263 games, 15,213 players
+- Materialized Views: 5 (refresh required after ingestion)
+- Indexes: 10+ performance indexes (40% backtest speedup)
+
+**Diagram Type:** Entity-Relationship Diagram with critical join patterns
+
+---
+
+#### 6. Data Flow Diagram ✨ NEW
+**File:** [data_flow_diagram.md](data_flow_diagram.md)
+**Purpose:** Document end-to-end data pipeline from ingestion to production
+
+**Key Stages:**
+1. **Data Ingestion** (13.2 min) - nflfastR → PostgreSQL
+2. **Feature Engineering** (8 min) - Raw data → 157 features
+3. **Model Training** (91 min parallel) - Features → 4 trained models
+4. **Backtest Validation** (18 min) - Walk-forward validation
+5. **Production Deployment** - A/B testing → Live predictions
+6. **Real-Time Prediction** (280-480ms) - API requests → Ensemble predictions
+7. **Monitoring & Feedback** - Performance tracking → Retrain triggers
+
+**Data Quality Gates:**
+- Gate 1 (Ingestion): Schema validation, duplicate detection, null checks
+- Gate 2 (Features): Temporal validation, no future data, lag/rolling only
+- Gate 3 (Training): No leakage, MCMC convergence, feature variance
+- Gate 4 (Validation): Ensemble health, R integration, drift detection
+- Gate 5 (Deployment): Backtest passed, monitoring configured, rollback plan
+
+**Performance Metrics:**
+- Initial Setup: ~2 hours (ingestion → production)
+- Incremental Update: ~10 minutes (weekly refresh)
+- Real-Time Prediction: 280-480ms (target: <500ms) ✅
+- Cache Hit Rate: 70-85% (feature cache)
+- Database Query: 50-100ms → <1ms (pooled)
+
+**Diagram Type:** Data flow diagram with quality gates and latency breakdown
+
+---
+
 ### Sequence Diagrams (Level 4)
 
-#### 4. Training Workflow
+#### 7. Training Workflow
 **File:** [sequence_training_workflow.md](sequence_training_workflow.md)
 **Purpose:** Document temporal sequence of model training from trigger to deployment
 
@@ -124,7 +210,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 5. Prediction Flow
+#### 8. Prediction Flow
 **File:** [sequence_prediction_flow.md](sequence_prediction_flow.md)
 **Purpose:** Document real-time prediction generation through 5-component ensemble
 
@@ -164,6 +250,7 @@ All diagrams use valid Mermaid syntax and have been verified for:
 - ✅ Edge labels and styling
 - ✅ Color coding (classDef)
 - ✅ Sequence diagram notation (→, -->>, par, alt)
+- ✅ ERD notation (||--o{, ||..o{)
 
 **Rendering Tested:**
 - Mermaid Live Editor: https://mermaid.live
@@ -183,7 +270,25 @@ All diagrams use valid Mermaid syntax and have been verified for:
 - **Purple (#f3e5f5)** - Database components
 - **Orange (#ffccbc)** - Validation/quality gates
 - **Cyan (#b3e5fc)** - Deployment/production
-- **Red (#ffebee)** - Monitoring/alerts
+- **Red (#ffebee)** - Monitoring/alerts/risk gates
+- **Light Purple (#d1c4e9)** - Metrics calculation
+
+**ERD Diagrams:**
+- **Blue (#e1f5fe)** - public schema (raw data)
+- **Yellow (#fff9c4)** - mart schema (derived/materialized)
+- **Green (#c8e6c9)** - ml schema (model registry)
+- **Orange (#ffccbc)** - staging schema (ETL)
+- **Purple (#f3e5f5)** - metadata schema (admin)
+
+**Data Flow Diagrams:**
+- **Blue (#e1f5fe)** - External data sources
+- **Yellow (#fff9c4)** - Data ingestion
+- **Purple (#f3e5f5)** - Data storage (PostgreSQL)
+- **Green (#c8e6c9)** - Feature engineering
+- **Orange (#ffccbc)** - Model training
+- **Red (#ffebee)** - Validation & quality gates
+- **Cyan (#b3e5fc)** - Production serving
+- **Light Purple (#d1c4e9)** - Monitoring & feedback
 
 **Sequence Diagrams:**
 - Standard Mermaid notation
@@ -205,6 +310,14 @@ graph LR
     A -->|Data Flow| B
     B -->|Error Path| C
     C -->|Logging| D
+```
+
+**ERD Diagrams:**
+```
+||--o{ : Foreign key constraint enforced
+||..o{ : Logical relationship (not foreign key)
+PK     : Primary key
+FK     : Foreign key
 ```
 
 **Sequence Diagrams:**
@@ -244,6 +357,33 @@ Note : Explanation/timing
 | Validation Gates | 7 checks |
 | Success Rate | 95% |
 
+### Backtest Flow
+| Metric | Value |
+|--------|-------|
+| Baseline Time | 45-65 minutes |
+| Optimized Time | 18 minutes |
+| Speedup | **2.7x** |
+| Database Pooling | 50-100ms → <1ms |
+| Cache Hit Rate | 70-85% |
+
+### Database ERD
+| Metric | Value |
+|--------|-------|
+| Total Tables | 56 |
+| Total Columns | 257 (core tables) |
+| Data Volume | 1.25M plays, 7,263 games |
+| Materialized Views | 5 |
+| Performance Indexes | 10+ (40% speedup) |
+
+### Data Flow Pipeline
+| Metric | Value |
+|--------|-------|
+| Initial Setup | ~2 hours |
+| Incremental Update | ~10 minutes |
+| Real-Time Prediction | 280-480ms |
+| Cache Hit Rate | 70-85% |
+| Quality Gates | 5 stages |
+
 ### Prediction Flow
 | Metric | Value |
 |--------|-------|
@@ -254,7 +394,7 @@ Note : Explanation/timing
 
 ---
 
-## Future Diagrams (Phase 3)
+## Future Diagrams (Phase 4)
 
 ### Context Diagram (Level 1)
 - System boundaries
@@ -268,13 +408,12 @@ Note : Explanation/timing
 - Communication protocols
 
 ### Additional Component Diagrams
-- Feature Engineering Pipeline
-- Backtest Validation System
+- Feature Engineering Pipeline (detailed)
 - Dashboard & Monitoring Stack
 - Deployment Automation (CI/CD)
+- Model Registry Sync
 
 ### Additional Sequence Diagrams
-- Backtest Execution Flow
 - Feature Cache Management
 - Model Registry Sync
 - Alert & Monitoring Flow
@@ -324,13 +463,13 @@ Copy diagram code blocks to https://mermaid.live for interactive editing.
 # [Diagram Type]: [Component/Process Name]
 
 **Last Updated:** YYYY-MM-DD
-**Diagram Type:** C4 [Context/Container/Component] or Sequence
+**Diagram Type:** C4 [Context/Container/Component] or Sequence or ERD
 **Status:** [Production/Design]
 
 ## Overview
 [Purpose, responsibilities, key metrics]
 
-## [Component/Sequence] Diagram
+## [Component/Sequence/ERD] Diagram
 ```mermaid
 [diagram code]
 ```
@@ -366,6 +505,10 @@ Copy diagram code blocks to https://mermaid.live for interactive editing.
 - [MODEL_REGISTRY.yaml](../../models/MODEL_REGISTRY.yaml) - Production models
 - [TRAINING_WINDOW_ABLATION_RESULTS.md](../milestones/TRAINING_WINDOW_ABLATION_RESULTS.md)
 
+**Database Documentation:**
+- [SQL_PATTERNS.md](../database/SQL_PATTERNS.md) - Query pattern library
+- [DATABASE_SCHEMA_AUDIT.md](../database/DATABASE_SCHEMA_AUDIT.md) - Complete audit
+
 ---
 
 ## Acknowledgments
@@ -381,5 +524,6 @@ Copy diagram code blocks to https://mermaid.live for interactive editing.
 
 ---
 
-**Phase 2 Status:** ✅ COMPLETE (5 diagrams, November 15, 2025)
-**Next Phase:** Context & Container diagrams (TBD)
+**Phase 3 Status:** ✅ COMPLETE (8 diagrams, November 15, 2025)
+**Progress:** 8/14 diagrams (57%)
+**Next Phase:** Context & Container diagrams (Level 1-2)
