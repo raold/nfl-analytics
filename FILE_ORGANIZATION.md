@@ -1,6 +1,6 @@
 # File Organization Guidelines
 
-**Last Updated:** November 13, 2025
+**Last Updated:** November 15, 2025
 **Purpose:** Define canonical locations for all file types
 
 ---
@@ -32,14 +32,17 @@ FILE_ORGANIZATION.md         # This file
 docs/
 ├── archive/              # Historical docs (organized by date)
 │   └── 2025_nov/        # Archive by year_month
+├── backtest/            # Backtest simulation reports
 ├── decisions/           # Architecture Decision Records (ADRs)
 ├── deployment/          # Production deployment guides
+├── experiments/         # Experimental research documentation
 ├── guides/              # How-to guides and tutorials
 ├── milestones/          # Project milestone summaries
 ├── models/              # Model-specific documentation
 ├── performance/         # Performance analysis reports
 ├── database/            # Database schema and queries
-└── fixes/               # Bug fix postmortems and reports
+├── fixes/               # Bug fix postmortems and reports
+└── knowledge/           # Synthesized knowledge and insights
 ```
 
 **File naming conventions:**
@@ -53,8 +56,11 @@ docs/
 |-----------|----------|---------|
 | Architecture docs | `docs/` | `ARCHITECTURE_REFERENCE.md` |
 | ADRs | `docs/decisions/` | `ADR-001-database-choice.md` |
+| Backtest reports | `docs/backtest/` | `4WAY_ENSEMBLE_BACKTEST_REPORT.md` |
 | Deployment guides | `docs/deployment/` | `PRODUCTION_DEPLOYMENT_CHECKLIST.md` |
+| Experiment docs | `docs/experiments/` | `BFS_EXP5_CHECKLIST.md` |
 | How-to guides | `docs/guides/` | `common_tasks_reference.md` |
+| Knowledge synthesis | `docs/knowledge/` | `DOCUMENTATION_ORGANIZATION_SYNTHESIS.md` |
 | Milestones | `docs/milestones/` | `BNN_INVESTIGATION_COMPLETE.md` |
 | Model docs | `docs/models/` | `BNN_MODEL_INVENTORY.md` |
 | Performance reports | `docs/performance/` | `ENSEMBLE_ABLATION_STUDY.md` |
@@ -202,14 +208,79 @@ docs/archive/2025_nov/SESSION_SUMMARY_2025-11-10.md
 | Session summary | `docs/archive/YYYY_MMM/` |
 | Implementation complete | `docs/milestones/` |
 | Postmortem | `docs/fixes/` |
+| Backtest simulation report | `docs/backtest/` |
 | Deployment guide | `docs/deployment/` |
+| Experiment documentation | `docs/experiments/` |
 | Performance analysis | `docs/performance/` |
 | Architecture decision | `docs/decisions/` |
+| Knowledge synthesis | `docs/knowledge/` |
 | How-to guide | `docs/guides/` |
 | Audit report | `docs/archive/YYYY_MMM/` |
 | Model documentation | `docs/models/` |
 | Database schema docs | `docs/database/` |
 | Temporary analysis | `.cache/` or `logs/` (gitignored) |
+
+---
+
+## Decision Matrix for Ambiguous Documents
+
+**Problem:** Some documents don't fit cleanly into a single category
+
+**Solution:** Use this decision tree to categorize ambiguous documents
+
+### Delivery Reports / Completion Reports
+
+**Question:** Is this reporting work completion to stakeholders?
+
+| Document Type | Characteristics | Location |
+|---------------|----------------|----------|
+| **Phase/Feature Complete** | Announces major feature completion, production-ready | `docs/milestones/` |
+| **Session Handoff** | End-of-work summary for context switching | `docs/archive/YYYY_MMM/` |
+| **A/B Test Results** | Deployment validation with metrics | `docs/deployment/` |
+| **Experiment Results** | Research findings, not production-ready | `docs/experiments/` |
+
+**Examples:**
+```
+✅ ENSEMBLE_V6_COMPLETE.md → docs/milestones/  (production milestone)
+✅ AB_TEST_DELIVERY_REPORT.md → docs/deployment/  (production validation)
+✅ BFS_EXPERIMENTS_SUMMARY.md → docs/experiments/  (research findings)
+✅ SESSION_COMPLETION_NOV13.md → docs/archive/2025_nov/  (session handoff)
+```
+
+### Quick Reference vs. Full Guide
+
+**Question:** Is this a comprehensive guide or a quick lookup?
+
+| Document Type | Characteristics | Location |
+|---------------|----------------|----------|
+| **Comprehensive Guide** | Tutorial-style, teaches concepts | `docs/guides/` |
+| **Quick Reference** | Cheat sheet, command snippets only | `docs/guides/` (with `_QUICK_REFERENCE` suffix) |
+| **Component-Specific** | Quick commands for one component only | Same directory as component code |
+
+**Examples:**
+```
+✅ DATABASE_RECOVERY_QUICK_REFERENCE.txt → docs/guides/
+✅ AB_TEST_INTEGRATION_GUIDE.md → docs/deployment/ (deployment-specific)
+✅ py/ensemble/ENSEMBLE_USAGE.md → py/ensemble/ (code-adjacent)
+```
+
+### Validation vs. Testing vs. Performance
+
+**Question:** What is the primary purpose of this analysis?
+
+| Document Type | Purpose | Location |
+|---------------|---------|----------|
+| **Validation Report** | Confirms production readiness | `docs/deployment/` |
+| **Testing Report** | Test suite execution results | `docs/archive/YYYY_MMM/` (unless milestone) |
+| **Performance Analysis** | Comparative ablation studies | `docs/performance/` |
+| **Backtest Report** | Historical simulation results | `docs/backtest/` (NEW) |
+
+**Examples:**
+```
+✅ HYBRID_XGBOOST_V1_VALIDATION.md → docs/deployment/  (production gates)
+✅ ENSEMBLE_ABLATION_STUDY.md → docs/performance/  (comparative analysis)
+✅ 4WAY_ENSEMBLE_BACKTEST_REPORT.md → docs/backtest/  (historical simulation)
+```
 
 ---
 
@@ -298,6 +369,7 @@ git commit -m "docs: reorganize files per FILE_ORGANIZATION.md"
 | Date | Change | Author |
 |------|--------|--------|
 | 2025-11-13 | Initial version | Claude Code |
+| 2025-11-15 | Added experiments/, backtest/, knowledge/ directories; decision matrix | Claude Code |
 
 ---
 
