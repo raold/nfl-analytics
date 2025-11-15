@@ -3,7 +3,7 @@
 **Last Updated:** November 15, 2025
 **Project:** NFL Analytics Platform
 **Documentation Type:** C4 Model (Context, Container, Component, Code)
-**Total Diagrams:** 8 (Phase 3 Complete)
+**Total Diagrams:** 14 (ALL PHASES COMPLETE) ✅
 
 ---
 
@@ -12,12 +12,255 @@
 This directory contains C4 model architecture diagrams for the NFL Analytics platform, documenting the system from high-level context through detailed component interactions.
 
 **C4 Model Levels:**
-- **Level 1: Context** - System boundaries and external dependencies (TBD)
-- **Level 2: Container** - High-level architecture (TBD)
+- **Level 1: Context** - System boundaries and external dependencies (2 diagrams) ✅
+- **Level 2: Container** - High-level architecture (4 diagrams) ✅
 - **Level 3: Component** - Detailed component design (6 diagrams) ✅
 - **Level 4: Code** - Sequence diagrams for critical workflows (2 diagrams) ✅
 
-**Progress:** 8/14 diagrams complete (57%)
+**Progress:** 14/14 diagrams complete (100%) ✅
+
+---
+
+## Phase 4 Diagrams (November 15, 2025) - NEW
+
+### Context Diagrams (Level 1)
+
+#### 1. System Context
+**File:** [c4_level1_system_context.md](c4_level1_system_context.md)
+**Purpose:** Document system boundaries, external dependencies, and user personas
+
+**Key Elements:**
+- **External Actors:** Sports bettors, researchers, administrators
+- **External Systems:** nflfastR API, The Odds API, sportsbooks
+- **External Services:** Email, Slack, GitHub, Git LFS
+- **NFL Analytics System:** Core prediction platform
+
+**Data Flows:**
+- Data ingestion (nflfastR → PostgreSQL)
+- Odds polling (The Odds API → Redis)
+- Prediction generation (User → API → Ensemble)
+- Model training (PostgreSQL → Training Pipeline → Git LFS)
+- Monitoring (Containers → Prometheus → Grafana)
+
+**User Personas:**
+- **Sports Bettor:** View predictions, place bets, track ROI
+- **Researcher:** Analyze model performance, explore features, validate methodologies
+- **Administrator:** Monitor system health, deploy updates, troubleshoot issues
+
+**Technology Stack:**
+- Languages: Python, R, SQL, LaTeX
+- Frameworks: FastAPI, Streamlit, brms/Stan
+- Infrastructure: Docker, PostgreSQL, Redis, Prometheus/Grafana
+
+**Diagram Type:** C4 Context diagram with external dependencies
+
+---
+
+#### 2. Deployment Context
+**File:** [c4_level1_deployment_context.md](c4_level1_deployment_context.md)
+**Purpose:** Document deployment architecture across development and production environments
+
+**Key Elements:**
+- **Development Environment:** Local Docker Compose (Mac M4)
+- **Staging Environment:** Not yet implemented
+- **Production Environment:** Future cloud deployment (AWS/GCP)
+
+**Infrastructure:**
+- **Docker Host:** 6 core containers + 3 exporters
+- **Persistent Volumes:** pgdata (5GB), redis_data (2GB), models/ (2-5GB)
+- **Network:** nfl-analytics bridge network
+- **Resource Allocation:** 10-core CPU, 16GB RAM (Mac M4)
+
+**Security Zones:**
+- Internal network (containers communicate via bridge)
+- External access (published ports, localhost only)
+- Secret management (.env file in development, AWS Secrets Manager in production)
+
+**Disaster Recovery:**
+- PostgreSQL: Daily pg_dump backups (30-day retention)
+- Redis: Optional RDB snapshots (cache can rebuild)
+- Models: Git LFS versioning (all versions retained)
+- Recovery Time Objective (RTO): <1 hour
+- Recovery Point Objective (RPO): 24 hours
+
+**Cost Estimate (Future Production):**
+- AWS: ~$390/month (~$4,680/year)
+- Optimized: ~$3,500/year (38% reduction with reserved instances)
+
+**Diagram Type:** C4 Deployment context with infrastructure details
+
+---
+
+### Container Diagrams (Level 2)
+
+#### 3. Container Overview
+**File:** [c4_level2_container_overview.md](c4_level2_container_overview.md)
+**Purpose:** Document all 6 Docker containers and their interactions
+
+**Containers:**
+- **PostgreSQL 16 + TimescaleDB** - Data warehouse (5GB, 56 tables, 5 schemas)
+- **Redis 7** - In-memory cache (2GB max, 70-85% hit rate)
+- **FastAPI** - Prediction API (port 8000, API key auth, rate limiting)
+- **Streamlit** - Interactive dashboard (port 8501, 4 pages)
+- **Prometheus** - Metrics storage (port 9090, 30-day retention)
+- **Grafana** - Visualization (port 3000, 27 panels)
+
+**Communication Protocols:**
+- PostgreSQL wire protocol (psycopg3)
+- Redis protocol (redis-py)
+- HTTP/JSON (FastAPI REST API)
+- HTTP (Prometheus metrics, Grafana queries)
+
+**Data Persistence:**
+- pgdata volume (5GB, CRITICAL - daily backups)
+- redis_data volume (2GB, optional - cache can rebuild)
+- models/ directory (2-5GB, CRITICAL - Git LFS tracked)
+
+**Service Dependencies:**
+- PostgreSQL → Redis → FastAPI → Streamlit
+- PostgreSQL → Prometheus → Grafana
+
+**Performance:**
+- API Latency: 280-480ms (target: <500ms) ✅
+- Database Queries: <1ms (pooled), 50-100ms (unoptimized)
+- Feature Cache Hit Rate: 70-85%
+
+**Diagram Type:** C4 Container diagram with communication protocols
+
+---
+
+#### 4. API Container Detail
+**File:** [c4_level2_api_container.md](c4_level2_api_container.md)
+**Purpose:** Document FastAPI internal structure and prediction pipeline
+
+**Internal Components:**
+- **Entry Points:** Main router (api/main.py) - 5 endpoints
+- **Middleware Stack:** CORS, API key auth, rate limiting, error handling
+- **Core Prediction Logic:** EnsemblePredictor, feature extraction, aggregation
+- **Model Loading:** R bridge (rpy2), 4 models (State-Space, Hierarchical, XGBoost, IP)
+- **Data Clients:** PostgreSQL (psycopg3 pooling), Redis (redis-py caching)
+- **Prometheus Metrics:** predictions_total, prediction_latency_seconds, models_loaded_total, api_requests_total
+
+**API Endpoints:**
+- `POST /predict` - Generate ensemble prediction (auth required)
+- `GET /models` - List loaded models (auth required)
+- `GET /health` - Health check (no auth)
+- `GET /metrics` - Prometheus metrics (no auth)
+- `GET /docs` - Swagger UI (no auth)
+
+**Latency Breakdown:**
+- Request validation: 10ms
+- API key validation: 5ms
+- Rate limit check: 3ms
+- Feature extraction: 50-150ms (cache hit/miss)
+- Parallel prediction: 200-300ms (Hierarchical v2 bottleneck)
+- Aggregation: 10ms
+- Temperature scaling: 5ms
+- JSON serialization: 5ms
+- **Total: 280-480ms**
+
+**Security:**
+- API key authentication (bcrypt hashed in PostgreSQL)
+- Rate limiting (Redis sliding window, 100 req/hr default)
+- Input validation (Pydantic models)
+- CORS (enabled for Streamlit dashboard)
+
+**Diagram Type:** C4 Container detail with internal components
+
+---
+
+#### 5. Data Container Detail
+**File:** [c4_level2_data_container.md](c4_level2_data_container.md)
+**Purpose:** Document PostgreSQL database structure and schema organization
+
+**Schema Organization:**
+- **public schema (Raw Data):** games, plays, weather, injuries, odds_history (TimescaleDB)
+- **mart schema (Derived Data):** game_summary, player_game_stats, player_hierarchy, team_epa, game_features_enhanced
+- **ml schema (Model Registry):** model_metadata, training_runs, predictions
+- **staging schema (ETL):** staging_games, staging_plays
+- **metadata schema (Admin):** schema_version, refresh_log
+
+**Critical Tables:**
+- **games (7,263 rows):** Game-level data (26 columns)
+  - Key columns: game_id, season, week, kickoff (NOT game_date), spread_close (NOT spread_line), total_close
+  - Common mistake: `SELECT * FROM games WHERE game_date = '2024-11-10'` ❌
+  - Correct: `SELECT * FROM games WHERE kickoff = '2024-11-10'` ✅
+
+- **plays (1.25M rows):** Play-by-play data (67 columns)
+  - Key columns: play_id, game_id, season, week, posteam, yards_gained, epa
+
+- **player_game_stats (Materialized View):** Player performance (45 columns)
+  - **CRITICAL:** Key is (season, week, player_id) - NO game_id column!
+  - Common mistake: `JOIN games g ON g.game_id = pgs.game_id` ❌
+  - Correct: `JOIN games g ON g.season = pgs.season AND g.week = pgs.week AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)` ✅
+  - See [SQL_PATTERNS.md](../database/SQL_PATTERNS.md) for correct join patterns
+
+**Performance Indexes:**
+- games_kickoff_idx (B-tree on kickoff)
+- games_season_week_idx (B-tree on (season, week))
+- player_game_stats_composite_idx (B-tree on (season, week, player_id))
+- odds_history_time_idx (B-tree on timestamp for TimescaleDB)
+- **Impact:** 40% backtest speedup
+
+**PostgreSQL Extensions:**
+- **TimescaleDB:** Time-series storage for odds_history (10-20x compression)
+- **pg_stat_statements:** Query performance tracking (feed to Prometheus)
+
+**Backup Strategy:**
+- Daily pg_dump at 3 AM (30-day retention, ~500MB compressed)
+- Git LFS storage
+- RTO: 1-2 hours, RPO: 24 hours
+
+**Diagram Type:** C4 Container detail with schema organization
+
+---
+
+#### 6. Monitoring Container Detail
+**File:** [c4_level2_monitoring_container.md](c4_level2_monitoring_container.md)
+**Purpose:** Document Prometheus/Grafana monitoring stack
+
+**Prometheus Components:**
+- **Scrape Scheduler:** 15-second scrape interval (4 targets: API, Node Exporter, Postgres Exporter, Prometheus)
+- **TSDB Storage:** 30-day retention, ~1GB (delta encoding + Gorilla compression)
+- **Recording Rules:** Pre-computed aggregations (api_request_rate_5m, cache_hit_ratio_5m, prediction_latency_p95_5m)
+- **Alert Rules:** Threshold-based alerts (HighAPIErrorRate, HighAPILatency, HighDatabaseConnections, HighRedisMemory)
+- **Query Engine:** PromQL processor (rate(), increase(), histogram_quantile())
+
+**Grafana Components:**
+- **Dashboards (27 panels):**
+  - System Overview (4 panels): CPU, memory, disk I/O, network I/O
+  - Database Metrics (8 panels): Connections, queries/sec, transaction rate, cache hit rate
+  - Redis Metrics (6 panels): Memory usage, hit rate, clients, evictions
+  - Application Metrics (9 panels): API latency (p50/p95/p99), prediction count, error rate, models loaded
+- **Alert Manager:** Route alerts (critical → email + Slack, warning → Slack, info → log only)
+- **User Management:** admin (superuser), readonly (viewer)
+
+**Metric Exporters:**
+- **Node Exporter:** System metrics (~200 metrics)
+  - CPU: node_cpu_seconds_total{mode="idle/user/system"}
+  - Memory: node_memory_MemTotal_bytes, node_memory_MemAvailable_bytes
+  - Disk: node_disk_read_bytes_total, node_disk_write_bytes_total
+  - Network: node_network_receive_bytes_total, node_network_transmit_bytes_total
+
+- **Postgres Exporter:** Database metrics (~50 metrics)
+  - Status: pg_up (1=up, 0=down)
+  - Connections: pg_stat_database_numbackends
+  - Transactions: pg_stat_database_xact_commit, pg_stat_database_xact_rollback
+  - Cache: pg_stat_database_blks_hit, pg_stat_database_blks_read
+  - Query Performance: pg_stat_statements_total_time_seconds, pg_stat_statements_mean_time_seconds
+
+**Alert Examples:**
+- **HighAPIErrorRate:** Error rate >5% for 5 minutes → Email + Slack (critical)
+- **HighAPILatency:** p95 latency >1s for 5 minutes → Slack (warning)
+- **HighDatabaseConnections:** >80% max connections for 2 minutes → Email + Slack (critical)
+- **LowCacheHitRate:** Cache hit rate <70% for 10 minutes → Slack (warning)
+
+**Performance:**
+- Prometheus ingestion: ~20 samples/sec (current), ~10,000 samples/sec (capacity)
+- Prometheus query latency: <100ms (simple), <500ms (aggregations), <2s (complex)
+- Grafana dashboard load: <1s (System), <2s (Database), <5s (All 27 panels)
+
+**Diagram Type:** C4 Container detail with monitoring architecture
 
 ---
 
@@ -25,7 +268,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ### Component Diagrams (Level 3)
 
-#### 1. Data Ingestion Pipeline
+#### 7. Data Ingestion Pipeline
 **File:** [c4_component_data_ingestion.md](c4_component_data_ingestion.md)
 **Purpose:** Document how NFL data flows from nflfastR to PostgreSQL
 
@@ -45,7 +288,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 2. Odds Polling Service
+#### 8. Odds Polling Service
 **File:** [c4_component_odds_polling.md](c4_component_odds_polling.md)
 **Purpose:** Document real-time odds monitoring and line movement detection
 
@@ -68,7 +311,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 3. Training Pipeline
+#### 9. Training Pipeline
 **File:** [c4_component_training_pipeline.md](c4_component_training_pipeline.md)
 **Purpose:** Document end-to-end model training and validation workflow
 
@@ -94,7 +337,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 4. Backtest Flow ✨ NEW
+#### 10. Backtest Flow
 **File:** [c4_component_backtest_flow.md](c4_component_backtest_flow.md)
 **Purpose:** Document backtest execution flow and risk gate validation
 
@@ -118,7 +361,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 5. Database ERD ✨ NEW
+#### 11. Database ERD
 **File:** [database_erd.md](database_erd.md)
 **Purpose:** Document database schema relationships and entity structure
 
@@ -147,7 +390,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 6. Data Flow Diagram ✨ NEW
+#### 12. Data Flow Diagram
 **File:** [data_flow_diagram.md](data_flow_diagram.md)
 **Purpose:** Document end-to-end data pipeline from ingestion to production
 
@@ -180,7 +423,7 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ### Sequence Diagrams (Level 4)
 
-#### 7. Training Workflow
+#### 13. Training Workflow
 **File:** [sequence_training_workflow.md](sequence_training_workflow.md)
 **Purpose:** Document temporal sequence of model training from trigger to deployment
 
@@ -210,9 +453,9 @@ This directory contains C4 model architecture diagrams for the NFL Analytics pla
 
 ---
 
-#### 8. Prediction Flow
+#### 14. Prediction Flow
 **File:** [sequence_prediction_flow.md](sequence_prediction_flow.md)
-**Purpose:** Document real-time prediction generation through 5-component ensemble
+**Purpose:** Document real-time prediction generation through 4-component ensemble
 
 **Phases:**
 1. API Request Validation (10ms)
@@ -263,7 +506,25 @@ All diagrams use valid Mermaid syntax and have been verified for:
 
 ### Color Coding
 
-**Component Diagrams:**
+**Context Diagrams (Level 1):**
+- **Blue (#e1f5fe)** - External actors (users)
+- **Yellow (#fff9c4)** - External data providers
+- **Green (#c8e6c9)** - External services
+- **Orange (#ffccbc)** - NFL Analytics System (core system)
+- **Cyan (#b3e5fc)** - Host resources
+- **Red (#ffebee, dashed)** - Future production (not yet implemented)
+
+**Container Diagrams (Level 2):**
+- **Blue (#e1f5fe)** - External systems/clients
+- **Purple (#f3e5f5)** - Data layer containers
+- **Orange (#ffccbc)** - Application layer containers
+- **Yellow (#fff9c4)** - Monitoring layer containers / Prometheus components
+- **Green (#c8e6c9)** - File system (host volumes) / Grafana components
+- **Cyan (#b3e5fc)** - Data access clients / Indexes
+- **Light Purple (#d1c4e9)** - Prometheus metrics
+- **Red (#ffebee)** - External services / PostgreSQL extensions / Alert destinations
+
+**Component Diagrams (Level 3):**
 - **Blue (#e1f5fe)** - External systems (APIs, data sources)
 - **Yellow (#fff9c4)** - Data processing components
 - **Green (#c8e6c9)** - Cache/in-memory storage
@@ -392,31 +653,63 @@ Note : Explanation/timing
 | Bottleneck | Hierarchical v2 (200ms) |
 | Target | <500ms ✅ |
 
+### Container Overview
+| Metric | Value |
+|--------|-------|
+| Total Containers | 6 core + 3 exporters |
+| PostgreSQL Size | ~5GB (pgdata) |
+| Redis Max Memory | 2GB (allkeys-lru) |
+| API Latency (p95) | 280-480ms ✅ |
+| Database Query | <1ms (pooled) |
+
+### API Container
+| Metric | Value |
+|--------|-------|
+| Endpoints | 5 (/health, /predict, /models, /metrics, /docs) |
+| Model Loading Time | 12-17s (startup) |
+| Prediction Latency | 280-480ms |
+| Throughput | ~2 pred/sec (single instance) |
+| Memory Usage | 1.5-2GB |
+
+### Data Container
+| Metric | Value |
+|--------|-------|
+| Database Size | ~5GB |
+| Tables | 56 across 5 schemas |
+| Rows | 1.25M plays, 7,263 games |
+| Indexes | 10+ performance indexes |
+| Backup Size | ~500MB (compressed) |
+
+### Monitoring Container
+| Metric | Value |
+|--------|-------|
+| Scrape Interval | 15s |
+| Metrics Count | ~300 time-series |
+| Prometheus Storage | ~1GB (30-day retention) |
+| Grafana Panels | 27 across 4 categories |
+| Dashboard Load Time | <5s (all 27 panels) |
+
 ---
 
-## Future Diagrams (Phase 4)
+## Related Documentation
 
-### Context Diagram (Level 1)
-- System boundaries
-- External actors (users, data providers, sportsbooks)
-- High-level value proposition
+**Project Documentation:**
+- [CLAUDE.md](../../CLAUDE.md) - Project overview and agent guide
+- [ARCHITECTURE_REFERENCE.md](../ARCHITECTURE_REFERENCE.md) - High-level architecture
+- [DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md) - Schema guide
 
-### Container Diagram (Level 2)
-- Application containers (FastAPI, Streamlit, R services)
-- Data stores (PostgreSQL, Redis, S3)
-- Technology choices
-- Communication protocols
+**Performance Analysis:**
+- [BATCH_PREDICTION_OPTIMIZATION.md](../performance/BATCH_PREDICTION_OPTIMIZATION.md)
+- [MPS_OPTIMIZATION_QUICKSTART.md](../performance/MPS_OPTIMIZATION_QUICKSTART.md)
+- [ARCHITECTURE_COMPUTE_ANALYSIS.md](../performance/ARCHITECTURE_COMPUTE_ANALYSIS.md)
 
-### Additional Component Diagrams
-- Feature Engineering Pipeline (detailed)
-- Dashboard & Monitoring Stack
-- Deployment Automation (CI/CD)
-- Model Registry Sync
+**Model Documentation:**
+- [MODEL_REGISTRY.yaml](../../models/MODEL_REGISTRY.yaml) - Production models
+- [TRAINING_WINDOW_ABLATION_RESULTS.md](../milestones/TRAINING_WINDOW_ABLATION_RESULTS.md)
 
-### Additional Sequence Diagrams
-- Feature Cache Management
-- Model Registry Sync
-- Alert & Monitoring Flow
+**Database Documentation:**
+- [SQL_PATTERNS.md](../database/SQL_PATTERNS.md) - Query pattern library
+- [DATABASE_SCHEMA_AUDIT.md](../database/DATABASE_SCHEMA_AUDIT.md) - Complete audit
 
 ---
 
@@ -489,28 +782,6 @@ Copy diagram code blocks to https://mermaid.live for interactive editing.
 
 ---
 
-## Related Documentation
-
-**Project Documentation:**
-- [CLAUDE.md](../../CLAUDE.md) - Project overview and agent guide
-- [ARCHITECTURE_REFERENCE.md](../ARCHITECTURE_REFERENCE.md) - High-level architecture
-- [DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md) - Schema guide
-
-**Performance Analysis:**
-- [BATCH_PREDICTION_OPTIMIZATION.md](../performance/BATCH_PREDICTION_OPTIMIZATION.md)
-- [MPS_OPTIMIZATION_QUICKSTART.md](../performance/MPS_OPTIMIZATION_QUICKSTART.md)
-- [ARCHITECTURE_COMPUTE_ANALYSIS.md](../performance/ARCHITECTURE_COMPUTE_ANALYSIS.md)
-
-**Model Documentation:**
-- [MODEL_REGISTRY.yaml](../../models/MODEL_REGISTRY.yaml) - Production models
-- [TRAINING_WINDOW_ABLATION_RESULTS.md](../milestones/TRAINING_WINDOW_ABLATION_RESULTS.md)
-
-**Database Documentation:**
-- [SQL_PATTERNS.md](../database/SQL_PATTERNS.md) - Query pattern library
-- [DATABASE_SCHEMA_AUDIT.md](../database/DATABASE_SCHEMA_AUDIT.md) - Complete audit
-
----
-
 ## Acknowledgments
 
 **Diagrams Created:** November 15, 2025
@@ -524,6 +795,5 @@ Copy diagram code blocks to https://mermaid.live for interactive editing.
 
 ---
 
-**Phase 3 Status:** ✅ COMPLETE (8 diagrams, November 15, 2025)
-**Progress:** 8/14 diagrams (57%)
-**Next Phase:** Context & Container diagrams (Level 1-2)
+**All Phases Status:** ✅ COMPLETE (14/14 diagrams, November 15, 2025)
+**Documentation Coverage:** 100% (Context, Container, Component, Code levels)
