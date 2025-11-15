@@ -1183,7 +1183,69 @@ issues = validator.validate_sql_query(query)
 
 **Complete History:** See [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
-### November 14, 2025: Google Drive Removal & Infrastructure Cleanup
+### November 14, 2025 (Evening): XGBoost v4 Ridge Residuals - Phase 1+2 Complete & Multi-Season Validation
+
+**Context**: Completed critical production fixes for XGBoost v4 integration and validated model performance across 2022-2024 seasons. All validation gates passed with 88.31% improvement over baseline.
+
+**Work Performed**:
+1. **Phase 1: Critical Fixes** ✅ COMPLETE (6 issues resolved)
+   - Security: Removed hardcoded credentials from 4 files, environment variable management via python-dotenv
+   - Architecture: Fixed `residual_feature=0` distribution mismatch (QB-specific expected residuals)
+   - Data Validation: Fail-fast on missing critical data, fallback to league averages
+   - Error Handling: Fail-fast model loading at startup with actionable error messages
+   - Fallback Mechanism: Three-tier strategy (ensemble → subset → database L3 avg → None)
+
+2. **Phase 2: A/B Test Framework Setup** ✅ COMPLETE
+   - Fixed A/B router (removed hardcoded credentials, corrected ensemble imports)
+   - Created comprehensive A/B test configuration (`config/ab_test_config.yaml`, 185 lines)
+   - 50/50 split (MD5 hash-based deterministic routing), 4-week duration (Nov 14 - Dec 12, 2025)
+   - Success criteria: MAE improvement > 5 yards, p < 0.05, win rate +2pp, ROI +1%
+   - Guardrails: auto-stop if degradation > 10% MAE or -2% ROI
+
+3. **Multi-Season Validation (2022-2024)** ✅ PRODUCTION APPROVED
+   - 2022: 5.06 MAE (+87.40% improvement, p < 0.000001) ✅
+   - 2023: 4.76 MAE (+88.15% improvement, p < 0.000001) ✅
+   - 2024: 4.27 MAE (+89.38% improvement, p < 0.000001) ✅
+   - **Mean: 4.70 ± 0.40 MAE (88.31% improvement, all p < 0.000001)** ✅
+   - All 4 consistency gates PASSED (MAE < 8 yards, improvement > 80%, p < 0.05, std < 2 yards)
+
+4. **Bug Fixes** ✅ COMPLETE
+   - Fixed JSON serialization error (`convert_numpy_types` helper function)
+   - Added type conversion for numpy bool_, integer, floating, ndarray
+
+**Files Created (3 files):**
+- `config/ab_test_config.yaml` - A/B test configuration (185 lines)
+- `PHASE_1_2_CRITICAL_FIXES_COMPLETE.md` - Phase 1+2 documentation (390 lines)
+- `XGBOOST_V4_VALIDATION_COMPLETE.md` - Comprehensive validation results & roadmap
+
+**Files Modified (6 files, +3,153 lines, -504 lines):**
+- `.env.example` - Added DB_PASSWORD with pragma comments
+- `py/ensemble/enhanced_ensemble_v6.py` - 5 critical fixes (1,288 lines)
+- `scripts/xgb_exp7_backtest_2024.py` - Removed credentials (551 lines)
+- `scripts/xgb_v4_multi_season_validation.py` - Removed credentials, fixed JSON serialization (629 lines)
+- `py/production/ab_test_router.py` - Fixed credentials + imports (601 lines, NEW)
+- `CLAUDE.md` - Updated with Phase 1+2 status (this file)
+
+**Git Commit:** a69c505 - fix(security): remove hardcoded credentials and implement critical production fixes
+
+**Expected Business Impact:**
+- Ensemble v6: ~33 MAE (7 yard improvement over v5's ~40 MAE)
+- XGBoost component: 4.70 ± 0.40 MAE (88.31% improvement over v2 baseline)
+- Win Rate: 60-61% (+2-3 pp improvement)
+- ROI: 6-9% (+1-2% improvement)
+
+**Production Timeline:**
+- Week of Nov 18-24: Launch A/B test (v5 control vs v6 treatment), collect 25+ games
+- Week 2 (Nov 25-Dec 1): Statistical significance check (50 games), early stop decision if p < 0.01
+- Week 3 (Dec 2-8): Continue monitoring (75 games), ensure guardrails not violated
+- Week 4 (Dec 9-15): Final analysis (100 games minimum), production deployment decision
+- **Expected Production Deployment:** December 15, 2025 (pending A/B test success)
+
+**Status**: ✅ Phase 1+2 complete, multi-season validation passed all gates, APPROVED for A/B test launch
+
+---
+
+### November 14, 2025 (Morning): Google Drive Removal & Infrastructure Cleanup
 
 **Context**: Completed infrastructure cleanup removing unused Google Drive sync code (3,500 lines) and migrating to Git LFS workflow. Fixed dashboard bugs and validated end-to-end system operation.
 

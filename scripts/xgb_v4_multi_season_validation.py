@@ -44,10 +44,28 @@ import warnings
 import pickle
 import json
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Any
 
 import numpy as np
 import pandas as pd
+
+
+def convert_numpy_types(obj: Any) -> Any:
+    """Convert numpy types to Python native types for JSON serialization."""
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, (np.bool_, bool)):
+        return bool(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_numpy_types(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [convert_numpy_types(item) for item in obj]
+    else:
+        return obj
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sklearn.linear_model import RidgeCV
@@ -556,7 +574,8 @@ class XGBoostV4MultiSeasonValidator:
 
         summary_path = results_dir / f"xgb_v4_multi_season_validation_summary_{timestamp}.json"
         with open(summary_path, 'w') as f:
-            json.dump(summary, f, indent=2)
+            # Convert numpy types to Python natives for JSON serialization
+            json.dump(convert_numpy_types(summary), f, indent=2)
         logger.info(f"✅ Saved summary: {summary_path}")
 
         # Statistical significance CSV
