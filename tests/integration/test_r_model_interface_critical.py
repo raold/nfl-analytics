@@ -29,6 +29,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import os
 import pytest
 import psycopg2
 import numpy as np
@@ -49,7 +50,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions",
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),  # pragma: allowlist secret
 }
 
 # Model paths (production models)
@@ -222,6 +223,7 @@ def test_batch_prediction_correctness(r_interface, sample_game_data):
 
         if result is None:
             errors.append(f"Row {idx}: No prediction returned")
+            logger.warning(f"Component returned None for row {idx}")
             continue
 
         mean, std = result

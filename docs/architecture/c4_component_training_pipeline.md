@@ -309,7 +309,7 @@ fit <- model$sample(
   data = stan_data,
   chains = 4,
   parallel_chains = 4,
-  iter_warmup = 1000,
+  iter_warmup = 3000,  # Production standard (Nov 15, 2025)
   iter_sampling = 2000,
   adapt_delta = 0.95,
   max_treedepth = 12,
@@ -348,7 +348,7 @@ model <- brm(
   ),
   chains = 4,
   iter = 6000,  # Increased from 2000 (Nov 13, 2025)
-  warmup = 2000,
+  warmup = 3000,  # NOTE (Nov 15, 2025): Production models should use warmup >= 3000 for reliable convergence
   cores = 4,
   control = list(adapt_delta = 0.95)
 )
@@ -362,6 +362,9 @@ model <- brm(
 - Before (2000 iter): Rhat=1.0337 (FAILED)
 - After (6000 iter): Rhat=1.0092 (PASSED) ✅
 - 73% improvement in convergence
+
+**IMPORTANT NOTE (Nov 15, 2025):**
+Production Bayesian models should use `warmup >= 3000` iterations to ensure reliable convergence. Lower warmup values (e.g., 1000) may be acceptable for prototyping or quick testing, but production deployments require adequate warmup to explore the posterior distribution fully.
 
 ---
 
@@ -415,8 +418,8 @@ model <- brm(
     prior(exponential(0.1), class = sigma)
   ),
   chains = 4,
-  iter = 4000,
-  warmup = 1000,
+  iter = 5000,
+  warmup = 3000,  # Production standard (Nov 15, 2025)
   cores = 4
 )
 ```
@@ -748,7 +751,7 @@ async def reload_models():
             "weights": {"state_space_v2": 0.30, ...}
         }
     """
-    ensemble = EnhancedEnsemble4Way()
+    ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
     ensemble.load_models()
 
     return {
