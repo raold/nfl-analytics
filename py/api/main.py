@@ -197,7 +197,7 @@ class PredictionRequest(BaseModel):
     stat_type: str = Field(
         ...,
         description="Statistic type",
-        regex="^(passing_yards|passing_tds|interceptions|rushing_yards|rushing_tds|receiving_yards|receptions|receiving_tds|field_goals|extra_points)$",
+        pattern="^(passing_yards|passing_tds|interceptions|rushing_yards|rushing_tds|receiving_yards|receptions|receiving_tds|field_goals|extra_points)$",
     )
     week: int = Field(..., ge=1, le=18, description="NFL week (1-18)")
     season: int = Field(
@@ -358,6 +358,50 @@ class MetricsResponse(BaseModel):
     uptime_seconds: float
 
 
+class GamePredictionRequest(BaseModel):
+    """Game-level prediction request."""
+
+    game_id: str = Field(..., description="Game ID (e.g., '2024_09_CLE_PIT')")
+    season: int = Field(..., ge=1999, le=2099, description="NFL season year")
+    week: int = Field(..., ge=1, le=18, description="NFL week (1-18)")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "game_id": "2024_09_CLE_PIT",
+                "season": 2024,
+                "week": 9,
+            }
+        }
+
+
+class TeamPrediction(BaseModel):
+    """Team prediction for a game."""
+
+    team: str
+    qb_id: Optional[str] = None
+    qb_name: Optional[str] = None
+    predicted_passing_yards: Optional[float] = None
+    predicted_passing_yards_std: Optional[float] = None
+
+
+class GamePredictionResponse(BaseModel):
+    """Game-level prediction response."""
+
+    game_id: str
+    season: int
+    week: int
+    home_team: str
+    away_team: str
+    home_prediction: TeamPrediction
+    away_prediction: TeamPrediction
+    total_predicted_yards: Optional[float] = None
+    timestamp: str = Field(
+        default_factory=lambda: datetime.utcnow().isoformat() + "Z"
+    )
+    processing_ms: float
+
+
 # ============================================================================
 # Model Manager
 # ============================================================================
@@ -377,92 +421,48 @@ class ModelManager:
         self.models = {}
         self.model_versions = {}
         self.ensemble_weights = {
-            "bayesian": 0.35,
-            "bnn": 0.25,
-            "xgboost": 0.25,
-            "state_space": 0.15,
+            "state_space_v2": 0.30,
+            "hierarchical_v2": 0.30,
+            "hybrid_xgboost_v1": 0.25,
+            "informative_priors_v2": 0.15,
         }
         self.start_time = time.time()
+        self.ensemble = None
 
         logger.info(f"ModelManager initialized with path: {models_path}")
 
     def load_models(self) -> bool:
         """
-        Load all available ensemble models.
+        Load Enhanced Ensemble v5.1 (4-way ensemble with Hybrid XGBoost).
 
         Returns:
-            True if at least one model loaded successfully, False otherwise
+            True if ensemble loaded successfully, False otherwise
         """
-        success_count = 0
-        model_names = ["bayesian", "bnn", "xgboost", "state_space"]
+        try:
+            from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
-        for model_name in model_names:
-            try:
-                self._load_model(model_name)
-                success_count += 1
-                if PROMETHEUS_AVAILABLE:
-                    MODEL_LOAD_STATUS.labels(model_name=model_name).set(1)
-            except Exception as e:
-                logger.warning(f"Failed to load {model_name} model: {e}")
-                if PROMETHEUS_AVAILABLE:
-                    MODEL_LOAD_STATUS.labels(model_name=model_name).set(0)
+            self.ensemble = EnhancedEnsemble4Way()
+            logger.info("✅ Enhanced Ensemble v5.1 loaded successfully")
 
-        logger.info(f"Loaded {success_count}/{len(model_names)} models")
-        return success_count > 0
-
-    def _load_model(self, model_name: str) -> None:
-        """
-        Load individual model.
-
-        Args:
-            model_name: Model name (bayesian, bnn, xgboost, state_space)
-        """
-        import joblib
-        import pickle
-
-        # Simulate model loading (in production, load actual models)
-        model_paths = {
-            "bayesian": self.models_path / "bayesian" / "state_space_v2.0.rds",
-            "bnn": self.models_path / "bayesian" / "bnn_multioutput_v1_final.pt",
-            "xgboost": self.models_path / "xgboost" / "v3.0.pkl",
-            "state_space": self.models_path / "bayesian" / "simplified_random_walk_v2.rds",
-        }
-
-        model_versions = {
-            "bayesian": "state_space_v2.0",
-            "bnn": "multioutput_v1_final",
-            "xgboost": "v3.0",
-            "state_space": "simplified_random_walk_v2",
-        }
-
-        path = model_paths.get(model_name)
-        if path and path.exists():
-            # Load model
-            if path.suffix == ".pkl":
-                with open(path, "rb") as f:
-                    self.models[model_name] = pickle.load(f)
-            elif path.suffix == ".pt":
-                import torch
-                self.models[model_name] = torch.load(path, map_location="cpu")
-            else:
-                # R model stubs for now
-                self.models[model_name] = {"type": model_name, "path": str(path)}
-
-            self.model_versions[model_name] = model_versions.get(
-                model_name, "unknown"
-            )
-            logger.info(f"Loaded {model_name} model from {path}")
-        else:
-            # Create mock model for development
-            self.models[model_name] = {
-                "type": model_name,
-                "status": "mock",
-                "path": str(path) if path else "not_found",
+            # Update model versions to match ensemble
+            self.model_versions = {
+                "state_space_v2": "simplified_random_walk_v2",
+                "hierarchical_v2": "passing_yards_hierarchical_v2",
+                "hybrid_xgboost_v1": "hybrid_static_incremental_v1",
+                "informative_priors_v2": "passing_informative_priors_v2",
             }
-            self.model_versions[model_name] = model_versions.get(
-                model_name, "unknown"
-            )
-            logger.info(f"Created mock {model_name} model (file not found)")
+
+            if PROMETHEUS_AVAILABLE:
+                MODEL_LOAD_STATUS.labels(model_name="ensemble_v5_1").set(1)
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to load Enhanced Ensemble v5.1: {e}", exc_info=True)
+            if PROMETHEUS_AVAILABLE:
+                MODEL_LOAD_STATUS.labels(model_name="ensemble_v5_1").set(0)
+            return False
+
 
     def predict(
         self,
@@ -471,58 +471,71 @@ class ModelManager:
         week: int,
         season: int,
         confidence_level: float = 0.90,
-    ) -> dict:
+    ) -> Optional[dict]:
         """
-        Generate ensemble prediction for player stat.
+        Generate ensemble prediction for player stat using Enhanced Ensemble v5.1.
 
         Args:
             player_id: Player ID
-            stat_type: Statistic type
+            stat_type: Statistic type (currently only passing_yards supported)
             week: NFL week
             season: NFL season
             confidence_level: Confidence level for interval
 
         Returns:
-            Dictionary with prediction, uncertainty, intervals, etc.
+            Dictionary with prediction, uncertainty, intervals, etc. or None if prediction fails
         """
-        # Get base predictions from each model (mock implementation)
-        bayesian_pred = 268.5 + np.random.normal(0, 15)
-        bnn_pred = 265.0 + np.random.normal(0, 18)
-        xgboost_pred = 270.0 + np.random.normal(0, 20)
-        state_space_pred = 267.0 + np.random.normal(0, 12)
+        if not self.ensemble:
+            logger.error("Ensemble model not loaded")
+            return None
 
-        # Weighted ensemble
-        weights = self.ensemble_weights
-        ensemble_prediction = (
-            weights["bayesian"] * bayesian_pred
-            + weights["bnn"] * bnn_pred
-            + weights["xgboost"] * xgboost_pred
-            + weights["state_space"] * state_space_pred
-        )
+        # Currently only supports passing_yards
+        if stat_type != "passing_yards":
+            logger.warning(f"Stat type '{stat_type}' not supported yet (only passing_yards)")
+            # Return None to allow fallback behavior
+            return None
 
-        # Uncertainty estimation
-        predictions = [bayesian_pred, bnn_pred, xgboost_pred, state_space_pred]
-        ensemble_uncertainty = np.std(predictions)
+        try:
+            # Get ensemble prediction
+            result = self.ensemble.predict(
+                player_id=player_id,
+                season=season,
+                week=week,
+                return_individual=True
+            )
 
-        # Confidence intervals
-        z_score = {
-            0.50: 0.674,
-            0.68: 1.0,
-            0.90: 1.645,
-            0.95: 1.96,
-            0.99: 2.576,
-        }.get(confidence_level, 1.645)
+            # Check if prediction succeeded
+            if result["ensemble_mean"] is None:
+                logger.warning(f"Ensemble returned None for {player_id} W{week} {season}")
+                return None
 
-        interval_width = z_score * ensemble_uncertainty
-        ci_lower = ensemble_prediction - interval_width
-        ci_upper = ensemble_prediction + interval_width
+            # Map confidence_level to z-score
+            z_score = {
+                0.50: 0.674,
+                0.68: 1.0,
+                0.90: 1.645,
+                0.95: 1.96,
+                0.99: 2.576,
+            }.get(confidence_level, 1.645)
 
-        return {
-            "prediction": float(ensemble_prediction),
-            "uncertainty": float(ensemble_uncertainty),
-            "confidence_interval_lower": float(ci_lower),
-            "confidence_interval_upper": float(ci_upper),
-        }
+            # Calculate confidence interval based on requested level
+            interval_width = z_score * result["ensemble_std"]
+            ci_lower = result["ensemble_mean"] - interval_width
+            ci_upper = result["ensemble_mean"] + interval_width
+
+            return {
+                "prediction": float(result["ensemble_mean"]),
+                "uncertainty": float(result["ensemble_std"]),
+                "confidence_interval_lower": float(ci_lower),
+                "confidence_interval_upper": float(ci_upper),
+                "weights": result.get("weights", {}),
+                "individual_predictions": result.get("predictions", {}),
+                "inference_time_ms": result.get("inference_time_ms", 0),
+            }
+
+        except Exception as e:
+            logger.error(f"Ensemble prediction failed for {player_id}: {e}", exc_info=True)
+            return None
 
     def get_uptime_seconds(self) -> float:
         """Get model manager uptime in seconds."""
@@ -665,7 +678,7 @@ async def health() -> HealthResponse:
 
     # Determine health status
     health_status = "healthy"
-    if not model_manager or not model_manager.models:
+    if not model_manager or not model_manager.ensemble:
         health_status = "degraded"
 
     # Get cache stats if available
@@ -683,7 +696,7 @@ async def health() -> HealthResponse:
         status=health_status,
         timestamp=datetime.utcnow().isoformat() + "Z",
         version="1.0.0",
-        models_loaded=len(model_manager.models) if model_manager else 0,
+        models_loaded=1 if (model_manager and model_manager.ensemble) else 0,
         cache_available=cache_available,
         cache_stats=cache_stats,
         uptime_seconds=time.time() - start_time,
@@ -725,11 +738,11 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
             "confidence_level": 0.90
         }
     """
-    if not model_manager or not model_manager.models:
-        logger.error("Models not loaded")
+    if not model_manager or not model_manager.ensemble:
+        logger.error("Ensemble model not loaded")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Models not loaded - service unavailable",
+            detail="Ensemble model not loaded - service unavailable",
         )
 
     # Create cache key
@@ -770,10 +783,19 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
             confidence_level=request.confidence_level,
         )
 
+        # Check if prediction failed
+        if pred_result is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Failed to generate prediction for {request.player_id} "
+                       f"(stat_type={request.stat_type}, week={request.week}, season={request.season}). "
+                       f"Player may not exist in database or stat_type not supported.",
+            )
+
         # Build response
         response = PredictionResponse(
             player_id=request.player_id,
-            player_name=f"Player-{request.player_id[-6:]}",  # Mock player name
+            player_name=f"Player-{request.player_id[-6:]}",  # TODO: Get real name from DB
             stat_type=request.stat_type,
             week=request.week,
             season=request.season,
@@ -787,13 +809,18 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
                 level=request.confidence_level,
             ),
             model_versions=ModelVersions(
-                bayesian=model_manager.model_versions.get("bayesian", "unknown"),
-                bnn=model_manager.model_versions.get("bnn", "unknown"),
-                xgboost=model_manager.model_versions.get("xgboost", "unknown"),
-                state_space=model_manager.model_versions.get("state_space", "unknown"),
-                ensemble="v3.1",
+                bayesian=model_manager.model_versions.get("state_space_v2", "unknown"),
+                bnn=model_manager.model_versions.get("hierarchical_v2", "unknown"),
+                xgboost=model_manager.model_versions.get("hybrid_xgboost_v1", "unknown"),
+                state_space=model_manager.model_versions.get("informative_priors_v2", "unknown"),
+                ensemble="v5.1",
             ),
-            ensemble_weights=EnsembleWeights(**model_manager.ensemble_weights),
+            ensemble_weights=EnsembleWeights(
+                bayesian=model_manager.ensemble_weights["state_space_v2"],
+                bnn=model_manager.ensemble_weights["hierarchical_v2"],
+                xgboost=model_manager.ensemble_weights["hybrid_xgboost_v1"],
+                state_space=model_manager.ensemble_weights["informative_priors_v2"],
+            ),
             cache_hit=cache_hit,
             processing_ms=(time.time() - processing_start) * 1000,
         )
@@ -833,6 +860,180 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
         )
 
 
+@app.post(
+    "/predict/game",
+    response_model=GamePredictionResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Predictions"],
+)
+async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse:
+    """
+    Generate game-level predictions for both QBs.
+
+    Args:
+        request: Game prediction request with game_id, season, week
+
+    Returns:
+        GamePredictionResponse with predictions for both teams' QBs
+
+    Raises:
+        HTTPException: If models not loaded or game not found
+
+    Example:
+        POST /predict/game
+        {
+            "game_id": "2024_09_CLE_PIT",
+            "season": 2024,
+            "week": 9
+        }
+    """
+    if not model_manager or not model_manager.ensemble:
+        logger.error("Ensemble model not loaded")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Ensemble model not loaded - service unavailable",
+        )
+
+    processing_start = time.time()
+
+    try:
+        import psycopg2
+        from psycopg2.extras import RealDictCursor
+
+        # Get game details and QBs from database
+        conn = psycopg2.connect(
+            host="localhost",
+            port=5544,
+            dbname="devdb01",
+            user="dro",
+            password="sicillionbillions"
+        )
+
+        # Query to get game info and starting QBs
+        query = """
+        SELECT
+            g.game_id,
+            g.season,
+            g.week,
+            g.home_team,
+            g.away_team,
+            -- Home QB
+            (
+                SELECT pgs.player_id
+                FROM mart.player_game_stats pgs
+                JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+                WHERE pgs.season = g.season
+                  AND pgs.week = g.week
+                  AND ph.current_team = g.home_team
+                  AND pgs.stat_category = 'passing'
+                  AND ph.position_group = 'QB'
+                ORDER BY pgs.stat_attempts DESC
+                LIMIT 1
+            ) as home_qb_id,
+            -- Away QB
+            (
+                SELECT pgs.player_id
+                FROM mart.player_game_stats pgs
+                JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+                WHERE pgs.season = g.season
+                  AND pgs.week = g.week
+                  AND ph.current_team = g.away_team
+                  AND pgs.stat_category = 'passing'
+                  AND ph.position_group = 'QB'
+                ORDER BY pgs.stat_attempts DESC
+                LIMIT 1
+            ) as away_qb_id
+        FROM games g
+        WHERE g.game_id = %s
+          AND g.season = %s
+          AND g.week = %s
+        LIMIT 1
+        """
+
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute(query, (request.game_id, request.season, request.week))
+        game_data = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if not game_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})"
+            )
+
+        # Get predictions for both QBs
+        home_qb_id = game_data["home_qb_id"]
+        away_qb_id = game_data["away_qb_id"]
+
+        home_pred = None
+        away_pred = None
+
+        if home_qb_id:
+            home_pred = model_manager.predict(
+                player_id=home_qb_id,
+                stat_type="passing_yards",
+                week=request.week,
+                season=request.season,
+                confidence_level=0.90,
+            )
+
+        if away_qb_id:
+            away_pred = model_manager.predict(
+                player_id=away_qb_id,
+                stat_type="passing_yards",
+                week=request.week,
+                season=request.season,
+                confidence_level=0.90,
+            )
+
+        # Calculate total predicted yards
+        total_yards = None
+        if home_pred and away_pred:
+            total_yards = home_pred["prediction"] + away_pred["prediction"]
+
+        response = GamePredictionResponse(
+            game_id=request.game_id,
+            season=request.season,
+            week=request.week,
+            home_team=game_data["home_team"],
+            away_team=game_data["away_team"],
+            home_prediction=TeamPrediction(
+                team=game_data["home_team"],
+                qb_id=home_qb_id,
+                qb_name=f"QB-{home_qb_id[-6:]}" if home_qb_id else None,
+                predicted_passing_yards=home_pred["prediction"] if home_pred else None,
+                predicted_passing_yards_std=home_pred["uncertainty"] if home_pred else None,
+            ),
+            away_prediction=TeamPrediction(
+                team=game_data["away_team"],
+                qb_id=away_qb_id,
+                qb_name=f"QB-{away_qb_id[-6:]}" if away_qb_id else None,
+                predicted_passing_yards=away_pred["prediction"] if away_pred else None,
+                predicted_passing_yards_std=away_pred["uncertainty"] if away_pred else None,
+            ),
+            total_predicted_yards=total_yards,
+            processing_ms=(time.time() - processing_start) * 1000,
+        )
+
+        logger.info(
+            f"Game prediction generated for {request.game_id}: "
+            f"{game_data['away_team']}@{game_data['home_team']} "
+            f"(total: {total_yards:.1f} yards)" if total_yards else "incomplete"
+        )
+
+        return response
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error generating game prediction: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate game prediction: {str(e)}",
+        )
+
+
 @app.get(
     "/metrics",
     tags=["Monitoring"],
@@ -858,7 +1059,7 @@ async def metrics():
 
     metrics_response = {
         "uptime_seconds": time.time() - start_time,
-        "models_loaded": len(model_manager.models) if model_manager else 0,
+        "models_loaded": 1 if (model_manager and model_manager.ensemble) else 0,
         "cache_available": redis_cache is not None,
         "cache_stats": cache_stats,
     }
@@ -892,7 +1093,7 @@ async def status() -> MetricsResponse:
         total_predictions=int(PREDICTIONS_MADE._value.get() if PROMETHEUS_AVAILABLE else 0),
         cache_hit_rate=cache_hit_rate,
         avg_processing_ms=145.3,  # Mock average
-        models_loaded=len(model_manager.models) if model_manager else 0,
+        models_loaded=1 if (model_manager and model_manager.ensemble) else 0,
         uptime_seconds=uptime,
     )
 
@@ -943,11 +1144,13 @@ async def root():
         "status": "running",
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "uptime_seconds": time.time() - start_time,
+        "ensemble_version": "v5.1",
         "links": {
             "docs": "/docs",
             "openapi": "/openapi.json",
             "health": "/health",
-            "predict": "/predict",
+            "predict_player": "/predict",
+            "predict_game": "/predict/game",
             "metrics": "/metrics",
             "status": "/status",
         },

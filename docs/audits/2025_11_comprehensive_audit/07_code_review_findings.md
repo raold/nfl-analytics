@@ -41,8 +41,8 @@
 
 **Files Affected:**
 ```python
-# Production code (HIGH RISK) <!-- pragma: allowlist secret -->
-scripts/train_best_bnn.py:23              password='sicillionbillions'
+# Production code (HIGH RISK)
+scripts/train_best_bnn.py:23              password='sicillionbillions' #pragma: allowlist secret
 scripts/export_db_snapshot.py:17          DB_PASSWORD = "sicillionbillions"
 scripts/validate_online_learning.py:473   'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
 scripts/train_bnn_passing_ensemble.py:386 default="sicillionbillions"
@@ -59,8 +59,8 @@ py/models/state_space.py:53               password = os.environ.get("POSTGRES_PA
 py/models/train_bnn_passing.py:39         password="sicillionbillions"
 py/data/fetch_prop_odds.py:62             "password": os.getenv("DB_PASSWORD", "sicillionbillions")
 
-# Docker configuration (CRITICAL) <!-- pragma: allowlist secret -->
-docker-compose.yml:11                     POSTGRES_PASSWORD=sicillionbillions
+# Docker configuration (CRITICAL)
+docker-compose.yml:11                     POSTGRES_PASSWORD=sicillionbillions #pragma: allowlist secret
 docker-compose.yml:64                     DATABASE_URL=postgresql://dro:sicillionbillions@...
 docker-compose.yml:109                    DB_PASSWORD=sicillionbillions
 docker-compose.yml:174                    GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-sicillionbillions}
@@ -79,10 +79,10 @@ docker-compose.gpu.yml:138                POSTGRES_PASSWORD=sicillionbillions
 
 **Remediation:**
 ```bash
-# IMMEDIATE ACTION REQUIRED <!-- pragma: allowlist secret -->
+# IMMEDIATE ACTION REQUIRED
 
 # 1. Rotate database password
-psql -U postgres -c "ALTER USER dro WITH PASSWORD 'STRONG_RANDOM_PASSWORD';"
+psql -U postgres -c "ALTER USER dro WITH PASSWORD 'STRONG_RANDOM_PASSWORD';" #pragma: allowlist secret
 
 # 2. Create .env file (NEVER commit)
 cat > .env <<EOF

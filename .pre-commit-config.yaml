@@ -86,6 +86,62 @@ repos:
         files: ^\./[^/]+\.(md|txt)$
         description: Prevent documentation files in root directory
 
+      - id: check-hardcoded-dates
+        name: Detect hardcoded temporal values
+        entry: bash -c 'grep -Hn -E "(season|year)\s*[=<-]\s*20[0-9]{2}" "$@" || exit 0' --
+        language: system
+        files: \.(py|R)$
+        exclude: ^(tests/|examples/|docs/)
+        description: Detect hardcoded season/year values
+
+      - id: check-brms-predictions
+        name: Validate brms posterior_predict calls
+        entry: python scripts/check_brms_predictions.py
+        language: system
+        files: \.R$
+        exclude: ^(tests/|examples/)
+        description: Ensure posterior_predict has sample_new_levels parameter
+
+      - id: check-convergence-template
+        name: Check MCMC convergence checks present
+        entry: bash -c 'if grep -q "brm(" "$@" && ! grep -q "max_rhat" "$@"; then echo "❌ Missing convergence checks"; exit 1; fi' --
+        language: system
+        files: ^R/train_.*\.R$
+        description: Validate R training scripts have convergence diagnostics
+
+      # Phase 3 Enforcement Rules (Nov 15, 2025)
+      - id: validate-api-contracts
+        name: API Contract Validation
+        entry: python py/utils/enforcement_router.py
+        language: system
+        files: \.(py)$
+        pass_filenames: true
+        description: Catch deprecated ensemble parameters and missing db_password
+
+      - id: validate-sql-results
+        name: SQL Result Validation
+        entry: python py/utils/enforcement_router.py
+        language: system
+        files: \.(py)$
+        pass_filenames: true
+        description: Ensure SQL results checked before .iloc[0] access
+
+      - id: validate-r-predictions
+        name: R Prediction Validation
+        entry: python py/utils/enforcement_router.py
+        language: system
+        files: \.(py)$
+        pass_filenames: true
+        description: Validate R predictions checked for NaN
+
+      - id: validate-ensemble-components
+        name: Ensemble Component Validation
+        entry: python py/utils/enforcement_router.py
+        language: system
+        files: \.(py)$
+        pass_filenames: true
+        description: Ensure ensemble has minimum component checks
+
 # Global settings
 default_language_version:
   python: python3.11

@@ -1,0 +1,135 @@
+
+============================================================
+NFL ANALYTICS DATABASE PERFORMANCE DASHBOARD
+============================================================
+
+1. TOP 10 SLOWEST QUERIES (by total execution time)
+------------------------------------------------------------
+DO
+psql:db/monitoring_queries_performance.sql:55: ERROR:  pg_stat_statements must be loaded via shared_preload_libraries
+
+2. QUERIES WITH HIGHEST I/O (disk reads)
+------------------------------------------------------------
+psql:db/monitoring_queries_performance.sql:77: ERROR:  pg_stat_statements must be loaded via shared_preload_libraries
+
+3. CACHE HIT RATIO (target: >99%)
+------------------------------------------------------------
+ cache_type  | disk_reads | cache_hits | data_read_from_disk | data_read_from_cache | hit_ratio_pct |    status    
+-------------+------------+------------+---------------------+----------------------+---------------+--------------
+ Table Cache |   19372688 |  190711535 | 148 GB              | 1455 GB              |         90.78 | ⚠ ACCEPTABLE
+ Index Cache |     886027 |  251360739 | 6922 MB             | 1918 GB              |         99.65 | ✓ EXCELLENT
+(2 rows)
+
+
+4. INDEX USAGE BY TABLE (top 15 most queried)
+------------------------------------------------------------
+ schemaname |        tablename        | index_scans | sequential_scans | index_usage_pct | live_rows | status 
+------------+-------------------------+-------------+------------------+-----------------+-----------+--------
+ public     | games                   |     7162351 |             8348 |           99.88 |      7263 | ✓ OK
+ mart       | player_hierarchy        |      979812 |              901 |           99.91 |     15213 | ✓ OK
+ public     | plays                   |      217268 |             4641 |           97.91 |   1252835 | ✓ OK
+ mart       | player_game_stats       |      101090 |                9 |           99.99 |     24950 | ✓ OK
+ mart       | bayesian_player_ratings |       28277 |                5 |           99.98 |       470 | ✓ OK
+ public     | teams                   |           0 |            10149 |            0.00 |        33 | ✓ OK
+ public     | players                 |        1918 |                1 |           99.95 |     15225 | ✓ OK
+ ml         | model_registry          |        1455 |               26 |           98.24 |        24 | ✓ OK
+ ml         | predictions             |        1390 |               22 |           98.44 |      1387 | ✓ OK
+ public     | rosters                 |         212 |                0 |          100.00 |     57174 | ✓ OK
+ mart       | team_epa                |          36 |               18 |           66.67 |     14172 | ✓ OK
+ public     | rosters_weekly          |          38 |                5 |           88.37 |    857149 | ✓ OK
+ ml         | model_evaluations       |          31 |                6 |           83.78 |         0 | ✓ OK
+ public     | mv_team_rolling_stats   |          17 |               14 |           54.84 |     13932 | ✓ OK
+ public     | mv_game_aggregates      |          15 |               14 |           51.72 |      7098 | ✓ OK
+(15 rows)
+
+
+5. TABLE BLOAT (top 10 tables with wasted space)
+------------------------------------------------------------
+ schemaname |        tablename        | live_rows | dead_rows | total_size | bloat_pct |        last_autovacuum        | status 
+------------+-------------------------+-----------+-----------+------------+-----------+-------------------------------+--------
+ public     | games                   |      7263 |      1360 | 14 MB      |     15.77 | 2025-11-08 00:45:18.224095+00 | ✓ OK
+ mart       | bayesian_player_ratings |       470 |       117 | 272 kB     |     19.93 |                               | ✓ OK
+ mart       | position_groups         |        28 |        28 | 32 kB      |     50.00 |                               | ✓ OK
+ public     | mv_refresh_log          |        12 |        19 | 64 kB      |     61.29 |                               | ✓ OK
+ ml         | model_registry          |        24 |        14 | 128 kB     |     36.84 |                               | ✓ OK
+ public     | data_quality_log        |        12 |         2 | 32 kB      |     14.29 |                               | ✓ OK
+ public     | dba_audit_log           |         2 |         1 | 88 kB      |     33.33 |                               | ✓ OK
+(7 rows)
+
+
+6. LONG-RUNNING QUERIES (>10 seconds, active now)
+------------------------------------------------------------
+ pid | usename | duration | state | wait_event_type | wait_event | query_preview 
+-----+---------+----------+-------+-----------------+------------+---------------
+(0 rows)
+
+
+7. CONNECTION POOL STATUS (max: 100 connections)
+------------------------------------------------------------
+        state        | connections | pct_of_max 
+---------------------+-------------+------------
+ active              |           2 |       2.00
+ idle                |           2 |       2.00
+ idle in transaction |           1 |       1.00
+(3 rows)
+
+
+8. DISK USAGE BY SCHEMA
+------------------------------------------------------------
+ schemaname | table_count | total_size | table_size | index_size 
+------------+-------------+------------+------------+------------
+ public     |          41 | 4522 MB    | 2438 MB    | 2082 MB
+ mart       |          15 | 29 MB      | 20 MB      | 8720 kB
+ ml         |          10 | 1416 kB    | 440 kB     | 856 kB
+(3 rows)
+
+
+9. AUTOVACUUM ACTIVITY (last 24 hours)
+------------------------------------------------------------
+ schemaname | tablename | last_autovacuum | time_since_vacuum | autovacuum_count | autoanalyze_count | dead_rows 
+------------+-----------+-----------------+-------------------+------------------+-------------------+-----------
+(0 rows)
+
+
+10. INDEX EFFICIENCY (high cost, low usage)
+------------------------------------------------------------
+ schemaname | tablename |            indexname             | scans  | index_size |      status      
+------------+-----------+----------------------------------+--------+------------+------------------
+ public     | plays     | idx_plays_drive_metrics          |      0 | 169 MB     | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_win_prob               |      0 | 156 MB     | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_drive                  |      0 | 140 MB     | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_total_home_epa         |   1942 | 115 MB     | ✓ OK
+ public     | plays     | idx_plays_total_away_epa         |    132 | 113 MB     | ✓ OK
+ public     | plays     | idx_plays_home_wp                |      0 | 85 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_ep                     |      0 | 85 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_qb_epa                 |      0 | 81 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_xpass                  |      0 | 80 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_series                 |   2931 | 46 MB      | ✓ OK
+ public     | plays     | idx_plays_game_type_epa          |      0 | 42 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_defensive_player_stats |      0 | 39 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_passer_epa_yards       |      1 | 33 MB      | ✓ OK
+ public     | plays     | idx_plays_rushing_yards          |      0 | 32 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_game_id                | 212240 | 28 MB      | ✓ OK
+ public     | plays     | idx_plays_receiver_yards_v2      |      0 | 25 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_xyac_epa               |      0 | 25 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_passing_yards          |      3 | 23 MB      | ✓ OK
+ public     | plays     | idx_plays_receiving_yards        |      0 | 22 MB      | ⚠ DROP CANDIDATE
+ public     | plays     | idx_plays_play_type_nfl          |      0 | 22 MB      | ⚠ DROP CANDIDATE
+(20 rows)
+
+
+============================================================
+PERFORMANCE MONITORING COMPLETE
+============================================================
+
+ALERTS TO INVESTIGATE:
+- Cache hit ratio < 95%: Increase shared_buffers
+- Tables with >20% bloat: Run VACUUM ANALYZE
+- Queries >10s: Optimize or add indexes
+- Unused indexes >100MB: Consider dropping
+
+REFRESH FREQUENCY:
+- Run every 5 minutes in production for real-time monitoring
+- Integrate with Prometheus/Grafana for dashboards
+- Set up alerts for critical thresholds
+

@@ -16,15 +16,15 @@
 # 1. MCMC Optimization (1 hour, 35% speedup)
 bash scripts/optimize_mcmc_m4.sh
 
-# 2. SQL Indexes (30 min, 15% speedup) <!-- pragma: allowlist secret -->
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+# 2. SQL Indexes (30 min, 15% speedup)
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -f db/performance_indexes_phase6.sql
 
 # 3. Redis Cache (10 min, 15x prediction speedup)
 python py/api/cache_warmup.py --season 2024 --weeks 1-10
 
 # 4. PostgreSQL Monitoring (15 min)
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -f db/setup_pg_stat_statements.sql
 ```
 

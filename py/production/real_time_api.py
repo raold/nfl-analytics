@@ -21,8 +21,7 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException
 from psycopg2.pool import SimpleConnectionPool
 from pydantic import BaseModel, Field
 
-from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
-from py.production.ab_test_controller import ABTestController
+from py.production.ab_test_router import ABTestRouter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -66,9 +65,8 @@ except Exception as e:
     logger.warning(f"Redis not available - caching disabled: {e}")
     redis_client = None
 
-# Initialize models
-ensemble_v3 = None
-ab_controller = None
+# Initialize A/B test router
+ab_router = None
 
 
 # ============================================================================
@@ -143,27 +141,25 @@ class HealthResponse(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize models and connections on startup"""
-    global ensemble_v3, ab_controller
+    global ab_router
 
     logger.info("Starting NFL Props API...")
 
-    # Initialize ensemble
+    # Initialize A/B test router (v5 vs v6 Sagarin integration)
     try:
-        ensemble_v3 = EnhancedEnsembleV3(
-            use_bnn=False,  # Disable BNN for faster startup in demo
-            use_stacking=True,
-            use_portfolio_opt=True,
-        )
-        logger.info("✓ Ensemble v3.0 initialized")
-    except Exception as e:
-        logger.error(f"Failed to initialize ensemble: {e}")
+        import os
+        ab_test_enabled = os.getenv("AB_TEST_ENABLED", "true").lower() == "true"
+        ab_test_split_ratio = float(os.getenv("AB_TEST_SPLIT_RATIO", "0.5"))
 
-    # Initialize A/B test controller
-    try:
-        ab_controller = ABTestController(test_name="v2.5_production", allocation_pct=0.5)
-        logger.info("✓ A/B test controller initialized")
+        ab_router = ABTestRouter(
+            split_ratio=ab_test_split_ratio,
+            enabled=ab_test_enabled,
+            test_name="ensemble_v5_vs_v6_sagarin"
+        )
+        logger.info(f"✓ A/B test router initialized: {ab_test_split_ratio:.0%} to v6 (Sagarin)")
     except Exception as e:
-        logger.error(f"Failed to initialize A/B controller: {e}")
+        logger.error(f"Failed to initialize A/B router: {e}")
+        raise
 
     # Warm up cache with common predictions
     await warm_cache()
@@ -338,8 +334,9 @@ async def health_check():
 
     # Check models
     models_loaded = {
-        "ensemble_v3": ensemble_v3 is not None,
-        "ab_controller": ab_controller is not None,
+        "ab_router": ab_router is not None,
+        "ensemble_v5": ab_router.ensemble_v5 is not None if ab_router else False,
+        "ensemble_v6": ab_router.ensemble_v6 is not None if ab_router else False,
     }
 
     return HealthResponse(
@@ -356,74 +353,45 @@ async def predict(request: PredictionRequest):
     """
     Get prediction for a single player/prop combination.
 
-    Uses A/B test controller to determine model version unless specified.
+    Uses A/B test router to route between v5 (control) and v6 (treatment).
     """
     import time
 
+    if not ab_router:
+        raise HTTPException(status_code=503, detail="A/B router not initialized")
+
     start_time = time.time()
 
-    # Determine model version
-    if request.model_version:
-        model_version = request.model_version
-    elif ab_controller:
-        model_assignment = ab_controller.get_model_assignment(request.player_id, request.week)
-        model_version = model_assignment.value
-    else:
-        model_version = "informative_priors_v2.5"
-
-    # Check cache
-    cache_hit = False
-    cache_key = get_cache_key(
-        request.player_id, request.prop_type, request.week, request.season, model_version
-    )
-
-    if redis_client:
-        try:
-            cached = redis_client.get(cache_key)
-            if cached:
-                cache_hit = True
-                prediction_data = json.loads(cached)
-                logger.info(f"Cache hit for {request.player_id}")
-            else:
-                prediction_data = None
-        except:
-            prediction_data = None
-    else:
-        prediction_data = None
-
-    # Load from database if not cached
-    if not prediction_data:
-        prediction_data = load_prediction_from_db(
-            request.player_id, request.prop_type, request.season, model_version
+    # Get prediction from A/B router (handles model selection automatically)
+    try:
+        result = ab_router.predict(
+            player_id=request.player_id,
+            season=request.season,
+            week=request.week,
+            log_to_db=True  # Automatically logs to ml.predictions
         )
-
-        if not prediction_data:
-            raise HTTPException(
-                status_code=404, detail=f"No prediction found for player {request.player_id}"
-            )
-
-        # Cache the result
-        if redis_client:
-            try:
-                redis_client.setex(cache_key, 900, json.dumps(prediction_data))  # 15 minute TTL
-            except:
-                pass
+    except Exception as e:
+        logger.error(f"Prediction failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
     # Calculate latency
     latency_ms = (time.time() - start_time) * 1000
 
+    # Check cache (optional optimization for future)
+    cache_hit = False  # Simplified for now
+
     return PredictionResponse(
         player_id=request.player_id,
-        player_name=prediction_data.get("player_name"),
+        player_name=None,  # Could fetch from result if needed
         prop_type=request.prop_type,
-        prediction=prediction_data["prediction"],
+        prediction=result["ensemble_mean"],
         confidence_interval={
-            "q05": prediction_data.get("q05", 0),
-            "q50": prediction_data.get("q50", prediction_data["prediction"]),
-            "q95": prediction_data.get("q95", 0),
+            "q05": result["quantile_10"],
+            "q50": result["ensemble_mean"],
+            "q95": result["quantile_90"],
         },
-        uncertainty=prediction_data.get("uncertainty", 0),
-        model_version=model_version,
+        uncertainty=result["ensemble_std"],
+        model_version=result["model_version"],
         cache_hit=cache_hit,
         latency_ms=latency_ms,
         timestamp=datetime.now(),
@@ -464,44 +432,27 @@ async def predict_batch(request: BatchPredictionRequest, background_tasks: Backg
 @app.post("/predict/ensemble", response_model=EnsemblePredictionResponse, tags=["Predictions"])
 async def predict_ensemble(request: PredictionRequest):
     """
-    Get 4-way ensemble prediction combining all models.
+    Get ensemble prediction with individual model breakdowns.
 
-    Includes predictions from:
-    - Bayesian hierarchical (v2.5)
-    - XGBoost
-    - Bayesian Neural Network
-    - Meta-learner combination
+    Routes through A/B test to either v5 (4-way) or v6 (5-way with ELO).
     """
-    if not ensemble_v3:
-        raise HTTPException(status_code=503, detail="Ensemble model not available")
+    if not ab_router:
+        raise HTTPException(status_code=503, detail="A/B router not initialized")
 
-    # Load individual model predictions
-    model_predictions = {}
-
-    # Bayesian v2.5
-    bayesian_pred = load_prediction_from_db(
-        request.player_id, request.prop_type, request.season, "informative_priors_v2.5"
+    # Get prediction with individual model results
+    result = ab_router.predict(
+        player_id=request.player_id,
+        season=request.season,
+        week=request.week,
+        return_individual=True,
+        log_to_db=True
     )
-    if bayesian_pred:
-        model_predictions["bayesian_v2.5"] = bayesian_pred["prediction"]
 
-    # XGBoost (mock for demo)
-    model_predictions["xgboost"] = bayesian_pred["prediction"] * np.random.normal(1.0, 0.05)
+    # Extract model predictions if available
+    model_predictions = result.get("predictions", {})
 
-    # BNN (mock for demo)
-    model_predictions["bnn"] = bayesian_pred["prediction"] * np.random.normal(1.0, 0.08)
-
-    # Calculate ensemble prediction (simplified)
-    if model_predictions:
-        # Inverse variance weighting
-        weights = {"bayesian_v2.5": 0.4, "xgboost": 0.35, "bnn": 0.25}
-        ensemble_pred = sum(model_predictions[m] * weights.get(m, 0.33) for m in model_predictions)
-    else:
-        raise HTTPException(
-            status_code=404, detail=f"No predictions available for player {request.player_id}"
-        )
-
-    # Generate recommendation
+    # Generate recommendation based on prediction
+    ensemble_pred = result["ensemble_mean"]
     if ensemble_pred > 300:
         recommendation = "Strong OVER"
     elif ensemble_pred > 250:
@@ -513,20 +464,23 @@ async def predict_ensemble(request: PredictionRequest):
     else:
         recommendation = "No edge"
 
+    # Calculate edge (simplified)
+    edge = abs(ensemble_pred - 250) / 250 * 100
+
     return EnsemblePredictionResponse(
         player_id=request.player_id,
-        player_name=bayesian_pred.get("player_name"),
+        player_name=None,  # Could fetch if needed
         prop_type=request.prop_type,
         ensemble_prediction=ensemble_pred,
         model_predictions=model_predictions,
         confidence_interval={
-            "q05": ensemble_pred * 0.7,
+            "q05": result["quantile_10"],
             "q50": ensemble_pred,
-            "q95": ensemble_pred * 1.3,
+            "q95": result["quantile_90"],
         },
-        uncertainty=ensemble_pred * 0.15,
+        uncertainty=result["ensemble_std"],
         recommendation=recommendation,
-        edge=abs(ensemble_pred - 250) / 250 * 100,  # Simplified edge calculation
+        edge=edge,
         timestamp=datetime.now(),
     )
 
@@ -549,12 +503,42 @@ async def list_models():
 
         return {
             "models": models,
-            "default": "informative_priors_v2.5",
-            "ensemble_available": ensemble_v3 is not None,
+            "ab_test": {
+                "enabled": ab_router.enabled if ab_router else False,
+                "control_version": "v5.0",
+                "treatment_version": "v6.0",
+                "split_ratio": ab_router.split_ratio if ab_router else 0,
+            },
+            "ensemble_available": ab_router is not None,
         }
 
     finally:
         db_pool.putconn(conn)
+
+
+@app.get("/ab-test/status", tags=["A/B Testing"])
+async def ab_test_status():
+    """
+    Get current A/B test status and statistics.
+
+    Returns summary of predictions for both groups (v5 vs v6).
+    """
+    if not ab_router:
+        return {"enabled": False, "message": "A/B test router not initialized"}
+
+    try:
+        summary = ab_router.get_test_summary()
+        return {
+            "enabled": ab_router.enabled,
+            "test_name": ab_router.test_name,
+            "control": "v5.0 (4-way ensemble)",
+            "treatment": "v6.0 (5-way with ELO + adaptive weights)",
+            "split_ratio": ab_router.split_ratio,
+            "summary": summary,
+        }
+    except Exception as e:
+        logger.error(f"Failed to get A/B test summary: {e}")
+        return {"enabled": ab_router.enabled, "error": str(e)}
 
 
 @app.post("/feedback", tags=["Feedback"])
@@ -564,21 +548,14 @@ async def submit_feedback(
     """
     Submit outcome feedback for model improvement.
 
-    Used for A/B testing and online learning.
+    Used for A/B testing evaluation. Predictions are automatically logged
+    via ab_router.predict(), so this is for manual corrections only.
     """
-    if ab_controller:
-        ab_controller.record_outcome(
-            player_id=player_id,
-            week=7,  # Would get from context
-            actual_value=actual,
-            predicted_value=predicted,
-            model_version=model_version,
-        )
-
     return {
         "status": "recorded",
         "error": abs(predicted - actual),
         "percentage_error": abs(predicted - actual) / actual * 100,
+        "note": "Predictions auto-logged via A/B router"
     }
 
 

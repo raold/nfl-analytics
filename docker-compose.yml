@@ -70,10 +70,18 @@ services:
       - API_PORT=8000
       - LOG_LEVEL=INFO
       - MODELS_DIR=/app/models
+      - ENSEMBLE_VERSION=v5
+      # Database credentials for ensemble predictions
+      - DB_HOST=nfl-analytics-pg-1
+      - DB_PORT=5432
+      - DB_NAME=devdb01
+      - DB_USER=dro
+      - DB_PASSWORD=sicillionbillions
     ports:
       - "8000:8000"
     volumes:
       - ./api:/app/api
+      - ./py:/app/py:ro  # Mount py/ directory for ensemble module (read-only)
       - ./models:/app/models:ro  # Mount models directory (read-only)
       - ./logs/api:/app/logs
     depends_on:

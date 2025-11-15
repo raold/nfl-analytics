@@ -1,381 +1,446 @@
-# Deployment Documentation Index
+# Deployment Documentation - Master Index
 
-**Date:** November 10, 2025
-**Total Pages:** 3,193 lines across 4 comprehensive documents
-**Status:** READY FOR DEPLOYMENT
-
----
-
-## Document Overview
-
-### 1. README.md (580 lines) - START HERE
-**Purpose:** Navigation guide and deployment overview
-
-**Read first for:**
-- Understanding what's being deployed
-- Document overview and how to use each one
-- Phase-by-phase guide
-- Critical file locations
-- Quick start instructions
-
-**Key Sections:**
-- Overview (what, why, when)
-- Document guide (how to use each doc)
-- Phase-by-phase breakdown
-- Critical files & locations
-- Quick validation commands
-- Risk management summary
-- Common issues & solutions
-
-**Estimated Read Time:** 20-30 minutes
-
-**Start with this if:** You're new to the deployment or need an overview
+**Project:** NFL Analytics Deployment
+**Current Focus:** A/B Test (Ensemble v5 vs v6)
+**Status:** Ready for Production
+**Last Updated:** November 14, 2025
 
 ---
 
-### 2. PRODUCTION_DEPLOYMENT_CHECKLIST.md (1,579 lines) - MAIN REFERENCE
-**Purpose:** Comprehensive step-by-step deployment checklist
+## Quick Navigation
 
-**Use for:**
-- Detailed step-by-step instructions
-- Acceptance criteria for each item
-- Timeline estimates
-- Owner assignments
-- Pass/fail criteria
+### For A/B Test Deployment (Current Priority)
 
-**Key Sections:**
-- Section 1: Pre-Deployment Validation (calibration, backtest, leakage tests)
-- Section 2: Model Artifacts & Versioning (file locations, registry, backups)
-- Section 3: Infrastructure Setup (Docker, database, monitoring)
-- Section 4: Risk Gates & Safety Systems (4 gates, limits, stops)
-- Section 5: Monitoring & Observability (Prometheus, Grafana, alerts)
-- Section 6: Rollback & Contingency (failure modes, recovery)
-- Section 7: A/B Testing & Shadow (phased rollout approach)
-- Section 8: Documentation & Knowledge Transfer (runbooks, ADRs, model cards)
-- Section 9: Deployment Timeline (5 phases, 58 days)
-- Section 10: Success Criteria & Sign-Off (phase gates)
-- Section 11: Post-Deployment Monitoring (first week + ongoing)
-- Appendices: File locations, technical references
+**START HERE:** [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md) (Print this 1-page summary)
 
-**Estimated Read Time:** 90-120 minutes (or skim for your section)
+**Full Guide:** [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md) (Comprehensive)
 
-**Use this when:** You need detailed instructions for a specific task or phase
+**Planning:** [`AB_TEST_TIMELINE_GANTT.md`](AB_TEST_TIMELINE_GANTT.md) (4-week schedule)
 
-**Pro Tip:** Print this and check off items as you complete them
+**Visual:** [`AB_TEST_DEPLOYMENT_FLOWCHART.md`](AB_TEST_DEPLOYMENT_FLOWCHART.md) (Decision trees)
+
+**Context:** [`AB_TEST_DEPLOYMENT_SUMMARY.md`](AB_TEST_DEPLOYMENT_SUMMARY.md) (Full background)
 
 ---
 
-### 3. DEPLOYMENT_QUICK_REFERENCE.md (438 lines) - DAILY USE
-**Purpose:** One-page daily reference guide
+### For General Production Deployment
 
-**Use for:**
-- Daily checklists (morning/afternoon)
-- Quick troubleshooting
-- Common commands
-- Emergency escalation
-- Phase completion dates
+**START HERE:** [`README.md`](README.md) (General deployment overview)
 
-**Key Sections:**
-- One-page overview (what, metrics, critical path)
-- Daily checklist for each phase
-- Troubleshooting quick guide
-- Key scripts & commands (copy-paste ready)
-- Emergency contacts & escalation matrix
-- Phase completion timeline
-- Sign-off template
+**Main Reference:** [`PRODUCTION_DEPLOYMENT_CHECKLIST.md`](PRODUCTION_DEPLOYMENT_CHECKLIST.md)
 
-**Estimated Read Time:** 10-15 minutes (reference throughout deployment)
+**Daily Use:** [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
 
-**Use this when:** You need a quick reminder or want to run daily commands
-
-**Pro Tip:** Print and post at your desk during deployment
+**Troubleshooting:** [`HEALTH_CHECK_PROCEDURES.md`](HEALTH_CHECK_PROCEDURES.md)
 
 ---
 
-### 4. HEALTH_CHECK_PROCEDURES.md (596 lines) - TROUBLESHOOTING
-**Purpose:** Detailed infrastructure health verification procedures
-
-**Use for:**
-- Daily health checks (automated)
-- Troubleshooting infrastructure issues
-- Verifying systems are operational
-- Response procedures if checks fail
-- Automation setup
-
-**Key Sections:**
-- Quick daily health check (10 min, automated)
-- Detailed health checks (Docker, DB, monitoring, calibration)
-- Bash scripts for each check
-- Expected output examples
-- Automation procedures
-- Response procedures
-- Health check frequency by phase
-
-**Estimated Read Time:** 30-45 minutes (reference during troubleshooting)
-
-**Use this when:** Something seems wrong or you need to verify system health
-
-**Pro Tip:** Automate the quick check script and run daily
-
----
-
-## How to Use These Documents
-
-### Before Deployment (Read This Order)
-1. README.md (20 min) - Get overview
-2. DEPLOYMENT_QUICK_REFERENCE.md (10 min) - Understand timeline
-3. PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 1-4 (30 min) - Details
-4. HEALTH_CHECK_PROCEDURES.md (20 min) - Understand health checks
-
-**Total: 80 minutes of reading**
-
-### During Each Phase
-
-**Phase 1 (Pre-Deployment)**
-- Primary: PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 1-2
-- Reference: HEALTH_CHECK_PROCEDURES.md
-- Daily: DEPLOYMENT_QUICK_REFERENCE.md
-
-**Phase 2 (Infrastructure)**
-- Primary: PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 3-5
-- Reference: HEALTH_CHECK_PROCEDURES.md
-- Daily: DEPLOYMENT_QUICK_REFERENCE.md
-
-**Phase 3 (Shadow)**
-- Primary: PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 7
-- Daily Checks: HEALTH_CHECK_PROCEDURES.md (hourly)
-- Daily Reference: DEPLOYMENT_QUICK_REFERENCE.md
-- Troubleshooting: All docs as needed
-
-**Phase 4 (A/B Testing)**
-- Primary: PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 7.2
-- Daily: DEPLOYMENT_QUICK_REFERENCE.md "A/B Testing Phase"
-- If Issues: HEALTH_CHECK_PROCEDURES.md
-
-**Phase 5 (Production)**
-- Reference: PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 11
-- Daily Checks: HEALTH_CHECK_PROCEDURES.md
-- Troubleshooting: README.md "Common Issues"
-
-### During Troubleshooting
-1. Check DEPLOYMENT_QUICK_REFERENCE.md "Troubleshooting Quick Guide"
-2. If not there, see README.md "Common Issues & Solutions"
-3. If still needed, check HEALTH_CHECK_PROCEDURES.md for detailed diagnosis
-4. If infrastructure issue, reference PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 3-5
-5. If model issue, reference PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 2
-
----
-
-## Key Information at a Glance
-
-### What's Being Deployed
-- 4-Way Ensemble: State-Space + Hierarchical + Informative Priors + BNN
-- Expected ROI: +5-7% (validated on 2022-2024)
-- Go-Live: Week 12-13, 2025 NFL season
-- Infrastructure: PostgreSQL, Redis, FastAPI, Prometheus, Grafana
-
-### Timeline
-- Pre-Deployment: 1-2 days (Nov 11-12)
-- Infrastructure: 1 day (Nov 13)
-- Shadow: 7-14 days (Nov 14-27)
-- A/B Testing: 28 days minimum (Nov 28 - Dec 25)
-- Full Deployment: Dec 26+ (ongoing)
-- **Total: ~58 days to production**
-
-### Success Criteria
-| Phase | Metric | Target |
-|-------|--------|--------|
-| Pre-Deployment | All validation tests | PASS |
-| Infrastructure | All services healthy | UP |
-| Shadow | Calibration | 85-95% |
-| Shadow | Win rate (7-day) | >52% |
-| A/B | Sample size | 200+ per variant |
-| A/B | Statistical significance | P(A>B) >95% |
-| A/B | Expected ROI | +4% to +8% |
-
-### Critical Paths
-**Must Complete Before Proceeding:**
-1. Pre-Deployment: All tests pass ✓
-2. Infrastructure: All services healthy ✓
-3. Shadow: Calibration 85-95% ✓ + Win rate >52% ✓
-4. A/B Testing: 200 bets per variant ✓ + P(A>B) >95% ✓
-5. Production: No critical alerts in 24h ✓
-
----
-
-## Document Hierarchy
+## Document Structure
 
 ```
-README.md (START HERE)
+docs/deployment/
 │
-├─ Quick Overview + Navigation
+├── INDEX.md (this file)                               ← Master navigation
 │
-├─→ DEPLOYMENT_QUICK_REFERENCE.md
-│   └─ Daily checklists + quick commands (keep at desk)
+├── A/B TEST DEPLOYMENT (Nov 14, 2025)                ← CURRENT PRIORITY
+│   ├── AB_TEST_QUICK_REFERENCE.md                    ← Print this (1 page)
+│   ├── A_B_TEST_DEPLOYMENT_CHECKLIST.md              ← Comprehensive guide
+│   ├── AB_TEST_TIMELINE_GANTT.md                     ← 4-week plan
+│   ├── AB_TEST_DEPLOYMENT_SUMMARY.md                 ← Full context
+│   └── AB_TEST_DEPLOYMENT_FLOWCHART.md               ← Visual decision trees
 │
-├─→ PRODUCTION_DEPLOYMENT_CHECKLIST.md
-│   └─ Detailed steps for each section
+├── GENERAL DEPLOYMENT (Nov 10, 2025)
+│   ├── README.md                                      ← General overview
+│   ├── PRODUCTION_DEPLOYMENT_CHECKLIST.md            ← Full production guide
+│   ├── DEPLOYMENT_QUICK_REFERENCE.md                 ← Daily reference
+│   └── HEALTH_CHECK_PROCEDURES.md                    ← Infrastructure health
 │
-└─→ HEALTH_CHECK_PROCEDURES.md
-    └─ Infrastructure troubleshooting (when things fail)
+├── ENVIRONMENT & CONFIGURATION
+│   ├── ENVIRONMENT_VARIABLES.md                      ← Config reference
+│   ├── CICD_README.md                                ← CI/CD setup
+│   ├── CICD_QUICK_REFERENCE.md                       ← CI/CD commands
+│   ├── CICD_IMPLEMENTATION_CHECKLIST.md              ← CI/CD checklist
+│   └── CICD_PIPELINE_AUDIT_NOV14.md                  ← CI/CD status
+│
+├── DOCKER & INFRASTRUCTURE
+│   ├── DOCKER_PHASE_1_QUICK_REFERENCE.md             ← Docker commands
+│   ├── DOCKER_PHASE_1_INDEX.md                       ← Docker overview
+│   ├── DOCKER_PHASE_1_VALIDATION.md                  ← Docker validation
+│   ├── DOCKER_ARCHITECTURE_COMPARISON.md             ← Architecture choices
+│   └── DOCKER_DASHBOARD_COMPLETE.md                  ← Dashboard setup
+│
+└── SPECIALIZED DEPLOYMENT
+    ├── HYBRID_XGBOOST_V1_CHECKLIST.md                ← Hybrid XGBoost
+    ├── HYBRID_XGBOOST_V1_TRAINING.md                 ← Training guide
+    └── FASTAPI_ENSEMBLE_V5_1_INTEGRATION.md          ← FastAPI integration
 ```
 
 ---
 
-## File Locations
+## A/B Test Documentation (Current Priority)
 
-### These Documents
-```
-/Users/dro/rice/nfl-analytics/docs/deployment/
-├── README.md                              (← Start here)
-├── PRODUCTION_DEPLOYMENT_CHECKLIST.md     (← Main reference)
-├── DEPLOYMENT_QUICK_REFERENCE.md          (← Daily use)
-├── HEALTH_CHECK_PROCEDURES.md             (← Troubleshooting)
-└── INDEX.md                               (← This file)
-```
+### 1. Quick Reference Card **[PRINT THIS]**
+**File:** [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md)
+**Length:** 7 KB, ~300 lines, 1 page
+**Use:** Daily operations, emergency reference
 
-### Related Documentation
-```
-/Users/dro/rice/nfl-analytics/
-├── CLAUDE.md                              (Project context)
-├── docs/ARCHITECTURE_REFERENCE.md         (System design)
-├── docs/DATABASE_SCHEMA_AUDIT.md          (Database structure)
-├── docs/decisions/ADR-001-*.md            (Decisions)
-├── docs/decisions/ADR-002-*.md
-└── docker-compose.yml                     (Infrastructure)
-```
+**Contents:**
+- Pre-deployment checklist (4 items)
+- Deployment steps (5 steps)
+- Daily monitoring (4 checks)
+- Weekly analysis (3 steps)
+- Emergency rollback (1 script)
+- Decision matrix
+- Key URLs & contacts
 
-### Models
-```
-/Users/dro/rice/nfl-analytics/models/bayesian/
-├── simplified_random_walk_v2.rds          (State-Space)
-├── passing_yards_hierarchical_v2.rds      (Hierarchical)
-├── passing_informative_priors_v2.rds      (Informative)
-└── bnn_multioutput_passing_v1_canonical.pt (BNN)
-```
+**When to use:** Keep at desk during deployment
 
 ---
 
-## Quick Command Reference
+### 2. Comprehensive Deployment Checklist **[MAIN GUIDE]**
+**File:** [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md)
+**Length:** 82 KB, ~1,800 lines, 9 sections
+**Use:** Step-by-step deployment execution
 
-### Start Deployment
-```bash
-# Read overview
-cat /Users/dro/rice/nfl-analytics/docs/deployment/README.md
+**Contents:**
+1. **Pre-Deployment Checklist** (6 hours, 5 sections)
+   - Model validation
+   - Database validation
+   - Infrastructure health
+   - Environment configuration
+   - Rollback plan tested
 
-# Quick reference
-cat /Users/dro/rice/nfl-analytics/docs/deployment/DEPLOYMENT_QUICK_REFERENCE.md
-```
+2. **Deployment Checklist** (1 hour, 8 steps)
+   - Stop current API
+   - Register models
+   - Set environment variables
+   - Start API with A/B router
+   - Verify health endpoints
+   - Test sample prediction
+   - Check database logging
+   - Monitor first hour
 
-### Pre-Deployment Testing
-```bash
-cd /Users/dro/rice/nfl-analytics
+3. **Post-Deployment Monitoring** (24 hours intensive)
+   - Hourly checks (first 24 hours)
+   - Daily checks (days 2-7)
+   - Weekly milestones (weeks 1-4)
 
-# Validate models
-python py/models/test_all_models_loading.py
+4. **Weekly Analysis Checklist** (Mondays, 30 min)
+   - Run analysis script
+   - Verify 5 deployment criteria
+   - Review Grafana dashboard
+   - Document progress
 
-# Validate calibration
-python py/validation/test_ensemble_4way_calibration.py
+5. **Emergency Procedures** (<5 min rollback)
+   - MAE regression >5%: Immediate rollback
+   - API errors spike: Disable A/B test
+   - Database issues: Switch to log-only mode
 
-# Run backtest
-python py/backtests/comprehensive_ensemble_backtest.py
+6. **Timeline & Dependencies** (4-week Gantt chart)
 
-# Check database
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 -c "SELECT 1;"
-```
+**Key Features:**
+- ✅ Pass/fail criteria for every step
+- ✅ SQL queries included
+- ✅ Shell commands provided
+- ✅ Emergency procedures documented
+- ✅ 5 deployment criteria detailed
 
-### Infrastructure
-```bash
-# Start all services
-docker compose up -d
-
-# Check health
-docker compose ps
-
-# View logs
-docker compose logs -f api
-```
-
-### Run Daily Health Check
-```bash
-bash /Users/dro/rice/nfl-analytics/scripts/quick_health_check.sh
-```
-
----
-
-## Who Should Read What
-
-### Research Lead
-- **Read**: README.md + PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 1, 2, 7, 10
-- **Key Focus**: Validation, A/B testing decision, sign-off
-- **Time**: 60 minutes
-
-### DevOps Coordinator
-- **Read**: README.md + PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 3, 5, 6
-- **Reference**: HEALTH_CHECK_PROCEDURES.md (during deployment)
-- **Key Focus**: Infrastructure, monitoring, alerts, rollback
-- **Time**: 90 minutes
-
-### Data Coordinator
-- **Read**: README.md + PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 3.1, 1.3
-- **Key Focus**: Database, data freshness, leakage tests
-- **Time**: 30 minutes
-
-### Development Coordinator
-- **Read**: README.md + PRODUCTION_DEPLOYMENT_CHECKLIST.md Section 3, 4, 8
-- **Key Focus**: API, risk gates, documentation, ADRs, git
-- **Time**: 60 minutes
-
-### Operations Team (Post-Deployment)
-- **Read**: DEPLOYMENT_QUICK_REFERENCE.md + HEALTH_CHECK_PROCEDURES.md
-- **Key Focus**: Daily operations, health checks, troubleshooting
-- **Time**: 45 minutes
+**When to use:** Primary reference during all phases
 
 ---
 
-## Version & Maintenance
+### 3. Timeline & Gantt Chart **[PLANNING]**
+**File:** [`AB_TEST_TIMELINE_GANTT.md`](AB_TEST_TIMELINE_GANTT.md)
+**Length:** 11 KB, ~450 lines
+**Use:** Project planning, milestone tracking
 
-**Current Version:** 1.0
-**Created:** November 10, 2025
-**Status:** READY FOR DEPLOYMENT
+**Contents:**
+- Visual Gantt chart (ASCII format)
+- Detailed daily schedule (4 weeks)
+- Critical path analysis
+- Dependency chains
+- Bottleneck identification
+- Parallel workstreams
+- Milestone dates
+- Risk-adjusted timelines (best/base/worst case)
 
-**Maintenance Schedule:**
-- Daily: Update post-deployment observations
-- Weekly: Review and refine during shadow phase
-- Monthly: Archive completed sections, create runbooks
-- As-needed: Fix errors or add clarifications
+**Key Dates:**
+- **Start:** Thursday, November 14, 2025
+- **Week 1:** Monday, November 21, 2025
+- **Week 2:** Monday, November 28, 2025
+- **Week 3:** Monday, December 5, 2025
+- **DECISION:** Friday, December 8, 2025
 
-**Suggested Updates:**
-- After each phase completes: Document actual timeline vs estimate
-- During A/B testing: Add specific test results
-- Post-deployment: Create operations runbooks (Section 8)
-- Monthly: Update performance metrics and trends
+**When to use:** Planning meetings, status updates
+
+---
+
+### 4. Deployment Summary **[CONTEXT]**
+**File:** [`AB_TEST_DEPLOYMENT_SUMMARY.md`](AB_TEST_DEPLOYMENT_SUMMARY.md)
+**Length:** 25 KB, ~550 lines
+**Use:** Executive summary, handoffs
+
+**Contents:**
+- Executive summary
+- Deliverable descriptions
+- Source documentation analysis (5,100 lines synthesized)
+- Key features breakdown
+- 5 deployment criteria explained
+- Monitoring & analysis tools
+- Risk management
+- Integration points
+- Success metrics
+- Documentation index
+
+**When to use:** Initial project review, team onboarding
+
+---
+
+### 5. Decision Flowchart **[VISUAL]**
+**File:** [`AB_TEST_DEPLOYMENT_FLOWCHART.md`](AB_TEST_DEPLOYMENT_FLOWCHART.md)
+**Length:** 15 KB, ~600 lines
+**Use:** Visual reference, decision guidance
+
+**Contents:**
+- Overall deployment flow (ASCII diagram)
+- Weekly decision tree
+- Emergency rollback decision tree
+- Deployment criteria evaluation flow
+- Monitoring frequency flow
+- Traffic routing diagram
+- Status indicators
+- Quick decision matrix
+
+**When to use:** Visual learners, training, quick decisions
+
+---
+
+## General Deployment Documentation
+
+### 1. README (Start Here)
+**File:** [`README.md`](README.md)
+**Length:** 580 lines
+**Use:** Navigation guide, deployment overview
+
+**When to use:** New to deployment, need overview
+
+---
+
+### 2. Production Deployment Checklist
+**File:** [`PRODUCTION_DEPLOYMENT_CHECKLIST.md`](PRODUCTION_DEPLOYMENT_CHECKLIST.md)
+**Length:** 1,579 lines
+**Use:** Comprehensive production deployment
+
+**When to use:** Full production deployment (not A/B test)
+
+---
+
+### 3. Deployment Quick Reference
+**File:** [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
+**Length:** 438 lines
+**Use:** Daily checklists, common commands
+
+**When to use:** Daily operations (general deployment)
+
+---
+
+### 4. Health Check Procedures
+**File:** [`HEALTH_CHECK_PROCEDURES.md`](HEALTH_CHECK_PROCEDURES.md)
+**Length:** 596 lines
+**Use:** Infrastructure troubleshooting
+
+**When to use:** System health verification, debugging
+
+---
+
+## Usage Guides by Role
+
+### ML Team (A/B Test Focus)
+
+**Before Deployment:**
+1. Read: [`AB_TEST_DEPLOYMENT_SUMMARY.md`](AB_TEST_DEPLOYMENT_SUMMARY.md) (20 min)
+2. Review: [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md) Section 1 (30 min)
+3. Print: [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md)
+
+**During Deployment:**
+- Primary: [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md)
+- Daily: [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md)
+- Visual: [`AB_TEST_DEPLOYMENT_FLOWCHART.md`](AB_TEST_DEPLOYMENT_FLOWCHART.md)
+
+**Weekly Analysis:**
+- Checklist: Section 4 of comprehensive guide
+- Timeline: Check Gantt chart for milestones
+
+---
+
+### DevOps Team (Infrastructure Focus)
+
+**Before Deployment:**
+1. Read: [`README.md`](README.md) (20 min)
+2. Review: [`PRODUCTION_DEPLOYMENT_CHECKLIST.md`](PRODUCTION_DEPLOYMENT_CHECKLIST.md) Section 3-5 (45 min)
+3. Print: [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
+
+**During Deployment:**
+- Primary: [`PRODUCTION_DEPLOYMENT_CHECKLIST.md`](PRODUCTION_DEPLOYMENT_CHECKLIST.md)
+- Health: [`HEALTH_CHECK_PROCEDURES.md`](HEALTH_CHECK_PROCEDURES.md)
+- Daily: [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
+
+**A/B Test Support:**
+- Emergency: [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md) Emergency Procedures
+- Rollback: [`AB_TEST_DEPLOYMENT_FLOWCHART.md`](AB_TEST_DEPLOYMENT_FLOWCHART.md) Emergency Decision Tree
+
+---
+
+### Project Manager (Timeline Focus)
+
+**Before Deployment:**
+1. Read: [`AB_TEST_DEPLOYMENT_SUMMARY.md`](AB_TEST_DEPLOYMENT_SUMMARY.md) (20 min)
+2. Review: [`AB_TEST_TIMELINE_GANTT.md`](AB_TEST_TIMELINE_GANTT.md) (15 min)
+3. Skim: [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md) Sections 1, 4, 6
+
+**During Deployment:**
+- Timeline: [`AB_TEST_TIMELINE_GANTT.md`](AB_TEST_TIMELINE_GANTT.md)
+- Status: Weekly analysis sections
+- Decision: Section 4 criteria checklist
+
+---
+
+## Key Metrics & Criteria
+
+### 5 Deployment Criteria (A/B Test)
+
+**All 5 must pass to DEPLOY v6:**
+
+1. **Minimum Sample Size:** ≥100 completed games per group
+2. **MAE Improvement:** >2% (target: 2.7%)
+3. **Statistical Significance:** p < 0.05
+4. **Calibration:** ≥89% (both groups)
+5. **RMSE Stability:** <5% degradation
+
+**Decision Matrix:**
+- 5/5 pass → **DEPLOY** v6 to 100%
+- 4/5 pass → **DEPLOY WITH CAUTION** (80%, monitor)
+- 3/5 pass → **WAIT** (extend test 1-2 weeks)
+- <3/5 pass → **ROLLBACK** (disable v6, investigate)
+
+---
+
+## Critical Dates
+
+### A/B Test Timeline
+
+| Date | Milestone | Owner | Status |
+|------|-----------|-------|--------|
+| **Thu Nov 14, 16:00** | Pre-Deployment Complete | ML Team | ⏳ |
+| **Thu Nov 14, 17:00** | API Deployed | DevOps | ⏳ |
+| **Fri Nov 15, 17:00** | 24-Hour Stability Check | DevOps | ⏳ |
+| **Mon Nov 21, 10:00** | Week 1 Analysis | ML Lead | ⏳ |
+| **Mon Nov 28, 10:00** | Week 2 Analysis | ML Lead | ⏳ |
+| **Mon Dec 5, 10:00** | Week 3 Analysis | ML Lead | ⏳ |
+| **Fri Dec 8, 10:00** | **DECISION GATE** | **Team** | **⏳** |
+| **Fri Dec 8, 14:00** | v6 Deployment (if approved) | DevOps | ⏳ |
+
+---
+
+## Quick Links
+
+### A/B Test Resources
+- **Analysis Script:** `/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`
+- **A/B Router:** `/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`
+- **Ensemble v5:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+- **Ensemble v6:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6.py`
+
+### Infrastructure URLs
+- **API:** http://localhost:8000
+- **Health:** http://localhost:8000/health
+- **A/B Status:** http://localhost:8000/ab-test/status
+- **Grafana:** http://localhost:3000/d/ab-test-monitoring
+- **Prometheus:** http://localhost:9090
+- **Database:** postgresql://dro:sicillionbillions@localhost:5544/devdb01
+
+### Source Documentation
+- **Production Guide:** [`PRODUCTION_DEPLOYMENT_COMPLETE.md`](../PRODUCTION_DEPLOYMENT_COMPLETE.md)
+- **Ensemble v6 Spec:** [`ENSEMBLE_V6_COMPLETE.md`](../ENSEMBLE_V6_COMPLETE.md)
+- **Sagarin Integration:** [`SAGARIN_INTEGRATION_COMPLETE_FINAL.md`](../SAGARIN_INTEGRATION_COMPLETE_FINAL.md)
+- **Team Strength:** [`TEAM_STRENGTH_RATINGS_COMPLETE.md`](../TEAM_STRENGTH_RATINGS_COMPLETE.md)
+
+---
+
+## Change Log
+
+### v2.0 (November 14, 2025) - A/B Test Documentation
+
+**Added:**
+- A/B Test Quick Reference (1-page print-friendly)
+- A/B Test Deployment Checklist (comprehensive, 1,800 lines)
+- A/B Test Timeline & Gantt Chart (4-week plan)
+- A/B Test Deployment Summary (synthesis of 5,100 lines)
+- A/B Test Decision Flowchart (visual decision trees)
+
+**Updated:**
+- Master index (this file) for A/B test priority
+- Quick navigation section
+- Document structure diagram
+- Usage guides by role
+
+**Total New Documentation:** 5 files, 140 KB, 3,300 lines
+
+---
+
+### v1.0 (November 10, 2025) - Initial Deployment Documentation
+
+**Created:**
+- README.md (navigation guide)
+- PRODUCTION_DEPLOYMENT_CHECKLIST.md (comprehensive)
+- DEPLOYMENT_QUICK_REFERENCE.md (daily use)
+- HEALTH_CHECK_PROCEDURES.md (troubleshooting)
+- INDEX.md (master index)
 
 ---
 
 ## Getting Help
 
-### For Navigation Questions
-- See README.md "How to Use These Documents"
-
-### For Specific Phase Questions
-- See PRODUCTION_DEPLOYMENT_CHECKLIST.md Section [X]
+### For A/B Test Questions
+- **Pre-Deployment:** Section 1 of comprehensive checklist
+- **During Deployment:** Quick reference card
+- **Weekly Analysis:** Section 4 of comprehensive checklist
+- **Decision Making:** Flowchart decision trees
+- **Emergency:** Quick reference emergency procedures
 
 ### For Infrastructure Issues
-- See HEALTH_CHECK_PROCEDURES.md
+- **System Health:** [`HEALTH_CHECK_PROCEDURES.md`](HEALTH_CHECK_PROCEDURES.md)
+- **Docker:** [`DOCKER_PHASE_1_QUICK_REFERENCE.md`](DOCKER_PHASE_1_QUICK_REFERENCE.md)
+- **Database:** Database section in health check procedures
 
-### For Troubleshooting
-- See README.md "Common Issues & Solutions"
-- Then HEALTH_CHECK_PROCEDURES.md
-
-### For Emergency Issues
-- See DEPLOYMENT_QUICK_REFERENCE.md "Emergency Contacts & Escalation"
+### For General Deployment
+- **Overview:** [`README.md`](README.md)
+- **Full Guide:** [`PRODUCTION_DEPLOYMENT_CHECKLIST.md`](PRODUCTION_DEPLOYMENT_CHECKLIST.md)
+- **Daily Reference:** [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
 
 ---
 
-**Last Updated:** November 10, 2025
-**Status:** READY FOR DEPLOYMENT
-**Next Review:** November 11, 2025
+## Version Control
 
-This index provides a roadmap through comprehensive deployment documentation. Start with README.md and follow the phase-specific guidance for your role and deployment stage.
+**Current Version:** 2.0 (A/B Test Focus)
+**Last Updated:** November 14, 2025
+**Next Review:** After Week 1 (November 21, 2025)
+**Status:** Ready for A/B Test Deployment
 
+**Update Schedule:**
+- Daily: Update during A/B test monitoring
+- Weekly: After each analysis
+- Post-Decision: Archive and create runbooks
+- As-Needed: Bug fixes, clarifications
+
+---
+
+**Status:** ✅ COMPLETE - All A/B Test documentation ready
+**Next Action:** Begin Pre-Deployment Checklist (Section 1)
+**Decision Date:** Friday, December 8, 2025, 10:00 AM
+**Documentation Total:** 10 deployment guides, 320 KB, 6,100+ lines
+
+---
+
+**For immediate deployment:** Start with [`AB_TEST_QUICK_REFERENCE.md`](AB_TEST_QUICK_REFERENCE.md)
+**For comprehensive guide:** Use [`A_B_TEST_DEPLOYMENT_CHECKLIST.md`](A_B_TEST_DEPLOYMENT_CHECKLIST.md)
+**For planning:** Review [`AB_TEST_TIMELINE_GANTT.md`](AB_TEST_TIMELINE_GANTT.md)

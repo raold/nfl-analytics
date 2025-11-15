@@ -1,8 +1,55 @@
 # Database Quick Reference
 
-**Last Updated:** November 8, 2025
+**Last Updated:** November 14, 2025
 **Purpose:** Quick lookup reference for database schema, connections, and critical conventions
 **Full Documentation:** See [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
+
+---
+
+## ⚠️ CRITICAL: Common Schema Mistakes
+
+**This error has occurred DOZENS of times. Read this section carefully.**
+
+### ❌ MISTAKE: Assuming `game_id` exists in `mart.player_game_stats`
+
+**WRONG CODE (will fail):**
+```sql
+SELECT pgs.*, g.spread_close
+FROM mart.player_game_stats pgs
+JOIN games g ON g.game_id = pgs.game_id  -- ❌ Column does not exist
+```
+
+**ERROR:** `column pgs.game_id does not exist`
+
+### ✅ CORRECT: Join via (season, week) composite key
+
+**CORRECT CODE:**
+```sql
+SELECT pgs.*, g.spread_close
+FROM mart.player_game_stats pgs
+JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+LEFT JOIN games g ON
+    g.season = pgs.season
+    AND g.week = pgs.week
+    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
+WHERE pgs.player_id = '00-0019596';
+```
+
+**KEY POINTS:**
+1. `mart.player_game_stats` does NOT have `game_id` column
+2. Join via `(season, week)` composite key
+3. Filter to player's team: `(home_team = current_team OR away_team = current_team)`
+4. Use `LEFT JOIN` (some games may not have betting lines)
+
+**Full Pattern Library:** See [SQL_PATTERNS.md](SQL_PATTERNS.md) for working examples
+
+**Automated Validation:**
+```python
+from py.utils.sql_validator import validate_query
+
+errors = validate_query("SELECT pgs.game_id FROM mart.player_game_stats pgs")
+# Returns: ["ERROR: Column 'game_id' does not exist in 'mart.player_game_stats'..."]
+```
 
 ---
 
@@ -125,8 +172,20 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
 
 **Player Stats Lookup:**
 1. Query `mart.player_hierarchy` for player metadata (15,213 players)
-2. Join `mart.player_game_stats` on `player_id` and `game_id`
-3. Match positions and teams via hierarchy table
+2. Join `mart.player_game_stats` on `player_id` (NOT `game_id` - see warning above)
+3. Join `games` via `(season, week)` composite key + team matching
+4. Match positions and teams via hierarchy table
+
+**Example:**
+```sql
+SELECT pgs.*, ph.player_name, g.spread_close
+FROM mart.player_game_stats pgs
+JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+LEFT JOIN games g ON
+    g.season = pgs.season
+    AND g.week = pgs.week
+    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team);
+```
 
 ---
 

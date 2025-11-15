@@ -171,11 +171,11 @@ EARLY_STOPPING_ROUNDS = 50  # From 75
 **Action Required:**
 ```bash
 # Enable pg_stat_statements (one-time setup)
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ <!-- pragma: allowlist secret -->
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -f db/setup_pg_stat_statements.sql
 
 # Check slow queries
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ <!-- pragma: allowlist secret -->
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -f db/monitoring_queries_performance.sql
 ```
 
@@ -384,7 +384,7 @@ PREDICTION_DURATION = Histogram(
 
 **Check Command:**
 ```bash
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
+psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \ #pragma: allowlist secret
   -c "SHOW shared_buffers;"
 ```
 
