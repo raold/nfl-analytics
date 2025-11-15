@@ -56,6 +56,7 @@ import logging
 import pickle
 import time
 import warnings
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -117,13 +118,13 @@ class EnhancedEnsemble4Way:
         informative_path: str = "models/bayesian/passing_informative_priors_v2.rds",
         ridge_path: str = "models/ridge_residuals_v7_backtest2024_20251114_184552.pkl",
         xgboost_path: str = "models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json",
-        weights: dict[str, float] | None = None,
-        temperature_scaler_path: str | None = "models/calibration/temperature_scaler_4way.pkl",
+        weights: Optional[Dict[str, float]] = None,
+        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_4way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: str | None = None,
+        db_password: Optional[str] = None,
     ):
         """
         Initialize 4-way ensemble predictor with XGBoost v4 Ridge Residuals.
@@ -320,7 +321,7 @@ class EnhancedEnsemble4Way:
 
     def _get_r_prediction(
         self, player_id: str, season: int, week: int, model_path: Path, model_name: str
-    ) -> tuple[float, float] | None:
+    ) -> Optional[Tuple[float, float]]:
         """
         Get predictions from R/brms model using rpy2.
 
@@ -427,7 +428,7 @@ class EnhancedEnsemble4Way:
 
     def _get_state_space_prediction(
         self, player_id: str, season: int, week: int
-    ) -> tuple[float, float] | None:
+    ) -> Optional[Tuple[float, float]]:
         """
         Get state-space prediction using player skills.
 
@@ -515,7 +516,7 @@ class EnhancedEnsemble4Way:
 
     def _get_xgboost_ridge_prediction(
         self, player_id: str, season: int, week: int
-    ) -> tuple[float, float] | None:
+    ) -> Optional[Tuple[float, float]]:
         """
         Get XGBoost v4 Ridge Residuals prediction.
 
@@ -939,7 +940,7 @@ class EnhancedEnsemble4Way:
 
         return result
 
-    def predict_batch(self, games: list[dict], output_csv: str | None = None) -> pd.DataFrame:
+    def predict_batch(self, games: List[Dict], output_csv: Optional[str] = None) -> pd.DataFrame:
         """
         Generate ensemble predictions for multiple games.
 
