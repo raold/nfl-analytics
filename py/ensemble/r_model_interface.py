@@ -234,8 +234,9 @@ class RModelInterface:
 
             # Generate posterior predictions
             # CRITICAL: allow_new_levels=TRUE for 2025 holdout (new player_season levels)
+            # CRITICAL: sample_new_levels="uncertainty" to sample from random effects distribution
             ro.r(
-                f"posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = {ndraws}, allow_new_levels = TRUE)"
+                f"posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = \"uncertainty\")"
             )
 
             # CRITICAL: R models predict log_yards, must exponentiate
