@@ -215,7 +215,7 @@ Then model outcome on $X_{\perp Z}$ (pure treatment effect) instead of raw $X$ (
 
 \subsubsection{The v1.0 Single-Model Catastrophe}
 
-v1.0 ensemble used \emph{single} hierarchical Bayesian model (BRMS partial pooling, theoretically sound, 98-hour development effort). Despite sophisticated statistical methodology (3-level pooling, informative priors, MCMC convergence R̂ < 1.01), v1.0 failed catastrophically:
+v1.0 ensemble used \emph{single} hierarchical Bayesian model (BRMS partial pooling, theoretically sound, 98-hour development effort). Despite sophisticated statistical methodology (3-level pooling, informative priors, MCMC convergence $\hat{R}$ < 1.01), v1.0 failed catastrophically:
 
 \begin{itemize}[itemsep=2pt,parsep=0pt]
     \item Maximum Drawdown: -83.5\% (portfolio nearly wiped out)
@@ -454,10 +454,10 @@ Single-season validation captures quirks (e.g., 2023 had unusually high QB injur
 Validation protocol requires four gates for production approval:
 
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
-    \item \textbf{MAE < 8 yards:} All seasons 4.27--5.06 (well below threshold) ✓
-    \item \textbf{Improvement > 80\%:} All seasons 87.4--89.4\% (exceeds target) ✓
-    \item \textbf{Statistical significance:} All p < 0.000001 (far below $\alpha = 0.05$) ✓
-    \item \textbf{Cross-season stability:} $\sigma = 0.40$ MAE (well below 2 yard threshold) ✓
+    \item \textbf{MAE < 8 yards:} All seasons 4.27--5.06 (well below threshold) $\checkmark$
+    \item \textbf{Improvement > 80\%:} All seasons 87.4--89.4\% (exceeds target) $\checkmark$
+    \item \textbf{Statistical significance:} All p < 0.000001 (far below $\alpha = 0.05$) $\checkmark$
+    \item \textbf{Cross-season stability:} $\sigma = 0.40$ MAE (well below 2 yard threshold) $\checkmark$
 \end{enumerate}
 
 \paragraph{Lesson: Minimum 3 Seasons, Target Low Inter-Season Variance.}
@@ -571,7 +571,7 @@ This section documents the two major failures of the 13-month research journey: 
 \begin{table}[h]
 \centering
 \caption{BNN Passing Model Investigation: Complete Timeline (Oct 14 -- Nov 9, 2025)}
-\label{tab:bnn-timeline}
+% \label{tab:bnn-timeline} % REMOVED: Duplicate of Appendix I line 37 (more detailed version)
 \begin{tabular}{@{}lllS[table-format=2.0]@{}}
 \toprule
 \textbf{Date} & \textbf{Approach} & \textbf{Outcome} & {\textbf{Hours}} \\
@@ -754,7 +754,7 @@ MINIMUM VALIDATION REQUIREMENTS:
 - [ ] Validated on ≥3 NFL seasons (≥500 games)
 - [ ] Performance consistent across seasons (no single-season flukes)
 - [ ] Statistical significance test (DM or Wilcoxon, p<0.05)
-- [ ] No single-season outliers (all seasons within 2σ)
+- [ ] No single-season outliers (all seasons within 2$\sigma$)
 \end{verbatim}
 
 \paragraph{3. Documentation Standards for Large Claims.}
@@ -856,13 +856,13 @@ Single validation gate insufficient. Sports betting systems require layered defe
 
 Nov 12 baseline error (incremental vs mean predictor) passed:
 \begin{itemize}[itemsep=2pt,parsep=0pt]
-    \item Layer 1 (unit tests): ✓ Code executed without errors
-    \item Layer 2 (integration tests): ✓ Incremental model integrated with ensemble
+    \item Layer 1 (unit tests): $\checkmark$ Code executed without errors
+    \item Layer 2 (integration tests): $\checkmark$ Incremental model integrated with ensemble
 \end{itemize}
 
 Failed at:
 \begin{itemize}[itemsep=2pt,parsep=0pt]
-    \item Layer 3 (historical validation): ❌ Multi-season performance degraded (-13.7\%)
+    \item Layer 3 (historical validation): $\times$ Multi-season performance degraded (-13.7\%)
 \end{itemize}
 
 \textbf{Caught before Layers 4--6} (no production impact). Defense-in-depth prevented deployment disaster.
@@ -889,7 +889,7 @@ Error in fit_ss[, "mu_league"]: incorrect number of dimensions
 \textbf{BROKEN (Assumed 2D Indexing):}
 \begin{verbatim}
 fit_ss <- readRDS("model.rds")$draws()
-mu_league <- mean(fit_ss[, "mu_league"])  # ❌ Dimension error
+mu_league <- mean(fit_ss[, "mu_league"])  # $\times$ Dimension error
 \end{verbatim}
 
 \textbf{FIXED (Type-Safe 3D Indexing):}
@@ -905,7 +905,7 @@ if (inherits(fit_ss_raw, "CmdStanFit")) {
 
 # Convert to array for reliable indexing
 fit_ss_array <- as_draws_array(fit_ss)
-mu_league <- mean(fit_ss_array[,, "mu_league"])  # ✓ 3D indexing
+mu_league <- mean(fit_ss_array[,, "mu_league"])  # $\checkmark$ 3D indexing
 \end{verbatim}
 
 \paragraph{Lesson: Object Type Heterogeneity Requires Defensive Programming.}
@@ -1262,7 +1262,7 @@ Replace random walk with self-attention mechanism:
 
 \begin{equation}
 \hat{y}_t = \text{Transformer}\left( \{y_{t-1}, y_{t-2}, \ldots, y_{t-52}\}, \mathbf{X}_t \right)
-\label{eq:transformer-predictor}
+% \label{eq:transformer-predictor} % REMOVED: Duplicate of Appendix M line 748 (architectural focus)
 \end{equation}
 
 Self-attention learns which historical games are relevant (e.g., attention to week t$-$6 when injury occurred, attention to week t$-$10 when coaching changed).
@@ -1340,7 +1340,7 @@ Historical validation (2022--2024) & 0.5 & Production approval \\
 
 \subsection{Empiricism Over Theory}
 
-v1.0 hierarchical model was theoretically sound (Bayesian partial pooling, informative priors, MCMC convergence R̂ < 1.01). Peer review would approve methodology. Yet empirically failed (-83.5\% drawdown).
+v1.0 hierarchical model was theoretically sound (Bayesian partial pooling, informative priors, MCMC convergence $\hat{R}$ < 1.01). Peer review would approve methodology. Yet empirically failed (-83.5\% drawdown).
 
 \paragraph{Lesson: Theory is Hypothesis, Data is Verdict.}
 
@@ -1511,5 +1511,3 @@ For practitioners building prediction systems in any domain: Embrace failures as
 \noindent\textbf{Chapter 10 Complete.} Next: Chapter 1--2 updates, cross-references, final integration.
 
 ---
-
-\end{document}

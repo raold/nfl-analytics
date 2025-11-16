@@ -254,7 +254,7 @@ Phase 4 differed strategically: \textit{use documented failures as design input}
 When implementing ELO+WLS multi-season validation, Sports Analytics Validator caught SQL schema error at \texttt{git commit}:
 
 \begin{verbatim}
-❌ BLOCKING: sql_validation: Column 'game_id' does not exist
+$\times$ BLOCKING: sql_validation: Column 'game_id' does not exist
    in mart.player_game_stats
 💡 Suggestion: Join via (season, week) composite key
    See docs/database/SQL_PATTERNS.md
@@ -375,10 +375,10 @@ STAGED_FILES=$(git diff --cached --name-only)
 python py/utils/enforcement_router.py $STAGED_FILES
 
 if [ $? -ne 0 ]; then
-    echo "❌ Validation failed - commit blocked"
+    echo "$\times$ Validation failed - commit blocked"
     exit 1  # Non-zero exit blocks commit
 fi
-echo "✅ All validation gates passed"
+echo "$\checkmark$ All validation gates passed"
 \end{verbatim}
 
 \paragraph{Success Story (November 15, 2025).}

@@ -117,8 +117,8 @@ Despite achieving the best validation Brier score, Trial \#13 exhibits \textbf{c
 \toprule
 \textbf{Model} & \textbf{Val Brier} & \textbf{Test Brier} & \textbf{Gap} & \textbf{Verdict} \\
 \midrule
-Optuna Best (Trial \#13) & \textbf{0.2263} ⭐ & \textbf{0.2890} ❌ & +0.0627 & Severe overfitting \\
-Ablation Best (5 Rounds) & 0.2313 & \textbf{0.2746} ✓ & +0.0433 & Moderate overfitting \\
+Optuna Best (Trial \#13) & \textbf{0.2263} ⭐ & \textbf{0.2890} $\times$ & +0.0627 & Severe overfitting \\
+Ablation Best (5 Rounds) & 0.2313 & \textbf{0.2746} $\checkmark$ & +0.0433 & Moderate overfitting \\
 XGBoost v3 Baseline & \textbf{0.2050} ⭐⭐ & N/A & N/A & Best performance \\
 \textit{Decision Threshold} & N/A & \textit{< 0.23} & N/A & \textit{Optuna FAILED} \\
 \bottomrule
@@ -156,8 +156,8 @@ Table~\ref{tab:optuna_ablation_comparison} compares our grid search ablation stu
 \toprule
 \textbf{Method} & \textbf{Trials} & \textbf{Best Val} & \textbf{Best Test} & \textbf{Gap} & \textbf{Duration} \\
 \midrule
-Grid Search (Ablation) & 9 & 0.2297 & \textbf{0.2746} ✓ & +0.0449 & ~12 hrs \\
-Bayesian Opt (Optuna) & 50 & \textbf{0.2263} ⭐ & 0.2890 ❌ & +0.0627 & ~4 hrs \\
+Grid Search (Ablation) & 9 & 0.2297 & \textbf{0.2746} $\checkmark$ & +0.0449 & ~12 hrs \\
+Bayesian Opt (Optuna) & 50 & \textbf{0.2263} ⭐ & 0.2890 $\times$ & +0.0627 & ~4 hrs \\
 \bottomrule
 \end{tabular}
 
@@ -171,10 +171,10 @@ Bayesian Opt (Optuna) & 50 & \textbf{0.2263} ⭐ & 0.2890 ❌ & +0.0627 & ~4 hrs
 Despite different search strategies, both ablation and Optuna converge on key architectural insights:
 
 \begin{itemize}[noitemsep]
-    \item ✅ \textbf{Chemistry edges are useless}: ALL top 5 Optuna trials set \texttt{use\_chemistry=False}
-    \item ✅ \textbf{Moderate message passing}: 2--4 rounds optimal (not 1, not 5)
-    \item ✅ \textbf{Smaller batch sizes}: 32--64 outperform 128--256
-    \item ✅ \textbf{Lower learning rates}: 0.0003--0.0057 (not 0.01)
+    \item $\checkmark$ \textbf{Chemistry edges are useless}: ALL top 5 Optuna trials set \texttt{use\_chemistry=False}
+    \item $\checkmark$ \textbf{Moderate message passing}: 2--4 rounds optimal (not 1, not 5)
+    \item $\checkmark$ \textbf{Smaller batch sizes}: 32--64 outperform 128--256
+    \item $\checkmark$ \textbf{Lower learning rates}: 0.0003--0.0057 (not 0.01)
 \end{itemize}
 
 % ============================================================================

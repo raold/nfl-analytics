@@ -38,20 +38,31 @@ This dissertation investigates a fundamental question in quantitative sports ana
 
 We develop a complete betting system pipeline—from data ingestion to model training to risk management to evaluation—and test it rigorously on 5,529 games across 21 seasons (2004--2024).
 
-\textbf{Thesis.} A hybrid stack combining classical models, modern ML, and reinforcement learning—with explicit uncertainty quantification and risk governance—can extract reliable edge from NFL betting markets.
+\textbf{Thesis.} A disciplined ensemble architecture combining orthogonalized features, diversified model methodologies, and adaptive weight optimization—validated through multi-season testing and honest failure accounting—can extract systematic profit (+6.45\% ROI, 2.51 Sharpe ratio) from NFL betting markets using publicly available data.
 
-\textbf{Hypotheses.}
-\begin{enumerate}
-  \item State-space priors improve temporal stability and calibration relative to purely discriminative baselines.
-  \item Structured score distributions (Skellam and bivariate Poisson) enable superior pricing of spreads/totals and better teaser/middle planning than direct margin regression.
-  \item Market microstructure features (line velocity, cross-book discrepancies) contribute unique signal beyond team-performance covariates.
-  \item RL policies trained offline with conservative constraints and posterior-variance gating convert modeling edge into drawdown-aware bankroll growth.
+\textbf{Supporting Evidence:}
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Orthogonalization principle} (Appendix~\ref{app:orthogonalization}): Two-stage Ridge Residuals architecture achieved 88.31\% MAE improvement (mean 4.70 $\pm$ 0.40 MAE across 2022--2024, all p < 0.000001) by decomposing quarterback skill into opponent-orthogonal residuals via Gram-Schmidt orthogonalization.
+
+    \item \textbf{Ensemble diversification} (Appendix~\ref{app:architecture-evolution}): 5-way architecture (State-Space 27\%, Hierarchical 27\%, XGBoost Ridge 23\%, Informative Priors 13\%, ELO 10\%) with mean correlation $\bar{\rho} = 0.32$ achieved 56\% variance reduction. Ensemble variance decomposition principle: Adding uncorrelated weak models (ELO: 68.4 MAE individual) beats refining correlated strong models.
+
+    \item \textbf{Hybrid architectures} (Chapter~\ref{chap:lessons-learned}): 70\% static + 30\% incremental XGBoost blend achieved +4.2\% improvement over pure static (38.03 vs 39.66 MAE average 2022--2024), resolving static-adaptive dilemma through complementary strength balancing.
+
+    \item \textbf{Multi-season validation} (Appendix~\ref{app:orthogonalization}, Table~\ref{tab:ridge-multi-season-consistency}): Three-season consistency testing (2022--2024, 546 games) with inter-season variance $\sigma = 0.40$ MAE (vs baseline $\sigma = 1.89$ MAE) prevented overfitting to single-season quirks.
+
+    \item \textbf{Honest failure documentation} (Chapter~\ref{chap:lessons-learned}, \S\ref{sec:failure-archive}): Transparent accounting of Bayesian Neural Network investigation (84 hours, 6 failed approaches, 0 production models) and baseline error (incremental vs mean predictor, 9 hours wasted) with Bayesian abandonment criteria ($k = 2$ failures $\to$ terminate) prevents repeat mistakes.
 \end{enumerate}
 
 \subsection{Methodological Contributions}
 
-This work makes four primary contributions, independent of profitability outcomes:
+This work makes seven primary contributions, independent of profitability outcomes:
 \begin{enumerate}
+  \item \textbf{Feature orthogonalization methodology for sports prediction}: Formalized opponent-player confound as Gram-Schmidt orthogonalization problem (Appendix~\ref{app:orthogonalization}), proving residual extraction eliminates spurious correlations (Theorem~\ref{eq:orthogonal-decomposition-theorem}). Three-stage Ridge Residuals architecture (Ridge opponent baseline $\to$ QB-specific residual extraction $\to$ XGBoost with uncorrelated features) generalizes to any domain with confounding (NBA player-defender, MLB pitcher-park, soccer striker-defense, finance market-neutral alpha). Demonstrates \textbf{feature engineering dominates model complexity} principle: 88.31\% improvement with shallow trees (depth 3) vs 0\% improvement from 84 hours of Bayesian Neural Network research.
+
+  \item \textbf{Ensemble architecture evolution methodology}: Documented complete 13-month journey from v1.0 catastrophic failure (-83.5\% drawdown) to v6.0 profitable production (+6.45\% ROI, +10.2pp improvement) with radical transparency (Appendix~\ref{app:architecture-evolution}). Contributions: (a) ensemble variance decomposition analysis proving diversification dominates individual sophistication ($\bar{\rho}$ reduction more cost-effective than M increase), (b) CVX weight optimization validation (+36.4\% ROI improvement vs equal weights), (c) hybrid static-incremental architecture pattern (70/30 blend resolves stability-adaptation tradeoff), (d) honest failure accounting framework with Bayesian abandonment criterion (prevents sunk cost fallacy).
+
+  \item \textbf{Production deployment playbook with multi-layer validation}: Documented 6-layer defense-in-depth architecture (Chapter~\ref{chap:lessons-learned}, Table~\ref{tab:defense-in-depth}) catching different error classes at different stages. Key insight: Baseline error (incremental vs mean predictor) passed unit tests and integration tests but failed at Layer 3 (multi-season historical validation), preventing production disaster. Framework includes: fail-fast validation on critical dependencies, type-safe model loading for polyglot systems (R/Python integration), canonical training standards (2018--2024 + H=4 decay), and multi-season consistency gates (minimum 3 seasons, $\sigma < 2$ yards inter-season variance).
+
   \item \textbf{Rigorous empirical evaluation}: Comprehensive testing of weather effects, calibration-to-profitability gaps, and RL vs Kelly baselines with transparent reporting of negative results.
   \item \textbf{Complete system architecture}: A full pipeline from ingestion to evaluation, reusable for sports analytics and sequential decision domains.
   \item \textbf{Dependence-aware methods}: Copula-based pricing for correlated outcomes (same-game parlays, teasers) and key-number reweighting for integer margins.
@@ -79,8 +90,12 @@ Below is a brief road map of this dissertation:
   \item \textbf{Chapter~7: Simulation \& Strategy Testing} — Monte Carlo engines, teasing, parlays, correlated outcomes, strategy performance.
   \item \textbf{Chapter~8: System Architecture \& Governance} — modular pipeline, experiment tracking, deployment strategy, version control.
   \item \textbf{Chapter~9: Results, Ablations, Discussion} — comparative performance, feature ablations, robustness, error analysis.
-  \item \textbf{Chapter~10: Conclusion and Future Work} — summary of findings, limitations, and opportunities ahead.
+  \item \textbf{Chapter~10: Lessons Learned} — synthesis of 13-month research journey (October 2024 -- November 2025) from catastrophic failure to profitable production. Technical lessons (feature engineering, diversification, hybrid architectures), honest failure archive (BNN investigation 84 hours, baseline error 9 hours), statistical insights (ensemble variance decomposition, Bayesian abandonment criterion), transferable applications (finance, healthcare, climate), and future research directions (causal features, transformers, ensemble v7).
+  \item \textbf{Chapter~11: Conclusion and Future Work} — final synthesis, limitations, and research frontiers.
   \item \textbf{Appendices} — extended figures, proofs, code reference, glossaries.
+  \item \textbf{Appendix~N: Orthogonalization Deep Dive} — Mathematical treatment of Ridge Residuals methodology (Gram-Schmidt orthogonalization, variance decomposition, omitted variable bias), ablation studies, multi-season validation (2022--2024 consistency analysis), production deployment lessons (fail-fast, defense-in-depth), and future directions (nonlinear opponent baseline, hierarchical residuals, causal features).
+  \item \textbf{Appendix~M: Architecture Evolution} — Complete timeline from v1.0 catastrophic failure (-83.5\% drawdown, October 2024) to v6.0 profitable production (+6.45\% ROI, November 2025). Honest failure documentation (BNN abandonment, baseline errors), convergence improvement analysis (6000-iteration MCMC optimization), CVX weight optimization validation, hybrid architecture development (70/30 static-incremental blend), and lessons learned framework.
+  \item \textbf{Appendix~O: Model Specifications} — Complete technical specifications for 6 production models (State-Space v2, Hierarchical v2, XGBoost v4 Ridge Residuals, Informative Priors v2, Hybrid XGBoost v1, Supporting models). Includes: MCMC convergence diagnostics ($\hat{R}$, ESS, divergences), hyperparameter configurations, multi-season validation tables (2022--2024 performance), feature importance analysis, computational benchmarks, software version registry (reproducibility standard), random seed registry, and 12-item deployment checklist.
 \end{itemize}
 
 \section{Technical Approach Overview}
@@ -90,7 +105,8 @@ At a high level, the system will operate in layers:
 \begin{itemize}
   \item A data ingestion and feature pipeline — building situational, team-level, market-level features.
   \item Classical and benchmark models (GLM, Poisson, state-space) to form priors and baselines.
-  \item An RL agent (e.g.\ DQN, PPO) that takes feature + market state to decide bets or allocations.
+  \item An ensemble prediction system combining orthogonalized features (Ridge Residuals), diversified methodologies (Bayesian state-space, hierarchical partial pooling, gradient boosting, ELO ratings), and adaptive weight optimization (CVX convex programming, Weighted Least Squares with exponential recency decay). Architecture evolution from v1.0 single-model catastrophe to v6.0 5-way ensemble detailed in Appendix~\ref{app:architecture-evolution}.
+  \item Conservative offline RL agent (CQL with posterior-variance gating) for bet sizing, validated through off-policy evaluation with high-confidence bounds. Reinforcement learning provides marginal gains (+24\% improvement via Conservative Q-Learning bet sizer, Chapter~\ref{chap:lessons-learned}) but is secondary to prediction quality improvements.
   \item Uncertainty propagation (posterior distributions, bootstrap ensembles) to inform risk control.
   \item A simulation engine that translates distributions into actionable betting strategies.
   \item An evaluation and governance layer to compare models, version them, log experiments, and deploy.

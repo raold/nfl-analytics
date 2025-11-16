@@ -1,5 +1,5 @@
 \chapter{Appendix M: Ensemble Architecture Evolution}
-\label{appendix:architecture-evolution}
+\label{app:architecture-evolution}
 
 \section{Introduction: From Failure to Success}
 
@@ -70,7 +70,7 @@ Nov 14, 2025  & v6.0   & 5-way + ELO + adaptive WLS weights & +6.45\% \\
 \begin{table}[h]
 \centering
 \caption{Person-Hours Invested by Component (Total: 787 hours)}
-\label{tab:resource-allocation}
+% \label{tab:resource-allocation} % REMOVED: Duplicate of Chapter 10 line 45 (full data version)
 \begin{tabular}{lrr}
 \toprule
 \textbf{Component} & \textbf{Hours} & \textbf{\% Total} \\
@@ -135,12 +135,12 @@ where $i$ indexes position, $j$ indexes team, $k$ indexes player, $t$ indexes ti
 \textbf{Metric} & \textbf{Value} & \textbf{Target} & \textbf{Status} \\
 \midrule
 Total Bets Placed & 582 & -- & -- \\
-Win Rate & 51.9\% & >53\% & ❌ FAILED \\
-ROI & -3.75\% & +5--7\% & ❌ FAILED \\
-Final Bankroll & \$4,101 & \$10,000 & ❌ FAILED \\
-Max Drawdown & -83.5\% & <-30\% & ❌ FAILED \\
-Sharpe Ratio & -1.08 & >1.0 & ❌ FAILED \\
-MAE (yards) & 62.3 & <50 & ❌ FAILED \\
+Win Rate & 51.9\% & >53\% & $\times$ FAILED \\
+ROI & -3.75\% & +5--7\% & $\times$ FAILED \\
+Final Bankroll & \$4,101 & \$10,000 & $\times$ FAILED \\
+Max Drawdown & -83.5\% & <-30\% & $\times$ FAILED \\
+Sharpe Ratio & -1.08 & >1.0 & $\times$ FAILED \\
+MAE (yards) & 62.3 & <50 & $\times$ FAILED \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -370,7 +370,7 @@ v5.0 standardized all models to:
 
 \begin{equation}
 \text{Training Data} = \text{Core}_{2018-2024} + \text{Historical}_{2015-2017} \cdot e^{-\lambda t}
-\label{eq:canonical-window}
+% \label{eq:canonical-window} % REMOVED: Duplicate of Chapter 10 line 501
 \end{equation}
 
 where:
@@ -687,7 +687,7 @@ Single-model architectures (v1.0) failed catastrophically (-83.5\% drawdown) des
 
 \begin{equation}
 \sigma^2_{\text{ensemble}} = \frac{1}{M} \bar{\sigma}^2 + \left(1 - \frac{1}{M}\right) \bar{\rho} \bar{\sigma}^2
-\label{eq:ensemble-variance-decomposition}
+% \label{eq:ensemble-variance-decomposition} % REMOVED: Duplicate of Chapter 10 line 234
 \end{equation}
 
 where $M$ is number of models, $\bar{\sigma}^2$ is average model variance, $\bar{\rho}$ is average pairwise correlation. As $M \to \infty$ and $\bar{\rho} \to 0$, variance shrinks to zero.

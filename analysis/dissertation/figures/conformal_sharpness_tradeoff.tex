@@ -28,36 +28,36 @@
 
   % BNN baseline interval width reference line
   \draw[dotted, accent, thick] (1.7,0) -- (1.7,6);
-  \node[note, fill=white, text width=1.8cm, align=center] at (1.7, 5.5) {BNN\\width};
+  \node[note, fill=white, text width=1.6cm, align=center, anchor=south] at (1.7, 3.0) {BNN\\width};
 
   % Data points (TODO: Replace with actual results)
 
   % BNN Baseline (sharp but under-calibrated)
   \fill[accent] (1.7, 1.31) circle (4pt);
-  \node[accent, font=\scriptsize, right] at (1.9, 1.31) {BNN Base};
-  \node[accent, font=\tiny] at (1.7, 0.9) {(17, 26.2)};
+  \node[accent, font=\scriptsize, anchor=west] at (1.85, 1.31) {BNN Base};
+  \node[accent, font=\tiny, anchor=north] at (1.7, 0.75) {(17, 26.2)};
 
   % Temperature Scaling (optimal: sharp AND calibrated)
   \fill[tempcolor] (1.7, 4.48) circle (5pt);
-  \node[tempcolor, font=\small\bfseries, above right] at (1.9, 4.48) {Temp. Scaling};
-  \node[tempcolor, font=\tiny] at (1.7, 4.1) {(17, 89.5)};
+  \node[tempcolor, font=\small\bfseries, anchor=south west] at (1.85, 4.58) {Temp. Scaling};
+  \node[tempcolor, font=\tiny, anchor=north] at (1.7, 3.95) {(17, 89.5)};
   % Highlight as Pareto-optimal
-  \draw[tempcolor, thick, dashed] (1.4, 4.2) rectangle (2.0, 4.8);
+  \draw[tempcolor, thick, dashed] (1.4, 4.15) rectangle (2.0, 4.85);
 
   % Split Conformal (BNN base) (conservative)
   \fill[conformalcolor] (6.85, 4.56) circle (4pt);
-  \node[conformalcolor, font=\scriptsize, above] at (6.85, 4.8) {Split Conf.};
-  \node[conformalcolor, font=\tiny] at (6.85, 4.2) {(68.5, 91.2)};
+  \node[conformalcolor, font=\scriptsize, anchor=south] at (6.85, 4.85) {Split Conf.};
+  \node[conformalcolor, font=\tiny, anchor=north] at (6.85, 4.15) {(68.5, 91.2)};
 
   % Split Conformal (RF base) (slightly wider)
   \fill[conformalcolor!70] (7.13, 4.54) circle (4pt);
-  \node[conformalcolor!70, font=\scriptsize, right] at (7.3, 4.54) {Split (RF)};
-  \node[conformalcolor!70, font=\tiny] at (7.13, 4.1) {(71.3, 90.8)};
+  \node[conformalcolor!70, font=\scriptsize, anchor=west] at (7.28, 4.54) {Split (RF)};
+  \node[conformalcolor!70, font=\tiny, anchor=north] at (7.13, 4.05) {(71.3, 90.8)};
 
   % CQR (adaptive, narrowest conformal)
   \fill[cqrcolor] (6.32, 4.62) circle (4pt);
-  \node[cqrcolor, font=\scriptsize, left] at (6.1, 4.62) {CQR};
-  \node[cqrcolor, font=\tiny] at (6.32, 4.2) {(63.2, 92.3)};
+  \node[cqrcolor, font=\scriptsize, anchor=east] at (6.05, 4.62) {CQR};
+  \node[cqrcolor, font=\tiny, anchor=north] at (6.32, 4.15) {(63.2, 92.3)};
 
   % Sharpness comparison arrows
   \draw[<->, thick, black] (1.7, 0.5) -- (6.32, 0.5);
@@ -79,18 +79,18 @@
     \node[left, font=\scriptsize] at (-0.1, \ypos) {\y};
   }
 
-  % Quadrant labels
-  \node[note, fill=white, text width=2.5cm, align=center] at (1.5, 5.5) {
+  % Quadrant labels (repositioned to avoid overlaps)
+  \node[note, fill=white, text width=2.2cm, align=center, anchor=north west] at (0.1, 5.9) {
     \textbf{Ideal}\\
     Sharp + Calibrated
   };
 
-  \node[note, fill=gray!5, text width=2.5cm, align=center] at (8.0, 5.5) {
+  \node[note, fill=gray!5, text width=2.5cm, align=center, anchor=north east] at (9.9, 5.9) {
     \textbf{Conservative}\\
     Calibrated but Wide
   };
 
-  \node[note, fill=red!5, text width=2.5cm, align=center] at (1.5, 1.5) {
+  \node[note, fill=red!5, text width=2.5cm, align=center, anchor=south west] at (0.1, 0.1) {
     \textbf{Dangerous}\\
     Sharp but Overconfident
   };
