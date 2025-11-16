@@ -323,786 +323,69 @@ Some components have parallel directories (`monitor/` and `monitoring/`, `sim/` 
 
 ## Development Workflow
 
-### Setup
+**Complete Guide:** See [SETUP.md](SETUP.md) or [docs/guides/COMMON_TASKS_REFERENCE.md](docs/guides/COMMON_TASKS_REFERENCE.md)
 
-**Python Environment** (uv recommended):
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-uv venv .venv && source .venv/bin/activate
-uv pip install -r requirements.txt
-```
+### Quick Start
+- **Python:** `uv venv .venv && uv pip install -r requirements.txt`
+- **R:** `Rscript -e 'renv::restore()'`
+- **Database:** `bash scripts/dev/init_dev.sh`
+- **Testing:** `pytest tests/unit -m unit` (unit) or `pytest tests/integration -m integration` (integration)
+- **Pre-commit:** `pre-commit install`
 
-**R Environment**:
-```bash
-Rscript -e 'renv::restore()'
-# OR
-Rscript setup_packages.R
-```
-
-**Database**:
-```bash
-# Start database
-bash scripts/dev/init_dev.sh
-
-# Ingest data
-Rscript --vanilla data/ingest_schedules.R
-Rscript --vanilla data/ingest_pbp.R
-
-# Refresh materialized views
-psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \  # pragma: allowlist secret
-  -c "REFRESH MATERIALIZED VIEW mart.game_summary;"
-```
-
-### Testing
-
-**Quick Test Commands**:
-```bash
-# Setup testing (one-time)
-bash scripts/setup_testing.sh
-
-# Run unit tests (fast, no DB)
-pytest tests/unit -m unit
-
-# Run integration tests (requires Docker + Postgres)
-docker compose up -d pg
-pytest tests/integration -m integration
-
-# Coverage report
-pytest --cov=py --cov-report=html
-open htmlcov/index.html
-```
-
-**Pre-commit Hooks**:
-```bash
-# Install hooks
-pre-commit install
-
-# Run manually
-pre-commit run --all-files
-```
-
-### Git Workflow
-
-**Important Conventions**:
-- **Never commit secrets**: Use `.env` for API keys
-- **Test before commit**: Pre-commit hooks enforce linting/formatting
-- **Descriptive commits**: Follow conventional commits format
-- **Branch strategy**: main branch is `main`
-
-**Typical Workflow**:
-```bash
-# Create feature branch
-git checkout -b feature/your-feature-name
-
-# Make changes, test
-pytest tests/
-
-# Commit (pre-commit hooks run automatically)
-git add .
-git commit -m "feat: add new feature"
-
-# Push and create PR
-git push origin feature/your-feature-name
-gh pr create --title "Add new feature" --body "Description..."
-```
+### Key Conventions
+- Never commit secrets (use `.env`)
+- Test before commit (pre-commit hooks enforce linting/formatting)
+- Follow conventional commits format
+- Main branch: `main`
 
 ---
 
 ## Agent Coordinator
 
-**NEW:** Intelligent task routing system for multi-component coordination
+**Complete Guide:** See [docs/AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md)
 
-**Quick Start:**
-```bash
-# Analyze a task
-python scripts/coordinate_task.py analyze "Your task description"
+Intelligent task routing system that routes tasks to 6 specialized agents (Dissertation, Model Management, Frontend, Data Layer, Prediction Engine, Documentation) based on keywords, file patterns, and component responsibilities.
 
-# List all specialized agents
-python scripts/coordinate_task.py list
-
-# Get workflow for a component
-python scripts/coordinate_task.py workflow prediction_engine
-```
-
-**Purpose:** The Agent Coordinator intelligently routes complex tasks to appropriate specialized agents based on keywords, file patterns, and component responsibilities.
-
-**Specialized Agents:**
-1. **Dissertation Agent** - LaTeX compilation, figures, content auditing
-2. **Model Management Agent** - Training, evaluation, versioning, registry
-3. **Frontend Agent** - Dashboard updates, Streamlit/Grafana monitoring
-4. **Data Layer Agent** - Schema management, migrations, queries, data integrity
-5. **Prediction Engine Agent** - Ensemble integration, backtesting, production deployment
-6. **Documentation Agent** - GitHub management, documentation updates, status tracking
-
-### Agent Task Routing for 19-Agent Audit
-
-| Agent ID | Component | Focus Area | Key Files |
-|----------|-----------|------------|-----------|
-| 1-3 | Dissertation | LaTeX, figures, tables | `analysis/dissertation/main/` |
-| 4-7 | Model Management | Training, registry, validation | `models/`, `py/models/`, `R/` |
-| 8-10 | Frontend | Dashboard, monitoring | `dashboard/app.py`, `grafana/` |
-| 11-14 | Data Layer | Schema, migrations, queries | `db/`, `docs/database/` |
-| 15-17 | Prediction Engine | Ensemble, backtest, deployment | `py/ensemble/`, `py/backtest/` |
-| 18-19 | Documentation | Status tracking, GitHub | `docs/`, `CLAUDE.md`, `PROJECT_STATUS.md` |
-
-**Routing Rules:**
-- Dissertation changes → Agents 1-3
-- Model training/registry → Agents 4-7
-- Dashboard/Grafana → Agents 8-10
-- Database schema/queries → Agents 11-14
-- Ensemble/backtest → Agents 15-17
-- Documentation updates → Agents 18-19
-
-**When to Use:**
-- Planning complex multi-component tasks
-- Understanding task scope and dependencies
-- Coordinating work across multiple project areas
-- Determining execution order for dependent tasks
-
-**Documentation:** See [docs/AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md) for complete guide
-
-**Python API:**
-```python
-from py.utils.agent_coordinator import get_coordinator
-
-coordinator = get_coordinator()
-
-# Analyze task
-routing = coordinator.analyze_task(
-    "Retrain models and update dashboard",
-    files=["models/", "dashboard/app.py"]
-)
-
-# Get workflow
-workflow = coordinator.suggest_workflow(routing.primary_agent)
-```
-
-**Integration Examples:** See `examples/agent_coordinator_integration.py` for practical patterns
+**Quick Start:** `python scripts/coordinate_task.py analyze "Your task"`
 
 ---
 
-## Agent Infrastructure (Phases 1, 2, 3 + Research Coordinator + Nov 14 Additions)
+## Agent Infrastructure
 
-**✅ ALL PHASES COMPLETE + 3 NEW AGENTS** (November 14, 2025)
+**Complete Reference:** See [docs/AGENT_INFRASTRUCTURE.md](docs/AGENT_INFRASTRUCTURE.md)
 
-**Total:** 11 specialized agents (8 Phase 1-3 + 3 Nov 14 additions)
-**CLI Tools:** 11 shell scripts for immediate use
-**Code:** ~7,996 lines across 11 agent modules (25 files in py/utils/)
+**Status:** ✅ ALL PHASES COMPLETE (November 14, 2025)
+**Total:** 14 specialized agents (11 distributed + 3 standalone)
+**ROI:** 100+ hours saved over 6 months through early error detection
 
-**Integration Guides:**
-- [docs/PHASE_2_3_INTEGRATION_COMPLETE.md](docs/PHASE_2_3_INTEGRATION_COMPLETE.md) - Phases 1-3
-- [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md) - Nov 14 additions
+### Quick Reference
 
-### Phase 1: Security & Quality (3 agents)
+| Phase | Agents | Purpose | CLI Tools |
+|-------|--------|---------|-----------|
+| **Phase 1: Security & Quality** | Code Reviewer, Security Auditor, Data Leakage Detector | Prevent data leakage, security vulnerabilities | `review_code.sh`, `security_audit.sh`, `check_leakage.sh` |
+| **Phase 2: Performance & Testing** | Performance Optimizer, Test Suite Generator, Statistical Model Validator | MCMC tuning, 80%+ test coverage, model validation | `optimize_performance.sh`, `generate_tests.sh`, `validate_model.sh` |
+| **Phase 3: Production** | Ensemble Orchestrator, Betting Strategy Validator | Multi-language coordination, risk gates | `orchestrate_ensemble.sh`, `validate_strategy.sh` |
+| **Phase 4: Critical Infrastructure** | Ensemble Health Monitor, Model Registry Auditor, Sports Analytics Validator | Pre-backtest validation, auto-registration, NFL domain rules | `check_ensemble_health.sh`, `model_registry_auditor.sh`, `validate_sports_analytics.sh` |
+| **Standalone** | Research Coordinator | Dissertation management, experiment tracking | N/A |
 
-### 1. Code Reviewer (Multi-Language)
+### Key Capabilities
 
-**Purpose:** Automated code review for Python (68%), R (7%), SQL (3%), TeX (19%), JS (2%), Shell (1%)
+**Prevents Critical Failures:**
+- ✅ SQL schema errors (documented "DOZENS of times") → Sports Analytics Validator
+- ✅ Expensive R integration failures (Nov 13: 3.5 hours lost) → Ensemble Health Monitor
+- ✅ Data leakage before training (84 hours wasted on BNN) → Data Leakage Detector
+- ✅ Hardcoded credentials (4 found in Phase 1 audit) → Security Auditor
 
-**Detects:**
-- Data leakage (temporal, target, player)
-- Security vulnerabilities (credentials, SQL injection)
-- Bayesian modeling issues (priors, MCMC config)
-- Code quality (type hints, docstrings)
+**Automation & Time Savings:**
+- 28-56 hours saved via Model Registry Auditor (337 pending registrations)
+- 1-2.5 hours per MCMC convergence issue via Performance Optimizer
+- 80%+ test coverage via Test Suite Generator
 
-**Usage:**
-```bash
-# Review git changes
-./scripts/review_code.sh
+### Integration with Coordinator
 
-# Review specific file
-./scripts/review_code.sh py/models/train_bnn_passing.py
-```
+All Phase 1-4 agents are integrated into the Agent Coordinator system for intelligent task routing. See [docs/AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md) for usage patterns.
 
-**Python API:**
-```python
-from py.utils.code_reviewer import CodeReviewer
-
-reviewer = CodeReviewer()
-issues = reviewer.review_file("py/models/train.py")
-report = reviewer.review_changes(git_diff=True)
-```
-
-### 2. Security Auditor
-
-**Purpose:** Comprehensive security scanning for real-money betting systems
-
-**Scans:**
-- Credentials & secrets (sicillionbillions, API keys)  <!-- pragma: allowlist secret -->
-- Docker security (privileged mode, exposed ports)
-- API security (missing auth, weak CORS)
-- File permissions (sensitive files world-readable)
-- Dependency vulnerabilities (pip-audit integration)
-
-**Usage:**
-```bash
-# Run full security audit
-./scripts/security_audit.sh
-
-# Save report and run weekly
-./scripts/security_audit.sh --weekly
-```
-
-**Python API:**
-```python
-from py.utils.security_auditor import SecurityAuditor
-
-auditor = SecurityAuditor()
-report = auditor.run_full_audit()
-auditor.save_report()  # → security_audit_report.json
-```
-
-### 3. Data Leakage Detector
-
-**Purpose:** Detect temporal leakage - #1 cause of betting model failure
-
-**Detects:**
-- Temporal leakage (future data, missing asof joins)
-- Target leakage (outcome in features, perfect correlation)
-- Player contamination (same player in train/test)
-- Statistical anomalies (zero variance, extreme skewness)
-
-**Usage:**
-```bash
-# Check feature engineering code
-./scripts/check_leakage.sh py/data/feature_engineering.py
-
-# Check all feature files
-./scripts/check_leakage.sh --code
-```
-
-**Python API:**
-```python
-from py.utils.data_leakage_detector import DataLeakageDetector
-import pandas as pd
-
-detector = DataLeakageDetector()
-
-# Check DataFrame
-report = detector.check_dataframe(df, target_col='passing_yards')
-
-# Validate train/test split (CRITICAL before training)
-report = detector.validate_split(train_df, test_df, date_col='kickoff')
-
-if detector.report.has_critical_leakage():
-    print("⛔ Model invalid - do not use for betting")
-    exit(1)
-```
-
-**Pre-Training Workflow:**
-```python
-# ALWAYS check for leakage before training
-detector = DataLeakageDetector()
-detector.validate_split(train, test, date_col='kickoff')
-
-if detector.report.has_critical_leakage():
-    print(detector.generate_report())
-    exit(1)  # Block training
-
-# Safe to proceed
-model.fit(X_train, y_train)
-```
-
-### Phase 2: Performance & Testing (3 agents)
-
-#### 4. Performance Optimizer
-
-**Purpose:** Identify bottlenecks in models, SQL queries, and backtests
-
-**Usage:**
-```bash
-# Full analysis
-./scripts/optimize_performance.sh
-
-# Check MCMC configuration
-./scripts/optimize_performance.sh --mcmc
-
-# Analyze SQL query
-./scripts/optimize_performance.sh --sql query.sql
-
-# Estimate backtest time
-./scripts/optimize_performance.sh --backtest
-```
-
-**Checks:**
-- MCMC configuration (chains, tune, draws)
-- SQL query patterns (missing indexes, slow joins)
-- Pandas performance (iterrows, apply)
-- Backtest time estimation
-
-#### 5. Test Suite Generator
-
-**Purpose:** Generate comprehensive tests targeting 80%+ coverage
-
-**Usage:**
-```bash
-# Generate tests for specific file
-./scripts/generate_tests.sh py/models/train_bnn_passing.py
-
-# Generate full test suite
-./scripts/generate_tests.sh --full
-
-# Check current coverage
-./scripts/generate_tests.sh --coverage
-```
-
-**Generates:**
-- Unit tests (basic, edge cases, error handling)
-- Property tests (Hypothesis library)
-- Temporal validation tests (sports betting specific)
-
-#### 6. Statistical Model Validator
-
-**Purpose:** Validate Bayesian models before production deployment
-
-**Usage:**
-```bash
-# Validate specific model
-./scripts/validate_model.sh models/bayesian/bnn_passing_v1_metadata.json
-
-# Validate all models
-./scripts/validate_model.sh --all
-```
-
-**Validates:**
-- R-hat <1.01 (convergence)
-- ESS >400 (bulk and tail)
-- Divergences <10
-- Calibration >85% (target: 90%)
-
-**⛔ Blocks deployment if validation fails**
-
-### Phase 3: Production Deployment (2 agents)
-
-#### 7. Ensemble Orchestrator
-
-**Purpose:** Manage 5-way ensemble (Bayesian + XGBoost + BNN + State-Space + CQL)
-
-**Usage:**
-```bash
-# Train all models
-./scripts/orchestrate_ensemble.sh --train 2018-2024
-
-# Optimize weights
-./scripts/orchestrate_ensemble.sh --optimize predictions.pkl actuals.pkl
-
-# Get status
-./scripts/orchestrate_ensemble.sh --status
-```
-
-**Features:**
-- Multi-language coordination (R + Python)
-- CVX weight optimization
-- Model versioning and registry
-- Performance monitoring
-
-#### 8. Betting Strategy Validator
-
-**Purpose:** Validate betting strategies before live deployment
-
-**Usage:**
-```bash
-# Validate backtest results
-./scripts/validate_strategy.sh backtest_returns.pkl 10000
-
-# Run stress tests
-./scripts/validate_strategy.sh --stress backtest_returns.pkl
-
-# Calculate Kelly bet size
-./scripts/validate_strategy.sh --kelly 0.05 0.60
-```
-
-**Risk Gates:**
-- ROI >5% (target: 7%+)
-- Win Rate >59% (target: 62%+)
-- Sharpe Ratio >2.2 (target: 2.5+)
-- Max Drawdown <-8%
-
-**⛔ Blocks deployment if validation fails**
-
-### Phase 4: Critical Infrastructure (3 agents - Nov 14, 2025)
-
-#### 9. Ensemble Health Monitor
-
-**Purpose:** P0 pre-backtest validation to prevent R model integration failures (Nov 13, 2025: 3.5 hours lost)
-
-**Usage:**
-```bash
-# Check ensemble health before backtest
-./scripts/check_ensemble_health.sh
-
-# Exit code 0 = healthy, 1 = critical issues found
-if [ $? -eq 0 ]; then
-    python py/backtest/historical_validation_4way.py
-fi
-```
-
-**Validates:**
-- All 4 ensemble components load successfully
-- R model integration (rpy2, state-space v2, hierarchical v2)
-- Component drift vs last validation
-- Calibration coverage (90% target)
-- Inter-model prediction agreement
-
-**Python API:**
-```python
-from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
-
-monitor = EnsembleHealthMonitor()
-report = monitor.check_ensemble_health()
-if not report.is_healthy:
-    print(f"⛔ Critical issues: {report.critical_issues}")
-    exit(1)  # Block 18-hour backtest
-```
-
-**ROI:** Would have saved 3.5 hours on Nov 13 + prevents future failures
-
-#### 10. Model Registry Auditor
-
-**Purpose:** Automate 337 pending model registrations (19-38 hours manual work saved)
-
-**Usage:**
-```bash
-# Scan for pending registrations
-./scripts/model_registry_auditor.sh --scan
-
-# Auto-register models that pass convergence
-./scripts/model_registry_auditor.sh --register
-
-# Generate audit report
-./scripts/model_registry_auditor.sh --audit
-```
-
-**Audits:**
-- Filesystem models: 361 files
-- Database models: 25 registered
-- Pending registrations: 337 models
-- Convergence validation (Rhat < 1.02, ESS > 400)
-- File integrity and dependency graphs
-
-**Python API:**
-```python
-from py.utils.model_registry_auditor import ModelRegistryAuditor
-
-auditor = ModelRegistryAuditor()
-report = auditor.audit_full()
-print(f"Pending: {report.pending_registrations}")
-
-# Auto-register passing models
-auditor.register_pending_models()
-```
-
-**ROI:** 28-56 hours saved (337 models @ 5-10 min each)
-
-#### 11. Sports Analytics Validator
-
-**Purpose:** Prevent recurring SQL schema bugs violating NFL domain rules (documented "DOZENS of times")
-
-**Usage:**
-```bash
-# Validate DataFrame against NFL rules
-./scripts/validate_sports_analytics.sh --validate-df data/features.csv
-
-# Check SQL query logic
-./scripts/validate_sports_analytics.sh --check-query queries/player_stats.sql
-
-# Generate validation report
-./scripts/validate_sports_analytics.sh --report
-```
-
-**Validates:**
-- Position eligibility (QB/RB/WR/TE stats)
-- Stat ranges (passing 0-600, rushing 0-300 yards)
-- Schedule constraints (weeks 1-18, 17 games/team)
-- Team abbreviations (LAR/LAC enforcement, not "LA")
-- Game results consistency
-
-**Python API:**
-```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
-
-validator = SportsAnalyticsValidator()
-report = validator.validate_dataframe(df)
-if report.has_errors():
-    print(report.generate_report())
-    exit(1)  # Block model training
-```
-
-**Critical Example (Nov 14, 2025):**
-```sql
--- ❌ WRONG - mart.player_game_stats has NO game_id column
-SELECT * FROM mart.player_game_stats WHERE game_id = 123;
-
--- ✅ CORRECT - Use composite key (season, week, team)
-SELECT * FROM mart.player_game_stats
-WHERE season = 2024 AND week = 10 AND team = 'KC';
-```
-
-**ROI:** Prevents recurring production bugs (SQL schema errors occurred "DOZENS of times")
-
-### Research Coordinator (NEW)
-
-**Purpose:** Track experiments, maintain dissertation, tell research story
-
-**Unique Capabilities:**
-- Experiment tracking and development story
-- Dissertation management (529 pages LaTeX, 426 lines main.tex)
-- R/Bayesian statistics guidance (brms, Stan, cmdstanr)
-- Publication-quality typography and aesthetics
-- Cross-component synthesis and narrative
-
-**Example Tasks:**
-- "Update dissertation Chapter 8 with BNN calibration results"
-- "Document the state-space model experiment journey"
-- "Help me interpret these brms MCMC diagnostics"
-- "Generate TikZ figure for calibration curve"
-- "Ensure consistent figure styling across dissertation"
-
-**Why Standalone?** Unique academic workflow focus (narrative, aesthetics, storytelling) distinct from infrastructure agents.
-
-### Agent Integration
-
-Phase 1+2+3+4 agents distributed across coordinator:
-
-| Agent Module | Integrated Into | Capabilities |
-|-------------|-----------------|-------------|
-| Code Reviewer | DOCUMENTATION | Code review, security audit |
-| Security Auditor | DOCUMENTATION | Credentials, Docker, API security |
-| Data Leakage Detector | DATA_LAYER | Temporal validation, split checking |
-| Performance Optimizer | MODEL_MANAGEMENT | MCMC tuning, training profiling |
-| Performance Optimizer | DATA_LAYER | SQL query optimization |
-| Performance Optimizer | PREDICTION_ENGINE | Backtest optimization |
-| Test Generator | MODEL_MANAGEMENT | 80%+ coverage, property tests |
-| Statistical Validator | MODEL_MANAGEMENT | MCMC diagnostics, calibration |
-| Ensemble Orchestrator | PREDICTION_ENGINE | Multi-model coordination, R+Python |
-| Betting Validator | PREDICTION_ENGINE | Risk gates, Kelly criterion |
-| **Ensemble Health Monitor** | **PREDICTION_ENGINE** | **Pre-backtest validation, R model integration** |
-| **Model Registry Auditor** | **MODEL_MANAGEMENT** | **Auto-registration, convergence audits** |
-| **Sports Analytics Validator** | **DATA_LAYER** | **NFL domain rules, SQL schema validation** |
-| Research Coordinator | (STANDALONE) | Experiment tracking, dissertation, R guidance |
-
-**Result:** 10 agents in coordinator (not 14) via distributed integration
-
-### Documentation
-
-**Phase 1 Guide:** [docs/PHASE_1_AGENT_ENHANCEMENTS.md](docs/PHASE_1_AGENT_ENHANCEMENTS.md)
-**Phase 2+3 Guide:** [docs/PHASE_2_3_INTEGRATION_COMPLETE.md](docs/PHASE_2_3_INTEGRATION_COMPLETE.md)
-**Phase 4 Guide:** [docs/AGENT_AUDIT_NOV14.md](docs/AGENT_AUDIT_NOV14.md) | [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md)
-**Coordinator Guide:** [docs/AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md)
-
-**Phase 1-3 Files Created:**
-- `py/utils/code_reviewer.py` (680 lines)
-- `py/utils/security_auditor.py` (590 lines)
-- `py/utils/data_leakage_detector.py` (720 lines)
-- `scripts/review_code.sh`, `scripts/security_audit.sh`, `scripts/check_leakage.sh`
-
-**Phase 4 Files Created (November 14, 2025):**
-- `py/utils/ensemble_health_monitor.py` (850 lines)
-- `py/utils/model_registry_auditor.py` (1,284 lines)
-- `py/utils/sports_analytics_validator.py` (792 lines)
-- `scripts/check_ensemble_health.sh` (105 lines)
-- `scripts/model_registry_auditor.sh` (207 lines)
-- `scripts/validate_sports_analytics.sh` (101 lines)
-- `tests/unit/test_sports_analytics_validator.py` (513 lines)
-- `docs/guides/TASK_TOOL_INTEGRATION.md` (403 lines)
-
-**Total Agent Infrastructure:** 14 agents (11 distributed + 3 standalone), ~10,922 lines core code + 3,300 lines documentation
-
-### November 14, 2025: Phase 4 Implementation Complete
-
-**Context:** Audit identified 3 critical missing agents addressing documented pain points (Nov 13 R integration failure, 337 pending model registrations, recurring SQL schema bugs).
-
-**Implementation:** All 3 agents implemented in parallel using Task tool (3,926 lines core code + 413 lines CLI wrappers + 513 lines tests)
-
-**Status:** ✅ COMPLETE (November 14, 2025)
-
-**ROI Analysis:**
-- **Ensemble Health Monitor:** Saves 3.5+ hours per R integration failure (P0 blocker prevention)
-- **Model Registry Auditor:** Saves 28-56 hours (337 models @ 5-10 min each)
-- **Sports Analytics Validator:** Prevents recurring SQL bugs (documented "DOZENS of times")
-- **Total ROI:** 31-59 hours saved + critical production reliability
-
-#### 9. Ensemble Health Monitor (P0 CRITICAL)
-
-**Purpose:** Pre-backtest validation to prevent expensive R integration failures (Nov 13: 3.5 hours lost)
-
-**Capabilities:**
-- Real-time component drift detection (4-way ensemble)
-- R model health checks (detects rpy2 failures BEFORE backtest)
-- Weight rebalancing alerts (monitors 30/30/25/15% weights)
-- Prediction agreement monitoring (flags high uncertainty for CQL bet sizing)
-- Ensemble calibration tracking (90% coverage target)
-
-**Usage:**
-```bash
-# Pre-backtest validation
-./scripts/check_ensemble_health.sh
-if [ $? -eq 0 ]; then
-    python py/backtest/historical_validation_4way.py  # Safe to run 18-hour backtest
-fi
-```
-
-**Python API:**
-```python
-from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
-
-monitor = EnsembleHealthMonitor()
-report = monitor.check_ensemble_health()
-
-if not report.is_healthy:
-    print(f"⛔ {len(report.critical_issues)} critical issues")
-    for issue in report.critical_issues:
-        print(f"  - {issue}")
-    exit(1)  # Block backtest
-
-# All checks passed
-print("✅ Ensemble healthy - safe to run backtest")
-```
-
-**ROI:** Would have saved 3.5 hours on Nov 13 + prevents future backtest failures
-
-**Files:**
-- `py/utils/ensemble_health_monitor.py` (850 lines)
-- `scripts/check_ensemble_health.sh` (105 lines)
-- `docs/tools/ENSEMBLE_HEALTH_MONITOR.md` (18KB guide)
-- `examples/ensemble_health_integration.py` (256 lines, 4 patterns)
-
-#### 10. Model Registry Auditor (P1 HIGH)
-
-**Purpose:** Automate model registration workflow (337 pending registrations identified Nov 14)
-
-**Capabilities:**
-- Automated registration workflow (scan models/, compare to database, register pending)
-- Convergence audits (Rhat < 1.02, ESS > 400, calibration > 85%)
-- File integrity checks (detect corrupted .rds/.pkl/.pth files)
-- Dependency graph validation (ensemble v5.1 requires 4 models all registered)
-- Canonical window compliance (2018-2024 + H=4 decay)
-- Database sync monitoring (alerts when YAML diverges from ml.model_metadata)
-
-**Usage:**
-```bash
-# Scan for pending registrations
-./scripts/model_registry_auditor.sh --scan
-
-# Auto-register pending models (dry run first)
-./scripts/model_registry_auditor.sh --register --dry-run
-./scripts/model_registry_auditor.sh --register
-
-# Full audit report
-./scripts/model_registry_auditor.sh --audit
-```
-
-**Python API:**
-```python
-from py.utils.model_registry_auditor import ModelRegistryAuditor
-
-auditor = ModelRegistryAuditor()
-report = auditor.audit_full()
-
-print(f"Filesystem models: {report.models_on_disk}")      # 361
-print(f"Database models: {report.models_in_db}")          # 25
-print(f"Pending registrations: {report.pending_count}")   # 337
-print(f"Critical issues: {report.critical_issues}")       # 10
-
-# Auto-register pending models
-results = auditor.auto_register(dry_run=False)
-print(f"Registered {results.success_count} models")
-```
-
-**ROI:** Automates 337 registrations @ 5-10 min each = **28-56 hours saved**
-
-**Files:**
-- `py/utils/model_registry_auditor.py` (1,284 lines)
-- `scripts/model_registry_auditor.sh` (207 lines)
-- `docs/MODEL_REGISTRY_AUDITOR.md` (comprehensive guide)
-
-#### 11. Sports Analytics Validator (P1 HIGH)
-
-**Purpose:** Enforce NFL domain rules to prevent recurring SQL schema bugs (documented "DOZENS of times")
-
-**Capabilities:**
-- **Position eligibility:** QB stats (passing), RB stats (rushing/receiving), WR/TE (receiving only)
-- **Stat range validation:** Passing 0-600 yards, rushing 0-300 yards, receiving 0-350 yards, attempts 0-70
-- **Schedule constraints:** Week 1-18, teams play 17 games, bye weeks
-- **Team abbreviation validation:** LAR/LAC (not "LA"), enforce 32-team roster
-- **Game result consistency:** home_score + away_score = total_points
-- **Player-team temporal logic:** Players can't play for multiple teams in same week
-- **SQL query validation:** Catches `mart.player_game_stats.game_id` errors (column doesn't exist)
-
-**Usage:**
-```bash
-# Validate training data
-./scripts/validate_sports_analytics.sh --validate-df data/train.csv
-
-# Check SQL query for domain violations
-./scripts/validate_sports_analytics.sh --check-query query.sql
-
-# Generate full validation report
-./scripts/validate_sports_analytics.sh --report
-```
-
-**Python API:**
-```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
-
-validator = SportsAnalyticsValidator()
-
-# Validate DataFrame (BEFORE training)
-report = validator.validate_dataframe(df)
-
-if report.has_errors():
-    print("❌ NFL domain violations detected:")
-    print(report.generate_report())
-    exit(1)  # Block training
-
-# Validate SQL query
-query = "SELECT pgs.game_id FROM mart.player_game_stats pgs"  # ERROR: game_id doesn't exist
-issues = validator.validate_sql_query(query)
-# Returns: ['Column game_id does not exist in player_game_stats']
-```
-
-**Example Violations Caught:**
-```python
-# ❌ QB with rushing_yards > 200 (impossible per NFL rules)
-# ❌ WHERE home_team = 'LA' (ambiguous - use LAR or LAC)
-# ❌ WHERE week = 25 (invalid - must be 1-22)
-# ❌ SELECT pgs.game_id (column doesn't exist in player_game_stats)
-# ❌ Passing yards = 700 (exceeds NFL record of 554)
-```
-
-**ROI:** Prevents recurring SQL bugs, enforces domain knowledge, catches data quality issues early
-
-**Files:**
-- `py/utils/sports_analytics_validator.py` (792 lines)
-- `scripts/validate_sports_analytics.sh` (101 lines)
-- `tests/unit/test_sports_analytics_validator.py` (513 lines, 30+ tests)
-- `docs/SPORTS_ANALYTICS_VALIDATOR_GUIDE.md` (829 lines)
-- `examples/sports_analytics_validator_demo.py` (260 lines)
-
-### Summary: November 14 Agent Additions
-
-**Investment:** 24-30 hours implementation (COMPLETE in 1 session via parallel Task tool agents)
-
-**Deliverables:**
-- 3 Python utility modules (2,926 lines core code)
-- 3 CLI wrapper scripts (413 lines)
-- 6 documentation files (comprehensive guides, examples, milestones)
-- 1 test suite (513 lines, 30+ test methods)
-- **Grand Total:** 6,521 lines of production-ready code and documentation
-
-**ROI:**
-1. **ensemble-health-monitor:** Prevents Nov 13-style failures (3.5 hours saved per incident)
-2. **model-registry-auditor:** Automates 337 registrations (28-56 hours saved)
-3. **sports-analytics-validator:** Prevents recurring SQL bugs (documented "DOZENS of times")
-
-**Total ROI:** 31-59 hours saved + critical production reliability improvements
-
-**Status:** ✅ All agents production-ready, CLI wrappers tested, comprehensive documentation complete
-
-**Documentation:**
-- [docs/AGENT_AUDIT_NOV14.md](docs/AGENT_AUDIT_NOV14.md) - Audit findings and gaps analysis
-- [docs/guides/TASK_TOOL_INTEGRATION.md](docs/guides/TASK_TOOL_INTEGRATION.md) - Integration guide
-- Agent-specific docs: ENSEMBLE_HEALTH_MONITOR.md, MODEL_REGISTRY_AUDITOR.md, SPORTS_ANALYTICS_VALIDATOR_GUIDE.md
+**Full documentation:** [docs/AGENT_INFRASTRUCTURE.md](docs/AGENT_INFRASTRUCTURE.md) (detailed usage, APIs, examples)
 
 ---
 
@@ -1191,97 +474,42 @@ issues = validator.validate_sql_query(query)
 
 ## Unified Enforcement Framework
 
-**NEW:** November 15, 2025 - Automated validation routing to prevent recurring issues
+**Complete Reference:** See [docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md)
 
-**Status:** ✅ Production-ready
-**Purpose:** Catch errors at commit time (not runtime) through automated agent routing
-**Documentation:** [docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md)
+**Status:** ✅ Production-ready (November 15, 2025)
+**Purpose:** Catch errors at commit time (not runtime) through automated validation routing
+**ROI:** 100+ hours saved over 6 months through early error detection
 
 ### Overview
 
-The Unified Enforcement Framework automatically routes code changes to specialized validation agents based on file patterns and content, preventing recurring production issues.
+Automatically routes code changes to specialized validation agents based on file patterns, preventing recurring production issues through pre-commit hooks and runtime decorators.
 
-**Key Benefits:**
-- ✅ Prevents SQL schema errors (documented "DOZENS of times")
-- ✅ Blocks expensive failures (Nov 13: 3.5 hours lost on R integration)
-- ✅ Stops data leakage before training (84 hours wasted on BNN investigation)
-- ✅ Detects security issues before commit (4 hardcoded credentials found in Phase 1 audit)
+### Enforcement Rules
 
-**ROI:** 100+ hours saved over 6 months through early error detection
+| Rule | Name | Level | Prevents | Example |
+|------|------|-------|----------|---------|
+| 1 | SQL Validation | BLOCKING | Schema errors ("DOZENS of times") | Catches `mart.player_game_stats.game_id` (column doesn't exist) |
+| 2 | Backtest Health | BLOCKING | Expensive failures (3.5 hrs lost Nov 13) | Validates R model integration BEFORE 18-hour backtest |
+| 3 | Model Training | BLOCKING | Data leakage (84 hrs wasted on BNN) | Scans for `DataLeakageDetector.validate_split()` calls |
+| 4 | Security Audit | BLOCKING | Hardcoded secrets (4 found Phase 1) | Detects credentials in code |
+| 5 | Ensemble Guard | WARNING | Performance degradation | Monitors component weights |
+| 6 | Schema Change | WARNING | Cascading query failures | Enforces migration documentation |
+| 7 | Documentation Sync | INFO | Stale CLAUDE.md | Suggests doc updates |
 
-### Core Components
+**Phase 2 Additions (Nov 15):** 7 additional rules for R convergence, temporal values, multi-season validation, file integrity
 
-**1. Enforcement Router** (`py/utils/enforcement_router.py` - 500 lines)
-- 7 enforcement rules (SQL, backtest health, model training, security, ensemble, schema, docs)
-- 3 severity levels (BLOCKING, WARNING, INFO)
-- Automatic routing to specialized agents
-- Multi-level integration (git hooks, runtime decorators, CI/CD-ready)
-
-**2. Git Pre-Commit Hook** (`.git/hooks/pre-commit`)
-- Runs automatically on `git commit`
-- Validates all staged files against applicable rules
-- Blocks commit if BLOCKING-level validation fails
-- Provides actionable error messages with suggestions
-
-**3. Runtime Decorators** (optional enforcement)
-- Apply validation at function execution time
-- Use for production-critical code paths
-- Example: `@enforce_sql_validation`, `@enforce_backtest_health`
-
-### Enforcement Rules Matrix
-
-| Rule # | Name | Trigger | Level | Prevents |
-|--------|------|---------|-------|----------|
-| 1 | **SQL Validation** | `.sql`, `pd.read_sql`, SQL strings | BLOCKING | Schema errors ("DOZENS of times") |
-| 2 | **Backtest Health** | `*_validation.py`, `historical_backtest_*.py` | BLOCKING | Expensive failures (3.5 hrs lost Nov 13) |
-| 3 | **Model Training** | `train_*.py`, `train_*.R` | BLOCKING | Data leakage (84 hrs wasted on BNN) |
-| 4 | **Security Audit** | `.env`, credentials in code | BLOCKING | Hardcoded secrets (4 found) |
-| 5 | **Ensemble Guard** | `py/ensemble/enhanced_ensemble_*.py` | WARNING | Performance degradation |
-| 6 | **Schema Change** | `db/*.sql`, `CREATE VIEW`, `ALTER TABLE` | WARNING | Cascading query failures |
-| 7 | **Documentation Sync** | `docs/milestones/*.md`, `MODEL_REGISTRY.yaml` | INFO | Stale CLAUDE.md |
-
-### Phase 2 Expansion (November 15, 2025)
-
-**Status:** ✅ COMPLETE
-**Investment:** 8.5-12 hours
-**ROI:** 25-60 hours saved per development cycle
-
-**Added 7 New Rules:**
-- Rule #8: R Model Convergence Pre-Check (BLOCKING) - prevents convergence failures
-- Rule #9: Hardcoded Temporal Values (BLOCKING) - prevents factor level errors
-- Rule #10: allow_new_levels Validation (BLOCKING) - validates brms predictions
-- Enhanced Rule #2: R Model Integration Health - added rpy2 validation
-- Rule #12: Multi-Season Validation (WARNING) - recommends ≥3 seasons
-- Rule #13: Documentation Drift (INFO) - suggests doc updates
-- Rule #14: Model File Integrity (WARNING) - validates model saves
-
-**Added 3 Specialized Agents:**
-1. **MCMC Configuration Optimizer** (`py/utils/mcmc_config_optimizer.py`)
-   - Estimates required iterations for convergence
-   - ROI: 1-2.5 hours per incident
-
-2. **Ensemble Weight Drift Monitor** (`py/utils/ensemble_weight_monitor.py`)
-   - Detects when components need weight reoptimization
-   - ROI: 2-5% ROI improvement
-
-3. **R/Python Dependency Sync Validator** (`py/utils/dependency_sync_validator.py`)
-   - Prevents rpy2 version mismatches
-   - ROI: 7-15 hours (prevents backtest failures)
-
-**Complete Documentation:** [docs/ENFORCEMENT_FRAMEWORK_PHASE_2.md](docs/ENFORCEMENT_FRAMEWORK_PHASE_2.md)
-
-### Usage Examples
+### Usage
 
 **Automatic (Git Pre-Commit Hook):**
 ```bash
-# Runs automatically on every commit
-git add scripts/new_validation.py
-git commit -m "Add new validation"
+git commit -m "Fix"
+# → Runs validation automatically, blocks if BLOCKING-level failures detected
+```
 
-# Output if SQL error detected:
-# ❌ BLOCKING: sql_validation: Column 'game_id' does not exist in mart.player_game_stats
-# 💡 Suggestion: Join to games via (season, week) composite key. See docs/database/SQL_PATTERNS.md
-# ❌ Commit blocked
+**Manual Validation:**
+```bash
+python py/utils/enforcement_router.py scripts/my_script.py
+# → Returns 0 if passed, 1 if failed with actionable error messages
 ```
 
 **Runtime Decorator:**
@@ -1291,109 +519,15 @@ from py.utils.enforcement_router import enforce_backtest_health
 @enforce_backtest_health
 def run_expensive_validation(seasons: List[int]):
     """Won't run if ensemble is unhealthy."""
-    for season in seasons:
-        backtest_season(season)
-```
-
-**Manual Validation:**
-```bash
-# Validate before running expensive operation
-python py/utils/enforcement_router.py scripts/elo_wls_multi_season_validation.py
-
-# Output:
-# ✅ PASSED: sql_validation: SQL validation passed
-# ✅ PASSED: backtest_health: Ensemble health check passed
-# ✅ PASSED: security_audit: No secrets detected
-```
-
-### Integration with Existing Agents
-
-The framework routes to existing Phase 1-4 agents:
-
-| Agent | Enforcement Rule | Integration |
-|-------|------------------|-------------|
-| SQL Validator | Rule #1 | Checks queries against schema patterns |
-| Ensemble Health Monitor | Rule #2 | Validates R model integration, component drift |
-| Data Leakage Detector | Rule #3 | Scans training scripts for validation calls |
-| Security Auditor | Rule #4 | Scans for hardcoded credentials |
-
-### Bypass (Emergency Only)
-
-```bash
-# ONLY use in emergencies when you're certain the validation is incorrect
-git commit --no-verify
-```
-
-**⚠️ WARNING:** Bypassing enforcement removes protection against recurring issues. Use sparingly and document why in commit message.
-
-### Error Message Examples
-
-**SQL Schema Error (Rule #1):**
-```
-❌ BLOCKING: sql_validation: Column 'team' does not exist in mart.player_game_stats
-💡 Suggestion: Use 'current_team' or join to games to derive team
-Details: See docs/database/SQL_PATTERNS.md for correct join pattern
-```
-
-**Ensemble Unhealthy (Rule #2):**
-```
-❌ BLOCKING: backtest_health: Ensemble unhealthy - hierarchical_v2 failed to load
-💡 Suggestion: Run ./scripts/check_ensemble_health.sh for detailed diagnostics
-Details: R model integration failed (rpy2 error)
-```
-
-**Missing Data Leakage Check (Rule #3):**
-```
-❌ BLOCKING: model_training: Missing data leakage validation
-💡 Suggestion: Add DataLeakageDetector.validate_split() before model.fit()
-Details: Training scripts must validate temporal splits before training
-```
-
-**Hardcoded Credential (Rule #4):**
-```
-❌ BLOCKING: security_audit: Hardcoded password detected in line 42
-💡 Suggestion: Move to .env file and load via os.getenv('DB_PASSWORD')
-Details: Use pragma comment if credential is intentionally public
+    ...
 ```
 
 ### Success Stories
 
-**November 15, 2025 - ELO+WLS Validation:**
-- **Problem:** SQL query assumed `mart.player_game_stats.team` column existed (it doesn't)
-- **Before Framework:** Would fail after 6-8 hours of computation
-- **With Framework:** Caught in <1 second at commit time
-- **Impact:** Saved 6-8 hours + prevented production bug
+- **ELO+WLS Validation (Nov 15):** Caught SQL schema error in <1 second (would've failed after 6-8 hours)
+- **R Integration Failure (Nov 13):** Validates R models BEFORE backtest (saved 3.5 hours debugging)
 
-**November 13, 2025 - R Integration Failure:**
-- **Problem:** Ensemble backtest ran 18 hours with broken R model integration
-- **Solution:** Rule #2 (Backtest Health) now validates R models BEFORE backtest
-- **Impact:** Would have saved 3.5 hours debugging + prevented future failures
-
-### Files Created
-
-**Core Framework (2 files, 550 lines):**
-- `py/utils/enforcement_router.py` (500 lines) - Core routing logic
-- `.git/hooks/pre-commit` (50 lines) - Git integration
-
-**Documentation (1 file, 400+ lines):**
-- `docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md` - Comprehensive guide
-
-**Total:** 950+ lines of production-ready enforcement infrastructure
-
-### Design Philosophy
-
-1. **Fail Fast, Fail Loudly** - Catch errors at commit time, not runtime
-2. **Actionable Errors** - Every error includes suggestion for fix
-3. **Multi-Level Defense** - Git hooks + runtime decorators + CI/CD
-4. **No Silent Failures** - BLOCKING rules halt execution
-5. **Graceful Degradation** - Missing validators skip (don't crash)
-
-### Future Enhancements (Optional)
-
-- CI/CD integration (GitHub Actions workflow)
-- Enhanced SQL validator (query cost estimation)
-- Performance profiler integration (detect slow queries)
-- Automatic documentation sync (commit hooks for CLAUDE.md updates)
+**Full documentation:** [docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md) (208 lines: examples, error messages, design philosophy)
 
 ---
 
@@ -1496,494 +630,45 @@ Details: Use pragma comment if credential is intentionally public
 
 ## Recent Work
 
-**Complete History:** See [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
+**Complete History:** See [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md) and [docs/archive/2025_nov/](docs/archive/2025_nov/)
 
 ### November 15, 2025: Production Deployment Complete - Ensemble v6.0
 
-**Context**: Comprehensive infrastructure rebuild and production deployment. Ensemble v6.0 with XGBoost v4 Ridge integration deployed to production. R model integration completed (blocker from Nov 13 resolved). All 6 Docker services rebuilt with corrected configurations.
+**Status**: ✅ PRODUCTION DEPLOYED (8 hours: Infrastructure Rebuild 3h + Production Prep 3h + Audit 2h)
 
-**Sessions**: 2 major sessions (Infrastructure Rebuild 3h + Production Prep 3h) + 1 validation session (Comprehensive Audit 2h)
+**Key Achievements**:
+1. **Ensemble v6.0 Live**: State-Space 30%, Hierarchical 30%, XGBoost v4 Ridge 25%, Informative Priors 15%
+   - Expected: 32-35 MAE (17.5% improvement over v5.1's ~40 MAE)
+   - Temperature Scaling: 90.0% calibration (T=0.5534)
+   - API: 4.0s inference with real R + Python models
 
-**Work Summary**:
+2. **R Model Integration**: Created `py/ensemble/r_model_interface.py` (533 lines) - resolved Nov 13 blocker
 
-**Phase 1: Infrastructure Rebuild (3 hours)** ✅ COMPLETE
-1. **Dashboard SQL Fixes** - Changed all queries from `predictions.retrospectives` (game-level) to `ml.predictions` (player-level). Fixed 8 query functions. Now shows correct player passing yards predictions.
-2. **API Production Integration** - Replaced stub model loader (synthetic predictions) with real ensemble predictions from trained Bayesian models. Created `py/ensemble/r_model_interface.py` (533 lines) for rpy2 integration.
-3. **Ensemble Architecture Reconciliation** - Resolved 3 conflicting ensemble definitions. Created canonical v6.0 definition: State-Space v2 30%, Hierarchical v2 30%, XGBoost v4 Ridge 25%, Informative Priors v2 15%.
-4. **XGBoost v4 Integration** - Integrated ridge residuals model (4.70 ± 0.40 MAE, 88.31% improvement, APPROVED Nov 15) into production ensemble.
+3. **A/B Test Framework**: v5.1 control vs v6.0 treatment (4 weeks, 50/50 split, MD5-based routing)
+   - Success criteria: MAE >5 yards, p<0.05, win rate +2pp, ROI +1%
+   - Guardrails: Auto-stop if >10% MAE degradation or -2% ROI
 
-**Phase 2: Production Preparation (3 hours)** ✅ COMPLETE
-1. **Database Schema** - Migration 044 deployed: added `ensemble_version` and `model_components` columns for A/B test tracking
-2. **Temperature Scaling** - v6 trained (90.0% calibration, optimal T=0.5534). Integrated into ensemble predictions.
-3. **R Runtime** - API Dockerfile updated: added rpy2, brms, cmdstanr for Bayesian model inference
-4. **Docker Rebuild** - All 6 services rebuilt: PostgreSQL, Redis, FastAPI (v6.0), Streamlit (corrected), Prometheus, Grafana
-5. **Deployment** - Week 12 predictions generated and live in dashboard. A/B test framework operational.
+4. **Infrastructure**: All 6 Docker services rebuilt (PostgreSQL, Redis, FastAPI v6.0, Streamlit, Prometheus, Grafana)
 
-**Phase 3: Comprehensive Infrastructure Audit (2 hours)** ✅ COMPLETE
-- 6 infrastructure issues evaluated (3 VALID, 3 INVALID)
-- VALID: LA abbreviations (460 games), MCMC parallelization (4→6 cores), BNN cleanup (5.08 GB)
-- INVALID: Foreign key validation, Redis caching, CLV filter (already done or cosmetic)
-- Total ROI: 14 hours investment → 30+ hours saved (229% monthly)
+5. **Comprehensive Audit**: 17,826 lines across 27 files, identified 3 valid issues (LA abbreviations, MCMC parallelization, BNN cleanup)
 
-**Ensemble Status**:
-- **v6.0 (production):** Expected 32-35 MAE (17.5% improvement over v5.1's ~40 MAE)
-- **Components verified:** All 5 components loading and generating predictions
-- **Temperature Scaling:** 90.0% calibration coverage (target achieved perfectly)
-- **API Inference:** 4.0 seconds per prediction with real ensemble models
-- **Dashboard:** Week 12 predictions live, all 4 pages operational
+**Pending (ETA Dec 1)**: LA team fix (460 games), MCMC 4→6 cores, BNN cleanup (5.08 GB)
 
-**A/B Test Setup**:
-- Configuration: `config/ab_test_config.yaml` (185 lines, MD5-based deterministic routing)
-- Control: v5.1 ensemble (50% traffic)
-- Treatment: v6.0 ensemble (50% traffic)
-- Duration: 4 weeks (Nov 14 - Dec 12, 2025)
-- Success: MAE >5 yards improvement, p<0.05, win rate +2pp, ROI +1%
-- Guardrails: Auto-stop if degradation >10% MAE or -2% ROI
-
-**Pending Fixes (from Comprehensive Audit)**:
-- LA Team Abbreviation: 460 games need fixing (282→STL 1995-2015, 178→LAR 2016-2025), ETA Dec 1
-- MCMC Parallelization: 4→6 cores for 35-40% speedup, ETA Dec 1
-- BNN Cleanup: Archive 44 files (5.08 GB), ETA Dec 1
-
-**Files Created (38 files, 10,400+ lines)**:
-- Core: `py/ensemble/r_model_interface.py`, `py/ensemble/enhanced_ensemble_v6_production.py`
-- Database: `db/migrations/044_add_ensemble_tracking_columns.sql`
-- Dashboard: Rewrote 8 query functions in `dashboard/app.py`
-- Configuration: `config/ab_test_config.yaml` (A/B test setup)
-- Documentation: 15 files across archive, milestones, guides, deployment directories
-
-**Files Modified (10+ files)**:
-- `docker-compose.yml` (R runtime dependencies added)
-- `api/main.py` (R integration, model loading)
-- `dashboard/app.py` (8 SQL query fixes)
-- `models/MODEL_REGISTRY.yaml` (XGBoost v4 registered)
-
-**Critical Blockers Resolved**:
-- Nov 13 R model loading failure: ✅ FIXED (r_model_interface.py created)
-- Nov 14 dashboard bug: ✅ FIXED (SQL queries corrected)
-- Nov 14 API serving stubs: ✅ FIXED (now serves real predictions)
-- Ensemble architecture confusion: ✅ RESOLVED (canonical v6.0 defined)
-
-**Status**: ✅ PRODUCTION DEPLOYMENT COMPLETE. ✅ Ensemble v6.0 live. ✅ A/B test operational. ✅ R integration complete. ✅ Ready for production traffic.
-
-**Documentation**:
-- Main: `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` (6,000+ lines)
-- Audit: `docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md`
-- Status: `docs/EXECUTION_STATUS_NOV15.md`
-- R Integration: `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (470 lines)
-- Backtest Guide: `docs/ENSEMBLE_V6_BACKTEST_GUIDE.md`, `ENSEMBLE_V6_BACKTEST_QUICK_START.txt`
-- Temperature Scaling: `docs/guides/TEMPERATURE_SCALER_V6_USAGE.md`
-- R Interface: `docs/guides/R_MODEL_INTERFACE_GUIDE.md`
+**Documentation**: See `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` (6,000+ lines)
 
 ---
 
-### November 15, 2025: Unified Enforcement Framework & ELO+WLS Validation Launch
+### Older Sessions
 
-**Context**: After discovering recurring SQL schema error (documented "DOZENS of times"), implemented comprehensive enforcement framework to prevent production issues through automated validation routing. Fixed SQL schema bug in ELO+WLS validation and launched multi-season backtest.
+**November 14**: Enforcement Framework, XGBoost v4 validation, Google Drive removal
+**November 13**: Multi-agent audit, temperature scaling, database optimization
+**November 9**: BNN investigation complete, model registry infrastructure
+**November 8**: Docker dashboard, canonical training window, state-space approval
 
-**Work Performed**:
-
-1. **Unified Enforcement Router** ✅ COMPLETE (`py/utils/enforcement_router.py` - 500 lines)
-   - 7 enforcement rules (SQL, backtest health, model training, security, ensemble, schema, docs)
-   - 3 severity levels (BLOCKING, WARNING, INFO)
-   - Automatic routing to existing Phase 1-4 agents
-   - Multi-level integration (git hooks, runtime decorators, CI/CD-ready)
-
-2. **Git Pre-Commit Hook** ✅ COMPLETE (`.git/hooks/pre-commit`)
-   - Runs automatically on every `git commit`
-   - Validates all staged files against applicable rules
-   - Blocks commits with BLOCKING-level failures
-   - Provides actionable error messages with fix suggestions
-
-3. **SQL Schema Error Fixed** ✅ COMPLETE
-   - **Problem:** `scripts/elo_wls_multi_season_validation.py` assumed `mart.player_game_stats` has `game_id`, `team`, `opponent` columns (they don't exist)
-   - **Solution:** Updated to use correct join pattern via `(season, week)` composite key + `current_team` column
-   - **Impact:** Caught in <1 second via enforcement framework (would have failed after 6-8 hours of computation)
-
-4. **ELO+WLS Multi-Season Validation** ✅ LAUNCHED (PID 82246, running)
-   - Parallel validation to XGBoost v4 (same methodology)
-   - 3 seasons (2022, 2023, 2024) with rolling origin cross-validation
-   - Diebold-Mariano significance testing vs Ensemble v5 baseline
-   - Estimated time: 6-8 hours (1,800 games)
-   - Monitor: `tail -f results/elo_wls_validation.log`
-
-5. **Documentation** ✅ COMPLETE
-   - `docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md` (400+ lines comprehensive guide)
-   - Updated CLAUDE.md with enforcement framework section (180 lines)
-   - All 7 rules documented with examples and error messages
-
-**Files Created (3 files, 950+ lines):**
-- `py/utils/enforcement_router.py` (500 lines) - Core routing logic
-- `.git/hooks/pre-commit` (50 lines) - Git integration
-- `docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md` (400+ lines) - Comprehensive guide
-
-**Files Modified (2 files):**
-- `scripts/elo_wls_multi_season_validation.py` - Fixed SQL join pattern (lines 120-157)
-- `CLAUDE.md` - Added enforcement framework section (180 lines, this file)
-
-**Enforcement Rules Implemented:**
-
-| Rule # | Name | Level | Prevents |
-|--------|------|-------|----------|
-| 1 | SQL Validation | BLOCKING | Schema errors ("DOZENS of times") |
-| 2 | Backtest Health | BLOCKING | Expensive failures (Nov 13: 3.5 hrs) |
-| 3 | Model Training | BLOCKING | Data leakage (BNN: 84 hrs wasted) |
-| 4 | Security Audit | BLOCKING | Hardcoded secrets (4 found Phase 1) |
-| 5 | Ensemble Guard | WARNING | Performance degradation |
-| 6 | Schema Change | WARNING | Cascading query failures |
-| 7 | Documentation Sync | INFO | Stale CLAUDE.md |
-
-**Success Story (Nov 15):**
-- SQL schema error in ELO+WLS validation caught by framework in <1 second
-- Without framework: would fail after 6-8 hours of computation
-- Framework provided actionable fix suggestion referencing `docs/database/SQL_PATTERNS.md`
-
-**Expected ROI:**
-- Nov 13 R integration: 3.5 hours saved per incident
-- BNN investigation: 84 hours saved from early leakage detection
-- SQL errors: ~30 min × dozens of occurrences = 15-30 hours saved
-- **Total: 100+ hours saved over next 6 months**
-
-**Next Steps:**
-- ⏳ Wait for ELO+WLS validation to complete (6-8 hours, started 06:12 AM)
-- ⏳ Compare results to XGBoost v4 (4.70 ± 0.40 MAE baseline)
-- ⏳ Make A/B test decision (v5 vs v6-XGB vs v6-ELO vs v7-Combined)
-
-**Status**: ✅ Enforcement framework production-ready. ELO+WLS validation running successfully.
+_Complete history:_ [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
 ---
 
-### November 14, 2025 (Evening): XGBoost v4 Ridge Residuals - Phase 1+2 Complete & Multi-Season Validation
-
-**Context**: Completed critical production fixes for XGBoost v4 integration and validated model performance across 2022-2024 seasons. All validation gates passed with 88.31% improvement over baseline.
-
-**Work Performed**:
-1. **Phase 1: Critical Fixes** ✅ COMPLETE (6 issues resolved)
-   - Security: Removed hardcoded credentials from 4 files, environment variable management via python-dotenv
-   - Architecture: Fixed `residual_feature=0` distribution mismatch (QB-specific expected residuals)
-   - Data Validation: Fail-fast on missing critical data, fallback to league averages
-   - Error Handling: Fail-fast model loading at startup with actionable error messages
-   - Fallback Mechanism: Three-tier strategy (ensemble → subset → database L3 avg → None)
-
-2. **Phase 2: A/B Test Framework Setup** ✅ COMPLETE
-   - Fixed A/B router (removed hardcoded credentials, corrected ensemble imports)
-   - Created comprehensive A/B test configuration (`config/ab_test_config.yaml`, 185 lines)
-   - 50/50 split (MD5 hash-based deterministic routing), 4-week duration (Nov 14 - Dec 12, 2025)
-   - Success criteria: MAE improvement > 5 yards, p < 0.05, win rate +2pp, ROI +1%
-   - Guardrails: auto-stop if degradation > 10% MAE or -2% ROI
-
-3. **Multi-Season Validation (2022-2024)** ✅ PRODUCTION APPROVED
-   - 2022: 5.06 MAE (+87.40% improvement, p < 0.000001) ✅
-   - 2023: 4.76 MAE (+88.15% improvement, p < 0.000001) ✅
-   - 2024: 4.27 MAE (+89.38% improvement, p < 0.000001) ✅
-   - **Mean: 4.70 ± 0.40 MAE (88.31% improvement, all p < 0.000001)** ✅
-   - All 4 consistency gates PASSED (MAE < 8 yards, improvement > 80%, p < 0.05, std < 2 yards)
-
-4. **Bug Fixes** ✅ COMPLETE
-   - Fixed JSON serialization error (`convert_numpy_types` helper function)
-   - Added type conversion for numpy bool_, integer, floating, ndarray
-
-**Files Created (3 files):**
-- `config/ab_test_config.yaml` - A/B test configuration (185 lines)
-- `PHASE_1_2_CRITICAL_FIXES_COMPLETE.md` - Phase 1+2 documentation (390 lines)
-- `XGBOOST_V4_VALIDATION_COMPLETE.md` - Comprehensive validation results & roadmap
-
-**Files Modified (6 files, +3,153 lines, -504 lines):**
-- `.env.example` - Added DB_PASSWORD with pragma comments
-- `py/ensemble/enhanced_ensemble_v6.py` - 5 critical fixes (1,288 lines)
-- `scripts/xgb_exp7_backtest_2024.py` - Removed credentials (551 lines)
-- `scripts/xgb_v4_multi_season_validation.py` - Removed credentials, fixed JSON serialization (629 lines)
-- `py/production/ab_test_router.py` - Fixed credentials + imports (601 lines, NEW)
-- `CLAUDE.md` - Updated with Phase 1+2 status (this file)
-
-**Git Commit:** a69c505 - fix(security): remove hardcoded credentials and implement critical production fixes
-
-**Expected Business Impact:**
-- Ensemble v6: ~33 MAE (7 yard improvement over v5's ~40 MAE)
-- XGBoost component: 4.70 ± 0.40 MAE (88.31% improvement over v2 baseline)
-- Win Rate: 60-61% (+2-3 pp improvement)
-- ROI: 6-9% (+1-2% improvement)
-
-**Production Timeline:**
-- Week of Nov 18-24: Launch A/B test (v5 control vs v6 treatment), collect 25+ games
-- Week 2 (Nov 25-Dec 1): Statistical significance check (50 games), early stop decision if p < 0.01
-- Week 3 (Dec 2-8): Continue monitoring (75 games), ensure guardrails not violated
-- Week 4 (Dec 9-15): Final analysis (100 games minimum), production deployment decision
-- **Expected Production Deployment:** December 15, 2025 (pending A/B test success)
-
-**Status**: ✅ Phase 1+2 complete, multi-season validation passed all gates, APPROVED for A/B test launch
-
----
-
-### November 14, 2025 (Morning): Google Drive Removal & Infrastructure Cleanup
-
-**Context**: Completed infrastructure cleanup removing unused Google Drive sync code (3,500 lines) and migrating to Git LFS workflow. Fixed dashboard bugs and validated end-to-end system operation.
-
-**Work Performed**:
-1. **Dashboard Logger Error Fix** ✅ COMPLETE
-   - Fixed `NameError: logger not defined` on line 542 of `dashboard/app.py`
-   - Added `import logging` and logger configuration
-   - Dashboard container rebuilt successfully
-
-2. **Dashboard Schema Fix** ✅ COMPLETE
-   - Fixed `KeyError: 'predicted_margin'` on line 1640
-   - Added defensive column existence checks
-   - Graceful degradation for incomplete data
-
-3. **Google Drive Sync Infrastructure Removal** ✅ COMPLETE
-   - Deleted 5 files: `sync_manager.py`, `conflict_resolver.py`, `file_locks.py`, `machine_manager.py`, `__init__.py`
-   - Removed Google Drive environment variables from `.env.example`
-   - Updated CLAUDE.md infrastructure section (line 62)
-   - Recovered ~3,500 lines of unused code
-
-4. **Git LFS Workflow Documentation** ✅ COMPLETE
-   - Created `docs/guides/GIT_LFS_WORKFLOW.md` (425 lines)
-   - Comprehensive guide for team members
-   - Mac M4 ↔ Windows RTX 4090 workflow examples
-   - Troubleshooting section for common issues
-
-5. **End-to-End Validation** ✅ COMPLETE
-   - FastAPI: Ensemble v5.1 loaded (State-Space 30%, Hierarchical 30%, Hybrid XGB 25%, IP 15%)
-   - Dashboard: All 4 pages operational (System Status, Model Status, Data Summary, Predictions)
-   - Temperature scaler: T=0.5534
-   - All health checks passing
-
-**Files Created**:
-- `docs/guides/GIT_LFS_WORKFLOW.md` (425 lines)
-- `docs/archive/2025_NOV/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md` (490 lines)
-
-**Files Modified**:
-- `dashboard/app.py` (2 fixes: logger import, schema defensive checks)
-- `.env.example` (removed 8 lines Google Drive section)
-- `CLAUDE.md` (updated infrastructure description line 62)
-
-**Files Deleted**:
-- `py/compute/sync_manager.py` (~1,200 lines)
-- `py/compute/sync/conflict_resolver.py` (~650 lines)
-- `py/compute/sync/file_locks.py` (~450 lines)
-- `py/compute/sync/machine_manager.py` (~400 lines)
-- `py/compute/sync/__init__.py` (~20 lines)
-
-**Net Impact:** -3,000 lines (cleaner codebase)
-
-**Strategic Decision**: Git LFS provides better workflow than Google Drive for cross-machine model sync. Simpler codebase, native Git integration, public repository ready.
-
-**Status**: ✅ Infrastructure cleanup complete. Ensemble v5.1 operational. Ready for 19-agent comprehensive audit.
-
----
-
-### November 13, 2025: Multi-Agent Parallel Execution - Infrastructure Complete (1 Critical Blocker)
-
-**Context**: Deployed 6 specialized agents in parallel to implement comprehensive production improvements. Successfully completed 6/7 major workstreams in 3.5 hours. Identified critical R model integration failure in ensemble backtest that requires immediate fix.
-
-**Work Performed**:
-
-1. **Temperature Scaling Implementation** ✅ COMPLETE
-   - Implemented isotonic regression-based temperature scaling
-   - Optimal temperature: T = 0.5534
-   - Results: Coverage 97.3% → 89.7% (target 90%), interval width -25.6%
-   - Status: Production-ready, integrated into enhanced_ensemble_v5.py
-   - Files: `py/calibration/temperature_scaling.py` (347 lines)
-
-2. **Temporal Safety Testing Framework** ✅ COMPLETE
-   - 25+ comprehensive temporal leakage tests
-   - Zero critical leakage detected across 15 feature engineering modules
-   - 7 risk gates all passing (lag validation, temporal splits, contamination)
-   - Status: Production-ready, ready for CI/CD integration
-   - Files: `tests/integration/test_temporal_safety_comprehensive.py` (841 lines)
-
-3. **Backtest Performance Optimization** ✅ COMPLETE
-   - Database pooling: 50-100x faster queries
-   - Feature caching: 70-85% hit rate
-   - Results: 2.7x speedup (45-65 min → 18 min for 148 games)
-   - Status: Production-ready, 0% accuracy degradation
-   - Files: `py/utils/database_pool.py`, `py/utils/feature_cache.py` (746 lines total)
-
-4. **Database Optimization & Monitoring** ✅ COMPLETE
-   - 10 composite/covering/partial indexes created (1 complete, 9 CONCURRENTLY)
-   - Query tracking via pg_stat_statements enabled
-   - Results: 40% backtest speedup, 3-5x query speedup expected
-   - Status: Production-ready, requires PostgreSQL restart
-   - Files: `db/optimize_indexes.sql`, `db/health_check.sql` (22 KB total)
-
-5. **Model Registry Synchronization** ✅ COMPLETE
-   - 7 models synced to database (IDs 11-36)
-   - Temperature scaler registered as ID 36 (NEW)
-   - Updated MODEL_REGISTRY.yaml with ensemble v6.1 configuration
-   - Status: Complete, database validated
-   - Files: `models/MODEL_REGISTRY.yaml` (updated)
-
-6. **Ensemble Version Architecture Analysis** ✅ COMPLETE
-   - Identified critical issue in v6: Wrong architecture (includes BNN v3.1 Rushing)
-   - Clarified v5 is correct but needs hybrid XGBoost upgrade
-   - Proposed ensemble v5.1: SS 30%, Hier 30%, Hybrid XGB 25%, IP 15%
-   - Status: Plan documented, implementation ready (2 hours estimated)
-   - Files: `docs/ARCHITECTURE_ANALYSIS_NOV13_2025.md` (7,892-line analysis)
-
-7. **Full 4-Way Ensemble Backtest** ⛔ FAILED - CRITICAL BLOCKER
-   - Backtest executed but failed risk gates
-   - **Critical Finding**: R models (Hierarchical v2, Informative Priors v2) failed to load
-   - Result: 2-way ensemble (State-Space + XGBoost only) vs 4-way intended
-   - Metrics failed: MAE 142 yards (vs <45 target), coverage 98.4% (overcalibrated)
-   - Root cause: rpy2 integration failure in historical_validation_4way.py
-   - Status: BLOCKED FOR PRODUCTION (4-6 hours to fix)
-   - Files: `py/backtest/historical_validation_4way.py` (662 lines)
-
-**Key Metrics**:
-- Development velocity: 6,731 lines/hour (23,568 lines in 3.5 hours)
-- Code created: 24 files, 5,568 lines
-- Documentation: 15+ files, 18,000+ lines
-- Test coverage: 25+ integration tests, zero regressions
-- Performance improvements: Temperature scaling 25.6%, backtest 2.7x, database 40%
-
-**Critical Blocker (P0)**:
-- **Issue**: R model loading failure in ensemble backtest
-- **Impact**: Cannot validate 4-way ensemble, cannot deploy to production
-- **Fix**: Debug rpy2 integration (1-2h) + implement batch prediction (2-3h)
-- **Time to fix**: 4-6 hours
-- **Fallback**: Python-only ensemble (State-Space + XGBoost, degraded performance)
-
-**Files Created**:
-- `py/calibration/temperature_scaling.py` (347 lines)
-- `tests/integration/test_temporal_safety_comprehensive.py` (841 lines)
-- `py/utils/database_pool.py`, `feature_cache.py` (746 lines)
-- `py/backtest/historical_validation_4way_optimized.py` (1,035 lines)
-- `db/optimize_indexes.sql`, `health_check.sql`, etc. (2,000+ lines)
-- `py/backtest/historical_validation_4way.py` (662 lines)
-- 15+ documentation files (18,000+ lines)
-
-**Files Modified**:
-- `models/MODEL_REGISTRY.yaml` (7 models updated, temperature scaler added)
-- `py/ensemble/enhanced_ensemble_v5.py` (temperature scaling integration)
-- Database: 7 models synced, indexes created
-
-**Next Priorities**:
-1. **CRITICAL**: Fix R model integration (P0 blocker, 4-6 hours)
-2. **HIGH**: Create ensemble v5.1 (P1, 2 hours)
-3. **HIGH**: Deploy database optimizations (P1, 2 hours + restart)
-4. **HIGH**: Re-validate 4-way ensemble after R fix (P1, 2-3 hours)
-
-**Status**: ✅ 6/7 workstreams production-ready. ⛔ 1/7 blocked (R model loading). Cannot deploy production until R model issue fixed.
-
-**Documentation**: See `docs/milestones/MULTI_AGENT_SESSION_NOV13_FINAL.md` (full session summary) and `docs/HANDOFF_NOV14.md` (detailed next steps)
-
----
-
-### November 9, 2025: BNN Investigation Complete & Model Registry Infrastructure
-
-**Context**: After 26 days and 84 person-hours, concluded BNN passing model research. Built comprehensive model registry infrastructure for production model management.
-
-**Work Performed**:
-1. **BNN Multi-Output Passing v2 Investigation** ❌ FAILED
-   - Final failure: NaN losses despite all architectural fixes
-   - Attempted 6 different approaches (Multi-Output v1, v2, Ensemble, Informative Priors, etc.)
-   - Root causes: Feature engineering (lag/rolling), data leakage, architectural limitations
-   - Dissertation Appendix I created (780 lines) documenting investigation
-
-2. **Model Registry Infrastructure** ✅ COMPLETE
-   - Created `scripts/model_registry.py` (1,179 lines, 7 commands)
-   - Created `MODEL_REGISTRY.yaml` production manifest
-   - Database sync: 8 models in sync, 227 pending registration
-   - Deleted data leakage model (`bnn_multi_output_v1.pth`, 298 MB)
-
-3. **4-Way Ensemble Configuration** ✅ FINALIZED
-   - State-Space v2 (APPROVED Nov 8) - 30% weight
-   - BNN Multi-Output v3.1 (rushing only) - 25% weight
-   - Hierarchical v2 - 25% weight
-   - XGBoost baseline - 20% weight
-   - Expected ROI: +5-7%
-
-4. **Strategic Decision**: BNN Research Line ABANDONED
-   - Only BNN v3.1 Rushing (89.5% calibrated) remains in production
-   - No further BNN passing model development
-   - Focus shifted to 4-way ensemble integration and production deployment
-
-**Files Created**:
-- `analysis/dissertation/main/appendix_bnn_investigation.tex` (780 lines)
-- `scripts/model_registry.py` (1,179 lines CLI tool)
-- `MODEL_REGISTRY.yaml` (production manifest)
-- `docs/milestones/BNN_INVESTIGATION_COMPLETE.md` (comprehensive documentation)
-
-**Files Modified**:
-- `CLAUDE.md` - Updated ensemble configuration, abandoned BNN research
-- Database: Deleted leakage model, synced 8 production models
-
-**Next Priorities**:
-1. **Phase 1.5: FastAPI Prediction Service** - Load existing models, test predictions
-2. **Phase 2: Full 4-way ensemble backtest** (2022-2024 with canonical window)
-3. **Phase 3: Model registry sync** - Register 227 pending models to database
-4. **Phase 4: Production deployment** with A/B testing
-
-**Status**: ✅ BNN investigation complete. Ready for ensemble integration and production deployment.
-
----
-
-### November 8, 2025: Docker Dashboard Complete & Production Monitoring Stack
-
-**Context**: Completed Phase 1 Docker infrastructure with Grafana + Streamlit dashboards for system monitoring. Ready to return to GPU training and 5-way ensemble integration.
-
-**Work Performed**:
-1. **Grafana Dashboard** (27 panels) ✅ COMPLETE
-   - Fixed JSON provisioning format (removed HTTP API wrapper)
-   - System Overview: CPU, Memory, Disk I/O, Network (4 panels)
-   - Database Metrics: Connections, queries, transactions, cache (8 panels)
-   - Redis Metrics: Memory, hit rate, clients, keys (6 panels)
-   - Application Metrics: Prometheus targets, storage, alerts (9 panels)
-   - Access: http://localhost:3000 (admin / sicillionbillions)  <!-- pragma: allowlist secret -->
-
-2. **Streamlit Dashboard** (4 pages) ⚠️ MOSTLY COMPLETE
-   - System Status: Service health checks (7 Docker services)
-   - Model Status: Model registry and training runs
-   - Data Summary: Database statistics (7,263 games, 1,254,173 plays)
-   - Predictions: Visualization (requires ensemble output)
-   - Fixed `actual_margin` calculation bug (dashboard/app.py:1417)
-   - Access: http://localhost:8501
-
-3. **Docker Infrastructure** (7 services healthy)
-   - PostgreSQL + TimescaleDB, Redis, Prometheus, Grafana
-   - Node Exporter, Postgres Exporter, Streamlit
-   - All services monitored and accessible
-
-**Files Created**:
-- `DOCKER_DASHBOARD_COMPLETE.md` - Comprehensive stopping point documentation
-- `grafana/provisioning/dashboards/nfl-analytics-system.json` - 27-panel dashboard (fixed)
-- `grafana/provisioning/dashboards/dashboards.yaml` - Provisioning config
-- `grafana/provisioning/dashboards/README.md` - Usage guide
-
-**Files Modified**:
-- `dashboard/Dockerfile` - Rewritten (monolithic → microservices)
-- `dashboard/app.py` - Fixed actual_margin calculation
-- `docker-compose.yml` - Fixed API dependency, added models volume mount
-
-**Next Priorities**:
-1. **Phase 1.5: FastAPI Prediction Service** - Real-time prediction API (http://localhost:8000)
-   - Load existing trained models (no GPU required)
-   - `/predict` endpoint for ensemble predictions
-   - Connect Streamlit dashboard to API
-   - Enables testing predictions before full retraining
-2. **Phase 2: GPU Docker Container** - Reproducible training environment (optional before full retraining)
-3. **Phase 3: 5-Way Ensemble Integration** - Retrain all models with canonical window, full backtest (2022-2024)
-4. **Phase 4: Real-Time Odds Integration** - Live betting support
-
-**Status**: ✅ Dashboard infrastructure complete. Ready to return to production prediction pipeline.
-
----
-
-### November 8, 2025: Canonical Training Window & State-Space Approval
-- ✅ Established canonical training window (2018-2024 + H=4 decay on 2015-2017)
-- ✅ State-space model APPROVED for production (MAE: 47.77 yards, p=0.0069)
-- ✅ Comprehensive ablation study (4 scenarios, 148 games, statistical validation)
-- ✅ Documentation: TRAINING_WINDOW_ABLATION_RESULTS.md, STATE_SPACE_FINAL_DECISION.md
-
-### November 2-3, 2025: BNN Calibration & Production Deployment
-- ✅ BNN calibrated (89.5% coverage, T=0.75 temperature scaling)
-- ✅ Automated leakage tests (10 tests, CI/CD integrated)
-- ✅ CQL bet sizer (+24% improvement, 4 risk gates)
-- ✅ Expected ROI: +5-7% (validated on clean data)
-
-_Older entries: See [RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)_
-
----
 
 ## AI Assistant Guidelines
 
