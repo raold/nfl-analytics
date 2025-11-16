@@ -120,6 +120,7 @@
 \begin{landscape}
 \begin{figure}[p]
 \centering
+\resizebox{0.95\linewidth}{!}{%
 \begin{tikzpicture}[
     node distance=2cm and 3cm,
     category/.style={rectangle, rounded corners, draw=accent_blue, thick, fill=accent_blue!10,
@@ -212,7 +213,8 @@
     All passing yard models failed due to computational, numerical, calibration, or architectural issues.
 };
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}% End resizebox
 \caption{BNN Failure Taxonomy: Root Causes by Category}
 \label{fig:bnn_failure_taxonomy}
 \end{figure}

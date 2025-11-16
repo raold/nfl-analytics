@@ -50,9 +50,12 @@ Evidential DL & Nov 4-8 & 8 & Epistemic uncertainty & NaN epoch 24 \\
 \textbf{Total} & \textbf{26 days} & \textbf{84} & --- & \textbf{0/6 success} \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textbf{Notes:} Hours = person-hours of focused research (coding, training, debugging, analysis). Outcome = primary failure mode preventing production deployment. Success rate: 0\% (all 6 approaches failed convergence, calibration, or computational tractability gates).
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} Hours = person-hours of focused research (coding, training, debugging, analysis). Outcome = primary failure mode preventing production deployment. Success rate: 0\% (all 6 approaches failed convergence, calibration, or computational tractability gates).
+\end{minipage}
 \end{table}
 
 \paragraph{Resource Distribution.}
@@ -84,9 +87,12 @@ Evidential DL & 4 & 3796488 & Normal-Inverse-Gamma & NIG loss & Epistemic + alea
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\begin{tablenotes}
-\item \textbf{Notes:} Parameters = total trainable weights including weight and bias distributions. Prior Type = weight distribution family. Inference = method for posterior approximation (VI = variational inference, ELBO = evidence lower bound, NIG = normal-inverse-gamma). Key Innovation = primary differentiating feature versus prior approaches.
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} Parameters = total trainable weights including weight and bias distributions. Prior Type = weight distribution family. Inference = method for posterior approximation (VI = variational inference, ELBO = evidence lower bound, NIG = normal-inverse-gamma). Key Innovation = primary differentiating feature versus prior approaches.
+\end{minipage}
 \end{table}
 
 \subsection{Multi-Output v1 (Oct 14-18): Data Leakage Discovery}
@@ -264,9 +270,12 @@ Conformal BNN & 41.2 & 90.0 & 133.2 \\
 \textbf{Difference} & \textbf{0.0} & \textbf{+7.7 pp} & \textbf{+56.0\%} \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textbf{Notes:} MAE in passing yards. Coverage = empirical fraction of true values within predicted intervals. Interval Width = average width of 90\% prediction intervals. Conformal BNN achieves exact 90\% coverage by inflating interval widths 56\%, making predictions less actionable for betting.
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} MAE in passing yards. Coverage = empirical fraction of true values within predicted intervals. Interval Width = average width of 90\% prediction intervals. Conformal BNN achieves exact 90\% coverage by inflating interval widths 56\%, making predictions less actionable for betting.
+\end{minipage}
 \end{table}
 
 \paragraph{Failure Mode: Betting Utility.}
@@ -345,9 +354,12 @@ Informative Priors & 1.0008 & 6234 & 5421 & 0.1 & 7.8 \\
 \textbf{Target} & \textbf{<1.01} & \textbf{>400} & \textbf{>400} & \textbf{<1\%} & \textbf{---} \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textbf{Notes:} R-hat = Gelman-Rubin convergence diagnostic (measures between-chain vs within-chain variance). ESS = effective sample size (bulk = central posterior, tail = extreme quantiles). Divergences = fraction of MCMC samples with numerical issues. Tree Depth = average HMC tree depth (higher = better exploration). All 3 approaches meet convergence criteria (R-hat <1.01, ESS >400), but failed other deployment gates (leakage, computational cost, overconstrained predictions).
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} R-hat = Gelman-Rubin convergence diagnostic (measures between-chain vs within-chain variance). ESS = effective sample size (bulk = central posterior, tail = extreme quantiles). Divergences = fraction of MCMC samples with numerical issues. Tree Depth = average HMC tree depth (higher = better exploration). All 3 approaches meet convergence criteria (R-hat <1.01, ESS >400), but failed other deployment gates (leakage, computational cost, overconstrained predictions).
+\end{minipage}
 \end{table}
 
 \paragraph{Interpretation.}
@@ -390,9 +402,12 @@ XGBoost v4 Ridge & 4.7 & --- & --- & 12 & None (approved Nov 14) \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
-\begin{tablenotes}
-\item \textbf{Notes:} MAE in passing yards (lower better). Coverage = empirical 90\% interval coverage (target 90\%). Interval Width = average width of 90\% prediction intervals (lower better, maintains utility). Inference = prediction latency per sample (target <50 ms for production). Deployment Blocker = specific reason preventing production approval. XGBoost v4 Ridge (Chapter~\ref{sec:xgboost-v4-ridge}) achieved breakthrough 88.31\% improvement after BNN abandonment.
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} MAE in passing yards (lower better). Coverage = empirical 90\% interval coverage (target 90\%). Interval Width = average width of 90\% prediction intervals (lower better, maintains utility). Inference = prediction latency per sample (target <50 ms for production). Deployment Blocker = specific reason preventing production approval. XGBoost v4 Ridge (Chapter~\ref{sec:xgboost-v4-ridge}) achieved breakthrough 88.31\% improvement after BNN abandonment.
+\end{minipage}
 \end{table}
 
 \subsection{Failure Mode Taxonomy}
@@ -414,9 +429,12 @@ Calibration Issues & 1 & Conformal BNN \\
 Computational Constraints & 1 & Ensemble BNN \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textbf{Notes:} Failure modes are mutually exclusive (each approach assigned to primary blocker). Training Instability = NaN losses during training preventing convergence. Poor Generalization = data leakage or overconstrained priors causing high test error. Calibration Issues = intervals too wide for betting utility. Computational Constraints = inference latency or training time prohibitive for production.
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} Failure modes are mutually exclusive (each approach assigned to primary blocker). Training Instability = NaN losses during training preventing convergence. Poor Generalization = data leakage or overconstrained priors causing high test error. Calibration Issues = intervals too wide for betting utility. Computational Constraints = inference latency or training time prohibitive for production.
+\end{minipage}
 \end{table}
 
 \paragraph{Training Instability (33\% of failures).}
@@ -541,9 +559,12 @@ Temporal Validation & Pass & \xmark & \checkmark & \checkmark & \checkmark \\
 \textbf{Gates Passed} & \textbf{6/6} & \textbf{4/6} & \textbf{4/6} & \textbf{5/6} & \textbf{4/4} \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item \textbf{Notes:} \checkmark = gate passed, \xmark = gate failed. Multi-Output v1 failed temporal validation (data leakage). Ensemble BNN failed inference latency and training time (computational cost). Conformal BNN failed interval width (too conservative for betting). XGBoost v4 Ridge (Chapter~\ref{sec:xgboost-v4-ridge}) passes all applicable gates. Production deployment requires \textit{all} gates to pass---no exceptions.
-\end{tablenotes}
+
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} \checkmark = gate passed, \xmark = gate failed. Multi-Output v1 failed temporal validation (data leakage). Ensemble BNN failed inference latency and training time (computational cost). Conformal BNN failed interval width (too conservative for betting). XGBoost v4 Ridge (Chapter~\ref{sec:xgboost-v4-ridge}) passes all applicable gates. Production deployment requires \textit{all} gates to pass---no exceptions.
+\end{minipage}
 \end{table}
 
 \paragraph{Practical Implication:}
