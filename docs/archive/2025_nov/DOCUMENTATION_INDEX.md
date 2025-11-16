@@ -1,355 +1,479 @@
-# Documentation Index
+# NFL Analytics Documentation Index
 
-**Last Updated:** November 8, 2025
-**Total Documents:** 274 markdown files (reorganized and consolidated)
-**Purpose:** Central navigation for all project documentation
-
----
-
-## 📖 Quick Start (New Users Start Here)
-
-| Document | Purpose | Audience |
-|----------|---------|----------|
-| **[README.md](README.md)** | Project overview, quick start guide | Everyone |
-| **[SETUP.md](SETUP.md)** | Environment setup instructions | New developers |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Git LFS, contribution guidelines | Contributors |
-
-**Estimated time to get started:** 30 minutes
+**Last Updated:** November 15, 2025
+**Total Documentation Files:** 565 markdown files (+4 from ADR infrastructure)
+**Project Version:** 4.9
+**Status:** Google Drive Removed, Ensemble v5.1 Production Ready, Infrastructure Complete
 
 ---
 
-## 🤖 For AI Assistants
+## Quick Navigation
 
-| Document | Purpose | Size |
-|----------|---------|------|
-| **[CLAUDE.md](CLAUDE.md)** ⭐ | Comprehensive AI assistant documentation | 45 KB |
-| **[AGENTS.md](AGENTS.md)** | Coding guidelines and best practices | 55 KB |
-| **[docs/agent_context/](docs/agent_context/)** | Specialized agent documentation (23 files) | Various |
-
-**Start here** if you're an AI assistant helping with this project.
-
----
-
-## 📊 Project Status & Planning
-
-### Current Status
-| Document | Last Updated | Purpose |
-|----------|--------------|---------|
-| **[PROJECT_STATUS.md](PROJECT_STATUS.md)** | Nov 3, 2025 | Current project status, recent work |
-| **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** | Nov 3, 2025 | ⚠️ DEPRECATED - Use PostgreSQL `ml.model_registry` |
-| **[PHASE_PLAN.md](PHASE_PLAN.md)** | Oct 17, 2025 | Causal inference phase plan (24 weeks) |
-
-### Recent Completions
-| Document | Date | Summary |
-|----------|------|---------|
-| **[docs/milestones/PHASE_5_COMPLETION_SUMMARY.md](docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
-| **[docs/milestones/BNN_CALIBRATION_COMPLETE.md](docs/milestones/BNN_CALIBRATION_COMPLETE.md)** | Nov 3, 2025 | BNN calibration with T=0.75 (89.5% coverage) |
-| **[analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md](analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md)** | Oct 30, 2025 | Critical data leakage findings |
-| **[analysis/OPTIMIZED_ENSEMBLE_2025_DEPLOYMENT.md](analysis/OPTIMIZED_ENSEMBLE_2025_DEPLOYMENT.md)** | Oct 30, 2025 | Ensemble deployment plan |
+- [Architecture & Design](#architecture--design) - System architecture, diagrams, design decisions
+- [Architecture Decision Records (ADRs)](#architecture-decision-records-adrs) - **NEW:** Formal decision documentation
+- [Database Documentation](#database-documentation) - Schema, SQL patterns, quick references
+- [Agent Infrastructure](#agent-infrastructure) - Multi-agent framework, specialized agents, coordinators
+- [Guides & Tutorials](#guides--tutorials) - How-to guides, quickstarts, integration patterns
+- [Milestones & Completions](#milestones--completions) - Project phases, completion summaries, achievements
+- [Audits & Reports](#audits--reports) - Comprehensive audits, findings, improvements
+- [Performance & Optimization](#performance--optimization) - Benchmarks, optimization reports, analysis
+- [Deployment & Operations](#deployment--operations) - Docker, CI/CD, production checklist, monitoring
+- [Fixes & Postmortems](#fixes--postmortems) - Bug fixes, root cause analysis, lessons learned
+- [Experiments & Research](#experiments--research) - Model experiments, BNN investigation, calibration
+- [Archive](#archive) - Historical session logs, dated records
 
 ---
 
-## 🔬 Technical Documentation
+## 📋 Full Documentation Index
 
-### Architecture & Reference
+### Architecture & Design
 
-| Document | Last Updated | Focus |
-|----------|--------------|-------|
-| **[docs/ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md)** | Nov 8, 2025 | Complete directory structure and module organization |
-| **[docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md)** | Nov 8, 2025 | Detailed component usage, APIs, and integration patterns |
+**Overview of system design, components, and technical decisions**
 
-### Core Systems
+- `docs/ARCHITECTURE_REFERENCE.md` - Comprehensive architecture documentation
+- `docs/ARCHITECTURE_ANALYSIS_NOV13_2025.md` - Deep analysis of ensemble versions (7,892 lines)
+- `docs/ARCHITECTURE_ANALYSIS_NOV2025.md` - Architecture review and assessment
+- `docs/COMPONENT_DEEP_DIVES.md` - Detailed component documentation (8 modules)
+- `docs/COMPONENT_DEPENDENCY_GRAPH.md` - Component dependencies and relationships
+- `docs/COMPUTE_SYSTEM.md` - Distributed compute architecture (Mac M4 + Windows 4090)
+- `docs/CROSS_MACHINE_DATABASE_SYNC.md` - Cross-machine synchronization
+- `docs/MIGRATION_TRACKING.md` - Migration status and tracking
 
-#### Bayesian Modeling
-| Document | Last Updated | Focus |
-|----------|--------------|-------|
-| **[docs/ADVANCED_BAYESIAN_V3.md](docs/ADVANCED_BAYESIAN_V3.md)** | Oct 13, 2025 | v3.0 technical deep dive |
-| **[docs/BAYESIAN_ENHANCEMENTS_v2.md](docs/BAYESIAN_ENHANCEMENTS_v2.md)** | Earlier | v2.5 enhancements |
-| **[docs/milestones/BAYESIAN_PROPS_COMPLETE.md](docs/milestones/BAYESIAN_PROPS_COMPLETE.md)** | - | Methodology completion |
+**Historical Architecture Decisions (Pre-ADR Framework):**
+- `docs/decisions/ADR-001-canonical-training-window.md` - 2018-2024 canonical window decision
+- `docs/decisions/ADR-002-relaxed-convergence-threshold.md` - Relaxed convergence (Rhat < 1.02)
+- `docs/decisions/ADR-003-ensemble-calibration-production.md` - Ensemble calibration strategy
+- `docs/decisions/ADR-008-hybrid-static-incremental.md` - Hybrid XGBoost implementation
+- `docs/decisions/ARCHITECTURE.md` - Architecture overview
+- `docs/decisions/ARCHITECTURE_ASSESSMENT_SUMMARY.md` - Architecture assessment
+- `docs/decisions/REDIS_CACHING_ARCHITECTURE_AUDIT.md` - Redis caching strategy
 
-#### Causal Inference
-| Document | Last Updated | Focus |
-|----------|--------------|-------|
-| **[docs/CAUSAL_INFERENCE_FRAMEWORK.md](docs/CAUSAL_INFERENCE_FRAMEWORK.md)** ⭐ | Oct 16, 2025 | 8-module framework guide |
-| **[PHASE_PLAN.md](PHASE_PLAN.md)** | Oct 17, 2025 | 24-week implementation plan |
-
-#### Database
-| Document | Last Updated | Focus |
-|----------|--------------|-------|
-| **[docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** ⭐ | Oct 30, 2025 | Comprehensive 56-table audit |
-| **[docs/database/DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md)** ⭐ **NEW** | Nov 8, 2025 | Quick lookup for common queries and column references |
-| **[docs/database/schema.md](docs/database/schema.md)** | - | Full schema documentation |
-| **[docs/database/erd.md](docs/database/erd.md)** | - | Entity-relationship diagram |
-
-#### Infrastructure
-| Document | Last Updated | Focus |
-|----------|--------------|-------|
-| **[docs/DOCKER_WORKFLOW.md](docs/DOCKER_WORKFLOW.md)** | Oct 31, 2025 | Docker setup and usage |
-| **[docs/COMPUTE_SYSTEM.md](docs/COMPUTE_SYSTEM.md)** | Oct 4, 2025 | Distributed compute (M4 + 4090) |
-| **[docs/WINDOWS_4090_SETUP.md](docs/WINDOWS_4090_SETUP.md)** | Oct 24, 2025 | GPU workstation setup |
+**C4 Models & Diagrams:**
+- `docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/c4_context.md` - C4 context diagram
+- `docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/c4_container.md` - C4 container diagram
+- `docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/c4_component_ensemble.md` - Ensemble component diagram
+- `docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/architecture_documentation_gaps.md` - Gap analysis
 
 ---
 
-## 📈 Analysis & Research
+### Architecture Decision Records (ADRs)
 
-### Recent Research (Oct 2025)
-| Document | Date | Topic |
-|----------|------|-------|
-| **[analysis/MODEL_MATRIX.md](analysis/MODEL_MATRIX.md)** | Oct 31, 2025 | Model inventory matrix |
-| **[analysis/RESEARCH_TO_OUTPUT_MAPPING.md](analysis/RESEARCH_TO_OUTPUT_MAPPING.md)** | Oct 31, 2025 | Research → output mapping |
-| **[analysis/INVESTIGATION_SUMMARY_ELEVATED_WIN_RATE.md](analysis/INVESTIGATION_SUMMARY_ELEVATED_WIN_RATE.md)** | Oct 30, 2025 | Win rate analysis |
-| **[analysis/REGULARIZATION_FEATURE_ABLATION_SUMMARY.md](analysis/REGULARIZATION_FEATURE_ABLATION_SUMMARY.md)** | Oct 30, 2025 | Feature ablation study |
+**✨ NEW: Formal documentation of significant architectural decisions (November 2025)**
 
-### Experiments
-- **[experiments/](experiments/)** - 40-experiment framework (cVAE + Causal)
-  - `expanded_experiment_suite.json` - All experiment specs
-  - `experiment_rankings.json` - ROI/EV rankings
-  - `top_10_cvae.csv`, `top_10_causal.csv` - Top experiments
+**ADR Index:**
+- `docs/adr/README.md` - **ADR index and methodology guide** (what ADRs are, when to create, best practices)
+- `docs/adr/template.md` - **Standard ADR template** (use for new ADRs)
 
----
+**Infrastructure & Deployment:**
+- `docs/adr/001-docker-compose-infrastructure.md` - **Docker Compose for Production Stack**
+  - **Status:** Accepted (2025-11-08)
+  - **Decision:** Use Docker Compose over Kubernetes for 6-service orchestration
+  - **Impact:** 99% developer experience improvement (1 command vs 30 manual commands)
+  - **Tags:** infrastructure, deployment, docker, orchestration
 
-## 🎓 Dissertation (324 Pages)
+- `docs/adr/002-git-lfs-migration.md` - **Git LFS for Model Artifact Storage**
+  - **Status:** Accepted (2025-11-14)
+  - **Decision:** Migrate from Google Drive sync to Git LFS for model versioning
+  - **Impact:** Removed 3,500 lines of sync code, native Git workflow, public deployment ready
+  - **Tags:** infrastructure, version-control, ml-model, storage
 
-| Document | Location | Purpose |
-|----------|----------|---------|
-| **Main PDF** | [analysis/dissertation/main/main.pdf](analysis/dissertation/main/main.pdf) | 324-page compiled dissertation (5.48 MB) |
-| **Main LaTeX** | [analysis/dissertation/main/main.tex](analysis/dissertation/main/main.tex) | LaTeX source |
-| **Status** | [analysis/dissertation/docs/DISSERTATION_STATUS.md](analysis/dissertation/docs/DISSERTATION_STATUS.md) | Compilation status |
-| **Chapters** | [analysis/dissertation/chapter_*/](analysis/dissertation/) | 12 chapters + appendices |
-| **Figures** | [analysis/dissertation/figures/](analysis/dissertation/figures/) | Figure generation scripts |
+**Machine Learning & Models:**
+- `docs/adr/003-xgboost-v4-ridge-residuals.md` - **XGBoost v4 Ridge Residuals Feature Engineering**
+  - **Status:** Accepted (2025-11-14)
+  - **Decision:** Two-stage architecture (Ridge baseline + XGBoost residual learning)
+  - **Impact:** 88.31% improvement (40.20 → 4.70 MAE), statistically significant across 2022-2024
+  - **Tags:** ml-model, feature-engineering, xgboost, prediction-accuracy
 
----
+**Future ADRs (Planned):**
+- ADR-004: Ensemble v6 Configuration (4-way weights)
+- ADR-005: A/B Testing Framework (MD5 hash-based routing)
+- ADR-006: Model Registry Database Schema (ml.model_metadata)
+- ADR-007: Production Deployment Strategy (cloud platform choice)
 
-## 📋 Reports & Summaries
+**Why ADRs?**
+- Preserve institutional knowledge across team changes
+- Document rationale for future reference ("Why did we do it this way?")
+- Enable informed revisiting of decisions when context changes
+- Prevent repeating past mistakes
 
-### Active Reports (2025)
-| Document | Date | Topic |
-|----------|------|-------|
-| **[docs/reports/2025_nov_session_summaries.md](docs/reports/2025_nov_session_summaries.md)** ⭐ **NEW** | Nov 3, 2025 | Consolidated Nov 2-3 session work (7 sessions) |
-| **[docs/reports/feature_engineering_complete.md](docs/reports/feature_engineering_complete.md)** | Oct 2025 | Feature engineering completion |
-| **[docs/reports/database_backfill_execution_summary.md](docs/reports/database_backfill_execution_summary.md)** | Oct 2025 | Database backfill |
-| **[docs/reports/2025_season_data_ingestion.md](docs/reports/2025_season_data_ingestion.md)** | Oct 2025 | 2025 data ingestion |
-| **[docs/reports/DATA_LEAKAGE_ANALYSIS.md](docs/reports/DATA_LEAKAGE_ANALYSIS.md)** | Nov 3, 2025 | Data leakage investigation and fixes |
-| **[docs/reports/AUTOMATED_LEAKAGE_TESTS_COMPLETE.md](docs/reports/AUTOMATED_LEAKAGE_TESTS_COMPLETE.md)** | Nov 3, 2025 | Automated leakage detection tests |
-| **[docs/reports/COMPREHENSIVE_SAFE_BACKTEST_RESULTS.md](docs/reports/COMPREHENSIVE_SAFE_BACKTEST_RESULTS.md)** | Nov 3, 2025 | Full backtest with leakage-safe features |
-
-### Archived Reports
-- **[docs/archive/2025_nov/](docs/archive/2025_nov/)** - Nov 2-3 session summaries (9 files)
-
----
-
-## 🏆 Milestones
-
-| Document | Date | Milestone |
-|----------|------|-----------|
-| **[docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)** ⭐ **NEW** | Nov 8, 2025 | Consolidated historical work log (Nov 2025-Oct 2025) |
-| **[docs/milestones/BNN_CALIBRATION_COMPLETE.md](docs/milestones/BNN_CALIBRATION_COMPLETE.md)** ⭐ **NEW** | Nov 3, 2025 | BNN calibration achieved (T=0.75, 89.5% coverage) |
-| **[docs/milestones/PHASE_5_COMPLETION_SUMMARY.md](docs/milestones/PHASE_5_COMPLETION_SUMMARY.md)** | Oct 30, 2025 | Phase 5 feature engineering complete |
-| **[docs/milestones/PHASES_2-4_COMPLETE.md](docs/milestones/PHASES_2-4_COMPLETE.md)** | Earlier | Phases 2-4 completion |
-| **[docs/milestones/SCHEMA_FIXES_COMPLETE.md](docs/milestones/SCHEMA_FIXES_COMPLETE.md)** | Earlier | Database schema fixes |
-| **[docs/milestones/CQL_COMPLETE_SUMMARY.md](docs/milestones/CQL_COMPLETE_SUMMARY.md)** | Oct 9, 2025 | CQL training complete (24% improvement) |
-| **[docs/milestones/COMPILATION_SUCCESS.md](docs/milestones/COMPILATION_SUCCESS.md)** | Oct 19, 2025 | Dissertation compilation success |
-| **[docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md](docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md)** | - | Simulator validation |
+**Creating New ADRs:**
+1. Copy `docs/adr/template.md` to `docs/adr/XXX-title.md`
+2. Fill out sections (context, decision, alternatives, consequences)
+3. Review with team and finalize
+4. Update `docs/adr/README.md` index
 
 ---
 
-## 🛠️ Implementation Guides
+### Database Documentation
 
-### Feature Engineering
-- **[py/features/](py/features/)** - Feature engineering modules (15+ files)
-- **[docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** - Schema integration patterns
+**Schema, queries, patterns, and quick references**
 
-### Model Training & Validation
-- **[R/](R/)** - R statistical models (50+ files)
-- **[py/models/](py/models/)** - Python ML models
-- **[docs/models/MODEL_REGISTRY.md](docs/models/MODEL_REGISTRY.md)** - ⚠️ DEPRECATED (use PostgreSQL `ml.model_registry`)
-- **[scripts/sync_model_registry.py](scripts/sync_model_registry.py)** - Database/filesystem sync tool
-- **[docs/TRAINING_WINDOW_ABLATION_RESULTS.md](docs/TRAINING_WINDOW_ABLATION_RESULTS.md)** ⭐ **NEW** - Ablation study results (500+ lines, Nov 8, 2025)
-- **[docs/STATE_SPACE_FINAL_DECISION.md](docs/STATE_SPACE_FINAL_DECISION.md)** ⭐ **NEW** - GO/NO-GO decision analysis (400+ lines, Nov 8, 2025)
-- **[docs/STATE_SPACE_2025_HOLDOUT_VALIDATION.md](docs/STATE_SPACE_2025_HOLDOUT_VALIDATION.md)** - 2025 hold-out validation results
-- **[docs/STATE_SPACE_MODELING_COMPLETE_JOURNEY.md](docs/STATE_SPACE_MODELING_COMPLETE_JOURNEY.md)** - Complete modeling journey (4 attempts)
+**Core References:**
+- `docs/database/DATABASE_QUICK_REFERENCE.md` - 257 columns, connection info, critical conventions
+- `docs/database/SQL_PATTERNS.md` - Canonical SQL query patterns (CRITICAL: join patterns, schema-first discipline)
+- `docs/database/schema.md` - Full schema definition
+- `docs/database/erd.md` - Entity-relationship diagram
+- `docs/DATABASE_QUICK_START.md` - Quick start guide for database setup
+- `docs/DATABASE_SCHEMA_AUDIT.md` - Complete schema audit (56 tables, 5 schemas)
 
-### Testing
-- **[tests/README.md](tests/README.md)** - Testing framework guide
-- **[scripts/setup_testing.sh](scripts/setup_testing.sh)** - Test environment setup
+**ML-Specific:**
+- `docs/database/ML_PREDICTIONS_SCHEMA_COMPLETE.md` - ML predictions schema
+- `docs/database/ML_PREDICTIONS_TABLE_GUIDE.md` - ML predictions table usage
+- `docs/database/ML_PREDICTIONS_TABLE_SUMMARY.md` - Summary of ML predictions
+- `docs/database/SQL_ERROR_PREVENTION_SUMMARY.md` - Error prevention patterns
 
-### Common Tasks & Workflows
-- **[docs/guides/COMMON_TASKS_REFERENCE.md](docs/guides/COMMON_TASKS_REFERENCE.md)** ⭐ **NEW** - Cookbook of frequent development tasks and workflows
-- **[docs/guides/PRODUCTION_DEPLOYMENT_PLAN.md](docs/guides/PRODUCTION_DEPLOYMENT_PLAN.md)** - Production deployment checklist
+**Fixes & Patterns:**
+- `docs/fixes/PLAYER_GAME_STATS_JOIN_REFERENCE.md` - Correct join patterns (game_id missing)
+- `docs/fixes/SQL_SCHEMA_AUDIT_NOV14.md` - Schema error audit (documented "DOZENS of times")
+
+**Data Ingestion:**
+- `docs/DATA_INGESTION_FIX_NOV7.md` - Data ingestion fixes
+- `docs/DATA_INGESTION_STATUS_NOV7.md` - Data ingestion status
+- `docs/DATABASE_OPTIMIZATION_COMPLETE.md` - Database optimization (indexes, pooling)
+- `docs/data-dictionary/README.md` - Data dictionary reference
+
+### Agent Infrastructure
+
+**Multi-agent framework, specialized agents, task routing**
+
+**Core Framework:**
+- `docs/AGENT_COORDINATOR_GUIDE.md` - Comprehensive agent coordinator guide
+- `docs/agent_context/README.md` - Agent context overview
+- `docs/AGENTS.md` - Agent reference documentation
+- `docs/agent_context/AGENTS.md` - Detailed agent listing
+- `docs/CLI_TOOL_SUMMARY.md` - CLI tool reference (11 tools)
+
+**Phase 1: Security & Quality:**
+- Code reviewer, Security auditor, Data leakage detector
+- `docs/PHASE_1_AGENT_ENHANCEMENTS.md` - Phase 1 implementation (referenced in CLAUDE.md)
+
+**Phase 2-3: Performance & Deployment:**
+- Performance optimizer, Test generator, Statistical validator
+- Ensemble orchestrator, Betting strategy validator
+- `docs/PHASE_2_3_INTEGRATION_COMPLETE.md` - Phases 2-3 integration guide
+
+**Phase 4: Critical Infrastructure (Nov 14, 2025):**
+- Ensemble health monitor, Model registry auditor, Sports analytics validator
+- `docs/AGENT_AUDIT_NOV14.md` - Phase 4 audit and implementation
+- `docs/guides/TASK_TOOL_INTEGRATION.md` - Task tool integration guide (403 lines)
+
+**Enforcement Framework:**
+- `docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md` - Complete enforcement framework (7 rules, BLOCKING/WARNING/INFO levels)
+- `docs/ENFORCEMENT_FRAMEWORK_PHASE_2.md` - Phase 2 enhancements (14 rules total)
+- `docs/ENFORCEMENT_FRAMEWORK_PHASE_3.md` - Phase 3 enhancements
+
+**Subagent Context:**
+- `docs/agent_context/SUBAGENT_COORDINATION.md` - Subagent coordination
+- `docs/agent_context/SUBAGENT_DEVOPS.md` - DevOps agent
+- `docs/agent_context/SUBAGENT_DEVOPS_PARALLEL_ORCHESTRATOR.md` - Parallel orchestrator
+- `docs/agent_context/SUBAGENT_ETL.md` - ETL agent
+- `docs/agent_context/SUBAGENT_ETL_PARALLEL_ORCHESTRATOR.md` - ETL parallel orchestrator
+- `docs/agent_context/SUBAGENT_DISTRIBUTED_TRAINING_COORDINATOR.md` - Training coordinator
+- `docs/agent_context/SUBAGENT_RESEARCH_ANALYTICS.md` - Research analytics agent
+- `docs/agent_context/SUBAGENT_ACADEMIC_PUBLISHING.md` - Academic publishing agent
+- `docs/agent_context/SUBAGENT_IMPLEMENTATION_SUMMARY.md` - Implementation summary
+- `docs/agent_context/SUBAGENT_QUICK_REFERENCE.md` - Quick reference
+
+**Specialized Monitoring:**
+- `docs/audits/2025_11_comprehensive_audit/13_ensemble_health_monitor.md` - Ensemble health monitoring
+- `docs/audits/2025_11_comprehensive_audit/14_model_registry_audit.md` - Model registry audit
+- `docs/audits/2025_11_comprehensive_audit/15_sports_analytics_validation.md` - Sports analytics validation
+
+### Guides & Tutorials
+
+**How-to guides, quickstarts, integration patterns, references**
+
+**Getting Started:**
+- `docs/guides/COMMON_TASKS_REFERENCE.md` - Common development tasks
+- `docs/guides/QUICKSTART_COMPUTE.md` - Compute system quickstart
+- `docs/guides/API_QUICKSTART.md` - FastAPI quickstart
+
+**Workflows & Integration:**
+- `docs/guides/GIT_LFS_WORKFLOW.md` - Git LFS cross-machine sync workflow (425 lines)
+- `docs/guides/TASK_TOOL_INTEGRATION.md` - Task tool integration patterns (403 lines)
+- `docs/guides/DEPLOYMENT_GUIDE.md` - Production deployment guide
+- `docs/guides/PRODUCTION_DEPLOYMENT_PLAN.md` - Detailed deployment plan
+- `docs/guides/TESTING_GUIDE.md` - Testing framework and patterns
+- `docs/guides/TEMPERATURE_SCALER_V6_USAGE.md` - Temperature scaling usage
+- `docs/guides/R_MODEL_INTERFACE_GUIDE.md` - R model interface for Python
+
+**Specialized Quickstarts:**
+- `docs/guides/EVIDENTIAL_REGRESSION_QUICKSTART.md` - Evidential regression guide
+- `docs/BFS_INTEGRATION_QUICK_START.md` - Brute force search integration
+- `docs/BFS_EXPERIMENT_5_QUICK_START.md` - BFS Experiment 5 quickstart
+- `docs/EXP7_QUICK_START.md` - Experiment 7 (Ridge residuals) quickstart
+- `docs/DOCKER_PHASE1_SETUP.md` - Docker Phase 1 setup guide
+- `docs/DOCKER_WORKFLOW.md` - Docker workflow patterns
+
+**Infrastructure Setup:**
+- `docs/deployment/DEPLOYMENT_QUICK_REFERENCE.md` - Deployment quick reference
+- `docs/deployment/VALIDATION_QUICK_REFERENCE.md` - Validation quick reference
+- `docs/deployment/AB_TEST_QUICK_REFERENCE.md` - A/B test quick reference
+- `docs/deployment/CICD_QUICK_REFERENCE.md` - CI/CD quick reference
+
+### Milestones & Completions
+
+**Major project phases, feature completions, achievements**
+
+**Recent Completions (Nov 2025):**
+- `docs/milestones/SESSION_COMPLETE_NOV14.md` - Session completion (Nov 14)
+- `docs/milestones/ENFORCEMENT_FRAMEWORK_PHASE_2_COMPLETE.md` - Framework Phase 2 complete
+- `docs/milestones/ENSEMBLE_V6_COMPLETE_NOV14.md` - Ensemble v6 completion
+- `docs/milestones/ENSEMBLE_V6_BACKTEST_SCRIPT_COMPLETE.md` - Backtest script complete
+- `docs/milestones/TEMPERATURE_SCALER_V6_TRAINING_COMPLETE.md` - Temperature scaling complete
+- `docs/milestones/MULTI_AGENT_SESSION_NOV13_FINAL.md` - Multi-agent session (Nov 13)
+
+**Infrastructure & Deployment:**
+- `docs/milestones/MONITORING_INTEGRATION_COMPLETE.md` - Monitoring complete
+- `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` - R model integration complete
+- `docs/milestones/MODEL_LOADING_IMPLEMENTATION_COMPLETE.md` - Model loading complete
+- `docs/milestones/PHASE_1_5_COMPLETE.md` - Phase 1.5 (FastAPI) complete
+- `docs/milestones/HYBRID_XGBOOST_INTEGRATION_COMPLETE.md` - Hybrid XGBoost integration complete
+
+**Ensemble & Modeling:**
+- `docs/milestones/5_PHASE_ENHANCEMENT_COMPLETE.md` - Phase 5 enhancements
+- `docs/milestones/ENSEMBLE_TESTING_REPORT.md` - Ensemble testing results
+- `docs/milestones/ENSEMBLE_WEIGHT_OPTIMIZATION_COMPLETE.md` - Weight optimization complete
+- `docs/milestones/ENSEMBLE_RESEARCH_SYNTHESIS.md` - Ensemble research synthesis
+- `docs/milestones/PHASES_2-4_COMPLETE.md` - Phases 2-4 completion
+- `docs/milestones/PHASE1_IMPLEMENTATION_GUIDE.md` - Phase 1 implementation guide
+- `docs/milestones/PHASE_1_COMPLETE_SUMMARY.md` - Phase 1 completion summary
+- `docs/milestones/PHASE4_PHASE5_DISSERTATION_INTEGRATION.md` - Dissertation integration
+
+**Calibration & Validation:**
+- `docs/milestones/BNN_CALIBRATION_COMPLETE.md` - BNN calibration complete
+- `docs/milestones/TEMPERATURE_SCALER_INTEGRATION_COMPLETE.md` - Temperature scaler integration
+- `docs/milestones/TEMPERATURE_SCALING_COMPLETE.md` - Temperature scaling complete
+- `docs/milestones/TEMPORAL_SAFETY_IMPLEMENTATION_SUMMARY.md` - Temporal safety summary
+- `docs/milestones/SPORTS_ANALYTICS_VALIDATOR_COMPLETE.md` - Sports validator complete
+
+**Data & Feature Engineering:**
+- `docs/milestones/DATABASE_INGESTION_VALIDATION.md` - Database ingestion validation
+- `docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md` - Simulator validation complete
+- `docs/milestones/CQL_COMPLETE_SUMMARY.md` - CQL training results
+- `docs/milestones/COMPILATION_SUCCESS.md` - Dissertation compilation success
+- `docs/milestones/BAYESIAN_PROPS_COMPLETE.md` - Bayesian props methodology complete
+
+**BNN & Advanced Modeling:**
+- `docs/milestones/BNN_INVESTIGATION_COMPLETE.md` - BNN investigation complete (6 approaches, 84 hours)
+- `docs/milestones/ADVANCED_BAYESIAN_V3_COMPLETE.md` - Advanced Bayesian v3.0 complete
+- `docs/milestones/RECENT_WORK_HISTORY.md` - Complete work history
+
+### Audits & Reports
+
+**Comprehensive audits, system assessments, improvement recommendations**
+
+**November 2025 Comprehensive Audit (19 agents):**
+- `docs/audits/2025_11_comprehensive_audit/README.md` - Audit overview
+- `docs/audits/2025_11_comprehensive_audit/01_codebase_structure.md` - Codebase structure analysis
+- `docs/audits/2025_11_comprehensive_audit/02_data_layer.md` - Database and data layer
+- `docs/audits/2025_11_comprehensive_audit/03_model_training.md` - Model training infrastructure
+- `docs/audits/2025_11_comprehensive_audit/04_prediction_engine.md` - Prediction engine
+- `docs/audits/2025_11_comprehensive_audit/05_testing_coverage.md` - Testing coverage gaps
+- `docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/` - C4 diagrams (context, container, component)
+- `docs/audits/2025_11_comprehensive_audit/07_documentation_quality.md` - Documentation quality assessment
+- `docs/audits/2025_11_comprehensive_audit/08_technical_debt.md` - Technical debt inventory
+- `docs/audits/2025_11_comprehensive_audit/09_security_audit.md` - Security vulnerabilities
+- `docs/audits/2025_11_comprehensive_audit/10_performance_bottlenecks.md` - Performance analysis
+- `docs/audits/2025_11_comprehensive_audit/11_deployment_readiness.md` - Production deployment readiness
+- `docs/audits/2025_11_comprehensive_audit/12_git_hygiene.md` - Git and versioning practices
+- `docs/audits/2025_11_comprehensive_audit/13_ensemble_health_monitor.md` - Ensemble health monitoring
+- `docs/audits/2025_11_comprehensive_audit/14_model_registry_audit.md` - Model registry audit (337 pending)
+- `docs/audits/2025_11_comprehensive_audit/15_sports_analytics_validation.md` - Sports analytics validation
+- `docs/audits/2025_11_comprehensive_audit/audit_summary.md` - Executive summary
+- `docs/audits/2025_11_comprehensive_audit/prioritized_action_plan.md` - Prioritized action plan
+
+**Infrastructure Audits:**
+- `docs/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` - Infrastructure audit (Nov 15)
+- `docs/FILE_ORGANIZATION_AUDIT_COMPLETE.md` - File organization audit
+- `docs/INFRASTRUCTURE_FIXES_INDEX.md` - Infrastructure fixes index
+- `docs/LA_TEAM_ABBREVIATION_FIX_NOV15.md` - LA team abbreviation fix
+
+**Model Audits:**
+- `docs/models/BNN_MODEL_INVENTORY.md` - BNN model inventory
+- `docs/models/ENSEMBLE_MODEL_COMPARISON.md` - Ensemble model comparison
+- `docs/models/MODEL_SELECTION_MATRIX.md` - Model selection criteria
+
+### Performance & Optimization
+
+**Benchmarks, optimization reports, performance analysis**
+
+**Compute & Speed:**
+- `docs/performance/ARCHITECTURE_COMPUTE_ANALYSIS.md` - Compute architecture analysis
+- `docs/performance/BATCH_PREDICTION_OPTIMIZATION.md` - Batch prediction optimization
+- `docs/performance/MAC_M4_MPS_OPTIMIZATION_OPPORTUNITIES.md` - Mac M4 MPS optimization
+- `docs/performance/MPS_OPTIMIZATION_QUICKSTART.md` - MPS optimization quickstart
+- `docs/performance/QUICK_START_MPS_OPTIMIZATION.md` - Quick start guide
+
+**Model Performance:**
+- `docs/performance/ENSEMBLE_ABLATION_STUDY.md` - Ensemble ablation study
+- `docs/performance/TRAINING_WINDOW_ABLATION_RESULTS.md` - Training window ablation results
+- `docs/performance/STATE_SPACE_FINAL_DECISION.md` - State-space final decision (47.77 MAE approved)
+- `docs/performance/ARCHITECTURE_DIAGRAMS.md` - Performance architecture diagrams
+
+**Calibration & Validation:**
+- `docs/experiments/CALIBRATION_VALIDATION_RESULTS.md` - Calibration validation results
+- `docs/experiments/BNN_CALIBRATION_PRODUCTION.md` - BNN calibration production
+- `docs/experiments/TEMPERATURE_SCALING_VALIDATION.md` - Temperature scaling validation
+
+### Deployment & Operations
+
+**Docker, CI/CD, production checklist, monitoring**
+
+**Docker Infrastructure:**
+- `docs/deployment/DOCKER_DASHBOARD_COMPLETE.md` - Docker dashboard complete (27 Grafana panels)
+- `docs/DOCKER_PHASE1_SETUP.md` - Docker Phase 1 setup
+- `docs/DOCKER_WORKFLOW.md` - Docker workflow patterns
+
+**Deployment Guides:**
+- `docs/deployment/DEPLOYMENT_LOG_NOV15.md` - Deployment log (Nov 15)
+- `docs/deployment/PRODUCTION_DEPLOYMENT_CHECKLIST.md` - Production checklist
+- `docs/deployment/DEPLOYMENT_QUICK_REFERENCE.md` - Deployment quick reference
+- `docs/deployment/AB_TEST_QUICK_REFERENCE.md` - A/B test quick reference
+- `docs/deployment/CICD_QUICK_REFERENCE.md` - CI/CD quick reference
+
+**Production Sessions:**
+- `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` - Production deployment complete
+- `docs/archive/2025_nov/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md` - Google Drive removal session
+- `docs/archive/2025_nov/SESSION_NOV13_MULTI_AGENT_PARALLEL.md` - Multi-agent parallel session
+
+**Monitoring:**
+- `docs/milestones/MONITORING_INTEGRATION_COMPLETE.md` - Monitoring complete (Prometheus + Grafana)
+
+### Fixes & Postmortems
+
+**Bug fixes, root cause analysis, lessons learned**
+
+**SQL Schema Fixes:**
+- `docs/fixes/SQL_SCHEMA_AUDIT_NOV14.md` - Schema error audit (documented "DOZENS of times")
+- `docs/fixes/PLAYER_GAME_STATS_JOIN_REFERENCE.md` - Correct join patterns (game_id missing)
+
+**Model Fixes:**
+- `docs/fixes/INCREMENTAL_XGB_BASELINE_ERROR_POSTMORTEM.md` - Incremental XGBoost postmortem
+- `docs/fixes/R_MODEL_INTEGRATION_FIX_NOV15.md` - R model integration fix
+
+**Infrastructure Fixes:**
+- `docs/fixes/LA_TEAM_ABBREVIATION_FIX_NOV15.md` - LA team abbreviation fix
+- `docs/DATA_INGESTION_FIX_NOV7.md` - Data ingestion fix
+
+**Postmortems:**
+- `docs/POSTMORTEMS.md` - Comprehensive postmortem collection
+
+### Experiments & Research
+
+**Model experiments, BNN investigation, calibration**
+
+**BNN Investigation (Nov 9, 2025):**
+- `docs/experiments/BNN_INVESTIGATION_COMPLETE.md` - BNN investigation complete (6 approaches, 84 hours)
+- `docs/experiments/BNN_MULTI_OUTPUT_V1_RESULTS.md` - BNN multi-output v1 results
+- `docs/experiments/BNN_MULTI_OUTPUT_V2_RESULTS.md` - BNN multi-output v2 results
+- `analysis/dissertation/main/appendix_bnn_investigation.tex` - Dissertation Appendix I (780 lines)
+
+**XGBoost Experiments:**
+- `docs/experiments/BFS_INTEGRATION_QUICK_START.md` - BFS integration quickstart
+- `docs/experiments/BFS_EXPERIMENT_5_QUICK_START.md` - BFS Experiment 5
+- `docs/EXP7_QUICK_START.md` - Experiment 7 (Ridge residuals) quickstart
+- `XGBOOST_V4_VALIDATION_COMPLETE.md` - XGBoost v4 validation complete (88.31% improvement)
+
+**Calibration:**
+- `docs/experiments/CALIBRATION_VALIDATION_RESULTS.md` - Calibration validation results
+- `docs/experiments/BNN_CALIBRATION_PRODUCTION.md` - BNN calibration production
+- `docs/experiments/TEMPERATURE_SCALING_VALIDATION.md` - Temperature scaling validation
+
+**State-Space:**
+- `docs/performance/STATE_SPACE_FINAL_DECISION.md` - State-space final decision (47.77 MAE approved)
+- `docs/performance/TRAINING_WINDOW_ABLATION_RESULTS.md` - Training window ablation
+
+### Archive
+
+**Historical session logs, dated records**
+
+**November 2025:**
+- `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` - Production deployment
+- `docs/archive/2025_nov/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md` - Google Drive removal
+- `docs/archive/2025_nov/SESSION_NOV13_MULTI_AGENT_PARALLEL.md` - Multi-agent parallel
+- `docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` - Infrastructure audit
+- `docs/archive/2025_nov/LA_TEAM_ABBREVIATION_FIX_NOV15.md` - LA fix
+
+**October 2025:**
+- `docs/archive/2025_oct/` - October sessions (TikZ standardization, advanced Bayesian, CQL)
+
+**September 2025 and earlier:**
+- `docs/archive/2025_sep/` - September sessions
+- Older archives organized by month
 
 ---
 
-## 📦 Code Module Documentation
+## Documentation Statistics
 
-### Python Modules
-| Module | Documentation | Purpose |
-|--------|---------------|---------|
-| **py/causal/** | [py/causal/README.md](py/causal/README.md) | Causal inference (8 modules) |
-| **py/features/** | ❌ Missing README | Feature engineering |
-| **py/models/** | ❌ Missing README | ML models |
-| **py/ensemble/** | ❌ Missing README | Ensemble methods |
-| **py/backtests/** | ❌ Missing README | Backtesting framework |
+### By Category
 
-### R Modules
-| Module | Documentation | Purpose |
-|--------|---------------|---------|
-| **R/** | ❌ Missing README | R statistical modeling |
+| Category | Count | Percentage |
+|----------|-------|------------|
+| Architecture & Design | 12 | 2.1% |
+| **ADRs (NEW)** | **4** | **0.7%** |
+| Database Documentation | 15 | 2.7% |
+| Agent Infrastructure | 25 | 4.4% |
+| Guides & Tutorials | 30 | 5.3% |
+| Milestones & Completions | 40 | 7.1% |
+| Audits & Reports | 25 | 4.4% |
+| Performance & Optimization | 15 | 2.7% |
+| Deployment & Operations | 20 | 3.5% |
+| Fixes & Postmortems | 10 | 1.8% |
+| Experiments & Research | 20 | 3.5% |
+| Archive | 349 | 61.8% |
 
----
+### Recent Additions (November 15, 2025)
 
-## 🗂️ Documentation Categories (All 267 Files)
-
-### By Location
-- **Root Level:** 10 files (core documentation)
-- **docs/:** 121 files (technical docs, reports, guides)
-- **analysis/:** 42 files (research, dissertation, experiments)
-- **Dissertation:** 9 files (dissertation-specific docs)
-- **Tests:** 2 files (testing documentation)
-- **Code READMEs:** 35 files (scattered across modules)
-
-### By Purpose
-- **Getting Started:** 5 files
-- **Technical/API:** 30+ files
-- **Reports/Analysis:** 40+ files
-- **Milestones:** 13 files
-- **Status/Planning:** 15+ files
-- **Agent Context:** 23 files
-- **Dissertation:** 50+ files
+**ADR Infrastructure (+4 files, +1,500 lines):**
+- `docs/adr/README.md` - ADR index and methodology (comprehensive guide)
+- `docs/adr/template.md` - Standard ADR template (reusable)
+- `docs/adr/001-docker-compose-infrastructure.md` - Docker Compose decision
+- `docs/adr/002-git-lfs-migration.md` - Git LFS migration decision
+- `docs/adr/003-xgboost-v4-ridge-residuals.md` - XGBoost v4 decision
 
 ---
 
-## ⚠️ Critical Documents (Must Read)
+## Quick Access
 
-### For Understanding Data Issues
-1. **[analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md](analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md)** - 81% win rate investigation
-2. **[docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** - Column naming standards
+### Most Referenced Documents
 
-### For Understanding System Architecture
-1. **[CLAUDE.md](CLAUDE.md)** - Complete system overview (45 KB)
-2. **[docs/ADVANCED_BAYESIAN_V3.md](docs/ADVANCED_BAYESIAN_V3.md)** - Bayesian architecture
-3. **[docs/CAUSAL_INFERENCE_FRAMEWORK.md](docs/CAUSAL_INFERENCE_FRAMEWORK.md)** - Causal inference design
+1. `CLAUDE.md` - AI assistant instructions (4.9, 529 lines)
+2. `docs/database/DATABASE_QUICK_REFERENCE.md` - Database schema (257 columns)
+3. `docs/database/SQL_PATTERNS.md` - SQL query patterns (CRITICAL)
+4. `docs/guides/GIT_LFS_WORKFLOW.md` - Git LFS workflow (425 lines)
+5. `docs/adr/README.md` - **NEW:** ADR index and methodology
 
-### For Current Work
-1. **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - What's happening now
-2. **[PHASE_5_COMPLETION_SUMMARY.md](PHASE_5_COMPLETION_SUMMARY.md)** - Recent completions
-3. **[RETRAINING_STATUS.md](RETRAINING_STATUS.md)** - Model training status
+### Essential Reading for New Team Members
 
----
+1. `README.md` - Project overview
+2. `SETUP.md` - Installation guide
+3. `CLAUDE.md` - Project conventions and status
+4. `docs/guides/COMMON_TASKS_REFERENCE.md` - Common tasks
+5. `docs/adr/README.md` - **NEW:** Understanding architectural decisions
 
-## 🔍 Finding Documentation
+### Latest Updates (November 15, 2025)
 
-### By Topic
-
-**Bayesian Modeling:**
-- Start: [docs/ADVANCED_BAYESIAN_V3.md](docs/ADVANCED_BAYESIAN_V3.md)
-- Older work: [docs/BAYESIAN_ENHANCEMENTS_v2.md](docs/BAYESIAN_ENHANCEMENTS_v2.md)
-
-**Causal Inference:**
-- Start: [docs/CAUSAL_INFERENCE_FRAMEWORK.md](docs/CAUSAL_INFERENCE_FRAMEWORK.md)
-- Plan: [PHASE_PLAN.md](PHASE_PLAN.md)
-
-**Database:**
-- Schema audit: [docs/DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)
-- Full schema: [docs/database/schema.md](docs/database/schema.md)
-
-**Docker/Deployment:**
-- Workflow: [docs/DOCKER_WORKFLOW.md](docs/DOCKER_WORKFLOW.md)
-- Windows GPU: [docs/WINDOWS_4090_SETUP.md](docs/WINDOWS_4090_SETUP.md)
-
-**Dissertation:**
-- Status: [analysis/dissertation/docs/DISSERTATION_STATUS.md](analysis/dissertation/docs/DISSERTATION_STATUS.md)
-- Main file: [analysis/dissertation/main/main.tex](analysis/dissertation/main/main.tex)
+1. ✨ **NEW:** ADR infrastructure (4 files, comprehensive decision documentation)
+2. `docs/deployment/DEPLOYMENT_LOG_NOV15.md` - Latest deployment
+3. `XGBOOST_V4_VALIDATION_COMPLETE.md` - XGBoost v4 validation
+4. `docs/archive/2025_nov/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md` - Google Drive removal
 
 ---
 
-## 📝 Documentation Standards
+## Maintenance
 
-### File Naming
-- Root-level: `SCREAMING_SNAKE_CASE.md` (e.g., `PROJECT_STATUS.md`)
-- Subdirectories: `lowercase_with_underscores.md` (e.g., `feature_engineering_complete.md`)
-- README files: Always `README.md` (case-sensitive)
+**Index Custodian:** Project Team (rotating quarterly)
 
-### Required Sections
-All major documentation should include:
-1. Last Updated date
-2. Purpose/Overview
-3. Table of Contents (for long docs)
-4. Usage examples (for technical docs)
-5. Related documentation links
+**Update Frequency:**
+- Major updates: Weekly during active development
+- Minor updates: As documentation is created/modified
+- Full audit: Monthly
 
-### Maintenance
-- Update PROJECT_STATUS.md after major milestones
-- Add completion summaries to relevant docs/ subdirectories
-- Archive pre-2025 reports to docs/archive/
-- Keep DOCUMENTATION_INDEX.md current
+**Last Audit:** November 15, 2025
 
 ---
 
-## 🎯 Documentation Improvement Roadmap
-
-### Completed ✅
-- Comprehensive documentation audit (Nov 1, 2025)
-- Central navigation index (this file)
-- Critical file updates (PROJECT_STATUS.md, RETRAINING_STATUS.md)
-
-### In Progress 🔄
-- Consolidate duplicate files (CLAUDE.md, AGENTS.md)
-- Archive old reports to docs/archive/2024/
-- Merge overlapping docs (PROPS, CQL, status)
-
-### Planned 📋
-- Add missing READMEs (py/features, py/models, R/)
-- Create CHANGELOG.md
-- Add LICENSE file
-- Broken link checker (automated)
-- Documentation versioning
-
----
-
-## 📞 Getting Help
-
-**Can't find what you need?**
-
-1. **Search:** Use `grep -r "topic" . --include="*.md"` in project root
-2. **AI Assistants:** Start with [CLAUDE.md](CLAUDE.md)
-3. **Recent Work:** Check [PROJECT_STATUS.md](PROJECT_STATUS.md)
-4. **Code:** Look for README.md in relevant subdirectory
-
-**Found an issue with documentation?**
-- Outdated information: Update and commit
-- Missing documentation: Create and add to this index
-- Broken links: Fix and validate
-- Unclear content: Clarify and add examples
-
----
-
-## 📊 Documentation Health
-
-**Last Audit:** November 3, 2025
-**Total Files:** 267 markdown files (reorganized)
-**Overall Grade:** A- (Excellent foundation, well-organized)
-
-**Strengths:**
-- ✅ Comprehensive coverage (267 files)
-- ✅ Excellent recent updates (Oct 30-Nov 3, 2025)
-- ✅ Strong technical documentation
-- ✅ Good milestone tracking
-- ✅ Central index complete ⭐
-- ✅ Session summaries consolidated ⭐
-- ✅ Archive structure created ⭐
-
-**Recent Improvements (Nov 3, 2025):**
-- ✅ Consolidated 7 session files → 1 comprehensive summary
-- ✅ Moved 9 files to archive (docs/archive/2025_nov/)
-- ✅ Organized milestones, reports, guides directories
-- ✅ Migrated model registry to PostgreSQL
-- ✅ Created automation script (sync_model_registry.py)
-
-**Remaining Improvements:**
-- ⚠️ Missing CHANGELOG and LICENSE
-- ⚠️ Some module READMEs needed (py/features, py/models)
-
----
-
-**This index is maintained as part of the documentation cleanup initiative (Nov 2025).**
-**Last updated:** November 3, 2025 by Claude Code
+**Version:** 5.0 (+ADR infrastructure)
+**Last Updated:** 2025-11-15
+**Maintainer:** Claude Code (Sonnet 4.5)

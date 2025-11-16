@@ -657,7 +657,7 @@ class EnhancedEnsemble5Way:
         Predict using Hierarchical Bayesian v2.
 
         Uses R interface (rpy2 + brms) to generate posterior predictions.
-        Includes allow_new_levels=True for new/unseen factor levels.
+        Note: allow_new_levels is handled internally by R interface.
 
         Returns:
             (mean_prediction, std_prediction)
@@ -666,7 +666,7 @@ class EnhancedEnsemble5Way:
         if self.r_interface is not None and self.hierarchical_path.exists():
             result = self.r_interface.predict_hierarchical(
                 player_id, season, week, self.hierarchical_path,
-                ndraws=1000, allow_new_levels=True
+                ndraws=1000
             )
             if result is not None:
                 return result
@@ -730,7 +730,7 @@ class EnhancedEnsemble5Way:
         Predict using Informative Priors v2.
 
         Uses R interface (rpy2 + brms) to generate posterior predictions.
-        Includes allow_new_levels=True for new/unseen factor levels.
+        Note: allow_new_levels is handled internally by R interface.
 
         Returns:
             (mean_prediction, std_prediction)
@@ -739,7 +739,7 @@ class EnhancedEnsemble5Way:
         if self.r_interface is not None and self.informative_path.exists():
             result = self.r_interface.predict_informative_priors(
                 player_id, season, week, self.informative_path,
-                ndraws=1000, allow_new_levels=True
+                ndraws=1000
             )
             if result is not None:
                 return result

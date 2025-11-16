@@ -36,7 +36,7 @@ import psycopg
 def test_db_dsn() -> str:
     """
     Return database connection string for tests.
-    
+
     Uses TEST_DATABASE_URL if set, otherwise falls back to a test database.
     """
     return os.getenv(
@@ -49,12 +49,12 @@ def test_db_dsn() -> str:
 def db_connection(test_db_dsn: str) -> Generator[psycopg.Connection, None, None]:
     """
     Provide a fresh database connection for each test.
-    
+
     Automatically rolls back changes after the test completes.
     """
     conn = psycopg.connect(test_db_dsn)
     conn.autocommit = False
-    
+
     try:
         yield conn
         conn.rollback()  # Rollback any changes
@@ -82,7 +82,7 @@ def sample_snapshot_time() -> dt.datetime:
 def sample_odds_api_response() -> dict:
     """
     Return a sample response from The Odds API.
-    
+
     Represents a single NFL game with multiple bookmakers and markets.
     """
     return {
@@ -202,7 +202,13 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     """Configure pytest with custom markers."""
+    # Existing markers
     config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+
+    # P0 Test Suite markers (Nov 15, 2025)
+    config.addinivalue_line("markers", "critical: marks tests as critical (P0 priority, prevents expensive failures)")
+    config.addinivalue_line("markers", "integration: marks tests as integration tests (require database)")
+    config.addinivalue_line("markers", "benchmark: marks tests as performance benchmarks")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -210,7 +216,7 @@ def pytest_collection_modifyitems(config, items):
     if config.getoption("--runslow"):
         # --runslow given in cli: do not skip slow tests
         return
-    
+
     skip_slow = pytest.mark.skip(reason="need --runslow option to run")
     for item in items:
         if "slow" in item.keywords:

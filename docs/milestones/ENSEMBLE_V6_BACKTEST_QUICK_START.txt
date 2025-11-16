@@ -1,0 +1,154 @@
+================================================================================
+ENSEMBLE V6.0 BACKTEST - QUICK START
+================================================================================
+
+Date: November 15, 2025
+Runtime: ~18 hours (overnight job)
+Purpose: Validate ensemble v6.0 (5-way with XGBoost v4 Ridge) vs baseline v5.1
+
+================================================================================
+QUICK LAUNCH COMMANDS
+================================================================================
+
+1. DRY RUN (5 games, 30 seconds - VALIDATE SETUP FIRST):
+
+   python py/backtest/historical_validation_v6.py --dry-run
+
+2. FULL BACKTEST (148 games, 18 hours):
+
+   bash scripts/launch_ensemble_v6_backtest.sh
+
+   OR manually:
+
+   nohup python py/backtest/historical_validation_v6.py \
+       --start-season 2022 \
+       --end-season 2024 \
+       --output results/ensemble_v6_backtest_2022_2024.csv \
+       > /tmp/ensemble_v6_backtest.log 2>&1 &
+   echo $! > /tmp/ensemble_v6_backtest.pid
+
+3. MONITOR PROGRESS:
+
+   tail -f /tmp/ensemble_v6_backtest.log
+
+4. CHECK STATUS:
+
+   ps -p $(cat /tmp/ensemble_v6_backtest.pid)
+
+5. KILL IF NEEDED:
+
+   kill $(cat /tmp/ensemble_v6_backtest.pid)
+
+================================================================================
+EXPECTED RESULTS (TARGETS)
+================================================================================
+
+Risk Gates (ALL must pass for production):
+
+  ✅ MAE < 35 yards (vs v5.1's ~40 MAE)
+  ✅ MAE improvement > 7 yards
+  ✅ Calibration 88-92%
+  ⚠️  Inference speed < 500ms (R optimization required, accept failure)
+  ✅ Statistical significance p < 0.05 (Diebold-Mariano test)
+
+Business Metrics (Expected):
+
+  • MAE: ~33 yards (7 yard improvement)
+  • Win Rate: 60-61% (+2-3pp)
+  • ROI: 6-8% (+1-2%)
+  • Sharpe Ratio: 2.4+ (+0.2-0.4)
+
+================================================================================
+OUTPUT FILES
+================================================================================
+
+After completion (~18 hours):
+
+  1. results/ensemble_v6_backtest_2022_2024.csv
+     → Per-game predictions (148 rows)
+
+  2. results/ensemble_v6_backtest_summary_<timestamp>.json
+     → Metrics, statistical tests, risk gates, decision
+
+  3. results/ensemble_v6_backtest_2022_2024_v5_baseline.csv
+     → Baseline v5.1 predictions for comparison
+
+  4. docs/milestones/ENSEMBLE_V6_BACKTEST_COMPLETE.md
+     → Milestone documentation (auto-generated if APPROVED)
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Issue: "Ensemble v6.0 failed to load"
+→ Train XGBoost v4: python scripts/xgb_exp7_backtest_2024.py
+
+Issue: "Database connection failed"
+→ Start PostgreSQL: docker compose up -d pg
+
+Issue: "R model loading fails"
+→ Check models exist: ls models/bayesian/*.rds
+
+Issue: "Backtest stalled"
+→ Resume from checkpoint: python py/backtest/historical_validation_v6.py --checkpoint /tmp/ensemble_v6_checkpoint.pkl
+
+Issue: "Out of memory"
+→ Increase system memory (16GB minimum)
+
+================================================================================
+NEXT STEPS AFTER COMPLETION
+================================================================================
+
+IF APPROVED (all risk gates pass):
+  1. Review results: cat results/ensemble_v6_backtest_summary_*.json
+  2. A/B test setup (50/50 split, 4 weeks)
+  3. Production deployment
+
+IF BLOCKED (any critical gate fails):
+  1. Root cause analysis (which gates failed?)
+  2. Remediation (retrain, adjust weights, investigate data)
+  3. Re-run backtest
+
+================================================================================
+MONITORING TIPS
+================================================================================
+
+Real-time progress:
+  tail -f /tmp/ensemble_v6_backtest.log | grep "Progress:"
+
+Last 100 lines:
+  tail -100 /tmp/ensemble_v6_backtest.log
+
+Search for errors:
+  grep -i "error\|fail" /tmp/ensemble_v6_backtest.log
+
+Check predictions generated:
+  grep "v6: " /tmp/ensemble_v6_backtest.log | tail -1
+
+================================================================================
+TIMELINE
+================================================================================
+
+Phase                    Duration    Description
+--------------------------------------------------------------------------------
+Setup                    30s         Initialize ensembles, load models
+Data Fetch               2-5s        Query 148 games from database
+Processing               18 hours    ~7.3 min/game (R model overhead)
+Analysis                 1 min       Calculate metrics, statistical tests
+--------------------------------------------------------------------------------
+TOTAL                    ~18 hours   End-to-end runtime
+
+Expected Completion: ~18 hours from launch
+Launch: November 15, 2025
+Estimated Done: November 16, 2025 (afternoon)
+
+================================================================================
+DOCUMENTATION
+================================================================================
+
+Full Guide:    docs/ENSEMBLE_V6_BACKTEST_GUIDE.md
+Script:        py/backtest/historical_validation_v6.py
+Launch Script: scripts/launch_ensemble_v6_backtest.sh
+XGBoost v4:    docs/XGBOOST_V4_VALIDATION_COMPLETE.md
+
+================================================================================

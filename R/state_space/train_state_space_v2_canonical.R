@@ -226,8 +226,8 @@ start_time <- Sys.time()
 
 fit <- mod$sample(
   data = stan_data,
-  chains = 4,
-  parallel_chains = 4,
+  chains = 6,
+  parallel_chains = 6,
   iter_warmup = 1000,
   iter_sampling = 2000,
   adapt_delta = 0.95,
