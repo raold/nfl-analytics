@@ -698,13 +698,8 @@ class EnhancedEnsemble6Way:
                 # Use latest skill (normalized so 0 = average, positive = above average)
                 skill = player_skills.iloc[-1]['skill_mean']
                 # Convert skill to multiplier (skill is in log-yards space)
-                skill_factor = np.exp(skill)
-
-                # Sanity check: skill_factor should be between 0.5 and 2.0
-                # (Elite QB is ~2x worse QB, not 20x)
-                if skill_factor > 2.0 or skill_factor < 0.5:
-                    logger.warning(f"⚠️  Unrealistic skill_factor: {skill_factor:.2f} (skill={skill:.2f}) - capping to [0.5, 2.0]")
-                    skill_factor = np.clip(skill_factor, 0.5, 2.0)
+                # Normalize to league average (skill_mean=2.61) to get multiplicative factor
+                skill_factor = np.exp(skill - 2.61)
             else:
                 # No skill data - assume league average
                 skill_factor = 1.0

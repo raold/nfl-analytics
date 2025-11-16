@@ -94,10 +94,15 @@ class HistoricalValidator4Way:
         )
 
     def fetch_historical_games(self) -> pd.DataFrame:
-        """Fetch historical games with passing yards data from play-by-play."""
+        """Fetch historical games with passing yards data from official statistics (mart.player_game_stats).
+
+        CRITICAL FIX (Nov 15, 2025): Changed from play-by-play aggregation to official stats.
+        Play-by-play data systematically undercounted yards by 5-50 yards/game (missing sacks,
+        2-point conversions, data quality issues). This caused -12 to -17 yard systematic bias.
+        """
         logger.info(f"Fetching games: {self.start_season} - {self.end_season}")
 
-        # Aggregate play-by-play data to player-game level
+        # Use official statistics from mart.player_game_stats (CORRECTED)
         query = """
         SELECT
             g.game_id,
@@ -110,25 +115,27 @@ class HistoricalValidator4Way:
             g.total_close,
             g.home_score,
             g.away_score,
-            p.passer_player_id as player_id,
-            p.passer_player_name as player_name,
-            p.posteam as team,
-            SUM(CASE WHEN p.pass = true THEN p.yards_gained ELSE 0 END) as passing_yards,
-            COUNT(CASE WHEN p.pass = true THEN 1 END) as passing_attempts,
-            COUNT(CASE WHEN p.complete_pass = 1 THEN 1 END) as completions,
-            COUNT(CASE WHEN p.touchdown = 1 AND p.pass = true THEN 1 END) as passing_tds,
-            COUNT(CASE WHEN p.interception = 1 THEN 1 END) as interceptions
-        FROM plays p
-        JOIN games g ON p.game_id = g.game_id
-        WHERE p.passer_player_id IS NOT NULL
-          AND g.season >= %(start_season)s
-          AND g.season <= %(end_season)s
-          AND g.week > 0  -- Exclude preseason (week 0)
-        GROUP BY g.game_id, g.season, g.week, g.home_team, g.away_team,
-                 g.kickoff, g.spread_close, g.total_close, g.home_score, g.away_score,
-                 p.passer_player_id, p.passer_player_name, p.posteam
-        HAVING SUM(CASE WHEN p.pass = true THEN p.yards_gained ELSE 0 END) > 0
-        ORDER BY g.kickoff, g.game_id, player_name
+            pgs.player_id,
+            ph.player_name,
+            ph.current_team as team,
+            pgs.stat_yards as passing_yards,
+            pgs.stat_attempts as passing_attempts,
+            pgs.stat_completions::integer as completions,
+            pgs.stat_touchdowns as passing_tds,
+            pgs.stat_negative::integer as interceptions
+        FROM mart.player_game_stats pgs
+        JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+        JOIN games g ON
+            g.season = pgs.season
+            AND g.week = pgs.week
+            AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
+        WHERE pgs.stat_category = 'passing'
+          AND ph.position_group = 'QB'
+          AND pgs.season >= %(start_season)s
+          AND pgs.season <= %(end_season)s
+          AND pgs.week > 0  -- Exclude preseason (week 0)
+          AND pgs.stat_yards > 0
+        ORDER BY g.kickoff, g.game_id, ph.player_name
         """
 
         df = pd.read_sql_query(

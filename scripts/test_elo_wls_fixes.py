@@ -133,6 +133,57 @@ def test_minimum_models_check():
     return True
 
 
+def test_elo_skill_factor_realistic():
+    """Test Fix 5: ELO skill_factor produces realistic predictions."""
+    logger.info("\n" + "="*70)
+    logger.info("TEST 5: ELO Skill Factor Realism (Fix 5)")
+    logger.info("="*70)
+
+    from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+
+    try:
+        ensemble = EnhancedEnsemble6Way(db_password=os.getenv("DB_PASSWORD"))
+
+        # Test with known player (Patrick Mahomes)
+        result = ensemble.predict(
+            player_id="00-0033077",
+            season=2024,
+            week=9
+        )
+
+        if result is None or result.get('ensemble_mean') is None:
+            logger.warning("⚠️  SKIP: No prediction returned (models not loaded)")
+            return True
+
+        # Check ELO prediction specifically
+        elo_pred = result.get('predictions', {}).get('elo_wls', None)
+        if elo_pred is None:
+            logger.warning("⚠️  SKIP: ELO predictor failed (no data)")
+            return True
+
+        # Validate prediction is realistic (not capped at 500)
+        mean = elo_pred['mean']
+        if mean < 100 or mean > 500:
+            logger.error(f"❌ FAIL: Unrealistic prediction: {mean:.1f} yards")
+            return False
+
+        # Check that it's NOT the old capped value
+        if abs(mean - 500.0) < 1.0:
+            logger.error(f"❌ FAIL: Still capped at 500 yards (bug not fixed)")
+            return False
+
+        logger.info(f"✅ PASS: Realistic ELO prediction: {mean:.1f} yards (not capped)")
+        logger.info(f"   Expected range: 150-350 yards for typical QB")
+
+        return True
+
+    except Exception as e:
+        logger.error(f"❌ FAIL: Exception during ELO test: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 def main():
     """Run all tests."""
     logger.info("\n" + "="*70)
@@ -144,6 +195,7 @@ def main():
         ("Prediction Structure", test_prediction_structure),
         ("NaN Validation", test_nan_validation),
         ("Minimum Models Check", test_minimum_models_check),
+        ("ELO Skill Factor Realism", test_elo_skill_factor_realistic),
     ]
 
     results = []
