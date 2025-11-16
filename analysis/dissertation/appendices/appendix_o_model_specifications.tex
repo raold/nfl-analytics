@@ -1,5 +1,5 @@
 \chapter{Appendix O: Production Model Specifications}
-\label{appendix:model-specifications}
+\label{app:model-specifications}
 
 \section{Introduction: Technical Reference for Reproducibility}
 
@@ -23,7 +23,7 @@ All models trained on standardized window:
 
 \begin{equation}
 \mathcal{D}_{\text{train}} = \mathcal{D}_{2018-2024}^{\text{full}} \cup \mathcal{D}_{2015-2017}^{\text{decay}}
-\label{eq:canonical-window}
+% \label{eq:canonical-window} % REMOVED: Duplicate of Chapter 10 line 501
 \end{equation}
 
 where decay weights follow exponential function:
@@ -67,7 +67,7 @@ y_{it} &: \quad \text{Observed passing yards for player } i \text{ in game } t \
 \sigma_0^2 &: \quad \text{Initial state variance}
 \end{align}
 
-\textbf{Simplification from v1}: Removed home/away split for improved convergence stability (R̂ 1.0013 vs 1.0237 in v1).
+\textbf{Simplification from v1}: Removed home/away split for improved convergence stability ($\hat{R}$ 1.0013 vs 1.0237 in v1).
 
 \subsection{Prior Specifications}
 
@@ -121,19 +121,19 @@ Random seed & 42 \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Threshold} & \textbf{Status} \\
 \midrule
-$\hat{R}$ (max across all params) & 1.0013 & <1.01 & ✅ PASS \\
-ESS (min bulk) & 2,218 & >400 & ✅ PASS \\
-ESS (min tail) & 2,456 & >400 & ✅ PASS \\
-Divergent transitions & 0 & <10 & ✅ PASS \\
-Max treedepth hits & 3 & <100 & ✅ PASS \\
-Energy diagnostic (E-BFMI) & 0.94 & >0.3 & ✅ PASS \\
+$\hat{R}$ (max across all params) & 1.0013 & <1.01 & $\checkmark$ PASS \\
+ESS (min bulk) & 2,218 & >400 & $\checkmark$ PASS \\
+ESS (min tail) & 2,456 & >400 & $\checkmark$ PASS \\
+Divergent transitions & 0 & <10 & $\checkmark$ PASS \\
+Max treedepth hits & 3 & <100 & $\checkmark$ PASS \\
+Energy diagnostic (E-BFMI) & 0.94 & >0.3 & $\checkmark$ PASS \\
 \midrule
 \textbf{Convergence Status} & \multicolumn{3}{c}{\textbf{EXCELLENT CONVERGENCE}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Interpretation}: R̂ of 1.0013 indicates chains mixed perfectly (threshold 1.01). Zero divergences confirms gradient flow exploration successful. High ESS (>2,200) ensures robust posterior estimates.
+\textbf{Interpretation}: $\hat{R}$ of 1.0013 indicates chains mixed perfectly (threshold 1.01). Zero divergences confirms gradient flow exploration successful. High ESS (>2,200) ensures robust posterior estimates.
 
 \subsection{Performance Metrics}
 
@@ -145,10 +145,10 @@ Energy diagnostic (E-BFMI) & 0.94 & >0.3 & ✅ PASS \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Target} & \textbf{Status} \\
 \midrule
-MAE (yards) & 47.77 & <50 & ✅ PASS \\
-RMSE (yards) & 62.34 & <70 & ✅ PASS \\
-Calibration (90\% CI) & 88.5\% & 85-92\% & ✅ PASS \\
-Sharpness (mean interval width) & 185.3 & <200 & ✅ PASS \\
+MAE (yards) & 47.77 & <50 & $\checkmark$ PASS \\
+RMSE (yards) & 62.34 & <70 & $\checkmark$ PASS \\
+Calibration (90\% CI) & 88.5\% & 85-92\% & $\checkmark$ PASS \\
+Sharpness (mean interval width) & 185.3 & <200 & $\checkmark$ PASS \\
 \midrule
 Statistical Superiority & \multicolumn{3}{l}{p=0.0069 vs v1 (Wilcoxon test)} \\
 \bottomrule
@@ -206,7 +206,7 @@ t &: \quad \text{Time (game index)} \\
 
 \subsection{Convergence Improvement: 2000 → 6000 Iterations}
 
-\textbf{Motivation}: Initial 2000-iteration training (Nov 9) produced R̂ = 1.0337 (above 1.02 threshold). Retrained Nov 13 with 6000 iterations.
+\textbf{Motivation}: Initial 2000-iteration training (Nov 9) produced $\hat{R}$ = 1.0337 (above 1.02 threshold). Retrained Nov 13 with 6000 iterations.
 
 \begin{table}[h]
 \centering
@@ -221,12 +221,12 @@ ESS (min bulk) & 1,823 & 8,394 & +6,571 & +360.4\% \\
 Divergences & 128 & 42 & -86 & -67.2\% \\
 Training time (min) & 185.3 & 548.7 & +363.4 & +196.1\% \\
 \midrule
-\textbf{Status} & ⚠️ BORDERLINE & ✅ EXCELLENT & -- & -- \\
+\textbf{Status} & ⚠️ BORDERLINE & $\checkmark$ EXCELLENT & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Trade-off}: 3× longer training time, but 73\% improvement in R̂, 360\% increase in ESS. Critical for production deployment.
+\textbf{Trade-off}: 3× longer training time, but 73\% improvement in $\hat{R}$, 360\% increase in ESS. Critical for production deployment.
 
 \subsection{Final Convergence Diagnostics (6000 Iterations)}
 
@@ -238,17 +238,17 @@ Training time (min) & 185.3 & 548.7 & +363.4 & +196.1\% \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Threshold} & \textbf{Status} \\
 \midrule
-$\hat{R}$ (max) & 1.0092 & <1.02 & ✅ PASS (relaxed) \\
-ESS (min bulk) & 8,394 & >400 & ✅ PASS \\
-ESS (min tail) & 7,821 & >400 & ✅ PASS \\
-Divergences & 42 & <1\% of 6000 & ✅ PASS \\
+$\hat{R}$ (max) & 1.0092 & <1.02 & $\checkmark$ PASS (relaxed) \\
+ESS (min bulk) & 8,394 & >400 & $\checkmark$ PASS \\
+ESS (min tail) & 7,821 & >400 & $\checkmark$ PASS \\
+Divergences & 42 & <1\% of 6000 & $\checkmark$ PASS \\
 \midrule
 \textbf{Convergence Status} & \multicolumn{3}{c}{\textbf{EXCELLENT CONVERGENCE}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Note}: Threshold relaxed from R̂ < 1.01 to R̂ < 1.02 per ADR-002 (hierarchical models with 15K+ parameters require more iterations for perfect convergence).
+\textbf{Note}: Threshold relaxed from $\hat{R}$ < 1.01 to $\hat{R}$ < 1.02 per ADR-002 (hierarchical models with 15K+ parameters require more iterations for perfect convergence).
 
 \subsection{Performance Metrics}
 
@@ -260,10 +260,10 @@ Divergences & 42 & <1\% of 6000 & ✅ PASS \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Target} & \textbf{Status} \\
 \midrule
-MAE (yards) & 52.34 & <55 & ✅ PASS \\
-RMSE (yards) & 68.91 & <75 & ✅ PASS \\
-Calibration (90\% CI) & 87.2\% & 85-92\% & ✅ PASS \\
-Sharpness (mean interval width) & 192.7 & <210 & ✅ PASS \\
+MAE (yards) & 52.34 & <55 & $\checkmark$ PASS \\
+RMSE (yards) & 68.91 & <75 & $\checkmark$ PASS \\
+Calibration (90\% CI) & 87.2\% & 85-92\% & $\checkmark$ PASS \\
+Sharpness (mean interval width) & 192.7 & <210 & $\checkmark$ PASS \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -358,9 +358,9 @@ Two-stage model addressing spurious correlation between player skill and opponen
 \toprule
 \textbf{Season} & \textbf{MAE} & \textbf{RMSE} & \textbf{Improvement} & \textbf{p-value} & \textbf{Significance} \\
 \midrule
-2022 & 5.06 & 6.74 & +87.40\% & <0.000001 & ✅ \\
-2023 & 4.76 & 6.21 & +88.15\% & <0.000001 & ✅ \\
-2024 & 4.27 & 5.93 & +89.38\% & <0.000001 & ✅ \\
+2022 & 5.06 & 6.74 & +87.40\% & <0.000001 & $\checkmark$ \\
+2023 & 4.76 & 6.21 & +88.15\% & <0.000001 & $\checkmark$ \\
+2024 & 4.27 & 5.93 & +89.38\% & <0.000001 & $\checkmark$ \\
 \midrule
 \textbf{Mean $\pm$ SD} & \textbf{4.70 $\pm$ 0.40} & \textbf{6.29 $\pm$ 0.42} & \textbf{88.31\%} & -- & -- \\
 \bottomrule
@@ -371,10 +371,10 @@ Two-stage model addressing spurious correlation between player skill and opponen
 
 \textbf{Consistency Gates}:
 \begin{enumerate}
-\item MAE < 8 yards all seasons: ✅ PASS (max 5.06)
-\item Improvement > 80\% all seasons: ✅ PASS (min 87.40\%)
-\item Statistical significance (p < 0.05): ✅ PASS (all p < 0.000001)
-\item Cross-season std < 2 yards: ✅ PASS (0.40 yards)
+\item MAE < 8 yards all seasons: $\checkmark$ PASS (max 5.06)
+\item Improvement > 80\% all seasons: $\checkmark$ PASS (min 87.40\%)
+\item Statistical significance (p < 0.05): $\checkmark$ PASS (all p < 0.000001)
+\item Cross-season std < 2 yards: $\checkmark$ PASS (0.40 yards)
 \end{enumerate}
 
 \textbf{Approval}: Production-ready Nov 15, 2025 (all gates passed)
@@ -458,12 +458,12 @@ ESS (min bulk) & 1,512 & 8,490 & +6,978 & +461.5\% \\
 Divergences & 412 & 177 & -235 & -57.0\% \\
 Training time (min) & 192.7 & 571.3 & +378.6 & +196.5\% \\
 \midrule
-\textbf{Status} & ❌ FAILED & ✅ EXCELLENT & -- & -- \\
+\textbf{Status} & $\times$ FAILED & $\checkmark$ EXCELLENT & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Critical Improvement}: 84\% reduction in R̂ gap above threshold, 461\% increase in ESS. 2000-iteration version would have failed production deployment.
+\textbf{Critical Improvement}: 84\% reduction in $\hat{R}$ gap above threshold, 461\% increase in ESS. 2000-iteration version would have failed production deployment.
 
 \subsection{Final Convergence Diagnostics (6000 Iterations)}
 
@@ -475,10 +475,10 @@ Training time (min) & 192.7 & 571.3 & +378.6 & +196.5\% \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Threshold} & \textbf{Status} \\
 \midrule
-$\hat{R}$ (max) & 1.0177 & <1.02 & ✅ PASS (relaxed) \\
-ESS (min bulk) & 8,490 & >400 & ✅ PASS \\
-ESS (min tail) & 7,982 & >400 & ✅ PASS \\
-Divergences & 177 & <3\% of 6000 & ✅ PASS (2.95\%) \\
+$\hat{R}$ (max) & 1.0177 & <1.02 & $\checkmark$ PASS (relaxed) \\
+ESS (min bulk) & 8,490 & >400 & $\checkmark$ PASS \\
+ESS (min tail) & 7,982 & >400 & $\checkmark$ PASS \\
+Divergences & 177 & <3\% of 6000 & $\checkmark$ PASS (2.95\%) \\
 \midrule
 \textbf{Convergence Status} & \multicolumn{3}{c}{\textbf{EXCELLENT CONVERGENCE}} \\
 \bottomrule
@@ -495,10 +495,10 @@ Divergences & 177 & <3\% of 6000 & ✅ PASS (2.95\%) \\
 \toprule
 \textbf{Metric} & \textbf{Value} & \textbf{Target} & \textbf{Status} \\
 \midrule
-MAE (yards) & 53.12 & <55 & ✅ PASS \\
-RMSE (yards) & 69.45 & <75 & ✅ PASS \\
-Calibration (90\% CI) & 86.8\% & 85-92\% & ✅ PASS \\
-Sharpness (mean interval width) & 196.3 & <210 & ✅ PASS \\
+MAE (yards) & 53.12 & <55 & $\checkmark$ PASS \\
+RMSE (yards) & 69.45 & <75 & $\checkmark$ PASS \\
+Calibration (90\% CI) & 86.8\% & 85-92\% & $\checkmark$ PASS \\
+Sharpness (mean interval width) & 196.3 & <210 & $\checkmark$ PASS \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -605,7 +605,7 @@ Hybrid approach balancing stability (static) with adaptation (incremental):
 \begin{itemize}
 \item Hybrid beats static by +4.2\% (MAE improvement)
 \item Hybrid beats pure incremental by +15.9\%
-\item Lower variance (σ = 0.18 vs static: σ = 0.68) indicates robustness
+\item Lower variance ($\sigma$ = 0.18 vs static: $\sigma$ = 0.68) indicates robustness
 \end{itemize}
 
 \subsection{Baseline Error Correction (November 12, 2025)}
@@ -744,7 +744,7 @@ Informative Priors v2 & 1.0177 & 8,490 & 177 & 6,000 & EXCELLENT \\
 \end{tabular}
 \end{table}
 
-\textbf{All models pass relaxed R̂ < 1.02 threshold} (ADR-002).
+\textbf{All models pass relaxed $\hat{R}$ < 1.02 threshold} (ADR-002).
 
 \subsection{Multi-Season Consistency}
 
@@ -932,7 +932,7 @@ python scripts/validate_ensemble_v6.py --test-season 2024
 \subsection{Production Deployment Checklist}
 
 \begin{enumerate}
-\item[$\square$] All models pass convergence diagnostics (R̂ < 1.02, ESS > 400)
+\item[$\square$] All models pass convergence diagnostics ($\hat{R}$ < 1.02, ESS > 400)
 \item[$\square$] All models achieve calibration 85-92\%
 \item[$\square$] Ensemble MAE < 45 yards on 2024 holdout
 \item[$\square$] Inference time < 500ms (p95)
@@ -946,7 +946,7 @@ python scripts/validate_ensemble_v6.py --test-season 2024
 \item[$\square$] Rollback plan documented
 \end{enumerate}
 
-\textbf{Status (Nov 15, 2025)}: ✅ All checklist items completed
+\textbf{Status (Nov 15, 2025)}: $\checkmark$ All checklist items completed
 
 ---
 
@@ -956,7 +956,7 @@ This appendix provides complete technical specifications enabling exact reproduc
 
 \textbf{Key Achievements}:
 \begin{itemize}
-\item \textbf{Convergence excellence}: All Bayesian models achieve R̂ < 1.018, ESS > 2,200
+\item \textbf{Convergence excellence}: All Bayesian models achieve $\hat{R}$ < 1.018, ESS > 2,200
 \item \textbf{Multi-season robustness}: XGBoost v4 Ridge achieves MAE 4.70 ± 0.40 yards (2022-2024)
 \item \textbf{Hybrid architecture success}: 70/30 static-incremental blend +4.2\% vs pure static
 \item \textbf{Production deployment}: Ensemble v6.0 achieves 41.5 MAE, 89.7\% calibration

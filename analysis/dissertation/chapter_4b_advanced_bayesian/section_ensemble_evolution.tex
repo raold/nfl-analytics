@@ -132,14 +132,14 @@ Informative Priors v2 & 15 & 53.12 & 87.4\% & Expert knowledge, domain constrain
 \paragraph{Production Approval (November 8, 2025).}
 v5.0 passed all 5 deployment gates:
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
-    \item ✅ MAE < 45 yards (achieved 40.0)
-    \item ✅ ROI > 5\% (achieved 5.5\%)
-    \item ✅ Calibration > 85\% (achieved 90.2\%)
-    \item ✅ All components converged (Rhat < 1.01, ESS > 400)
-    \item ✅ Temporal validation passed (3-season backtest 2022-2024)
+    \item $\checkmark$ MAE < 45 yards (achieved 40.0)
+    \item $\checkmark$ ROI > 5\% (achieved 5.5\%)
+    \item $\checkmark$ Calibration > 85\% (achieved 90.2\%)
+    \item $\checkmark$ All components converged (Rhat < 1.01, ESS > 400)
+    \item $\checkmark$ Temporal validation passed (3-season backtest 2022-2024)
 \end{enumerate}
 
-Status: ✅ \textbf{APPROVED BASELINE} (Nov 8, 2025).
+Status: $\checkmark$ \textbf{APPROVED BASELINE} (Nov 8, 2025).
 
 \subsection{v5.1: Hybrid XGBoost Upgrade (November 14, 2025)}
 
@@ -180,7 +180,7 @@ v5.1 (Hybrid XGB) & 39.2 & 6.0 & 59.0 & 1.92 \\
 \end{table}
 
 \paragraph{Production Deployment (November 14, 2025).}
-v5.1 deployed to production after A/B test validation (50 games, $p < 0.01$ improvement over v5.0). Status: ✅ \textbf{PRODUCTION} (current as of Nov 15, 2025).
+v5.1 deployed to production after A/B test validation (50 games, $p < 0.01$ improvement over v5.0). Status: $\checkmark$ \textbf{PRODUCTION} (current as of Nov 15, 2025).
 
 \subsection{v6.0: XGBoost v4 Ridge Integration (A/B Testing)}
 
@@ -297,9 +297,9 @@ Figure~\ref{fig:ensemble-mae-progression} shows MAE reduction across all version
 % Annotations
 \node[font=\scriptsize,accentblue] at (axis cs:1,60.5) {BNN failed};
 \node[font=\scriptsize,accentblue] at (axis cs:2,52) {R integration};
-\node[font=\scriptsize,accentblue] at (axis cs:3,42) {✓ Baseline};
-\node[font=\scriptsize,accentblue] at (axis cs:4,41.2) {✓ Production};
-\node[font=\scriptsize,accentblue] at (axis cs:5,30.5) {✓ Projected};
+\node[font=\scriptsize,accentblue] at (axis cs:3,42) {$\checkmark$ Baseline};
+\node[font=\scriptsize,accentblue] at (axis cs:4,41.2) {$\checkmark$ Production};
+\node[font=\scriptsize,accentblue] at (axis cs:5,30.5) {$\checkmark$ Projected};
 
 \end{axis}
 \end{tikzpicture}

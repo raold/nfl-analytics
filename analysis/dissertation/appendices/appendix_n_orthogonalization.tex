@@ -16,7 +16,7 @@
 % ============================================================================
 
 \chapter{Orthogonalization Deep Dive: Ridge Residuals Methodology}
-\label{appendix:orthogonalization}
+\label{app:orthogonalization}
 
 \section{Introduction: The Orthogonalization Problem in Sports Analytics}
 
@@ -231,8 +231,8 @@ If $X \perp\!\!\!\perp Y \mid Z$, then $\rho_{XY \cdot Z} = 0$ even when $\rho_{
 \textbf{Feature Pair} & \textbf{Type} & {\textbf{Pearson $\rho$}} & {\textbf{p-value}} & \textbf{Interpretation} \\
 \midrule
 \texttt{player\_recent\_avg} $\times$ \texttt{opp\_def\_epa\_exp} & Confound & 0.42 & < 0.001 & Strong correlation \\
-\texttt{player\_recent\_avg} $\times$ \texttt{residual\_feature} & Decorrelated & 0.03 & 0.421 & Orthogonal ✓ \\
-\texttt{opp\_def\_epa\_exp} $\times$ \texttt{residual\_feature} & Decorrelated & -0.01 & 0.782 & Orthogonal ✓ \\
+\texttt{player\_recent\_avg} $\times$ \texttt{residual\_feature} & Decorrelated & 0.03 & 0.421 & Orthogonal $\checkmark$ \\
+\texttt{opp\_def\_epa\_exp} $\times$ \texttt{residual\_feature} & Decorrelated & -0.01 & 0.782 & Orthogonal $\checkmark$ \\
 \texttt{player\_recent\_avg} $\times$ \texttt{passing\_yards} & True signal & 0.68 & < 0.001 & Genuine skill \\
 \bottomrule
 \end{tabular}
@@ -334,7 +334,7 @@ Optimal $\alpha$ minimizes total MSE, not bias or variance individually. Cross-v
 0 & 52.3 & 14.7 & 38.2 & Overfits to noise \\
 1 & 48.9 & 12.1 & 38.9 & Weak regularization \\
 10 & 44.2 & 8.3 & 40.5 & Moderate shrinkage \\
-100 & {40.1} & {4.2} & 43.8 & \textbf{Optimal} ✓ \\
+100 & {40.1} & {4.2} & 43.8 & \textbf{Optimal} $\checkmark$ \\
 200 & 41.8 & 2.9 & 46.2 & Over-regularized \\
 \bottomrule
 \end{tabular}
@@ -591,7 +591,7 @@ Available at test time (player recent average is lagged L3, known before game). 
 \textbf{Residual Type} & {\textbf{Test MAE}} & {\textbf{Improvement (\%)}} & \textbf{Notes} \\
 \midrule
 Generic ($r = 0$) & 40.18 & 0.0 & No signal at test time \\
-Player-specific (L3 avg) & {4.76} & {88.2} & Generalizes ✓ \\
+Player-specific (L3 avg) & {4.76} & {88.2} & Generalizes $\checkmark$ \\
 League-average centered & 7.83 & 80.5 & Loses QB specificity \\
 Position-average centered & 6.21 & 84.6 & Better but still lossy \\
 \bottomrule
@@ -684,7 +684,7 @@ r_{\text{clip}} = \text{sign}(r) \cdot \min(|r|, 170)
 \midrule
 None (no clipping) & 0.0 & 5.21 & 2.8 & Overfits to outliers \\
 $\pm$250 yards ($\pm 3\sigma$) & 1.2 & 4.89 & 1.9 & Weak clipping \\
-$\pm$170 yards ($\pm 2\sigma$) & {4.7} & {4.76} & {1.2} & \textbf{Optimal} ✓ \\
+$\pm$170 yards ($\pm 2\sigma$) & {4.7} & {4.76} & {1.2} & \textbf{Optimal} $\checkmark$ \\
 $\pm$85 yards ($\pm 1\sigma$) & 18.3 & 5.34 & 0.8 & Over-clipped (underfit) \\
 \bottomrule
 \end{tabular}
@@ -713,13 +713,13 @@ Systematic ablation isolates each architectural decision's impact. Remove one co
 \textbf{Configuration} & {\textbf{MAE}} & {\textbf{$\Delta$ MAE}} & {\textbf{$\Delta$ MAE (\%)}} & {\textbf{p-value}} & \textbf{Critical?} \\
 \midrule
 \textbf{Full v4 (baseline)} & {4.76} & {0.00} & {0.0} & {---} & --- \\
-w/o Ridge ($\alpha = 0$, use OLS) & 6.83 & 2.07 & 43.5 & < 0.001 & ✓ \\
-w/o QB-specific centering & 8.92 & 4.16 & 87.4 & < 0.001 & ✓✓ \\
-w/o residuals (raw ensemble pred) & 11.34 & 6.58 & 138.2 & < 0.001 & ✓✓✓ \\
-w/o clipping (no outlier protect) & 5.21 & 0.45 & 9.5 & 0.023 & ✓ \\
-w/o XGBoost (Ridge only) & 40.18 & 35.42 & 744.1 & < 0.001 & ✓✓✓ \\
-w/o opponent features & 7.45 & 2.69 & 56.5 & < 0.001 & ✓✓ \\
-Weak regularization ($\alpha = 10$) & 5.89 & 1.13 & 23.7 & < 0.001 & ✓ \\
+w/o Ridge ($\alpha = 0$, use OLS) & 6.83 & 2.07 & 43.5 & < 0.001 & $\checkmark$ \\
+w/o QB-specific centering & 8.92 & 4.16 & 87.4 & < 0.001 & $\checkmark$$\checkmark$ \\
+w/o residuals (raw ensemble pred) & 11.34 & 6.58 & 138.2 & < 0.001 & $\checkmark$$\checkmark$$\checkmark$ \\
+w/o clipping (no outlier protect) & 5.21 & 0.45 & 9.5 & 0.023 & $\checkmark$ \\
+w/o XGBoost (Ridge only) & 40.18 & 35.42 & 744.1 & < 0.001 & $\checkmark$$\checkmark$$\checkmark$ \\
+w/o opponent features & 7.45 & 2.69 & 56.5 & < 0.001 & $\checkmark$$\checkmark$ \\
+Weak regularization ($\alpha = 10$) & 5.89 & 1.13 & 23.7 & < 0.001 & $\checkmark$ \\
 Strong regularization ($\alpha = 200$) & 5.02 & 0.26 & 5.5 & 0.089 & --- \\
 \bottomrule
 \end{tabular}
@@ -857,9 +857,9 @@ Deep neural networks require 100K+ samples for reliable training (avoiding overf
 \toprule
 \textbf{Model Type} & {\textbf{Typical Samples}} & {\textbf{NFL Available}} & \textbf{Feasible?} \\
 \midrule
-Linear Regression & 100 & 2000 & ✓ \\
-Ridge Regression & 500 & 2000 & ✓ \\
-XGBoost & 2000 & 2000 & ✓ \\
+Linear Regression & 100 & 2000 & $\checkmark$ \\
+Ridge Regression & 500 & 2000 & $\checkmark$ \\
+XGBoost & 2000 & 2000 & $\checkmark$ \\
 Deep Neural Net (3 layers) & 50000 & 2000 & ✗ \\
 Transformer & 1000000 & 2000 & ✗ \\
 \bottomrule
@@ -901,12 +901,12 @@ Single-season validation can mislead: 2023 quirks (rule changes, roster turnover
 \end{tablenotes}
 \end{table}
 
-\paragraph{Consistency Gates (All PASSED ✓).}
+\paragraph{Consistency Gates (All PASSED $\checkmark$).}
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
-    \item \textbf{MAE < 8 yards:} All seasons 4.27--5.06 (well below threshold) ✓
-    \item \textbf{Improvement > 80\%:} All seasons 87.4--89.4\% (exceeds target) ✓
-    \item \textbf{Statistical significance:} All p < 0.000001 (far below $\alpha = 0.05$) ✓
-    \item \textbf{Cross-season stability:} $\sigma = 0.40$ MAE (well below 2 yard threshold) ✓
+    \item \textbf{MAE < 8 yards:} All seasons 4.27--5.06 (well below threshold) $\checkmark$
+    \item \textbf{Improvement > 80\%:} All seasons 87.4--89.4\% (exceeds target) $\checkmark$
+    \item \textbf{Statistical significance:} All p < 0.000001 (far below $\alpha = 0.05$) $\checkmark$
+    \item \textbf{Cross-season stability:} $\sigma = 0.40$ MAE (well below 2 yard threshold) $\checkmark$
 \end{enumerate}
 
 \paragraph{Key Findings.}
@@ -925,7 +925,7 @@ Three-season validation confirms Ridge Residuals is not lucky on one holdout---i
 ---
 
 \section{Production Deployment Lessons}
-\label{sec:production-lessons}
+% \label{sec:production-lessons} % REMOVED: Duplicate of Chapter 10 line 804
 
 \subsection{Feature Engineering > Model Complexity}
 
