@@ -1,5 +1,9 @@
 # R/features_epa.R
-library(DBI); library(RPostgres); library(dplyr); library(lubridate); library(tidyr)
+library(DBI)
+library(RPostgres)
+library(dplyr)
+library(lubridate)
+library(tidyr)
 
 con <- dbConnect(
   RPostgres::Postgres(),
@@ -14,10 +18,12 @@ pbp <- tbl(con, "plays")
 agg <- pbp |>
   filter(!is.na(posteam)) |>
   group_by(game_id, posteam) |>
-  summarise(epa_sum = sum(epa, na.rm=TRUE),
-            plays = n(),
-            epa_mean = mean(epa, na.rm=TRUE),
-            .groups = "drop")
+  summarise(
+    epa_sum = sum(epa, na.rm = TRUE),
+    plays = n(),
+    epa_mean = mean(epa, na.rm = TRUE),
+    .groups = "drop"
+  )
 
 g <- tbl(con, "games") |>
   select(game_id, season, week, home_team, away_team, home_score, away_score, spread_close, total_close) |>
@@ -36,13 +42,15 @@ dbExecute(con, "CREATE TABLE IF NOT EXISTS mart.team_epa (
   primary key (game_id, posteam)
 );")
 
-team_epa <- agg |> collect() |> mutate(
-  explosive_pass = 0,
-  explosive_rush = 0
-)
+team_epa <- agg |>
+  collect() |>
+  mutate(
+    explosive_pass = 0,
+    explosive_rush = 0
+  )
 DBI::dbWithTransaction(con, {
   dbExecute(con, "DELETE FROM mart.team_epa;")
-  dbWriteTable(con, DBI::Id(schema="mart", table="team_epa"), team_epa, append = TRUE, row.names = FALSE)
+  dbWriteTable(con, DBI::Id(schema = "mart", table = "team_epa"), team_epa, append = TRUE, row.names = FALSE)
 })
 
 dbDisconnect(con)

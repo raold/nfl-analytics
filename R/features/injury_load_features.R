@@ -76,7 +76,7 @@ injuries_grouped <- injuries %>%
   ) %>%
   left_join(position_weights, by = "position_group") %>%
   mutate(
-    weight = ifelse(is.na(weight), 0.5, weight),  # Default weight for OTHER
+    weight = ifelse(is.na(weight), 0.5, weight), # Default weight for OTHER
     weighted_severity = severity * weight
   )
 
@@ -100,7 +100,6 @@ team_injury_load <- injuries_grouped %>%
 
     # Weighted severity score
     injury_load_weighted = sum(weighted_severity, na.rm = TRUE),
-
     .groups = "drop"
   )
 
@@ -156,7 +155,7 @@ game_injury_features <- games %>%
   left_join(away_injury_features, by = c("season", "week", "away_team" = "team")) %>%
   mutate(
     # Replace NA with 0 (no injuries)
-    across(starts_with("home_") | starts_with("away_"), ~ifelse(is.na(.), 0, .)),
+    across(starts_with("home_") | starts_with("away_"), ~ ifelse(is.na(.), 0, .)),
 
     # Derived features
     injury_load_diff = home_injury_load - away_injury_load,
@@ -222,9 +221,11 @@ summary_stats <- game_injury_features %>%
 cat("\nSummary Statistics:\n")
 cat(sprintf("  Avg injuries per team (home): %.2f\n", summary_stats$avg_home_injuries))
 cat(sprintf("  Avg injuries per team (away): %.2f\n", summary_stats$avg_away_injuries))
-cat(sprintf("  Games with QB injury: %d (%.1f%%)\n",
-            summary_stats$games_with_qb_injury,
-            summary_stats$games_with_qb_injury / nrow(game_injury_features) * 100))
+cat(sprintf(
+  "  Games with QB injury: %d (%.1f%%)\n",
+  summary_stats$games_with_qb_injury,
+  summary_stats$games_with_qb_injury / nrow(game_injury_features) * 100
+))
 cat(sprintf("  Avg injury load differential: %.2f\n", summary_stats$avg_injury_load_diff))
 
 dbDisconnect(con)

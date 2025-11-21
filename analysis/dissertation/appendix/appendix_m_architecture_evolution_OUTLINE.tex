@@ -69,7 +69,7 @@ v5.0 Canonical & Nov 8, 2025 & 15 & Canonical training window & PRODUCTION \\
 v5.1 Hybrid XGB & Nov 14, 2025 & 3 & 70/30 static-incremental hybrid & PRODUCTION \\
 v6.0 5-Way Adaptive & Nov 15, 2025 & 2 & ELO + adaptive WLS weights & VALIDATION \\
 \baselinerule
-\textbf{Total} & \textbf{13 months} & \textbf{170} & --- & --- \\
+\textbf{Total} & \textbf{13 months} & \textbf{170} & {---} & {---} \\
 \bottomrule
 \end{tabular}
 
@@ -99,11 +99,11 @@ XGBoost (Static) & 65 & 28 & $\checkmark$ Production & 17.5\% (70\% of 25\%) \\
 XGBoost (Incremental) & 42 & 15 & $\checkmark$ Production & 7.5\% (30\% of 25\%) \\
 ELO Win/Loss & 18 & 3 & ⏳ Validation & 10\% ensemble weight \\
 \textcolor{red}{BNN Passing} & \textcolor{red}{84} & \textcolor{red}{6} & \textcolor{red}{$\times$ Abandoned} & \textcolor{red}{0\% (removed)} \\
-Ensemble Integration & 95 & --- & $\checkmark$ Production & CVX optimization \\
+Ensemble Integration & 95 & {---} & $\checkmark$ Production & CVX optimization \\
 Risk Management (CQL) & 48 & 4 & $\checkmark$ Production & +24\% bet sizing \\
-Infrastructure & 130 & --- & $\checkmark$ Production & Docker, monitoring \\
+Infrastructure & 130 & {---} & $\checkmark$ Production & Docker, monitoring \\
 \baselinerule
-\textbf{Total} & \textbf{787} & \textbf{115} & --- & --- \\
+\textbf{Total} & \textbf{787} & \textbf{115} & {---} & {---} \\
 \bottomrule
 \end{tabular}
 
@@ -262,9 +262,9 @@ MAE (yards) & 52.34 & 42.17 & -19.4 & p < 0.001 \\
 Win Rate (\%) & 51.9 & 58.3 & +12.3 & p < 0.01 \\
 \textbf{ROI (\%)} & \textbf{-3.75} & \textbf{+3.82} & \textbf{+7.57} & \textbf{p < 0.001} \\
 Sharpe Ratio & -0.82 & 1.87 & +269 & p < 0.001 \\
-Max Drawdown (\%) & -83.5 & -11.2 & -86.6 & --- \\
+Max Drawdown (\%) & -83.5 & -11.2 & -86.6 & {---} \\
 Calibration (\%) & 96.5 & 89.1 & -7.7 & p < 0.05 \\
-Bets Placed & 60 & 125 & +108.3 & --- \\
+Bets Placed & 60 & 125 & +108.3 & {---} \\
 \bottomrule
 \end{tabular}
 
@@ -447,9 +447,9 @@ MAE (yards) & 42.17 & 38.03 & -9.8 & p < 0.01 \\
 Win Rate (\%) & 58.3 & 59.3 & +1.7 & p = 0.08 \\
 \textbf{ROI (\%)} & \textbf{+3.82} & \textbf{+5.21} & \textbf{+36.4} & \textbf{p < 0.05} \\
 Sharpe Ratio & 1.87 & 2.34 & +25.1 & p < 0.05 \\
-Max Drawdown (\%) & -11.2 & -8.7 & -22.3 & --- \\
+Max Drawdown (\%) & -11.2 & -8.7 & -22.3 & {---} \\
 Calibration (\%) & 89.1 & 88.7 & -0.4 & p = 0.74 \\
-Avg Confidence & 0.62 & 0.68 & +9.7 & --- \\
+Avg Confidence & 0.62 & 0.68 & +9.7 & {---} \\
 \bottomrule
 \end{tabular}
 

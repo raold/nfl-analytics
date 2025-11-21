@@ -397,6 +397,56 @@ This v3.0 ensemble achieves breakthrough 86.4\% MAE improvement over baseline (4
 % Include the v3.0 Ensemble Section
 \input{../chapter_4_baseline_modeling/v3_ensemble_section.tex}
 
+% Include ensemble evolution section
+\input{../chapter_4b_advanced_bayesian/section_ensemble_evolution.tex}
+
+\section{Case Study: The Limits of Complexity—An 84-Hour BNN Investigation}
+\label{sec:bnn-failure-case-study}
+
+In the spirit of radical transparency that defines this dissertation's methodology, this section documents a significant research failure: an 84-hour investigation into Bayesian Neural Networks (BNNs) for passing yardage prediction that ultimately produced zero production models. This case study provides a crucial counterpoint to the successful models in this chapter, illustrating the practical limits of model complexity and the importance of abandoning unpromising research paths.
+
+\subsection{Hypothesis and Timeline}
+
+The initial hypothesis was that BNNs could capture complex nonlinear interactions (e.g., QB skill vs. specific defensive schemes) and quantify epistemic uncertainty more effectively than other methods. The research spanned over three weeks and multiple approaches.
+
+\begin{table}[h]
+\centering
+\caption{BNN Passing Model Investigation: Complete Timeline (Oct 14 -- Nov 9, 2025)}
+\label{tab:bnn-timeline-condensed}
+\begin{tabular}{@{}lllS[table-format=2.0]@{}}
+\toprule
+\textbf{Date} & \textbf{Approach} & \textbf{Outcome} & {\textbf{Hours}} \\
+\midrule
+Oct 14--18 & Multi-Output v1 & NaN losses (data leakage) & 16 \\
+Oct 19--23 & Multi-Output v2 & NaN losses (architecture) & 18 \\
+Oct 24--27 & Ensemble (3 BNNs) & Marginally worse than v2 & 12 \\
+Oct 28--31 & Informative Priors & Overconfident (poor calibration) & 14 \\
+Nov 1--5 & Simplified (2 layers) & Worse than baseline & 10 \\
+Nov 6--9 & Feature Engineering Fix & NaN losses persist & 14 \\
+\midrule
+\textbf{TOTAL} & \textbf{6 approaches} & \textbf{0 production models} & \textbf{84} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item \textbf{Notes:} 84 hours represented 10.7\% of the total 787-hour research investment, with zero ROI.
+\end{tablenotes}
+\end{table}
+
+\subsection{Root Cause Analysis: Why BNNs Failed}
+
+Three fundamental issues, common in sports analytics, doomed the approach:
+\begin{enumerate}
+    \item \textbf{Insufficient Sample Size:} Deep learning models like BNNs require vast datasets (N > 100,000) to learn robust representations. The NFL passing dataset (N $\approx$ 2,000 games) was simply too small, causing the models to learn uncertainty but not signal (MAE was 45% worse than the XGBoost baseline).
+    \item \textbf{Inadequate Feature Engineering:} BNNs excel at learning from raw data (e.g., pixels). They cannot, however, rescue a problem that requires domain-specific, engineered features. Even when provided with better features (like the Ridge Residuals), the BNNs failed to outperform the much simpler XGBoost model that was designed around them.
+    \item \textbf{Architectural Complexity:} The high number of hyperparameters (layers, priors, dropout rates) made the BNNs prone to overfitting on the small validation set. The models showed a 14.5\% performance degradation from validation to holdout, compared to just 2.1\% for the simpler XGBoost model.
+\end{enumerate}
+
+\subsection{Lesson: The Bayesian Abandonment Criterion}
+
+The most valuable lesson from this failure was the development of a formal process to prevent falling into a sunk-cost fallacy. After 6 failed attempts, the posterior probability that the BNN approach was viable was calculated to be less than 0.1\%. A formal \textbf{Bayesian abandonment criterion} was established: if after $k=2$ consecutive failures, the posterior probability of success drops below a threshold (e.g., 30\%), the research line is terminated. Adhering to this rule would have saved 68 hours of effort, which could have been reallocated to more promising research like the Ridge Residuals method.
+
+This case study provides strong evidence for a core thesis of this dissertation: in a domain with limited data and significant confounding, success comes from simpler models built on well-engineered, causally-informed features, not from applying complex, data-hungry architectures.
+
 \chaptersummary{
 This chapter developed advanced Bayesian hierarchical frameworks and ensemble methods that address the uncertainty quantification limitations of classical baselines. We implemented three hierarchical models with partial pooling and time-varying effects (MAE 10.5, LOO-ELPD -9842.3), demonstrating 0.9 pp predictive improvement over state-space Kalman filters while providing full posterior distributions for Kelly sizing.
 

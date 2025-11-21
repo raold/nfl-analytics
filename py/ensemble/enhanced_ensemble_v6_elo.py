@@ -691,18 +691,10 @@ class EnhancedEnsemble6Way:
             # NFL average: ~62% of yards from passing
             team_pass_rate = 0.62
 
-            # Get player skill factor (if available)
-            player_skills = self.skills_df[self.skills_df['player_id'] == player_id] if self.skills_df is not None else None
-
-            if player_skills is not None and len(player_skills) > 0:
-                # Use latest skill (normalized so 0 = average, positive = above average)
-                skill = player_skills.iloc[-1]['skill_mean']
-                # Convert skill to multiplier (skill is in log-yards space)
-                # Normalize to league average (skill_mean=2.61) to get multiplicative factor
-                skill_factor = np.exp(skill - 2.61)
-            else:
-                # No skill data - assume league average
-                skill_factor = 1.0
+            # SIMPLIFIED (Nov 16, 2025): Remove player skill factor complexity
+            # Following Sagarin advice: "Keep it simple - ELO's value is diversification, not accuracy"
+            # Player-specific adjustments increase correlation with other models, reducing ensemble value
+            # Pure team-level ELO maintains low correlation and serves as effective baseline
 
             # Base passing yards estimate
             # Step 1: Convert team score (points) to total offensive yards
@@ -711,14 +703,15 @@ class EnhancedEnsemble6Way:
             total_yards = team_score * yards_per_point
 
             # Step 2: Apply pass rate (what % of yards come from passing)
-            passing_yards = total_yards * team_pass_rate * skill_factor
+            # No skill_factor - keep it simple!
+            passing_yards = total_yards * team_pass_rate
 
             # Sanity check: Cap at 500 yards (NFL record: 554, typical max: ~450)
             if passing_yards > 500:
                 logger.warning(
                     f"⚠️  ELO prediction unrealistic: {passing_yards:.1f} yards (capped at 500)\n"
                     f"    Debug: team_score={team_score:.1f}, total_yards={total_yards:.1f}, "
-                    f"pass_rate={team_pass_rate:.2f}, skill_factor={skill_factor:.2f}"
+                    f"pass_rate={team_pass_rate:.2f}"
                 )
                 passing_yards = 500.0
 
@@ -728,7 +721,7 @@ class EnhancedEnsemble6Way:
 
             logger.debug(f"ELO: {team} (ELO: {team_elo:.0f}) vs {opponent} (ELO: {opponent_elo:.0f})")
             logger.debug(f"ELO: Diff = {elo_diff:.0f}, Margin = {expected_margin:.1f} pts, Score = {team_score:.1f}")
-            logger.debug(f"ELO: {passing_yards:.1f} ± {pred_std:.1f} yards (skill factor: {skill_factor:.2f})")
+            logger.debug(f"ELO: {passing_yards:.1f} ± {pred_std:.1f} yards (simple team-level only)")
 
             return (passing_yards, pred_std)
 

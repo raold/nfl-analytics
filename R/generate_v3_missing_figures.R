@@ -32,10 +32,10 @@ prop_performance <- expand.grid(
 ) %>%
   mutate(
     value = c(
-      24.3, 12.1, 15.7, 0.42,  # MAE
-      54.2, 52.8, 53.1, 55.8,  # Hit Rate
-      3.1, 2.4, 2.7, 4.2,       # Avg Edge
-      1.45, 1.38, 1.41, 1.52   # Sharpe
+      24.3, 12.1, 15.7, 0.42, # MAE
+      54.2, 52.8, 53.1, 55.8, # Hit Rate
+      3.1, 2.4, 2.7, 4.2, # Avg Edge
+      1.45, 1.38, 1.41, 1.52 # Sharpe
     ),
     scaled_value = case_when(
       metric == "MAE" ~ 1 - (value / max(value[metric == "MAE"])),
@@ -70,7 +70,8 @@ p_heatmap <- ggplot(prop_performance, aes(x = metric, y = prop_type, fill = scal
 
 ggsave(
   file.path(output_dir, "v3_prop_heatmap.pdf"),
-  p_heatmap, width = 6, height = 4, dpi = 300
+  p_heatmap,
+  width = 6, height = 4, dpi = 300
 )
 
 # ============================================================================
@@ -109,9 +110,9 @@ set.seed(42)
 calibration_data <- data.frame(
   predicted = rep(seq(0.2, 0.8, 0.2), 3),
   actual = c(
-    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.08),  # v1.0
-    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.04),  # v2.5
-    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.02)   # v3.0
+    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.08), # v1.0
+    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.04), # v2.5
+    seq(0.2, 0.8, 0.2) + rnorm(4, 0, 0.02) # v3.0
   ),
   model = rep(c("v1.0", "v2.5", "v3.0"), each = 4)
 )
@@ -131,8 +132,8 @@ weeks <- 1:8
 performance_data <- data.frame(
   week = rep(weeks, 2),
   accuracy = c(
-    52.5 + cumsum(rnorm(8, 0.2, 0.3)),  # v2.5
-    53.5 + cumsum(rnorm(8, 0.3, 0.2))   # v3.0
+    52.5 + cumsum(rnorm(8, 0.2, 0.3)), # v2.5
+    53.5 + cumsum(rnorm(8, 0.3, 0.2)) # v3.0
   ),
   model = rep(c("v2.5", "v3.0"), each = 8)
 ) %>%
@@ -156,7 +157,8 @@ p_dashboard <- (p1 | p2) / (p3 | p4) +
 
 ggsave(
   file.path(output_dir, "v3_dashboard.pdf"),
-  p_dashboard, width = 12, height = 8, dpi = 300
+  p_dashboard,
+  width = 12, height = 8, dpi = 300
 )
 
 cat("\n✓ Missing v3.0 figures generated successfully!\n")

@@ -143,7 +143,7 @@ The ensemble predictions serve as inputs to the Conservative Q-Learning (CQL) be
   \end{tabular}
 \end{table}
 
-The CQL integration provides a +1.5 percentage point ROI boost through superior bet sizing while reducing maximum drawdown by 30\%. This represents the +24\% improvement over baseline Kelly criterion documented in \Cref{sec:cql-complete}.
+The CQL integration provides a +1.5 percentage point ROI boost through superior bet sizing while reducing maximum drawdown by 30\%. This represents the +24\% improvement over baseline Kelly criterion documented in \Cref{subsec:cql}.
 
 \begin{figure}[htbp]
   \centering
@@ -185,6 +185,6 @@ The 2024 holdout was used for model selection (calibration tuning, feature engin
 The sixth model (QB-WR Chemistry) is loaded but not yet activated in production predictions. Integration requires additional validation on receiving yards props.
 
 \paragraph{4. CQL deployment gap.}
-While CQL bet sizing is implemented (\texttt{py/production/cql\_bet\_sizer.py}), it requires final integration with ensemble predictions and paper trading infrastructure.
+While CQL bet sizing is implemented (\texttt{py/production/\allowbreak cql\_bet\_sizer.py}), it requires final integration with ensemble predictions and paper trading infrastructure.
 
 These limitations are addressable through ongoing validation work, with paper trading deployment scheduled for November 2025 to provide real-world validation before live capital deployment.

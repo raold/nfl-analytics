@@ -323,9 +323,9 @@ cat("Creating CLV distribution plot...\n")
 line_movements <- line_movements %>%
   mutate(
     # Assume 50/50 home/away bets
-    clv_ewb_home = line_movement,  # Bet home at opening
-    clv_ewb_away = -line_movement,  # Bet away at opening
-    clv_cl = 0,  # Closing line = 0 CLV by definition
+    clv_ewb_home = line_movement, # Bet home at opening
+    clv_ewb_away = -line_movement, # Bet away at opening
+    clv_cl = 0, # Closing line = 0 CLV by definition
     clv_adaptive = ifelse(abs_line_movement > 0.5, line_movement, 0)
   )
 
@@ -632,15 +632,21 @@ cat(sprintf("  SD: %.3f points\n", sd(line_movements$abs_line_movement, na.rm = 
 
 cat("\nSteam Move Analysis:\n")
 steam_pct <- sum(line_movements$steam_move, na.rm = TRUE) / nrow(line_movements) * 100
-cat(sprintf("  Steam moves (>0.5 pts): %s (%.1f%%)\n",
-            format(sum(line_movements$steam_move, na.rm = TRUE), big.mark = ","),
-            steam_pct))
-cat(sprintf("  Large moves (>1.0 pts): %s (%.1f%%)\n",
-            format(sum(line_movements$abs_line_movement > 1.0, na.rm = TRUE), big.mark = ","),
-            sum(line_movements$abs_line_movement > 1.0, na.rm = TRUE) / nrow(line_movements) * 100))
-cat(sprintf("  Extreme moves (>2.0 pts): %s (%.1f%%)\n",
-            format(sum(line_movements$abs_line_movement > 2.0, na.rm = TRUE), big.mark = ","),
-            sum(line_movements$abs_line_movement > 2.0, na.rm = TRUE) / nrow(line_movements) * 100))
+cat(sprintf(
+  "  Steam moves (>0.5 pts): %s (%.1f%%)\n",
+  format(sum(line_movements$steam_move, na.rm = TRUE), big.mark = ","),
+  steam_pct
+))
+cat(sprintf(
+  "  Large moves (>1.0 pts): %s (%.1f%%)\n",
+  format(sum(line_movements$abs_line_movement > 1.0, na.rm = TRUE), big.mark = ","),
+  sum(line_movements$abs_line_movement > 1.0, na.rm = TRUE) / nrow(line_movements) * 100
+))
+cat(sprintf(
+  "  Extreme moves (>2.0 pts): %s (%.1f%%)\n",
+  format(sum(line_movements$abs_line_movement > 2.0, na.rm = TRUE), big.mark = ","),
+  sum(line_movements$abs_line_movement > 2.0, na.rm = TRUE) / nrow(line_movements) * 100
+))
 
 cat("\nCLV by Strategy:\n")
 for (i in 1:nrow(clv_stats)) {

@@ -1,0 +1,93 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Gaussian copula joint exceedance}}{21}{figure.caption.141}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Reliability diagram (95\% CIs)}}{22}{figure.caption.149}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Integer‑margin pmf comparison}}{27}{figure.caption.180}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Database Schema (ERD)}}{36}{figure.caption.208}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Permutation feature importance for XGBoost baseline ensemble on 2024 holdout (281 games). Market delta and spread dominate (0.24 and 0.18 normalized importance), confirming market efficiency as the primary signal. Rolling EPA metrics and QB status contribute moderately, while weather and travel have minimal impact.}}{51}{figure.caption.320}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Canonical training window ablation study results (November 8, 2025). Four scenarios tested on 2025 hold-out set (148 games): (A) 2018--2024 strict (MAE: 48.1 yds), (B) 2018--2024 with H=4 exponential decay on 2015--2017 (MAE: 47.8 yds), (C) 2020--2024 current (MAE: 48.4 yds), (D) 2015--2024 dissertation baseline (MAE: 47.8 yds). Scenario B selected as canonical window based on statistical superiority over strict windows (p=0.003 vs A, p=0.007 vs C) and interpretable decay function. Error bars represent 95\% bootstrap confidence intervals. All production models retrained with this window for ensemble consistency.}}{59}{figure.caption.325}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Feature importance comparison between XGBoost and BNN models across the top 15 features. Defensive situational features (dark blue) dominate XGBoost importance rankings, while BNN assigns more weight to vegas line bias and environmental factors. The divergence reflects differing model architectures: XGBoost captures non-linear interactions while BNN emphasizes uncertainty-informative features.}}{60}{figure.caption.378}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Rolling OOS log loss}}{63}{figure.caption.392}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Rolling OOS ECE}}{64}{figure.caption.393}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Reliability curves (2024 holdout)}}{65}{figure.caption.394}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Feature Store Architecture for Baseline Models}}{66}{figure.caption.402}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Integer‑margin frequencies (holdout)}}{75}{figure.caption.480}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Baseline calibration}}{76}{figure.caption.487}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Copula impact on teaser/SGP EV}}{77}{figure.caption.500}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces GLM reliability (Platt)}}{85}{figure.caption.544}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces GNN GPU Optimization: Marginal Speedup Contributions. Each bar represents the speedup factor contributed by a specific optimization phase, with labels showing both the speedup multiplier and resulting epoch time. The dominant contribution (12$\times $) comes from batch-parallel processing, validating the hypothesis that sequential processing was the primary bottleneck.}}{135}{figure.caption.852}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Cumulative Speedup Progression (Log Scale). The log-scale y-axis emphasizes the multiplicative nature of optimization phases. Starting from 1$\times $ baseline, optimizations compound to achieve 82.5$\times $ per-epoch speedup on 9-season dataset, reducing epoch time from 33 minutes to 24 seconds.}}{136}{figure.caption.853}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces GPU Utilization: Baseline vs Optimized. Despite processing 9$\times $ more data (2,367 games vs 272 games), the optimized implementation maintains similar GPU utilization (~33\%) with significantly better throughput. The baseline's 45\% utilization on a single season reflects hardware underutilization due to sequential processing bottlenecks.}}{136}{figure.caption.854}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces GNN Training Convergence Through Epoch 49. Validation Brier score (lower is better) showing actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49) on 9 seasons (2,367 games). The smoothed trend (red line) indicates steady improvement, with early convergence observed by epoch 15, validating that the hierarchical architecture successfully captures game prediction patterns without requiring extensive training.}}{137}{figure.caption.855}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Model evolution performance}}{144}{figure.caption.901}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Ensemble component performance}}{145}{figure.caption.906}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Calibration comparison}}{146}{figure.caption.907}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Ensemble MAE progression across versions}}{154}{figure.caption.975}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Offline RL learning curves (median and IQR across seeds).}}{166}{figure.caption.1036}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}}{167}{figure.caption.1037}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces End-to-end offline RL workflow from data to promotion.}}{168}{figure.caption.1045}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Sensitivity of growth/drawdown to pessimism level $\alpha $ in Kelly‑LCB and the RL policy’s calibration to $p$ uncertainty.}}{171}{figure.caption.1066}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Final bankroll distribution}}{188}{figure.caption.1168}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Fractional Kelly bankroll trajectories}}{189}{figure.caption.1172}%
+\contentsline {figure}{\numberline {7.3}{\ignorespaces Profit Optimization System Architecture}}{201}{figure.caption.1270}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Simulated teaser expected value surface as a function of leg success probabilities. The zero contour (white) marks the middle threshold that informs acceptance tests inside the simulator (\Cref {sec:teaser-math}).}}{208}{figure.caption.1293}%
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Acceptance pass/fail rates by season and test category (margins, key masses, dependence).}}{215}{figure.caption.1343}%
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Relationship between acceptance outcomes and live performance (e.g., CLV/ROI). Failing acceptance correlates with degraded live metrics, justifying the gate.}}{215}{figure.caption.1344}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {9.1}{\ignorespaces ROI Projection Under Missing Signal Integration. Conservative scenario (solid blue) assumes linear additivity of feature improvements (+9.8\% lift from baseline). Realistic scenario (dashed blue) accounts for 20\% correlation between feature categories (+8.4\% lift). Current baseline (-7.5\% ROI, red dashed) reflects empirical performance. Full integration reaches marginally profitable range (+0.9\% to +2.3\% ROI) but falls short of original +5\% target (green dash-dot).}}{248}{figure.caption.1624}%
+\contentsline {figure}{\numberline {9.2}{\ignorespaces Comparison of 90\% credible interval coverage across all methods investigated. The horizontal dashed line indicates the target coverage of 90\%. All single-output BNN variants (baseline, with Vegas features, with opponent features, with optimized hyperparameters) remain severely under-calibrated regardless of modifications. In contrast, non-Bayesian baselines (conformal prediction, quantile regression) and the architectural innovation (multi-output BNN) achieve calibration near or exceeding the target.}}{252}{figure.caption.1641}%
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Incremental impact of feature engineering on 90\% credible interval coverage. Each bar represents a cumulative feature configuration: baseline (4 features), +Vegas lines (6 features), +environment (10 features), +opponent defense (9 features, environment features removed). Error bars represent bootstrapped 95\% confidence intervals (1000 resamples). The horizontal red dashed line indicates the target 90\% coverage. Despite incorporating domain expertise and multiple information sources, the best feature set improves coverage by only 5.1 percentage points, leaving the model severely under-calibrated.}}{255}{figure.caption.1650}%
+\contentsline {figure}{\numberline {9.4}{\ignorespaces Coverage-sharpness trade-off across uncertainty quantification methods. Each point represents a method, with x-axis showing average 90\% interval width (lower is sharper) and y-axis showing empirical coverage (closer to 90\% is better calibrated). The dashed horizontal line indicates target 90\% coverage; the shaded region marks acceptable calibration (85-95\%). The dashed vertical line shows the single-output BNN's interval width. Single-output BNN variants cluster in the bottom-left (narrow but under-calibrated), while quantile regression and conformal prediction achieve calibration by drastically widening intervals. The multi-output BNN achieves near-optimal balance: strong calibration without extreme interval widening.}}{263}{figure.caption.1695}%
+\contentsline {figure}{\numberline {9.5}{\ignorespaces BNN calibration reliability diagram comparing predicted probabilities to observed frequencies across different confidence levels. The multi-output BNN (blue line) closely tracks the perfect calibration diagonal, while the single-output BNN baseline (orange line) shows systematic under-calibration. Each point represents a binned confidence level, with error bars showing 95\% confidence intervals from bootstrapping.}}{265}{figure.caption.1699}%
+\contentsline {figure}{\numberline {9.6}{\ignorespaces BNN Calibration Improvement Progression}}{270}{figure.caption.1718}%
+\contentsline {figure}{\numberline {9.7}{\ignorespaces BNN Improvement Hierarchy}}{273}{figure.caption.1730}%
+\contentsline {figure}{\numberline {9.8}{\ignorespaces Evolution of ensemble performance across model versions, showing progression in ROI, Win Rate, and Sharpe Ratio from baseline v1.0 (3-model ensemble with 9 features) to 5-Way v3.1 (5-model ensemble with 157 features). Each metric shows consistent improvement, with the 5-way ensemble achieving 6.8\% ROI, 61\% win rate, and 2.6 Sharpe ratio.}}{279}{figure.caption.1778}%
+\contentsline {figure}{\numberline {9.9}{\ignorespaces Temporal evolution of cumulative ROI across 2022--2024 backtest period for all ensemble versions. The 5-way ensemble (v3.1) demonstrates consistent upward trajectory with minimal drawdown periods, achieving 6.8\% cumulative ROI. Shaded regions indicate 95\% bootstrap confidence intervals.}}{280}{figure.caption.1782}%
+\contentsline {figure}{\numberline {9.10}{\ignorespaces Training window ablation study results comparing four scenarios on the 2025 hold-out set. Scenario B (2018--2024 with H=4 exponential decay on 2015--2017) achieves the best MAE (47.77 yards) and is statistically superior to both strict 2018--2024 ($p=0.003$) and current 2020--2024 ($p=0.007$) windows. Error bars represent 95\% bootstrap confidence intervals.}}{284}{figure.caption.1801}%
+\contentsline {figure}{\numberline {9.11}{\ignorespaces Coverage-sharpness trade-off for uncertainty quantification methods. Each point represents a method, with x-axis showing average 90\% interval width (lower is sharper) and y-axis showing empirical coverage on 2024 holdout (closer to 90\% is better calibrated). The shaded region marks acceptable calibration (85--95\%). Temperature scaling achieves near-optimal balance: strong calibration (89.5\%) with sharp intervals (17 yards). Conformal methods guarantee coverage at the cost of 4-fold wider intervals.}}{299}{figure.caption.1927}%
+\contentsline {figure}{\numberline {9.12}{\ignorespaces Coverage stability over time (2024 season, weeks 1--18). Conformal prediction maintains near-constant coverage (90--92\%) across all weeks, validating distribution-free guarantees under mild covariate shift. Temperature scaling exhibits slight drift (87--91\%), reflecting sensitivity to distributional changes not captured by fixed $T=0.75$.}}{300}{figure.caption.1934}%
+\contentsline {figure}{\numberline {9.13}{\ignorespaces Evidential regression calibration curve (left) and normalized residual plot (right). The calibration curve reveals severe over-calibration: all predictions fall within even narrow confidence intervals. This indicates the model is too conservative with uncertainty estimates.}}{311}{figure.caption.2010}%
+\contentsline {figure}{\numberline {9.14}{\ignorespaces Uncertainty decomposition for evidential regression. Top left: Aleatoric uncertainty (irreducible data noise, mean 2,359 yards). Top right: Epistemic uncertainty (model uncertainty, mean 11,391 yards). Bottom left: Scatter plot shows epistemic dominates aleatoric. Bottom right: Total uncertainty distribution (mean 11,638 yards).}}{313}{figure.caption.2018}%
+\contentsline {figure}{\numberline {9.15}{\ignorespaces GNN Calibration Plot (2025 Test Set): Predicted probabilities vs observed frequencies. Diagonal line indicates perfect calibration. Our GNN (5 Message Rounds) shows slight overconfidence in extreme predictions ($p < 0.3$ or $p > 0.7$) but maintains reasonable calibration overall.}}{318}{figure.caption.2058}%
+\contentsline {figure}{\numberline {9.16}{\ignorespaces Causal DAG for NFL Rushing Performance. Solid arrows represent causal relationships. Dashed red paths show confounding backdoor paths from treatment (carries) to outcome (yards) that must be blocked via adjustment. Minimal adjustment set: \{Player Ability, Team Quality, Opponent Defense\}. Game Script is a collider (affected by Team Quality) and should NOT be conditioned on to avoid inducing bias.}}{324}{figure.caption.2098}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {10.1}{\ignorespaces Claude AI semantic research workflow. User queries in natural language are translated to executable code (SQL, R, Python), validated with statistical rigor, and interpreted with domain knowledge. The conversational loop enables iterative refinement.}}{365}{figure.caption.2230}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Per-season reliability: GLM baseline (2015--2019)}}{404}{figure.caption.2376}%
+\contentsline {figure}{\numberline {A.2}{\ignorespaces Per-season reliability: GLM baseline (2020--2024)}}{405}{figure.caption.2377}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {D.1}{\ignorespaces CQL Training Curves: Total loss, TD error, CQL penalty, and mean Q-value across 2000 epochs. Training completed in approximately 9 minutes on NVIDIA RTX 4090 (24GB VRAM) with CUDA acceleration. Loss reduction of 75\% demonstrates effective convergence with conservative regularization.}}{419}{figure.caption.2488}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {K.1}{\ignorespaces BNN Investigation Timeline: 6 Failures Over 26 Days (October 14 -- November 9, 2025)}}{464}{figure.caption.2821}%
+\contentsline {figure}{\numberline {K.2}{\ignorespaces 90\% Coverage Calibration: Temperature Scaling (T=0.75) Only Success}}{466}{figure.caption.2822}%
+\contentsline {figure}{\numberline {K.3}{\ignorespaces BNN Failure Taxonomy: Root Causes by Category}}{469}{figure.caption.2823}%
+\contentsline {figure}{\numberline {K.4}{\ignorespaces MC Dropout Gradient Explosion: NaN Losses from Epoch 12}}{470}{figure.caption.2824}%
+\contentsline {figure}{\numberline {K.5}{\ignorespaces Time Investment Waterfall: 84 Hours Across 6 Failures}}{471}{figure.caption.2825}%
+\contentsline {figure}{\numberline {K.6}{\ignorespaces MC Dropout gradient explosion pattern (typical across 5 seeds)}}{475}{figure.caption.2856}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {L.1}{\ignorespaces Ensemble Composition: Performance-Complexity Trade-Off}}{499}{figure.caption.3065}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {O.1}{\ignorespaces BNN Investigation: Diminishing Returns Over Time. Progress score (0-10) measures cumulative advancement toward production-ready model. Multi-Output v1 (18 hours) achieved highest score (6/10) before data leakage discovery. Subsequent approaches showed negative marginal returns: each additional hour yielded less progress. By hour 76 (Conformal BNN), marginal progress approached zero, signaling optimal stopping point.}}{541}{figure.caption.3432}%
+\contentsline {figure}{\numberline {O.2}{\ignorespaces BNN Investigation Research Journey: Four-Act Narrative Structure. The investigation progressed from initial optimism (Multi-Output v1 strong training metrics) through repeated setbacks (5 consecutive failures) to strategic realization (diminishing returns) and ultimate abandonment. This freed resources for XGBoost v4, which achieved breakthrough results in 57\% less time. The arc illustrates that research progress is non-monotonic: sometimes the path forward requires stepping back.}}{545}{figure.caption.3450}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {P.1}{\ignorespaces Geometric interpretation of orthogonalization. Correlated features $\mathbf {x}_{\text {player}}$ and $\mathbf {x}_{\text {opp}}$ (blue, red vectors, $\rho = 0.42$) create confounding. Gram-Schmidt process projects $\mathbf {x}_{\text {player}}$ onto orthogonal complement of $\mathbf {x}_{\text {opp}}$, yielding uncorrelated features $\mathbf {u}_{\text {opp}}$ and $\mathbf {u}_{\text {player}}$ (green, orange vectors, $\rho = 0$).}}{550}{figure.caption.3482}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }

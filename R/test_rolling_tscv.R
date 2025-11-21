@@ -5,18 +5,20 @@ library(purrr)
 library(tibble)
 library(glue)
 
-con <- dbConnect(Postgres(), dbname='devdb01', host='localhost', port=5544, user='dro', password='sicillionbillions')
-games <- dbGetQuery(con, 'SELECT season, week, game_id, home_team, away_team, home_score, away_score, spread_close FROM games WHERE season BETWEEN 1999 AND 2024')
+con <- dbConnect(Postgres(), dbname = "devdb01", host = "localhost", port = 5544, user = "dro", password = "sicillionbillions")
+games <- dbGetQuery(con, "SELECT season, week, game_id, home_team, away_team, home_score, away_score, spread_close FROM games WHERE season BETWEEN 1999 AND 2024")
 dbDisconnect(con)
 
-games <- games |> mutate(
-  margin = home_score - away_score,
-  spread_target = if_else(!is.na(spread_close), as.integer(margin + spread_close > 0), NA_integer_)
-) |> dplyr::filter(!is.na(spread_target), !is.na(spread_close))
+games <- games |>
+  mutate(
+    margin = home_score - away_score,
+    spread_target = if_else(!is.na(spread_close), as.integer(margin + spread_close > 0), NA_integer_)
+  ) |>
+  dplyr::filter(!is.na(spread_target), !is.na(spread_close))
 
 cat("Total games:", nrow(games), "\n\n")
 
-exp_weight <- function(s, t, H) 0.5 ^ ((t - s) / H)
+exp_weight <- function(s, t, H) 0.5^((t - s) / H)
 
 train_glm_weighted <- function(df, train_years, t_eval, H = NULL, recent_only_start = NULL) {
   dtr <- df |> dplyr::filter(season %in% train_years)
@@ -39,10 +41,12 @@ train_glm_weighted <- function(df, train_years, t_eval, H = NULL, recent_only_st
 }
 
 predict_metrics <- function(mod, dte) {
-  if (is.null(mod) || is.null(dte) || nrow(dte) == 0) return(NULL)
+  if (is.null(mod) || is.null(dte) || nrow(dte) == 0) {
+    return(NULL)
+  }
   p <- as.numeric(predict(mod, dte, type = "response"))
   y <- dte$spread_target
-  ll <- - (y * log(p + 1e-15) + (1 - y) * log(1 - p + 1e-15))
+  ll <- -(y * log(p + 1e-15) + (1 - y) * log(1 - p + 1e-15))
   tibble(p = p, y = y, ll = ll)
 }
 

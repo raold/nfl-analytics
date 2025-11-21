@@ -104,6 +104,7 @@ After fixes, v4.0 components worked individually but ensemble integration still 
 \caption{Ensemble v5.0 Component Weights (Baseline)}
 \label{tab:ensemble-v5-weights}
 \small
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{} l c c c c @{}}
 \toprule
 \textbf{Component} & \textbf{Weight (\%)} & \textbf{MAE} & \textbf{Calibration} & \textbf{Rationale} \\
@@ -116,6 +117,7 @@ Informative Priors v2 & 15 & 53.12 & 87.4\% & Expert knowledge, domain constrain
 \textbf{Ensemble v5.0} & \textbf{100} & \textbf{40.0} & \textbf{90.2\%} & \textbf{Weighted average, temperature scaled} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \begin{tablenotes}
 \item \textbf{Notes:} Weights optimized via CVX (constrained least squares) on 2023 validation. MAE = mean absolute error on 2024 holdout (148 games). Calibration = coverage of 90\% prediction intervals. Temperature scaling (T=0.5534) applied to ensemble output for perfect 90\% calibration.
 \end{tablenotes}

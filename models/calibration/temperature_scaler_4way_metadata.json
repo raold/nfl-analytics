@@ -1,0 +1,13 @@
+{
+  "temperature": 1.0771,
+  "target_coverage": 0.9,
+  "coverage_before": 0.744505,
+  "coverage_after": 0.913699,
+  "width_before": 365.7,
+  "width_after": 379.5,
+  "mae": 97.52,
+  "n_samples": 146,
+  "training_seasons": "2025-season-holdout",
+  "training_date": "2025-11-16T00:00:00",
+  "notes": "CORRECTED: Previous T=0.5992 was under-scaling (74% coverage). New T=1.0771 achieves 91.1% coverage target."
+}

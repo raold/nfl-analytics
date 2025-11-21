@@ -45,26 +45,29 @@ log_audit <- function(message, level = "INFO") {
 
 # Store audit result in database
 store_audit_result <- function(conn, audit_type, table_name = NULL, check_name, status, violation_count = NULL, message = "", metadata = NULL) {
-  tryCatch({
-    metadata_json <- if (!is.null(metadata)) toJSON(metadata, auto_unbox = TRUE) else NULL
+  tryCatch(
+    {
+      metadata_json <- if (!is.null(metadata)) toJSON(metadata, auto_unbox = TRUE) else NULL
 
-    query <- "
+      query <- "
       INSERT INTO dba_audit_log (audit_type, table_name, check_name, status, violation_count, message, metadata)
       VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
     "
 
-    dbExecute(conn, query, list(
-      audit_type,
-      table_name,
-      check_name,
-      status,
-      violation_count,
-      message,
-      metadata_json
-    ))
-  }, error = function(e) {
-    log_audit(sprintf("Failed to store audit result: %s", e$message), level = "WARNING")
-  })
+      dbExecute(conn, query, list(
+        audit_type,
+        table_name,
+        check_name,
+        status,
+        violation_count,
+        message,
+        metadata_json
+      ))
+    },
+    error = function(e) {
+      log_audit(sprintf("Failed to store audit result: %s", e$message), level = "WARNING")
+    }
+  )
 }
 
 # Check 1: Database Overview
@@ -81,11 +84,15 @@ check_database_overview <- function(conn) {
   ")
 
   log_audit(sprintf("Database: %s, Size: %s", result$database_name, result$total_size))
-  log_audit(sprintf("Tables: %d, Views: %d, Indexes: %d",
-                   as.integer(result$table_count), as.integer(result$view_count), as.integer(result$index_count)))
+  log_audit(sprintf(
+    "Tables: %d, Views: %d, Indexes: %d",
+    as.integer(result$table_count), as.integer(result$view_count), as.integer(result$index_count)
+  ))
 
-  store_audit_result(conn, "database_overview", NULL, "database_size",
-                    "PASS", NULL, sprintf("Size: %s", result$total_size), as.list(result))
+  store_audit_result(
+    conn, "database_overview", NULL, "database_size",
+    "PASS", NULL, sprintf("Size: %s", result$total_size), as.list(result)
+  )
 
   return(list(status = "PASS", data = result))
 }
@@ -115,10 +122,14 @@ check_primary_keys <- function(conn) {
     store_audit_result(conn, "schema_integrity", NULL, "primary_keys", "PASS", 0L, "All tables have primary keys")
     return(list(status = "PASS", violations = 0))
   } else {
-    log_audit(sprintf("⚠️  WARNING: %d tables missing primary keys: %s",
-                     n_missing, paste(result$table_name, collapse = ", ")), level = "WARNING")
-    store_audit_result(conn, "schema_integrity", NULL, "primary_keys", "WARNING", as.integer(n_missing),
-                      sprintf("Tables missing PKs: %s", paste(result$table_name, collapse = ", ")))
+    log_audit(sprintf(
+      "⚠️  WARNING: %d tables missing primary keys: %s",
+      n_missing, paste(result$table_name, collapse = ", ")
+    ), level = "WARNING")
+    store_audit_result(
+      conn, "schema_integrity", NULL, "primary_keys", "WARNING", as.integer(n_missing),
+      sprintf("Tables missing PKs: %s", paste(result$table_name, collapse = ", "))
+    )
     warnings <<- warnings + 1
     return(list(status = "WARNING", violations = n_missing, tables = result$table_name))
   }
@@ -143,8 +154,10 @@ check_referential_integrity <- function(conn) {
     return(list(status = "PASS", violations = 0))
   } else {
     log_audit(sprintf("❌ FAIL: %d orphaned plays records", violations), level = "FAIL")
-    store_audit_result(conn, "referential_integrity", "plays", "plays_to_games", "FAIL", violations,
-                      "Orphaned play records found")
+    store_audit_result(
+      conn, "referential_integrity", "plays", "plays_to_games", "FAIL", violations,
+      "Orphaned play records found"
+    )
     critical_failures <<- critical_failures + 1
     return(list(status = "FAIL", violations = violations))
   }
@@ -282,15 +295,19 @@ check_table_maintenance <- function(conn) {
     if (dead_pct > 15) {
       log_audit(sprintf("⚠️  WARNING: plays table dead row percentage is %.2f%% (threshold: 15%%)", dead_pct), level = "WARNING")
       log_audit("RECOMMENDATION: Consider running VACUUM ANALYZE on plays table", level = "WARNING")
-      store_audit_result(conn, "table_maintenance", "plays", "dead_row_percentage", "WARNING",
-                        as.integer(dead_pct), sprintf("Dead rows: %.2f%%", dead_pct),
-                        list(live_rows = plays_row$live_rows, dead_rows = plays_row$dead_rows))
+      store_audit_result(
+        conn, "table_maintenance", "plays", "dead_row_percentage", "WARNING",
+        as.integer(dead_pct), sprintf("Dead rows: %.2f%%", dead_pct),
+        list(live_rows = plays_row$live_rows, dead_rows = plays_row$dead_rows)
+      )
       warnings <<- warnings + 1
     } else {
       log_audit(sprintf("✅ PASS: plays table dead row percentage is %.2f%% (healthy)", dead_pct))
-      store_audit_result(conn, "table_maintenance", "plays", "dead_row_percentage", "PASS",
-                        as.integer(dead_pct), sprintf("Dead rows: %.2f%%", dead_pct),
-                        list(live_rows = plays_row$live_rows, dead_rows = plays_row$dead_rows))
+      store_audit_result(
+        conn, "table_maintenance", "plays", "dead_row_percentage", "PASS",
+        as.integer(dead_pct), sprintf("Dead rows: %.2f%%", dead_pct),
+        list(live_rows = plays_row$live_rows, dead_rows = plays_row$dead_rows)
+      )
     }
   }
 
@@ -298,12 +315,16 @@ check_table_maintenance <- function(conn) {
   high_dead_rows <- result[!is.na(result$dead_row_pct) & result$dead_row_pct > 20, ]
 
   if (nrow(high_dead_rows) > 0) {
-    log_audit(sprintf("⚠️  WARNING: %d tables with >20%% dead rows: %s",
-                     nrow(high_dead_rows), paste(high_dead_rows$table_name, collapse = ", ")), level = "WARNING")
+    log_audit(sprintf(
+      "⚠️  WARNING: %d tables with >20%% dead rows: %s",
+      nrow(high_dead_rows), paste(high_dead_rows$table_name, collapse = ", ")
+    ), level = "WARNING")
     for (i in 1:nrow(high_dead_rows)) {
       row <- high_dead_rows[i, ]
-      store_audit_result(conn, "table_maintenance", row$table_name, "dead_row_percentage", "WARNING",
-                        as.integer(row$dead_row_pct), sprintf("Dead rows: %.2f%%", row$dead_row_pct))
+      store_audit_result(
+        conn, "table_maintenance", row$table_name, "dead_row_percentage", "WARNING",
+        as.integer(row$dead_row_pct), sprintf("Dead rows: %.2f%%", row$dead_row_pct)
+      )
     }
     warnings <<- warnings + 1
   }
@@ -326,13 +347,17 @@ check_index_coverage <- function(conn) {
 
   if (idx_count >= 100) {
     log_audit("✅ PASS: Comprehensive index coverage")
-    store_audit_result(conn, "schema_integrity", NULL, "index_coverage", "PASS",
-                      idx_count, sprintf("%d indexes", idx_count))
+    store_audit_result(
+      conn, "schema_integrity", NULL, "index_coverage", "PASS",
+      idx_count, sprintf("%d indexes", idx_count)
+    )
     return(list(status = "PASS", count = idx_count))
   } else {
     log_audit(sprintf("⚠️  WARNING: Only %d indexes (expected >= 100)", idx_count), level = "WARNING")
-    store_audit_result(conn, "schema_integrity", NULL, "index_coverage", "WARNING",
-                      idx_count, "Low index count")
+    store_audit_result(
+      conn, "schema_integrity", NULL, "index_coverage", "WARNING",
+      idx_count, "Low index count"
+    )
     warnings <<- warnings + 1
     return(list(status = "WARNING", count = idx_count))
   }
@@ -368,13 +393,17 @@ check_season_coverage <- function(conn) {
 
   if (nrow(recent_coverage) > 0 && all(recent_coverage$data_sources >= 4)) {
     log_audit("✅ PASS: Good data coverage for recent seasons")
-    store_audit_result(conn, "data_completeness", NULL, "season_coverage", "PASS",
-                      NULL, "Recent seasons have comprehensive data coverage")
+    store_audit_result(
+      conn, "data_completeness", NULL, "season_coverage", "PASS",
+      NULL, "Recent seasons have comprehensive data coverage"
+    )
     return(list(status = "PASS", data = result))
   } else {
     log_audit("⚠️  WARNING: Some recent seasons have incomplete data coverage", level = "WARNING")
-    store_audit_result(conn, "data_completeness", NULL, "season_coverage", "WARNING",
-                      NULL, "Incomplete coverage for some seasons")
+    store_audit_result(
+      conn, "data_completeness", NULL, "season_coverage", "WARNING",
+      NULL, "Incomplete coverage for some seasons"
+    )
     warnings <<- warnings + 1
     return(list(status = "WARNING", data = result))
   }

@@ -11,6 +11,8 @@ recurring issues by automatically routing code changes to specialized validation
 - Enforce data leakage checks (BNN: 84 hours wasted)
 - Validate model convergence before deployment
 - Security audit credential changes
+- Prevent placeholder predictions from reaching production
+- Prevent underpowered experiments (v7.0: 58 hours wasted on insufficient data)
 
 **Integration Points:**
 1. Pre-commit hooks (git-level enforcement)
@@ -19,7 +21,7 @@ recurring issues by automatically routing code changes to specialized validation
 
 **Author:** Claude Code (Sonnet 4.5)
 **Date:** November 15, 2025
-**Version:** 1.0
+**Version:** 1.2 (Added Rule 20: Data Sufficiency Gate)
 """
 
 import re
@@ -330,6 +332,36 @@ class EnforcementRouter:
                 r'valid_predictions',
             ],
             validator=self._validate_ensemble_components,
+            level=EnforcementLevel.BLOCKING
+        )
+
+        # Rule 19: Placeholder Detection (CRITICAL) - PHASE 4
+        self.rules['placeholder_detection'] = EnforcementRule(
+            name='placeholder_detection',
+            description='Prevent hardcoded placeholder predictions from reaching production',
+            triggers=[
+                r'py/ensemble/.*\.py$',           # All ensemble files
+                r'predict\(',                      # Predict methods
+                r'return.*dict',                   # Dict returns
+            ],
+            validator=self._validate_placeholder_predictions,
+            level=EnforcementLevel.BLOCKING
+        )
+
+        # Rule 20: Data Sufficiency Gate (CRITICAL) - PHASE 5
+        self.rules['data_sufficiency_gate'] = EnforcementRule(
+            name='data_sufficiency_gate',
+            description='Prevent underpowered experiments with insufficient training data',
+            triggers=[
+                r'meta_learning',                  # Meta-learning code
+                r'adaptive.*weight',               # Adaptive weighting
+                r'online.*learning',               # Online learning methods
+                r'incremental',                    # Incremental learning
+                r'lightgbm',                       # Complex tree models
+                r'xgboost.*train',                 # XGBoost training
+                r'sklearn.*fit',                   # Sklearn model training
+            ],
+            validator=self._validate_data_sufficiency,
             level=EnforcementLevel.BLOCKING
         )
 
@@ -1069,6 +1101,345 @@ class EnforcementRouter:
             message="Ensemble component validation present"
         )
 
+    def _validate_placeholder_predictions(self, file_path: str, content: Optional[str]) -> ValidationResult:
+        """
+        Validate no hardcoded placeholder predictions in ensemble code (Rule 19 - CRITICAL).
+
+        **Purpose:** Prevent placeholder predictions from reaching production/validation.
+
+        **Detection Patterns:**
+        1. Hardcoded mean values around 250 ± 5 yards
+        2. Hardcoded std values (25-40 yards) without computation
+        3. Warning messages indicating placeholders
+
+        **Why Critical:** Placeholders blocked validation for 18+ hours (Nov 16-18)
+        """
+        if not content or not file_path.endswith('.py'):
+            return ValidationResult(
+                status=ValidationStatus.SKIPPED,
+                agent_name='placeholder_detection',
+                message="Not a Python file"
+            )
+
+        # Skip test files
+        if 'test' in file_path.lower() or '_test.py' in file_path:
+            return ValidationResult(
+                status=ValidationStatus.SKIPPED,
+                agent_name='placeholder_detection',
+                message="Test file - placeholders allowed for testing"
+            )
+
+        issues = []
+
+        # Pattern 1: Hardcoded mean values around 250 ± 5 yards
+        mean_patterns = [
+            (r"['\"]mean['\"]\\?\s*:\s*250\.0", "Hardcoded mean: 250.0"),
+            (r"['\"]mean['\"]\\?\s*:\s*245\.0", "Hardcoded mean: 245.0"),
+            (r"['\"]mean['\"]\\?\s*:\s*248\.0", "Hardcoded mean: 248.0"),
+            (r"['\"]mean['\"]\\?\s*:\s*252\.0", "Hardcoded mean: 252.0"),
+            (r"['\"]mean['\"]\\?\s*:\s*255\.0", "Hardcoded mean: 255.0"),
+            (r"mean\s*=\s*250(?![\d])", "Direct assignment: mean = 250"),
+            (r"mean\s*=\s*24[5-9](?![\d])", "Direct assignment: mean = 245-249"),
+            (r"mean\s*=\s*25[0-5](?![\d])", "Direct assignment: mean = 250-255"),
+        ]
+
+        for pattern, description in mean_patterns:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                line_num = content[:match.start()].count('\n') + 1
+                # Check if in predict method (high risk zone)
+                predict_method_start = content.rfind('def predict', 0, match.start())
+                next_def = content.find('def ', match.end())
+                in_predict = predict_method_start > -1 and (next_def == -1 or next_def > match.start())
+
+                if in_predict:
+                    issues.append({
+                        'line': line_num,
+                        'match': match.group(0)[:60],
+                        'description': description,
+                        'severity': 'CRITICAL',
+                        'location': 'predict() method'
+                    })
+                else:
+                    issues.append({
+                        'line': line_num,
+                        'match': match.group(0)[:60],
+                        'description': description,
+                        'severity': 'HIGH',
+                        'location': 'ensemble file'
+                    })
+
+        # Pattern 2: Hardcoded std values without computation (25-40 yards)
+        std_patterns = [
+            (r"['\"]std['\"]\\?\s*:\s*[2-4][0-9]\.[0-9]", "Hardcoded std without computation"),
+            (r"std\s*=\s*[2-4][0-9](?![\d])", "Direct std assignment: 20-49"),
+        ]
+
+        for pattern, description in std_patterns:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                line_num = content[:match.start()].count('\n') + 1
+                # Look for computation context (is it computed?)
+                search_start = max(0, match.start() - 200)
+                context = content[search_start:match.start() + 100]
+
+                has_computation = any(op in context for op in [
+                    'np.std', 'std(', 'pandas.std', 'computed', 'calculate',
+                    'numpy', 'quantile', 'percentile'
+                ])
+
+                if not has_computation:
+                    # Check if in predict method
+                    predict_method_start = content.rfind('def predict', 0, match.start())
+                    next_def = content.find('def ', match.end())
+                    in_predict = predict_method_start > -1 and (next_def == -1 or next_def > match.start())
+
+                    issues.append({
+                        'line': line_num,
+                        'match': match.group(0)[:60],
+                        'description': description,
+                        'severity': 'CRITICAL' if in_predict else 'HIGH',
+                        'location': 'predict() method' if in_predict else 'ensemble code'
+                    })
+
+        # Pattern 3: Warning messages indicating placeholders
+        placeholder_keywords = [
+            (r"placeholder", "Placeholder indicator"),
+            (r"not yet integrated", "Not yet integrated indicator"),
+            (r"TODO.*integrate", "TODO: integrate indicator"),
+            (r"temporary.*return", "Temporary return indicator"),
+            (r"dummy.*prediction", "Dummy prediction indicator"),
+        ]
+
+        for pattern, description in placeholder_keywords:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for match in matches:
+                line_num = content[:match.start()].count('\n') + 1
+                # Check if near a return statement
+                search_end = min(len(content), match.end() + 200)
+                context = content[match.start():search_end]
+
+                if 'return' in context:
+                    issues.append({
+                        'line': line_num,
+                        'match': match.group(0),
+                        'description': description,
+                        'severity': 'CRITICAL',
+                        'location': 'predict/return path'
+                    })
+
+        if issues:
+            critical_issues = [i for i in issues if i.get('severity') == 'CRITICAL']
+
+            return ValidationResult(
+                status=ValidationStatus.FAILED,
+                agent_name='placeholder_detection',
+                message=f"Placeholder predictions detected: {len(critical_issues)} CRITICAL, {len(issues) - len(critical_issues)} HIGH",
+                details={
+                    'issues': issues[:10],  # Limit to first 10
+                    'critical_count': len(critical_issues),
+                    'recommendation': 'Remove all placeholder predictions before running validation/backtest',
+                    'blocked_for': '18+ hours (Nov 16-18)' if critical_issues else None
+                }
+            )
+
+        return ValidationResult(
+            status=ValidationStatus.PASSED,
+            agent_name='placeholder_detection',
+            message="No placeholder predictions detected"
+        )
+
+    def _validate_data_sufficiency(self, file_path: str, content: Optional[str]) -> ValidationResult:
+        """
+        Validate sufficient training data exists before complex model training (Rule 20 - CRITICAL).
+
+        **Purpose:** Prevent underpowered experiments like v7.0 (1,701 games for meta-learning = 58 hours wasted).
+
+        **Detection Patterns:**
+        1. Meta-learning without data sufficiency checks
+        2. Online learning without initialization validation
+        3. Complex models (LightGBM, XGBoost) without sample size validation
+        4. Statistical tests without minimum sample requirements
+
+        **Why Critical:** v7.0 needed 5,000-10,000 games but had only 1,701 → 58 hours wasted.
+
+        **Thresholds:**
+        - Meta-learning: ≥5,000 samples
+        - Online learning: ≥1,000 samples for initialization
+        - Ensemble reweighting: ≥100 games per component
+        - Statistical tests: ≥30 samples per group (Central Limit Theorem)
+        - LightGBM/XGBoost: ≥100 samples per feature
+        """
+        if not content or not file_path.endswith('.py'):
+            return ValidationResult(
+                status=ValidationStatus.SKIPPED,
+                agent_name='data_sufficiency_gate',
+                message="Not a Python file"
+            )
+
+        # Skip test files
+        if 'test' in file_path.lower() or '_test.py' in file_path:
+            return ValidationResult(
+                status=ValidationStatus.SKIPPED,
+                agent_name='data_sufficiency_gate',
+                message="Test file - data sufficiency not required for testing"
+            )
+
+        issues = []
+
+        # Pattern 1: Meta-learning without data validation
+        if re.search(r'meta.*learning|adaptive.*weight|contextual.*weight', content, re.IGNORECASE):
+            # Check for data validation
+            has_data_check = bool(re.search(
+                r'(assert\s+len\(.*\)\s*>=\s*\d+|'
+                r'if\s+len\(.*\)\s*<\s*\d+.*raise|'
+                r'validate.*sample.*size|'
+                r'check.*data.*sufficiency)',
+                content,
+                re.IGNORECASE
+            ))
+
+            # Check for training calls
+            has_training = bool(re.search(r'\.fit\(|\.train\(|lightgbm\.train', content, re.IGNORECASE))
+
+            if has_training and not has_data_check:
+                issues.append({
+                    'pattern': 'Meta-learning without data validation',
+                    'severity': 'CRITICAL',
+                    'required_samples': 5000,
+                    'suggestion': 'Add: assert len(training_data) >= 5000, "Insufficient data for meta-learning"',
+                    'reference': 'v7.0 failure: 1,701 games insufficient (needed 5,000-10,000)',
+                    'postmortem': 'docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md'
+                })
+
+        # Pattern 2: Online learning without initialization check
+        if re.search(r'online.*learning|incremental.*learning|stream.*learning', content, re.IGNORECASE):
+            has_init_check = bool(re.search(
+                r'(if\s+len\(.*\)\s*<\s*\d+.*warm.*start|'
+                r'initial.*batch.*size|'
+                r'bootstrap.*samples)',
+                content,
+                re.IGNORECASE
+            ))
+
+            has_training = bool(re.search(r'\.partial_fit\(|\.update\(|incremental', content, re.IGNORECASE))
+
+            if has_training and not has_init_check:
+                issues.append({
+                    'pattern': 'Online learning without initialization validation',
+                    'severity': 'HIGH',
+                    'required_samples': 1000,
+                    'suggestion': 'Add: assert len(init_data) >= 1000, "Need ≥1,000 samples for initialization"',
+                    'reference': 'Cold start requires sufficient bootstrap data'
+                })
+
+        # Pattern 3: Complex tree models without sample size validation
+        if re.search(r'(lightgbm|xgboost).*train|lgb\.train|xgb\.train', content, re.IGNORECASE):
+            # Count features being used
+            feature_patterns = [
+                r'n_features\s*=\s*(\d+)',
+                r'len\(features\)\s*==\s*(\d+)',
+                r'X\.shape\[1\]\s*==\s*(\d+)',
+            ]
+
+            n_features = None
+            for pattern in feature_patterns:
+                match = re.search(pattern, content)
+                if match:
+                    n_features = int(match.group(1))
+                    break
+
+            # Check for sample validation
+            has_sample_check = bool(re.search(
+                r'(assert.*len\(.*\)\s*>=.*n_features|'
+                r'if.*\.shape\[0\]\s*<.*\*.*n_features|'
+                r'validate.*samples.*per.*feature)',
+                content,
+                re.IGNORECASE
+            ))
+
+            if not has_sample_check:
+                min_samples = (n_features * 100) if n_features else 5000
+                issues.append({
+                    'pattern': 'Complex tree model without sample validation',
+                    'severity': 'HIGH',
+                    'required_samples': min_samples,
+                    'suggestion': f'Add: assert len(X) >= n_features * 100, "Need {min_samples}+ samples for LightGBM"',
+                    'reference': 'Rule of thumb: 50-100 samples per feature for tree models',
+                    'features_detected': n_features if n_features else 'Unknown'
+                })
+
+        # Pattern 4: Ensemble reweighting without per-component validation
+        if re.search(r'ensemble.*reweight|optimize.*weights|component.*weights', content, re.IGNORECASE):
+            has_component_check = bool(re.search(
+                r'(games.*per.*component|'
+                r'len\(.*predictions.*\)\s*>=\s*100|'
+                r'validate.*component.*data)',
+                content,
+                re.IGNORECASE
+            ))
+
+            has_optimization = bool(re.search(r'cvx|scipy\.optimize|minimize\(', content, re.IGNORECASE))
+
+            if has_optimization and not has_component_check:
+                issues.append({
+                    'pattern': 'Ensemble reweighting without component data validation',
+                    'severity': 'MEDIUM',
+                    'required_samples': 100,
+                    'suggestion': 'Add: assert min(games_per_component) >= 100, "Need ≥100 games per component"',
+                    'reference': 'Each component needs sufficient data to estimate weights'
+                })
+
+        # Pattern 5: Statistical tests without minimum sample requirements
+        if re.search(r't\.test|scipy\.stats|statsmodels', content, re.IGNORECASE):
+            has_sample_check = bool(re.search(
+                r'(len\(.*\)\s*>=\s*30|'
+                r'n\s*>=\s*30|'
+                r'sample.*size.*check)',
+                content,
+                re.IGNORECASE
+            ))
+
+            if not has_sample_check:
+                issues.append({
+                    'pattern': 'Statistical tests without Central Limit Theorem check',
+                    'severity': 'MEDIUM',
+                    'required_samples': 30,
+                    'suggestion': 'Add: assert len(group) >= 30, "Need ≥30 samples per group for CLT"',
+                    'reference': 'Central Limit Theorem requires n≥30 for normality assumption'
+                })
+
+        if issues:
+            critical_issues = [i for i in issues if i['severity'] == 'CRITICAL']
+            high_issues = [i for i in issues if i['severity'] == 'HIGH']
+
+            return ValidationResult(
+                status=ValidationStatus.FAILED,
+                agent_name='data_sufficiency_gate',
+                message=f"Data sufficiency validation missing: {len(critical_issues)} CRITICAL, {len(high_issues)} HIGH",
+                details={
+                    'issues': issues,
+                    'critical_count': len(critical_issues),
+                    'recommendation': 'Add data validation BEFORE model training to prevent underpowered experiments',
+                    'example': (
+                        'def validate_data_sufficiency(n_samples, n_features, model_type):\n'
+                        '    """Validate sufficient training data before building pipeline."""\n'
+                        '    min_required = {"lightgbm": n_features * 100, "linear": n_features * 20}[model_type]\n'
+                        '    assert n_samples >= min_required, f"Need {min_required}+ samples"\n'
+                    ),
+                    'prevented_failures': [
+                        'v7.0: 1,701 games for meta-learning (needed 5,000+) → 58 hours wasted',
+                        'v7.0: WLS on 50 games (needed 100+) → ineffective',
+                    ]
+                }
+            )
+
+        return ValidationResult(
+            status=ValidationStatus.PASSED,
+            agent_name='data_sufficiency_gate',
+            message="Data sufficiency validation present or not applicable"
+        )
+
 
 # Singleton instance
 _router_instance = None
@@ -1145,6 +1516,16 @@ def enforce_backtest_health(func: Callable) -> Callable:
 def enforce_model_training(func: Callable) -> Callable:
     """Enforce model training validation."""
     return enforce('model_training')(func)
+
+
+def enforce_placeholder_detection(func: Callable) -> Callable:
+    """Enforce placeholder prediction detection."""
+    return enforce('placeholder_detection')(func)
+
+
+def enforce_data_sufficiency(func: Callable) -> Callable:
+    """Enforce data sufficiency validation."""
+    return enforce('data_sufficiency_gate')(func)
 
 
 if __name__ == '__main__':

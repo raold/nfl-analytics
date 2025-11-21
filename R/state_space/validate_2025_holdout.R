@@ -83,12 +83,16 @@ query_2025 <- "
 test_data_2025 <- dbGetQuery(con, query_2025)
 dbDisconnect(con)
 
-cat(sprintf("  ✓ Loaded %d games from %d QBs (2025)\n",
-            nrow(test_data_2025),
-            n_distinct(test_data_2025$player_id)))
-cat(sprintf("  ✓ Weeks: %d-%d\n",
-            min(test_data_2025$week),
-            max(test_data_2025$week)))
+cat(sprintf(
+  "  ✓ Loaded %d games from %d QBs (2025)\n",
+  nrow(test_data_2025),
+  n_distinct(test_data_2025$player_id)
+))
+cat(sprintf(
+  "  ✓ Weeks: %d-%d\n",
+  min(test_data_2025$week),
+  max(test_data_2025$week)
+))
 
 # ============================================================================
 # STEP 2: Load trained model (2020-2024)
@@ -105,9 +109,13 @@ fit <- readRDS(model_path)
 cat(sprintf("  ✓ Loaded model: %s\n", model_path))
 
 # Extract global parameters
-global_params <- fit$draws(variables = c("mu_league", "sigma_player", "Q", "R",
-                                          "beta_attempts", "beta_home"),
-                           format = "draws_matrix")
+global_params <- fit$draws(
+  variables = c(
+    "mu_league", "sigma_player", "Q", "R",
+    "beta_attempts", "beta_home"
+  ),
+  format = "draws_matrix"
+)
 
 mu_league_mean <- mean(global_params[, "mu_league"])
 beta_attempts_mean <- mean(global_params[, "beta_attempts"])
@@ -134,12 +142,14 @@ skills_path <- "models/bayesian/simplified_random_walk_skills_v1.csv"
 if (file.exists(skills_path)) {
   skills_2024 <- read_csv(skills_path, show_col_types = FALSE) %>%
     group_by(player_id, player_name) %>%
-    slice_max(game_num, n = 1) %>%  # Get final skill estimate (last game of 2024)
+    slice_max(game_num, n = 1) %>% # Get final skill estimate (last game of 2024)
     ungroup() %>%
     select(player_id, player_name, skill_final = skill_mean)
 
-  cat(sprintf("  ✓ Loaded skill trajectories for %d players from training\n",
-              nrow(skills_2024)))
+  cat(sprintf(
+    "  ✓ Loaded skill trajectories for %d players from training\n",
+    nrow(skills_2024)
+  ))
 } else {
   # If skills file doesn't exist, use league mean for all
   skills_2024 <- data.frame(player_id = character(0), skill_final = numeric(0))
@@ -155,8 +165,8 @@ predictions_2025 <- test_data_2025 %>%
 
     # Log-scale prediction
     log_pred = player_skill +
-               beta_attempts_mean * log(passing_attempts) +
-               beta_home_mean * is_home,
+      beta_attempts_mean * log(passing_attempts) +
+      beta_home_mean * is_home,
 
     # Back-transform to yards (undo log(y+1) transformation)
     pred_yards = exp(log_pred) - 1,
@@ -194,9 +204,11 @@ cat("\n")
 cat("======================================================================\n")
 cat("2025 HOLD-OUT VALIDATION RESULTS\n")
 cat("======================================================================\n")
-cat(sprintf("Test set: %d games from %d QBs (2025 weeks 1-6)\n",
-            nrow(predictions_2025),
-            n_distinct(predictions_2025$player_id)))
+cat(sprintf(
+  "Test set: %d games from %d QBs (2025 weeks 1-6)\n",
+  nrow(predictions_2025),
+  n_distinct(predictions_2025$player_id)
+))
 cat("\n")
 cat("Prediction Accuracy:\n")
 cat(sprintf("  MAE:  %.2f yards\n", mae))
@@ -211,11 +223,15 @@ cat("\n")
 if (coverage_90 >= 85 && coverage_90 <= 95) {
   cat("  ✅ WELL-CALIBRATED: Coverage within target range\n")
 } else if (coverage_90 < 85) {
-  cat(sprintf("  ⚠️  UNDER-CALIBRATED: Intervals too narrow (missing %.1f%% of actual values)\n",
-              90 - coverage_90))
+  cat(sprintf(
+    "  ⚠️  UNDER-CALIBRATED: Intervals too narrow (missing %.1f%% of actual values)\n",
+    90 - coverage_90
+  ))
 } else {
-  cat(sprintf("  ⚠️  OVER-CALIBRATED: Intervals too wide (covering %.1f%% extra)\n",
-              coverage_90 - 90))
+  cat(sprintf(
+    "  ⚠️  OVER-CALIBRATED: Intervals too wide (covering %.1f%% extra)\n",
+    coverage_90 - 90
+  ))
 }
 cat("======================================================================\n\n")
 

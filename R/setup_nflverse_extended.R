@@ -40,11 +40,11 @@ if (!requireNamespace("nflfastR", quietly = TRUE)) {
 
 # Priority additions
 cat("\nInstalling priority nflverse extensions:\n")
-install_if_missing("nfl4th")      # 4th down decision modeling
-install_if_missing("nflplotR")    # Visualization with logos
-install_if_missing("nflseedR")    # Playoff simulation
+install_if_missing("nfl4th") # 4th down decision modeling
+install_if_missing("nflplotR") # Visualization with logos
+install_if_missing("nflseedR") # Playoff simulation
 
-cat("\n" , rep("=", 80), "\n")
+cat("\n", rep("=", 80), "\n")
 cat("Installation complete! Testing packages...\n")
 cat(rep("=", 80), "\n\n")
 
@@ -54,24 +54,27 @@ suppressPackageStartupMessages(library(nfl4th))
 suppressPackageStartupMessages(library(dplyr))
 
 # Load a small sample of PBP data
-pbp_sample <- tryCatch({
-  nflreadr::load_pbp(2024, file_type = "rds") |>
-    filter(down == 4, !is.na(ydstogo)) |>
-    head(5)
-}, error = function(e) {
-  # Fallback to 2023 if 2024 not available yet
-  nflreadr::load_pbp(2023, file_type = "rds") |>
-    filter(down == 4, !is.na(ydstogo)) |>
-    head(5)
-})
+pbp_sample <- tryCatch(
+  {
+    nflreadr::load_pbp(2024, file_type = "rds") |>
+      filter(down == 4, !is.na(ydstogo)) |>
+      head(5)
+  },
+  error = function(e) {
+    # Fallback to 2023 if 2024 not available yet
+    nflreadr::load_pbp(2023, file_type = "rds") |>
+      filter(down == 4, !is.na(ydstogo)) |>
+      head(5)
+  }
+)
 
 if (nrow(pbp_sample) > 0) {
   pbp_4th <- pbp_sample |>
     nfl4th::add_4th_probs()
-  
+
   cat("✓ nfl4th working! Sample 4th down decisions:\n")
-  print(pbp_4th |> 
-    select(game_id, desc, go_boost, fg_boost) |> 
+  print(pbp_4th |>
+    select(game_id, desc, go_boost, fg_boost) |>
     head(3))
 } else {
   cat("⚠ Could not load PBP data for testing\n")
@@ -95,8 +98,10 @@ test_plot <- ggplot(test_df, aes(x = rating, y = reorder(team, rating))) +
 
 cat("✓ nflplotR working! Saving test plot...\n")
 dir.create("analysis/dissertation/figures/tests", recursive = TRUE, showWarnings = FALSE)
-ggsave("analysis/dissertation/figures/tests/nflplotR_test.png", 
-       test_plot, width = 6, height = 4, dpi = 150)
+ggsave("analysis/dissertation/figures/tests/nflplotR_test.png",
+  test_plot,
+  width = 6, height = 4, dpi = 150
+)
 cat("  Saved to: analysis/dissertation/figures/tests/nflplotR_test.png\n")
 
 # Test nflseedR
@@ -107,17 +112,20 @@ suppressPackageStartupMessages(library(nflseedR))
 schedules <- nflreadr::load_schedules(2024)
 
 # Simulate playoffs for first 10 weeks
-sim_result <- tryCatch({
-  nflseedR::simulate_nfl(
-    nfl_season = 2024,
-    process_games = schedules |> filter(week <= 10),
-    playoff_seeds = 7,
-    sims = 100  # Small number for quick test
-  )
-}, error = function(e) {
-  cat("⚠ Simulation error (may need more completed games):", e$message, "\n")
-  NULL
-})
+sim_result <- tryCatch(
+  {
+    nflseedR::simulate_nfl(
+      nfl_season = 2024,
+      process_games = schedules |> filter(week <= 10),
+      playoff_seeds = 7,
+      sims = 100 # Small number for quick test
+    )
+  },
+  error = function(e) {
+    cat("⚠ Simulation error (may need more completed games):", e$message, "\n")
+    NULL
+  }
+)
 
 if (!is.null(sim_result)) {
   playoff_probs <- sim_result |>
@@ -128,7 +136,7 @@ if (!is.null(sim_result)) {
     ) |>
     arrange(desc(playoff_prob)) |>
     head(5)
-  
+
   cat("✓ nflseedR working! Top 5 playoff probabilities:\n")
   print(playoff_probs)
 } else {
@@ -137,18 +145,21 @@ if (!is.null(sim_result)) {
 
 # Test injury data
 cat("\n\nTesting injury data from nflreadr...\n")
-injuries_2024 <- tryCatch({
-  nflreadr::load_injuries(2024)
-}, error = function(e) {
-  cat("⚠ Could not load 2024 injuries, trying 2023...\n")
-  nflreadr::load_injuries(2023)
-})
+injuries_2024 <- tryCatch(
+  {
+    nflreadr::load_injuries(2024)
+  },
+  error = function(e) {
+    cat("⚠ Could not load 2024 injuries, trying 2023...\n")
+    nflreadr::load_injuries(2023)
+  }
+)
 
 if (!is.null(injuries_2024) && nrow(injuries_2024) > 0) {
   injury_summary <- injuries_2024 |>
     count(report_status, sort = TRUE) |>
     head(5)
-  
+
   cat("✓ Injury data available! Status distribution:\n")
   print(injury_summary)
 } else {

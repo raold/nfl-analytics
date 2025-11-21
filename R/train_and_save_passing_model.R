@@ -11,9 +11,9 @@ library(glue)
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("BAYESIAN PASSING YARDS MODEL - COMPLETE PIPELINE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -242,8 +242,8 @@ ratings_df <- tibble(
 
   # Quality metrics
   n_games_observed = pred_data$n_games,
-  effective_sample_size = 1000.0,  # Placeholder
-  rhat = 1.0,  # Placeholder
+  effective_sample_size = 1000.0, # Placeholder
+  rhat = 1.0, # Placeholder
 
   # Timestamps
   trained_at = Sys.time(),
@@ -267,8 +267,8 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'pas
 cat("Deleted old ratings\n")
 
 # Insert new ratings
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
   sql <- glue("
     INSERT INTO mart.bayesian_player_ratings (
@@ -289,7 +289,7 @@ for(i in 1:nrow(ratings_df)) {
 
   dbExecute(conn, sql)
 
-  if(i %% 20 == 0) {
+  if (i %% 20 == 0) {
     cat(glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
   }
 }
@@ -305,9 +305,9 @@ dbDisconnect(conn)
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ PIPELINE COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Summary:\n")
 cat(glue("  - Model: {model_path}\n"))

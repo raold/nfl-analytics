@@ -33,7 +33,7 @@ if (!dbExistsTable(con, "plays")) {
 # Load play-by-play data for 4th downs
 cat("Loading 4th down plays from database...\n")
 pbp_4th <- dbGetQuery(con, "
-  SELECT 
+  SELECT
     game_id,
     play_id,
     posteam,
@@ -65,49 +65,56 @@ pbp_4th_enriched <- pbp_4th |>
     # Add required columns with reasonable defaults
     qtr = quarter,
     half_seconds_remaining = case_when(
-      quarter <= 2 ~ 1800 - (quarter - 1) * 900,  # First half
-      TRUE ~ 1800 - (quarter - 3) * 900           # Second half
+      quarter <= 2 ~ 1800 - (quarter - 1) * 900, # First half
+      TRUE ~ 1800 - (quarter - 3) * 900 # Second half
     ),
-    score_differential = 0,  # Neutral for simplification
-    yardline_100 = 50,       # Midfield default
+    score_differential = 0, # Neutral for simplification
+    yardline_100 = 50, # Midfield default
     posteam_timeouts_remaining = 3,
     defteam_timeouts_remaining = 3
   )
 
 # Try to add 4th down probabilities (may fail if data incomplete)
-pbp_with_probs <- tryCatch({
-  pbp_4th_enriched |>
-    nfl4th::add_4th_probs() |>
-    select(game_id, play_id, posteam, epa, 
-           go_boost, fg_boost, punt_boost,
-           go, first_down, punt, field_goal_attempt) |>
-    mutate(
-      # Determine if bad decision (any boost < -2 means should have done something else)
-      bad_decision = case_when(
-        go_boost < -2 ~ 1,
-        fg_boost < -2 ~ 1,
-        punt_boost < -2 ~ 1,
-        TRUE ~ 0
-      ),
-      went_on_fourth = coalesce(go, 0)
-    )
-}, error = function(e) {
-  cat("WARNING: Could not calculate 4th down probs:", e$message, "\n")
-  cat("Falling back to simple EPA-based metrics\n\n")
-  
-  # Fallback: just use EPA
-  pbp_4th_enriched |>
-    mutate(
-      went_on_fourth = 1,  # Assume went for it if on 4th down
-      bad_decision = 0,
-      go_boost = NA_real_,
-      fg_boost = NA_real_,
-      punt_boost = NA_real_
-    ) |>
-    select(game_id, play_id, posteam, epa, 
-           go_boost, fg_boost, punt_boost,
-           went_on_fourth, bad_decision)
-})
+pbp_with_probs <- tryCatch(
+  {
+    pbp_4th_enriched |>
+      nfl4th::add_4th_probs() |>
+      select(
+        game_id, play_id, posteam, epa,
+        go_boost, fg_boost, punt_boost,
+        go, first_down, punt, field_goal_attempt
+      ) |>
+      mutate(
+        # Determine if bad decision (any boost < -2 means should have done something else)
+        bad_decision = case_when(
+          go_boost < -2 ~ 1,
+          fg_boost < -2 ~ 1,
+          punt_boost < -2 ~ 1,
+          TRUE ~ 0
+        ),
+        went_on_fourth = coalesce(go, 0)
+      )
+  },
+  error = function(e) {
+    cat("WARNING: Could not calculate 4th down probs:", e$message, "\n")
+    cat("Falling back to simple EPA-based metrics\n\n")
+
+    # Fallback: just use EPA
+    pbp_4th_enriched |>
+      mutate(
+        went_on_fourth = 1, # Assume went for it if on 4th down
+        bad_decision = 0,
+        go_boost = NA_real_,
+        fg_boost = NA_real_,
+        punt_boost = NA_real_
+      ) |>
+      select(
+        game_id, play_id, posteam, epa,
+        go_boost, fg_boost, punt_boost,
+        went_on_fourth, bad_decision
+      )
+  }
+)
 
 cat("Calculated decision quality for", nrow(pbp_with_probs), "plays\n\n")
 
@@ -137,16 +144,18 @@ dbExecute(con, "TRUNCATE TABLE mart.team_4th_down_features;")
 cat("Truncated existing mart.team_4th_down_features\n")
 
 # Write data using dbAppendTable to avoid schema issues
-dbAppendTable(con, 
-              Id(schema = "mart", table = "team_4th_down_features"), 
-              team_4th_features)
+dbAppendTable(
+  con,
+  Id(schema = "mart", table = "team_4th_down_features"),
+  team_4th_features
+)
 
 cat("\n✓ Wrote", nrow(team_4th_features), "rows to mart.team_4th_down_features\n")
 
 # Show sample query
 cat("\nSample query to use features:\n")
 cat("
-SELECT 
+SELECT
   g.game_id,
   g.home_team,
   g.away_team,
@@ -155,9 +164,9 @@ SELECT
   h.fourth_down_epa AS home_4th_epa,
   a.fourth_down_epa AS away_4th_epa
 FROM games g
-LEFT JOIN mart.team_4th_down_features h 
+LEFT JOIN mart.team_4th_down_features h
   ON g.game_id = h.game_id AND g.home_team = h.team
-LEFT JOIN mart.team_4th_down_features a 
+LEFT JOIN mart.team_4th_down_features a
   ON g.game_id = a.game_id AND g.away_team = a.team
 WHERE g.season >= 2020
 LIMIT 5;

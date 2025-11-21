@@ -21,7 +21,7 @@ get_db_connection <- function() {
 # Load model
 model_file <- "models/bayesian/passing_yards_hierarchical_v1.rds"
 
-if(file.exists(model_file)) {
+if (file.exists(model_file)) {
   cat("Loading model from", model_file, "\n")
   model <- readRDS(model_file)
 
@@ -41,11 +41,11 @@ if(file.exists(model_file)) {
   # Extract ratings for each player
   ratings_list <- list()
 
-  for(player_col in player_cols) {
+  for (player_col in player_cols) {
     # Extract player ID from column name
     player_id <- gsub("r_player_id\\[(.+),Intercept\\]", "\\1", player_col)
 
-    if(player_id %in% unique(model_data$player_id)) {
+    if (player_id %in% unique(model_data$player_id)) {
       # Get posterior distribution
       player_effect <- posterior_samples[[player_col]]
 
@@ -65,8 +65,8 @@ if(file.exists(model_file)) {
         rating_q05 = quantile(player_effect, 0.05),
         rating_q50 = quantile(player_effect, 0.50),
         rating_q95 = quantile(player_effect, 0.95),
-        position_group_mean = 0.0,  # Will calculate separately
-        team_effect = 0.0,  # Will calculate separately
+        position_group_mean = 0.0, # Will calculate separately
+        team_effect = 0.0, # Will calculate separately
         vs_opponent_effect = NA_real_,
         n_games_observed = sum(model_data$player_id == player_id),
         effective_sample_size = posterior::ess_bulk(player_effect),
@@ -109,7 +109,6 @@ if(file.exists(model_file)) {
     arrange(desc(rating_mean)) %>%
     select(player_id, rating_mean, rating_sd, n_games_observed) %>%
     head(10))
-
 } else {
   cat("❌ Model file not found:", model_file, "\n")
 }

@@ -13,6 +13,7 @@ The database schema underwent three major phases of expansion to support increas
   \small
   \caption{Database schema evolution across feature engineering phases (2020--2025).}
   \label{tab:schema-evolution}
+  \begin{adjustbox}{max width=\textwidth}
   \begin{tabular}{@{} l r r r l @{}}
     \toprule
     \textbf{Phase} & \textbf{Columns} & \textbf{Tables} & \textbf{Size (MB)} & \textbf{Key Features Added} \\
@@ -22,6 +23,7 @@ The database schema underwent three major phases of expansion to support increas
     Advanced (v3.0) & 257 & 28 & 2,503 & Situational defense, interactions, chemistry \\
     \bottomrule
   \end{tabular}
+  \end{adjustbox}
 \end{table}
 
 The 3.4× expansion from baseline to advanced reflects systematic coverage of feature categories identified through ablation studies and domain expertise. Each phase preserved backward compatibility through careful migration design.
@@ -98,6 +100,7 @@ Synergistic combinations with multiplicative effects:
   \small
   \caption{Phase 5 feature coverage rates by category (2020--2025, $N=1{,}408$ games).}
   \label{tab:phase5-coverage}
+  \begin{adjustbox}{max width=\textwidth}
   \begin{tabular}{@{} l r r r l @{}}
     \toprule
     \textbf{Category} & \textbf{Features} & \textbf{Complete} & \textbf{Coverage} & \textbf{Notes} \\
@@ -111,6 +114,7 @@ Synergistic combinations with multiplicative effects:
     \textbf{Total Phase 5} & \textbf{44} & \textbf{1,365} & \textbf{96.9\%} & \textbf{Sufficient for training} \\
     \bottomrule
   \end{tabular}
+  \end{adjustbox}
 \end{table}
 
 The 96.9\% overall coverage rate is sufficient for model training. Missing defensive situational features (3\%) correspond to early-season games with insufficient rolling window data, handled through forward-fill imputation.

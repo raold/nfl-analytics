@@ -4,9 +4,11 @@
 
 \subsubsection{Motivation and Problem Statement}
 
-The initial rejection of Graph Neural Networks for NFL prediction (\S\ref{subsec:gnn_team_matchups}) rested on a critical computational bottleneck: pilot implementations exhibited 10--50$\times$ training overhead relative to gradient-boosted trees, yielding marginal calibration improvements ($\sim$1\% Brier reduction). This cost-benefit analysis suggested GNNs were impractical for production deployment.
+The initial rejection of Graph Neural Networks for NFL prediction (\S\ref{subsec:gnn_team_matchups}) rested on a critical computational bottleneck: pilot implementations exhibited 10--50$\times$ training overhead relative to gradient-boosted trees, yielding marginal calibration improvements ($\sim$1\% Brier reduction).
+This cost-benefit analysis suggested GNNs were impractical for production deployment.
 
-However, this assessment carried an implicit assumption: that the observed computational burden reflected a \textit{fundamental} architectural limitation rather than an \textit{implementation artifact}. If the bottleneck stemmed from CPU-bound sequential processing rather than inherent algorithmic complexity, dedicated GPU acceleration might radically alter the viability calculus.
+However, this assessment carried an implicit assumption: that the observed computational burden reflected a \textit{fundamental} architectural limitation rather than an \textit{implementation artifact}.
+If the bottleneck stemmed from CPU-bound sequential processing rather than inherent algorithmic complexity, dedicated GPU acceleration might radically alter the viability calculus.
 
 \paragraph{Hypothesis.} The computational overhead is primarily attributable to:
 \begin{enumerate}
@@ -192,16 +194,21 @@ The dominant contribution came from batch-parallel processing (12$\times$), vali
     \item \textbf{Ensemble integration}: Comparable training cost to existing baseline components
 \end{itemize}
 
-\paragraph{Architectural extensions.} The hierarchical player-level GNN initially proposed (Player $\to$ Position $\to$ Team $\to$ Game) is now computationally feasible. This architecture could capture:
+\paragraph{Architectural extensions.}
+The hierarchical player-level GNN initially proposed (Player $\to$ Position $\to$ Team $\to$ Game) is now computationally feasible.
+This architecture could capture:
 \begin{itemize}
     \item Position-specific matchup advantages (e.g., elite pass rush vs weak offensive line)
     \item QB-WR chemistry via learned edge weights
     \item Injury cascades (backup player effects propagating through depth chart)
 \end{itemize}
 
-Training on 9 seasons (2016--2024, 2,367 games) for 100 epochs achieved a best validation Brier score of \textbf{0.2445} (Epoch 3), with final convergence to 0.2504 (Epoch 100). The hierarchical architecture successfully captures game prediction patterns, with validation AUC reaching 0.5788 and accuracy of 54.41\%.
+Training on 9 seasons (2016--2024, 2,367 games) for 100 epochs achieved a best validation Brier score of \textbf{0.2445} (Epoch 3), with final convergence to 0.2504 (Epoch 100).
+The hierarchical architecture successfully captures game prediction patterns, with validation AUC reaching 0.5788 and accuracy of 54.41\%.
 
-\paragraph{Early convergence and production implications.} The full 100-epoch training curve revealed a critical insight: the model achieved optimal validation performance remarkably early (Epoch 3), with subsequent training degrading performance by 2.4\% (0.2445 $\to$ 0.2504). This classic overfitting pattern suggests the hierarchical architecture rapidly captures the underlying game prediction patterns without requiring extensive training.
+\paragraph{Early convergence and production implications.}
+The full 100-epoch training curve revealed a critical insight: the model achieved optimal validation performance remarkably early (Epoch 3), with subsequent training degrading performance by 2.4\% (0.2445 $\to$ 0.2504).
+This classic overfitting pattern suggests the hierarchical architecture rapidly captures the underlying game prediction patterns without requiring extensive training.
 
 For production deployment, this finding has significant implications:
 \begin{itemize}

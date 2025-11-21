@@ -5,10 +5,12 @@
 \subsection{GPU Training Infrastructure for Neural Network Models}
 \label{subsec:gpu-training-infrastructure}
 
-Bayesian Neural Networks and deep ensemble methods require substantial computational resources that exceed typical CPU capabilities. We developed a GPU training orchestration system to efficiently leverage NVIDIA RTX 4090 hardware (24GB VRAM, 16,384 CUDA cores) for parallel model training.
+Bayesian Neural Networks and deep ensemble methods require substantial computational resources that exceed typical CPU capabilities.
+We developed a GPU training orchestration system to efficiently leverage NVIDIA RTX 4090 hardware (24GB VRAM, 16,384 CUDA cores) for parallel model training.
 
 \paragraph{GPU Training Orchestrator.}
-The orchestrator (\texttt{scripts/gpu\_training\_orchestrator.py}, 487 LOC) manages sequential training of compute-intensive models with automatic monitoring, checkpointing, and failure recovery. Key features:
+The orchestrator (\texttt{scripts/gpu\_training\_orchestrator.py}, 487 LOC) manages sequential training of compute-intensive models with automatic monitoring, checkpointing, and failure recovery.
+Key features:
 \begin{itemize}
   \item \textbf{Phase-based scheduling}: Critical models (Phase 1) run first, overnight batches (Phase 2) queued
   \item \textbf{Automatic checkpointing}: Saves model state every 10--50 epochs to resume from failures

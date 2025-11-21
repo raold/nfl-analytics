@@ -61,14 +61,16 @@ p_evolution <- ggplot(model_evolution, aes(x = version)) +
     legend.title = element_blank()
   ) +
   annotate(
-    "text", x = 3.5, y = 10,
+    "text",
+    x = 3.5, y = 10,
     label = "86.4% MAE\nimprovement",
     size = 3, color = "#2166AC", fontface = "bold"
   )
 
 ggsave(
   file.path(output_dir, "v3_model_evolution.pdf"),
-  p_evolution, width = 7, height = 4, dpi = 300
+  p_evolution,
+  width = 7, height = 4, dpi = 300
 )
 
 # ============================================================================
@@ -82,10 +84,10 @@ prop_performance <- expand.grid(
 ) %>%
   mutate(
     value = c(
-      24.3, 12.1, 15.7, 0.42,  # MAE
-      54.2, 52.8, 53.1, 55.8,  # Hit Rate
-      3.1, 2.4, 2.7, 4.2,       # Avg Edge
-      1.45, 1.38, 1.41, 1.52   # Sharpe
+      24.3, 12.1, 15.7, 0.42, # MAE
+      54.2, 52.8, 53.1, 55.8, # Hit Rate
+      3.1, 2.4, 2.7, 4.2, # Avg Edge
+      1.45, 1.38, 1.41, 1.52 # Sharpe
     ),
     scaled_value = case_when(
       metric == "MAE" ~ 1 - (value / max(value[metric == "MAE"])),
@@ -116,7 +118,8 @@ p_heatmap <- ggplot(prop_performance, aes(x = metric, y = prop_type, fill = scal
 
 ggsave(
   file.path(output_dir, "v3_prop_heatmap.pdf"),
-  p_heatmap, width = 6, height = 4, dpi = 300
+  p_heatmap,
+  width = 6, height = 4, dpi = 300
 )
 
 # ============================================================================
@@ -143,7 +146,7 @@ ensemble_data <- data.frame(
 ) %>%
   mutate(
     model = factor(model, levels = c("Meta", "BNN", "XGBoost", "Bayesian")),
-    accuracy = pmin(pmax(accuracy, 48), 58)  # Bound for realism
+    accuracy = pmin(pmax(accuracy, 48), 58) # Bound for realism
   )
 
 p_ensemble <- ggplot(ensemble_data, aes(x = week, y = accuracy, color = model)) +
@@ -172,14 +175,16 @@ p_ensemble <- ggplot(ensemble_data, aes(x = week, y = accuracy, color = model)) 
   ) +
   theme_dissertation +
   annotate(
-    "text", x = 7, y = 52.4,
+    "text",
+    x = 7, y = 52.4,
     label = "Breakeven (52.4%)",
     size = 3, color = "red", vjust = -0.5
   )
 
 ggsave(
   file.path(output_dir, "v3_ensemble_components.pdf"),
-  p_ensemble, width = 7, height = 4, dpi = 300
+  p_ensemble,
+  width = 7, height = 4, dpi = 300
 )
 
 # ============================================================================
@@ -235,7 +240,8 @@ p_calibration <- ggplot(calibration_long, aes(x = predicted, y = actual)) +
 
 ggsave(
   file.path(output_dir, "v3_calibration.pdf"),
-  p_calibration, width = 6, height = 6, dpi = 300
+  p_calibration,
+  width = 6, height = 6, dpi = 300
 )
 
 # ============================================================================
@@ -246,10 +252,10 @@ set.seed(42)
 roi_data <- data.frame(
   model = rep(c("v1.0", "v2.0", "v2.5", "v3.0"), each = 100),
   roi = c(
-    rnorm(100, 1.59, 2.5),   # v1.0
-    rnorm(100, 2.84, 2.2),   # v2.0
-    rnorm(100, 4.21, 1.8),   # v2.5
-    rnorm(100, 5.30, 1.5)    # v3.0
+    rnorm(100, 1.59, 2.5), # v1.0
+    rnorm(100, 2.84, 2.2), # v2.0
+    rnorm(100, 4.21, 1.8), # v2.5
+    rnorm(100, 5.30, 1.5) # v3.0
   )
 ) %>%
   mutate(
@@ -271,14 +277,16 @@ p_roi <- ggplot(roi_data, aes(x = model, y = roi, fill = model)) +
   ) +
   theme_dissertation +
   annotate(
-    "text", x = 3.5, y = 0,
+    "text",
+    x = 3.5, y = 0,
     label = "Breakeven",
     size = 3, color = "red", vjust = -0.5
   )
 
 ggsave(
   file.path(output_dir, "v3_roi_distribution.pdf"),
-  p_roi, width = 6, height = 5, dpi = 300
+  p_roi,
+  width = 6, height = 5, dpi = 300
 )
 
 # ============================================================================
@@ -286,7 +294,7 @@ ggsave(
 # ============================================================================
 
 p_combined <- (p_evolution | p_heatmap) /
-              (p_ensemble | p_calibration) +
+  (p_ensemble | p_calibration) +
   plot_annotation(
     title = "v3.0 Ensemble Model Performance Dashboard",
     theme = theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
@@ -294,7 +302,8 @@ p_combined <- (p_evolution | p_heatmap) /
 
 ggsave(
   file.path(output_dir, "v3_dashboard.pdf"),
-  p_combined, width = 14, height = 10, dpi = 300
+  p_combined,
+  width = 14, height = 10, dpi = 300
 )
 
 # ============================================================================
@@ -336,8 +345,10 @@ write.csv(
 
 # Also create LaTeX table
 latex_table <- summary_stats %>%
-  knitr::kable(format = "latex", booktabs = TRUE,
-               caption = "v3.0 Ensemble Model Performance Summary") %>%
+  knitr::kable(
+    format = "latex", booktabs = TRUE,
+    caption = "v3.0 Ensemble Model Performance Summary"
+  ) %>%
   as.character()
 
 writeLines(latex_table, file.path(output_dir, "v3_summary_table.tex"))

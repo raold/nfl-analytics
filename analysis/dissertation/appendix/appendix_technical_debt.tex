@@ -83,7 +83,9 @@ def test_temporal_validation():
 
 \textbf{Audit Results:} 50+ TODO test stubs identified in \texttt{tests/unit/} directory. These stubs inflate coverage metrics while providing zero validation.
 
-\textbf{Remediation:} Automated test generation (Phase 2 agent, Section~\ref{sec:phase_2_agents}) created 147 additional tests raising coverage to 76.8\%. Remaining 3.2\% gap requires manual test implementation for complex Bayesian model validation.
+\textbf{Remediation:} Automated test generation (Phase 2 agent, % TODO: Add phase 2 agents section
+% Section~\ref{sec:phase_2_agents}
+Section~(Phase 2 Agents)) created 147 additional tests raising coverage to 76.8\%. Remaining 3.2\% gap requires manual test implementation for complex Bayesian model validation.
 
 \subsection{Missing Integration Tests}
 
@@ -252,7 +254,9 @@ P3 (Data Quality) & 2 & Statistical validation rules, drift detection \\
 \subsection{What Worked Well}
 \begin{enumerate}
     \item \textbf{Automated Leakage Detection:} 10 CI/CD tests caught 3 critical temporal leakage bugs before production (November 2025). Prevented model invalidation.
-    \item \textbf{Repository Pattern (Partial):} BaseRepository abstraction (Section~\ref{sec:repo-pattern}) successfully isolated 40\% of database access, demonstrating value of centralized data access layer.
+    \item \textbf{Repository Pattern (Partial):} BaseRepository abstraction (% TODO: Add repository pattern section
+% Section~\ref{sec:repo-pattern}
+Section~(Repository Pattern)) successfully isolated 40\% of database access, demonstrating value of centralized data access layer.
     \item \textbf{Test-Driven Security:} Automated credential scanning tool flagged all 23 hardcoded password instances in 90 seconds. Manual audit would have taken days.
 \end{enumerate}
 

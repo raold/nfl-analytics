@@ -1,0 +1,134 @@
+% Copy-paste template for TikZ diagrams
+% Prevents text overlap through safe node styles and generous spacing
+%
+% USAGE:
+%   1. Copy entire template
+%   2. Replace node labels and connections
+%   3. Use safe node styles: safenode, compactnode, widenode
+%   4. Use safe arrow style: safearrow
+%
+% SAFE NODE STYLES (from tikz_diagram_style.tex):
+%   safenode     - Standard node with text wrapping (2.2cm width)
+%   compactnode  - Small node for short labels (1.5cm width)
+%   widenode     - Wide node for long text (3cm width)
+%   safearrow    - Thick blue arrow with rounded corners
+%
+% NODE DISTANCE:
+%   Vertical:   1.8cm (generous spacing prevents overlap)
+%   Horizontal: 2.5cm (prevents long labels from colliding)
+
+\begin{figure}[htbp]
+\centering
+
+\begin{tikzpicture}[
+  node distance=1.8cm and 2.5cm,  % Vertical and horizontal spacing
+  every node/.style={align=center}  % Center text in nodes
+]
+
+% ============================================================
+% NODES
+% ============================================================
+
+% Use safenode for standard nodes with wrapped text
+\node[safenode] (data) {Training\\Data};
+\node[safenode, below=of data] (features) {Feature\\Engineering};
+\node[safenode, below=of features] (model) {Model\\Training};
+\node[safenode, below=of model] (prediction) {Prediction};
+
+% Use compactnode for short labels
+\node[compactnode, right=of data] (validation) {Validation\\Set};
+
+% Use widenode for long text
+\node[widenode, right=of model] (ensemble) {4-Way Ensemble\\(SS + Hier + XGB + IP)};
+
+% ============================================================
+% ARROWS
+% ============================================================
+
+% Use safearrow for all connections
+\draw[safearrow] (data) -- (features);
+\draw[safearrow] (features) -- (model);
+\draw[safearrow] (model) -- (prediction);
+\draw[safearrow] (data) -- (validation);
+\draw[safearrow] (model) -- (ensemble);
+
+% Optional: Add labels to arrows
+\draw[safearrow] (data) -- node[right, font=\small] {Clean} (features);
+
+% Optional: Curved arrows (avoid overlap)
+\draw[safearrow, bend right=20] (validation) to (prediction);
+
+\end{tikzpicture}
+
+\caption{Your caption here}
+\label{fig:your-label}
+\end{figure}
+
+% ============================================================
+% COMMON PATTERNS
+% ============================================================
+
+% 1. Horizontal layout (left to right):
+%    \node[safenode] (a) {A};
+%    \node[safenode, right=of a] (b) {B};
+%    \node[safenode, right=of b] (c) {C};
+
+% 2. Grid layout (2x2):
+%    \node[safenode] (tl) {Top Left};
+%    \node[safenode, right=of tl] (tr) {Top Right};
+%    \node[safenode, below=of tl] (bl) {Bottom Left};
+%    \node[safenode, below=of tr] (br) {Bottom Right};
+
+% 3. Bidirectional arrows:
+%    \draw[safearrow, <->] (a) -- (b);
+
+% 4. Dashed arrows (for optional/uncertain relationships):
+%    \draw[safearrow, dashed] (a) -- (b);
+
+% 5. Multiple nodes at same level:
+%    \node[safenode] (center) {Center};
+%    \node[safenode, above left=of center] (tl) {Top Left};
+%    \node[safenode, above right=of center] (tr) {Top Right};
+
+% 6. Grouped nodes with box:
+%    \begin{scope}[on background layer]
+%    \node[draw=accent, thick, rounded corners, fit=(a)(b)(c),
+%          inner sep=5mm, fill=accent!5] {};
+%    \end{scope}
+
+% 7. Self-loop (feedback):
+%    \draw[safearrow] (model) edge[loop right] node[right] {Iterate} (model);
+
+% 8. Node positioning shortcuts:
+%    above=of X        % Directly above X
+%    below=of X        % Directly below X
+%    right=of X        % Directly right of X
+%    left=of X         % Directly left of X
+%    above left=of X   % Diagonal above-left
+%    above right=of X  % Diagonal above-right
+
+% 9. Custom spacing (override node distance):
+%    \node[safenode, below=3cm of X] (Y) {Y};  % 3cm below instead of 1.8cm
+
+% 10. Invisible helper nodes (for complex layouts):
+%     \node[coordinate] (helper) at ($(a)!0.5!(b)$) {};  % Midpoint between a and b
+%     \draw[safearrow] (a) -- (helper) -- (c);
+
+% ============================================================
+% TROUBLESHOOTING
+% ============================================================
+
+% PROBLEM: Nodes overlap
+% SOLUTION: Increase node distance or use compactnode for short labels
+
+% PROBLEM: Arrows cross nodes
+% SOLUTION: Use bend right/bend left or adjust node positions
+
+% PROBLEM: Text too long for node
+% SOLUTION: Use widenode or add manual line breaks with \\
+
+% PROBLEM: Diagram too wide for page
+% SOLUTION: Reduce node distance or rotate with \begin{sidewaysfigure}
+
+% PROBLEM: Arrows not connecting properly
+% SOLUTION: Check node names match exactly (case-sensitive)

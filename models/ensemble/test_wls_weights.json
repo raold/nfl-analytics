@@ -1,0 +1,29 @@
+{
+  "weights": {
+    "state_space_v2": 0.3420463695017479,
+    "hierarchical_v2": 0.3084782550247479,
+    "xgboost_v4_ridge": 0.15849559473938588,
+    "informative_priors_v2": 0.04097970418916425,
+    "elo": 0.15000007486702097
+  },
+  "metadata": {
+    "halflife": 3.0,
+    "validation_metric": 8.464359711337597,
+    "n_observations": 50,
+    "model_names": [
+      "state_space_v2",
+      "hierarchical_v2",
+      "xgboost_v4_ridge",
+      "informative_priors_v2",
+      "elo"
+    ],
+    "halflife_candidates": [
+      2.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      8.0
+    ]
+  }
+}

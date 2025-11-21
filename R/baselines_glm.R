@@ -73,4 +73,3 @@ if (identical(environment(), globalenv())) {
     }
   })
 }
-

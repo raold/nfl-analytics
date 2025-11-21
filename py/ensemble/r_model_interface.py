@@ -58,17 +58,20 @@ class RModelInterface:
 
     Attributes:
         db_config (Dict): Database connection parameters
+        db_pool (Optional[DatabasePoolManager]): Optional connection pool for performance
         rpy2_initialized (bool): Whether rpy2 has been initialized
     """
 
-    def __init__(self, db_config: Dict):
+    def __init__(self, db_config: Dict, db_pool=None):
         """
         Initialize R model interface.
 
         Args:
             db_config: Database connection parameters (host, port, dbname, user, password)
+            db_pool: Optional DatabasePoolManager instance for connection pooling
         """
         self.db_config = db_config
+        self.db_pool = db_pool
         self.rpy2_initialized = False
         self._r_session = None
 
@@ -101,8 +104,26 @@ class RModelInterface:
             raise
 
     def _get_db_connection(self):
-        """Create database connection."""
-        return psycopg2.connect(**self.db_config)
+        """
+        Get database connection (uses pool if available, otherwise creates new connection).
+
+        Returns:
+            Context manager yielding database connection
+        """
+        if self.db_pool:
+            # Use connection pool (4x faster)
+            return self.db_pool.get_connection()
+        else:
+            # Fallback: Create new connection (legacy behavior)
+            import contextlib
+            @contextlib.contextmanager
+            def _connection():
+                conn = psycopg2.connect(**self.db_config)
+                try:
+                    yield conn
+                finally:
+                    conn.close()
+            return _connection()
 
     def _fetch_player_features(
         self, player_id: str, season: int, week: int
@@ -117,8 +138,6 @@ class RModelInterface:
         Returns:
             DataFrame with 1 row containing all features, or None if no data
         """
-        conn = self._get_db_connection()
-
         query = """
         SELECT
             pgs.player_id,
@@ -164,19 +183,18 @@ class RModelInterface:
         """
 
         try:
-            df = pd.read_sql_query(query, conn, params=(player_id, season, week))
-            conn.close()
+            with self._get_db_connection() as conn:
+                df = pd.read_sql_query(query, conn, params=(player_id, season, week))
 
-            if len(df) == 0:
-                logger.warning(
-                    f"No features found for player_id={player_id}, season={season}, week={week}"
-                )
-                return None
+                if len(df) == 0:
+                    logger.warning(
+                        f"No features found for player_id={player_id}, season={season}, week={week}"
+                    )
+                    return None
 
-            return df
+                return df
         except Exception as e:
             logger.error(f"❌ Failed to fetch features: {e}")
-            conn.close()
             return None
 
     def predict_brms_model(
@@ -186,7 +204,7 @@ class RModelInterface:
         week: int,
         model_path: Path,
         model_name: str,
-        ndraws: int = 1000,
+        ndraws: int = 500,
     ) -> Optional[Tuple[float, float]]:
         """
         Generate predictions from a brms model.
@@ -197,7 +215,7 @@ class RModelInterface:
             week: Week number
             model_path: Path to RDS model file
             model_name: Model name for logging (e.g., "Hierarchical v2")
-            ndraws: Number of posterior draws (default: 1000)
+            ndraws: Number of posterior draws (default: 500)
 
         Returns:
             (mean_prediction, std_prediction) tuple or None if prediction fails
@@ -264,7 +282,7 @@ class RModelInterface:
         season: int,
         week: int,
         model_path: Path,
-        ndraws: int = 1000,
+        ndraws: int = 500,
     ) -> Optional[Tuple[float, float]]:
         """
         Predict using Hierarchical Bayesian v2 model.
@@ -289,7 +307,7 @@ class RModelInterface:
         season: int,
         week: int,
         model_path: Path,
-        ndraws: int = 1000,
+        ndraws: int = 500,
     ) -> Optional[Tuple[float, float]]:
         """
         Predict using Informative Priors v2 model.
@@ -338,7 +356,6 @@ class RModelInterface:
         """
         try:
             # Get player data (attempts, home/away)
-            conn = self._get_db_connection()
             query = """
             SELECT
                 pgs.stat_attempts as attempts,
@@ -356,11 +373,11 @@ class RModelInterface:
             LIMIT 1
             """
 
-            cursor = conn.cursor()
-            cursor.execute(query, (player_id, season, week))
-            row = cursor.fetchone()
-            cursor.close()
-            conn.close()
+            with self._get_db_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(query, (player_id, season, week))
+                row = cursor.fetchone()
+                cursor.close()
 
             if not row:
                 logger.warning(
@@ -372,14 +389,21 @@ class RModelInterface:
             if attempts is None or attempts == 0:
                 attempts = 30  # Default
 
-            # Get latest player skill
-            player_skills = skills_df[skills_df["player_id"] == player_id]
-            if len(player_skills) == 0:
-                logger.warning(f"State-space: No skills for {player_id}")
-                return None
-
-            # Use most recent skill
-            theta = player_skills.iloc[-1]["skill_mean"]
+            # Get latest player skill (O(1) dict lookup vs O(n) DataFrame filter)
+            if isinstance(skills_df, dict):
+                # Optimized: dict lookup (O(1))
+                player_skill = skills_df.get(player_id)
+                if player_skill is None:
+                    logger.warning(f"State-space: No skills for {player_id}")
+                    return None
+                theta = player_skill["skill_mean"]
+            else:
+                # Fallback: DataFrame filter (O(n), slower)
+                player_skills = skills_df[skills_df["player_id"] == player_id]
+                if len(player_skills) == 0:
+                    logger.warning(f"State-space: No skills for {player_id}")
+                    return None
+                theta = player_skills.iloc[-1]["skill_mean"]
 
             # Learned parameters from Stan model
             beta_attempts = 0.810

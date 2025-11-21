@@ -1,0 +1,60 @@
+{
+  "best_method": "performance",
+  "recommended_weights": {
+    "State-Space v2": 0.31854863861826704,
+    "Hierarchical v2": 0.3403278588622867,
+    "Informative Priors v2": 0.3411235025194462
+  },
+  "performance": {
+    "mae": 40.57074026656144,
+    "rmse": 50.91575259915837,
+    "bias": 0.21940686589151262,
+    "calibration_90": 92.94195250659631,
+    "n_predictions": 1516
+  },
+  "improvement_vs_renormalized": {
+    "mae_yards": 0.14421908850275145,
+    "mae_pct": 0.35421646192755746
+  },
+  "all_methods": {
+    "inverse_variance": {
+      "weights": {
+        "State-Space v2": 0.38089841290568266,
+        "Hierarchical v2": 0.3076173304195929,
+        "Informative Priors v2": 0.3114842566747244
+      },
+      "mae": 40.667848449234974,
+      "rmse": 51.063778228268646,
+      "bias": 0.4154876321864648,
+      "calibration_90": 92.61213720316623
+    },
+    "equal": {
+      "weights": {
+        "State-Space v2": 0.3333333333333333,
+        "Hierarchical v2": 0.3333333333333333,
+        "Informative Priors v2": 0.3333333333333333
+      },
+      "mae": 40.59245550189296,
+      "rmse": 50.948027407673806,
+      "bias": 0.26599155669322,
+      "calibration_90": 92.87598944591029
+    },
+    "performance": {
+      "weights": {
+        "State-Space v2": 0.31854863861826704,
+        "Hierarchical v2": 0.3403278588622867,
+        "Informative Priors v2": 0.3411235025194462
+      },
+      "mae": 40.57074026656144,
+      "rmse": 50.91575259915837,
+      "bias": 0.21940686589151262,
+      "calibration_90": 92.94195250659631
+    }
+  },
+  "notes": {
+    "xgboost_excluded_reason": "Critical target leakage - 91.4% feature importance on residual containing actual_test_yards",
+    "xgboost_mae_before_exclusion": 2.72,
+    "discovery_date": "2025-11-16",
+    "audit_report": "docs/fixes/XGBOOST_LEAKAGE_AUDIT_NOV16.md"
+  }
+}

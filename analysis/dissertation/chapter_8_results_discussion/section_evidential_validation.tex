@@ -5,7 +5,7 @@ We validate the evidential regression model (Section~\ref{sec:evidential_learnin
 
 \subsection{Experimental Setup}
 
-\paragraph{Data} We train on 2018-2023 rushing yards (4,286 training samples, 1,072 validation samples) and test on 2024 season (929 samples). Dataset covers 327 unique rushers across 6,287 rushing performances. Same canonical training window as BNN v3.1 and state-space v2 (Section~\ref{sec:canonical_training_window}).
+\paragraph{Data} We train on 2018-2023 rushing yards (4,286 training samples, 1,072 validation samples) and test on 2024 season (929 samples). Dataset covers 327 unique rushers across 6,287 rushing performances. Same canonical training window as BNN v3.1 and state-space v2 (Section~\ref{sec:training_window_ablation}).
 
 \paragraph{Features} Five core features: carries, avg\_rushing\_l3, avg\_carries\_l3, season\_avg, rushing\_tds. Features standardized ($\mu=0, \sigma=1$) before training.
 
@@ -95,7 +95,7 @@ Std interval width & 34,589 & -- & (high variance) \\
 
 \noindent \textbf{Critical Finding:} Mean prediction interval of 38,285 yards is \textbf{255× wider} than target threshold (150 yards) and \textbf{2,500× larger} than typical rushing yards (15-50 yards per game). Such wide intervals provide no actionable information for betting decisions.
 
-\paragraph{Comparison to BNN v3.1} BNN achieves 89.5\% coverage at 90\% confidence~(Section~\ref{sec:bnn_calibration}) with intervals of 85-120 yards. Evidential regression produces intervals 320× wider while achieving 100\% coverage—demonstrating the calibration-sharpness tradeoff failure.
+\paragraph{Comparison to BNN v3.1} BNN achieves 89.5\% coverage at 90\% confidence~(Section~\ref{sec:bnn_calibration_study}) with intervals of 85-120 yards. Evidential regression produces intervals 320× wider while achieving 100\% coverage—demonstrating the calibration-sharpness tradeoff failure.
 
 \subsection{Results: Speed Benchmark}
 

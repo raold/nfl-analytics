@@ -107,7 +107,9 @@ where $y_{it}(1), y_{it}(0)$ are potential outcomes under treatment/control. Agg
 \citet{sun2021event} extend group-time ATT to event-study plots, tracing effects $\tau$ periods before/after treatment. Parallel trends---the identifying assumption that treated and control units would follow the same trajectory absent treatment---is assessed by testing pre-treatment coefficients for zero effect. \citet{rambachan2023honest} introduce sensitivity analysis for violations: bounds on ATT under bounded deviations from parallel trends, formalizing robustness checks.
 
 \paragraph{Application to NFL Injuries.}
-Chapter~\ref{chap:causal} applies DiD to star quarterback injuries (e.g., Patrick Mahomes injury, Week 9, 2023). Treatment group: Chiefs games post-injury. Control group: Chiefs games pre-injury and comparable teams with no QB change. We estimate ATT on offensive EPA/play and win probability, using \texttt{did} for group-time estimates. Results show a -0.15 EPA/play decline (95\% CI: $[-0.24, -0.06]$, $p<0.01$), validating market adjustment in spread lines. This causal estimate informs our injury feature engineering, replacing naive binary indicators with ATT-calibrated expected-value shifts.
+% TODO: No causal chapter - using section instead
+% Chapter~\ref{chap:causal}
+Chapter~8 applies DiD to star quarterback injuries (e.g., Patrick Mahomes injury, Week 9, 2023). Treatment group: Chiefs games post-injury. Control group: Chiefs games pre-injury and comparable teams with no QB change. We estimate ATT on offensive EPA/play and win probability, using \texttt{did} for group-time estimates. Results show a -0.15 EPA/play decline (95\% CI: $[-0.24, -0.06]$, $p<0.01$), validating market adjustment in spread lines. This causal estimate informs our injury feature engineering, replacing naive binary indicators with ATT-calibrated expected-value shifts.
 
 %=============================================================================
 \subsection{Bayesian Ensemble Methods: Stacking for Predictive Distributions}
@@ -292,7 +294,9 @@ The UQ methods reviewed here appear throughout the dissertation:
 \begin{itemize}[leftmargin=*, itemsep=2pt, parsep=0pt]
   \item \textbf{Conformal Prediction:} Section~\ref{sec:conformal-calibration} (Chapter~\ref{chap:risk}) implements split conformal and CQR for player props and game margins. Empirical coverage 89.2\% (target 90\%) on 2023--2024 test games.
 
-  \item \textbf{Difference-in-Differences:} Section~\ref{sec:did-injuries} (Chapter~\ref{chap:causal}) estimates QB injury ATT using \texttt{did} package. Results inform injury feature engineering, replacing binary indicators with ATT-calibrated expected-value shifts.
+  \item \textbf{Difference-in-Differences:} Section~\ref{sec:did-injuries} (% TODO: No causal chapter - using section instead
+% Chapter~\ref{chap:causal}
+Chapter~8) estimates QB injury ATT using \texttt{did} package. Results inform injury feature engineering, replacing binary indicators with ATT-calibrated expected-value shifts.
 
   \item \textbf{Bayesian Stacking:} Section~\ref{sec:ensemble-stacking} (Chapter~\ref{chap:advanced-bayes}) optimizes 4-way ensemble weights via CRPS stacking. Achieves 89.5\% calibration, outperforming best single model (91.2\% Hierarchical v2) by reducing tail risk.
 

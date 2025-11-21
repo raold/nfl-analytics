@@ -7,7 +7,9 @@ This appendix provides complete technical specifications for all six production 
 
 \subsection{Purpose and Scope}
 
-\textbf{Reproducibility Standards}: All specifications adhere to the Reproducibility Checklist (Section~\ref{sec:reproducibility-checklist}), requiring:
+\textbf{Reproducibility Standards}: All specifications adhere to the Reproducibility Checklist (% TODO: Add reproducibility checklist section
+% Section~\ref{sec:reproducibility-checklist}
+Section~(Reproducibility Checklist)), requiring:
 
 \begin{itemize}
 \item \textbf{Exact hyperparameters}: No ``tuned values'' without explicit values
@@ -45,6 +47,7 @@ w(2015) &= \exp(-3/4) = 0.472
 ---
 
 \section{State-Space Random Walk v2}
+\label{sec:state-space-v2-spec}
 
 \subsection{Model Specification}
 
@@ -169,6 +172,7 @@ Statistical Superiority & \multicolumn{3}{l}{p=0.0069 vs v1 (Wilcoxon test)} \\
 ---
 
 \section{Hierarchical Bayesian v2}
+\label{sec:hierarchical-v2-spec}
 
 \subsection{Model Specification}
 
@@ -221,7 +225,7 @@ ESS (min bulk) & 1,823 & 8,394 & +6,571 & +360.4\% \\
 Divergences & 128 & 42 & -86 & -67.2\% \\
 Training time (min) & 185.3 & 548.7 & +363.4 & +196.1\% \\
 \midrule
-\textbf{Status} & ⚠️ BORDERLINE & $\checkmark$ EXCELLENT & -- & -- \\
+\textbf{Status} & ⚠ BORDERLINE & $\checkmark$ EXCELLENT & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -280,6 +284,7 @@ Sharpness (mean interval width) & 192.7 & <210 & $\checkmark$ PASS \\
 ---
 
 \section{XGBoost v4 Ridge Residuals (Two-Stage Orthogonalization)}
+\label{sec:xgboost-v4-ridge-appendix}
 
 \subsection{Architecture Overview}
 

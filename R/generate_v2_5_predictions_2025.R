@@ -147,7 +147,7 @@ log_info(paste("  Correlation:", round(correlation, 3)))
 
 # CI coverage
 results$in_ci <- (results$actual_yards >= results$pred_q05) &
-                 (results$actual_yards <= results$pred_q95)
+  (results$actual_yards <= results$pred_q95)
 ci_coverage <- mean(results$in_ci)
 log_info(paste("  90% CI Coverage:", round(ci_coverage * 100, 1), "%"))
 

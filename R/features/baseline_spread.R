@@ -1,4 +1,8 @@
-library(tidymodels); library(xgboost); library(dplyr); library(DBI); library(RPostgres)
+library(tidymodels)
+library(xgboost)
+library(dplyr)
+library(DBI)
+library(RPostgres)
 
 # Connect to database (using consistent connection parameters)
 con <- dbConnect(
@@ -20,9 +24,11 @@ if (dbExistsTable(con, "plays")) {
   pbp <- tbl(con, "plays")
   agg <- pbp |>
     group_by(game_id, posteam) |>
-    summarise(epa_off = mean(epa, na.rm=TRUE),
-              pass_rate = mean(pass, na.rm=TRUE),
-              rush_rate = mean(rush, na.rm=TRUE))
+    summarise(
+      epa_off = mean(epa, na.rm = TRUE),
+      pass_rate = mean(pass, na.rm = TRUE),
+      rush_rate = mean(rush, na.rm = TRUE)
+    )
 } else {
   # Create empty agg if plays table doesn't exist
   agg <- data.frame(game_id = character(), posteam = character(), epa_off = numeric())
@@ -35,14 +41,14 @@ df <- g |> mutate(spread_result = (home_score - away_score))
 if (nrow(agg |> collect()) > 0) {
   df <- df |>
     left_join(agg |> collect() |> group_by(game_id) |>
-                summarise(epa_gap = diff(sort(epa_off, decreasing=TRUE))[1]), by="game_id")
+      summarise(epa_gap = diff(sort(epa_off, decreasing = TRUE))[1]), by = "game_id")
 } else {
   df <- df |> mutate(epa_gap = NA_real_)
 }
 
 # Join weather data if table exists
 if (dbExistsTable(con, "weather")) {
-  df <- df |> left_join(tbl(con,"weather") |> collect(), by="game_id")
+  df <- df |> left_join(tbl(con, "weather") |> collect(), by = "game_id")
 } else {
   df <- df |> mutate(temp_c = NA_real_, wind_kph = NA_real_, precip_mm = NA_real_)
 }
@@ -54,25 +60,26 @@ df <- df |>
 
 set.seed(42)
 split <- initial_split(df, prop = 0.8)
-train <- training(split); test <- testing(split)
+train <- training(split)
+test <- testing(split)
 
-rec <- recipe(y ~ ., data=train) |>
+rec <- recipe(y ~ ., data = train) |>
   step_impute_mean(all_predictors()) |>
   step_normalize(all_predictors())
 
-spec <- boost_tree(trees=1500, learn_rate=0.03, mtry = tune(), tree_depth = tune()) |>
+spec <- boost_tree(trees = 1500, learn_rate = 0.03, mtry = tune(), tree_depth = tune()) |>
   set_engine("xgboost") |>
   set_mode("regression")
 
 wf <- workflow(rec, spec)
-rs <- vfold_cv(train, v=5)
-grid <- grid_latin_hypercube(mtry(c(1,5)), tree_depth(), size=15)
+rs <- vfold_cv(train, v = 5)
+grid <- grid_latin_hypercube(mtry(c(1, 5)), tree_depth(), size = 15)
 
-tuned <- tune_grid(wf, rs, grid=grid, metrics = metric_set(rmse, mae))
+tuned <- tune_grid(wf, rs, grid = grid, metrics = metric_set(rmse, mae))
 best <- select_best(tuned, "rmse")
 final_wf <- finalize_workflow(wf, best) |> fit(train)
 preds <- predict(final_wf, test) |> bind_cols(test["y"])
-metrics(preds, truth=y, estimate=.pred)
+metrics(preds, truth = y, estimate = .pred)
 
 # Close database connection
 dbDisconnect(con)

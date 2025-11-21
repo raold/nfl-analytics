@@ -60,13 +60,13 @@ pbp_4th <- pbp %>%
       TRUE ~ "other"
     ),
     # Calculate decision quality
-    go_boost = go_wp - punt_wp,  # Advantage of going for it vs punt
-    fg_boost = fg_wp - go_wp,    # Advantage of FG vs going
+    go_boost = go_wp - punt_wp, # Advantage of going for it vs punt
+    fg_boost = fg_wp - go_wp, # Advantage of FG vs going
     # Bad decision flags
     bad_decision = case_when(
-      decision == "go" & go_boost < -0.02 ~ 1,        # Should have kicked
-      decision == "punt" & go_boost > 0.02 ~ 1,       # Should have gone
-      decision == "kick_fg" & fg_boost < -0.02 ~ 1,   # Should have gone/punted
+      decision == "go" & go_boost < -0.02 ~ 1, # Should have kicked
+      decision == "punt" & go_boost > 0.02 ~ 1, # Should have gone
+      decision == "kick_fg" & fg_boost < -0.02 ~ 1, # Should have gone/punted
       TRUE ~ 0
     ),
     # Success
@@ -104,7 +104,7 @@ team_4th_features <- pbp_4th %>%
   ) %>%
   # Replace NaN with 0 or NA as appropriate
   mutate(
-    across(where(is.numeric), ~if_else(is.nan(.), 0, .))
+    across(where(is.numeric), ~ if_else(is.nan(.), 0, .))
   ) %>%
   # Rename posteam to team to match database schema
   rename(team = posteam)

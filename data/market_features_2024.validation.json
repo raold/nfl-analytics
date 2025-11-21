@@ -1,0 +1,93 @@
+{
+  "total_events": 572,
+  "date_range": {
+    "start": "2024-09-06T00:20:00+00:00",
+    "end": "2025-02-09T23:30:00+00:00"
+  },
+  "missing_data": {},
+  "feature_stats": {
+    "max_line_velocity": {
+      "mean": 0.32213359557109555,
+      "std": 0.3027821455467174,
+      "min": 0.0,
+      "max": 2.0833333333333335,
+      "median": 0.25
+    },
+    "max_line_acceleration": {
+      "mean": 0.013405160377816628,
+      "std": 0.01263027676424364,
+      "min": 0.0,
+      "max": 0.08680555555555557,
+      "median": 0.010416666666666666
+    },
+    "cross_book_std": {
+      "mean": 0.42095446132967507,
+      "std": 0.7457752188922229,
+      "min": 0.0,
+      "max": 7.641521912738138,
+      "median": 0.24152294576982294
+    },
+    "cross_book_median": {
+      "mean": 22.357517482517483,
+      "std": 23.179159734888056,
+      "min": -25.5,
+      "max": 79.5,
+      "median": 32.75
+    },
+    "cross_book_range": {
+      "mean": 1.1232517482517483,
+      "std": 2.037976036489001,
+      "min": 0.0,
+      "max": 20.5,
+      "median": 0.5
+    },
+    "cross_book_count": {
+      "mean": 9.325174825174825,
+      "std": 1.2593033701770193,
+      "min": 2.0,
+      "max": 10.0,
+      "median": 10.0
+    },
+    "hours_to_kickoff": {
+      "mean": 12.870421037296039,
+      "std": 16.188877734039757,
+      "min": -2.933333333333333,
+      "max": 240.33333333333334,
+      "median": 17.0
+    },
+    "time_decay_weight": {
+      "mean": 0.6428367312954435,
+      "std": 0.25495485098394755,
+      "min": 4.4773733831436474e-05,
+      "max": 1.0,
+      "median": 0.49246428767540973
+    },
+    "sharp_move_count": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "median": 0.0
+    },
+    "multiple_sharp_moves": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "median": 0.0
+    },
+    "high_dispersion": {
+      "mean": 0.06818181818181818,
+      "std": 0.25227826730062397,
+      "min": 0.0,
+      "max": 1.0,
+      "median": 0.0
+    }
+  },
+  "quality_flags": {
+    "high_dispersion_events": 39,
+    "sharp_move_events": 0,
+    "multiple_sharp_moves": 0
+  },
+  "data_quality_pct": 100.0
+}

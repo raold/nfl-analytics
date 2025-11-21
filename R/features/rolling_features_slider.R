@@ -17,7 +17,7 @@
 suppressPackageStartupMessages({
   library(dplyr)
   library(tidyr)
-  library(slider)    # Fast, type-stable sliding window functions
+  library(slider) # Fast, type-stable sliding window functions
   library(DBI)
   library(RPostgres)
 })
@@ -37,9 +37,8 @@ suppressPackageStartupMessages({
 #' @param include_ewma Include exponentially weighted features (default: TRUE)
 #' @return games_df with rolling features added
 compute_rolling_team_features <- function(games_df,
-                                           windows = c(3, 5, 10),
-                                           include_ewma = TRUE) {
-
+                                          windows = c(3, 5, 10),
+                                          include_ewma = TRUE) {
   games_df <- games_df |>
     arrange(season, week) |>
     group_by(team) |>
@@ -59,10 +58,9 @@ compute_rolling_team_features <- function(games_df,
           .complete = FALSE,
           na_rm = TRUE
         ),
-
         !!paste0("epa_sd_L", w) := slide_dbl(
           epa_total,
-          .f = ~sd(.x, na.rm = TRUE),
+          .f = ~ sd(.x, na.rm = TRUE),
           .before = w,
           .after = 0,
           .complete = FALSE
@@ -136,7 +134,7 @@ compute_rolling_team_features <- function(games_df,
       # Consistency: sliding range
       epa_range_L5 = slide_dbl(
         epa_total,
-        .f = ~diff(range(.x, na.rm = TRUE)),
+        .f = ~ diff(range(.x, na.rm = TRUE)),
         .before = 5,
         .after = 0,
         .complete = FALSE
@@ -145,7 +143,7 @@ compute_rolling_team_features <- function(games_df,
       # Trend: linear slope over last 5 games
       epa_slope_L5 = slide_dbl(
         epa_total,
-        .f = ~if(length(.x) >= 3) {
+        .f = ~ if (length(.x) >= 3) {
           coef(lm(.x ~ seq_along(.x)))[2]
         } else {
           NA_real_
@@ -158,8 +156,8 @@ compute_rolling_team_features <- function(games_df,
       # Percentile within season
       epa_pct_rank_season = slide_dbl(
         epa_total,
-        .f = ~percent_rank(.x)[length(.x)],
-        .before = Inf,  # All games in season so far
+        .f = ~ percent_rank(.x)[length(.x)],
+        .before = Inf, # All games in season so far
         .after = 0,
         .complete = FALSE
       ),
@@ -187,10 +185,12 @@ compute_rolling_team_features <- function(games_df,
       # Streaks: consecutive wins/losses
       win_streak = slide_dbl(
         win,
-        .f = ~{
-          if(length(.x) == 0) return(0)
+        .f = ~ {
+          if (length(.x) == 0) {
+            return(0)
+          }
           rle_result <- rle(.x)
-          if(rle_result$values[length(rle_result$values)] == 1) {
+          if (rle_result$values[length(rle_result$values)] == 1) {
             rle_result$lengths[length(rle_result$lengths)]
           } else {
             0
@@ -204,11 +204,13 @@ compute_rolling_team_features <- function(games_df,
       # Cover streak (for ATS modeling)
       cover_streak = slide_dbl(
         cover,
-        .f = ~{
-          if(length(.x) == 0) return(0)
+        .f = ~ {
+          if (length(.x) == 0) {
+            return(0)
+          }
           rle_result <- rle(.x)
-          if(!is.na(rle_result$values[length(rle_result$values)]) &&
-             rle_result$values[length(rle_result$values)] == 1) {
+          if (!is.na(rle_result$values[length(rle_result$values)]) &&
+            rle_result$values[length(rle_result$values)] == 1) {
             rle_result$lengths[length(rle_result$lengths)]
           } else {
             0
@@ -222,23 +224,21 @@ compute_rolling_team_features <- function(games_df,
       # Quantile features: 25th, 50th, 75th percentiles over last 10
       epa_q25_L10 = slide_dbl(
         epa_total,
-        .f = ~quantile(.x, 0.25, na.rm = TRUE),
+        .f = ~ quantile(.x, 0.25, na.rm = TRUE),
         .before = 10,
         .after = 0,
         .complete = FALSE
       ),
-
       epa_median_L10 = slide_dbl(
         epa_total,
-        .f = ~quantile(.x, 0.50, na.rm = TRUE),
+        .f = ~ quantile(.x, 0.50, na.rm = TRUE),
         .before = 10,
         .after = 0,
         .complete = FALSE
       ),
-
       epa_q75_L10 = slide_dbl(
         epa_total,
-        .f = ~quantile(.x, 0.75, na.rm = TRUE),
+        .f = ~ quantile(.x, 0.75, na.rm = TRUE),
         .before = 10,
         .after = 0,
         .complete = FALSE
@@ -259,7 +259,7 @@ compute_rolling_team_features <- function(games_df,
       mutate(
         epa_ewma_h4 = slide_dbl(
           epa_total,
-          .f = ~{
+          .f = ~ {
             weights <- alpha_4 * (1 - alpha_4)^(rev(seq_along(.x)) - 1)
             weighted.mean(.x, weights, na.rm = TRUE)
           },
@@ -267,10 +267,9 @@ compute_rolling_team_features <- function(games_df,
           .after = 0,
           .complete = FALSE
         ),
-
         margin_ewma_h4 = slide_dbl(
           margin,
-          .f = ~{
+          .f = ~ {
             weights <- alpha_4 * (1 - alpha_4)^(rev(seq_along(.x)) - 1)
             weighted.mean(.x, weights, na.rm = TRUE)
           },
@@ -278,10 +277,9 @@ compute_rolling_team_features <- function(games_df,
           .after = 0,
           .complete = FALSE
         ),
-
         success_rate_ewma_h4 = slide_dbl(
           success_rate,
-          .f = ~{
+          .f = ~ {
             weights <- alpha_4 * (1 - alpha_4)^(rev(seq_along(.x)) - 1)
             weighted.mean(.x, weights, na.rm = TRUE)
           },
@@ -300,10 +298,10 @@ compute_rolling_team_features <- function(games_df,
       # Games since bye week
       weeks_since_bye = slide_dbl(
         rest_days,
-        .f = ~{
-          bye_idx <- which(.x > 10)  # Bye weeks have >10 days rest
-          if(length(bye_idx) == 0) {
-            length(.x)  # No bye yet
+        .f = ~ {
+          bye_idx <- which(.x > 10) # Bye weeks have >10 days rest
+          if (length(bye_idx) == 0) {
+            length(.x) # No bye yet
           } else {
             length(.x) - max(bye_idx)
           }
@@ -316,7 +314,7 @@ compute_rolling_team_features <- function(games_df,
       # Road game density (% of last 5 games on road)
       road_pct_L5 = slide_dbl(
         is_home,
-        .f = ~mean(.x == 0, na.rm = TRUE),
+        .f = ~ mean(.x == 0, na.rm = TRUE),
         .before = 5,
         .after = 0,
         .complete = FALSE
@@ -325,7 +323,7 @@ compute_rolling_team_features <- function(games_df,
       # Back-to-back short rest games
       short_rest_L2 = slide_dbl(
         rest_days,
-        .f = ~sum(.x < 7, na.rm = TRUE),
+        .f = ~ sum(.x < 7, na.rm = TRUE),
         .before = 2,
         .after = 0,
         .complete = FALSE
@@ -383,7 +381,7 @@ validate_rolling_features <- function(games_df) {
     slice(1) |>
     ungroup() |>
     select(matches("_L[0-9]|_ewma|streak")) |>
-    summarize(across(everything(), ~sum(!is.na(.x))))
+    summarize(across(everything(), ~ sum(!is.na(.x))))
 
   results$first_game_na_count <- first_game_checks
 
@@ -429,10 +427,9 @@ validate_rolling_features <- function(games_df) {
 #' @param validate Run validation checks (default: TRUE)
 #' @return tibble with rolling features
 run_rolling_feature_pipeline <- function(write_to_mart = FALSE,
-                                          season_start = 2015,
-                                          season_end = 2024,
-                                          validate = TRUE) {
-
+                                         season_start = 2015,
+                                         season_end = 2024,
+                                         validate = TRUE) {
   message("═══════════════════════════════════════════════════════")
   message("  Advanced Rolling Features with slider")
   message("═══════════════════════════════════════════════════════\n")
@@ -499,7 +496,7 @@ run_rolling_feature_pipeline <- function(write_to_mart = FALSE,
       points_for = home_score, points_against = away_score,
       margin = home_margin, win = home_win, cover = home_cover,
       epa_total = home_epa, success_rate = home_success_rate,
-      rest_days = 7  # Placeholder
+      rest_days = 7 # Placeholder
     ),
     games_raw |> transmute(
       game_id, season, week,
@@ -508,7 +505,7 @@ run_rolling_feature_pipeline <- function(write_to_mart = FALSE,
       points_for = away_score, points_against = home_score,
       margin = -home_margin, win = 1 - home_win, cover = 1 - home_cover,
       epa_total = away_epa, success_rate = away_success_rate,
-      rest_days = 7  # Placeholder
+      rest_days = 7 # Placeholder
     )
   ) |>
     arrange(team, season, week)
@@ -518,9 +515,11 @@ run_rolling_feature_pipeline <- function(write_to_mart = FALSE,
   start_time <- Sys.time()
   games_with_rolling <- compute_rolling_team_features(games_long, windows = c(3, 5, 10), include_ewma = TRUE)
   end_time <- Sys.time()
-  message(sprintf("✓ Computed %d features in %.1f seconds\n",
-                  ncol(games_with_rolling) - ncol(games_long),
-                  as.numeric(difftime(end_time, start_time, units = "secs"))))
+  message(sprintf(
+    "✓ Computed %d features in %.1f seconds\n",
+    ncol(games_with_rolling) - ncol(games_long),
+    as.numeric(difftime(end_time, start_time, units = "secs"))
+  ))
 
   # Opponent adjustment
   message("Computing opponent-adjusted features...")
@@ -554,10 +553,12 @@ run_rolling_feature_pipeline <- function(write_to_mart = FALSE,
   }
 
   message("═══════════════════════════════════════════════════════")
-  message(sprintf("Pipeline complete: %d games, %d teams, %d features",
-                  nrow(games_with_rolling),
-                  length(unique(games_with_rolling$team)),
-                  ncol(games_with_rolling)))
+  message(sprintf(
+    "Pipeline complete: %d games, %d teams, %d features",
+    nrow(games_with_rolling),
+    length(unique(games_with_rolling$team)),
+    ncol(games_with_rolling)
+  ))
   message("═══════════════════════════════════════════════════════\n")
 
   games_with_rolling

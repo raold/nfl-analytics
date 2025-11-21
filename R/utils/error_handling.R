@@ -121,15 +121,18 @@ safe_execute <- function(expr, conn = NULL, error_message = NULL, finally_expr =
 
     # Rollback database transaction if connection provided
     if (!is.null(conn) && dbIsValid(conn)) {
-      tryCatch({
-        dbRollback(conn)
-        log_message("Database transaction rolled back", level = "WARNING")
-      }, error = function(rollback_err) {
-        log_message(
-          sprintf("Failed to rollback: %s", rollback_err$message),
-          level = "CRITICAL"
-        )
-      })
+      tryCatch(
+        {
+          dbRollback(conn)
+          log_message("Database transaction rolled back", level = "WARNING")
+        },
+        error = function(rollback_err) {
+          log_message(
+            sprintf("Failed to rollback: %s", rollback_err$message),
+            level = "CRITICAL"
+          )
+        }
+      )
     }
 
     # Re-throw the error
@@ -154,30 +157,35 @@ retry_operation <- function(expr, max_attempts = 3, delay = 2, error_message = N
   attempt <- 1
 
   while (attempt <= max_attempts) {
-    result <- tryCatch({
-      eval(expr)
-    }, error = function(e) {
-      if (attempt == max_attempts) {
-        # Final attempt failed
-        if (is.null(error_message)) {
-          error_message <- "Operation failed after all retries"
+    result <- tryCatch(
+      {
+        eval(expr)
+      },
+      error = function(e) {
+        if (attempt == max_attempts) {
+          # Final attempt failed
+          if (is.null(error_message)) {
+            error_message <- "Operation failed after all retries"
+          }
+          log_message(
+            sprintf("%s (attempt %d/%d): %s", error_message, attempt, max_attempts, e$message),
+            level = "ERROR"
+          )
+          stop(e)
+        } else {
+          # Log retry
+          log_message(
+            sprintf(
+              "Attempt %d/%d failed, retrying in %d seconds: %s",
+              attempt, max_attempts, delay, e$message
+            ),
+            level = "WARNING"
+          )
+          Sys.sleep(delay)
+          NULL # Continue to next attempt
         }
-        log_message(
-          sprintf("%s (attempt %d/%d): %s", error_message, attempt, max_attempts, e$message),
-          level = "ERROR"
-        )
-        stop(e)
-      } else {
-        # Log retry
-        log_message(
-          sprintf("Attempt %d/%d failed, retrying in %d seconds: %s",
-                  attempt, max_attempts, delay, e$message),
-          level = "WARNING"
-        )
-        Sys.sleep(delay)
-        NULL  # Continue to next attempt
       }
-    })
+    )
 
     if (!is.null(result)) {
       if (attempt > 1) {
@@ -232,12 +240,15 @@ safe_db_operation <- function(db_params = NULL, expr) {
 
     # Rollback if connection exists
     if (!is.null(conn) && dbIsValid(conn)) {
-      tryCatch({
-        dbRollback(conn)
-        log_message("Transaction rolled back", level = "WARNING")
-      }, error = function(rollback_err) {
-        log_message(sprintf("Rollback failed: %s", rollback_err$message), level = "CRITICAL")
-      })
+      tryCatch(
+        {
+          dbRollback(conn)
+          log_message("Transaction rolled back", level = "WARNING")
+        },
+        error = function(rollback_err) {
+          log_message(sprintf("Rollback failed: %s", rollback_err$message), level = "CRITICAL")
+        }
+      )
     }
     stop(e)
   }, finally = {
@@ -277,22 +288,32 @@ validate_data <- function(data, expected_cols = NULL, min_rows = 1, max_rows = I
   if (!is.null(expected_cols)) {
     missing_cols <- setdiff(expected_cols, names(data))
     if (length(missing_cols) > 0) {
-      stop(sprintf("Data validation failed: Missing columns: %s",
-                   paste(missing_cols, collapse = ", ")))
+      stop(sprintf(
+        "Data validation failed: Missing columns: %s",
+        paste(missing_cols, collapse = ", ")
+      ))
     }
   }
 
   # Check for all NA columns
   all_na_cols <- names(data)[sapply(data, function(x) all(is.na(x)))]
   if (length(all_na_cols) > 0) {
-    log_message(sprintf("Warning: Columns with all NA values: %s",
-                        paste(all_na_cols, collapse = ", ")),
-                level = "WARNING")
+    log_message(
+      sprintf(
+        "Warning: Columns with all NA values: %s",
+        paste(all_na_cols, collapse = ", ")
+      ),
+      level = "WARNING"
+    )
   }
 
-  log_message(sprintf("Data validation passed: %d rows, %d columns",
-                      row_count, ncol(data)),
-              level = "INFO")
+  log_message(
+    sprintf(
+      "Data validation passed: %d rows, %d columns",
+      row_count, ncol(data)
+    ),
+    level = "INFO"
+  )
 
   return(TRUE)
 }
@@ -314,12 +335,19 @@ run_pipeline_step <- function(step_name, expr, conn = NULL, validate_fn = NULL) 
     expr = expr,
     conn = conn,
     error_message = sprintf("Pipeline step '%s' failed", step_name),
-    finally_expr = substitute({
-      elapsed <- difftime(Sys.time(), step_start_time, units = "secs")
-      log_message(sprintf("Pipeline step '%s' completed in %.2f seconds",
-                          step_name, elapsed),
-                  level = "INFO")
-    }, list(step_start_time = step_start_time, step_name = step_name))
+    finally_expr = substitute(
+      {
+        elapsed <- difftime(Sys.time(), step_start_time, units = "secs")
+        log_message(
+          sprintf(
+            "Pipeline step '%s' completed in %.2f seconds",
+            step_name, elapsed
+          ),
+          level = "INFO"
+        )
+      },
+      list(step_start_time = step_start_time, step_name = step_name)
+    )
   )
 
   # Run validation if provided

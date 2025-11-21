@@ -37,7 +37,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. ESPN QBR (2006-2025)
     # ============================================================
@@ -72,7 +71,7 @@ safe_db_operation(
       step_name = "Upsert ESPN QBR",
       expr = {
         qbr_clean <- qbr_data %>%
-          filter(game_week != "Season Total") %>%  # Filter out season aggregates
+          filter(game_week != "Season Total") %>% # Filter out season aggregates
           select(
             player_id,
             season,
@@ -416,12 +415,16 @@ safe_db_operation(
 
         log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(qbr_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f",
-                             qbr_summary$season[i],
-                             qbr_summary$unique_qbs[i],
-                             qbr_summary$total_records[i],
-                             qbr_summary$avg_qbr[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f",
+              qbr_summary$season[i],
+              qbr_summary$unique_qbs[i],
+              qbr_summary$total_records[i],
+              qbr_summary$avg_qbr[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Defense summary
@@ -435,11 +438,15 @@ safe_db_operation(
 
         log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(def_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f defenders, %.0f records",
-                             def_summary$season[i],
-                             def_summary$unique_defenders[i],
-                             def_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f defenders, %.0f records",
+              def_summary$season[i],
+              def_summary$unique_defenders[i],
+              def_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Snap counts summary
@@ -453,11 +460,15 @@ safe_db_operation(
 
         log_message("=== Snap Counts Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(snaps_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f players, %.0f records",
-                             snaps_summary$season[i],
-                             snaps_summary$unique_players[i],
-                             snaps_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f players, %.0f records",
+              snaps_summary$season[i],
+              snaps_summary$unique_players[i],
+              snaps_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Depth charts summary
@@ -472,11 +483,15 @@ safe_db_operation(
 
         log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(depth_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f starters, %.0f records",
-                             depth_summary$season[i],
-                             depth_summary$unique_players[i],
-                             depth_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f starters, %.0f records",
+              depth_summary$season[i],
+              depth_summary$unique_players[i],
+              depth_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         TRUE

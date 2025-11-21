@@ -306,3 +306,42 @@ Root:
 **Status**: Guides directory complete. All 18 guides operational.
 
 **Next**: See [DOCUMENTATION_INDEX.md](../../DOCUMENTATION_INDEX.md) for complete documentation catalog.
+
+## R Bayesian Modeling
+
+### R Bayesian Modeling Cookbook (NEW - Nov 16, 2025)
+**File:** [R_BAYESIAN_MODELING_COOKBOOK.md](R_BAYESIAN_MODELING_COOKBOOK.md)
+**Purpose:** Comprehensive guide for training, validating, and deploying production R Bayesian models
+**Coverage:** State-Space v2, Hierarchical v2, Informative Priors v2 (75% of ensemble)
+
+**Sections:**
+1. Quick Start (5-minute setup)
+2. Environment Setup (R 4.0+, cmdstanr, brms)
+3. Training Workflow (canonical window, feature engineering)
+4. Model-Specific Guides (all 3 production models)
+5. MCMC Diagnostics (Rhat, ESS, divergences)
+6. Common Errors & Solutions (30+ fixes)
+7. Model Registry Integration
+8. Production Checklist
+9. Troubleshooting Guide
+10. References & Resources
+
+**Quick Reference:** [R_BAYESIAN_QUICK_REFERENCE.md](R_BAYESIAN_QUICK_REFERENCE.md) - Fast lookup for common commands and fixes
+
+**Implementation Summary:** [../milestones/R_BAYESIAN_COOKBOOK_COMPLETE.md](../milestones/R_BAYESIAN_COOKBOOK_COMPLETE.md)
+
+**Key Features:**
+- 5-minute Quick Start → Hello World model
+- Copy-paste ready code examples
+- 30+ error solutions with code fixes
+- Complete MCMC diagnostics guide
+- Production deployment checklist (50+ items)
+- 2,078 lines comprehensive coverage
+
+**Use Cases:**
+- Training new team members on R Bayesian stack
+- Debugging convergence issues (Rhat, ESS, divergences)
+- Retraining production models after data updates
+- Disaster recovery (bus factor mitigation)
+- Quick lookup for common errors
+

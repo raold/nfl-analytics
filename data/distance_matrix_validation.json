@@ -1,0 +1,42 @@
+{
+  "is_symmetric": true,
+  "diagonal_zeros": true,
+  "known_distances": {
+    "SEA-MIA": {
+      "expected": 2724,
+      "actual": 2719.8,
+      "error": 4.2,
+      "within_tolerance": true
+    },
+    "SF-NE": {
+      "expected": 2699,
+      "actual": 2673.6,
+      "error": 25.4,
+      "within_tolerance": true
+    },
+    "LAR-NYG": {
+      "expected": 2448,
+      "actual": 2449.4,
+      "error": 1.4,
+      "within_tolerance": true
+    },
+    "GB-TB": {
+      "expected": 1200,
+      "actual": 1182.3,
+      "error": 17.7,
+      "within_tolerance": true
+    }
+  },
+  "max_distance": 2719.8,
+  "min_distance": 0.0,
+  "coast_to_coast": {
+    "SEA-MIA": 2719.8,
+    "SF-MIA": 2554.8,
+    "SF-NE": 2673.6,
+    "SF-NYG": 2546.7,
+    "SF-NYJ": 2546.7,
+    "SF-PHI": 2502.3,
+    "LAR-NE": 2589.4,
+    "LAC-NE": 2589.4
+  }
+}

@@ -81,25 +81,25 @@ CANONICAL_COLUMNS <- c(
   # ============================================================
 
   # Props outcomes (direct betting targets, not yards_gained proxy)
-  "passing_yards",    # Net passing yards (excludes sacks)
-  "receiving_yards",  # Receiving yards (not yards_gained)
-  "rushing_yards",    # Rushing yards (not yards_gained)
-  "return_yards",     # Return yards (punt/kickoff)
+  "passing_yards", # Net passing yards (excludes sacks)
+  "receiving_yards", # Receiving yards (not yards_gained)
+  "rushing_yards", # Rushing yards (not yards_gained)
+  "return_yards", # Return yards (punt/kickoff)
 
   # Advanced EPA (QB vs receiver separation)
-  "qb_epa",              # QB EPA at throw (before YAC)
-  "xyac_epa",            # Expected yards after catch EPA
-  "xyac_mean_yardage",   # Mean expected YAC
+  "qb_epa", # QB EPA at throw (before YAC)
+  "xyac_epa", # Expected yards after catch EPA
+  "xyac_mean_yardage", # Mean expected YAC
   "xyac_median_yardage", # Median expected YAC
-  "xyac_success",        # Binary YAC success
-  "xyac_fd",             # YAC resulted in first down
+  "xyac_success", # Binary YAC success
+  "xyac_fd", # YAC resulted in first down
 
   # Play validity & context
-  "aborted_play",      # Play aborted (exclude from stats)
-  "out_of_bounds",     # Clock management context
-  "order_sequence",    # Play number within drive
-  "play_type_nfl",     # NFL official play categorization
-  "tackled_for_loss"   # Defensive disruption
+  "aborted_play", # Play aborted (exclude from stats)
+  "out_of_bounds", # Clock management context
+  "order_sequence", # Play number within drive
+  "play_type_nfl", # NFL official play categorization
+  "tackled_for_loss" # Defensive disruption
 )
 
 cat("=================================================================\n")
@@ -116,52 +116,57 @@ con <- get_db_connection()
 for (season in START_SEASON:END_SEASON) {
   cat(sprintf("\n[%s] Processing season %d...\n", Sys.time(), season))
 
-  tryCatch({
-    # Load play-by-play from nflreadr
-    cat(sprintf("  Loading data from nflreadr... "))
-    pbp_raw <- nflreadr::load_pbp(season)
-    cat(sprintf("loaded %d plays\n", nrow(pbp_raw)))
+  tryCatch(
+    {
+      # Load play-by-play from nflreadr
+      cat(sprintf("  Loading data from nflreadr... "))
+      pbp_raw <- nflreadr::load_pbp(season)
+      cat(sprintf("loaded %d plays\n", nrow(pbp_raw)))
 
-    # Select only canonical columns
-    pbp_clean <- pbp_raw %>%
-      select(any_of(CANONICAL_COLUMNS))
+      # Select only canonical columns
+      pbp_clean <- pbp_raw %>%
+        select(any_of(CANONICAL_COLUMNS))
 
-    cat(sprintf("  Selected %d columns from nflreadr\n", ncol(pbp_clean)))
+      cat(sprintf("  Selected %d columns from nflreadr\n", ncol(pbp_clean)))
 
-    # Boolean type conversion for Phase 1 columns
-    boolean_cols <- c("xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss")
-    for (col in boolean_cols) {
-      if (col %in% names(pbp_clean) && !is.logical(pbp_clean[[col]])) {
-        pbp_clean[[col]] <- as.logical(pbp_clean[[col]])
+      # Boolean type conversion for Phase 1 columns
+      boolean_cols <- c("xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss")
+      for (col in boolean_cols) {
+        if (col %in% names(pbp_clean) && !is.logical(pbp_clean[[col]])) {
+          pbp_clean[[col]] <- as.logical(pbp_clean[[col]])
+        }
       }
-    }
 
-    # Integer type conversion (order_sequence comes as "1.0" from nflreadr)
-    if ("order_sequence" %in% names(pbp_clean)) {
-      pbp_clean$order_sequence <- as.integer(pbp_clean$order_sequence)
-    }
+      # Integer type conversion (order_sequence comes as "1.0" from nflreadr)
+      if ("order_sequence" %in% names(pbp_clean)) {
+        pbp_clean$order_sequence <- as.integer(pbp_clean$order_sequence)
+      }
 
-    # Delete existing plays for this season
-    deleted_count <- dbExecute(con,
-      sprintf("DELETE FROM plays WHERE game_id LIKE '%s_%%'", as.character(season)))
-    cat(sprintf("  Deleted %d existing plays\n", deleted_count))
+      # Delete existing plays for this season
+      deleted_count <- dbExecute(
+        con,
+        sprintf("DELETE FROM plays WHERE game_id LIKE '%s_%%'", as.character(season))
+      )
+      cat(sprintf("  Deleted %d existing plays\n", deleted_count))
 
-    # Insert new plays in batches of 10,000
-    batch_size <- 10000
-    num_batches <- ceiling(nrow(pbp_clean) / batch_size)
+      # Insert new plays in batches of 10,000
+      batch_size <- 10000
+      num_batches <- ceiling(nrow(pbp_clean) / batch_size)
 
-    for (batch_idx in 1:num_batches) {
-      start_row <- (batch_idx - 1) * batch_size + 1
-      end_row <- min(batch_idx * batch_size, nrow(pbp_clean))
-      batch_data <- pbp_clean[start_row:end_row, ]
+      for (batch_idx in 1:num_batches) {
+        start_row <- (batch_idx - 1) * batch_size + 1
+        end_row <- min(batch_idx * batch_size, nrow(pbp_clean))
+        batch_data <- pbp_clean[start_row:end_row, ]
 
-      dbWriteTable(con, "plays", batch_data, append = TRUE, row.names = FALSE)
-      cat(sprintf("  Inserted batch %d/%d (%d-%d of %d plays)\n",
-                  batch_idx, num_batches, start_row, end_row, nrow(pbp_clean)))
-    }
+        dbWriteTable(con, "plays", batch_data, append = TRUE, row.names = FALSE)
+        cat(sprintf(
+          "  Inserted batch %d/%d (%d-%d of %d plays)\n",
+          batch_idx, num_batches, start_row, end_row, nrow(pbp_clean)
+        ))
+      }
 
-    # Validate Phase 1 column population
-    validation_query <- sprintf("
+      # Validate Phase 1 column population
+      validation_query <- sprintf("
       SELECT
         COUNT(*) as total,
         COUNT(passing_yards) as has_passing,
@@ -171,14 +176,17 @@ for (season in START_SEASON:END_SEASON) {
       WHERE game_id LIKE '%s_%%'
     ", as.character(season))
 
-    validation <- dbGetQuery(con, validation_query)
-    cat(sprintf("  ✓ Season %d complete: %d plays, %.1f%% passing_yards, %.1f%% qb_epa\n",
-                season, validation$total, validation$pct,
-                100.0 * validation$has_qb_epa / validation$total))
-
-  }, error = function(e) {
-    cat(sprintf("  ✗ ERROR in season %d: %s\n", season, e$message))
-  })
+      validation <- dbGetQuery(con, validation_query)
+      cat(sprintf(
+        "  ✓ Season %d complete: %d plays, %.1f%% passing_yards, %.1f%% qb_epa\n",
+        season, validation$total, validation$pct,
+        100.0 * validation$has_qb_epa / validation$total
+      ))
+    },
+    error = function(e) {
+      cat(sprintf("  ✗ ERROR in season %d: %s\n", season, e$message))
+    }
+  )
 }
 
 # Final validation across all seasons
