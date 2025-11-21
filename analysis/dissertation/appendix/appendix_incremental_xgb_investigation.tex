@@ -139,7 +139,8 @@ We systematically eliminated potential causes:
 
 \paragraph{Hypothesis 3: XGBoost Configuration Error.}
 \begin{itemize}
-\item \textbf{Test}: Inspected model object with \texttt{model.get\_params()} and \texttt{model.get\_booster().trees\_to\_dataframe()}
+\item \textbf{Test}: Inspected model object with \texttt{model.get\_params()} and\\
+\texttt{model.get\_booster().trees\_to\_dataframe()}
 \item \textbf{Result}: \texttt{n\_estimators=0}, no trees in booster
 \item \textbf{Conclusion}: \textbf{ROOT CAUSE IDENTIFIED}
 \end{itemize}

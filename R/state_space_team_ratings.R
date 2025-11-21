@@ -47,19 +47,23 @@ fit_team_strength_ewma <- function(games, half_life = 4) {
     hist <- df |>
       filter(home_team == tm | away_team == tm) |>
       arrange(season, week) |>
-      mutate(sign = ifelse(home_team == tm, +1, -1),
-             obs = sign * margin)
+      mutate(
+        sign = ifelse(home_team == tm, +1, -1),
+        obs = sign * margin
+      )
     s <- 0
     tprev <- NA_integer_
     rows <- vector("list", nrow(hist))
     for (i in seq_len(nrow(hist))) {
       # EWMA in game order; ignore gaps for now (stub)
       s <- (1 - lambda) * s + lambda * hist$obs[i]
-      rows[[i]] <- tibble(team = tm,
-                          game_id = hist$game_id[i],
-                          season = hist$season[i],
-                          week = hist$week[i],
-                          strength = s)
+      rows[[i]] <- tibble(
+        team = tm,
+        game_id = hist$game_id[i],
+        season = hist$season[i],
+        week = hist$week[i],
+        strength = s
+      )
     }
     out[[tm]] <- bind_rows(rows)
   }
@@ -72,9 +76,10 @@ run_state_space <- function(write_to_mart = FALSE, method = c("ewma", "rls", "dl
   games <- fetch_games()
   method <- match.arg(method)
   ratings <- switch(method,
-                    ewma = fit_team_strength_ewma(games),
-                    rls  = fit_team_strength_rls(games),
-                    dlm  = if (supp_dlmm) fit_team_strength_dlm(games) else fit_team_strength_rls(games))
+    ewma = fit_team_strength_ewma(games),
+    rls  = fit_team_strength_rls(games),
+    dlm  = if (supp_dlmm) fit_team_strength_dlm(games) else fit_team_strength_rls(games)
+  )
   if (isTRUE(write_to_mart)) {
     con <- dbConnect(
       RPostgres::Postgres(),
@@ -118,7 +123,7 @@ fit_team_strength_rls <- function(games, lambda = 0.98) {
   idx <- stats::setNames(seq_len(p), teams)
   # State theta (p x 1) and covariance P (p x p)
   theta <- rep(0, p)
-  P <- diag(1e2, p)  # large prior variance
+  P <- diag(1e2, p) # large prior variance
   rows <- vector("list", nrow(games) * 2)
   rix <- 1L
   games_ord <- games |>
@@ -143,11 +148,15 @@ fit_team_strength_rls <- function(games, lambda = 0.98) {
     # Covariance update
     P <- (P - tcrossprod(K, Px)) / lambda
     # Record both teams
-    rows[[rix]] <- tibble::tibble(team = g$home_team, game_id = g$game_id, season = g$season, week = g$week,
-                                  strength = theta[idx[[g$home_team]]])
+    rows[[rix]] <- tibble::tibble(
+      team = g$home_team, game_id = g$game_id, season = g$season, week = g$week,
+      strength = theta[idx[[g$home_team]]]
+    )
     rix <- rix + 1L
-    rows[[rix]] <- tibble::tibble(team = g$away_team, game_id = g$game_id, season = g$season, week = g$week,
-                                  strength = theta[idx[[g$away_team]]])
+    rows[[rix]] <- tibble::tibble(
+      team = g$away_team, game_id = g$game_id, season = g$season, week = g$week,
+      strength = theta[idx[[g$away_team]]]
+    )
     rix <- rix + 1L
   }
   dplyr::bind_rows(rows) |>
@@ -166,16 +175,20 @@ fit_team_strength_dlm <- function(games, v = 9.0, w = 1.0) {
     hist <- df |>
       filter(home_team == tm | away_team == tm) |>
       arrange(season, week) |>
-      mutate(sign = ifelse(home_team == tm, +1, -1),
-             obs = sign * margin)
+      mutate(
+        sign = ifelse(home_team == tm, +1, -1),
+        obs = sign * margin
+      )
     mod <- dlm::dlmModPoly(order = 1, dV = v, dW = w)
     fit <- suppressWarnings(dlm::dlmFilter(hist$obs, mod))
     s <- as.numeric(fit$m[-1])
-    out[[tm]] <- tibble(team = tm,
-                        game_id = hist$game_id,
-                        season = hist$season,
-                        week = hist$week,
-                        strength = s)
+    out[[tm]] <- tibble(
+      team = tm,
+      game_id = hist$game_id,
+      season = hist$season,
+      week = hist$week,
+      strength = s
+    )
   }
   bind_rows(out) |>
     arrange(team, season, week)

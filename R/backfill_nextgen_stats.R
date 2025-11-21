@@ -37,7 +37,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. LOAD NEXT GEN PASSING STATS
     # ============================================================
@@ -64,7 +63,7 @@ safe_db_operation(
         validate_data(
           data = data,
           expected_cols = c("player_gsis_id", "season", "week"),
-          min_rows = 1000  # Should have thousands of QB-week records
+          min_rows = 1000 # Should have thousands of QB-week records
         )
       }
     )
@@ -338,12 +337,16 @@ safe_db_operation(
 
         log_message("=== Next Gen Passing Stats Summary ===", level = "INFO")
         for (i in 1:nrow(passing_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg CPOE: %.2f",
-                             passing_summary$season[i],
-                             passing_summary$unique_qbs[i],
-                             passing_summary$total_records[i],
-                             passing_summary$avg_cpoe[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f QBs, %.0f records, Avg CPOE: %.2f",
+              passing_summary$season[i],
+              passing_summary$unique_qbs[i],
+              passing_summary$total_records[i],
+              passing_summary$avg_cpoe[i]
+            ),
+            level = "INFO"
+          )
         }
 
         rushing_summary <- dbGetQuery(conn, "
@@ -356,11 +359,15 @@ safe_db_operation(
 
         log_message("=== Next Gen Rushing Stats Summary ===", level = "INFO")
         for (i in 1:nrow(rushing_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f rushers, %.0f records",
-                             rushing_summary$season[i],
-                             rushing_summary$unique_rushers[i],
-                             rushing_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f rushers, %.0f records",
+              rushing_summary$season[i],
+              rushing_summary$unique_rushers[i],
+              rushing_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         receiving_summary <- dbGetQuery(conn, "
@@ -373,11 +380,15 @@ safe_db_operation(
 
         log_message("=== Next Gen Receiving Stats Summary ===", level = "INFO")
         for (i in 1:nrow(receiving_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f receivers, %.0f records",
-                             receiving_summary$season[i],
-                             receiving_summary$unique_receivers[i],
-                             receiving_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f receivers, %.0f records",
+              receiving_summary$season[i],
+              receiving_summary$unique_receivers[i],
+              receiving_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         TRUE

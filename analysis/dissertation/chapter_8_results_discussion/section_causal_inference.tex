@@ -10,7 +10,7 @@ We developed a comprehensive causal inference framework implementing synthetic c
 
 \subsection{Motivation: Market Inefficiency at Regime Breaks}
 
-NFL betting markets exhibit semi-strong form efficiency for typical games (\S\ref{sec:central-finding}) but show systematic mispricing during regime shifts:
+NFL betting markets exhibit semi-strong form efficiency for typical games (\S\ref{sec:data-leakage-investigation}) but show systematic mispricing during regime shifts:
 
 \paragraph{Injury Returns.}
 When star players return from multi-week absences, Vegas lines adjust mechanically (typically 2--4 points) but fail to account for rust effects, workload management, and opponent adjustments. Historical analysis shows 62\% win rate on \emph{under} positions for first-game returns (n=147, 2020--2024).
@@ -90,7 +90,12 @@ A well-calibrated model satisfies $\Pr(\text{outcome} \in \text{prediction inter
 \paragraph{Prior Sensitivity Analysis.}
 \Cref{tab:bnn-prior-sensitivity} presents results from testing whether relaxing the noise prior improves calibration. We trained identical BNN architectures with noise standard deviation $\sigma \in \{0.5, 0.7, 1.0, 1.5\}$ (baseline: $\sigma=0.3$). Each configuration used 4 chains, 2,000 samples post-warmup, requiring ~97 minutes on M4 MacBook Pro.
 
+\begin{table}[htbp]
+\centering
+\caption{BNN Prior Sensitivity Analysis: Calibration vs Noise Standard Deviation}
+\label{tab:bnn-prior-sensitivity}
 \input{../figures/out/bnn_prior_sensitivity_table.tex}
+\end{table}
 
 \paragraph{Key Finding: Prior Insensitivity.}
 Relaxing the noise prior had \emph{no effect} on calibration coverage, which remained at 26\% regardless of $\sigma$. This negative result rules out tight priors as the cause of under-calibration and points to deeper issues:
@@ -247,6 +252,6 @@ The causal inference framework demonstrates three contributions:
   \item \textbf{Honest reporting}: Documents failures (BNN calibration, limited samples) alongside successes
 \end{enumerate}
 
-While not yet production-ready, the framework establishes infrastructure for exploiting market inefficiencies that appear during regime breaks—the most promising frontier given semi-strong efficiency of typical game markets (\S\ref{sec:central-finding}). Causal reasoning transforms qualitative intuitions (``injuries matter'') into quantified, testable estimates with uncertainty bounds.
+While not yet production-ready, the framework establishes infrastructure for exploiting market inefficiencies that appear during regime breaks—the most promising frontier given semi-strong efficiency of typical game markets (\S\ref{sec:data-leakage-investigation}). Causal reasoning transforms qualitative intuitions (``injuries matter'') into quantified, testable estimates with uncertainty bounds.
 
 Future work focuses on fixing BNN calibration issues, expanding the shock event database, and validating that real-time deployment can capture the 3--6\% ROI improvements observed in historical backtests.

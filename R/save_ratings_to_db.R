@@ -32,10 +32,10 @@ cat(glue::glue("Found {length(player_cols)} player effects\n"))
 # Build ratings dataframe
 ratings_list <- list()
 
-for(player_col in player_cols) {
+for (player_col in player_cols) {
   player_id <- gsub("r_player_id\\[(.+),Intercept\\]", "\\1", player_col)
 
-  if(player_id %in% unique(data$player_id)) {
+  if (player_id %in% unique(data$player_id)) {
     player_effect <- posterior_samples[[player_col]]
 
     ratings_list[[player_id]] <- tibble(
@@ -69,10 +69,11 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'pas
 
 cat("Inserting ratings using SQL...\n")
 
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
-  sql <- sprintf("
+  sql <- sprintf(
+    "
     INSERT INTO mart.bayesian_player_ratings (
       player_id, stat_type, season, model_version,
       rating_mean, rating_sd, rating_q05, rating_q50, rating_q95,

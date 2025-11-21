@@ -142,10 +142,10 @@ cat(glue::glue("Found {length(player_cols)} player effects\n"))
 
 ratings_list <- list()
 
-for(player_col in player_cols) {
+for (player_col in player_cols) {
   player_id <- gsub("r_player_id\\[(.+),Intercept\\]", "\\1", player_col)
 
-  if(player_id %in% unique(data$player_id)) {
+  if (player_id %in% unique(data$player_id)) {
     player_effect <- posterior_samples[[player_col]]
 
     ratings_list[[player_id]] <- tibble(

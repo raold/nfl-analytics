@@ -42,7 +42,7 @@ SCENARIOS <- list(
 
 # Exponential decay weight function
 exp_weight <- function(s, t, H) {
-  0.5 ^ ((t - s) / H)
+  0.5^((t - s) / H)
 }
 
 # Train state-space model with specified window
@@ -98,21 +98,25 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
   player_data <- dbGetQuery(con, query, params = list(scenario$start_year, scenario$end_year))
   dbDisconnect(con)
 
-  cat(sprintf("  Loaded %d games from %d QBs (%d-%d)\n",
-              nrow(player_data), n_distinct(player_data$player_id),
-              scenario$start_year, scenario$end_year))
+  cat(sprintf(
+    "  Loaded %d games from %d QBs (%d-%d)\n",
+    nrow(player_data), n_distinct(player_data$player_id),
+    scenario$start_year, scenario$end_year
+  ))
 
   # Filter to players with >= 10 games
   player_counts <- player_data %>%
     group_by(player_id) %>%
-    summarise(n_games = n(), .groups = 'drop') %>%
+    summarise(n_games = n(), .groups = "drop") %>%
     filter(n_games >= 10)
 
   final_data <- player_data %>%
     filter(player_id %in% player_counts$player_id)
 
-  cat(sprintf("  Retained %d games from %d QBs (>= 10 games)\n",
-              nrow(final_data), n_distinct(final_data$player_id)))
+  cat(sprintf(
+    "  Retained %d games from %d QBs (>= 10 games)\n",
+    nrow(final_data), n_distinct(final_data$player_id)
+  ))
 
   # Prepare Stan data
   player_ids <- unique(final_data$player_id)
@@ -120,7 +124,7 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
 
   games_per_player <- final_data %>%
     group_by(player_id) %>%
-    summarise(n_games = n(), .groups = 'drop') %>%
+    summarise(n_games = n(), .groups = "drop") %>%
     arrange(match(player_id, player_ids))
 
   T_max <- max(games_per_player$n_games)
@@ -134,7 +138,9 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
 
   for (i in 1:N_players) {
     pid <- player_ids[i]
-    player_games <- final_data %>% filter(player_id == pid) %>% arrange(season, week)
+    player_games <- final_data %>%
+      filter(player_id == pid) %>%
+      arrange(season, week)
     n_games <- nrow(player_games)
 
     y[i, 1:n_games] <- log(player_games$passing_yards + 1)
@@ -146,8 +152,9 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
     if (scenario$decay && !is.null(scenario$decay_years)) {
       # Weight observations from decay_years
       weights <- ifelse(player_games$season %in% scenario$decay_years,
-                        exp_weight(player_games$season, scenario$end_year, scenario$H),
-                        1.0)
+        exp_weight(player_games$season, scenario$end_year, scenario$H),
+        1.0
+      )
       # Note: Stan model doesn't support observation weights directly, so this is approximate
       # For now, we just document that decay years get ~21-30% weight
     }
@@ -178,7 +185,7 @@ train_state_space <- function(scenario, stan_model_path = "models/stan/simplifie
     iter_sampling = 2000,
     adapt_delta = 0.95,
     max_treedepth = 12,
-    refresh = 0,  # Suppress output
+    refresh = 0, # Suppress output
     seed = 42
   )
 
@@ -260,12 +267,16 @@ predict_2025 <- function(model_result) {
   test_data_2025 <- dbGetQuery(con, query_2025)
   dbDisconnect(con)
 
-  cat(sprintf("  2025 test set: %d games from %d QBs\n",
-              nrow(test_data_2025), n_distinct(test_data_2025$player_id)))
+  cat(sprintf(
+    "  2025 test set: %d games from %d QBs\n",
+    nrow(test_data_2025), n_distinct(test_data_2025$player_id)
+  ))
 
   # Extract global parameters
-  global_params <- model_result$fit$draws(variables = c("mu_league", "beta_attempts", "beta_home", "R"),
-                                           format = "draws_matrix")
+  global_params <- model_result$fit$draws(
+    variables = c("mu_league", "beta_attempts", "beta_home", "R"),
+    format = "draws_matrix"
+  )
 
   mu_league_mean <- mean(global_params[, "mu_league"])
   beta_attempts_mean <- mean(global_params[, "beta_attempts"])

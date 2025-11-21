@@ -20,9 +20,9 @@ library(cmdstanr)
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("STATE-SPACE DYNAMIC PLAYER SKILL TRACKING\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -106,7 +106,7 @@ data <- data %>%
     log_attempts = log(attempts),
 
     # Time-centered for better convergence
-    time_scaled = scale(game_num)[,1],
+    time_scaled = scale(game_num)[, 1],
 
     # Season breaks (for drift reset)
     season_start = (week == 1),
@@ -140,7 +140,7 @@ compute_dynamic_skill <- function(player_data) {
   loess_fit <- loess(
     log_yards ~ game_num,
     data = player_data,
-    span = 0.3,  # Fairly responsive
+    span = 0.3, # Fairly responsive
     degree = 1
   )
 
@@ -169,21 +169,21 @@ cat("Training time: ~8-12 minutes...\n\n")
 formula <- bf(
   log_yards ~ 1 +
     log_attempts +
-    dynamic_skill +           # Time-varying skill level
+    dynamic_skill + # Time-varying skill level
     is_home +
     spread_abs +
     is_bad_weather +
     exp_cat +
-    (1 | player_id) +         # Player baseline (pooled across time)
-    (1 | team) +              # Team effects
-    (log_attempts | season),  # Season-specific slopes
-  sigma ~ log_attempts        # Distributional regression for variance
+    (1 | player_id) + # Player baseline (pooled across time)
+    (1 | team) + # Team effects
+    (log_attempts | season), # Season-specific slopes
+  sigma ~ log_attempts # Distributional regression for variance
 )
 
 # Priors
 priors <- c(
   prior(normal(0, 1), class = Intercept),
-  prior(normal(1, 0.3), class = b, coef = dynamic_skill),  # Strong effect expected
+  prior(normal(1, 0.3), class = b, coef = dynamic_skill), # Strong effect expected
   prior(normal(0, 0.5), class = b),
   prior(exponential(10), class = sd, group = player_id),
   prior(exponential(20), class = sd, group = team),
@@ -321,8 +321,8 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'pas
 cat("Deleted old ratings\n")
 
 # Insert new ratings
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
   sql <- glue::glue("
     INSERT INTO mart.bayesian_player_ratings (
@@ -343,7 +343,7 @@ for(i in 1:nrow(ratings_df)) {
 
   dbExecute(conn, sql)
 
-  if(i %% 20 == 0) {
+  if (i %% 20 == 0) {
     cat(glue::glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
   }
 }
@@ -364,9 +364,9 @@ dbDisconnect(conn)
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ STATE-SPACE MODEL COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Summary:\n")
 cat(glue::glue("  - Model: {model_path}\n"))

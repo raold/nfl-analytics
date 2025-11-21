@@ -1,0 +1,73 @@
+% Copy-paste template for tables with 5+ columns
+% Automatically constrains to page width and prevents overfull hbox warnings
+%
+% USAGE:
+%   1. Copy entire template
+%   2. Replace caption, label, column headers, and data
+%   3. Use custom column types: MAE, ROI, Brier (defined in main.tex preamble)
+%   4. Add table notes in minipage at bottom
+%
+% SAFE COLUMN TYPES (from main.tex):
+%   MAE   - Right-aligned, 1 decimal (e.g., 42.5)
+%   ROI   - Right-aligned, 1 decimal with % sign (e.g., 6.2\%)
+%   Brier - Right-aligned, 3 decimals (e.g., 0.185)
+%   Pct   - Right-aligned, 1 decimal with % sign (e.g., 59.5\%)
+%
+% EXAMPLE:
+%   \begin{tabular}{l MAE ROI Brier}
+%   Model & MAE & ROI (\%) & Brier \\
+%   XGBoost & 42.5 & 6.2 & 0.185 \\
+
+\begin{table}[htbp]
+\centering
+\caption{Your caption here}
+\label{tab:your-label}
+
+% adjustbox ensures table never exceeds page width
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l MAE ROI}  % Use custom column types: MAE, ROI, Brier, Pct
+\toprule
+\textbf{Model} & \textbf{MAE (yards)} & \textbf{ROI (\%)} \\
+\midrule
+
+% Data rows
+XGBoost v4      & 42.53 & 6.2 \\
+Ridge Baseline  & 45.67 & 5.8 \\
+Ensemble v5     & 40.12 & 7.1 \\
+
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+
+% Table notes spanning full width (prevents overfull hbox)
+\vspace{2mm}
+\begin{minipage}{\linewidth}
+\small
+\textbf{Notes:} Your notes here. All metrics computed on 2025 hold-out set. MAE = Mean Absolute Error. ROI = Return on Investment. Betting odds from consensus closing lines (2024 season).
+\end{minipage}
+
+\end{table}
+
+% COMMON PATTERNS:
+%
+% 1. Multi-column header:
+%    \multicolumn{2}{c}{\textbf{2024 Season}} \\
+%    \cmidrule(lr){2-3}
+%
+% 2. Bold best value:
+%    \textbf{42.53}  % Bold lowest MAE
+%
+% 3. Decimal alignment alternatives:
+%    S[table-format=2.2]  % For siunitx package (2 digits before decimal, 2 after)
+%
+% 4. Wide table with small font:
+%    \begin{adjustbox}{max width=\textwidth}
+%    \small
+%    \begin{tabular}{...}
+%
+% 5. Landscape table (for very wide tables):
+%    \begin{landscape}
+%    \begin{table}[htbp]
+%    ...
+%    \end{table}
+%    \end{landscape}

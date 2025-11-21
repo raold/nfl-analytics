@@ -91,7 +91,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. SCHEDULES (GAMES TABLE)
     # ============================================================
@@ -107,10 +106,14 @@ safe_db_operation(
           error_message = sprintf("Failed to load %d schedules from nflverse", CURRENT_SEASON)
         )
 
-        log_message(sprintf("Found %d games (%d completed)",
-                           nrow(schedules),
-                           sum(!is.na(schedules$home_score))),
-                   level = "INFO")
+        log_message(
+          sprintf(
+            "Found %d games (%d completed)",
+            nrow(schedules),
+            sum(!is.na(schedules$home_score))
+          ),
+          level = "INFO"
+        )
 
         # Transform to games table format
         games_df <- schedules %>%
@@ -155,8 +158,8 @@ safe_db_operation(
         validate_data(
           data = data,
           expected_cols = c("game_id", "season", "week", "home_team", "away_team"),
-          min_rows = 1,  # At least some games
-          max_rows = 300  # Maximum reasonable for full season
+          min_rows = 1, # At least some games
+          max_rows = 300 # Maximum reasonable for full season
         )
       }
     )
@@ -177,42 +180,60 @@ safe_db_operation(
 
         total_predictions_deleted <- 0
         for (table in predictions_tables) {
-          deleted <- tryCatch({
-            dbExecute(conn, sprintf("DELETE FROM %s WHERE game_id LIKE '%d_%%'", table, CURRENT_SEASON))
-          }, error = function(e) {
-            log_message(sprintf("%s table not found, skipping", table), level = "INFO")
-            0
-          })
+          deleted <- tryCatch(
+            {
+              dbExecute(conn, sprintf("DELETE FROM %s WHERE game_id LIKE '%d_%%'", table, CURRENT_SEASON))
+            },
+            error = function(e) {
+              log_message(sprintf("%s table not found, skipping", table), level = "INFO")
+              0
+            }
+          )
           if (deleted > 0) {
-            log_message(sprintf("Deleted %d rows from %s for season %d",
-                               deleted, table, CURRENT_SEASON), level = "INFO")
+            log_message(sprintf(
+              "Deleted %d rows from %s for season %d",
+              deleted, table, CURRENT_SEASON
+            ), level = "INFO")
             total_predictions_deleted <- total_predictions_deleted + deleted
           }
         }
 
         # Delete plays
-        plays_deleted <- dbExecute(conn,
-          sprintf("DELETE FROM plays WHERE game_id LIKE '%d_%%'", CURRENT_SEASON))
-        log_message(sprintf("Deleted %d existing plays for season %d",
-                           plays_deleted, CURRENT_SEASON), level = "INFO")
+        plays_deleted <- dbExecute(
+          conn,
+          sprintf("DELETE FROM plays WHERE game_id LIKE '%d_%%'", CURRENT_SEASON)
+        )
+        log_message(sprintf(
+          "Deleted %d existing plays for season %d",
+          plays_deleted, CURRENT_SEASON
+        ), level = "INFO")
 
         # Delete existing games for this season LAST (parent table)
-        deleted_count <- dbExecute(conn,
-          sprintf("DELETE FROM games WHERE season = %d", CURRENT_SEASON))
-        log_message(sprintf("Deleted %d existing games for season %d",
-                           deleted_count, CURRENT_SEASON), level = "INFO")
+        deleted_count <- dbExecute(
+          conn,
+          sprintf("DELETE FROM games WHERE season = %d", CURRENT_SEASON)
+        )
+        log_message(sprintf(
+          "Deleted %d existing games for season %d",
+          deleted_count, CURRENT_SEASON
+        ), level = "INFO")
 
         # Insert all games for current season
         rows_inserted <- dbWriteTable(conn, "games", games_data,
-                                      append = TRUE, row.names = FALSE)
+          append = TRUE, row.names = FALSE
+        )
         log_message(sprintf("Inserted %d games", nrow(games_data)), level = "INFO")
 
         # Verify insertion
-        verification <- dbGetQuery(conn,
-          sprintf("SELECT COUNT(*) as count FROM games WHERE season = %d", CURRENT_SEASON))
+        verification <- dbGetQuery(
+          conn,
+          sprintf("SELECT COUNT(*) as count FROM games WHERE season = %d", CURRENT_SEASON)
+        )
         if (verification$count != nrow(games_data)) {
-          stop(sprintf("Data verification failed: Expected %d games, found %d",
-                      nrow(games_data), verification$count))
+          stop(sprintf(
+            "Data verification failed: Expected %d games, found %d",
+            nrow(games_data), verification$count
+          ))
         }
 
         TRUE
@@ -224,9 +245,13 @@ safe_db_operation(
     # 2. PLAY-BY-PLAY (PLAYS TABLE) - Only if games have been played
     # ============================================================
 
-    completed_games <- dbGetQuery(conn,
-      sprintf("SELECT COUNT(*) as count FROM games WHERE season = %d AND home_score IS NOT NULL",
-              CURRENT_SEASON))
+    completed_games <- dbGetQuery(
+      conn,
+      sprintf(
+        "SELECT COUNT(*) as count FROM games WHERE season = %d AND home_score IS NOT NULL",
+        CURRENT_SEASON
+      )
+    )
 
     if (completed_games$count > 0) {
       plays_data <- run_pipeline_step(
@@ -240,15 +265,19 @@ safe_db_operation(
             error_message = sprintf("Failed to load %d play-by-play from nflverse", CURRENT_SEASON)
           )
 
-          log_message(sprintf("Found %d plays from %d games",
-                             nrow(pbp), length(unique(pbp$game_id))),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "Found %d plays from %d games",
+              nrow(pbp), length(unique(pbp$game_id))
+            ),
+            level = "INFO"
+          )
 
           # Standardize column names using our canonical naming
           # Always use 'quarter' not 'qtr'
           if ("qtr" %in% names(pbp) && !"quarter" %in% names(pbp)) {
             pbp$quarter <- pbp$qtr
-            pbp$qtr <- NULL  # Remove the non-standard column
+            pbp$qtr <- NULL # Remove the non-standard column
           }
           # Keep both time_seconds and game_seconds_remaining for backwards compatibility
           # and new features that need game-level time tracking
@@ -324,25 +353,25 @@ safe_db_operation(
             # ============================================================
 
             # Props outcomes (direct betting targets, not yards_gained proxy)
-            "passing_yards",    # Net passing yards (excludes sacks)
-            "receiving_yards",  # Receiving yards (not yards_gained)
-            "rushing_yards",    # Rushing yards (not yards_gained)
-            "return_yards",     # Return yards (punt/kickoff)
+            "passing_yards", # Net passing yards (excludes sacks)
+            "receiving_yards", # Receiving yards (not yards_gained)
+            "rushing_yards", # Rushing yards (not yards_gained)
+            "return_yards", # Return yards (punt/kickoff)
 
             # Advanced EPA (QB vs receiver separation)
-            "qb_epa",              # QB EPA at throw (before YAC)
-            "xyac_epa",            # Expected yards after catch EPA
-            "xyac_mean_yardage",   # Mean expected YAC
+            "qb_epa", # QB EPA at throw (before YAC)
+            "xyac_epa", # Expected yards after catch EPA
+            "xyac_mean_yardage", # Mean expected YAC
             "xyac_median_yardage", # Median expected YAC
-            "xyac_success",        # Binary YAC success
-            "xyac_fd",             # YAC resulted in first down
+            "xyac_success", # Binary YAC success
+            "xyac_fd", # YAC resulted in first down
 
             # Play validity & context
-            "aborted_play",      # Play aborted (exclude from stats)
-            "out_of_bounds",     # Clock management context
-            "order_sequence",    # Play number within drive
-            "play_type_nfl",     # NFL official play categorization
-            "tackled_for_loss",  # Defensive disruption
+            "aborted_play", # Play aborted (exclude from stats)
+            "out_of_bounds", # Clock management context
+            "order_sequence", # Play number within drive
+            "play_type_nfl", # NFL official play categorization
+            "tackled_for_loss", # Defensive disruption
 
             # ============================================================
             # PHASE 2: DEFENSIVE & PLAYER TRACKING (Migration 028 - Nov 7 2025)
@@ -541,8 +570,10 @@ safe_db_operation(
           missing_from_nflreadr <- setdiff(CANONICAL_COLUMNS, names(pbp))
           if (length(missing_from_nflreadr) > 0) {
             log_message(
-              sprintf("Warning: nflreadr missing expected columns: %s",
-                      paste(missing_from_nflreadr, collapse=", ")),
+              sprintf(
+                "Warning: nflreadr missing expected columns: %s",
+                paste(missing_from_nflreadr, collapse = ", ")
+              ),
               level = "WARN"
             )
           }
@@ -551,8 +582,10 @@ safe_db_operation(
           extra_in_nflreadr <- setdiff(names(pbp), CANONICAL_COLUMNS)
           if (length(extra_in_nflreadr) > 0) {
             log_message(
-              sprintf("Info: nflreadr has %d additional columns not in our schema (review quarterly)",
-                      length(extra_in_nflreadr)),
+              sprintf(
+                "Info: nflreadr has %d additional columns not in our schema (review quarterly)",
+                length(extra_in_nflreadr)
+              ),
               level = "INFO"
             )
           }
@@ -565,8 +598,8 @@ safe_db_operation(
           validate_data(
             data = data,
             expected_cols = c("game_id", "play_id"),
-            min_rows = 100,  # At least some plays
-            max_rows = 50000  # Maximum reasonable for full season
+            min_rows = 100, # At least some plays
+            max_rows = 50000 # Maximum reasonable for full season
           )
         }
       )
@@ -576,10 +609,14 @@ safe_db_operation(
         step_name = "Upsert Plays to Database",
         expr = {
           # Delete existing plays for this season first
-          deleted_count <- dbExecute(conn,
-            sprintf("DELETE FROM plays WHERE game_id LIKE '%d_%%'", CURRENT_SEASON))
-          log_message(sprintf("Deleted %d existing plays for season %d",
-                             deleted_count, CURRENT_SEASON), level = "INFO")
+          deleted_count <- dbExecute(
+            conn,
+            sprintf("DELETE FROM plays WHERE game_id LIKE '%d_%%'", CURRENT_SEASON)
+          )
+          log_message(sprintf(
+            "Deleted %d existing plays for season %d",
+            deleted_count, CURRENT_SEASON
+          ), level = "INFO")
 
           # Insert plays in batches to avoid memory issues
           batch_size <- 10000
@@ -590,19 +627,31 @@ safe_db_operation(
             batch <- plays_data[i:end_idx, ]
 
             dbWriteTable(conn, "plays", batch, append = TRUE, row.names = FALSE)
-            log_message(sprintf("Inserted plays batch %d-%d of %d",
-                               i, end_idx, total_rows),
-                       level = "INFO")
+            log_message(
+              sprintf(
+                "Inserted plays batch %d-%d of %d",
+                i, end_idx, total_rows
+              ),
+              level = "INFO"
+            )
           }
 
           # Verify insertion
-          verification <- dbGetQuery(conn,
-            sprintf("SELECT COUNT(*) as count FROM plays WHERE game_id LIKE '%d_%%'",
-                    CURRENT_SEASON))
-          if (abs(verification$count - nrow(plays_data)) > 10) {  # Allow small discrepancy
-            log_message(sprintf("Warning: Expected %d plays, found %d",
-                               nrow(plays_data), verification$count),
-                       level = "WARNING")
+          verification <- dbGetQuery(
+            conn,
+            sprintf(
+              "SELECT COUNT(*) as count FROM plays WHERE game_id LIKE '%d_%%'",
+              CURRENT_SEASON
+            )
+          )
+          if (abs(verification$count - nrow(plays_data)) > 10) { # Allow small discrepancy
+            log_message(
+              sprintf(
+                "Warning: Expected %d plays, found %d",
+                nrow(plays_data), verification$count
+              ),
+              level = "WARNING"
+            )
           }
 
           TRUE
@@ -610,8 +659,10 @@ safe_db_operation(
         conn = conn
       )
     } else {
-      log_message(sprintf("No completed games found for season %d, skipping play-by-play",
-                         CURRENT_SEASON), level = "INFO")
+      log_message(sprintf(
+        "No completed games found for season %d, skipping play-by-play",
+        CURRENT_SEASON
+      ), level = "INFO")
     }
 
     # ============================================================
@@ -767,29 +818,40 @@ safe_db_operation(
     ", CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON))
 
     log_message(sprintf("=== Season %d Ingestion Complete ===", CURRENT_SEASON), level = "INFO")
-    log_message(sprintf("Games: %s (Completed: %s)",
-                       format(as.integer(summary$games_count), big.mark = ","),
-                       format(as.integer(summary$completed_games), big.mark = ",")),
-               level = "INFO")
+    log_message(
+      sprintf(
+        "Games: %s (Completed: %s)",
+        format(as.integer(summary$games_count), big.mark = ","),
+        format(as.integer(summary$completed_games), big.mark = ",")
+      ),
+      level = "INFO"
+    )
     log_message(sprintf("Plays: %s", format(as.integer(summary$plays_count), big.mark = ",")), level = "INFO")
     log_message(sprintf("Roster entries: %s", format(as.integer(summary$roster_count), big.mark = ",")), level = "INFO")
 
     # Check for alerts (non-critical, wrap in tryCatch)
-    tryCatch({
-      if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
-        alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
-        if (is.list(alerts) && length(alerts) > 0) {
-          unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
-          if (unread_alerts > 0) {
-            log_message(sprintf("⚠️  %d unread alerts in %s",
-                               unread_alerts,
-                               file.path(LOG_DIR, "alerts.json")),
-                       level = "WARNING")
+    tryCatch(
+      {
+        if (file.exists(file.path(LOG_DIR, "alerts.json"))) {
+          alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"))
+          if (is.list(alerts) && length(alerts) > 0) {
+            unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
+            if (unread_alerts > 0) {
+              log_message(
+                sprintf(
+                  "⚠️  %d unread alerts in %s",
+                  unread_alerts,
+                  file.path(LOG_DIR, "alerts.json")
+                ),
+                level = "WARNING"
+              )
+            }
           }
         }
+      },
+      error = function(e) {
+        # Silently ignore alert checking errors
       }
-    }, error = function(e) {
-      # Silently ignore alert checking errors
-    })
+    )
   })
 )

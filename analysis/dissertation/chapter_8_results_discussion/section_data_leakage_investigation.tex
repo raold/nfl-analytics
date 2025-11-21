@@ -5,7 +5,7 @@
 \section{Data Leakage Investigation: From Fantasy to Reality}
 \label{sec:data-leakage-investigation}
 
-This section documents a critical methodological finding that reshaped the entire empirical evaluation. Initial backtests showed extraordinarily high win rates (62.4\%) that, upon rigorous investigation, revealed multiple sources of temporal data leakage---inadvertent use of information unavailable at decision time. This investigation exemplifies the scientific rigor required for credible sports analytics research and explains why our final results (\Cref{sec:central-finding}) differ substantially from preliminary estimates.
+This section documents a critical methodological finding that reshaped the entire empirical evaluation. Initial backtests showed extraordinarily high win rates (62.4\%) that, upon rigorous investigation, revealed multiple sources of temporal data leakage---inadvertent use of information unavailable at decision time. This investigation exemplifies the scientific rigor required for credible sports analytics research and explains why our final results (presented in this section) differ substantially from preliminary estimates.
 
 \subsection{The Red Flag: Too Good to Be True}
 
@@ -159,7 +159,7 @@ The leakage resolution fundamentally reshaped our empirical conclusions:
 Preliminary results suggested sophisticated models could achieve 62\%+ win rates, implying \$50k/week profit potential on \$1M bankroll---a finding that would have been academically embarrassing when revealed as artifactual.
 
 \paragraph{After investigation.}
-Cleaned results (51.0\% win rate, $-7.5$\% ROI, \Cref{sec:central-finding}) demonstrate market efficiency: publicly available information is insufficient to beat vigorish. This \emph{negative result} is scientifically more valuable than false positives---it maps the boundary of feasibility and guides future work toward less efficient markets (props, live betting, alternative sports).
+Cleaned results (51.0\% win rate, $-7.5$\% ROI) demonstrate market efficiency: publicly available information is insufficient to beat vigorish. This \emph{negative result} is scientifically more valuable than false positives---it maps the boundary of feasibility and guides future work toward less efficient markets (props, live betting, alternative sports).
 
 \paragraph{Revised thesis claim.}
 The contribution is not profitable NFL betting, but rather \emph{infrastructure for trustworthy uncertainty quantification under strict leakage controls}. The Bayesian methods, ensemble techniques, and temporal validation frameworks transfer to domains where edges exist (e.g., emerging sports, inefficient prop markets, real-time decision systems).
@@ -172,6 +172,6 @@ The contribution is not profitable NFL betting, but rather \emph{infrastructure 
   \item \textbf{Season-level features}: IDENTIFIED, not yet fixed (60.2\% $\to$ 55--57\% expected)
 \end{itemize}
 
-All code, diagnostics, and validation scripts are version-controlled (\texttt{py/backtest/diagnostic\_spread\_only.py}, \texttt{clean\_backtest\_FIXED.py}, \texttt{recent\_seasons\_test.py}) with comprehensive documentation in \texttt{DATA\_LEAKAGE\_ANALYSIS.md}. This transparency ensures reproducibility and enables future researchers to build on our leakage-detection methodology.
+All code, diagnostics, and validation scripts are version-controlled (\texttt{py/backtest/\allowbreak diagnostic\_spread\_only.py}, \texttt{clean\_backtest\_FIXED.py}, \texttt{recent\_seasons\_test.py}) with comprehensive documentation in \texttt{DATA\_LEAKAGE\_ANALYSIS.md}. This transparency ensures reproducibility and enables future researchers to build on our leakage-detection methodology.
 
 The central finding of this dissertation---calibration without profitability---is the \emph{correct} conclusion after leakage remediation. Had we proceeded with contaminated 62\% results, the entire thesis would have been invalidated upon external replication. This investigation exemplifies the scientific integrity required for credible empirical work in computational finance and sports analytics.

@@ -47,7 +47,7 @@ for (yr in 2010:2024) {
     process_games = TRUE,
     playoff_seeds = TRUE,
     fresh_season = TRUE,
-    simulations = 1000  # 1000 simulations per week (balance speed/accuracy)
+    simulations = 1000 # 1000 simulations per week (balance speed/accuracy)
   )
 
   # Extract team-level playoff probabilities by week
@@ -111,7 +111,7 @@ game_playoff_features <- games %>%
   mutate(
     # Derived features
     playoff_prob_diff = home_playoff_prob - away_playoff_prob,
-    stakes = (home_playoff_prob + away_playoff_prob) / 2,  # Avg playoff urgency
+    stakes = (home_playoff_prob + away_playoff_prob) / 2, # Avg playoff urgency
     desperation_home = case_when(
       week >= 14 & home_playoff_prob > 0.4 & home_playoff_prob < 0.6 ~ 1,
       TRUE ~ 0
@@ -180,12 +180,16 @@ summary_stats <- game_playoff_features %>%
 
 cat("\nSummary Statistics:\n")
 cat(sprintf("  Avg playoff stakes: %.1f%%\n", summary_stats$avg_stakes * 100))
-cat(sprintf("  Desperation games: %d (%.1f%%)\n",
-            summary_stats$desperation_games,
-            summary_stats$desperation_games / nrow(game_playoff_features) * 100))
-cat(sprintf("  Tanking indicator games: %d (%.1f%%)\n",
-            summary_stats$tanking_games,
-            summary_stats$tanking_games / nrow(game_playoff_features) * 100))
+cat(sprintf(
+  "  Desperation games: %d (%.1f%%)\n",
+  summary_stats$desperation_games,
+  summary_stats$desperation_games / nrow(game_playoff_features) * 100
+))
+cat(sprintf(
+  "  Tanking indicator games: %d (%.1f%%)\n",
+  summary_stats$tanking_games,
+  summary_stats$tanking_games / nrow(game_playoff_features) * 100
+))
 cat(sprintf("  High stakes games (>50%% avg playoff prob): %d\n", summary_stats$high_stakes_games))
 
 dbDisconnect(con)

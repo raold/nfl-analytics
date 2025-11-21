@@ -20,11 +20,11 @@ library(glue)
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("INFORMATIVE PRIORS MODEL v2 - CANONICAL TRAINING WINDOW\n")
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("Training: 2015-2024 (uniform, equivalent to 2018-2024 + decay)\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -94,6 +94,17 @@ ORDER BY pgs.season, pgs.week, pgs.player_id
 "
 
 data <- dbGetQuery(conn, query)
+
+# Input validation
+stopifnot(
+  "No data returned from query" = nrow(data) > 0,
+  "Insufficient data for modeling" = nrow(data) >= 100,
+  "Missing required columns" = all(c("player_id", "yards", "attempts", "is_home") %in% colnames(data)),
+  "Invalid yards values" = all(data$yards >= 0, na.rm = TRUE),
+  "Invalid attempts values" = all(data$attempts > 0, na.rm = TRUE),
+  "Missing season information" = !all(is.na(data$season))
+)
+
 cat(glue("Loaded {nrow(data)} passing records\n"))
 cat(glue("Seasons: {min(data$season)}-{max(data$season)}\n"))
 cat(glue("Unique QBs: {n_distinct(data$player_id)}\n\n"))
@@ -113,7 +124,7 @@ log_yards_mean <- mean(log(prior_data$yards))
 log_yards_sd <- sd(log(prior_data$yards))
 log_attempts_coef <- coef(lm(log(yards) ~ log(attempts), data = prior_data))[2]
 home_effect <- mean(log(prior_data$yards[prior_data$is_home == 1])) -
-               mean(log(prior_data$yards[prior_data$is_home == 0]))
+  mean(log(prior_data$yards[prior_data$is_home == 0]))
 
 cat(sprintf("  Intercept prior: N(%.2f, %.2f)\n", log_yards_mean, log_yards_sd / 2))
 cat(sprintf("  log_attempts prior: N(%.3f, 0.1)\n", log_attempts_coef))
@@ -157,7 +168,7 @@ formula <- bf(
     is_bad_weather +
     is_dome +
     scale(total_close) +
-    scale(years_exp) +  # Use continuous instead of categorical
+    scale(years_exp) + # Use continuous instead of categorical
     (1 | player_id) +
     (1 | team) +
     (1 | opponent) +
@@ -194,10 +205,10 @@ model <- brm(
   data = data,
   family = gaussian(),
   prior = priors,
-  chains = 6,
+  chains = 10,
   iter = 4000,
   warmup = 2000,
-  cores = 6,
+  cores = 10,
   threads = threading(2),
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95, max_treedepth = 12),
@@ -242,9 +253,121 @@ if (convergence_failed) {
 cat("\n✅ CONVERGENCE SUCCESS!\n\n")
 
 # ============================================================================
-# 7. SAVE MODEL
+# 7. PRIOR PREDICTIVE CHECKS
 # ============================================================================
-cat("Step 7: Saving model...\n")
+cat("Step 7: Prior predictive checks...\n")
+
+# Sample from prior
+cat("  Sampling from prior distribution...\n")
+prior_model <- update(model,
+  sample_prior = "only", chains = 2, iter = 1000,
+  warmup = 500, seed = 42
+)
+
+# Generate prior predictions
+prior_preds <- posterior_predict(prior_model, ndraws = 1000)
+prior_yards <- exp(prior_preds) # Convert from log scale
+
+# Check if priors produce reasonable predictions
+prior_mean <- mean(prior_yards)
+prior_q05 <- quantile(prior_yards, 0.05)
+prior_q95 <- quantile(prior_yards, 0.95)
+
+cat(sprintf("  Prior predictive distribution:\n"))
+cat(sprintf("    Mean: %.1f yards\n", prior_mean))
+cat(sprintf("    5th percentile: %.1f yards\n", prior_q05))
+cat(sprintf("    95th percentile: %.1f yards\n", prior_q95))
+
+# Validate priors are reasonable (informative priors should be tighter)
+if (prior_q05 < 50 || prior_q95 > 500) {
+  cat("\n⚠️  WARNING: Informative prior predictions outside expected range\n")
+  cat("    Expected 95% interval: 100-400 yards (tighter than generic priors)\n")
+  cat(sprintf("    Actual 95%% interval: %.1f-%.1f yards\n", prior_q05, prior_q95))
+} else {
+  cat("  ✅ Informative prior predictions within expected range\n")
+}
+
+cat("\n")
+
+# ============================================================================
+# 8. POSTERIOR PREDICTIVE CHECKS
+# ============================================================================
+cat("Step 8: Posterior predictive checks...\n")
+
+# Check distributional fit
+library(bayesplot)
+pp <- pp_check(model, type = "dens_overlay", ndraws = 100)
+ggsave("models/bayesian/informative_priors_v2_pp_check_density.png", pp,
+  width = 8, height = 6
+)
+cat("  ✅ Density overlay plot saved\n")
+
+# Check calibration (90% intervals)
+pp_int <- pp_check(model, type = "intervals", prob = 0.90)
+ggsave("models/bayesian/informative_priors_v2_pp_check_intervals.png", pp_int,
+  width = 10, height = 6
+)
+cat("  ✅ Calibration intervals plot saved\n")
+
+# Check prediction accuracy
+pp_stat <- pp_check(model, type = "stat", stat = "mean")
+ggsave("models/bayesian/informative_priors_v2_pp_check_mean.png", pp_stat,
+  width = 8, height = 6
+)
+cat("  ✅ Mean prediction check saved\n")
+
+cat("\n")
+
+# ============================================================================
+# 9. RESIDUAL DIAGNOSTICS
+# ============================================================================
+cat("Step 9: Residual diagnostics...\n")
+
+# Extract residuals
+residuals <- residuals(model)[, "Estimate"]
+
+# Q-Q plot for normality
+png("models/bayesian/informative_priors_v2_qq_plot.png", width = 800, height = 600)
+qqnorm(residuals, main = "Q-Q Plot: Informative Priors v2 Residuals")
+qqline(residuals, col = "red", lwd = 2)
+dev.off()
+cat("  ✅ Q-Q plot saved\n")
+
+# Shapiro-Wilk test (on sample if too large)
+n_sample <- min(5000, length(residuals))
+shapiro_test <- shapiro.test(sample(residuals, n_sample))
+cat(sprintf(
+  "  Shapiro-Wilk test: W = %.4f, p = %.4f\n",
+  shapiro_test$statistic, shapiro_test$p.value
+))
+
+if (shapiro_test$p.value < 0.01) {
+  cat("  ⚠️  WARNING: Residuals significantly non-normal (p < 0.01)\n")
+} else {
+  cat("  ✅ Residuals consistent with normality\n")
+}
+
+# Residual histogram
+png("models/bayesian/informative_priors_v2_residual_hist.png", width = 800, height = 600)
+hist(residuals,
+  breaks = 50, main = "Residual Distribution (Informative Priors v2)",
+  xlab = "Residual (log yards)", col = "lightblue"
+)
+dev.off()
+cat("  ✅ Residual histogram saved\n")
+
+# Autocorrelation check
+png("models/bayesian/informative_priors_v2_acf.png", width = 800, height = 600)
+acf(residuals, main = "Autocorrelation: Informative Priors v2 Residuals")
+dev.off()
+cat("  ✅ Autocorrelation plot saved\n")
+
+cat("\n")
+
+# ============================================================================
+# 10. SAVE MODEL
+# ============================================================================
+cat("Step 10: Saving model...\n")
 
 model_path <- "models/bayesian/passing_informative_priors_v2.rds"
 saveRDS(model, model_path)
@@ -256,9 +379,9 @@ cat(glue("✓ Model size: {round(file_size_mb, 1)} MB\n\n"))
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ INFORMATIVE PRIORS MODEL v2 TRAINING COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Summary:\n")
 cat(glue("  - Training window: 2015-2024 (uniform, {nrow(data)} games)\n"))
@@ -266,8 +389,15 @@ cat(glue("  - Prior estimation: 2015-2019 ({nrow(prior_data)} games)\n"))
 cat(glue("  - Training time: {round(elapsed, 1)} minutes\n"))
 cat(glue("  - Max Rhat: {round(max_rhat, 4)}\n"))
 cat(glue("  - Min ESS: {round(min_ess, 0)}\n"))
+cat(glue("  - Shapiro-Wilk p-value: {round(shapiro_test$p.value, 4)}\n"))
 cat(glue("  - Model file: {model_path}\n"))
-cat(glue("  - Model size: {round(file_size_mb, 1)} MB\n\n"))
+cat(glue("  - Model size: {round(file_size_mb, 1)} MB\n"))
+cat("  - Diagnostic plots:\n")
+cat("    - models/bayesian/informative_priors_v2_pp_check_density.png\n")
+cat("    - models/bayesian/informative_priors_v2_pp_check_intervals.png\n")
+cat("    - models/bayesian/informative_priors_v2_qq_plot.png\n")
+cat("    - models/bayesian/informative_priors_v2_residual_hist.png\n")
+cat("    - models/bayesian/informative_priors_v2_acf.png\n\n")
 
 dbDisconnect(conn)
 

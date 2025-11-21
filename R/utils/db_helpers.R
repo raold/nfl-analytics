@@ -14,9 +14,11 @@ convert_logical_to_int <- function(df) {
   logical_cols <- names(df)[sapply(df, is.logical)]
 
   if (length(logical_cols) > 0) {
-    message(sprintf("Converting %d logical columns to integer: %s",
-                    length(logical_cols),
-                    paste(head(logical_cols, 10), collapse = ", ")))
+    message(sprintf(
+      "Converting %d logical columns to integer: %s",
+      length(logical_cols),
+      paste(head(logical_cols, 10), collapse = ", ")
+    ))
 
     for (col in logical_cols) {
       df[[col]] <- as.integer(df[[col]])
@@ -39,4 +41,4 @@ get_db_connection <- function() {
   )
 }
 
-TRUE  # Return TRUE to indicate successful loading
+TRUE # Return TRUE to indicate successful loading

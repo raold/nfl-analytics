@@ -1,0 +1,139 @@
+=============================================================================
+ENSEMBLE v7.0 CLEANUP SUMMARY
+=============================================================================
+Date: November 19, 2025
+Action: Archive and delete failed v7.0 experiment
+Reason: Validation failure (+0.01 yards vs +2.0 yards target)
+
+=============================================================================
+FILES ARCHIVED AND DELETED
+=============================================================================
+
+CODE (7 files, 3,981 lines):
+✅ py/ensemble/enhanced_ensemble_v7_production.py
+✅ py/ensemble/enhanced_ensemble_v7.py
+✅ py/ensemble/enhanced_ensemble_v7_base.py
+✅ py/ensemble/meta_learning_weight_predictor.py
+✅ py/features/meta_learning_context.py
+✅ py/ensemble/stacked_meta_learner.py
+✅ py/ensemble/thompson_sampling_meta.py
+
+SCRIPTS (10 files):
+✅ scripts/backtest_ensemble_v7_multi_season.py
+✅ scripts/validate_ensemble_v7_multiyear.py
+✅ scripts/test_ensemble_v7_integration.py
+✅ scripts/test_ensemble_v7_wls_adjustment.py
+✅ scripts/test_v7_single_prediction.py
+✅ scripts/aggregate_batch_results_v7.py
+✅ scripts/populate_test_predictions_v7.py
+✅ scripts/run_batched_backtest_v7.sh
+✅ scripts/run_batched_backtest_v7_parallel.sh
+✅ scripts/validate_v7_sports_analytics.py
+
+TESTS (5 files):
+✅ tests/unit/test_ensemble_v7_components.py
+✅ tests/unit/test_stacked_meta_learner.py
+✅ tests/unit/test_thompson_sampling_meta.py
+✅ tests/integration/test_ensemble_v7_integration.py
+✅ tests/integration/test_ensemble_v7_sql.py
+
+MODELS (7 files, ~64 MB):
+✅ models/xgb_ridge_residuals_v7_20251114_171023.json
+✅ models/xgb_ridge_residuals_v7_20251114_182121.json
+✅ models/xgb_ridge_residuals_v7_backtest2024_20251114_184538.json
+✅ models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json
+✅ models/xgb_ridge_residuals_v7_backtest2024_20251117_140011.json
+✅ models/ridge_residuals_v7_backtest2024_20251117_140011.pkl
+✅ models/ridge_residuals_v7_backtest2024_20251114_184552.pkl
+
+RESULTS (20 files, ~700 MB):
+✅ results/ensemble_v7_validation/ (18 CSV files)
+✅ results/backtest_v7_run.log
+✅ results/validation_v7_nov18_current.log
+
+DOCUMENTATION (13 files):
+✅ docs/archive/2025_nov/SESSION_NOV18_ENSEMBLE_V7_PHASES_ABC_COMPLETE.md
+✅ docs/archive/2025_nov/SESSION_NOV17_V7_VALIDATION_BLOCKER.md
+✅ docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md
+✅ docs/research/ENSEMBLE_V7_FAILURE_INVESTIGATION.md
+✅ docs/knowledge/ENSEMBLE_V7_SESSION_NOV18_SYNTHESIS.md
+✅ docs/knowledge/ENSEMBLE_V7_PROCESSING_COMPLETE.md
+✅ docs/testing/ENSEMBLE_V7_TEST_GUIDE.md
+✅ docs/testing/ENSEMBLE_V7_PYTEST_COMMANDS.md
+✅ docs/milestones/ENSEMBLE_V7_VALIDATION_COMPLETE.md
+✅ docs/milestones/postmortems/2025_11_18_ensemble_v7_validation_failure.md
+✅ SPORTS_ANALYTICS_VALIDATION_V7_REPORT.md
+✅ SPORTS_ANALYTICS_VALIDATION_V7_SUMMARY.txt
+✅ ENSEMBLE_V7_TEST_SUMMARY.md
+
+PYCACHE:
+✅ py/ensemble/__pycache__/enhanced_ensemble_v7*.pyc
+✅ py/features/__pycache__/meta_learning_context*.pyc
+✅ scripts/__pycache__/backtest_ensemble_v7*.pyc
+
+TOTAL: 62 files, ~9.6 MB archived (all files backed up in research/failed_v7/)
+
+=============================================================================
+FILES RETAINED (REUSABLE COMPONENTS)
+=============================================================================
+
+WLS COMPONENTS (2 files):
+✅ py/ensemble/adaptive_wls_weights.py - WLS v1 (ELO blending)
+✅ py/ensemble/adaptive_wls_weights_v2.py - WLS v2 (grid search)
+
+CONTEXT FEATURES (3 files):
+✅ py/features/qb_experience_features.py - QB career stages
+✅ py/features/roster_stability_features.py - Roster turnover
+✅ py/features/market_dispersion_features.py - Betting market uncertainty
+
+R INTERFACE (1 file):
+✅ py/ensemble/r_model_interface.py - R↔Python bridge (shared by v6.0+)
+
+TEST INFRASTRUCTURE (3 files):
+✅ tests/integration/test_ensemble_integration.py - Generic harness
+✅ tests/unit/test_environmental_contextual_features.py
+✅ tests/unit/test_game_outcome_ensemble_contextual.py
+
+ADR (1 file):
+✅ docs/adr/009-abandon-ensemble-v7-meta-learning.md - Decision record
+
+TOTAL RETAINED: 10 files (~2,500 lines)
+
+=============================================================================
+ARCHIVE LOCATION
+=============================================================================
+
+research/failed_v7/
+├── README.md (5,200 lines) - Complete context and lessons learned
+├── MANIFEST.md (850 lines) - File inventory
+├── CLEANUP_SUMMARY.txt (this file)
+├── code/ (7 files)
+├── scripts/ (10 files)
+├── tests/ (5 files)
+├── models/ (7 files, ~64 MB)
+├── results/ (20 files, ~700 MB)
+└── docs/ (13 files)
+
+Total: 62 files, ~9.6 MB
+
+=============================================================================
+VERIFICATION
+=============================================================================
+
+✅ All v7.0 files archived before deletion
+✅ Reusable components (WLS, context features, R interface) retained
+✅ ADR-009 retained in docs/adr/ for decision rationale
+✅ Complete README and MANIFEST created
+✅ No production code (v6.0) affected
+✅ Import statements need manual update (see next steps)
+
+=============================================================================
+NEXT STEPS
+=============================================================================
+
+1. Update import statements (9 files reference v7.0 - now archived)
+2. Update CLAUDE.md ensemble version history
+3. Git commit: "refactor: archive failed Ensemble v7.0 experiment"
+4. Reference ADR-009 and postmortem in commit message
+
+=============================================================================

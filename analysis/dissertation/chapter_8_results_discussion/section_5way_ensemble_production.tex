@@ -2,7 +2,7 @@
 \section{5-Way Ensemble Integration and Production Results}
 \label{sec:5way-ensemble-production}
 
-This section presents the comprehensive integration and validation of the 5-way ensemble system, representing the culmination of the modeling work described in this dissertation. We detail the model retraining process with the canonical training window (established in \S\ref{sec:canonical-window}), ensemble weight optimization, full backtest results across 2022--2024, statistical validation via Diebold-Mariano tests, and production deployment readiness assessment.
+This section presents the comprehensive integration and validation of the 5-way ensemble system, representing the culmination of the modeling work described in this dissertation. We detail the model retraining process with the canonical training window (established in \S\ref{sec:training_window_ablation}), ensemble weight optimization, full backtest results across 2022--2024, statistical validation via Diebold-Mariano tests, and production deployment readiness assessment.
 
 The 5-way ensemble combines:
 \begin{enumerate}
@@ -16,7 +16,7 @@ The 5-way ensemble combines:
 \subsection{Model Retraining with Canonical Training Window}
 \label{subsec:retraining-canonical}
 
-Following the training window ablation study (\S\ref{sec:canonical-window}), all five ensemble components were retrained using the canonical window: 2018--2024 with full weight, plus exponential decay on 2015--2017 with $H=4$ half-life parameter.
+Following the training window ablation study (\S\ref{sec:training_window_ablation}), all five ensemble components were retrained using the canonical window: 2018--2024 with full weight, plus exponential decay on 2015--2017 with $H=4$ half-life parameter.
 
 \paragraph{Decay Function.}
 The exponential decay weights historical data according to:
@@ -314,7 +314,7 @@ Future enhancements include:
   \item \textbf{Live odds integration}: Real-time market monitoring via Pinnacle API (see \Cref{chap:production})
   \item \textbf{Multi-market expansion}: Extend to totals, team props, and player receiving yards
   \item \textbf{Adaptive reweighting}: Weekly ensemble weight updates based on recent performance
-  \item \textbf{Causal shock detection}: Integrate injury/coaching change effects from \Cref{chap:causal}
+  \item \textbf{Causal shock detection}: Integrate injury/coaching change effects from \Cref{sec:causal-inference}
 \end{enumerate}
 
 The successful integration of five diverse modeling approaches---Bayesian state-space, hierarchical priors, neural networks, gradient boosting, and reinforcement learning---demonstrates the value of methodological pluralism. No single method dominates across all contexts; the ensemble exploits complementary strengths to achieve superior performance.

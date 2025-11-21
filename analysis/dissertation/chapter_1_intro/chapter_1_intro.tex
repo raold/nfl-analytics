@@ -48,9 +48,11 @@ We develop a complete betting system pipeline—from data ingestion to model tra
 
     \item \textbf{Hybrid architectures} (Chapter~\ref{chap:lessons-learned}): 70\% static + 30\% incremental XGBoost blend achieved +4.2\% improvement over pure static (38.03 vs 39.66 MAE average 2022--2024), resolving static-adaptive dilemma through complementary strength balancing.
 
-    \item \textbf{Multi-season validation} (Appendix~\ref{app:orthogonalization}, Table~\ref{tab:ridge-multi-season-consistency}): Three-season consistency testing (2022--2024, 546 games) with inter-season variance $\sigma = 0.40$ MAE (vs baseline $\sigma = 1.89$ MAE) prevented overfitting to single-season quirks.
+    \item \textbf{Multi-season validation} (Appendix~\ref{app:orthogonalization}, Table~\ref{tab:multiseas-validation}): Three-season consistency testing (2022--2024, 546 games) with inter-season variance $\sigma = 0.40$ MAE (vs baseline $\sigma = 1.89$ MAE) prevented overfitting to single-season quirks.
 
-    \item \textbf{Honest failure documentation} (Chapter~\ref{chap:lessons-learned}, \S\ref{sec:failure-archive}): Transparent accounting of Bayesian Neural Network investigation (84 hours, 6 failed approaches, 0 production models) and baseline error (incremental vs mean predictor, 9 hours wasted) with Bayesian abandonment criteria ($k = 2$ failures $\to$ terminate) prevents repeat mistakes.
+    \item \textbf{Honest failure documentation} (Chapter~\ref{chap:lessons-learned}, \S% TODO: Add failure archive section
+% \ref{sec:failure-archive}
+Section~(Failure Archive)): Transparent accounting of Bayesian Neural Network investigation (84 hours, 6 failed approaches, 0 production models) and baseline error (incremental vs mean predictor, 9 hours wasted) with Bayesian abandonment criteria ($k = 2$ failures $\to$ terminate) prevents repeat mistakes.
 \end{enumerate}
 
 \subsection{Methodological Contributions}
@@ -61,7 +63,9 @@ This work makes seven primary contributions, independent of profitability outcom
 
   \item \textbf{Ensemble architecture evolution methodology}: Documented complete 13-month journey from v1.0 catastrophic failure (-83.5\% drawdown) to v6.0 profitable production (+6.45\% ROI, +10.2pp improvement) with radical transparency (Appendix~\ref{app:architecture-evolution}). Contributions: (a) ensemble variance decomposition analysis proving diversification dominates individual sophistication ($\bar{\rho}$ reduction more cost-effective than M increase), (b) CVX weight optimization validation (+36.4\% ROI improvement vs equal weights), (c) hybrid static-incremental architecture pattern (70/30 blend resolves stability-adaptation tradeoff), (d) honest failure accounting framework with Bayesian abandonment criterion (prevents sunk cost fallacy).
 
-  \item \textbf{Production deployment playbook with multi-layer validation}: Documented 6-layer defense-in-depth architecture (Chapter~\ref{chap:lessons-learned}, Table~\ref{tab:defense-in-depth}) catching different error classes at different stages. Key insight: Baseline error (incremental vs mean predictor) passed unit tests and integration tests but failed at Layer 3 (multi-season historical validation), preventing production disaster. Framework includes: fail-fast validation on critical dependencies, type-safe model loading for polyglot systems (R/Python integration), canonical training standards (2018--2024 + H=4 decay), and multi-season consistency gates (minimum 3 seasons, $\sigma < 2$ yards inter-season variance).
+  \item \textbf{Production deployment playbook with multi-layer validation}: Documented 6-layer defense-in-depth architecture (Chapter~\ref{chap:lessons-learned}, % TODO: Add defense-in-depth table
+% Table~\ref{tab:defense-in-depth}
+Table~(Defense-in-Depth)) catching different error classes at different stages. Key insight: Baseline error (incremental vs mean predictor) passed unit tests and integration tests but failed at Layer 3 (multi-season historical validation), preventing production disaster. Framework includes: fail-fast validation on critical dependencies, type-safe model loading for polyglot systems (R/Python integration), canonical training standards (2018--2024 + H=4 decay), and multi-season consistency gates (minimum 3 seasons, $\sigma < 2$ yards inter-season variance).
 
   \item \textbf{Rigorous empirical evaluation}: Comprehensive testing of weather effects, calibration-to-profitability gaps, and RL vs Kelly baselines with transparent reporting of negative results.
   \item \textbf{Complete system architecture}: A full pipeline from ingestion to evaluation, reusable for sports analytics and sequential decision domains.

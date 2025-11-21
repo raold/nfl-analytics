@@ -15,7 +15,6 @@ suppressPackageStartupMessages({
 #' Generate LaTeX comparison table for dissertation
 #' @param output_path Path to save .tex file
 generate_bayesian_model_comparison_table <- function(output_path = "analysis/dissertation/figures/out/bayesian_model_comparison.tex") {
-
   # Model comparison data from training runs
   comparison_df <- tibble(
     Model = c("Basic Hierarchical", "Time-Varying", "Full Attack/Defense"),
@@ -25,9 +24,11 @@ generate_bayesian_model_comparison_table <- function(output_path = "analysis/dis
       "Score $\\sim$ Home + $(1|\\text{Team})$ + $(1|\\text{Opp})$"
     ),
     `LOO-CV ELPD` = c(-11075, -11038.6, -20251.7),
-    `Parameters` = c("66 (32 teams × 2 + 2 fixed)",
-                     "130 (32 teams × 4 + 2 fixed)",
-                     "68 (32 teams × 2 + 2 fixed)"),
+    `Parameters` = c(
+      "66 (32 teams × 2 + 2 fixed)",
+      "130 (32 teams × 4 + 2 fixed)",
+      "68 (32 teams × 2 + 2 fixed)"
+    ),
     `Training Time` = c("5.2s", "14.8s", "11.9s"),
     `Key Feature` = c(
       "Simple pooling",
@@ -72,7 +73,6 @@ generate_bayesian_model_comparison_table <- function(output_path = "analysis/dis
 
 #' Generate top team ratings table
 generate_top_teams_table <- function(output_path = "analysis/dissertation/figures/out/bayesian_top_teams.tex") {
-
   # Connect to database
   con <- dbConnect(
     RPostgres::Postgres(),
@@ -123,9 +123,11 @@ generate_top_teams_table <- function(output_path = "analysis/dissertation/figure
 
   # Print markdown version
   message("\nMarkdown preview:")
-  print(kable(ratings %>% mutate(`90% CI` = sprintf("[%.2f, %.2f]", ci_lower, ci_upper)) %>%
-                select(Team = team, `Rating` = rating_mean, SD = rating_sd, `90% CI`),
-              format = "markdown"))
+  print(kable(
+    ratings %>% mutate(`90% CI` = sprintf("[%.2f, %.2f]", ci_lower, ci_upper)) %>%
+      select(Team = team, `Rating` = rating_mean, SD = rating_sd, `90% CI`),
+    format = "markdown"
+  ))
 
   invisible(latex_table)
 }

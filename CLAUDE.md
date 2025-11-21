@@ -124,167 +124,49 @@ Build a production-grade NFL props betting system using advanced Bayesian method
 
 ## Key Components
 
-**Detailed Usage:** See [docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md)
+**Detailed Reference:** [docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md) | [docs/ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md)
 
-### 1. Causal Inference Framework
-- **Location:** `py/causal/` (8 modules)
-- **Status:** ✅ Complete (Phase 6)
-- **Purpose:** Shock event analysis (injuries, trades, coaching)
+### Core Production Stack
 
-### 2. Bayesian Hierarchical Models
-- **Location:** `R/` and `models/bayesian/`
-- **Status:** ✅ v3.0 Complete
-- **Models:** State-space v2 APPROVED (47.77 MAE), Hierarchical v2, BNN v3.1 Rushing (89.5% calibrated)
-- **Training Window:** 2018-2024 + H=4 decay (canonical, Nov 8, 2025)
-- **Note:** BNN research line abandoned Nov 9, 2025 after 6 failed approaches (84 person-hours)
+**1. Ensemble v6.0** (`py/ensemble/enhanced_ensemble_v6_production.py`) - ✅ DEPLOYED Nov 15
+- 5-way: State-Space 30%, Hierarchical 30%, XGBoost v4 Ridge 25% (4.70 MAE, +88% improvement), Informative Priors 15%
+- Temperature Scaling: 90% calibration (T=0.5534)
+- Performance: 4.0s inference, Expected ROI +6-9%
+- Endpoint: http://localhost:8000
 
-### 3. Ensemble Methods
-- **Location:** `py/ensemble/enhanced_ensemble_v6_production.py` (v6.0 in production as of Nov 15)
-- **Architecture:** 5-way ensemble with temperature scaling
-  - State-Space v2: 30% weight (47.77 MAE, APPROVED Nov 8)
-  - Hierarchical v2: 30% weight (Bayesian hierarchical with opponent grouping)
-  - XGBoost v4 Ridge: 25% weight (4.70 ± 0.40 MAE, 88.31% improvement, APPROVED Nov 15)
-  - Informative Priors v2: 15% weight (Bayesian domain knowledge priors)
-  - Temperature Scaling v6: 90.0% calibration (optimal T=0.5534, integrated Nov 15)
-- **Expected ROI:** +6-9% (17.5% improvement over v5.1, projected from component performance)
-- **Status:** ✅ PRODUCTION DEPLOYED (Nov 15, 2025)
-- **API Inference:** 4.0 seconds per prediction (real ensemble from trained models)
-- **A/B Test:** Control (v5.1) vs Treatment (v6.0), 4 weeks (Nov 14 - Dec 12, 2025)
+**2. Bayesian Models** (`R/`, `models/bayesian/`) - ✅ Complete
+- State-Space v2 (47.77 MAE, APPROVED), Hierarchical v2, BNN v3.1 Rushing (89.5% calibrated)
+- Training: 2018-2024 + H=4 decay (canonical window)
+- Note: BNN passing research ABANDONED Nov 9 (84 hrs, 6 approaches, 0 production models)
 
-#### Ensemble Version History
-- **v3.0**: 4-way (State-Space 30%, BNN 25%, Hierarchical 25%, XGBoost 20%) - DEPRECATED
-- **v4.0**: Failed R model integration - ABANDONED
-- **v5.0**: 4-way (State-Space 30%, Hierarchical 30%, Static XGB 25%, IP 15%) - BASELINE
-- **v5.1**: 4-way (State-Space 30%, Hierarchical 30%, Hybrid XGB 25%, IP 15%) - INTERMEDIATE ✅ (Nov 8-14)
-- **v6.0**: 5-way with temperature scaling (SS 30%, Hier 30%, XGB v4 25%, IP 15%, Temp Scaling 90% calib) - **PRODUCTION DEPLOYED** ✅ (Nov 15, 2025)
+**3. Docker Services** - ✅ 6/6 Operational
+- PostgreSQL (5544), Redis (6379), FastAPI (8000), Streamlit (8501), Prometheus (9090), Grafana (3000)
+- Dashboard: http://localhost:8501 | API: http://localhost:8000/docs
 
-**Current Production:** v6.0 (deployed Nov 15, 2025)
-**File:** `py/ensemble/enhanced_ensemble_v6_production.py` (production) + `py/ensemble/r_model_interface.py` (R integration)
-**Endpoint:** http://localhost:8000 (FastAPI - Ensemble v6.0, real predictions)
-**Docker Status:** ✅ Rebuilt Nov 15 with R runtime dependencies (rpy2, brms, cmdstanr)
+**4. Dissertation** (`analysis/dissertation/main/main.tex`) - ✅ 667 pages
+- Status: Compiles cleanly (0 errors, 0 undefined refs, 0 siunitx errors)
+- Standards: [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.md)
 
-### 4. Reinforcement Learning (CQL)
-- **Location:** `py/rl/`
-- **Performance:** +24% improvement, 1.75% policy reward
+### Supporting Infrastructure
 
-### 5. Distributed Compute
-- **Location:** `py/compute/`, `run_compute.py`
-- **Architecture:** SETI@home-style (Mac M4 ↔ Windows 4090)
+**Data & Validation:**
+- **Pipeline** (`py/pipeline/`, `py/data/`): ETL, feature engineering, automated refresh
+- **Validation** (`py/validation/`, `tests/`): 25+ integration tests, temporal leakage detection, calibration checks
+- **Backtesting** (`py/backtest/`): 2022-2024 validation (47.77 MAE baseline, +88% improvement)
 
-### 6. Online Learning - Hybrid Static-Incremental
+**Optimization & Risk:**
+- **Model Registry** (`scripts/model_registry.py`): 8 models synced, 227 pending
+- **Optimization** (`py/optimization/`): CVX weight optimization, hyperparameter search
+- **Risk Management** (`py/risk/`): CVaR, Kelly sizing, exposure limits
 
-**Status:** Production-ready (Week 2 integration pending)
+**AI & Advanced:**
+- **Causal Inference** (`py/causal/`): 8 modules, shock event analysis (injuries, trades)
+- **Reinforcement Learning** (`py/rl/`): CQL agent (+24% improvement, 1.75% reward)
+- **Online Learning** (`py/online/`): Hybrid 70/30 static-incremental (38.03 MAE)
 
-**Findings:**
-- Initial claim (Nov 10): Incremental XGBoost +21% vs "static baseline" (55.16 MAE)
-- Baseline error discovered (Nov 12): 55.16 was mean predictor, not XGBoost
-- Corrected comparison: Pure incremental -13.7% vs proper static XGBoost (39.76 MAE)
-- Hybrid solution (Nov 12): 70% static + 30% incremental = +4.2% improvement
-
-**Performance (2022-2024 average):**
-- Hybrid 70/30: 38.03 MAE
-- Static XGBoost: 39.66 MAE
-- Pure Incremental: 45.22 MAE
-
-**Architecture:**
-```python
-hybrid_pred = 0.7 * static_xgb.predict(X) + 0.3 * incremental_xgb.predict_one(x)
-```
-
-**Files:**
-- `py/online/hybrid_static_incremental.py` - Production implementation
-- `py/online/incremental_xgboost.py` - Incremental component (30% weight)
-- `scripts/validate_hybrid_model.py` - Validation protocol
-
-**Next Steps:**
-- Week 2: Integrate into enhanced_ensemble_v6 (20% weight)
-- Week 3: A/B test on 2025 season (first 50 games)
-- Week 4-5: Production deployment if A/B test succeeds
-
-### 7. Dissertation
-- **Location:** `analysis/dissertation/main/main.tex`
-- **Status:** ✅ 529 pages, 426 lines main.tex (Nov 2025 compilation)
-- **Appendix I:** BNN investigation documentation (780 lines, 6 failed approaches, Nov 9, 2025)
-
-### 8. Docker Services (Production Stack)
-
-**Status:** ✅ 6/6 services operational (Nov 14, 2025)
-
-| Service | Port | Status | Purpose |
-|---------|------|--------|---------|
-| PostgreSQL | 5544 | ✅ Healthy | Database (257 columns, 1.25M plays) |
-| Redis | 6379 | ✅ Healthy | Feature caching |
-| FastAPI | 8000 | ✅ Healthy | Ensemble v5.1 predictions |
-| Streamlit | 8501 | ✅ Healthy | Dashboard (4 pages) |
-| Prometheus | 9090 | ✅ Healthy | Metrics collection |
-| Grafana | 3000 | ✅ Healthy | Monitoring (27 panels) |
-
-**Access:**
-- Dashboard: http://localhost:8501
-- API: http://localhost:8000/docs
-- Grafana: http://localhost:3000 (admin / sicillionbillions)  <!-- pragma: allowlist secret -->
-
-### 9. Model Registry Infrastructure
-- **Location:** `scripts/model_registry.py` (CLI tool, 1,179 lines)
-- **Status:** ✅ Complete (Nov 9, 2025)
-- **Purpose:** Track, validate, and sync production models with database
-- **Database Sync:** 8 models in sync, 227 pending registration
-
-### 10. Data Pipeline
-- **Location:** `py/pipeline/`, `py/data/`
-- **Purpose:** ETL workflows for ingesting raw NFL data, feature engineering, and materialized view refresh
-- **Key Files:** `auto_retrain.py`, `refresh_predictions.py`
-- **Status:** ✅ Operational (automated daily refresh)
-- **Documentation:** See `docs/ARCHITECTURE_REFERENCE.md#data-pipeline`
-
-### 11. Backtesting Framework
-- **Location:** `py/backtest/`, `docs/backtest/`
-- **Purpose:** Historical validation of ensemble models with comprehensive performance metrics (MAE, ROI, Sharpe, drawdown)
-- **Key Files:** `historical_validation_4way.py`, `ensemble_5way_backtest.py`, `harness.py`
-- **Status:** ✅ Operational (2022-2024 baseline: 47.77 MAE, +88.31% improvement)
-- **Documentation:** See `docs/backtest/4WAY_ENSEMBLE_BACKTEST_REPORT.md`
-
-### 12. Prediction Engine
-- **Location:** `py/predict/`, `py/prediction/`, `py/api/`
-- **Purpose:** Real-time ensemble predictions with uncertainty quantification and confidence intervals
-- **Key Files:** `deploy_optimized_ensemble_2025.py`, `enhanced_ensemble_v5.py`, FastAPI inference endpoints
-- **Status:** ✅ Production-ready (v5.1 in use, <100ms latency per prediction)
-- **Documentation:** See `docs/COMPONENT_DEEP_DIVES.md#prediction-engine`
-
-### 13. Risk Management
-- **Location:** `py/risk/`
-- **Purpose:** Portfolio risk assessment, CVaR optimization, Kelly bet sizing, exposure limits
-- **Key Files:** `cvar_lp.py`, `cvar_report.py`, `generate_scenarios.py`
-- **Status:** ✅ Complete (risk gates integrated into ensemble)
-- **Documentation:** See `docs/COMPONENT_DEEP_DIVES.md#risk-management`
-
-### 14. Validation Framework
-- **Location:** `py/validation/`, `tests/`
-- **Purpose:** Data quality checks, temporal leakage detection, model calibration validation, test suite execution
-- **Key Files:** `data_quality_checks.py`, `leakage_diagnostic.py`, `test_*` modules
-- **Status:** ✅ Comprehensive (25+ integration tests, 0 regressions in latest backtest)
-- **Documentation:** See `docs/validation/` and `tests/README.md`
-
-### 15. Optimization Module
-- **Location:** `py/optimization/`
-- **Purpose:** Hyperparameter search, ensemble weight optimization via CVX, portfolio allocation
-- **Key Files:** `bnn_hyperparameter_search.py`, `portfolio_optimizer.py`
-- **Status:** ✅ Complete (weights optimized Nov 8, 2025: SS 30%, Hier 30%, XGB 25%, IP 15%)
-- **Documentation:** See `docs/optimization/ENSEMBLE_WEIGHT_OPTIMIZATION_ANALYSIS.md`
-
-### 16. Monitoring & Observability
-- **Location:** `py/monitor/`, `py/monitoring/`, `dashboard/`, `grafana/`
-- **Purpose:** Real-time system health, model drift detection, performance tracking, alert generation
-- **Key Files:** `production_monitor.py`, `calibration_tracker.py`, `performance_dashboard.py`, Streamlit dashboard
-- **Status:** ✅ Operational (Prometheus + Grafana: 27 panels, Streamlit: 4 pages)
-- **Documentation:** See `docs/DOCKER_DASHBOARD_COMPLETE.md`
-
-### 17. Simulation Engine
-- **Location:** `py/sim/`, `py/simulation/`
-- **Purpose:** Monte Carlo simulations for scenario analysis, acceptance testing, live metrics generation
-- **Key Files:** `acceptance.py`, `generate_historical_metrics.py`, `generate_simulated_metrics.py`
-- **Status:** ✅ Complete (simulator acceptance tests passing, 89.5% calibration)
-- **Documentation:** See `docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md`
+**Monitoring:**
+- **Observability** (`dashboard/`, `grafana/`): 27 Grafana panels, 4-page Streamlit dashboard
+- **Simulation** (`py/sim/`): Monte Carlo, acceptance testing (89.5% calibration)
 
 ---
 
@@ -390,251 +272,18 @@ All Phase 1-4 agents are integrated into the Agent Coordinator system for intell
 
 ---
 
-## DISSERTATION QUALITY STANDARDS - NON-NEGOTIABLE ⚠️
+## Dissertation Quality Standards
 
-**CRITICAL:** `analysis/dissertation/main/main.tex` represents the **GOLD STANDARD** for this project. This is bedrock. This is granite. NO exceptions, NO shortcuts, NO "good enough for now." Every addition must be publication-quality with full rigor and beauty.
+**Complete Reference:** [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.md)
 
-### Bedrock Requirements
+**Non-Negotiable Requirements:**
+- **Statistical Rigor (Journal-Level):** All claims backed by evidence, proper test selection, assumptions validated, Bayesian diagnostics (R-hat < 1.01, ESS > 400), complete reporting
+- **Narrative Arc (Story First):** Clear flow, every section advances story, proper contextualization, compelling conclusions
+- **Visual Elegance (Publication-Ready):** TikZ style guide (`style/tikz_diagram_style.tex`), self-explanatory figures, complete captions, professional tables
+- **Reproducibility (Code + Data):** All analyses documented, data sources cited, computational environment specified
+- **Zero Tolerance:** NO TODOs in main.tex, NO placeholders, NO approximate stats, NO LaTeX errors, NO shortcuts on rigor
 
-#### 1. **Statistical Rigor** (Journal-Level)
-
-- ✅ **All claims backed by statistical evidence**
-  - Every quantitative statement must have supporting analysis
-  - No assertions without data
-  - Effect sizes reported alongside p-values
-- ✅ **Proper test selection documented and justified**
-  - Why this test? Document assumptions
-  - Alternative tests considered and rejected
-  - References to statistical literature when appropriate
-- ✅ **Assumptions validated and reported**
-  - Normality tests (Q-Q plots, Shapiro-Wilk)
-  - Homoscedasticity checks (Levene's test)
-  - Independence verified (Durbin-Watson for time series)
-  - All assumption violations documented with mitigations
-- ✅ **Diagnostics included for Bayesian models**
-  - R-hat < 1.01 (convergence)
-  - ESS > 400 (bulk and tail effective sample size)
-  - Divergences < 10
-  - Trace plots and posterior predictive checks
-  - Calibration plots (target: 90% coverage)
-- ✅ **Complete reporting**
-  - Confidence intervals always reported
-  - Sample sizes explicit
-  - Missing data handling documented
-  - Sensitivity analyses for key findings
-
-#### 2. **Narrative Arc** (Story First)
-
-- ✅ **Clear flow:** Introduction → Methods → Results → Discussion
-  - Each chapter builds on previous
-  - Transitions connect ideas smoothly
-  - No orphaned sections
-- ✅ **Every section advances the story**
-  - Purpose statement at start of each section
-  - How does this contribute to thesis?
-  - Callbacks to research questions
-- ✅ **Proper contextualization**
-  - Related work cited appropriately
-  - Contributions clearly stated
-  - Limitations acknowledged honestly
-- ✅ **Compelling conclusions**
-  - Tied back to research questions
-  - Practical implications discussed
-  - Future work specific and actionable
-
-#### 3. **Visual Elegance** (Publication-Ready)
-
-- ✅ **All figures use `style/tikz_diagram_style.tex`**
-  - Consistent accent blue: RGB(31, 119, 180)
-  - Rounded corners (`rounded corners=3pt`)
-  - Professional fonts (`\sffamily`)
-  - Standardized node styles
-- ✅ **Figures tell story without text**
-  - Self-explanatory visualizations
-  - Clear legends and labels
-  - Appropriate chart type for data
-  - Color-blind friendly palettes
-- ✅ **Captions provide complete context**
-  - What is shown
-  - Key takeaways
-  - Method details if needed
-  - Sample sizes and data sources
-- ✅ **Tables formatted professionally**
-  - Booktabs style (no vertical lines)
-  - Clear headers with units
-  - Aligned decimal points
-  - Notes explain abbreviations
-
-#### 4. **Reproducibility** (Code + Data)
-
-- ✅ **All analyses documented in code**
-  - R scripts for all statistical tests
-  - Python code for ML experiments
-  - SQL queries for data extraction
-  - Random seeds set for stochastic methods
-- ✅ **Data sources cited and accessible**
-  - nflverse package versions documented
-  - Database schema versioned
-  - Feature engineering fully specified
-- ✅ **Computational environment documented**
-  - R version and package versions (`renv`)
-  - Python environment (`requirements.txt` or `uv`)
-  - Hardware specifications for long-running jobs
-  - Execution times reported for benchmarks
-
-#### 5. **Zero Tolerance** (No Exceptions)
-
-- ❌ **NO TODO comments in main.tex**
-  - Complete all sections before merging
-  - Use separate tracking for pending work
-- ❌ **NO placeholder figures**
-  - Either include real figure or remove reference
-  - No "Figure X will go here"
-- ❌ **NO approximate statistics**
-  - Report exact p-values (not "p < 0.05")
-  - Full precision on effect sizes
-  - Confidence intervals complete
-- ❌ **NO LaTeX errors or critical warnings**
-  - Must compile cleanly
-  - Undefined references fixed immediately
-  - Overfull/underfull hboxes addressed
-- ❌ **NO shortcuts on rigor**
-  - Can't skip assumption checks to save time
-  - Can't omit diagnostics because "they look fine"
-  - Can't hand-wave statistical details
-
-### Quality Gates (MUST PASS)
-
-**Before ANY dissertation work proceeds:**
-
-- [ ] **Statistical methods validated**
-  - Test selection appropriate for data type
-  - Assumptions checked and documented
-  - Power analysis if needed for null results
-- [ ] **Narrative flow reviewed**
-  - Does this section advance the story?
-  - Are transitions smooth?
-  - Is purpose clear?
-- [ ] **Visual standards met**
-  - TikZ style guide followed (`style/tikz_diagram_style.tex`)
-  - Figures publication-ready
-  - Tables formatted with booktabs
-- [ ] **Citations complete**
-  - All claims referenced
-  - Bibliography up to date
-  - No "citation needed" placeholders
-- [ ] **Reproducibility verified**
-  - Code documented and executable
-  - Data sources accessible
-  - Results can be regenerated
-
-### Enforcement Mechanism
-
-**Research Coordinator Subagent** (Enhanced):
-
-When working on dissertation content, the research coordinator MUST:
-
-1. **Block** non-compliant work before execution
-2. **Require** revision to meet standards
-3. **Reject** "we'll fix it later" arguments
-4. **Enforce** quality gates at every step
-
-**Automatic Invocation:**
-- ANY modification to `analysis/dissertation/main/*.tex`
-- ANY new figure in `analysis/dissertation/figures/`
-- ANY statistical analysis destined for dissertation
-- ANY results section writeup
-
-**No Exceptions:**
-- Time pressure does NOT lower standards
-- "Quick draft" is NOT allowed - only publication quality
-- Intermediate work stays in scratch files, NOT main.tex
-
-### Research Coordinator - Enhanced for Rigor & Beauty
-
-**Purpose:** Ensure dissertation work meets publication standards with statistical rigor, narrative coherence, and visual elegance.
-
-**Unique Capabilities:**
-- **Statistical Rigor Validation:** Checks test appropriateness, assumption validation, diagnostic completeness
-- **Narrative Arc Management:** Ensures story flow, proper transitions, compelling conclusions
-- **Visual Excellence Enforcement:** Validates TikZ compliance, publication aesthetics, figure quality
-- **Reproducibility Guardian:** Verifies code documentation, data accessibility, computational environment
-- **R/Bayesian Expertise:** Deep knowledge of brms, Stan, MCMC diagnostics, posterior predictive checks
-
-**Quality Enforcement Actions:**
-1. **Pre-execution validation:** Check if work meets standards BEFORE starting
-2. **In-progress monitoring:** Ensure quality maintained throughout
-3. **Pre-commit blocking:** Prevent merging work that doesn't pass gates
-4. **Revision requirements:** Send back for improvement if needed
-
-**Example Interactions:**
-
-```markdown
-User: "Add BNN calibration results to Chapter 8"
-Research Coordinator:
-  1. Check: Statistical rigor gates
-     - Are R-hat values < 1.01? → YES
-     - Is ESS > 400? → YES
-     - Are divergences < 10? → NO (18 divergences) → BLOCK
-     → Require divergence analysis before proceeding
-
-  2. Check: Narrative flow
-     - Does Chapter 8 flow need this? → YES
-     - Are transitions prepared? → NO → Require intro paragraph
-
-  3. Check: Visual standards
-     - Calibration plot uses TikZ style? → NO
-     - Fix figure before adding to main.tex
-
-  → BLOCKED: Fix divergences + add transition + update figure
-```
-
-**When to Invoke:**
-- ALWAYS for dissertation modifications
-- ALWAYS for statistical result writeups
-- ALWAYS for figure additions
-- ALWAYS for methods documentation
-
-### Practical Guidelines
-
-**For Statistical Analysis:**
-1. Run analysis in R/Python script first
-2. Document ALL diagnostics (not just passing ones)
-3. Create publication-quality figures
-4. Write methods section with reproducibility details
-5. Get research coordinator review
-6. Only then add to main.tex
-
-**For Figures:**
-1. Use `style/tikz_diagram_style.tex` as template
-2. Test figure compiles standalone
-3. Write complete caption (what + why + how)
-4. Get research coordinator visual review
-5. Add to dissertation
-
-**For Methods Sections:**
-1. Justify all choices (why this model? why these priors?)
-2. Document assumptions and how validated
-3. Include computational details
-4. Cite statistical literature
-5. Research coordinator reviews for completeness
-
-**For Results:**
-1. Report complete statistics (not just p-values)
-2. Include effect sizes and confidence intervals
-3. Add interpretation paragraph
-4. Connect back to research questions
-5. Research coordinator checks narrative flow
-
-### Success Metrics
-
-✅ **Zero TODO comments in main.tex**
-✅ **LaTeX compiles without errors**
-✅ **All figures use standardized TikZ style**
-✅ **Every statistical claim has supporting evidence**
-✅ **Complete diagnostic reporting for all models**
-✅ **Smooth narrative flow throughout**
-✅ **Publication-ready on first draft**
+**Enforcement:** Research Coordinator subagent blocks non-compliant dissertation work. Automatic invocation for ANY modification to `analysis/dissertation/main/*.tex`.
 
 ---
 
@@ -782,49 +431,16 @@ def run_expensive_validation(seasons: List[int]):
 
 ## Current Status
 
-### Recent Completions (October 2025)
+**Complete History:** [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
-**Dissertation (Oct 19, 2025)**:
-- ✅ TikZ figure standardization complete
-  - Created `style/tikz_diagram_style.tex` for consistent styling
-  - Updated Chapters 9, 12, and causal DAG figures
-  - Standardized on accent blue (RGB: 31,119,180) with rounded corners
-- ✅ PDF compilation successful (324 pages, 5.48 MB)
-- ✅ All major LaTeX warnings resolved
-- ✅ Undefined references commented with TODO notes
+**Current Production (Nov 2025):**
+- **Ensemble v6.0:** DEPLOYED (XGBoost v4 Ridge 4.70 MAE, 90% calibration, +88% improvement)
+- **Dissertation:** 667 pages, compiles cleanly (0 errors, 0 undefined refs)
+- **Infrastructure:** Git LFS workflow, 11 specialized agents, unified enforcement framework
+- **Database:** 257 columns, 1.25M plays, 7,263 games
+- **Model Registry:** 8 models synced, 227 pending registration
 
-**Advanced Bayesian Models (Oct 13, 2025)**:
-- ✅ Informative priors model trained (25.3s)
-- ✅ QB-WR chemistry model trained (30.5 min, 2,168 pairs)
-- ✅ Bayesian Neural Network trained (MAE: 58.70 yards)
-- ✅ State-space trajectories generated
-
-**CQL Training (Oct 9, 2025)**:
-- ✅ CQL agent trained on 5,146 games (2006-2024)
-- ✅ 24% improvement over baseline (1.75% vs 1.41%)
-- ✅ Model saved: `models/cql/best_model.pth`
-
-**Causal Inference (Oct 16, 2025)**:
-- ✅ Phase 6 complete: All 8 modules implemented
-- ✅ Framework validated with preliminary backtesting (+3.3 pp ROI)
-- ✅ Dissertation integration complete (Chapter 8)
-
-### Active Work
-
-**Next Priorities**:
-1. **FastAPI Prediction Service** - Real-time prediction API (Phase 1.5)
-2. **Full 4-way ensemble backtest** (2022-2024 with canonical window)
-3. **Production deployment** with A/B testing
-4. **Model registry sync** - Register 227 pending models to database
-
-### Known Issues
-
-1. **State-space model**: Database insert logging issue (model saved successfully)
-2. **Database inserts**: Some models trained successfully but DB insert failed (logging errors)
-
-### Strategic Decisions
-
-1. **BNN Research Abandoned** (Nov 9, 2025): After 6 failed approaches and 84 person-hours, BNN passing model research terminated. Only BNN v3.1 Rushing (89.5% calibrated) remains in production ensemble.
+**Strategic Decision (Nov 9, 2025):** BNN Research Abandoned after 6 failed approaches (84 person-hours). Only BNN v3.1 Rushing (89.5% calibrated) remains in production.
 
 ---
 

@@ -36,6 +36,7 @@ Table~\ref{tab:bnn-timeline} presents the complete chronology of our investigati
 \caption{BNN Passing Model Investigation Timeline (Oct 14 - Nov 9, 2025)}
 \label{tab:bnn-timeline}
 \small
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{} l l S[table-format=2.0] l l @{}}
 \toprule
 \textbf{Approach} & \textbf{Dates} & \textbf{Hours} & \textbf{Primary Goal} & \textbf{Outcome} \\
@@ -50,6 +51,7 @@ Evidential DL & Nov 4-8 & 8 & Epistemic uncertainty & NaN epoch 24 \\
 \textbf{Total} & \textbf{26 days} & \textbf{84} & --- & \textbf{0/6 success} \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 
 \vspace{2mm}
 \begin{minipage}{\linewidth}
@@ -142,7 +144,9 @@ Building on v1's failure, Multi-Output v2 implemented comprehensive fixes for da
 \end{itemize}
 
 \paragraph{Training Progression.}
-For 47 epochs, training proceeded smoothly with monotonically decreasing loss (Figure~\ref{fig:bnn-loss-curves}, panel A). Validation MAE stabilized at 41 yards---competitive with baseline XGBoost. However, at epoch 48, a catastrophic failure occurred:
+For 47 epochs, training proceeded smoothly with monotonically decreasing loss (% TODO: Add label to BNN loss curves figure
+% Figure~\ref{fig:bnn-loss-curves}
+Figure~(BNN loss curves), panel A). Validation MAE stabilized at 41 yards---competitive with baseline XGBoost. However, at epoch 48, a catastrophic failure occurred:
 
 \begin{verbatim}
 Epoch 48/200:
@@ -351,7 +355,7 @@ Multi-Output v1 & 1.0021 & 4823 & 3947 & 0.2 & 8.4 \\
 Ensemble BNN & 0.9998 & 5621 & 4892 & 0.0 & 9.1 \\
 Informative Priors & 1.0008 & 6234 & 5421 & 0.1 & 7.8 \\
 \baselinerule
-\textbf{Target} & \textbf{<1.01} & \textbf{>400} & \textbf{>400} & \textbf{<1\%} & \textbf{---} \\
+\textbf{Target} & \textbf{<1.01} & \textbf{>400} & \textbf{>400} & \textbf{<1\%} & \textbf{{---}} \\
 \bottomrule
 \end{tabular}
 
@@ -388,17 +392,17 @@ Table~\ref{tab:bnn-performance} compares the 6 BNN approaches against baseline m
 \midrule
 \multicolumn{6}{l}{\textit{BNN Approaches (Oct 14 - Nov 9)}} \\
 Multi-Output v1 & 35.0 & 85.2 & 92.3 & 24 & Data leakage \\
-Multi-Output v2 & --- & --- & --- & --- & NaN epoch 47 \\
+Multi-Output v2 & {---} & {---} & {---} & {---} & NaN epoch 47 \\
 Ensemble BNN & 38.5 & 87.3 & 88.1 & 127 & Computational cost \\
 Informative Priors & 78.0 & 94.2 & 145.6 & 26 & Overconstrained (poor MAE) \\
 Conformal BNN & 41.2 & 90.0 & 133.2 & 31 & Wide intervals (low utility) \\
-Evidential DL & --- & --- & --- & --- & NaN epoch 24 \\
+Evidential DL & {---} & {---} & {---} & {---} & NaN epoch 24 \\
 \baselinerule
 \multicolumn{6}{l}{\textit{Production Baselines}} \\
-XGBoost v2 & 40.2 & --- & --- & 8 & None (baseline) \\
+XGBoost v2 & 40.2 & {---} & {---} & 8 & None (baseline) \\
 Hierarchical v2 & 43.1 & 91.2 & 78.4 & 42 & None (approved Nov 8) \\
 State-Space v2 & 47.8 & 89.8 & 82.1 & 35 & None (approved Nov 8) \\
-XGBoost v4 Ridge & 4.7 & --- & --- & 12 & None (approved Nov 14) \\
+XGBoost v4 Ridge & 4.7 & {---} & {---} & 12 & None (approved Nov 14) \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
@@ -703,5 +707,4 @@ As we integrate BNN v3.1 Rushing (the sole successful BNN model) into production
 
 This investigation was conducted October 14 - November 9, 2025 as part of the broader NFL analytics dissertation research (Chapters 4-9). Computing resources: MacBook M4 (CPU training), Windows RTX 4090 (GPU ablation studies). No external funding. All code available at: \url{https://github.com/raold/nfl-analytics}
 
-\bibliographystyle{plainnat}
-% Bibliography entries for BNN methods cited
+% Bibliography entries for BNN methods cited (bibliography commands in main.tex only)

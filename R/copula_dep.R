@@ -23,7 +23,6 @@ fit_gaussian_copula <- function(u, v) {
 if (identical(environment(), globalenv())) {
   set.seed(42)
   u <- pnorm(rnorm(1000))
-  v <- pnorm(0.3 * qnorm(u) + sqrt(1-0.3^2) * rnorm(1000))
+  v <- pnorm(0.3 * qnorm(u) + sqrt(1 - 0.3^2) * rnorm(1000))
   print(fit_gaussian_copula(u, v))
 }
-

@@ -93,9 +93,9 @@ log_info(paste("✓ Loaded", nrow(player_data), "players for prediction"))
 # Need to match the training data structure with required features
 pred_data <- player_data %>%
   mutate(
-    log_attempts = log(avg_attempts),  # Required feature
-    is_home = pct_home,  # Average home/away split (0-1)
-    is_bad_weather = pct_bad_weather,  # Average bad weather occurrence
+    log_attempts = log(avg_attempts), # Required feature
+    is_home = pct_home, # Average home/away split (0-1)
+    is_bad_weather = pct_bad_weather, # Average bad weather occurrence
     position = factor(position),
     team = factor(team),
     player_id = factor(player_id),
@@ -123,13 +123,13 @@ results <- data.frame(
   position = player_data$position,
   season = player_data$season,
   model_version = "informative_priors_v2.5",
-  rating_mean_log = predictions[, "Estimate"],  # log-space
-  rating_sd_log = predictions[, "Est.Error"],    # log-space
-  rating_q05_log = predictions[, "Q5"],          # log-space
-  rating_q95_log = predictions[, "Q95"],         # log-space
-  pred_yards = exp(predictions[, "Estimate"]),   # back to yards
-  pred_q05 = exp(predictions[, "Q5"]),           # back to yards
-  pred_q95 = exp(predictions[, "Q95"]),          # back to yards
+  rating_mean_log = predictions[, "Estimate"], # log-space
+  rating_sd_log = predictions[, "Est.Error"], # log-space
+  rating_q05_log = predictions[, "Q5"], # log-space
+  rating_q95_log = predictions[, "Q95"], # log-space
+  pred_yards = exp(predictions[, "Estimate"]), # back to yards
+  pred_q05 = exp(predictions[, "Q5"]), # back to yards
+  pred_q95 = exp(predictions[, "Q95"]), # back to yards
   n_games_2024 = player_data$n_games_2024,
   actual_yards = player_data$avg_yards_actual
 )
@@ -158,7 +158,7 @@ log_info(paste("  Correlation:", round(correlation, 3)))
 
 # Calculate CI coverage
 results$in_ci <- (results$actual_yards >= results$pred_q05) &
-                 (results$actual_yards <= results$pred_q95)
+  (results$actual_yards <= results$pred_q95)
 ci_coverage <- mean(results$in_ci)
 log_info(paste("  90% CI Coverage:", round(ci_coverage * 100, 1), "%"))
 

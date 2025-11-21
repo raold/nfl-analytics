@@ -19,7 +19,7 @@
 library(brms)
 library(tidyverse)
 library(DBI)
-library(RPostgres)  # Use RPostgres instead of RPostgreSQL
+library(RPostgres) # Use RPostgres instead of RPostgreSQL
 library(cmdstanr)
 library(posterior)
 library(loo)
@@ -36,7 +36,7 @@ options(brms.threads = 2)
 # Database connection
 get_db_connection <- function() {
   dbConnect(
-    Postgres(),  # Updated for RPostgres
+    Postgres(), # Updated for RPostgres
     host = Sys.getenv("DB_HOST", "localhost"),
     port = as.integer(Sys.getenv("DB_PORT", 5544)),
     dbname = Sys.getenv("DB_NAME", "devdb01"),
@@ -160,14 +160,14 @@ build_passing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
   # Define priors based on domain knowledge
   priors <- c(
     # Population-level effects
-    prior(normal(200, 50), class = Intercept),  # Average passing yards
-    prior(normal(0, 20), class = b),            # Fixed effects
+    prior(normal(200, 50), class = Intercept), # Average passing yards
+    prior(normal(0, 20), class = b), # Fixed effects
 
     # Group-level SDs (hierarchical structure)
-    prior(exponential(0.05), class = sd, group = player_id),        # Player variation
-    prior(exponential(0.1), class = sd, group = team),              # Team variation
-    prior(exponential(0.2), class = sd, group = position_season),   # Position-season
-    prior(exponential(0.1), class = sd, group = opponent)           # Opponent defense
+    prior(exponential(0.05), class = sd, group = player_id), # Player variation
+    prior(exponential(0.1), class = sd, group = team), # Team variation
+    prior(exponential(0.2), class = sd, group = position_season), # Position-season
+    prior(exponential(0.1), class = sd, group = opponent) # Opponent defense
 
     # Note: No sigma prior since we use distributional formula sigma ~ log_attempts
   )
@@ -186,11 +186,11 @@ build_passing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
       experience_cat +
 
       # Hierarchical random effects (partial pooling)
-      (1 | player_id) +                    # Player-specific intercept
-      (1 | team) +                          # Team offensive system
-      (1 | opponent) +                      # Opponent defensive strength
-      (1 | position_season) +               # Position group by season
-      (log_attempts | player_season),      # Player-season slope for attempts
+      (1 | player_id) + # Player-specific intercept
+      (1 | team) + # Team offensive system
+      (1 | opponent) + # Opponent defensive strength
+      (1 | position_season) + # Position group by season
+      (log_attempts | player_season), # Player-season slope for attempts
 
     # Model variance as function of attempts (heteroscedasticity)
     sigma ~ log_attempts
@@ -225,7 +225,7 @@ build_rushing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
 
   # Different priors for rushing (lower average, higher variance)
   priors <- c(
-    prior(normal(50, 30), class = Intercept),   # Average rushing yards
+    prior(normal(50, 30), class = Intercept), # Average rushing yards
     prior(normal(0, 15), class = b),
     prior(exponential(0.03), class = sd, group = player_id),
     prior(exponential(0.1), class = sd, group = team),
@@ -243,15 +243,14 @@ build_rushing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
       spread_abs +
       scale(total_line) +
       experience_cat +
-      position_group +  # Position matters more for rushing
+      position_group + # Position matters more for rushing
 
       # Hierarchical structure
       (1 | player_id) +
       (1 | team) +
       (1 | opponent) +
-      (1 | position_group:team) +  # Position-team interaction
+      (1 | position_group:team) + # Position-team interaction
       (log_attempts | player_season),
-
     sigma ~ log_attempts + position_group
   )
 
@@ -288,7 +287,7 @@ build_receiving_model <- function(data, chains = 4, iter = 2000, warmup = 1000) 
     prior(exponential(0.1), class = sd, group = team),
     prior(exponential(0.15), class = sd, group = position_group),
     prior(exponential(0.1), class = sd, group = opponent),
-    prior(exponential(0.1), class = sd, group = qb_id)  # QB throwing to receiver
+    prior(exponential(0.1), class = sd, group = qb_id) # QB throwing to receiver
     # Note: No sigma prior since we use distributional formula
   )
 
@@ -302,7 +301,7 @@ build_receiving_model <- function(data, chains = 4, iter = 2000, warmup = 1000) 
   formula <- bf(
     log_yards ~ 1 +
       # Fixed effects
-      log_attempts +  # Targets
+      log_attempts + # Targets
       is_home +
       is_favored +
       spread_abs +
@@ -314,10 +313,9 @@ build_receiving_model <- function(data, chains = 4, iter = 2000, warmup = 1000) 
       (1 | player_id) +
       (1 | team) +
       (1 | opponent) +
-      (1 | qb_id) +  # QB effect on receiver
+      (1 | qb_id) + # QB effect on receiver
       (1 | position_group:team) +
       (log_attempts | player_season),
-
     sigma ~ log_attempts + position_group
   )
 
@@ -360,7 +358,7 @@ diagnose_model <- function(model, model_name) {
   # 2. Check convergence (Rhat)
   rhats <- rhat(model)
   problematic_rhats <- rhats[rhats > 1.01]
-  if(length(problematic_rhats) > 0) {
+  if (length(problematic_rhats) > 0) {
     cat("\nWARNING: Parameters with Rhat > 1.01:\n")
     print(problematic_rhats)
   } else {
@@ -370,7 +368,7 @@ diagnose_model <- function(model, model_name) {
   # 3. Effective sample size
   ess <- ess_bulk(model)
   low_ess <- ess[ess < 400]
-  if(length(low_ess) > 0) {
+  if (length(low_ess) > 0) {
     cat("\nWARNING: Parameters with ESS < 400:\n")
     print(low_ess)
   } else {
@@ -380,7 +378,7 @@ diagnose_model <- function(model, model_name) {
   # 4. Check for divergences
   divs <- nuts_params(model)$divergent__
   n_divs <- sum(divs)
-  if(n_divs > 0) {
+  if (n_divs > 0) {
     cat(glue("\nWARNING: {n_divs} divergent transitions detected\n"))
   } else {
     cat("✓ No divergent transitions\n")
@@ -431,11 +429,11 @@ extract_player_ratings <- function(model, data, stat_type, model_version = "v1.0
   # Process each player
   results <- list()
 
-  for(player_col in player_cols) {
+  for (player_col in player_cols) {
     # Extract player ID from column name
     player_id <- gsub("r_player_id\\[(.+),Intercept\\]", "\\1", player_col)
 
-    if(player_id %in% unique(data$player_id)) {
+    if (player_id %in% unique(data$player_id)) {
       # Get player's posterior distribution
       player_effect <- posterior_samples[[player_col]]
 
@@ -447,13 +445,17 @@ extract_player_ratings <- function(model, data, stat_type, model_version = "v1.0
       team_col <- glue("r_team[{player_data$team},Intercept]")
       position_col <- glue("r_position_season[{player_data$position_group}_{max(data$season)},Intercept]")
 
-      team_effect <- if(team_col %in% names(posterior_samples)) {
+      team_effect <- if (team_col %in% names(posterior_samples)) {
         mean(posterior_samples[[team_col]])
-      } else { 0 }
+      } else {
+        0
+      }
 
-      position_effect <- if(position_col %in% names(posterior_samples)) {
+      position_effect <- if (position_col %in% names(posterior_samples)) {
         mean(posterior_samples[[position_col]])
-      } else { 0 }
+      } else {
+        0
+      }
 
       # Calculate statistics
       results[[player_id]] <- data.frame(
@@ -468,7 +470,7 @@ extract_player_ratings <- function(model, data, stat_type, model_version = "v1.0
         rating_q95 = quantile(player_effect, 0.95),
         position_group_mean = position_effect,
         team_effect = team_effect,
-        vs_opponent_effect = NA,  # Would need opponent-specific extraction
+        vs_opponent_effect = NA, # Would need opponent-specific extraction
         n_games_observed = sum(data$player_id == player_id),
         effective_sample_size = ess_bulk(player_effect),
         rhat = rhat(player_effect),
@@ -518,19 +520,19 @@ save_to_database <- function(conn, ratings_df, stat_type) {
 compare_models <- function(models, names) {
   "Compare multiple models using LOO-CV"
 
-  cat(paste0("\n", paste0(rep("=", 60), collapse=""), "\n"))
+  cat(paste0("\n", paste0(rep("=", 60), collapse = ""), "\n"))
   cat("MODEL COMPARISON (LOO-CV)\n")
-  cat(paste0(paste0(rep("=", 60), collapse=""), "\n\n"))
+  cat(paste0(paste0(rep("=", 60), collapse = ""), "\n\n"))
 
   # Compute LOO for each model
   loos <- list()
-  for(i in seq_along(models)) {
+  for (i in seq_along(models)) {
     cat(glue("Computing LOO for {names[i]}...\n"))
     loos[[names[i]]] <- loo(models[[i]], cores = parallel::detectCores() - 1)
   }
 
   # Compare models
-  if(length(loos) > 1) {
+  if (length(loos) > 1) {
     comparison <- loo_compare(loos)
     print(comparison)
 
@@ -554,9 +556,9 @@ compare_models <- function(models, names) {
 # =============================================================================
 
 main <- function() {
-  cat(paste0(paste0(rep("=", 80), collapse=""), "\n"))
+  cat(paste0(paste0(rep("=", 80), collapse = ""), "\n"))
   cat("BAYESIAN HIERARCHICAL MODELS FOR NFL PLAYER PROPS\n")
-  cat(paste0(paste0(rep("=", 80), collapse=""), "\n\n"))
+  cat(paste0(paste0(rep("=", 80), collapse = ""), "\n\n"))
 
   # Connect to database
   conn <- get_db_connection()
@@ -565,129 +567,131 @@ main <- function() {
   # Track execution time
   start_time <- Sys.time()
 
-  tryCatch({
-    # 1. PASSING YARDS MODEL
-    cat(paste0("\n", paste0(rep("=", 60), collapse=""), "\n"))
-    cat("PHASE 1: PASSING YARDS MODEL\n")
-    cat(paste0(paste0(rep("=", 60), collapse=""), "\n"))
+  tryCatch(
+    {
+      # 1. PASSING YARDS MODEL
+      cat(paste0("\n", paste0(rep("=", 60), collapse = ""), "\n"))
+      cat("PHASE 1: PASSING YARDS MODEL\n")
+      cat(paste0(paste0(rep("=", 60), collapse = ""), "\n"))
 
-    passing_data <- load_player_data(conn, "passing", min_season = 2020)
+      passing_data <- load_player_data(conn, "passing", min_season = 2020)
 
-    if(nrow(passing_data) > 0) {
-      passing_model <- build_passing_model(passing_data, chains = 4, iter = 2000)
+      if (nrow(passing_data) > 0) {
+        passing_model <- build_passing_model(passing_data, chains = 4, iter = 2000)
 
-      # Diagnostics
-      passing_diag <- diagnose_model(passing_model, "passing_yards")
+        # Diagnostics
+        passing_diag <- diagnose_model(passing_model, "passing_yards")
 
-      # Extract and save ratings
-      passing_ratings <- extract_player_ratings(
-        passing_model,
-        passing_data,
-        "passing_yards",
-        "hierarchical_v1.0"
-      )
-      save_to_database(conn, passing_ratings, "passing_yards")
+        # Extract and save ratings
+        passing_ratings <- extract_player_ratings(
+          passing_model,
+          passing_data,
+          "passing_yards",
+          "hierarchical_v1.0"
+        )
+        save_to_database(conn, passing_ratings, "passing_yards")
 
-      # Save model object
-      dir.create("models/bayesian", recursive = TRUE, showWarnings = FALSE)
-      saveRDS(passing_model, "models/bayesian/passing_yards_hierarchical_v1.rds")
-      cat("✓ Passing model saved to models/bayesian/\n")
+        # Save model object
+        dir.create("models/bayesian", recursive = TRUE, showWarnings = FALSE)
+        saveRDS(passing_model, "models/bayesian/passing_yards_hierarchical_v1.rds")
+        cat("✓ Passing model saved to models/bayesian/\n")
+      }
+
+      # 2. RUSHING YARDS MODEL
+      cat(paste0("\n", paste0(rep("=", 60), collapse = ""), "\n"))
+      cat("PHASE 2: RUSHING YARDS MODEL\n")
+      cat(paste0(paste0(rep("=", 60), collapse = ""), "\n"))
+
+      rushing_data <- load_player_data(conn, "rushing", min_season = 2020)
+
+      if (nrow(rushing_data) > 0) {
+        rushing_model <- build_rushing_model(rushing_data, chains = 4, iter = 2000)
+
+        # Diagnostics
+        rushing_diag <- diagnose_model(rushing_model, "rushing_yards")
+
+        # Extract and save ratings
+        rushing_ratings <- extract_player_ratings(
+          rushing_model,
+          rushing_data,
+          "rushing_yards",
+          "hierarchical_v1.0"
+        )
+        save_to_database(conn, rushing_ratings, "rushing_yards")
+
+        # Save model
+        saveRDS(rushing_model, "models/bayesian/rushing_yards_hierarchical_v1.rds")
+        cat("✓ Rushing model saved to models/bayesian/\n")
+      }
+
+      # 3. RECEIVING YARDS MODEL
+      cat(paste0("\n", paste0(rep("=", 60), collapse = ""), "\n"))
+      cat("PHASE 3: RECEIVING YARDS MODEL\n")
+      cat(paste0(paste0(rep("=", 60), collapse = ""), "\n"))
+
+      receiving_data <- load_player_data(conn, "receiving", min_season = 2020)
+
+      if (nrow(receiving_data) > 0) {
+        receiving_model <- build_receiving_model(receiving_data, chains = 4, iter = 2000)
+
+        # Diagnostics
+        receiving_diag <- diagnose_model(receiving_model, "receiving_yards")
+
+        # Extract and save ratings
+        receiving_ratings <- extract_player_ratings(
+          receiving_model,
+          receiving_data,
+          "receiving_yards",
+          "hierarchical_v1.0"
+        )
+        save_to_database(conn, receiving_ratings, "receiving_yards")
+
+        # Save model
+        saveRDS(receiving_model, "models/bayesian/receiving_yards_hierarchical_v1.rds")
+        cat("✓ Receiving model saved to models/bayesian/\n")
+      }
+
+      # 4. MODEL COMPARISON
+      if (exists("passing_model") && exists("rushing_model") && exists("receiving_model")) {
+        cat(paste0("\n", paste0(rep("=", 60), collapse = ""), "\n"))
+        cat("PHASE 4: MODEL COMPARISON\n")
+        cat(paste0(paste0(rep("=", 60), collapse = ""), "\n"))
+
+        # Could compare different model specifications here
+        # For now, just show individual LOO results
+
+        cat("\nComputing LOO-CV for all models...\n")
+        passing_loo <- loo(passing_model, cores = parallel::detectCores() - 1)
+        rushing_loo <- loo(rushing_model, cores = parallel::detectCores() - 1)
+        receiving_loo <- loo(receiving_model, cores = parallel::detectCores() - 1)
+
+        cat("\nLOO Results:\n")
+        cat("Passing Model ELPD:", passing_loo$estimates["elpd_loo", "Estimate"], "\n")
+        cat("Rushing Model ELPD:", rushing_loo$estimates["elpd_loo", "Estimate"], "\n")
+        cat("Receiving Model ELPD:", receiving_loo$estimates["elpd_loo", "Estimate"], "\n")
+      }
+
+      # Summary
+      end_time <- Sys.time()
+      duration <- difftime(end_time, start_time, units = "mins")
+
+      cat(paste0("\n", paste0(rep("=", 80), collapse = ""), "\n"))
+      cat("EXECUTION COMPLETE\n")
+      cat(paste0(paste0(rep("=", 80), collapse = ""), "\n"))
+      cat(glue("Total execution time: {round(duration, 2)} minutes\n"))
+      cat("\nAll models trained and saved successfully!\n")
+      cat("Player ratings stored in mart.bayesian_player_ratings\n")
+      cat("Model objects saved to models/bayesian/\n")
+      cat("Diagnostic plots saved to figures/bayesian_diagnostics/\n")
+    },
+    error = function(e) {
+      cat("\n❌ ERROR:", conditionMessage(e), "\n")
+      traceback()
     }
-
-    # 2. RUSHING YARDS MODEL
-    cat(paste0("\n", paste0(rep("=", 60), collapse=""), "\n"))
-    cat("PHASE 2: RUSHING YARDS MODEL\n")
-    cat(paste0(paste0(rep("=", 60), collapse=""), "\n"))
-
-    rushing_data <- load_player_data(conn, "rushing", min_season = 2020)
-
-    if(nrow(rushing_data) > 0) {
-      rushing_model <- build_rushing_model(rushing_data, chains = 4, iter = 2000)
-
-      # Diagnostics
-      rushing_diag <- diagnose_model(rushing_model, "rushing_yards")
-
-      # Extract and save ratings
-      rushing_ratings <- extract_player_ratings(
-        rushing_model,
-        rushing_data,
-        "rushing_yards",
-        "hierarchical_v1.0"
-      )
-      save_to_database(conn, rushing_ratings, "rushing_yards")
-
-      # Save model
-      saveRDS(rushing_model, "models/bayesian/rushing_yards_hierarchical_v1.rds")
-      cat("✓ Rushing model saved to models/bayesian/\n")
-    }
-
-    # 3. RECEIVING YARDS MODEL
-    cat(paste0("\n", paste0(rep("=", 60), collapse=""), "\n"))
-    cat("PHASE 3: RECEIVING YARDS MODEL\n")
-    cat(paste0(paste0(rep("=", 60), collapse=""), "\n"))
-
-    receiving_data <- load_player_data(conn, "receiving", min_season = 2020)
-
-    if(nrow(receiving_data) > 0) {
-      receiving_model <- build_receiving_model(receiving_data, chains = 4, iter = 2000)
-
-      # Diagnostics
-      receiving_diag <- diagnose_model(receiving_model, "receiving_yards")
-
-      # Extract and save ratings
-      receiving_ratings <- extract_player_ratings(
-        receiving_model,
-        receiving_data,
-        "receiving_yards",
-        "hierarchical_v1.0"
-      )
-      save_to_database(conn, receiving_ratings, "receiving_yards")
-
-      # Save model
-      saveRDS(receiving_model, "models/bayesian/receiving_yards_hierarchical_v1.rds")
-      cat("✓ Receiving model saved to models/bayesian/\n")
-    }
-
-    # 4. MODEL COMPARISON
-    if(exists("passing_model") && exists("rushing_model") && exists("receiving_model")) {
-      cat(paste0("\n", paste0(rep("=", 60), collapse=""), "\n"))
-      cat("PHASE 4: MODEL COMPARISON\n")
-      cat(paste0(paste0(rep("=", 60), collapse=""), "\n"))
-
-      # Could compare different model specifications here
-      # For now, just show individual LOO results
-
-      cat("\nComputing LOO-CV for all models...\n")
-      passing_loo <- loo(passing_model, cores = parallel::detectCores() - 1)
-      rushing_loo <- loo(rushing_model, cores = parallel::detectCores() - 1)
-      receiving_loo <- loo(receiving_model, cores = parallel::detectCores() - 1)
-
-      cat("\nLOO Results:\n")
-      cat("Passing Model ELPD:", passing_loo$estimates["elpd_loo", "Estimate"], "\n")
-      cat("Rushing Model ELPD:", rushing_loo$estimates["elpd_loo", "Estimate"], "\n")
-      cat("Receiving Model ELPD:", receiving_loo$estimates["elpd_loo", "Estimate"], "\n")
-    }
-
-    # Summary
-    end_time <- Sys.time()
-    duration <- difftime(end_time, start_time, units = "mins")
-
-    cat(paste0("\n", paste0(rep("=", 80), collapse=""), "\n"))
-    cat("EXECUTION COMPLETE\n")
-    cat(paste0(paste0(rep("=", 80), collapse=""), "\n"))
-    cat(glue("Total execution time: {round(duration, 2)} minutes\n"))
-    cat("\nAll models trained and saved successfully!\n")
-    cat("Player ratings stored in mart.bayesian_player_ratings\n")
-    cat("Model objects saved to models/bayesian/\n")
-    cat("Diagnostic plots saved to figures/bayesian_diagnostics/\n")
-
-  }, error = function(e) {
-    cat("\n❌ ERROR:", conditionMessage(e), "\n")
-    traceback()
-  })
+  )
 }
 
 # Run if called directly
-if(!interactive()) {
+if (!interactive()) {
   main()
 }

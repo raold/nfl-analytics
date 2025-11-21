@@ -30,7 +30,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. ESPN QBR (WEEKLY DATA - FIX: USE summary_type="week")
     # ============================================================
@@ -41,7 +40,7 @@ safe_db_operation(
         log_message("Fetching ESPN QBR WEEKLY data from nflverse (2006-2025)...", level = "INFO")
 
         qbr <- retry_operation(
-          expr = load_espn_qbr(seasons = 2006:2025, summary_type = "week"),  # KEY FIX!
+          expr = load_espn_qbr(seasons = 2006:2025, summary_type = "week"), # KEY FIX!
           max_attempts = 3,
           delay = 5,
           error_message = "Failed to load ESPN QBR from nflverse"
@@ -65,8 +64,8 @@ safe_db_operation(
       expr = {
         qbr_clean <- qbr_data %>%
           mutate(
-            rank = as.integer(rank),  # Convert rank to integer
-            qb_plays = as.integer(qb_plays)  # Convert qb_plays to integer
+            rank = as.integer(rank), # Convert rank to integer
+            qb_plays = as.integer(qb_plays) # Convert qb_plays to integer
           ) %>%
           select(
             player_id,
@@ -344,10 +343,10 @@ safe_db_operation(
         # Also deduplicate - source data has exact duplicates
         # Filter out NULL weeks - these are season-level depth charts, not game-specific
         depth_clean <- depth_charts_data %>%
-          mutate(season_type = game_type) %>%  # Create season_type from game_type
+          mutate(season_type = game_type) %>% # Create season_type from game_type
           select(
             season,
-            season_type,  # Now available
+            season_type, # Now available
             week,
             club_code,
             gsis_id,
@@ -361,7 +360,7 @@ safe_db_operation(
             depth_position
           ) %>%
           filter(!is.na(gsis_id), !is.na(club_code), !is.na(season), !is.na(week)) %>%
-          distinct()  # Remove exact duplicates from source data
+          distinct() # Remove exact duplicates from source data
 
         dbExecute(conn, "CREATE TEMP TABLE depth_staging AS SELECT * FROM depth_charts LIMIT 0")
         dbWriteTable(conn, "depth_staging", depth_clean, append = TRUE, row.names = FALSE)
@@ -408,12 +407,16 @@ safe_db_operation(
 
         log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(qbr_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f",
-                             qbr_summary$season[i],
-                             qbr_summary$unique_qbs[i],
-                             qbr_summary$total_records[i],
-                             qbr_summary$avg_qbr[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f",
+              qbr_summary$season[i],
+              qbr_summary$unique_qbs[i],
+              qbr_summary$total_records[i],
+              qbr_summary$avg_qbr[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # PFR Defense
@@ -427,11 +430,15 @@ safe_db_operation(
 
         log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(def_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f defenders, %.0f records",
-                             def_summary$season[i],
-                             def_summary$unique_defenders[i],
-                             def_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f defenders, %.0f records",
+              def_summary$season[i],
+              def_summary$unique_defenders[i],
+              def_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Snap Counts
@@ -445,11 +452,15 @@ safe_db_operation(
 
         log_message("=== Snap Counts Summary (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(snaps_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f players, %.0f records",
-                             snaps_summary$season[i],
-                             snaps_summary$unique_players[i],
-                             snaps_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f players, %.0f records",
+              snaps_summary$season[i],
+              snaps_summary$unique_players[i],
+              snaps_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Depth Charts
@@ -464,11 +475,15 @@ safe_db_operation(
 
         log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", level = "INFO")
         for (i in 1:nrow(depth_summary)) {
-          log_message(sprintf("  Season %.0f: %.0f starters, %.0f records",
-                             depth_summary$season[i],
-                             depth_summary$unique_players[i],
-                             depth_summary$total_records[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  Season %.0f: %.0f starters, %.0f records",
+              depth_summary$season[i],
+              depth_summary$unique_players[i],
+              depth_summary$total_records[i]
+            ),
+            level = "INFO"
+          )
         }
 
         TRUE

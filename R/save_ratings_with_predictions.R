@@ -47,10 +47,10 @@ cat(glue::glue("Found {length(player_cols)} player effects\n"))
 # Build ratings dataframe with actual predictions
 ratings_list <- list()
 
-for(player_col in player_cols) {
+for (player_col in player_cols) {
   player_id <- gsub("r_player_id\\[(.+),Intercept\\]", "\\1", player_col)
 
-  if(player_id %in% unique(data$player_id)) {
+  if (player_id %in% unique(data$player_id)) {
     # Get player-specific effect
     player_effect <- posterior_samples[[player_col]]
 
@@ -75,22 +75,22 @@ for(player_col in player_cols) {
     exp_effect <- if_else(
       tolower(player_data$experience) == "rookie",
       exp_rookie_coef,
-      0  # Other levels are reference
+      0 # Other levels are reference
     )
 
     # Calculate log-space prediction for typical game
     # Linear predictor: Intercept + player_effect + covariates * betas
     log_yards_pred <- (
       intercept_samples +
-      player_effect +
-      log_attempts_coef * player_data$typical_log_attempts +
-      is_home_coef * player_data$pct_home +
-      is_favored_coef * player_data$pct_favored +
-      spread_abs_coef * player_data$avg_spread_abs +
-      is_bad_weather_coef * player_data$pct_bad_weather +
-      is_dome_coef * player_data$pct_dome +
-      total_line_coef * scale(player_data$avg_total_line)[1] +
-      exp_effect
+        player_effect +
+        log_attempts_coef * player_data$typical_log_attempts +
+        is_home_coef * player_data$pct_home +
+        is_favored_coef * player_data$pct_favored +
+        spread_abs_coef * player_data$avg_spread_abs +
+        is_bad_weather_coef * player_data$pct_bad_weather +
+        is_dome_coef * player_data$pct_dome +
+        total_line_coef * scale(player_data$avg_total_line)[1] +
+        exp_effect
     )
 
     # Transform back to yards scale
@@ -143,10 +143,11 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'pas
 
 cat("Inserting ratings with yard predictions using SQL...\n")
 
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
-  sql <- sprintf("
+  sql <- sprintf(
+    "
     INSERT INTO mart.bayesian_player_ratings (
       player_id, stat_type, season, model_version,
       rating_mean, rating_sd, rating_q05, rating_q50, rating_q95,
@@ -171,7 +172,7 @@ for(i in 1:nrow(ratings_df)) {
 
   dbExecute(conn, sql)
 
-  if(i %% 10 == 0) {
+  if (i %% 10 == 0) {
     cat(glue::glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
   }
 }

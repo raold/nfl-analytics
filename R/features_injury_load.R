@@ -32,14 +32,17 @@ all_injuries <- list()
 
 for (season in SEASONS) {
   cat("Loading", season, "injuries...")
-  
-  injuries <- tryCatch({
-    nflreadr::load_injuries(season)
-  }, error = function(e) {
-    cat(" ERROR:", e$message, "\n")
-    return(NULL)
-  })
-  
+
+  injuries <- tryCatch(
+    {
+      nflreadr::load_injuries(season)
+    },
+    error = function(e) {
+      cat(" ERROR:", e$message, "\n")
+      return(NULL)
+    }
+  )
+
   if (!is.null(injuries) && nrow(injuries) > 0) {
     all_injuries[[length(all_injuries) + 1]] <- injuries
     cat(" ", nrow(injuries), "records\n")
@@ -88,12 +91,12 @@ injury_features <- injuries_df |>
     players_out = sum(is_out, na.rm = TRUE),
     players_questionable = sum(is_questionable, na.rm = TRUE),
     players_doubtful = sum(is_doubtful, na.rm = TRUE),
-    
+
     # Position-specific
     key_position_out = any(is_key_position & is_out, na.rm = TRUE),
     qb_out = any(is_qb & is_out, na.rm = TRUE),
     oline_injuries = sum(is_oline, na.rm = TRUE),
-    
+
     # Severity index (weighted by status)
     injury_severity_index = sum(
       case_when(
@@ -104,7 +107,6 @@ injury_features <- injuries_df |>
       ),
       na.rm = TRUE
     ),
-    
     .groups = "drop"
   )
 
@@ -119,9 +121,11 @@ dbExecute(con, "TRUNCATE TABLE mart.team_injury_load;")
 cat("Truncated existing mart.team_injury_load\n")
 
 # Write data using dbAppendTable
-dbAppendTable(con, 
-              Id(schema = "mart", table = "team_injury_load"), 
-              injury_features)
+dbAppendTable(
+  con,
+  Id(schema = "mart", table = "team_injury_load"),
+  injury_features
+)
 
 cat("\n✓ Wrote", nrow(injury_features), "rows to mart.team_injury_load\n")
 
@@ -140,7 +144,7 @@ print(summary_stats)
 # Show sample query
 cat("\nSample query to use features:\n")
 cat("
-SELECT 
+SELECT
   g.game_id,
   g.season,
   g.week,
@@ -153,9 +157,9 @@ SELECT
   hi.injury_severity_index AS home_injury_severity,
   ai.injury_severity_index AS away_injury_severity
 FROM games g
-LEFT JOIN mart.team_injury_load hi 
+LEFT JOIN mart.team_injury_load hi
   ON g.home_team = hi.team AND g.season = hi.season AND g.week = hi.week
-LEFT JOIN mart.team_injury_load ai 
+LEFT JOIN mart.team_injury_load ai
   ON g.away_team = ai.team AND g.season = ai.season AND g.week = ai.week
 WHERE g.season >= 2020
 LIMIT 10;

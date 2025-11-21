@@ -20,7 +20,9 @@ reweight_key_masses <- function(pmf, targets) {
     ) |>
     select(-target, -factor)
   s <- sum(pmf2$prob)
-  if (s <= 0) return(pmf2)
+  if (s <= 0) {
+    return(pmf2)
+  }
   pmf2 |>
     mutate(prob = prob / s)
 }

@@ -4,7 +4,64 @@ This document tracks significant errors, their root causes, and lessons learned.
 
 ---
 
-## 1. Incremental XGBoost Baseline Error (November 10-12, 2025)
+## 1. Ensemble v7.0 Validation Failure (November 18-19, 2025)
+
+### Summary
+
+**What Happened**: After 56+ hours of development (Phases A/B/C) and 18.5 hours of validation compute, Ensemble v7.0 (adaptive WLS + meta-learning) provided **NO meaningful improvement** over v6.0 baseline.
+
+**Result**: +0.01 yards improvement (0.02%) vs +2.0 yards target → **MISSED by 99%**
+
+**Outcome**: v7.0 development **TERMINATED**. Revert to v6.0 for production.
+
+### Quick Facts
+
+| Metric | Value |
+|--------|-------|
+| **v6.0 Baseline** | 54.64 MAE |
+| **v7.0 Full** | 54.63 MAE |
+| **Improvement** | +0.01 yards (+0.02%) |
+| **Target** | +2.0 yards (>3.6%) |
+| **Statistical Significance** | None (all DM tests = nan) |
+| **Effort Wasted** | ~26 hours (45% of 58h total) |
+| **Production Impact** | $0 (caught in validation) |
+
+### Root Causes
+
+1. **Insufficient Training Data**: Meta-learning requires 5,000-10,000 samples; had only 1,701 games
+2. **WLS Window Too Short**: 6-week window (8-12 effective samples) too noisy for stable weight estimation
+3. **v6.0 Already Optimal**: Baseline already well-calibrated; little room for improvement
+4. **Context Features Uninformative**: 15 meta-features don't predict optimal weight adjustments
+5. **No Systematic Bias**: WLS bias correction ineffective when residuals already ~N(0, σ²)
+
+### Key Lessons
+
+⭐⭐⭐ **Validate data availability before complex features** - Check samples-per-feature BEFORE building pipeline
+
+⭐⭐ **Diminishing returns on ensemble optimization** - To beat v6.0, need BETTER COMPONENTS (not better weighting)
+
+⭐⭐ **Bias correction only helps when bias exists** - Check bias magnitude BEFORE building correction
+
+⭐ **Cold start problems dilute gains** - Account for early-season games with no history (~35% of data)
+
+⭐⭐⭐ **Statistical significance is non-negotiable** - If DM test returns nan, difference is too small to claim
+
+### Prevention Measures
+
+1. ✅ **Rule 20: Data Sufficiency Gate** - Enforce minimum 100× samples per feature for meta-learning
+2. ✅ **Failed Approaches Registry** - Document v7.0 alongside BNN and incremental XGBoost
+3. ✅ **Pre-Validation Checklist** - Require bias magnitude check, data sufficiency, acceptance criteria
+4. ✅ **Shift to Component Improvement** - Focus on XGBoost v5 with real opponent features (not ensemble weighting)
+
+### Full Postmortem
+
+See: `/Users/dro/rice/nfl-analytics/docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md` (14,000+ lines)
+
+**Status**: ✅ CLOSED - v7.0 terminated, v6.0 approved for production
+
+---
+
+## 2. Incremental XGBoost Baseline Error (November 10-12, 2025)
 
 ### Timeline
 
@@ -276,7 +333,7 @@ CLAIM DOCUMENTATION REQUIREMENTS:
 
 ---
 
-## 2. State-Space v2 Model Loading Bug (November 13, 2025)
+## 3. State-Space v2 Model Loading Bug (November 13, 2025)
 
 ### Timeline
 
@@ -544,7 +601,7 @@ verify_and_extract <- function(draws_obj, param_name) {
 
 ---
 
-**Last Updated:** November 13, 2025
+**Last Updated:** November 19, 2025
 **Author:** NFL Analytics Research Team
-**Reviewers:** Claude Code (Haiku 4.5)
-**Next Review:** After ensemble integration completion
+**Reviewers:** Claude Code (Sonnet 4.5)
+**Next Review:** After major incident or quarterly

@@ -13,9 +13,9 @@ library(glue)
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("BAYESIAN RECEIVING MODEL WITH QB-WR CHEMISTRY (FIXED)\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -115,7 +115,7 @@ cat("Step 3: Engineering features...\n")
 data <- data %>%
   mutate(
     # Log transformations
-    log_yards = log(yards + 1),  # +1 to handle zeros
+    log_yards = log(yards + 1), # +1 to handle zeros
     log_targets = log(targets),
 
     # QB-WR chemistry ID
@@ -160,15 +160,15 @@ formula <- bf(
     scale(total_close) +
     experience_cat +
     position_group +
-    (1 | receiver_id) +              # Receiver talent
-    (1 | qb_id) +                    # QB talent
-    (1 | qb_wr_pair) +               # QB-WR CHEMISTRY (dyadic effect)
+    (1 | receiver_id) + # Receiver talent
+    (1 | qb_id) + # QB talent
+    (1 | qb_wr_pair) + # QB-WR CHEMISTRY (dyadic effect)
     (1 | team) +
     (1 | opponent) +
     (1 | position_season) +
     (1 | qb_season) +
-    (log_targets | player_season),   # Varying slopes by player-season
-  sigma ~ log_targets + position_group  # DISTRIBUTIONAL REGRESSION
+    (log_targets | player_season), # Varying slopes by player-season
+  sigma ~ log_targets + position_group # DISTRIBUTIONAL REGRESSION
 )
 
 # Set priors
@@ -177,7 +177,7 @@ priors <- c(
   prior(normal(0, 0.5), class = b),
   prior(exponential(10), class = sd, group = receiver_id),
   prior(exponential(10), class = sd, group = qb_id),
-  prior(exponential(5), class = sd, group = qb_wr_pair),  # Chemistry effect
+  prior(exponential(5), class = sd, group = qb_wr_pair), # Chemistry effect
   prior(exponential(20), class = sd, group = team),
   prior(exponential(20), class = sd, group = opponent),
   prior(exponential(20), class = sd, group = position_season),
@@ -298,7 +298,7 @@ ratings_df <- tibble(
 
   # Predictions in YARDS (exp of log predictions)
   rating_mean = exp(colMeans(predictions)),
-  rating_sd = exp(colMeans(predictions)) * apply(predictions, 2, sd),  # Delta method approx
+  rating_sd = exp(colMeans(predictions)) * apply(predictions, 2, sd), # Delta method approx
   rating_q05 = apply(predictions, 2, function(x) exp(quantile(x, 0.05))),
   rating_q50 = apply(predictions, 2, function(x) exp(quantile(x, 0.50))),
   rating_q95 = apply(predictions, 2, function(x) exp(quantile(x, 0.95))),
@@ -338,8 +338,8 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'rec
 cat("Deleted old ratings\n")
 
 # Insert new ratings (including qb_id for chemistry tracking)
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
   sql <- glue("
     INSERT INTO mart.bayesian_player_ratings (
@@ -360,7 +360,7 @@ for(i in 1:nrow(ratings_df)) {
 
   dbExecute(conn, sql)
 
-  if(i %% 20 == 0) {
+  if (i %% 20 == 0) {
     cat(glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
   }
 }
@@ -381,9 +381,9 @@ dbDisconnect(conn)
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ PIPELINE COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Summary:\n")
 cat(glue("  - Model: {model_path}\n"))

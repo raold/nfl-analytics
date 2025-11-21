@@ -17,7 +17,7 @@
 #   targets::tar_make_future()   # Run with parallel workers
 
 library(targets)
-library(tarchetypes)  # Additional target factories
+library(tarchetypes) # Additional target factories
 
 # Set options
 tar_option_set(
@@ -25,10 +25,10 @@ tar_option_set(
     "dplyr", "tidyr", "DBI", "RPostgres", "nflverse",
     "brms", "loo", "slider", "furrr", "future"
   ),
-  format = "qs",  # Fast serialization format
-  memory = "transient",  # Free memory after each target
+  format = "qs", # Fast serialization format
+  memory = "transient", # Free memory after each target
   garbage_collection = TRUE,
-  error = "continue"  # Continue after errors
+  error = "continue" # Continue after errors
 )
 
 # Enable parallel processing
@@ -55,7 +55,6 @@ list(
     },
     deployment = "main"
   ),
-
   tar_target(
     name = games_raw,
     command = {
@@ -71,7 +70,6 @@ list(
       DBI::dbGetQuery(db_connection, query) |> dplyr::as_tibble()
     }
   ),
-
   tar_target(
     name = plays_raw,
     command = {
@@ -102,7 +100,6 @@ list(
         )
     }
   ),
-
   tar_target(
     name = games_with_epa,
     command = {
@@ -111,17 +108,16 @@ list(
           team_epa_aggregates |> dplyr::rename(home_team = posteam),
           by = c("game_id", "home_team")
         ) |>
-        dplyr::rename_with(~paste0("home_", .x), .cols = c(epa_total:plays)) |>
+        dplyr::rename_with(~ paste0("home_", .x), .cols = c(epa_total:plays)) |>
         dplyr::left_join(
           team_epa_aggregates |>
-dplyr::rename(away_team = posteam),
+            dplyr::rename(away_team = posteam),
           by = c("game_id", "away_team")
         ) |>
-        dplyr::rename_with(~paste0("away_", .x), .cols = c(epa_total:plays)) |>
+        dplyr::rename_with(~ paste0("away_", .x), .cols = c(epa_total:plays)) |>
         dplyr::mutate(home_margin = home_score - away_score)
     }
   ),
-
   tar_target(
     name = rolling_team_stats,
     command = {
@@ -141,7 +137,6 @@ dplyr::rename(away_team = posteam),
       )
     }
   ),
-
   tar_target(
     name = glm_diagnostics,
     command = {
@@ -164,23 +159,20 @@ dplyr::rename(away_team = posteam),
         cores = 4
       )
     },
-    deployment = "main"  # Run on main process (Stan doesn't parallelize well)
+    deployment = "main" # Run on main process (Stan doesn't parallelize well)
   ),
-
   tar_target(
     name = brms_team_ratings,
     command = {
       extract_team_ratings(brms_basic_model, model_type = "basic")
     }
   ),
-
   tar_target(
     name = brms_loo_cv,
     command = {
       loo::loo(brms_basic_model)
     }
   ),
-
   tar_target(
     name = brms_full_model,
     command = {
@@ -193,7 +185,6 @@ dplyr::rename(away_team = posteam),
     },
     deployment = "main"
   ),
-
   tar_target(
     name = brms_attack_defense_ratings,
     command = {
@@ -217,12 +208,17 @@ dplyr::rename(away_team = posteam),
   tar_target(
     name = ratings_plot,
     command = {
-      ggplot2::ggplot(brms_team_ratings,
-                     ggplot2::aes(x = reorder(team, rating_mean),
-                                 y = rating_mean)) +
+      ggplot2::ggplot(
+        brms_team_ratings,
+        ggplot2::aes(
+          x = reorder(team, rating_mean),
+          y = rating_mean
+        )
+      ) +
         ggplot2::geom_point(size = 3) +
         ggplot2::geom_errorbar(ggplot2::aes(ymin = rating_q05, ymax = rating_q95),
-                              width = 0.2) +
+          width = 0.2
+        ) +
         ggplot2::coord_flip() +
         ggplot2::labs(
           title = "Bayesian Team Ratings (2015-2024)",
@@ -233,7 +229,6 @@ dplyr::rename(away_team = posteam),
         ggplot2::theme_minimal()
     }
   ),
-
   tar_target(
     name = save_ratings_plot,
     command = {
@@ -248,7 +243,6 @@ dplyr::rename(away_team = posteam),
     },
     format = "file"
   ),
-
   tar_target(
     name = write_ratings_to_db,
     command = {
@@ -312,7 +306,6 @@ dplyr::rename(away_team = posteam),
       )
     }
   ),
-
   tar_target(
     name = print_summary,
     command = {
@@ -326,9 +319,11 @@ dplyr::rename(away_team = posteam),
       cat(sprintf("  GLM RMSE:         %.2f points\n", pipeline_summary$glm_rmse))
       cat(sprintf("  BRMS LOO ELPD:    %.1f\n", pipeline_summary$brms_elpd))
       cat(sprintf("  Holdout RMSE:     %.2f points\n", pipeline_summary$holdout_rmse))
-      cat(sprintf("\nTop Rated Team:     %s (%.2f points)\n",
-                  pipeline_summary$top_team,
-                  pipeline_summary$top_rating))
+      cat(sprintf(
+        "\nTop Rated Team:     %s (%.2f points)\n",
+        pipeline_summary$top_team,
+        pipeline_summary$top_rating
+      ))
       cat(sprintf("\nCompleted:          %s\n", pipeline_summary$pipeline_completed_at))
       cat("═══════════════════════════════════════════════════════════\n\n")
       invisible(pipeline_summary)

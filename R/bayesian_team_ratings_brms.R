@@ -15,10 +15,10 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(DBI)
   library(RPostgres)
-  library(brms)        # Bayesian regression models via Stan
-  library(loo)         # Leave-one-out cross-validation
-  library(posterior)   # Posterior analysis
-  library(bayesplot)   # Bayesian diagnostics
+  library(brms) # Bayesian regression models via Stan
+  library(loo) # Leave-one-out cross-validation
+  library(posterior) # Posterior analysis
+  library(bayesplot) # Bayesian diagnostics
 })
 
 #' Fetch games data with EPA aggregates for modeling
@@ -72,11 +72,13 @@ prepare_brms_data <- function(games_df) {
   # Create time index (rescaled for numerical stability)
   games_df <- games_df |>
     mutate(
-      time_idx = (season - min(season)) * 20 + week,  # Unique time index
+      time_idx = (season - min(season)) * 20 + week, # Unique time index
       time_scaled = (time_idx - mean(time_idx)) / sd(time_idx),
-      era = cut(season, breaks = c(2014, 2017, 2020, 2025),
-                labels = c("2015-2017", "2018-2020", "2021+")),
-      home_adv = 1  # Home advantage indicator
+      era = cut(season,
+        breaks = c(2014, 2017, 2020, 2025),
+        labels = c("2015-2017", "2018-2020", "2021+")
+      ),
+      home_adv = 1 # Home advantage indicator
     )
 
   # Ensure factor levels for teams (required for random effects)
@@ -107,10 +109,10 @@ fit_brms_model_basic <- function(games_df, chains = 4, iter = 2000, cores = 4) {
 
   # Priors (weakly informative)
   priors <- c(
-    prior(normal(2.4, 2), class = Intercept),    # Home advantage ~2.4 points (empirical)
+    prior(normal(2.4, 2), class = Intercept), # Home advantage ~2.4 points (empirical)
     prior(normal(0, 1), class = b, coef = home_adv),
-    prior(exponential(0.1), class = sd),          # Team variation ~10 points
-    prior(exponential(1), class = sigma)          # Residual ~7-10 points
+    prior(exponential(0.1), class = sd), # Team variation ~10 points
+    prior(exponential(1), class = sigma) # Residual ~7-10 points
   )
 
   # Fit model with Stan
@@ -123,7 +125,7 @@ fit_brms_model_basic <- function(games_df, chains = 4, iter = 2000, cores = 4) {
     iter = iter,
     cores = cores,
     control = list(adapt_delta = 0.95),
-    backend = "cmdstanr",  # Use cmdstanr for better performance
+    backend = "cmdstanr", # Use cmdstanr for better performance
     refresh = 0
   )
 
@@ -140,7 +142,7 @@ fit_brms_model_timevarying <- function(games_df, chains = 4, iter = 2000, cores 
   # Formula with time-varying effects via GP
   formula <- bf(
     home_margin ~ 1 + home_adv +
-      (1 + time_scaled | home_team) +  # Random slopes over time
+      (1 + time_scaled | home_team) + # Random slopes over time
       (1 + time_scaled | away_team)
   )
 
@@ -148,7 +150,7 @@ fit_brms_model_timevarying <- function(games_df, chains = 4, iter = 2000, cores 
     prior(normal(2.4, 2), class = Intercept),
     prior(normal(0, 1), class = b),
     prior(exponential(0.1), class = sd),
-    prior(lkj(2), class = cor),  # Correlation between intercept and slope
+    prior(lkj(2), class = cor), # Correlation between intercept and slope
     prior(exponential(1), class = sigma)
   )
 
@@ -191,15 +193,15 @@ fit_brms_model_full <- function(games_df, chains = 4, iter = 2000, cores = 4) {
   # Formula: score with team attack + opponent defense
   formula <- bf(
     score ~ 1 + is_home +
-      (1 | team) +      # Team attack strength
-      (1 | opponent)     # Opponent defense strength
+      (1 | team) + # Team attack strength
+      (1 | opponent) # Opponent defense strength
   )
 
   priors <- c(
-    prior(normal(22, 5), class = Intercept),     # Mean score ~22 points
-    prior(normal(1.2, 1), class = b, coef = is_home),  # Home advantage
+    prior(normal(22, 5), class = Intercept), # Mean score ~22 points
+    prior(normal(1.2, 1), class = b, coef = is_home), # Home advantage
     prior(exponential(0.15), class = sd),
-    prior(exponential(0.5), class = sigma)       # Within-game variation
+    prior(exponential(0.5), class = sigma) # Within-game variation
   )
 
   fit <- brm(
@@ -250,7 +252,7 @@ extract_team_ratings <- function(fit, model_type = "basic") {
       attack_sd = team_attack[, "Est.Error"],
       defense_mean = team_defense[, "Estimate"],
       defense_sd = team_defense[, "Est.Error"],
-      rating_mean = attack_mean - defense_mean,  # Net rating
+      rating_mean = attack_mean - defense_mean, # Net rating
       rating_sd = sqrt(attack_sd^2 + defense_sd^2)
     )
   } else {
@@ -265,9 +267,9 @@ extract_team_ratings <- function(fit, model_type = "basic") {
 #' @param model One of: "basic", "timevarying", "full", "all"
 #' @return list(fit, ratings, loo, diagnostics)
 run_bayesian_ratings <- function(write_to_mart = FALSE,
-                                  model = c("basic", "timevarying", "full", "all"),
-                                  season_start = 2015,
-                                  season_end = 2024) {
+                                 model = c("basic", "timevarying", "full", "all"),
+                                 season_start = 2015,
+                                 season_end = 2024) {
   model <- match.arg(model)
 
   # Connect to database
@@ -356,9 +358,10 @@ run_bayesian_ratings <- function(write_to_mart = FALSE,
       )
 
     dbWriteTable(con,
-                 DBI::Id(schema = "mart", table = "bayesian_team_ratings"),
-                 to_write,
-                 row.names = FALSE)
+      DBI::Id(schema = "mart", table = "bayesian_team_ratings"),
+      to_write,
+      row.names = FALSE
+    )
 
     message("✓ Wrote ", nrow(to_write), " team ratings to database")
   }
@@ -396,21 +399,24 @@ if (!interactive()) {
   model_type <- ifelse(length(args) > 0, args[1], "basic")
   write_mart <- ifelse(length(args) > 1, as.logical(args[2]), FALSE)
 
-  tryCatch({
-    results <- run_bayesian_ratings(
-      write_to_mart = write_mart,
-      model = model_type,
-      season_start = 2015,
-      season_end = 2024
-    )
+  tryCatch(
+    {
+      results <- run_bayesian_ratings(
+        write_to_mart = write_mart,
+        model = model_type,
+        season_start = 2015,
+        season_end = 2024
+      )
 
-    if (!is.null(results$basic)) {
-      generate_diagnostics(results$basic$fit)
+      if (!is.null(results$basic)) {
+        generate_diagnostics(results$basic$fit)
+      }
+
+      message("\n✓ Bayesian rating analysis complete!")
+    },
+    error = function(e) {
+      message("ERROR: ", conditionMessage(e))
+      quit(status = 1)
     }
-
-    message("\n✓ Bayesian rating analysis complete!")
-  }, error = function(e) {
-    message("ERROR: ", conditionMessage(e))
-    quit(status = 1)
-  })
+  )
 }

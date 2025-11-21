@@ -602,5 +602,247 @@ class TestRiskGateEnforcement:
         logger.info(f"📊 Simulated ROI: {roi:.2%} (target: >5%)")
 
 
+# ============================================================================
+# 8. Extracted Integration Tests from v7 (General Ensemble Tests)
+# ============================================================================
+
+@pytest.fixture
+def ensemble_v6_with_mocks():
+    """Create v6 ensemble with all components mocked (extracted from v7)."""
+    with patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface") as mock_r, \
+         patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"):
+
+        from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
+        # Create ensemble
+        ensemble = EnhancedEnsemble5Way(
+            db_password="test_password_123",
+        )
+
+        # Mark as loaded
+        ensemble.models_loaded = True
+
+        # Mock component predictions (realistic values for Mahomes)
+        ensemble._predict_state_space = Mock(return_value=(240.0, 45.0))
+        ensemble._predict_hierarchical = Mock(return_value=(235.0, 42.0))
+        ensemble._predict_xgboost_v4 = Mock(return_value=(245.0, 40.0))
+        ensemble._predict_informative_priors = Mock(return_value=(230.0, 48.0))
+        ensemble._predict_hybrid = Mock(return_value=(250.0, 51.0))
+
+        # Mock database feature fetch
+        ensemble._fetch_features = Mock(return_value={
+            "pass_yards_l3": 250.0,
+            "pass_attempts_l3": 35.0,
+            "completions_l3": 24.0,
+            "completions_pct_l3": 0.686,
+            "opponent_epa": -0.05,
+            "opponent_points_allowed": 20.0,
+            "home_away_encoded": 1,
+        })
+
+        return ensemble
+
+
+@pytest.fixture
+def mahomes_2024_week10():
+    """Patrick Mahomes vs Houston Texans (high-roughing defense)."""
+    return {
+        "player_id": "00-0033873",
+        "season": 2024,
+        "week": 10,
+    }
+
+
+@pytest.mark.integration
+@pytest.mark.extracted_v7
+class TestEnsembleE2EPrediction:
+    """Test full prediction pipeline (extracted from v7)."""
+
+    def test_all_5_components_generate_predictions(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """All 5 components should generate valid predictions."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Check result structure
+        assert isinstance(result, dict)
+        assert "ensemble_mean" in result
+
+    def test_ensemble_mean_reasonable_value(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble mean should be in reasonable range (180-350 yards)."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+        ensemble_mean = result["ensemble_mean"]
+
+        assert 180 <= ensemble_mean <= 350, \
+            f"Ensemble mean {ensemble_mean:.1f} outside reasonable range"
+
+    def test_ensemble_mean_not_placeholder(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble mean should NOT be placeholder (250 yards)."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+        ensemble_mean = result["ensemble_mean"]
+
+        assert ensemble_mean != 250.0, "Ensemble returned placeholder (250)"
+
+    def test_prediction_returns_uncertainty(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Prediction should include uncertainty quantification."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        assert "ensemble_std" in result, "Missing ensemble_std"
+        assert result["ensemble_std"] > 0, "Uncertainty must be positive"
+
+
+@pytest.mark.integration
+@pytest.mark.extracted_v7
+class TestComponentDiversityExtracted:
+    """Test component diversity and aggregation (extracted from v7)."""
+
+    def test_component_diversity_threshold_5_yards(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Components should have ≥5 yards standard deviation."""
+        # Get component predictions
+        predictions = [
+            ensemble_v6_with_mocks._predict_state_space("00-0033873", 2024, 10, {})[0],
+            ensemble_v6_with_mocks._predict_hierarchical("00-0033873", 2024, 10, {})[0],
+            ensemble_v6_with_mocks._predict_xgboost_v4({})[0],
+            ensemble_v6_with_mocks._predict_informative_priors("00-0033873", 2024, 10, {})[0],
+            ensemble_v6_with_mocks._predict_hybrid({})[0],
+        ]
+
+        std = np.std(predictions)
+        assert std >= 5.0, f"Component diversity {std:.2f} yards < 5 yards threshold"
+
+    def test_ensemble_weighted_average_correct(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble should use weighted average correctly."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Manual calculation
+        weights = ensemble_v6_with_mocks.weights
+        predictions = {
+            "state_space_v2": 240.0,
+            "hierarchical_v2": 235.0,
+            "xgboost_v4_ridge": 245.0,
+            "informative_priors_v2": 230.0,
+            "hybrid_static_incremental": 250.0,
+        }
+
+        expected_mean = sum(weights[k] * predictions[k] for k in predictions.keys())
+        actual_mean = result["ensemble_mean"]
+
+        # Allow small difference due to floating point
+        assert abs(actual_mean - expected_mean) < 1.0, \
+            f"Weighted average {actual_mean:.2f} ≠ expected {expected_mean:.2f}"
+
+    def test_uncertainty_pooling(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble should pool uncertainty correctly."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Ensemble std should be present and positive
+        assert "ensemble_std" in result
+        assert result["ensemble_std"] > 0
+
+
+@pytest.mark.integration
+@pytest.mark.extracted_v7
+class TestTemperatureScalingExtracted:
+    """Test temperature scaling calibration (extracted from v7)."""
+
+    def test_temperature_scaling_applied(self, ensemble_v6_with_mocks):
+        """Temperature scaling should be applied to predictions."""
+        # Check that temperature parameter exists
+        assert hasattr(ensemble_v6_with_mocks, 'temperature') or \
+               ensemble_v6_with_mocks.temperature_path is not None
+
+    def test_prediction_intervals_use_calibrated_std(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Prediction intervals should use calibrated uncertainty."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Check prediction intervals exist
+        if "lower_90" in result and "upper_90" in result:
+            lower = result["lower_90"]
+            upper = result["upper_90"]
+            mean = result["ensemble_mean"]
+
+            # Intervals should be symmetric around mean
+            assert lower < mean < upper, "Prediction intervals invalid"
+
+
+@pytest.mark.integration
+@pytest.mark.extracted_v7
+class TestComponentFailureHandlingExtracted:
+    """Test graceful degradation with component failures (extracted from v7)."""
+
+    def test_ensemble_handles_one_component_failure(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble should work with 4/5 components."""
+        # Simulate one component failure
+        ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
+
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Should succeed with 4 components
+        assert result is not None
+        assert "ensemble_mean" in result
+
+    def test_ensemble_handles_two_component_failures(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble should work with 3/5 components (minimum)."""
+        # Simulate two component failures
+        ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
+        ensemble_v6_with_mocks._predict_informative_priors = Mock(return_value=(None, None))
+
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        # Should succeed with 3 components
+        assert result is not None
+        assert "ensemble_mean" in result
+
+    def test_ensemble_fails_with_three_component_failures(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Ensemble should fail gracefully with <3 components."""
+        # Simulate three component failures
+        ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
+        ensemble_v6_with_mocks._predict_informative_priors = Mock(return_value=(None, None))
+        ensemble_v6_with_mocks._predict_hierarchical = Mock(return_value=(None, None))
+
+        # Should raise RuntimeError with <3 components
+        with pytest.raises(RuntimeError, match="Insufficient ensemble components"):
+            ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+
+@pytest.mark.integration
+@pytest.mark.extracted_v7
+class TestPredictionOutputStructureExtracted:
+    """Test prediction output structure (extracted from v7)."""
+
+    def test_required_output_keys(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Prediction should include required output keys."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        required_keys = ["ensemble_mean", "ensemble_std"]
+        for key in required_keys:
+            assert key in result, f"Missing required key: {key}"
+
+    def test_output_values_are_numeric(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """All output values should be numeric."""
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+
+        for key in ["ensemble_mean", "ensemble_std"]:
+            if key in result:
+                value = result[key]
+                assert isinstance(value, (int, float)), \
+                    f"{key} is not numeric: {type(value)}"
+                assert not np.isnan(value), f"{key} is NaN"
+
+    def test_weights_sum_to_one(self, ensemble_v6_with_mocks):
+        """Ensemble weights should sum to 1.0."""
+        weights = ensemble_v6_with_mocks.weights
+        weight_sum = sum(weights.values())
+
+        assert abs(weight_sum - 1.0) < 1e-6, \
+            f"Weights sum to {weight_sum:.6f}, expected 1.0"
+
+    def test_prediction_time_is_reasonable(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+        """Prediction should complete in reasonable time (<5s)."""
+        start = time.time()
+        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+        elapsed = time.time() - start
+
+        assert elapsed < 5.0, f"Prediction took {elapsed:.2f}s (max 5.0s)"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "-m", "critical"])

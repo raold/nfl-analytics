@@ -83,25 +83,25 @@ CANONICAL_COLUMNS <- c(
   # ============================================================
 
   # Props outcomes (direct betting targets, not yards_gained proxy)
-  "passing_yards",    # Net passing yards (excludes sacks)
-  "receiving_yards",  # Receiving yards (not yards_gained)
-  "rushing_yards",    # Rushing yards (not yards_gained)
-  "return_yards",     # Return yards (punt/kickoff)
+  "passing_yards", # Net passing yards (excludes sacks)
+  "receiving_yards", # Receiving yards (not yards_gained)
+  "rushing_yards", # Rushing yards (not yards_gained)
+  "return_yards", # Return yards (punt/kickoff)
 
   # Advanced EPA (QB vs receiver separation)
-  "qb_epa",              # QB EPA at throw (before YAC)
-  "xyac_epa",            # Expected yards after catch EPA
-  "xyac_mean_yardage",   # Mean expected YAC
+  "qb_epa", # QB EPA at throw (before YAC)
+  "xyac_epa", # Expected yards after catch EPA
+  "xyac_mean_yardage", # Mean expected YAC
   "xyac_median_yardage", # Median expected YAC
-  "xyac_success",        # Binary YAC success
-  "xyac_fd",             # YAC resulted in first down
+  "xyac_success", # Binary YAC success
+  "xyac_fd", # YAC resulted in first down
 
   # Play validity & context
-  "aborted_play",      # Play aborted (exclude from stats)
-  "out_of_bounds",     # Clock management context
-  "order_sequence",    # Play number within drive
-  "play_type_nfl",     # NFL official play categorization
-  "tackled_for_loss",  # Defensive disruption
+  "aborted_play", # Play aborted (exclude from stats)
+  "out_of_bounds", # Clock management context
+  "order_sequence", # Play number within drive
+  "play_type_nfl", # NFL official play categorization
+  "tackled_for_loss", # Defensive disruption
 
   # ============================================================
   # PHASE 2: DEFENSIVE & PLAYER TRACKING (Migration 028 - Nov 7 2025)
@@ -257,83 +257,88 @@ con <- get_db_connection()
 for (season in START_SEASON:END_SEASON) {
   cat(sprintf("\n[%s] Processing season %d...\n", Sys.time(), season))
 
-  tryCatch({
-    # Load play-by-play from nflreadr
-    cat(sprintf("  Loading data from nflreadr... "))
-    pbp_raw <- nflreadr::load_pbp(season)
-    cat(sprintf("loaded %d plays\n", nrow(pbp_raw)))
+  tryCatch(
+    {
+      # Load play-by-play from nflreadr
+      cat(sprintf("  Loading data from nflreadr... "))
+      pbp_raw <- nflreadr::load_pbp(season)
+      cat(sprintf("loaded %d plays\n", nrow(pbp_raw)))
 
-    # Select only canonical columns
-    pbp_clean <- pbp_raw %>%
-      select(any_of(CANONICAL_COLUMNS))
+      # Select only canonical columns
+      pbp_clean <- pbp_raw %>%
+        select(any_of(CANONICAL_COLUMNS))
 
-    cat(sprintf("  Selected %d columns from nflreadr\n", ncol(pbp_clean)))
+      cat(sprintf("  Selected %d columns from nflreadr\n", ncol(pbp_clean)))
 
-    # Boolean type conversion for Phases 1-5
-    boolean_cols <- c(
-      # Phase 1
-      "xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss",
-      # Phase 2
-      "rush_attempt", "pass_attempt", "field_goal_attempt", "punt_attempt", "kickoff_attempt",
-      # Phase 3
-      "drive_inside20", "drive_ended_with_score",
-      # Phase 4
-      "fumble_forced", "safety", "punt_blocked", "first_down_penalty",
-      # Phase 5
-      "div_game", "punt_inside_twenty", "punt_in_endzone", "punt_out_of_bounds",
-      "punt_downed", "punt_fair_catch", "kickoff_inside_twenty", "kickoff_in_endzone",
-      "kickoff_out_of_bounds", "kickoff_downed", "kickoff_fair_catch",
-      "tackle_with_assist", "timeout", "replay_or_challenge",
-      "touchback", "own_kickoff_recovery", "own_kickoff_recovery_td",
-      "return_touchdown", "third_down_failed", "fourth_down_failed"
-    )
-    for (col in boolean_cols) {
-      if (col %in% names(pbp_clean) && !is.logical(pbp_clean[[col]])) {
-        pbp_clean[[col]] <- as.logical(pbp_clean[[col]])
+      # Boolean type conversion for Phases 1-5
+      boolean_cols <- c(
+        # Phase 1
+        "xyac_success", "xyac_fd", "aborted_play", "out_of_bounds", "tackled_for_loss",
+        # Phase 2
+        "rush_attempt", "pass_attempt", "field_goal_attempt", "punt_attempt", "kickoff_attempt",
+        # Phase 3
+        "drive_inside20", "drive_ended_with_score",
+        # Phase 4
+        "fumble_forced", "safety", "punt_blocked", "first_down_penalty",
+        # Phase 5
+        "div_game", "punt_inside_twenty", "punt_in_endzone", "punt_out_of_bounds",
+        "punt_downed", "punt_fair_catch", "kickoff_inside_twenty", "kickoff_in_endzone",
+        "kickoff_out_of_bounds", "kickoff_downed", "kickoff_fair_catch",
+        "tackle_with_assist", "timeout", "replay_or_challenge",
+        "touchback", "own_kickoff_recovery", "own_kickoff_recovery_td",
+        "return_touchdown", "third_down_failed", "fourth_down_failed"
+      )
+      for (col in boolean_cols) {
+        if (col %in% names(pbp_clean) && !is.logical(pbp_clean[[col]])) {
+          pbp_clean[[col]] <- as.logical(pbp_clean[[col]])
+        }
       }
-    }
 
-    # Integer type conversion for Phases 1-5
-    integer_cols <- c(
-      # Phase 1
-      "order_sequence",
-      # Phase 3
-      "drive_play_count", "drive_first_downs", "drive_yards_penalized",
-      "temp", "wind",
-      # Phase 4: No integer columns in Phase 4
-      # Phase 5
-      "week", "home_timeouts_remaining", "away_timeouts_remaining",
-      "posteam_timeouts_remaining", "defteam_timeouts_remaining",
-      "play_clock", "quarter_seconds_remaining",
-      "drive_quarter_start", "drive_quarter_end"
-    )
-    for (col in integer_cols) {
-      if (col %in% names(pbp_clean) && !is.integer(pbp_clean[[col]])) {
-        pbp_clean[[col]] <- as.integer(pbp_clean[[col]])
+      # Integer type conversion for Phases 1-5
+      integer_cols <- c(
+        # Phase 1
+        "order_sequence",
+        # Phase 3
+        "drive_play_count", "drive_first_downs", "drive_yards_penalized",
+        "temp", "wind",
+        # Phase 4: No integer columns in Phase 4
+        # Phase 5
+        "week", "home_timeouts_remaining", "away_timeouts_remaining",
+        "posteam_timeouts_remaining", "defteam_timeouts_remaining",
+        "play_clock", "quarter_seconds_remaining",
+        "drive_quarter_start", "drive_quarter_end"
+      )
+      for (col in integer_cols) {
+        if (col %in% names(pbp_clean) && !is.integer(pbp_clean[[col]])) {
+          pbp_clean[[col]] <- as.integer(pbp_clean[[col]])
+        }
       }
-    }
 
-    # Delete existing plays for this season
-    deleted_count <- dbExecute(con,
-      sprintf("DELETE FROM plays WHERE game_id LIKE '%s_%%'", as.character(season)))
-    cat(sprintf("  Deleted %d existing plays\n", deleted_count))
+      # Delete existing plays for this season
+      deleted_count <- dbExecute(
+        con,
+        sprintf("DELETE FROM plays WHERE game_id LIKE '%s_%%'", as.character(season))
+      )
+      cat(sprintf("  Deleted %d existing plays\n", deleted_count))
 
-    # Insert new plays in batches of 10,000
-    batch_size <- 10000
-    num_batches <- ceiling(nrow(pbp_clean) / batch_size)
+      # Insert new plays in batches of 10,000
+      batch_size <- 10000
+      num_batches <- ceiling(nrow(pbp_clean) / batch_size)
 
-    for (batch_idx in 1:num_batches) {
-      start_row <- (batch_idx - 1) * batch_size + 1
-      end_row <- min(batch_idx * batch_size, nrow(pbp_clean))
-      batch_data <- pbp_clean[start_row:end_row, ]
+      for (batch_idx in 1:num_batches) {
+        start_row <- (batch_idx - 1) * batch_size + 1
+        end_row <- min(batch_idx * batch_size, nrow(pbp_clean))
+        batch_data <- pbp_clean[start_row:end_row, ]
 
-      dbWriteTable(con, "plays", batch_data, append = TRUE, row.names = FALSE)
-      cat(sprintf("  Inserted batch %d/%d (%d-%d of %d plays)\n",
-                  batch_idx, num_batches, start_row, end_row, nrow(pbp_clean)))
-    }
+        dbWriteTable(con, "plays", batch_data, append = TRUE, row.names = FALSE)
+        cat(sprintf(
+          "  Inserted batch %d/%d (%d-%d of %d plays)\n",
+          batch_idx, num_batches, start_row, end_row, nrow(pbp_clean)
+        ))
+      }
 
-    # Validate Phase 1-3 column population
-    validation_query <- sprintf("
+      # Validate Phase 1-3 column population
+      validation_query <- sprintf("
       SELECT
         COUNT(*) as total,
         COUNT(passing_yards) as has_passing,
@@ -345,14 +350,17 @@ for (season in START_SEASON:END_SEASON) {
       WHERE game_id LIKE '%s_%%'
     ", as.character(season))
 
-    validation <- dbGetQuery(con, validation_query)
-    cat(sprintf("  ✓ Season %d complete: %d plays, %.1f%% passing, %d tackles, %d weather\n",
-                season, as.integer(validation$total), validation$pct_passing,
-                as.integer(validation$has_tackle), as.integer(validation$has_weather)))
-
-  }, error = function(e) {
-    cat(sprintf("  ✗ ERROR in season %d: %s\n", season, e$message))
-  })
+      validation <- dbGetQuery(con, validation_query)
+      cat(sprintf(
+        "  ✓ Season %d complete: %d plays, %.1f%% passing, %d tackles, %d weather\n",
+        season, as.integer(validation$total), validation$pct_passing,
+        as.integer(validation$has_tackle), as.integer(validation$has_weather)
+      ))
+    },
+    error = function(e) {
+      cat(sprintf("  ✗ ERROR in season %d: %s\n", season, e$message))
+    }
+  )
 }
 
 # Final validation across all seasons

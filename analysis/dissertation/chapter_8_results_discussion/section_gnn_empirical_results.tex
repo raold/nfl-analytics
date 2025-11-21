@@ -60,7 +60,7 @@ For production deployment, we recommend \textbf{ensemble methods} combining XGBo
 \subsection{Ablation Study: Architectural Component Analysis}
 \label{subsec:gnn_ablation_analysis}
 
-Our comprehensive ablation study (Section~\ref{sec:gnn_ablation}) revealed three counterintuitive findings that challenge conventional GNN wisdom:
+Our comprehensive ablation study (Section~\ref{subsec:gnn_ablation_analysis}) revealed three counterintuitive findings that challenge conventional GNN wisdom:
 
 \paragraph{Finding 1: Fewer Message Rounds Improve Generalization}
 
@@ -266,7 +266,8 @@ Deep Neural Network \citep{beal2020neural} & 2020 & 0.63 & 0.22 & 30 stats \\
 Several limitations constrain the generalizability of our GNN findings:
 
 \begin{enumerate}[noitemsep]
-    \item \textbf{PyTorch MPS Backend Bug}: Tensor corruption during CPU→MPS device transfer forced CPU-only training, preventing GPU acceleration and ensemble experiments. We confirmed the bug affects edge index tensors specifically (see Appendix~\ref{app:mps_bug_details}).
+    \item \textbf{PyTorch MPS Backend Bug}: Tensor corruption during CPU→MPS device transfer forced CPU-only training, preventing GPU acceleration and ensemble experiments. We confirmed the bug affects edge index tensors specifically.
+    % TODO: Add Appendix on MPS bug details (app:mps_bug_details)
 
     \item \textbf{Limited Temporal Modeling}: Current GNN operates on static game-day rosters, ignoring player form, recent performance, and injury status. Temporal graph networks could capture momentum effects.
 

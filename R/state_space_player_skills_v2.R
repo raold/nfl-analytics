@@ -11,14 +11,14 @@
 library(DBI)
 library(RPostgres)
 library(tidyverse)
-library(dlm)  # Dynamic Linear Models with Kalman filtering
+library(dlm) # Dynamic Linear Models with Kalman filtering
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("STATE-SPACE DYNAMIC PLAYER SKILL TRACKING v2.0\n")
 cat("Using Kalman filter with dlm package\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -116,7 +116,7 @@ apply_kalman_filter <- function(player_data) {
 
   # System variance (skill evolution rate)
   # Lower W = smoother trajectories, Higher W = more responsive
-  W <- V * 0.1  # 10% of observation variance
+  W <- V * 0.1 # 10% of observation variance
 
   # Build DLM
   mod <- dlmModPoly(order = 1, dV = V, dW = W)
@@ -125,11 +125,11 @@ apply_kalman_filter <- function(player_data) {
   filtered <- dlmFilter(player_data$log_yards, mod)
 
   # Extract filtered state (skill level at each time point)
-  player_data$dynamic_skill <- as.vector(filtered$m[-1])  # Drop initial value
+  player_data$dynamic_skill <- as.vector(filtered$m[-1]) # Drop initial value
 
   # Extract state standard deviation (uncertainty)
   state_vars <- dlmSvd2var(filtered$U.C, filtered$D.C)
-  player_data$skill_sd <- sqrt(sapply(state_vars[-1], function(x) x[1,1]))
+  player_data$skill_sd <- sqrt(sapply(state_vars[-1], function(x) x[1, 1]))
 
   return(player_data)
 }
@@ -250,7 +250,7 @@ ratings_df <- recent_skills %>%
     # Convert log-space skill to yards prediction
     # E[yards] = exp(skill + 0.5*var) for lognormal
     rating_mean = exp(dynamic_skill + 0.5 * skill_sd^2),
-    rating_sd = rating_mean * skill_sd,  # Delta method approximation
+    rating_sd = rating_mean * skill_sd, # Delta method approximation
 
     # Quantiles (approximate)
     rating_q05 = exp(dynamic_skill - 1.645 * skill_sd),
@@ -285,11 +285,12 @@ cat("Deleted old state-space ratings\n")
 
 # Insert new ratings
 n_inserted <- 0
-for(i in 1:nrow(ratings_df)) {
-  row <- ratings_df[i,]
+for (i in 1:nrow(ratings_df)) {
+  row <- ratings_df[i, ]
 
-  tryCatch({
-    sql <- glue::glue("
+  tryCatch(
+    {
+      sql <- glue::glue("
       INSERT INTO mart.bayesian_player_ratings (
         player_id, stat_type, season, model_version,
         rating_mean, rating_sd, rating_q05, rating_q50, rating_q95,
@@ -306,15 +307,17 @@ for(i in 1:nrow(ratings_df)) {
       )
     ")
 
-    dbExecute(conn, sql)
-    n_inserted <- n_inserted + 1
+      dbExecute(conn, sql)
+      n_inserted <- n_inserted + 1
 
-    if(i %% 20 == 0) {
-      cat(glue::glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
+      if (i %% 20 == 0) {
+        cat(glue::glue("  Inserted {i}/{nrow(ratings_df)} ratings\r"))
+      }
+    },
+    error = function(e) {
+      cat(glue::glue("\nWarning: Failed to insert player {row$player_id}: {e$message}\n"))
     }
-  }, error = function(e) {
-    cat(glue::glue("\nWarning: Failed to insert player {row$player_id}: {e$message}\n"))
-  })
+  )
 }
 
 cat(glue::glue("\n✓ Saved {n_inserted}/{nrow(ratings_df)} ratings to database\n\n"))
@@ -324,9 +327,9 @@ dbDisconnect(conn)
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ STATE-SPACE MODEL v2.0 COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Key Improvements over v1.0:\n")
 cat("  ✓ Proper Kalman filter (dlm package)\n")

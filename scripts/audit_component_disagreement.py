@@ -42,7 +42,7 @@ from scipy import stats
 from tqdm import tqdm
 
 # Import ensemble and feature extractors
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble6Way
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 from py.features.qb_experience_features import QBExperienceFeatures
 from py.features.roster_stability_features import RosterStabilityFeatures
 
@@ -87,8 +87,6 @@ def get_validation_games(seasons: List[int]) -> pd.DataFrame:
         pgs.player_display_name,
         pgs.season,
         pgs.week,
-        pgs.team,
-        pgs.opponent,
         pgs.stat_yards as actual_yards
     FROM mart.player_game_stats pgs
     WHERE pgs.season IN ({seasons_str})
@@ -185,7 +183,7 @@ class ContextFeatureExtractor:
 
 
 def collect_component_predictions(
-    ensemble: EnhancedEnsemble6Way, games_df: pd.DataFrame
+    ensemble: EnhancedEnsemble5Way, games_df: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Collect component-level predictions for all games.
@@ -412,7 +410,7 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
     print("Loading ensemble...")
     import os
 
-    ensemble = EnhancedEnsemble6Way(
+    ensemble = EnhancedEnsemble5Way(
         db_password=os.getenv("DB_PASSWORD", DB_CONFIG["password"])
     )
     print(f"✅ Ensemble loaded with weights: {ensemble.weights}")

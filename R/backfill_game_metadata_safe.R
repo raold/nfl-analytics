@@ -37,7 +37,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. ADD METADATA COLUMNS TO GAMES TABLE
     # ============================================================
@@ -77,13 +76,16 @@ safe_db_operation(
 
         columns_added <- 0
         for (col_def in new_columns) {
-          tryCatch({
-            dbExecute(conn, sprintf("ALTER TABLE games ADD COLUMN IF NOT EXISTS %s;", col_def))
-            columns_added <- columns_added + 1
-          }, error = function(e) {
-            # Column might already exist - not a critical error
-            log_message(sprintf("Column note: %s", e$message), level = "INFO")
-          })
+          tryCatch(
+            {
+              dbExecute(conn, sprintf("ALTER TABLE games ADD COLUMN IF NOT EXISTS %s;", col_def))
+              columns_added <- columns_added + 1
+            },
+            error = function(e) {
+              # Column might already exist - not a critical error
+              log_message(sprintf("Column note: %s", e$message), level = "INFO")
+            }
+          )
         }
 
         log_message(sprintf("Added/verified %d columns", columns_added), level = "INFO")
@@ -107,10 +109,14 @@ safe_db_operation(
           error_message = "Failed to load schedules from nflverse"
         )
 
-        log_message(sprintf("Loaded %d games from %d seasons",
-                           nrow(schedules),
-                           length(unique(schedules$season))),
-                   level = "INFO")
+        log_message(
+          sprintf(
+            "Loaded %d games from %d seasons",
+            nrow(schedules),
+            length(unique(schedules$season))
+          ),
+          level = "INFO"
+        )
 
         schedules
       },
@@ -119,7 +125,7 @@ safe_db_operation(
         validate_data(
           data = data,
           expected_cols = c("game_id", "season", "stadium"),
-          min_rows = 5000  # Should have many games across 26 seasons
+          min_rows = 5000 # Should have many games across 26 seasons
         )
       }
     )
@@ -143,7 +149,8 @@ safe_db_operation(
           filter(!is.na(game_id))
 
         log_message(sprintf("Preparing batch update for %d games", nrow(metadata_df)),
-                   level = "INFO")
+          level = "INFO"
+        )
 
         # Create temporary table for batch update
         temp_table_name <- paste0("temp_metadata_", format(Sys.time(), "%Y%m%d_%H%M%S"))
@@ -179,7 +186,8 @@ safe_db_operation(
 
         rows_updated <- dbExecute(conn, update_query)
         log_message(sprintf("Updated %d games with metadata in single batch", rows_updated),
-                   level = "INFO")
+          level = "INFO"
+        )
 
         # Clean up temp table
         dbExecute(conn, sprintf("DROP TABLE IF EXISTS %s", temp_table_name))
@@ -196,10 +204,14 @@ safe_db_operation(
         ")
 
         for (i in 1:nrow(season_summary)) {
-          log_message(sprintf("Season %.0f: %.0f games with metadata",
-                             season_summary$season[i],
-                             season_summary$games_with_stadium[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "Season %.0f: %.0f games with metadata",
+              season_summary$season[i],
+              season_summary$games_with_stadium[i]
+            ),
+            level = "INFO"
+          )
         }
 
         TRUE
@@ -337,11 +349,15 @@ safe_db_operation(
 
         log_message("=== Roof Type Distribution ===", level = "INFO")
         for (i in 1:nrow(roof_summary)) {
-          log_message(sprintf("  %s: %.0f games (%.1f%%)",
-                             roof_summary$roof[i],
-                             roof_summary$games[i],
-                             roof_summary$pct[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  %s: %.0f games (%.1f%%)",
+              roof_summary$roof[i],
+              roof_summary$games[i],
+              roof_summary$pct[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # Surface summary
@@ -358,10 +374,14 @@ safe_db_operation(
 
         log_message("=== Top 5 Surface Types ===", level = "INFO")
         for (i in 1:nrow(surface_summary)) {
-          log_message(sprintf("  %s: %.0f games",
-                             surface_summary$surface[i],
-                             surface_summary$games[i]),
-                     level = "INFO")
+          log_message(
+            sprintf(
+              "  %s: %.0f games",
+              surface_summary$surface[i],
+              surface_summary$games[i]
+            ),
+            level = "INFO"
+          )
         }
 
         # QB data coverage
@@ -375,11 +395,15 @@ safe_db_operation(
           FROM games
         ")
 
-        log_message(sprintf("QB Coverage: %.1f%% home, %.1f%% away (of %.0f games)",
-                           qb_summary$home_qb_pct,
-                           qb_summary$away_qb_pct,
-                           qb_summary$total_games),
-                   level = "INFO")
+        log_message(
+          sprintf(
+            "QB Coverage: %.1f%% home, %.1f%% away (of %.0f games)",
+            qb_summary$home_qb_pct,
+            qb_summary$away_qb_pct,
+            qb_summary$total_games
+          ),
+          level = "INFO"
+        )
 
         # Turnovers and penalties coverage
         stats_coverage <- dbGetQuery(conn, "
@@ -393,10 +417,14 @@ safe_db_operation(
           WHERE home_score IS NOT NULL
         ")
 
-        log_message(sprintf("Stats Coverage: %.1f%% turnovers, %.1f%% penalties",
-                           stats_coverage$turnover_pct,
-                           stats_coverage$penalty_pct),
-                   level = "INFO")
+        log_message(
+          sprintf(
+            "Stats Coverage: %.1f%% turnovers, %.1f%% penalties",
+            stats_coverage$turnover_pct,
+            stats_coverage$penalty_pct
+          ),
+          level = "INFO"
+        )
 
         TRUE
       },
@@ -424,10 +452,14 @@ safe_db_operation(
       alerts <- jsonlite::fromJSON(file.path(LOG_DIR, "alerts.json"), simplifyDataFrame = FALSE)
       unread_alerts <- sum(sapply(alerts, function(x) x$status == "unread"))
       if (unread_alerts > 0) {
-        log_message(sprintf("⚠️  %d unread alerts in %s",
-                           unread_alerts,
-                           file.path(LOG_DIR, "alerts.json")),
-                   level = "WARNING")
+        log_message(
+          sprintf(
+            "⚠️  %d unread alerts in %s",
+            unread_alerts,
+            file.path(LOG_DIR, "alerts.json")
+          ),
+          level = "WARNING"
+        )
       }
     }
   })

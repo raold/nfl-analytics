@@ -17,9 +17,9 @@ library(brms)
 
 set.seed(42)
 
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("ADVANCED PRIOR ELICITATION FOR BAYESIAN MODELING\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 # ============================================================================
 # 1. CONNECT TO DATABASE
@@ -230,7 +230,7 @@ model_informative <- brm(
   backend = "cmdstanr",
   control = list(adapt_delta = 0.95),
   seed = 42,
-  sample_prior = "yes"  # Enable prior predictive checks
+  sample_prior = "yes" # Enable prior predictive checks
 )
 
 # Prior predictive check
@@ -238,7 +238,7 @@ cat("\nGenerating prior predictive samples...\n")
 prior_samples <- prior_samples(model_informative)
 
 # Compare prior predictions to actual data
-prior_pred <- exp(rnorm(1000, mean = 5.5, sd = 0.3))  # Simplified
+prior_pred <- exp(rnorm(1000, mean = 5.5, sd = 0.3)) # Simplified
 
 cat("\nPrior Predictive Summary:\n")
 cat(sprintf("  Prior mean yards: %.1f\n", mean(prior_pred)))
@@ -263,14 +263,20 @@ cat(sprintf("✓ Model saved to %s\n", model_path))
 
 # Save prior specifications
 priors_df <- tibble(
-  parameter = c("intercept", "player_sd", "team_sd", "season_sd",
-                "log_attempts", "is_home", "is_bad_weather"),
-  distribution = c("normal", "normal", "normal", "normal",
-                   "normal", "normal", "normal"),
+  parameter = c(
+    "intercept", "player_sd", "team_sd", "season_sd",
+    "log_attempts", "is_home", "is_bad_weather"
+  ),
+  distribution = c(
+    "normal", "normal", "normal", "normal",
+    "normal", "normal", "normal"
+  ),
   param1 = c(5.5, 0.15, 0.08, 0.05, 1.0, 0.03, -0.08),
   param2 = c(0.3, 0.05, 0.03, 0.02, 0.2, 0.02, 0.04),
-  source = c("historical_mean", "empirical", "empirical", "empirical",
-             "historical_regression", "historical_regression", "historical_regression"),
+  source = c(
+    "historical_mean", "empirical", "empirical", "empirical",
+    "historical_regression", "historical_regression", "historical_regression"
+  ),
   interpretation = c(
     "Mean log yards ~5.5 (exp = 245 yards)",
     "Player skill varies by ~15% (log scale)",
@@ -296,16 +302,16 @@ dbDisconnect(conn)
 # ============================================================================
 # SUMMARY
 # ============================================================================
-cat(paste0(rep("=", 80), collapse=""), "\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n")
 cat("✅ ADVANCED PRIOR ELICITATION COMPLETE\n")
-cat(paste0(rep("=", 80), collapse=""), "\n\n")
+cat(paste0(rep("=", 80), collapse = ""), "\n\n")
 
 cat("Summary:\n")
 cat(sprintf("  - Historical data: %d games (2015-2019)\n", nrow(historical)))
 cat(sprintf("  - Current data: %d games (2020-2024)\n", nrow(current_data)))
-cat("  - Model: %s\n", model_path))
-cat("  - Prior specs: %s\n", prior_spec_path))
-cat("  - QB tiers: %s\n\n", tier_path))
+cat(sprintf("  - Model: %s\n", model_path))
+cat(sprintf("  - Prior specs: %s\n", prior_spec_path))
+cat(sprintf("  - QB tiers: %s\n\n", tier_path))
 
 cat("Key Innovations:\n")
 cat("  ✓ Empirical Bayes: Priors estimated from historical data\n")

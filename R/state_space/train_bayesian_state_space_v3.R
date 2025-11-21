@@ -41,13 +41,13 @@ DB_CONFIG <- list(
 )
 
 # Training configuration
-TRAIN_START_SEASON <- 2020  # Earlier start for more data
+TRAIN_START_SEASON <- 2020 # Earlier start for more data
 TRAIN_END_SEASON <- 2024
-MIN_GAMES_PER_PLAYER <- 10  # Require at least 10 games for state-space
+MIN_GAMES_PER_PLAYER <- 10 # Require at least 10 games for state-space
 
 # Prototype mode (for testing on subset)
 PROTOTYPE_MODE <- Sys.getenv("PROTOTYPE_MODE", "true") == "true"
-PROTOTYPE_N_QBS <- 10  # Train on 10 elite QBs in prototype mode
+PROTOTYPE_N_QBS <- 10 # Train on 10 elite QBs in prototype mode
 
 # Stan sampling configuration
 STAN_CONFIG <- list(
@@ -56,8 +56,8 @@ STAN_CONFIG <- list(
   iter_warmup = 1000,
   iter_sampling = 2000,
   seed = 42,
-  adapt_delta = 0.95,  # Higher adapt_delta for complex model
-  max_treedepth = 12   # Allow deeper trees
+  adapt_delta = 0.95, # Higher adapt_delta for complex model
+  max_treedepth = 12 # Allow deeper trees
 )
 
 # Position group mapping
@@ -150,8 +150,10 @@ cat(sprintf("  ✓ %d players with ≥%d games\n", nrow(games_per_player), MIN_G
 
 # Prototype mode: Select 10 elite QBs
 if (PROTOTYPE_MODE) {
-  elite_qbs <- c("Patrick Mahomes", "Josh Allen", "Lamar Jackson", "Joe Burrow", "Justin Herbert",
-                 "Matthew Stafford", "Tom Brady", "Aaron Rodgers", "Jared Goff", "Dak Prescott")
+  elite_qbs <- c(
+    "Patrick Mahomes", "Josh Allen", "Lamar Jackson", "Joe Burrow", "Justin Herbert",
+    "Matthew Stafford", "Tom Brady", "Aaron Rodgers", "Jared Goff", "Dak Prescott"
+  )
 
   games_per_player <- games_per_player %>%
     filter(player_name %in% elite_qbs)
@@ -163,8 +165,10 @@ if (PROTOTYPE_MODE) {
 player_games <- player_games %>%
   semi_join(games_per_player, by = "player_id")
 
-cat(sprintf("  ✓ Final dataset: %d games from %d players\n",
-            nrow(player_games), n_distinct(player_games$player_id)))
+cat(sprintf(
+  "  ✓ Final dataset: %d games from %d players\n",
+  nrow(player_games), n_distinct(player_games$player_id)
+))
 
 # ============================================================
 # STEP 3: PREPARE DATA FOR STAN (RAGGED ARRAY FORMAT)
@@ -183,7 +187,8 @@ player_index <- games_per_player %>%
 # Join player index
 player_games <- player_games %>%
   left_join(player_index %>% select(player_id, player_idx, position_group),
-            by = "player_id")
+    by = "player_id"
+  )
 
 # Get max games across all players
 T_max <- player_games %>%
@@ -233,7 +238,7 @@ stan_data <- list(
   N_players = N_players,
   T_max = T_max,
   N_positions = N_positions,
-  N_covariates = 2,  # attempts, home
+  N_covariates = 2, # attempts, home
   position_group = player_index$position_group,
   T_player = T_player,
   y = y_array,
@@ -286,7 +291,7 @@ fit <- model$sample(
   seed = STAN_CONFIG$seed,
   adapt_delta = STAN_CONFIG$adapt_delta,
   max_treedepth = STAN_CONFIG$max_treedepth,
-  refresh = 100  # Print progress every 100 iterations
+  refresh = 100 # Print progress every 100 iterations
 )
 
 end_time <- Sys.time()
@@ -447,7 +452,8 @@ diagnostics_file <- ifelse(
   "models/bayesian/state_space_diagnostics_v3_PROPER_BAYESIAN.txt"
 )
 
-diagnostics_text <- sprintf("
+diagnostics_text <- sprintf(
+  "
 Bayesian State-Space Model v3.0 Diagnostics
 ============================================
 
@@ -499,8 +505,10 @@ cat("SUMMARY\n")
 cat("======================================================================\n")
 cat(sprintf("✅ Model trained successfully in %.1f minutes\n", runtime))
 cat(sprintf("✅ Convergence: Rhat %.4f, ESS %.0f\n", max_rhat, min_ess))
-cat(sprintf("✅ Calibration: %.1f%% coverage, %.1f yard CI width\n",
-            coverage_90 * 100, median_ci_width))
+cat(sprintf(
+  "✅ Calibration: %.1f%% coverage, %.1f yard CI width\n",
+  coverage_90 * 100, median_ci_width
+))
 cat(sprintf("✅ Predictions exported: %s\n", output_file))
 
 if (PROTOTYPE_MODE) {

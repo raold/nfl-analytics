@@ -30,7 +30,6 @@ db_params <- list(
 safe_db_operation(
   db_params = db_params,
   expr = quote({
-
     # ============================================================
     # 1. INJURIES (2009-2025)
     # ============================================================
@@ -73,7 +72,7 @@ safe_db_operation(
             date_modified
           ) %>%
           filter(!is.na(season), !is.na(week), !is.na(gsis_id), !is.na(team)) %>%
-          distinct()  # Remove exact duplicates from source data
+          distinct() # Remove exact duplicates from source data
 
         dbExecute(conn, "CREATE TEMP TABLE injuries_staging AS SELECT * FROM injuries LIMIT 0")
         dbWriteTable(conn, "injuries_staging", injuries_clean, append = TRUE, row.names = FALSE)
@@ -114,7 +113,7 @@ safe_db_operation(
         log_message("Fetching officials from nflverse (2015-2025)...", level = "INFO")
 
         officials <- retry_operation(
-          expr = load_officials(seasons = 2015:2025),  # Officials data only available from 2015+
+          expr = load_officials(seasons = 2015:2025), # Officials data only available from 2015+
           max_attempts = 3,
           delay = 5,
           error_message = "Failed to load officials from nflverse"
@@ -304,8 +303,9 @@ safe_db_operation(
               parsed_date <- as.Date(date_of_birth, format = "%B %d, %Y")
               # Check if parsed successfully and year is reasonable (>= 1900)
               ifelse(is.na(parsed_date) | as.integer(format(parsed_date, "%Y")) < 1900,
-                     NA,
-                     as.character(parsed_date))
+                NA,
+                as.character(parsed_date)
+              )
             })
           ) %>%
           select(
@@ -466,7 +466,7 @@ safe_db_operation(
       step_name = "Upsert Draft Picks",
       expr = {
         drafts_clean <- drafts_data %>%
-          rename(to_season = to) %>%  # 'to' is reserved word in SQL
+          rename(to_season = to) %>% # 'to' is reserved word in SQL
           select(
             season, round, pick, team, gsis_id, pfr_player_id, cfb_player_id,
             pfr_player_name, hof, position, category, side, college, age, to_season,

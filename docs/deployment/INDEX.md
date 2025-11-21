@@ -31,6 +31,8 @@
 
 **Daily Use:** [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
 
+**Weekly Retraining:** [`RETRAINING_CHECKLIST.md`](RETRAINING_CHECKLIST.md) (NEW - Comprehensive guide)
+
 **Troubleshooting:** [`HEALTH_CHECK_PROCEDURES.md`](HEALTH_CHECK_PROCEDURES.md)
 
 ---
@@ -70,6 +72,7 @@ docs/deployment/
 │   └── DOCKER_DASHBOARD_COMPLETE.md                  ← Dashboard setup
 │
 └── SPECIALIZED DEPLOYMENT
+    ├── RETRAINING_CHECKLIST.md                       ← Weekly model retraining
     ├── HYBRID_XGBOOST_V1_CHECKLIST.md                ← Hybrid XGBoost
     ├── HYBRID_XGBOOST_V1_TRAINING.md                 ← Training guide
     └── FASTAPI_ENSEMBLE_V5_1_INTEGRATION.md          ← FastAPI integration
@@ -250,6 +253,42 @@ docs/deployment/
 **Use:** Infrastructure troubleshooting
 
 **When to use:** System health verification, debugging
+
+---
+
+### 5. Weekly Retraining Checklist **[NEW]**
+**File:** [`RETRAINING_CHECKLIST.md`](RETRAINING_CHECKLIST.md)
+**Length:** 3,000+ lines, 12 sections
+**Use:** Weekly model retraining without expert supervision
+
+**Contents:**
+1. **Overview** (Why retrain weekly, triggers, skill requirements, time estimates)
+2. **Pre-Retraining Checklist** (Docker services, database, disk space, backups)
+3. **Retraining Order** (5 models in dependency order with validation)
+4. **Validation Gates** (4 critical gates all models must pass)
+5. **Model Registration** (Database sync and verification)
+6. **Deployment Triggers** (Auto-deploy, manual review, rollback criteria)
+7. **Deployment Process** (8 steps with health checks)
+8. **Rollback Procedure** (Emergency recovery in 5-10 minutes)
+9. **Monitoring Post-Deployment** (24-48 hour intensive monitoring)
+10. **Troubleshooting Common Issues** (4 major issue categories)
+11. **Weekly Schedule Template** (Monday-Thursday detailed timeline)
+12. **Success Criteria** (Training, validation, deployment, monitoring)
+
+**Key Features:**
+- ✅ 5 model training scripts (State-Space v2, Hierarchical v2, Informative Priors v2, XGBoost v4, Temperature Scaler v6)
+- ✅ 4 validation gates (MCMC convergence, performance benchmarks, multi-season consistency, ensemble integration)
+- ✅ Auto-deploy criteria (>2 yards MAE improvement, no degradation)
+- ✅ Emergency rollback (5-10 minutes to previous models)
+- ✅ Complete troubleshooting (convergence failures, R integration errors, data leakage)
+
+**Time Estimate:**
+- **Monday:** 4-8 hours (mostly unattended training)
+- **Tuesday:** 3-4 hours (validation, deployment, monitoring)
+- **Wednesday-Thursday:** 30 minutes/day (monitoring)
+- **Total:** 6-8 hours per week
+
+**When to use:** Every Monday during NFL season OR when MAE degrades >10%
 
 ---
 

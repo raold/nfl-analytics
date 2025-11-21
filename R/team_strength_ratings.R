@@ -40,10 +40,10 @@ suppressPackageStartupMessages({
   library(tidyr)
   library(DBI)
   library(RPostgres)
-  library(brms)        # Bayesian regression models via Stan
-  library(posterior)   # Posterior analysis
-  library(bayesplot)   # Bayesian diagnostics
-  library(ggplot2)     # Visualization
+  library(brms) # Bayesian regression models via Stan
+  library(posterior) # Posterior analysis
+  library(bayesplot) # Bayesian diagnostics
+  library(ggplot2) # Visualization
 })
 
 # ========================================
@@ -123,8 +123,9 @@ prepare_brms_data <- function(games_df) {
     mutate(
       week_scaled = (week - mean(week)) / sd(week),
       spread_scaled = if_else(is.na(spread_close), 0,
-                              (spread_close - mean(spread_close, na.rm = TRUE)) /
-                              sd(spread_close, na.rm = TRUE))
+        (spread_close - mean(spread_close, na.rm = TRUE)) /
+          sd(spread_close, na.rm = TRUE)
+      )
     ) |>
     ungroup()
 
@@ -166,8 +167,10 @@ prepare_brms_data <- function(games_df) {
 #' @return brmsfit object
 fit_team_strength_model <- function(games_df, chains = 4, iter = 2000, cores = 4) {
   message("\nFitting hierarchical team strength model...")
-  message(sprintf("  MCMC: %d chains × %d iterations = %d samples",
-                  chains, iter, chains * iter))
+  message(sprintf(
+    "  MCMC: %d chains × %d iterations = %d samples",
+    chains, iter, chains * iter
+  ))
 
   # Formula: total points with team random effects
   # Home team and away team both contribute to total scoring
@@ -178,10 +181,10 @@ fit_team_strength_model <- function(games_df, chains = 4, iter = 2000, cores = 4
 
   # Priors (weakly informative)
   priors <- c(
-    prior(normal(45, 10), class = Intercept),  # Mean total ~45 points
-    prior(normal(0, 5), class = b),            # Spread/week effects
-    prior(exponential(0.2), class = sd),       # Team variation ~5 points
-    prior(exponential(0.1), class = sigma)     # Residual ~10 points
+    prior(normal(45, 10), class = Intercept), # Mean total ~45 points
+    prior(normal(0, 5), class = b), # Spread/week effects
+    prior(exponential(0.2), class = sd), # Team variation ~5 points
+    prior(exponential(0.1), class = sigma) # Residual ~10 points
   )
 
   # Fit model with Stan backend (faster than rstan)
@@ -195,7 +198,7 @@ fit_team_strength_model <- function(games_df, chains = 4, iter = 2000, cores = 4
     cores = cores,
     control = list(adapt_delta = 0.95),
     backend = "cmdstanr",
-    refresh = 100,  # Progress updates every 100 iterations
+    refresh = 100, # Progress updates every 100 iterations
     silent = 0
   )
 
@@ -229,15 +232,17 @@ fit_offense_defense_models <- function(games_df, chains = 4, iter = 2000, cores 
   games_long <- games_df |>
     # Home team perspective
     select(game_id, season, week, week_scaled, spread_scaled,
-           team = home_team, opponent = away_team,
-           points_scored = home_score, points_allowed = away_score) |>
+      team = home_team, opponent = away_team,
+      points_scored = home_score, points_allowed = away_score
+    ) |>
     mutate(location = "home") |>
     bind_rows(
       # Away team perspective
       games_df |>
         select(game_id, season, week, week_scaled, spread_scaled,
-               team = away_team, opponent = home_team,
-               points_scored = away_score, points_allowed = home_score) |>
+          team = away_team, opponent = home_team,
+          points_scored = away_score, points_allowed = home_score
+        ) |>
         mutate(location = "away")
     ) |>
     mutate(
@@ -252,8 +257,8 @@ fit_offense_defense_models <- function(games_df, chains = 4, iter = 2000, cores 
 
   offense_formula <- bf(
     points_scored ~ 1 + week_scaled +
-      (1 | team) +      # Team offensive ability
-      (1 | opponent)     # Opponent defensive ability (negative = better defense)
+      (1 | team) + # Team offensive ability
+      (1 | opponent) # Opponent defensive ability (negative = better defense)
   )
 
   offense_priors <- c(
@@ -284,8 +289,8 @@ fit_offense_defense_models <- function(games_df, chains = 4, iter = 2000, cores 
 
   defense_formula <- bf(
     points_allowed ~ 1 + week_scaled +
-      (1 | team) +      # Team defensive ability (negative = better defense)
-      (1 | opponent)     # Opponent offensive ability
+      (1 | team) + # Team defensive ability (negative = better defense)
+      (1 | opponent) # Opponent offensive ability
   )
 
   defense_priors <- c(
@@ -377,10 +382,12 @@ extract_team_ratings <- function(fit, games_df, by_season = TRUE) {
     ungroup() |>
     arrange(season, desc(net_strength))
 
-  message(sprintf("  Extracted ratings for %d teams × %d seasons = %d records",
-                  length(unique(ratings$team)),
-                  length(unique(ratings$season)),
-                  nrow(ratings)))
+  message(sprintf(
+    "  Extracted ratings for %d teams × %d seasons = %d records",
+    length(unique(ratings$team)),
+    length(unique(ratings$season)),
+    nrow(ratings)
+  ))
 
   ratings
 }
@@ -434,10 +441,12 @@ extract_offense_defense_ratings <- function(offense_fit, defense_fit, games_df) 
     ungroup() |>
     arrange(season, desc(net_strength))
 
-  message(sprintf("  Extracted ratings for %d teams × %d seasons = %d records",
-                  length(unique(ratings$team)),
-                  length(unique(ratings$season)),
-                  nrow(ratings)))
+  message(sprintf(
+    "  Extracted ratings for %d teams × %d seasons = %d records",
+    length(unique(ratings$team)),
+    length(unique(ratings$season)),
+    nrow(ratings)
+  ))
 
   ratings
 }
@@ -486,9 +495,11 @@ check_mcmc_diagnostics <- function(fit) {
     rhat_ok <- FALSE
   }
 
-  message(sprintf("  R-hat: max = %.4f (target: <1.01) %s",
-                  rhat_max,
-                  ifelse(rhat_ok, "✓", "✗ FAILED")))
+  message(sprintf(
+    "  R-hat: max = %.4f (target: <1.01) %s",
+    rhat_max,
+    ifelse(rhat_ok, "✓", "✗ FAILED")
+  ))
 
   # Effective sample size (check Bulk_ESS and Tail_ESS)
   if (!is.null(fit_summary$fixed)) {
@@ -510,12 +521,16 @@ check_mcmc_diagnostics <- function(fit) {
     ess_ok <- FALSE
   }
 
-  message(sprintf("  ESS (bulk): min = %.0f (target: >400) %s",
-                  ess_bulk_min,
-                  ifelse(ess_bulk_min > 400, "✓", "⚠ WARNING")))
-  message(sprintf("  ESS (tail): min = %.0f (target: >400) %s",
-                  ess_tail_min,
-                  ifelse(ess_tail_min > 400, "✓", "⚠ WARNING")))
+  message(sprintf(
+    "  ESS (bulk): min = %.0f (target: >400) %s",
+    ess_bulk_min,
+    ifelse(ess_bulk_min > 400, "✓", "⚠ WARNING")
+  ))
+  message(sprintf(
+    "  ESS (tail): min = %.0f (target: >400) %s",
+    ess_tail_min,
+    ifelse(ess_tail_min > 400, "✓", "⚠ WARNING")
+  ))
 
   # Divergent transitions (should be 0)
   np <- nuts_params(fit)
@@ -526,9 +541,11 @@ check_mcmc_diagnostics <- function(fit) {
   }
   div_ok <- divergences < 10
 
-  message(sprintf("  Divergences: %d (target: <10) %s",
-                  divergences,
-                  ifelse(div_ok, "✓", "⚠ WARNING")))
+  message(sprintf(
+    "  Divergences: %d (target: <10) %s",
+    divergences,
+    ifelse(div_ok, "✓", "⚠ WARNING")
+  ))
 
   # Overall convergence check
   convergence_ok <- rhat_ok && ess_ok && div_ok
@@ -559,34 +576,37 @@ generate_diagnostic_plots <- function(fit, output_dir = "models/team_strength") 
 
   message(sprintf("\nGenerating diagnostic plots (output: %s)...", output_dir))
 
-  tryCatch({
-    # Posterior predictive check (most important)
-    pp_file <- file.path(output_dir, "posterior_predictive_check.png")
-    png(pp_file, width = 1000, height = 600)
-    print(pp_check(fit, ndraws = 100))
-    dev.off()
-    message(sprintf("  ✓ Posterior predictive check: %s", pp_file))
+  tryCatch(
+    {
+      # Posterior predictive check (most important)
+      pp_file <- file.path(output_dir, "posterior_predictive_check.png")
+      png(pp_file, width = 1000, height = 600)
+      print(pp_check(fit, ndraws = 100))
+      dev.off()
+      message(sprintf("  ✓ Posterior predictive check: %s", pp_file))
 
-    # Trace plots for fixed effects only (avoid parameter name issues)
-    trace_file <- file.path(output_dir, "trace_plots.png")
-    png(trace_file, width = 1200, height = 800)
-    # Use regex to match only fixed effects
-    print(mcmc_trace(fit, regex_pars = "^b_"))
-    dev.off()
-    message(sprintf("  ✓ Trace plots: %s", trace_file))
+      # Trace plots for fixed effects only (avoid parameter name issues)
+      trace_file <- file.path(output_dir, "trace_plots.png")
+      png(trace_file, width = 1200, height = 800)
+      # Use regex to match only fixed effects
+      print(mcmc_trace(fit, regex_pars = "^b_"))
+      dev.off()
+      message(sprintf("  ✓ Trace plots: %s", trace_file))
 
-    # Parameter intervals for fixed effects
-    param_file <- file.path(output_dir, "parameter_intervals.png")
-    png(param_file, width = 1000, height = 800)
-    print(mcmc_intervals(fit, regex_pars = "^b_|^sigma"))
-    dev.off()
-    message(sprintf("  ✓ Parameter intervals: %s", param_file))
+      # Parameter intervals for fixed effects
+      param_file <- file.path(output_dir, "parameter_intervals.png")
+      png(param_file, width = 1000, height = 800)
+      print(mcmc_intervals(fit, regex_pars = "^b_|^sigma"))
+      dev.off()
+      message(sprintf("  ✓ Parameter intervals: %s", param_file))
 
-    message("✓ Diagnostic plots complete")
-  }, error = function(e) {
-    message(sprintf("  ⚠ Warning: Some diagnostic plots failed: %s", conditionMessage(e)))
-    message("  Continuing without plots...")
-  })
+      message("✓ Diagnostic plots complete")
+    },
+    error = function(e) {
+      message(sprintf("  ⚠ Warning: Some diagnostic plots failed: %s", conditionMessage(e)))
+      message("  Continuing without plots...")
+    }
+  )
 }
 
 # ========================================
@@ -602,12 +622,12 @@ generate_diagnostic_plots <- function(fit, output_dir = "models/team_strength") 
 #' @param cores CPU cores (default 4)
 #' @return list(fit, ratings, diagnostics)
 run_team_strength_pipeline <- function(
-    start_season = 2018,
-    end_season = 2024,
-    model_type = c("total", "separate"),
-    chains = 4,
-    iter = 2000,
-    cores = 4
+  start_season = 2018,
+  end_season = 2024,
+  model_type = c("total", "separate"),
+  chains = 4,
+  iter = 2000,
+  cores = 4
 ) {
   model_type <- match.arg(model_type)
 
@@ -647,8 +667,7 @@ run_team_strength_pipeline <- function(
       ratings = ratings,
       diagnostics = diagnostics
     ))
-
-  } else {  # separate
+  } else { # separate
     fits <- fit_offense_defense_models(games_df, chains = chains, iter = iter, cores = cores)
     ratings <- extract_offense_defense_ratings(fits$offense, fits$defense, games_df)
 
@@ -700,80 +719,96 @@ if (!interactive()) {
   end_season <- ifelse(length(args) > 1, as.integer(args[2]), 2024)
   model_type <- ifelse(length(args) > 2, args[3], "separate")
 
-  tryCatch({
-    # Run pipeline
-    results <- run_team_strength_pipeline(
-      start_season = start_season,
-      end_season = end_season,
-      model_type = model_type
-    )
+  tryCatch(
+    {
+      # Run pipeline
+      results <- run_team_strength_pipeline(
+        start_season = start_season,
+        end_season = end_season,
+        model_type = model_type
+      )
 
-    # Save ratings to CSV
-    output_file <- "models/team_strength/team_strength_ratings.csv"
-    message(sprintf("\nSaving ratings to %s...", output_file))
+      # Save ratings to CSV
+      output_file <- "models/team_strength/team_strength_ratings.csv"
+      message(sprintf("\nSaving ratings to %s...", output_file))
 
-    write.csv(results$ratings, output_file, row.names = FALSE)
+      write.csv(results$ratings, output_file, row.names = FALSE)
 
-    message(sprintf("  ✓ Saved %d ratings", nrow(results$ratings)))
+      message(sprintf("  ✓ Saved %d ratings", nrow(results$ratings)))
 
-    # Print top/bottom teams for latest season
-    latest_season <- max(results$ratings$season)
-    latest_ratings <- results$ratings |>
-      filter(season == latest_season) |>
-      select(team, offense_mean, defense_mean, net_strength, net_rank)
+      # Print top/bottom teams for latest season
+      latest_season <- max(results$ratings$season)
+      latest_ratings <- results$ratings |>
+        filter(season == latest_season) |>
+        select(team, offense_mean, defense_mean, net_strength, net_rank)
 
-    message(sprintf("\n=== TOP 5 TEAMS (%d) ===", latest_season))
-    print(head(latest_ratings, 5), n = 5)
+      message(sprintf("\n=== TOP 5 TEAMS (%d) ===", latest_season))
+      print(head(latest_ratings, 5), n = 5)
 
-    message(sprintf("\n=== BOTTOM 5 TEAMS (%d) ===", latest_season))
-    print(tail(latest_ratings, 5), n = 5)
+      message(sprintf("\n=== BOTTOM 5 TEAMS (%d) ===", latest_season))
+      print(tail(latest_ratings, 5), n = 5)
 
-    # Summary statistics
-    message("\n=== RATING STATISTICS ===")
-    message(sprintf("  Offense range: [%.2f, %.2f]",
-                    min(results$ratings$offense_mean),
-                    max(results$ratings$offense_mean)))
-    message(sprintf("  Defense range: [%.2f, %.2f]",
-                    min(results$ratings$defense_mean),
-                    max(results$ratings$defense_mean)))
-    message(sprintf("  Net strength range: [%.2f, %.2f]",
-                    min(results$ratings$net_strength),
-                    max(results$ratings$net_strength)))
+      # Summary statistics
+      message("\n=== RATING STATISTICS ===")
+      message(sprintf(
+        "  Offense range: [%.2f, %.2f]",
+        min(results$ratings$offense_mean),
+        max(results$ratings$offense_mean)
+      ))
+      message(sprintf(
+        "  Defense range: [%.2f, %.2f]",
+        min(results$ratings$defense_mean),
+        max(results$ratings$defense_mean)
+      ))
+      message(sprintf(
+        "  Net strength range: [%.2f, %.2f]",
+        min(results$ratings$net_strength),
+        max(results$ratings$net_strength)
+      ))
 
-    # Convergence summary
-    if (model_type == "separate") {
-      message("\n=== MCMC CONVERGENCE SUMMARY ===")
-      message(sprintf("  Offensive model: %s",
-                      ifelse(results$diagnostics$offense$convergence_ok, "✓ PASS", "✗ FAIL")))
-      message(sprintf("  Defensive model: %s",
-                      ifelse(results$diagnostics$defense$convergence_ok, "✓ PASS", "✗ FAIL")))
-      message(sprintf("  Overall: %s",
-                      ifelse(results$diagnostics$overall_ok, "✓ PASS", "✗ FAIL")))
-    } else {
-      message("\n=== MCMC CONVERGENCE SUMMARY ===")
-      message(sprintf("  Model: %s",
-                      ifelse(results$diagnostics$convergence_ok, "✓ PASS", "✗ FAIL")))
-    }
+      # Convergence summary
+      if (model_type == "separate") {
+        message("\n=== MCMC CONVERGENCE SUMMARY ===")
+        message(sprintf(
+          "  Offensive model: %s",
+          ifelse(results$diagnostics$offense$convergence_ok, "✓ PASS", "✗ FAIL")
+        ))
+        message(sprintf(
+          "  Defensive model: %s",
+          ifelse(results$diagnostics$defense$convergence_ok, "✓ PASS", "✗ FAIL")
+        ))
+        message(sprintf(
+          "  Overall: %s",
+          ifelse(results$diagnostics$overall_ok, "✓ PASS", "✗ FAIL")
+        ))
+      } else {
+        message("\n=== MCMC CONVERGENCE SUMMARY ===")
+        message(sprintf(
+          "  Model: %s",
+          ifelse(results$diagnostics$convergence_ok, "✓ PASS", "✗ FAIL")
+        ))
+      }
 
-    message("\n\n")
-    message(strrep("=", 80))
-    message("TEAM STRENGTH RATINGS COMPLETE")
-    message(strrep("=", 80))
-    message(sprintf("Output: %s", output_file))
-    message(sprintf("Models: models/team_strength/*.rds"))
-    message(sprintf("Diagnostics: models/team_strength/*.png"))
+      message("\n\n")
+      message(strrep("=", 80))
+      message("TEAM STRENGTH RATINGS COMPLETE")
+      message(strrep("=", 80))
+      message(sprintf("Output: %s", output_file))
+      message(sprintf("Models: models/team_strength/*.rds"))
+      message(sprintf("Diagnostics: models/team_strength/*.png"))
 
-    if (results$diagnostics$overall_ok || results$diagnostics$convergence_ok) {
-      message("\n✓ All MCMC diagnostics passed - Ready for production")
-      quit(status = 0)
-    } else {
-      message("\n⚠ Some MCMC diagnostics failed - Review before production use")
+      if (results$diagnostics$overall_ok || results$diagnostics$convergence_ok) {
+        message("\n✓ All MCMC diagnostics passed - Ready for production")
+        quit(status = 0)
+      } else {
+        message("\n⚠ Some MCMC diagnostics failed - Review before production use")
+        quit(status = 1)
+      }
+    },
+    error = function(e) {
+      message(sprintf("\n✗ ERROR: %s", conditionMessage(e)))
+      message(traceback())
       quit(status = 1)
     }
-
-  }, error = function(e) {
-    message(sprintf("\n✗ ERROR: %s", conditionMessage(e)))
-    message(traceback())
-    quit(status = 1)
-  })
+  )
 }

@@ -66,7 +66,7 @@ The Ridge Residuals methodology explicitly decorrelates opponent and player feat
 By construction, $\text{Cov}(r_q, X_{\text{defense}}) \approx 0$ (proven in Section~\ref{sec:statistical-theory}), eliminating the correlation that plagued XGBoost v2 while preserving player-specific skill signal.
 
 \paragraph{Roadmap.}
-This appendix proceeds as follows: Section~\ref{sec:math-foundations} establishes mathematical foundations of orthogonalization from first principles (Gram-Schmidt, variance decomposition). Section~\ref{sec:multicollinearity} formalizes the multicollinearity problem specific to NFL prediction. Section~\ref{sec:ridge-methodology} details the three-stage Ridge Residuals architecture with implementation specifics. Section~\ref{sec:statistical-theory} provides rigorous theoretical justification (orthogonal decomposition theorem, bias-variance tradeoff). Section~\ref{sec:implementation} documents production implementation nuances (QB-specific centering, fail-fast validation, outlier clipping). Section~\ref{sec:ablation} quantifies each component's contribution through systematic ablation studies. Section~\ref{sec:alternatives} compares to alternative approaches (pure XGBoost, incremental learning, ELO+WLS, deep learning). Section~\ref{sec:multiseas validation} validates robustness across 2022--2024 seasons. Section~\ref{sec:production-lessons} distills practical lessons for practitioners. Section~\ref{sec:limitations} acknowledges limitations and future research directions.
+This appendix proceeds as follows: Section~\ref{sec:math-foundations} establishes mathematical foundations of orthogonalization from first principles (Gram-Schmidt, variance decomposition). Section~\ref{sec:multicollinearity} formalizes the multicollinearity problem specific to NFL prediction. Section~\ref{sec:ridge-methodology} details the three-stage Ridge Residuals architecture with implementation specifics. Section~\ref{sec:statistical-theory} provides rigorous theoretical justification (orthogonal decomposition theorem, bias-variance tradeoff). Section~\ref{sec:implementation} documents production implementation nuances (QB-specific centering, fail-fast validation, outlier clipping). Section~\ref{sec:ablation} quantifies each component's contribution through systematic ablation studies. Section~\ref{sec:alternatives} compares to alternative approaches (pure XGBoost, incremental learning, ELO+WLS, deep learning). Section~\ref{sec:multiseas-validation} validates robustness across 2022--2024 seasons. Section~\ref{sec:production-lessons} distills practical lessons for practitioners. Section~\ref{sec:limitations} acknowledges limitations and future research directions.
 
 ---
 
@@ -226,6 +226,7 @@ If $X \perp\!\!\!\perp Y \mid Z$, then $\rho_{XY \cdot Z} = 0$ even when $\rho_{
 \small
 \caption{Empirical Feature Correlations (2022--2024 Training Data, $n=3,330$ QB-games)}
 \label{tab:feature-correlations}
+\begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}llS[table-format=1.2]S[table-format=1.6]l@{}}
 \toprule
 \textbf{Feature Pair} & \textbf{Type} & {\textbf{Pearson $\rho$}} & {\textbf{p-value}} & \textbf{Interpretation} \\
@@ -236,6 +237,7 @@ If $X \perp\!\!\!\perp Y \mid Z$, then $\rho_{XY \cdot Z} = 0$ even when $\rho_{
 \texttt{player\_recent\_avg} $\times$ \texttt{passing\_yards} & True signal & 0.68 & < 0.001 & Genuine skill \\
 \bottomrule
 \end{tabular}
+\end{adjustbox}
 \begin{tablenotes}
 \item \textbf{Notes:} $\rho$ computed on standardized features. Confound row shows problematic correlation ($\rho = 0.42$) between player skill proxy and opponent strength. Decorrelated rows confirm Ridge Residuals achieves orthogonality ($|\rho| < 0.05$, $p > 0.05$). True signal row validates player skill correlates with observed yards independent of opponent.
 \end{tablenotes}
@@ -297,7 +299,7 @@ with closed-form solution:
 \label{eq:ridge-solution}
 \end{equation}
 
-where $\mathbf{X}_{\text{opp}} \in \mathbb{R}^{n \times 2}$ contains opponent features (\texttt{opp\_def\_epa\_exp}, \texttt{opp\_points\_allowed\_avg}) and $\alpha > 0$ is the regularization penalty.
+where $\mathbf{X}_{\text{opp}} \in \mathbb{R}^{n \times 2}$ contains opponent features (\texttt{opp\_def\_epa\_exp}, \texttt{opp\_points\_\allowbreak allowed\_avg}) and $\alpha > 0$ is the regularization penalty.
 
 \paragraph{Why Ridge over OLS?}
 Opponent metrics are noisy (small sample sizes, high variance): Arizona's defensive EPA fluctuates $\pm$0.15 week-to-week (2023 data). Unregularized OLS ($\alpha = 0$) overfits to this noise, yielding coefficients $\|\boldsymbol{\beta}_{\text{OLS}}\|_2 = 14.7$ with poor test performance (Table~\ref{tab:ridge-tuning}). Ridge penalty $\alpha = 100$ shrinks coefficients toward zero ($\|\boldsymbol{\beta}_{\text{Ridge}}\|_2 = 4.2$), trading bias for massive variance reduction.
@@ -434,7 +436,9 @@ where $\ell(\cdot)$ is squared error loss, $K$ is number of trees, and $\Omega(f
 
 \paragraph{Hyperparameters (Cross-Validated).}
 \begin{itemize}[itemsep=2pt,parsep=0pt]
-    \item \texttt{max\_depth = 3}: Shallow trees prevent overfitting (deeper trees degrade, Table~\ref{tab:tree-depth-ablation})
+    \item \texttt{max\_depth = 3}: Shallow trees prevent overfitting (deeper trees degrade, % TODO: Add tree depth ablation table
+% Table~\ref{tab:tree-depth-ablation}
+Table~(Tree Depth Ablation))
     \item \texttt{learning\_rate = 0.05}: Conservative for 150 estimators
     \item \texttt{n\_estimators = 150}: Determined via early stopping (validation plateau at 148)
     \item \texttt{subsample = 0.8}: Row subsampling reduces variance
@@ -712,7 +716,7 @@ Systematic ablation isolates each architectural decision's impact. Remove one co
 \toprule
 \textbf{Configuration} & {\textbf{MAE}} & {\textbf{$\Delta$ MAE}} & {\textbf{$\Delta$ MAE (\%)}} & {\textbf{p-value}} & \textbf{Critical?} \\
 \midrule
-\textbf{Full v4 (baseline)} & {4.76} & {0.00} & {0.0} & {---} & --- \\
+\textbf{Full v4 (baseline)} & {4.76} & {0.00} & {0.0} & {---} & {---} \\
 w/o Ridge ($\alpha = 0$, use OLS) & 6.83 & 2.07 & 43.5 & < 0.001 & $\checkmark$ \\
 w/o QB-specific centering & 8.92 & 4.16 & 87.4 & < 0.001 & $\checkmark$$\checkmark$ \\
 w/o residuals (raw ensemble pred) & 11.34 & 6.58 & 138.2 & < 0.001 & $\checkmark$$\checkmark$$\checkmark$ \\
@@ -720,7 +724,7 @@ w/o clipping (no outlier protect) & 5.21 & 0.45 & 9.5 & 0.023 & $\checkmark$ \\
 w/o XGBoost (Ridge only) & 40.18 & 35.42 & 744.1 & < 0.001 & $\checkmark$$\checkmark$$\checkmark$ \\
 w/o opponent features & 7.45 & 2.69 & 56.5 & < 0.001 & $\checkmark$$\checkmark$ \\
 Weak regularization ($\alpha = 10$) & 5.89 & 1.13 & 23.7 & < 0.001 & $\checkmark$ \\
-Strong regularization ($\alpha = 200$) & 5.02 & 0.26 & 5.5 & 0.089 & --- \\
+Strong regularization ($\alpha = 200$) & 5.02 & 0.26 & 5.5 & 0.089 & {---} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
@@ -756,7 +760,9 @@ All components synergize to achieve 88.31\% improvement. Removing any critical c
 Single-stage XGBoost with all features (player + opponent) simultaneously, no explicit decorrelation.
 
 \paragraph{Results.}
-2023 Test MAE: 40.20 yards (87.7× worse than Ridge Residuals v4, Table~\ref{tab:alternatives-comparison}).
+2023 Test MAE: 40.20 yards (87.7× worse than Ridge Residuals v4, % TODO: Add alternatives comparison table
+% Table~\ref{tab:alternatives-comparison}
+Table~(Alternatives Comparison)).
 
 \paragraph{Why It Fails.}
 XGBoost greedily splits on highest-variance features. Opponent strength (variance $\sigma^2 = 142.3$) dominates early splits vs player skill ($\sigma^2 = 87.6$). Tree analysis (Table~\ref{tab:tree-analysis}):
@@ -893,7 +899,7 @@ Single-season validation can mislead: 2023 quirks (rule changes, roster turnover
 2024 & 148 & 4.27 & 40.23 & 89.4 & < 0.000001 & 0.35 \\
 \midrule
 \textbf{Mean} & {444} & {4.70} & {41.29} & {88.3} & {< 0.000001} & {0.38} \\
-\textbf{Std Dev} & --- & {0.40} & {1.89} & {1.00} & --- & {0.04} \\
+\textbf{Std Dev} & {---} & {0.40} & {1.89} & {1.00} & {---} & {0.04} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
@@ -925,7 +931,7 @@ Three-season validation confirms Ridge Residuals is not lucky on one holdout---i
 ---
 
 \section{Production Deployment Lessons}
-% \label{sec:production-lessons} % REMOVED: Duplicate of Chapter 10 line 804
+\label{sec:production-lessons}
 
 \subsection{Feature Engineering > Model Complexity}
 

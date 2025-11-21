@@ -109,8 +109,10 @@ test_data_2025 <- test_data_2025 %>%
   ) %>%
   mutate(experience_cat = droplevels(factor(experience_cat)))
 
-cat(sprintf("✓ Loaded %d test games from %d QBs (2025 weeks 1-6)\n\n",
-            nrow(test_data_2025), n_distinct(test_data_2025$player_id)))
+cat(sprintf(
+  "✓ Loaded %d test games from %d QBs (2025 weeks 1-6)\n\n",
+  nrow(test_data_2025), n_distinct(test_data_2025$player_id)
+))
 
 # ============================================================================
 # STEP 2: Generate predictions from Hierarchical Bayesian v2
@@ -146,9 +148,11 @@ hierarchical_preds <- test_data_2025 %>%
     interval_width = pred_upper_90 - pred_lower_90,
     model = "hierarchical_v2"
   ) %>%
-  select(player_id, player_name, season, week, team, opponent,
-         pred_yards, pred_lower_90, pred_upper_90, actual_yards,
-         error, abs_error, squared_error, covered_90, interval_width, model)
+  select(
+    player_id, player_name, season, week, team, opponent,
+    pred_yards, pred_lower_90, pred_upper_90, actual_yards,
+    error, abs_error, squared_error, covered_90, interval_width, model
+  )
 
 cat(sprintf("✓ Generated %d predictions\n\n", nrow(hierarchical_preds)))
 
@@ -184,9 +188,11 @@ priors_preds <- test_data_2025 %>%
     interval_width = pred_upper_90 - pred_lower_90,
     model = "informative_priors_v2"
   ) %>%
-  select(player_id, player_name, season, week, team, opponent,
-         pred_yards, pred_lower_90, pred_upper_90, actual_yards,
-         error, abs_error, squared_error, covered_90, interval_width, model)
+  select(
+    player_id, player_name, season, week, team, opponent,
+    pred_yards, pred_lower_90, pred_upper_90, actual_yards,
+    error, abs_error, squared_error, covered_90, interval_width, model
+  )
 
 cat(sprintf("✓ Generated %d predictions\n\n", nrow(priors_preds)))
 
@@ -210,10 +216,10 @@ if (inherits(fit_ss_raw, "CmdStanFit")) {
 fit_ss_array <- as_draws_array(fit_ss)
 
 # Extract global parameters
-mu_league <- mean(fit_ss_array[,, "mu_league"])
-beta_attempts <- mean(fit_ss_array[,, "beta_attempts"])
-beta_home <- mean(fit_ss_array[,, "beta_home"])
-R <- mean(fit_ss_array[,, "R"])
+mu_league <- mean(fit_ss_array[, , "mu_league"])
+beta_attempts <- mean(fit_ss_array[, , "beta_attempts"])
+beta_home <- mean(fit_ss_array[, , "beta_home"])
+R <- mean(fit_ss_array[, , "R"])
 
 # Load skill trajectories
 skills <- read_csv("models/bayesian/simplified_random_walk_skills_v2.csv", show_col_types = FALSE)
@@ -242,9 +248,11 @@ state_space_preds <- test_data_2025 %>%
     interval_width = pred_upper_90 - pred_lower_90,
     model = "state_space_v2"
   ) %>%
-  select(player_id, player_name, season, week, team, opponent,
-         pred_yards, pred_lower_90, pred_upper_90, actual_yards,
-         error, abs_error, squared_error, covered_90, interval_width, model)
+  select(
+    player_id, player_name, season, week, team, opponent,
+    pred_yards, pred_lower_90, pred_upper_90, actual_yards,
+    error, abs_error, squared_error, covered_90, interval_width, model
+  )
 
 cat(sprintf("✓ Generated %d predictions\n\n", nrow(state_space_preds)))
 
@@ -283,7 +291,7 @@ metrics <- all_preds %>%
     coverage_90 = mean(covered_90) * 100,
     mean_interval_width = mean(interval_width),
     median_abs_error = median(abs_error),
-    .groups = 'drop'
+    .groups = "drop"
   )
 
 print(metrics, n = Inf)

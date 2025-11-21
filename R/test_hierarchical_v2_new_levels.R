@@ -86,7 +86,7 @@ test_sample <- test_sample %>%
   mutate(
     log_yards = log(yards),
     log_attempts = log(attempts),
-    player_season = paste0(player_id, "_", season)  # Creates 2025 combinations
+    player_season = paste0(player_id, "_", season) # Creates 2025 combinations
   )
 
 cat(sprintf("✓ Loaded %d test samples\n", nrow(test_sample)))
@@ -105,46 +105,48 @@ cat("✓ Model loaded\n\n")
 cat("Step 3: Testing prediction with allow_new_levels=TRUE...\n")
 
 # This should work now (previously would fail with factor level error)
-tryCatch({
-  pred_draws <- posterior_predict(
-    model,
-    newdata = test_sample,
-    allow_new_levels = TRUE,
-    sample_new_levels = "gaussian"
-  )
-
-  # Calculate predictions
-  predictions <- test_sample %>%
-    mutate(
-      pred_yards = exp(colMeans(pred_draws)),
-      pred_lower_90 = exp(apply(pred_draws, 2, quantile, probs = 0.05)),
-      pred_upper_90 = exp(apply(pred_draws, 2, quantile, probs = 0.95)),
-      actual_yards = yards
+tryCatch(
+  {
+    pred_draws <- posterior_predict(
+      model,
+      newdata = test_sample,
+      allow_new_levels = TRUE,
+      sample_new_levels = "gaussian"
     )
 
-  cat("✅ SUCCESS: Predictions generated without factor level errors!\n\n")
+    # Calculate predictions
+    predictions <- test_sample %>%
+      mutate(
+        pred_yards = exp(colMeans(pred_draws)),
+        pred_lower_90 = exp(apply(pred_draws, 2, quantile, probs = 0.05)),
+        pred_upper_90 = exp(apply(pred_draws, 2, quantile, probs = 0.95)),
+        actual_yards = yards
+      )
 
-  cat("Prediction results:\n")
-  print(predictions %>%
-    select(player_name, season, week, actual_yards, pred_yards, pred_lower_90, pred_upper_90))
+    cat("✅ SUCCESS: Predictions generated without factor level errors!\n\n")
 
-  cat("\n")
-  cat("======================================================================\n")
-  cat("✅ TEST PASSED\n")
-  cat("======================================================================\n\n")
-  cat("The model now correctly handles new 2025 player_season combinations\n")
-  cat("that weren't present during training (2015-2024).\n\n")
-  cat("Key fix: Using actual season in player_season feature engineering\n")
-  cat("  OLD: player_season = paste0(player_id, '_', 2024)  # WRONG\n")
-  cat("  NEW: player_season = paste0(player_id, '_', season)  # CORRECT\n\n")
-  cat("Combined with allow_new_levels=TRUE and sample_new_levels='gaussian',\n")
-  cat("the model uses population-level parameters for new factor levels.\n")
-  cat("This is the correct behavior for true holdout validation.\n\n")
+    cat("Prediction results:\n")
+    print(predictions %>%
+      select(player_name, season, week, actual_yards, pred_yards, pred_lower_90, pred_upper_90))
 
-}, error = function(e) {
-  cat("❌ FAILED: ", e$message, "\n\n")
-  cat("The prediction still fails. This suggests the fix may not be complete.\n")
-  cat("Check that allow_new_levels=TRUE is properly set in all predict calls.\n\n")
-})
+    cat("\n")
+    cat("======================================================================\n")
+    cat("✅ TEST PASSED\n")
+    cat("======================================================================\n\n")
+    cat("The model now correctly handles new 2025 player_season combinations\n")
+    cat("that weren't present during training (2015-2024).\n\n")
+    cat("Key fix: Using actual season in player_season feature engineering\n")
+    cat("  OLD: player_season = paste0(player_id, '_', 2024)  # WRONG\n")
+    cat("  NEW: player_season = paste0(player_id, '_', season)  # CORRECT\n\n")
+    cat("Combined with allow_new_levels=TRUE and sample_new_levels='gaussian',\n")
+    cat("the model uses population-level parameters for new factor levels.\n")
+    cat("This is the correct behavior for true holdout validation.\n\n")
+  },
+  error = function(e) {
+    cat("❌ FAILED: ", e$message, "\n\n")
+    cat("The prediction still fails. This suggests the fix may not be complete.\n")
+    cat("Check that allow_new_levels=TRUE is properly set in all predict calls.\n\n")
+  }
+)
 
 dbDisconnect(conn)

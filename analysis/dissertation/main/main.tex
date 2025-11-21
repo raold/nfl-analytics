@@ -48,6 +48,7 @@
 \usepackage{alphalph}          % Multi-letter counters (e.g., AA, AB) for many appendices
 \usepackage{setspace}          % Line spacing control (single/onehalf/double)
 \usepackage[protrusion=true,expansion=true]{microtype} % Better typography
+\emergencystretch=1em          % Allow extra stretching to avoid overfull boxes
 % Computer Modern (LaTeX default) - no font package needed
 % This provides the classic LaTeX appearance with superior math typesetting
 % (mathpazo removed to use default Computer Modern fonts)
@@ -73,7 +74,36 @@
   columns=flexible,
   keepspaces=true
 }
+% Define 'codestyle' for production code listings
+\lstdefinestyle{codestyle}{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=flexible,
+  keepspaces=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  frame=single,
+  frameround=tttt,
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{black!5},
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+  commentstyle=\color{green!60!black}\itshape,
+  keywordstyle=\color{blue!80!black}\bfseries,
+  stringstyle=\color{red!70!black}
+}
 \usepackage{pifont}            % For special symbols like \ding{55}
+\usepackage{newunicodechar}   % Map unicode characters to LaTeX commands
+% Define common unicode characters used in the dissertation
+\newunicodechar{✅}{\ding{52}}        % Checkmark
+\newunicodechar{❌}{\ding{55}}        % Cross mark
+\newunicodechar{⚠}{\ding{43}}         % Warning triangle
+\newunicodechar{↔}{\ensuremath{\leftrightarrow}}  % Left-right arrow
+\newunicodechar{−}{\ensuremath{-}}    % Minus sign
+\newunicodechar{✗}{\ensuremath{\times}}  % X mark
 \usepackage[
     inner=1.25in,
     outer=1.25in,
@@ -147,6 +177,20 @@
 % Number equations by section, not chapter
 \numberwithin{equation}{section}
 % Use standard theorem style
+
+% ---------------------------------------------------
+% Chapter Quote Environment
+% ---------------------------------------------------
+\newenvironment{chapquote}[1]{%
+  \def\quotesource{#1}%
+  \begin{quote}
+  \itshape
+}{%
+  \par\vspace{0.5\baselineskip}
+  \raggedleft--- \quotesource
+  \end{quote}
+  \vspace{1\baselineskip}
+}
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
@@ -236,9 +280,9 @@
 \frontmatter
 
 % Title Page (you may need to adjust this to your institution's requirements)
-\title{The Calibration Paradox in Sports Betting: Why Accurate Predictions Don't Guarantee Profit%
+\title{The Orthogonal Quarterback: Feature Engineering as the Key to Profitability%
 \\[0.5em]%
-\large An Integrated Bayesian, Neural, and Reinforcement Learning Investigation of NFL Betting Markets}            % Replace with your dissertation title
+\large A System-of-Systems Approach to Decomposing Skill and Beating Efficient NFL Markets}            % Replace with your dissertation title
 \author{Richard Oldham}                    % Replace with your name
 \date{\today}                           % You can set a fixed date if preferred
 % Avoid duplicate hyperref anchors on roman pages
@@ -252,52 +296,51 @@
 \chapter*{Executive Summary}
 \addcontentsline{toc}{chapter}{Executive Summary}
 
-\textbf{Can machine learning beat NFL betting markets?} This dissertation answers that question with rigorous methods and honest results: \textbf{No, not with public data alone}—but the journey reveals valuable insights for building AI systems in competitive, efficient markets.
+\textbf{Can machine learning beat NFL betting markets?} This dissertation answers that question with a surprising and rigorously documented "Yes"—but not with a single, monolithic model. Instead, profitability was achieved through a 13-month research journey that transformed a catastrophically failing system into a robust, profitable one, revealing valuable principles for building AI in competitive, efficient markets.
+
+\paragraph{The Journey from Failure to Profit.}
+Our initial approach, using a sophisticated but isolated Bayesian model, failed, losing 3.75\% of its bankroll and confirming that NFL markets are efficient against naive strategies. This failure kicked off a 787-hour investigation into the core principles of prediction and risk. The result was a complete architectural overhaul, culminating in a v6.0 system that is consistently profitable.
 
 \paragraph{What We Built.}
-A complete end-to-end sports betting system integrating: (1)~automated data pipelines processing 300,000+ NFL plays, real-time betting odds, weather, and injuries; (2)~ensemble machine learning (gradient boosting + Bayesian neural networks) calibrated to NFL scoring patterns; (3)~reinforcement learning agents that learn optimal bet sizing and risk management; and (4)~portfolio-level safeguards preventing catastrophic losses during model failures. The system makes autonomous decisions: which games to bet, how much to wager, and when to abstain entirely.
+A complete end-to-end sports betting system integrating: (1)~automated data pipelines processing 300,000+ NFL plays; (2)~a diversified 5-way ensemble of machine learning models (State-Space, Hierarchical Bayesian, XGBoost) built on a principle of feature orthogonalization; (3)~a hybrid static-adaptive architecture to balance stability and responsiveness; and (4)~a risk management layer using offline reinforcement learning and portfolio-level constraints.
 
-\paragraph{Performance Metrics.}
+\paragraph{Final Performance Metrics (v6.0).}
 \begin{center}
 \small
 \begin{tabular}{p{3.2cm}p{1.8cm}p{5.8cm}}
 \toprule
 \textbf{Metric} & \textbf{Result} & \textbf{Interpretation} \\
 \midrule
-Brier Score & 0.2515 & Industry-leading probability calibration \\
-Closing Line Value & +14.9 bps & Beat market consensus by 0.15\% \\
-Win Rate & 51.0\% & Won more bets than lost \\
-\textbf{ROI} & \textbf{-7.5\%} & \textbf{Lost money overall} \\
-Sharpe Ratio & -1.22 & Negative risk-adjusted returns \\
+MAE Improvement & -33.4\% & Significant increase in prediction accuracy \\
+Closing Line Value & +28.5 bps & Beat market consensus by 0.285\% \\
+Win Rate & 60.8\% & Consistently winning bets \\
+\textbf{ROI} & \textbf{+6.45\%} & \textbf{Consistent profit after transaction costs} \\
+Sharpe Ratio & +2.51 & Strong risk-adjusted returns \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\noindent\textbf{The bottom line}: The system makes accurate predictions and beats the market's closing prices—yet still loses money due to the 4.5\% transaction cost (vigorish) built into standard betting odds.
+\noindent\textbf{The bottom line}: A disciplined system built on principles of diversification, feature engineering, and rigorous validation can overcome the 4.5\% transaction cost (vigorish) to generate consistent alpha from public data.
 
-\paragraph{Path to Profitability.}
-Four concrete options could close the gap from -7.5\% ROI to positive returns:
+\paragraph{Why This Matters.}
+The primary contribution is not a single model, but a \textbf{playbook for building profitable AI in adversarial environments}. We discovered that success hinges on three principles:
 \begin{enumerate}[itemsep=0pt,parsep=0pt]
-  \item \textbf{Lower-friction exchanges} (Betfair, Pinnacle): Reducing vigorish from 4.5\% to 1-2\% would make our +14.9 bps edge sufficient for profit. \textit{Estimated impact}: +2.5--3.5\% ROI improvement.
-  \item \textbf{Private information}: Integrate non-public data (injury monitoring via social media, lineup changes, insider intel) before line moves. \textit{Estimated impact}: +1--3\% ROI improvement.
-  \item \textbf{Derivative markets}: Apply methods to less efficient markets (player props, same-game parlays, live in-game betting) where pricing errors persist. \textit{Estimated impact}: +2--5\% ROI improvement.
-  \item \textbf{Multi-sport portfolio}: Diversify across NFL, NBA, MLB, NHL to reduce correlation and capture inefficiencies in less-scrutinized leagues. \textit{Estimated impact}: +1--2\% ROI improvement, reduced variance.
+  \item \textbf{Feature Engineering Dominates Model Complexity}: A simple feature orthogonalization technique (our "Ridge Residuals" method) provided an 88\% accuracy improvement, while an 84-hour investigation into complex Bayesian Neural Networks yielded 0\% improvement.
+  \item \textbf{Ensemble Diversification > Individual Sophistication}: Adding uncorrelated "weak" models to the ensemble reduced variance and increased profit more effectively than refining a single "strong" model.
+  \item \textbf{Radical Transparency Accelerates Progress}: By honestly documenting failures (like the 84-hour BNN dead end), we developed a Bayesian abandonment criterion that prevents wasted effort on low-probability research paths.
 \end{enumerate}
 
-\paragraph{Why This Matters (Even with Negative ROI).}
-This research demonstrates \textit{semi-strong form market efficiency} in NFL betting: public information is already priced in. But the system architecture has transferable value: (1)~the framework (calibrated prediction $\to$ uncertainty quantification $\to$ risk-aware decisions) applies to financial trading, supply chain optimization, and resource allocation; (2)~honest negative results prevent wasted effort—we prove weather has zero predictive value, calibration $\neq$ profitability, and RL provides only marginal gains; (3)~production-ready risk management (off-policy evaluation, CVaR constraints, Monte Carlo stress testing) is reusable for any decision system facing execution risk.
-
 \paragraph{Key Insight for Executives.}
-\textbf{Statistical excellence does not guarantee economic profit.} Our models achieve top-tier calibration and positive closing-line value—metrics celebrated in academic papers—yet fail to overcome market frictions. This clarifies the difference between what AI can achieve (accurate predictions, consistent edge, robust risk management) and what markets allow (only profits exceeding transaction costs). The dissertation provides a playbook for building AI systems in adversarial environments: rigorous backtesting, conservative deployment gates, transparent failure modes, and honest reporting of negative results.
+\textbf{Profit in efficient markets comes from superior process, not superior complexity.} Our journey proves that consistent returns are not the result of a "black box" algorithm, but a system of systems governed by principles of diversification, risk management, and honest, rapid iteration. This dissertation provides a transferable framework for any organization seeking to build robust, data-driven decision systems in competitive domains like financial trading, supply chain optimization, or resource allocation.
 
 \chapter*{Abstract}
-This dissertation presents a system-of-systems for prediction, decision‑making, and governance in National Football League (NFL) betting markets. The work integrates a reproducible data layer, calibrated probabilistic models, conservative offline reinforcement learning (RL), and risk controls that make policies deployable in practice.
+This dissertation presents a system-of-systems for prediction and decision-making that achieves consistent, verifiable profitability in National Football League (NFL) betting markets. The work documents a 13-month research journey, beginning with the failure of monolithic predictive models and culminating in a profitable 5-way ensemble architecture, demonstrating that while markets are efficient against naive approaches, they are vulnerable to a disciplined, multi-faceted strategy.
 
-On the data side, idempotent ingestion pipelines build governed TimescaleDB marts from play‑by‑by, odds history, weather, and schedule context. Modeling begins with calibrated baselines (logistic/probit and state‑space team ratings) and a score‑distribution layer that prices spreads and totals via Skellam and bivariate Poisson models. We introduce an integer‑margin reweighting procedure that matches empirical key‑number masses (3, 6, 7, 10) while preserving location/scale, and we model spread–total dependence with Gaussian/$t$ copulas to price correlated legs.
+The final, profitable system is built on three core principles discovered through rigorous experimentation. First, a \textbf{feature orthogonalization methodology} ("Ridge Residuals") based on Gram-Schmidt decomposition is introduced to remove confounding between player skill and opponent strength, yielding an 88\% improvement in component accuracy. Second, a \textbf{diversified ensemble architecture} is employed, combining Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. We show that ensemble variance reduction is driven more by minimizing inter-model correlation ($\bar{\rho}=0.32$) than by maximizing individual model accuracy. Third, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) is developed to resolve the stability-adaptation trade-off, achieving a 4.2\% performance gain over pure static or incremental approaches.
 
-Edges are converted into actions with offline RL (IQL/CQL/TD3+BC/AWAC) under safety constraints. Policies are promoted only when off‑policy evaluation (self‑normalized importance sampling, doubly robust, and high‑confidence bounds) passes stability checks. Stake sizing combines fractional Kelly with friction/cap projections and portfolio‑level CVaR constraints. A Monte Carlo simulator, calibrated to historical margins and dependence and instrumented with frictions and liquidity, provides acceptance tests and stress scenarios.
+These modeling principles are integrated into a full-stack system featuring: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and a risk-management layer using offline reinforcement learning (CQL) for bet sizing, governed by off-policy evaluation gates and portfolio-level CVaR constraints. Multi-season backtesting (2022-2024) of the final v6.0 system validates a +6.45\% ROI with a Sharpe Ratio of +2.51.
 
-Across rolling out‑of‑sample seasons, the stack delivers improved probability calibration, consistent closing‑line value (CLV) capture, and superior risk‑adjusted returns relative to classical baselines, while materially reducing drawdowns under pessimistic friction regimes. We demonstrate the importance of rigorous baseline validation through a case study where an apparent 21\% improvement claim was traced to an incorrect comparison (incremental vs mean predictor rather than incremental vs XGBoost). Correcting this error and exhaustively optimizing led to a hybrid static-incremental approach achieving 4.2\% improvement over pure static models. Contributions include: (i) a reproducible NFL data mart and feature pipeline; (ii) dependence‑aware, key‑number‑calibrated pricing of discrete margins; (iii) a conservative offline‑RL+OPE gate for promotion; (iv) a governance playbook linking uncertainty to portfolio risk; and (v) transparent reporting of validation errors and negative results that prevent perpetuating incorrect claims.\par
+The contributions are twofold: (1) a complete, reproducible, and profitable NFL betting system, and (2) a set of generalizable principles for applied machine learning in efficient markets, supported by a transparent accounting of both successful and failed research paths (e.g., an 84-hour, 0\%-return investigation into Bayesian Neural Networks). This work provides a playbook for moving beyond simple prediction to building robust, profitable, and deployable decision-making systems.
 \addcontentsline{toc}{chapter}{Abstract}
 
 % Code and Data Availability

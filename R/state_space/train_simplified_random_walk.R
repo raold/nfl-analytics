@@ -109,15 +109,17 @@ cat("\nSTEP 2: Filtering to players with sufficient data...\n")
 
 player_counts <- player_data %>%
   group_by(player_id, player_name) %>%
-  summarise(n_games = n(), .groups = 'drop') %>%
+  summarise(n_games = n(), .groups = "drop") %>%
   filter(n_games >= MIN_GAMES)
 
 cat(sprintf("  ✓ %d players with ≥%d games\n", nrow(player_counts), MIN_GAMES))
 
 # Prototype mode: select elite QBs
 if (PROTOTYPE_MODE) {
-  elite_qbs <- c("Patrick Mahomes", "Josh Allen", "Lamar Jackson", "Joe Burrow", "Justin Herbert",
-                 "Matthew Stafford", "Tom Brady", "Aaron Rodgers", "Jared Goff", "Dak Prescott")
+  elite_qbs <- c(
+    "Patrick Mahomes", "Josh Allen", "Lamar Jackson", "Joe Burrow", "Justin Herbert",
+    "Matthew Stafford", "Tom Brady", "Aaron Rodgers", "Jared Goff", "Dak Prescott"
+  )
 
   player_counts <- player_counts %>%
     filter(player_name %in% elite_qbs) %>%
@@ -130,8 +132,10 @@ if (PROTOTYPE_MODE) {
 final_data <- player_data %>%
   filter(player_id %in% player_counts$player_id)
 
-cat(sprintf("  ✓ Final dataset: %d games from %d players\n",
-            nrow(final_data), n_distinct(final_data$player_id)))
+cat(sprintf(
+  "  ✓ Final dataset: %d games from %d players\n",
+  nrow(final_data), n_distinct(final_data$player_id)
+))
 
 # ============================================================================
 # STEP 3: Prepare data for Stan
@@ -146,7 +150,7 @@ N_players <- length(player_ids)
 # Get max games per player
 games_per_player <- final_data %>%
   group_by(player_id) %>%
-  summarise(n_games = n(), .groups = 'drop') %>%
+  summarise(n_games = n(), .groups = "drop") %>%
   arrange(match(player_id, player_ids))
 
 T_max <- max(games_per_player$n_games)
@@ -162,7 +166,9 @@ observed <- matrix(0L, nrow = N_players, ncol = T_max)
 
 for (i in 1:N_players) {
   pid <- player_ids[i]
-  player_games <- final_data %>% filter(player_id == pid) %>% arrange(season, week)
+  player_games <- final_data %>%
+    filter(player_id == pid) %>%
+    arrange(season, week)
   n_games <- nrow(player_games)
 
   # Fill in observed games
@@ -289,7 +295,9 @@ theta_mean <- colMeans(theta_draws)
 skill_trajectories <- data.frame()
 for (i in 1:N_players) {
   pid <- player_ids[i]
-  player_info <- final_data %>% filter(player_id == pid) %>% head(1)
+  player_info <- final_data %>%
+    filter(player_id == pid) %>%
+    head(1)
 
   for (t in 1:T_player[i]) {
     theta_idx <- sprintf("theta[%d,%d]", i, t)

@@ -32,7 +32,7 @@ MIN_GAMES <- 10
 
 # Exponential decay weight function
 exp_weight <- function(s, t, H) {
-  0.5 ^ ((t - s) / H)
+  0.5^((t - s) / H)
 }
 
 # ============================================================================
@@ -113,7 +113,7 @@ weight_summary <- player_data %>%
   summarise(
     n_games = n(),
     mean_weight = mean(weight),
-    .groups = 'drop'
+    .groups = "drop"
   )
 
 cat("\nWeight distribution by season:\n")
@@ -128,7 +128,7 @@ cat("STEP 3: Filtering to players with sufficient data...\n")
 
 player_counts <- player_data %>%
   group_by(player_id, player_name) %>%
-  summarise(n_games = n(), effective_games = sum(weight), .groups = 'drop') %>%
+  summarise(n_games = n(), effective_games = sum(weight), .groups = "drop") %>%
   filter(effective_games >= MIN_GAMES)
 
 cat(sprintf("  ✓ %d players with ≥%.1f effective games\n", nrow(player_counts), MIN_GAMES))
@@ -137,8 +137,10 @@ cat(sprintf("  ✓ %d players with ≥%.1f effective games\n", nrow(player_count
 final_data <- player_data %>%
   filter(player_id %in% player_counts$player_id)
 
-cat(sprintf("  ✓ Final dataset: %d games from %d players\n",
-            nrow(final_data), n_distinct(final_data$player_id)))
+cat(sprintf(
+  "  ✓ Final dataset: %d games from %d players\n",
+  nrow(final_data), n_distinct(final_data$player_id)
+))
 
 # ============================================================================
 # STEP 4: Prepare weighted data for Stan
@@ -153,7 +155,7 @@ N_players <- length(player_ids)
 # Get max games per player
 games_per_player <- final_data %>%
   group_by(player_id) %>%
-  summarise(n_games = n(), .groups = 'drop') %>%
+  summarise(n_games = n(), .groups = "drop") %>%
   arrange(match(player_id, player_ids))
 
 T_max <- max(games_per_player$n_games)
@@ -166,11 +168,13 @@ y <- matrix(0, nrow = N_players, ncol = T_max)
 log_attempts <- matrix(0, nrow = N_players, ncol = T_max)
 is_home <- matrix(0L, nrow = N_players, ncol = T_max)
 observed <- matrix(0L, nrow = N_players, ncol = T_max)
-weights <- matrix(1.0, nrow = N_players, ncol = T_max)  # New: weight matrix
+weights <- matrix(1.0, nrow = N_players, ncol = T_max) # New: weight matrix
 
 for (i in 1:N_players) {
   pid <- player_ids[i]
-  player_games <- final_data %>% filter(player_id == pid) %>% arrange(season, week)
+  player_games <- final_data %>%
+    filter(player_id == pid) %>%
+    arrange(season, week)
   n_games <- nrow(player_games)
 
   # Fill in observed games
@@ -178,7 +182,7 @@ for (i in 1:N_players) {
   log_attempts[i, 1:n_games] <- log(player_games$passing_attempts)
   is_home[i, 1:n_games] <- player_games$is_home
   observed[i, 1:n_games] <- 1L
-  weights[i, 1:n_games] <- player_games$weight  # Apply decay weights
+  weights[i, 1:n_games] <- player_games$weight # Apply decay weights
 }
 
 # Stan data
@@ -190,7 +194,7 @@ stan_data <- list(
   observed = observed,
   log_attempts = log_attempts,
   is_home = is_home,
-  weights = weights  # Pass weights to Stan
+  weights = weights # Pass weights to Stan
 )
 
 cat(sprintf("  ✓ Stan data prepared:\n"))
@@ -226,8 +230,8 @@ start_time <- Sys.time()
 
 fit <- mod$sample(
   data = stan_data,
-  chains = 6,
-  parallel_chains = 6,
+  chains = 10,
+  parallel_chains = 10,
   iter_warmup = 1000,
   iter_sampling = 2000,
   adapt_delta = 0.95,
@@ -288,7 +292,9 @@ theta_mean <- colMeans(theta_draws)
 skill_trajectories <- data.frame()
 for (i in 1:N_players) {
   pid <- player_ids[i]
-  player_info <- final_data %>% filter(player_id == pid) %>% head(1)
+  player_info <- final_data %>%
+    filter(player_id == pid) %>%
+    head(1)
 
   for (t in 1:T_player[i]) {
     theta_idx <- sprintf("theta[%d,%d]", i, t)

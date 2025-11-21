@@ -71,9 +71,9 @@ cat("Loaded", nrow(all_rosters), "roster-week entries\n\n")
 # Extract unique players
 cat("Extracting unique players...\n")
 players <- all_rosters %>%
-  dplyr::filter(!is.na(gsis_id)) %>%  # Filter before grouping - use dplyr:: to avoid stats::filter
+  dplyr::filter(!is.na(gsis_id)) %>% # Filter before grouping - use dplyr:: to avoid stats::filter
   group_by(gsis_id) %>%
-  slice(1) %>%  # Take first occurrence of each player
+  slice(1) %>% # Take first occurrence of each player
   ungroup() %>%
   transmute(
     player_id = gsis_id,
@@ -104,7 +104,7 @@ cat("✓ Wrote", nrow(players), "players\n\n")
 cat("Processing rosters by season...\n\n")
 for (season in SEASONS) {
   season_rosters <- all_rosters %>%
-    dplyr::filter(season == !!season, !is.na(gsis_id), !is.na(week)) %>%  # Filter before transmute - use dplyr::
+    dplyr::filter(season == !!season, !is.na(gsis_id), !is.na(week)) %>% # Filter before transmute - use dplyr::
     transmute(
       season = season,
       week = week,
@@ -117,13 +117,13 @@ for (season in SEASONS) {
       full_name = full_name,
       football_name = football_name
     ) %>%
-    distinct(season, week, team, player_id, .keep_all = TRUE)  # Remove duplicates
-  
+    distinct(season, week, team, player_id, .keep_all = TRUE) # Remove duplicates
+
   if (nrow(season_rosters) == 0) {
     cat(season, ": No data\n")
     next
   }
-  
+
   dbWriteTable(con, "rosters", season_rosters, append = TRUE, row.names = FALSE)
   cat(season, ": Wrote", nrow(season_rosters), "roster entries\n")
 }
@@ -141,7 +141,7 @@ cat("✓ Indexes created\n\n")
 cat("=== Verification ===\n")
 
 player_summary <- dbGetQuery(con, "
-  SELECT 
+  SELECT
     position,
     COUNT(*) as player_count,
     COUNT(DISTINCT player_name) as unique_names
@@ -155,7 +155,7 @@ cat("\nPlayers by position:\n")
 print(player_summary)
 
 roster_summary <- dbGetQuery(con, "
-  SELECT 
+  SELECT
     season,
     COUNT(*) as roster_entries,
     COUNT(DISTINCT team) as teams,
@@ -171,7 +171,7 @@ print(roster_summary)
 # Sample query
 cat("\nSample: 2023 Week 1 Kansas City Chiefs roster:\n")
 sample_roster <- dbGetQuery(con, "
-  SELECT 
+  SELECT
     r.player_id,
     p.player_name,
     r.position,

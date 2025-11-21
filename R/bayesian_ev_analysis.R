@@ -60,13 +60,15 @@ fetch_ratings_and_results <- function(con) {
 predict_with_bayesian <- function(games, ratings, home_adv = 2.4) {
   games %>%
     left_join(ratings %>% rename(home_rating = rating_mean),
-              by = c("home_team" = "team")) %>%
+      by = c("home_team" = "team")
+    ) %>%
     left_join(ratings %>% rename(away_rating = rating_mean),
-              by = c("away_team" = "team")) %>%
+      by = c("away_team" = "team")
+    ) %>%
     mutate(
       # Bayesian prediction: difference in ratings + home advantage
       bayesian_margin = home_rating - away_rating + home_adv,
-      bayesian_prob_home = pnorm(bayesian_margin / 13.5),  # ~13.5 SD from data
+      bayesian_prob_home = pnorm(bayesian_margin / 13.5), # ~13.5 SD from data
 
       # Prediction error
       pred_error = actual_margin - bayesian_margin,
@@ -75,9 +77,9 @@ predict_with_bayesian <- function(games, ratings, home_adv = 2.4) {
       # ATS prediction (against spread)
       bayesian_ats_edge = bayesian_margin - spread_close,
       bayesian_covers = case_when(
-        actual_margin > spread_close ~ TRUE,   # Home covers
-        actual_margin < spread_close ~ FALSE,  # Home doesn't cover
-        TRUE ~ NA                              # Push
+        actual_margin > spread_close ~ TRUE, # Home covers
+        actual_margin < spread_close ~ FALSE, # Home doesn't cover
+        TRUE ~ NA # Push
       ),
       bayesian_pred_covers = bayesian_ats_edge > 0
     )
@@ -100,7 +102,7 @@ calculate_metrics <- function(predictions) {
       # Betting simulation (flat stakes)
       ats_win_rate = mean(bayesian_covers[bayesian_pred_covers], na.rm = TRUE),
       n_bets = sum(bayesian_pred_covers, na.rm = TRUE),
-      expected_roi = (ats_win_rate - 0.524) * 100  # Need 52.4% to beat vig
+      expected_roi = (ats_win_rate - 0.524) * 100 # Need 52.4% to beat vig
     ) %>%
     mutate(
       status = case_when(
@@ -131,9 +133,11 @@ analyze_uncertainty_calibration <- function(predictions, ratings) {
   # High uncertainty games (high combined SD)
   predictions_with_sd <- predictions %>%
     left_join(ratings %>% select(team, rating_sd) %>% rename(home_sd = rating_sd),
-              by = c("home_team" = "team")) %>%
+      by = c("home_team" = "team")
+    ) %>%
     left_join(ratings %>% select(team, rating_sd) %>% rename(away_sd = rating_sd),
-              by = c("away_team" = "team")) %>%
+      by = c("away_team" = "team")
+    ) %>%
     mutate(
       combined_sd = sqrt(home_sd^2 + away_sd^2),
       uncertainty_group = case_when(
@@ -166,13 +170,13 @@ compare_to_xgboost <- function(bayesian_metrics) {
   xgboost_benchmark <- tibble(
     model = "XGBoost v2",
     brier = 0.1641,
-    ats_accuracy_est = 0.52,  # Estimated from Brier
-    roi_est = 0.0  # Assume break-even
+    ats_accuracy_est = 0.52, # Estimated from Brier
+    roi_est = 0.0 # Assume break-even
   )
 
   bayesian_perf <- tibble(
     model = "Bayesian Hierarchical",
-    brier = NA,  # Calculate separately if needed
+    brier = NA, # Calculate separately if needed
     ats_accuracy_est = bayesian_metrics$ats_accuracy,
     roi_est = bayesian_metrics$expected_roi / 100
   )
@@ -200,7 +204,7 @@ simulate_ensemble_benefit <- function(predictions) {
     filter(!is.na(bayesian_covers)) %>%
     mutate(
       # Simulate XGBoost predictions (correlated with Bayesian but not perfectly)
-      xgb_margin = bayesian_margin + rnorm(n(), 0, 5),  # Add noise
+      xgb_margin = bayesian_margin + rnorm(n(), 0, 5), # Add noise
       xgb_pred_covers = xgb_margin > spread_close,
 
       # Ensemble: only bet when both agree
@@ -237,8 +241,10 @@ main <- function() {
   # Fetch data
   cat("Fetching Bayesian ratings and 2024 games...\n")
   data <- fetch_ratings_and_results(con)
-  cat(sprintf("Loaded %d team ratings and %d games from 2024\n\n",
-              nrow(data$ratings), nrow(data$games)))
+  cat(sprintf(
+    "Loaded %d team ratings and %d games from 2024\n\n",
+    nrow(data$ratings), nrow(data$games)
+  ))
 
   # Generate predictions
   cat("Generating Bayesian predictions...\n")
@@ -260,8 +266,10 @@ main <- function() {
   cat("\n--- COMPARISON TO XGBOOST BASELINE ---\n")
   comparison <- compare_to_xgboost(metrics)
   print(comparison$comparison, width = 100)
-  cat(sprintf("\nAccuracy advantage: %+.1f percentage points\n",
-              comparison$advantage * 100))
+  cat(sprintf(
+    "\nAccuracy advantage: %+.1f percentage points\n",
+    comparison$advantage * 100
+  ))
   cat(sprintf("Verdict: %s\n", comparison$verdict))
 
   cat("\n--- ENSEMBLE SIMULATION ---\n")

@@ -1,0 +1,85 @@
+ENSEMBLE v6.0 PERFORMANCE TEST - QUICK START
+===========================================
+
+WHAT IT TESTS:
+--------------
+✅ R posterior draws: 1000 → 500 (40% speedup)
+✅ Database connection pooling (eliminates 200-400ms overhead)
+✅ Skills dict O(1) lookup (replaces O(n) filtering)
+✅ No .iterrows() usage (vectorized operations)
+
+EXPECTED RESULTS:
+-----------------
+Baseline (v5.1): 4.0s per prediction
+Target (v6.0):   1.5s per prediction
+Speedup:         2.6x
+
+RUN TEST:
+---------
+cd /Users/dro/rice/nfl-analytics
+python scripts/test_v6_performance_improvements.py
+
+PREREQUISITES:
+--------------
+1. PostgreSQL running at localhost:5544
+2. All 5 models trained and available:
+   - models/bayesian/simplified_random_walk_v2.rds
+   - models/bayesian/passing_yards_hierarchical_v2.rds
+   - models/bayesian/passing_informative_priors_v2.rds
+   - models/ridge_residuals_v7_backtest2024_20251114_184552.pkl
+   - models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json
+   - models/xgboost/hybrid_static_incremental_v1/static_model.pkl
+   - models/xgboost/hybrid_static_incremental_v1/static_scaler.pkl
+3. R packages: brms, cmdstanr
+4. Python packages: rpy2, numpy, pandas, psycopg2, xgboost
+
+EXIT CODES:
+-----------
+0 = Success (speedup ≥ 2.6x)
+1 = Failure (speedup < 2.6x OR validation failed)
+
+RUNTIME:
+--------
+60-90 seconds (1 warm-up + 10 test runs @ ~1.5s each + overhead)
+
+VALIDATION:
+-----------
+✅ Predictions are real (not placeholders)
+✅ All 5 components available
+✅ Ensemble mean: 150-400 yards
+✅ Ensemble std: 1-100 yards
+✅ Temperature scaling: T=0.5534
+
+OUTPUT:
+-------
+- Warm-up run timing
+- 10 test runs with individual times
+- Average, std, min, max timing
+- Speedup calculation vs baseline
+- Component breakdown (5 models)
+- Validation results
+- Pass/fail summary
+
+TROUBLESHOOTING:
+----------------
+If target missed (<2.6x speedup):
+1. Check database connection pool health
+2. Verify R posterior draws = 500 (not 1000)
+3. Profile individual components (state-space, hierarchical, XGB)
+4. Check for unexpected I/O operations
+5. Verify skills dict conversion (O(1) lookup)
+
+If models fail to load:
+1. Check model paths exist
+2. Verify model file integrity (not corrupted)
+3. Check R packages installed (brms, cmdstanr)
+4. Check rpy2 working: python -c "import rpy2; print('OK')"
+
+If database connection fails:
+1. Verify PostgreSQL running: pg_isready -h localhost -p 5544
+2. Check DB_PASSWORD in .env
+3. Test connection: psql -h localhost -p 5544 -U dro -d devdb01
+
+DOCUMENTATION:
+--------------
+Full details: docs/performance/V6_PERFORMANCE_TEST_SUMMARY.md

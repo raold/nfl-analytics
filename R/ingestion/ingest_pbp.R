@@ -44,8 +44,8 @@ for (yr in 1999:2024) {
       down,
       ydstogo,
       epa,
-      pass,    # Keep as numeric (0/1)
-      rush     # Keep as numeric (0/1)
+      pass, # Keep as numeric (0/1)
+      rush # Keep as numeric (0/1)
     )
 
   # Convert to data.frame for DBI compatibility

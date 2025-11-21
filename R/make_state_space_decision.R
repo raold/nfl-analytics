@@ -65,7 +65,7 @@ if (delta_mae < 0) {
 cat("STEP 3: Making GO/NO-GO decision...\n\n")
 
 # Decision thresholds
-CLOSE_THRESHOLD <- 1.0  # Within 1 yard = "close"
+CLOSE_THRESHOLD <- 1.0 # Within 1 yard = "close"
 
 if (abs(delta_mae) <= CLOSE_THRESHOLD) {
   cat("❗ Models are CLOSE (delta MAE ≤ 1.0 yards)\n")
@@ -114,7 +114,6 @@ if (abs(delta_mae) <= CLOSE_THRESHOLD) {
       reason <- glue("Tie with {best_baseline$model} (no significant difference), exclude for simplicity")
     }
   }
-
 } else if (delta_mae < 0) {
   decision <- "GO"
   reason <- glue("State-space outperforms best baseline by {abs(round(delta_mae, 2))} yards MAE")
@@ -217,4 +216,3 @@ if (decision == "GO") {
 } else {
   cat("❌ State-space model excluded from ensemble (documented as negative result)\n\n")
 }
-")
