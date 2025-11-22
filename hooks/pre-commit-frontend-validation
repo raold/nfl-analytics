@@ -1,0 +1,187 @@
+#!/bin/bash
+#
+# Pre-commit Hook - Frontend Schema Validation
+#
+# Validates dashboard SQL queries against current database schema to prevent
+# committing code with schema errors that would break production.
+#
+# This hook prevents the bug that occurred "DOZENS of times":
+#   - mart.player_game_stats.game_id column error
+#   - Hardcoded team abbreviation 'LA' (should be LAR/LAC)
+#   - Missing WHERE clauses on large tables
+#
+# Installation:
+#   cp hooks/pre-commit-frontend-validation .git/hooks/pre-commit
+#   chmod +x .git/hooks/pre-commit
+#
+# To bypass (emergency only):
+#   git commit --no-verify
+#
+# Author: Claude Code (Sonnet 4.5)
+# Created: November 22, 2025
+
+set -e  # Exit on error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Project root
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+
+# ============================================================================
+# Configuration
+# ============================================================================
+
+# Files to check (dashboard and API)
+FILES_TO_CHECK=(
+    "dashboard/app.py"
+    "api/main.py"
+    "api/prediction.py"
+)
+
+# Whether to run full validation or just changed files
+VALIDATE_ONLY_CHANGED=true
+
+# Whether to block on warnings (false = only block on errors)
+BLOCK_ON_WARNINGS=false
+
+# ============================================================================
+# Helper Functions
+# ============================================================================
+
+print_header() {
+    echo ""
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}$1${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+# ============================================================================
+# Check if validation should run
+# ============================================================================
+
+should_validate() {
+    # Check if any relevant files are staged
+    local changed_files=$(git diff --cached --name-only)
+
+    for file in "${FILES_TO_CHECK[@]}"; do
+        if echo "${changed_files}" | grep -q "${file}"; then
+            return 0  # Yes, should validate
+        fi
+    done
+
+    # Also check if database schema files changed
+    if echo "${changed_files}" | grep -q "^db/"; then
+        print_warning "Database schema files changed - running validation"
+        return 0
+    fi
+
+    return 1  # No relevant files changed
+}
+
+# ============================================================================
+# Run Validation
+# ============================================================================
+
+run_validation() {
+    cd "${PROJECT_ROOT}"
+
+    print_header "🔍 FRONTEND SCHEMA VALIDATION"
+
+    # Check if sync_frontend.sh exists
+    if [ ! -f "scripts/sync_frontend.sh" ]; then
+        print_error "scripts/sync_frontend.sh not found - cannot validate"
+        print_warning "Install Frontend Engineering Agent first"
+        exit 1
+    fi
+
+    # Run validation
+    echo "Running schema validation..."
+    echo ""
+
+    if ./scripts/sync_frontend.sh validate-schema; then
+        print_success "Schema validation passed"
+        validation_passed=true
+    else
+        print_error "Schema validation failed"
+        validation_passed=false
+    fi
+
+    echo ""
+
+    # Run API contract validation (non-blocking)
+    echo "Checking API contract..."
+    echo ""
+
+    if ./scripts/sync_frontend.sh validate-api 2>/dev/null; then
+        print_success "API contract validated"
+    else
+        print_warning "API contract validation failed (non-blocking)"
+        echo "Note: This is informational only - commit will not be blocked"
+    fi
+
+    echo ""
+
+    # Return validation result
+    if [ "${validation_passed}" = true ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+
+main() {
+    # Check if validation should run
+    if ! should_validate; then
+        print_success "No frontend files changed - skipping validation"
+        exit 0
+    fi
+
+    # Run validation
+    if run_validation; then
+        print_header "✅ COMMIT ALLOWED - All checks passed"
+        exit 0
+    else
+        echo ""
+        print_header "❌ COMMIT BLOCKED - Schema validation failed"
+        echo ""
+        echo "Your commit contains SQL queries that don't match the current database schema."
+        echo ""
+        echo "To fix:"
+        echo "  1. Review the errors above"
+        echo "  2. Update queries to match current schema"
+        echo "  3. See docs/database/SQL_PATTERNS.md for correct patterns"
+        echo ""
+        echo "Common fixes:"
+        echo "  ❌ SELECT pgs.game_id FROM mart.player_game_stats pgs"
+        echo "  ✅ JOIN to games via (season, week) composite key - see SQL_PATTERNS.md"
+        echo ""
+        echo "To bypass this check (NOT RECOMMENDED):"
+        echo "  git commit --no-verify"
+        echo ""
+        exit 1
+    fi
+}
+
+main "$@"
