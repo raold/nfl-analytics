@@ -447,7 +447,10 @@ def run_online_updates():
         AND pr.stat_type = pgs.stat_type
         AND pr.season = pgs.season
         AND pr.week = pgs.week
-    JOIN games g ON pgs.game_id = g.game_id
+    JOIN games g
+        ON pgs.season = g.season
+        AND pgs.week = g.week
+        AND pgs.team IN (g.home_team, g.away_team)
     WHERE pr.model_version = 'informative_priors_v2.5'
       AND pgs.stat_yards IS NOT NULL
       AND g.gameday >= CURRENT_DATE - INTERVAL '7 days'
