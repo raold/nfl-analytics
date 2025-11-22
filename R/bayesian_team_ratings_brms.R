@@ -98,7 +98,7 @@ prepare_brms_data <- function(games_df) {
 #'
 #' With hierarchical priors on team-specific attack/defense parameters.
 #' This is the Bayesian analog to Dixon-Coles parameterization.
-fit_brms_model_basic <- function(games_df, chains = 4, iter = 2000, cores = 4) {
+fit_brms_model_basic <- function(games_df, chains = 10, iter = 4000, cores = 10) {
   message("Fitting Model 1: Basic hierarchical team effects...")
 
   # Formula: margin with separate random effects for home/away attack/defense
@@ -136,7 +136,7 @@ fit_brms_model_basic <- function(games_df, chains = 4, iter = 2000, cores = 4) {
 #'
 #' Implements Gaussian process smooth over time for each team's rating.
 #' This captures seasonal momentum and regime changes.
-fit_brms_model_timevarying <- function(games_df, chains = 4, iter = 2000, cores = 4) {
+fit_brms_model_timevarying <- function(games_df, chains = 10, iter = 4000, cores = 10) {
   message("Fitting Model 2: Time-varying team strength...")
 
   # Formula with time-varying effects via GP
@@ -174,7 +174,7 @@ fit_brms_model_timevarying <- function(games_df, chains = 4, iter = 2000, cores 
 #'
 #' Uses a multivariate outcome to jointly model home and away scores,
 #' allowing proper correlation structure.
-fit_brms_model_full <- function(games_df, chains = 4, iter = 2000, cores = 4) {
+fit_brms_model_full <- function(games_df, chains = 10, iter = 4000, cores = 10) {
   message("Fitting Model 3: Full attack/defense decomposition...")
 
   # Reshape to long format for multivariate modeling

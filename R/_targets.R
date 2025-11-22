@@ -154,9 +154,9 @@ list(
     command = {
       fit_brms_model_basic(
         games_with_epa,
-        chains = 4,
-        iter = 2000,
-        cores = 4
+        chains = 10,
+        iter = 4000,
+        cores = 10
       )
     },
     deployment = "main" # Run on main process (Stan doesn't parallelize well)
@@ -178,9 +178,9 @@ list(
     command = {
       fit_brms_model_full(
         games_with_epa,
-        chains = 4,
-        iter = 2000,
-        cores = 4
+        chains = 10,
+        iter = 4000,
+        cores = 10
       )
     },
     deployment = "main"

@@ -165,7 +165,7 @@ prepare_brms_data <- function(games_df) {
 #' @param iter Total iterations per chain (default 2000)
 #' @param cores Number of CPU cores (default 4)
 #' @return brmsfit object
-fit_team_strength_model <- function(games_df, chains = 4, iter = 2000, cores = 4) {
+fit_team_strength_model <- function(games_df, chains = 10, iter = 4000, cores = 10) {
   message("\nFitting hierarchical team strength model...")
   message(sprintf(
     "  MCMC: %d chains × %d iterations = %d samples",
@@ -225,7 +225,7 @@ fit_team_strength_model <- function(games_df, chains = 4, iter = 2000, cores = 4
 #' @param iter MCMC iterations
 #' @param cores CPU cores
 #' @return list(offense_fit, defense_fit)
-fit_offense_defense_models <- function(games_df, chains = 4, iter = 2000, cores = 4) {
+fit_offense_defense_models <- function(games_df, chains = 10, iter = 4000, cores = 10) {
   message("\nFitting separate offense/defense models...")
 
   # Reshape to long format (one row per team-game)
@@ -625,9 +625,9 @@ run_team_strength_pipeline <- function(
   start_season = 2018,
   end_season = 2024,
   model_type = c("total", "separate"),
-  chains = 4,
-  iter = 2000,
-  cores = 4
+  chains = 10,
+  iter = 4000,
+  cores = 10
 ) {
   model_type <- match.arg(model_type)
 
