@@ -37,6 +37,18 @@ except ImportError:
     get_default_cache = None
     REDIS_AVAILABLE = False
 
+# Import connection pooling
+try:
+    from dashboard.utils.db import get_db_connection
+    POOLING_AVAILABLE = True
+except ImportError:
+    POOLING_AVAILABLE = False
+    # Fallback to direct connection if pooling unavailable
+    def get_db_connection():
+        """Fallback to direct connection if pooling unavailable."""
+        import psycopg
+        return psycopg.connect(**DB_CONFIG)
+
 # Database configuration from environment variables
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
@@ -161,9 +173,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-@cache_data(ttl=300)  # Redis cache for 5 minutes
+@cache_data(ttl=300)  # Redis cache for 5 minutes (deprecated - use get_db_connection)
 def get_database_connection():
-    """Get database connection."""
+    """Get database connection (deprecated - connection pooling now handled by get_db_connection)."""
+    # Note: This function kept for backward compatibility
+    # New code should use: with get_db_connection() as conn:
     return psycopg.connect(**DB_CONFIG)
 
 @cache_data(ttl=300)  # Redis cache for 5 minutes
@@ -189,7 +203,7 @@ def fetch_retrospective_metrics(model_version=None, season=None):
         p.prob_win,
         p.calibrated,
         mr.model_name,
-        mr.model_version,
+        mr.version,
         g.kickoff,
         g.spread_close,
         g.total_close
@@ -201,7 +215,7 @@ def fetch_retrospective_metrics(model_version=None, season=None):
 
     params = []
     if model_version:
-        query += " AND mr.model_version = %s"
+        query += " AND mr.version = %s"
         params.append(model_version)
     if season:
         query += " AND p.season = %s"
@@ -209,7 +223,7 @@ def fetch_retrospective_metrics(model_version=None, season=None):
 
     query += " ORDER BY g.kickoff DESC LIMIT 1000"
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn, params=params if params else None)
 
     return df
@@ -248,7 +262,7 @@ def fetch_model_comparison():
     query = """
     SELECT
         mr.model_name,
-        mr.model_version,
+        mr.version,
         mr.status as model_status,
         COUNT(p.prediction_id) as total_predictions,
         ROUND(AVG(p.abs_prediction_error)::numeric, 2) as mae,
@@ -260,7 +274,7 @@ def fetch_model_comparison():
     FROM ml.model_registry mr
     LEFT JOIN ml.predictions p ON mr.model_id = p.model_id AND p.stat_type = 'passing_yards' AND p.actual_value IS NOT NULL
     WHERE mr.status IN ('production', 'staging', 'active')
-    GROUP BY mr.model_id, mr.model_name, mr.model_version, mr.status
+    GROUP BY mr.model_id, mr.model_name, mr.version, mr.status
     ORDER BY mae ASC NULLS LAST
     """
 
@@ -397,9 +411,14 @@ def fetch_bnn_uncertainty_metrics():
 @cache_data(ttl=30)  # Redis cache for 30 seconds (live updates)
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
-    # Use most recent completed week for demonstration (2024 Week 12)
-    # In production, this would query current week (2025 Week 10+)
     query = """
+    WITH current_week AS (
+        SELECT season, week
+        FROM games
+        WHERE season = 2025 AND game_type = 'REG'
+        ORDER BY kickoff DESC
+        LIMIT 1
+    )
     SELECT
         g.game_id,
         g.season,
@@ -418,7 +437,8 @@ def fetch_current_week_games():
             ELSE 'scheduled'
         END as game_status
     FROM games g
-    WHERE g.season = 2024 AND g.week = 12 AND g.game_type = 'REG'
+    CROSS JOIN current_week cw
+    WHERE g.season = cw.season AND g.week = cw.week AND g.game_type = 'REG'
     ORDER BY g.kickoff DESC
     LIMIT 10
     """
@@ -950,6 +970,238 @@ def fetch_training_runs():
     except Exception as e:
         return pd.DataFrame()
 
+def render_game_predictions_page():
+    """Render game predictions page organized by time slots."""
+    # Get current week dynamically
+    with psycopg.connect(**DB_CONFIG) as conn:
+        week_query = "SELECT season, week FROM games WHERE season = 2025 AND game_type = 'REG' ORDER BY kickoff DESC LIMIT 1"
+        week_result = pd.read_sql_query(week_query, conn)
+        if week_result.empty:
+            st.error("No games found for 2025 season")
+            return
+        current_season = int(week_result['season'].iloc[0])
+        current_week = int(week_result['week'].iloc[0])
+
+    st.header("🎯 Game Predictions vs Sportsbook")
+    st.markdown(f"**{current_season} NFL Season - Week {current_week}**")
+
+    # Fetch all games and predictions for current week
+    query = f"""
+    SELECT
+        g.game_id,
+        g.season,
+        g.week,
+        g.home_team,
+        g.away_team,
+        g.home_score,
+        g.away_score,
+        g.spread_close,
+        g.total_close,
+        g.kickoff,
+        p.predicted_spread,
+        p.predicted_total,
+        p.home_win_prob,
+        CASE
+            WHEN g.home_score IS NOT NULL THEN 'completed'
+            WHEN g.kickoff < NOW() THEN 'in_progress'
+            ELSE 'scheduled'
+        END as game_status
+    FROM games g
+    LEFT JOIN predictions.game_predictions p ON g.game_id = p.game_id
+    WHERE g.season = {current_season} AND g.week = {current_week} AND g.game_type = 'REG'
+    ORDER BY g.kickoff
+    """
+
+    with psycopg.connect(**DB_CONFIG) as conn:
+        games_df = pd.read_sql_query(query, conn)
+
+    if games_df.empty:
+        st.info(f"No games found for Week {current_week}")
+        return
+
+    # Get bye week teams
+    bye_query = f"""
+    WITH all_teams AS (
+        SELECT DISTINCT home_team as team FROM games WHERE season = {current_season}
+        UNION
+        SELECT DISTINCT away_team as team FROM games WHERE season = {current_season}
+    ),
+    week_teams AS (
+        SELECT DISTINCT home_team as team FROM games WHERE season = {current_season} AND week = {current_week}
+        UNION
+        SELECT DISTINCT away_team as team FROM games WHERE season = {current_season} AND week = {current_week}
+    )
+    SELECT t.team
+    FROM all_teams t
+    WHERE t.team NOT IN (SELECT team FROM week_teams)
+    ORDER BY t.team
+    """
+
+    with psycopg.connect(**DB_CONFIG) as conn:
+        bye_teams = pd.read_sql_query(bye_query, conn)
+
+    # Show bye week teams
+    if not bye_teams.empty:
+        bye_list = ', '.join(bye_teams['team'].tolist())
+        st.info(f"**Bye Week:** {bye_list}")
+
+    # Organize games by time slot and status
+    def categorize_game(row):
+        if pd.notna(row['kickoff']):
+            kickoff_utc = pd.to_datetime(row['kickoff'])
+            if kickoff_utc.tzinfo is None:
+                kickoff_utc = kickoff_utc.tz_localize('UTC')
+            kickoff_et = kickoff_utc.astimezone(ZoneInfo('America/New_York'))
+
+            hour = kickoff_et.hour
+            day_of_week = kickoff_et.weekday()  # 0=Monday, 3=Thursday, 6=Sunday
+
+            if day_of_week == 3:  # Thursday
+                return 'TNF'
+            elif day_of_week == 6:  # Sunday
+                if hour < 13:  # Before 1 PM
+                    return 'International'
+                elif hour < 16:  # 1-4 PM
+                    return 'Sunday 1PM'
+                elif hour < 20:  # 4-8 PM
+                    return 'Sunday 4PM'
+                else:  # 8 PM or later
+                    return 'SNF'
+            elif day_of_week == 0:  # Monday
+                return 'MNF'
+        return 'Other'
+
+    games_df['time_slot'] = games_df.apply(categorize_game, axis=1)
+
+    # Sort games: in-progress → completed → scheduled
+    status_order = {'in_progress': 0, 'completed': 1, 'scheduled': 2}
+    games_df['status_order'] = games_df['game_status'].map(status_order)
+
+    # Time slot order
+    slot_order = {'TNF': 0, 'International': 1, 'Sunday 1PM': 2, 'Sunday 4PM': 3, 'SNF': 4, 'MNF': 5, 'Other': 6}
+    games_df['slot_order'] = games_df['time_slot'].map(slot_order)
+
+    games_df = games_df.sort_values(['status_order', 'slot_order', 'kickoff'])
+
+    # Render games by time slot
+    current_slot = None
+    slot_headers = {
+        'TNF': '🏈 Thursday Night Football',
+        'International': '🌍 International Games',
+        'Sunday 1PM': '🏈 Sunday Early Games (1:00 PM ET)',
+        'Sunday 4PM': '🏈 Sunday Afternoon Games (4:00 PM ET)',
+        'SNF': '🏈 ⭐ Sunday Night Football (8:00 PM ET)',
+        'MNF': '🏈 🏈 Monday Night Football'
+    }
+
+    for _, game in games_df.iterrows():
+        # Show time slot header
+        if game['time_slot'] != current_slot:
+            current_slot = game['time_slot']
+            if current_slot in slot_headers:
+                st.markdown(f"### {slot_headers[current_slot]}")
+
+        # Render game card
+        render_game_card_with_predictions(game)
+
+def render_game_card_with_predictions(game):
+    """Render a single game card with sportsbook vs model predictions."""
+    home = game['home_team']
+    away = game['away_team']
+
+    # Format kickoff time
+    if pd.notna(game['kickoff']):
+        kickoff_utc = pd.to_datetime(game['kickoff'])
+        if kickoff_utc.tzinfo is None:
+            kickoff_utc = kickoff_utc.tz_localize('UTC')
+        kickoff_et = kickoff_utc.astimezone(ZoneInfo('America/New_York'))
+        kickoff_str = kickoff_et.strftime('%a %I:%M %p ET')
+    else:
+        kickoff_str = "TBD"
+
+    # Game status display
+    if game['game_status'] == 'completed':
+        home_score = int(game['home_score']) if pd.notna(game['home_score']) else 0
+        away_score = int(game['away_score']) if pd.notna(game['away_score']) else 0
+        status_str = f"FINAL: {away} {away_score} @ {home} {home_score}"
+    elif game['game_status'] == 'in_progress':
+        status_str = f"⚡ IN PROGRESS - {kickoff_str}"
+    else:
+        status_str = kickoff_str
+
+    # Sportsbook lines
+    spread_sb = game['spread_close'] if pd.notna(game['spread_close']) else None
+    total_sb = game['total_close'] if pd.notna(game['total_close']) else None
+
+    # Model predictions
+    spread_model = game['predicted_spread'] if pd.notna(game['predicted_spread']) else None
+    total_model = game['predicted_total'] if pd.notna(game['predicted_total']) else None
+    home_win_prob = game['home_win_prob'] if pd.notna(game['home_win_prob']) else None
+
+    # Calculate edges
+    spread_edge = (spread_model - spread_sb) if (spread_model is not None and spread_sb is not None) else None
+    total_edge = (total_model - total_sb) if (total_model is not None and total_sb is not None) else None
+
+    # Format values
+    spread_sb_str = f"{home} {spread_sb:+.1f}" if spread_sb is not None else "N/A"
+    spread_model_str = f"{home} {spread_model:+.1f}" if spread_model is not None else "N/A"
+    spread_edge_str = f"{spread_edge:+.1f}" if spread_edge is not None else "—"
+    spread_edge_style = "color: green; font-weight: bold;" if spread_edge is not None and abs(spread_edge) >= 3 else ""
+
+    total_sb_str = f"O/U {total_sb:.1f}" if total_sb is not None else "N/A"
+    total_model_str = f"O/U {total_model:.1f}" if total_model is not None else "N/A"
+    total_edge_str = f"{total_edge:+.1f}" if total_edge is not None else "—"
+    total_edge_style = "color: green; font-weight: bold;" if total_edge is not None and abs(total_edge) >= 3 else ""
+
+    ml_model_str = f"{home} {home_win_prob*100:.1f}%" if home_win_prob is not None else "N/A"
+
+    # Build HTML card
+    st.markdown(f"""
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #007bff;">
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #333;">
+            {status_str}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="flex: 1; text-align: center;">
+                <div style="font-size: 18px; font-weight: bold;">{away}</div>
+            </div>
+            <div style="flex: 0 0 50px; text-align: center; font-size: 20px; color: #666;">@</div>
+            <div style="flex: 1; text-align: center;">
+                <div style="font-size: 18px; font-weight: bold;">{home}</div>
+            </div>
+        </div>
+
+        <div style="background-color: white; padding: 10px; border-radius: 5px;">
+            <table style="width: 100%; font-size: 13px;">
+                <tr style="background-color: #e9ecef;">
+                    <th style="padding: 5px; text-align: left;">Line</th>
+                    <th style="padding: 5px; text-align: center;">Sportsbook</th>
+                    <th style="padding: 5px; text-align: center;">Model</th>
+                    <th style="padding: 5px; text-align: center;">Edge</th>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Spread</strong></td>
+                    <td style="padding: 5px; text-align: center;">{spread_sb_str}</td>
+                    <td style="padding: 5px; text-align: center;">{spread_model_str}</td>
+                    <td style="padding: 5px; text-align: center; {spread_edge_style}">{spread_edge_str}</td>
+                </tr>
+                <tr style="background-color: #f8f9fa;">
+                    <td style="padding: 5px;"><strong>Total</strong></td>
+                    <td style="padding: 5px; text-align: center;">{total_sb_str}</td>
+                    <td style="padding: 5px; text-align: center;">{total_model_str}</td>
+                    <td style="padding: 5px; text-align: center; {total_edge_style}">{total_edge_str}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Win Prob</strong></td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                    <td style="padding: 5px; text-align: center;">{ml_model_str}</td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
 def render_system_status_page():
     """Render the system status page."""
     st.header("🖥️ System Status")
@@ -1392,12 +1644,15 @@ def main():
 
     page = st.sidebar.radio(
         "Select Page",
-        ["Predictions", "System Status", "Model Status", "Data Summary"],
+        ["Predictions", "🎯 Game Predictions", "System Status", "Model Status", "Data Summary"],
         index=0
     )
 
     # Route to appropriate page
-    if page == "System Status":
+    if page == "🎯 Game Predictions":
+        render_game_predictions_page()
+        return
+    elif page == "System Status":
         render_system_status_page()
         return
     elif page == "Model Status":
@@ -1731,6 +1986,13 @@ def main():
 
                     prediction_info = " | ".join(prediction_lines) if prediction_lines else "No predictions available"
 
+                    # Check if prediction was correct (for completed games)
+                    prediction_correct = False
+                    if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
+                        home_win_prob = float(game['predicted_home_win_prob'])
+                        predicted_winner_team = game['home_team'] if home_win_prob > 0.5 else game['away_team']
+                        prediction_correct = (predicted_winner_team == winner)
+
                     with col:
                         st.markdown(f"""
                         <div style="background-color: {'#d4edda' if prediction_correct else '#f8d7da'};
@@ -1967,9 +2229,8 @@ def main():
             df_model_comparison.style.format({
                 'mae': '{:.2f}',
                 'std_error': '{:.2f}',
-                'accuracy': '{:.1%}',
                 'avg_confidence': '{:.3f}'
-            }).background_gradient(subset=['accuracy'], cmap='RdYlGn'),
+            }),
             use_container_width=True
         )
     else:
