@@ -1,28 +1,37 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** November 21, 2025
-**Version:** 5.2 (PostgreSQL R Lookup Migration Complete)
-**Project Status:** Ensemble v6.1 Production Ready (PostgreSQL R Lookup, 200-400x faster), Dashboard Operational
+**Last Updated:** November 22, 2025
+**Version:** 5.3 (Comprehensive 5-Round Audit Complete)
+**Project Status:** Production Ready (Grade A-, 88/100) - Week 1 fixes identified
+
+**🔍 Comprehensive Audit (Nov 22, 2025):**
+- **Status:** ✅ COMPLETE (5 rounds, 93 issues identified, 12-17 hours)
+- **Grade:** A- (88/100) - PRODUCTION READY with targeted improvements
+- **Critical Findings:** 6 issues (data leakage, dashboard performance, frontend brittleness)
+- **Quick Wins:** 5.3 hours → 3-5x compound speedup
+- **Week 1 Fixes:** 20 hours → prevent 90% of recurring issues
+- **Full Report:** [COMPREHENSIVE_AUDIT_COMPLETE_20251122.md](docs/audits/COMPREHENSIVE_AUDIT_COMPLETE_20251122.md)
 
 **📖 Quick Navigation:**
+- [COMPREHENSIVE_AUDIT_COMPLETE_20251122.md](docs/audits/COMPREHENSIVE_AUDIT_COMPLETE_20251122.md) - Full 5-round audit (Nov 22)
 - [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) - 397 documentation files
-- [SESSION_NOV21_R_OPTIMIZATION_COMPLETE.md](docs/SESSION_NOV21_R_OPTIMIZATION_COMPLETE.md) - Latest session (Nov 21)
+- [SESSION_NOV21_R_OPTIMIZATION_COMPLETE.md](docs/SESSION_NOV21_R_OPTIMIZATION_COMPLETE.md) - R optimization (Nov 21)
 - [DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Schema guide (257 columns)
 - [GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md) - Cross-machine model sync
 
 ## 🚀 Quick Reference for Agents
 
-**Current Production State (Nov 21, 2025):**
-- Ensemble: v6.1 PRODUCTION READY (State-Space v2 30%, Hierarchical v2 30%, XGBoost v4 Ridge 25%, Informative Priors v2 15%, Hybrid Static-Incremental 10%)
+**Current Production State (Nov 22, 2025):**
+- Ensemble: v6.1 PRODUCTION READY (State-Space v2 27%, Hierarchical v2 27%, XGBoost v4 Ridge 23%, Informative Priors v2 13%, Hybrid Static-Incremental 10%)
   - **NEW v6.1 Feature**: PostgreSQL R model lookup (<1ms vs 2-4s for rpy2, 200-400x faster, 100% reliable)
-  - r2py Migration: ✅ Phase 1 Complete (5,511 predictions cached, 100/100 validation success)
+  - r2py Migration: ✅ Phase 1 Complete (6,090 predictions cached, 100/100 validation success)
   - Expected ROI: +6-9% (17.5% improvement over v5.1)
-  - Temperature Scaling: v6 integrated (90.0% calibration, optimal T=0.5534)
-  - API Status: ✅ Operational (~105ms inference, all 5 components working)
+  - Temperature Scaling: ⚠️ DISCREPANCY FOUND - Production uses T=1.0771 (v4 fallback), documentation claims T=0.5534
+  - API Status: ✅ Operational (~105ms inference, all 5 components working, 6.9 days uptime)
 - Database: 257 columns, 1.25M plays, 7,263 games (+ migration 047 deployed: `ml.r_model_predictions`)
-- Dissertation: 529 pages, Appendix I (780 lines BNN investigation)
-- Infrastructure: Git + Git LFS (Google Drive removed), 6 Docker services ✅ rebuilt Nov 15
-- Services: 6 Docker containers ✅ HEALTHY (PostgreSQL, Redis, FastAPI v6.1, Streamlit, Prometheus, Grafana)
+- Dissertation: 667 pages ✅ PUBLICATION READY (1 missing citation: Kejzlar et al. 2023 on Dirichlet mixing)
+- Infrastructure: Git + Git LFS (Google Drive removed), 8/9 Docker services ✅ HEALTHY
+- Services: 8/9 Docker containers ✅ OPERATIONAL (PostgreSQL, Redis, FastAPI v6.1, Streamlit, Prometheus, Grafana, exporters)
 - Model Registry: 8 production models synced + XGBoost v4 Ridge (Nov 15), 227 pending (auto-registration available)
 
 **Critical Files:**
