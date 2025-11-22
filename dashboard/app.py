@@ -522,51 +522,95 @@ def get_game_predictions(game_id: str, season: int, week: int) -> dict:
             'inference_time_ms': float
         }
     """
-    try:
-        api_url = os.getenv("FASTAPI_URL", "http://localhost:8000")
-        response = requests.post(
-            f"{api_url}/api/v1/predict/game",
-            json={"game_id": game_id, "season": season, "week": week},
-            timeout=10
-        )
+    max_retries = 3
+    retry_delay = 1  # seconds
 
-        if response.status_code == 200:
-            data = response.json()
+    for attempt in range(max_retries):
+        try:
+            api_url = os.getenv("FASTAPI_URL", "http://localhost:8000")
+            response = requests.post(
+                f"{api_url}/api/v1/predict/game",
+                json={"game_id": game_id, "season": season, "week": week},
+                timeout=15  # Increased from 10s to allow for DB queries
+            )
 
-            # Extract predictions
-            home_yards = data['home_prediction']['predicted_passing_yards']
-            home_std = data['home_prediction']['predicted_passing_yards_std']
-            away_yards = data['away_prediction']['predicted_passing_yards']
-            away_std = data['away_prediction']['predicted_passing_yards_std']
-            total_yards = data.get('total_predicted_yards')
+            if response.status_code == 200:
+                data = response.json()
 
-            # Estimate win probability based on QB passing yards advantage
-            # Simple heuristic: team with higher QB yards has higher win prob
-            # More sophisticated version would use game outcome models
-            if home_yards and away_yards:
-                yards_diff = home_yards - away_yards
-                # Convert yards difference to win probability (sigmoid-like)
-                # Each 50 yards ≈ 10% win prob advantage
-                home_win_prob = 0.5 + (yards_diff / 500.0)
-                home_win_prob = max(0.1, min(0.9, home_win_prob))  # Clamp to [0.1, 0.9]
+                # Validate response structure before accessing
+                required_keys = ['home_prediction', 'away_prediction', 'total_predicted_yards']
+                missing_keys = [k for k in required_keys if k not in data]
+                if missing_keys:
+                    logger.error(f"API response missing keys: {missing_keys} for {game_id}")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                        continue
+                    return None
+
+                # Extract predictions with safe access
+                try:
+                    home_yards = data['home_prediction']['predicted_passing_yards']
+                    home_std = data['home_prediction']['predicted_passing_yards_std']
+                    away_yards = data['away_prediction']['predicted_passing_yards']
+                    away_std = data['away_prediction']['predicted_passing_yards_std']
+                    total_yards = data.get('total_predicted_yards')
+                except KeyError as e:
+                    logger.error(f"KeyError accessing prediction data: {e} for {game_id}")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay * (attempt + 1))
+                        continue
+                    return None
+
+                # Estimate win probability based on QB passing yards advantage
+                # Simple heuristic: team with higher QB yards has higher win prob
+                # More sophisticated version would use game outcome models
+                if home_yards and away_yards:
+                    yards_diff = home_yards - away_yards
+                    # Convert yards difference to win probability (sigmoid-like)
+                    # Each 50 yards ≈ 10% win prob advantage
+                    home_win_prob = 0.5 + (yards_diff / 500.0)
+                    home_win_prob = max(0.1, min(0.9, home_win_prob))  # Clamp to [0.1, 0.9]
+                else:
+                    home_win_prob = 0.5
+
+                return {
+                    'home_qb_yards': home_yards,
+                    'home_qb_yards_std': home_std,
+                    'away_qb_yards': away_yards,
+                    'away_qb_yards_std': away_std,
+                    'total_yards': total_yards,
+                    'home_win_prob': home_win_prob,
+                    'inference_time_ms': data.get('processing_ms', 0)
+                }
+
+            elif response.status_code == 404:
+                logger.error(f"API endpoint not found: /api/v1/predict/game (status 404) for {game_id}")
+                logger.error(f"This may indicate the API container needs to be restarted or routes are not registered")
+                return None  # Don't retry on 404
             else:
-                home_win_prob = 0.5
+                logger.warning(f"FastAPI returned {response.status_code} for {game_id}: {response.text[:200]}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))
+                    continue
+                return None
 
-            return {
-                'home_qb_yards': home_yards,
-                'home_qb_yards_std': home_std,
-                'away_qb_yards': away_yards,
-                'away_qb_yards_std': away_std,
-                'total_yards': total_yards,
-                'home_win_prob': home_win_prob,
-                'inference_time_ms': data.get('processing_ms', 0)
-            }
-        else:
-            logger.warning(f"FastAPI returned {response.status_code} for {game_id}")
+        except requests.exceptions.Timeout:
+            logger.warning(f"Request timeout for {game_id} (attempt {attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+                continue
             return None
-
-    except requests.exceptions.RequestException as e:
-        logger.warning(f"Failed to fetch predictions from FastAPI: {e}")
+        except requests.exceptions.ConnectionError:
+            logger.error(f"Cannot connect to FastAPI at {api_url} (attempt {attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+                continue
+            return None
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Failed to fetch predictions from FastAPI: {e} (attempt {attempt + 1}/{max_retries})")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay * (attempt + 1))
+                continue
         return None
     except Exception as e:
         logger.error(f"Error parsing prediction response: {e}")
