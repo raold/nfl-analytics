@@ -18,6 +18,11 @@ from datetime import datetime, timedelta
 import os
 import sys
 from pathlib import Path
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -37,6 +42,14 @@ except ImportError:
     def get_db_connection():
         return psycopg.connect(**DB_CONFIG)
 
+# Import schema validation
+try:
+    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    SCHEMA_VALIDATION_AVAILABLE = True
+except ImportError:
+    SCHEMA_VALIDATION_AVAILABLE = False
+    logger.warning("Schema validation not available - operating without validation")
+
 st.set_page_config(
     page_title="Paper Trading Monitor",
     page_icon="📊",
@@ -47,7 +60,12 @@ st.title("📊 Paper Trading Performance Monitor")
 
 @st.cache_data(ttl=60)  # Refresh every minute
 def fetch_active_sessions():
-    """Fetch active paper trading sessions."""
+    """
+    Fetch active paper trading sessions with schema validation and error handling.
+
+    Returns:
+        DataFrame with session data or empty DataFrame on error
+    """
     query = """
     SELECT
         session_id,
@@ -66,14 +84,44 @@ def fetch_active_sessions():
     ORDER BY started_at DESC
     """
 
-    with get_db_connection() as conn:
-        df = pd.read_sql_query(query, conn)
+    try:
+        with get_db_connection() as conn:
+            df = pd.read_sql_query(query, conn)
 
-    return df
+        # Schema validation
+        if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
+            schemas = get_common_schemas()
+            df = validate_schema(df, schemas['paper_trading_sessions'], strict=False)
+
+        logger.info(f"Fetched {len(df)} active paper trading sessions")
+        return df
+
+    except psycopg.Error as e:
+        st.error(f"Database error fetching sessions: {e}")
+        logger.error(f"Database error in fetch_active_sessions: {e}", exc_info=True)
+        return pd.DataFrame()
+
+    except ValidationError as e:
+        st.warning(f"Schema validation failed for sessions: {e}")
+        logger.warning(f"Schema mismatch in fetch_active_sessions: {e}")
+        return pd.DataFrame()
+
+    except Exception as e:
+        st.error(f"Unexpected error fetching sessions: {e}")
+        logger.error(f"Unexpected error in fetch_active_sessions: {e}", exc_info=True)
+        return pd.DataFrame()
 
 @st.cache_data(ttl=60)
 def fetch_session_trades(session_id):
-    """Fetch trades for a specific session."""
+    """
+    Fetch trades for a specific session with error handling.
+
+    Args:
+        session_id: Session ID to query
+
+    Returns:
+        DataFrame with trade data or empty DataFrame on error
+    """
     query = """
     SELECT
         paper_trade_id,
@@ -96,34 +144,90 @@ def fetch_session_trades(session_id):
     ORDER BY trade_timestamp DESC
     """
 
-    with get_db_connection() as conn:
-        df = pd.read_sql_query(query, conn, params=[session_id])
+    try:
+        with get_db_connection() as conn:
+            df = pd.read_sql_query(query, conn, params=[session_id])
 
-    return df
+        # Schema validation
+        if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
+            schemas = get_common_schemas()
+            df = validate_schema(df, schemas['paper_trades'], strict=False)
+
+        logger.info(f"Fetched {len(df)} trades for session {session_id}")
+        return df
+
+    except psycopg.Error as e:
+        st.error(f"Database error fetching trades: {e}")
+        logger.error(f"Database error in fetch_session_trades: {e}", exc_info=True)
+        return pd.DataFrame()
+
+    except ValidationError as e:
+        st.warning(f"Schema validation failed for trades: {e}")
+        logger.warning(f"Schema mismatch in fetch_session_trades: {e}")
+        return pd.DataFrame()
+
+    except Exception as e:
+        st.error(f"Unexpected error fetching trades: {e}")
+        logger.error(f"Unexpected error in fetch_session_trades: {e}", exc_info=True)
+        return pd.DataFrame()
 
 @st.cache_data(ttl=60)
 def fetch_performance_by_prop_type():
-    """Fetch performance breakdown by prop type."""
+    """
+    Fetch performance breakdown by prop type with error handling.
+
+    Returns:
+        DataFrame with prop type performance or empty DataFrame on error
+    """
     query = """
     SELECT * FROM paper_trades_by_prop_type
     """
 
-    with get_db_connection() as conn:
-        df = pd.read_sql_query(query, conn)
+    try:
+        with get_db_connection() as conn:
+            df = pd.read_sql_query(query, conn)
 
-    return df
+        logger.info(f"Fetched performance for {len(df)} prop types")
+        return df
+
+    except psycopg.Error as e:
+        st.error(f"Database error fetching prop type performance: {e}")
+        logger.error(f"Database error in fetch_performance_by_prop_type: {e}", exc_info=True)
+        return pd.DataFrame()
+
+    except Exception as e:
+        st.error(f"Unexpected error fetching prop type performance: {e}")
+        logger.error(f"Unexpected error in fetch_performance_by_prop_type: {e}", exc_info=True)
+        return pd.DataFrame()
 
 @st.cache_data(ttl=60)
 def fetch_performance_by_bookmaker():
-    """Fetch performance breakdown by bookmaker."""
+    """
+    Fetch performance breakdown by bookmaker with error handling.
+
+    Returns:
+        DataFrame with bookmaker performance or empty DataFrame on error
+    """
     query = """
     SELECT * FROM paper_trades_by_bookmaker
     """
 
-    with get_db_connection() as conn:
-        df = pd.read_sql_query(query, conn)
+    try:
+        with get_db_connection() as conn:
+            df = pd.read_sql_query(query, conn)
 
-    return df
+        logger.info(f"Fetched performance for {len(df)} bookmakers")
+        return df
+
+    except psycopg.Error as e:
+        st.error(f"Database error fetching bookmaker performance: {e}")
+        logger.error(f"Database error in fetch_performance_by_bookmaker: {e}", exc_info=True)
+        return pd.DataFrame()
+
+    except Exception as e:
+        st.error(f"Unexpected error fetching bookmaker performance: {e}")
+        logger.error(f"Unexpected error in fetch_performance_by_bookmaker: {e}", exc_info=True)
+        return pd.DataFrame()
 
 # Main dashboard
 sessions_df = fetch_active_sessions()
@@ -367,15 +471,24 @@ with st.expander("⏳ Pending Trades (Awaiting Settlement)"):
     LIMIT 20
     """
 
-    with get_db_connection() as conn:
-        pending_df = pd.read_sql_query(pending_query, conn)
+    try:
+        with get_db_connection() as conn:
+            pending_df = pd.read_sql_query(pending_query, conn)
 
-    if not pending_df.empty:
-        st.warning(f"{len(pending_df)} trades awaiting settlement")
-        st.dataframe(pending_df, use_container_width=True, hide_index=True)
-        st.info("Run `python py/production/settle_paper_trades.py` to settle pending trades")
-    else:
-        st.success("No pending trades")
+        if not pending_df.empty:
+            st.warning(f"{len(pending_df)} trades awaiting settlement")
+            st.dataframe(pending_df, use_container_width=True, hide_index=True)
+            st.info("Run `python py/production/settle_paper_trades.py` to settle pending trades")
+        else:
+            st.success("No pending trades")
+
+    except psycopg.Error as e:
+        st.error(f"Database error fetching pending trades: {e}")
+        logger.error(f"Database error fetching pending trades: {e}", exc_info=True)
+
+    except Exception as e:
+        st.error(f"Unexpected error fetching pending trades: {e}")
+        logger.error(f"Unexpected error fetching pending trades: {e}", exc_info=True)
 
 # Auto-refresh toggle
 st.sidebar.markdown("---")

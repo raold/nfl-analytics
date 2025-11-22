@@ -44,6 +44,15 @@ except ImportError:
 # Import API client
 from utils.api_client import APIClient
 
+# Import schema validation
+try:
+    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    SCHEMA_VALIDATION_AVAILABLE = True
+except ImportError:
+    SCHEMA_VALIDATION_AVAILABLE = False
+    import logging
+    logging.warning("Schema validation not available - operating without validation")
+
 # Import dashboard constants
 from constants import (
     STRONG_SPREAD_EDGE_THRESHOLD,
@@ -69,7 +78,7 @@ from constants import (
 
 def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
     """
-    Fetch game predictions from ml.game_predictions table if it exists.
+    Fetch game predictions from ml.game_predictions table with error handling.
 
     NOTE: As of Nov 21, 2025, this table doesn't exist yet. This function
     is a placeholder for future implementation.
@@ -81,6 +90,9 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
     Returns:
         DataFrame with stored predictions, or empty DataFrame if table doesn't exist
     """
+    import logging
+    logger = logging.getLogger(__name__)
+
     try:
         # Database config from environment
         DB_CONFIG = {
@@ -111,10 +123,17 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
         with get_db_connection() as conn:
             df = pd.read_sql_query(query, conn, params=(season, week))
 
+        logger.info(f"Fetched {len(df)} game predictions for {season} Week {week}")
         return df
 
+    except psycopg.Error as e:
+        # Table doesn't exist yet or query error - return empty DataFrame
+        logger.debug(f"Game predictions table query failed (expected if table doesn't exist): {e}")
+        return pd.DataFrame()
+
     except Exception as e:
-        # Table doesn't exist yet - return empty DataFrame
+        # Unexpected error - log and return empty
+        logger.warning(f"Unexpected error in fetch_game_predictions_db: {e}")
         return pd.DataFrame()
 
 
@@ -352,6 +371,11 @@ def render_game_predictions_comparison() -> None:
         with get_db_connection() as conn:
             df_games = pd.read_sql_query(query, conn, params=(current_season, current_week))
 
+        # Schema validation
+        if SCHEMA_VALIDATION_AVAILABLE and not df_games.empty:
+            schemas = get_common_schemas()
+            df_games = validate_schema(df_games, schemas['games'], strict=False)
+
         if df_games.empty:
             st.info(f"No games found for Week {current_week} of {current_season} season.")
             return
@@ -518,9 +542,21 @@ def render_game_predictions_comparison() -> None:
             4. Implementing proper bankroll management and risk controls
             """)
 
+    except psycopg.Error as e:
+        st.error(f"Database error loading games: {e}")
+        import logging
+        logging.error(f"Database error in render_game_predictions_comparison: {e}", exc_info=True)
+
+    except ValidationError as e:
+        st.warning(f"Schema validation failed for games: {e}")
+        import logging
+        logging.warning(f"Schema mismatch in render_game_predictions_comparison: {e}")
+
     except Exception as e:
-        st.error(f"Error loading game predictions: {str(e)}")
+        st.error(f"Unexpected error loading game predictions: {str(e)}")
         import traceback
+        import logging
+        logging.error(f"Unexpected error in render_game_predictions_comparison: {e}", exc_info=True)
         st.code(traceback.format_exc())
 
 
