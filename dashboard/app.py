@@ -47,7 +47,13 @@ except ImportError:
     def get_db_connection():
         """Fallback to direct connection if pooling unavailable."""
         import psycopg
-        return psycopg.connect(**DB_CONFIG)
+        return psycopg.connect(
+            host=os.getenv("DB_HOST", "localhost"),
+            port=int(os.getenv("DB_PORT", "5544")),
+            dbname=os.getenv("DB_NAME", "devdb01"),
+            user=os.getenv("DB_USER", "dro"),
+            password=os.getenv("DB_PASSWORD", "sicillionbillions")
+        )
 
 # Database configuration from environment variables
 DB_CONFIG = {
@@ -178,7 +184,7 @@ def get_database_connection():
     """Get database connection (deprecated - connection pooling now handled by get_db_connection)."""
     # Note: This function kept for backward compatibility
     # New code should use: with get_db_connection() as conn:
-    return psycopg.connect(**DB_CONFIG)
+    return get_db_connection()
 
 @cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_retrospective_metrics(model_version=None, season=None):
@@ -251,7 +257,7 @@ def fetch_performance_over_time():
     SELECT * FROM weekly_metrics
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn)
 
     return df
@@ -278,7 +284,7 @@ def fetch_model_comparison():
     ORDER BY mae ASC NULLS LAST
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn)
 
     return df
@@ -394,7 +400,7 @@ def fetch_bye_week_teams(season, week):
     ORDER BY t.team
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn, params=(season, season, season, week, season, week))
 
     return df['team'].tolist() if not df.empty else []
@@ -411,11 +417,12 @@ def fetch_bnn_uncertainty_metrics():
 @cache_data(ttl=30)  # Redis cache for 30 seconds (live updates)
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
+    current_season = datetime.now().year
     query = """
     WITH current_week AS (
         SELECT season, week
         FROM games
-        WHERE season = 2025 AND game_type = 'REG'
+        WHERE season = %s AND game_type = 'REG'
         ORDER BY kickoff DESC
         LIMIT 1
     )
@@ -443,8 +450,8 @@ def fetch_current_week_games():
     LIMIT 10
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
-        df = pd.read_sql_query(query, conn)
+    with get_db_connection() as conn:
+        df = pd.read_sql_query(query, conn, params=(current_season,))
 
     # Fetch live scores and predictions
     if not df.empty:
@@ -891,7 +898,7 @@ def check_service_health(host, port, service_name):
 def fetch_database_stats():
     """Fetch database statistics."""
     try:
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             stats = {}
 
             # Total games
@@ -942,7 +949,7 @@ def fetch_model_registry():
         FROM ml.model_registry
         ORDER BY updated_at DESC
         """
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             df = pd.read_sql_query(query, conn)
         return df
     except Exception as e:
@@ -964,7 +971,7 @@ def fetch_training_runs():
         ORDER BY started_at DESC
         LIMIT 10
         """
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             df = pd.read_sql_query(query, conn)
         return df
     except Exception as e:
@@ -973,11 +980,12 @@ def fetch_training_runs():
 def render_game_predictions_page():
     """Render game predictions page organized by time slots."""
     # Get current week dynamically
-    with psycopg.connect(**DB_CONFIG) as conn:
-        week_query = "SELECT season, week FROM games WHERE season = 2025 AND game_type = 'REG' ORDER BY kickoff DESC LIMIT 1"
-        week_result = pd.read_sql_query(week_query, conn)
+    current_year = datetime.now().year
+    with get_db_connection() as conn:
+        week_query = "SELECT season, week FROM games WHERE season = %s AND game_type = 'REG' ORDER BY kickoff DESC LIMIT 1"
+        week_result = pd.read_sql_query(week_query, conn, params=(current_year,))
         if week_result.empty:
-            st.error("No games found for 2025 season")
+            st.error(f"No games found for {current_year} season")
             return
         current_season = int(week_result['season'].iloc[0])
         current_week = int(week_result['week'].iloc[0])
@@ -1012,7 +1020,7 @@ def render_game_predictions_page():
     ORDER BY g.kickoff
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         games_df = pd.read_sql_query(query, conn)
 
     if games_df.empty:
@@ -1037,7 +1045,7 @@ def render_game_predictions_page():
     ORDER BY t.team
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         bye_teams = pd.read_sql_query(bye_query, conn)
 
     # Show bye week teams
@@ -1545,7 +1553,7 @@ def render_data_summary_page():
     st.subheader("🗄️ Schema Statistics")
 
     try:
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             # Count tables by schema
             schema_query = """
             SELECT
@@ -1583,7 +1591,7 @@ def render_data_summary_page():
     st.subheader("📥 Recent Data Ingestion")
 
     try:
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             # Get recent games by season and week
             recent_query = """
             SELECT
@@ -1675,7 +1683,7 @@ def main():
 
     # Model version filter (dynamically fetch from database)
     try:
-        with psycopg.connect(**DB_CONFIG) as conn:
+        with get_db_connection() as conn:
             model_versions_df = pd.read_sql_query(
                 "SELECT DISTINCT model_version FROM ml.model_registry WHERE status IN ('production', 'staging', 'active') ORDER BY model_version",
                 conn
