@@ -921,13 +921,83 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
     processing_start = time.time()
 
     try:
-        # Temporary: Generate deterministic predictions based on game_id
-        # TODO: Implement actual QB identification and ensemble prediction using EnhancedEnsemble
-        home_yards = 250.0 + (hash(request.game_id + "_home") % 100)
-        away_yards = 250.0 + (hash(request.game_id + "_away") % 100)
-        # Calculate uncertainty from mean prediction (typical 15-20% of mean for QB yards)
-        home_uncertainty = home_yards * 0.18
-        away_uncertainty = away_yards * 0.18
+        # Extract team abbreviations from game_id (format: YYYY_WW_AWAY_HOME)
+        parts = request.game_id.split("_")
+        if len(parts) != 4:
+            raise ValueError(f"Invalid game_id format: {request.game_id}. Expected: YYYY_WW_AWAY_HOME")
+
+        away_team = parts[2]
+        home_team = parts[3]
+
+        # Query database for starting QBs for this game
+        with get_db_connection() as conn:
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+            # Get starting QBs (most passing attempts in the game)
+            qb_query = """
+            SELECT
+                player_id,
+                team,
+                COUNT(*) as attempts,
+                SUM(CASE WHEN pass_attempt = 1 THEN 1 ELSE 0 END) as pass_attempts
+            FROM plays
+            WHERE game_id = %s
+                AND pass_attempt = 1
+                AND passer_player_id IS NOT NULL
+            GROUP BY player_id, team
+            ORDER BY pass_attempts DESC
+            LIMIT 2
+            """
+
+            cursor.execute(qb_query, (request.game_id,))
+            qbs = cursor.fetchall()
+
+            # If game hasn't happened yet, use season averages for team's likely starter
+            if not qbs:
+                logger.warning(f"No QB data for {request.game_id}, using season averages")
+
+                # Fallback to season averages (realistic estimates based on 2024 averages)
+                # This provides reasonable predictions even for future games
+                home_yards = 240.0  # Median QB passing yards
+                away_yards = 240.0
+                home_uncertainty = 50.0  # Typical std dev
+                away_uncertainty = 50.0
+            else:
+                # Use actual QB data to generate predictions
+                # For simplicity, use season averages for these QBs
+                # TODO: Integrate with EnhancedEnsemble5Way for full prediction
+
+                home_qb = next((qb for qb in qbs if qb['team'] == home_team), None)
+                away_qb = next((qb for qb in qbs if qb['team'] == away_team), None)
+
+                # Get season stats for these QBs
+                if home_qb:
+                    home_stats_query = """
+                    SELECT AVG(passing_yards) as avg_yards, STDDEV(passing_yards) as std_yards
+                    FROM mart.player_game_stats
+                    WHERE player_id = %s AND season = %s
+                    """
+                    cursor.execute(home_stats_query, (home_qb['player_id'], request.season))
+                    home_stats = cursor.fetchone()
+                    home_yards = float(home_stats['avg_yards'] or 240.0)
+                    home_uncertainty = float(home_stats['std_yards'] or 50.0)
+                else:
+                    home_yards = 240.0
+                    home_uncertainty = 50.0
+
+                if away_qb:
+                    away_stats_query = """
+                    SELECT AVG(passing_yards) as avg_yards, STDDEV(passing_yards) as std_yards
+                    FROM mart.player_game_stats
+                    WHERE player_id = %s AND season = %s
+                    """
+                    cursor.execute(away_stats_query, (away_qb['player_id'], request.season))
+                    away_stats = cursor.fetchone()
+                    away_yards = float(away_stats['avg_yards'] or 240.0)
+                    away_uncertainty = float(away_stats['std_yards'] or 50.0)
+                else:
+                    away_yards = 240.0
+                    away_uncertainty = 50.0
 
         processing_ms = (time.time() - processing_start) * 1000
 
