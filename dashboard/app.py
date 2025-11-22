@@ -981,14 +981,15 @@ def render_game_predictions_page():
     """Render game predictions page organized by time slots."""
     # Get current week dynamically
     current_year = datetime.now().year
-    with get_db_connection() as conn:
-        week_query = "SELECT season, week FROM games WHERE season = %s AND game_type = 'REG' ORDER BY kickoff DESC LIMIT 1"
-        week_result = pd.read_sql_query(week_query, conn, params=(current_year,))
-        if week_result.empty:
-            st.error(f"No games found for {current_year} season")
-            return
-        current_season = int(week_result['season'].iloc[0])
-        current_week = int(week_result['week'].iloc[0])
+    with st.spinner("Loading current week..."):
+        with get_db_connection() as conn:
+            week_query = "SELECT season, week FROM games WHERE season = %s AND game_type = 'REG' ORDER BY kickoff DESC LIMIT 1"
+            week_result = pd.read_sql_query(week_query, conn, params=(current_year,))
+            if week_result.empty:
+                st.error(f"No games found for {current_year} season")
+                return
+            current_season = int(week_result['season'].iloc[0])
+            current_week = int(week_result['week'].iloc[0])
 
     st.header("🎯 Game Predictions vs Sportsbook")
     st.markdown(f"**{current_season} NFL Season - Week {current_week}**")
@@ -1020,8 +1021,9 @@ def render_game_predictions_page():
     ORDER BY g.kickoff
     """
 
-    with get_db_connection() as conn:
-        games_df = pd.read_sql_query(query, conn)
+    with st.spinner("Loading game predictions..."):
+        with get_db_connection() as conn:
+            games_df = pd.read_sql_query(query, conn)
 
     if games_df.empty:
         st.info(f"No games found for Week {current_week}")
@@ -1253,7 +1255,8 @@ def render_system_status_page():
 
     # Database statistics
     st.subheader("💾 Database Statistics")
-    db_stats = fetch_database_stats()
+    with st.spinner("Loading database statistics..."):
+        db_stats = fetch_database_stats()
 
     if db_stats:
         col1, col2, col3, col4, col5 = st.columns(5)
@@ -1355,7 +1358,8 @@ def render_model_status_page():
 
     # Model registry
     st.subheader("📋 Model Registry")
-    df_models = fetch_model_registry()
+    with st.spinner("Loading model registry..."):
+        df_models = fetch_model_registry()
 
     if not df_models.empty:
         # Summary metrics
