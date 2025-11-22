@@ -16,15 +16,26 @@ from plotly.subplots import make_subplots
 import psycopg
 from datetime import datetime, timedelta
 import os
+import sys
+from pathlib import Path
 
-# Database configuration
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", "5544")),
-    "dbname": os.getenv("DB_NAME", "devdb01"),
-    "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions")
-}
+# Add project root to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# Import connection pooling
+try:
+    from dashboard.utils.db import get_db_connection, DB_CONFIG
+except ImportError:
+    # Fallback configuration
+    DB_CONFIG = {
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5544")),
+        "dbname": os.getenv("DB_NAME", "devdb01"),
+        "user": os.getenv("DB_USER", "dro"),
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+    }
+    def get_db_connection():
+        return psycopg.connect(**DB_CONFIG)
 
 st.set_page_config(
     page_title="Paper Trading Monitor",
@@ -55,7 +66,7 @@ def fetch_active_sessions():
     ORDER BY started_at DESC
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn)
 
     return df
@@ -85,7 +96,7 @@ def fetch_session_trades(session_id):
     ORDER BY trade_timestamp DESC
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn, params=[session_id])
 
     return df
@@ -97,7 +108,7 @@ def fetch_performance_by_prop_type():
     SELECT * FROM paper_trades_by_prop_type
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn)
 
     return df
@@ -109,7 +120,7 @@ def fetch_performance_by_bookmaker():
     SELECT * FROM paper_trades_by_bookmaker
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         df = pd.read_sql_query(query, conn)
 
     return df
@@ -356,7 +367,7 @@ with st.expander("⏳ Pending Trades (Awaiting Settlement)"):
     LIMIT 20
     """
 
-    with psycopg.connect(**DB_CONFIG) as conn:
+    with get_db_connection() as conn:
         pending_df = pd.read_sql_query(pending_query, conn)
 
     if not pending_df.empty:
