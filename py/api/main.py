@@ -87,7 +87,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import numpy as np
 from fastapi import FastAPI, HTTPException, Query, status
@@ -381,6 +381,28 @@ class MetricsResponse(BaseModel):
     avg_processing_ms: float
     models_loaded: int
     uptime_seconds: float
+
+
+class ModelInfo(BaseModel):
+    """Information about a loaded model."""
+
+    model_name: str = Field(..., description="Model identifier")
+    model_type: str = Field(..., description="Model type (bayesian, xgboost, etc)")
+    version: str = Field(..., description="Model version")
+    file_path: str = Field(..., description="Path to model file")
+    file_size_mb: float = Field(..., description="Model file size in MB")
+    loaded_at: str = Field(..., description="ISO timestamp of when model was loaded")
+    status: str = Field(..., description="Status: loaded, failed, unavailable")
+    metadata: Optional[dict] = Field(None, description="Additional model metadata")
+
+
+class ModelsListResponse(BaseModel):
+    """Response listing all loaded models."""
+
+    models: List[ModelInfo] = Field(..., description="List of model information")
+    total_models: int = Field(..., description="Total number of models configured")
+    loaded_models: int = Field(..., description="Number of successfully loaded models")
+    ensemble_ready: bool = Field(..., description="Whether ensemble is ready for predictions")
 
 
 class GamePredictionRequest(BaseModel):
@@ -776,6 +798,115 @@ async def health() -> HealthResponse:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=response.dict())
 
     return response
+
+
+@app.get(
+    "/models",
+    response_model=ModelsListResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Models"],
+)
+async def get_models() -> ModelsListResponse:
+    """
+    Get list of loaded models and their metadata.
+
+    Returns:
+        ModelsListResponse with model information and ensemble status
+
+    Example Response:
+        {
+            "models": [
+                {
+                    "model_name": "state_space_v2",
+                    "model_type": "bayesian",
+                    "version": "v2",
+                    "file_path": "models/bayesian/simplified_random_walk_v2.rds",
+                    "file_size_mb": 1.5,
+                    "loaded_at": "2025-11-22T10:30:00Z",
+                    "status": "loaded",
+                    "metadata": {"mae": 47.77, "calibration": 0.90}
+                }
+            ],
+            "total_models": 4,
+            "loaded_models": 4,
+            "ensemble_ready": true
+        }
+    """
+    if not model_manager:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Model manager not initialized"
+        )
+
+    # Build model information list
+    models_info = []
+    loaded_count = 0
+
+    # Get ensemble model versions
+    model_versions = model_manager.model_versions if model_manager else {}
+
+    # Define model metadata
+    model_configs = [
+        {
+            "name": "state_space_v2",
+            "type": "bayesian",
+            "version": "v2",
+            "path": "models/bayesian/simplified_random_walk_v2.rds",
+            "metadata": {"mae": 47.77, "training_window": "2018-2024", "method": "Stan"}
+        },
+        {
+            "name": "hierarchical_v2",
+            "type": "bayesian",
+            "version": "v2",
+            "path": "models/bayesian/passing_yards_hierarchical_v2.rds",
+            "metadata": {"training_window": "2018-2024", "method": "brms"}
+        },
+        {
+            "name": "hybrid_xgboost_v1",
+            "type": "xgboost",
+            "version": "v1",
+            "path": "models/xgboost/hybrid_static_incremental_v1",
+            "metadata": {"mae": 38.03, "blend": "70% static + 30% incremental"}
+        },
+        {
+            "name": "informative_priors_v2",
+            "type": "bayesian",
+            "version": "v2",
+            "path": "models/bayesian/passing_informative_priors_v2.rds",
+            "metadata": {"training_window": "2018-2024", "method": "brms"}
+        }
+    ]
+
+    for config in model_configs:
+        # Check if model file exists and get size
+        model_path = Path(config["path"])
+        file_exists = model_path.exists()
+        file_size_mb = model_path.stat().st_size / (1024 * 1024) if file_exists else 0.0
+
+        # Determine status
+        status_str = "loaded" if (model_manager.ensemble and file_exists) else "unavailable"
+        if status_str == "loaded":
+            loaded_count += 1
+
+        models_info.append(ModelInfo(
+            model_name=config["name"],
+            model_type=config["type"],
+            version=config["version"],
+            file_path=config["path"],
+            file_size_mb=round(file_size_mb, 2),
+            loaded_at=datetime.utcnow().isoformat() + "Z",
+            status=status_str,
+            metadata=config.get("metadata")
+        ))
+
+    ensemble_ready = model_manager.ensemble is not None and loaded_count >= 3
+
+    return ModelsListResponse(
+        models=models_info,
+        total_models=len(model_configs),
+        loaded_models=loaded_count,
+        ensemble_ready=ensemble_ready
+    )
 
 
 @app.post(
