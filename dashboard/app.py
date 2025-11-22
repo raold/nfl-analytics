@@ -525,7 +525,7 @@ def get_game_predictions(game_id: str, season: int, week: int) -> dict:
     try:
         api_url = os.getenv("FASTAPI_URL", "http://localhost:8000")
         response = requests.post(
-            f"{api_url}/predict/game",
+            f"{api_url}/api/v1/predict/game",
             json={"game_id": game_id, "season": season, "week": week},
             timeout=10
         )
