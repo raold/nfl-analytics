@@ -415,6 +415,11 @@ class EnforcementRouter:
         all_results = []
 
         for file_path in changed_files:
+            # Skip .md files in docs/audits/ (audit documentation contains code examples)
+            if file_path.endswith('.md') and 'docs/audits/' in file_path:
+                logger.info(f"Skipping validation for audit documentation: {file_path}")
+                continue
+
             results = self.validate_file(file_path)
             all_results.extend(results)
 
