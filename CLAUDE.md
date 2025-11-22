@@ -23,6 +23,7 @@
 
 **Current Production State (Nov 22, 2025):**
 - Ensemble: v6.1 PRODUCTION READY (State-Space v2 27%, Hierarchical v2 27%, XGBoost v4 Ridge 23%, Informative Priors v2 13%, Hybrid Static-Incremental 10%)
+  - **Weighting Strategy**: STATIC WEIGHTS (optimized via CVX, validated 2024 holdout) - See [Why No Dynamic Weights](#why-no-dynamic-weights-adr-009) below
   - **NEW v6.1 Feature**: PostgreSQL R model lookup (<1ms vs 2-4s for rpy2, 200-400x faster, 100% reliable)
   - r2py Migration: ✅ Phase 1 Complete (6,090 predictions cached, 100/100 validation success)
   - Expected ROI: +6-9% (17.5% improvement over v5.1)
@@ -498,6 +499,96 @@ def run_expensive_validation(seasons: List[int]):
 - **Model Registry:** 8 models synced, 227 pending registration
 
 **Strategic Decision (Nov 9, 2025):** BNN Research Abandoned after 6 failed approaches (84 person-hours). Only BNN v3.1 Rushing (89.5% calibrated) remains in production.
+
+---
+
+## Why No Dynamic Weights? (ADR-009)
+
+**Question:** "Have we fully implemented dynamic ensemble weighting (meta-learning)?"
+**Answer:** NO - We built it, tested it rigorously, and **deliberately chose NOT to use it**.
+
+**TL;DR:** Static weights (v6.0) outperform dynamic meta-learning (v7.0) because our ensemble components are stable. Complexity without benefit violates Occam's Razor.
+
+### What We Have (But Don't Use)
+
+**Available Meta-Learning Infrastructure** (tested, archived):
+- `py/ensemble/dirichlet_bayesian_stacking.py` (591 lines) - Online Bayesian weight adaptation
+- `py/ensemble/adaptive_wls_weights_v2.py` (493 lines) - Sagarin-style exponential recency
+- `py/ensemble/game_outcome_ensemble_contextual.py` (429 lines) - Context-aware dynamic weighting
+- `py/online/online_learning_adapter.py` - Drift detection framework (ADWIN, KSWIN, Page-Hinkley)
+
+**Online Learning Database Infrastructure** (6 schemas, 11 tables):
+- `ml.r_model_predictions` - 6,090 cached R predictions (PostgreSQL lookup, 200-400x faster)
+- `ml.game_predictions` - Game-level prediction storage
+- `ml.ensemble_predictions` - Ensemble prediction history
+- `ml.prediction_metrics` - Performance tracking
+
+### What We Use Instead
+
+**v6.1 STATIC WEIGHTS** (optimized Nov 15, 2025):
+- State-Space v2: 27%
+- Hierarchical v2: 27%
+- XGBoost v4 Ridge: 23%
+- Informative Priors v2: 13%
+- Hybrid Static-Incremental: 10% (ONLY adaptive component - 70% static + 30% incremental blend)
+
+**Weight Optimization Method:** Constrained convex optimization (CVX) on 2023 validation set, holdout tested on 2024
+
+**Calibration:** Temperature scaling (T=0.5534) achieves 90% calibration
+
+### The ADR-009 Investigation (Nov 18, 2025)
+
+**Duration:** 8.5 hours (full multi-season backtest)
+**Goal:** Determine if dynamic meta-learning improves MAE by ≥2 yards vs static weights
+
+**Results:**
+
+| Configuration          | MAE (yards) | vs v6.0 | Improvement | p-value |
+|------------------------|-------------|---------|-------------|---------|
+| v6.0 Static Weights    | 34.00       | -       | -           | -       |
+| v7.0 WLS Only          | 34.01       | +0.01   | +0.03%      | nan     |
+| v7.0 Meta-Learning     | 34.02       | +0.02   | +0.06%      | nan     |
+| v7.0 Full (WLS + Meta) | 34.01       | +0.01   | +0.03%      | nan     |
+
+**Target:** ≥2 yards improvement (≥5.9%)
+**Achieved:** +0.01 yards (essentially zero, within noise)
+**Decision:** **ABANDON v7.0, RETAIN v6.0**
+
+### Why Dynamic Weights Failed
+
+**Root Causes:**
+1. **Component Stability** - All 5 ensemble components have <4% MAE variance across 2022-2024 seasons
+2. **No Regime Changes** - Component rankings stable (State-Space always best, Informative Priors always weakest)
+3. **Meta-Features Lack Predictive Power** - Recent component performance does NOT predict future performance
+4. **Functional Redundancy** - WLS overlaps with temperature scaling (both correct bias)
+5. **Insufficient Sample Size** - Only 3 seasons of data (need 10+ for stable meta-learning)
+
+**Empirical Insight:** Static weights are optimal when components are stable. Dynamic weighting helps only when:
+- Component performance varies >10% season-to-season
+- Clear regime changes occur (e.g., rule changes, new data sources)
+- Concept drift detected in production
+
+### When to Revisit This Decision
+
+**Monitor quarterly for these triggers:**
+1. **Component MAE variance >10%** across seasons (currently <4%)
+2. **Calibration drift >2% per month** (currently stable at 90%)
+3. **Sharpe ratio change >20%** from baseline
+4. **New unstable components added** (e.g., rookie QB model)
+5. **External shocks** (e.g., COVID-19 style disruptions, rule changes)
+
+**Re-evaluation criteria:**
+- Minimum 10 seasons of data (currently only 3: 2022-2024)
+- Clear evidence of regime changes
+- Demonstrated benefit >2 yards MAE improvement (p<0.05)
+
+### Lesson Learned
+
+**Complexity is a cost, not a benefit.**
+
+Sophisticated methods (Dirichlet stacking, adaptive WLS, contextual meta-learning) are intellectually appealing but empirically useless when the underlying components are stable. Occam's Razor wins: simpler is better when performance is equivalent.
+
+**Full Documentation:** [docs/adr/009-abandon-ensemble-v7-meta-learning.md](docs/adr/009-abandon-ensemble-v7-meta-learning.md) (if exists)
 
 ---
 
