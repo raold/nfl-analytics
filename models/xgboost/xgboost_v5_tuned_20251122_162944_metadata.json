@@ -1,0 +1,18 @@
+{
+  "best_params": {
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "n_estimators": 500,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_alpha": 0.1,
+    "reg_lambda": 1.0
+  },
+  "test_mae": 3.715781467716868,
+  "test_rmse": 5.914665719107212,
+  "test_r2": 0.9943018307533139,
+  "n_features": 110,
+  "training_samples": 2254,
+  "test_samples": 574,
+  "timestamp": "2025-11-22T16:29:44.170637"
+}
