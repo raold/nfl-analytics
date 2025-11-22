@@ -51,10 +51,10 @@ PROTOTYPE_N_QBS <- 10 # Train on 10 elite QBs in prototype mode
 
 # Stan sampling configuration
 STAN_CONFIG <- list(
-  chains = 4,
-  parallel_chains = 4,
-  iter_warmup = 1000,
-  iter_sampling = 2000,
+  chains = 10,
+  parallel_chains = 10,
+  iter_warmup = 2000,
+  iter_sampling = 4000,
   seed = 42,
   adapt_delta = 0.95, # Higher adapt_delta for complex model
   max_treedepth = 12 # Allow deeper trees

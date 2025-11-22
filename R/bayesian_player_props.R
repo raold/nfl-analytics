@@ -152,7 +152,7 @@ load_player_data <- function(conn, stat_category, min_season = 2020) {
 # Model Specifications
 # =============================================================================
 
-build_passing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
+build_passing_model <- function(data, chains = 10, iter = 4000, warmup = 2000) {
   "Hierarchical model for QB passing yards"
 
   cat("Building passing yards hierarchical model...\n")
@@ -218,7 +218,7 @@ build_passing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
   return(model)
 }
 
-build_rushing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
+build_rushing_model <- function(data, chains = 10, iter = 4000, warmup = 2000) {
   "Hierarchical model for rushing yards"
 
   cat("Building rushing yards hierarchical model...\n")
@@ -275,7 +275,7 @@ build_rushing_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
   return(model)
 }
 
-build_receiving_model <- function(data, chains = 4, iter = 2000, warmup = 1000) {
+build_receiving_model <- function(data, chains = 10, iter = 4000, warmup = 2000) {
   "Hierarchical model for receiving yards"
 
   cat("Building receiving yards hierarchical model...\n")
@@ -577,7 +577,7 @@ main <- function() {
       passing_data <- load_player_data(conn, "passing", min_season = 2020)
 
       if (nrow(passing_data) > 0) {
-        passing_model <- build_passing_model(passing_data, chains = 4, iter = 2000)
+        passing_model <- build_passing_model(passing_data, chains = 10, iter = 4000)
 
         # Diagnostics
         passing_diag <- diagnose_model(passing_model, "passing_yards")
@@ -605,7 +605,7 @@ main <- function() {
       rushing_data <- load_player_data(conn, "rushing", min_season = 2020)
 
       if (nrow(rushing_data) > 0) {
-        rushing_model <- build_rushing_model(rushing_data, chains = 4, iter = 2000)
+        rushing_model <- build_rushing_model(rushing_data, chains = 10, iter = 4000)
 
         # Diagnostics
         rushing_diag <- diagnose_model(rushing_model, "rushing_yards")
@@ -632,7 +632,7 @@ main <- function() {
       receiving_data <- load_player_data(conn, "receiving", min_season = 2020)
 
       if (nrow(receiving_data) > 0) {
-        receiving_model <- build_receiving_model(receiving_data, chains = 4, iter = 2000)
+        receiving_model <- build_receiving_model(receiving_data, chains = 10, iter = 4000)
 
         # Diagnostics
         receiving_diag <- diagnose_model(receiving_model, "receiving_yards")

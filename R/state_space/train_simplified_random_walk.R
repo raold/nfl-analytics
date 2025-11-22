@@ -221,10 +221,10 @@ start_time <- Sys.time()
 
 fit <- mod$sample(
   data = stan_data,
-  chains = 4,
-  parallel_chains = 4,
-  iter_warmup = 1000,
-  iter_sampling = 2000,
+  chains = 10,
+  parallel_chains = 10,
+  iter_warmup = 2000,
+  iter_sampling = 4000,
   adapt_delta = 0.95,
   max_treedepth = 12,
   refresh = 100,
