@@ -1,0 +1,127 @@
+DRIVE-LEVEL PREDICTION SYSTEM - QUICK START GUIDE
+================================================
+
+Created: November 22, 2025
+Status: Ready for Training & Validation
+
+OVERVIEW
+--------
+LSTM-based drive-level prediction system for in-game betting.
+Predicts yards, points, and outcomes for each drive (8-12 per game).
+Enables real-time betting opportunities during games.
+
+DATA SUMMARY (2018-2024)
+-------------------------
+Total drives: 43,469
+Total games: 1,942
+Average drives/game: 22.4
+Features: 23 (context + momentum + team strength)
+
+QUICK START
+-----------
+
+1. TRAIN MODEL (2-4 hours)
+   $ source .venv/bin/activate
+   $ python scripts/train_lstm_drives_v1.py
+
+   Output:
+   - models/lstm_drive_v1_best.pt (best checkpoint)
+   - models/lstm_drive_v1_history_*.json (training history)
+
+   Expected Performance:
+   - Drive-level MAE: <15 yards (target)
+   - Points accuracy: >40%
+   - Result accuracy: >35%
+
+2. AGGREGATE TO GAME LEVEL (10 minutes)
+   $ python scripts/aggregate_drives_to_game.py
+
+   Output:
+   - data/drive_aggregation_results_2024.csv
+   - data/drive_aggregation_context_analysis.csv
+
+   Compares:
+   - Drive-aggregated predictions vs ground truth
+   - Performance by game context (scoring, closeness)
+
+3. SIMULATE IN-GAME BETTING (10 minutes)
+   $ python scripts/simulate_ingame_betting.py
+
+   Output:
+   - data/ingame_betting_simulation_2024.csv
+
+   Metrics:
+   - Total bets placed
+   - ROI (%)
+   - Win rate (%)
+   - Breakdown by bet type
+
+FILE STRUCTURE
+--------------
+py/pipeline/drive_aggregation.py        → Aggregate plays to drives
+py/models/lstm_drive_prediction.py      → LSTM architecture
+scripts/train_lstm_drives_v1.py         → Training pipeline
+scripts/aggregate_drives_to_game.py     → Drive-to-game aggregation
+scripts/simulate_ingame_betting.py      → In-game betting simulation
+
+data/drives_2018_2024.csv               → Drive-level features (43K drives)
+models/lstm_drive_v1_best.pt            → Best model (created after training)
+
+KEY FEATURES
+------------
+1. Multi-task learning (yards + points + result)
+2. Sequence modeling (last N drives)
+3. Temporal validation (no future leakage)
+4. Kelly criterion bet sizing
+5. Production-ready inference
+
+BETTING OPPORTUNITIES
+---------------------
+1. Next drive total (O/U 25 yards)
+   - Edge threshold: 5%
+   - Odds: -110 both sides
+
+2. Next drive scoring (Yes/No)
+   - Probability from model
+   - Odds: -120 (Yes), +100 (No)
+
+3. Updated game total
+   - Sum remaining drive predictions
+   - Compare to live lines
+
+SUCCESS CRITERIA
+----------------
+✓ Drive-level MAE: <15 yards
+✓ Beats linear baseline: >15%
+✓ Game-level aggregation: Matches/beats ensemble
+✓ In-game betting ROI: Positive
+
+NEXT STEPS
+----------
+1. Run full training (Step 1)
+2. Validate aggregation (Step 2)
+3. Simulate betting (Step 3)
+4. Integrate with ensemble v7 (if successful)
+
+TROUBLESHOOTING
+---------------
+Q: Training fails with CUDA error?
+A: Model runs on CPU by default. To use GPU, edit train_lstm_drives_v1.py line 476.
+
+Q: How long does training take?
+A: 2-4 hours on CPU (M4 MacBook), 30-60 minutes on GPU (RTX 4090).
+
+Q: Can I use fewer epochs for testing?
+A: Yes, edit num_epochs parameter in train_lstm_drives_v1.py line 494.
+
+Q: How do I tune hyperparameters?
+A: Modify config in run_training() call (lines 496-504).
+
+DOCUMENTATION
+-------------
+Full details: docs/milestones/DRIVE_LEVEL_PREDICTION_COMPLETE.md
+Roadmap: docs/PARALLEL_MODELING_ROADMAP_NOV22.md (Track F)
+
+CONTACT
+-------
+Questions? See CLAUDE.md for project context.
