@@ -59,35 +59,36 @@ class ReceivingBNN:
         """Load receiving data from database"""
         conn = psycopg2.connect(**self.db_config)
 
-        # Simplified query without problematic joins
+        # Query with proper JOIN to games table for season/week
         query = """
         WITH receiving_data AS (
             SELECT
                 p.game_id,
                 p.receiver_player_id as player_id,
                 p.receiver_player_name as player_name,
-                p.season,
-                p.week,
+                g.season,
+                g.week,
                 p.posteam as team,
                 p.defteam as opponent,
                 p.passer_player_id,
                 p.passer_player_name,
                 -- Aggregate receiving stats
-                COUNT(CASE WHEN p.pass_attempt = 1 THEN 1 END) as targets,
+                COUNT(CASE WHEN p.pass_attempt THEN 1 END) as targets,
                 COUNT(CASE WHEN p.complete_pass = 1 THEN 1 END) as receptions,
                 SUM(CASE WHEN p.complete_pass = 1 THEN p.receiving_yards ELSE 0 END) as receiving_yards,
-                SUM(CASE WHEN p.touchdown = 1 AND p.pass_attempt = 1 THEN 1 ELSE 0 END) as receiving_tds,
+                SUM(CASE WHEN p.touchdown = 1 AND p.pass_attempt THEN 1 ELSE 0 END) as receiving_tds,
                 AVG(CASE WHEN p.complete_pass = 1 THEN p.receiving_yards END) as yards_per_reception,
                 AVG(p.air_yards) as avg_air_yards,
                 AVG(p.yards_after_catch) as avg_yac
             FROM plays p
-            WHERE p.season BETWEEN %s AND %s
+            JOIN games g ON p.game_id = g.game_id
+            WHERE g.season BETWEEN %s AND %s
               AND p.season_type = 'REG'
               AND p.receiver_player_id IS NOT NULL
-              AND p.pass_attempt = 1
+              AND p.pass_attempt
             GROUP BY
                 p.game_id, p.receiver_player_id, p.receiver_player_name,
-                p.season, p.week, p.posteam, p.defteam,
+                g.season, g.week, p.posteam, p.defteam,
                 p.passer_player_id, p.passer_player_name
         ),
         player_averages AS (
