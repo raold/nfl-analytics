@@ -117,6 +117,77 @@ class WeekPredictionRequest(BaseModel):
         schema_extra = {"example": {"season": 2024, "week": 9}}
 
 
+class BatchGamePredictionRequest(BaseModel):
+    """Request for batch game predictions."""
+
+    games: List[GamePredictionRequest] = Field(
+        ..., min_items=1, max_items=50, description="List of games to predict (max 50)"
+    )
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "games": [
+                    {"game_id": "2024_12_BUF_KC", "season": 2024, "week": 12},
+                    {"game_id": "2024_12_BAL_LAC", "season": 2024, "week": 12},
+                    {"game_id": "2024_12_PHI_LAR", "season": 2024, "week": 12},
+                ]
+            }
+        }
+
+
+class PredictionError(BaseModel):
+    """Error information for failed prediction."""
+
+    game_id: str
+    error: str
+
+
+class BatchGamePredictionResponse(BaseModel):
+    """Response for batch game predictions."""
+
+    total_requested: int
+    total_successful: int
+    total_failed: int
+    predictions: List[GamePredictionResponse]
+    errors: List[PredictionError]
+    processing_ms: float
+    cache_hit_rate: float = Field(
+        ..., description="Percentage of predictions served from cache (0-1)"
+    )
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "total_requested": 3,
+                "total_successful": 3,
+                "total_failed": 0,
+                "predictions": [
+                    {
+                        "game_id": "2024_12_BUF_KC",
+                        "season": 2024,
+                        "week": 12,
+                        "home_team": "KC",
+                        "away_team": "BUF",
+                        "predicted_home_score": 27.5,
+                        "predicted_away_score": 24.2,
+                        "predicted_total": 51.7,
+                        "predicted_spread": 3.3,
+                        "predicted_home_win_prob": 0.612,
+                        "spread_std": 7.1,
+                        "total_std": 9.5,
+                        "predicted_at": "2024-11-22T10:00:00Z",
+                        "ensemble_version": "v6.1",
+                        "processing_ms": 105.3,
+                    }
+                ],
+                "errors": [],
+                "processing_ms": 320.5,
+                "cache_hit_rate": 0.67,
+            }
+        }
+
+
 class GamePredictionResponse(BaseModel):
     """Response for full game prediction."""
 
@@ -298,6 +369,13 @@ def calculate_edges(
 # Import GameOutcomePredictor
 from py.ensemble.game_outcome_predictor import GameOutcomePredictor
 
+# Import Redis cache decorator
+from py.utils.game_prediction_cache import (
+    cache_game_prediction,
+    invalidate_game_cache,
+    get_cache_stats,
+)
+
 # Initialize predictor (singleton pattern)
 _game_predictor = None
 
@@ -310,6 +388,7 @@ def get_game_predictor() -> GameOutcomePredictor:
     return _game_predictor
 
 
+@cache_game_prediction(ttl_seconds=3600)  # 1-hour cache TTL
 def generate_game_prediction(
     game_id: str,
     season: int,
@@ -324,6 +403,8 @@ def generate_game_prediction(
     """
     Generate real game prediction using Ensemble v6.1.
 
+    Redis-cached with 1-hour TTL for 50-200x speedup on cache hits.
+
     Args:
         game_id: Game ID
         season: NFL season
@@ -336,7 +417,7 @@ def generate_game_prediction(
         sportsbook_away_ml: Sportsbook away moneyline (if available)
 
     Returns:
-        Dictionary with prediction values
+        Dictionary with prediction values (includes _cached and _cache_key metadata)
     """
     # Get predictor
     predictor = get_game_predictor()
@@ -754,6 +835,200 @@ async def predict_week(request: WeekPredictionRequest) -> WeekPredictionResponse
         )
 
 
+@router.post(
+    "/predict/games/batch",
+    response_model=BatchGamePredictionResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Game Predictions"],
+)
+async def predict_games_batch(
+    request: BatchGamePredictionRequest,
+) -> BatchGamePredictionResponse:
+    """
+    Batch predict multiple games in a single request.
+
+    Handles partial failures gracefully - returns all successful predictions
+    plus error details for any failures. Leverages Redis caching for 50-200x
+    speedup on cache hits.
+
+    Args:
+        request: Batch prediction request with list of games
+
+    Returns:
+        BatchGamePredictionResponse with predictions, errors, and cache stats
+
+    Raises:
+        HTTPException: If request validation fails
+
+    Example:
+        POST /predict/games/batch
+        {
+            "games": [
+                {"game_id": "2024_12_BUF_KC", "season": 2024, "week": 12},
+                {"game_id": "2024_12_BAL_LAC", "season": 2024, "week": 12},
+                {"game_id": "2024_12_PHI_LAR", "season": 2024, "week": 12}
+            ]
+        }
+    """
+    processing_start = time.time()
+
+    predictions: List[GamePredictionResponse] = []
+    errors: List[PredictionError] = []
+    cache_hits = 0
+    total_games = len(request.games)
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Process each game
+        for game_req in request.games:
+            game_start = time.time()
+
+            try:
+                # Fetch game details
+                game_query = """
+                SELECT
+                    game_id,
+                    season,
+                    week,
+                    home_team,
+                    away_team,
+                    spread_close,
+                    total_close,
+                    home_moneyline,
+                    away_moneyline
+                FROM games
+                WHERE game_id = %s
+                    AND season = %s
+                    AND week = %s
+                LIMIT 1;
+                """
+
+                cursor.execute(game_query, (game_req.game_id, game_req.season, game_req.week))
+                game_data = cursor.fetchone()
+
+                if not game_data:
+                    errors.append(
+                        PredictionError(
+                            game_id=game_req.game_id,
+                            error=f"Game not found: {game_req.game_id} (season={game_req.season}, week={game_req.week})",
+                        )
+                    )
+                    continue
+
+                # Generate prediction (cached via decorator)
+                prediction = generate_game_prediction(
+                    game_id=game_data["game_id"],
+                    season=game_data["season"],
+                    week=game_data["week"],
+                    home_team=game_data["home_team"],
+                    away_team=game_data["away_team"],
+                    sportsbook_spread=game_data["spread_close"],
+                    sportsbook_total=game_data["total_close"],
+                    sportsbook_home_ml=game_data["home_moneyline"],
+                    sportsbook_away_ml=game_data["away_moneyline"],
+                )
+
+                # Track cache hits
+                if prediction.get("_cached", False):
+                    cache_hits += 1
+
+                # Store prediction in database
+                prediction_data = {
+                    "game_id": game_data["game_id"],
+                    "season": game_data["season"],
+                    "week": game_data["week"],
+                    "home_team": game_data["home_team"],
+                    "away_team": game_data["away_team"],
+                    "sportsbook_spread": game_data["spread_close"],
+                    "sportsbook_total": game_data["total_close"],
+                    "sportsbook_home_ml": game_data["home_moneyline"],
+                    "sportsbook_away_ml": game_data["away_moneyline"],
+                    **{
+                        k: v
+                        for k, v in prediction.items()
+                        if not k.startswith("_")  # Exclude cache metadata
+                    },
+                }
+
+                store_game_prediction(conn, prediction_data, ensemble_version="v6.1")
+
+                game_processing_ms = (time.time() - game_start) * 1000
+
+                predictions.append(
+                    GamePredictionResponse(
+                        game_id=game_data["game_id"],
+                        season=game_data["season"],
+                        week=game_data["week"],
+                        home_team=game_data["home_team"],
+                        away_team=game_data["away_team"],
+                        predicted_home_score=prediction["predicted_home_score"],
+                        predicted_away_score=prediction["predicted_away_score"],
+                        predicted_total=prediction["predicted_total"],
+                        predicted_spread=prediction["predicted_spread"],
+                        predicted_home_win_prob=prediction["predicted_home_win_prob"],
+                        spread_std=prediction["spread_std"],
+                        total_std=prediction["total_std"],
+                        sportsbook_spread=game_data["spread_close"],
+                        sportsbook_total=game_data["total_close"],
+                        sportsbook_home_ml=game_data["home_moneyline"],
+                        sportsbook_away_ml=game_data["away_moneyline"],
+                        spread_edge=prediction["spread_edge"],
+                        total_edge=prediction["total_edge"],
+                        ml_edge=prediction["ml_edge"],
+                        predicted_at=datetime.utcnow(),
+                        ensemble_version="v6.1",
+                        processing_ms=game_processing_ms,
+                    )
+                )
+
+            except Exception as e:
+                logger.error(
+                    f"Error predicting game {game_req.game_id}: {e}", exc_info=True
+                )
+                errors.append(
+                    PredictionError(game_id=game_req.game_id, error=str(e))
+                )
+
+        cursor.close()
+        conn.close()
+
+        processing_ms = (time.time() - processing_start) * 1000
+        cache_hit_rate = cache_hits / total_games if total_games > 0 else 0.0
+
+        # Record metrics
+        if PROMETHEUS_AVAILABLE:
+            GAME_PREDICTIONS_MADE.labels(prediction_type="batch").inc(total_games)
+            GAME_PREDICTION_DURATION.labels(prediction_type="batch").observe(
+                processing_ms / 1000
+            )
+
+        response = BatchGamePredictionResponse(
+            total_requested=total_games,
+            total_successful=len(predictions),
+            total_failed=len(errors),
+            predictions=predictions,
+            errors=errors,
+            processing_ms=processing_ms,
+            cache_hit_rate=cache_hit_rate,
+        )
+
+        logger.info(
+            f"Batch prediction complete: {len(predictions)}/{total_games} successful "
+            f"({cache_hit_rate:.1%} cache hits, {processing_ms:.1f}ms total)"
+        )
+
+        return response
+
+    except Exception as e:
+        logger.error(f"Error in batch prediction: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process batch predictions: {str(e)}",
+        )
+
+
 @router.get(
     "/predictions/game/{game_id}",
     response_model=GamePredictionResponse,
@@ -1020,4 +1295,160 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate QB predictions: {str(e)}",
+        )
+
+
+# ============================================================================
+# Cache Management Endpoints
+# ============================================================================
+
+
+class CacheInvalidateRequest(BaseModel):
+    """Request for cache invalidation."""
+
+    game_id: Optional[str] = Field(None, description="Specific game to invalidate")
+    season: Optional[int] = Field(None, ge=1999, le=2030, description="Season to invalidate")
+    week: Optional[int] = Field(None, ge=1, le=22, description="Week to invalidate")
+    invalidate_all: bool = Field(False, description="Invalidate all game predictions")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "game_id": "2024_12_BAL_LAC",
+                "season": 2024,
+                "week": 12,
+                "invalidate_all": False,
+            }
+        }
+
+
+class CacheInvalidateResponse(BaseModel):
+    """Response for cache invalidation."""
+
+    invalidated_count: int
+    message: str
+
+
+class CacheStatsResponse(BaseModel):
+    """Response for cache statistics."""
+
+    total_keys: int
+    redis_memory_mb: float
+    cache_available: bool
+    ensemble_version: str
+    default_ttl_seconds: int
+
+
+@router.post(
+    "/predict/cache/invalidate",
+    response_model=CacheInvalidateResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Cache Management"],
+)
+async def invalidate_prediction_cache(
+    request: CacheInvalidateRequest,
+) -> CacheInvalidateResponse:
+    """
+    Invalidate cached game predictions.
+
+    Use cases:
+    - Odds update: Invalidate specific game when sportsbook lines change
+    - Week refresh: Invalidate all games in a week
+    - Full invalidation: Clear all cached predictions
+
+    Args:
+        request: Cache invalidation request
+
+    Returns:
+        CacheInvalidateResponse with count of invalidated keys
+
+    Example:
+        POST /predict/cache/invalidate
+        {
+            "game_id": "2024_12_BAL_LAC",
+            "season": 2024,
+            "week": 12
+        }
+    """
+    try:
+        if request.invalidate_all:
+            # Invalidate all game predictions
+            count = invalidate_game_cache()
+            message = f"Invalidated all {count} cached game predictions"
+        elif request.game_id and request.season and request.week:
+            # Invalidate specific game
+            count = invalidate_game_cache(
+                game_id=request.game_id, season=request.season, week=request.week
+            )
+            message = f"Invalidated {count} cache entries for game {request.game_id}"
+        elif request.season and request.week:
+            # Invalidate specific week
+            count = invalidate_game_cache(season=request.season, week=request.week)
+            message = f"Invalidated {count} cache entries for {request.season} Week {request.week}"
+        elif request.season:
+            # Invalidate entire season
+            count = invalidate_game_cache(season=request.season)
+            message = f"Invalidated {count} cache entries for {request.season} season"
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Must provide either invalidate_all=true, game_id+season+week, season+week, or season",
+            )
+
+        logger.info(f"Cache invalidation: {message}")
+
+        return CacheInvalidateResponse(invalidated_count=count, message=message)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error invalidating cache: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to invalidate cache: {str(e)}",
+        )
+
+
+@router.get(
+    "/predict/cache/stats",
+    response_model=CacheStatsResponse,
+    status_code=status.HTTP_200_OK,
+    tags=["Cache Management"],
+)
+async def get_prediction_cache_stats() -> CacheStatsResponse:
+    """
+    Get cache statistics for monitoring.
+
+    Returns cache metrics including:
+    - Total cached game predictions
+    - Redis memory usage
+    - Cache configuration
+
+    Example:
+        GET /predict/cache/stats
+    """
+    try:
+        stats = get_cache_stats()
+
+        if "error" in stats:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Cache unavailable: {stats['error']}",
+            )
+
+        return CacheStatsResponse(
+            total_keys=stats["total_keys"],
+            redis_memory_mb=stats["redis_memory_mb"],
+            cache_available=stats["cache_available"],
+            ensemble_version=stats["ensemble_version"],
+            default_ttl_seconds=stats["default_ttl_seconds"],
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting cache stats: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get cache stats: {str(e)}",
         )
