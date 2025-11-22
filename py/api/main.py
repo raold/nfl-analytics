@@ -300,6 +300,30 @@ class PredictionResponse(BaseModel):
     cache_hit: bool = Field(default=False, description="Whether result was cached")
     processing_ms: float = Field(..., description="Processing time in milliseconds")
 
+    # Dashboard compatibility properties (added Nov 22, 2025)
+    @property
+    def confidence(self) -> float:
+        """Alias for confidence_level (dashboard compatibility)."""
+        return self.confidence_level
+
+    @property
+    def lower_bound(self) -> float:
+        """Flatten confidence_interval.lower (dashboard compatibility)."""
+        return self.confidence_interval.lower
+
+    @property
+    def upper_bound(self) -> float:
+        """Flatten confidence_interval.upper (dashboard compatibility)."""
+        return self.confidence_interval.upper
+
+    @property
+    def models_used(self) -> list:
+        """Convert ensemble_weights to models_used format (dashboard compatibility)."""
+        return [
+            {"model_name": k, "weight": v}
+            for k, v in self.ensemble_weights.dict().items()
+        ]
+
     class Config:
         schema_extra = {
             "example": {
@@ -442,7 +466,9 @@ class ModelManager:
         try:
             from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
-            self.ensemble = EnhancedEnsemble4Way()
+            self.ensemble = EnhancedEnsemble4Way(
+                db_password=os.getenv("DB_PASSWORD", "sicillionbillions")
+            )
             logger.info("✅ Enhanced Ensemble v5.1 loaded successfully")
 
             # Update model versions to match ensemble
@@ -509,6 +535,19 @@ class ModelManager:
             if result["ensemble_mean"] is None:
                 logger.warning(f"Ensemble returned None for {player_id} W{week} {season}")
                 return None
+
+            # Validate minimum ensemble components (Nov 15 bug: only 2/4 models loaded)
+            individual_predictions = result.get("predictions", {})
+            valid_predictions = {
+                k: v for k, v in individual_predictions.items()
+                if v is not None and not (isinstance(v, float) and np.isnan(v))
+            }
+            if len(valid_predictions) < 3:
+                raise RuntimeError(
+                    f"Ensemble validation failed: Only {len(valid_predictions)}/4 components provided valid predictions. "
+                    f"Valid: {list(valid_predictions.keys())}. "
+                    f"This indicates model loading failure - check logs for R/XGBoost errors."
+                )
 
             # Map confidence_level to z-score
             z_score = {
