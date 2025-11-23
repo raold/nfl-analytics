@@ -149,7 +149,7 @@ class BatchGamePredictionResponse(BaseModel):
     total_requested: int
     total_successful: int
     total_failed: int
-    predictions: List[GamePredictionResponse]
+    predictions: List["GamePredictionResponse"]  # Forward reference - class defined below
     errors: List[PredictionError]
     processing_ms: float
     cache_hit_rate: float = Field(
@@ -1211,15 +1211,15 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
             # Get starting QBs (most passing attempts in the game)
             qb_query = """
             SELECT
-                player_id,
-                team,
+                passer_player_id AS player_id,
+                posteam AS team,
                 COUNT(*) as attempts,
-                SUM(CASE WHEN pass_attempt = 1 THEN 1 ELSE 0 END) as pass_attempts
+                SUM(CASE WHEN pass_attempt = TRUE THEN 1 ELSE 0 END) as pass_attempts
             FROM plays
             WHERE game_id = %s
-                AND pass_attempt = 1
+                AND pass_attempt = TRUE
                 AND passer_player_id IS NOT NULL
-            GROUP BY player_id, team
+            GROUP BY passer_player_id, posteam
             ORDER BY pass_attempts DESC
             LIMIT 2
             """
@@ -1248,9 +1248,9 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                 # Get season stats for these QBs
                 if home_qb:
                     home_stats_query = """
-                    SELECT AVG(passing_yards) as avg_yards, STDDEV(passing_yards) as std_yards
+                    SELECT AVG(stat_yards) as avg_yards, STDDEV(stat_yards) as std_yards
                     FROM mart.player_game_stats
-                    WHERE player_id = %s AND season = %s
+                    WHERE player_id = %s AND season = %s AND stat_category = 'passing'
                     """
                     cursor.execute(home_stats_query, (home_qb['player_id'], request.season))
                     home_stats = cursor.fetchone()
@@ -1262,9 +1262,9 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
 
                 if away_qb:
                     away_stats_query = """
-                    SELECT AVG(passing_yards) as avg_yards, STDDEV(passing_yards) as std_yards
+                    SELECT AVG(stat_yards) as avg_yards, STDDEV(stat_yards) as std_yards
                     FROM mart.player_game_stats
-                    WHERE player_id = %s AND season = %s
+                    WHERE player_id = %s AND season = %s AND stat_category = 'passing'
                     """
                     cursor.execute(away_stats_query, (away_qb['player_id'], request.season))
                     away_stats = cursor.fetchone()
