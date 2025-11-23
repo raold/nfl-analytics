@@ -612,9 +612,6 @@ def get_game_predictions(game_id: str, season: int, week: int) -> dict:
                 time.sleep(retry_delay * (attempt + 1))
                 continue
             return None
-    except Exception as e:
-        logger.error(f"Error parsing prediction response: {e}")
-        return None
 
 def get_team_logo_url(team_abbr):
     """Get team logo URL from nflverse."""
