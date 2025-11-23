@@ -459,8 +459,8 @@ def fetch_current_week_games():
         df['away_team_display'] = df['away_team'].apply(normalize_team_display)
         df['home_team_display'] = df['home_team'].apply(normalize_team_display)
 
-        season = df['season'].iloc[0]
-        week = df['week'].iloc[0]
+        season = int(df['season'].iloc[0])  # Convert pandas int64 to Python int for JSON serialization
+        week = int(df['week'].iloc[0])
         live_scores = fetch_live_scores(season, week)
 
         # Merge live scores into dataframe
