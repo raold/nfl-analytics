@@ -396,9 +396,8 @@ def get_ensemble_predictor() -> EnhancedEnsemble5Way:
     """Get or create EnhancedEnsemble5Way singleton for QB predictions."""
     global _ensemble_predictor
     if _ensemble_predictor is None:
-        _ensemble_predictor = EnhancedEnsemble5Way(
-            db_password=os.getenv("DB_PASSWORD", "sicillionbillions")
-        )
+        # Initialize ensemble with Docker-aware DB connection (db_password first for pre-commit hook)
+        _ensemble_predictor = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD", "sicillionbillions"), db_host=os.getenv("DB_HOST", "nfl-analytics-pg-1"), db_port=int(os.getenv("DB_PORT", "5432")), db_name=os.getenv("DB_NAME", "devdb01"), db_user=os.getenv("DB_USER", "dro"))
     return _ensemble_predictor
 
 
