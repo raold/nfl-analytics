@@ -41,6 +41,7 @@ from api.models import (
 from api.prediction import EnsemblePredictor
 from api.auth import require_api_key, APIKey, get_authenticator
 from api.middleware import RateLimitMiddleware
+from py.api.routes import game_predictions
 
 # Setup logging
 logging.basicConfig(
@@ -66,6 +67,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register game predictions router
+try:
+    app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
+    logger.info("✓ Game predictions router loaded successfully")
+except Exception as e:
+    logger.error(f"Failed to load game predictions router: {e}", exc_info=True)
 
 # Global state
 START_TIME = time.time()
@@ -325,12 +333,9 @@ async def predict(
 
 
 @app.get("/models", response_model=ModelsListResponse, tags=["Models"])
-async def list_models(api_key: APIKey = Depends(require_api_key)):
+async def list_models():
     """
-    List all loaded models with metadata (requires API key)
-
-    Authentication:
-    - Include 'X-API-Key' header with valid API key
+    List all loaded models with metadata (no authentication required)
 
     Returns:
     - Model name, type, version
@@ -350,7 +355,7 @@ async def list_models(api_key: APIKey = Depends(require_api_key)):
     models_list = list(model_info.values())
     loaded_count = len([m for m in models_list if m.status == "loaded"])
 
-    logger.info(f"Models list requested by {api_key.key_name}")
+    logger.info(f"Models list requested ({loaded_count}/{len(models_list)} models loaded)")
 
     return ModelsListResponse(
         models=models_list,
