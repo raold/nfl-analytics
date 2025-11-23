@@ -1228,10 +1228,10 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                 passer_player_id AS player_id,
                 posteam AS team,
                 COUNT(*) as attempts,
-                SUM(CASE WHEN pass_attempt = TRUE THEN 1 ELSE 0 END) as pass_attempts
+                SUM(CASE WHEN pass = TRUE THEN 1 ELSE 0 END) as pass_attempts
             FROM plays
             WHERE game_id = %s
-                AND pass_attempt = TRUE
+                AND pass = TRUE
                 AND passer_player_id IS NOT NULL
             GROUP BY passer_player_id, posteam
             ORDER BY pass_attempts DESC
@@ -1246,15 +1246,16 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                 logger.info(f"Game {request.game_id} not played yet, finding season starting QBs")
 
                 # Find each team's starting QB (most attempts this season)
+                # Extract season from game_id format: YYYY_WW_AWAY_HOME
                 season_qb_query = """
                 SELECT
                     passer_player_id AS player_id,
                     posteam AS team,
                     COUNT(*) as total_attempts
                 FROM plays
-                WHERE season = %s
+                WHERE SUBSTRING(game_id FROM 1 FOR 4)::int = %s
                     AND posteam IN (%s, %s)
-                    AND pass_attempt = TRUE
+                    AND pass = TRUE
                     AND passer_player_id IS NOT NULL
                 GROUP BY passer_player_id, posteam
                 ORDER BY total_attempts DESC
