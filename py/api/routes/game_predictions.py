@@ -1290,11 +1290,12 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                     return_components=True
                 )
 
-                # Validate ensemble has sufficient components (>= 3/5)
+                # Validate ensemble has sufficient components (>= 2/5)
+                # Nov 23 fix: Lowered from 3 to 2 to support future games where R models unavailable
                 if 'components' in home_pred:
                     valid_components = len([c for c in home_pred['components'].values() if c.get('mean') is not None])
-                    if valid_components < 3:
-                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 3)")
+                    if valid_components < 2:
+                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 2)")
 
                 home_yards = home_pred['ensemble_mean']
                 home_uncertainty = home_pred['ensemble_std']
@@ -1315,11 +1316,12 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                     return_components=True
                 )
 
-                # Validate ensemble has sufficient components (>= 3/5)
+                # Validate ensemble has sufficient components (>= 2/5)
+                # Nov 23 fix: Lowered from 3 to 2 to support future games where R models unavailable
                 if 'components' in away_pred:
                     valid_components = len([c for c in away_pred['components'].values() if c.get('mean') is not None])
-                    if valid_components < 3:
-                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 3)")
+                    if valid_components < 2:
+                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 2)")
 
                 away_yards = away_pred['ensemble_mean']
                 away_uncertainty = away_pred['ensemble_std']
