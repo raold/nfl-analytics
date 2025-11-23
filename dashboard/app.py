@@ -420,10 +420,11 @@ def fetch_current_week_games():
     current_season = datetime.now().year
     query = """
     WITH current_week AS (
+        -- Find the week with games closest to NOW (current or most recent)
         SELECT season, week
         FROM games
         WHERE season = %s AND game_type = 'REG'
-        ORDER BY kickoff DESC
+        ORDER BY ABS(EXTRACT(EPOCH FROM (kickoff - NOW()))) ASC
         LIMIT 1
     )
     SELECT
