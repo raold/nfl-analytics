@@ -147,6 +147,10 @@ def validate_game_prediction(data: Dict[str, Any]) -> Optional[GamePrediction]:
     """
     Validate and extract game prediction response.
 
+    Supports both flat and nested API response formats:
+    - Flat: {home_qb_yards, home_qb_yards_std, ...}
+    - Nested: {home_prediction: {predicted_passing_yards, ...}, ...}
+
     Args:
         data: Raw response dictionary from API
 
@@ -156,25 +160,32 @@ def validate_game_prediction(data: Dict[str, Any]) -> Optional[GamePrediction]:
     Raises:
         ValueError: If required fields are missing
     """
-    required_fields = [
-        'game_id', 'home_team', 'away_team',
-        'home_qb_yards', 'home_qb_yards_std',
-        'away_qb_yards', 'away_qb_yards_std'
-    ]
+    # Handle nested API response format (v1.1+)
+    if 'home_prediction' in data and 'away_prediction' in data:
+        # Extract nested values
+        home_pred = data['home_prediction']
+        away_pred = data['away_prediction']
 
-    # Check required fields
-    missing_fields = [f for f in required_fields if f not in data]
-    if missing_fields:
-        raise ValueError(f"Missing required fields: {missing_fields}")
+        home_yards = float(home_pred['predicted_passing_yards'])
+        home_std = float(home_pred['predicted_passing_yards_std'])
+        away_yards = float(away_pred['predicted_passing_yards'])
+        away_std = float(away_pred['predicted_passing_yards_std'])
+    else:
+        # Fall back to flat format (legacy)
+        required_fields = [
+            'game_id', 'home_team', 'away_team',
+            'home_qb_yards', 'home_qb_yards_std',
+            'away_qb_yards', 'away_qb_yards_std'
+        ]
 
-    # Validate numeric types
-    try:
+        missing_fields = [f for f in required_fields if f not in data]
+        if missing_fields:
+            raise ValueError(f"Missing required fields: {missing_fields}")
+
         home_yards = float(data['home_qb_yards'])
         home_std = float(data['home_qb_yards_std'])
         away_yards = float(data['away_qb_yards'])
         away_std = float(data['away_qb_yards_std'])
-    except (ValueError, TypeError) as e:
-        raise ValueError(f"Invalid numeric values: {e}")
 
     # Validate ranges (sanity check)
     if not (0 <= home_yards <= 600):
