@@ -549,10 +549,14 @@ class EnhancedEnsemble5Way:
             logger.warning(f"Component hybrid_static_incremental failed: {e}")
 
         # CRITICAL: Validate minimum ensemble components loaded
-        if len(valid_predictions) < 3:
+        # Nov 23 fix: Lowered from 3 to 2 to support future games where R models unavailable
+        # (R models need historical play data, which doesn't exist for future games)
+        # With 2 components (XGBoost 23% + Hybrid 10%), weight renormalization provides
+        # reasonable predictions with increased uncertainty
+        if len(valid_predictions) < 2:
             raise RuntimeError(
                 f"Insufficient ensemble components loaded: {len(valid_predictions)} valid "
-                f"(minimum 3 required). Valid components: {valid_predictions}. "
+                f"(minimum 2 required). Valid components: {valid_predictions}. "
                 f"Check model files and R interface initialization."
             )
 
