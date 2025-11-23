@@ -14,9 +14,11 @@ Architecture:
 Usage:
     ```python
     from dashboard.utils.api_client import APIClient, GamePrediction
+    from datetime import datetime
 
     api = APIClient("http://localhost:8000")
-    prediction = api.get_game_prediction("2024_12_KC_LV", season=2024, week=12)
+    current_season = datetime.now().year
+    prediction = api.get_game_prediction(f"{current_season}_12_KC_LV", season=current_season, week=12)
 
     if prediction is None:
         st.warning("Could not load prediction")
@@ -290,10 +292,12 @@ class APIClient:
 
     Example:
         ```python
+        from datetime import datetime
         api = APIClient("http://localhost:8000")
 
         # Get game prediction
-        pred = api.get_game_prediction("2024_12_KC_LV", season=2024, week=12)
+        current_season = datetime.now().year
+        pred = api.get_game_prediction(f"{current_season}_12_KC_LV", season=current_season, week=12)
         if pred:
             print(f"Home QBs passing yards: {pred['home_qb_yards']:.1f}")
 
@@ -532,7 +536,9 @@ class APIClient:
 
         Example:
             ```python
-            pred = api.get_game_prediction("2024_12_KC_LV", season=2024, week=12)
+            from datetime import datetime
+            current_season = datetime.now().year
+            pred = api.get_game_prediction(f"{current_season}_12_KC_LV", season=current_season, week=12)
 
             if pred is None:
                 st.warning("Could not load prediction")
@@ -555,7 +561,7 @@ class APIClient:
 
         try:
             response = self.session.post(
-                f"{self.base_url}/predict/game",
+                f"{self.base_url}/api/v1/predict/game",
                 json={
                     "game_id": str(game_id),
                     "season": int(season),
@@ -632,7 +638,9 @@ def get_api_client(
             return get_api_client(enable_cache=True)
 
         api = _get_client()
-        prediction = api.get_game_prediction("2024_12_KC_LV", season=2024, week=12)
+        from datetime import datetime
+        current_season = datetime.now().year
+        prediction = api.get_game_prediction(f"{current_season}_12_KC_LV", season=current_season, week=12)
         ```
     """
     return APIClient(

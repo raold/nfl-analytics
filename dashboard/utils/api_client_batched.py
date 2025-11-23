@@ -88,7 +88,7 @@ class BatchedAPIClient:
             """Fetch single game prediction (executed in thread pool)."""
             try:
                 response = requests.post(
-                    f"{self.base_url}/predict/game",
+                    f"{self.base_url}/api/v1/predict/game",
                     json={"game_id": game_id, "season": season, "week": week},
                     timeout=self.timeout
                 )
