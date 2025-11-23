@@ -118,13 +118,14 @@ services:
       - REDIS_HOST=nfl-analytics-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD:-changeme_redis_password}
+      - FASTAPI_URL=http://api:8000
       - LOG_LEVEL=INFO
     ports:
       - "8501:8501"
     volumes:
       - ./dashboard:/app
-      - ./logs/streamlit:/app/logs
       - ./models:/app/models:ro  # Mount models directory (read-only)
+      - ./py:/app/py:ro # Mount py/ directory for claude_cache (read-only)
     depends_on:
       pg-1:
         condition: service_healthy
