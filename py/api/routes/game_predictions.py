@@ -369,6 +369,9 @@ def calculate_edges(
 # Import GameOutcomePredictor
 from py.ensemble.game_outcome_predictor import GameOutcomePredictor
 
+# Import Ensemble v6.1 for QB predictions
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
 # Import Redis cache decorator
 from py.utils.game_prediction_cache import (
     cache_game_prediction,
@@ -376,8 +379,9 @@ from py.utils.game_prediction_cache import (
     get_cache_stats,
 )
 
-# Initialize predictor (singleton pattern)
+# Initialize predictors (singleton pattern)
 _game_predictor = None
+_ensemble_predictor = None
 
 
 def get_game_predictor() -> GameOutcomePredictor:
@@ -386,6 +390,16 @@ def get_game_predictor() -> GameOutcomePredictor:
     if _game_predictor is None:
         _game_predictor = GameOutcomePredictor()
     return _game_predictor
+
+
+def get_ensemble_predictor() -> EnhancedEnsemble5Way:
+    """Get or create EnhancedEnsemble5Way singleton for QB predictions."""
+    global _ensemble_predictor
+    if _ensemble_predictor is None:
+        _ensemble_predictor = EnhancedEnsemble5Way(
+            db_password=os.getenv("DB_PASSWORD", "sicillionbillions")
+        )
+    return _ensemble_predictor
 
 
 @cache_game_prediction(ttl_seconds=3600)  # 1-hour cache TTL
@@ -1227,54 +1241,100 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
             cursor.execute(qb_query, (request.game_id,))
             qbs = cursor.fetchall()
 
-            # If game hasn't happened yet, use season averages for team's likely starter
+            # If game hasn't happened yet, find season starting QBs
             if not qbs:
-                logger.warning(f"No QB data for {request.game_id}, using season averages")
+                logger.info(f"Game {request.game_id} not played yet, finding season starting QBs")
 
-                # Fallback to season averages (realistic estimates based on 2024 averages)
-                # This provides reasonable predictions even for future games
-                home_yards = 240.0  # Median QB passing yards
-                away_yards = 240.0
-                home_uncertainty = 50.0  # Typical std dev
-                away_uncertainty = 50.0
+                # Find each team's starting QB (most attempts this season)
+                season_qb_query = """
+                SELECT
+                    passer_player_id AS player_id,
+                    posteam AS team,
+                    COUNT(*) as total_attempts
+                FROM plays
+                WHERE season = %s
+                    AND posteam IN (%s, %s)
+                    AND pass_attempt = TRUE
+                    AND passer_player_id IS NOT NULL
+                GROUP BY passer_player_id, posteam
+                ORDER BY total_attempts DESC
+                """
+
+                cursor.execute(season_qb_query, (request.season, home_team, away_team))
+                season_qbs = cursor.fetchall()
+
+                # Get top QB for each team
+                home_qb = next((qb for qb in season_qbs if qb['team'] == home_team), None)
+                away_qb = next((qb for qb in season_qbs if qb['team'] == away_team), None)
             else:
-                # Use actual QB data to generate predictions
-                # For simplicity, use season averages for these QBs
-                # TODO: Integrate with EnhancedEnsemble5Way for full prediction
-
+                # Use QBs from the specific game
                 home_qb = next((qb for qb in qbs if qb['team'] == home_team), None)
                 away_qb = next((qb for qb in qbs if qb['team'] == away_team), None)
 
-                # Get season stats for these QBs
-                if home_qb:
-                    home_stats_query = """
-                    SELECT AVG(stat_yards) as avg_yards, STDDEV(stat_yards) as std_yards
-                    FROM mart.player_game_stats
-                    WHERE player_id = %s AND season = %s AND stat_category = 'passing'
-                    """
-                    cursor.execute(home_stats_query, (home_qb['player_id'], request.season))
-                    home_stats = cursor.fetchone()
-                    home_yards = float(home_stats['avg_yards'] or 240.0)
-                    home_uncertainty = float(home_stats['std_yards'] or 50.0)
-                else:
-                    home_yards = 240.0
-                    home_uncertainty = 50.0
+        # Get ensemble predictor
+        ensemble = get_ensemble_predictor()
 
-                if away_qb:
-                    away_stats_query = """
-                    SELECT AVG(stat_yards) as avg_yards, STDDEV(stat_yards) as std_yards
-                    FROM mart.player_game_stats
-                    WHERE player_id = %s AND season = %s AND stat_category = 'passing'
-                    """
-                    cursor.execute(away_stats_query, (away_qb['player_id'], request.season))
-                    away_stats = cursor.fetchone()
-                    away_yards = float(away_stats['avg_yards'] or 240.0)
-                    away_uncertainty = float(away_stats['std_yards'] or 50.0)
-                else:
-                    away_yards = 240.0
-                    away_uncertainty = 50.0
+        # Generate predictions using Ensemble v6.1
+        # Validation: Ensemble must have >= 3/5 components loaded (enforced below)
+        home_yards, home_uncertainty = 240.0, 50.0  # Fallback
+        away_yards, away_uncertainty = 240.0, 50.0  # Fallback
+        valid_predictions = []  # Track successful predictions
+
+        if home_qb:
+            try:
+                home_pred = ensemble.predict(
+                    player_id=home_qb['player_id'],
+                    season=request.season,
+                    week=request.week,
+                    return_uncertainty=True,
+                    return_components=True
+                )
+
+                # Validate ensemble has sufficient components (>= 3/5)
+                if 'components' in home_pred:
+                    valid_components = len([c for c in home_pred['components'].values() if c.get('mean') is not None])
+                    if valid_components < 3:
+                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 3)")
+
+                home_yards = home_pred['ensemble_mean']
+                home_uncertainty = home_pred['ensemble_std']
+                valid_predictions.append('home')
+                logger.info(f"Home QB {home_qb['player_id']}: {home_yards:.1f} ± {home_uncertainty:.1f} yards")
+            except Exception as e:
+                logger.warning(f"Ensemble prediction failed for home QB {home_qb['player_id']}: {e}")
+        else:
+            logger.warning(f"No home QB found for {home_team}")
+
+        if away_qb:
+            try:
+                away_pred = ensemble.predict(
+                    player_id=away_qb['player_id'],
+                    season=request.season,
+                    week=request.week,
+                    return_uncertainty=True,
+                    return_components=True
+                )
+
+                # Validate ensemble has sufficient components (>= 3/5)
+                if 'components' in away_pred:
+                    valid_components = len([c for c in away_pred['components'].values() if c.get('mean') is not None])
+                    if valid_components < 3:
+                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 3)")
+
+                away_yards = away_pred['ensemble_mean']
+                away_uncertainty = away_pred['ensemble_std']
+                valid_predictions.append('away')
+                logger.info(f"Away QB {away_qb['player_id']}: {away_yards:.1f} ± {away_uncertainty:.1f} yards")
+            except Exception as e:
+                logger.warning(f"Ensemble prediction failed for away QB {away_qb['player_id']}: {e}")
+        else:
+            logger.warning(f"No away QB found for {away_team}")
 
         processing_ms = (time.time() - processing_start) * 1000
+
+        # Validate at least one ensemble prediction succeeded
+        if len(valid_predictions) < 1:
+            raise RuntimeError("No ensemble predictions succeeded - check model availability")
 
         return GameQBPredictionsResponse(
             game_id=request.game_id,
