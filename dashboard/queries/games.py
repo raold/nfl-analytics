@@ -247,7 +247,6 @@ class GameQueries:
             COUNT(*) as games,
             MAX(kickoff) as latest_kickoff
         FROM games
-        WHERE season >= 2024
         GROUP BY season, week, game_type
         ORDER BY season DESC, week DESC
         LIMIT 10
