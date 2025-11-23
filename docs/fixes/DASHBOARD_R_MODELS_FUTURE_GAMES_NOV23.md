@@ -171,12 +171,14 @@ curl -X POST 'http://localhost:8000/api/v1/predict/game' \
 ## Next Steps
 
 1. ✅ Root cause identified (R models need play data, future games don't have it)
-2. ⏳ Implement Option A fix (lower threshold to 2 components)
-3. ⏳ Rebuild API container
-4. ⏳ Test predictions for all Week 12 games
-5. ⏳ Verify dashboard shows real predictions (not placeholders)
-6. ⏳ Monitor uncertainty values (should be higher for 2-component vs 5-component)
-7. ⏳ Document trade-off (Python-only for future, full ensemble for historical)
+2. ✅ Implement Option A fix (lower threshold to 2 components)
+3. ✅ Rebuild API container (discovered duplicate validation in API endpoint)
+4. ✅ Test predictions for all Week 12 games (all showing real values)
+5. ⏳ User verifies dashboard shows real predictions (not placeholders)
+6. ✅ Monitor uncertainty values (16-24 yards std, varying by QB/game)
+7. ✅ Document trade-off (Python-only for future, full ensemble for historical)
+
+**Status:** ✅ COMPLETE - See `docs/fixes/DASHBOARD_THRESHOLD_FIX_COMPLETE_NOV23.md` for full summary
 
 ---
 
