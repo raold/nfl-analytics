@@ -34,6 +34,7 @@ class BetOpportunity:
     confidence: float  # 0-1 confidence in edge estimate
     correlation_group: str | None = None  # For correlated bets
     timestamp: datetime = None
+    meta_probability: float = 1.0  # Meta-labeling: probability bet is profitable (Nov 27, 2025)
 
     @property
     def decimal_odds(self) -> float:
@@ -42,6 +43,30 @@ class BetOpportunity:
             return 1 + (self.market_odds / 100)
         else:
             return 1 + (100 / abs(self.market_odds))
+
+    @property
+    def meta_kelly_multiplier(self) -> float:
+        """
+        Convert meta-probability to Kelly fraction multiplier.
+
+        Integration with MetaLabelingClassifier (py/production/meta_labeling.py):
+        - meta_prob < 0.4 → no bet (return 0)
+        - meta_prob 0.4-0.6 → half Kelly (linear interpolation)
+        - meta_prob > 0.6 → full Kelly (return 1)
+
+        This reduces position size on low-quality bets identified by
+        meta-labeling features like turnover luck regression and SoV diff.
+        """
+        low_threshold = 0.4
+        high_threshold = 0.6
+
+        if self.meta_probability < low_threshold:
+            return 0.0  # No bet
+        elif self.meta_probability > high_threshold:
+            return 1.0  # Full Kelly
+        else:
+            # Linear interpolation
+            return (self.meta_probability - low_threshold) / (high_threshold - low_threshold)
 
 
 @dataclass
@@ -197,8 +222,17 @@ class EnhancedKellySizer:
         self.edge_decay = edge_decay
         self.cvar_constraint = cvar_constraint
 
-    def calculate_base_kelly(self, bet: BetOpportunity) -> float:
-        """Calculate base Kelly fraction for a single bet"""
+    def calculate_base_kelly(self, bet: BetOpportunity, use_meta_labeling: bool = True) -> float:
+        """
+        Calculate base Kelly fraction for a single bet.
+
+        Args:
+            bet: BetOpportunity with probability, odds, confidence, and meta_probability
+            use_meta_labeling: If True, apply meta-labeling multiplier (Nov 27, 2025)
+
+        Returns:
+            Kelly fraction (0 to 1), scaled by confidence decay and meta-labeling
+        """
         p = bet.model_prob
         b = bet.decimal_odds - 1  # Net odds
         q = 1 - p
@@ -213,6 +247,12 @@ class EnhancedKellySizer:
         if self.edge_decay:
             decay_factor = EdgeDecayFunction.confidence_decay(1.0, bet.confidence)
             kelly *= decay_factor
+
+        # Apply meta-labeling multiplier (Nov 27, 2025)
+        # This reduces position size on low-quality bets identified by
+        # meta-features like turnover luck regression and SoV differential
+        if use_meta_labeling:
+            kelly *= bet.meta_kelly_multiplier
 
         return max(0, kelly)
 
