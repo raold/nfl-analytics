@@ -8,11 +8,12 @@ comprehensive game-level features for outcome predictions (spreads, totals, mone
 
 **Purpose:**
 Extract all 96 base features (24 offensive + 24 defensive × 2 teams) plus 4 derived
-matchup features plus 12 injury features for game outcome predictions. Single entry point
-that coordinates feature extraction from TeamOffensiveFeatures, TeamDefensiveFeatures,
-and mart.team_injury_load.
+matchup features plus 12 injury features plus ~120 advanced features (60 per team)
+for game outcome predictions. Single entry point that coordinates feature extraction from
+TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
+Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (112 total):**
+**Features Extracted (232 total):**
 
 1. Home Team Offensive (24):
    - Prefix: 'home_off_'
@@ -48,6 +49,31 @@ and mart.team_injury_load.
    - Derived (2): injury_severity_diff, injury_spread_adjustment
    - Source: mart.team_injury_load table (2,798 rows, 2020-2024)
    - Impact: QB injury = -5 pts, key position = -2 pts, oline = -0.5 pts/injury
+
+7. Next Gen Stats Features (23 per team = 46):
+   - Prefix: 'home_ngs_' / 'away_ngs_'
+   - Source: NextGenStatsFeatures (passing, rushing, receiving tracking data)
+   - Examples: ngs_time_to_throw, ngs_cpoe, ngs_separation, ngs_ryoe
+
+8. QBR Features (10 per team = 20):
+   - Prefix: 'home_qbr_' / 'away_qbr_'
+   - Source: QBRFeatures (ESPN QBR metrics)
+   - Examples: qbr_4wk_avg, qbr_pts_added_4wk, qb_any_a_4wk
+
+9. Possession Value Features (4 per team = 8):
+   - Prefix: 'home_poss_' / 'away_poss_'
+   - Source: get_team_possession_value_features (expected points per possession)
+   - Examples: avg_starting_field_position, avg_possession_value, pace_factor, possessions_per_game
+
+10. Playcalling Features (16 per team = 32):
+    - Prefix: 'home_play_' / 'away_play_'
+    - Source: PlaycallingFeatures (4th down aggressiveness, deep passing, WPA)
+    - Examples: fourth_down_go_rate, deep_pass_rate, high_leverage_wpa
+
+11. Opponent-Adjusted Features (7 per team = 14):
+    - Prefix: 'home_oadj_' / 'away_oadj_'
+    - Source: OpponentAdjustedFeatures (EPA adjusted for opponent strength)
+    - Examples: off_epa_opponent_adjusted, dvoa_off_approx, dvoa_def_approx
 
 **Temporal Safety:**
 All features use ONLY games BEFORE target week. Both underlying extractors implement
@@ -91,6 +117,32 @@ import pandas as pd
 
 from py.features.team_offensive_features import TeamOffensiveFeatures
 from py.features.team_defensive_features import TeamDefensiveFeatures
+
+# Optional advanced feature modules (graceful degradation if unavailable)
+try:
+    from py.features.nextgen_features import NextGenStatsFeatures
+except ImportError:
+    NextGenStatsFeatures = None
+
+try:
+    from py.features.qbr_features import QBRFeatures
+except ImportError:
+    QBRFeatures = None
+
+try:
+    from py.features.possession_value import get_team_possession_value_features
+except ImportError:
+    get_team_possession_value_features = None
+
+try:
+    from py.features.playcalling_features import get_team_playcalling_features
+except ImportError:
+    get_team_playcalling_features = None
+
+try:
+    from py.features.opponent_adjusted_features import OpponentAdjustedFeatures
+except ImportError:
+    OpponentAdjustedFeatures = None
 
 import psycopg2
 import os
@@ -143,8 +195,40 @@ class GameFeatureExtractor:
                     'password': 'sicillionbillions'
                 }
         """
+        # Base extractors (always available)
         self.offensive_extractor = TeamOffensiveFeatures(db_config=db_config)
         self.defensive_extractor = TeamDefensiveFeatures(db_config=db_config)
+
+        # Advanced extractors (optional, graceful degradation)
+        if NextGenStatsFeatures:
+            self.ngs_extractor = NextGenStatsFeatures(db_config=db_config)
+            logger.info("NextGen Stats extractor initialized")
+        else:
+            self.ngs_extractor = None
+            logger.warning("NextGen Stats extractor unavailable")
+
+        if QBRFeatures:
+            self.qbr_extractor = QBRFeatures(db_config=db_config)
+            logger.info("QBR extractor initialized")
+        else:
+            self.qbr_extractor = None
+            logger.warning("QBR extractor unavailable")
+
+        if OpponentAdjustedFeatures:
+            self.oadj_extractor = OpponentAdjustedFeatures(db_config=db_config)
+            logger.info("Opponent-Adjusted extractor initialized")
+        else:
+            self.oadj_extractor = None
+            logger.warning("Opponent-Adjusted extractor unavailable")
+
+        # Database connection for function-based extractors
+        self.db_config = db_config or {
+            'host': 'localhost',
+            'port': 5544,
+            'dbname': 'devdb01',
+            'user': 'dro',
+            'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+        }
 
         # Feature cache: {(team, season, week, feature_type): (features, timestamp)}
         self._feature_cache = {}
@@ -160,7 +244,7 @@ class GameFeatureExtractor:
         use_cache: bool = True
     ) -> Dict[str, float]:
         """
-        Extract all 112 features for a game matchup (includes injury features).
+        Extract all 232 features for a game matchup (includes injury and advanced features).
 
         This is the main entry point for game-level feature extraction.
 
@@ -172,7 +256,7 @@ class GameFeatureExtractor:
             use_cache: Whether to use cached features (5-minute TTL)
 
         Returns:
-            Dictionary with 112 features:
+            Dictionary with 232 features (112 base + 120 advanced):
             {
                 # Home team offensive features (24)
                 'home_off_epa_per_play': float,
@@ -211,6 +295,33 @@ class GameFeatureExtractor:
                 'away_oline_injuries': int,
                 'injury_severity_diff': float,  # home - away
                 'injury_spread_adjustment': float,  # estimated spread impact (-5 for QB, etc.)
+
+                # Next Gen Stats features (23 per team × 2 = 46)
+                'home_ngs_time_to_throw': float,
+                'home_ngs_cpoe': float,
+                ... (23 home, 23 away)
+
+                # QBR features (10 per team × 2 = 20)
+                'home_qbr_4wk_avg': float,
+                'home_qbr_pts_added_4wk': float,
+                ... (10 home, 10 away)
+
+                # Possession value features (4 per team × 2 = 8)
+                'home_poss_avg_starting_field_position': float,
+                'home_poss_avg_possession_value': float,
+                'home_poss_pace_factor': float,
+                'home_poss_possessions_per_game': float,
+                ... (4 home, 4 away)
+
+                # Playcalling features (16 per team × 2 = 32)
+                'home_play_fourth_down_go_rate': float,
+                'home_play_deep_pass_rate': float,
+                ... (16 home, 16 away)
+
+                # Opponent-adjusted features (7 per team × 2 = 14)
+                'home_oadj_off_epa_opponent_adjusted': float,
+                'home_oadj_dvoa_off_approx': float,
+                ... (7 home, 7 away)
             }
 
         Raises:
@@ -266,6 +377,69 @@ class GameFeatureExtractor:
                 'injury_severity_diff': 0.0,
                 'injury_spread_adjustment': 0.0
             })
+
+        # Add Next Gen Stats features (23 per team)
+        if self.ngs_extractor:
+            try:
+                home_ngs = self.ngs_extractor.get_team_ngs_features(home_team, season, week)
+                features.update({f'home_ngs_{k}': v for k, v in home_ngs.items()})
+                away_ngs = self.ngs_extractor.get_team_ngs_features(away_team, season, week)
+                features.update({f'away_ngs_{k}': v for k, v in away_ngs.items()})
+                logger.debug(f"Added {len(home_ngs) + len(away_ngs)} NGS features")
+            except Exception as e:
+                logger.warning(f"Failed to extract NGS features: {e}")
+
+        # Add QBR features (10 per team)
+        if self.qbr_extractor:
+            try:
+                home_qbr = self.qbr_extractor.extract_features(home_team, season, week)
+                features.update({f'home_qbr_{k}': v for k, v in home_qbr.items()})
+                away_qbr = self.qbr_extractor.extract_features(away_team, season, week)
+                features.update({f'away_qbr_{k}': v for k, v in away_qbr.items()})
+                logger.debug(f"Added {len(home_qbr) + len(away_qbr)} QBR features")
+            except Exception as e:
+                logger.warning(f"Failed to extract QBR features: {e}")
+
+        # Add possession value features (8 per team)
+        if get_team_possession_value_features:
+            try:
+                conn = psycopg2.connect(**self.db_config)
+                try:
+                    home_poss = get_team_possession_value_features(conn, home_team, season, week)
+                    features.update({f'home_poss_{k}': v for k, v in home_poss.items()})
+                    away_poss = get_team_possession_value_features(conn, away_team, season, week)
+                    features.update({f'away_poss_{k}': v for k, v in away_poss.items()})
+                    logger.debug(f"Added {len(home_poss) + len(away_poss)} possession value features")
+                finally:
+                    conn.close()
+            except Exception as e:
+                logger.warning(f"Failed to extract possession value features: {e}")
+
+        # Add playcalling features (16 per team)
+        if get_team_playcalling_features:
+            try:
+                conn = psycopg2.connect(**self.db_config)
+                try:
+                    home_play = get_team_playcalling_features(conn, home_team, season, week)
+                    features.update({f'home_play_{k}': v for k, v in home_play.items()})
+                    away_play = get_team_playcalling_features(conn, away_team, season, week)
+                    features.update({f'away_play_{k}': v for k, v in away_play.items()})
+                    logger.debug(f"Added {len(home_play) + len(away_play)} playcalling features")
+                finally:
+                    conn.close()
+            except Exception as e:
+                logger.warning(f"Failed to extract playcalling features: {e}")
+
+        # Add opponent-adjusted features (7 per team)
+        if self.oadj_extractor:
+            try:
+                home_oadj = self.oadj_extractor.extract_features(home_team, away_team, season, week)
+                features.update({f'home_oadj_{k}': v for k, v in home_oadj.items()})
+                away_oadj = self.oadj_extractor.extract_features(away_team, home_team, season, week)
+                features.update({f'away_oadj_{k}': v for k, v in away_oadj.items()})
+                logger.debug(f"Added {len(home_oadj) + len(away_oadj)} opponent-adjusted features")
+            except Exception as e:
+                logger.warning(f"Failed to extract opponent-adjusted features: {e}")
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]
