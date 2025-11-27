@@ -1,0 +1,7 @@
+{
+  "model_path": "models/xgboost/xgboost_v6_advanced_spread_20251127_124409.json",
+  "optimal_market_weight": 1.0,
+  "optimal_model_weight": 0.0,
+  "optimization_date": "2025-11-27T13:15:02.443094",
+  "validation_mae": 9.610294117647058
+}
