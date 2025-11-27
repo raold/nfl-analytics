@@ -13,7 +13,7 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (232 total):**
+**Features Extracted (280 total):**
 
 1. Home Team Offensive (24):
    - Prefix: 'home_off_'
@@ -74,6 +74,27 @@ Playcalling, Opponent-Adjusted, and mart.team_injury_load.
     - Prefix: 'home_oadj_' / 'away_oadj_'
     - Source: OpponentAdjustedFeatures (EPA adjusted for opponent strength)
     - Examples: off_epa_opponent_adjusted, dvoa_off_approx, dvoa_def_approx
+
+12. Turnover Luck Features (25):
+    - Prefix: 'to_'
+    - Source: TurnoverLuckEngine (regression-to-mean indicators)
+    - Examples: to_home_turnover_luck_last_5, to_home_fumble_recovery_rate_l5,
+      to_home_expected_regression_points, to_turnover_luck_diff
+    - Research: Fumble recovery ~50%, extreme luck regresses to mean
+
+13. Primetime Features (9):
+    - Prefix: 'pt_'
+    - Source: PrimetimeFeaturesEngine (TNF/SNF/MNF detection)
+    - Examples: pt_is_thursday_night, pt_is_primetime, pt_is_tnf_home_disadvantage,
+      pt_game_slot_encoded
+    - Research: TNF road covers ~63% ATS, MNF higher public betting
+
+14. Strength of Victory Features (14):
+    - Prefix: 'sov_'
+    - Source: OpponentStrengthEngine.compute_game_sov_features()
+    - Examples: sov_home_strength_of_victory, sov_home_strength_of_schedule,
+      sov_sov_diff, sov_sos_diff, sov_win_rate_diff
+    - Research: Quality wins matter more than quantity (Sagarin-style)
 
 **Temporal Safety:**
 All features use ONLY games BEFORE target week. Both underlying extractors implement
@@ -143,6 +164,22 @@ try:
     from py.features.opponent_adjusted_features import OpponentAdjustedFeatures
 except ImportError:
     OpponentAdjustedFeatures = None
+
+# Quick Wins: Turnover luck, primetime, and strength of victory features
+try:
+    from py.features.turnover_luck import TurnoverLuckEngine
+except ImportError:
+    TurnoverLuckEngine = None
+
+try:
+    from py.features.primetime_features import PrimetimeFeaturesEngine
+except ImportError:
+    PrimetimeFeaturesEngine = None
+
+try:
+    from py.features.opponent_strength import OpponentStrengthEngine
+except ImportError:
+    OpponentStrengthEngine = None
 
 import psycopg2
 import os
@@ -220,6 +257,46 @@ class GameFeatureExtractor:
         else:
             self.oadj_extractor = None
             logger.warning("Opponent-Adjusted extractor unavailable")
+
+        # Quick Wins feature extractors (Nov 27, 2025)
+        if TurnoverLuckEngine:
+            self.turnover_luck_extractor = TurnoverLuckEngine(
+                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
+                db_port=db_config.get('port', 5544) if db_config else 5544,
+                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
+                db_user=db_config.get('user', 'dro') if db_config else 'dro',
+                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+            )
+            logger.info("Turnover Luck extractor initialized")
+        else:
+            self.turnover_luck_extractor = None
+            logger.warning("Turnover Luck extractor unavailable")
+
+        if PrimetimeFeaturesEngine:
+            self.primetime_extractor = PrimetimeFeaturesEngine(
+                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
+                db_port=db_config.get('port', 5544) if db_config else 5544,
+                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
+                db_user=db_config.get('user', 'dro') if db_config else 'dro',
+                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+            )
+            logger.info("Primetime Features extractor initialized")
+        else:
+            self.primetime_extractor = None
+            logger.warning("Primetime Features extractor unavailable")
+
+        if OpponentStrengthEngine:
+            self.opponent_strength_extractor = OpponentStrengthEngine(
+                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
+                db_port=db_config.get('port', 5544) if db_config else 5544,
+                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
+                db_user=db_config.get('user', 'dro') if db_config else 'dro',
+                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+            )
+            logger.info("Opponent Strength (SoV) extractor initialized")
+        else:
+            self.opponent_strength_extractor = None
+            logger.warning("Opponent Strength (SoV) extractor unavailable")
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
@@ -440,6 +517,65 @@ class GameFeatureExtractor:
                 logger.debug(f"Added {len(home_oadj) + len(away_oadj)} opponent-adjusted features")
             except Exception as e:
                 logger.warning(f"Failed to extract opponent-adjusted features: {e}")
+
+        # ========================================================================
+        # Quick Wins Phase 1 Features (Nov 27, 2025)
+        # ========================================================================
+
+        # Add turnover luck features (25 features: regression indicators, expected points)
+        # Research: Fumble recovery ~50%, teams with extreme luck regress to mean
+        if self.turnover_luck_extractor:
+            try:
+                turnover_features = self.turnover_luck_extractor.compute_game_turnover_features(
+                    home_team, away_team, season, week
+                )
+                features.update({f'to_{k}': v for k, v in turnover_features.items()})
+                logger.debug(f"Added {len(turnover_features)} turnover luck features")
+            except Exception as e:
+                logger.warning(f"Failed to extract turnover luck features: {e}")
+
+        # Add primetime features (9 features: TNF/SNF/MNF flags, market attention)
+        # Research: TNF road covers ~63% ATS, MNF higher public betting
+        if self.primetime_extractor:
+            try:
+                # Use batch features and filter for this specific game
+                batch_features = self.primetime_extractor.compute_batch_features(season, week)
+                if len(batch_features) > 0:
+                    game_row = batch_features[
+                        (batch_features['home_team'] == home_team) &
+                        (batch_features['away_team'] == away_team)
+                    ]
+                    if len(game_row) > 0:
+                        primetime_features = game_row.iloc[0].to_dict()
+                    else:
+                        # Game not found in batch, use neutral features
+                        primetime_features = self.primetime_extractor._neutral_features()
+                else:
+                    primetime_features = self.primetime_extractor._neutral_features()
+
+                # Only add numeric features (not game_slot categorical, game_id, team names)
+                exclude_keys = {'game_slot', 'game_id', 'home_team', 'away_team'}
+                for k, v in primetime_features.items():
+                    if k not in exclude_keys and isinstance(v, (bool, int, float, np.bool_, np.integer, np.floating)):
+                        features[f'pt_{k}'] = int(v) if isinstance(v, (bool, np.bool_)) else float(v)
+                # Add game_slot as categorical encoding
+                slot_map = {'TNF': 1, 'SNF': 2, 'MNF': 3, 'LATE_AFTERNOON': 4, 'EARLY_SUNDAY': 5, 'OTHER': 0, 'UNKNOWN': -1}
+                features['pt_game_slot_encoded'] = slot_map.get(primetime_features.get('game_slot', 'UNKNOWN'), -1)
+                logger.debug(f"Added primetime features (primetime={primetime_features.get('is_primetime', False)})")
+            except Exception as e:
+                logger.warning(f"Failed to extract primetime features: {e}")
+
+        # Add strength of victory features (14 features: SoV, SoS, win quality)
+        # Research: Quality wins matter more than quantity (Sagarin-style)
+        if self.opponent_strength_extractor:
+            try:
+                sov_features = self.opponent_strength_extractor.compute_game_sov_features(
+                    home_team, away_team, season, week
+                )
+                features.update({f'sov_{k}': v for k, v in sov_features.items()})
+                logger.debug(f"Added {len(sov_features)} strength of victory features")
+            except Exception as e:
+                logger.warning(f"Failed to extract strength of victory features: {e}")
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]

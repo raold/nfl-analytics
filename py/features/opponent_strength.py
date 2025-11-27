@@ -39,7 +39,7 @@ Research: Sagarin Methodology + Public Predictors Analysis (Nov 13-14, 2025)
 import logging
 import warnings
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -473,6 +473,194 @@ class OpponentStrengthEngine:
         logger.info(f"  Missing data: {df['opp_def_epa_exp'].isna().sum():,} ({df['opp_def_epa_exp'].isna().mean():.1%})")
 
         return df
+
+    def compute_strength_of_victory(
+        self,
+        team: str,
+        season: int,
+        week: int,
+        lookback_games: int = 6
+    ) -> Dict:
+        """
+        Compute Strength of Victory (SoV) for a team.
+
+        SoV measures the quality of a team's wins by weighting wins by opponent strength.
+        This identifies teams with "quality wins" vs teams beating only weak opponents.
+
+        **Why This Matters**:
+        - Teams that beat strong opponents are undervalued
+        - Teams with easy schedules and inflated records are overvalued
+        - Betting markets overweight recent wins without quality adjustment
+
+        **Formula**:
+        SoV = sum(win * opponent_rating) / sum(wins)
+        where opponent_rating is exponentially-weighted EPA or power rating
+
+        Args:
+            team: Team abbreviation
+            season: Season year
+            week: Week number (features use only prior games)
+            lookback_games: Number of games to consider
+
+        Returns:
+            Dictionary with SoV features
+        """
+        query = """
+        WITH team_games AS (
+            SELECT
+                g.game_id,
+                g.season,
+                g.week,
+                g.kickoff,
+                g.home_team,
+                g.away_team,
+                g.home_score,
+                g.away_score,
+                CASE
+                    WHEN g.home_team = %(team)s THEN 'home'
+                    ELSE 'away'
+                END as team_side,
+                CASE
+                    WHEN g.home_team = %(team)s THEN g.away_team
+                    ELSE g.home_team
+                END as opponent,
+                CASE
+                    WHEN g.home_team = %(team)s THEN g.home_score
+                    ELSE g.away_score
+                END as team_score,
+                CASE
+                    WHEN g.home_team = %(team)s THEN g.away_score
+                    ELSE g.home_score
+                END as opponent_score,
+                CASE
+                    WHEN g.home_team = %(team)s AND g.home_score > g.away_score THEN 1
+                    WHEN g.away_team = %(team)s AND g.away_score > g.home_score THEN 1
+                    ELSE 0
+                END as is_win
+            FROM games g
+            WHERE (g.home_team = %(team)s OR g.away_team = %(team)s)
+              AND g.season >= %(min_season)s
+              AND (g.season < %(season)s OR (g.season = %(season)s AND g.week < %(week)s))
+              AND g.home_score IS NOT NULL
+              AND g.away_score IS NOT NULL
+            ORDER BY g.kickoff DESC
+            LIMIT %(lookback)s
+        ),
+        opponent_ratings AS (
+            -- Get each opponent's offensive EPA as a proxy for quality
+            SELECT
+                tg.game_id,
+                tg.opponent,
+                tg.is_win,
+                tg.team_score - tg.opponent_score as margin,
+                COALESCE(
+                    (SELECT AVG(p.epa)
+                     FROM plays p
+                     WHERE p.game_id = tg.game_id
+                       AND p.posteam = tg.opponent
+                       AND p.epa IS NOT NULL),
+                    0.0
+                ) as opponent_off_epa
+            FROM team_games tg
+        )
+        SELECT
+            COUNT(*) as games_played,
+            SUM(is_win) as wins,
+            AVG(margin) as avg_margin,
+            AVG(CASE WHEN is_win = 1 THEN margin ELSE NULL END) as avg_win_margin,
+            -- Strength of Victory = avg opponent EPA in wins
+            AVG(CASE WHEN is_win = 1 THEN opponent_off_epa ELSE NULL END) as strength_of_victory,
+            -- Strength of Schedule = avg opponent EPA overall
+            AVG(opponent_off_epa) as strength_of_schedule
+        FROM opponent_ratings;
+        """
+
+        try:
+            with self._connect_db() as conn:
+                result = pd.read_sql_query(
+                    query,
+                    conn,
+                    params={
+                        "team": team,
+                        "season": season,
+                        "week": week,
+                        "min_season": season - 1,
+                        "lookback": lookback_games
+                    }
+                )
+
+            if len(result) == 0 or result.iloc[0]['games_played'] == 0:
+                return self._neutral_sov_features()
+
+            row = result.iloc[0]
+            games_played = int(row['games_played']) if pd.notna(row['games_played']) else 0
+            wins = int(row['wins']) if pd.notna(row['wins']) else 0
+            sov = float(row['strength_of_victory']) if pd.notna(row['strength_of_victory']) else 0.0
+            sos = float(row['strength_of_schedule']) if pd.notna(row['strength_of_schedule']) else 0.0
+            avg_margin = float(row['avg_margin']) if pd.notna(row['avg_margin']) else 0.0
+
+            # Win rate
+            win_rate = wins / games_played if games_played > 0 else 0.5
+
+            # SoV indicator: positive = quality wins, negative = weak opponent wins
+            # Normalized: if SoV is positive (beat teams with good EPA), it's quality
+            sov_indicator = 1 if sov > 0.05 else (-1 if sov < -0.05 else 0)
+
+            return {
+                'strength_of_victory': round(sov, 4),
+                'strength_of_schedule': round(sos, 4),
+                'win_rate_l6': round(win_rate, 3),
+                'avg_margin_l6': round(avg_margin, 2),
+                'sov_indicator': sov_indicator,
+                'games_played': games_played,
+            }
+
+        except Exception as e:
+            logger.warning(f"SoV query failed for {team}: {e}")
+            return self._neutral_sov_features()
+
+    def _neutral_sov_features(self) -> Dict:
+        """Return neutral SoV features when data unavailable."""
+        return {
+            'strength_of_victory': 0.0,
+            'strength_of_schedule': 0.0,
+            'win_rate_l6': 0.5,
+            'avg_margin_l6': 0.0,
+            'sov_indicator': 0,
+            'games_played': 0,
+        }
+
+    def compute_game_sov_features(
+        self,
+        home_team: str,
+        away_team: str,
+        season: int,
+        week: int
+    ) -> Dict:
+        """
+        Compute SoV features for a game matchup.
+
+        Returns differential features (home - away) plus team-level features.
+        """
+        home_sov = self.compute_strength_of_victory(home_team, season, week)
+        away_sov = self.compute_strength_of_victory(away_team, season, week)
+
+        result = {}
+
+        # Home team SoV features
+        for key, value in home_sov.items():
+            result[f'home_{key}'] = value
+
+        # Away team SoV features
+        for key, value in away_sov.items():
+            result[f'away_{key}'] = value
+
+        # Differential features
+        result['sov_diff'] = home_sov['strength_of_victory'] - away_sov['strength_of_victory']
+        result['sos_diff'] = home_sov['strength_of_schedule'] - away_sov['strength_of_schedule']
+        result['win_rate_diff'] = home_sov['win_rate_l6'] - away_sov['win_rate_l6']
+
+        return result
 
     def save_features(self, df: pd.DataFrame, output_path: str):
         """Save opponent strength features to CSV."""
