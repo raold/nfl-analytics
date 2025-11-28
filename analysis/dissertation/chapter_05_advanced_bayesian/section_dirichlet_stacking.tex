@@ -4,7 +4,7 @@
 
 The ensemble systems developed in \Cref{sec:ensemble-evolution} established static weight vectors optimized via constrained convex optimization on historical validation data. While these fixed weights achieve strong performance for game-level predictions (spreads, totals), the fundamental question remains: \emph{can data-driven Bayesian learning discover superior weight configurations, particularly for distinct prediction domains such as player props?}
 
-This section presents a systematic investigation of Dirichlet Bayesian stacking \citep{yao2018}, a principled framework for ensemble weight learning that provides closed-form posterior updates without MCMC overhead. Through comprehensive hyperparameter grid search over 108 configurations spanning 2022--2024 NFL data, we uncover a critical domain-specific insight: \textbf{player-level predictions (props) require fundamentally different ensemble weights than game-level predictions (spreads, totals)}. This finding motivates a novel dual-weight paradigm that allocates 79.1\% weight to Bayesian hierarchical models for props (capturing individual variance) while retaining balanced XGBoost/State-Space allocations for games (modeling opponent interactions). The optimal Dirichlet configuration achieves 31.5\% MAE improvement (89.42 $\to$ 61.26 yards) for passing yardage predictions, validating data-driven weight learning while reconciling with the static weight philosophy established in our rejection of online meta-learning (ADR-009, \Cref{subsec:why-no-dynamic-weights}).
+This section presents a systematic investigation of Dirichlet Bayesian stacking \citep{yao2018}, a principled framework for ensemble weight learning that provides closed-form posterior updates without MCMC overhead. Through comprehensive hyperparameter grid search over 108 configurations spanning 2022--2024 NFL data, we uncover a critical domain-specific insight: \textbf{player-level predictions (props) require fundamentally different ensemble weights than game-level predictions (spreads, totals)}. This finding motivates a novel dual-weight paradigm that allocates 79.1\% weight to Bayesian hierarchical models for props (capturing individual variance) while retaining balanced XGBoost/State-Space allocations for games (modeling opponent interactions). The optimal Dirichlet configuration achieves 31.5\% MAE improvement (89.42 $\to$ 61.26 yards) for passing yardage predictions, validating data-driven weight learning while reconciling with the static weight philosophy established in our rejection of online meta-learning (ADR-009).
 
 \subsection{Theoretical Foundation: Dirichlet-Categorical Conjugacy}
 \label{subsec:dirichlet-theory}
@@ -275,8 +275,8 @@ DEFAULT_WEIGHTS_V6 = {
 }
 
 # v8.0 Dirichlet Weights: Optimized for player props
-# Grid search: 108 configs, α₀=1.0, σ=20.0, squared scoring
-# Result: 31.5% MAE improvement (89.42 → 61.26 yards) vs v6.0
+# Grid search: 108 configs, alpha_0=1.0, sigma=20.0, squared scoring
+# Result: 31.5% MAE improvement (89.42 -> 61.26 yards) vs v6.0
 DIRICHLET_WEIGHTS_V8 = {
     "state_space_v2": 0.082,
     "hierarchical_v2": 0.396,
@@ -348,7 +348,7 @@ v8.0 DIRICHLET & Game Spreads & \textit{Not Tested}\tnote{c} & Expected Worse \\
 \subsection{Reconciliation with ADR-009: Static Learning vs Online Meta-Learning}
 \label{subsec:reconcile-adr009}
 
-In \Cref{subsec:why-no-dynamic-weights}, we documented the rejection of ensemble v7.0's online dynamic weighting (ADR-009, Nov 18, 2025) after 8.5 hours of multi-season backtesting revealed only +0.01 MAE improvement---essentially zero benefit. This raises a natural question: \emph{How does Dirichlet stacking (v8.0) differ from the rejected meta-learning approach, and why is it acceptable?}
+In prior work (ADR-009, Nov 18, 2025), we documented the rejection of ensemble v7.0's online dynamic weighting after 8.5 hours of multi-season backtesting revealed only +0.01 MAE improvement---essentially zero benefit. This raises a natural question: \emph{How does Dirichlet stacking (v8.0) differ from the rejected meta-learning approach, and why is it acceptable?}
 
 \paragraph{Critical Distinctions.}
 \begin{table}[h]

@@ -164,7 +164,7 @@ features:
 
 The comprehensive master feature catalog consolidating all 186+ features across baseline, ensemble, and RL models is presented in \Cref{tab:master-features}. Each feature family is documented with temporal safety indicators, source files, and cross-references to chapters that utilize them.
 
-\input{../chapter_3_data_foundation/table_master_features.tex}
+\input{../chapter_03_data_foundation/table_master_features.tex}
 
 \subsection{Missing Signal Analysis and Feature Gap Assessment}
 \label{subsec:missing_signals}
@@ -645,7 +645,7 @@ To ensure reproducible evaluation, we define dataset cohorts with explicit train
 The integration of temporal weighting with dataset cohorts ensures robust evaluation across eras while maintaining leakage-free feature generation.
 
 % Phase 5 Exhaustive Feature Engineering Implementation
-\input{../chapter_3_data_foundation/subsection_phase5_exhaustive_features.tex}
+\input{../chapter_03_data_foundation/subsection_phase5_exhaustive_features.tex}
 
 \section{As-Of Feature Generation}
 \label{sec:asof-generation}
@@ -666,7 +666,7 @@ The integration of temporal weighting with dataset cohorts ensures robust evalua
 \end{algorithm}
 
 % Phase 2 Advanced Stats Integration (November 2025)
-\input{../chapter_3_data_foundation/section_3_5_phase2_advanced_stats.tex}
+\input{../chapter_03_data_foundation/section_3_5_phase2_advanced_stats.tex}
 
 \chaptersummary{
 This chapter established a reproducible data foundation with five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data with 92.7\% coverage; (ii) a governed TimescaleDB architecture with staging/core/mart layers, hypertables, and optimized indexing; (iii) a feature catalog expanded from 112 baseline to 232 total features (+107\%) through Phase 2 Advanced Stats Integration, incorporating Next Gen Stats tracking data (46 features), ESPN QBR metrics (20 features), possession value analytics (8 features), playcalling sophistication measures (32 features), and opponent-adjusted efficiency ratings (14 features); (iv) a multi-layered leakage prevention architecture combining SQL constraints, pandas validation, runtime guards, and 15 unit tests achieving 100\% validation success rate; (v) data quality gates with drift detection and coverage monitoring; and (vi) temporal weighting schemes with exponential decay (half-life $H \in \{3,4,5\}$) addressing NFL rule changes and market evolution.

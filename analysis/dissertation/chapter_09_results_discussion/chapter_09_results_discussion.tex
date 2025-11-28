@@ -80,6 +80,8 @@ This dissertation began with a fundamental question: can machine learning extrac
 
 However, that failure was not the conclusion, but the beginning of a 13-month research journey. The central finding of this dissertation is therefore not that markets are efficient, but that \textbf{profitability is achievable through a disciplined process of discovery}. By systematically identifying the failure modes of early models and developing specific architectural principles to overcome them, we constructed the v6.0 system—a profitable, robust, and reproducible decision engine.
 
+The dramatic improvement in model accuracy and profitability can be substantially attributed to the feature orthogonalization process described in Chapter 4. The "Ridge Residuals" method provided an 88\% improvement in component accuracy by giving the ensemble models a less noisy, more robust signal of intrinsic team and player strength. This confirms our core hypothesis: in efficient markets, superior feature engineering is a more potent source of alpha than marginal improvements in model architecture.
+
 The final v6.0 system, a 5-way ensemble built on the principles of feature orthogonalization, diversification, and hybrid modeling, was subjected to the same rigorous, multi-season validation that caused earlier models to fail. It succeeded.
 
 \begin{table}[h]
@@ -111,7 +113,7 @@ This result reframes the initial hypothesis. The answer is "Yes," but with a cri
 The failure of the initial models was not a failure of the project, but a validation of market efficiency. The success of the final model is a validation of the scientific process.
 
 % DATA LEAKAGE INVESTIGATION - Critical methodological finding (Nov 2, 2025)
-\input{../chapter_8_results_discussion/section_data_leakage_investigation.tex}
+\input{../chapter_09_results_discussion/section_data_leakage_investigation.tex}
 
 \section{Empirical Validation: 40 Experiments}\label{sec:experiments}
 
@@ -135,7 +137,7 @@ The 15 failed experiments encountered database schema mismatches rather than met
 The experimental framework demonstrated efficient execution ($<$1 second for all 40 experiments), robust error handling, and comprehensive result tracking via CSV and JSON exports. The success of 25 experiments validates the core methodology while the systematic documentation of failures provides a roadmap for future data integration work.
 
 % Fourth-Down CQL Results (November 2025)
-\input{../chapter_8_results_discussion/section_fourth_down_cql.tex}
+\input{../chapter_09_results_discussion/section_fourth_down_cql.tex}
 
 \section{Predictive Performance}
 \Cref{tab:multimodel-comparison} presents the full multimodel comparison. Stacked ensembles outperform individual models by modest but consistent margins (0.0037 Brier improvement over GLM baseline, representing 1.5\% relative gain).
@@ -385,27 +387,27 @@ We report out-of-sample performance by season. Stability across 2015--2024 demon
 \IfFileExists{../figures/out/oos_record_table.tex}{\input{../figures/out/oos_record_table.tex}}{\input{../results/oos_record_table.tex}}
 
 % BNN Calibration Study for Player Props (Rushing Yards) - ELEVATED SECTION
-\input{../chapter_8_results_discussion/section_bnn_calibration_study.tex}
+\input{../chapter_09_results_discussion/section_bnn_calibration_study.tex}
 
 % 5-Way Ensemble Production Validation - NEW SECTION (Nov 8, 2025)
-\input{../chapter_8_results_discussion/subsection_5way_ensemble_validation.tex}
+\input{../chapter_09_results_discussion/subsection_5way_ensemble_validation.tex}
 
 % Canonical Training Window and State-Space v2 Approval - CRITICAL MILESTONES (Nov 8, 2025)
 \input{../sections/canonical_window_and_state_space_approval.tex}
 
 % 5-Way Ensemble Integration and Production Results - COMPREHENSIVE SECTION (Nov 9, 2025)
-\input{../chapter_8_results_discussion/section_5way_ensemble_production.tex}
+\input{../chapter_09_results_discussion/section_5way_ensemble_production.tex}
 
 % Advanced Uncertainty Quantification Validation - 7-PHASE ENHANCEMENT (Nov 9, 2025)
-\input{../chapter_8_results_discussion/section_conformal_empirical_validation.tex}
-\input{../chapter_8_results_discussion/section_online_learning_validation.tex}
-\input{../chapter_8_results_discussion/section_evidential_validation.tex}
+\input{../chapter_09_results_discussion/section_conformal_empirical_validation.tex}
+\input{../chapter_09_results_discussion/section_online_learning_validation.tex}
+\input{../chapter_09_results_discussion/section_evidential_validation.tex}
 
 % Include GNN empirical results section
-\input{../chapter_8_results_discussion/section_gnn_empirical_results.tex}
+\input{../chapter_09_results_discussion/section_gnn_empirical_results.tex}
 
 % Include Causal Inference Framework section
-\input{../chapter_8_results_discussion/section_causal_inference.tex}
+\input{../chapter_09_results_discussion/section_causal_inference.tex}
 
 \section{Economic Value and Risk}
 We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.
