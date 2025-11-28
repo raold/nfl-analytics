@@ -116,7 +116,7 @@ Chapter~8 applies DiD to star quarterback injuries (e.g., Patrick Mahomes injury
 \label{subsec:stacking-lit}
 
 \paragraph{Motivation: Model Averaging vs Model Selection.}
-No single model captures all data-generating mechanisms. Bayesian model averaging (BMA) \citep{hoeting1999} weights models by posterior probability $p(M_k \mid \mathcal{D})$, but this requires a closed world assumption (true model is among candidates) and is sensitive to prior specification. In the \emph{M-open} setting---where all models are misspecified---BMA can concentrate weight on the wrong model. \emph{Stacking} \citep{wolpert1992stacked} optimizes predictive performance directly by finding convex weights that minimize out-of-sample loss.
+No single model captures all data-generating mechanisms. Bayesian model averaging (BMA) \citep{hoeting1999bayesian} weights models by posterior probability $p(M_k \mid \mathcal{D})$, but this requires a closed world assumption (true model is among candidates) and is sensitive to prior specification. In the \emph{M-open} setting---where all models are misspecified---BMA can concentrate weight on the wrong model. \emph{Stacking} \citep{wolpert1992stacked} optimizes predictive performance directly by finding convex weights that minimize out-of-sample loss.
 
 \paragraph{Stacking of Predictive Distributions.}
 \citet{yao2018stacking} generalize stacking from point predictions to full predictive distributions. Given $K$ models with posterior predictive distributions $p_k(y\mid x, \mathcal{D})$, the stacked predictive is
