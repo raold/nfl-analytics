@@ -135,7 +135,7 @@ Ensemble (both agree) & 120 & 55.0\% & +2.60\% \\
 Disagreement filtering reduces bet volume by 26\% but increases win rate by 1.0 pp and ROI by 1.01 pp. This validates the \emph{wisdom of crowds} principle: diverse models with complementary biases outperform individual forecasters.
 
 % GPU TRAINING INFRASTRUCTURE - Documents computational methods for BNN training (Nov 2, 2025)
-\input{../chapter_4_baseline_modeling/subsection_gpu_training_infrastructure.tex}
+\input{../chapter_04_baseline_modeling/subsection_gpu_training_infrastructure.tex}
 
 \subsection{Production Deployment and Integration}
 
@@ -271,7 +271,7 @@ Based on CPU-only pilot implementations, GNNs appeared impractical due to severa
 
 However, systematic profiling revealed that the computational bottleneck stemmed from implementation artifacts (sequential game processing, CPU-only execution) rather than fundamental algorithmic limitations. Dedicated GPU optimization with batch-parallel processing eliminated this barrier, as documented in \S\ref{subsec:gnn_gpu_optimization}.
 
-\input{../chapter_4_baseline_modeling/section_gnn_gpu_optimization.tex}
+\input{../chapter_04_baseline_modeling/section_gnn_gpu_optimization.tex}
 
 \subsection{Regime Detection and Changepoint Algorithms}
 
@@ -395,13 +395,13 @@ The following section extends the Bayesian hierarchical methodology to player pr
 This v3.0 ensemble achieves breakthrough 86.4\% MAE improvement over baseline (42.3 $\to$ 5.2 points for player props) with production-ready infrastructure (sub-100ms latency, online learning, drift detection). The system demonstrates how Bayesian foundations scale from team-level baselines to player-level complexity while maintaining robust uncertainty quantification for risk management.
 
 % Include the v3.0 Ensemble Section
-\input{../chapter_4_baseline_modeling/v3_ensemble_section.tex}
+\input{../chapter_04_baseline_modeling/v3_ensemble_section.tex}
 
 % Include ensemble evolution section
-\input{../chapter_4b_advanced_bayesian/section_ensemble_evolution.tex}
+\input{../chapter_05_advanced_bayesian/section_ensemble_evolution.tex}
 
 % Include Dirichlet Bayesian Stacking section (November 2025)
-\input{../chapter_4b_advanced_bayesian/section_dirichlet_stacking.tex}
+\input{../chapter_05_advanced_bayesian/section_dirichlet_stacking.tex}
 
 \section{Case Study: The Limits of Complexity—An 84-Hour BNN Investigation}
 \label{sec:bnn-failure-case-study}

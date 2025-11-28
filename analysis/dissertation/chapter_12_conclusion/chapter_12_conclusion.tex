@@ -77,6 +77,19 @@ We document when and why the system fails: 21\% of weeks produce zero bets due t
   \item \textbf{Simulated liquidity}: Acceptance tests use pessimistic friction regimes but cannot perfectly replicate real-world market conditions.
 \end{itemize}
 
+\subsection*{Limitations and Boundaries of the Playbook}
+\addcontentsline{toc}{subsection}{Limitations and Boundaries of the Playbook}
+
+While this dissertation presents a generalizable "playbook" for building profitable AI in competitive environments, its success is contingent on specific characteristics of the target domain. The principles of feature engineering, ensemble diversification, and risk management are universal, but their application must be adapted. The NFL betting market proved an ideal testbed for several reasons:
+
+\begin{itemize}
+    \item \textbf{Rich, Structured Public Data:} The availability of decades of high-quality play-by-play data is a prerequisite. Domains with sparse or unstructured data would require significantly more investment in data processing.
+    \item \textbf{Medium-Frequency Dynamics:} Game outcomes are weekly events. This cadence allows for complex models to be trained and validated offline, a luxury not available in high-frequency domains like algorithmic trading, where microsecond latency and continuous model updates are paramount.
+    \item \textbf{A "Solvable" Level of Efficiency:} The NFL market is highly efficient, but the 4.5\% vigorish creates a fixed barrier that can be overcome with a superior model. In markets with near-zero transaction costs and adversarial participants (e.g., quantitative finance), the alpha from such a system would likely decay much faster.
+\end{itemize}
+
+Applying this playbook to other domains would require careful consideration of these factors. In supply chain optimization, for instance, the challenge may not be market efficiency but modeling real-world physical constraints and stochastic delays. In finance, the emphasis would shift from complex feature engineering to low-latency infrastructure and adversarial game theory. The core lesson holds—know your domain, diversify your models, manage your risk—but the implementation details will differ significantly.
+
 \section{Future Directions}
 
 Despite current unprofitability, this work opens several research directions:
@@ -103,7 +116,7 @@ Despite current unprofitability, this work opens several research directions:
 \end{itemize}
 
 % Profit Optimization Future Work from Ch 12
-\input{../chapter_10_conclusion/section_profit_optimization_future_work.tex}
+\input{../chapter_12_conclusion/section_profit_optimization_future_work.tex}
 
 \section{Broader Implications for Sports Analytics}
 

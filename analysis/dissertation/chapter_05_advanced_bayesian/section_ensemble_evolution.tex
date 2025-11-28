@@ -377,9 +377,9 @@ Following \citet{yao2018stacking}, we implement Dirichlet Bayesian stacking to l
 
 The Dirichlet stacking algorithm maintains a belief distribution over component weights $\mathbf{w} = (w_1, \ldots, w_K)$ where $\sum_k w_k = 1$ and $w_k \geq 0$. For each prediction task $t$:
 \begin{align}
-\text{Prior: } & \mathbf{w} \sim \text{Dirichlet}(\boldsymbol{\alpha}_0), \label{eq:dirichlet-prior}\\
-\text{Likelihood: } & p(y_t \mid \mathbf{f}_t, \mathbf{w}) \propto \exp\left(-\frac{1}{2\sigma^2} \left(y_t - \sum_k w_k f_{kt}\right)^2\right), \label{eq:dirichlet-likelihood}\\
-\text{Update: } & \boldsymbol{\alpha}_{t+1} = \boldsymbol{\alpha}_t + \boldsymbol{\delta}_t(\mathbf{f}_t, y_t), \label{eq:dirichlet-update}
+\text{Prior: } & \mathbf{w} \sim \text{Dirichlet}(\boldsymbol{\alpha}_0), \label{eq:dirichlet-prior-evo}\\
+\text{Likelihood: } & p(y_t \mid \mathbf{f}_t, \mathbf{w}) \propto \exp\left(-\frac{1}{2\sigma^2} \left(y_t - \sum_k w_k f_{kt}\right)^2\right), \label{eq:dirichlet-likelihood-evo}\\
+\text{Update: } & \boldsymbol{\alpha}_{t+1} = \boldsymbol{\alpha}_t + \boldsymbol{\delta}_t(\mathbf{f}_t, y_t), \label{eq:dirichlet-update-evo}
 \end{align}
 where $\mathbf{f}_t = (f_{1t}, \ldots, f_{Kt})$ are component predictions, $y_t$ is the observed outcome, and $\boldsymbol{\delta}_t$ is the gradient of the scoring rule (squared, absolute, or log loss).
 

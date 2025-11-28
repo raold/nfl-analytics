@@ -448,7 +448,7 @@ Dataset diagnostics from the feature catalog (\texttt{py/features/catalog.yaml})
 Full coverage statistics and temporal distribution details are documented in the automated leakage audit (Appendix~\ref{app:leakage_audit}), which certifies that all dataset cohorts maintain strict temporal integrity for offline RL training and OPE evaluation.
 
 % Include the new experiment-augmented RL section
-\input{../chapter_5_rl_design/section_experiment_augmented_rl.tex}
+\input{../chapter_06_rl_design/section_experiment_augmented_rl.tex}
 
 \chaptersummary{
 We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance. We extended the baseline RL framework by integrating 29 experiment-derived features from the 25 successful cVAE and causal experiments (\Cref{sec:experiments}), expanding the state space from 15 to 44 dimensions and enabling experiment-aware bet sizing with projected ROI improvements of +3--10\%. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
