@@ -1,0 +1,95 @@
+% Figure: Updated Database Entity-Relationship Diagram (November 2025)
+% Shows complete schema with ML tables added for prediction caching
+% Generated: November 28, 2025
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm and 1.2cm,
+    table/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!10, rounded corners, minimum width=2.5cm, minimum height=0.6cm, align=center, font=\scriptsize\bfseries},
+    mltable/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!15, rounded corners, minimum width=2.5cm, minimum height=0.6cm, align=center, font=\scriptsize\bfseries},
+    view/.style={rectangle, draw=orange, thick, fill=orange!10, rounded corners, minimum width=2.5cm, minimum height=0.6cm, align=center, font=\scriptsize\bfseries},
+    schema/.style={rectangle, draw=gray, thick, fill=gray!15, rounded corners, minimum width=2.2cm, minimum height=0.5cm, align=center, font=\scriptsize\ttfamily},
+    arrow/.style={->, thick, gray},
+    fk/.style={->, thick, accentBlue, dashed}
+]
+
+% Schema labels
+\node[schema] (pub) {PUBLIC schema};
+\node[schema, right=6cm of pub] (mart) {MART schema};
+\node[schema, right=5cm of mart] (ml) {ML schema};
+
+% Core tables (PUBLIC)
+\node[table, below=0.8cm of pub] (games) {games\\(7,263 rows)};
+\node[table, below=0.5cm of games] (plays) {plays\\(1.25M rows)};
+\node[table, below=0.5cm of plays] (weather) {weather};
+\node[table, below=0.5cm of weather] (injuries) {injuries};
+\node[table, below=0.5cm of injuries] (rosters) {rosters};
+\node[table, below=0.5cm of rosters] (odds) {odds\_history\\(TimescaleDB)};
+\node[table, below=0.5cm of odds] (players) {players};
+
+% Materialized views (MART)
+\node[view, below=0.8cm of mart] (gs) {game\_summary};
+\node[view, below=0.5cm of gs] (tepa) {team\_epa};
+\node[view, below=0.5cm of tepa] (gw) {game\_weather};
+\node[view, below=0.5cm of gw] (pgs) {player\_game\_stats};
+\node[view, below=0.5cm of pgs] (tpc) {team\_playoff\_ctx};
+\node[view, below=0.5cm of tpc] (til) {team\_injury\_load};
+\node[view, below=0.5cm of til] (gfe) {game\_features\_enh\\(170+ columns)};
+
+% ML tables (ML schema) - NEW
+\node[mltable, below=0.8cm of ml] (mreg) {model\_registry\\(337 models)};
+\node[mltable, below=0.5cm of mreg] (rpred) {r\_model\_predictions\\(6,090 cached)};
+\node[mltable, below=0.5cm of rpred] (gpred) {game\_predictions};
+\node[mltable, below=0.5cm of gpred] (epred) {ensemble\_predictions};
+\node[mltable, below=0.5cm of epred] (pmet) {prediction\_metrics};
+\node[mltable, below=0.5cm of pmet] (abtest) {ab\_test\_assignments};
+\node[mltable, below=0.5cm of abtest] (abres) {ab\_test\_results};
+
+% Foreign key relationships
+\draw[fk] (plays.west) -- ++(-0.3,0) |- node[near start, above, font=\tiny] {game\_id} (games.west);
+\draw[fk] (weather.west) -- ++(-0.3,0) |- (games.west);
+\draw[fk] (injuries.west) -- ++(-0.3,0) |- (games.west);
+\draw[fk] (odds.west) -- ++(-0.3,0) |- (games.west);
+
+% MART to PUBLIC
+\draw[arrow] (games.east) -- ++(0.5,0) |- (gs.west);
+\draw[arrow] (plays.east) -- ++(0.5,0) |- (tepa.west);
+\draw[arrow] (weather.east) -- ++(0.5,0) |- (gw.west);
+\draw[arrow] (plays.east) -- ++(0.5,0) |- (pgs.west);
+
+% ML to MART
+\draw[arrow] (gfe.east) -- ++(0.5,0) |- (rpred.west);
+\draw[arrow] (pgs.east) -- ++(0.5,0) |- (gpred.west);
+
+% ML internal relationships
+\draw[fk] (rpred.north) -- ++(0,0.3) -| node[near start, right, font=\tiny] {model\_id} (mreg.south);
+\draw[fk] (gpred.north) -- ++(0,0.3) -| (mreg.south);
+\draw[fk] (epred.north) -- ++(0,0.2) -- (gpred.south);
+
+% Legend
+\node[rectangle, draw=gray, fill=gray!5, rounded corners, text width=5.5cm, font=\scriptsize, align=left, below=0.5cm of gfe, xshift=-2cm] (legend) {
+    \textbf{Schema Legend:}\\
+    \textcolor{accentBlue}{\rule{0.5cm}{2pt}} Core tables (PUBLIC)\\
+    \textcolor{orange}{\rule{0.5cm}{2pt}} Materialized views (MART)\\
+    \textcolor{forestGreen}{\rule{0.5cm}{2pt}} ML tables (ML schema)\\[0.2cm]
+    \textbf{Data Volume (Nov 2025):}\\
+    257 columns, 1.25M plays, 7,263 games\\
+    6,090 R predictions cached (PostgreSQL lookup)\\
+    337 models registered (8 production, 227 pending)
+};
+
+% New in Nov 2025 annotation
+\node[rectangle, draw=forestGreen, fill=forestGreen!5, rounded corners, text width=3.2cm, font=\scriptsize, align=left, right=0.3cm of abres] (new) {
+    \textbf{New (Nov 2025):}\\
+    \texttt{ml.r\_model\_predictions}\\
+    enables 200-400x faster\\
+    R model inference via\\
+    PostgreSQL lookup\\
+    ($<$1ms vs 2-4s rpy2)
+};
+
+\end{tikzpicture}
+\caption[Updated Database ERD with ML Schema]{Updated Entity-Relationship Diagram showing the complete 56-table schema across 5 schemas. The PUBLIC schema contains core tables (\texttt{games}, \texttt{plays}, \texttt{weather}, \texttt{injuries}, \texttt{rosters}, \texttt{odds\_history}). The MART schema provides pre-aggregated materialized views for model training (\texttt{game\_features\_enh} with 170+ columns). The ML schema (new November 2025) supports prediction caching and model management: \texttt{model\_registry} tracks 337 models, \texttt{r\_model\_predictions} caches 6,090 R model predictions for 200-400x speedup, and \texttt{ab\_test\_*} tables track Dirichlet weight experiments. Total database size: 2.8 GB with 1.25M plays across 7,263 games.}
+\label{fig:database-erd-v2}
+\end{figure}

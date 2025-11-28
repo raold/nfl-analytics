@@ -1,0 +1,89 @@
+% Figure: Infrastructure Optimization Architecture (November 2025)
+% Shows 3-phase optimization: MCMC parallelization, Redis caching, Batch API
+% Generated: November 28, 2025
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1cm and 1.2cm,
+    phase/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!20, rounded corners, minimum width=3.5cm, minimum height=0.8cm, align=center, font=\footnotesize\bfseries},
+    component/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!8, rounded corners, minimum width=3.2cm, minimum height=0.7cm, align=center, font=\scriptsize},
+    metric/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!15, rounded corners, minimum width=2.5cm, minimum height=0.6cm, align=center, font=\scriptsize},
+    arrow/.style={->, thick, accentBlue},
+    improvement/.style={->, thick, forestGreen, line width=1.5pt}
+]
+
+% Phase headers
+\node[phase] (p1) {Phase 1: MCMC\\Parallelization};
+\node[phase, right=3.5cm of p1] (p2) {Phase 2: Redis\\Prediction Caching};
+\node[phase, right=3.5cm of p2] (p3) {Phase 3: Batch\\API Endpoint};
+
+% Phase 1 components
+\node[component, below=0.8cm of p1] (chains) {R Training Scripts\\4 $\rightarrow$ 10 MCMC chains};
+\node[component, below=0.5cm of chains] (stan) {cmdstanr + brms\\Mac M4 full utilization};
+\node[component, below=0.5cm of stan] (scripts) {13 scripts upgraded\\(state-space, hierarchical)};
+
+% Phase 1 metrics
+\node[metric, below=0.5cm of scripts] (m1_before) {Before: 45 min/model};
+\node[metric, below=0.3cm of m1_before] (m1_after) {After: 18 min/model};
+\node[rectangle, draw=forestGreen, thick, fill=forestGreen!30, rounded corners, minimum width=2cm, font=\scriptsize\bfseries, below=0.3cm of m1_after] (m1_gain) {60\% faster};
+
+% Phase 2 components
+\node[component, below=0.8cm of p2] (redis) {Redis Cache Layer\\SHA256 key hashing};
+\node[component, below=0.5cm of redis] (ttl) {1-hour TTL\\game\_prediction\_cache.py};
+\node[component, below=0.5cm of ttl] (invalidate) {Cache invalidation\\API endpoints};
+
+% Phase 2 metrics
+\node[metric, below=0.5cm of invalidate] (m2_before) {Before: $\sim$105ms};
+\node[metric, below=0.3cm of m2_before] (m2_after) {After: $<$1ms (cache hit)};
+\node[rectangle, draw=forestGreen, thick, fill=forestGreen!30, rounded corners, minimum width=2cm, font=\scriptsize\bfseries, below=0.3cm of m2_after] (m2_gain) {50-200x faster};
+
+% Phase 3 components
+\node[component, below=0.8cm of p3] (batch) {POST /predict/games/batch\\1-50 games per request};
+\node[component, below=0.5cm of batch] (partial) {Partial failure handling\\(successes + errors)};
+\node[component, below=0.5cm of partial] (prometheus) {Prometheus metrics\\cache\_hit\_rate tracking};
+
+% Phase 3 metrics
+\node[metric, below=0.5cm of prometheus] (m3_before) {Before: N $\times$ 105ms};
+\node[metric, below=0.3cm of m3_before] (m3_after) {After: $<$2s (16 games)};
+\node[rectangle, draw=forestGreen, thick, fill=forestGreen!30, rounded corners, minimum width=2cm, font=\scriptsize\bfseries, below=0.3cm of m3_after] (m3_gain) {10-20\% less overhead};
+
+% Arrows within phases
+\draw[arrow] (p1) -- (chains);
+\draw[arrow] (chains) -- (stan);
+\draw[arrow] (stan) -- (scripts);
+\draw[arrow] (scripts) -- (m1_before);
+\draw[improvement] (m1_before) -- (m1_after);
+\draw[arrow] (m1_after) -- (m1_gain);
+
+\draw[arrow] (p2) -- (redis);
+\draw[arrow] (redis) -- (ttl);
+\draw[arrow] (ttl) -- (invalidate);
+\draw[arrow] (invalidate) -- (m2_before);
+\draw[improvement] (m2_before) -- (m2_after);
+\draw[arrow] (m2_after) -- (m2_gain);
+
+\draw[arrow] (p3) -- (batch);
+\draw[arrow] (batch) -- (partial);
+\draw[arrow] (partial) -- (prometheus);
+\draw[arrow] (prometheus) -- (m3_before);
+\draw[improvement] (m3_before) -- (m3_after);
+\draw[arrow] (m3_after) -- (m3_gain);
+
+% Connecting arrows between phases
+\draw[->, thick, gray, dashed] (p1.east) -- (p2.west);
+\draw[->, thick, gray, dashed] (p2.east) -- (p3.west);
+
+% Summary box at bottom
+\node[rectangle, draw=accentBlue, thick, fill=accentBlue!5, rounded corners, text width=12cm, font=\scriptsize, align=center, below=1.5cm of m2_gain] (summary) {
+    \textbf{Total Infrastructure Impact (November 2025)}\\[0.2cm]
+    Training: 45 min $\rightarrow$ 18 min per model ($\sim$50 hours saved annually)\\
+    API Latency: 105ms $\rightarrow$ $<$1ms on cache hits (99\% reduction)\\
+    Batch Processing: 16 games in $<$2s vs $\sim$1.7s sequential\\
+    Dashboard responsiveness: sub-second week views (previously 5-10s)
+};
+
+\end{tikzpicture}
+\caption[Infrastructure Optimization Architecture]{Three-phase infrastructure optimization completed November 2025. Phase 1 parallelized MCMC sampling from 4 to 10 chains across 13 R training scripts, achieving 60\% training speedup on Mac M4 hardware. Phase 2 introduced Redis caching for game predictions with 1-hour TTL and SHA256 key hashing, reducing inference latency from 105ms to $<$1ms on cache hits (50-200x improvement). Phase 3 added batch API endpoint supporting 1-50 games per request with partial failure handling and Prometheus metrics integration. Combined improvements enable sub-second dashboard responsiveness and reduce annual compute costs by approximately 50-70 hours.}
+\label{fig:infrastructure-optimization}
+\end{figure}

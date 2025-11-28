@@ -1,0 +1,90 @@
+% Figure: Temperature Scaling Discrepancy and Resolution
+% Shows the fallback chain that caused T=1.0771 vs correct T=0.7083
+% Generated: November 28, 2025
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm and 1.5cm,
+    box/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!10, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    error/.style={rectangle, draw=red, thick, fill=red!15, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    success/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!15, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    file/.style={rectangle, draw=gray, thick, fill=gray!10, rounded corners, minimum width=3.5cm, minimum height=0.6cm, align=center, font=\scriptsize\ttfamily},
+    arrow/.style={->, thick, accentBlue},
+    errorarrow/.style={->, thick, red, dashed}
+]
+
+% Timeline header
+\node[font=\footnotesize\bfseries] (header) {Temperature Scaling Resolution Timeline};
+
+% Left side: Problem
+\node[box, below=0.5cm of header, xshift=-4cm] (deploy) {v6.0 Deployed\\Nov 15, 2025};
+
+\node[file, below=0.8cm of deploy] (expected) {temperature\_scaler\_5way.pkl\\(expected by code)};
+
+\node[error, below=0.6cm of expected] (missing) {FILE NOT FOUND};
+
+\node[file, below=0.6cm of missing] (fallback) {temperature\_scaler\_4way.pkl\\(silent fallback)};
+
+\node[error, below=0.6cm of fallback] (wrong_t) {T = 1.0771\\(v4 calibration)};
+
+% Right side: Resolution
+\node[box, below=0.5cm of header, xshift=4cm] (discover) {Discrepancy Found\\Nov 23, 2025};
+
+\node[file, below=0.8cm of discover] (v6_file) {temperature\_scaler\_v6.pkl\\(correct calibration)};
+
+\node[success, below=0.6cm of v6_file] (copy) {Copied to\\5way.pkl};
+
+\node[file, below=0.6cm of copy] (new_file) {temperature\_scaler\_5way.pkl\\(now exists)};
+
+\node[success, below=0.6cm of new_file] (correct_t) {T = 0.7083\\(90\% calibration)};
+
+% Center: Impact comparison
+\node[rectangle, draw=orange, thick, fill=orange!10, rounded corners, text width=4cm, align=center, font=\scriptsize, below=0.5cm of header, yshift=-5.5cm] (impact) {
+    \textbf{Calibration Impact}\\[0.2cm]
+    \begin{tabular}{lcc}
+    & Wrong & Correct \\
+    \hline
+    Temperature & 1.0771 & 0.7083 \\
+    Coverage & 87\% & 90\% \\
+    Interval Width & Wider & Tighter \\
+    \end{tabular}
+};
+
+% Arrows
+\draw[arrow] (deploy) -- (expected);
+\draw[errorarrow] (expected) -- node[right, font=\tiny, text=red] {missing} (missing);
+\draw[errorarrow] (missing) -- node[right, font=\tiny, text=red] {fallback} (fallback);
+\draw[errorarrow] (fallback) -- (wrong_t);
+
+\draw[arrow] (discover) -- (v6_file);
+\draw[arrow, forestGreen] (v6_file) -- node[right, font=\tiny, text=forestGreen] {fix} (copy);
+\draw[arrow, forestGreen] (copy) -- (new_file);
+\draw[arrow, forestGreen] (new_file) -- (correct_t);
+
+% Connect wrong and correct to impact
+\draw[->, thick, red, dashed] (wrong_t.south) -- ++(0,-0.3) -| ([xshift=-1cm]impact.north);
+\draw[->, thick, forestGreen] (correct_t.south) -- ++(0,-0.3) -| ([xshift=1cm]impact.north);
+
+% Root cause annotation
+\node[rectangle, draw=gray, fill=gray!5, rounded corners, text width=3.5cm, font=\scriptsize, align=left, right=0.8cm of fallback] (cause) {
+    \textbf{Root Cause:}\\
+    Code expected \texttt{5way.pkl}\\
+    (5 ensemble components)\\
+    but file was named\\
+    \texttt{v6.pkl} (version-based)
+};
+
+% Solution annotation
+\node[rectangle, draw=forestGreen, fill=forestGreen!5, rounded corners, text width=3.5cm, font=\scriptsize, align=left, right=0.8cm of new_file] (solution) {
+    \textbf{Solution:}\\
+    Standardized naming:\\
+    \texttt{\{N\}way.pkl} format\\
+    where N = \# components\\
+    Added startup logging
+};
+
+\end{tikzpicture}
+\caption[Temperature Scaling Discrepancy Resolution]{Temperature scaling discrepancy discovered November 23, 2025. Production v6.0 expected \texttt{temperature\_scaler\_5way.pkl} (component-count naming) but the file was named \texttt{temperature\_scaler\_v6.pkl} (version-based naming). The silent fallback to \texttt{temperature\_scaler\_4way.pkl} caused production to use $T=1.0771$ (v4 calibration) instead of the correct $T=0.7083$ (v6 calibration, 90\% coverage). Resolution involved copying the v6 calibration to the expected filename and standardizing on component-count naming. Lesson learned: all fallbacks should log at WARNING level to prevent silent degradation.}
+\label{fig:temperature-discrepancy}
+\end{figure}

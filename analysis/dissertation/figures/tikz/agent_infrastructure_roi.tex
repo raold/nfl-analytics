@@ -1,0 +1,77 @@
+% Figure: Agent Infrastructure ROI Analysis
+% Shows 19 specialized agents organized by phase with time/cost savings
+% Generated: November 28, 2025
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.6cm and 0.8cm,
+    phase/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!25, rounded corners, minimum width=2.5cm, minimum height=0.6cm, align=center, font=\footnotesize\bfseries},
+    agent/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!8, rounded corners, minimum width=2.8cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    metric/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!15, rounded corners, minimum width=2.5cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    total/.style={rectangle, draw=forestGreen, very thick, fill=forestGreen!25, rounded corners, minimum width=3.5cm, minimum height=0.8cm, align=center, font=\footnotesize\bfseries}
+]
+
+% Phase 1: Security & Quality (leftmost column)
+\node[phase] (p1) {Phase 1\\Security \& Quality};
+\node[agent, below=0.4cm of p1] (a1) {Code Reviewer};
+\node[agent, below=0.3cm of a1] (a2) {Security Auditor};
+\node[agent, below=0.3cm of a2] (a3) {Data Leakage Detector};
+\node[metric, below=0.4cm of a3] (m1) {4 secrets found\\84 hrs saved (BNN)};
+
+% Phase 2: Performance & Testing (second column)
+\node[phase, right=1.5cm of p1] (p2) {Phase 2\\Performance \& Testing};
+\node[agent, below=0.4cm of p2] (a4) {Perf. Optimizer};
+\node[agent, below=0.3cm of a4] (a5) {Test Generator};
+\node[agent, below=0.3cm of a5] (a6) {Model Validator};
+\node[metric, below=0.4cm of a6] {MCMC 4$\rightarrow$10 chains\\80\%+ test coverage};
+
+% Phase 3: Production (third column)
+\node[phase, right=1.5cm of p2] (p3) {Phase 3\\Production};
+\node[agent, below=0.4cm of p3] (a7) {Ensemble\\Orchestrator};
+\node[agent, below=0.3cm of a7] (a8) {Betting Strategy\\Validator};
+\node[metric, below=0.4cm of a8, yshift=-0.3cm] {R+Python coord.\\Risk gates enforced};
+
+% Phase 4: Critical Infrastructure (fourth column)
+\node[phase, right=1.5cm of p3] (p4) {Phase 4\\Critical Infra.};
+\node[agent, below=0.4cm of p4] (a9) {Ensemble Health\\Monitor};
+\node[agent, below=0.3cm of a9] (a10) {Model Registry\\Auditor};
+\node[agent, below=0.3cm of a10] (a11) {Sports Analytics\\Validator};
+\node[metric, below=0.4cm of a11] {Pre-backtest checks\\337 models tracked};
+
+% Phase 5: Production Infrastructure (fifth column)
+\node[phase, right=1.5cm of p4] (p5) {Phase 5\\Prod. Infrastructure};
+\node[agent, below=0.4cm of p5] (a12) {DB Migration\\Agent};
+\node[agent, below=0.3cm of a12] (a13) {Performance\\Profiler};
+\node[agent, below=0.3cm of a13] (a14) {A/B Test Monitor};
+\node[agent, below=0.3cm of a14] (a15) {Prediction Cache\\Manager};
+\node[agent, below=0.3cm of a15] (a16) {Frontend\\Engineering};
+\node[metric, below=0.4cm of a16] {156-338 hrs/yr\\50-200x speedup};
+
+% Standalone agents (below phases)
+\node[phase, below=4.5cm of p2, xshift=1cm] (p6) {Standalone Agents};
+\node[agent, right=0.3cm of p6] (a17) {Research Coordinator};
+\node[agent, right=0.3cm of a17] (a18) {Enforcement Router};
+\node[agent, right=0.3cm of a18] (a19) {Agent Coordinator};
+
+% Total ROI box
+\node[total, below=0.8cm of p6, xshift=3cm] (roi) {
+    \textbf{Total Agent Infrastructure ROI}\\
+    \$90k--165k estimated annual value\\
+    100+ hours saved over 6 months
+};
+
+% Summary statistics
+\node[rectangle, draw=gray, fill=gray!5, rounded corners, text width=11cm, font=\scriptsize, align=left, below=0.5cm of roi] (stats) {
+    \textbf{Key Prevented Failures:}
+    SQL schema errors (dozens of occurrences $\rightarrow$ 0) $\bullet$
+    R integration failures (3.5 hrs lost $\rightarrow$ pre-validated) $\bullet$
+    Data leakage (84 hrs BNN waste $\rightarrow$ caught at training) $\bullet$
+    Hardcoded credentials (4 found in Phase 1 audit) $\bullet$
+    A/B guardrail violations (auto-stop $<$15 min)
+};
+
+\end{tikzpicture}
+\caption[Agent Infrastructure ROI Analysis]{Distributed agent infrastructure comprising 19 specialized agents across 5 phases plus 3 standalone coordinators. Phase 1 agents (Security \& Quality) prevented 4 hardcoded credentials and enabled early abandonment of 84-hour BNN research. Phase 2 agents (Performance \& Testing) upgraded MCMC from 4 to 10 chains and generated 80\%+ test coverage. Phase 3 agents (Production) coordinate R/Python ensemble inference and enforce betting risk gates. Phase 4 agents (Critical Infrastructure) validate ensemble health before expensive backtests and manage 337 model registrations. Phase 5 agents (Production Infrastructure) delivered 156-338 hours annual savings via performance profiling and 50-200x prediction speedup via caching. Combined estimated annual value: \$90k--165k with 100+ hours saved in first 6 months of operation.}
+\label{fig:agent-infrastructure-roi}
+\end{figure}
