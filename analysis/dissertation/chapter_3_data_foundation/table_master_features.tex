@@ -26,6 +26,8 @@ Turnovers \& Penalties & Turnover rate, penalty yards & 4 & \checkmark & \texttt
 4th Down Coaching & Go-for-it rate, conversion rate, decision quality & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
 Injury Load & Position-specific injury impact scores & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
 Playoff Context & Playoff probability, stakes, desperation & 8 & \checkmark & \texttt{merge\_advanced\_features.py} \\
+Coordinator Continuity (OC) & OC continuity, tenure, new OC adjustment & 8 & \checkmark & \texttt{oc\_features.py} \\
+Coordinator Continuity (DC) & DC continuity, tenure, new DC adjustment & 8 & \checkmark & \texttt{dc\_features.py} \\
 \midrule
 \multicolumn{5}{l}{\textit{Matchup Differentials}} \\
 Differentials (Home-Away) & EPA diff, rest diff, success rate diff, etc. & 10 & \checkmark & Derived from base \\
@@ -48,14 +50,24 @@ Comparative Book Value & Model prob vs market-implied prob (CBV) & 3 & \checkmar
 \multicolumn{5}{l}{\textit{Target Variables (POST-GAME ONLY)}} \\
 Game Outcomes & Final score, margin, win, cover, over/under & 7 & \ding{55} & \texttt{games} table \\
 \midrule
-\textbf{Total} & \textbf{170+ features across 19 families} & \textbf{170+} & \textbf{163 safe} & --- \\
+\multicolumn{5}{l}{\textit{Phase 2 Advanced Analytics (\Cref{sec:phase2-advanced-stats})}} \\
+Next Gen Stats & CPOE, RYOE, separation, air yards, tracking metrics & 46 & \checkmark & \texttt{nextgen\_features.py} \\
+QBR Metrics & Total QBR, ANY/A, deep ball, pressure performance & 20 & \checkmark & \texttt{qbr\_features.py} \\
+Possession Value & Starting field position, pace factor & 8 & \checkmark & \texttt{possession\_value.py} \\
+Playcalling Analytics & 4th down aggression, deep passing, WPA, clutch & 32 & \checkmark & \texttt{playcalling\_features.py} \\
+Opponent-Adjusted & DVOA approx., SOS, EPA variance, boom-bust & 14 & \checkmark & \texttt{opponent\_adjusted\_features.py} \\
+\midrule
+\textbf{Baseline Total (Phase 1)} & \textbf{186 features across 21 families} & \textbf{186} & \textbf{179 safe} & --- \\
+\textbf{Phase 2 Total} & \textbf{120 advanced analytics features} & \textbf{120} & \textbf{120 safe} & \textbf{Nov 2025} \\
+\midrule
+\textbf{Grand Total} & \textbf{232 features (+107\% expansion)} & \textbf{232} & \textbf{232 safe} & \textbf{All validated} \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
 \paragraph{Feature Temporal Safety.}
-Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. These are validated by 15 unit tests and 2 runtime validators (see Appendix~\ref{app:leakage_audit}). The 7 unsafe features (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors.
+Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. All 232 features (186 baseline + 120 Phase 2 advanced analytics) are validated by 15 unit tests and 2 runtime validators (see Appendix~\ref{app:leakage_audit}). The 7 unsafe features (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors. Coordinator continuity features (OC+DC, 16 features) are derived from the \texttt{coaching\_staff} table with temporal joins ensuring season-year as-of semantics. Phase 2 advanced analytics features (\Cref{sec:phase2-advanced-stats}) add cutting-edge NFL tracking data and efficiency metrics with 100\% temporal safety validation.
 
 \paragraph{Cross-References.}
 \begin{itemize}
@@ -74,4 +86,4 @@ The feature catalog balances three principles:
     \item \textbf{Redundancy control}: Rolling windows (last 3/5 games) provide recent signal while expanding averages capture long-term trends
 \end{enumerate}
 
-For detailed definitions of all 170+ features, see the feature catalog at \texttt{py/features/catalog.yaml}. Key ablation results showing the marginal contribution of each family are presented in \Cref{tab:ablations} (Chapter 4).
+For detailed definitions of all 232 features (186 baseline + 120 Phase 2 advanced analytics), see the feature catalogs at \texttt{py/features/catalog.yaml} (baseline) and Phase 2 module documentation in \Cref{sec:phase2-advanced-stats}. Key ablation results showing the marginal contribution of each family are presented in \Cref{tab:ablations} (Chapter 4).

@@ -37,6 +37,7 @@ from py.features.causal_features_v1 import CausalFeaturesV1
 from py.features.player_aggregation_features import (
     aggregate_player_projections_multi_season
 )
+from py.features.oc_features import OCFeatureGenerator
 
 logging.basicConfig(
     level=logging.INFO,
@@ -87,6 +88,13 @@ class XGBoostV5Integrated:
         # Initialize feature calculators
         self.travel_features = EnhancedTravelFeatures()
         self.causal_features = CausalFeaturesV1(self.db_config)
+        self.oc_features = OCFeatureGenerator(db_config={
+            'host': self.db_config['host'],
+            'port': self.db_config['port'],
+            'database': self.db_config['dbname'],
+            'user': self.db_config['user'],
+            'password': self.db_config['password']
+        })
 
         logger.info(f"Initialized XGBoostV5Integrated({start_season}-{end_season})")
 
@@ -242,9 +250,34 @@ class XGBoostV5Integrated:
             df_with_causal['is_short_week'] = 0
             logger.info("   ⚠️  Using default rest values (7 days)")
 
-        logger.info(f"\n✓ Feature engineering complete: {df_with_causal.shape[1]} total columns")
+        # Track D: OC Coaching Features (4 features)
+        logger.info("\n5. Track D: OC Coaching Features...")
+        oc_features_list = []
+        for _, row in df_with_causal.iterrows():
+            try:
+                team = row['team']
+                season = int(row['season'])
+                week = int(row['week'])
+                oc_feat = self.oc_features.get_features(team, season, week)
+                oc_features_list.append(oc_feat)
+            except Exception as e:
+                # Fallback to defaults if coaching data not available
+                oc_features_list.append({
+                    'oc_continuity': 0,
+                    'games_with_oc': max(0, int(row['week']) - 1),
+                    'oc_tenure_seasons': 1,
+                    'new_oc_adjustment': 0.4  # Neutral default
+                })
 
-        return df_with_causal
+        # Merge OC features
+        oc_df = pd.DataFrame(oc_features_list)
+        df_with_oc = pd.concat([df_with_causal.reset_index(drop=True), oc_df], axis=1)
+        logger.info(f"   ✓ Added 4 OC coaching features")
+        logger.info(f"   Shape after OC features: {df_with_oc.shape}")
+
+        logger.info(f"\n✓ Feature engineering complete: {df_with_oc.shape[1]} total columns")
+
+        return df_with_oc
 
     def select_feature_columns(self, df: pd.DataFrame) -> list:
         """
@@ -289,13 +322,17 @@ class XGBoostV5Integrated:
         # Rest features
         rest_features = ['away_rest', 'home_rest', 'rest_days_difference', 'is_short_week']
 
+        # Track D: OC Coaching Features
+        oc_features = ['oc_continuity', 'games_with_oc', 'oc_tenure_seasons', 'new_oc_adjustment']
+
         # Combine all features (filter for existence)
         all_features = (
             core_features +
             [f for f in agg_features if f in df.columns] +
             [f for f in travel_features if f in df.columns] +
             [f for f in causal_features if f in df.columns] +
-            [f for f in rest_features if f in df.columns]
+            [f for f in rest_features if f in df.columns] +
+            [f for f in oc_features if f in df.columns]
         )
 
         # Remove duplicates, preserve order
@@ -307,6 +344,7 @@ class XGBoostV5Integrated:
         logger.info(f"  Track C1 travel: {len([f for f in travel_features if f in df.columns])}")
         logger.info(f"  Track C2 causal+weather: {len([f for f in causal_features if f in df.columns])}")
         logger.info(f"  Rest features: {len([f for f in rest_features if f in df.columns])}")
+        logger.info(f"  Track D OC coaching: {len([f for f in oc_features if f in df.columns])}")
 
         return feature_cols
 

@@ -467,11 +467,21 @@ class ModelManager:
         self.models_path = Path(models_path)
         self.models = {}
         self.model_versions = {}
+        # Default v6.0 weights for game predictions
         self.ensemble_weights = {
-            "state_space_v2": 0.30,
-            "hierarchical_v2": 0.30,
-            "hybrid_xgboost_v1": 0.25,
-            "informative_priors_v2": 0.15,
+            "state_space_v2": 0.27,
+            "hierarchical_v2": 0.27,
+            "xgboost_v4_ridge": 0.23,
+            "informative_priors_v2": 0.13,
+            "hybrid_static_incremental": 0.10,
+        }
+        # Dirichlet v8.0 weights for player props (31.5% MAE improvement)
+        self.dirichlet_weights = {
+            "state_space_v2": 0.082,
+            "hierarchical_v2": 0.396,
+            "xgboost_v4_ridge": 0.026,
+            "informative_priors_v2": 0.395,
+            "hybrid_static_incremental": 0.101,
         }
         self.start_time = time.time()
         self.ensemble = None
@@ -480,36 +490,45 @@ class ModelManager:
 
     def load_models(self) -> bool:
         """
-        Load Enhanced Ensemble v5.1 (4-way ensemble with Hybrid XGBoost).
+        Load Enhanced Ensemble v6.1 (5-way ensemble with Dirichlet weights support).
+
+        v6.1 Features:
+        - 5 components: State-Space, Hierarchical, XGBoost v4 Ridge, Informative Priors, Hybrid
+        - PostgreSQL R model lookup (200-400x faster than rpy2)
+        - Dirichlet weights for player props (31.5% MAE improvement)
+        - Default weights for game predictions
 
         Returns:
             True if ensemble loaded successfully, False otherwise
         """
         try:
-            from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
+            from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-            self.ensemble = EnhancedEnsemble4Way(
+            self.ensemble = EnhancedEnsemble5Way(
                 db_password=os.getenv("DB_PASSWORD", "sicillionbillions")
             )
-            logger.info("✅ Enhanced Ensemble v5.1 loaded successfully")
+            logger.info("✅ Enhanced Ensemble v6.1 loaded successfully")
+            logger.info("   Supports: use_dirichlet_weights() for player props")
+            logger.info("   Supports: use_default_weights() for game predictions")
 
-            # Update model versions to match ensemble
+            # Update model versions to match ensemble v6.1
             self.model_versions = {
                 "state_space_v2": "simplified_random_walk_v2",
                 "hierarchical_v2": "passing_yards_hierarchical_v2",
-                "hybrid_xgboost_v1": "hybrid_static_incremental_v1",
+                "xgboost_v4_ridge": "xgb_ridge_residuals_v7",
                 "informative_priors_v2": "passing_informative_priors_v2",
+                "hybrid_static_incremental": "hybrid_static_incremental_v1",
             }
 
             if PROMETHEUS_AVAILABLE:
-                MODEL_LOAD_STATUS.labels(model_name="ensemble_v5_1").set(1)
+                MODEL_LOAD_STATUS.labels(model_name="ensemble_v6_1").set(1)
 
             return True
 
         except Exception as e:
-            logger.error(f"Failed to load Enhanced Ensemble v5.1: {e}", exc_info=True)
+            logger.error(f"Failed to load Enhanced Ensemble v6.1: {e}", exc_info=True)
             if PROMETHEUS_AVAILABLE:
-                MODEL_LOAD_STATUS.labels(model_name="ensemble_v5_1").set(0)
+                MODEL_LOAD_STATUS.labels(model_name="ensemble_v6_1").set(0)
             return False
 
 
@@ -520,9 +539,10 @@ class ModelManager:
         week: int,
         season: int,
         confidence_level: float = 0.90,
+        use_dirichlet: bool = True,
     ) -> Optional[dict]:
         """
-        Generate ensemble prediction for player stat using Enhanced Ensemble v5.1.
+        Generate ensemble prediction for player stat using Enhanced Ensemble v6.1.
 
         Args:
             player_id: Player ID
@@ -530,6 +550,8 @@ class ModelManager:
             week: NFL week
             season: NFL season
             confidence_level: Confidence level for interval
+            use_dirichlet: If True, use Dirichlet v8.0 weights (31.5% MAE improvement)
+                          If False, use default v6.0 weights
 
         Returns:
             Dictionary with prediction, uncertainty, intervals, etc. or None if prediction fails
@@ -545,6 +567,13 @@ class ModelManager:
             return None
 
         try:
+            # Use Dirichlet weights for player props predictions (31.5% MAE improvement)
+            if use_dirichlet:
+                self.ensemble.use_dirichlet_weights()
+                logger.debug("Using DIRICHLET weights for player props")
+            else:
+                self.ensemble.use_default_weights()
+                logger.debug("Using DEFAULT weights")
             # Get ensemble prediction
             result = self.ensemble.predict(
                 player_id=player_id,
@@ -713,6 +742,7 @@ async def lifespan(app: FastAPI):
 # FastAPI Application
 # ============================================================================
 
+print(f"[DEBUG main.py:716] About to create FastAPI app")
 app = FastAPI(
     title="NFL Props Prediction API",
     description="Production-grade NFL player prop predictions with Bayesian uncertainty quantification",
@@ -721,6 +751,7 @@ app = FastAPI(
     openapi_url="/openapi.json",
     lifespan=lifespan,
 )
+print(f"[DEBUG main.py:725] FastAPI app created successfully")
 
 # Add CORS middleware
 app.add_middleware(
@@ -732,7 +763,15 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
+print(f"[DEBUG main.py:{735}] About to register game_predictions router")  # Direct output for debugging
+try:
+    print(f"[DEBUG main.py:{737}] game_predictions.router = {game_predictions.router}")
+    app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
+    logger.info("Game predictions router loaded successfully")
+    print(f"[DEBUG main.py:{740}] Game predictions router registered successfully")
+except Exception as e:
+    logger.error(f"Failed to load game predictions router: {e}", exc_info=True)
+    print(f"[DEBUG main.py:{743}] ERROR registering game_predictions router: {e}")
 
 # Import and include props predictions router
 try:
@@ -992,10 +1031,34 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
                        f"Player may not exist in database or stat_type not supported.",
             )
 
+        # Get player name from database
+        player_name = f"Player-{request.player_id[-6:]}"  # Default fallback
+        try:
+            import psycopg2
+            conn = psycopg2.connect(
+                host="localhost",
+                port=5544,
+                dbname="devdb01",
+                user="dro",
+                password="sicillionbillions"
+            )
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT player_name FROM players WHERE player_id = %s",
+                (request.player_id,)
+            )
+            result = cursor.fetchone()
+            if result:
+                player_name = result[0]
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            logger.warning(f"Could not fetch player name for {request.player_id}: {e}")
+
         # Build response
         response = PredictionResponse(
             player_id=request.player_id,
-            player_name=f"Player-{request.player_id[-6:]}",  # TODO: Get real name from DB
+            player_name=player_name,
             stat_type=request.stat_type,
             week=request.week,
             season=request.season,

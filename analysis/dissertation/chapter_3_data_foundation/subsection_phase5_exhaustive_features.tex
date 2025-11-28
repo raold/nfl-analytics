@@ -91,6 +91,53 @@ Synergistic combinations with multiplicative effects:
 
 \noindent\textbf{High-Value Opportunities:} Identified 34 games (2020--2024) with synergistic interaction patterns (e.g., dome team traveling to cold outdoor division rival on Thursday night).
 
+\paragraph{6. Coaching Continuity Features (16 features).}
+Captures offensive and defensive coordinator stability, a critical dimension often overlooked in betting markets. Early-season performance variability under new coordinators creates exploitable inefficiencies.
+
+\subparagraph{Offensive Coordinator (OC) Features (8 features).}
+\begin{itemize}
+  \item \textbf{oc\_continuity}: Binary indicator (1 if same OC as prior season, 0 otherwise)
+  \item \textbf{games\_with\_oc}: Number of games with current OC (0-indexed, capped at 17)
+  \item \textbf{oc\_tenure\_seasons}: Consecutive seasons with current OC
+  \item \textbf{new\_oc\_adjustment}: Exponential decay factor modeling offensive learning curve
+  \item \textbf{opponent\_oc\_continuity}: Binary indicator for opponent's OC stability
+\end{itemize}
+
+\subparagraph{Defensive Coordinator (DC) Features (8 features).}
+Mirror OC features for defensive scheme continuity:
+\begin{itemize}
+  \item \textbf{dc\_continuity}: Binary indicator (1 if same DC as prior season)
+  \item \textbf{games\_with\_dc}: Number of games with current DC (0-indexed, capped at 17)
+  \item \textbf{dc\_tenure\_seasons}: Consecutive seasons with current DC
+  \item \textbf{new\_dc\_adjustment}: Exponential decay factor for defensive learning curve
+  \item \textbf{opponent\_dc\_continuity}: Binary indicator for opponent's DC stability
+\end{itemize}
+
+\noindent\textbf{Feature Engineering Details:}
+The \texttt{new\_dc\_adjustment} and \texttt{new\_oc\_adjustment} features model early-season performance volatility under new coordinators using an exponential decay function:
+\begin{equation}
+\text{adjustment}(w) = \begin{cases}
+0.8 \cdot e^{-w / H}, & \text{if new coordinator (continuity = 0)} \\
+0.0, & \text{if returning coordinator (continuity = 1)}
+\end{cases}
+\label{eq:coordinator_adjustment}
+\end{equation}
+where $w$ is the week number (0-indexed, so week 1 uses $w=0$) and $H=4.0$ is the half-life in weeks. This parameterization yields:
+\begin{itemize}
+  \item \textbf{Week 1}: adjustment = 0.800 (80\% uncertainty)
+  \item \textbf{Week 3}: adjustment = 0.473 (47\% uncertainty)
+  \item \textbf{Week 5}: adjustment = 0.294 (29\% uncertainty)
+  \item \textbf{Week 10}: adjustment = 0.075 (7\% uncertainty, approaching stability)
+\end{itemize}
+
+\noindent\textbf{Validation Examples:}
+\begin{itemize}
+  \item \textbf{Kansas City Chiefs (2024):} DC Steve Spagnuolo (6+ year tenure, \texttt{dc\_continuity=1}, \texttt{dc\_tenure\_seasons=6}, \texttt{new\_dc\_adjustment=0.0}). Stable defensive scheme with minimal early-season volatility.
+  \item \textbf{Buffalo Bills (2024):} New DC Bobby Babich (\texttt{dc\_continuity=0}, \texttt{dc\_tenure\_seasons=1}, Week 1: \texttt{new\_dc\_adjustment=0.8}, Week 5: \texttt{new\_dc\_adjustment=0.294}). Elevated defensive uncertainty in early weeks.
+\end{itemize}
+
+\noindent\textbf{Implementation:} Computed via \texttt{py/features/oc\_features.py} and \texttt{py/features/dc\_features.py}, querying the \texttt{coaching\_staff} table with temporal joins. Integrated into XGBoost v5 training pipeline (\texttt{scripts/train\_xgboost\_player\_agg\_v5.py:merge\_coaching\_features()}) generating 16 total features (8 home + 8 away).
+
 \subsubsection{Coverage Rates and Data Quality}
 
 \Cref{tab:phase5-coverage} summarizes coverage rates for Phase 5 features across the 2020--2025 evaluation period.
@@ -110,8 +157,9 @@ Synergistic combinations with multiplicative effects:
     Vegas Line Bias & 9 & 1,408 & 100.0\% & Complete (odds API) \\
     Environmental & 11 & 1,306 & 92.7\% & 7.3\% missing: pre-2021 weather \\
     Feature Interactions & 12 & 1,408 & 100.0\% & Computed from above \\
+    Coaching Continuity (OC+DC) & 16 & 1,408 & 100.0\% & Complete (coaching\_staff table) \\
     \midrule
-    \textbf{Total Phase 5} & \textbf{44} & \textbf{1,365} & \textbf{96.9\%} & \textbf{Sufficient for training} \\
+    \textbf{Total Phase 5} & \textbf{60} & \textbf{1,365} & \textbf{96.9\%} & \textbf{Sufficient for training} \\
     \bottomrule
   \end{tabular}
   \end{adjustbox}

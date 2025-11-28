@@ -481,56 +481,71 @@ def store_game_prediction(
     """
     cursor = conn.cursor()
 
+    # First, get or create model_id for the ensemble version
+    model_query = """
+    INSERT INTO ml.model_registry (model_name, model_type, version, description, created_at)
+    VALUES (%s, 'ensemble', %s, %s, NOW())
+    ON CONFLICT (model_name) DO UPDATE SET updated_at = NOW()
+    RETURNING model_id;
+    """
+
+    model_name = f"ensemble_{ensemble_version.replace('.', '_')}"
+    cursor.execute(model_query, (
+        model_name,
+        ensemble_version,
+        f"Ensemble version {ensemble_version}"
+    ))
+    model_id = cursor.fetchone()[0]
+
     insert_query = """
     INSERT INTO ml.game_predictions (
-        game_id, season, week, home_team, away_team,
+        game_id, season, week, model_id,
         predicted_home_score, predicted_away_score,
         predicted_total, predicted_spread, predicted_home_win_prob,
         spread_std, total_std,
         sportsbook_spread, sportsbook_total,
         sportsbook_home_ml, sportsbook_away_ml,
         spread_edge, total_edge, ml_edge,
-        ensemble_version, status, predicted_at
+        predicted_at
     ) VALUES (
-        %(game_id)s, %(season)s, %(week)s, %(home_team)s, %(away_team)s,
+        %(game_id)s, %(season)s, %(week)s, %(model_id)s,
         %(predicted_home_score)s, %(predicted_away_score)s,
         %(predicted_total)s, %(predicted_spread)s, %(predicted_home_win_prob)s,
         %(spread_std)s, %(total_std)s,
         %(sportsbook_spread)s, %(sportsbook_total)s,
         %(sportsbook_home_ml)s, %(sportsbook_away_ml)s,
         %(spread_edge)s, %(total_edge)s, %(ml_edge)s,
-        %(ensemble_version)s, 'pending', NOW()
+        NOW()
     )
-    ON CONFLICT (model_id, game_id, ensemble_version)
-    DO UPDATE SET
-        predicted_home_score = EXCLUDED.predicted_home_score,
-        predicted_away_score = EXCLUDED.predicted_away_score,
-        predicted_total = EXCLUDED.predicted_total,
-        predicted_spread = EXCLUDED.predicted_spread,
-        predicted_home_win_prob = EXCLUDED.predicted_home_win_prob,
-        spread_std = EXCLUDED.spread_std,
-        total_std = EXCLUDED.total_std,
-        sportsbook_spread = EXCLUDED.sportsbook_spread,
-        sportsbook_total = EXCLUDED.sportsbook_total,
-        sportsbook_home_ml = EXCLUDED.sportsbook_home_ml,
-        sportsbook_away_ml = EXCLUDED.sportsbook_away_ml,
-        spread_edge = EXCLUDED.spread_edge,
-        total_edge = EXCLUDED.total_edge,
-        ml_edge = EXCLUDED.ml_edge,
-        predicted_at = NOW(),
-        updated_at = NOW()
+    ON CONFLICT (game_id, model_id, predicted_at)
+    DO NOTHING  -- Don't update if same prediction exists for same time
     RETURNING prediction_id;
     """
 
-    data = {**prediction_data, "ensemble_version": ensemble_version}
+    # Add model_id to data and remove non-existent columns
+    data = {**prediction_data}
+    data['model_id'] = model_id
+    # Remove columns that don't exist in schema
+    data.pop('home_team', None)
+    data.pop('away_team', None)
+    data.pop('ensemble_version', None)
+    data.pop('status', None)
+
     cursor.execute(insert_query, data)
-    prediction_id = cursor.fetchone()[0]
+    result = cursor.fetchone()
+    if result:
+        prediction_id = result[0]
+        logger.info(
+            f"Stored new game prediction: {prediction_data['game_id']} (prediction_id={prediction_id})"
+        )
+    else:
+        logger.info(
+            f"Prediction already exists for: {prediction_data['game_id']} at this time"
+        )
+        prediction_id = None
+
     conn.commit()
     cursor.close()
-
-    logger.info(
-        f"Stored game prediction: {prediction_data['game_id']} (prediction_id={prediction_id})"
-    )
 
     return prediction_id
 

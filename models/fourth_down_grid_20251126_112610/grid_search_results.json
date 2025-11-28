@@ -1,0 +1,314 @@
+[
+  {
+    "trial": 1,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.001,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 0.7269567019581177,
+    "agreement_rate": 0.8463891248937978,
+    "reward_lift": 0.06196139964787151
+  },
+  {
+    "trial": 2,
+    "hyperparameters": {
+      "alpha": 0.1,
+      "lr": 0.0001,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.6574576301476136,
+    "agreement_rate": 0.8190314358538657,
+    "reward_lift": 0.10711762051681994
+  },
+  {
+    "trial": 3,
+    "hyperparameters": {
+      "alpha": 0.1,
+      "lr": 1e-05,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.6570281129166753,
+    "agreement_rate": 0.8047578589634664,
+    "reward_lift": 0.16236896107441423
+  },
+  {
+    "trial": 4,
+    "hyperparameters": {
+      "alpha": 3.0,
+      "lr": 1e-05,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 1.4224149804041175,
+    "agreement_rate": 0.8389124893797791,
+    "reward_lift": 0.0565338343941747
+  },
+  {
+    "trial": 5,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 1e-05,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 0.8575743560346297,
+    "agreement_rate": 0.8242990654205608,
+    "reward_lift": 0.054488592164400385
+  },
+  {
+    "trial": 6,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.0001,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.8187617242182256,
+    "agreement_rate": 0.8499575191163976,
+    "reward_lift": 0.03556262397400328
+  },
+  {
+    "trial": 7,
+    "hyperparameters": {
+      "alpha": 0.3,
+      "lr": 1e-05,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.7078745734013945,
+    "agreement_rate": 0.8142735768903994,
+    "reward_lift": 0.04446758912917631
+  },
+  {
+    "trial": 8,
+    "hyperparameters": {
+      "alpha": 0.3,
+      "lr": 0.001,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.6596304234454182,
+    "agreement_rate": 0.8377230246389125,
+    "reward_lift": 0.09077579783715067
+  },
+  {
+    "trial": 9,
+    "hyperparameters": {
+      "alpha": 3.0,
+      "lr": 0.0001,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 1.2350710766303108,
+    "agreement_rate": 0.8365335598980459,
+    "reward_lift": 0.0684843989253035
+  },
+  {
+    "trial": 10,
+    "hyperparameters": {
+      "alpha": 0.1,
+      "lr": 0.0001,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 0.651736020115373,
+    "agreement_rate": 0.8103653355989805,
+    "reward_lift": 0.15172792250512063
+  },
+  {
+    "trial": 11,
+    "hyperparameters": {
+      "alpha": 3.0,
+      "lr": 1e-05,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 1.3932345239999067,
+    "agreement_rate": 0.8390824129141886,
+    "reward_lift": 0.04624403738044003
+  },
+  {
+    "trial": 12,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.001,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.5828463412070459,
+    "agreement_rate": 0.8450297366185217,
+    "reward_lift": 0.052875538497379304
+  },
+  {
+    "trial": 13,
+    "hyperparameters": {
+      "alpha": 0.1,
+      "lr": 1e-05,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.6731775682948973,
+    "agreement_rate": 0.798980458793543,
+    "reward_lift": 0.17339101877457164
+  },
+  {
+    "trial": 14,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.001,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 0.60393297378881,
+    "agreement_rate": 0.8389124893797791,
+    "reward_lift": 0.06346397035700357
+  },
+  {
+    "trial": 15,
+    "hyperparameters": {
+      "alpha": 0.1,
+      "lr": 0.001,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.6115687958106822,
+    "agreement_rate": 0.8261682242990654,
+    "reward_lift": 0.10975441571861877
+  },
+  {
+    "trial": 16,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.0001,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.7743380281891318,
+    "agreement_rate": 0.8346644010195412,
+    "reward_lift": 0.06481051520306225
+  },
+  {
+    "trial": 17,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 1e-05,
+      "hidden_dims": [
+        128,
+        64
+      ],
+      "batch_size": 512
+    },
+    "final_loss": 0.9675568305148979,
+    "agreement_rate": 0.8132540356839423,
+    "reward_lift": 0.06676635176328488
+  },
+  {
+    "trial": 18,
+    "hyperparameters": {
+      "alpha": 1.0,
+      "lr": 0.001,
+      "hidden_dims": [
+        256,
+        128,
+        64
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.719084154188787,
+    "agreement_rate": 0.8567544604927783,
+    "reward_lift": 0.06166367415376056
+  },
+  {
+    "trial": 19,
+    "hyperparameters": {
+      "alpha": 3.0,
+      "lr": 0.001,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 256
+    },
+    "final_loss": 0.8168766900550487,
+    "agreement_rate": 0.8406117247238742,
+    "reward_lift": 0.02784834962276006
+  },
+  {
+    "trial": 20,
+    "hyperparameters": {
+      "alpha": 0.3,
+      "lr": 0.0001,
+      "hidden_dims": [
+        512,
+        256,
+        128
+      ],
+      "batch_size": 128
+    },
+    "final_loss": 0.6043020818546145,
+    "agreement_rate": 0.8314358538657604,
+    "reward_lift": 0.08166052429185394
+  }
+]

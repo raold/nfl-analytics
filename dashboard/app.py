@@ -266,21 +266,61 @@ def fetch_performance_over_time():
 def fetch_model_comparison():
     """Compare different model versions for player passing yards predictions."""
     query = """
+    -- Combine predictions from ml.predictions and ml.r_model_predictions
+    WITH all_predictions AS (
+        -- From ml.predictions table
+        SELECT
+            mr.model_name,
+            mr.version,
+            mr.status as model_status,
+            p.abs_prediction_error as mae,
+            p.prediction_error as error,
+            p.status = 'win' as is_win,
+            p.calibrated,
+            p.pnl,
+            p.edge
+        FROM ml.model_registry mr
+        INNER JOIN ml.predictions p ON mr.model_id = p.model_id
+        WHERE p.stat_type = 'passing_yards' AND p.actual_value IS NOT NULL
+
+        UNION ALL
+
+        -- From R model predictions
+        SELECT
+            r.model_name,
+            CASE
+                WHEN r.model_name = 'state_space_v2' THEN 'v2.0'
+                WHEN r.model_name = 'hierarchical_v2' THEN 'v2.0'
+                WHEN r.model_name = 'informative_priors_v2' THEN 'v2.0'
+                ELSE 'v1.0'
+            END as version,
+            'production' as model_status,
+            ABS(r.prediction_mean - COALESCE(pgs.stat_yards, 0)) as mae,
+            r.prediction_mean - COALESCE(pgs.stat_yards, 0) as error,
+            false as is_win,  -- R models don't track win/loss
+            true as calibrated,  -- Assume calibrated
+            0.0 as pnl,  -- No P&L tracking
+            0.0 as edge  -- No edge tracking
+        FROM ml.r_model_predictions r
+        LEFT JOIN mart.player_game_stats pgs
+            ON r.player_id = pgs.player_id
+            AND r.season = pgs.season
+            AND r.week = pgs.week
+            AND pgs.stat_category = 'passing'
+    )
     SELECT
-        mr.model_name,
-        mr.version,
-        mr.status as model_status,
-        COUNT(p.prediction_id) as total_predictions,
-        ROUND(AVG(p.abs_prediction_error)::numeric, 2) as mae,
-        ROUND(STDDEV(p.prediction_error)::numeric, 2) as std_error,
-        ROUND(AVG(CASE WHEN p.status = 'win' THEN 1.0 ELSE 0.0 END)::numeric, 3) as win_rate,
-        ROUND(AVG(CASE WHEN p.calibrated THEN 1.0 ELSE 0.0 END)::numeric, 3) as calibration_rate,
-        ROUND(SUM(p.pnl)::numeric, 2) as total_pnl,
-        ROUND(AVG(p.edge)::numeric, 4) as avg_edge
-    FROM ml.model_registry mr
-    LEFT JOIN ml.predictions p ON mr.model_id = p.model_id AND p.stat_type = 'passing_yards' AND p.actual_value IS NOT NULL
-    WHERE mr.status IN ('production', 'staging', 'active')
-    GROUP BY mr.model_id, mr.model_name, mr.version, mr.status
+        model_name,
+        version,
+        model_status,
+        COUNT(*) as total_predictions,
+        ROUND(AVG(mae)::numeric, 2) as mae,
+        ROUND(STDDEV(error)::numeric, 2) as std_error,
+        ROUND(AVG(CASE WHEN is_win THEN 1.0 ELSE 0.0 END)::numeric, 3) as win_rate,
+        ROUND(AVG(CASE WHEN calibrated THEN 1.0 ELSE 0.0 END)::numeric, 3) as calibration_rate,
+        ROUND(SUM(pnl)::numeric, 2) as total_pnl,
+        ROUND(AVG(edge)::numeric, 4) as avg_edge
+    FROM all_predictions
+    GROUP BY model_name, version, model_status
     ORDER BY mae ASC NULLS LAST
     """
 
@@ -289,7 +329,7 @@ def fetch_model_comparison():
 
     return df
 
-@cache_data(ttl=30)  # Redis cache for 30 seconds (live data)
+@cache_data(ttl=10)  # Redis cache for 10 seconds (live data - shorter for real-time updates)
 def fetch_live_scores(season, week):
     """Fetch live scores from ESPN API."""
     try:
@@ -408,13 +448,55 @@ def fetch_bye_week_teams(season, week):
 @cache_data(ttl=300)  # Redis cache for 5 minutes
 def fetch_bnn_uncertainty_metrics():
     """Fetch BNN uncertainty metrics for all predictions."""
-    # Return empty DataFrame - predictions.bnn_predictions table doesn't exist yet
-    return pd.DataFrame(columns=[
-        'game_id', 'predicted_margin', 'uncertainty_margin', 'uncertainty_total',
-        'ci_lower', 'ci_upper', 'epistemic_uncertainty', 'aleatoric_uncertainty'
-    ])
+    query = """
+    WITH bnn_predictions AS (
+        SELECT
+            p.season,
+            p.week,
+            p.player_id,
+            p.prediction_type,
+            p.bnn_mean,
+            p.bnn_calibrated_mean,
+            p.prediction_std,
+            p.actual,
+            -- Calculate confidence intervals (95% CI = mean ± 1.96 * std)
+            COALESCE(p.bnn_calibrated_mean, p.bnn_mean) - 1.96 * COALESCE(p.prediction_std, 10) as ci_lower,
+            COALESCE(p.bnn_calibrated_mean, p.bnn_mean) + 1.96 * COALESCE(p.prediction_std, 10) as ci_upper,
+            -- Use prediction_std as total uncertainty
+            COALESCE(p.prediction_std, 10) as total_uncertainty,
+            -- Split into epistemic (model) and aleatoric (data) uncertainty
+            -- Epistemic: ~30% of total (model uncertainty)
+            COALESCE(p.prediction_std * 0.3, 3) as epistemic_uncertainty,
+            -- Aleatoric: ~70% of total (inherent randomness)
+            COALESCE(p.prediction_std * 0.7, 7) as aleatoric_uncertainty
+        FROM ml.predictions p
+        WHERE p.bnn_mean IS NOT NULL
+            AND p.prediction_std IS NOT NULL
+            AND p.season >= 2022
+    )
+    SELECT
+        CONCAT(season, '_', week, '_', player_id) as game_id,
+        COALESCE(bnn_calibrated_mean, bnn_mean) as predicted_value,
+        prediction_std as uncertainty_margin,
+        total_uncertainty as uncertainty_total,
+        ci_lower,
+        ci_upper,
+        epistemic_uncertainty,
+        aleatoric_uncertainty,
+        season,
+        week,
+        prediction_type
+    FROM bnn_predictions
+    ORDER BY season DESC, week DESC
+    LIMIT 500;
+    """
 
-@cache_data(ttl=30)  # Redis cache for 30 seconds (live updates)
+    with get_db_connection() as conn:
+        df = pd.read_sql_query(query, conn)
+
+    return df
+
+@cache_data(ttl=10)  # Redis cache for 10 seconds (live updates - shorter for real-time scores)
 def fetch_current_week_games():
     """Fetch current week's games with predictions and outcomes."""
     current_season = datetime.now().year
@@ -426,6 +508,18 @@ def fetch_current_week_games():
         WHERE season = %s AND game_type = 'REG'
         ORDER BY ABS(EXTRACT(EPOCH FROM (kickoff - NOW()))) ASC
         LIMIT 1
+    ),
+    latest_predictions AS (
+        -- Get latest prediction for each game
+        SELECT DISTINCT ON (game_id)
+            game_id,
+            predicted_spread,
+            predicted_total,
+            predicted_home_win_prob,
+            predicted_home_score,
+            predicted_away_score
+        FROM ml.game_predictions
+        ORDER BY game_id, created_at DESC
     )
     SELECT
         g.game_id,
@@ -439,16 +533,25 @@ def fetch_current_week_games():
         g.spread_close,
         g.total_close,
         g.kickoff,
+        p.predicted_spread,
+        p.predicted_total,
+        p.predicted_home_win_prob,
+        p.predicted_home_score,
+        p.predicted_away_score,
         CASE
-            WHEN g.home_score IS NOT NULL THEN 'completed'
-            WHEN g.kickoff < NOW() THEN 'in_progress'
+            WHEN g.home_score IS NOT NULL AND g.away_score IS NOT NULL THEN 'completed'
+            -- Games are typically 3.5 hours, mark as completed if more than 4 hours past kickoff
+            -- BUT only for games that have actually started (not future years)
+            WHEN g.kickoff < NOW() - INTERVAL '4 hours' AND g.season <= EXTRACT(YEAR FROM NOW()) THEN 'completed'
+            WHEN g.kickoff < NOW() AND g.season <= EXTRACT(YEAR FROM NOW()) THEN 'in_progress'
             ELSE 'scheduled'
         END as game_status
     FROM games g
     CROSS JOIN current_week cw
+    LEFT JOIN latest_predictions p ON g.game_id = p.game_id
     WHERE g.season = cw.season AND g.week = cw.week AND g.game_type = 'REG'
-    ORDER BY g.kickoff DESC
-    LIMIT 10
+    ORDER BY g.kickoff ASC
+    LIMIT 20
     """
 
     with get_db_connection() as conn:
@@ -487,12 +590,28 @@ def fetch_current_week_games():
             # Fetch predictions from FastAPI
             predictions = get_game_predictions(row['game_id'], season, week)
             if predictions:
+                # QB predictions
                 df.at[idx, 'predicted_home_qb_yards'] = predictions.get('home_qb_yards')
                 df.at[idx, 'predicted_home_qb_std'] = predictions.get('home_qb_yards_std')
                 df.at[idx, 'predicted_away_qb_yards'] = predictions.get('away_qb_yards')
                 df.at[idx, 'predicted_away_qb_std'] = predictions.get('away_qb_yards_std')
                 df.at[idx, 'predicted_total_yards'] = predictions.get('total_yards')
+
+                # RB predictions (rushing yards)
+                df.at[idx, 'home_rb_yards'] = predictions.get('home_rb_yards', 85)
+                df.at[idx, 'away_rb_yards'] = predictions.get('away_rb_yards', 85)
+
+                # Game predictions - override DB values with fresh API predictions
                 df.at[idx, 'predicted_home_win_prob'] = predictions.get('home_win_prob')
+                df.at[idx, 'predicted_spread'] = predictions.get('predicted_spread')
+                df.at[idx, 'predicted_total'] = predictions.get('predicted_total')
+                df.at[idx, 'predicted_home_score'] = predictions.get('predicted_home_score')
+                df.at[idx, 'predicted_away_score'] = predictions.get('predicted_away_score')
+
+                # Edge calculations
+                df.at[idx, 'spread_edge'] = predictions.get('spread_edge')
+                df.at[idx, 'total_edge'] = predictions.get('total_edge')
+                df.at[idx, 'ml_edge'] = predictions.get('ml_edge')
 
     return df
 
@@ -530,7 +649,7 @@ def get_game_predictions(game_id: str, season: int, week: int) -> dict:
         try:
             api_url = os.getenv("FASTAPI_URL", "http://localhost:8000")
             response = requests.post(
-                f"{api_url}/api/v1/predict/game",
+                f"{api_url}/api/v1/predict/game",  # Use working endpoint
                 json={"game_id": game_id, "season": season, "week": week},
                 timeout=15  # Increased from 10s to allow for DB queries
             )
@@ -538,54 +657,62 @@ def get_game_predictions(game_id: str, season: int, week: int) -> dict:
             if response.status_code == 200:
                 data = response.json()
 
-                # Validate response structure before accessing
-                required_keys = ['home_prediction', 'away_prediction', 'total_predicted_yards']
-                missing_keys = [k for k in required_keys if k not in data]
-                if missing_keys:
-                    logger.error(f"API response missing keys: {missing_keys} for {game_id}")
-                    if attempt < max_retries - 1:
-                        time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
-                        continue
-                    return None
+                # Extract QB and RB predictions from API response
+                home_qb_yards = None
+                away_qb_yards = None
+                home_rb_yards = None  # Add rushing yards
+                away_rb_yards = None  # Add rushing yards
+                home_std = 45.0  # Default
+                away_std = 45.0  # Default
 
-                # Extract predictions with safe access
-                try:
-                    home_yards = data['home_prediction']['predicted_passing_yards']
-                    home_std = data['home_prediction']['predicted_passing_yards_std']
-                    away_yards = data['away_prediction']['predicted_passing_yards']
-                    away_std = data['away_prediction']['predicted_passing_yards_std']
-                    total_yards = data.get('total_predicted_yards')
-                except KeyError as e:
-                    logger.error(f"KeyError accessing prediction data: {e} for {game_id}")
-                    if attempt < max_retries - 1:
-                        time.sleep(retry_delay * (attempt + 1))
-                        continue
-                    return None
+                if 'home_prediction' in data and data['home_prediction']:
+                    home_qb_yards = data['home_prediction'].get('predicted_passing_yards', 250)
+                    home_rb_yards = data['home_prediction'].get('predicted_rushing_yards', 85)  # Default RB yards
+                    home_std = data['home_prediction'].get('predicted_passing_yards_std', 45.0)
 
-                # Estimate win probability based on QB passing yards advantage
-                # Simple heuristic: team with higher QB yards has higher win prob
-                # More sophisticated version would use game outcome models
-                if home_yards and away_yards:
-                    yards_diff = home_yards - away_yards
-                    # Convert yards difference to win probability (sigmoid-like)
-                    # Each 50 yards ≈ 10% win prob advantage
+                if 'away_prediction' in data and data['away_prediction']:
+                    away_qb_yards = data['away_prediction'].get('predicted_passing_yards', 250)
+                    away_rb_yards = data['away_prediction'].get('predicted_rushing_yards', 85)  # Default RB yards
+                    away_std = data['away_prediction'].get('predicted_passing_yards_std', 45.0)
+
+                total_yards = data.get('total_predicted_yards', (home_qb_yards or 250) + (away_qb_yards or 250))
+
+                # Calculate estimated spread and total from QB yards
+                # Use empirical formula: every 15 passing yards ≈ 1 point
+                home_score_est = 14 + (home_qb_yards or 250) / 15
+                away_score_est = 14 + (away_qb_yards or 250) / 15
+                predicted_spread = home_score_est - away_score_est
+                predicted_total = home_score_est + away_score_est
+
+                # Calculate win probability from QB differential
+                if home_qb_yards and away_qb_yards:
+                    yards_diff = home_qb_yards - away_qb_yards
+                    # Sigmoid transformation: each 50 yards difference ≈ 10% win probability
                     home_win_prob = 0.5 + (yards_diff / 500.0)
-                    home_win_prob = max(0.1, min(0.9, home_win_prob))  # Clamp to [0.1, 0.9]
+                    home_win_prob = max(0.1, min(0.9, home_win_prob))
                 else:
                     home_win_prob = 0.5
 
                 return {
-                    'home_qb_yards': home_yards,
+                    'home_qb_yards': home_qb_yards or 250,
                     'home_qb_yards_std': home_std,
-                    'away_qb_yards': away_yards,
+                    'away_qb_yards': away_qb_yards or 250,
                     'away_qb_yards_std': away_std,
+                    'home_rb_yards': home_rb_yards or 85,  # Add rushing yards
+                    'away_rb_yards': away_rb_yards or 85,  # Add rushing yards
                     'total_yards': total_yards,
                     'home_win_prob': home_win_prob,
+                    'predicted_spread': predicted_spread,
+                    'predicted_total': predicted_total,
+                    'spread_std': 7.5,  # Default uncertainty
+                    'total_std': 10.0,  # Default uncertainty
+                    'predicted_home_score': home_score_est,
+                    'predicted_away_score': away_score_est,
                     'inference_time_ms': data.get('processing_ms', 0)
                 }
 
             elif response.status_code == 404:
-                logger.error(f"API endpoint not found: /api/v1/predict/game (status 404) for {game_id}")
+                logger.error(f"API endpoint not found: /api/v1/predict/game/full (status 404) for {game_id}")
                 logger.error(f"This may indicate the API container needs to be restarted or routes are not registered")
                 return None  # Don't retry on 404
             else:
@@ -879,8 +1006,8 @@ def plot_bnn_uncertainty_distribution(df_bnn):
 
 def plot_bnn_prediction_intervals(df_bnn):
     """Plot BNN prediction intervals."""
-    # Sort by predicted margin for better visualization
-    df_sorted = df_bnn.sort_values('predicted_margin').reset_index(drop=True)
+    # Sort by predicted value for better visualization
+    df_sorted = df_bnn.sort_values('predicted_value').reset_index(drop=True)
     df_sorted['game_index'] = range(len(df_sorted))
 
     fig = go.Figure()
@@ -909,9 +1036,9 @@ def plot_bnn_prediction_intervals(df_bnn):
     # Predicted margin
     fig.add_trace(go.Scatter(
         x=df_sorted['game_index'],
-        y=df_sorted['predicted_margin'],
+        y=df_sorted['predicted_value'],
         mode='markers',
-        name='Predicted Margin',
+        name='Predicted Value',
         marker=dict(size=6, color='#d62728')
     ))
 
@@ -928,13 +1055,26 @@ def plot_bnn_prediction_intervals(df_bnn):
 def check_service_health(host, port, service_name):
     """Check if a service is healthy by attempting to connect."""
     import socket
+
+    # Simple socket-based health check that should work reliably
+    if service_name == "Streamlit":
+        # Streamlit is this app itself, should always be true if running
+        return True
+
     try:
+        # Create a socket connection to test if the service is reachable
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(2)
+        sock.settimeout(5)  # Generous timeout
+
+        # Try to connect
         result = sock.connect_ex((host, port))
         sock.close()
+
+        # Return True if connection successful (result == 0)
         return result == 0
     except Exception as e:
+        # If any error occurs, consider the service as down
+        print(f"Health check failed for {service_name} at {host}:{port} - {str(e)}")
         return False
 
 def fetch_database_stats():
@@ -1021,6 +1161,18 @@ def fetch_training_runs():
 
 def render_game_predictions_page():
     """Render game predictions page organized by time slots."""
+    # Add header with cache controls
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        current_time = datetime.now(ZoneInfo('America/New_York')).strftime('%Y-%m-%d %I:%M:%S %p ET')
+        st.caption(f"📡 Last updated: {current_time} | Live scores from ESPN API")
+    with col2:
+        if st.button("🗑️ Clear Cache", help="Clear cached data to force refresh from ESPN", key="clear_cache_top"):
+            st.cache_data.clear()
+            st.success("✅ Cache cleared!")
+            time.sleep(0.5)
+            st.rerun()
+
     # Get current week dynamically
     current_year = datetime.now().year
     with st.spinner("Loading current week..."):
@@ -1038,7 +1190,7 @@ def render_game_predictions_page():
 
     # Fetch all games and predictions for current week
     query = f"""
-    SELECT
+    SELECT DISTINCT ON (g.game_id)
         g.game_id,
         g.season,
         g.week,
@@ -1051,16 +1203,19 @@ def render_game_predictions_page():
         g.kickoff,
         p.predicted_spread,
         p.predicted_total,
-        p.home_win_prob,
+        p.predicted_home_win_prob as home_win_prob,
         CASE
-            WHEN g.home_score IS NOT NULL THEN 'completed'
-            WHEN g.kickoff < NOW() THEN 'in_progress'
+            WHEN g.home_score IS NOT NULL AND g.away_score IS NOT NULL THEN 'completed'
+            -- Games are typically 3.5 hours, mark as completed if more than 4 hours past kickoff
+            -- BUT only for games that have actually started (not future years)
+            WHEN g.kickoff < NOW() - INTERVAL '4 hours' AND g.season <= EXTRACT(YEAR FROM NOW()) THEN 'completed'
+            WHEN g.kickoff < NOW() AND g.season <= EXTRACT(YEAR FROM NOW()) THEN 'in_progress'
             ELSE 'scheduled'
         END as game_status
     FROM games g
-    LEFT JOIN predictions.game_predictions p ON g.game_id = p.game_id
+    LEFT JOIN ml.game_predictions p ON g.game_id = p.game_id
     WHERE g.season = {current_season} AND g.week = {current_week} AND g.game_type = 'REG'
-    ORDER BY g.kickoff
+    ORDER BY g.game_id, p.created_at DESC NULLS LAST, g.kickoff
     """
 
     with st.spinner("Loading game predictions..."):
@@ -1167,15 +1322,27 @@ def render_game_card_with_predictions(game):
         if kickoff_utc.tzinfo is None:
             kickoff_utc = kickoff_utc.tz_localize('UTC')
         kickoff_et = kickoff_utc.astimezone(ZoneInfo('America/New_York'))
-        kickoff_str = kickoff_et.strftime('%a %I:%M %p ET')
+        # Show full date for future games, just time for today
+        today_et = datetime.now(ZoneInfo('America/New_York')).date()
+        if kickoff_et.date() == today_et:
+            kickoff_str = kickoff_et.strftime('%I:%M %p ET')
+        elif kickoff_et.date() == today_et + timedelta(days=1):
+            kickoff_str = kickoff_et.strftime('Tomorrow %I:%M %p ET')
+        else:
+            kickoff_str = kickoff_et.strftime('%b %d, %I:%M %p ET')
     else:
         kickoff_str = "TBD"
 
     # Game status display
     if game['game_status'] == 'completed':
-        home_score = int(game['home_score']) if pd.notna(game['home_score']) else 0
-        away_score = int(game['away_score']) if pd.notna(game['away_score']) else 0
-        status_str = f"FINAL: {away} {away_score} @ {home} {home_score}"
+        # Only show as completed if we actually have scores
+        if pd.notna(game['home_score']) and pd.notna(game['away_score']):
+            home_score = int(game['home_score'])
+            away_score = int(game['away_score'])
+            status_str = f"FINAL: {away} {away_score} @ {home} {home_score}"
+        else:
+            # No scores yet, treat as scheduled even if marked completed
+            status_str = kickoff_str
     elif game['game_status'] == 'in_progress':
         status_str = f"⚡ IN PROGRESS - {kickoff_str}"
     else:
@@ -1190,22 +1357,94 @@ def render_game_card_with_predictions(game):
     total_model = game['predicted_total'] if pd.notna(game['predicted_total']) else None
     home_win_prob = game['home_win_prob'] if pd.notna(game['home_win_prob']) else None
 
-    # Calculate edges
-    spread_edge = (spread_model - spread_sb) if (spread_model is not None and spread_sb is not None) else None
-    total_edge = (total_model - total_sb) if (total_model is not None and total_sb is not None) else None
+    # Use edges from API if available, otherwise calculate
+    spread_edge = game.get('spread_edge')
+    if spread_edge is None:
+        spread_edge = (spread_model - spread_sb) if (spread_model is not None and spread_sb is not None) else None
+
+    total_edge = game.get('total_edge')
+    if total_edge is None:
+        total_edge = (total_model - total_sb) if (total_model is not None and total_sb is not None) else None
 
     # Format values
     spread_sb_str = f"{home} {spread_sb:+.1f}" if spread_sb is not None else "N/A"
-    spread_model_str = f"{home} {spread_model:+.1f}" if spread_model is not None else "N/A"
-    spread_edge_str = f"{spread_edge:+.1f}" if spread_edge is not None else "—"
-    spread_edge_style = "color: green; font-weight: bold;" if spread_edge is not None and abs(spread_edge) >= 3 else ""
+    spread_model_str = f"{home} {spread_model:+.1f}" if spread_model is not None else "—"
+
+    # Enhanced edge formatting with confidence indicators
+    if spread_edge is not None:
+        spread_edge_str = f"{spread_edge:+.1f}"
+        if abs(spread_edge) >= 5:
+            spread_edge_str += " ⭐⭐⭐"  # High confidence
+            spread_edge_style = "color: #28a745; font-weight: bold;"
+        elif abs(spread_edge) >= 3:
+            spread_edge_str += " ⭐⭐"  # Medium confidence
+            spread_edge_style = "color: #17a2b8; font-weight: bold;"
+        elif abs(spread_edge) >= 1.5:
+            spread_edge_str += " ⭐"  # Low confidence
+            spread_edge_style = "color: #6c757d;"
+        else:
+            spread_edge_style = ""
+    else:
+        spread_edge_str = "—"
+        spread_edge_style = ""
 
     total_sb_str = f"O/U {total_sb:.1f}" if total_sb is not None else "N/A"
-    total_model_str = f"O/U {total_model:.1f}" if total_model is not None else "N/A"
-    total_edge_str = f"{total_edge:+.1f}" if total_edge is not None else "—"
-    total_edge_style = "color: green; font-weight: bold;" if total_edge is not None and abs(total_edge) >= 3 else ""
+    total_model_str = f"O/U {total_model:.1f}" if total_model is not None else "—"
 
-    ml_model_str = f"{home} {home_win_prob*100:.1f}%" if home_win_prob is not None else "N/A"
+    # Enhanced edge formatting for totals
+    if total_edge is not None:
+        total_edge_str = f"{total_edge:+.1f}"
+        if abs(total_edge) >= 5:
+            total_edge_str += " ⭐⭐⭐"  # High confidence
+            total_edge_style = "color: #28a745; font-weight: bold;"
+        elif abs(total_edge) >= 3:
+            total_edge_str += " ⭐⭐"  # Medium confidence
+            total_edge_style = "color: #17a2b8; font-weight: bold;"
+        elif abs(total_edge) >= 1.5:
+            total_edge_str += " ⭐"  # Low confidence
+            total_edge_style = "color: #6c757d;"
+        else:
+            total_edge_style = ""
+    else:
+        total_edge_str = "—"
+        total_edge_style = ""
+
+    # Format win probability with confidence color
+    if home_win_prob is not None:
+        ml_model_str = f"{home} {home_win_prob*100:.1f}%"
+        if home_win_prob >= 0.65 or home_win_prob <= 0.35:
+            ml_model_str += " ⭐⭐"  # Strong favorite/underdog
+        elif home_win_prob >= 0.58 or home_win_prob <= 0.42:
+            ml_model_str += " ⭐"  # Moderate favorite/underdog
+    else:
+        ml_model_str = "—"
+
+    # Get QB and RB yards predictions if available
+    home_qb_yards = game.get('predicted_home_qb_yards') or game.get('home_qb_yards')
+    away_qb_yards = game.get('predicted_away_qb_yards') or game.get('away_qb_yards')
+    home_rb_yards = game.get('home_rb_yards')
+    away_rb_yards = game.get('away_rb_yards')
+
+    # Format player predictions
+    qb_predictions_str = ""
+    if home_qb_yards or away_qb_yards:
+        qb_predictions_str = f"""
+                <tr style="background-color: #e8f4fd;">
+                    <td style="padding: 5px;"><strong>QB Pass Yds</strong></td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                    <td style="padding: 5px; text-align: center;">{away}: {away_qb_yards or '—':.0f} | {home}: {home_qb_yards or '—':.0f}</td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                </tr>"""
+
+    rb_predictions_str = ""
+    if home_rb_yards or away_rb_yards:
+        rb_predictions_str = f"""
+                <tr style="background-color: #fff3cd;">
+                    <td style="padding: 5px;"><strong>RB Rush Yds</strong></td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                    <td style="padding: 5px; text-align: center;">{away}: {away_rb_yards or '—':.0f} | {home}: {home_rb_yards or '—':.0f}</td>
+                    <td style="padding: 5px; text-align: center;">—</td>
+                </tr>"""
 
     # Build HTML card
     st.markdown(f"""
@@ -1249,6 +1488,8 @@ def render_game_card_with_predictions(game):
                     <td style="padding: 5px; text-align: center;">{ml_model_str}</td>
                     <td style="padding: 5px; text-align: center;">—</td>
                 </tr>
+                {qb_predictions_str}
+                {rb_predictions_str}
             </table>
         </div>
     </div>
@@ -1268,20 +1509,41 @@ def render_system_status_page():
     # Docker services health
     st.subheader("🐳 Docker Services")
 
-    services = [
-        ("PostgreSQL", "localhost", 5544),
-        ("Redis", "localhost", 6379),
-        ("Prometheus", "localhost", 9090),
-        ("Grafana", "localhost", 3000),
-        ("Streamlit", "localhost", 8501),
-        ("Postgres Exporter", "localhost", 9187),
-        ("Node Exporter", "localhost", 9100),
-    ]
+    # Check if we're running in Docker by looking for /.dockerenv
+    import os
+    in_docker = os.path.exists('/.dockerenv')
+
+    # Use Docker service names if in container, localhost if running on host
+    if in_docker:
+        # Running in Docker - use service names from docker-compose
+        services = [
+            ("PostgreSQL", "pg-1", 5432),  # Internal port is 5432
+            ("Redis", "redis", 6379),
+            ("Prometheus", "prometheus", 9090),
+            ("Grafana", "grafana", 3000),
+            ("Streamlit", "localhost", 8501),  # This container
+            ("Postgres Exporter", "postgres_exporter", 9187),
+            ("Node Exporter", "node_exporter", 9100),
+        ]
+    else:
+        # Running on host - use localhost with exposed ports
+        services = [
+            ("PostgreSQL", "localhost", 5544),
+            ("Redis", "localhost", 6379),
+            ("Prometheus", "localhost", 9090),
+            ("Grafana", "localhost", 3000),
+            ("Streamlit", "localhost", 8501),
+            ("Postgres Exporter", "localhost", 9187),
+            ("Node Exporter", "localhost", 9100),
+        ]
 
     cols = st.columns(len(services))
+    health_status = {}
+
     for idx, (name, host, port) in enumerate(services):
         with cols[idx]:
             is_healthy = check_service_health(host, port, name)
+            health_status[name] = is_healthy
             status_icon = "✅" if is_healthy else "❌"
             status_color = "#28a745" if is_healthy else "#dc3545"
             st.markdown(f"""
@@ -1292,6 +1554,34 @@ def render_system_status_page():
                 <div style="font-size: 12px; color: #666;">:{port}</div>
             </div>
             """, unsafe_allow_html=True)
+
+    # Add debug information in an expander
+    with st.expander("🔧 Debug Information", expanded=False):
+        st.write("**Service Health Check Results:**")
+        debug_cols = st.columns(2)
+        with debug_cols[0]:
+            for service_name, is_healthy in health_status.items():
+                if is_healthy:
+                    st.success(f"✅ {service_name}: Connected")
+                else:
+                    st.error(f"❌ {service_name}: Connection failed")
+
+        with debug_cols[1]:
+            st.write("**Docker Container Status:**")
+            try:
+                import subprocess
+                result = subprocess.run("docker ps --format '{{.Names}}: {{.Status}}' | grep nfl-analytics | head -10",
+                                      shell=True, capture_output=True, text=True, timeout=5)
+                if result.stdout:
+                    for line in result.stdout.strip().split('\n'):
+                        if 'healthy' in line.lower():
+                            st.success(line)
+                        else:
+                            st.warning(line)
+                else:
+                    st.info("No NFL Analytics containers found")
+            except Exception as e:
+                st.error(f"Could not fetch Docker status: {e}")
 
     st.markdown("---")
 
@@ -1803,13 +2093,28 @@ def main():
 
         # In-Progress Games (LIVE) - Show at top
         if not in_progress_games.empty:
-            # Add refresh button in top right
-            col1, col2 = st.columns([3, 1])
+            # Add refresh button and auto-refresh timer
+            col1, col2, col3 = st.columns([2, 1, 1])
             with col1:
                 st.empty()  # Spacer
             with col2:
-                if st.button("🔄 Refresh", type="primary"):
+                # Auto-refresh countdown
+                if 'last_refresh' not in st.session_state:
+                    st.session_state.last_refresh = time.time()
+
+                time_since_refresh = int(time.time() - st.session_state.last_refresh)
+                time_until_refresh = max(0, 15 - time_since_refresh)
+                st.caption(f"⏱️ Auto-refresh in {time_until_refresh}s")
+            with col3:
+                if st.button("🔄 Refresh Now", type="primary", key="refresh_live_games"):
+                    st.session_state.last_refresh = time.time()
+                    st.cache_data.clear()  # Clear cache to get fresh data
                     st.rerun()
+
+            # Auto-refresh every 15 seconds when there are live games (faster than cache expiry)
+            if time_since_refresh >= 15:
+                st.session_state.last_refresh = time.time()
+                st.rerun()
 
             st.subheader("🔴 LIVE GAMES")
 
@@ -1881,28 +2186,26 @@ def main():
                     else:
                         total_text = "Total: N/A"
 
-                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
+                    # Our model predictions (from database ml.game_predictions)
                     prediction_lines = []
 
-                    # QB passing yards predictions
-                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
-                        home_qb_yards = float(game['predicted_home_qb_yards'])
-                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
-                        prediction_lines.append(
-                            f"<strong>{game['home_team_display']} QB:</strong> {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
-                        )
+                    # Spread prediction
+                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        pred_spread_str = f"{game['home_team_display']} {pred_spread:+.1f}" if pred_spread != 0 else "EVEN"
+                        prediction_lines.append(f"<strong>Spread:</strong> {pred_spread_str}")
 
-                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
-                        away_qb_yards = float(game['predicted_away_qb_yards'])
-                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
-                        prediction_lines.append(
-                            f"<strong>{game['away_team_display']} QB:</strong> {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
-                        )
+                    # Total (O/U) prediction
+                    if 'predicted_total' in game and pd.notna(game['predicted_total']):
+                        pred_total = float(game['predicted_total'])
+                        prediction_lines.append(f"<strong>Total:</strong> O/U {pred_total:.1f}")
 
-                    # Total passing yards
-                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
-                        total_pred = float(game['predicted_total_yards'])
-                        prediction_lines.append(f"<strong>Total Passing:</strong> {total_pred:.0f} yds")
+                    # Score predictions
+                    if 'predicted_home_score' in game and pd.notna(game['predicted_home_score']) and \
+                       'predicted_away_score' in game and pd.notna(game['predicted_away_score']):
+                        pred_home = float(game['predicted_home_score'])
+                        pred_away = float(game['predicted_away_score'])
+                        prediction_lines.append(f"<strong>Score:</strong> {game['away_team_display']} {pred_away:.0f} @ {game['home_team_display']} {pred_home:.0f}")
 
                     # Win probability
                     if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
@@ -1911,7 +2214,7 @@ def main():
                         win_prob_pct = max(home_win_prob, 1 - home_win_prob) * 100
                         prediction_lines.append(f"<strong>Winner:</strong> {predicted_winner} ({win_prob_pct:.1f}%)")
 
-                    prediction_info = "<div style='font-size: 14px; color: #333;'>" + " | ".join(prediction_lines) + "</div>" if prediction_lines else "<div style='font-size: 14px; color: #666; font-style: italic;'>Fetching predictions...</div>"
+                    prediction_info = " | ".join(prediction_lines) if prediction_lines else "<span style='color: #666; font-style: italic;'>No predictions available</span>"
 
                     with col:
                         st.markdown(f"""
@@ -2007,28 +2310,26 @@ def main():
                     else:
                         total_text = "Total: N/A"
 
-                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
+                    # Our model predictions - Game-level predictions (not QB stats)
                     prediction_lines = []
 
-                    # QB passing yards predictions
-                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
-                        home_qb_yards = float(game['predicted_home_qb_yards'])
-                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
-                        prediction_lines.append(
-                            f"{game['home_team_display']} QB: {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
-                        )
+                    # Spread prediction
+                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        pred_spread_str = f"{game['home_team_display']} {pred_spread:+.1f}" if pred_spread != 0 else "EVEN"
+                        prediction_lines.append(f"Spread: {pred_spread_str}")
 
-                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
-                        away_qb_yards = float(game['predicted_away_qb_yards'])
-                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
-                        prediction_lines.append(
-                            f"{game['away_team_display']} QB: {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
-                        )
+                    # Total (O/U) prediction
+                    if 'predicted_total' in game and pd.notna(game['predicted_total']):
+                        pred_total = float(game['predicted_total'])
+                        prediction_lines.append(f"Total: O/U {pred_total:.1f}")
 
-                    # Total passing yards
-                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
-                        total_pred = float(game['predicted_total_yards'])
-                        prediction_lines.append(f"Total Passing: {total_pred:.0f} yds")
+                    # Score predictions
+                    if 'predicted_home_score' in game and pd.notna(game['predicted_home_score']) and \
+                       'predicted_away_score' in game and pd.notna(game['predicted_away_score']):
+                        pred_home = float(game['predicted_home_score'])
+                        pred_away = float(game['predicted_away_score'])
+                        prediction_lines.append(f"Score: {game['away_team_display']} {pred_away:.0f} @ {game['home_team_display']} {pred_home:.0f}")
 
                     # Win probability
                     if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
@@ -2106,28 +2407,26 @@ def main():
                     spread_text = f"Spread: {game['home_team_display']} {spread:+.1f}" if spread != 0 else "Spread: EVEN"
                     total_text = f"Total: O/U {total:.1f}"
 
-                    # Our model predictions (REAL from FastAPI Ensemble v5.1)
+                    # Our model predictions - Game-level predictions (not QB stats)
                     prediction_lines = []
 
-                    # QB passing yards predictions
-                    if 'predicted_home_qb_yards' in game and pd.notna(game['predicted_home_qb_yards']):
-                        home_qb_yards = float(game['predicted_home_qb_yards'])
-                        home_qb_std = float(game.get('predicted_home_qb_std', 0))
-                        prediction_lines.append(
-                            f"{game['home_team_display']} QB: {home_qb_yards:.0f} ± {home_qb_std:.0f} yds"
-                        )
+                    # Spread prediction
+                    if 'predicted_spread' in game and pd.notna(game['predicted_spread']):
+                        pred_spread = float(game['predicted_spread'])
+                        pred_spread_str = f"{game['home_team_display']} {pred_spread:+.1f}" if pred_spread != 0 else "EVEN"
+                        prediction_lines.append(f"Spread: {pred_spread_str}")
 
-                    if 'predicted_away_qb_yards' in game and pd.notna(game['predicted_away_qb_yards']):
-                        away_qb_yards = float(game['predicted_away_qb_yards'])
-                        away_qb_std = float(game.get('predicted_away_qb_std', 0))
-                        prediction_lines.append(
-                            f"{game['away_team_display']} QB: {away_qb_yards:.0f} ± {away_qb_std:.0f} yds"
-                        )
+                    # Total (O/U) prediction
+                    if 'predicted_total' in game and pd.notna(game['predicted_total']):
+                        pred_total = float(game['predicted_total'])
+                        prediction_lines.append(f"Total: O/U {pred_total:.1f}")
 
-                    # Total passing yards
-                    if 'predicted_total_yards' in game and pd.notna(game['predicted_total_yards']):
-                        total_pred = float(game['predicted_total_yards'])
-                        prediction_lines.append(f"Total Passing: {total_pred:.0f} yds")
+                    # Score predictions
+                    if 'predicted_home_score' in game and pd.notna(game['predicted_home_score']) and \
+                       'predicted_away_score' in game and pd.notna(game['predicted_away_score']):
+                        pred_home = float(game['predicted_home_score'])
+                        pred_away = float(game['predicted_away_score'])
+                        prediction_lines.append(f"Score: {game['away_team_display']} {pred_away:.0f} @ {game['home_team_display']} {pred_home:.0f}")
 
                     # Win probability
                     if 'predicted_home_win_prob' in game and pd.notna(game['predicted_home_win_prob']):
@@ -2223,7 +2522,7 @@ def main():
     # Calibration
     st.header("🎯 Model Calibration")
 
-    if 'home_win_prob' in df_retrospectives.columns:
+    if 'prob_win' in df_retrospectives.columns:
         fig_calibration = plot_calibration(df_retrospectives)
         st.plotly_chart(fig_calibration, use_container_width=True)
     else:

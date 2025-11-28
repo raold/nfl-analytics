@@ -1,0 +1,16 @@
+{
+  "trial": 16,
+  "hyperparameters": {
+    "alpha": 1.0,
+    "lr": 0.0001,
+    "hidden_dims": [
+      512,
+      256,
+      128
+    ],
+    "batch_size": 128
+  },
+  "final_loss": 0.7743380281891318,
+  "agreement_rate": 0.8346644010195412,
+  "reward_lift": 0.06481051520306225
+}

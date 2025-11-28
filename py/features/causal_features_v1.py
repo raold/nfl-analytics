@@ -167,9 +167,14 @@ class CausalFeaturesV1:
         Returns:
             Dict with causal feature values:
                 - did_roughing_yards: +17.70 if high-roughing defense post-2018, else 0
-                - psm_travel_yards: +1.38 if long-distance (≥2000 miles), else 0 (disabled)
-                - psm_weather_yards: -2.24 if extreme weather, else 0 (disabled)
-                - causal_total_yards: Sum of enabled features
+                - psm_travel_yards: +1.38 if long-distance (≥2000 miles), else 0 (weight=0.0)
+                - psm_weather_yards: -2.24 if extreme weather, else 0 (weight=0.0)
+                - temp_numeric: Temperature in Fahrenheit (default: 50.0)
+                - wind_numeric: Wind speed in mph (default: 5.0)
+                - is_bad_weather: Binary (cold OR windy OR precipitation)
+                - is_cold_weather: Binary (temp <32°F)
+                - is_high_wind: Binary (wind >20mph)
+                - causal_total_yards: Sum of enabled features (DiD only)
         """
         features = {}
 
@@ -178,17 +183,36 @@ class CausalFeaturesV1:
             opponent_team, season
         )
 
-        # Feature 2: PSM Travel (disabled, weight=0.0)
-        features["psm_travel_yards"] = 0.0  # Null finding, disabled
-        # Commented out original calculation:
-        # features["psm_travel_yards"] = self._calculate_psm_travel(
-        #     player_team, opponent_team
-        # )
+        # Feature 2: PSM Travel (weight=0.0 for causal_total, but raw value preserved for XGBoost)
+        features["psm_travel_yards"] = self._calculate_psm_travel(
+            player_team, opponent_team
+        )
 
-        # Feature 3: PSM Weather (disabled, weight=0.0)
-        features["psm_weather_yards"] = 0.0  # Null finding, disabled
-        # Commented out original calculation:
-        # features["psm_weather_yards"] = self._calculate_psm_weather(game_weather)
+        # Feature 3: PSM Weather (weight=0.0 for causal_total, but raw value preserved for XGBoost)
+        features["psm_weather_yards"] = self._calculate_psm_weather(game_weather)
+
+        # Feature 4-8: Raw weather features (for XGBoost learning despite null PSM findings)
+        if game_weather:
+            features["temp_numeric"] = game_weather.get("temp", 50.0)  # Default 50°F
+            features["wind_numeric"] = game_weather.get("wind", 5.0)   # Default 5 mph
+            features["is_bad_weather"] = int(
+                (game_weather.get("temp") is not None and game_weather.get("temp") < 32)
+                or (game_weather.get("wind") is not None and game_weather.get("wind") > 20)
+                or (game_weather.get("precipitation", 0) > 0)
+            )
+            features["is_cold_weather"] = int(
+                game_weather.get("temp") is not None and game_weather.get("temp") < 32
+            )
+            features["is_high_wind"] = int(
+                game_weather.get("wind") is not None and game_weather.get("wind") > 20
+            )
+        else:
+            # Defaults for missing weather data
+            features["temp_numeric"] = 50.0
+            features["wind_numeric"] = 5.0
+            features["is_bad_weather"] = 0
+            features["is_cold_weather"] = 0
+            features["is_high_wind"] = 0
 
         # Total causal adjustment (only enabled features)
         features["causal_total_yards"] = (

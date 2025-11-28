@@ -1,0 +1,13 @@
+{
+  "hidden_dims": [
+    8
+  ],
+  "activation": "relu",
+  "prior_std": 0.3,
+  "imputation_values": {
+    "avg_air_yards": 7.5,
+    "avg_yac": 4.25
+  },
+  "timestamp": "2025-11-23T17:04:00.373382",
+  "temporal_safety": "Career averages computed on training set only, no test set leakage"
+}

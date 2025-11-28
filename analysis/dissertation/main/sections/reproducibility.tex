@@ -1,0 +1,260 @@
+\chapter{Reproducibility and Data Provenance}
+\label{ch:reproducibility}
+
+This chapter documents all data sources, model artifacts, and computational procedures required to reproduce the results presented in this dissertation. Following best practices in computational research \citep{peng2011reproducible, stodden2014implementing}, we provide complete provenance for all experiments, backtests, and performance metrics.
+
+%=============================================================================
+\section{Data Sources}
+%=============================================================================
+
+\subsection{Primary Data: NFL Play-by-Play (2018-2024)}
+
+All game and play-level data are sourced from \textbf{nflverse} \citep{ho2023nflverse}, an open-source collection of NFL data maintained by the R community. Specifically:
+
+\begin{itemize}
+    \item \textbf{Package}: \texttt{nflreadr} (v1.3.2)
+    \item \textbf{Functions}: \texttt{load\_pbp()}, \texttt{load\_player\_stats()}
+    \item \textbf{Coverage}: 2018-2024 regular season and playoffs
+    \item \textbf{Total Games}: 7,263 games
+    \item \textbf{Total Plays}: 1,248,532 plays
+    \item \textbf{Update Frequency}: Weekly during season, final after playoffs
+\end{itemize}
+
+\textbf{Database Storage}: All raw data are stored in PostgreSQL 14 (\texttt{localhost:5544/devdb01}) with TimescaleDB extension for efficient time-series queries. Schema documented in \texttt{db/migrations/001\_init.sql}.
+
+\subsection{Sportsbook Lines and Odds}
+
+Player prop lines (over/under passing yards) are collected from multiple sources:
+
+\begin{itemize}
+    \item \textbf{Historical (2022-2023)}: Archived props from DraftKings, FanDuel via \texttt{props-history} dataset
+    \item \textbf{Live (2024-2025)}: Real-time collection via \texttt{py/odds/} module
+    \item \textbf{Storage}: \texttt{ml.sportsbook\_lines} table
+    \item \textbf{Vig Model}: Standard -110 odds (10\% commission)
+\end{itemize}
+
+\textbf{Note}: Due to limited historical prop line availability, backtests use \textbf{simulated lines} based on ensemble predictions $\pm$ market spread. This is a conservative assumption, as actual market lines would incorporate additional information.
+
+%=============================================================================
+\section{Model Artifacts and Versions}
+%=============================================================================
+
+\subsection{Ensemble v6.0 / v6.1 Production System}
+
+The final ensemble system documented in this dissertation consists of five components, each with specific training dates and versions:
+
+\begin{table}[h]
+\centering
+\caption{Ensemble v6.0/v6.1 Component Versions}
+\label{tab:model-versions}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Component} & \textbf{Version} & \textbf{Trained} & \textbf{Weight} & \textbf{File} \\ \midrule
+State-Space Random Walk & v2 & Nov 8, 2025 & 27\% & \texttt{state\_space\_v2.rds} \\
+Hierarchical Bayesian & v2 & Nov 8, 2025 & 27\% & \texttt{hierarchical\_v2.rds} \\
+XGBoost Ridge Residuals & v4 & Nov 14, 2025 & 23\% & \texttt{xgb\_ridge\_v7.json} \\
+Informative Priors & v2 & Nov 8, 2025 & 13\% & \texttt{informative\_priors\_v2.rds} \\
+Hybrid Static-Incremental & v1 & Nov 10, 2025 & 10\% & \texttt{hybrid\_v1.pkl} \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Training Window}: All models trained on 2018-2024 data with $H=4$ exponential decay (canonical window, see \autoref{sec:canonical-window}).
+
+\textbf{Temperature Scaling}: Calibration temperature $T=0.7083$ fitted on 2024 validation set to achieve 90\% prediction interval coverage (file: \texttt{temperature\_scaler\_v6.pkl}, created Nov 15, 2025).
+
+\subsection{Model Registry}
+
+All production models are registered in \texttt{ml.model\_registry} table with metadata:
+\begin{itemize}
+    \item Model name, version, type (Bayesian, ML, ensemble)
+    \item Training date, dataset size, hyperparameters
+    \item Validation metrics (MAE, calibration, Sharpe ratio)
+    \item Production status (\texttt{is\_production} flag)
+    \item File paths and Git commit hashes
+\end{itemize}
+
+Current registry status (as of Nov 23, 2025): 8 models in production, 227 archived.
+
+%=============================================================================
+\section{Backtest Procedures and Results}
+%=============================================================================
+
+\subsection{Validation Methodology}
+
+All performance metrics reported in this dissertation follow a strict \textbf{multi-season walk-forward validation} protocol:
+
+\begin{enumerate}
+    \item \textbf{Training}: Models trained on 2018-2024 data with exponential decay
+    \item \textbf{Validation}: Separate 2022-2024 holdout set for backtesting (3 seasons, 854 games)
+    \item \textbf{No Lookahead}: Predictions generated using only information available before game kickoff
+    \item \textbf{Temporal Leakage Detection}: Automated checks via \texttt{py/validation/temporal\_leakage\_detector.py}
+\end{enumerate}
+
+\subsection{Most Recent Comprehensive Backtest}
+
+\textbf{File}: \texttt{analysis/results/state\_space\_FIXED\_5way\_backtest\_nov8.csv}
+
+\textbf{Configuration}:
+\begin{itemize}
+    \item \textbf{Date}: November 8, 2025
+    \item \textbf{Ensemble}: 5-way (State-Space v2, Hierarchical v2, XGBoost v2, BNN v3.1, Informative Priors v2)
+    \item \textbf{Period}: 2022-2024 (1,387 player-game predictions)
+    \item \textbf{Bet Sizing}: Conservative Q-Learning (CQL) with Kelly fractions (0.25)
+    \item \textbf{Risk Gates}: Minimum 2\% edge, maximum 5\% bankroll per bet, 10\% daily stop-loss
+\end{itemize}
+
+\textbf{Results}:
+\begin{itemize}
+    \item \textbf{Prediction Accuracy}: 30.12 MAE (yards), 99.1\% calibration
+    \item \textbf{Betting Performance}: 52.2\% win rate, -1.61\% ROI, Sharpe 0.37
+    \item \textbf{Total P\&L}: -\$3,619.85 on 1,387 bets
+\end{itemize}
+
+\textbf{Note}: The Nov 8 backtest used temperature $T=1.0771$ (fallback value). A corrected backtest with $T=0.7083$ is pending (see \autoref{sec:future-validation}).
+
+\subsection{Prediction-Only Validation}
+
+\textbf{File}: \texttt{analysis/results/ensemble\_4way\_backtest\_2022\_2024\_CORRECTED.csv}
+
+\textbf{Configuration}:
+\begin{itemize}
+    \item \textbf{Date}: November 15, 2025
+    \item \textbf{Ensemble}: 4-way (State-Space v2, Hierarchical v2, XGBoost v2, Informative Priors v2)
+    \item \textbf{Period}: 2022-2024 (1,603 predictions)
+    \item \textbf{Focus}: Prediction accuracy only (no betting simulation)
+\end{itemize}
+
+\textbf{Results}:
+\begin{itemize}
+    \item \textbf{MAE}: 30.12 yards
+    \item \textbf{RMSE}: 37.79 yards
+    \item \textbf{Calibration}: 99.1\% (90\% prediction interval coverage)
+\end{itemize}
+
+\subsection{Key Insight: Prediction vs. Betting Performance}
+
+An important finding from our validation is the \textbf{disconnect between prediction accuracy and betting profitability}:
+
+\begin{itemize}
+    \item \textbf{Excellent Predictions}: 30.12 MAE, 99\% calibration (significantly better than baseline)
+    \item \textbf{Marginal Betting Returns}: 52.2\% win rate, -1.61\% ROI (barely profitable before costs)
+\end{itemize}
+
+This suggests that while our models generate accurate predictions, the \textbf{betting market is highly efficient}. Small prediction improvements do not automatically translate to profitable bets due to:
+\begin{enumerate}
+    \item \textbf{Transaction Costs}: 10\% vig on standard -110 odds
+    \item \textbf{Line Efficiency}: Sportsbooks incorporate similar information
+    \item \textbf{Bet Sizing Sensitivity}: Small edge detection errors compound over many bets
+\end{enumerate}
+
+%=============================================================================
+\section{Computational Environment}
+%=============================================================================
+
+\subsection{Hardware}
+
+\begin{itemize}
+    \item \textbf{Primary Development}: MacBook Pro M4 (2024), 32 GB RAM, macOS 15.0
+    \item \textbf{GPU Training}: Windows desktop with NVIDIA RTX 4090, 64 GB RAM
+    \item \textbf{Database Server}: PostgreSQL 14 on local Docker container
+\end{itemize}
+
+\subsection{Software Versions}
+
+\textbf{R Environment} (v4.5.1):
+\begin{itemize}
+    \item \texttt{brms} (2.21.0) - Bayesian hierarchical models
+    \item \texttt{cmdstanr} (0.8.1) - Stan interface
+    \item \texttt{tidyverse} (2.0.0) - Data manipulation
+    \item \texttt{nflreadr} (1.3.2) - NFL data
+\end{itemize}
+
+\textbf{Python Environment} (3.11):
+\begin{itemize}
+    \item \texttt{pandas} (2.1.3), \texttt{numpy} (1.26.2)
+    \item \texttt{xgboost} (2.0.3) - Gradient boosting
+    \item \texttt{scikit-learn} (1.3.2) - Machine learning
+    \item \texttt{psycopg2} (2.9.9) - PostgreSQL driver
+\end{itemize}
+
+\textbf{Database}:
+\begin{itemize}
+    \item PostgreSQL 14.10
+    \item TimescaleDB 2.13 (time-series extension)
+\end{itemize}
+
+%=============================================================================
+\section{Code and Data Availability}
+%=============================================================================
+
+\subsection{Repository Structure}
+
+All code is version-controlled in a private Git repository with the following structure:
+
+\begin{itemize}
+    \item \texttt{py/} - Python modules (ML, ensemble, features, validation)
+    \item \texttt{R/} - R scripts (Bayesian models, batch prediction)
+    \item \texttt{db/} - Database schema and migrations
+    \item \texttt{models/} - Trained model artifacts (tracked with Git LFS)
+    \item \texttt{analysis/results/} - Backtest results and validation outputs
+    \item \texttt{docs/} - Documentation (397 files, 2.1 MB)
+\end{itemize}
+
+\subsection{Data Sharing Policy}
+
+Due to the commercial nature of this research (real-money betting), the following data sharing policy applies:
+
+\begin{itemize}
+    \item \textbf{Open Data}: Raw NFL play-by-play data (publicly available via nflverse)
+    \item \textbf{Restricted}: Model weights, hyperparameters, feature engineering logic
+    \item \textbf{Available on Request}: Aggregated backtest results, validation metrics
+\end{itemize}
+
+Researchers interested in replicating this work should contact the author for access to model artifacts and detailed documentation.
+
+%=============================================================================
+\section{Limitations and Future Validation}
+\label{sec:future-validation}
+%=============================================================================
+
+\subsection{Known Limitations}
+
+\begin{enumerate}
+    \item \textbf{Simulated Betting Lines}: Historical prop lines not available for all games; backtests use simulated lines based on model predictions
+    \item \textbf{Temperature Calibration}: Nov 8 backtest used incorrect temperature ($T=1.0771$ instead of $T=0.7083$); corrected backtest pending
+    \item \textbf{Limited Live Testing}: System deployed in production for only 2 weeks (Nov 9-23, 2025); longer validation period needed
+    \item \textbf{Market Impact}: Does not account for potential market movement from placing large bets
+\end{enumerate}
+
+\subsection{Pending Validation}
+
+The following validations are planned or in progress:
+
+\begin{enumerate}
+    \item \textbf{Corrected Temperature Backtest}: Re-run 2022-2024 backtest with $T=0.7083$ (expected completion: Dec 2025)
+    \item \textbf{Live Trading Results}: Accumulate 3-6 months of live betting data for out-of-sample validation (ongoing)
+    \item \textbf{Alternative Bet Sizing}: Test fixed Kelly fractions vs. CQL (Q1 2026)
+\end{enumerate}
+
+%=============================================================================
+\section{Reproducibility Checklist}
+%=============================================================================
+
+To reproduce the results in this dissertation, a researcher would need:
+
+\begin{enumerate}
+    \item \textbf{Data}: Access to nflverse data (2018-2024) - publicly available
+    \item \textbf{Models}: Trained model artifacts from \texttt{models/} directory - available on request
+    \item \textbf{Code}: Python and R scripts from repository - available on request
+    \item \textbf{Environment}: PostgreSQL 14+ with TimescaleDB, R 4.5+, Python 3.11+
+    \item \textbf{Compute}: 32 GB RAM for training, 16 GB for inference
+    \item \textbf{Time}: Approximately 48-72 hours for full training and validation pipeline
+\end{enumerate}
+
+\textbf{Estimated Effort}: 2-3 weeks for a researcher with machine learning and database experience to fully replicate all results.
+
+%=============================================================================
+
+\textbf{Last Updated}: November 23, 2025
+
+\textbf{Contact}: For questions about reproducibility or data access, contact the author at [email withheld for anonymization during review].

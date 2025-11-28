@@ -61,7 +61,6 @@ class XGBoostV5HyperparameterTuner:
 
     def __init__(
         self,
-        db_config: Dict,
         n_folds: int = 5,
         quick_search: bool = False
     ):
@@ -69,11 +68,9 @@ class XGBoostV5HyperparameterTuner:
         Initialize hyperparameter tuner.
 
         Args:
-            db_config: Database connection parameters
             n_folds: Number of cross-validation folds (default: 5)
             quick_search: If True, use reduced search space (default: False)
         """
-        self.db_config = db_config
         self.n_folds = n_folds
         self.quick_search = quick_search
 
@@ -447,18 +444,8 @@ def main():
     )
     args = parser.parse_args()
 
-    # Database configuration
-    db_config = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': 'sicillionbillions'  # pragma: allowlist secret
-    }
-
     # Initialize tuner
     tuner = XGBoostV5HyperparameterTuner(
-        db_config=db_config,
         n_folds=args.n_folds,
         quick_search=args.quick
     )

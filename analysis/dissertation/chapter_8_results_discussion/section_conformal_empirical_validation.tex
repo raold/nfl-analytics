@@ -193,16 +193,17 @@ Table~\ref{tab:conformal-timing} compares wall-clock time for calibration and in
 
 \begin{table}[t]
 \centering
+\small
 \caption{Computational Cost Comparison (MacBook M1, single core)}
 \label{tab:conformal-timing}
-\begin{tabular}{@{}lccc@{}}
+\begin{tabular}{@{}lp{2.5cm}cc@{}}
 \toprule
-\textbf{Method} & \textbf{Calibration Time} & \textbf{Inference (1 pred)} & \textbf{Inference (1K preds)} \\
+\textbf{Method} & \textbf{Calibration Time} & \textbf{Inf. (1)} & \textbf{Inf. (1K)} \\
 \midrule
-Temperature Scaling & 6 min (grid search) & 0.2 ms & 0.2 sec \\
-Split Conformal (RF) & $<$1 sec (quantile) & 1.5 ms & 1.5 sec \\
-Split Conformal (BNN) & $<$1 sec (quantile) & 0.3 ms & 0.3 sec \\
-CQR & $<$1 sec (quantile) & 2.1 ms & 2.1 sec \\
+Temperature Scaling & 6 min (grid) & 0.2 ms & 0.2 sec \\
+Split Conf. (RF) & <1 sec (quant.) & 1.5 ms & 1.5 sec \\
+Split Conf. (BNN) & <1 sec (quant.) & 0.3 ms & 0.3 sec \\
+CQR & <1 sec (quant.) & 2.1 ms & 2.1 sec \\
 \bottomrule
 \end{tabular}
 \end{table}

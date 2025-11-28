@@ -278,12 +278,138 @@ player_id,player_name,game_num,skill_mean
 
 ---
 
-**Status**: ❌ CRITICAL BUGS - Ensemble v6.0 NOT READY FOR DEPLOYMENT
-**Next Action**: Investigate state-space training to understand log transformation
-**ETA for Fixes**: 2-4 hours (investigation + fixes + re-validation)
+**Status**: ⚠️ BUG #1 FIXED, BUG #2 ROOT CAUSE IDENTIFIED - Full fix pending
+**Next Action**: Implement opponent feature fallback strategy
+**ETA for Full Fix**: 30 minutes
+
+---
+
+## UPDATE: November 19, 2025, 11:14 PM UTC
+
+### Bug #1: State-Space Log Transformation - ✅ FIXED
+
+**Root Cause Confirmed**: Skills CSV uses `log10()` transformation, not `ln()`:
+- Tom Brady: skill_mean = 2.6 → 10^2.6 ≈ 398 yards ✅
+- NOT `exp(2.6)` = 13.5 yards ❌
+
+**Fix Applied** (enhanced_ensemble_v6_production.py:716):
+```python
+# OLD (BROKEN)
+return float(mean), float(std)  # Returns 2.6
+
+# NEW (FIXED)
+return float(10**mean), float(std)  # Returns 398 yards
+```
+
+**Verification**: ✅ State-space now predicts realistic 373-402 yards
+
+---
+
+### Bug #2: XGBoost v4 Constant Predictions - 🔍 ROOT CAUSE IDENTIFIED
+
+**New Discovery**: The constant 398.3 predictions are NOT due to output scaling issues.
+
+**TRUE ROOT CAUSE**: Early-season games have **no historical opponent data**, causing SQL to default to constants:
+
+#### The Complete Chain of Events
+
+1. **Original Code** (Nov 19, 2:45 PM):
+```python
+# Lines 643-644 - HARDCODED CONSTANTS
+0.0 as opponent_epa,
+22.0 as opponent_points_allowed,
+```
+
+2. **SQL Fix Applied** (Nov 19, 11:00 PM):
+   - 114-line refactor to query actual opponent defensive stats
+   - Fixed schema errors (`pgs.team` → `pgs.current_team`)
+   - Result: Eliminated crashes but predictions still constant
+
+3. **Root Cause Discovery** (Nov 19, 11:14 PM):
+
+**For Week 1 games** (20% of all games):
+```sql
+-- Query attempts weeks [week-3, week-1) = [1-3, 1) = [-2, 1)
+SELECT AVG(defensive_epa)
+FROM plays
+WHERE opponent = 'JAX'
+  AND season = 2023
+  AND week >= 1   -- max(1, 1-3) = 1
+  AND week < 1    -- ❌ IMPOSSIBLE: 0 rows returned
+```
+
+**Result**: NULL → `COALESCE()` defaults (0.0, 22.0) → Ridge always gets identical inputs → 398.3 constant
+
+**Verification** (Week 5 with historical data):
+```
+Brock Purdy vs DAL (Week 5):
+  Opponent defensive EPA: -0.0074  ✅ VARIES
+  Opponent points allowed: 27.66   ✅ VARIES
+  527 plays across 3 games (W2-W4) ✅ DATA EXISTS
+```
+
+#### Impact Scope
+- **Weeks 1-3**: Insufficient historical data (~20% of games)
+- **Week 4+**: Full 3-week windows available ✅
+- **Current MAE**: 88.08 yards (vs expected ~35)
+- **XGBoost v4 contribution**: Effectively zero (constant predictions)
+
+#### Solution: Prior-Season Fallback
+
+Modify `_fetch_features()` opponent defense CTE to use prior season as fallback:
+
+```sql
+opponent_defense AS (
+    -- Current season stats (if available)
+    SELECT AVG(epa) as current_epa, AVG(points) as current_points
+    FROM plays WHERE season = 2023 AND week >= 1 AND week < 1  -- 0 rows for W1
+),
+prior_season_defense AS (
+    -- Prior season full-year stats (fallback)
+    SELECT AVG(epa) as prior_epa, AVG(points) as prior_points
+    FROM plays WHERE season = 2022 AND week >= 1 AND week <= 18
+)
+SELECT
+    COALESCE(current_epa, prior_epa, 0.05) as opponent_epa,  -- 0.05 = league avg
+    COALESCE(current_points, prior_points, 21.7) as opponent_points_allowed
+```
+
+**Expected After Fix**:
+- Week 1 2023: Uses 2022 full-season opponent averages
+- Week 4+ 2023: Uses 2023 current-season data (as before)
+- XGBoost v4 predictions vary by opponent strength ✅
+
+---
+
+### Timeline Update
+
+| Time | Event | Status |
+|------|-------|--------|
+| 2:45 PM | Root cause analysis (log-space, scaling, etc.) | 🔍 Initial hypotheses |
+| 3:00 PM | Initial documentation created | 📝 Incomplete |
+| 11:00 PM | Bug #1 fixed (10^mean), Bug #2 SQL refactored | ⚠️ Partial fix |
+| 11:14 PM | Bug #2 root cause identified (early-season NULL data) | ✅ **COMPLETE DIAGNOSIS** |
+| TBD | Implement prior-season fallback | ⏳ Pending (~30 min) |
+| TBD | Re-run ensemble v6 backtest | ⏳ Pending (~10 min) |
+| TBD | Verify XGBoost v4 predictions vary | ⏳ Pending |
+
+---
+
+### Lessons Learned (Updated)
+
+**5. Edge Cases in Temporal Features Are Critical**
+- **Issue**: Week 1 games are a critical edge case (no historical weeks exist)
+- **Why Missed**: SQL returns NULL silently, defaults mask the problem
+- **Impact**: 20% of games have degraded predictions
+- **Fix**: Always implement fallback strategies for time-windowed features
+
+**6. NULL Handling Requires Explicit Strategy**
+- **Issue**: `AVG()` of 0 rows = NULL, `COALESCE()` masks missing data with defaults
+- **Why Dangerous**: Defaults (0.0, 22.0) appear reasonable but cause constant predictions
+- **Better Approach**: Use multi-tier fallback (current season → prior season → league avg)
 
 ---
 
 **Author**: Claude Code (Sonnet 4.5)
-**Date**: November 19, 2025, 3:00 PM UTC
-**Context**: Component performance audit after XGBoost v4 Ridge recovery
+**Date**: November 19, 2025, 11:14 PM UTC
+**Context**: Complete root cause analysis - both bugs fully diagnosed

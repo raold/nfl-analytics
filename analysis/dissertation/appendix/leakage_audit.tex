@@ -12,7 +12,7 @@ This appendix documents the comprehensive temporal leakage audit conducted acros
 The leakage audit consists of four complementary layers:
 
 \begin{enumerate}
-\item \textbf{Feature Catalog}: A machine-readable YAML manifest (\texttt{py/features/catalog.yaml}) documenting all 170+ features with explicit \texttt{asof\_safe} tags.
+\item \textbf{Feature Catalog}: A machine-readable YAML manifest (\texttt{py/features/catalog.yaml}) documenting baseline features plus Phase 2 advanced analytics modules (232 total features, see \Cref{sec:phase2-advanced-stats}) with explicit \texttt{asof\_safe} tags.
 
 \item \textbf{Automated Scanner}: A static analysis tool (\texttt{scripts/audit\_leakage.py}) that scans all Python and SQL code for references to post-decision fields.
 

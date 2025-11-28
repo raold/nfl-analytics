@@ -37,7 +37,7 @@ Usage:
 
 import logging
 from typing import Dict, Optional, List, Tuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import psycopg2
 from functools import lru_cache
 
@@ -175,11 +175,11 @@ class RModelPredictionLookup:
 
             # Check staleness
             generated_at = result[6]
-            is_stale = (datetime.now() - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+            is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
             if is_stale:
                 logger.warning(
-                    f"Stale prediction ({(datetime.now() - generated_at).days} days old): "
+                    f"Stale prediction ({(datetime.now(timezone.utc) - generated_at).days} days old): "
                     f"{model_name} | {player_id} | S{season}W{week}"
                 )
 
@@ -255,7 +255,7 @@ class RModelPredictionLookup:
             for row in rows:
                 model_name = row[0]
                 generated_at = row[7]
-                is_stale = (datetime.now() - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+                is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
                 results[model_name] = {
                     'mean': float(row[1]),
@@ -499,3 +499,146 @@ def get_all_r_model_predictions(
     """
     lookup = RModelPredictionLookup()
     return lookup.get_all_r_predictions(player_id, season, week)
+
+
+# ==============================================================================
+# RModelInterface Compatibility Layer (Drop-in rpy2 Replacement)
+# ==============================================================================
+
+class RPredictionLookup:
+    """
+    Drop-in replacement for RModelInterface (rpy2 version).
+
+    Provides identical API to py.ensemble.r_model_interface.RModelInterface
+    but uses PostgreSQL lookup instead of rpy2 runtime calls.
+
+    Migration:
+        # OLD (rpy2, slow):
+        from py.ensemble.r_model_interface import RModelInterface
+        interface = RModelInterface(db_config)
+        mean, std = interface.predict_hierarchical(player_id, season, week, model_path)
+
+        # NEW (PostgreSQL, fast):
+        from py.ensemble.r_prediction_lookup import RPredictionLookup
+        lookup = RPredictionLookup(db_config)
+        mean, std = lookup.predict_hierarchical(player_id, season, week, model_path)
+
+    Performance:
+        - rpy2: 2-4 seconds per prediction
+        - PostgreSQL: <10ms per prediction (200-400x faster)
+    """
+
+    def __init__(self, db_config: Dict, db_pool=None):
+        """
+        Initialize PostgreSQL lookup (compatible with RModelInterface constructor).
+
+        Args:
+            db_config: Database connection dict (host, port, dbname, user, password)
+            db_pool: Optional connection pool (ignored, for API compatibility)
+        """
+        self._lookup = RModelPredictionLookup()
+        logger.info("✅ Initialized RPredictionLookup (PostgreSQL mode, no rpy2)")
+
+    def predict_hierarchical(
+        self,
+        player_id: str,
+        season: int,
+        week: int,
+        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000  # Ignored (for API compatibility)
+    ) -> Tuple[float, float]:
+        """
+        Get hierarchical v2 prediction (compatible with RModelInterface.predict_hierarchical).
+
+        Args:
+            player_id: NFL player ID
+            season: Season year
+            week: Week number (0-23)
+            model_path: IGNORED (kept for API compatibility with rpy2 version)
+            ndraws: IGNORED (predictions pre-generated with 1000 draws)
+
+        Returns:
+            (mean, std) tuple in yards
+
+        Raises:
+            RuntimeError: If prediction not found in database
+        """
+        pred = self._lookup.get_prediction('hierarchical_v2', player_id, season, week)
+
+        if pred is None:
+            raise RuntimeError(
+                f"Hierarchical v2 prediction not found in database. "
+                f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
+            )
+
+        return (pred['mean'], pred['std'])
+
+    def predict_informative_priors(
+        self,
+        player_id: str,
+        season: int,
+        week: int,
+        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000  # Ignored (for API compatibility)
+    ) -> Tuple[float, float]:
+        """
+        Get informative priors v2 prediction (compatible with RModelInterface.predict_informative_priors).
+
+        Args:
+            player_id: NFL player ID
+            season: Season year
+            week: Week number (0-23)
+            model_path: IGNORED (kept for API compatibility with rpy2 version)
+            ndraws: IGNORED (predictions pre-generated with 1000 draws)
+
+        Returns:
+            (mean, std) tuple in yards
+
+        Raises:
+            RuntimeError: If prediction not found in database
+        """
+        pred = self._lookup.get_prediction('informative_priors_v2', player_id, season, week)
+
+        if pred is None:
+            raise RuntimeError(
+                f"Informative priors v2 prediction not found in database. "
+                f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
+            )
+
+        return (pred['mean'], pred['std'])
+
+    def predict_state_space(
+        self,
+        player_id: str,
+        season: int,
+        week: int,
+        skills_df: Optional[object] = None,  # Ignored (for API compatibility)
+        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000  # Ignored (for API compatibility)
+    ) -> Tuple[float, float]:
+        """
+        Get state-space v2 prediction (compatible with RModelInterface.predict_state_space).
+
+        Args:
+            player_id: NFL player ID
+            season: Season year
+            week: Week number (0-23)
+            skills_df: IGNORED (kept for API compatibility with rpy2 version)
+            model_path: IGNORED (kept for API compatibility with rpy2 version)
+            ndraws: IGNORED (predictions pre-generated with 1000 draws)
+
+        Returns:
+            (mean, std) tuple in yards
+
+        Raises:
+            RuntimeError: If prediction not found in database
+        """
+        pred = self._lookup.get_prediction('state_space_v2', player_id, season, week)
+
+        if pred is None:
+            raise RuntimeError(
+                f"State-space v2 prediction not found in database. "
+                f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
+            )
+
+        return (pred['mean'], pred['std'])

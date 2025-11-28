@@ -1,353 +1,201 @@
 #!/usr/bin/env python3
 """
-Generate Week 12 2024 Predictions using Ensemble v6.0
-======================================================
+Generate predictions for all Week 12 2025 games using GameOutcomePredictor.
 
-Populates ml.predictions table with ensemble v6.0 predictions for all Week 12 2024 games.
-
-Usage:
-    python scripts/generate_week12_predictions.py
-
-Requirements:
-    - Ensemble v6.0 models loaded
-    - Database connection to devdb01
-    - Week 12 2024 schedule in games table
-
-Author: Claude Code (Sonnet 4.5)
-Date: November 15, 2025
+This script creates baseline predictions for display in the dashboard.
 """
 
 import os
 import sys
 from pathlib import Path
+import psycopg
+from datetime import datetime
+import logging
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import json
-import logging
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-
-import numpy as np
-import pandas as pd
-import psycopg2
-from dotenv import load_dotenv
-
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-
-# Load environment variables
-load_dotenv()
+from py.ensemble.game_outcome_predictor import GameOutcomePredictor
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
+# Database configuration
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "dbname": os.getenv("DB_NAME", "devdb01"),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+}
 
-def get_week12_starters(conn) -> List[Dict]:
-    """
-    Get starting QBs for Week 12 2024 games from existing predictions.
 
-    Returns list of dicts with player_id, player_name, team, opponent, is_home, game_id
-    """
+def get_week12_games():
+    """Fetch all Week 12 2025 games from database."""
     query = """
-    SELECT DISTINCT
-        player_id,
-        player_name,
-        team,
-        opponent,
-        is_home,
+    SELECT game_id, home_team, away_team, spread_close, total_close
+    FROM games
+    WHERE season = 2025 AND week = 12
+    ORDER BY kickoff
+    """
+
+    with psycopg.connect(**DB_CONFIG) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            games = cursor.fetchall()
+
+    return [
+        {
+            'game_id': row[0],
+            'home_team': row[1],
+            'away_team': row[2],
+            'spread_close': row[3],
+            'total_close': row[4]
+        }
+        for row in games
+    ]
+
+
+def store_prediction(game_id, home_team, away_team, prediction_data, sportsbook_spread, sportsbook_total):
+    """Store game prediction in database."""
+    query = """
+    INSERT INTO ml.game_predictions (
         game_id,
-        season,
-        week
-    FROM ml.predictions
-    WHERE season = 2024
-      AND week = 12
-      AND stat_type = 'passing_yards'
-    ORDER BY player_name;
-    """
-
-    cur = conn.cursor()
-    cur.execute(query)
-    rows = cur.fetchall()
-    cur.close()
-
-    starters = []
-    for row in rows:
-        player_id, player_name, team, opponent, is_home, game_id, season, week = row
-        starters.append({
-            'player_id': player_id,
-            'player_name': player_name,
-            'team': team,
-            'opponent': opponent,
-            'is_home': is_home,
-            'game_id': game_id,
-            'season': season,
-            'week': week
-        })
-
-    logger.info(f"Found {len(starters)} starting QBs for Week 12 2024")
-    return starters
-
-
-def insert_prediction(
-    conn,
-    model_id: int,
-    game_info: Dict,
-    prediction: Dict,
-    ensemble_version: str,
-    model_components: Dict
-) -> int:
-    """
-    Insert prediction into ml.predictions table.
-
-    Returns prediction_id of inserted row.
-    """
-    insert_query = """
-    INSERT INTO ml.predictions (
-        model_id,
-        game_id,
+        home_team,
+        away_team,
         season,
         week,
-        player_id,
-        player_name,
-        team,
-        opponent,
-        is_home,
-        stat_type,
-        prediction_mean,
-        prediction_std,
-        prediction_q05,
-        prediction_q95,
         ensemble_version,
-        model_components,
-        status,
+        predicted_home_score,
+        predicted_away_score,
+        predicted_spread,
+        predicted_total,
+        predicted_home_win_prob,
+        spread_std,
+        total_std,
+        sportsbook_spread,
+        sportsbook_total,
+        spread_edge,
+        total_edge,
         created_at
     ) VALUES (
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
     )
-    ON CONFLICT (model_id, game_id, player_id, stat_type)
+    ON CONFLICT ON CONSTRAINT unique_game_model_prediction
     DO UPDATE SET
-        prediction_mean = EXCLUDED.prediction_mean,
-        prediction_std = EXCLUDED.prediction_std,
-        prediction_q05 = EXCLUDED.prediction_q05,
-        prediction_q95 = EXCLUDED.prediction_q95,
-        ensemble_version = EXCLUDED.ensemble_version,
-        model_components = EXCLUDED.model_components,
-        updated_at = NOW()
-    RETURNING prediction_id;
+        predicted_home_score = EXCLUDED.predicted_home_score,
+        predicted_away_score = EXCLUDED.predicted_away_score,
+        predicted_spread = EXCLUDED.predicted_spread,
+        predicted_total = EXCLUDED.predicted_total,
+        predicted_home_win_prob = EXCLUDED.predicted_home_win_prob,
+        spread_std = EXCLUDED.spread_std,
+        total_std = EXCLUDED.total_std,
+        sportsbook_spread = EXCLUDED.sportsbook_spread,
+        sportsbook_total = EXCLUDED.sportsbook_total,
+        spread_edge = EXCLUDED.spread_edge,
+        total_edge = EXCLUDED.total_edge,
+        created_at = EXCLUDED.created_at
+    RETURNING prediction_id
     """
 
-    # Calculate 90% prediction intervals
-    lower_90 = prediction['lower_90']
-    upper_90 = prediction['upper_90']
+    # Calculate edges
+    spread_edge = prediction_data['predicted_spread'] - sportsbook_spread if sportsbook_spread is not None else None
+    total_edge = prediction_data['predicted_total'] - sportsbook_total if sportsbook_total is not None else None
 
-    cur = conn.cursor()
-    cur.execute(
-        insert_query,
-        (
-            model_id,
-            game_info['game_id'],
-            game_info['season'],
-            game_info['week'],
-            game_info['player_id'],
-            game_info['player_name'],
-            game_info['team'],
-            game_info['opponent'],
-            game_info['is_home'],
-            'passing_yards',
-            prediction['ensemble_mean'],
-            prediction['calibrated_std'],
-            lower_90,
-            upper_90,
-            ensemble_version,
-            json.dumps(model_components),
-            'pending',
-            datetime.now()
-        )
+    data = (
+        game_id,
+        home_team,
+        away_team,
+        2025,
+        12,
+        'baseline_v1.0',  # Using baseline since we don't have full ensemble running
+        prediction_data['predicted_home_score'],
+        prediction_data['predicted_away_score'],
+        prediction_data['predicted_spread'],
+        prediction_data['predicted_total'],
+        prediction_data['predicted_home_win_prob'],
+        prediction_data.get('spread_std', 0),
+        prediction_data.get('total_std', 0),
+        sportsbook_spread,
+        sportsbook_total,
+        spread_edge,
+        total_edge,
+        datetime.utcnow()
     )
 
-    prediction_id = cur.fetchone()[0]
-    cur.close()
-    conn.commit()
-
-    return prediction_id
+    with psycopg.connect(**DB_CONFIG) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(query, data)
+            result = cursor.fetchone()
+            conn.commit()
+            return result[0] if result else None
 
 
 def main():
-    """Generate Week 12 2024 predictions using Ensemble v6.0"""
+    """Generate predictions for all Week 12 games."""
+    logger.info("="*60)
+    logger.info("Generating predictions for Week 12 2025 games")
+    logger.info("="*60)
 
-    logger.info("="*80)
-    logger.info("Week 12 2024 Prediction Generation - Ensemble v6.0")
-    logger.info("="*80)
+    # Get all games
+    games = get_week12_games()
+    logger.info(f"Found {len(games)} games to process\n")
 
-    # Database connection
-    db_password = os.getenv("DB_PASSWORD")
-    if not db_password:
-        logger.error("DB_PASSWORD environment variable not set")
-        return 1
-
-    db_config = {
-        "host": "localhost",
-        "port": 5544,
-        "dbname": "devdb01",
-        "user": "dro",
-        "password": db_password
-    }
-
-    try:
-        conn = psycopg2.connect(**db_config)
-        logger.info("✅ Database connection established")
-    except Exception as e:
-        logger.error(f"❌ Database connection failed: {e}")
-        return 1
-
-    # Load Ensemble v6.0
-    logger.info("\nLoading Ensemble v6.0...")
-    try:
-        ensemble = EnhancedEnsemble5Way(db_password=db_password)
-        logger.info(f"✅ Ensemble loaded with weights: {ensemble.weights}")
-        logger.info(f"   Temperature: {ensemble.temperature:.4f}")
-        logger.info(f"   Version: {ensemble.ensemble_version}")
-    except Exception as e:
-        logger.error(f"❌ Ensemble loading failed: {e}")
-        import traceback
-        traceback.print_exc()
-        conn.close()
-        return 1
-
-    # Get Week 12 starters
-    logger.info("\nFetching Week 12 2024 starting QBs...")
-    try:
-        starters = get_week12_starters(conn)
-        logger.info(f"✅ Found {len(starters)} QBs for Week 12")
-    except Exception as e:
-        logger.error(f"❌ Failed to fetch starters: {e}")
-        import traceback
-        traceback.print_exc()
-        conn.close()
-        return 1
-
-    # Get model_id for ensemble v6.0
-    cur = conn.cursor()
-    cur.execute("SELECT model_id FROM ml.model_registry WHERE model_name = 'ensemble_v6.0';")
-    model_id_row = cur.fetchone()
-    cur.close()
-
-    if not model_id_row:
-        logger.error("❌ ensemble_v6.0 not found in model_registry")
-        conn.close()
-        return 1
-
-    model_id = model_id_row[0]
-    logger.info(f"✅ Using model_id={model_id} (ensemble_v6.0)")
-
-    # Ensemble metadata
-    ensemble_version = "v6.0"
-    model_components = {
-        "state_space_v2": 0.27,
-        "hierarchical_v2": 0.27,
-        "xgboost_v4_ridge": 0.23,
-        "informative_priors_v2": 0.13,
-        "hybrid_static_incremental": 0.10
-    }
+    # Initialize predictor
+    predictor = GameOutcomePredictor()
 
     # Generate predictions
-    logger.info("\n" + "="*80)
-    logger.info("Generating predictions...")
-    logger.info("="*80)
+    success_count = 0
+    error_count = 0
 
-    predictions_inserted = 0
-    predictions_failed = 0
-    results = []
-
-    for i, starter in enumerate(starters, 1):
-        player_name = starter['player_name']
-        team = starter['team']
-        opponent = starter['opponent']
-
-        logger.info(f"\n[{i}/{len(starters)}] {player_name} ({team} vs {opponent})")
-
+    for game in games:
         try:
+            logger.info(f"Processing {game['game_id']}: {game['away_team']} @ {game['home_team']}")
+
             # Generate prediction
-            pred = ensemble.predict(
-                player_id=starter['player_id'],
-                season=starter['season'],
-                week=starter['week'],
-                return_components=False,
-                return_uncertainty=True
+            prediction = predictor.predict_game(
+                home_team=game['home_team'],
+                away_team=game['away_team'],
+                season=2025,
+                week=12
             )
 
-            logger.info(f"  Prediction: {pred['ensemble_mean']:.1f} ± {pred['calibrated_std']:.1f} yards")
-            logger.info(f"  90% PI: [{pred['lower_90']:.1f}, {pred['upper_90']:.1f}]")
-            logger.info(f"  Inference time: {pred['prediction_time_ms']:.1f}ms")
-
-            # Insert into database
-            prediction_id = insert_prediction(
-                conn,
-                model_id,
-                starter,
-                pred,
-                ensemble_version,
-                model_components
+            # Store in database
+            prediction_id = store_prediction(
+                game_id=game['game_id'],
+                home_team=game['home_team'],
+                away_team=game['away_team'],
+                prediction_data=prediction,
+                sportsbook_spread=game['spread_close'],
+                sportsbook_total=game['total_close']
             )
 
-            logger.info(f"  ✅ Inserted prediction_id={prediction_id}")
-            predictions_inserted += 1
+            # Calculate and log edge
+            spread_edge = prediction['predicted_spread'] - game['spread_close'] if game['spread_close'] is not None else None
+            total_edge = prediction['predicted_total'] - game['total_close'] if game['total_close'] is not None else None
 
-            results.append({
-                'player_name': player_name,
-                'team': team,
-                'opponent': opponent,
-                'prediction_mean': pred['ensemble_mean'],
-                'prediction_std': pred['calibrated_std'],
-                'lower_90': pred['lower_90'],
-                'upper_90': pred['upper_90']
-            })
+            logger.info(f"  ✅ Predicted: {game['home_team']} {prediction['predicted_spread']:+.1f} | Total {prediction['predicted_total']:.1f}")
+            logger.info(f"  📊 Sportsbook: {game['home_team']} {game['spread_close']:+.1f} | Total {game['total_close']:.1f}")
+            if spread_edge is not None:
+                logger.info(f"  📈 Edge: Spread {spread_edge:+.1f} | Total {total_edge:+.1f}")
+            logger.info(f"  💾 Stored as prediction_id={prediction_id}\n")
+
+            success_count += 1
 
         except Exception as e:
-            logger.error(f"  ❌ Prediction failed: {e}")
-            predictions_failed += 1
+            logger.error(f"  ❌ Error processing {game['game_id']}: {e}\n")
+            import traceback
+            logger.error(traceback.format_exc())
+            error_count += 1
+            continue
 
-    # Summary
-    logger.info("\n" + "="*80)
-    logger.info("SUMMARY")
-    logger.info("="*80)
-    logger.info(f"Total QBs: {len(starters)}")
-    logger.info(f"Predictions inserted: {predictions_inserted}")
-    logger.info(f"Predictions failed: {predictions_failed}")
-
-    # Top 5 predictions
-    if results:
-        logger.info("\n📊 Top 5 Predictions (by predicted yards):")
-        results_sorted = sorted(results, key=lambda x: x['prediction_mean'], reverse=True)
-        for i, r in enumerate(results_sorted[:5], 1):
-            logger.info(
-                f"  {i}. {r['player_name']:20s} ({r['team']} vs {r['opponent']:3s}): "
-                f"{r['prediction_mean']:.1f} yards "
-                f"[{r['lower_90']:.1f}, {r['upper_90']:.1f}]"
-            )
-
-    # Verify database
-    logger.info("\n📋 Database Verification:")
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT COUNT(*)
-        FROM ml.predictions
-        WHERE season = 2024 AND week = 12 AND ensemble_version = 'v6.0'
-    """)
-    count = cur.fetchone()[0]
-    cur.close()
-    logger.info(f"  Week 12 predictions with v6.0: {count}")
-
-    conn.close()
-    logger.info("\n✅ Week 12 prediction generation complete!")
-
-    return 0
+    logger.info("="*60)
+    logger.info(f"Generation complete: {success_count} success, {error_count} errors")
+    logger.info("="*60)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
