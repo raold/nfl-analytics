@@ -1,0 +1,84 @@
+% Figure: Ensemble v6.1 Architecture
+% 5-way ensemble with component weights and data flow
+% Generated: November 28, 2025
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.5cm,
+    component/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!15, rounded corners, minimum width=2.8cm, minimum height=1.2cm, align=center, font=\footnotesize},
+    weight/.style={circle, draw=accentBlue, thick, fill=white, minimum size=0.8cm, font=\scriptsize\bfseries},
+    input/.style={rectangle, draw=gray, thick, fill=gray!10, rounded corners, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+    output/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!20, rounded corners, minimum width=4cm, minimum height=1.2cm, align=center, font=\footnotesize},
+    calibration/.style={rectangle, draw=orange, thick, fill=orange!10, rounded corners, minimum width=3.5cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, accentBlue},
+    dashedarrow/.style={->, thick, gray, dashed}
+]
+
+% Input layer
+\node[input] (player) {Player Features\\(career stats, trends)};
+\node[input, right=2.5cm of player] (game) {Game Context\\(opponent, venue)};
+\node[input, right=2.5cm of game] (r_lookup) {R Model Lookup\\(PostgreSQL, $<$1ms)};
+
+% Component layer - 5 models
+\node[component, below=1.5cm of player, xshift=-1cm] (ss) {State-Space v2\\(cmdstanr)\\MAE: 47.77};
+\node[weight, below right=0.1cm and 0.2cm of ss] (w_ss) {27\%};
+
+\node[component, right=0.8cm of ss] (hier) {Hierarchical v2\\(brms)\\MAE: 48.12};
+\node[weight, below right=0.1cm and 0.2cm of hier] (w_hier) {27\%};
+
+\node[component, right=0.8cm of hier] (xgb) {XGBoost v4\\(Ridge Residuals)\\MAE: 4.70};
+\node[weight, below right=0.1cm and 0.2cm of xgb] (w_xgb) {23\%};
+
+\node[component, right=0.8cm of xgb] (priors) {Informative\\Priors v2\\MAE: 49.05};
+\node[weight, below right=0.1cm and 0.2cm of priors] (w_priors) {13\%};
+
+\node[component, right=0.8cm of priors] (hybrid) {Hybrid\\70\% Static\\30\% Incr.};
+\node[weight, below right=0.1cm and 0.2cm of hybrid] (w_hybrid) {10\%};
+
+% Aggregation layer
+\node[calibration, below=2.5cm of xgb] (agg) {Inverse-Variance Weighted\\Aggregation ($\sum w_i \mu_i$)};
+
+% Temperature scaling
+\node[calibration, below=1cm of agg] (temp) {Temperature Scaling\\$T = 0.7083$ (90\% calibration)};
+
+% Output
+\node[output, below=1cm of temp] (output) {Ensemble Prediction\\$\mu \pm \sigma$ (90\% CI)\\Expected ROI: +6-9\%};
+
+% Connections from inputs to components
+\draw[arrow] (player.south) -- ++(0,-0.3) -| (ss.north);
+\draw[arrow] (player.south) -- ++(0,-0.3) -| (hier.north);
+\draw[arrow] (game.south) -- ++(0,-0.3) -| (xgb.north);
+\draw[arrow] (game.south) -- ++(0,-0.3) -| (priors.north);
+\draw[arrow] (r_lookup.south) -- ++(0,-0.3) -| (hybrid.north);
+
+% R model lookup connections (dashed to show PostgreSQL path)
+\draw[dashedarrow] (r_lookup.south) -- ++(0,-0.3) -| (ss.north);
+\draw[dashedarrow] (r_lookup.south) -- ++(0,-0.3) -| (hier.north);
+
+% Connections from components to aggregation
+\draw[arrow] (ss.south) -- ++(0,-0.6) -| (agg.north);
+\draw[arrow] (hier.south) -- ++(0,-0.6) -| ([xshift=-0.5cm]agg.north);
+\draw[arrow] (xgb.south) -- (agg.north);
+\draw[arrow] (priors.south) -- ++(0,-0.6) -| ([xshift=0.5cm]agg.north);
+\draw[arrow] (hybrid.south) -- ++(0,-0.6) -| (agg.north);
+
+% Aggregation to temperature to output
+\draw[arrow] (agg) -- (temp);
+\draw[arrow] (temp) -- (output);
+
+% Legend box
+\node[rectangle, draw=gray, fill=gray!5, rounded corners, text width=3.5cm, font=\scriptsize, align=left, right=0.5cm of hybrid] (legend) {
+    \textbf{Model Sources:}\\
+    \textcolor{accentBlue}{\rule{0.5cm}{2pt}} R models (brms/Stan)\\
+    \textcolor{gray}{\rule[0.3ex]{0.5cm}{0.8pt}} Python (XGBoost)\\[0.2cm]
+    \textbf{Weights:} CVX-optimized\\
+    on 2023 validation data\\[0.2cm]
+    \textbf{Inference:} $\sim$105ms\\
+    (with Redis cache: $<$1ms)
+};
+
+\end{tikzpicture}
+\caption[Ensemble v6.1 Architecture]{Ensemble v6.1 production architecture showing the 5-way weighted combination of Bayesian and ML models. State-Space and Hierarchical models use PostgreSQL R prediction lookup for 200-400x speedup versus rpy2. Component weights were optimized via constrained convex optimization (CVX) on 2023 validation data and holdout-tested on 2024. Temperature scaling ($T=0.7083$) provides calibrated 90\% prediction intervals. The Hybrid component blends 70\% static predictions with 30\% online-learned incremental updates for adaptivity to within-season trends.}
+\label{fig:ensemble-v6-architecture}
+\end{figure}
