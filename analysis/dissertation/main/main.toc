@@ -565,7 +565,7 @@
 \contentsline {paragraph}{Key Observations.}{183}{section*.1183}%
 \contentsline {subsection}{\numberline {5.5.9}Comparison to Alternative Weight Learning Methods}{183}{subsection.1184}%
 \contentsline {paragraph}{Stacking via Linear Regression \citep {wolpert1992}.}{183}{section*.1185}%
-\contentsline {paragraph}{Bayesian Model Averaging (BMA) \citep {hoeting1999}.}{184}{section*.1187}%
+\contentsline {paragraph}{Bayesian Model Averaging (BMA) \citep {hoeting1999bayesian}.}{184}{section*.1187}%
 \contentsline {paragraph}{Online Newton Step (ONS) \citep {hazan2007}.}{184}{section*.1189}%
 \contentsline {paragraph}{Comparison Table.}{184}{table.caption.1193}%
 \contentsline {subsection}{\numberline {5.5.10}Limitations and Future Extensions}{184}{subsection.1194}%

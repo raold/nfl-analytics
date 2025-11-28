@@ -481,7 +481,7 @@ The classical stacking approach fits a linear model:
 \end{equation}
 This yields weights $\mathbf{w} = \boldsymbol{\beta}$ but lacks probabilistic interpretation and may produce $w_i < 0$ or $\sum_i w_i \neq 1$ without constraints.
 
-\paragraph{Bayesian Model Averaging (BMA) \citep{hoeting1999}.}
+\paragraph{Bayesian Model Averaging (BMA) \citep{hoeting1999bayesian}.}
 BMA weights models by posterior probability:
 \begin{equation}
 w_i = \frac{p(M_i) p(\mathbf{y} \mid M_i)}{\sum_j p(M_j) p(\mathbf{y} \mid M_j)},
