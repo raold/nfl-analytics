@@ -136,8 +136,8 @@ Well-calibrated models produce predicted probabilities matching observed frequen
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.7\textwidth]{../figures/out/gnn_calibration_plot.png}
-\caption{GNN Calibration Plot (2025 Test Set): Predicted probabilities vs observed frequencies. Diagonal line indicates perfect calibration. Our GNN (5 Message Rounds) shows slight overconfidence in extreme predictions ($p < 0.3$ or $p > 0.7$) but maintains reasonable calibration overall.}
+\input{../figures/gnn_calibration_plot.tex}
+\caption{GNN Calibration Plot (2025 Test Set): Predicted probabilities vs observed frequencies. Diagonal line indicates perfect calibration. Our GNN (5 Message Rounds) shows slight overconfidence in extreme predictions ($p < 0.3$ or $p > 0.7$) but maintains reasonable calibration overall. The histogram (orange bars) shows the distribution of predictions across probability bins.}
 \label{fig:gnn_calibration}
 \end{figure}
 

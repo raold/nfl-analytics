@@ -103,14 +103,14 @@ class TouchdownPredictor:
                 p.posteam as team,
                 p.defteam as opponent,
                 -- TD outcome (binary)
-                MAX(CASE WHEN p.touchdown = 1 AND p.rush_attempt THEN 1 ELSE 0 END) as scored_td,
+                MAX(CASE WHEN p.touchdown::int = 1 AND p.rush_attempt::int = 1 THEN 1 ELSE 0 END) as scored_td,
                 -- Volume features
-                COUNT(*) FILTER (WHERE p.rush_attempt) as attempts,
-                COUNT(*) FILTER (WHERE p.yardline_100 <= 20 AND p.rush_attempt) as redzone_attempts,
-                COUNT(*) FILTER (WHERE p.yardline_100 <= 5 AND p.rush_attempt) as goalline_attempts,
+                COUNT(*) FILTER (WHERE p.rush_attempt::int = 1) as attempts,
+                COUNT(*) FILTER (WHERE p.yardline_100 <= 20 AND p.rush_attempt::int = 1) as redzone_attempts,
+                COUNT(*) FILTER (WHERE p.yardline_100 <= 5 AND p.rush_attempt::int = 1) as goalline_attempts,
                 -- Performance features
                 SUM(p.rushing_yards) as total_yards,
-                AVG(p.rushing_yards) FILTER (WHERE p.rush_attempt) as yards_per_carry,
+                AVG(p.rushing_yards) FILTER (WHERE p.rush_attempt::int = 1) as yards_per_carry,
                 -- Context features
                 AVG(p.score_differential) as avg_score_diff,
                 COUNT(*) FILTER (WHERE p.quarter = 4) as fourth_quarter_attempts
@@ -119,9 +119,9 @@ class TouchdownPredictor:
             WHERE g.season BETWEEN %s AND %s
               AND p.season_type = 'REG'
               AND p.rusher_player_id IS NOT NULL
-              AND p.rush_attempt
+              AND p.rush_attempt::int = 1
             GROUP BY 1,2,3,4,5,6,7,8
-            HAVING COUNT(*) FILTER (WHERE p.rush_attempt) >= 5
+            HAVING COUNT(*) FILTER (WHERE p.rush_attempt::int = 1) >= 5
 
             UNION ALL
 
@@ -135,14 +135,14 @@ class TouchdownPredictor:
                 p.posteam as team,
                 p.defteam as opponent,
                 -- TD outcome (binary)
-                MAX(CASE WHEN p.touchdown = 1 AND p.pass_attempt THEN 1 ELSE 0 END) as scored_td,
+                MAX(CASE WHEN p.touchdown::int = 1 AND p.pass_attempt::int = 1 THEN 1 ELSE 0 END) as scored_td,
                 -- Volume features
-                COUNT(*) FILTER (WHERE p.pass_attempt) as attempts,
-                COUNT(*) FILTER (WHERE p.yardline_100 <= 20 AND p.pass_attempt) as redzone_attempts,
-                COUNT(*) FILTER (WHERE p.yardline_100 <= 5 AND p.pass_attempt) as goalline_attempts,
+                COUNT(*) FILTER (WHERE p.pass_attempt::int = 1) as attempts,
+                COUNT(*) FILTER (WHERE p.yardline_100 <= 20 AND p.pass_attempt::int = 1) as redzone_attempts,
+                COUNT(*) FILTER (WHERE p.yardline_100 <= 5 AND p.pass_attempt::int = 1) as goalline_attempts,
                 -- Performance features
-                SUM(CASE WHEN p.complete_pass = 1 THEN p.receiving_yards ELSE 0 END) as total_yards,
-                AVG(p.air_yards) FILTER (WHERE p.pass_attempt) as yards_per_carry,
+                SUM(CASE WHEN p.complete_pass::int = 1 THEN p.receiving_yards ELSE 0 END) as total_yards,
+                AVG(p.air_yards) FILTER (WHERE p.pass_attempt::int = 1) as yards_per_carry,
                 -- Context features
                 AVG(p.score_differential) as avg_score_diff,
                 COUNT(*) FILTER (WHERE p.quarter = 4) as fourth_quarter_attempts
@@ -151,9 +151,9 @@ class TouchdownPredictor:
             WHERE g.season BETWEEN %s AND %s
               AND p.season_type = 'REG'
               AND p.receiver_player_id IS NOT NULL
-              AND p.pass_attempt
+              AND p.pass_attempt::int = 1
             GROUP BY 1,2,3,4,5,6,7,8
-            HAVING COUNT(*) FILTER (WHERE p.pass_attempt) >= 3
+            HAVING COUNT(*) FILTER (WHERE p.pass_attempt::int = 1) >= 3
         ),
         player_recent_form AS (
             SELECT
@@ -497,8 +497,9 @@ def main():
     )
 
     for _, row in high_prob_tds.iterrows():
+        stat_type_str = "RUSHING" if row['stat_type'] == 0 else "RECEIVING"
         logger.info(
-            f"  {row['player_name']:25s} ({row['stat_type']:>9s}): "
+            f"  {row['player_name']:25s} ({stat_type_str:>9s}): "
             f"P(TD)={row['td_probability']:.1%}, Actual={row['scored_td']}"
         )
 

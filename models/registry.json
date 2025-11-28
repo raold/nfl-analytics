@@ -1,0 +1,368 @@
+{
+  "xgboost_passing_v5_integrated": [
+    {
+      "name": "xgboost_passing_v5_integrated",
+      "version": "v5.0.0",
+      "created_at": "2025-11-27T05:33:00.212017",
+      "author": "NFL Analytics Team",
+      "description": "XGBoost v5 integrated model with OC+DC coaching features. Includes 114 features: player aggregations from 3 Bayesian models, enhanced travel features, causal features (DID roughing, PSM travel/weather), OC continuity features, and DC features. Trained on 2020-2024 data. WARNING: Contains data leakage - same-game features (attempts, completions, TDs) used during training are not available at inference time. Low MAE (3.74) is artificially inflated. REQUIRES RETRAINING without leaky features before production use.",
+      "metrics": {
+        "mae": 3.74,
+        "rmse": 5.85,
+        "r2": 0.994,
+        "baseline_mae": 61.82,
+        "improvement_pct": 93.95,
+        "n_test": 574,
+        "leakage_warning": "same-game features unavailable at inference"
+      },
+      "artifacts": {
+        "model": "models/xgboost/xgboost_v5_integrated.json",
+        "metadata": "models/xgboost/xgboost_v5_integrated_metadata.json",
+        "feature_importance": "models/xgboost/passing_xgboost_v5_feature_importance.png"
+      },
+      "parent_version": "v4.0.0",
+      "status": "staging",
+      "tags": [
+        "staging",
+        "xgboost",
+        "passing",
+        "coaching-features",
+        "integrated",
+        "leakage-warning",
+        "needs-retraining"
+      ]
+    }
+  ],
+  "dc_features_module": [
+    {
+      "name": "dc_features_module",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T05:33:00.212186",
+      "author": "NFL Analytics Team",
+      "description": "Defensive Coordinator (DC) feature generator. Extracts DC continuity, scheme familiarity, blitz frequency, and zone coverage ratio features. Complements OC features for complete coaching staff modeling. Uses rolling 4-game windows with exponential decay (H=4).",
+      "metrics": {
+        "features_generated": 4,
+        "avg_computation_time_ms": 50,
+        "coverage": 1.0
+      },
+      "artifacts": {
+        "module": "py/features/dc_features.py",
+        "integration_example": "scripts/train_xgboost_player_agg_v5.py"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "features",
+        "coaching",
+        "defensive",
+        "continuity"
+      ]
+    }
+  ],
+  "oc_features_module": [
+    {
+      "name": "oc_features_module",
+      "version": "v1.1.0",
+      "created_at": "2025-11-27T05:33:00.212302",
+      "author": "NFL Analytics Team",
+      "description": "Offensive Coordinator (OC) feature generator (updated). Extracts OC continuity, games with OC, tenure seasons, and new OC adjustment. Integrated into XGBoost v5 training pipeline alongside DC features. Uses rolling 4-game windows with exponential decay (H=4).",
+      "metrics": {
+        "features_generated": 4,
+        "avg_computation_time_ms": 45,
+        "coverage": 1.0
+      },
+      "artifacts": {
+        "module": "py/features/oc_features.py",
+        "integration_example": "scripts/train_xgboost_player_agg_v5.py"
+      },
+      "parent_version": "v1.0.0",
+      "status": "prod",
+      "tags": [
+        "production",
+        "features",
+        "coaching",
+        "offensive",
+        "continuity"
+      ]
+    }
+  ],
+  "ensemble_v6_dirichlet_weights": [
+    {
+      "name": "ensemble_v6_dirichlet_weights",
+      "version": "v6.1.0",
+      "created_at": "2025-11-27T05:33:00.212402",
+      "author": "NFL Analytics Team",
+      "description": "Ensemble v6.1 with updated Dirichlet weights. Configuration: State-Space v2 (27%), Hierarchical v2 (27%), XGBoost v4 Ridge (23%), Informative Priors v2 (13%), Hybrid Static-Incremental (10%). Temperature scaling T=0.5534. Updated in enhanced_ensemble_v6_production.py and strategy/base.py.",
+      "metrics": {
+        "expected_mae": 34.0,
+        "expected_calibration": 0.9,
+        "expected_roi": 0.065
+      },
+      "artifacts": {
+        "ensemble": "py/ensemble/enhanced_ensemble_v6_production.py",
+        "strategy": "py/ensemble/strategy/base.py",
+        "weights_doc": "docs/adr/009-abandon-ensemble-v7-meta-learning.md"
+      },
+      "parent_version": "v6.0.0",
+      "status": "prod",
+      "tags": [
+        "production",
+        "ensemble",
+        "dirichlet",
+        "static-weights"
+      ]
+    }
+  ],
+  "fourth_down_cql_grid": [
+    {
+      "name": "fourth_down_cql_grid",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T05:33:00.212510",
+      "author": "NFL Analytics Team",
+      "description": "Fourth down decision CQL agent grid search (Nov 26, 2025). Hyperparameter optimization across 20 trials. Trained on fourth_down_dataset_train.csv (2018-2023). Grid search directory: models/fourth_down_grid_20251126_112610/",
+      "metrics": {
+        "n_trials": 20,
+        "best_reward": -0.15,
+        "avg_computation_time_hrs": 2.5
+      },
+      "artifacts": {
+        "grid_search_dir": "models/fourth_down_grid_20251126_112610/",
+        "training_script": "scripts/train_fourth_down_cql.py",
+        "dataset": "data/fourth_down_dataset_train.csv"
+      },
+      "parent_version": null,
+      "status": "dev",
+      "tags": [
+        "rl",
+        "cql",
+        "fourth-down",
+        "grid-search"
+      ]
+    }
+  ],
+  "game_feature_extractor": [
+    {
+      "name": "game_feature_extractor",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T05:33:00.212671",
+      "author": "NFL Analytics Team",
+      "description": "Game-level feature extraction module. Aggregates player-level projections from Bayesian models (state-space, hierarchical, informative priors) to game-level team features. Computes mean, std, Gini, depth ratio, percentiles, and top-player concentration metrics.",
+      "metrics": {
+        "features_per_model": 13,
+        "total_features": 78,
+        "avg_computation_time_ms": 120
+      },
+      "artifacts": {
+        "module": "py/features/game_feature_extractor.py"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "features",
+        "game-level",
+        "aggregation",
+        "bayesian"
+      ]
+    }
+  ],
+  "team_defensive_features": [
+    {
+      "name": "team_defensive_features",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T05:33:00.212832",
+      "author": "NFL Analytics Team",
+      "description": "Team defensive feature generator. Extracts pass defense efficiency, run defense efficiency, pressure rate, coverage quality, and situational metrics. Uses rolling windows with exponential decay.",
+      "metrics": {
+        "features_generated": 8,
+        "avg_computation_time_ms": 80,
+        "coverage": 1.0
+      },
+      "artifacts": {
+        "module": "py/features/team_defensive_features.py"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "features",
+        "defense",
+        "team-level",
+        "efficiency"
+      ]
+    }
+  ],
+  "team_offensive_features": [
+    {
+      "name": "team_offensive_features",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T05:33:00.213002",
+      "author": "NFL Analytics Team",
+      "description": "Team offensive feature generator. Extracts pass offense efficiency, run offense efficiency, red zone efficiency, third down efficiency, and tempo metrics. Uses rolling windows with exponential decay.",
+      "metrics": {
+        "features_generated": 7,
+        "avg_computation_time_ms": 75,
+        "coverage": 1.0
+      },
+      "artifacts": {
+        "module": "py/features/team_offensive_features.py"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "features",
+        "offense",
+        "team-level",
+        "efficiency"
+      ]
+    }
+  ],
+  "bayesian_state_space_v2": [
+    {
+      "name": "bayesian_state_space_v2",
+      "version": "v2.0.0",
+      "created_at": "2025-11-27T05:33:44.897815",
+      "author": "NFL Analytics Team",
+      "description": "State-Space v2 Bayesian model for passing yards prediction. Dynamic player skill estimation with random walk priors. Uses cmdstanr with 10 MCMC chains (Mac M4 optimized). Training window: 2018-2024 with H=4 exponential decay. Ensemble weight: 27% (highest individual component).",
+      "metrics": {
+        "mae": 47.77,
+        "ensemble_weight": 0.27,
+        "rhat_max": 1.01,
+        "ess_min": 400,
+        "calibration": 0.9
+      },
+      "artifacts": {
+        "model": "models/bayesian/passing_yards_state_space_v2.rds",
+        "training_script": "R/train_bayesian_state_space_v3.R"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "bayesian",
+        "state-space",
+        "cmdstan",
+        "passing"
+      ]
+    }
+  ],
+  "bayesian_hierarchical_v2": [
+    {
+      "name": "bayesian_hierarchical_v2",
+      "version": "v2.0.0",
+      "created_at": "2025-11-27T05:33:44.898111",
+      "author": "NFL Analytics Team",
+      "description": "Hierarchical v2 Bayesian model for passing yards prediction. Multi-level model with player, team, and position effects. Uses brms with 10 MCMC chains (Mac M4 optimized). Training window: 2018-2024 with H=4 exponential decay. Ensemble weight: 27% (tied for highest).",
+      "metrics": {
+        "ensemble_weight": 0.27,
+        "rhat_max": 1.01,
+        "ess_min": 400,
+        "calibration": 0.9,
+        "model_size_mb": 120
+      },
+      "artifacts": {
+        "model": "models/bayesian/passing_yards_hierarchical_v2.rds",
+        "training_script": "R/train_and_save_passing_model.R"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "bayesian",
+        "hierarchical",
+        "brms",
+        "passing"
+      ]
+    }
+  ],
+  "bayesian_informative_priors_v2": [
+    {
+      "name": "bayesian_informative_priors_v2",
+      "version": "v2.0.0",
+      "created_at": "2025-11-27T05:33:44.898333",
+      "author": "NFL Analytics Team",
+      "description": "Informative Priors v2 Bayesian model for passing yards prediction. Bayesian regression with domain-informed priors on player/team effects. Uses brms with 10 MCMC chains (Mac M4 optimized). Training window: 2018-2024 with H=4 exponential decay. Ensemble weight: 13% (lowest but still valuable for diversity).",
+      "metrics": {
+        "ensemble_weight": 0.13,
+        "rhat_max": 1.01,
+        "ess_min": 400,
+        "calibration": 0.9,
+        "model_size_mb": 123
+      },
+      "artifacts": {
+        "model": "models/bayesian/passing_informative_priors_v2.rds",
+        "training_script": "R/train_and_save_passing_model.R"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "bayesian",
+        "informative-priors",
+        "brms",
+        "passing"
+      ]
+    }
+  ],
+  "bnn_rushing_v3_1": [
+    {
+      "name": "bnn_rushing_v3_1",
+      "version": "v3.1.0",
+      "created_at": "2025-11-27T05:33:44.898555",
+      "author": "NFL Analytics Team",
+      "description": "Bayesian Neural Network v3.1 for rushing yards prediction. Only production BNN model (BNN passing research abandoned after 84 hrs). Uses PyMC with variational inference. Calibrated to 89.5%. Note: Not used in ensemble v6 (focused on passing yards).",
+      "metrics": {
+        "calibration": 0.895,
+        "mae": 38.0,
+        "research_hours": 84
+      },
+      "artifacts": {
+        "model": "models/bayesian/rushing_bnn_v3_1.pkl",
+        "research_doc": "docs/milestones/BNN_INVESTIGATION_COMPLETE.md"
+      },
+      "parent_version": null,
+      "status": "staging",
+      "tags": [
+        "production",
+        "bnn",
+        "rushing",
+        "pymc",
+        "calibrated"
+      ]
+    }
+  ],
+  "ab_test_infrastructure_v1": [
+    {
+      "name": "ab_test_infrastructure_v1",
+      "version": "v1.0.0",
+      "created_at": "2025-11-27T10:00:00.000000",
+      "author": "NFL Analytics Team",
+      "description": "A/B Test Infrastructure for v6.0 vs v6.1 Dirichlet weights experiment. Includes: ABTestMonitor (guardrails, statistical testing, SPRT), DirichletABTestRouter (MD5 hashing, deterministic assignment), database tables (ml.ab_test_results, ml.ab_test_status, ml.ab_test_guardrail_violations, ml.ab_test_significance), and config management. Designed for 4-week validation of Dirichlet weights for player props.",
+      "metrics": {
+        "tables_created": 4,
+        "views_created": 3,
+        "guardrails": 4,
+        "statistical_tests": 3
+      },
+      "artifacts": {
+        "monitor": "py/utils/ab_test_monitor.py",
+        "router": "py/production/ab_test_dirichlet_props.py",
+        "config": "config/ab_test_config.yaml",
+        "migration": "db/migrations/007_ab_test_monitoring.sql",
+        "shell_script": "scripts/monitor_ab_test.sh"
+      },
+      "parent_version": null,
+      "status": "prod",
+      "tags": [
+        "production",
+        "ab-testing",
+        "infrastructure",
+        "dirichlet",
+        "monitoring",
+        "guardrails"
+      ]
+    }
+  ]
+}

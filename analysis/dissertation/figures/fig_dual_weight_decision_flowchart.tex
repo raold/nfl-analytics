@@ -1,0 +1,56 @@
+% Figure: Dual-Weight Paradigm Decision Flowchart
+% Shows algorithmic routing between v6.0 static and v8.0 Dirichlet weights
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    box/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!10, rounded corners, minimum width=3cm, minimum height=1cm, align=center, font=\footnotesize},
+    decision/.style={diamond, draw=accentBlue, thick, fill=accentBlue!10, aspect=2, minimum width=3cm, align=center, font=\footnotesize},
+    endpoint/.style={rectangle, draw=forestGreen, thick, fill=forestGreen!20, rounded corners, minimum width=3.5cm, minimum height=1.2cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, accentBlue}
+]
+
+% Start node
+\node[box] (start) {Prediction Request\\(game or prop)};
+
+% Decision node: prediction type
+\node[decision, below=of start] (type) {Prediction\\Type?};
+
+% Game branch
+\node[endpoint, below left=of type] (game) {\textbf{v6.0 Static Weights}\\State-Space 27\%\\Hierarchical 27\%\\XGBoost 23\%\\Priors 13\%, Hybrid 10\%};
+
+% Props branch
+\node[endpoint, below right=of type] (props) {\textbf{v8.0 Dirichlet Weights}\\Hierarchical 39.6\%\\Priors 39.5\%\\State-Space 15.2\%\\XGBoost 2.6\%, Hybrid 3.1\%};
+
+% Game metadata box
+\node[box, below=of game, fill=accentBlue!5] (game_meta) {Games (spreads/totals)\\54.5\% cover rate\\+4.0\% ROI\\Opponent interactions dominant};
+
+% Props metadata box
+\node[box, below=of props, fill=forestGreen!5] (props_meta) {Props (yards/TDs)\\31.5\% MAE improvement\\Within-player variance 84\%\\Bayesian uncertainty critical};
+
+% Arrows
+\draw[arrow] (start) -- (type);
+\draw[arrow] (type) -- node[above left, font=\tiny] {Game\\(spread/total)} (game);
+\draw[arrow] (type) -- node[above right, font=\tiny] {Prop\\(yards/TDs)} (props);
+\draw[arrow] (game) -- (game_meta);
+\draw[arrow] (props) -- (props_meta);
+
+% Add theoretical justification box
+\node[box, right=3cm of props_meta, draw=gray, fill=gray!5, minimum width=4cm, text width=3.8cm] (theory) {
+    \textbf{Theoretical Justification:}\\[0.2cm]
+    Variance Decomposition:\\
+    $\sigma^2_{\text{total}} = \sigma^2_{\text{player}} + \sigma^2_{\text{opponent}}$\\[0.1cm]
+    Props: 84\% player, 16\% opponent\\
+    $\Rightarrow$ Bayesian posteriors optimal\\[0.2cm]
+    Games: Opponent interactions\\
+    $\Rightarrow$ XGBoost tree ensembles optimal
+};
+
+% Connect theory to endpoints
+\draw[->, dashed, gray, thick] (game_meta.east) -- (theory.west);
+\draw[->, dashed, gray, thick] (props_meta.east) -- (theory.west);
+
+\end{tikzpicture}
+\caption{Dual-weight paradigm decision flowchart showing algorithmic routing between v6.0 static weights (game predictions) and v8.0 Dirichlet-learned weights (player props). The paradigm emerged from mechanistic analysis: variance decomposition reveals 84\% within-player variance for props (favoring Bayesian uncertainty quantification via Hierarchical + Priors models) vs opponent interaction dominance for games (favoring XGBoost gradient boosting). Grid search optimization (108 configurations, walk-forward 2022-2024 validation) confirmed the split: XGBoost weight collapses 89\% for props (23\% → 2.6\%) while Bayesian models surge 98\% (40\% → 79.1\% combined). This represents a novel contribution to ensemble methodology: prediction type determines optimal weighting strategy, not component architecture alone.}
+\label{fig:dual-weight-decision-flowchart}
+\end{figure}

@@ -33,31 +33,31 @@
   % Data points (TODO: Replace with actual results)
 
   % BNN Baseline (sharp but under-calibrated)
-  \fill[accent] (1.7, 1.31) circle (4pt);
-  \node[accent, font=\scriptsize, anchor=west] at (1.85, 1.31) {BNN Base};
-  \node[accent, font=\tiny, anchor=north] at (1.7, 0.75) {(17, 26.2)};
+  \fill[accent] (1.7, 1.31) circle (3pt);
+  \node[accent, font=\tiny, anchor=west] at (1.85, 1.41) {BNN Base};
+  \node[accent, font=\tiny, anchor=north west] at (1.85, 1.15) {(17, 26.2)};
 
   % Temperature Scaling (optimal: sharp AND calibrated)
-  \fill[tempcolor] (1.7, 4.48) circle (5pt);
-  \node[tempcolor, font=\small\bfseries, anchor=south west] at (1.85, 4.58) {Temp. Scaling};
-  \node[tempcolor, font=\tiny, anchor=north] at (1.7, 3.95) {(17, 89.5)};
+  \fill[tempcolor] (1.7, 4.48) circle (4pt);
+  \node[tempcolor, font=\scriptsize\bfseries, anchor=west] at (2.05, 4.58) {Temp. Scaling};
+  \node[tempcolor, font=\tiny, anchor=west] at (2.05, 4.30) {(17, 89.5)};
   % Highlight as Pareto-optimal
   \draw[tempcolor, thick, dashed] (1.4, 4.15) rectangle (2.0, 4.85);
 
   % Split Conformal (BNN base) (conservative)
-  \fill[conformalcolor] (6.85, 4.56) circle (4pt);
-  \node[conformalcolor, font=\scriptsize, anchor=south] at (6.85, 4.85) {Split Conf.};
-  \node[conformalcolor, font=\tiny, anchor=north] at (6.85, 4.15) {(68.5, 91.2)};
+  \fill[conformalcolor] (6.85, 4.56) circle (3pt);
+  \node[conformalcolor, font=\tiny, anchor=south] at (6.85, 4.70) {Split Conf.};
+  \node[conformalcolor, font=\tiny, anchor=north] at (6.85, 4.35) {(68.5, 91.2)};
 
   % Split Conformal (RF base) (slightly wider)
-  \fill[conformalcolor!70] (7.13, 4.54) circle (4pt);
-  \node[conformalcolor!70, font=\scriptsize, anchor=west] at (7.28, 4.54) {Split (RF)};
-  \node[conformalcolor!70, font=\tiny, anchor=north] at (7.13, 4.05) {(71.3, 90.8)};
+  \fill[conformalcolor!70] (7.13, 4.54) circle (3pt);
+  \node[conformalcolor!70, font=\tiny, anchor=south west] at (7.23, 4.60) {Split (RF)};
+  \node[conformalcolor!70, font=\tiny, anchor=north west] at (7.23, 4.40) {(71.3, 90.8)};
 
   % CQR (adaptive, narrowest conformal)
-  \fill[cqrcolor] (6.32, 4.62) circle (4pt);
-  \node[cqrcolor, font=\scriptsize, anchor=east] at (6.05, 4.62) {CQR};
-  \node[cqrcolor, font=\tiny, anchor=north] at (6.32, 4.15) {(63.2, 92.3)};
+  \fill[cqrcolor] (6.32, 4.62) circle (3pt);
+  \node[cqrcolor, font=\tiny, anchor=south east] at (6.15, 4.72) {CQR};
+  \node[cqrcolor, font=\tiny, anchor=north east] at (6.15, 4.50) {(63.2, 92.3)};
 
   % Sharpness comparison arrows
   \draw[<->, thick, black] (1.7, 0.5) -- (6.32, 0.5);

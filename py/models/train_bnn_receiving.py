@@ -90,10 +90,10 @@ class ReceivingBNN:
                 p.passer_player_id,
                 p.passer_player_name,
                 -- Aggregate receiving stats
-                COUNT(CASE WHEN p.pass_attempt THEN 1 END) as targets,
-                COUNT(CASE WHEN p.complete_pass = 1 THEN 1 END) as receptions,
-                SUM(CASE WHEN p.complete_pass = 1 THEN p.receiving_yards ELSE 0 END) as receiving_yards,
-                SUM(CASE WHEN p.touchdown = 1 AND p.pass_attempt THEN 1 ELSE 0 END) as receiving_tds,
+                COUNT(CASE WHEN p.pass_attempt::int = 1 THEN 1 END) as targets,
+                COUNT(CASE WHEN p.complete_pass::int = 1 THEN 1 END) as receptions,
+                SUM(CASE WHEN p.complete_pass::int = 1 THEN p.receiving_yards ELSE 0 END) as receiving_yards,
+                SUM(CASE WHEN p.touchdown::int = 1 AND p.pass_attempt::int = 1 THEN 1 ELSE 0 END) as receiving_tds,
                 AVG(CASE WHEN p.complete_pass = 1 THEN p.receiving_yards END) as yards_per_reception,
                 AVG(p.air_yards) as avg_air_yards,
                 AVG(p.yards_after_catch) as avg_yac
@@ -298,6 +298,7 @@ class ReceivingBNN:
         n_samples: int = 1000,
         n_chains: int = 2,
         target_accept: float = 0.85,
+        max_treedepth: int = 10,
     ):
         """Train the BNN using MCMC"""
 
@@ -310,6 +311,7 @@ class ReceivingBNN:
                 draws=n_samples,
                 chains=n_chains,
                 target_accept=target_accept,
+                max_treedepth=max_treedepth,
                 progressbar=True,
                 return_inferencedata=True,
             )
@@ -397,11 +399,11 @@ def main():
     logger.info("TEMPORAL SAFETY: Career averages computed on training set only")
     logger.info("=" * 60)
 
-    # Initialize model with conservative priors
+    # Initialize model with ULTRA-CONSERVATIVE settings for v2
     bnn = ReceivingBNN(
-        hidden_dims=(16, 8),  # Simpler architecture for numerical stability
+        hidden_dims=(8,),  # SINGLE LAYER - simplest possible architecture
         activation="relu",
-        prior_std=0.5,  # Reduced from 1.0 for better convergence
+        prior_std=0.3,  # VERY TIGHT priors for stability
     )
 
     # Load data (WITHOUT career averages to prevent leakage)
@@ -459,14 +461,23 @@ def main():
 
     logger.info(f"Feature matrix shape: train={X_train.shape}, test={X_test.shape}")
 
-    # Train model (leveraging Mac M4's parallel processing)
-    logger.info("\nTraining BNN (this may take 10-15 minutes with 8 parallel chains on M4)...")
+    # Train model with ULTRA-AGGRESSIVE convergence settings (v2)
+    logger.info("\nTraining BNN v2 with ultra-conservative MCMC settings...")
+    logger.info("Changes from v1:")
+    logger.info("  - Architecture: (16,8) → (8,) single layer")
+    logger.info("  - Prior std: 0.5 → 0.3 (tighter)")
+    logger.info("  - Target accept: 0.90 → 0.95 (more conservative)")
+    logger.info("  - Max tree depth: default(10) → 15")
+    logger.info("  - Samples: 3000 (unchanged)")
+    logger.info("Expected: 10-15 minutes with 8 parallel chains")
+    logger.info("")
     bnn.train(
         X_train,
         y_train,
-        n_samples=3000,  # Increased from 1000 for better convergence (ESS, R-hat)
-        n_chains=8,      # Increased from 2 to leverage M4's 10+ cores
-        target_accept=0.90,  # Increased from 0.85 for better calibration
+        n_samples=3000,  # Keep at 3000 for speed (v1 had enough samples)
+        n_chains=8,      # Leverage M4's parallel cores
+        target_accept=0.95,  # VERY conservative stepping (v1=0.90)
+        max_treedepth=15,  # Increased from default 10 (v1 hit max depth)
     )
 
     # Evaluate on test set

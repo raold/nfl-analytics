@@ -1,0 +1,85 @@
+% Figure: Phase 2 Feature Expansion (112 → 232 features)
+% Shows baseline vs Phase 2 feature counts across 5 modules
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar stacked,
+    width=0.85\textwidth,
+    height=0.5\textwidth,
+    bar width=0.6cm,
+    ylabel={Feature Count},
+    xlabel={Feature Module},
+    symbolic x coords={Baseline, Phase 2},
+    xtick=data,
+    ymin=0,
+    ymax=250,
+    legend style={at={(0.5,-0.15)}, anchor=north, legend columns=3},
+    nodes near coords,
+    every node near coord/.append style={font=\footnotesize},
+    grid=major,
+    grid style={dashed, gray!30}
+]
+
+% Baseline features (112 total)
+\addplot[fill=accentBlue!40, draw=accentBlue] coordinates {
+    (Baseline, 35) % Basic stats
+    (Phase 2, 35)
+};
+\addlegendentry{Basic Stats (35)}
+
+\addplot[fill=accentBlue!60, draw=accentBlue] coordinates {
+    (Baseline, 42) % Traditional advanced
+    (Phase 2, 42)
+};
+\addlegendentry{Traditional Advanced (42)}
+
+\addplot[fill=accentBlue!80, draw=accentBlue] coordinates {
+    (Baseline, 35) % Derived features
+    (Phase 2, 35)
+};
+\addlegendentry{Derived Features (35)}
+
+% Phase 2 additions (120 new features)
+\addplot[fill=forestGreen!70, draw=forestGreen] coordinates {
+    (Baseline, 0)
+    (Phase 2, 46) % Next Gen Stats
+};
+\addlegendentry{Next Gen Stats (46)}
+
+\addplot[fill=forestGreen!85, draw=forestGreen] coordinates {
+    (Baseline, 0)
+    (Phase 2, 20) % ESPN QBR
+};
+\addlegendentry{ESPN QBR (20)}
+
+\addplot[fill=forestGreen!60, draw=forestGreen] coordinates {
+    (Baseline, 0)
+    (Phase 2, 8) % Possession Value
+};
+\addlegendentry{Possession Value (8)}
+
+\addplot[fill=forestGreen!75, draw=forestGreen] coordinates {
+    (Baseline, 0)
+    (Phase 2, 32) % Playcalling
+};
+\addlegendentry{Playcalling (32)}
+
+\addplot[fill=forestGreen!50, draw=forestGreen] coordinates {
+    (Baseline, 0)
+    (Phase 2, 14) % Opponent-Adjusted
+};
+\addlegendentry{Opponent-Adjusted (14)}
+
+% Add total labels
+\node[above] at (axis cs:Baseline, 112) {\textbf{112}};
+\node[above] at (axis cs:Phase 2, 232) {\textbf{232}};
+
+% Add percentage increase annotation
+\draw[->, thick, accentBlue] (axis cs:Baseline, 130) -- node[above, sloped] {+107\% expansion} (axis cs:Phase 2, 130);
+
+\end{axis}
+\end{tikzpicture}
+\caption{Phase 2 Advanced Stats feature expansion from baseline 112 features to 232 features (+107\%). The 5 new modules (green) add 120 cutting-edge NFL analytics features: Next Gen Stats (CPOE 2.0, RYOE), ESPN QBR metrics, possession value modeling, playcalling analytics (4th down regime change), and opponent-adjusted performance (DVOA approximation). All features validated for temporal safety (H=4 exponential decay, proper time-shifting).}
+\label{fig:feature-expansion-phase2}
+\end{figure}

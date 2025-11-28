@@ -144,6 +144,23 @@ exit(0 if monitor.auto_stop_if_violated() else 1)
     fi
 }
 
+cmd_dirichlet() {
+    # Test Dirichlet A/B routing
+    if [ $# -lt 1 ]; then
+        echo -e "${YELLOW}Usage: $0 dirichlet <player_id> [season] [week]${NC}"
+        echo "Example: $0 dirichlet 00-0019596 2024 12"
+        exit 1
+    fi
+    local player_id=$1
+    local season=${2:-2024}
+    local week=${3:-12}
+    echo -e "${BLUE}Testing Dirichlet A/B routing...${NC}\n"
+    python py/production/ab_test_dirichlet_props.py \
+        --player-id "$player_id" \
+        --season "$season" \
+        --week "$week"
+}
+
 cmd_promote() {
     echo -e "${BLUE}Checking promotion eligibility...${NC}\n"
     python py/utils/ab_test_monitor.py promote
@@ -196,6 +213,10 @@ main() {
             ;;
         promote)
             cmd_promote
+            ;;
+        dirichlet)
+            shift
+            cmd_dirichlet "$@"
             ;;
         help|-h|--help)
             print_usage

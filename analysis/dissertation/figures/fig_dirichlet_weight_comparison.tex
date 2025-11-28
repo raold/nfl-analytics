@@ -1,0 +1,60 @@
+% Figure: Dirichlet Stacking Weight Comparison (v6.0 vs v8.0)
+% Shows dual-weight paradigm: v6.0 static for games, v8.0 Dirichlet for props
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    width=0.85\textwidth,
+    height=0.5\textwidth,
+    bar width=0.5cm,
+    ylabel={Ensemble Weight (\%)},
+    xlabel={Component Model},
+    symbolic x coords={State-Space, Hierarchical, XGBoost, Priors, Hybrid},
+    xtick=data,
+    xticklabel style={rotate=45, anchor=east},
+    ymin=0,
+    ymax=45,
+    legend style={at={(0.5,1.05)}, anchor=south, legend columns=2},
+    nodes near coords,
+    every node near coord/.append style={font=\footnotesize},
+    grid=major,
+    grid style={dashed, gray!30}
+]
+
+% v6.0 Static Weights (games: spreads/totals)
+\addplot[fill=accentBlue!70, draw=accentBlue] coordinates {
+    (State-Space, 27)
+    (Hierarchical, 27)
+    (XGBoost, 23)
+    (Priors, 13)
+    (Hybrid, 10)
+};
+\addlegendentry{v6.0 Static (Games: 54.5\% cover, +4.0\% ROI)}
+
+% v8.0 Dirichlet Weights (props: yards/TDs)
+\addplot[fill=forestGreen!70, draw=forestGreen] coordinates {
+    (State-Space, 15.2)
+    (Hierarchical, 39.6)
+    (XGBoost, 2.6)
+    (Priors, 39.5)
+    (Hybrid, 3.1)
+};
+\addlegendentry{v8.0 Dirichlet (Props: 31.5\% MAE improvement)}
+
+% Add annotations for key insights
+\node[align=center, font=\footnotesize] at (axis cs:XGBoost, 35) {
+    \textbf{XGBoost collapse:}\\
+    23\% → 2.6\% (89\% reduction)
+};
+
+\node[align=center, font=\footnotesize] at (axis cs:Hierarchical, 50) {
+    \textbf{Bayesian surge:}\\
+    79.1\% combined weight
+};
+
+\end{axis}
+\end{tikzpicture}
+\caption{Dual-weight paradigm comparison between v6.0 static weights (games) and v8.0 Dirichlet-learned weights (props). Key insight: XGBoost dominates game predictions (opponent interactions, 23\%) but collapses for player props (2.6\%), while Bayesian models (Hierarchical + Priors) surge to 79.1\% combined weight for props. Variance decomposition shows 84\% within-player variance (favoring Bayesian uncertainty quantification) vs 16\% opponent variance (favoring XGBoost gradient boosting). Learned via grid search (108 configurations, optimal: prior strength=1.0, likelihood scale=20.0, squared scoring).}
+\label{fig:dirichlet-weight-comparison}
+\end{figure}

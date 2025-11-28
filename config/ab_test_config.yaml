@@ -1,78 +1,92 @@
-# A/B Test Configuration: Ensemble v5 vs v6 (XGBoost Ridge Residuals)
+# A/B Test Configuration: v6.0 (Default) vs v6.1 (Dirichlet Weights)
 # =========================================================================
-# Test Name: ensemble_v5_vs_v6_xgboost_ridge
-# Start Date: 2025-11-14
-# Duration: 4 weeks (first 50 games of 2025 season)
-# Decision Criteria: v6 beats v5 by 5+ yards MAE
+# Test Name: ensemble_v6_vs_v6.1_dirichlet_weights
+# Start Date: 2025-11-27
+# Duration: 4 weeks (until Dec 25, 2025)
+# Decision Criteria: v6.1 Dirichlet beats v6.0 default by 2+ yards MAE on player props
+#
+# CONTEXT: Dirichlet grid search found 31.5% MAE improvement for player props
+#          v6.0 remains optimal for game predictions (spreads/totals)
+#          This A/B test validates Dirichlet weights for player props production use
 
-# Test Configuration
-test:
-  name: ensemble_v5_vs_v6_xgboost_ridge
+# Test Configuration (keys expected by ABTestMonitor)
+test_config:
+  name: ensemble_v6_vs_v6.1_dirichlet_props
   enabled: true
-  start_date: "2025-11-14"
-  end_date: "2025-12-12"  # 4 weeks
-  minimum_samples: 100  # games per group before analysis
-
-# Traffic Allocation
-allocation:
-  control_group: ensemble_v5  # 4-way: State-Space, Hierarchical, XGBoost v2, Informative Priors
-  treatment_group: ensemble_v6  # 4-way: State-Space, Hierarchical, XGBoost v4 Ridge, Informative Priors
-  split_ratio: 0.5  # 50/50 split
+  start_date: "2025-11-27"
+  end_date: "2025-12-25"  # 4 weeks
+  min_sample_size: 100  # predictions per group
+  traffic_split: 0.5  # 50/50 split
   hash_seed: 42  # For deterministic assignment
 
 # Model Versions
 models:
   control:
-    name: enhanced_ensemble_v5
-    version: "5.0"
+    name: enhanced_ensemble_v6_production
+    version: "v6.0"
+    description: "Default static weights optimized via CVX"
     weights:
-      state_space_v2: 0.30
-      hierarchical_v2: 0.25
-      xgboost_v2_baseline: 0.20
-      informative_priors_v2: 0.25
-    expected_mae: 40.0  # yards
-    expected_roi: 5.0  # percent
+      state_space_v2: 0.27
+      hierarchical_v2: 0.27
+      xgboost_v4_ridge: 0.23
+      informative_priors_v2: 0.13
+      hybrid_static_incremental: 0.10
+    expected_mae: 34.0  # yards (current production)
+    expected_roi: 6.5  # percent
 
   treatment:
-    name: enhanced_ensemble_v6
-    version: "6.0"
+    name: enhanced_ensemble_v6_production
+    version: "v6.1"
+    description: "Dirichlet-optimized weights for player props"
     weights:
-      state_space_v2: 0.30
-      hierarchical_v2: 0.25
-      xgboost_v4_ridge: 0.20  # UPGRADED: XGBoost v4 (Ridge Residuals)
-      informative_priors_v2: 0.25
-    expected_mae: 33.0  # yards (7 yard improvement)
-    expected_roi: 6.0  # percent (+1% improvement)
+      state_space_v2: 0.082
+      hierarchical_v2: 0.396
+      xgboost_v4_ridge: 0.026
+      informative_priors_v2: 0.395
+      hybrid_static_incremental: 0.101
+    expected_mae: 23.3  # yards (31.5% improvement from Dirichlet grid search)
+    expected_roi: 8.0  # percent (projected)
 
 # Success Criteria
 success_criteria:
-  primary_metric: mae  # Mean Absolute Error
-  minimum_improvement: 5.0  # yards MAE improvement required
-  statistical_significance: 0.05  # p-value threshold
-  minimum_win_rate_improvement: 0.02  # 2 percentage points
-  minimum_roi_improvement: 0.01  # 1% ROI improvement
+  primary_metric: mae
+  mae_improvement_yards: 2.0  # yards MAE improvement required (conservative target)
+  statistical_significance:
+    p_value: 0.05  # significance threshold
+  win_rate_improvement_pp: 2.0  # 2 percentage points
+  roi_improvement_pct: 1.0  # 1% ROI improvement
 
-# Monitoring
-monitoring:
-  log_predictions: true  # Log all predictions to ml.predictions table
-  log_actuals: true  # Update with actual results after games
-  metrics_refresh_interval: 3600  # seconds (1 hour)
-  alert_on_degradation: true  # Alert if MAE > expected by 10%
-  alert_email: "dro@example.com"
-
-# Guardrails
+# Guardrails (auto-stop conditions)
 guardrails:
-  max_mae_degradation: 0.10  # Stop test if MAE degrades by 10%
-  max_roi_degradation: -0.02  # Stop test if ROI drops by 2%
-  auto_stop_on_critical_failure: true  # Auto-stop if guardrails violated
+  max_mae_degradation_pct: 10.0  # % - stop if treatment MAE is >10% worse
+  max_roi_drop_pct: 2.0  # percentage points - stop if ROI drops by 2pp
+  min_win_rate_drop_pct: 2.0  # percentage points - stop if win rate drops by 2pp
+  max_calibration_drop_pct: 5.0  # % - stop if calibration drops by 5%
+  min_sample_size: 50  # minimum before checking guardrails
+  auto_stop_on_critical_failure: true
+
+# Monitoring Configuration
+monitoring:
+  log_predictions: true
+  log_actuals: true
+  metrics_refresh_interval: 3600  # seconds (1 hour)
+  alert_on_degradation: true
+  prometheus_metrics: true
 
 # Data Collection
 data:
-  predictions_table: ml.predictions
-  actuals_table: mart.player_game_stats
-  ab_group_field: ab_group  # 'control' or 'treatment'
-  model_version_field: model_version  # 'v5.0' or 'v6.0'
-  test_name_field: ab_test_name
+  predictions_table: ml.ab_test_results
+  status_table: ml.ab_test_status
+  guardrails_table: ml.ab_test_guardrail_violations
+  significance_table: ml.ab_test_significance
+
+# Database Configuration
+database:
+  host: localhost
+  port: 5544
+  name: devdb01
+  user: dro
+  password_env_var: DB_PASSWORD  # pragma: allowlist secret
 
 # Analysis Schedule
 analysis:
@@ -82,7 +96,7 @@ analysis:
       decision: monitor_only
     - week: 2
       minimum_samples: 50
-      decision: early_stop_if_clear_winner  # Stop if p < 0.01 and improvement > 7 yards
+      decision: early_stop_if_clear_winner
     - week: 3
       minimum_samples: 75
       decision: monitor_only
@@ -90,96 +104,79 @@ analysis:
       minimum_samples: 100
       decision: final_decision
 
-  final_analysis:
-    week: 4
-    minimum_samples: 100
-    metrics:
-      - mae  # Primary
-      - rmse
-      - win_rate
-      - roi
-      - sharpe_ratio
-      - calibration_90pct
-
-# Database Configuration
-database:
-  host: localhost
-  port: 5544
-  name: devdb01
-  user: dro
-  password_env_var: DB_PASSWORD  # Read from environment  # pragma: allowlist secret
-
-# Grafana Dashboard
+# Grafana Dashboard Configuration
 grafana:
-  dashboard_name: AB Test - Ensemble v5 vs v6
+  dashboard_name: "AB Test - Dirichlet v8.0 Props"
   refresh_interval: 5m
   panels:
-    - name: MAE by Group
+    - name: MAE by Group (Player Props)
       query: |
         SELECT
           ab_group,
-          AVG(ABS(prediction - actual)) as mae
-        FROM ml.predictions
-        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
-          AND actual IS NOT NULL
-        GROUP BY ab_group
+          model_version,
+          AVG(error) as mae,
+          COUNT(*) as n_predictions
+        FROM ml.ab_test_results
+        WHERE model_version IN ('v6.0', 'v6.1')
+          AND actual_value IS NOT NULL
+        GROUP BY ab_group, model_version
     - name: Cumulative Predictions
       query: |
         SELECT
+          DATE(prediction_date) as date,
           ab_group,
           COUNT(*) as predictions
-        FROM ml.predictions
-        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
-        GROUP BY ab_group
-    - name: Win Rate by Group
+        FROM ml.ab_test_results
+        WHERE model_version IN ('v6.0', 'v6.1')
+        GROUP BY DATE(prediction_date), ab_group
+        ORDER BY date
+    - name: Win Rate Comparison
       query: |
         SELECT
           ab_group,
-          SUM(CASE WHEN won = 1 THEN 1 ELSE 0 END)::float / COUNT(*) as win_rate
-        FROM ml.predictions
-        WHERE ab_test_name = 'ensemble_v5_vs_v6_xgboost_ridge'
-          AND actual IS NOT NULL
-        GROUP BY ab_group
+          model_version,
+          AVG(CASE WHEN win THEN 1.0 ELSE 0.0 END) * 100 as win_rate_pct
+        FROM ml.ab_test_results
+        WHERE model_version IN ('v6.0', 'v6.1')
+          AND actual_value IS NOT NULL
+        GROUP BY ab_group, model_version
 
-# Notes
+# Documentation
 notes: |
-  ## Key Differences v5 vs v6
+  ## A/B Test: v6.0 Default Weights vs v6.1 Dirichlet Weights (Player Props)
 
-  **Ensemble v5 (Control):**
-  - XGBoost v2 baseline (40.20 MAE)
-  - 4-way ensemble
-  - Expected MAE: ~40 yards
+  ### Background
+  Dirichlet Bayesian stacking hyperparameter tuning (Nov 26, 2025) found:
+  - 31.5% MAE improvement (89.42 -> 61.26 yards) on player props
+  - Learned weights emphasize hierarchical models (79.1% combined)
+  - XGBoost contribution minimal (2.6% vs 23% in v6.0)
 
-  **Ensemble v6 (Treatment):**
-  - XGBoost v4 Ridge Residuals (4.27 MAE on 2024 backtest)
-  - Two-stage architecture (Ridge opponent baseline + XGBoost residual learning)
-  - 88.31% improvement on XGBoost component
-  - Expected MAE: ~33 yards (7 yard improvement)
-  - Expected ROI: +1% improvement (5% → 6%)
+  ### Key Difference
+  | Component | v6.0 (Control) | v6.1 (Treatment) | Change |
+  |-----------|----------------|------------------|--------|
+  | hierarchical_v2 | 27% | 39.6% | +47% |
+  | informative_priors_v2 | 13% | 39.5% | +204% |
+  | state_space_v2 | 27% | 8.2% | -70% |
+  | xgboost_v4_ridge | 23% | 2.6% | -89% |
+  | hybrid_static_incremental | 10% | 10.1% | +1% |
 
-  ## Validation Results (Pre-A/B Test)
+  ### ADR-009 Compliance
+  This is NOT dynamic meta-learning (rejected in ADR-009). This is:
+  - **Static weight optimization** via Bayesian learning on historical data
+  - Weights are FIXED at prediction time (no per-prediction adjustment)
+  - Different optimal weights for different prediction domains (props vs games)
 
-  **Multi-Season Validation (2022-2024):**
-  - 2022: 5.06 MAE (+87.40% improvement)
-  - 2023: 4.76 MAE (+88.15% improvement)
-  - 2024: 4.27 MAE (+89.38% improvement)
-  - Mean: 4.70 ± 0.40 MAE
-  - All Diebold-Mariano tests: p < 0.000001
-
-  ## Decision Framework
-
-  **Success (Deploy v6):**
-  - MAE improvement > 5 yards
-  - Statistical significance: p < 0.05
+  ### Decision Framework
+  **Promote v6.1 if:**
+  - MAE improvement > 2 yards (p < 0.05)
   - Win rate improvement > 2 pp
   - No guardrail violations
 
-  **Failure (Keep v5):**
-  - MAE improvement < 5 yards
-  - p > 0.05 (not statistically significant)
+  **Keep v6.0 if:**
+  - MAE improvement < 2 yards
   - Guardrails violated
+  - Statistical insignificance (p > 0.05)
 
-  **Inconclusive (Extend Test):**
-  - 3 < MAE improvement < 5 yards
-  - 0.05 < p < 0.10
-  - Need more data
+  ### Usage
+  - Player Props (passing yards, rushing yards): Use v6.1 Dirichlet weights
+  - Game Predictions (spreads, totals): Keep v6.0 default weights (ADR-009)

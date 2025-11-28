@@ -1,6 +1,6 @@
 {
   "model_version": "v5_integrated",
-  "training_date": "2025-11-22T11:22:31.061369",
+  "training_date": "2025-11-26T17:09:21.228811",
   "features": [
     "attempts",
     "completions",
@@ -111,15 +111,19 @@
     "away_rest",
     "home_rest",
     "rest_days_difference",
-    "is_short_week"
+    "is_short_week",
+    "oc_continuity",
+    "games_with_oc",
+    "oc_tenure_seasons",
+    "new_oc_adjustment"
   ],
-  "n_features": 110,
+  "n_features": 114,
   "metrics": {
-    "mae": 3.472247432748615,
-    "rmse": 5.421765608020737,
-    "r2": 0.9952119749683902,
+    "mae": 3.7388014311574476,
+    "rmse": 5.8546351491956345,
+    "r2": 0.9944169102800308,
     "baseline_mae": 61.818815331010455,
-    "improvement_pct": 94.38318671401842,
+    "improvement_pct": 93.95200084126824,
     "n_test": 574.0
   },
   "hyperparameters": {

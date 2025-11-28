@@ -17,6 +17,9 @@ import sys
 import numpy as np
 import pandas as pd
 
+# Initialize logger early (before try/except blocks that use it)
+logger = logging.getLogger(__name__)
+
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -57,8 +60,6 @@ try:
 except ImportError:
     get_default_cache = None
     logger.warning("ClaudeRedisCache not found - model caching disabled")
-
-logger = logging.getLogger(__name__)
 
 
 class UnifiedEnsemblePredictor:
