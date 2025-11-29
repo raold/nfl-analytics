@@ -1158,6 +1158,14 @@ class EnforcementRouter:
                 message="No content to validate"
             )
 
+        # Skip non-Python files (documentation, config, etc.)
+        if not file_path.endswith('.py'):
+            return ValidationResult(
+                status=ValidationStatus.PASSED,
+                agent_name='ensemble_components_check',
+                message="Not a Python file"
+            )
+
         issues = []
 
         # Find ensemble predict calls
