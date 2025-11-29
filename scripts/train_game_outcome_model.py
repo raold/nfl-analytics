@@ -39,7 +39,8 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from py.features.game_feature_extractor import GameFeatureExtractor
-from py.features.player_aggregation_features import PlayerAggregationFeatures
+from py.features.player_aggregation_features import aggregate_player_projections
+from py.utils.psycopg_pool import get_connection_pool
 
 logging.basicConfig(
     level=logging.INFO,
@@ -75,8 +76,17 @@ class GameOutcomeModelTrainer:
     def __init__(self, db_config: Optional[Dict] = None):
         """Initialize trainer with database connection and feature extractors."""
         self.db_config = db_config or DB_CONFIG
+
+        # Initialize connection pool (singleton) - eliminates connection overhead
+        self.pool = get_connection_pool(
+            host=self.db_config.get('host', 'localhost'),
+            port=self.db_config.get('port', 5544),
+            dbname=self.db_config.get('dbname', 'devdb01'),
+            user=self.db_config.get('user', 'dro'),
+            password=self.db_config.get('password', 'sicillionbillions'),
+        )
+
         self.game_extractor = GameFeatureExtractor(db_config=self.db_config)
-        self.player_agg = PlayerAggregationFeatures(db_config=self.db_config)
 
         # Model storage
         self.spread_model = None
@@ -92,6 +102,8 @@ class GameOutcomeModelTrainer:
         """
         Load game data with outcomes for specified seasons.
 
+        Uses connection pool to eliminate connection overhead.
+
         Args:
             seasons: List of seasons to load
             min_week: Minimum week (skip early weeks with insufficient data)
@@ -99,72 +111,31 @@ class GameOutcomeModelTrainer:
         Returns:
             DataFrame with game info and outcomes
         """
-        conn = psycopg2.connect(**self.db_config)
-        try:
-            query = """
-            SELECT
-                g.game_id,
-                g.season,
-                g.week,
-                g.home_team,
-                g.away_team,
-                g.home_score,
-                g.away_score,
-                g.spread_close as vegas_spread,
-                g.total_close as vegas_total
-            FROM games g
-            WHERE g.season = ANY(%s)
-              AND g.week >= %s
-              AND g.week <= 18
-              AND g.home_score IS NOT NULL
-              AND g.away_score IS NOT NULL
-            ORDER BY g.season, g.week
-            """
+        query = """
+        SELECT
+            g.game_id,
+            g.season,
+            g.week,
+            g.home_team,
+            g.away_team,
+            g.home_score,
+            g.away_score,
+            g.spread_close as vegas_spread,
+            g.total_close as vegas_total
+        FROM games g
+        WHERE g.season = ANY(%s)
+          AND g.week >= %s
+          AND g.week <= 18
+          AND g.home_score IS NOT NULL
+          AND g.away_score IS NOT NULL
+        ORDER BY g.season, g.week
+        """
 
+        with self.pool.get_connection() as conn:
             df = pd.read_sql(query, conn, params=(seasons, min_week))
-            logger.info(f"Loaded {len(df)} games from seasons {seasons} (weeks {min_week}+)")
-            return df
 
-        finally:
-            conn.close()
-
-    def _extract_features_for_game(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
-    ) -> Optional[Dict[str, float]]:
-        """
-        Extract all features for a single game.
-
-        Combines:
-        1. GameFeatureExtractor (232 features)
-        2. Player aggregation features (Bayesian projections)
-
-        Returns:
-            Combined feature dictionary or None if extraction fails
-        """
-        try:
-            # Get game-level features
-            game_features = self.game_extractor.extract_game_features(
-                home_team, away_team, season, week, use_cache=False
-            )
-
-            # Get player aggregation features
-            try:
-                player_features = self.player_agg.extract_features(
-                    home_team, away_team, season, week
-                )
-                game_features.update(player_features)
-            except Exception as e:
-                logger.debug(f"Player aggregation failed for {home_team} vs {away_team}: {e}")
-
-            return game_features
-
-        except Exception as e:
-            logger.warning(f"Feature extraction failed for {home_team} vs {away_team} ({season} W{week}): {e}")
-            return None
+        logger.info(f"Loaded {len(df)} games from seasons {seasons} (weeks {min_week}+)")
+        return df
 
     def _build_dataset(
         self,
@@ -174,6 +145,11 @@ class GameOutcomeModelTrainer:
         """
         Build feature matrix and target matrix for games.
 
+        OPTIMIZED VERSION:
+        - Batch-loads player aggregation by (season, week) - eliminates N+1 query pattern
+        - Uses caching in GameFeatureExtractor - avoids redundant DB queries
+        - Batch DataFrame conversion - reduces memory churn
+
         Args:
             games_df: DataFrame with game info
             desc: Description for logging
@@ -181,36 +157,86 @@ class GameOutcomeModelTrainer:
         Returns:
             Tuple of (features_df, targets_df)
         """
-        features_list = []
-        targets_list = []
-        game_ids = []
-
         total_games = len(games_df)
         logger.info(f"Building {desc}: {total_games} games")
+
+        # ========================================================================
+        # PHASE 1: Batch-load player aggregation features by (season, week)
+        # This eliminates N+1 query pattern: ~64 queries instead of ~1189
+        # ========================================================================
+        season_weeks = games_df[['season', 'week']].drop_duplicates()
+        player_agg_cache = {}
+
+        logger.info(f"Pre-loading player aggregations for {len(season_weeks)} season-weeks...")
+        for _, sw in season_weeks.iterrows():
+            key = (int(sw['season']), int(sw['week']))
+            try:
+                player_agg_cache[key] = aggregate_player_projections(
+                    season=key[0],
+                    week=key[1],
+                    model_names=['state_space_v2', 'hierarchical_v2', 'informative_priors_v2'],
+                    db_host=self.db_config.get('host', 'localhost'),
+                    db_port=self.db_config.get('port', 5544),
+                    db_name=self.db_config.get('dbname', 'devdb01'),
+                    db_user=self.db_config.get('user', 'dro'),
+                    db_password=self.db_config.get('password', 'sicillionbillions'),
+                )
+            except Exception as e:
+                logger.warning(f"Failed to load player aggregation for {key}: {e}")
+                player_agg_cache[key] = pd.DataFrame()  # Empty fallback
+
+        loaded_count = len([k for k, v in player_agg_cache.items() if not v.empty])
+        logger.info(f"Loaded player aggregation for {loaded_count}/{len(season_weeks)} season-weeks")
+
+        # ========================================================================
+        # PHASE 2: Extract features for each game with batch DataFrame conversion
+        # ========================================================================
+        features_batches = []
+        targets_batches = []
+        current_features = []
+        current_targets = []
+        batch_size = 100  # Convert to DataFrame every 100 games to reduce memory churn
 
         for idx, row in games_df.iterrows():
             if (idx + 1) % 50 == 0:
                 logger.info(f"  Progress: {idx + 1}/{total_games} games")
 
-            # Extract features
-            features = self._extract_features_for_game(
-                row['home_team'],
-                row['away_team'],
-                row['season'],
-                row['week']
-            )
+            # Extract game-level features (293 features) with caching enabled
+            try:
+                features = self.game_extractor.extract_game_features(
+                    row['home_team'], row['away_team'], row['season'], row['week'],
+                    use_cache=True  # ENABLE CACHING - avoids redundant DB queries
+                )
+            except Exception as e:
+                logger.warning(f"Feature extraction failed for {row['home_team']} vs {row['away_team']} ({row['season']} W{row['week']}): {e}")
+                continue
 
             if features is None:
                 continue
+
+            # Lookup player aggregation from cache (instant, no DB query)
+            key = (int(row['season']), int(row['week']))
+            player_agg_df = player_agg_cache.get(key, pd.DataFrame())
+
+            if not player_agg_df.empty:
+                game_row = player_agg_df[
+                    (player_agg_df['home_team'] == row['home_team']) &
+                    (player_agg_df['away_team'] == row['away_team'])
+                ]
+                if not game_row.empty:
+                    for col in game_row.columns:
+                        if col.startswith(('home_', 'away_')) and col not in features:
+                            val = game_row[col].values[0]
+                            if pd.notna(val):
+                                features[col] = float(val)
 
             # Calculate targets
             actual_spread = row['home_score'] - row['away_score']
             actual_total = row['home_score'] + row['away_score']
             home_win = 1 if actual_spread > 0 else 0
 
-            # Store
-            features_list.append(features)
-            targets_list.append({
+            current_features.append(features)
+            current_targets.append({
                 'game_id': row['game_id'],
                 'season': row['season'],
                 'week': row['week'],
@@ -222,11 +248,22 @@ class GameOutcomeModelTrainer:
                 'vegas_spread': row['vegas_spread'],
                 'vegas_total': row['vegas_total']
             })
-            game_ids.append(row['game_id'])
 
-        # Convert to DataFrames
-        features_df = pd.DataFrame(features_list)
-        targets_df = pd.DataFrame(targets_list)
+            # Batch DataFrame conversion every batch_size games
+            if len(current_features) >= batch_size:
+                features_batches.append(pd.DataFrame(current_features))
+                targets_batches.append(pd.DataFrame(current_targets))
+                current_features = []
+                current_targets = []
+
+        # Handle remaining games
+        if current_features:
+            features_batches.append(pd.DataFrame(current_features))
+            targets_batches.append(pd.DataFrame(current_targets))
+
+        # Concatenate all batches
+        features_df = pd.concat(features_batches, ignore_index=True) if features_batches else pd.DataFrame()
+        targets_df = pd.concat(targets_batches, ignore_index=True) if targets_batches else pd.DataFrame()
 
         logger.info(f"Built {desc}: {len(features_df)} games, {len(features_df.columns)} features")
         return features_df, targets_df
