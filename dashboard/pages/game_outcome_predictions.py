@@ -33,9 +33,81 @@ settings = get_settings()
 DB_CONFIG = settings.database.psycopg_kwargs()
 API_BASE_URL = settings.api.base_url
 API_KEY = settings.api.api_key
-LATEST_TABLE = "ml.game_outcome_predictions_latest"
+LATEST_VIEW = "ml.game_outcome_predictions_latest"
 FULL_TABLE = settings.game_outcome_table
 DEFAULT_SEASON = int(os.getenv("GAME_OUTCOME_DEFAULT_SEASON", str(datetime.utcnow().year)))
+STATE_LABELS = [
+    ("Upcoming", "upcoming"),
+    ("In Progress", "in_progress"),
+    ("Final", "final"),
+]
+STATE_LOOKUP = {label: code for label, code in STATE_LABELS}
+STATE_LOOKUP_REV = {code: label for label, code in STATE_LABELS}
+EASTERN_TZ = pytz.timezone("US/Eastern")
+
+
+def format_kickoff_time(ts: pd.Timestamp) -> str:
+    if pd.isna(ts):
+        return "TBD"
+    kickoff = pd.to_datetime(ts)
+    if kickoff.tzinfo is None:
+        kickoff = kickoff.tz_localize("UTC")
+    kickoff_local = kickoff.tz_convert(EASTERN_TZ)
+    return kickoff_local.strftime("%a %b %d • %I:%M %p ET")
+
+
+def format_game_state(row: pd.Series) -> str:
+    state_label = STATE_LOOKUP_REV.get(row.get('game_state'), row.get('game_state', ''))
+    if row.get('game_state') == 'final' and pd.notna(row.get('actual_home_score')):
+        return f"{state_label} • {row['home_team']} {row['actual_home_score']}-{row['actual_away_score']} {row['away_team']}"
+    if row.get('game_state') == 'in_progress':
+        home = row.get('actual_home_score')
+        away = row.get('actual_away_score')
+        if pd.notna(home) and pd.notna(away):
+            return f"{state_label} • {row['home_team']} {int(home)}-{int(away)} {row['away_team']}"
+    return state_label
+
+
+def render_game_card(game: pd.Series):
+    col_a, col_b, col_c = st.columns([2, 3, 2])
+    with col_a:
+        st.markdown(f"**{game['matchup']}**")
+        st.caption(format_kickoff_time(game['kickoff']))
+        st.caption(format_game_state(game))
+        if game.get('odds_stale'):
+            st.warning("Vegas line > 60 min old", icon="⚠️")
+
+    with col_b:
+        spread_std = game.get('spread_std')
+        total_std = game.get('total_std')
+        st.markdown(
+            f"**Model Spread:** {game['pred_home_spread']:+.1f} "
+            f"(σ {spread_std:.1f})" if pd.notna(spread_std) else f"**Model Spread:** {game['pred_home_spread']:+.1f}"
+        )
+        st.markdown(
+            f"**Model Total:** {game['pred_total']:.1f} "
+            f"(σ {total_std:.1f})" if pd.notna(total_std) else f"**Model Total:** {game['pred_total']:.1f}"
+        )
+        if pd.notna(game.get('vegas_spread')):
+            vegas_line = f"**Vegas Spread:** {game['vegas_spread']:+.1f}"
+            st.markdown(vegas_line)
+        if pd.notna(game.get('vegas_total')):
+            st.markdown(f"**Vegas Total:** {game['vegas_total']:.1f}")
+        if pd.notna(game.get('home_moneyline')):
+            st.caption(
+                f"Moneyline: {game['home_team']} {game['home_moneyline']:+.0f} | "
+                f"{game['away_team']} {game['away_moneyline']:+.0f}"
+            )
+
+    with col_c:
+        win_prob = game.get('pred_home_win_prob')
+        win_value = f"{win_prob*100:.1f}%" if pd.notna(win_prob) else "N/A"
+        st.metric("Home Win %", win_value)
+        st.metric("Spread Edge", f"{game['spread_edge']:+.1f}" if pd.notna(game.get('spread_edge')) else "N/A")
+        st.metric("Total Edge", f"{game['total_edge']:+.1f}" if pd.notna(game.get('total_edge')) else "N/A")
+        st.markdown("**Recommendations**")
+        for rec in get_betting_recommendation(game):
+            st.markdown(rec)
 
 # Page config
 st.set_page_config(
@@ -98,6 +170,30 @@ def fetch_prediction_runs_from_api() -> Optional[pd.DataFrame]:
         return None
 
 
+@st.cache_data(ttl=300)
+def get_default_week(season: int) -> Optional[int]:
+    """Determine the default week (next upcoming game)."""
+    upcoming_query = """
+    SELECT MIN(week) AS week
+    FROM public.games
+    WHERE season = %(season)s
+      AND kickoff >= NOW()
+    """
+    df = run_db_query(upcoming_query, {'season': season})
+    week = df.at[0, 'week']
+    if pd.notna(week):
+        return int(week)
+
+    fallback_query = """
+    SELECT MAX(week) AS week
+    FROM ml.game_outcome_predictions
+    WHERE season = %(season)s
+    """
+    df = run_db_query(fallback_query, {'season': season})
+    week = df.at[0, 'week']
+    return int(week) if pd.notna(week) else None
+
+
 def compute_confidence(edge: float, std: float) -> str:
     if pd.isna(edge) or pd.isna(std) or std == 0:
         return "Low"
@@ -112,10 +208,33 @@ def enrich_predictions(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return df
 
+    df['kickoff'] = pd.to_datetime(df['kickoff'])
+    if 'odds_last_fetched' in df.columns:
+        df['odds_last_fetched'] = pd.to_datetime(df['odds_last_fetched'])
+
+    numeric_cols = [
+        'pred_home_spread', 'pred_total', 'pred_home_win_prob',
+        'spread_std', 'total_std', 'vegas_spread', 'vegas_total',
+        'home_moneyline', 'away_moneyline', 'home_spread_odds',
+        'away_spread_odds', 'over_odds', 'under_odds',
+        'inference_time_ms', 'spread_edge', 'total_edge'
+    ]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
     if 'spread_edge' not in df.columns:
         df['spread_edge'] = df['pred_home_spread'] - df['vegas_spread']
     if 'total_edge' not in df.columns:
         df['total_edge'] = df['pred_total'] - df['vegas_total']
+
+    if 'game_state' not in df.columns:
+        now = datetime.utcnow()
+        df['game_state'] = np.where(
+            (df.get('actual_home_score').notna()) & (df.get('actual_away_score').notna()),
+            'final',
+            np.where(df['kickoff'] <= now, 'in_progress', 'upcoming')
+        )
 
     df['matchup'] = df['away_team'] + ' @ ' + df['home_team']
     df['spread_confidence'] = df.apply(
@@ -126,11 +245,23 @@ def enrich_predictions(df: pd.DataFrame) -> pd.DataFrame:
         lambda row: compute_confidence(row.get('total_edge'), row.get('total_std')),
         axis=1
     )
+    df['game_state_label'] = df['game_state'].map(STATE_LOOKUP_REV).fillna(df['game_state'].str.title())
+    if 'odds_last_fetched' in df.columns:
+        df['odds_age_min'] = (datetime.utcnow() - df['odds_last_fetched']).dt.total_seconds() / 60.0
+        df['odds_stale'] = (df['odds_age_min'] > 60) & df['game_state'].isin(['upcoming', 'in_progress'])
+    else:
+        df['odds_stale'] = False
     return df
 
 
 @st.cache_data(ttl=60)  # Cache for 1 minute
-def load_predictions(season=DEFAULT_SEASON, week=None, team=None, prediction_run_id: Optional[str] = None):
+def load_predictions(
+    season=DEFAULT_SEASON,
+    week=None,
+    team=None,
+    prediction_run_id: Optional[str] = None,
+    state_filters: Optional[List[str]] = None,
+):
     """Load game predictions from API (preferred) or database."""
     params = {'season': season}
     if week:
@@ -140,20 +271,67 @@ def load_predictions(season=DEFAULT_SEASON, week=None, team=None, prediction_run
     if prediction_run_id:
         params['prediction_run_id'] = prediction_run_id
 
+    normalized_states = [s.lower() for s in state_filters] if state_filters else []
+    if len(normalized_states) == 1:
+        params['game_state'] = normalized_states[0]
+
     use_api = API_BASE_URL is not None
     if use_api:
         api_df = fetch_predictions_from_api(params)
         if api_df is not None and not api_df.empty:
-            return enrich_predictions(api_df)
+            df = enrich_predictions(api_df)
+            if normalized_states:
+                df = df[df['game_state'].isin(normalized_states)]
+            return df
 
-    table_name = FULL_TABLE if prediction_run_id else LATEST_TABLE
+    table_name = FULL_TABLE if prediction_run_id else LATEST_VIEW
     query = f"""
     SELECT
-        gp.*,
-        (gp.pred_home_spread - gp.vegas_spread) AS spread_edge,
-        (gp.pred_total - gp.vegas_total) AS total_edge,
-        gp.away_team || ' @ ' || gp.home_team AS matchup
+        gp.prediction_id,
+        gp.prediction_run_id,
+        gp.game_id,
+        gp.season,
+        gp.week,
+        gp.home_team,
+        gp.away_team,
+        g.kickoff,
+        gp.pred_home_spread,
+        gp.pred_total,
+        gp.pred_home_win_prob,
+        gp.spread_std,
+        gp.total_std,
+        g.spread_close AS vegas_spread,
+        g.total_close AS vegas_total,
+        g.home_moneyline,
+        g.away_moneyline,
+        g.home_spread_odds,
+        g.away_spread_odds,
+        g.over_odds,
+        g.under_odds,
+        g.odds_last_fetched,
+        gp.actual_home_score,
+        gp.actual_away_score,
+        gp.actual_spread,
+        gp.actual_total,
+        gp.model_version,
+        gp.prediction_timestamp,
+        gp.inference_time_ms,
+        (gp.pred_home_spread - g.spread_close) AS spread_edge,
+        (gp.pred_total - g.total_close) AS total_edge,
+        CASE
+            WHEN COALESCE(g.game_status, '') ILIKE 'final%%'
+                 OR (g.home_score IS NOT NULL AND g.away_score IS NOT NULL)
+                THEN 'final'
+            WHEN g.kickoff <= NOW()
+                 AND (g.home_score IS NULL OR g.away_score IS NULL)
+                THEN 'in_progress'
+            ELSE 'upcoming'
+        END AS game_state,
+        g.game_status,
+        g.home_score,
+        g.away_score
     FROM {table_name} gp
+    JOIN public.games g ON g.game_id = gp.game_id
     WHERE gp.season = %(season)s
     """
 
@@ -164,7 +342,7 @@ def load_predictions(season=DEFAULT_SEASON, week=None, team=None, prediction_run
     if prediction_run_id:
         query += " AND gp.prediction_run_id = %(prediction_run_id)s"
 
-    query += " ORDER BY gp.week, gp.kickoff"
+    query += " ORDER BY gp.week, g.kickoff"
 
     try:
         df = run_db_query(query, params)
@@ -172,7 +350,10 @@ def load_predictions(season=DEFAULT_SEASON, week=None, team=None, prediction_run
         logger.error("Failed to load predictions from DB: %s", exc)
         return pd.DataFrame()
 
-    return enrich_predictions(df)
+    df = enrich_predictions(df)
+    if normalized_states:
+        df = df[df['game_state'].isin(normalized_states)]
+    return df
 
 
 @st.cache_data(ttl=300)  # Cache for 5 minutes
@@ -348,7 +529,13 @@ season = st.sidebar.selectbox("Season", options=season_options, index=season_ind
 
 # Week selector
 week_options = ["All Weeks"] + [f"Week {i}" for i in range(1, 19)]
-week_selection = st.sidebar.selectbox("Week", options=week_options, index=0)
+default_week_value = get_default_week(season)
+default_week_index = 0
+if default_week_value:
+    default_label = f"Week {default_week_value}"
+    if default_label in week_options:
+        default_week_index = week_options.index(default_label)
+week_selection = st.sidebar.selectbox("Week", options=week_options, index=default_week_index)
 selected_week = None if week_selection == "All Weeks" else int(week_selection.split()[1])
 
 # Team selector
@@ -360,6 +547,15 @@ team_options = ["All Teams"] + [
 ]
 selected_team = st.sidebar.selectbox("Team", options=team_options, index=0)
 selected_team = None if selected_team == "All Teams" else selected_team
+
+# Game state selector
+state_labels = [label for label, _ in STATE_LABELS]
+selected_state_labels = st.sidebar.multiselect(
+    "Game State",
+    options=state_labels,
+    default=state_labels
+)
+selected_state_codes = [STATE_LOOKUP[label] for label in selected_state_labels] if selected_state_labels else [code for _, code in STATE_LABELS]
 
 # Prediction vintage selector
 prediction_runs = load_prediction_runs()
@@ -391,7 +587,13 @@ edge_threshold = st.sidebar.slider(
 )
 
 # Load predictions
-predictions_df = load_predictions(season, selected_week, selected_team, selected_run_id)
+predictions_df = load_predictions(
+    season,
+    selected_week,
+    selected_team,
+    selected_run_id,
+    state_filters=selected_state_codes
+)
 
 if predictions_df.empty:
     st.warning("No predictions found for the selected filters. Predictions are being generated...")
@@ -420,6 +622,12 @@ else:
         avg_spread_edge = filtered_df['spread_edge'].abs().mean() if not filtered_df.empty else 0
         st.metric("Avg Spread Edge", f"{avg_spread_edge:.1f} pts")
 
+    state_counts = predictions_df['game_state_label'].value_counts()
+    state_cols = st.columns(len(STATE_LABELS))
+    for idx, (label, code) in enumerate(STATE_LABELS):
+        with state_cols[idx]:
+            st.metric(label, int(state_counts.get(label, 0)))
+
     # Main content tabs
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Predictions", "🎯 Top Edges", "📈 Analysis", "📋 Raw Data"])
 
@@ -427,56 +635,19 @@ else:
         st.header("Game Predictions")
 
         if not filtered_df.empty:
-            # Group by week for better display
-            weeks = sorted(filtered_df['week'].unique())
-
-            for week in weeks:
-                week_games = filtered_df[filtered_df['week'] == week]
-
-                with st.expander(f"Week {week} ({len(week_games)} games with edges)", expanded=(week == weeks[0])):
-
-                    for _, game in week_games.iterrows():
-                        col1, col2, col3 = st.columns([2, 3, 3])
-
-                        with col1:
-                            st.markdown(f"### {game['matchup']}")
-                            if pd.notna(game['kickoff']):
-                                kickoff_time = pd.to_datetime(game['kickoff'])
-                                st.caption(kickoff_time.strftime("%b %d, %I:%M %p"))
-
-                        with col2:
-                            st.markdown("**Spread**")
-                            col2a, col2b, col2c = st.columns(3)
-                            with col2a:
-                                st.metric("Model", format_spread(game['pred_home_spread']))
-                            with col2b:
-                                st.metric("Vegas", format_spread(game['vegas_spread']))
-                            with col2c:
-                                edge_color = "red" if abs(game['spread_edge']) > game['spread_std'] * 1.5 else "orange"
-                                st.markdown(f"<span style='color:{edge_color}'>Edge: {game['spread_edge']:+.1f}</span>",
-                                          unsafe_allow_html=True)
-
-                            st.markdown("**Total**")
-                            col2d, col2e, col2f = st.columns(3)
-                            with col2d:
-                                st.metric("Model", f"{game['pred_total']:.1f}")
-                            with col2e:
-                                st.metric("Vegas", f"{game['vegas_total']:.1f}")
-                            with col2f:
-                                edge_color = "red" if abs(game['total_edge']) > game['total_std'] * 1.5 else "orange"
-                                st.markdown(f"<span style='color:{edge_color}'>Edge: {game['total_edge']:+.1f}</span>",
-                                          unsafe_allow_html=True)
-
-                        with col3:
-                            st.markdown("**Betting Recommendations**")
-                            recommendations = get_betting_recommendation(game)
-                            for rec in recommendations:
-                                st.markdown(rec)
-
-                            # Win probability
-                            st.markdown(f"**Win Prob:** {game['home_team']} {format_probability(game['pred_home_win_prob'])}")
-
-                        st.markdown("---")
+            for state_label, state_code in STATE_LABELS:
+                state_subset = filtered_df[filtered_df['game_state'] == state_code]
+                if state_subset.empty:
+                    continue
+                st.subheader(f"{state_label} ({len(state_subset)})")
+                weeks = sorted(state_subset['week'].unique())
+                for week in weeks:
+                    week_games = state_subset[state_subset['week'] == week].sort_values('kickoff')
+                    expanded = state_code == 'upcoming'
+                    with st.expander(f"Week {week} ({len(week_games)})", expanded=expanded):
+                        for _, game in week_games.iterrows():
+                            render_game_card(game)
+                            st.markdown("---")
         else:
             st.info("No games meet the edge threshold criteria. Try lowering the threshold.")
 
@@ -489,13 +660,14 @@ else:
         with col1:
             st.subheader("🎯 Top Spread Edges")
             top_spread = predictions_df.nlargest(10, 'spread_edge')[
-                ['week', 'matchup', 'pred_home_spread', 'vegas_spread', 'spread_edge', 'spread_std']
+                ['week', 'matchup', 'pred_home_spread', 'vegas_spread', 'spread_edge', 'spread_std', 'game_state']
             ]
 
             for _, game in top_spread.iterrows():
                 confidence = "🔥" if abs(game['spread_edge']) > game['spread_std'] * 1.5 else "⭐"
+                state_prefix = STATE_LOOKUP_REV.get(game['game_state'], '')
                 st.markdown(
-                    f"{confidence} **Week {game['week']}** - {game['matchup']}: "
+                    f"{confidence} **Week {game['week']}** - {state_prefix} - {game['matchup']}: "
                     f"Model {format_spread(game['pred_home_spread'])} vs Vegas {format_spread(game['vegas_spread'])} "
                     f"(Edge: {game['spread_edge']:+.1f})"
                 )
@@ -503,14 +675,15 @@ else:
         with col2:
             st.subheader("📊 Top Total Edges")
             top_total = predictions_df.nlargest(10, 'total_edge')[
-                ['week', 'matchup', 'pred_total', 'vegas_total', 'total_edge', 'total_std']
+                ['week', 'matchup', 'pred_total', 'vegas_total', 'total_edge', 'total_std', 'game_state']
             ]
 
             for _, game in top_total.iterrows():
                 confidence = "🔥" if abs(game['total_edge']) > game['total_std'] * 1.5 else "⭐"
                 direction = "Over" if game['total_edge'] > 0 else "Under"
+                state_prefix = STATE_LOOKUP_REV.get(game['game_state'], '')
                 st.markdown(
-                    f"{confidence} **Week {game['week']}** - {game['matchup']}: "
+                    f"{confidence} **Week {game['week']}** - {state_prefix} - {game['matchup']}: "
                     f"{direction} (Model {game['pred_total']:.1f} vs Vegas {game['vegas_total']:.1f}, "
                     f"Edge: {game['total_edge']:+.1f})"
                 )

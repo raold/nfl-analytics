@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import asyncio
 from functools import partial
+import asyncio
+from functools import partial
 from typing import List, Optional
 from uuid import UUID
 
@@ -26,6 +28,28 @@ from py.services.game_outcome_runs import run_game_outcome_predictions
 settings = get_settings()
 
 router = APIRouter(prefix="/game-outcomes", tags=["GameOutcomeModel"])
+LATEST_VIEW = "ml.game_outcome_predictions_latest"
+TABLE_NAME = settings.game_outcome_table
+VALID_STATES = {"upcoming", "in_progress", "final"}
+
+
+def _determine_default_season(conn: psycopg.Connection) -> int:
+    row = conn.execute(
+        "SELECT COALESCE(MAX(season), EXTRACT(YEAR FROM NOW())::INT) FROM ml.game_outcome_predictions"
+    ).fetchone()
+    return int(row[0])
+
+
+def _normalize_state(value: Optional[str]) -> Optional[str]:
+    if not value:
+        return None
+    normalized = value.lower()
+    if normalized not in VALID_STATES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid game_state '{value}'. Allowed: {sorted(VALID_STATES)}",
+        )
+    return normalized
 
 
 class PredictionRun(BaseModel):
@@ -56,10 +80,19 @@ class GameOutcomePrediction(BaseModel):
     total_std: Optional[float]
     vegas_spread: Optional[float]
     vegas_total: Optional[float]
+    home_moneyline: Optional[float]
+    away_moneyline: Optional[float]
+    home_spread_odds: Optional[float]
+    away_spread_odds: Optional[float]
+    over_odds: Optional[float]
+    under_odds: Optional[float]
+    odds_last_fetched: Optional[datetime]
     actual_home_score: Optional[int]
     actual_away_score: Optional[int]
     actual_spread: Optional[float]
     actual_total: Optional[float]
+    game_state: str
+    game_status: Optional[str]
     model_version: Optional[str]
     prediction_timestamp: Optional[datetime]
     inference_time_ms: Optional[float]
@@ -116,67 +149,93 @@ async def list_predictions(
     prediction_run_id: Optional[UUID] = Query(
         None, description="Specify a run to return historical predictions"
     ),
+    game_state: Optional[str] = Query(
+        None,
+        description="Filter by game state: upcoming, in_progress, final",
+    ),
     _: APIKey = Depends(require_api_key),
 ):
     """Return stored predictions filtered by season/week/team/run."""
-    table_name = (
-        settings.game_outcome_table
-        if prediction_run_id
-        else "ml.game_outcome_predictions_latest"
-    )
+    table_name = TABLE_NAME if prediction_run_id else LATEST_VIEW
+    normalized_state = _normalize_state(game_state)
+
+    game_state_expr = """
+        CASE
+            WHEN COALESCE(g.game_status, '') ILIKE 'final%%'
+                 OR (g.home_score IS NOT NULL AND g.away_score IS NOT NULL)
+                THEN 'final'
+            WHEN g.kickoff <= NOW()
+                 AND (g.home_score IS NULL OR g.away_score IS NULL)
+                THEN 'in_progress'
+            ELSE 'upcoming'
+        END
+    """
 
     base_query = f"""
         SELECT
-            prediction_id,
-            prediction_run_id,
-            game_id,
-            season,
-            week,
-            home_team,
-            away_team,
-            kickoff,
-            pred_home_spread,
-            pred_total,
-            pred_home_win_prob,
-            spread_std,
-            total_std,
-            vegas_spread,
-            vegas_total,
-            actual_home_score,
-            actual_away_score,
-            actual_spread,
-            actual_total,
-            model_version,
-            prediction_timestamp,
-            inference_time_ms,
-            (pred_home_spread - vegas_spread) AS spread_edge,
-            (pred_total - vegas_total) AS total_edge
-        FROM {table_name}
+            gp.prediction_id,
+            gp.prediction_run_id,
+            gp.game_id,
+            gp.season,
+            gp.week,
+            gp.home_team,
+            gp.away_team,
+            g.kickoff,
+            gp.pred_home_spread,
+            gp.pred_total,
+            gp.pred_home_win_prob,
+            gp.spread_std,
+            gp.total_std,
+            g.spread_close AS vegas_spread,
+            g.total_close AS vegas_total,
+            g.home_moneyline,
+            g.away_moneyline,
+            g.home_spread_odds,
+            g.away_spread_odds,
+            g.over_odds,
+            g.under_odds,
+            g.odds_last_fetched,
+            gp.actual_home_score,
+            gp.actual_away_score,
+            gp.actual_spread,
+            gp.actual_total,
+            gp.model_version,
+            gp.prediction_timestamp,
+            gp.inference_time_ms,
+            (gp.pred_home_spread - g.spread_close) AS spread_edge,
+            (gp.pred_total - g.total_close) AS total_edge,
+            {game_state_expr} AS game_state,
+            g.game_status
+        FROM {table_name} gp
+        JOIN public.games g ON g.game_id = gp.game_id
         WHERE 1=1
     """
 
     params = {}
 
-    if prediction_run_id:
-        base_query += " AND prediction_run_id = %(prediction_run_id)s"
-        params["prediction_run_id"] = str(prediction_run_id)
-
-    if season:
-        base_query += " AND season = %(season)s"
-        params["season"] = season
-
-    if week:
-        base_query += " AND week = %(week)s"
-        params["week"] = week
-
-    if team:
-        base_query += " AND (home_team = %(team)s OR away_team = %(team)s)"
-        params["team"] = team.upper()
-
-    base_query += " ORDER BY week, kickoff NULLS LAST"
-
     try:
         with _get_connection() as conn:
+            effective_season = season or _determine_default_season(conn)
+            base_query += " AND gp.season = %(season)s"
+            params["season"] = effective_season
+
+            if prediction_run_id:
+                base_query += " AND gp.prediction_run_id = %(prediction_run_id)s"
+                params["prediction_run_id"] = str(prediction_run_id)
+
+            if week:
+                base_query += " AND gp.week = %(week)s"
+                params["week"] = week
+
+            if team:
+                base_query += " AND (gp.home_team = %(team)s OR gp.away_team = %(team)s)"
+                params["team"] = team.upper()
+
+            if normalized_state:
+                base_query += " AND " + game_state_expr + " = %(state)s"
+                params["state"] = normalized_state
+
+            base_query += " ORDER BY gp.week, g.kickoff NULLS LAST"
             rows = conn.execute(base_query, params).fetchall()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to load predictions: {exc}") from exc
