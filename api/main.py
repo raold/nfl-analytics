@@ -41,7 +41,7 @@ from api.models import (
 from api.prediction import EnsemblePredictor
 from api.auth import require_api_key, APIKey, get_authenticator
 from api.middleware import RateLimitMiddleware
-from py.api.routes import game_predictions
+from py.api.routes import game_predictions, game_outcome_predictions
 
 # Setup logging
 logging.basicConfig(
@@ -72,8 +72,10 @@ app.add_middleware(
 try:
     app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
     logger.info("✓ Game predictions router loaded successfully")
+    app.include_router(game_outcome_predictions.router, prefix="/api/v1", tags=["game_outcome_predictions"])
+    logger.info("✓ GameOutcomeModel router loaded successfully")
 except Exception as e:
-    logger.error(f"Failed to load game predictions router: {e}", exc_info=True)
+    logger.error(f"Failed to load prediction routers: {e}", exc_info=True)
 
 # Global state
 START_TIME = time.time()

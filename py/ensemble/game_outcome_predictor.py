@@ -18,6 +18,7 @@ import logging
 import os
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
@@ -31,17 +32,13 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from py.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 # Database configuration
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", "5544")),
-    "dbname": os.getenv("DB_NAME", "devdb01"),
-    "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),  # pragma: allowlist secret
-}
+DB_CONFIG = settings.database.psycopg_kwargs()
 
 # Default values
 DEFAULT_QB_YARDS = 240.0  # Average QB passing yards
@@ -62,7 +59,15 @@ class GameOutcomePredictor:
     def __init__(self):
         """Initialize predictor with Ensemble v6.1."""
         logger.info("Initializing GameOutcomePredictor with Ensemble v6.1")
-        self.ensemble = EnhancedEnsemble5Way()
+        fallback_password = DB_CONFIG["password"]
+        db_password = os.getenv("DB_PASSWORD") or fallback_password
+        self.ensemble = EnhancedEnsemble5Way(
+            db_password=db_password,
+            db_host=DB_CONFIG["host"],
+            db_port=DB_CONFIG["port"],
+            db_name=DB_CONFIG["dbname"],
+            db_user=DB_CONFIG["user"],
+        )
         logger.info("Ensemble v6.1 loaded successfully")
 
     def _get_db_connection(self):
@@ -277,6 +282,14 @@ class GameOutcomePredictor:
             )
             elapsed = time.time() - start
 
+            predictions = result.get('predictions') or {}
+            valid_predictions = [
+                pred for pred in predictions.values()
+                if pred and pred[0] is not None
+            ]
+            if len(valid_predictions) < 3:
+                raise RuntimeError("Ensemble requires at least 3 component predictions")
+
             pred_yards = result['ensemble_mean']
             pred_std = result['ensemble_std']
 
@@ -460,16 +473,16 @@ if __name__ == "__main__":
 
     predictor = GameOutcomePredictor()
 
-    # Test with 2025 Week 12: BUF @ HOU
+    sample_year = datetime.now().year
     result = predictor.predict_game(
         home_team="HOU",
         away_team="BUF",
-        season=2025,
+        season=sample_year,
         week=12
     )
 
     print("\n" + "="*60)
-    print("GAME PREDICTION TEST: BUF @ HOU (2025 Week 12)")
+    print(f"GAME PREDICTION TEST: BUF @ HOU ({sample_year} Week 12)")
     print("="*60)
     print(f"Home Score (HOU): {result['predicted_home_score']:.1f}")
     print(f"Away Score (BUF): {result['predicted_away_score']:.1f}")

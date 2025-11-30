@@ -26,6 +26,7 @@ from api.models import (
 
 # Import production ensemble
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from py.config.settings import get_settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,15 +55,18 @@ class EnsemblePredictor:
         logger.info(f"Initializing EnsemblePredictor (device={device})")
         logger.info(f"Models directory: {self.models_dir}")
 
-        # Get database credentials from environment
-        db_host = os.getenv("DB_HOST", "localhost")
-        db_port = int(os.getenv("DB_PORT", "5544"))
-        db_name = os.getenv("DB_NAME", "devdb01")
-        db_user = os.getenv("DB_USER", "dro")
-        db_password = os.getenv("DB_PASSWORD", "sicillionbillions")
+        # Get database credentials from centralized settings
+        db_settings = get_settings().database
+        db_host = db_settings.host
+        db_port = db_settings.port
+        db_name = db_settings.name
+        db_user = db_settings.user
+        resolved_password = db_settings.require_password()
+        db_password = os.getenv("DB_PASSWORD") or resolved_password
 
         # Initialize production ensemble
         self.ensemble = EnhancedEnsemble4Way(
+            db_password=db_password,
             state_space_path=str(self.models_dir / "bayesian" / "simplified_random_walk_v2.rds"),
             hierarchical_path=str(self.models_dir / "bayesian" / "passing_yards_hierarchical_v2.rds"),
             informative_path=str(self.models_dir / "bayesian" / "passing_informative_priors_v2.rds"),
@@ -72,7 +76,6 @@ class EnsemblePredictor:
             db_port=db_port,
             db_name=db_name,
             db_user=db_user,
-            db_password=db_password,
         )
         logger.info("✅ Production ensemble initialized")
 
@@ -257,6 +260,8 @@ class EnsemblePredictor:
         if "predictions" in result:
             for model_name, (pred, unc) in result["predictions"].items():
                 weight = result["weights"].get(model_name, 0.0)
+                if pred is None:
+                    continue
                 model_contributions.append(
                     ModelContribution(
                         model_name=model_name,
@@ -265,6 +270,16 @@ class EnsemblePredictor:
                         weight=float(weight)
                     )
                 )
+
+        valid_predictions = [
+            contrib for contrib in model_contributions
+            if np.isfinite(contrib.prediction)
+        ]
+        if len(valid_predictions) < 3:
+            logger.error(
+                "Insufficient ensemble component predictions: %d", len(valid_predictions)
+            )
+            raise RuntimeError("Ensemble requires at least 3 component predictions")
 
         # Calculate confidence from uncertainty
         ensemble_std = result["ensemble_std"]
@@ -285,7 +300,7 @@ class EnsemblePredictor:
             confidence=round(confidence, 2),
             lower_bound=round(result["quantile_10"], 1),
             upper_bound=round(result["quantile_90"], 1),
-            models_used=model_contributions,
+            models_used=valid_predictions,
             timestamp=datetime.utcnow(),
             ensemble_method="production_4way"
         )

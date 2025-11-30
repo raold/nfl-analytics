@@ -35,6 +35,7 @@ import shap
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
 from py.features.game_feature_extractor import GameFeatureExtractor
+from py.config.settings import get_settings
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -72,7 +73,8 @@ class GameOutcomeModel:
         self.model_dir = Path(model_dir)
         self.model_dir.mkdir(parents=True, exist_ok=True)
 
-        # Initialize feature extractor
+        # Initialize feature extractor and settings
+        self.settings = get_settings()
         self.feature_extractor = GameFeatureExtractor()
 
         # Model components (initialized during training)
@@ -300,13 +302,13 @@ class GameOutcomeModel:
         all_games = []
 
         # Database connection for getting games
-        conn_str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
+        conn_kwargs = self.settings.database.psycopg_kwargs()
 
         for season in seasons:
             logger.info(f"Extracting features for season {season}...")
 
             # Get all games for the season
-            with psycopg2.connect(conn_str) as conn:
+            with psycopg2.connect(**conn_kwargs) as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     cur.execute("""
                         SELECT DISTINCT
@@ -363,6 +365,25 @@ class GameOutcomeModel:
 
         return df
 
+    def _validate_game_inputs(
+        self,
+        home_team: str,
+        away_team: str,
+        season: int,
+        week: int
+    ):
+        """Validate team/week inputs before prediction."""
+        if home_team not in VALID_TEAMS:
+            raise ValueError(f"Invalid home_team: {home_team}. Must be one of {VALID_TEAMS}")
+        if away_team not in VALID_TEAMS:
+            raise ValueError(f"Invalid away_team: {away_team}. Must be one of {VALID_TEAMS}")
+        if not (2000 <= season <= 2030):
+            raise ValueError(f"Invalid season: {season}. Must be between 2000-2030")
+        if not (1 <= week <= 18):
+            raise ValueError(f"Invalid week: {week}. Must be between 1-18")
+        if home_team == away_team:
+            raise ValueError(f"home_team and away_team cannot be the same: {home_team}")
+
     def predict(
         self,
         home_team: str,
@@ -388,26 +409,12 @@ class GameOutcomeModel:
             RuntimeError: If models not trained
             ValueError: If invalid inputs provided
         """
-        # FIXED: Input validation
         if not self.models_trained:
             raise RuntimeError(
                 "Models not trained. Call train() or load_models() first."
             )
 
-        # Validate teams
-        if home_team not in VALID_TEAMS:
-            raise ValueError(f"Invalid home_team: {home_team}. Must be one of {VALID_TEAMS}")
-        if away_team not in VALID_TEAMS:
-            raise ValueError(f"Invalid away_team: {away_team}. Must be one of {VALID_TEAMS}")
-
-        # Validate season and week
-        if not (2000 <= season <= 2030):
-            raise ValueError(f"Invalid season: {season}. Must be between 2000-2030")
-        if not (1 <= week <= 18):
-            raise ValueError(f"Invalid week: {week}. Must be between 1-18")
-
-        if home_team == away_team:
-            raise ValueError(f"home_team and away_team cannot be the same: {home_team}")
+        self._validate_game_inputs(home_team, away_team, season, week)
 
         start = time.time()
 
@@ -448,6 +455,95 @@ class GameOutcomeModel:
         }
 
         return result
+
+    def predict_games(self, games: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Predict multiple games in a single batch for lower latency.
+
+        Args:
+            games: Iterable of dicts each containing home_team, away_team, season, week,
+                plus optional metadata such as game_id and kickoff.
+
+        Returns:
+            List of prediction dictionaries aligned with successfully processed games.
+        """
+        if not self.models_trained:
+            raise RuntimeError(
+                "Models not trained. Call train() or load_models() first."
+            )
+
+        if not games:
+            return []
+
+        feature_rows = []
+        meta_rows = []
+        start = time.time()
+
+        for game in games:
+            try:
+                home_team = game['home_team']
+                away_team = game['away_team']
+                season = int(game['season'])
+                week = int(game['week'])
+            except (KeyError, TypeError, ValueError) as e:
+                logger.warning(f"Invalid game payload {game}: {e}")
+                continue
+
+            try:
+                self._validate_game_inputs(home_team, away_team, season, week)
+            except ValueError as e:
+                logger.warning(f"Skipping invalid matchup {away_team}@{home_team}: {e}")
+                continue
+
+            try:
+                features = self.feature_extractor.extract_game_features(
+                    home_team, away_team, season, week
+                )
+            except Exception as e:
+                logger.error(f"Feature extraction failed for {away_team}@{home_team}: {e}")
+                continue
+
+            feature_rows.append([features.get(col, 0.0) for col in self.feature_names])
+            meta_rows.append({
+                'home_team': home_team,
+                'away_team': away_team,
+                'season': season,
+                'week': week,
+                'game_id': game.get('game_id'),
+                'kickoff': game.get('kickoff')
+            })
+
+        if not feature_rows:
+            return []
+
+        X = np.array(feature_rows)
+        spread_preds = self.spread_model.predict(X)
+        total_preds = self.total_model.predict(X)
+        win_prob_preds = self.win_prob_model.predict_proba(X)[:, 1]
+
+        elapsed_ms = (time.time() - start) * 1000
+        per_game_time = elapsed_ms / len(meta_rows)
+        spread_std = self.spread_std if self.spread_std else 3.5
+        total_std = self.total_std if self.total_std else 5.0
+
+        results = []
+        for idx, meta in enumerate(meta_rows):
+            results.append({
+                'home_spread': float(round(spread_preds[idx], 1)),
+                'total_points': float(round(total_preds[idx], 1)),
+                'home_win_probability': float(round(win_prob_preds[idx], 3)),
+                'spread_std': float(round(spread_std, 2)),
+                'total_std': float(round(total_std, 2)),
+                'inference_time_ms': float(round(per_game_time, 1)),
+                'home_team': meta['home_team'],
+                'away_team': meta['away_team'],
+                'season': meta['season'],
+                'week': meta['week'],
+                'game_id': meta['game_id'],
+                'kickoff': meta['kickoff']
+            })
+
+        return results
 
     def _evaluate_models(
         self,
@@ -616,10 +712,13 @@ def main():
 
     # Test prediction
     try:
+        # Use current season for example
+        from datetime import datetime
+        current_year = datetime.now().year
         prediction = model.predict(
             home_team='KC',
             away_team='BUF',
-            season=2024,
+            season=current_year,
             week=11
         )
         print(f"\nSample Prediction:")

@@ -182,7 +182,8 @@ except ImportError:
     OpponentStrengthEngine = None
 
 import psycopg2
-import os
+
+from py.config.settings import get_settings
 
 logging.basicConfig(
     level=logging.INFO,
@@ -223,36 +224,33 @@ class GameFeatureExtractor:
         Initialize game feature extractor with database connection.
 
         Args:
-            db_config: Database configuration dict. If None, uses default connection:
-                {
-                    'host': 'localhost',
-                    'port': 5544,
-                    'dbname': 'devdb01',
-                    'user': 'dro',
-                    'password': 'sicillionbillions'
-                }
+            db_config: Database configuration dict. If None, draws values from
+                environment variables via py.config.settings.
         """
+        self.settings = get_settings()
+        resolved_db_config = db_config or self.settings.database.psycopg_kwargs()
+
         # Base extractors (always available)
-        self.offensive_extractor = TeamOffensiveFeatures(db_config=db_config)
-        self.defensive_extractor = TeamDefensiveFeatures(db_config=db_config)
+        self.offensive_extractor = TeamOffensiveFeatures(db_config=resolved_db_config)
+        self.defensive_extractor = TeamDefensiveFeatures(db_config=resolved_db_config)
 
         # Advanced extractors (optional, graceful degradation)
         if NextGenStatsFeatures:
-            self.ngs_extractor = NextGenStatsFeatures(db_config=db_config)
+            self.ngs_extractor = NextGenStatsFeatures(db_config=resolved_db_config)
             logger.info("NextGen Stats extractor initialized")
         else:
             self.ngs_extractor = None
             logger.warning("NextGen Stats extractor unavailable")
 
         if QBRFeatures:
-            self.qbr_extractor = QBRFeatures(db_config=db_config)
+            self.qbr_extractor = QBRFeatures(db_config=resolved_db_config)
             logger.info("QBR extractor initialized")
         else:
             self.qbr_extractor = None
             logger.warning("QBR extractor unavailable")
 
         if OpponentAdjustedFeatures:
-            self.oadj_extractor = OpponentAdjustedFeatures(db_config=db_config)
+            self.oadj_extractor = OpponentAdjustedFeatures(db_config=resolved_db_config)
             logger.info("Opponent-Adjusted extractor initialized")
         else:
             self.oadj_extractor = None
@@ -261,11 +259,11 @@ class GameFeatureExtractor:
         # Quick Wins feature extractors (Nov 27, 2025)
         if TurnoverLuckEngine:
             self.turnover_luck_extractor = TurnoverLuckEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=resolved_db_config.get('host', 'localhost'),
+                db_port=resolved_db_config.get('port', 5544),
+                db_name=resolved_db_config.get('dbname', 'devdb01'),
+                db_user=resolved_db_config.get('user', 'dro'),
+                db_password=resolved_db_config.get('password')
             )
             logger.info("Turnover Luck extractor initialized")
         else:
@@ -274,11 +272,11 @@ class GameFeatureExtractor:
 
         if PrimetimeFeaturesEngine:
             self.primetime_extractor = PrimetimeFeaturesEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=resolved_db_config.get('host', 'localhost'),
+                db_port=resolved_db_config.get('port', 5544),
+                db_name=resolved_db_config.get('dbname', 'devdb01'),
+                db_user=resolved_db_config.get('user', 'dro'),
+                db_password=resolved_db_config.get('password')
             )
             logger.info("Primetime Features extractor initialized")
         else:
@@ -287,11 +285,11 @@ class GameFeatureExtractor:
 
         if OpponentStrengthEngine:
             self.opponent_strength_extractor = OpponentStrengthEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=resolved_db_config.get('host', 'localhost'),
+                db_port=resolved_db_config.get('port', 5544),
+                db_name=resolved_db_config.get('dbname', 'devdb01'),
+                db_user=resolved_db_config.get('user', 'dro'),
+                db_password=resolved_db_config.get('password')
             )
             logger.info("Opponent Strength (SoV) extractor initialized")
         else:
@@ -299,13 +297,7 @@ class GameFeatureExtractor:
             logger.warning("Opponent Strength (SoV) extractor unavailable")
 
         # Database connection for function-based extractors
-        self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
-        }
+        self.db_config = resolved_db_config
 
         # Feature cache: {(team, season, week, feature_type): (features, timestamp)}
         self._feature_cache = {}
@@ -818,13 +810,7 @@ class GameFeatureExtractor:
             }
         """
         # Connect to database
-        conn = psycopg2.connect(
-            host='localhost',
-            port=5544,
-            dbname='devdb01',
-            user='dro',
-            password=os.getenv('DB_PASSWORD', 'sicillionbillions')
-        )
+        conn = psycopg2.connect(**self.db_config)
 
         try:
             with conn.cursor() as cur:

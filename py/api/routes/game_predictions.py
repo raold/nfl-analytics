@@ -19,7 +19,6 @@ Version: 1.0.0
 """
 
 import logging
-import os
 import sys
 import time
 from datetime import datetime
@@ -32,6 +31,8 @@ from prometheus_client import Counter, Histogram
 from psycopg2.extras import RealDictCursor
 from pydantic import BaseModel, Field, validator
 
+from py.config.settings import get_settings
+
 # Add project root to path
 project_root = str(PathLib(__file__).parent.parent.parent.parent)
 if project_root not in sys.path:
@@ -39,6 +40,7 @@ if project_root not in sys.path:
 
 # Setup logging
 logger = logging.getLogger(__name__)
+settings = get_settings()
 
 # ============================================================================
 # Router Setup
@@ -71,13 +73,7 @@ except Exception as e:
 # Database Connection
 # ============================================================================
 
-DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", "5544")),
-    "dbname": os.getenv("DB_NAME", "devdb01"),
-    "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),  # pragma: allowlist secret
-}
+DB_CONFIG = settings.database.psycopg_kwargs()
 
 
 def get_db_connection():
@@ -396,8 +392,14 @@ def get_ensemble_predictor() -> EnhancedEnsemble5Way:
     """Get or create EnhancedEnsemble5Way singleton for QB predictions."""
     global _ensemble_predictor
     if _ensemble_predictor is None:
-        # Initialize ensemble with Docker-aware DB connection (db_password first for pre-commit hook)
-        _ensemble_predictor = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD", "sicillionbillions"), db_host=os.getenv("DB_HOST", "nfl-analytics-pg-1"), db_port=int(os.getenv("DB_PORT", "5432")), db_name=os.getenv("DB_NAME", "devdb01"), db_user=os.getenv("DB_USER", "dro"))
+        db_settings = settings.database
+        _ensemble_predictor = EnhancedEnsemble5Way(
+            db_password=db_settings.require_password(),
+            db_host=db_settings.host,
+            db_port=db_settings.port,
+            db_name=db_settings.name,
+            db_user=db_settings.user,
+        )
     return _ensemble_predictor
 
 
