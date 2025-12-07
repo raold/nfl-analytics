@@ -30,9 +30,9 @@ machine_info.json
 .vscode/
 *.code-workspace
 
-# Docker and git config files
+# Docker config files
 .dockerignore
-.gitattributes
+# Note: .gitattributes IS tracked (needed for Git LFS)
 
 # GitHub workflows (sensitive automation) - REMOVED to allow CI/CD workflows
 # .github/workflows/
@@ -175,5 +175,7 @@ check_*.sh
 *.bak
 *.backup
 
-# Database backups (large files, sync separately)
-backups/
+# Database backups (tracked via Git LFS)
+backups/*
+!backups/*.dump
+!backups/README.md
