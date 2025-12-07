@@ -4,14 +4,32 @@ Bayesian Online Updating System
 
 Implements continuous model improvement through:
 - Incremental posterior updates with new data
+- Per-stat-type Dirichlet weight adaptation
 - Automatic hyperparameter tuning
 - Concept drift detection
 - Performance monitoring
+
+Key Features:
+- Connects to ml.predictions for outcome-based learning
+- Updates Dirichlet weights per stat type
+- Logs all updates to ml.bayesian_update_log
+- Supports per-game (player props) and weekly batch (game outcomes) updates
+
+Usage:
+    # After each game completes
+    updater = EnhancedBayesianOnlineUpdater()
+    updater.run_after_game_update(game_id='2024_01_KC_DET')
+
+    # Weekly batch update (Tuesday AM)
+    updater.run_weekly_batch_update(season=2024, week=1)
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 import logging
 from datetime import datetime, timedelta
@@ -418,8 +436,303 @@ class DriftDetector:
         return False
 
 
+class EnhancedBayesianOnlineUpdater:
+    """
+    Enhanced Bayesian Online Updater with per-stat-type Dirichlet weights.
+
+    Connects to ml.predictions to learn from prediction outcomes.
+    Updates both:
+    1. Player priors (Normal-Normal conjugate update)
+    2. Ensemble weights (Dirichlet update per stat type)
+
+    Supports two update modes:
+    - Per-game: For player props (fast adaptation)
+    - Weekly batch: For game outcomes (more stable)
+    """
+
+    def __init__(
+        self,
+        model_version: str = "ensemble_v6.1",
+        learning_rate: float = 0.1,
+        forgetting_factor: float = 0.95,
+    ):
+        """
+        Initialize enhanced updater.
+
+        Args:
+            model_version: Model version for tracking
+            learning_rate: Speed of adaptation (0-1)
+            forgetting_factor: Weight on historical data (0-1)
+        """
+        self.model_version = model_version
+        self.learning_rate = learning_rate
+        self.forgetting_factor = forgetting_factor
+
+        self.db_config = {
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+        }
+
+        # Initialize Dirichlet stacker for ensemble weights
+        try:
+            from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+            self.dirichlet_stacker = DirichletBayesianStackingByStatType(
+                db_config=self.db_config,
+                use_db=True,
+            )
+        except ImportError:
+            logger.warning("DirichletBayesianStackingByStatType not available")
+            self.dirichlet_stacker = None
+
+        # Player updater (existing)
+        self.player_updater = BayesianOnlineUpdater(
+            model_version=model_version,
+            learning_rate=learning_rate,
+            forgetting_factor=forgetting_factor,
+        )
+
+        logger.info(f"Initialized EnhancedBayesianOnlineUpdater (v{model_version})")
+
+    def run_after_game_update(self, game_id: str):
+        """
+        Run after each game completes (for player props).
+
+        This is the per-game update mode for fast adaptation.
+        Updates both player priors and Dirichlet weights.
+
+        Args:
+            game_id: Game identifier (e.g., '2024_01_KC_DET')
+        """
+        logger.info(f"Running post-game update for {game_id}")
+
+        conn = psycopg2.connect(**self.db_config)
+
+        try:
+            # Fetch predictions with outcomes for this game
+            predictions_df = self._fetch_predictions_with_outcomes(conn, game_id)
+
+            if predictions_df.empty:
+                logger.info(f"No predictions with outcomes for {game_id}")
+                return
+
+            logger.info(f"Found {len(predictions_df)} predictions for {game_id}")
+
+            # Update Dirichlet weights per stat type
+            self._update_dirichlet_weights(predictions_df, game_id)
+
+            # Update player priors
+            self._update_player_priors(predictions_df)
+
+            # Record stat-type performance
+            self._record_stat_type_performance(conn, predictions_df, game_id)
+
+            conn.commit()
+            logger.info(f"Post-game update complete for {game_id}")
+
+        except Exception as e:
+            logger.error(f"Error in post-game update: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+
+    def run_weekly_batch_update(self, season: int, week: int):
+        """
+        Run weekly batch update (for game outcomes).
+
+        Processes all games from the specified week.
+        Best run Tuesday AM after weekend games.
+
+        Args:
+            season: NFL season
+            week: NFL week number
+        """
+        logger.info(f"Running weekly batch update for {season} Week {week}")
+
+        conn = psycopg2.connect(**self.db_config)
+
+        try:
+            # Fetch all game predictions for the week
+            game_predictions_df = self._fetch_game_predictions(conn, season, week)
+
+            if game_predictions_df.empty:
+                logger.info(f"No game predictions for {season} Week {week}")
+                return
+
+            logger.info(f"Found {len(game_predictions_df)} game predictions")
+
+            # Update Dirichlet weights for game outcomes (spread, total, win_prob)
+            for stat_type in ['spread', 'total', 'win_prob']:
+                stat_df = game_predictions_df[game_predictions_df['stat_type'] == stat_type]
+                if not stat_df.empty:
+                    self._update_dirichlet_weights(stat_df, f"{season}_W{week}")
+
+            conn.commit()
+            logger.info(f"Weekly batch update complete for {season} Week {week}")
+
+        except Exception as e:
+            logger.error(f"Error in weekly batch update: {e}")
+            conn.rollback()
+        finally:
+            conn.close()
+
+    def _fetch_predictions_with_outcomes(self, conn, game_id: str) -> pd.DataFrame:
+        """Fetch predictions with actual outcomes for a game."""
+        query = """
+        SELECT
+            p.prediction_id,
+            p.player_id,
+            p.game_id,
+            p.stat_type,
+            p.predicted_mean,
+            p.predicted_std,
+            p.actual_value,
+            p.prediction_error,
+            p.component_predictions,
+            g.season,
+            g.week
+        FROM ml.predictions p
+        JOIN games g ON p.game_id = g.game_id
+        WHERE p.game_id = %s
+          AND p.actual_value IS NOT NULL
+        """
+        return pd.read_sql(query, conn, params=[game_id])
+
+    def _fetch_game_predictions(self, conn, season: int, week: int) -> pd.DataFrame:
+        """Fetch game-level predictions for a week."""
+        query = """
+        SELECT
+            gp.game_id,
+            gp.stat_type,
+            gp.predicted_value,
+            gp.actual_value,
+            gp.prediction_error,
+            gp.component_predictions,
+            %s as season,
+            %s as week
+        FROM ml.game_predictions gp
+        JOIN games g ON gp.game_id = g.game_id
+        WHERE g.season = %s AND g.week = %s
+          AND gp.actual_value IS NOT NULL
+        """
+        return pd.read_sql(query, conn, params=[season, week, season, week])
+
+    def _update_dirichlet_weights(self, predictions_df: pd.DataFrame, context: str):
+        """Update Dirichlet weights based on prediction outcomes."""
+        if self.dirichlet_stacker is None:
+            return
+
+        for stat_type in predictions_df['stat_type'].unique():
+            stat_df = predictions_df[predictions_df['stat_type'] == stat_type]
+
+            for _, row in stat_df.iterrows():
+                # Parse component predictions if stored as JSON
+                component_preds = row.get('component_predictions')
+                if isinstance(component_preds, str):
+                    import json
+                    try:
+                        component_preds = json.loads(component_preds)
+                    except:
+                        continue
+
+                if not component_preds:
+                    continue
+
+                # Update Dirichlet weights for this stat type
+                try:
+                    self.dirichlet_stacker.update(
+                        stat_type=stat_type,
+                        component_predictions=component_preds,
+                        actual=row['actual_value'],
+                        game_id=row.get('game_id'),
+                        player_id=row.get('player_id'),
+                        season=row.get('season'),
+                        week=row.get('week'),
+                    )
+                except Exception as e:
+                    logger.debug(f"Could not update Dirichlet for {stat_type}: {e}")
+
+        logger.info(f"Updated Dirichlet weights for {context}")
+
+    def _update_player_priors(self, predictions_df: pd.DataFrame):
+        """Update player priors based on observed outcomes."""
+        player_updates = {}
+
+        for _, row in predictions_df.iterrows():
+            if row['player_id'] and row['actual_value']:
+                updated = self.player_updater.update_posterior(
+                    player_id=row['player_id'],
+                    prop_type=row['stat_type'],
+                    observation=row['actual_value'],
+                )
+                player_updates[f"{row['player_id']}_{row['stat_type']}"] = updated
+
+        if player_updates:
+            self.player_updater._save_updates(player_updates)
+            logger.info(f"Updated {len(player_updates)} player priors")
+
+    def _record_stat_type_performance(self, conn, predictions_df: pd.DataFrame, game_id: str):
+        """Record model performance by stat type."""
+        cur = conn.cursor()
+
+        for stat_type in predictions_df['stat_type'].unique():
+            stat_df = predictions_df[predictions_df['stat_type'] == stat_type]
+            if stat_df.empty:
+                continue
+
+            # Compute metrics
+            errors = stat_df['prediction_error'].dropna()
+            if len(errors) == 0:
+                continue
+
+            mae = float(errors.abs().mean())
+            rmse = float(np.sqrt((errors ** 2).mean()))
+
+            # Get season/week from game_id
+            parts = game_id.split('_')
+            season = int(parts[0]) if len(parts) > 0 else 2024
+            week = int(parts[1]) if len(parts) > 1 else 1
+
+            try:
+                cur.execute("""
+                    INSERT INTO ml.stat_type_performance (
+                        model_id, model_name, stat_type, stat_category,
+                        season, week_start, week_end,
+                        mae, rmse, n_predictions, computed_at
+                    ) VALUES (
+                        1, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW()
+                    )
+                    ON CONFLICT (model_id, stat_type, season, week_start, week_end)
+                    DO UPDATE SET
+                        mae = EXCLUDED.mae,
+                        rmse = EXCLUDED.rmse,
+                        n_predictions = EXCLUDED.n_predictions,
+                        computed_at = EXCLUDED.computed_at
+                """, (
+                    self.model_version,
+                    stat_type,
+                    'player_prop' if stat_type not in ['spread', 'total', 'win_prob'] else 'game_outcome',
+                    season,
+                    week,
+                    week,
+                    mae,
+                    rmse,
+                    len(stat_df),
+                ))
+            except Exception as e:
+                logger.debug(f"Could not record performance: {e}")
+
+    def get_current_weights(self, stat_type: str) -> dict:
+        """Get current Dirichlet weights for a stat type."""
+        if self.dirichlet_stacker:
+            return self.dirichlet_stacker.get_weights(stat_type)
+        return {}
+
+
 def run_online_updates():
-    """Run online updating for recent games"""
+    """Run online updating for recent games (legacy interface)"""
 
     logger.info("=" * 60)
     logger.info("BAYESIAN ONLINE UPDATING")
