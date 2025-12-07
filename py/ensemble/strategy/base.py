@@ -30,6 +30,19 @@ DEFAULT_WEIGHTS_V6 = {
     "hybrid_static_incremental": 0.10,
 }
 
+# v6.1 Weights - 6-way ensemble with GNN (INITIAL CONSERVATIVE ALLOCATION)
+# GNN added with 10% weight (AUC 0.61, Accuracy 55.9%)
+# Other weights scaled down proportionally to maintain total = 1.0
+# NOTE: These are INITIAL weights - will be optimized after validation
+DEFAULT_WEIGHTS_V6_1_GNN = {
+    "state_space_v2": 0.24,
+    "hierarchical_v2": 0.24,
+    "xgboost_v4_ridge": 0.20,
+    "informative_priors_v2": 0.12,
+    "hybrid_static_incremental": 0.10,
+    "gnn_hierarchical_v1": 0.10,
+}
+
 # v8.0 Dirichlet Weights - Optimized for player-level predictions (props: yards, TDs)
 # Learned via Bayesian stacking on 2022-2024 passing yards data (Nov 26, 2025)
 # Grid search: 108 configs, best: prior_strength=1.0, likelihood_scale=20.0, scoring=squared
