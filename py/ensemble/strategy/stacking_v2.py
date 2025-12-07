@@ -521,9 +521,14 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
             else:
                 weight_list.append(0.2)  # Default weight
 
-        # Normalize
+        # Normalize (guard against division by zero)
         total = sum(weight_list)
-        weight_list = [w / total for w in weight_list]
+        if total <= 0 or len(weight_list) == 0:
+            logger.warning("Weight normalization failed, using equal weights")
+            n_preds = max(1, len(predictions))
+            weight_list = [1.0 / n_preds] * len(predictions)
+        else:
+            weight_list = [w / total for w in weight_list]
 
         # Weighted average
         mean = sum(w * p.prediction_mean for w, p in zip(weight_list, predictions))

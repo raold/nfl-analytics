@@ -41,13 +41,17 @@ if str(project_root) not in sys.path:
 
 logger = logging.getLogger(__name__)
 
-# Database configuration
+# Database configuration - password MUST be set via environment variable
+_db_password = os.getenv("DB_PASSWORD")
+if not _db_password:
+    logger.warning("DB_PASSWORD not set - database operations will fail. Set DB_PASSWORD environment variable.")
+
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+    "password": _db_password,
 }
 
 # Default values
