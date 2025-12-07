@@ -108,9 +108,7 @@ def example_1_backup_rb_analysis():
     plt.show()
 
     # Generate report
-    modeler.generate_report(
-        results, output_path=str(output_dir / "example1_backup_rb_report.md")
-    )
+    modeler.generate_report(results, output_path=str(output_dir / "example1_backup_rb_report.md"))
 
     print(f"\n✓ Visualizations saved to {output_dir / 'example1_backup_rb.pdf'}")
     print(f"✓ Report saved to {output_dir / 'example1_backup_rb_report.md'}")

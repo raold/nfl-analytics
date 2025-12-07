@@ -224,7 +224,6 @@ class TestDockerCompose:
         """Test that materialized views are created."""
         conn_string = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
 
-
         try:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:

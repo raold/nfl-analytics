@@ -262,9 +262,7 @@ def analyze_results(results_all_seasons):
     season_improvement_std = season_metrics["improvement"].std()
 
     # High-roughing defense subgroup
-    high_roughing_results = results_all_seasons[
-        results_all_seasons["is_high_roughing_defense"]
-    ]
+    high_roughing_results = results_all_seasons[results_all_seasons["is_high_roughing_defense"]]
 
     if len(high_roughing_results) > 0:
         hr_v6_mae = high_roughing_results["v6_error"].mean()
@@ -277,9 +275,7 @@ def analyze_results(results_all_seasons):
         hr_v6_mae = hr_v7_mae = hr_improvement = hr_p_value = None
 
     # Low-roughing defense subgroup (for contrast)
-    low_roughing_results = results_all_seasons[
-        not results_all_seasons["is_high_roughing_defense"]
-    ]
+    low_roughing_results = results_all_seasons[not results_all_seasons["is_high_roughing_defense"]]
 
     if len(low_roughing_results) > 0:
         lr_v6_mae = low_roughing_results["v6_error"].mean()

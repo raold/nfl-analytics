@@ -555,7 +555,6 @@ class TestSchemaDriftDetection:
 
         mock_connect.side_effect = [create_identical_conn(), create_identical_conn()]
 
-
         # Simplified mock - just check no drift is reported
         report = DriftReport(source_env="source", target_env="target")
         assert not report.has_drift
