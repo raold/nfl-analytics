@@ -60,6 +60,7 @@ import time
 import warnings
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -168,17 +169,17 @@ class GameOutcomeModel:
         self.model_dir.mkdir(parents=True, exist_ok=True)
 
         # Model objects (lazy loaded)
-        self.spread_model = None
-        self.total_model = None
-        self.win_prob_model = None
-        self.feature_scaler = None
-        self.feature_names = None
+        self.spread_model: Optional[xgb.XGBRegressor] = None
+        self.total_model: Optional[xgb.XGBRegressor] = None
+        self.win_prob_model: Optional[xgb.XGBClassifier] = None
+        self.feature_scaler: Optional[StandardScaler] = None
+        self.feature_names: Optional[list[str]] = None
         self.models_trained = False
 
         # SHAP explainer (computed after training)
-        self.spread_explainer = None
-        self.total_explainer = None
-        self.win_prob_explainer = None
+        self.spread_explainer: Optional[shap.Explainer] = None
+        self.total_explainer: Optional[shap.Explainer] = None
+        self.win_prob_explainer: Optional[shap.Explainer] = None
 
         logger.info(f"GameOutcomeModel initialized (models dir: {self.model_dir})")
 
