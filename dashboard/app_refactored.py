@@ -100,7 +100,7 @@ def render_predictions_page():
             model_versions = (
                 df_models["model_version"].unique().tolist() if not df_models.empty else []
             )
-    except:
+    except Exception:
         model_versions = []
 
     selected_model = st.sidebar.selectbox("Model Version", ["All"] + model_versions, index=0)

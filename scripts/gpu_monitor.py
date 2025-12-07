@@ -112,7 +112,7 @@ class GPUMonitor:
                         status["completed_jobs"].append(job)
                     elif job["status"] == "pending":
                         status["pending_jobs"].append(job)
-            except:
+            except Exception:
                 pass
 
         # Check for running processes
@@ -123,7 +123,7 @@ class GPUMonitor:
                     if model in line and "python" in line:
                         if not status["current_job"]:
                             status["current_job"] = {"name": model, "status": "running"}
-        except:
+        except Exception:
             pass
 
         # Parse latest training logs
@@ -142,7 +142,7 @@ class GPUMonitor:
                             if "epoch" in line.lower() or "loss" in line.lower():
                                 status["logs"][log_file.stem] = line.strip()
                                 break
-                    except:
+                    except Exception:
                         pass
 
         return status

@@ -320,7 +320,7 @@ async def health_check():
         cur.close()
         db_pool.putconn(conn)
         db_healthy = True
-    except:
+    except Exception:
         pass
 
     # Check Redis
@@ -329,7 +329,7 @@ async def health_check():
         try:
             redis_client.ping()
             redis_healthy = True
-        except:
+        except Exception:
             pass
 
     # Check models

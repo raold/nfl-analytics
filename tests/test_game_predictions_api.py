@@ -265,7 +265,7 @@ def main():
     try:
         requests.get(f"{API_BASE_URL}/../health", timeout=2)
         api_running = True
-    except:
+    except Exception:
         api_running = False
         print("\n⚠️  API not running - skipping endpoint tests")
         print("   Start API with: uvicorn py.api.main:app --host 0.0.0.0 --port 8000")

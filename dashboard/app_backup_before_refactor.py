@@ -1792,7 +1792,7 @@ def main():
                 conn,
             )
             model_versions = model_versions_df["model_version"].tolist()
-    except:
+    except Exception:
         model_versions = []
 
     selected_model = st.sidebar.selectbox("Model Version", ["All"] + model_versions, index=0)

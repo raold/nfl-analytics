@@ -210,21 +210,21 @@ class ABTestRunner:
             try:
                 pred = self.rpy2_interface.predict_state_space(player_id, season, week)
                 predictions["state_space_v2"] = pred.get("mean") if pred else None
-            except:
+            except Exception:
                 predictions["state_space_v2"] = None
 
             # Hierarchical v2
             try:
                 pred = self.rpy2_interface.predict_hierarchical(player_id, season, week)
                 predictions["hierarchical_v2"] = pred.get("mean") if pred else None
-            except:
+            except Exception:
                 predictions["hierarchical_v2"] = None
 
             # Informative Priors v2
             try:
                 pred = self.rpy2_interface.predict_informative_priors(player_id, season, week)
                 predictions["informative_priors_v2"] = pred.get("mean") if pred else None
-            except:
+            except Exception:
                 predictions["informative_priors_v2"] = None
 
             elapsed_ms = (time.time() - start_time) * 1000

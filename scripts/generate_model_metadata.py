@@ -68,7 +68,7 @@ def extract_version(filename: str) -> str:
     if "_v" in filename:
         try:
             return "v" + filename.split("_v")[1].split("_")[0].split(".")[0]
-        except:
+        except Exception:
             pass
     return "v1.0"
 

@@ -55,7 +55,7 @@ def check_citations_used(tex_dir, bib_entries):
             for citation_list in citations:
                 for key in citation_list.split(","):
                     cited_keys.add(key.strip())
-        except:
+        except Exception:
             pass
 
     bib_keys = {entry["key"] for entry in bib_entries}

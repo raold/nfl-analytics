@@ -29,7 +29,7 @@ def get_process_cmd(pid):
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except:
+    except Exception:
         pass
     return None
 
@@ -46,7 +46,7 @@ def monitor_round_completion(pid):
         # For now, we'll wait for the process to complete
         # In production, we'd tail log files or check Redis task status
         return not check_process_running(pid)
-    except:
+    except Exception:
         return False
 
 

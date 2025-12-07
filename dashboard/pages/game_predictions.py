@@ -594,7 +594,7 @@ def main():
                 st.success("API Connected")
             else:
                 st.warning(f"API returned {health.status_code}")
-        except:
+        except Exception:
             st.error("API Offline")
 
     # Main content area
