@@ -348,7 +348,7 @@ class V25ProductionDeployer:
                 logger.info("✓ API endpoint test passed")
             else:
                 logger.warning("⚠ API endpoint returned non-200 status")
-        except:
+        except Exception:
             logger.warning("⚠ API endpoint not available (not critical)")
 
         return tests_passed

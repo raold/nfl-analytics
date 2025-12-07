@@ -348,12 +348,12 @@ class MixtureExpertsBNN:
         if X_train_shape is None and hasattr(self.model, "X"):
             try:
                 X_train_shape = self.model["X"].get_value().shape
-            except:
+            except Exception:
                 pass
         if y_train_shape is None and hasattr(self.model, "y"):
             try:
                 y_train_shape = self.model["y"].get_value().shape
-            except:
+            except Exception:
                 pass
 
         save_obj = {

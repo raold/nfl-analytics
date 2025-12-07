@@ -220,22 +220,22 @@ class DashboardFeatureGenerator:
                                 elif keyword.arg == "default":
                                     try:
                                         default = ast.literal_eval(keyword.value)
-                                    except:
+                                    except Exception:
                                         default = None
                                 elif keyword.arg == "help":
                                     try:
                                         help_text = ast.literal_eval(keyword.value)
-                                    except:
+                                    except Exception:
                                         help_text = None
                                 elif keyword.arg == "choices":
                                     try:
                                         choices = ast.literal_eval(keyword.value)
-                                    except:
+                                    except Exception:
                                         choices = None
                                 elif keyword.arg == "required":
                                     try:
                                         required = ast.literal_eval(keyword.value)
-                                    except:
+                                    except Exception:
                                         required = False
 
                             # Determine widget type

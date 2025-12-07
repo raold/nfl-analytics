@@ -66,7 +66,7 @@ def check_package_installed(package_name: str) -> bool:
             spec = importlib.util.find_spec(alternative_names[package_name].replace("-", "_"))
             if spec is not None:
                 return True
-        except:
+        except Exception:
             pass
 
     return False

@@ -147,7 +147,7 @@ def test_github_operations():
             print(f"      Name: {stats.get('name', 'N/A')}")
             print(f"      Stars: {stats.get('stargazerCount', 'N/A')}")
             print(f"      Open Issues: {stats.get('openIssuesCount', 'N/A')}")
-        except:
+        except Exception:
             print("   ✅ Repo stats command executed")
             print(f"      Output: {result.get('output', '')[:100]}")
     else:

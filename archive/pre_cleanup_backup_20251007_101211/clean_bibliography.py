@@ -23,7 +23,7 @@ def get_cited_keys(tex_dir):
             for citation_list in citations:
                 for key in citation_list.split(","):
                     cited_keys.add(key.strip())
-        except:
+        except Exception:
             pass
 
     return cited_keys

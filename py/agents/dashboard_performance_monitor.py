@@ -570,7 +570,7 @@ class DashboardPerformanceMonitor:
             current, peak = tracemalloc.get_traced_memory()
             tracemalloc.stop()
             return current / (1024 * 1024)  # Convert bytes to MB
-        except:
+        except Exception:
             return 0.0
 
     def _classify_performance(self, duration_ms: float, threshold_ms: float) -> PerformanceSeverity:

@@ -253,7 +253,7 @@ class QualityChecker:
                     content = f.read()
                     if "dissertation_style" in content:
                         style_imports += 1
-            except:
+            except Exception:
                 pass
 
         if style_imports == 0:

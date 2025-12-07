@@ -966,7 +966,7 @@ class DifferenceInDifferencesEstimator:
                     df_boot, outcome, cohort_var, time_var, bootstrap_reps=1
                 )
                 boot_atts_list.append(boot_atts)
-            except:
+            except Exception:
                 continue
 
         if len(boot_atts_list) == 0:

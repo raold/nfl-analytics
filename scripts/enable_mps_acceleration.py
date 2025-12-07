@@ -87,7 +87,7 @@ def has_device_utils_import(file_path: Path) -> bool:
         with open(file_path) as f:
             content = f.read()
         return "get_best_device" in content
-    except:
+    except Exception:
         return False
 
 

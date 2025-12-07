@@ -159,7 +159,7 @@ class TestAsofJoinSafety:
         # Load asof_team_features if exists
         try:
             df = pd.read_sql("SELECT * FROM mart.asof_team_features LIMIT 1000", db_connection)
-        except:
+        except Exception:
             pytest.skip("mart.asof_team_features table does not exist")
 
         # Check temporal ordering

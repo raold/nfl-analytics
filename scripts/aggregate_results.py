@@ -42,7 +42,7 @@ class ResultsAggregator:
 
             if torch.cuda.is_available():
                 return torch.version.cuda
-        except:
+        except Exception:
             pass
         return "unknown"
 
@@ -187,7 +187,7 @@ class ResultsAggregator:
                             1 for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE
                         ),
                     }
-                except:
+                except Exception:
                     pass
 
     def calculate_speedup(self):

@@ -304,7 +304,7 @@ def render_game_predictions_comparison() -> None:
         from app import get_current_nfl_week
 
         current_season, current_week = get_current_nfl_week()
-    except:
+    except Exception:
         # Fallback if import fails
         current_season = 2025
         current_week = 12

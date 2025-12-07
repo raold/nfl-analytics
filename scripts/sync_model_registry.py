@@ -113,7 +113,7 @@ def extract_model_info(file_path: Path) -> dict | None:
     if "_v" in filename:
         try:
             version = "v" + filename.split("_v")[1].split("_")[0].split(".")[0]
-        except:
+        except Exception:
             pass
 
     model_family = MODEL_FAMILY_MAP.get(model_type, "unknown")

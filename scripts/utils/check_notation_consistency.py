@@ -47,7 +47,7 @@ def check_notation_consistency(tex_dir):
                     if re.search(variant, content):
                         found_variations.add(variant)
                         notation_usage[pattern_name].add((variant, tex_file.name))
-            except:
+            except Exception:
                 pass
 
         if len(found_variations) > 1:
@@ -89,7 +89,7 @@ def check_table_formatting(tex_dir):
                 else:
                     tables_without_threeparttable += 1
                     issues.append(f"{tex_file.name}: Missing threeparttable")
-        except:
+        except Exception:
             pass
 
     print(f"\nTables with threeparttable: {tables_with_threeparttable}")
@@ -122,7 +122,7 @@ def check_citation_style(tex_dir):
             cite_commands["\\citep{"] += len(re.findall(r"\\citep\{", content))
             cite_commands["\\citet{"] += len(re.findall(r"\\citet\{", content))
             cite_commands["\\citeauthor{"] += len(re.findall(r"\\citeauthor\{", content))
-        except:
+        except Exception:
             pass
 
     print("\nCitation command usage:")
@@ -157,7 +157,7 @@ def check_figure_references(tex_dir):
             ref_styles["\\cref{"] += len(re.findall(r"\\cref\{", content))
             ref_styles["Figure~\\ref"] += len(re.findall(r"Figure~\\ref", content))
             ref_styles["Table~\\ref"] += len(re.findall(r"Table~\\ref", content))
-        except:
+        except Exception:
             pass
 
     print("\nReference command usage:")
