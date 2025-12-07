@@ -1,8 +1,9 @@
 # Database Quick Reference
 
-**Last Updated:** November 14, 2025
+**Last Updated:** December 7, 2025
 **Purpose:** Quick lookup reference for database schema, connections, and critical conventions
 **Full Documentation:** See [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
+**Health Check:** `python scripts/db_health_check.py`
 
 ---
 
@@ -111,19 +112,18 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 
 ### mart schema (Derived/Materialized)
 
-**Materialized Views** (refresh required):
-- `mart.game_summary` - Enriched game-level summary
-- `mart.game_weather` - Derived weather features
-- `mart.game_features_enhanced` - 157-feature composite for modeling
+**Materialized Views** (refresh with `SELECT mart.refresh_all_views();`):
+- `mart.game_summary` - 7,263 games with betting analysis, weather
+- `mart.player_hierarchy` - 24,341 players with position groups, team mappings
+- `mart.player_game_stats` - 25,677 player-game records from NextGen stats
 
 **Tables:**
-- `mart.team_epa` - Per-game EPA summaries
-- `mart.team_4th_down_features` - 4th-down decision metrics
-- `mart.team_playoff_context` - Playoff probabilities
-- `mart.team_injury_load` - Injury load metrics
-- `mart.player_hierarchy` - 15,213 players with position mappings
-- `mart.player_game_stats` - 24,950 player-game records
-- `mart.bayesian_player_ratings` - Bayesian model predictions
+- `mart.team_epa` - 14,366 team-game EPA summaries
+- `mart.team_4th_down_features` - 14,362 4th-down decision metrics
+- `mart.team_playoff_context` - 3,360 playoff probabilities (2020+)
+- `mart.team_injury_load` - 2,798 injury load metrics
+- `mart.position_groups` - 29 position→position_group mappings
+- `mart.bayesian_player_ratings` - Bayesian model output (populated by models)
 
 ---
 
