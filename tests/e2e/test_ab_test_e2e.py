@@ -285,7 +285,7 @@ class TestDatabaseLoggingE2E:
         router = ABTestRouter(split_ratio=0.0)  # All control
 
         # Make prediction
-        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Verify model registry query
         registry_calls = [
@@ -322,7 +322,7 @@ class TestDatabaseLoggingE2E:
         # Batch predictions
         games = [{"player_id": f"player_{i:03d}", "season": 2024, "week": 10} for i in range(50)]
 
-        df = router.predict_batch(games, log_to_db=True)
+        router.predict_batch(games, log_to_db=True)
 
         # Verify all logged (2 queries per prediction: model_id + player info)
         assert mock_cursor.execute.call_count == 50 * 3  # model_id, player_info, insert
@@ -460,7 +460,7 @@ class TestPerformanceBenchmarks:
         games = [{"player_id": f"player_{i:05d}", "season": 2024, "week": 10} for i in range(100)]
 
         start = time.time()
-        df = router.predict_batch(games, log_to_db=False)
+        router.predict_batch(games, log_to_db=False)
         elapsed = time.time() - start
 
         assert elapsed < 5.0, f"Batch 100 took {elapsed:.2f}s, exceeds 5s"

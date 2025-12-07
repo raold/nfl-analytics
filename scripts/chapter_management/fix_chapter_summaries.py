@@ -45,9 +45,7 @@ def extract_chaptersummary(content):
     depth = 0
     in_first_arg = False
     in_second_arg = False
-    first_arg_start = None
     first_arg_end = None
-    second_arg_start = None
     second_arg_end = None
 
     i = pos + len("\\chaptersummary")
@@ -55,10 +53,10 @@ def extract_chaptersummary(content):
         if content[i] == "{":
             if depth == 0 and not in_first_arg:
                 in_first_arg = True
-                first_arg_start = i + 1
+                i + 1
             elif depth == 0 and in_first_arg and first_arg_end is not None and not in_second_arg:
                 in_second_arg = True
-                second_arg_start = i + 1
+                i + 1
             depth += 1
         elif content[i] == "}":
             depth -= 1

@@ -622,7 +622,7 @@ def test_performance_split_validation(detector):
     )
 
     start = time.time()
-    report = detector.validate_split(train_df, test_df)
+    detector.validate_split(train_df, test_df)
     elapsed = time.time() - start
 
     # Should complete in < 0.5 seconds
@@ -743,7 +743,7 @@ def test_malformed_dates(detector):
 
 def test_report_generation(detector, leaky_dataframe):
     """Test that report generation produces readable output."""
-    report = detector.check_dataframe(leaky_dataframe, target_col="passing_yards")
+    detector.check_dataframe(leaky_dataframe, target_col="passing_yards")
 
     # Generate formatted report
     report_text = detector.generate_report()

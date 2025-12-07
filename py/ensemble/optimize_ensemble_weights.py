@@ -114,9 +114,8 @@ def load_predictions(predictions_path: Path) -> pd.DataFrame:
     df = pd.read_csv(predictions_path)
 
     # Validate required columns
-    required_cols = ["actual_yards"]
     pred_cols = [col for col in df.columns if col.startswith("pred_")]
-    std_cols = [col for col in df.columns if col.startswith("std_")]
+    [col for col in df.columns if col.startswith("std_")]
 
     if "actual_yards" not in df.columns:
         logger.error("Missing 'actual_yards' column")

@@ -207,7 +207,7 @@ def plot_ablation_heatmap(df: pd.DataFrame, output_path: Path):
 
     # 4. Configuration comparison (Val vs Test Brier)
     ax = axes[1, 1]
-    comparison_data = df[["Val Brier", "Test Brier"]].values
+    df[["Val Brier", "Test Brier"]].values
     config_names = df["Configuration"].str[:15].values  # Truncate names
 
     x = np.arange(len(config_names))
@@ -423,7 +423,7 @@ def generate_text_analysis(df: pd.DataFrame, output_path: Path):
     report.append("-" * 80)
     best_val = df.loc[df["Val Brier"].idxmin()]
     best_test = df.loc[df["Test Brier"].idxmin()]
-    best_gen = df_gen_sorted.iloc[0]
+    df_gen_sorted.iloc[0]
 
     report.append("1. Best Overall Model:")
     report.append(f"   → {best_test['Configuration']}")

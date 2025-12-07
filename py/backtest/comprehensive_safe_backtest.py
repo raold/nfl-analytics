@@ -169,8 +169,8 @@ class ComprehensiveSafeBacktest:
         print("Preparing matchup features...")
 
         # Get home and away records
-        home_df = df[df["is_home"] == True].copy()
-        away_df = df[df["is_home"] == False].copy()
+        home_df = df[df["is_home"]].copy()
+        away_df = df[not df["is_home"]].copy()
 
         # Merge on game_id
         matchups = home_df.merge(away_df, on="game_id", suffixes=("_home", "_away"))

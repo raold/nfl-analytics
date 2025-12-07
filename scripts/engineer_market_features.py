@@ -458,7 +458,7 @@ class MarketFeatureEngineer:
         df = df.merge(latest_snapshots, on=["event_id", "market_key"], how="left")
 
         # Filter to latest snapshot
-        df_latest = df[df["snapshot_at"] == df["latest_snapshot_at"]].copy()
+        df[df["snapshot_at"] == df["latest_snapshot_at"]].copy()
 
         # Aggregate to event level
         event_features = (

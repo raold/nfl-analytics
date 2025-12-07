@@ -254,7 +254,7 @@ class AttentionLayer(nn.Module):
         messages = attn_weights.unsqueeze(1) * V  # (num_edges, embed_dim)
 
         # Aggregate to destination nodes using scatter (more robust than for-loop)
-        num_nodes = embeddings.size(0)
+        embeddings.size(0)
         aggregated = torch.zeros_like(embeddings)
 
         # Expand dst_indices to match message dimensions for scatter

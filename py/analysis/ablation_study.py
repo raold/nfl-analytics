@@ -281,7 +281,7 @@ def compute_metrics(predictions: pd.DataFrame) -> dict[str, float]:
     """
     pred_yards = predictions["pred_yards"].to_numpy()
     actual_yards = predictions["actual_yards"].to_numpy()
-    pred_std = predictions["pred_std"].to_numpy()
+    predictions["pred_std"].to_numpy()
 
     # MAE
     mae = np.abs(pred_yards - actual_yards).mean()
@@ -684,7 +684,7 @@ def main():
     )
 
     # Significant improvements
-    n_significant = (statistical_tests_df["significant_at_0.05"] == True).sum()
+    n_significant = (statistical_tests_df["significant_at_0.05"]).sum()
     logger.info(
         f"Significant improvements over individual models (α=0.05): {n_significant}/{len(statistical_tests_df)}"
     )

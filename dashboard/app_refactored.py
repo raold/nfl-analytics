@@ -121,7 +121,7 @@ def render_predictions_page():
                 df_performance = PredictionQueries.weekly_performance_metrics(conn)
 
                 # Get model comparison
-                df_comparison = PredictionQueries.model_comparison(conn)
+                PredictionQueries.model_comparison(conn)
 
         except Exception as e:
             st.error(f"Error fetching data: {str(e)}")

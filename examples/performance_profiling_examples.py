@@ -228,7 +228,7 @@ def example_6_report_export():
 
     # Detect bottlenecks
     print("\nDetecting bottlenecks...")
-    bottlenecks = agent.detect_bottlenecks(
+    agent.detect_bottlenecks(
         profile_database=True,
         profile_python=False,
         profile_api=False,

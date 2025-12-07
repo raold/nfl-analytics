@@ -146,7 +146,6 @@ def generate_improvement_hierarchy():
     # Improvement sources
     categories = ["Feature\nEngineering", "Prior\nTuning", "Architectural\nInnovation"]
     max_improvements = [5.1, 0.5, 60.2]  # percentage points
-    final_coverage = [31.3, 31.8, 92.0]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

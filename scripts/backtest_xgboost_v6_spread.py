@@ -137,7 +137,7 @@ class XGBoostV6Backtester:
                 features[model_feat] = features[raw_feat]
 
         # Get columns that exist in both
-        available_features = [f for f in self.feature_names if f in features.columns]
+        [f for f in self.feature_names if f in features.columns]
         missing_features = [f for f in self.feature_names if f not in features.columns]
 
         if missing_features:

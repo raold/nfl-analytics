@@ -108,7 +108,7 @@ def test_no_nan_values(extractor):
 def test_performance_benchmark(extractor):
     """Test that feature extraction completes within performance targets."""
     start_time = time.time()
-    features = extractor.extract_game_features("HOU", "BUF", 2025, 12)
+    extractor.extract_game_features("HOU", "BUF", 2025, 12)
     elapsed_ms = (time.time() - start_time) * 1000
 
     logger.info(f"Feature extraction time: {elapsed_ms:.1f}ms")

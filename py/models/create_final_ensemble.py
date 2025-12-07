@@ -66,7 +66,7 @@ conn = psycopg2.connect(
 print("\n2. Loading test data...")
 query = """
 WITH team_game_stats AS (
-    SELECT 
+    SELECT
         game_id,
         posteam as team,
         COUNT(*) as plays,
@@ -82,7 +82,7 @@ WITH team_game_stats AS (
     GROUP BY game_id, posteam
     HAVING COUNT(*) > 10
 )
-SELECT 
+SELECT
     t1.game_id,
     SUBSTRING(t1.game_id FROM 1 FOR 4)::int as season,
     CASE WHEN t1.final_score > t2.final_score THEN 1.0 ELSE 0.0 END as team1_win,

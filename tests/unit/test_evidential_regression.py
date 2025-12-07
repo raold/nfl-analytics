@@ -373,7 +373,7 @@ class TestEvidentialRegressor:
 
         split = 150
         X_train, X_test = X[:split], X[split:]
-        y_train, y_test = y[:split], y[split:]
+        y_train, _y_test = y[:split], y[split:]
 
         # Train model
         model = EvidentialRegressor(

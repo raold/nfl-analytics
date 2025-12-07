@@ -323,7 +323,7 @@ def train_hybrid_model(train_df: pd.DataFrame) -> HybridStaticIncrementalXGBoost
     # Train static component with sample weights
     # Note: XGBRegressor.fit() accepts sample_weight parameter
     logger.info("Training static component with exponential decay weights...")
-    X_train_df = pd.DataFrame(X_train, columns=FEATURE_COLS)
+    pd.DataFrame(X_train, columns=FEATURE_COLS)
 
     # Manually train to support sample weights
     from sklearn.preprocessing import StandardScaler

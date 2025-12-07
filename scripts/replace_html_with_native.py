@@ -97,7 +97,6 @@ def replace_international_banner(content: str) -> str:
 def replace_scheduled_games_banner(content: str) -> str:
     """Replace scheduled games banners."""
     # Multiple patterns for different day labels
-    pattern = r'st\.markdown\(f"""[\s\S]*?<h3 style="color: white;.*?>[\s\S]*?🔴 LIVE NOW.*?</h3>[\s\S]*?""", unsafe_allow_html=True\)'
 
     # This is more complex - need to handle multiple cases
     # For now, return content unchanged (manual fix required)

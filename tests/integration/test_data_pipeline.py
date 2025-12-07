@@ -119,7 +119,7 @@ class TestDataIngestion:
     def test_weather_join_coverage(self, db_connection):
         """Test weather data join coverage."""
         query = """
-            SELECT 
+            SELECT
                 COUNT(*) AS total_games,
                 COUNT(w.game_id) AS games_with_weather,
                 COUNT(w.game_id)::float / COUNT(*)::float AS coverage
@@ -200,7 +200,7 @@ class TestDataQuality:
     def test_weather_values_reasonable(self, db_connection):
         """Test that weather values are reasonable."""
         query = """
-            SELECT 
+            SELECT
                 MIN(temp_c) AS min_temp,
                 MAX(temp_c) AS max_temp,
                 MIN(wind_kph) AS min_wind,

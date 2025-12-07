@@ -555,13 +555,6 @@ class TestSchemaDriftDetection:
 
         mock_connect.side_effect = [create_identical_conn(), create_identical_conn()]
 
-        target_config = {
-            "host": "localhost",
-            "port": 5544,
-            "database": "target_db",
-            "user": "test",
-            "password": "test",
-        }
 
         # Simplified mock - just check no drift is reported
         report = DriftReport(source_env="source", target_env="target")

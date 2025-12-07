@@ -257,7 +257,7 @@ def profile_assembly_loop(ensemble, games):
 
     # Convert to DataFrame (same as original)
     df_start = time.perf_counter()
-    df = pd.DataFrame(results)
+    pd.DataFrame(results)
     df_time = (time.perf_counter() - df_start) * 1000
 
     # Print results
@@ -373,7 +373,7 @@ def profile_memory_allocation(ensemble, games):
 
     mem_after_loop = tracemalloc.get_traced_memory()
 
-    df = pd.DataFrame(results)
+    pd.DataFrame(results)
     mem_after_df = tracemalloc.get_traced_memory()
 
     tracemalloc.stop()
@@ -419,7 +419,7 @@ def profile_with_cprofile(ensemble, games):
     profiler.enable()
 
     # Run predict_batch
-    df = ensemble.predict_batch(games)
+    ensemble.predict_batch(games)
 
     profiler.disable()
 

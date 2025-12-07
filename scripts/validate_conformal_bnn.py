@@ -391,7 +391,6 @@ class ConformalBNNValidator:
             base_estimator = PyTorchBNNWrapper(bnn_model, device="cpu", n_samples=50)
 
             # No training needed (pre-fitted)
-            cv_method = "prefit"
 
         else:
             logger.info("  Base model: Random Forest")

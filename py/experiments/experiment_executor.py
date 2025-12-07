@@ -683,7 +683,7 @@ class ExperimentExecutor:
         ORDER BY week
         """
 
-        df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
+        pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
             "temporal_mae": 6.8,

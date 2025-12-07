@@ -55,7 +55,7 @@ def analyze_results(results_all_seasons):
 
     # High-roughing defense subgroup
     high_roughing_results = results_all_seasons[
-        results_all_seasons["is_high_roughing_defense"] == True
+        results_all_seasons["is_high_roughing_defense"]
     ]
 
     if len(high_roughing_results) > 0:
@@ -70,7 +70,7 @@ def analyze_results(results_all_seasons):
 
     # Low-roughing defense subgroup (for contrast)
     low_roughing_results = results_all_seasons[
-        results_all_seasons["is_high_roughing_defense"] == False
+        not results_all_seasons["is_high_roughing_defense"]
     ]
 
     if len(low_roughing_results) > 0:

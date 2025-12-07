@@ -558,7 +558,7 @@ class EnsembleHealthMonitor:
 
         # Calculate inter-model agreement
         means = [p[0] for p in component_predictions.values()]
-        stds = [p[1] for p in component_predictions.values()]
+        [p[1] for p in component_predictions.values()]
 
         prediction_variance = np.var(means)
 

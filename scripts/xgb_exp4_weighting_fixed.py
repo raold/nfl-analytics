@@ -404,8 +404,8 @@ def main():
         train_df = df[train_mask].copy()
         test_df = df[test_mask].copy()
 
-        sample_weights_train = sample_weights[train_mask]
-        sample_weights_test = sample_weights[test_mask]
+        sample_weights[train_mask]
+        sample_weights[test_mask]
 
         logger.info(f"✓ Train set: {len(train_df):,} rows")
         logger.info(f"✓ Test set: {len(test_df):,} rows")

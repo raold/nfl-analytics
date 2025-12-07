@@ -402,7 +402,7 @@ class DefensivePressureEffectivenessEngine:
         metrics = metrics.copy()
 
         # Merge game dates for sorting
-        game_dates = metrics[["game_id", "defense_team"]].drop_duplicates()
+        metrics[["game_id", "defense_team"]].drop_duplicates()
 
         # Sort by team and game
         metrics = metrics.sort_values(["defense_team", "game_id"])

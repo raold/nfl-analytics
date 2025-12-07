@@ -251,7 +251,7 @@ def load_standard_tasks_redis(queue: RedisTaskQueue):
     tasks_added = 0
 
     for task_config in standard_tasks:
-        task_id = queue.add_task(
+        queue.add_task(
             name=task_config["name"],
             task_type=task_config["type"],
             config=task_config["config"],

@@ -52,7 +52,7 @@ def main():
     # Run audit
     if args.page:
         logger.info(f"Auditing specific page: {args.page}")
-        issues = auditor.audit_page(args.page)
+        auditor.audit_page(args.page)
         report = None  # TODO: Create report from issues
     else:
         logger.info("Running full frontend audit...")

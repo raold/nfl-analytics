@@ -215,7 +215,7 @@ def test_vegas_line_bias():
             return False
 
         # Verify critical schema usage (must use spread_close, not spread_line)
-        sample = features.head(1)
+        features.head(1)
         print(f"✓ Generated {len(features)} game records")
         print("✓ Using correct schema columns (spread_close, total_close)")
         return True

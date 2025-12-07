@@ -76,7 +76,7 @@ def ensemble_v7_with_mocks(test_db_config):
     """Create ensemble v7.0 with all components mocked."""
     with (
         patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1") as mock_causal,
-        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface") as mock_r,
+        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
         patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
     ):
 

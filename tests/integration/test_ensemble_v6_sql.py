@@ -188,20 +188,6 @@ class TestDatabaseSchema:
         # This test validates the SQL query structure (not execution)
 
         # Expected query pattern from v6 ensemble
-        query_pattern = """
-        SELECT
-            pass_yards_l3,
-            pass_attempts_l3,
-            completions_l3,
-            completions_pct_l3,
-            opponent_epa,
-            opponent_points_allowed,
-            home_away_encoded
-        FROM mart.player_game_stats
-        WHERE player_id = %s
-          AND season = %s
-          AND week = %s
-        """
 
         # Validate query has expected columns (manual check - no SQL execution)
         expected_columns = [

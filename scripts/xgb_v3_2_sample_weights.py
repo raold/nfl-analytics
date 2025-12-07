@@ -228,7 +228,7 @@ def main():
     test_df = df[test_mask].copy()
 
     sample_weights_train = sample_weights[train_mask]
-    sample_weights_test = sample_weights[test_mask]
+    sample_weights[test_mask]
 
     # Prepare features
     X_train, y_train, feature_names = prepare_features(train_df)

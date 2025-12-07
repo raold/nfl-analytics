@@ -41,7 +41,7 @@ def monitor_round_completion(pid):
     # Use lsof to find open files and look for log patterns
     try:
         # Check if process is writing to any log files
-        result = subprocess.run(["lsof", "-p", str(pid)], capture_output=True, text=True)
+        subprocess.run(["lsof", "-p", str(pid)], capture_output=True, text=True)
 
         # For now, we'll wait for the process to complete
         # In production, we'd tail log files or check Redis task status

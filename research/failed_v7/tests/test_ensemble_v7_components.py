@@ -347,15 +347,6 @@ class TestComponentDiversity:
 
     def test_minimum_3_components_required(self, mock_ensemble_with_partial_components):
         """Ensemble requires minimum 3 components to work."""
-        features = {
-            "pass_yards_l3": 200.0,
-            "pass_attempts_l3": 30.0,
-            "completions_l3": 20.0,
-            "completions_pct_l3": 0.65,
-            "opponent_epa": 0.0,
-            "opponent_points_allowed": 22.0,
-            "home_away_encoded": 0,
-        }
 
         # Mock causal features
         mock_ensemble_with_partial_components.causal_features = Mock()
@@ -381,7 +372,6 @@ class TestComponentDiversity:
 
     def test_insufficient_components_raises_error(self, mock_ensemble_with_all_components):
         """Should raise error if fewer than 3 components available."""
-        features = {}
 
         # Mock all components to fail
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(None, None))
@@ -411,7 +401,6 @@ class TestComponentDiversity:
 
     def test_component_variance_check(self, mock_ensemble_with_all_components):
         """Components should have variance >= 5 yards."""
-        features = {}
 
         # All components predict same value (no variance)
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(240.0, 50.0))
@@ -443,7 +432,6 @@ class TestComponentDiversity:
 
     def test_component_mean_not_placeholder(self, mock_ensemble_with_all_components):
         """Ensemble mean should not be 250 (placeholder)."""
-        features = {}
 
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(240.0, 50.0))
         mock_ensemble_with_all_components._predict_hierarchical = Mock(return_value=(235.0, 50.0))

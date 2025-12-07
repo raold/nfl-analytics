@@ -362,7 +362,7 @@ class CLAUDEMDValidator:
             conn.close()
 
             # Extract claimed metrics from CLAUDE.md
-            matches = re.findall(
+            re.findall(
                 r"(\d+)\s*(?:games|plays|columns|models)", self.content, re.IGNORECASE
             )
 

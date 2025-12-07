@@ -671,36 +671,6 @@ class NextGenStatsFeatures:
         opponent_data = [(row["season"], row["week"], row["opponent"]) for row in opponent_weeks]
 
         # Query 1: Passing NGS allowed (opponent QBs)
-        query_passing = """
-        WITH opponent_qbs AS (
-            SELECT
-                r.season,
-                r.week,
-                r.team as opponent,
-                ngp.attempts,
-                ngp.avg_time_to_throw,
-                ngp.completion_percentage_above_expectation as cpoe,
-                ngp.aggressiveness,
-                ngp.avg_intended_air_yards as adot
-            FROM nextgen_passing ngp
-            INNER JOIN rosters r
-                ON ngp.player_id = r.player_id
-                AND ngp.season = r.season
-                AND ngp.week = r.week
-            WHERE (r.season, r.week, r.team) = ANY(%s::opponent_week_team[])
-              AND ngp.attempts > 0
-        )
-        SELECT
-            season,
-            week,
-            opponent,
-            SUM(avg_time_to_throw * attempts) / NULLIF(SUM(attempts), 0) as time_to_throw_allowed,
-            SUM(cpoe * attempts) / NULLIF(SUM(attempts), 0) as cpoe_allowed,
-            SUM(aggressiveness * attempts) / NULLIF(SUM(attempts), 0) as aggressiveness_allowed,
-            SUM(adot * attempts) / NULLIF(SUM(attempts), 0) as adot_allowed
-        FROM opponent_qbs
-        GROUP BY season, week, opponent;
-        """
 
         # PostgreSQL doesn't support ARRAY of composite types easily, use multiple queries
         passing_results = []

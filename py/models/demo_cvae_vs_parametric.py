@@ -167,7 +167,7 @@ def compare_distributions(cvae_model: ConditionalVAE, conditions: torch.Tensor):
     # Add correlation values
     for i in range(4):
         for j in range(4):
-            text = ax.text(
+            ax.text(
                 j,
                 i,
                 f"{corr_matrix[i, j]:.2f}",
@@ -405,7 +405,7 @@ def main():
     )
 
     # Generate comparison plots
-    fig = compare_distributions(model, test_conditions)
+    compare_distributions(model, test_conditions)
     plt.savefig("analysis/cvae_vs_parametric.png", dpi=150, bbox_inches="tight")
     print("   Saved comparison plots to analysis/cvae_vs_parametric.png")
 

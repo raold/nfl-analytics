@@ -206,7 +206,7 @@ class PredictionRequest(BaseModel):
     )
 
     @validator("stat_type")
-    def validate_stat_type(cls, v):
+    def validate_stat_type(self, v):
         valid_stats = {
             "passing_yards",
             "passing_tds",
@@ -262,7 +262,7 @@ class EnsembleWeights(BaseModel):
     state_space: float = Field(..., ge=0.0, le=1.0)
 
     @validator("*")
-    def weights_sum_to_one(cls, v):
+    def weights_sum_to_one(self, v):
         # Note: This validates individual fields; sum check in model
         if not (0.0 <= v <= 1.0):
             raise ValueError("Weight must be between 0.0 and 1.0")
@@ -872,7 +872,6 @@ async def get_models() -> ModelsListResponse:
     loaded_count = 0
 
     # Get ensemble model versions
-    model_versions = model_manager.model_versions if model_manager else {}
 
     # Define model metadata
     model_configs = [

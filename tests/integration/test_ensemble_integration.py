@@ -333,7 +333,7 @@ def test_meta_features_engineering(
 
     ensemble_with_stacking.meta_learner.predict = Mock(side_effect=capture_predict)
 
-    result = ensemble_with_stacking.get_4way_ensemble_predictions(
+    ensemble_with_stacking.get_4way_ensemble_predictions(
         mock_bayesian_predictions,
         mock_xgb_predictions,
         mock_bnn_predictions,

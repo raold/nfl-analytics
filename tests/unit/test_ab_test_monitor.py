@@ -590,7 +590,7 @@ def test_guardrail_status_to_dict():
 
     d = status.to_dict()
 
-    assert d["violated"] == True
+    assert d["violated"]
     assert len(d["violations"]) == 1
     assert len(d["warnings"]) == 1
     assert d["metrics"]["mae_degradation_pct"] == 15.0
@@ -618,7 +618,7 @@ def test_significance_report_to_dict():
     assert d["metric"] == "mae"
     assert d["difference"] == -7.0
     assert d["p_value"] == 0.001
-    assert d["significant"] == True
+    assert d["significant"]
     assert d["ci_lower"] == -10.0
     assert d["ci_upper"] == -4.0
 

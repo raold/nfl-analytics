@@ -619,7 +619,7 @@ class PerformanceProfilingAgent:
         start_time = time.time()
         profiler.enable()
 
-        result = func(*args, **kwargs)
+        func(*args, **kwargs)
 
         profiler.disable()
         elapsed = time.time() - start_time

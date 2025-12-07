@@ -331,11 +331,11 @@ class BayesianNeuralNetwork:
                 sigma_pred = pm.Deterministic("sigma_pred", pm.math.exp(log_sigma_pred) + 1e-6)
 
                 # Likelihood with input-dependent noise
-                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
             else:
                 # Homoscedastic: Single scalar noise parameter
                 sigma = pm.HalfNormal("sigma", sigma=1.0)
-                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
 
         bnn.model = model
 

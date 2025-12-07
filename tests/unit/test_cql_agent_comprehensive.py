@@ -476,7 +476,7 @@ def test_training_step_reduces_loss(cql_agent):
         cql_agent.replay_buffer.push(state, action, reward, next_state, done)
 
     # Get initial loss
-    initial_result = cql_agent.update()
+    cql_agent.update()
 
     # Train for 100 steps
     for _ in range(100):
@@ -552,8 +552,7 @@ def test_action_to_bet_size_mapping():
 def test_policy_evaluation_expected_reward(cql_agent):
     """Test policy evaluation on logged dataset."""
     # Create dataset with known rewards
-    states = [np.random.randn(20) for _ in range(100)]
-    actions = [0, 1, 2, 3] * 25  # Balanced actions
+    [np.random.randn(20) for _ in range(100)]
     rewards = [0.5, 0.8, 1.0, 1.2] * 25  # Higher rewards for higher actions
 
     # Calculate expected reward

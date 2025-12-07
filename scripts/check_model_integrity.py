@@ -30,7 +30,7 @@ def check_integrity(model_path: str) -> int:
     try:
         if path.suffix == ".pkl":
             with open(path, "rb") as f:
-                model = pickle.load(f)
+                pickle.load(f)
         elif path.suffix == ".rds":
             # Can't load R files from Python, just check exists + size
             pass

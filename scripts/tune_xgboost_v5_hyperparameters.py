@@ -418,7 +418,7 @@ def main():
     tuner = XGBoostV5HyperparameterTuner(n_folds=args.n_folds, quick_search=args.quick)
 
     # Run grid search
-    results = tuner.run_grid_search()
+    tuner.run_grid_search()
 
     # Save results
     tuner.save_results()

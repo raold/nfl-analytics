@@ -168,7 +168,6 @@ def verify_temperature_scaling(df: pd.DataFrame) -> dict:
     """Verify that temperature scaling is being applied correctly."""
 
     # Expected temperature values from code
-    expected_temps = {"bayesian": 0.75, "xgboost": 0.80, "bnn": 0.75, "bnn_calibrated": 1.0}
 
     # For ensemble, we have the intervals
     ensemble_df = df[df["prediction_mean"].notna()].copy()

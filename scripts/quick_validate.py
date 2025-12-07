@@ -219,10 +219,10 @@ def main():
 Examples:
   # Before backtest (runs all essential validators)
   python scripts/quick_validate.py --before-backtest
-  
+
   # Quick check (data leakage + SQL only)
   python scripts/quick_validate.py --quick
-  
+
   # Before model training
   python scripts/quick_validate.py --before-training
         """,

@@ -561,7 +561,7 @@ def main():
     X_train = train_data[feature_cols]
     y_train = train_data["passing_yards"]
     X_test = test_data[feature_cols]
-    y_test = test_data["passing_yards"]
+    test_data["passing_yards"]
 
     logger.info(f"\nTrain samples: {len(X_train)}")
     logger.info(f"Test samples: {len(X_test)}")

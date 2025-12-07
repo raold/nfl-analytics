@@ -104,11 +104,11 @@ def example_1_backup_rb_analysis():
     output_dir = Path("output/did_analysis")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    fig = modeler.visualize_results(results, save_path=str(output_dir / "example1_backup_rb.pdf"))
+    modeler.visualize_results(results, save_path=str(output_dir / "example1_backup_rb.pdf"))
     plt.show()
 
     # Generate report
-    report = modeler.generate_report(
+    modeler.generate_report(
         results, output_path=str(output_dir / "example1_backup_rb_report.md")
     )
 
@@ -432,7 +432,7 @@ def example_6_comparison_to_twfe():
     # Estimate with TWFE (simplified)
     treated_post = df[(df["treated"] == 1)]["outcome"].mean()
     treated_pre = df[(df["treated"] == 0) & (df["cohort"] != "never_treated")]["outcome"].mean()
-    control = df[df["cohort"] == "never_treated"]["outcome"].mean()
+    df[df["cohort"] == "never_treated"]["outcome"].mean()
 
     twfe_att = (treated_post - treated_pre) - 0  # Simplified
 

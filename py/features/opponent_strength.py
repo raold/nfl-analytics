@@ -375,7 +375,7 @@ class OpponentStrengthEngine:
             game_id = game["game_id"]
             season = game["season"]
             week = game["week"]
-            kickoff = game["kickoff"]
+            game["kickoff"]
             home_team = game["home_team"]
             away_team = game["away_team"]
 

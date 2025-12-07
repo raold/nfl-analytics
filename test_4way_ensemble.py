@@ -158,7 +158,7 @@ def main():
 
     try:
         # Test 1: Model availability
-        available_count = test_model_availability()
+        test_model_availability()
 
         # Test 2: Variance pooling math
         test_variance_pooling()

@@ -270,7 +270,7 @@ class TestConnectionRetryLogic:
 
             # Should raise after 3 attempts
             with pytest.raises(RepositoryError):
-                with repository.get_connection() as conn:
+                with repository.get_connection():
                     pass
 
             # Should have tried exactly 3 times
@@ -295,7 +295,7 @@ class TestConnectionRetryLogic:
             mock_pool.getconn.return_value = mock_conn
 
             try:
-                with repository.get_connection() as conn:
+                with repository.get_connection():
                     raise ValueError("Query failed")
             except ValueError:
                 pass
@@ -310,7 +310,7 @@ class TestConnectionRetryLogic:
             mock_pool.getconn.return_value = mock_conn
 
             try:
-                with repository.get_connection() as conn:
+                with repository.get_connection():
                     raise psycopg2.Error("Database error")
             except RepositoryError:
                 pass

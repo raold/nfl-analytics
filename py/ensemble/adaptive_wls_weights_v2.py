@@ -287,7 +287,6 @@ class AdaptiveWLSWeightsV2:
 
         # Grid search over halflife candidates
         best_metric_value = float("inf")
-        best_weights = None
         best_halflife = None
 
         grid_results = []
@@ -333,7 +332,6 @@ class AdaptiveWLSWeightsV2:
             # Track best
             if metric_value < best_metric_value:
                 best_metric_value = metric_value
-                best_weights = weights
                 best_halflife = halflife
 
         if best_halflife is None:

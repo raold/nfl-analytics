@@ -207,13 +207,11 @@ class GameOutcomeBacktest:
                     # Bet on home team
                     bet_side = "home"
                     bet_prob = prob_home_win
-                    bet_spread = spread  # Home team spread
                     outcome = 1 if (margin + spread) > 0 else 0
                 else:
                     # Bet on away team
                     bet_side = "away"
                     bet_prob = 1 - prob_home_win
-                    bet_spread = -spread  # Away team gets opposite spread
                     outcome = 1 if (-margin + (-spread)) > 0 else 0
 
                 # Calculate Kelly bet size with safety limits

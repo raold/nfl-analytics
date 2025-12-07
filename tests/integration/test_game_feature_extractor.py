@@ -151,7 +151,7 @@ class TestGameFeatureExtractor:
         """
         # 2025 Week 12: HOU vs BUF
         start_time = time.time()
-        features = extractor.extract_game_features("HOU", "BUF", 2025, 12)
+        extractor.extract_game_features("HOU", "BUF", 2025, 12)
         elapsed_ms = (time.time() - start_time) * 1000
 
         logger.info(f"Feature extraction time: {elapsed_ms:.1f}ms")

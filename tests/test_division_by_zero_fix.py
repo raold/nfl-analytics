@@ -98,7 +98,7 @@ def test_nan_std_handling():
     print("TEST 3: NaN std handling")
     print("=" * 70)
 
-    ensemble = PlayerPropsEnsemble(
+    PlayerPropsEnsemble(
         use_bayesian=False,
         use_xgboost=False,
         use_bnn=False,

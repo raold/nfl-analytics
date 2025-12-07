@@ -357,7 +357,7 @@ def test_pipeline_handles_zero_variance_features():
     np.random.seed(42)
     X = np.random.randn(100, 3)
     X[:, 1] = 5.0  # Zero variance feature
-    y = X[:, 0] + X[:, 2] + np.random.randn(100)
+    X[:, 0] + X[:, 2] + np.random.randn(100)
 
     # Act: Train Ridge with StandardScaler
     scaler = StandardScaler()

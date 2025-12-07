@@ -487,7 +487,7 @@ def main():
     print("THURSDAY NIGHT FEATURES SAMPLE")
     print("=" * 70)
     if len(thursday_night) > 0:
-        thursday_games = thursday_night[thursday_night["is_thursday_night"] == True]
+        thursday_games = thursday_night[thursday_night["is_thursday_night"]]
         print(
             f"Total Thursday night games: {len(thursday_games) // 2}"
         )  # Divide by 2 (home + away)

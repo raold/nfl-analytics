@@ -819,7 +819,7 @@ class DifferenceInDifferencesEstimator:
                 continue
 
             baseline = cohort_df[cohort_df[time_var] == -1][outcome].values
-            control_mean = control_df[outcome].mean()
+            control_df[outcome].mean()
 
             for t in rel_times:
                 if t == -1:
@@ -942,7 +942,7 @@ class DifferenceInDifferencesEstimator:
             Dictionary with bootstrap results
         """
         # Estimate ATTs on original data
-        original_atts = self.estimate_group_time_att(
+        self.estimate_group_time_att(
             df, outcome, cohort_var, time_var, bootstrap_reps=1
         )
 
@@ -1408,7 +1408,7 @@ def main():
     modeler = InjuryShockModeler()
 
     # Run analysis
-    results = modeler.analyze_injury_shock(
+    modeler.analyze_injury_shock(
         start_season=2020,
         end_season=2024,
         outcome_type="backup_rushing_yards",
@@ -1419,7 +1419,7 @@ def main():
     )
 
     # Visualize
-    fig = modeler.visualize_results(save_path="injury_shock_analysis.pdf")
+    modeler.visualize_results(save_path="injury_shock_analysis.pdf")
     plt.show()
 
     # Generate report

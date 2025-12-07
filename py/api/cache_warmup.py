@@ -111,7 +111,8 @@ class CacheWarmer:
                         if path.suffix == ".pkl":
                             from py.models.bayesian_neural_network import BayesianNeuralNetwork
 
-                            loader = lambda p: BayesianNeuralNetwork.load(p)
+                            def loader(p):
+                                return BayesianNeuralNetwork.load(p)
                         elif path.suffix == ".json":
                             import xgboost as xgb
 

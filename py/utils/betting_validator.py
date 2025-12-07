@@ -479,7 +479,7 @@ class BettingValidator:
             # Double the volatility
             mean_return = np.mean(returns)
             std_return = np.std(returns)
-            stressed_returns = np.random.normal(mean_return, std_return * 2, len(returns))
+            np.random.normal(mean_return, std_return * 2, len(returns))
 
             stressed_sharpe = mean_return / (std_return * 2) * np.sqrt(252)
 

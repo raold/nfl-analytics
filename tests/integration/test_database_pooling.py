@@ -471,7 +471,7 @@ def test_pooled_vs_unpooled_performance(connection_pool, simple_query, benchmark
             pool_obj.putconn(conn)
 
     # Benchmark
-    result = benchmark(pooled_queries)
+    benchmark(pooled_queries)
 
     logger.info(f"✅ Pooled queries: {benchmark.stats.mean:.3f}s for 10 queries")
 

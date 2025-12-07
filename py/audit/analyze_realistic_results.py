@@ -258,9 +258,9 @@ def main():
 
     # Run analyses
     calibration = analyze_calibration(df)
-    tier_analysis = analyze_win_rate_by_confidence(df)
+    analyze_win_rate_by_confidence(df)
     seasonal = analyze_seasonal_patterns(df)
-    edge_analysis = analyze_edge_realization(df)
+    analyze_edge_realization(df)
     check_for_anomalies(df)
 
     print("\n" + "=" * 80)

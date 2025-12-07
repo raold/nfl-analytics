@@ -178,7 +178,7 @@ class WeeklyPredictionGenerator:
 
             # Extract ensemble prediction
             mean = result["ensemble_mean"]
-            std_raw = result["ensemble_std"]
+            result["ensemble_std"]
             std_calibrated = result["calibrated_std"]
             temperature = result["temperature"]
 

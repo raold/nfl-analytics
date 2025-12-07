@@ -407,9 +407,9 @@ def compare_static_vs_online(
 
     # Static model: Train once on first 50% of data
     split_idx = len(df) // 2
-    X_train_static = X.iloc[:split_idx]
+    X.iloc[:split_idx]
     y_train_static = y.iloc[:split_idx]
-    X_test_static = X.iloc[split_idx:]
+    X.iloc[split_idx:]
     y_test_static = y.iloc[split_idx:]
 
     # Train static model (simple baseline: mean)
