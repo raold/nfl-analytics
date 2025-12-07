@@ -13,10 +13,11 @@ Date: 2025-01-24
 import argparse
 import json
 import logging
+import random
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -77,44 +78,81 @@ def get_gpu_stats() -> Dict[str, float]:
 
 
 class NFLGameDataset:
-    """Dataset for NFL games with graph structure."""
+    """Dataset for NFL games with per-season graph support to avoid temporal leakage."""
 
     def __init__(
         self,
-        graph: NFLGraph,
+        graphs_by_season: Dict[int, NFLGraph],
         games: pd.DataFrame,
+        default_graph: Optional[NFLGraph] = None,
     ):
-        self.graph = graph
+        """
+        Initialize dataset with per-season graphs.
+
+        Args:
+            graphs_by_season: Dict mapping season -> NFLGraph for that season
+            games: DataFrame of games (must have 'season' column)
+            default_graph: Fallback graph if season not found (for backwards compat)
+        """
+        self.graphs_by_season = graphs_by_season
         self.games = games.reset_index(drop=True)
+        self.default_graph = default_graph
+
+        # For backwards compatibility, expose first graph as .graph
+        # This is used in train_epoch and evaluate for node features
+        if graphs_by_season:
+            # Use the most recent season's graph as the primary one
+            max_season = max(graphs_by_season.keys())
+            self.graph = graphs_by_season[max_season]
+        else:
+            self.graph = default_graph
 
     def __len__(self):
         return len(self.games)
 
+    def get_graph_for_game(self, game_season: int) -> NFLGraph:
+        """Get the appropriate graph for a game's season."""
+        if game_season in self.graphs_by_season:
+            return self.graphs_by_season[game_season]
+        elif self.default_graph is not None:
+            return self.default_graph
+        else:
+            # Fall back to nearest available season
+            available_seasons = sorted(self.graphs_by_season.keys())
+            nearest = min(available_seasons, key=lambda s: abs(s - game_season))
+            return self.graphs_by_season[nearest]
+
     def __getitem__(self, idx: int) -> Dict:
-        """Get a single game."""
+        """Get a single game with the correct season's graph."""
         game = self.games.iloc[idx]
+        season = int(game.get("season", max(self.graphs_by_season.keys())))
+
+        # Get the graph for this game's season
+        graph = self.get_graph_for_game(season)
 
         home_team = game["home_team"]
         away_team = game["away_team"]
 
-        # Get team node IDs
-        home_team_idx = self.graph.team_id_map.get(home_team)
-        away_team_idx = self.graph.team_id_map.get(away_team)
+        # Get team node IDs from the season-specific graph
+        home_team_idx = graph.team_id_map.get(home_team)
+        away_team_idx = graph.team_id_map.get(away_team)
 
         if home_team_idx is None or away_team_idx is None:
-            raise ValueError(f"Team not found in graph: {home_team} or {away_team}")
+            raise ValueError(f"Team not found in graph for season {season}: {home_team} or {away_team}")
 
         # Target: home team win (1) or loss (0)
         target = 1 if game["home_score"] > game["away_score"] else 0
 
         return {
             "game_id": game["game_id"],
+            "season": season,
             "home_team_idx": home_team_idx,
             "away_team_idx": away_team_idx,
             "target": target,
             "home_score": game["home_score"],
             "away_score": game["away_score"],
             "spread": game.get("spread", 0.0),
+            "graph": graph,  # Include the correct graph for this game
         }
 
 
@@ -122,40 +160,63 @@ def load_multi_season_data(
     seasons: List[int],
     include_chemistry: bool = True,
     db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01",
-) -> Tuple[NFLGraph, Dict[int, pd.DataFrame]]:
+    use_per_season_graphs: bool = True,
+) -> Tuple[Dict[int, NFLGraph], Dict[int, pd.DataFrame]]:
     """
-    Load data for multiple seasons and build a unified graph.
+    Load data for multiple seasons and build graphs.
 
     Args:
         seasons: List of seasons to load
         include_chemistry: Include QB-WR chemistry edges
         db_url: Database connection URL
+        use_per_season_graphs: If True, build separate graph per season to avoid
+            temporal data leakage. If False, build one unified graph (legacy behavior).
 
     Returns:
-        (graph, games_by_season)
+        (graphs_by_season, games_by_season)
+        - graphs_by_season: Dict mapping season -> NFLGraph for that season
+        - games_by_season: Dict mapping season -> DataFrame of games
     """
     db = NFLDatabase(db_url)
     builder = NFLGraphBuilder(db)
 
-    # Build unified graph combining ALL seasons
-    logger.info(f"Building unified graph for seasons: {seasons}")
-    logger.info(f"  Chemistry edges: {'enabled' if include_chemistry else 'disabled'}")
+    graphs_by_season = {}
+    games_by_season = {}
 
-    # Use multi-season graph builder to include players from ALL seasons
-    graph = builder.build_multi_season_graph(
-        seasons=seasons,
-        include_chemistry=include_chemistry,
-        include_matchups=False,
-    )
+    if use_per_season_graphs:
+        # FIXED: Build separate graph per season to prevent temporal leakage
+        # This ensures games from 2020 only see 2020 rosters, not future data
+        logger.info(f"Building per-season graphs for seasons: {seasons}")
+        logger.info(f"  Chemistry edges: {'enabled' if include_chemistry else 'disabled'}")
+        logger.info(f"  ⚠️ Per-season graphs enabled (avoids temporal leakage)")
+
+        for season in seasons:
+            graph = builder.build_season_graph(
+                season=season,
+                include_chemistry=include_chemistry,
+                include_matchups=False,
+            )
+            graphs_by_season[season] = graph
+            logger.info(f"  Season {season}: {graph.num_nodes} nodes, {len(graph.edges.get('player_to_position', []))} edges")
+    else:
+        # Legacy: Build unified graph (HAS TEMPORAL LEAKAGE - not recommended)
+        logger.warning("⚠️ Using unified multi-season graph (temporal leakage risk!)")
+        unified_graph = builder.build_multi_season_graph(
+            seasons=seasons,
+            include_chemistry=include_chemistry,
+            include_matchups=False,
+        )
+        # Use same graph for all seasons
+        for season in seasons:
+            graphs_by_season[season] = unified_graph
 
     # Load games for each season
-    games_by_season = {}
     for season in seasons:
         games = db.load_games(season=season)
         games_by_season[season] = games
         logger.info(f"  Season {season}: {len(games)} games")
 
-    return graph, games_by_season
+    return graphs_by_season, games_by_season
 
 
 def create_splits(
@@ -245,6 +306,56 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
     return remapped
 
 
+def _prepare_graph_tensors(graph: NFLGraph, device: str) -> Dict:
+    """Prepare graph tensors for a single season's graph."""
+    non_blocking = (device in ["cuda", "mps"])
+
+    player_features = graph.node_features.get("player")
+    if player_features is None:
+        raise ValueError("No player features in graph")
+
+    player_features = player_features.to(device, non_blocking=non_blocking)
+    position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(device, non_blocking=non_blocking)
+    team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(device, non_blocking=non_blocking)
+
+    # Edge indices (remap from global IDs to type-specific indices)
+    player_to_position_edges_remapped = remap_edges_to_type_indices(
+        graph.edges["player_to_position"], graph, "player", "position"
+    )
+    position_to_team_edges_remapped = remap_edges_to_type_indices(
+        graph.edges["position_to_team"], graph, "position", "team"
+    )
+    chemistry_edges_remapped = remap_edges_to_type_indices(
+        graph.edges["player_chemistry"], graph, "player", "player"
+    ) if graph.edges["player_chemistry"] else []
+
+    player_to_position_edges = torch.tensor(
+        player_to_position_edges_remapped, dtype=torch.long
+    ).t().to(device, non_blocking=non_blocking) if player_to_position_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+
+    position_to_team_edges = torch.tensor(
+        position_to_team_edges_remapped, dtype=torch.long
+    ).t().to(device, non_blocking=non_blocking) if position_to_team_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+
+    chemistry_edges = torch.tensor(
+        chemistry_edges_remapped, dtype=torch.long
+    ).t().to(device, non_blocking=non_blocking) if chemistry_edges_remapped else None
+
+    # Create team ID to index mapping
+    team_ids = graph.node_type_to_ids["team"]
+    team_id_to_idx = {global_id: i for i, global_id in enumerate(team_ids)}
+
+    return {
+        "player_features": player_features,
+        "position_indices": position_indices,
+        "team_indices": team_indices,
+        "player_to_position_edges": player_to_position_edges,
+        "position_to_team_edges": position_to_team_edges,
+        "chemistry_edges": chemistry_edges,
+        "team_id_to_idx": team_id_to_idx,
+    }
+
+
 def train_epoch(
     model: HierarchicalGNN,
     dataset: NFLGameDataset,
@@ -255,7 +366,11 @@ def train_epoch(
     batch_size: int = 32,
     accumulation_steps: int = 1,
 ) -> float:
-    """Train for one epoch with mixed precision and batching."""
+    """Train for one epoch with mixed precision and batching.
+
+    Supports per-season graphs to avoid temporal data leakage. Games from
+    different seasons are processed with their respective season's graph.
+    """
     model.train()
 
     total_loss = 0.0
@@ -264,102 +379,166 @@ def train_epoch(
     # Enable mixed precision if scaler is provided
     use_amp = scaler is not None
 
-    # Prepare graph data (shared across all games)
-    graph = dataset.graph
+    # Check if we have per-season graphs
+    has_per_season_graphs = hasattr(dataset, 'graphs_by_season') and len(dataset.graphs_by_season) > 1
 
-    # Convert player features to tensor
-    player_features = graph.node_features.get("player")
-    if player_features is None:
-        raise ValueError("No player features in graph")
+    if has_per_season_graphs:
+        # Group games by season for per-season processing
+        games_df = dataset.games
+        seasons_in_dataset = games_df['season'].unique()
+        logger.debug(f"Processing {len(seasons_in_dataset)} seasons with per-season graphs")
 
-    # Transfer to GPU with non_blocking for async transfer (CUDA and MPS)
-    non_blocking = (device in ["cuda", "mps"])
-    player_features = player_features.to(device, non_blocking=non_blocking)
+        # Prepare graph tensors for each season
+        graph_tensors_by_season = {
+            season: _prepare_graph_tensors(dataset.graphs_by_season[season], device)
+            for season in seasons_in_dataset
+            if season in dataset.graphs_by_season
+        }
+    else:
+        # Single graph mode (backwards compatible)
+        graph = dataset.graph
+        graph_tensors_by_season = {"default": _prepare_graph_tensors(graph, device)}
+        seasons_in_dataset = ["default"]
 
-    # Position and team indices
-    position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(device, non_blocking=non_blocking)
-    team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(device, non_blocking=non_blocking)
+    # For single-graph mode, use one set of graph tensors for all games
+    if not has_per_season_graphs:
+        gt = graph_tensors_by_season["default"]
+        player_features = gt["player_features"]
+        position_indices = gt["position_indices"]
+        team_indices = gt["team_indices"]
+        player_to_position_edges = gt["player_to_position_edges"]
+        position_to_team_edges = gt["position_to_team_edges"]
+        chemistry_edges = gt["chemistry_edges"]
+        team_id_to_idx = gt["team_id_to_idx"]
 
-    # Edge indices (remap from global IDs to type-specific indices)
-    player_to_position_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["player_to_position"], graph, "player", "position"
-    )
-    position_to_team_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["position_to_team"], graph, "position", "team"
-    )
-    chemistry_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["player_chemistry"], graph, "player", "player"
-    ) if graph.edges["player_chemistry"] else []
+    # Process games - group by season if we have per-season graphs
+    if has_per_season_graphs:
+        # Process each season's games separately to avoid temporal leakage
+        games_df = dataset.games
+        all_indices = list(range(num_games))
 
-    player_to_position_edges = torch.tensor(
-        player_to_position_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if player_to_position_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+        # Shuffle indices for stochastic training while keeping season grouping
+        import random
+        random.shuffle(all_indices)
 
-    position_to_team_edges = torch.tensor(
-        position_to_team_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if position_to_team_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+        # Group shuffled indices by season
+        indices_by_season = {}
+        for idx in all_indices:
+            season = int(games_df.iloc[idx]['season'])
+            if season not in indices_by_season:
+                indices_by_season[season] = []
+            indices_by_season[season].append(idx)
 
-    chemistry_edges = torch.tensor(
-        chemistry_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if chemistry_edges_remapped else None
+        # Process each season's games with its own graph
+        for season in tqdm(list(indices_by_season.keys()), desc="Training seasons"):
+            season_indices = indices_by_season[season]
+            if season not in graph_tensors_by_season:
+                logger.warning(f"Season {season} not in graph_tensors, skipping")
+                continue
 
-    # Create team ID to index mapping
-    team_ids = graph.node_type_to_ids["team"]
-    team_id_to_idx = {global_id: i for i, global_id in enumerate(team_ids)}
+            gt = graph_tensors_by_season[season]
 
-    # Process games in TRUE BATCH-PARALLEL mode (HUGE speedup!)
-    num_batches = (num_games + batch_size - 1) // batch_size
+            # Process this season's games in batches
+            num_season_batches = (len(season_indices) + batch_size - 1) // batch_size
 
-    for batch_idx in tqdm(range(num_batches), desc="Training"):
-        batch_start = batch_idx * batch_size
-        batch_end = min(batch_start + batch_size, num_games)
+            for batch_idx in range(num_season_batches):
+                batch_start = batch_idx * batch_size
+                batch_end = min(batch_start + batch_size, len(season_indices))
+                batch_indices = season_indices[batch_start:batch_end]
 
-        # Collect ALL games in batch
-        batch_games = [dataset[i] for i in range(batch_start, batch_end)]
+                # Collect games
+                batch_games = [dataset[i] for i in batch_indices]
 
-        # Zero gradients
-        optimizer.zero_grad()
+                # Zero gradients
+                optimizer.zero_grad()
 
-        # Stack team indices for batch processing
-        home_team_indices = []
-        away_team_indices = []
-        targets = []
+                # Stack team indices
+                home_team_indices = []
+                away_team_indices = []
+                targets = []
 
-        for game in batch_games:
-            home_team_indices.append(team_id_to_idx[game["home_team_idx"]])
-            away_team_indices.append(team_id_to_idx[game["away_team_idx"]])
-            targets.append(game["target"])
+                for game in batch_games:
+                    home_team_indices.append(gt["team_id_to_idx"][game["home_team_idx"]])
+                    away_team_indices.append(gt["team_id_to_idx"][game["away_team_idx"]])
+                    targets.append(game["target"])
 
-        home_team_batch = torch.tensor(home_team_indices, dtype=torch.long, device=device)
-        away_team_batch = torch.tensor(away_team_indices, dtype=torch.long, device=device)
-        target_batch = torch.tensor(targets, dtype=torch.float32, device=device)
+                home_team_batch = torch.tensor(home_team_indices, dtype=torch.long, device=device)
+                away_team_batch = torch.tensor(away_team_indices, dtype=torch.long, device=device)
+                target_batch = torch.tensor(targets, dtype=torch.float32, device=device)
 
-        # BATCH-PARALLEL forward pass (process ALL games at once!)
-        with autocast(enabled=use_amp):
-            probs = model(
-                player_features=player_features,
-                position_indices=position_indices,
-                team_indices=team_indices,
-                player_to_position_edges=player_to_position_edges,
-                position_to_team_edges=position_to_team_edges,
-                chemistry_edges=chemistry_edges,
-                home_team_idx=home_team_batch,  # Batched!
-                away_team_idx=away_team_batch,  # Batched!
-            )  # Returns (batch_size,) probabilities
+                # Forward pass with season-specific graph
+                with autocast(enabled=use_amp):
+                    probs = model(
+                        player_features=gt["player_features"],
+                        position_indices=gt["position_indices"],
+                        team_indices=gt["team_indices"],
+                        player_to_position_edges=gt["player_to_position_edges"],
+                        position_to_team_edges=gt["position_to_team_edges"],
+                        chemistry_edges=gt["chemistry_edges"],
+                        home_team_idx=home_team_batch,
+                        away_team_idx=away_team_batch,
+                    )
 
-            # Batch loss
-            loss = criterion(probs, target_batch)
+                    loss = criterion(probs, target_batch)
 
-        # Backward pass with gradient scaling
-        if use_amp:
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            optimizer.step()
+                # Backward pass
+                if use_amp:
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    optimizer.step()
 
-        total_loss += loss.item() * len(batch_games)
+                total_loss += loss.item() * len(batch_games)
+    else:
+        # Single graph mode - original batch-parallel processing
+        num_batches = (num_games + batch_size - 1) // batch_size
+
+        for batch_idx in tqdm(range(num_batches), desc="Training"):
+            batch_start = batch_idx * batch_size
+            batch_end = min(batch_start + batch_size, num_games)
+
+            batch_games = [dataset[i] for i in range(batch_start, batch_end)]
+
+            optimizer.zero_grad()
+
+            home_team_indices = []
+            away_team_indices = []
+            targets = []
+
+            for game in batch_games:
+                home_team_indices.append(team_id_to_idx[game["home_team_idx"]])
+                away_team_indices.append(team_id_to_idx[game["away_team_idx"]])
+                targets.append(game["target"])
+
+            home_team_batch = torch.tensor(home_team_indices, dtype=torch.long, device=device)
+            away_team_batch = torch.tensor(away_team_indices, dtype=torch.long, device=device)
+            target_batch = torch.tensor(targets, dtype=torch.float32, device=device)
+
+            with autocast(enabled=use_amp):
+                probs = model(
+                    player_features=player_features,
+                    position_indices=position_indices,
+                    team_indices=team_indices,
+                    player_to_position_edges=player_to_position_edges,
+                    position_to_team_edges=position_to_team_edges,
+                    chemistry_edges=chemistry_edges,
+                    home_team_idx=home_team_batch,
+                    away_team_idx=away_team_batch,
+                )
+
+                loss = criterion(probs, target_batch)
+
+            if use_amp:
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
+
+            total_loss += loss.item() * len(batch_games)
 
     return total_loss / num_games
 
@@ -368,64 +547,39 @@ def evaluate(
     model: HierarchicalGNN,
     dataset: NFLGameDataset,
     device: str,
-) -> Dict[str, float]:
-    """Evaluate model on a dataset."""
+) -> Tuple[Dict[str, float], np.ndarray, np.ndarray]:
+    """Evaluate model on a dataset.
+
+    For single-season datasets (typical for val/test), uses that season's graph.
+    For multi-season datasets, uses the most recent season's graph.
+
+    Returns:
+        (metrics_dict, predictions_array, targets_array)
+    """
     model.eval()
 
     predictions = []
     targets = []
 
-    # Prepare graph data
+    # Use _prepare_graph_tensors for consistent graph preparation
     graph = dataset.graph
-
-    # Transfer to GPU with non_blocking for async transfer (CUDA and MPS)
-    non_blocking = (device in ["cuda", "mps"])
-    player_features = graph.node_features.get("player").to(device, non_blocking=non_blocking)
-    position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(device, non_blocking=non_blocking)
-    team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(device, non_blocking=non_blocking)
-
-    # Edge indices (remap from global IDs to type-specific indices)
-    player_to_position_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["player_to_position"], graph, "player", "position"
-    )
-    position_to_team_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["position_to_team"], graph, "position", "team"
-    )
-    chemistry_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["player_chemistry"], graph, "player", "player"
-    ) if graph.edges["player_chemistry"] else []
-
-    player_to_position_edges = torch.tensor(
-        player_to_position_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if player_to_position_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
-
-    position_to_team_edges = torch.tensor(
-        position_to_team_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if position_to_team_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
-
-    chemistry_edges = torch.tensor(
-        chemistry_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if chemistry_edges_remapped else None
-
-    # Create team ID to index mapping
-    team_ids = graph.node_type_to_ids["team"]
-    team_id_to_idx = {global_id: i for i, global_id in enumerate(team_ids)}
+    gt = _prepare_graph_tensors(graph, device)
 
     with torch.no_grad():
         for i in range(len(dataset)):
             game = dataset[i]
 
-            # Map global team IDs to type-specific indices
-            home_team_idx_local = team_id_to_idx[game["home_team_idx"]]
-            away_team_idx_local = team_id_to_idx[game["away_team_idx"]]
+            # Map global team IDs to type-specific indices using graph tensors
+            home_team_idx_local = gt["team_id_to_idx"][game["home_team_idx"]]
+            away_team_idx_local = gt["team_id_to_idx"][game["away_team_idx"]]
 
             logit = model(
-                player_features=player_features,
-                position_indices=position_indices,
-                team_indices=team_indices,
-                player_to_position_edges=player_to_position_edges,
-                position_to_team_edges=position_to_team_edges,
-                chemistry_edges=chemistry_edges,
+                player_features=gt["player_features"],
+                position_indices=gt["position_indices"],
+                team_indices=gt["team_indices"],
+                player_to_position_edges=gt["player_to_position_edges"],
+                position_to_team_edges=gt["position_to_team_edges"],
+                chemistry_edges=gt["chemistry_edges"],
                 home_team_idx=home_team_idx_local,
                 away_team_idx=away_team_idx_local,
             )
@@ -549,8 +703,8 @@ def train_gnn_single_config(
     logger.info(f"  Epochs: {epochs}, LR: {learning_rate}, Batch: {batch_size}")
     logger.info(f"  Chemistry: {use_chemistry}, Device: {device}")
 
-    # Load data
-    graph, games_by_season = load_multi_season_data(seasons, include_chemistry=use_chemistry)
+    # Load data (now returns per-season graphs to avoid temporal leakage)
+    graphs_by_season, games_by_season = load_multi_season_data(seasons, include_chemistry=use_chemistry)
 
     # Create splits (last season test, second-to-last val)
     test_seasons = [max(seasons)]
@@ -561,13 +715,14 @@ def train_gnn_single_config(
         games_by_season, train_seasons, val_seasons, test_seasons
     )
 
-    # Create datasets
-    train_dataset = NFLGameDataset(graph, train_games)
-    val_dataset = NFLGameDataset(graph, val_games)
-    test_dataset = NFLGameDataset(graph, test_games)
+    # Create datasets with per-season graphs
+    train_dataset = NFLGameDataset(graphs_by_season, train_games)
+    val_dataset = NFLGameDataset(graphs_by_season, val_games)
+    test_dataset = NFLGameDataset(graphs_by_season, test_games)
 
-    # Initialize model
-    player_feature_dim = graph.node_features["player"].shape[1]
+    # Initialize model (use most recent season's graph for feature dim)
+    primary_graph = graphs_by_season[max(seasons)]
+    player_feature_dim = primary_graph.node_features["player"].shape[1]
     model = HierarchicalGNN(
         player_feature_dim=player_feature_dim,
         embedding_dim=embedding_dim,
@@ -697,8 +852,8 @@ def main():
     parser.add_argument(
         "--device",
         type=str,
-        default="mps" if torch.backends.mps.is_available() else "cpu",
-        help="Device to train on",
+        default="cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu",
+        help="Device to train on (auto-detects CUDA > MPS > CPU)",
     )
     parser.add_argument(
         "--output-dir",
@@ -762,8 +917,8 @@ def main():
     logger.info(f"Learning rate: {args.lr}")
     logger.info(f"Chemistry edges: {not args.no_chemistry}")
 
-    # Load data
-    graph, games_by_season = load_multi_season_data(
+    # Load data (now returns per-season graphs to avoid temporal leakage)
+    graphs_by_season, games_by_season = load_multi_season_data(
         args.seasons, include_chemistry=(not args.no_chemistry)
     )
 
@@ -800,13 +955,14 @@ def main():
             games_by_season, train_seasons, val_seasons, test_seasons
         )
 
-    # Create datasets
-    train_dataset = NFLGameDataset(graph, train_games)
-    val_dataset = NFLGameDataset(graph, val_games)
-    test_dataset = NFLGameDataset(graph, test_games)
+    # Create datasets with per-season graphs
+    train_dataset = NFLGameDataset(graphs_by_season, train_games)
+    val_dataset = NFLGameDataset(graphs_by_season, val_games)
+    test_dataset = NFLGameDataset(graphs_by_season, test_games)
 
-    # Initialize model
-    player_feature_dim = graph.node_features["player"].shape[1]
+    # Initialize model (use most recent season's graph for feature dim)
+    primary_graph = graphs_by_season[max(args.seasons)]
+    player_feature_dim = primary_graph.node_features["player"].shape[1]
 
     model = HierarchicalGNN(
         player_feature_dim=player_feature_dim,

@@ -415,63 +415,16 @@ class HierarchicalGNN(nn.Module):
 # =============================================================================
 
 
-def train_hierarchical_gnn(
-    train_data: pd.DataFrame,
-    val_data: pd.DataFrame,
-    player_feature_dim: int,
-    embedding_dim: int = 64,
-    epochs: int = 100,
-    lr: float = 1e-3,
-    device: str = "mps" if torch.backends.mps.is_available() else "cpu",
-) -> HierarchicalGNN:
-    """
-    Train the hierarchical GNN.
-
-    Args:
-        train_data: Training games
-        val_data: Validation games
-        player_feature_dim: Dimension of player features
-        embedding_dim: Embedding dimension
-        epochs: Number of training epochs
-        lr: Learning rate
-        device: Device to train on
-
-    Returns:
-        Trained model
-    """
-    logger.info(f"Training Hierarchical GNN on {len(train_data)} games...")
-    logger.info(f"Device: {device}")
-
-    # Initialize model
-    model = HierarchicalGNN(
-        player_feature_dim=player_feature_dim,
-        embedding_dim=embedding_dim,
-        num_message_rounds=3,
-        use_attention=True,
-    ).to(device)
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
-    criterion = nn.BCELoss()
-
-    best_val_loss = float("inf")
-    best_model_state = None
-
-    for epoch in range(epochs):
-        model.train()
-
-        # TODO: Implement batch training with graph construction
-        # For now, this is a skeleton showing the architecture
-
-        logger.info(f"Epoch {epoch+1}/{epochs} - Training...")
-
-        # Validation
-        model.eval()
-        # TODO: Implement validation loop
-
-        if (epoch + 1) % 10 == 0:
-            logger.info(f"Epoch {epoch+1}/{epochs} completed")
-
-    return model
+# =============================================================================
+# DEPRECATED: Use train_hierarchical_gnn.py instead
+# =============================================================================
+# The train_hierarchical_gnn() function that was here was a broken scaffold.
+# It never performed actual training (no forward pass, no loss, no backprop).
+# The complete, working training implementation is in train_hierarchical_gnn.py.
+#
+# To train the GNN model:
+#   python py/models/train_hierarchical_gnn.py --device cuda --batch-size 512
+# =============================================================================
 
 
 def main():

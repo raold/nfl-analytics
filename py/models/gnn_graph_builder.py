@@ -529,6 +529,21 @@ class NFLGraphBuilder:
             player_features[player_id] = feature_tensor
 
         logger.info(f"Created features for {len(player_features)} players")
+
+        # Normalize features (z-score normalization) to improve gradient stability
+        if player_features:
+            all_features = torch.stack(list(player_features.values()))
+            mean = all_features.mean(dim=0)
+            std = all_features.std(dim=0)
+            # Avoid division by zero for constant features
+            std = torch.where(std < 1e-6, torch.ones_like(std), std)
+
+            # Apply normalization to each player's features
+            for player_id in player_features:
+                player_features[player_id] = (player_features[player_id] - mean) / std
+
+            logger.info(f"  Features normalized (z-score): mean={mean.tolist()}, std={std.tolist()}")
+
         return player_features
 
     def _find_chemistry_edges(self, player_hierarchy: pd.DataFrame) -> List[Tuple[str, str]]:
