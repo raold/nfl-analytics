@@ -7,33 +7,37 @@ Combines offensive and defensive features for both teams in a matchup to create
 comprehensive game-level features for outcome predictions (spreads, totals, moneylines).
 
 **Purpose:**
-Extract all 96 base features (24 offensive + 24 defensive × 2 teams) plus 4 derived
+Extract all 108 base features (27 offensive + 27 defensive × 2 teams) plus 4 derived
 matchup features plus 12 injury features plus ~120 advanced features (60 per team)
 for game outcome predictions. Single entry point that coordinates feature extraction from
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (280 total):**
+**Features Extracted (293 total):**
 
-1. Home Team Offensive (24):
+1. Home Team Offensive (27):
    - Prefix: 'home_off_'
    - Source: TeamOffensiveFeatures.extract_features(home_team)
    - Examples: home_off_epa_per_play, home_off_success_rate, home_off_points_per_game
+   - Includes: home_off_epa_std_4wk, home_off_scoring_std_4wk, home_off_epa_consistency_score
 
-2. Home Team Defensive (24):
+2. Home Team Defensive (27):
    - Prefix: 'home_def_'
    - Source: TeamDefensiveFeatures.extract_features(home_team)
    - Examples: home_def_epa_allowed_per_play, home_def_sack_rate, home_def_points_allowed_per_game
+   - Includes: home_def_epa_std_4wk, home_def_points_allowed_std_4wk, home_def_epa_consistency_score
 
-3. Away Team Offensive (24):
+3. Away Team Offensive (27):
    - Prefix: 'away_off_'
    - Source: TeamOffensiveFeatures.extract_features(away_team)
    - Examples: away_off_epa_per_play, away_off_success_rate, away_off_points_per_game
+   - Includes: away_off_epa_std_4wk, away_off_scoring_std_4wk, away_off_epa_consistency_score
 
-4. Away Team Defensive (24):
+4. Away Team Defensive (27):
    - Prefix: 'away_def_'
    - Source: TeamDefensiveFeatures.extract_features(away_team)
    - Examples: away_def_epa_allowed_per_play, away_def_sack_rate, away_def_points_allowed_per_game
+   - Includes: away_def_epa_std_4wk, away_def_points_allowed_std_4wk, away_def_epa_consistency_score
 
 5. Derived Matchup Features (4):
    - offensive_mismatch: home_off_epa - away_def_epa (positive = home advantage)
@@ -89,7 +93,7 @@ Playcalling, Opponent-Adjusted, and mart.team_injury_load.
       pt_game_slot_encoded
     - Research: TNF road covers ~63% ATS, MNF higher public betting
 
-14. Strength of Victory Features (14):
+14. Strength of Victory Features (15):
     - Prefix: 'sov_'
     - Source: OpponentStrengthEngine.compute_game_sov_features()
     - Examples: sov_home_strength_of_victory, sov_home_strength_of_schedule,

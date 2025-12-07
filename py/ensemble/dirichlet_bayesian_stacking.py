@@ -65,6 +65,7 @@ XGBoost improves mid-season).
 
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -490,6 +491,380 @@ class DirichletBayesianStacking:
         logger.info(f"Current weights: {instance.get_weights()}")
 
         return instance
+
+
+class DirichletBayesianStackingByStatType:
+    """
+    Manages separate Dirichlet stackers per stat type with database persistence.
+
+    Each stat type (passing_yards, rushing_yards, spread, etc.) has its own
+    Dirichlet stacker with separate weights learned from prediction outcomes.
+
+    Key Insight: Different stat types benefit from different ensemble weights.
+    - BNN excels at rushing prediction but struggles with passing
+    - Game outcomes (spread/total) need different weights than player props
+
+    Usage:
+        from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+
+        stacker = DirichletBayesianStackingByStatType()
+        weights = stacker.get_weights('passing_yards')
+        # {'hierarchical': 0.396, 'informative_priors': 0.395, ...}
+
+        # After observing prediction outcomes
+        stacker.update('passing_yards', predictions, actual)
+    """
+
+    # Default weights from CLAUDE.md
+    DEFAULT_WEIGHTS_V6 = {
+        # v6.0 weights for game outcomes
+        'state_space': 0.27,
+        'hierarchical': 0.27,
+        'xgboost': 0.23,
+        'informative_priors': 0.13,
+        'hybrid': 0.10,
+    }
+
+    DIRICHLET_WEIGHTS_V8 = {
+        # v8.0 weights for player props
+        'hierarchical': 0.396,
+        'informative_priors': 0.395,
+        'hybrid': 0.101,
+        'state_space': 0.082,
+        'xgboost': 0.026,
+    }
+
+    STAT_TYPE_DEFAULTS = {
+        'passing_yards': DIRICHLET_WEIGHTS_V8,
+        'rushing_yards': DIRICHLET_WEIGHTS_V8,
+        'receiving_yards': DIRICHLET_WEIGHTS_V8,
+        'receptions': DIRICHLET_WEIGHTS_V8,
+        'passing_tds': DIRICHLET_WEIGHTS_V8,
+        'rushing_tds': DIRICHLET_WEIGHTS_V8,
+        'spread': DEFAULT_WEIGHTS_V6,
+        'total': DEFAULT_WEIGHTS_V6,
+        'win_prob': DEFAULT_WEIGHTS_V6,
+    }
+
+    COMPONENT_NAMES = ['hierarchical', 'informative_priors', 'state_space', 'xgboost', 'hybrid']
+
+    LIKELIHOOD_SCALES = {
+        'passing_yards': 50.0,
+        'rushing_yards': 25.0,
+        'receiving_yards': 25.0,
+        'receptions': 3.0,
+        'passing_tds': 0.8,
+        'rushing_tds': 0.5,
+        'spread': 7.0,
+        'total': 7.0,
+        'win_prob': 0.15,
+    }
+
+    def __init__(
+        self,
+        db_config: Optional[Dict] = None,
+        use_db: bool = True,
+        prior_strength: float = 10.0,
+    ):
+        """
+        Initialize the per-stat-type Dirichlet stacker.
+
+        Args:
+            db_config: Database connection config. Defaults to project standard.
+            use_db: Whether to persist to database (False for testing).
+            prior_strength: Base strength for Dirichlet priors.
+        """
+        self.db_config = db_config or {
+            'host': os.getenv('DB_HOST', 'localhost'),
+            'port': int(os.getenv('DB_PORT', '5544')),
+            'database': os.getenv('DB_NAME', 'devdb01'),
+            'user': os.getenv('DB_USER', 'dro'),
+            'password': os.getenv('DB_PASSWORD'),
+        }
+        if not self.db_config['password']:
+            logger.warning("DB_PASSWORD not set - database operations may fail")
+        self.use_db = use_db
+        self.prior_strength = prior_strength
+
+        # Cache of DirichletBayesianStacking instances per stat type
+        self._stackers: Dict[str, DirichletBayesianStacking] = {}
+
+        # Load from database on init
+        if use_db:
+            self._load_all_from_db()
+
+        logger.info(f"Initialized DirichletBayesianStackingByStatType (use_db={use_db})")
+
+    def _get_connection(self):
+        """Get database connection."""
+        try:
+            import psycopg2
+            return psycopg2.connect(**self.db_config)
+        except ImportError:
+            logger.warning("psycopg2 not available, using in-memory only")
+            return None
+
+    def _load_all_from_db(self):
+        """Load all Dirichlet states from database."""
+        conn = self._get_connection()
+        if not conn:
+            return
+
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT stat_type, component_name, alpha, prior_alpha
+                FROM ml.dirichlet_alpha_by_stat_type
+                ORDER BY stat_type, component_order
+            """)
+
+            rows = cur.fetchall()
+            conn.close()
+
+            # Group by stat_type
+            by_stat_type: Dict[str, Dict[str, float]] = {}
+            prior_by_stat_type: Dict[str, Dict[str, float]] = {}
+
+            for row in rows:
+                stat_type, component, alpha, prior_alpha = row
+                if stat_type not in by_stat_type:
+                    by_stat_type[stat_type] = {}
+                    prior_by_stat_type[stat_type] = {}
+                by_stat_type[stat_type][component] = float(alpha)
+                prior_by_stat_type[stat_type][component] = float(prior_alpha)
+
+            # Create stackers from loaded alphas
+            for stat_type, alphas in by_stat_type.items():
+                prior_alphas = prior_by_stat_type[stat_type]
+                # Reconstruct weights from prior alphas
+                prior_sum = sum(prior_alphas.values())
+                prior_weights = {k: v / prior_sum for k, v in prior_alphas.items()}
+
+                stacker = DirichletBayesianStacking(
+                    component_names=list(alphas.keys()),
+                    prior_weights=prior_weights,
+                    prior_strength=prior_sum,  # Use actual sum as strength
+                    likelihood_scale=self.LIKELIHOOD_SCALES.get(stat_type, 40.0),
+                )
+                # Override alpha with loaded values
+                stacker.alpha = alphas.copy()
+                self._stackers[stat_type] = stacker
+
+            logger.info(f"Loaded {len(self._stackers)} stat-type stackers from DB")
+
+        except Exception as e:
+            logger.warning(f"Could not load from DB: {e}. Using defaults.")
+            if conn:
+                conn.close()
+
+    def get_stacker(self, stat_type: str) -> DirichletBayesianStacking:
+        """
+        Get or create a Dirichlet stacker for the given stat type.
+        """
+        if stat_type in self._stackers:
+            return self._stackers[stat_type]
+
+        # Create new stacker with defaults
+        defaults = self.STAT_TYPE_DEFAULTS.get(stat_type, self.DEFAULT_WEIGHTS_V6)
+        stacker = DirichletBayesianStacking(
+            component_names=list(defaults.keys()),
+            prior_weights=defaults,
+            prior_strength=self.prior_strength,
+            likelihood_scale=self.LIKELIHOOD_SCALES.get(stat_type, 40.0),
+        )
+
+        self._stackers[stat_type] = stacker
+        return stacker
+
+    def get_weights(self, stat_type: str) -> Dict[str, float]:
+        """Get current ensemble weights for a stat type."""
+        return self.get_stacker(stat_type).get_weights()
+
+    def predict(
+        self,
+        stat_type: str,
+        component_predictions: Dict[str, float]
+    ) -> Tuple[float, Dict[str, float]]:
+        """Make ensemble prediction using current weights for stat type."""
+        return self.get_stacker(stat_type).predict(component_predictions)
+
+    def update(
+        self,
+        stat_type: str,
+        component_predictions: Dict[str, float],
+        actual: float,
+        game_id: Optional[str] = None,
+        player_id: Optional[str] = None,
+        season: Optional[int] = None,
+        week: Optional[int] = None,
+    ):
+        """
+        Update Dirichlet alphas based on prediction outcomes.
+
+        Args:
+            stat_type: Type of stat predicted
+            component_predictions: Dict of component -> predicted value
+            actual: Actual observed value
+            game_id: Optional game identifier for logging
+            player_id: Optional player identifier for logging
+            season: Season number for logging
+            week: Week number for logging
+        """
+        stacker = self.get_stacker(stat_type)
+
+        # Store prior for logging
+        prior_alphas = stacker.alpha.copy()
+        weights_before = stacker.get_weights()
+
+        # Update using existing method
+        stacker.update(component_predictions, actual)
+
+        # Persist to database
+        if self.use_db:
+            self._save_update_to_db(stat_type, stacker)
+            self._log_bayesian_update(
+                stat_type=stat_type,
+                prior_alphas=prior_alphas,
+                posterior_alphas=stacker.alpha,
+                actual=actual,
+                component_predictions=component_predictions,
+                weights_before=weights_before,
+                game_id=game_id,
+                player_id=player_id,
+                season=season,
+                week=week,
+            )
+
+    def _save_update_to_db(self, stat_type: str, stacker: DirichletBayesianStacking):
+        """Save updated alphas to database."""
+        conn = self._get_connection()
+        if not conn:
+            return
+
+        try:
+            cur = conn.cursor()
+            for component, alpha in stacker.alpha.items():
+                cur.execute("""
+                    UPDATE ml.dirichlet_alpha_by_stat_type
+                    SET alpha = %s,
+                        n_updates = n_updates + 1,
+                        updated_at = NOW()
+                    WHERE stat_type = %s AND component_name = %s
+                """, (alpha, stat_type, component))
+
+            conn.commit()
+            conn.close()
+
+        except Exception as e:
+            logger.warning(f"Could not save to DB: {e}")
+            if conn:
+                conn.close()
+
+    def _log_bayesian_update(
+        self,
+        stat_type: str,
+        prior_alphas: Dict,
+        posterior_alphas: Dict,
+        actual: float,
+        component_predictions: Dict,
+        weights_before: Dict,
+        game_id: Optional[str] = None,
+        player_id: Optional[str] = None,
+        season: Optional[int] = None,
+        week: Optional[int] = None,
+    ):
+        """Log the Bayesian update to audit table."""
+        conn = self._get_connection()
+        if not conn:
+            return
+
+        try:
+            import json
+            cur = conn.cursor()
+
+            # Compute ensemble prediction (weighted average using prior weights)
+            ensemble_pred = sum(
+                weights_before.get(c, 0) * component_predictions.get(c, 0)
+                for c in prior_alphas
+            )
+
+            # Compute likelihoods from alpha changes
+            likelihoods = {
+                c: posterior_alphas[c] - prior_alphas[c]
+                for c in prior_alphas
+            }
+
+            cur.execute("""
+                INSERT INTO ml.bayesian_update_log (
+                    update_type, stat_type, season, week,
+                    prior_params, likelihoods, posterior_params,
+                    actual_value, ensemble_prediction,
+                    component_predictions, player_id, game_id
+                ) VALUES (
+                    'dirichlet_alpha', %s, %s, %s,
+                    %s::jsonb, %s::jsonb, %s::jsonb,
+                    %s, %s, %s::jsonb, %s, %s
+                )
+            """, (
+                stat_type,
+                season or 2024,
+                week or 1,
+                json.dumps(prior_alphas),
+                json.dumps(likelihoods),
+                json.dumps(posterior_alphas),
+                actual,
+                ensemble_pred,
+                json.dumps(component_predictions),
+                player_id,
+                game_id,
+            ))
+
+            conn.commit()
+            conn.close()
+
+        except Exception as e:
+            logger.debug(f"Could not log update: {e}")
+            if conn:
+                conn.close()
+
+    def reset_to_priors(self, stat_type: Optional[str] = None):
+        """Reset alphas to prior values."""
+        if stat_type:
+            if stat_type in self._stackers:
+                self._stackers[stat_type].reset()
+        else:
+            for stacker in self._stackers.values():
+                stacker.reset()
+
+        if self.use_db:
+            conn = self._get_connection()
+            if conn:
+                try:
+                    cur = conn.cursor()
+                    if stat_type:
+                        cur.execute("SELECT ml.reset_dirichlet_alphas(%s)", (stat_type,))
+                    else:
+                        cur.execute("SELECT ml.reset_dirichlet_alphas()")
+                    conn.commit()
+                    conn.close()
+                except Exception as e:
+                    logger.warning(f"Could not reset in DB: {e}")
+                    if conn:
+                        conn.close()
+
+        logger.info(f"Reset Dirichlet alphas to priors (stat_type={stat_type})")
+
+    def get_summary(self) -> Dict:
+        """Get summary of all Dirichlet states."""
+        summary = {}
+        for stat_type, stacker in self._stackers.items():
+            diag = stacker.get_diagnostics()
+            summary[stat_type] = {
+                'weights': diag['weights'],
+                'alpha_sum': diag['alpha_sum'],
+                'num_updates': diag['num_updates'],
+            }
+        return summary
 
 
 if __name__ == "__main__":

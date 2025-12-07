@@ -53,57 +53,62 @@ scrape_configs:
         replacement: 'http'
 
   # Streamlit Dashboard - UI metrics and user interactions
-  - job_name: 'streamlit_dashboard'
-    scrape_interval: 30s
-    scrape_timeout: 5s
-    static_configs:
-      - targets: ['streamlit:8501']
-    metrics_path: '/metrics'
-    honor_timestamps: true
+  # DISABLED: Streamlit does not expose Prometheus metrics by default
+  # - job_name: 'streamlit_dashboard'
+  #   scrape_interval: 30s
+  #   scrape_timeout: 5s
+  #   static_configs:
+  #     - targets: ['streamlit:8501']
+  #   metrics_path: '/metrics'
+  #   honor_timestamps: true
 
   # ============================================================================
   # Performance Metrics (Betting Results)
   # ============================================================================
+  # DISABLED: These endpoints will be added when betting tracking is implemented
+  # See: docs/betting/ for implementation roadmap
 
   # Bet outcomes, ROI, win rate, Sharpe ratio
-  - job_name: 'nfl_performance'
-    scrape_interval: 30s
-    scrape_timeout: 10s
-    static_configs:
-      - targets: ['api:8000']
-    metrics_path: '/performance/metrics'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: service
-        replacement: 'performance'
+  # - job_name: 'nfl_performance'
+  #   scrape_interval: 30s
+  #   scrape_timeout: 10s
+  #   static_configs:
+  #     - targets: ['api:8000']
+  #   metrics_path: '/performance/metrics'
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: service
+  #       replacement: 'performance'
 
   # ============================================================================
   # Model Quality Metrics
   # ============================================================================
+  # DISABLED: These endpoints will be added when backtest tracking is implemented
+  # See: py/backtest/ for implementation roadmap
 
   # Model calibration, MAE, coverage, drift detection
-  - job_name: 'nfl_model_quality'
-    scrape_interval: 60s
-    scrape_timeout: 10s
-    static_configs:
-      - targets: ['api:8000']
-    metrics_path: '/model/metrics'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: service
-        replacement: 'model_quality'
+  # - job_name: 'nfl_model_quality'
+  #   scrape_interval: 60s
+  #   scrape_timeout: 10s
+  #   static_configs:
+  #     - targets: ['api:8000']
+  #   metrics_path: '/model/metrics'
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: service
+  #       replacement: 'model_quality'
 
   # Ensemble component metrics - Individual model performance
-  - job_name: 'nfl_ensemble'
-    scrape_interval: 60s
-    scrape_timeout: 10s
-    static_configs:
-      - targets: ['api:8000']
-    metrics_path: '/ensemble/metrics'
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: service
-        replacement: 'ensemble'
+  # - job_name: 'nfl_ensemble'
+  #   scrape_interval: 60s
+  #   scrape_timeout: 10s
+  #   static_configs:
+  #     - targets: ['api:8000']
+  #   metrics_path: '/ensemble/metrics'
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: service
+  #       replacement: 'ensemble'
 
   # ============================================================================
   # Database Metrics
@@ -121,15 +126,17 @@ scrape_configs:
         replacement: 'devdb01'
 
   # Redis cache - Memory usage, key stats, connection pool
-  - job_name: 'redis'
-    scrape_interval: 30s
-    scrape_timeout: 5s
-    static_configs:
-      - targets: ['redis_exporter:9121']
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: service
-        replacement: 'redis'
+  # DISABLED: redis_exporter container not running
+  # To enable: Add redis_exporter service to docker-compose.yml
+  # - job_name: 'redis'
+  #   scrape_interval: 30s
+  #   scrape_timeout: 5s
+  #   static_configs:
+  #     - targets: ['redis_exporter:9121']
+  #   relabel_configs:
+  #     - source_labels: [__address__]
+  #       target_label: service
+  #       replacement: 'redis'
 
   # ============================================================================
   # System & Infrastructure
@@ -158,12 +165,14 @@ scrape_configs:
         replacement: 'node_exporter:9100'
 
   # Docker container metrics (via cAdvisor)
-  - job_name: 'cadvisor'
-    scrape_interval: 15s
-    scrape_timeout: 5s
-    static_configs:
-      - targets: ['cadvisor:8080']
-    metrics_path: '/metrics'
+  # DISABLED: cAdvisor container not running
+  # To enable: Add cAdvisor service to docker-compose.yml
+  # - job_name: 'cadvisor'
+  #   scrape_interval: 15s
+  #   scrape_timeout: 5s
+  #   static_configs:
+  #     - targets: ['cadvisor:8080']
+  #     metrics_path: '/metrics'
 
 # Remote write configuration (optional, for long-term storage)
 # Uncomment to enable remote storage backend (e.g., S3, Thanos)
