@@ -170,7 +170,7 @@ class NFLDatabase:
             total_close as total
         FROM games
         WHERE season = {season}
-          AND game_type = 'REG'
+          AND week <= 18
         """
 
         if week is not None:
@@ -887,8 +887,25 @@ def main():
     logger.info("NFL Graph Builder Test")
     logger.info("=" * 80)
 
-    # Build graph for 2024 season
-    graph, games = prepare_training_data(season=2024)
+    # Build multi-season graph for 2020-2024
+    seasons = [2020, 2021, 2022, 2023, 2024]
+    logger.info(f"Building graph for seasons: {seasons}")
+
+    db = NFLDatabase()
+    builder = NFLGraphBuilder(db)
+
+    graph = builder.build_multi_season_graph(
+        seasons=seasons,
+        include_chemistry=True,
+        include_matchups=False
+    )
+
+    # Load games for all seasons
+    all_games = []
+    for season in seasons:
+        season_games = db.load_games(season=season)
+        all_games.append(season_games)
+    games = pd.concat(all_games, ignore_index=True)
 
     logger.info("\nGraph Summary:")
     logger.info(f"  Total nodes: {graph.num_nodes}")
@@ -901,7 +918,9 @@ def main():
         logger.info(f"  {edge_type}: {len(edges)} edges")
 
     logger.info(f"\nGames loaded: {len(games)}")
-    logger.info(f"  Weeks: {games['week'].min()} - {games['week'].max()}")
+    if len(games) > 0:
+        logger.info(f"  Seasons: {games['season'].min()} - {games['season'].max()}")
+        logger.info(f"  Weeks per season: {games.groupby('season')['week'].max().to_dict()}")
 
     logger.info("=" * 80)
 
