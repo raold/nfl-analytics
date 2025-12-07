@@ -98,7 +98,7 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
 
     try:
         # Database config from environment
-        DB_CONFIG = {
+        {
             "host": os.getenv("DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", "5544")),
             "dbname": os.getenv("DB_NAME", "devdb01"),
@@ -340,7 +340,7 @@ def render_game_predictions_comparison() -> None:
             st.rerun()
 
     # Fetch games from database
-    DB_CONFIG = {
+    {
         "host": os.getenv("DB_HOST", "localhost"),
         "port": int(os.getenv("DB_PORT", "5544")),
         "dbname": os.getenv("DB_NAME", "devdb01"),

@@ -375,7 +375,6 @@ class EnhancedEnsemble4Way:
             sigma = 0.35  # Learned noise parameter
 
             log_yards_mean = latest_skill + np.log(attempts) + home_effect
-            log_yards_std = sigma
 
             # Convert to yards scale
             yards_mean = np.exp(log_yards_mean + 0.5 * sigma**2)  # Lognormal correction

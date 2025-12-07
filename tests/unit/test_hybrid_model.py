@@ -88,7 +88,7 @@ def test_initialization_default():
 
     assert model.static_weight == 0.7
     assert model.incremental_weight == 0.3
-    assert model.static_trained == False
+    assert not model.static_trained
     assert model.feature_names is None
 
 
@@ -136,7 +136,7 @@ def test_fit_static_numpy(hybrid_model, synthetic_data):
 
     hybrid_model.fit_static(X_train, y_train)
 
-    assert hybrid_model.static_trained == True
+    assert hybrid_model.static_trained
     assert hybrid_model.static_scaler is not None
 
 
@@ -156,7 +156,7 @@ def test_fit_static_dataframe(hybrid_model):
 
     hybrid_model.fit_static(df, y)
 
-    assert hybrid_model.static_trained == True
+    assert hybrid_model.static_trained
     assert hybrid_model.feature_names == ["f1", "f2", "f3"]
 
 
@@ -250,7 +250,7 @@ def test_learn_one_array(hybrid_model, synthetic_data):
     hybrid_model.fit_static(X_train, y_train)
 
     # Initial prediction
-    pred_before = hybrid_model.predict_one(x_test)
+    hybrid_model.predict_one(x_test)
 
     # Learn from new sample
     hybrid_model.learn_one(x_test, y_test)
@@ -342,7 +342,7 @@ def test_save_load(hybrid_model, synthetic_data):
 
         # Predictions should match
         assert np.isclose(pred_before, pred_after, rtol=1e-5)
-        assert model_loaded.static_trained == True
+        assert model_loaded.static_trained
 
 
 def test_save_creates_directory(hybrid_model, synthetic_data):
@@ -383,7 +383,7 @@ def test_get_metrics(hybrid_model, synthetic_data):
 
     assert metrics["static_weight"] == 0.7
     assert metrics["incremental_weight"] == 0.3
-    assert metrics["static_trained"] == True
+    assert metrics["static_trained"]
 
 
 # =============================================================================
@@ -408,7 +408,7 @@ def test_single_training_sample(hybrid_model):
 
     # Should train successfully
     hybrid_model.fit_static(X_train, y_train)
-    assert hybrid_model.static_trained == True
+    assert hybrid_model.static_trained
 
 
 def test_nan_in_test_data(hybrid_model, synthetic_data):
@@ -462,7 +462,7 @@ def test_full_workflow(hybrid_model, synthetic_data):
         predictions.append(pred)
         hybrid_model.learn_one(x, y)
 
-    mae_before = np.mean([abs(y - p) for y, p in zip(y_test, predictions)])
+    np.mean([abs(y - p) for y, p in zip(y_test, predictions)])
 
     # Save model
     with tempfile.TemporaryDirectory() as tmpdir:

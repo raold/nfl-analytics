@@ -455,7 +455,7 @@ class GNNComponent:
                 return {(g[0], g[1]): None for g in games}
 
             # Load season graph once
-            graph = self._get_season_graph(season)
+            self._get_season_graph(season)
 
             # Process each game
             for home_team, away_team, week in games:

@@ -189,7 +189,7 @@ def test_asof_join_with_lag():
     )
 
     # UNSAFE: Regular asof join (may include same-day stats)
-    unsafe = pd.merge_asof(
+    pd.merge_asof(
         games.sort_values("kickoff"),
         stats.sort_values("date"),
         left_on="kickoff",

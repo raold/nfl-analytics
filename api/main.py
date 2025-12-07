@@ -129,7 +129,7 @@ async def startup_event():
     if redis_client:
         from api.middleware import create_rate_limiter
 
-        rate_limiter = create_rate_limiter(
+        create_rate_limiter(
             redis_client=redis_client, default_limit=100, window_seconds=3600
         )
         # Note: Middleware added via app.add_middleware() in production setup
@@ -155,7 +155,7 @@ async def startup_event():
 
     # Initialize authenticator
     try:
-        authenticator = get_authenticator()
+        get_authenticator()
         logger.info("✓ API key authenticator initialized")
     except Exception as e:
         logger.error(f"Authenticator initialization failed: {e}")

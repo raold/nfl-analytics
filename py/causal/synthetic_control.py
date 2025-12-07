@@ -50,7 +50,7 @@ class SyntheticControl:
 
         # Split into pre and post treatment
         pre_treatment = df[df[time_var] < treatment_time]
-        post_treatment = df[df[time_var] >= treatment_time]
+        df[df[time_var] >= treatment_time]
 
         # Get treated and control outcomes
         treated_pre = pre_treatment[pre_treatment[unit_var] == treated_unit][outcome].values

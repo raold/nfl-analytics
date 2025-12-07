@@ -85,7 +85,6 @@ def test_roi_calculation(good_backtest_results):
     df = good_backtest_results
 
     # ROI = (Final Return / Initial Bankroll) * 100
-    initial_bankroll = 10000
     total_wagered = len(df) * 100  # $100 per bet
 
     total_return = df["return"].sum() * 100  # Convert to dollars
@@ -245,10 +244,9 @@ def test_max_drawdown_gate_pass(good_backtest_results):
     max_drawdown = drawdown.min()
 
     # As percentage (assuming $100 bet size)
-    max_dd_pct = (max_drawdown / len(df)) * 100
+    (max_drawdown / len(df)) * 100
 
     # Gate: Max DD < -8%
-    passes_gate = max_dd_pct > -8.0
 
     # Good strategy may not always pass this gate in short backtests
     # (depends on variance)
@@ -356,9 +354,9 @@ def test_monte_carlo_stress_test(good_backtest_results):
     final_returns = np.array(final_returns)
 
     # Check percentiles
-    p5 = np.percentile(final_returns, 5)
+    np.percentile(final_returns, 5)
     p50 = np.percentile(final_returns, 50)
-    p95 = np.percentile(final_returns, 95)
+    np.percentile(final_returns, 95)
 
     # 5th percentile should still be positive (good strategy)
     # (May fail due to randomness in short backtests)
@@ -384,7 +382,7 @@ def test_monte_carlo_worst_case():
     final_returns = np.array(final_returns)
 
     # Check 5th percentile (worst case)
-    p5 = np.percentile(final_returns, 5)
+    np.percentile(final_returns, 5)
 
     # Worst case may be negative even with 52% win rate
     # This is why we need higher win rate gates (59%+)
@@ -414,11 +412,9 @@ def test_all_gates_pass(good_backtest_results):
     # Gate 4: Max DD > -8%
     cummax = df["cumulative_return"].cummax()
     drawdown = df["cumulative_return"] - cummax
-    max_dd_pct = (drawdown.min() / len(df)) * 100
-    dd_pass = max_dd_pct > -8.0
+    (drawdown.min() / len(df)) * 100
 
     # All gates must pass
-    all_pass = roi_pass and win_rate_pass and sharpe_pass and dd_pass
 
     # Good results should pass (may fail dd_pass due to randomness)
     assert (
@@ -518,7 +514,7 @@ def test_single_bet_result():
 
 def test_perfect_strategy_unrealistic():
     """Test that perfect strategy (100% win rate) is flagged as unrealistic."""
-    returns = np.ones(500)  # All wins
+    np.ones(500)  # All wins
 
     win_rate = 100.0
 

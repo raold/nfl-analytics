@@ -31,7 +31,7 @@ class DQNNetwork(nn.Module):
     def __init__(
         self, state_dim: int = 44, action_dim: int = 5, hidden_dims: list[int] = [128, 128, 64]
     ):
-        super(DQNNetwork, self).__init__()
+        super().__init__()
 
         layers = []
         prev_dim = state_dim
@@ -265,7 +265,7 @@ class PPOActorCritic(nn.Module):
     def __init__(
         self, state_dim: int = 44, action_dim: int = 5, hidden_dims: list[int] = [128, 128]
     ):
-        super(PPOActorCritic, self).__init__()
+        super().__init__()
 
         # Shared base network
         base_layers = []

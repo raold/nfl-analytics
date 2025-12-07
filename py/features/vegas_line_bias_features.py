@@ -460,7 +460,7 @@ def main():
     print("=" * 70)
     if len(team_line_performance) > 0:
         over_pct = team_line_performance["over_hit"].mean() * 100
-        under_pct = (
+        (
             team_line_performance["~over_hit"].mean() * 100
             if "~over_hit" in team_line_performance.columns
             else (100 - over_pct)

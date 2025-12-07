@@ -484,26 +484,6 @@ def get_team_possession_value_features(
     # Query drives table for possession metrics (if table exists)
     # Note: This table likely doesn't exist, so we'll fall back to plays-based query
     # Keeping this for potential future use if drives table is created
-    query_drives = """
-    SELECT
-        AVG(start_field_position) AS avg_starting_field_position,
-        COUNT(*) AS total_drives,
-        COUNT(*) / NULLIF(COUNT(DISTINCT game_id), 0.0) AS possessions_per_game
-    FROM (
-        SELECT
-            d.game_id,
-            d.drive,
-            d.posteam,
-            25 AS start_field_position  -- Simplified: assume touchback
-        FROM drives d
-        JOIN games g ON d.game_id = g.game_id
-        WHERE d.posteam = %s
-          AND g.season = %s
-          AND g.week < %s
-        ORDER BY g.season DESC, g.week DESC, d.drive
-        LIMIT %s * 15
-    ) AS team_drives
-    """
 
     # Fallback query using plays table (primary method since drives table doesn't exist)
     # This query computes drive starts from play-by-play data using fixed_drive

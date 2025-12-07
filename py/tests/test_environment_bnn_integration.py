@@ -194,7 +194,7 @@ class EnvironmentBNNIntegrationTest:
             logger.info(f"  Features: {', '.join(feature_cols)}")
 
             # Transform using saved scaler
-            X_test_scaled = model_data["scaler"].transform(X_test)
+            model_data["scaler"].transform(X_test)
             logger.info("✓ Features standardized")
 
             # Create dummy predictions to validate the interface
@@ -245,12 +245,11 @@ class EnvironmentBNNIntegrationTest:
 
             # Load Environment BNN
             with open(self.model_path, "rb") as f:
-                env_model = pickle.load(f)
+                pickle.load(f)
 
             logger.info("✓ Environment BNN loaded")
 
             # Simulate predictions from all 3 models
-            n_samples = 5
 
             # Model 1: Baseline
             baseline_preds = np.array([45.2, 62.1, 38.5, 71.3, 55.8])

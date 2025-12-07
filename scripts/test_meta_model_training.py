@@ -189,7 +189,7 @@ def test_meta_model_training():
         max_depth=3,
     )
 
-    metrics = predictor.fit(
+    predictor.fit(
         historical_df=train_df,
         cv_splits=3,
         n_random_samples=200,  # Fewer samples for faster testing
@@ -265,7 +265,7 @@ def test_meta_model_training():
     output_path = Path("models/ensemble/test_meta_model.pkl")
     predictor.save(output_path)
 
-    loaded_predictor = MetaLearningWeightPredictor.load(output_path)
+    MetaLearningWeightPredictor.load(output_path)
     print("  ✅ Model saved and loaded successfully")
 
     print("\n" + "=" * 80)

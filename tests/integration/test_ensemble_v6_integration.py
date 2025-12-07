@@ -188,7 +188,7 @@ class TestXGBoostV4Integration:
         X_batch = np.random.rand(100, n_features)  # Batch of 100 predictions
 
         start_time = time.time()
-        predictions = xgboost_v4_model.predict(X_batch)
+        xgboost_v4_model.predict(X_batch)
         elapsed = time.time() - start_time
 
         time_per_prediction_ms = (elapsed / 100) * 1000
@@ -410,7 +410,7 @@ class TestComponentFailureHandling:
 
                 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
-                ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
+                EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
                 # Should fail gracefully with informative error
                 assert True  # If we get here, error handling worked
             except Exception as e:
@@ -510,7 +510,7 @@ class TestPerformanceBenchmarks:
             pytest.skip("Ensemble v5 not available")
 
         start_time = time.time()
-        result = ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
+        ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
         elapsed_ms = (time.time() - start_time) * 1000
 
         assert elapsed_ms < 500, f"Too slow: {elapsed_ms:.2f}ms"
@@ -575,7 +575,7 @@ class TestRiskGateEnforcement:
         # Simulated betting results
         wins = 60
         losses = 40
-        win_rate = wins / (wins + losses)
+        wins / (wins + losses)
         avg_win = 100
         avg_loss = 110  # With -110 juice
 
@@ -593,7 +593,7 @@ class TestRiskGateEnforcement:
 def ensemble_v6_with_mocks():
     """Create v6 ensemble with all components mocked (extracted from v7)."""
     with (
-        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface") as mock_r,
+        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
         patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
     ):
 
@@ -839,7 +839,7 @@ class TestPredictionOutputStructureExtracted:
     def test_prediction_time_is_reasonable(self, ensemble_v6_with_mocks, mahomes_2024_week10):
         """Prediction should complete in reasonable time (<5s)."""
         start = time.time()
-        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+        ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
         elapsed = time.time() - start
 
         assert elapsed < 5.0, f"Prediction took {elapsed:.2f}s (max 5.0s)"

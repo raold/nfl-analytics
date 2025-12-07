@@ -369,7 +369,7 @@ class GameOutcomeEnsemble:
             val_target = (val_df["margin"] > 0).astype(int).values
             val_features_df = engineer_game_features(val_df, self.team_stats_cache)
             X_val = val_features_df[feature_cols].values
-            X_val_scaled = self.scaler.transform(X_val)
+            self.scaler.transform(X_val)
             dval = xgb.DMatrix(X_val, label=val_target)
             evals = [(dtrain, "train"), (dval, "val")]
             self.xgb_model = xgb.train(

@@ -449,7 +449,7 @@ def test_ensemble_load_time(benchmark):
         ensemble.load_models()
         return ensemble
 
-    result = benchmark(load_ensemble)
+    benchmark(load_ensemble)
 
     logger.info(f"✅ Ensemble load time: {benchmark.stats.mean:.2f}s")
 
@@ -473,7 +473,7 @@ def test_prediction_latency(loaded_ensemble, test_player, benchmark):
             week=test_player["week"],
         )
 
-    result = benchmark(predict_once)
+    benchmark(predict_once)
 
     latency_ms = benchmark.stats.mean * 1000
     logger.info(f"✅ Prediction latency: {latency_ms:.1f}ms")

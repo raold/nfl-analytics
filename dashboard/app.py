@@ -2432,14 +2432,10 @@ def main():
                     # Determine winner
                     if actual_margin > 0:
                         winner = game["home_team"]
-                        winner_score = home_score
-                        loser = game["away_team"]
-                        loser_score = away_score
+                        game["away_team"]
                     else:
                         winner = game["away_team"]
-                        winner_score = away_score
-                        loser = game["home_team"]
-                        loser_score = home_score
+                        game["home_team"]
 
                     # Note: We're now showing player passing yards predictions (not game outcomes)
                     # Game outcome prediction accuracy is tracked separately in ml.predictions

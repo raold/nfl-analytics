@@ -364,7 +364,7 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Should have executed INSERT query
         assert mock_cursor.execute.call_count == 3  # model_id lookup, player info, insert
@@ -397,7 +397,7 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
 
         # Database should not be called
         mock_db.assert_not_called()
@@ -429,7 +429,7 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Check model registry query
         registry_calls = [
@@ -458,7 +458,7 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Database should not be called (null prediction)
         mock_db.assert_not_called()
@@ -790,7 +790,7 @@ class TestABTestRouterPerformance:
         start = time.time()
         for i in range(100000):
             hash_input = f"player_{i:05d}_2024_10_{router.test_name}"
-            hash_digest = hashlib.md5(hash_input.encode()).hexdigest()
+            hashlib.md5(hash_input.encode()).hexdigest()
         elapsed = time.time() - start
 
         avg_time_us = (elapsed / 100000) * 1_000_000

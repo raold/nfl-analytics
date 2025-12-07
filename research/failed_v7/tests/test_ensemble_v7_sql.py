@@ -104,7 +104,6 @@ class TestStateSpaceSkillsData:
         if skills_path.exists():
             df = pd.read_csv(skills_path)
 
-            required_columns = {"player_id"}  # Minimum required
             optional_columns = {"skill", "skill_mean", "skill_std"}
 
             # Check at least player_id column exists
@@ -174,7 +173,7 @@ class TestCausalFeaturesData:
             if "defense_team" in df.columns:
                 teams_in_data = df["defense_team"].tolist()
                 # At least some of expected teams should be present
-                found_teams = set(teams_in_data).intersection(set(expected_high_roughing))
+                set(teams_in_data).intersection(set(expected_high_roughing))
                 # Don't assert presence (data may not exist in test env)
                 # Just verify structure if present
 
@@ -262,8 +261,8 @@ class TestDatabaseConnectivity:
         # These should be set in CI/test environment
         db_host = os.getenv("DB_HOST", "localhost")
         db_port = os.getenv("DB_PORT", "5544")
-        db_name = os.getenv("DB_NAME", "devdb01")
-        db_user = os.getenv("DB_USER", "dro")
+        os.getenv("DB_NAME", "devdb01")
+        os.getenv("DB_USER", "dro")
 
         assert db_host is not None
         assert db_port is not None

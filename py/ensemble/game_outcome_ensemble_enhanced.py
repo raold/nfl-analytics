@@ -285,7 +285,7 @@ class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):
             val_target = (val_df["margin"] > 0).astype(int).values
             val_features_df = self._engineer_enhanced_features(val_df)
             X_val = val_features_df[available_cols].values
-            X_val_scaled = self.scaler.transform(X_val)
+            self.scaler.transform(X_val)
             dval = xgb.DMatrix(X_val, label=val_target)
             evals = [(dtrain, "train"), (dval, "val")]
             self.xgb_model = xgb.train(

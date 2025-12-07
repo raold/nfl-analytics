@@ -61,7 +61,7 @@ class PropsPredictionRequest(BaseModel):
     )
 
     @validator("stat_type")
-    def validate_stat_type(cls, v):
+    def validate_stat_type(self, v):
         valid_stats = {"passing_yards", "rushing_yards", "receiving_yards", "touchdowns"}
         if v not in valid_stats:
             raise ValueError(f"stat_type must be one of {valid_stats}")

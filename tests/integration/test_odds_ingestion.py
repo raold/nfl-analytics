@@ -235,9 +235,9 @@ class TestOddsIngestionFlow:
         # Count by market
         cursor.execute(
             """
-            SELECT market_key, COUNT(*) 
-            FROM odds_history 
-            GROUP BY market_key 
+            SELECT market_key, COUNT(*)
+            FROM odds_history
+            GROUP BY market_key
             ORDER BY market_key;
         """
         )

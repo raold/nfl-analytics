@@ -431,7 +431,6 @@ class EnhancedEnsemble4Way:
 
             # Model prediction: log(yards + 1) ~ N(theta + beta_attempts * log(attempts) + beta_home * is_home, R)
             log_yards_plus_1_mean = theta + beta_attempts * log_attempts + beta_home * is_home
-            log_yards_plus_1_std = R
 
             # Transform to yards scale: yards = exp(log(yards + 1)) - 1
             # For lognormal: if X ~ N(μ, σ²), then exp(X) has mean exp(μ + σ²/2)
@@ -625,7 +624,6 @@ class EnhancedEnsemble4Way:
 
             # Model prediction: log(yards + 1) ~ N(theta + beta_attempts * log(attempts) + beta_home * is_home, R)
             log_yards_plus_1_mean = theta + beta_attempts * np.log(attempts) + beta_home * is_home
-            log_yards_plus_1_std = R
 
             # Transform to yards scale: yards = exp(log(yards + 1)) - 1
             # For lognormal: if X ~ N(μ, σ²), then exp(X) has mean exp(μ + σ²/2)

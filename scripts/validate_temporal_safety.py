@@ -278,14 +278,12 @@ def main():
     # Run validation
     validator = TemporalSafetyValidator()
 
-    code_safe = True
-    db_safe = True
 
     if args.full or args.code_only:
-        code_safe = validator.validate_code_modules()
+        validator.validate_code_modules()
 
     if args.full or args.db_only:
-        db_safe = validator.validate_database_features()
+        validator.validate_database_features()
 
     # Generate report
     print(validator.generate_report())

@@ -281,7 +281,7 @@ def main():
 
     # Run study
     study = FeatureAblationStudy(train_seasons, test_seasons)
-    results = study.run_full_study()
+    study.run_full_study()
 
     # Print summary
     study.print_summary()

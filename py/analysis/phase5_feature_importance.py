@@ -294,7 +294,7 @@ def main():
     train_seasons = [2020, 2021, 2022]
     output_dir = Path("analysis/phase5_feature_importance")
 
-    importance_df = analyze_feature_importance(train_seasons, output_dir)
+    analyze_feature_importance(train_seasons, output_dir)
 
     print(f"\n{'='*80}")
     print("NEXT STEPS")

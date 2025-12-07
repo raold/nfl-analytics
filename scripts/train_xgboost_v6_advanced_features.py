@@ -440,7 +440,7 @@ class XGBoostV6AdvancedTrainer:
         try:
             from py.utils.data_leakage_detector import DataLeakageDetector
 
-            detector = DataLeakageDetector()
+            DataLeakageDetector()
             train_seasons = df.loc[train_mask, "season"].unique().tolist()
             test_seasons = df.loc[test_mask, "season"].unique().tolist()
             if max(train_seasons) >= min(test_seasons):

@@ -362,7 +362,7 @@ class RModelDiagnostic:
             # Run 10 predictions
             logger.info("Running 10 predictions...")
             for i in range(10):
-                result = interface.predict_hierarchical(
+                interface.predict_hierarchical(
                     player_id="00-0019596",
                     season=CURRENT_SEASON,
                     week=9 - i % 5,  # Vary week to avoid caching

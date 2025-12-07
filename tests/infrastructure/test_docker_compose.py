@@ -224,7 +224,6 @@ class TestDockerCompose:
         """Test that materialized views are created."""
         conn_string = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
 
-        expected_views = ["game_summary"]  # mart.game_summary
 
         try:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:

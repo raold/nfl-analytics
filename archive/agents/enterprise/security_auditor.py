@@ -430,7 +430,7 @@ class SecurityAuditor:
                 content = file_path.read_text()
                 lines = content.split("\n")
 
-                has_rate_limiting = "limiter" in content.lower() or "ratelimit" in content.lower()
+                "limiter" in content.lower() or "ratelimit" in content.lower()
                 has_auth = "depends(" in content.lower() or "require_auth" in content.lower()
 
                 for i, line in enumerate(lines, 1):

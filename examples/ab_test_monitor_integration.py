@@ -413,11 +413,11 @@ def main():
 
     # Example 4: Dashboard integration
     print("\n" + "=" * 80)
-    dashboard_data = example_4_dashboard_integration()
+    example_4_dashboard_integration()
 
     # Example 5: Production deployment gate
     print("\n" + "=" * 80)
-    can_deploy = example_5_production_deployment_gate()
+    example_5_production_deployment_gate()
 
     # Example 6: Simulated A/B test
     print("\n" + "=" * 80)

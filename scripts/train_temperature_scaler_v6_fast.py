@@ -140,7 +140,7 @@ def train_temperature_scaler(calib_df: pd.DataFrame):
     scaler = TemperatureScaler(target_coverage=0.90, method="brentq")
 
     # Fit temperature scaler
-    optimal_T = scaler.fit(calib_df)
+    scaler.fit(calib_df)
 
     # Get calibration report
     report = scaler.get_calibration_report()

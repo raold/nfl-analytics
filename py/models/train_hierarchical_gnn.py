@@ -799,7 +799,7 @@ def train_gnn_single_config(
 
     for epoch in range(epochs):
         # Train
-        train_loss = train_epoch(
+        train_epoch(
             model,
             train_dataset,
             optimizer,

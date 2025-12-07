@@ -55,7 +55,7 @@ class TestBNNModelLoading:
             return_value=mock_bnn_model,
         ):
             # First prediction
-            result1 = predictor._predict_bnn_model(
+            predictor._predict_bnn_model(
                 model_name="bnn_v1",
                 path=model_path,
                 player_id="12345",
@@ -63,7 +63,7 @@ class TestBNNModelLoading:
             )
 
             # Second prediction (should use cached model)
-            result2 = predictor._predict_bnn_model(
+            predictor._predict_bnn_model(
                 model_name="bnn_v1",
                 path=model_path,
                 player_id="12345",

@@ -236,7 +236,7 @@ def test_graceful_degradation(ensemble):
     logger.info("\nTesting with invalid player ID...")
 
     try:
-        result = ensemble.predict(player_id="INVALID-ID", season=2024, week=1)
+        ensemble.predict(player_id="INVALID-ID", season=2024, week=1)
         logger.info("✓ Handled gracefully (returned result)")
         return {"graceful": True}
     except Exception as e:

@@ -549,9 +549,9 @@ def main():
         current_month = datetime.now().month
         # NFL season runs Sept-Feb, so adjust year accordingly
         if current_month < 9:
-            default_season = current_year - 1
+            current_year - 1
         else:
-            default_season = current_year
+            pass
 
         # Find available seasons
         seasons = sorted(set([w[0] for w in available_weeks]), reverse=True)

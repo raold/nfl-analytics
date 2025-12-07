@@ -29,7 +29,7 @@ conn = psycopg2.connect(
 print("\n1. Loading historical games and odds...")
 query = """
 WITH game_features AS (
-    SELECT 
+    SELECT
         g.game_id,
         g.season,
         g.week,
@@ -42,7 +42,7 @@ WITH game_features AS (
         CASE WHEN g.home_score > g.away_score THEN 1 ELSE 0 END as home_win,
         CASE WHEN g.home_score + g.spread_close > g.away_score THEN 1 ELSE 0 END as home_cover,
         -- Calculate implied probability from spread (using standard -110 odds)
-        CASE 
+        CASE
             WHEN g.spread_close < 0 THEN 1 / (1 + EXP(g.spread_close / 7.0))
             ELSE 1 - 1 / (1 + EXP(-g.spread_close / 7.0))
         END as market_prob
@@ -52,7 +52,7 @@ WITH game_features AS (
     AND g.spread_close IS NOT NULL
 ),
 play_stats AS (
-    SELECT 
+    SELECT
         game_id,
         posteam,
         AVG(epa) as avg_epa,
@@ -62,7 +62,7 @@ play_stats AS (
     WHERE posteam IS NOT NULL
     GROUP BY game_id, posteam
 )
-SELECT 
+SELECT
     gf.*,
     COALESCE(h.avg_epa, 0) as home_epa,
     COALESCE(a.avg_epa, 0) as away_epa,
@@ -130,7 +130,7 @@ def kelly_criterion(p_win, odds=1.91, fraction=0.25):
     if p_win <= 0 or p_win >= 1:
         return 0
 
-    q = 1 - p_win
+    1 - p_win
     edge = p_win * odds - 1
 
     if edge <= 0:

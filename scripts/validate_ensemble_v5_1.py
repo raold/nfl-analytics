@@ -86,13 +86,11 @@ def validate_ensemble_v5_1():
         ("Hybrid XGBoost v1", ensemble.hybrid_xgboost_path),
     ]
 
-    all_exist = True
     for name, path in paths_to_check:
         if path.exists():
             logger.info(f"✅ {name}: {path}")
         else:
             logger.warning(f"⚠️  {name} not found: {path}")
-            all_exist = False
 
     # Test 5: Load models
     logger.info("\n[TEST 5] Loading models...")

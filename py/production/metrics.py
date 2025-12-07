@@ -692,7 +692,7 @@ class MetricsRegistry:
                 self.cache_size_keys.labels(cache_type="all").set(keys_count)
 
                 # Evictions
-                evicted = info.get("evicted_keys", 0)
+                info.get("evicted_keys", 0)
                 # Note: This is cumulative, so we only increment the delta
                 # For simplicity, we'll just set it (Prometheus will handle rate)
                 # A more robust implementation would track the previous value

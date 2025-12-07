@@ -106,8 +106,8 @@ def prepare_psm_data(
     df_clean = df[df[outcome_col].notna()].copy()
 
     # Separate treated and control
-    df_treated = df_clean[df_clean[treatment_col] == True].copy()
-    df_control = df_clean[df_clean[treatment_col] == False].copy()
+    df_treated = df_clean[df_clean[treatment_col]].copy()
+    df_control = df_clean[not df_clean[treatment_col]].copy()
 
     # Remove rows with missing covariates
     all_cols = [outcome_col] + covariate_cols
@@ -466,7 +466,7 @@ def main():
     df = load_combined_data()
     print(f"✓ Loaded {len(df)} games")
 
-    data_dir = project_root / "data"
+    project_root / "data"
     results_dir = project_root / "results"
     results_dir.mkdir(exist_ok=True)
 

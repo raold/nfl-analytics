@@ -253,8 +253,8 @@ def load_pytorch_bnn_predictions(model_path: str, data: pd.DataFrame) -> pd.Data
         with open(metadata_path) as f:
             metadata = json.load(f)
         feature_cols = metadata.get("feature_cols", [])
-        y_mean = metadata.get("y_mean", 0.0)
-        y_std = metadata.get("y_std", 1.0)
+        metadata.get("y_mean", 0.0)
+        metadata.get("y_std", 1.0)
     else:
         logger.warning(f"No metadata found at {metadata_path}, using defaults")
         feature_cols = [
@@ -266,8 +266,6 @@ def load_pytorch_bnn_predictions(model_path: str, data: pd.DataFrame) -> pd.Data
             "temp",
             "wind",
         ]
-        y_mean = 250.0
-        y_std = 80.0
 
     # Prepare features (simplified - missing L3 stats will be imputed)
     X = data[
@@ -291,11 +289,11 @@ def load_pytorch_bnn_predictions(model_path: str, data: pd.DataFrame) -> pd.Data
     # Standardize features (using training set parameters from metadata)
     if HAS_SKLEARN:
         scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X[feature_cols[: len(X.columns)]])
+        scaler.fit_transform(X[feature_cols[: len(X.columns)]])
 
     # Load PyTorch model
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model_state = torch.load(model_path, map_location=device)
+    torch.load(model_path, map_location=device)
 
     # NOTE: This requires the model architecture definition
     # For now, we'll note this as a limitation and use a placeholder
@@ -328,7 +326,7 @@ def load_pymc_bnn_predictions(model_path: str, data: pd.DataFrame) -> pd.DataFra
     logger.info("Loading PyMC BNN trace...")
 
     with open(model_path, "rb") as f:
-        trace = pickle.load(f)
+        pickle.load(f)
 
     # NOTE: PyMC BNN prediction requires model architecture and inference
     # This is complex and requires the original training code

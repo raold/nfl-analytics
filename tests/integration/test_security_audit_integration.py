@@ -150,7 +150,7 @@ def test_clean_file_no_credentials(mock_file_clean):
 
     import re
 
-    match = re.search(hardcoded_pattern, content)
+    re.search(hardcoded_pattern, content)
 
     # Should not match environment variable loading
     # (This is a simplified check - real implementation more sophisticated)
@@ -263,7 +263,7 @@ def test_detect_world_readable_sensitive_files():
 
         # Check permissions
         file_stat = env_file.stat()
-        perms = stat.filemode(file_stat.st_mode)
+        stat.filemode(file_stat.st_mode)
 
         # Should detect world-readable
         is_world_readable = bool(file_stat.st_mode & stat.S_IROTH)
@@ -271,7 +271,6 @@ def test_detect_world_readable_sensitive_files():
         assert is_world_readable, ".env file is world-readable (SECURITY ISSUE)"
 
         # Recommendation: chmod 600 (owner read/write only)
-        recommended_perms = 0o600
 
 
 def test_sensitive_files_correct_permissions():

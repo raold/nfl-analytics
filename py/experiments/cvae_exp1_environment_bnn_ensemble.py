@@ -226,7 +226,7 @@ def run_experiment():
     ]
 
     X_baseline = test_data_with_traj[baseline_features].fillna(0).values
-    X_baseline_scaled = env_bnn["scaler"].transform(X_baseline)
+    env_bnn["scaler"].transform(X_baseline)
 
     # Enhanced: Environment BNN + cVAE trajectory features (17 features)
     enhanced_features = baseline_features + [
@@ -243,7 +243,7 @@ def run_experiment():
 
     # Need new scaler for enhanced features
     scaler_enhanced = StandardScaler()
-    X_enhanced_scaled = scaler_enhanced.fit_transform(X_enhanced)
+    scaler_enhanced.fit_transform(X_enhanced)
 
     y_true = test_data_with_traj["stat_yards"].values
 

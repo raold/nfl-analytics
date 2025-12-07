@@ -283,7 +283,6 @@ def test_sql_query_complexity_estimation():
 def test_backtest_time_estimation():
     """Test backtest training time estimation."""
     # Parameters
-    n_games = 1000
     n_folds = 5  # Time-series cross-validation
     time_per_fold = 120  # 2 minutes per fold
 
@@ -376,12 +375,12 @@ def test_apply_vs_vectorized():
 
     # SLOWER: Using apply
     start = time.time()
-    result_apply = df["yards"].apply(lambda x: x * 2)
+    df["yards"].apply(lambda x: x * 2)
     time_apply = time.time() - start
 
     # FASTER: Vectorized
     start = time.time()
-    result_vectorized = df["yards"] * 2
+    df["yards"] * 2
     time_vectorized = time.time() - start
 
     # Vectorized should be faster
@@ -400,7 +399,7 @@ def test_groupby_agg_performance():
 
     # Efficient aggregation
     start = time.time()
-    result = df.groupby("team")["yards"].agg(["mean", "sum", "count"])
+    df.groupby("team")["yards"].agg(["mean", "sum", "count"])
     time_agg = time.time() - start
 
     # Should complete quickly (< 0.1s for 100k rows)

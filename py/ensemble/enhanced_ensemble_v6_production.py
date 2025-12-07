@@ -442,7 +442,7 @@ class EnhancedEnsemble5Way:
         # ============================================================
 
         hybrid_static_path = self.hybrid_base_path / "static_model.pkl"
-        hybrid_incremental_path = self.hybrid_base_path / "incremental_model.pkl"
+        self.hybrid_base_path / "incremental_model.pkl"
         hybrid_scaler_path = self.hybrid_base_path / "static_scaler.pkl"
 
         if not hybrid_static_path.exists():

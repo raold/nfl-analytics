@@ -454,7 +454,7 @@ def test_leakage_detection_speed(sample_train_test_split, leakage_detector, benc
     def detect_leakage():
         return leakage_detector.validate_split(train, test, date_col="kickoff")
 
-    result = benchmark(detect_leakage)
+    benchmark(detect_leakage)
 
     logger.info(f"✅ Leakage detection: {benchmark.stats.mean:.2f}s")
 

@@ -255,7 +255,7 @@ def compute_reward(row: dict) -> float:
         - Late-game plays weighted more heavily (time decay)
     """
     # Primary reward: Δ win probability
-    wp_before = row.get("wp", 0.5)
+    row.get("wp", 0.5)
     wpa = row.get("wpa", 0.0)  # Win probability added
     # Handle NULL WPA (very old data): default to 0
     if wpa is None or (isinstance(wpa, float) and np.isnan(wpa)):

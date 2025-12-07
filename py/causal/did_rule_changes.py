@@ -439,7 +439,7 @@ class DiDRuleChangeAnalyzer:
 
         # Fetch data
         all_seasons = control_seasons + [treatment_season]
-        df = self._fetch_passing_data(all_seasons)
+        self._fetch_passing_data(all_seasons)
 
         # Calculate home team margin (positive = home win)
         query = """

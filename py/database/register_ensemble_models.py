@@ -72,16 +72,16 @@ def insert_or_update_model(
         model_id (int): ID of inserted/updated model
     """
     # Extract metadata
-    model_name = model_data.get("name", model_key)
+    model_data.get("name", model_key)
     model_type = model_data.get("model_type", "unknown")
     file_path = model_data.get("file_path", "")
-    training_window = model_data.get("training_window", "")
-    framework = model_data.get("framework", "")
+    model_data.get("training_window", "")
+    model_data.get("framework", "")
 
     # Performance metrics
     performance = model_data.get("performance", {})
     mae_holdout = performance.get("mae_yards")
-    rmse_holdout = performance.get("rmse_yards")
+    performance.get("rmse_yards")
     calibration_90 = performance.get("calibration_90pct")
 
     # Ensemble weight
@@ -93,11 +93,11 @@ def insert_or_update_model(
     approved_date = model_data.get("approved_date")
     if approved_date:
         try:
-            trained_at = datetime.strptime(approved_date, "%Y-%m-%d")
+            datetime.strptime(approved_date, "%Y-%m-%d")
         except ValueError:
-            trained_at = datetime.now()
+            datetime.now()
     else:
-        trained_at = datetime.now()
+        datetime.now()
 
     # Model version (extract from model_key or use 'v1')
     version = model_key.split("_")[-1] if "_v" in model_key else "v1"

@@ -87,7 +87,7 @@ class CalibratedBNN:
         """Build BNN with calibrated temperature"""
 
         n_samples, n_features = X.shape
-        n_layers = len(self.hidden_dims)
+        len(self.hidden_dims)
 
         with pm.Model() as model:
             X_data = pm.Data("X", X)
@@ -262,7 +262,7 @@ def main():
     logger.info("=" * 70)
 
     # Initialize calibrated BNN
-    bnn = CalibratedBNN(
+    CalibratedBNN(
         hidden_dims=(64, 32), temperature=0.75, inference_method="advi"  # Validated calibration
     )
 

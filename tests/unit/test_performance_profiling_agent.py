@@ -255,7 +255,7 @@ data = [i for i in range(1000)]
             time.sleep(0.1)  # Simulate slow operation
             return 42
 
-        initial_bottlenecks = len(agent.bottlenecks)
+        len(agent.bottlenecks)
         report = agent.profile_function(slow_function)
 
         # Should detect slow computation (>100ms)

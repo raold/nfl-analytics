@@ -371,8 +371,8 @@ def calculate_did_treatment_effect(df: pd.DataFrame) -> dict:
     ]
 
     # Calculate first differences
-    treated_diff = treated_post_data.mean() - treated_pre_data.mean()
-    control_diff = control_post_data.mean() - control_pre_data.mean()
+    treated_post_data.mean() - treated_pre_data.mean()
+    control_post_data.mean() - control_pre_data.mean()
 
     # Standard errors (pooled variance)
     se_treated = np.sqrt(

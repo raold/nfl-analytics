@@ -174,7 +174,7 @@ class BNNConformalPredictor:
 
         # Extract model from checkpoint
         if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
-            state_dict = checkpoint["model_state_dict"]
+            checkpoint["model_state_dict"]
             # Need to reconstruct model architecture
             # For now, assume model is saved directly
             raise NotImplementedError(
@@ -220,7 +220,7 @@ class BNNConformalPredictor:
 
         if verbose:
             # Validate calibration (MAPIE 1.1.0 API)
-            y_pred = self.conformal_model.predict(X_calib)
+            self.conformal_model.predict(X_calib)
             y_pred_lower, y_pred_upper = self.conformal_model.predict_interval(X_calib)
 
             # Check empirical coverage (MAPIE 1.1.0 API)

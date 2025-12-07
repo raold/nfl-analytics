@@ -261,7 +261,7 @@ def test_performance_speedup(ensemble, large_batch):
         batch_df = pd.DataFrame(test_batch)
 
         start_batch = time.time()
-        batch_results = ensemble.predict_batch(batch_df)
+        ensemble.predict_batch(batch_df)
         time_batch = time.time() - start_batch
 
         speedup = time_single / time_batch
@@ -310,7 +310,7 @@ def test_memory_efficiency(ensemble, large_batch):
     # Run batch prediction
     try:
         batch_df = pd.DataFrame(large_batch)
-        results = ensemble.predict_batch(batch_df)
+        ensemble.predict_batch(batch_df)
 
         # Get final memory
         mem_after = process.memory_info().rss / 1024 / 1024  # MB
@@ -489,7 +489,7 @@ def test_batch_prediction_throughput(large_batch, benchmark):
         def run_batch():
             return ensemble.predict_batch(batch_df)
 
-        result = benchmark(run_batch)
+        benchmark(run_batch)
 
         throughput = len(batch_df) / benchmark.stats.mean
         logger.info(f"✅ Throughput: {throughput:.1f} games/sec")

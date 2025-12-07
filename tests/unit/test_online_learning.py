@@ -62,7 +62,7 @@ class TestDriftDetector(unittest.TestCase):
         # Feed stable data (mean = 50, std = 5)
         for _ in range(100):
             value = np.random.normal(50, 5)
-            drift = self.detector.update(value)
+            self.detector.update(value)
             # Should not detect drift (very unlikely with stable data)
 
         # Drift counts should be low
@@ -77,11 +77,9 @@ class TestDriftDetector(unittest.TestCase):
             self.detector.update(value)
 
         # Introduce drift (mean shifts to 70)
-        drift_detected = False
         for _ in range(50):
             value = np.random.normal(70, 5)
             if self.detector.update(value):
-                drift_detected = True
                 break
 
         # Should detect drift (at least one detector)
@@ -568,10 +566,8 @@ class TestPropertyBasedTests(unittest.TestCase):
             detector.update(np.random.normal(50, 5))
 
         # Change distribution dramatically
-        drift_detected = False
         for _ in range(100):
             if detector.update(np.random.normal(100, 5)):
-                drift_detected = True
                 break
 
         # Should detect drift (at least one detector)
