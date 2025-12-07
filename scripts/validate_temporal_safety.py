@@ -278,7 +278,6 @@ def main():
     # Run validation
     validator = TemporalSafetyValidator()
 
-
     if args.full or args.code_only:
         validator.validate_code_modules()
 

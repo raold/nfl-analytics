@@ -129,9 +129,7 @@ async def startup_event():
     if redis_client:
         from api.middleware import create_rate_limiter
 
-        create_rate_limiter(
-            redis_client=redis_client, default_limit=100, window_seconds=3600
-        )
+        create_rate_limiter(redis_client=redis_client, default_limit=100, window_seconds=3600)
         # Note: Middleware added via app.add_middleware() in production setup
         logger.info("✓ Rate limiting enabled (Redis-backed)")
     else:

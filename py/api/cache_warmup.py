@@ -113,6 +113,7 @@ class CacheWarmer:
 
                             def loader(p):
                                 return BayesianNeuralNetwork.load(p)
+
                         elif path.suffix == ".json":
                             import xgboost as xgb
 

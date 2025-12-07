@@ -942,9 +942,7 @@ class DifferenceInDifferencesEstimator:
             Dictionary with bootstrap results
         """
         # Estimate ATTs on original data
-        self.estimate_group_time_att(
-            df, outcome, cohort_var, time_var, bootstrap_reps=1
-        )
+        self.estimate_group_time_att(df, outcome, cohort_var, time_var, bootstrap_reps=1)
 
         # Bootstrap
         boot_atts_list = []
