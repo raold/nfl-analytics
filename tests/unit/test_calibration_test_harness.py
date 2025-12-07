@@ -15,26 +15,26 @@ import pytest
 def test_to_dict_basic():
     """Test to_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_to_dict_error_handling():
 
 
 @given(st.integers())
-def test_to_dict_property_idempotent(self, self):
+def test_to_dict_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_dict(self)
+    result = to_dict(val)
 
     # Assert property
-    assert to_dict(self) == result, "idempotent violated"
+    assert to_dict(val) == result, "idempotent violated"
 
 
 
 def test_summary_basic():
     """Test summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = summary()
+    result = summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_summary_edge_cases():
     """Test summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = summary()
+    result = summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_summary_error_handling():
 
 
 @given(st.integers())
-def test_summary_property_idempotent(self, self):
+def test_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = summary(self)
+    result = summary(val)
 
     # Assert property
-    assert summary(self) == result, "idempotent violated"
+    assert summary(val) == result, "idempotent violated"
 
 
 
 def test_compute_coverage_basic():
     """Test compute_coverage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_coverage()
+    result = compute_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_coverage_edge_cases():
     """Test compute_coverage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_coverage()
+    result = compute_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_compute_coverage_property_idempotent(self, y_true, q_lower, q_upper):
 def test_compute_sharpness_basic():
     """Test compute_sharpness: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_sharpness()
+    result = compute_sharpness()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_sharpness_edge_cases():
     """Test compute_sharpness: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_sharpness()
+    result = compute_sharpness()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_compute_sharpness_property_idempotent(self, q_lower, q_upper):
 def test_compute_calibration_error_basic():
     """Test compute_calibration_error: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_calibration_error()
+    result = compute_calibration_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_calibration_error_edge_cases():
     """Test compute_calibration_error: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_calibration_error()
+    result = compute_calibration_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_compute_calibration_error_property_idempotent(self, y_true, predictions
 def test_compute_crps_basic():
     """Test compute_crps: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_crps()
+    result = compute_crps()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_crps_edge_cases():
     """Test compute_crps: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_crps()
+    result = compute_crps()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_compute_crps_property_idempotent(self, y_true, predictions):
 def test_evaluate_basic():
     """Test evaluate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_edge_cases():
     """Test evaluate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_evaluate_property_idempotent(self, y_true, predictions):
 def test_log_experiment_basic():
     """Test log_experiment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_experiment()
+    result = log_experiment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_experiment_edge_cases():
     """Test log_experiment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_experiment()
+    result = log_experiment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_log_experiment_property_idempotent(self, self, experiment_name, config,
 def test_compare_experiments_basic():
     """Test compare_experiments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_experiments()
+    result = compare_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_experiments_edge_cases():
     """Test compare_experiments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_experiments()
+    result = compare_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -398,39 +398,39 @@ def test_compare_experiments_error_handling():
 
 
 @given(st.integers())
-def test_compare_experiments_property_idempotent(self, self):
+def test_compare_experiments_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = compare_experiments(self)
+    result = compare_experiments(val)
 
     # Assert property
-    assert compare_experiments(self) == result, "idempotent violated"
+    assert compare_experiments(val) == result, "idempotent violated"
 
 
 
 def test_save_summary_basic():
     """Test save_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_summary()
+    result = save_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_summary_edge_cases():
     """Test save_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_summary()
+    result = save_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -442,11 +442,11 @@ def test_save_summary_error_handling():
 
 
 @given(st.integers())
-def test_save_summary_property_idempotent(self, self):
+def test_save_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = save_summary(self)
+    result = save_summary(val)
 
     # Assert property
-    assert save_summary(self) == result, "idempotent violated"
+    assert save_summary(val) == result, "idempotent violated"
 

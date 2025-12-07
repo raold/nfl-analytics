@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_data_basic():
     """Test load_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_load_data_error_handling():
 
 
 @given(st.integers())
-def test_load_data_property_idempotent(self, self):
+def test_load_data_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_data(self)
+    result = load_data(val)
 
     # Assert property
-    assert load_data(self) == result, "idempotent violated"
+    assert load_data(val) == result, "idempotent violated"
 
 
 
 def test_get_xgboost_importance_basic():
     """Test get_xgboost_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_xgboost_importance()
+    result = get_xgboost_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_xgboost_importance_edge_cases():
     """Test get_xgboost_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_xgboost_importance()
+    result = get_xgboost_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_get_xgboost_importance_error_handling():
 
 
 @given(st.integers())
-def test_get_xgboost_importance_property_idempotent(self, self):
+def test_get_xgboost_importance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_xgboost_importance(self)
+    result = get_xgboost_importance(val)
 
     # Assert property
-    assert get_xgboost_importance(self) == result, "idempotent violated"
+    assert get_xgboost_importance(val) == result, "idempotent violated"
 
 
 
 def test_analyze_correlation_basic():
     """Test analyze_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_correlation()
+    result = analyze_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_correlation_edge_cases():
     """Test analyze_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_correlation()
+    result = analyze_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_analyze_correlation_property_idempotent(self, self, df):
 def test_recommend_pruning_basic():
     """Test recommend_pruning: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = recommend_pruning()
+    result = recommend_pruning()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_recommend_pruning_edge_cases():
     """Test recommend_pruning: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = recommend_pruning()
+    result = recommend_pruning()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_recommend_pruning_property_idempotent(self, self, importance_df, thresh
 def test_test_pruned_model_basic():
     """Test test_pruned_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_pruned_model()
+    result = test_pruned_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_pruned_model_edge_cases():
     """Test test_pruned_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_pruned_model()
+    result = test_pruned_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_test_pruned_model_property_idempotent(self, self, df, keep_features, te
 def test_visualize_importance_basic():
     """Test visualize_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = visualize_importance()
+    result = visualize_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_visualize_importance_edge_cases():
     """Test visualize_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = visualize_importance()
+    result = visualize_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_visualize_importance_property_idempotent(self, self, importance_df, out
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

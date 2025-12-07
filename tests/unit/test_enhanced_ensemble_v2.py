@@ -15,26 +15,26 @@ import pytest
 def test_load_bayesian_predictions_basic():
     """Test load_bayesian_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_bayesian_predictions_edge_cases():
     """Test load_bayesian_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_bayesian_predictions_property_idempotent(self, self, model_version
 def test_load_xgboost_predictions_basic():
     """Test load_xgboost_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_xgboost_predictions()
+    result = load_xgboost_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_xgboost_predictions_edge_cases():
     """Test load_xgboost_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_xgboost_predictions()
+    result = load_xgboost_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_xgboost_predictions_property_idempotent(self, self, model_path):
 def test_get_ensemble_predictions_basic():
     """Test get_ensemble_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_ensemble_predictions()
+    result = get_ensemble_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_ensemble_predictions_edge_cases():
     """Test get_ensemble_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_ensemble_predictions()
+    result = get_ensemble_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_get_ensemble_predictions_property_idempotent(self, self, bayesian_preds
 def test_optimize_bet_portfolio_basic():
     """Test optimize_bet_portfolio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_bet_portfolio()
+    result = optimize_bet_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_bet_portfolio_edge_cases():
     """Test optimize_bet_portfolio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_bet_portfolio()
+    result = optimize_bet_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_optimize_bet_portfolio_property_idempotent(self, self, predictions, lin
 def test_generate_daily_recommendations_basic():
     """Test generate_daily_recommendations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_daily_recommendations()
+    result = generate_daily_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_daily_recommendations_edge_cases():
     """Test generate_daily_recommendations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_daily_recommendations()
+    result = generate_daily_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_generate_daily_recommendations_property_idempotent(self, self, week, se
 def test_backtest_basic():
     """Test backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_backtest_edge_cases():
     """Test backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_all_plays_basic():
     """Test load_all_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_all_plays()
+    result = load_all_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_all_plays_edge_cases():
     """Test load_all_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_all_plays()
+    result = load_all_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_all_plays_property_idempotent(self, self, start_season, end_season
 def test_calculate_red_zone_defense_basic():
     """Test calculate_red_zone_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_red_zone_defense()
+    result = calculate_red_zone_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_red_zone_defense_edge_cases():
     """Test calculate_red_zone_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_red_zone_defense()
+    result = calculate_red_zone_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_red_zone_defense_property_idempotent(self, self, plays):
 def test_calculate_goal_line_defense_basic():
     """Test calculate_goal_line_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_goal_line_defense()
+    result = calculate_goal_line_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_goal_line_defense_edge_cases():
     """Test calculate_goal_line_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_goal_line_defense()
+    result = calculate_goal_line_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_goal_line_defense_property_idempotent(self, self, plays):
 def test_calculate_third_down_defense_basic():
     """Test calculate_third_down_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_third_down_defense()
+    result = calculate_third_down_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_third_down_defense_edge_cases():
     """Test calculate_third_down_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_third_down_defense()
+    result = calculate_third_down_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_third_down_defense_property_idempotent(self, self, plays):
 def test_calculate_fourth_down_defense_basic():
     """Test calculate_fourth_down_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_fourth_down_defense()
+    result = calculate_fourth_down_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_fourth_down_defense_edge_cases():
     """Test calculate_fourth_down_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_fourth_down_defense()
+    result = calculate_fourth_down_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_fourth_down_defense_property_idempotent(self, self, plays):
 def test_calculate_two_minute_defense_basic():
     """Test calculate_two_minute_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_two_minute_defense()
+    result = calculate_two_minute_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_two_minute_defense_edge_cases():
     """Test calculate_two_minute_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_two_minute_defense()
+    result = calculate_two_minute_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_calculate_two_minute_defense_property_idempotent(self, self, plays):
 def test_calculate_quarter_defense_basic():
     """Test calculate_quarter_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_quarter_defense()
+    result = calculate_quarter_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_quarter_defense_edge_cases():
     """Test calculate_quarter_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_quarter_defense()
+    result = calculate_quarter_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_calculate_quarter_defense_property_idempotent(self, self, plays):
 def test_calculate_score_differential_defense_basic():
     """Test calculate_score_differential_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_score_differential_defense()
+    result = calculate_score_differential_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_score_differential_defense_edge_cases():
     """Test calculate_score_differential_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_score_differential_defense()
+    result = calculate_score_differential_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_calculate_score_differential_defense_property_idempotent(self, self, pl
 def test_add_rolling_averages_basic():
     """Test add_rolling_averages: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_averages_edge_cases():
     """Test add_rolling_averages: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_add_rolling_averages_property_idempotent(self, self, metrics, window):
 def test_generate_all_features_basic():
     """Test generate_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

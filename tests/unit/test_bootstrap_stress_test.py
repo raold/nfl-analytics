@@ -15,26 +15,26 @@ import pytest
 def test_load_strategy_results_basic():
     """Test load_strategy_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_strategy_results()
+    result = load_strategy_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_strategy_results_edge_cases():
     """Test load_strategy_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_strategy_results()
+    result = load_strategy_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_strategy_results_property_idempotent(self, results_path):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_compute_equity_curve_basic():
     """Test compute_equity_curve: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_equity_curve()
+    result = compute_equity_curve()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_equity_curve_edge_cases():
     """Test compute_equity_curve: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_equity_curve()
+    result = compute_equity_curve()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_compute_equity_curve_property_idempotent(self, self, outcomes, bet_size
 def test_compute_drawdown_basic():
     """Test compute_drawdown: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_drawdown()
+    result = compute_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_drawdown_edge_cases():
     """Test compute_drawdown: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_drawdown()
+    result = compute_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_compute_drawdown_property_idempotent(self, self, equity_curve):
 def test_bootstrap_simulation_basic():
     """Test bootstrap_simulation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bootstrap_simulation()
+    result = bootstrap_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bootstrap_simulation_edge_cases():
     """Test bootstrap_simulation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bootstrap_simulation()
+    result = bootstrap_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_bootstrap_simulation_property_idempotent(self, self, outcomes, bet_size
 def test_stress_test_scenarios_basic():
     """Test stress_test_scenarios: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = stress_test_scenarios()
+    result = stress_test_scenarios()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_stress_test_scenarios_edge_cases():
     """Test stress_test_scenarios: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = stress_test_scenarios()
+    result = stress_test_scenarios()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

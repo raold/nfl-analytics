@@ -15,26 +15,26 @@ import pytest
 def test_add_edge_basic():
     """Test add_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_edge()
+    result = add_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_edge_edge_cases():
     """Test add_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_edge()
+    result = add_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_edge_property_idempotent(self, self, cause, effect):
 def test_find_confounders_basic():
     """Test find_confounders: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_confounders()
+    result = find_confounders()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_confounders_edge_cases():
     """Test find_confounders: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_confounders()
+    result = find_confounders()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_find_confounders_property_idempotent(self, self, treatment, outcome):
 def test_check_d_separation_basic():
     """Test check_d_separation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_d_separation()
+    result = check_d_separation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_d_separation_edge_cases():
     """Test check_d_separation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_d_separation()
+    result = check_d_separation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_check_d_separation_property_idempotent(self, self, x, y, z):
 def test_find_instrumental_variables_basic():
     """Test find_instrumental_variables: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_instrumental_variables()
+    result = find_instrumental_variables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_instrumental_variables_edge_cases():
     """Test find_instrumental_variables: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_instrumental_variables()
+    result = find_instrumental_variables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

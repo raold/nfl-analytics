@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_fetch_actuals_2024_basic():
     """Test fetch_actuals_2024: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_actuals_2024()
+    result = fetch_actuals_2024()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_actuals_2024_edge_cases():
     """Test fetch_actuals_2024: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_actuals_2024()
+    result = fetch_actuals_2024()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_actuals_2024_property_idempotent(self, self, stat_type, aggregate
 def test_fetch_v1_predictions_basic():
     """Test fetch_v1_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_v1_predictions()
+    result = fetch_v1_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_v1_predictions_edge_cases():
     """Test fetch_v1_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_v1_predictions()
+    result = fetch_v1_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fetch_v1_predictions_property_idempotent(self, self, stat_type):
 def test_generate_v2_5_predictions_basic():
     """Test generate_v2_5_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_v2_5_predictions()
+    result = generate_v2_5_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_v2_5_predictions_edge_cases():
     """Test generate_v2_5_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_v2_5_predictions()
+    result = generate_v2_5_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_generate_v2_5_predictions_property_idempotent(self, self, actuals):
 def test_load_bnn_predictions_basic():
     """Test load_bnn_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_bnn_predictions()
+    result = load_bnn_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_bnn_predictions_edge_cases():
     """Test load_bnn_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_bnn_predictions()
+    result = load_bnn_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_load_bnn_predictions_property_idempotent(self, self, actuals):
 def test_calculate_metrics_basic():
     """Test calculate_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_metrics_property_idempotent(self, self, actuals, predictions,
 def test_run_comparison_basic():
     """Test run_comparison: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_comparison()
+    result = run_comparison()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_comparison_edge_cases():
     """Test run_comparison: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_comparison()
+    result = run_comparison()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_run_comparison_property_idempotent(self, self, stat_type):
 def test_generate_comparison_report_basic():
     """Test generate_comparison_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_comparison_report()
+    result = generate_comparison_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_comparison_report_edge_cases():
     """Test generate_comparison_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_comparison_report()
+    result = generate_comparison_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_generate_comparison_report_property_idempotent(self, self, stat_type):
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -387,11 +387,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

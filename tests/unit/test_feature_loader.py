@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_defensive_situational_features_basic():
     """Test load_defensive_situational_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_defensive_situational_features()
+    result = load_defensive_situational_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_defensive_situational_features_edge_cases():
     """Test load_defensive_situational_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_defensive_situational_features()
+    result = load_defensive_situational_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_defensive_situational_features_property_idempotent(self, self, gam
 def test_load_vegas_features_basic():
     """Test load_vegas_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_vegas_features()
+    result = load_vegas_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_vegas_features_edge_cases():
     """Test load_vegas_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_vegas_features()
+    result = load_vegas_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_vegas_features_property_idempotent(self, self, game_ids):
 def test_load_environmental_features_basic():
     """Test load_environmental_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_environmental_features()
+    result = load_environmental_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_environmental_features_edge_cases():
     """Test load_environmental_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_environmental_features()
+    result = load_environmental_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_load_environmental_features_property_idempotent(self, self, game_ids):
 def test_load_feature_interactions_basic():
     """Test load_feature_interactions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_feature_interactions()
+    result = load_feature_interactions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_feature_interactions_edge_cases():
     """Test load_feature_interactions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_feature_interactions()
+    result = load_feature_interactions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_load_feature_interactions_property_idempotent(self, self, game_ids):
 def test_load_all_features_basic():
     """Test load_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_all_features()
+    result = load_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_all_features_edge_cases():
     """Test load_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_all_features()
+    result = load_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_fetch_player_ratings_basic():
     """Test fetch_player_ratings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_player_ratings()
+    result = fetch_player_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_player_ratings_edge_cases():
     """Test fetch_player_ratings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_player_ratings()
+    result = fetch_player_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_player_ratings_property_idempotent(self, self, stat_type, season,
 def test_calculate_hierarchical_features_basic():
     """Test calculate_hierarchical_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_hierarchical_features()
+    result = calculate_hierarchical_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_hierarchical_features_edge_cases():
     """Test calculate_hierarchical_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_hierarchical_features()
+    result = calculate_hierarchical_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_hierarchical_features_property_idempotent(self, self, player_
 def test_get_player_props_features_basic():
     """Test get_player_props_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_player_props_features()
+    result = get_player_props_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_player_props_features_edge_cases():
     """Test get_player_props_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_player_props_features()
+    result = get_player_props_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_player_props_features_property_idempotent(self, self, players, stat
 def test_create_ensemble_features_basic():
     """Test create_ensemble_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_ensemble_features()
+    result = create_ensemble_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_ensemble_features_edge_cases():
     """Test create_ensemble_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_ensemble_features()
+    result = create_ensemble_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_create_ensemble_features_property_idempotent(self, self, xgboost_predic
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,11 +255,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_all_plays_basic():
     """Test load_all_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_all_plays()
+    result = load_all_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_all_plays_edge_cases():
     """Test load_all_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_all_plays()
+    result = load_all_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_all_plays_property_idempotent(self, self, start_season, end_season
 def test_calculate_score_situation_defense_basic():
     """Test calculate_score_situation_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_score_situation_defense()
+    result = calculate_score_situation_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_score_situation_defense_edge_cases():
     """Test calculate_score_situation_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_score_situation_defense()
+    result = calculate_score_situation_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_score_situation_defense_property_idempotent(self, self, plays
 def test_calculate_garbage_time_defense_basic():
     """Test calculate_garbage_time_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_garbage_time_defense()
+    result = calculate_garbage_time_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_garbage_time_defense_edge_cases():
     """Test calculate_garbage_time_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_garbage_time_defense()
+    result = calculate_garbage_time_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -181,12 +181,12 @@ def test_calculate_garbage_time_defense_no_temporal_leakage():
     """Ensure calculate_garbage_time_defense doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -200,26 +200,26 @@ def test_calculate_garbage_time_defense_no_temporal_leakage():
 def test_calculate_competitive_fourth_quarter_defense_basic():
     """Test calculate_competitive_fourth_quarter_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_competitive_fourth_quarter_defense()
+    result = calculate_competitive_fourth_quarter_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_competitive_fourth_quarter_defense_edge_cases():
     """Test calculate_competitive_fourth_quarter_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_competitive_fourth_quarter_defense()
+    result = calculate_competitive_fourth_quarter_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_calculate_competitive_fourth_quarter_defense_property_idempotent(self, 
 def test_calculate_high_leverage_defense_basic():
     """Test calculate_high_leverage_defense: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_high_leverage_defense()
+    result = calculate_high_leverage_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_high_leverage_defense_edge_cases():
     """Test calculate_high_leverage_defense: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_high_leverage_defense()
+    result = calculate_high_leverage_defense()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_calculate_high_leverage_defense_property_idempotent(self, self, plays):
 def test_calculate_game_script_velocity_basic():
     """Test calculate_game_script_velocity: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_game_script_velocity()
+    result = calculate_game_script_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_game_script_velocity_edge_cases():
     """Test calculate_game_script_velocity: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_game_script_velocity()
+    result = calculate_game_script_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,26 +332,26 @@ def test_calculate_game_script_velocity_property_idempotent(self, self, plays):
 def test_add_rolling_averages_basic():
     """Test add_rolling_averages: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_averages_edge_cases():
     """Test add_rolling_averages: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -376,26 +376,26 @@ def test_add_rolling_averages_property_idempotent(self, self, metrics, window):
 def test_generate_all_features_basic():
     """Test generate_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

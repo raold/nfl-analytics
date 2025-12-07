@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_historical_data_basic():
     """Test load_historical_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_historical_data()
+    result = load_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_historical_data_edge_cases():
     """Test load_historical_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_historical_data()
+    result = load_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_historical_data_property_idempotent(self, self, season, week):
 def test_load_model_predictions_basic():
     """Test load_model_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_model_predictions()
+    result = load_model_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_model_predictions_edge_cases():
     """Test load_model_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_model_predictions()
+    result = load_model_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_model_predictions_property_idempotent(self, self, model_version, s
 def test_simulate_betting_lines_basic():
     """Test simulate_betting_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_betting_lines()
+    result = simulate_betting_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_betting_lines_edge_cases():
     """Test simulate_betting_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_betting_lines()
+    result = simulate_betting_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_simulate_betting_lines_property_idempotent(self, self, actual_values, n
 def test_run_backtest_basic():
     """Test run_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_backtest()
+    result = run_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_backtest_edge_cases():
     """Test run_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_backtest()
+    result = run_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_run_backtest_error_handling():
 
 
 @given(st.integers())
-def test_run_backtest_property_idempotent(self, self):
+def test_run_backtest_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_backtest(self)
+    result = run_backtest(val)
 
     # Assert property
-    assert run_backtest(self) == result, "idempotent violated"
+    assert run_backtest(val) == result, "idempotent violated"
 
 
 
 def test_generate_comparison_report_basic():
     """Test generate_comparison_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_comparison_report()
+    result = generate_comparison_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_comparison_report_edge_cases():
     """Test generate_comparison_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_comparison_report()
+    result = generate_comparison_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_generate_comparison_report_property_idempotent(self, self, results):
 def test_plot_results_basic():
     """Test plot_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_results()
+    result = plot_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_results_edge_cases():
     """Test plot_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_results()
+    result = plot_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

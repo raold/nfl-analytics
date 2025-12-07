@@ -15,26 +15,26 @@ import pytest
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fit_property_idempotent(self, self, X_bayesian, X_xgb, bayesian_uncerta
 def test_predict_proba_basic():
     """Test predict_proba: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_predict_proba_property_idempotent(self, self, X_bayesian, X_xgb, bayesi
 def test_get_feature_importance_basic():
     """Test get_feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_feature_importance_edge_cases():
     """Test get_feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -134,39 +134,39 @@ def test_get_feature_importance_error_handling():
 
 
 @given(st.integers())
-def test_get_feature_importance_property_idempotent(self, self):
+def test_get_feature_importance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_feature_importance(self)
+    result = get_feature_importance(val)
 
     # Assert property
-    assert get_feature_importance(self) == result, "idempotent violated"
+    assert get_feature_importance(val) == result, "idempotent violated"
 
 
 
 def test_save_basic():
     """Test save: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_save_property_idempotent(self, self, path):
 def test_load_basic():
     """Test load: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_load_property_idempotent(self, cls, path):
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_fit_property_idempotent(self, self, bayesian_preds, xgb_preds, bayesian
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

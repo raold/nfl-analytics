@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_fetch_nfl_odds_basic():
     """Test fetch_nfl_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_nfl_odds()
+    result = fetch_nfl_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_nfl_odds_edge_cases():
     """Test fetch_nfl_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_nfl_odds()
+    result = fetch_nfl_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_nfl_odds_property_idempotent(self, self, markets, bookmakers):
 def test_fetch_historical_lines_basic():
     """Test fetch_historical_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_historical_lines()
+    result = fetch_historical_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_historical_lines_edge_cases():
     """Test fetch_historical_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_historical_lines()
+    result = fetch_historical_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fetch_historical_lines_property_idempotent(self, self, game_date, marke
 def test_get_upcoming_games_basic():
     """Test get_upcoming_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_upcoming_games()
+    result = get_upcoming_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_upcoming_games_edge_cases():
     """Test get_upcoming_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_upcoming_games()
+    result = get_upcoming_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_upcoming_games_property_idempotent(self, self, season, week):
 def test_predict_games_basic():
     """Test predict_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_games()
+    result = predict_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_games_edge_cases():
     """Test predict_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_games()
+    result = predict_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_predict_games_property_idempotent(self, self, season, week, model_path)
 def test_find_opportunities_basic():
     """Test find_opportunities: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_opportunities()
+    result = find_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_opportunities_edge_cases():
     """Test find_opportunities: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_opportunities()
+    result = find_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

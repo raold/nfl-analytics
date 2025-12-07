@@ -15,26 +15,26 @@ import pytest
 def test_teaser_ev_basic():
     """Test teaser_ev: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = teaser_ev()
+    result = teaser_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_teaser_ev_edge_cases():
     """Test teaser_ev: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = teaser_ev()
+    result = teaser_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_teaser_ev_property_idempotent(self, q1, q2, payout_decimal, rho):
 def test_middle_breakeven_basic():
     """Test middle_breakeven: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = middle_breakeven()
+    result = middle_breakeven()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_middle_breakeven_edge_cases():
     """Test middle_breakeven: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = middle_breakeven()
+    result = middle_breakeven()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

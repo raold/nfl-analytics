@@ -15,26 +15,26 @@ import pytest
 def test_generate_reliability_for_season_basic():
     """Test generate_reliability_for_season: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_reliability_for_season()
+    result = generate_reliability_for_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_reliability_for_season_edge_cases():
     """Test generate_reliability_for_season: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_reliability_for_season()
+    result = generate_reliability_for_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_generate_reliability_for_season_property_idempotent(self, season, outpu
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

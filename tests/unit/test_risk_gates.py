@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_evaluate_bet_basic():
     """Test evaluate_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_bet()
+    result = evaluate_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_bet_edge_cases():
     """Test evaluate_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_bet()
+    result = evaluate_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_evaluate_bet_property_idempotent(self, self, bet):
 def test_get_configuration_basic():
     """Test get_configuration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_configuration()
+    result = get_configuration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_configuration_edge_cases():
     """Test get_configuration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_configuration()
+    result = get_configuration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,11 +123,11 @@ def test_get_configuration_error_handling():
 
 
 @given(st.integers())
-def test_get_configuration_property_idempotent(self, self):
+def test_get_configuration_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_configuration(self)
+    result = get_configuration(val)
 
     # Assert property
-    assert get_configuration(self) == result, "idempotent violated"
+    assert get_configuration(val) == result, "idempotent violated"
 

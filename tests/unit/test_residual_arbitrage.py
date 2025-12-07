@@ -15,26 +15,26 @@ import pytest
 def test_demo_residual_arbitrage_basic():
     """Test demo_residual_arbitrage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo_residual_arbitrage()
+    result = demo_residual_arbitrage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_residual_arbitrage_edge_cases():
     """Test demo_residual_arbitrage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo_residual_arbitrage()
+    result = demo_residual_arbitrage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_residual_arbitrage_error_handling():
 def test_implied_prob_basic():
     """Test implied_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = implied_prob()
+    result = implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_implied_prob_edge_cases():
     """Test implied_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = implied_prob()
+    result = implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_implied_prob_error_handling():
 
 
 @given(st.integers())
-def test_implied_prob_property_idempotent(self, self):
+def test_implied_prob_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = implied_prob(self)
+    result = implied_prob(val)
 
     # Assert property
-    assert implied_prob(self) == result, "idempotent violated"
+    assert implied_prob(val) == result, "idempotent violated"
 
 
 
 def test_fair_line_basic():
     """Test fair_line: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fair_line()
+    result = fair_line()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fair_line_edge_cases():
     """Test fair_line: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fair_line()
+    result = fair_line()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_fair_line_error_handling():
 
 
 @given(st.integers())
-def test_fair_line_property_idempotent(self, self):
+def test_fair_line_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = fair_line(self)
+    result = fair_line(val)
 
     # Assert property
-    assert fair_line(self) == result, "idempotent violated"
+    assert fair_line(val) == result, "idempotent violated"
 
 
 
 def test_calculate_consensus_basic():
     """Test calculate_consensus: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_consensus()
+    result = calculate_consensus()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_consensus_edge_cases():
     """Test calculate_consensus: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_consensus()
+    result = calculate_consensus()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_consensus_property_idempotent(self, lines, weights):
 def test_calculate_dispersion_basic():
     """Test calculate_dispersion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_dispersion()
+    result = calculate_dispersion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_dispersion_edge_cases():
     """Test calculate_dispersion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_dispersion()
+    result = calculate_dispersion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_dispersion_property_idempotent(self, lines):
 def test_find_outliers_basic():
     """Test find_outliers: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_outliers()
+    result = find_outliers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_outliers_edge_cases():
     """Test find_outliers: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_outliers()
+    result = find_outliers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_find_outliers_property_idempotent(self, self, lines, features):
 def test_find_correlation_arbs_basic():
     """Test find_correlation_arbs: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_correlation_arbs()
+    result = find_correlation_arbs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_correlation_arbs_edge_cases():
     """Test find_correlation_arbs: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_correlation_arbs()
+    result = find_correlation_arbs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_find_correlation_arbs_property_idempotent(self, spreads, totals, model_
 def test_find_synthetic_arbs_basic():
     """Test find_synthetic_arbs: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_synthetic_arbs()
+    result = find_synthetic_arbs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_synthetic_arbs_edge_cases():
     """Test find_synthetic_arbs: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_synthetic_arbs()
+    result = find_synthetic_arbs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_find_synthetic_arbs_property_idempotent(self, all_markets):
 def test_find_all_opportunities_basic():
     """Test find_all_opportunities: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_all_opportunities()
+    result = find_all_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_all_opportunities_edge_cases():
     """Test find_all_opportunities: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_all_opportunities()
+    result = find_all_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_find_all_opportunities_property_idempotent(self, self, markets, model_p
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -431,11 +431,11 @@ def test_generate_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_report_property_idempotent(self, self):
+def test_generate_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_report(self)
+    result = generate_report(val)
 
     # Assert property
-    assert generate_report(self) == result, "idempotent violated"
+    assert generate_report(val) == result, "idempotent violated"
 

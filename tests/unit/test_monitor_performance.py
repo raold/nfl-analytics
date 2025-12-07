@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_log_bet_basic():
     """Test log_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_bet()
+    result = log_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_bet_edge_cases():
     """Test log_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_bet()
+    result = log_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_log_bet_property_idempotent(self, self, game_id, week, season, bet_type
 def test_update_bet_basic():
     """Test update_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_bet()
+    result = update_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_bet_edge_cases():
     """Test update_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_bet()
+    result = update_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -137,12 +137,12 @@ def test_update_bet_no_temporal_leakage():
     """Ensure update_bet doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -156,26 +156,26 @@ def test_update_bet_no_temporal_leakage():
 def test_get_bets_basic():
     """Test get_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_bets()
+    result = get_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_bets_edge_cases():
     """Test get_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_bets()
+    result = get_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_get_bets_property_idempotent(self, self, start_date, end_date, season, 
 def test_calculate_metrics_basic():
     """Test calculate_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_calculate_metrics_property_idempotent(self, self, bets):
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_generate_report_property_idempotent(self, self, period):
 def test_check_alerts_basic():
     """Test check_alerts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_alerts()
+    result = check_alerts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_alerts_edge_cases():
     """Test check_alerts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_alerts()
+    result = check_alerts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -319,11 +319,11 @@ def test_check_alerts_error_handling():
 
 
 @given(st.integers())
-def test_check_alerts_property_idempotent(self, self):
+def test_check_alerts_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = check_alerts(self)
+    result = check_alerts(val)
 
     # Assert property
-    assert check_alerts(self) == result, "idempotent violated"
+    assert check_alerts(val) == result, "idempotent violated"
 

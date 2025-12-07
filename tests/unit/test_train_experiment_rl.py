@@ -15,26 +15,26 @@ import pytest
 def test_train_agent_basic():
     """Test train_agent: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_agent()
+    result = train_agent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_agent_edge_cases():
     """Test train_agent: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_agent()
+    result = train_agent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_agent_property_idempotent(self, env, agent, num_episodes, eval_fr
 def test_evaluate_agent_basic():
     """Test evaluate_agent: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_agent()
+    result = evaluate_agent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_agent_edge_cases():
     """Test evaluate_agent: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_agent()
+    result = evaluate_agent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_evaluate_agent_property_idempotent(self, env, agent, num_eval_episodes)
 def test_run_ablation_studies_basic():
     """Test run_ablation_studies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_ablation_studies()
+    result = run_ablation_studies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_ablation_studies_edge_cases():
     """Test run_ablation_studies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_ablation_studies()
+    result = run_ablation_studies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_run_ablation_studies_property_idempotent(self, env, agent_class, agent_
 def test_compare_baseline_vs_experiments_basic():
     """Test compare_baseline_vs_experiments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_baseline_vs_experiments()
+    result = compare_baseline_vs_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_baseline_vs_experiments_edge_cases():
     """Test compare_baseline_vs_experiments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_baseline_vs_experiments()
+    result = compare_baseline_vs_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_compare_baseline_vs_experiments_property_idempotent(self, num_episodes,
 def test_analyze_feature_importance_basic():
     """Test analyze_feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_feature_importance()
+    result = analyze_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_feature_importance_edge_cases():
     """Test analyze_feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_feature_importance()
+    result = analyze_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_analyze_feature_importance_property_idempotent(self, agent, feature_nam
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

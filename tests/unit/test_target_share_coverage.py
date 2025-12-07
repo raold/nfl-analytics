@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_passing_plays_basic():
     """Test load_passing_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_passing_plays_edge_cases():
     """Test load_passing_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_passing_plays_property_idempotent(self, self, start_season, end_se
 def test_infer_coverage_from_context_basic():
     """Test infer_coverage_from_context: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = infer_coverage_from_context()
+    result = infer_coverage_from_context()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_infer_coverage_from_context_edge_cases():
     """Test infer_coverage_from_context: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = infer_coverage_from_context()
+    result = infer_coverage_from_context()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_infer_coverage_from_context_property_idempotent(self, self, plays):
 def test_calculate_target_shares_by_coverage_basic():
     """Test calculate_target_shares_by_coverage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_target_shares_by_coverage()
+    result = calculate_target_shares_by_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_target_shares_by_coverage_edge_cases():
     """Test calculate_target_shares_by_coverage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_target_shares_by_coverage()
+    result = calculate_target_shares_by_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_target_shares_by_coverage_property_idempotent(self, self, pla
 def test_calculate_team_target_distribution_basic():
     """Test calculate_team_target_distribution: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_team_target_distribution()
+    result = calculate_team_target_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_team_target_distribution_edge_cases():
     """Test calculate_team_target_distribution: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_team_target_distribution()
+    result = calculate_team_target_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_team_target_distribution_property_idempotent(self, self, play
 def test_calculate_target_concentration_basic():
     """Test calculate_target_concentration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_target_concentration()
+    result = calculate_target_concentration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_target_concentration_edge_cases():
     """Test calculate_target_concentration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_target_concentration()
+    result = calculate_target_concentration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_target_concentration_property_idempotent(self, self, receiver
 def test_add_receiver_role_indicators_basic():
     """Test add_receiver_role_indicators: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_receiver_role_indicators()
+    result = add_receiver_role_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_receiver_role_indicators_edge_cases():
     """Test add_receiver_role_indicators: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_receiver_role_indicators()
+    result = add_receiver_role_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_add_receiver_role_indicators_property_idempotent(self, self, receiver_s
 def test_add_efficiency_vs_coverage_basic():
     """Test add_efficiency_vs_coverage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_efficiency_vs_coverage()
+    result = add_efficiency_vs_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_efficiency_vs_coverage_edge_cases():
     """Test add_efficiency_vs_coverage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_efficiency_vs_coverage()
+    result = add_efficiency_vs_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_add_efficiency_vs_coverage_property_idempotent(self, self, receiver_sta
 def test_generate_all_features_basic():
     """Test generate_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

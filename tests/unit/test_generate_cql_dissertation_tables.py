@@ -15,26 +15,26 @@ import pytest
 def test_generate_architecture_table_basic():
     """Test generate_architecture_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_architecture_table()
+    result = generate_architecture_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_architecture_table_edge_cases():
     """Test generate_architecture_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_architecture_table()
+    result = generate_architecture_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_generate_architecture_table_property_idempotent(self, df, output_path):
 def test_generate_alpha_sensitivity_table_basic():
     """Test generate_alpha_sensitivity_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_alpha_sensitivity_table()
+    result = generate_alpha_sensitivity_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_alpha_sensitivity_table_edge_cases():
     """Test generate_alpha_sensitivity_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_alpha_sensitivity_table()
+    result = generate_alpha_sensitivity_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_generate_alpha_sensitivity_table_property_idempotent(self, df, output_p
 def test_generate_convergence_table_basic():
     """Test generate_convergence_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_convergence_table()
+    result = generate_convergence_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_convergence_table_edge_cases():
     """Test generate_convergence_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_convergence_table()
+    result = generate_convergence_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_convergence_table_property_idempotent(self, df, output_path):
 def test_generate_ensemble_uncertainty_table_basic():
     """Test generate_ensemble_uncertainty_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_ensemble_uncertainty_table()
+    result = generate_ensemble_uncertainty_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_ensemble_uncertainty_table_edge_cases():
     """Test generate_ensemble_uncertainty_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_ensemble_uncertainty_table()
+    result = generate_ensemble_uncertainty_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_generate_ensemble_uncertainty_table_property_idempotent(self, df, outpu
 def test_generate_betting_performance_table_basic():
     """Test generate_betting_performance_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_betting_performance_table()
+    result = generate_betting_performance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_betting_performance_table_edge_cases():
     """Test generate_betting_performance_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_betting_performance_table()
+    result = generate_betting_performance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_generate_betting_performance_table_property_idempotent(self, betting_re
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

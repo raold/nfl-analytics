@@ -15,26 +15,26 @@ import pytest
 def test_parse_seasons_basic():
     """Test parse_seasons: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_seasons()
+    result = parse_seasons()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_seasons_edge_cases():
     """Test parse_seasons: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_seasons()
+    result = parse_seasons()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_parse_seasons_property_idempotent(self, spec):
 def test_ensure_dir_basic():
     """Test ensure_dir: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = ensure_dir()
+    result = ensure_dir()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_ensure_dir_edge_cases():
     """Test ensure_dir: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = ensure_dir()
+    result = ensure_dir()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_ensure_dir_property_idempotent(self, path):
 def test_load_feature_data_basic():
     """Test load_feature_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_feature_data()
+    result = load_feature_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_feature_data_edge_cases():
     """Test load_feature_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_feature_data()
+    result = load_feature_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_load_feature_data_property_idempotent(self, path, seasons):
 def test_walk_forward_predictions_basic():
     """Test walk_forward_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = walk_forward_predictions()
+    result = walk_forward_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_walk_forward_predictions_edge_cases():
     """Test walk_forward_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = walk_forward_predictions()
+    result = walk_forward_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_walk_forward_predictions_property_idempotent(self, df, base_models, fea
 def test_all_combinations_basic():
     """Test all_combinations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = all_combinations()
+    result = all_combinations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_all_combinations_edge_cases():
     """Test all_combinations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = all_combinations()
+    result = all_combinations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_all_combinations_property_idempotent(self, items):
 def test_add_equal_weight_ensembles_basic():
     """Test add_equal_weight_ensembles: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_equal_weight_ensembles()
+    result = add_equal_weight_ensembles()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_equal_weight_ensembles_edge_cases():
     """Test add_equal_weight_ensembles: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_equal_weight_ensembles()
+    result = add_equal_weight_ensembles()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_add_equal_weight_ensembles_property_idempotent(self, pred_df, base_mode
 def test_add_stack_ensembles_basic():
     """Test add_stack_ensembles: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_stack_ensembles()
+    result = add_stack_ensembles()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_stack_ensembles_edge_cases():
     """Test add_stack_ensembles: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_stack_ensembles()
+    result = add_stack_ensembles()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_add_stack_ensembles_property_idempotent(self, pred_df, base_models):
 def test_compute_roi_basic():
     """Test compute_roi: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_roi()
+    result = compute_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_roi_edge_cases():
     """Test compute_roi: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_roi()
+    result = compute_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_compute_roi_property_idempotent(self, probs, actuals, threshold, decima
 def test_overall_metrics_basic():
     """Test overall_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = overall_metrics()
+    result = overall_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_overall_metrics_edge_cases():
     """Test overall_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = overall_metrics()
+    result = overall_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_overall_metrics_property_idempotent(self, pred_df, model_cols, threshol
 def test_per_season_metrics_basic():
     """Test per_season_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = per_season_metrics()
+    result = per_season_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_per_season_metrics_edge_cases():
     """Test per_season_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = per_season_metrics()
+    result = per_season_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -455,26 +455,26 @@ def test_per_season_metrics_property_idempotent(self, pred_df, model_cols, thres
 def test_bootstrap_confidence_intervals_basic():
     """Test bootstrap_confidence_intervals: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bootstrap_confidence_intervals()
+    result = bootstrap_confidence_intervals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bootstrap_confidence_intervals_edge_cases():
     """Test bootstrap_confidence_intervals: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bootstrap_confidence_intervals()
+    result = bootstrap_confidence_intervals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -499,26 +499,26 @@ def test_bootstrap_confidence_intervals_property_idempotent(self, pred_df, model
 def test_prediction_covariance_basic():
     """Test prediction_covariance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prediction_covariance()
+    result = prediction_covariance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prediction_covariance_edge_cases():
     """Test prediction_covariance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prediction_covariance()
+    result = prediction_covariance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -543,26 +543,26 @@ def test_prediction_covariance_property_idempotent(self, pred_df, model_cols):
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -576,26 +576,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -609,26 +609,26 @@ def test_main_error_handling():
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -653,26 +653,26 @@ def test_fit_property_idempotent(self, self, train_df):
 def test_predict_proba_basic():
     """Test predict_proba: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -697,26 +697,26 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -741,26 +741,26 @@ def test_fit_property_idempotent(self, self, train_df):
 def test_predict_proba_basic():
     """Test predict_proba: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -785,26 +785,26 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 def test_feature_importance_basic():
     """Test feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = feature_importance()
+    result = feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_feature_importance_edge_cases():
     """Test feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = feature_importance()
+    result = feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -829,26 +829,26 @@ def test_feature_importance_property_idempotent(self, self, df):
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -873,26 +873,26 @@ def test_fit_property_idempotent(self, self, train_df):
 def test_predict_proba_basic():
     """Test predict_proba: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -917,26 +917,26 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 def test_feature_importance_basic():
     """Test feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = feature_importance()
+    result = feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_feature_importance_edge_cases():
     """Test feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = feature_importance()
+    result = feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -948,39 +948,39 @@ def test_feature_importance_error_handling():
 
 
 @given(st.integers())
-def test_feature_importance_property_idempotent(self, self):
+def test_feature_importance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = feature_importance(self)
+    result = feature_importance(val)
 
     # Assert property
-    assert feature_importance(self) == result, "idempotent violated"
+    assert feature_importance(val) == result, "idempotent violated"
 
 
 
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -1005,26 +1005,26 @@ def test_fit_property_idempotent(self, self, train_df):
 def test_predict_proba_basic():
     """Test predict_proba: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_proba()
+    result = predict_proba()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

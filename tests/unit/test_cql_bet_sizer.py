@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_recommend_bet_basic():
     """Test recommend_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = recommend_bet()
+    result = recommend_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_recommend_bet_edge_cases():
     """Test recommend_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = recommend_bet()
+    result = recommend_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_recommend_bet_property_idempotent(self, self, opportunity, bankroll):
 def test_recommend_portfolio_basic():
     """Test recommend_portfolio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = recommend_portfolio()
+    result = recommend_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_recommend_portfolio_edge_cases():
     """Test recommend_portfolio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = recommend_portfolio()
+    result = recommend_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

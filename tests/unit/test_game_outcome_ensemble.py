@@ -15,26 +15,26 @@ import pytest
 def test_get_team_season_stats_basic():
     """Test get_team_season_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_team_season_stats()
+    result = get_team_season_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_team_season_stats_edge_cases():
     """Test get_team_season_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_team_season_stats()
+    result = get_team_season_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_get_team_season_stats_property_idempotent(self, season):
 def test_validate_no_lookahead_bias_basic():
     """Test validate_no_lookahead_bias: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_no_lookahead_bias()
+    result = validate_no_lookahead_bias()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_no_lookahead_bias_edge_cases():
     """Test validate_no_lookahead_bias: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_no_lookahead_bias()
+    result = validate_no_lookahead_bias()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -104,12 +104,12 @@ def test_validate_no_lookahead_bias_no_temporal_leakage():
     """Ensure validate_no_lookahead_bias doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -123,26 +123,26 @@ def test_validate_no_lookahead_bias_no_temporal_leakage():
 def test_engineer_game_features_basic():
     """Test engineer_game_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = engineer_game_features()
+    result = engineer_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_engineer_game_features_edge_cases():
     """Test engineer_game_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = engineer_game_features()
+    result = engineer_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,26 +167,26 @@ def test_engineer_game_features_property_idempotent(self, df, team_stats):
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -233,26 +233,26 @@ def test_main_error_handling():
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -277,26 +277,26 @@ def test_fit_property_idempotent(self, self, train_df, val_df):
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -321,26 +321,26 @@ def test_predict_property_idempotent(self, self, df):
 def test_evaluate_basic():
     """Test evaluate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_edge_cases():
     """Test evaluate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

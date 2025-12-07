@@ -15,26 +15,26 @@ import pytest
 def test_load_model_basic():
     """Test load_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_model()
+    result = load_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_model_edge_cases():
     """Test load_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_model()
+    result = load_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_model_property_idempotent(self, model_path):
 def test_load_game_data_basic():
     """Test load_game_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_game_data()
+    result = load_game_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_game_data_edge_cases():
     """Test load_game_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_game_data()
+    result = load_game_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_game_data_property_idempotent(self, features_csv, home_team, away_
 def test_predict_win_probability_basic():
     """Test predict_win_probability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_win_probability()
+    result = predict_win_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_win_probability_edge_cases():
     """Test predict_win_probability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_win_probability()
+    result = predict_win_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_predict_win_probability_property_idempotent(self, model, game_data):
 def test_implied_probability_basic():
     """Test implied_probability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = implied_probability()
+    result = implied_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_implied_probability_edge_cases():
     """Test implied_probability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = implied_probability()
+    result = implied_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_implied_probability_property_idempotent(self, american_odds):
 def test_american_to_decimal_basic():
     """Test american_to_decimal: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_american_to_decimal_property_idempotent(self, american_odds):
 def test_calculate_ev_basic():
     """Test calculate_ev: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_ev()
+    result = calculate_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_ev_edge_cases():
     """Test calculate_ev: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_ev()
+    result = calculate_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_calculate_ev_property_idempotent(self, true_prob, decimal_odds, stake):
 def test_kelly_criterion_basic():
     """Test kelly_criterion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_kelly_criterion_property_idempotent(self, true_prob, decimal_odds, frac
 def test_generate_betting_recommendation_basic():
     """Test generate_betting_recommendation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_betting_recommendation()
+    result = generate_betting_recommendation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_betting_recommendation_edge_cases():
     """Test generate_betting_recommendation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_betting_recommendation()
+    result = generate_betting_recommendation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_generate_betting_recommendation_property_idempotent(self, home_win_prob
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

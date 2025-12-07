@@ -15,26 +15,26 @@ import pytest
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_main_error_handling():
 def test_to_dict_basic():
     """Test to_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -112,39 +112,39 @@ def test_to_dict_error_handling():
 
 
 @given(st.integers())
-def test_to_dict_property_idempotent(self, self):
+def test_to_dict_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_dict(self)
+    result = to_dict(val)
 
     # Assert property
-    assert to_dict(self) == result, "idempotent violated"
+    assert to_dict(val) == result, "idempotent violated"
 
 
 
 def test_add_snapshot_basic():
     """Test add_snapshot: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_snapshot()
+    result = add_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_snapshot_edge_cases():
     """Test add_snapshot: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_snapshot()
+    result = add_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -169,26 +169,26 @@ def test_add_snapshot_property_idempotent(self, self, game_id, timestamp, book, 
 def test_load_from_csv_basic():
     """Test load_from_csv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_from_csv()
+    result = load_from_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_from_csv_edge_cases():
     """Test load_from_csv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_from_csv()
+    result = load_from_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -213,26 +213,26 @@ def test_load_from_csv_property_idempotent(self, self, csv_path):
 def test_identify_sharp_indicators_basic():
     """Test identify_sharp_indicators: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = identify_sharp_indicators()
+    result = identify_sharp_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_identify_sharp_indicators_edge_cases():
     """Test identify_sharp_indicators: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = identify_sharp_indicators()
+    result = identify_sharp_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -257,26 +257,26 @@ def test_identify_sharp_indicators_property_idempotent(self, self, game_id, open
 def test_detect_steam_moves_basic():
     """Test detect_steam_moves: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_steam_moves()
+    result = detect_steam_moves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_steam_moves_edge_cases():
     """Test detect_steam_moves: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_steam_moves()
+    result = detect_steam_moves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -301,26 +301,26 @@ def test_detect_steam_moves_property_idempotent(self, self, game_id):
 def test_calculate_ewb_edge_basic():
     """Test calculate_ewb_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_ewb_edge()
+    result = calculate_ewb_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_ewb_edge_edge_cases():
     """Test calculate_ewb_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_ewb_edge()
+    result = calculate_ewb_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -345,26 +345,26 @@ def test_calculate_ewb_edge_property_idempotent(self, self, opening_spread, clos
 def test_analyze_game_basic():
     """Test analyze_game: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_game()
+    result = analyze_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_game_edge_cases():
     """Test analyze_game: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_game()
+    result = analyze_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -389,26 +389,26 @@ def test_analyze_game_property_idempotent(self, self, game_id, opening_spread, c
 def test_analyze_clv_basic():
     """Test analyze_clv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_clv()
+    result = analyze_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_clv_edge_cases():
     """Test analyze_clv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_clv()
+    result = analyze_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -433,26 +433,26 @@ def test_analyze_clv_property_idempotent(self, self, bet_times):
 def test_get_summary_stats_basic():
     """Test get_summary_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_summary_stats()
+    result = get_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_summary_stats_edge_cases():
     """Test get_summary_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_summary_stats()
+    result = get_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -464,11 +464,11 @@ def test_get_summary_stats_error_handling():
 
 
 @given(st.integers())
-def test_get_summary_stats_property_idempotent(self, self):
+def test_get_summary_stats_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_summary_stats(self)
+    result = get_summary_stats(val)
 
     # Assert property
-    assert get_summary_stats(self) == result, "idempotent violated"
+    assert get_summary_stats(val) == result, "idempotent violated"
 

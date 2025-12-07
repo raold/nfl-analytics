@@ -15,26 +15,26 @@ import pytest
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_test_error_handling():
 def test_is_significant_basic():
     """Test is_significant: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_significant()
+    result = is_significant()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_significant_edge_cases():
     """Test is_significant: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_significant()
+    result = is_significant()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_is_significant_property_idempotent(self, self, alpha):
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_test_error_handling():
 
 
 @given(st.integers())
-def test_test_property_idempotent(self, self):
+def test_test_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = test(self)
+    result = test(val)
 
     # Assert property
-    assert test(self) == result, "idempotent violated"
+    assert test(val) == result, "idempotent violated"
 
 
 
 def test_two_sample_test_basic():
     """Test two_sample_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = two_sample_test()
+    result = two_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_two_sample_test_edge_cases():
     """Test two_sample_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = two_sample_test()
+    result = two_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_two_sample_test_property_idempotent(self, self, sample1, sample2, stati
 def test_one_sample_test_basic():
     """Test one_sample_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = one_sample_test()
+    result = one_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_one_sample_test_edge_cases():
     """Test one_sample_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = one_sample_test()
+    result = one_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_one_sample_test_property_idempotent(self, self, sample, null_value, alt
 def test_paired_test_basic():
     """Test paired_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = paired_test()
+    result = paired_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_paired_test_edge_cases():
     """Test paired_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = paired_test()
+    result = paired_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_paired_test_property_idempotent(self, self, before, after, alternative)
 def test_correlation_test_basic():
     """Test correlation_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = correlation_test()
+    result = correlation_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_correlation_test_edge_cases():
     """Test correlation_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = correlation_test()
+    result = correlation_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_correlation_test_property_idempotent(self, self, x, y, method):
 def test_confidence_interval_basic():
     """Test confidence_interval: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = confidence_interval()
+    result = confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_confidence_interval_edge_cases():
     """Test confidence_interval: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = confidence_interval()
+    result = confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_confidence_interval_property_idempotent(self, self, data, statistic_fun
 def test_hypothesis_test_basic():
     """Test hypothesis_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = hypothesis_test()
+    result = hypothesis_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_hypothesis_test_edge_cases():
     """Test hypothesis_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = hypothesis_test()
+    result = hypothesis_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_hypothesis_test_property_idempotent(self, self, data, null_value, stati
 def test_two_sample_test_basic():
     """Test two_sample_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = two_sample_test()
+    result = two_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_two_sample_test_edge_cases():
     """Test two_sample_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = two_sample_test()
+    result = two_sample_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_two_sample_test_property_idempotent(self, self, sample1, sample2, stati
 def test_bayes_factor_t_test_basic():
     """Test bayes_factor_t_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bayes_factor_t_test()
+    result = bayes_factor_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bayes_factor_t_test_edge_cases():
     """Test bayes_factor_t_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bayes_factor_t_test()
+    result = bayes_factor_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -488,26 +488,26 @@ def test_bayes_factor_t_test_property_idempotent(self, self, sample1, sample2, p
 def test_credible_interval_basic():
     """Test credible_interval: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = credible_interval()
+    result = credible_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_credible_interval_edge_cases():
     """Test credible_interval: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = credible_interval()
+    result = credible_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -532,26 +532,26 @@ def test_credible_interval_property_idempotent(self, self, data, credibility, pr
 def test_t_test_basic():
     """Test t_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = t_test()
+    result = t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_t_test_edge_cases():
     """Test t_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = t_test()
+    result = t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -576,26 +576,26 @@ def test_t_test_property_idempotent(self, self, sample1, sample2, null_value, al
 def test_mann_whitney_u_basic():
     """Test mann_whitney_u: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = mann_whitney_u()
+    result = mann_whitney_u()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_mann_whitney_u_edge_cases():
     """Test mann_whitney_u: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = mann_whitney_u()
+    result = mann_whitney_u()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -620,26 +620,26 @@ def test_mann_whitney_u_property_idempotent(self, self, sample1, sample2, altern
 def test_wilcoxon_signed_rank_basic():
     """Test wilcoxon_signed_rank: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = wilcoxon_signed_rank()
+    result = wilcoxon_signed_rank()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_wilcoxon_signed_rank_edge_cases():
     """Test wilcoxon_signed_rank: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = wilcoxon_signed_rank()
+    result = wilcoxon_signed_rank()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -664,26 +664,26 @@ def test_wilcoxon_signed_rank_property_idempotent(self, self, sample, null_value
 def test_chi_square_test_basic():
     """Test chi_square_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = chi_square_test()
+    result = chi_square_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_chi_square_test_edge_cases():
     """Test chi_square_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = chi_square_test()
+    result = chi_square_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -708,26 +708,26 @@ def test_chi_square_test_property_idempotent(self, self, observed, expected):
 def test_combined_statistic_basic():
     """Test combined_statistic: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = combined_statistic()
+    result = combined_statistic()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_combined_statistic_edge_cases():
     """Test combined_statistic: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = combined_statistic()
+    result = combined_statistic()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -752,26 +752,26 @@ def test_combined_statistic_property_idempotent(self, x, axis):
 def test_statistic_func_basic():
     """Test statistic_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_statistic_func_edge_cases():
     """Test statistic_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -796,26 +796,26 @@ def test_statistic_func_property_idempotent(self, x, axis):
 def test_statistic_func_basic():
     """Test statistic_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_statistic_func_edge_cases():
     """Test statistic_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -840,26 +840,26 @@ def test_statistic_func_property_idempotent(self, y_perm, axis):
 def test_statistic_func_basic():
     """Test statistic_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_statistic_func_edge_cases():
     """Test statistic_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -884,26 +884,26 @@ def test_statistic_func_property_idempotent(self, x, y):
 def test_correlation_func_basic():
     """Test correlation_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = correlation_func()
+    result = correlation_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_correlation_func_edge_cases():
     """Test correlation_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = correlation_func()
+    result = correlation_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -928,26 +928,26 @@ def test_correlation_func_property_idempotent(self, a, b):
 def test_statistic_func_basic():
     """Test statistic_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_statistic_func_edge_cases():
     """Test statistic_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = statistic_func()
+    result = statistic_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -972,26 +972,26 @@ def test_statistic_func_property_idempotent(self, x, y):
 def test_correlation_func_basic():
     """Test correlation_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = correlation_func()
+    result = correlation_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_correlation_func_edge_cases():
     """Test correlation_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = correlation_func()
+    result = correlation_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

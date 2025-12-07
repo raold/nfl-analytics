@@ -15,26 +15,26 @@ import pytest
 def test_add_test_basic():
     """Test add_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_test()
+    result = add_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_test_edge_cases():
     """Test add_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_test()
+    result = add_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_test_property_idempotent(self, self, test):
 def test_analyze_function_basic():
     """Test analyze_function: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_function()
+    result = analyze_function()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_function_edge_cases():
     """Test analyze_function: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_function()
+    result = analyze_function()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_analyze_function_property_idempotent(self, self, func_node):
 def test_generate_unit_test_basic():
     """Test generate_unit_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_unit_test()
+    result = generate_unit_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_unit_test_edge_cases():
     """Test generate_unit_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_unit_test()
+    result = generate_unit_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_unit_test_property_idempotent(self, self, func_metadata, modul
 def test_generate_property_tests_basic():
     """Test generate_property_tests: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_property_tests()
+    result = generate_property_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_property_tests_edge_cases():
     """Test generate_property_tests: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_property_tests()
+    result = generate_property_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_generate_property_tests_property_idempotent(self, self, func_metadata, 
 def test_generate_temporal_tests_basic():
     """Test generate_temporal_tests: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_temporal_tests()
+    result = generate_temporal_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_temporal_tests_edge_cases():
     """Test generate_temporal_tests: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_temporal_tests()
+    result = generate_temporal_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -236,12 +236,12 @@ def test_generate_temporal_tests_no_temporal_leakage():
     """Ensure generate_temporal_tests doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -255,26 +255,26 @@ def test_generate_temporal_tests_no_temporal_leakage():
 def test_generate_tests_for_file_basic():
     """Test generate_tests_for_file: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_tests_for_file()
+    result = generate_tests_for_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_tests_for_file_edge_cases():
     """Test generate_tests_for_file: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_tests_for_file()
+    result = generate_tests_for_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,26 +299,26 @@ def test_generate_tests_for_file_property_idempotent(self, self, file_path):
 def test_write_tests_basic():
     """Test write_tests: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_tests()
+    result = write_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_tests_edge_cases():
     """Test write_tests: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_tests()
+    result = write_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,26 +343,26 @@ def test_write_tests_property_idempotent(self, self, output_path, suite):
 def test_generate_full_suite_basic():
     """Test generate_full_suite: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_full_suite()
+    result = generate_full_suite()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_full_suite_edge_cases():
     """Test generate_full_suite: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_full_suite()
+    result = generate_full_suite()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

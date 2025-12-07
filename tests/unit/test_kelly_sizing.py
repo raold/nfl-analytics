@@ -15,26 +15,26 @@ import pytest
 def test_american_to_decimal_odds_basic():
     """Test american_to_decimal_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_to_decimal_odds()
+    result = american_to_decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_to_decimal_odds_edge_cases():
     """Test american_to_decimal_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_to_decimal_odds()
+    result = american_to_decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_american_to_decimal_odds_property_idempotent(self, american_odds):
 def test_decimal_to_american_odds_basic():
     """Test decimal_to_american_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = decimal_to_american_odds()
+    result = decimal_to_american_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_decimal_to_american_odds_edge_cases():
     """Test decimal_to_american_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = decimal_to_american_odds()
+    result = decimal_to_american_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_decimal_to_american_odds_property_idempotent(self, decimal_odds):
 def test_american_odds_to_implied_prob_basic():
     """Test american_odds_to_implied_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_odds_to_implied_prob()
+    result = american_odds_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_odds_to_implied_prob_edge_cases():
     """Test american_odds_to_implied_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_odds_to_implied_prob()
+    result = american_odds_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_american_odds_to_implied_prob_property_idempotent(self, american_odds):
 def test_kelly_criterion_basic():
     """Test kelly_criterion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_kelly_criterion_property_idempotent(self, win_prob, decimal_odds, kelly
 def test_estimate_edge_basic():
     """Test estimate_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_edge()
+    result = estimate_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_edge_edge_cases():
     """Test estimate_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_edge()
+    result = estimate_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_estimate_edge_property_idempotent(self, model_prob, market_odds):
 def test_optimal_bet_size_basic():
     """Test optimal_bet_size: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimal_bet_size()
+    result = optimal_bet_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimal_bet_size_edge_cases():
     """Test optimal_bet_size: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimal_bet_size()
+    result = optimal_bet_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_optimal_bet_size_property_idempotent(self, model_prob, market_odds, ban
 def test_simulate_kelly_growth_basic():
     """Test simulate_kelly_growth: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_kelly_growth()
+    result = simulate_kelly_growth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_kelly_growth_edge_cases():
     """Test simulate_kelly_growth: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_kelly_growth()
+    result = simulate_kelly_growth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_simulate_kelly_growth_property_idempotent(self, win_prob, decimal_odds,
 def test_compare_kelly_fractions_basic():
     """Test compare_kelly_fractions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_kelly_fractions()
+    result = compare_kelly_fractions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_kelly_fractions_edge_cases():
     """Test compare_kelly_fractions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_kelly_fractions()
+    result = compare_kelly_fractions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_compare_kelly_fractions_property_idempotent(self, win_prob, decimal_odd
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

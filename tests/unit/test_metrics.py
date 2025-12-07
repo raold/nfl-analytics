@@ -15,26 +15,26 @@ import pytest
 def test_record_bet_basic():
     """Test record_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_bet()
+    result = record_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_bet_edge_cases():
     """Test record_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_bet()
+    result = record_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_record_bet_property_idempotent(self, self, won, profit, stake, odds, st
 def test_update_risk_metrics_basic():
     """Test update_risk_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_risk_metrics()
+    result = update_risk_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_risk_metrics_edge_cases():
     """Test update_risk_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_risk_metrics()
+    result = update_risk_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -104,12 +104,12 @@ def test_update_risk_metrics_no_temporal_leakage():
     """Ensure update_risk_metrics doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -123,26 +123,26 @@ def test_update_risk_metrics_no_temporal_leakage():
 def test_update_sharpe_ratio_basic():
     """Test update_sharpe_ratio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_sharpe_ratio()
+    result = update_sharpe_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_sharpe_ratio_edge_cases():
     """Test update_sharpe_ratio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_sharpe_ratio()
+    result = update_sharpe_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -168,12 +168,12 @@ def test_update_sharpe_ratio_no_temporal_leakage():
     """Ensure update_sharpe_ratio doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -187,26 +187,26 @@ def test_update_sharpe_ratio_no_temporal_leakage():
 def test_initialize_bankroll_basic():
     """Test initialize_bankroll: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = initialize_bankroll()
+    result = initialize_bankroll()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_initialize_bankroll_edge_cases():
     """Test initialize_bankroll: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = initialize_bankroll()
+    result = initialize_bankroll()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -231,26 +231,26 @@ def test_initialize_bankroll_property_idempotent(self, self, initial_amount):
 def test_record_prediction_basic():
     """Test record_prediction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_prediction()
+    result = record_prediction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_prediction_edge_cases():
     """Test record_prediction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_prediction()
+    result = record_prediction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -275,26 +275,26 @@ def test_record_prediction_property_idempotent(self, self, stat_type, predicted_
 def test_update_calibration_basic():
     """Test update_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_calibration()
+    result = update_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_calibration_edge_cases():
     """Test update_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_calibration()
+    result = update_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -320,12 +320,12 @@ def test_update_calibration_no_temporal_leakage():
     """Ensure update_calibration doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -339,26 +339,26 @@ def test_update_calibration_no_temporal_leakage():
 def test_update_model_version_basic():
     """Test update_model_version: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_model_version()
+    result = update_model_version()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_model_version_edge_cases():
     """Test update_model_version: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_model_version()
+    result = update_model_version()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -384,12 +384,12 @@ def test_update_model_version_no_temporal_leakage():
     """Ensure update_model_version doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -403,26 +403,26 @@ def test_update_model_version_no_temporal_leakage():
 def test_record_feature_drift_basic():
     """Test record_feature_drift: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_feature_drift()
+    result = record_feature_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_feature_drift_edge_cases():
     """Test record_feature_drift: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_feature_drift()
+    result = record_feature_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -447,26 +447,26 @@ def test_record_feature_drift_property_idempotent(self, self, feature_name, drif
 def test_track_prediction_latency_basic():
     """Test track_prediction_latency: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = track_prediction_latency()
+    result = track_prediction_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_track_prediction_latency_edge_cases():
     """Test track_prediction_latency: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = track_prediction_latency()
+    result = track_prediction_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -478,39 +478,39 @@ def test_track_prediction_latency_error_handling():
 
 
 @given(st.integers())
-def test_track_prediction_latency_property_idempotent(self, self):
+def test_track_prediction_latency_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = track_prediction_latency(self)
+    result = track_prediction_latency(val)
 
     # Assert property
-    assert track_prediction_latency(self) == result, "idempotent violated"
+    assert track_prediction_latency(val) == result, "idempotent violated"
 
 
 
 def test_track_bet_placement_latency_basic():
     """Test track_bet_placement_latency: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = track_bet_placement_latency()
+    result = track_bet_placement_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_track_bet_placement_latency_edge_cases():
     """Test track_bet_placement_latency: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = track_bet_placement_latency()
+    result = track_bet_placement_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -522,39 +522,39 @@ def test_track_bet_placement_latency_error_handling():
 
 
 @given(st.integers())
-def test_track_bet_placement_latency_property_idempotent(self, self):
+def test_track_bet_placement_latency_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = track_bet_placement_latency(self)
+    result = track_bet_placement_latency(val)
 
     # Assert property
-    assert track_bet_placement_latency(self) == result, "idempotent violated"
+    assert track_bet_placement_latency(val) == result, "idempotent violated"
 
 
 
 def test_track_database_query_basic():
     """Test track_database_query: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = track_database_query()
+    result = track_database_query()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_track_database_query_edge_cases():
     """Test track_database_query: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = track_database_query()
+    result = track_database_query()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -579,26 +579,26 @@ def test_track_database_query_property_idempotent(self, self, query_type):
 def test_track_feature_generation_basic():
     """Test track_feature_generation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = track_feature_generation()
+    result = track_feature_generation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_track_feature_generation_edge_cases():
     """Test track_feature_generation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = track_feature_generation()
+    result = track_feature_generation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -610,39 +610,39 @@ def test_track_feature_generation_error_handling():
 
 
 @given(st.integers())
-def test_track_feature_generation_property_idempotent(self, self):
+def test_track_feature_generation_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = track_feature_generation(self)
+    result = track_feature_generation(val)
 
     # Assert property
-    assert track_feature_generation(self) == result, "idempotent violated"
+    assert track_feature_generation(val) == result, "idempotent violated"
 
 
 
 def test_record_model_load_time_basic():
     """Test record_model_load_time: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_model_load_time()
+    result = record_model_load_time()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_model_load_time_edge_cases():
     """Test record_model_load_time: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_model_load_time()
+    result = record_model_load_time()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -668,12 +668,12 @@ def test_record_model_load_time_no_temporal_leakage():
     """Ensure record_model_load_time doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -687,26 +687,26 @@ def test_record_model_load_time_no_temporal_leakage():
 def test_record_error_basic():
     """Test record_error: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_error()
+    result = record_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_error_edge_cases():
     """Test record_error: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_error()
+    result = record_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -731,26 +731,26 @@ def test_record_error_property_idempotent(self, self, error_type):
 def test_record_request_basic():
     """Test record_request: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_request()
+    result = record_request()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_request_edge_cases():
     """Test record_request: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_request()
+    result = record_request()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

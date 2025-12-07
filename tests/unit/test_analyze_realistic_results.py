@@ -15,26 +15,26 @@ import pytest
 def test_load_trades_basic():
     """Test load_trades: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_trades()
+    result = load_trades()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_trades_edge_cases():
     """Test load_trades: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_trades()
+    result = load_trades()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_trades_error_handling():
 def test_analyze_calibration_basic():
     """Test analyze_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_calibration()
+    result = analyze_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_calibration_edge_cases():
     """Test analyze_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_calibration()
+    result = analyze_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_analyze_calibration_property_idempotent(self, df):
 def test_analyze_win_rate_by_confidence_basic():
     """Test analyze_win_rate_by_confidence: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_win_rate_by_confidence()
+    result = analyze_win_rate_by_confidence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_win_rate_by_confidence_edge_cases():
     """Test analyze_win_rate_by_confidence: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_win_rate_by_confidence()
+    result = analyze_win_rate_by_confidence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_analyze_win_rate_by_confidence_property_idempotent(self, df):
 def test_analyze_seasonal_patterns_basic():
     """Test analyze_seasonal_patterns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_seasonal_patterns()
+    result = analyze_seasonal_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_seasonal_patterns_edge_cases():
     """Test analyze_seasonal_patterns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_seasonal_patterns()
+    result = analyze_seasonal_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_analyze_seasonal_patterns_property_idempotent(self, df):
 def test_analyze_edge_realization_basic():
     """Test analyze_edge_realization: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_edge_realization()
+    result = analyze_edge_realization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_edge_realization_edge_cases():
     """Test analyze_edge_realization: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_edge_realization()
+    result = analyze_edge_realization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_analyze_edge_realization_property_idempotent(self, df):
 def test_check_for_anomalies_basic():
     """Test check_for_anomalies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_for_anomalies()
+    result = check_for_anomalies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_for_anomalies_edge_cases():
     """Test check_for_anomalies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_for_anomalies()
+    result = check_for_anomalies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_check_for_anomalies_property_idempotent(self, df):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

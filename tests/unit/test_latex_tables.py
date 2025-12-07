@@ -15,26 +15,26 @@ import pytest
 def test_format_p_value_basic():
     """Test format_p_value: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_p_value()
+    result = format_p_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_p_value_edge_cases():
     """Test format_p_value: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_p_value()
+    result = format_p_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_format_p_value_property_idempotent(self, p_value, threshold):
 def test_format_confidence_interval_basic():
     """Test format_confidence_interval: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_confidence_interval()
+    result = format_confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_confidence_interval_edge_cases():
     """Test format_confidence_interval: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_confidence_interval()
+    result = format_confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_format_confidence_interval_property_idempotent(self, ci, level):
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_test_error_handling():
 def test_create_results_table_basic():
     """Test create_results_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_results_table()
+    result = create_results_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_results_table_edge_cases():
     """Test create_results_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_results_table()
+    result = create_results_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_create_results_table_property_idempotent(self, self, results, title):
 def test_create_descriptive_table_basic():
     """Test create_descriptive_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_descriptive_table()
+    result = create_descriptive_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_descriptive_table_edge_cases():
     """Test create_descriptive_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_descriptive_table()
+    result = create_descriptive_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_create_descriptive_table_property_idempotent(self, self, data, group_va
 def test_create_correlation_table_basic():
     """Test create_correlation_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_correlation_table()
+    result = create_correlation_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_correlation_table_edge_cases():
     """Test create_correlation_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_correlation_table()
+    result = create_correlation_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_create_correlation_table_property_idempotent(self, self, correlation_ma
 def test_create_regression_table_basic():
     """Test create_regression_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_regression_table()
+    result = create_regression_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_regression_table_edge_cases():
     """Test create_regression_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_regression_table()
+    result = create_regression_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_create_regression_table_property_idempotent(self, self, models, title):
 def test_generate_table_basic():
     """Test generate_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_table()
+    result = generate_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_table_edge_cases():
     """Test generate_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_table()
+    result = generate_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_generate_table_property_idempotent(self, self, table_spec):
 def test_get_required_packages_basic():
     """Test get_required_packages: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_required_packages()
+    result = get_required_packages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_required_packages_edge_cases():
     """Test get_required_packages: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_required_packages()
+    result = get_required_packages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -387,39 +387,39 @@ def test_get_required_packages_error_handling():
 
 
 @given(st.integers())
-def test_get_required_packages_property_idempotent(self, self):
+def test_get_required_packages_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_required_packages(self)
+    result = get_required_packages(val)
 
     # Assert property
-    assert get_required_packages(self) == result, "idempotent violated"
+    assert get_required_packages(val) == result, "idempotent violated"
 
 
 
 def test_create_package_imports_basic():
     """Test create_package_imports: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_package_imports()
+    result = create_package_imports()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_package_imports_edge_cases():
     """Test create_package_imports: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_package_imports()
+    result = create_package_imports()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -431,11 +431,11 @@ def test_create_package_imports_error_handling():
 
 
 @given(st.integers())
-def test_create_package_imports_property_idempotent(self, self):
+def test_create_package_imports_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_package_imports(self)
+    result = create_package_imports(val)
 
     # Assert property
-    assert create_package_imports(self) == result, "idempotent violated"
+    assert create_package_imports(val) == result, "idempotent violated"
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_all_results_basic():
     """Test load_all_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_all_results()
+    result = load_all_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_all_results_edge_cases():
     """Test load_all_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_all_results()
+    result = load_all_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_load_all_results_error_handling():
 
 
 @given(st.integers())
-def test_load_all_results_property_idempotent(self, self):
+def test_load_all_results_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_all_results(self)
+    result = load_all_results(val)
 
     # Assert property
-    assert load_all_results(self) == result, "idempotent violated"
+    assert load_all_results(val) == result, "idempotent violated"
 
 
 
 def test_load_json_basic():
     """Test load_json: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_json()
+    result = load_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_json_edge_cases():
     """Test load_json: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_json()
+    result = load_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_json_property_idempotent(self, self, path):
 def test_calculate_generalization_gap_basic():
     """Test calculate_generalization_gap: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_generalization_gap()
+    result = calculate_generalization_gap()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_generalization_gap_edge_cases():
     """Test calculate_generalization_gap: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_generalization_gap()
+    result = calculate_generalization_gap()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_generalization_gap_property_idempotent(self, self, model):
 def test_generate_latex_table_basic():
     """Test generate_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_generate_latex_table_property_idempotent(self, self, output_path):
 def test_print_summary_basic():
     """Test print_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,11 +255,11 @@ def test_print_summary_error_handling():
 
 
 @given(st.integers())
-def test_print_summary_property_idempotent(self, self):
+def test_print_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = print_summary(self)
+    result = print_summary(val)
 
     # Assert property
-    assert print_summary(self) == result, "idempotent violated"
+    assert print_summary(val) == result, "idempotent violated"
 

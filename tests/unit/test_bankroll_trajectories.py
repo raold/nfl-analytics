@@ -15,26 +15,26 @@ import pytest
 def test_simulate_trajectory_basic():
     """Test simulate_trajectory: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_trajectory()
+    result = simulate_trajectory()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_trajectory_edge_cases():
     """Test simulate_trajectory: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_trajectory()
+    result = simulate_trajectory()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_simulate_trajectory_property_idempotent(self, n_bets, initial_bankroll,
 def test_generate_trajectories_basic():
     """Test generate_trajectories: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_trajectories()
+    result = generate_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_trajectories_edge_cases():
     """Test generate_trajectories: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_trajectories()
+    result = generate_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_generate_trajectories_property_idempotent(self, kelly_fractions, n_sims
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

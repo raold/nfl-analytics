@@ -15,26 +15,26 @@ import pytest
 def test_tau_bucket_basic():
     """Test tau_bucket: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = tau_bucket()
+    result = tau_bucket()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_tau_bucket_edge_cases():
     """Test tau_bucket: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = tau_bucket()
+    result = tau_bucket()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_tau_bucket_property_idempotent(self, tau_min):
 def test_fit_depth_basic():
     """Test fit_depth: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_depth()
+    result = fit_depth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_depth_edge_cases():
     """Test fit_depth: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_depth()
+    result = fit_depth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_fit_depth_property_idempotent(self, rows):
 def test_sample_depth_basic():
     """Test sample_depth: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample_depth()
+    result = sample_depth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_depth_edge_cases():
     """Test sample_depth: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample_depth()
+    result = sample_depth()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

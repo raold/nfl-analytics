@@ -15,26 +15,26 @@ import pytest
 def test_place_paper_bet_basic():
     """Test place_paper_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = place_paper_bet()
+    result = place_paper_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_place_paper_bet_edge_cases():
     """Test place_paper_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = place_paper_bet()
+    result = place_paper_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_place_paper_bet_property_idempotent(self, self, game_id, player_id, pla
 def test_settle_bet_basic():
     """Test settle_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = settle_bet()
+    result = settle_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_settle_bet_edge_cases():
     """Test settle_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = settle_bet()
+    result = settle_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_settle_bet_property_idempotent(self, self, paper_trade_id, actual_resul
 def test_get_performance_metrics_basic():
     """Test get_performance_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_performance_metrics()
+    result = get_performance_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_performance_metrics_edge_cases():
     """Test get_performance_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_performance_metrics()
+    result = get_performance_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -134,39 +134,39 @@ def test_get_performance_metrics_error_handling():
 
 
 @given(st.integers())
-def test_get_performance_metrics_property_idempotent(self, self):
+def test_get_performance_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_performance_metrics(self)
+    result = get_performance_metrics(val)
 
     # Assert property
-    assert get_performance_metrics(self) == result, "idempotent violated"
+    assert get_performance_metrics(val) == result, "idempotent violated"
 
 
 
 def test_close_session_basic():
     """Test close_session: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close_session()
+    result = close_session()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_session_edge_cases():
     """Test close_session: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close_session()
+    result = close_session()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -178,11 +178,11 @@ def test_close_session_error_handling():
 
 
 @given(st.integers())
-def test_close_session_property_idempotent(self, self):
+def test_close_session_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close_session(self)
+    result = close_session(val)
 
     # Assert property
-    assert close_session(self) == result, "idempotent violated"
+    assert close_session(val) == result, "idempotent violated"
 

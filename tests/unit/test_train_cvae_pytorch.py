@@ -15,26 +15,26 @@ import pytest
 def test_predict_with_uncertainty_basic():
     """Test predict_with_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_with_uncertainty()
+    result = predict_with_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_with_uncertainty_edge_cases():
     """Test predict_with_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_with_uncertainty()
+    result = predict_with_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_predict_with_uncertainty_property_idempotent(self, model, X, conditions
 def test_encode_basic():
     """Test encode: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = encode()
+    result = encode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_encode_edge_cases():
     """Test encode: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = encode()
+    result = encode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_encode_property_idempotent(self, self, x, c):
 def test_reparameterize_basic():
     """Test reparameterize: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reparameterize()
+    result = reparameterize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reparameterize_edge_cases():
     """Test reparameterize: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reparameterize()
+    result = reparameterize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_reparameterize_property_idempotent(self, self, mu, log_var):
 def test_decode_basic():
     """Test decode: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = decode()
+    result = decode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_decode_edge_cases():
     """Test decode: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = decode()
+    result = decode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_decode_property_idempotent(self, self, z, c):
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_forward_property_idempotent(self, self, x, c):
 def test_loss_function_basic():
     """Test loss_function: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = loss_function()
+    result = loss_function()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_loss_function_edge_cases():
     """Test loss_function: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = loss_function()
+    result = loss_function()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

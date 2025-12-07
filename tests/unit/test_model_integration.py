@@ -15,26 +15,26 @@ import pytest
 def test_adjust_bnn_prior_basic():
     """Test adjust_bnn_prior: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_bnn_prior()
+    result = adjust_bnn_prior()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_bnn_prior_edge_cases():
     """Test adjust_bnn_prior: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_bnn_prior()
+    result = adjust_bnn_prior()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_adjust_bnn_prior_property_idempotent(self, self, baseline_mean, baselin
 def test_incorporate_live_treatment_basic():
     """Test incorporate_live_treatment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = incorporate_live_treatment()
+    result = incorporate_live_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_incorporate_live_treatment_edge_cases():
     """Test incorporate_live_treatment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = incorporate_live_treatment()
+    result = incorporate_live_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_load_rushing_features_basic():
     """Test load_rushing_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_rushing_features()
+    result = load_rushing_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_rushing_features_edge_cases():
     """Test load_rushing_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_rushing_features()
+    result = load_rushing_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_rushing_features_property_idempotent(self, conn, season, week, pla
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_predict_with_uncertainty_basic():
     """Test predict_with_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_with_uncertainty()
+    result = predict_with_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_with_uncertainty_edge_cases():
     """Test predict_with_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_with_uncertainty()
+    result = predict_with_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_predict_with_uncertainty_property_idempotent(self, self, players_df):
 def test_get_prop_lines_basic():
     """Test get_prop_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_prop_lines()
+    result = get_prop_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_prop_lines_edge_cases():
     """Test get_prop_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_prop_lines()
+    result = get_prop_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_prop_lines_property_idempotent(self, self, conn, player_ids):
 def test_kelly_criterion_basic():
     """Test kelly_criterion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_kelly_criterion_property_idempotent(self, self, win_prob, odds_american
 def test_select_bets_basic():
     """Test select_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_bets()
+    result = select_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_bets_edge_cases():
     """Test select_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_bets()
+    result = select_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_select_bets_property_idempotent(self, self, predictions_df, prop_lines_
 def test_save_recommendations_basic():
     """Test save_recommendations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_recommendations()
+    result = save_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_recommendations_edge_cases():
     """Test save_recommendations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_recommendations()
+    result = save_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_save_recommendations_property_idempotent(self, self, predictions_df, be
 def test_run_pipeline_basic():
     """Test run_pipeline: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_pipeline()
+    result = run_pipeline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_pipeline_edge_cases():
     """Test run_pipeline: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_pipeline()
+    result = run_pipeline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

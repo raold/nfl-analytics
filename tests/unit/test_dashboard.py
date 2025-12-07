@@ -15,26 +15,26 @@ import pytest
 def test_run_basic():
     """Test run: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_property_idempotent(self, self, host, port, debug):
 def test_index_basic():
     """Test index: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = index()
+    result = index()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_index_edge_cases():
     """Test index: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = index()
+    result = index()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_index_error_handling():
 def test_api_scoreboard_basic():
     """Test api_scoreboard: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = api_scoreboard()
+    result = api_scoreboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_api_scoreboard_edge_cases():
     """Test api_scoreboard: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = api_scoreboard()
+    result = api_scoreboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_api_scoreboard_error_handling():
 def test_api_trends_basic():
     """Test api_trends: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = api_trends()
+    result = api_trends()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_api_trends_edge_cases():
     """Test api_trends: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = api_trends()
+    result = api_trends()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -158,26 +158,26 @@ def test_api_trends_error_handling():
 def test_api_recommendations_basic():
     """Test api_recommendations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = api_recommendations()
+    result = api_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_api_recommendations_edge_cases():
     """Test api_recommendations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = api_recommendations()
+    result = api_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_api_recommendations_error_handling():
 def test_api_compute_stats_basic():
     """Test api_compute_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = api_compute_stats()
+    result = api_compute_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_api_compute_stats_edge_cases():
     """Test api_compute_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = api_compute_stats()
+    result = api_compute_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_api_compute_stats_error_handling():
 def test_api_task_values_basic():
     """Test api_task_values: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = api_task_values()
+    result = api_task_values()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_api_task_values_edge_cases():
     """Test api_task_values: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = api_task_values()
+    result = api_task_values()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_generate_bankroll_histogram_basic():
     """Test generate_bankroll_histogram: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_bankroll_histogram()
+    result = generate_bankroll_histogram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_bankroll_histogram_edge_cases():
     """Test generate_bankroll_histogram: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_bankroll_histogram()
+    result = generate_bankroll_histogram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_generate_bankroll_histogram_property_idempotent(self, n_sims, initial_b
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

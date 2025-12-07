@@ -15,26 +15,26 @@ import pytest
 def test_fit_latency_basic():
     """Test fit_latency: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_latency()
+    result = fit_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_latency_edge_cases():
     """Test fit_latency: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_latency()
+    result = fit_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fit_latency_property_idempotent(self, rows):
 def test_sample_latency_basic():
     """Test sample_latency: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample_latency()
+    result = sample_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_latency_edge_cases():
     """Test sample_latency: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample_latency()
+    result = sample_latency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

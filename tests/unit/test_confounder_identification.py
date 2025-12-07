@@ -15,26 +15,26 @@ import pytest
 def test_propensity_score_matching_basic():
     """Test propensity_score_matching: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = propensity_score_matching()
+    result = propensity_score_matching()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_propensity_score_matching_edge_cases():
     """Test propensity_score_matching: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = propensity_score_matching()
+    result = propensity_score_matching()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_propensity_score_matching_property_idempotent(self, self, df, treatment
 def test_inverse_propensity_weighting_basic():
     """Test inverse_propensity_weighting: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = inverse_propensity_weighting()
+    result = inverse_propensity_weighting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_inverse_propensity_weighting_edge_cases():
     """Test inverse_propensity_weighting: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = inverse_propensity_weighting()
+    result = inverse_propensity_weighting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

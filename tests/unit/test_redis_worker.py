@@ -15,26 +15,26 @@ import pytest
 def test_initialize_basic():
     """Test initialize: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = initialize()
+    result = initialize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_initialize_edge_cases():
     """Test initialize: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = initialize()
+    result = initialize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_initialize_error_handling():
 
 
 @given(st.integers())
-def test_initialize_property_idempotent(self, self):
+def test_initialize_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = initialize(self)
+    result = initialize(val)
 
     # Assert property
-    assert initialize(self) == result, "idempotent violated"
+    assert initialize(val) == result, "idempotent violated"
 
 
 
 def test_get_next_task_basic():
     """Test get_next_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_next_task()
+    result = get_next_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_next_task_edge_cases():
     """Test get_next_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_next_task()
+    result = get_next_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_get_next_task_error_handling():
 
 
 @given(st.integers())
-def test_get_next_task_property_idempotent(self, self):
+def test_get_next_task_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_next_task(self)
+    result = get_next_task(val)
 
     # Assert property
-    assert get_next_task(self) == result, "idempotent violated"
+    assert get_next_task(val) == result, "idempotent violated"
 
 
 
 def test_complete_task_basic():
     """Test complete_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = complete_task()
+    result = complete_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_complete_task_edge_cases():
     """Test complete_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = complete_task()
+    result = complete_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_complete_task_property_idempotent(self, self, task_id, task_type, resul
 def test_fail_task_basic():
     """Test fail_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fail_task()
+    result = fail_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fail_task_edge_cases():
     """Test fail_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fail_task()
+    result = fail_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_fail_task_property_idempotent(self, self, task_id, error_message):
 def test_run_basic():
     """Test run: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,39 +222,39 @@ def test_run_error_handling():
 
 
 @given(st.integers())
-def test_run_property_idempotent(self, self):
+def test_run_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run(self)
+    result = run(val)
 
     # Assert property
-    assert run(self) == result, "idempotent violated"
+    assert run(val) == result, "idempotent violated"
 
 
 
 def test_get_worker_status_basic():
     """Test get_worker_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_worker_status()
+    result = get_worker_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_worker_status_edge_cases():
     """Test get_worker_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_worker_status()
+    result = get_worker_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,11 +266,11 @@ def test_get_worker_status_error_handling():
 
 
 @given(st.integers())
-def test_get_worker_status_property_idempotent(self, self):
+def test_get_worker_status_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_worker_status(self)
+    result = get_worker_status(val)
 
     # Assert property
-    assert get_worker_status(self) == result, "idempotent violated"
+    assert get_worker_status(val) == result, "idempotent violated"
 

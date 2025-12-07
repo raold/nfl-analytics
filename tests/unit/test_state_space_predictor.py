@@ -15,26 +15,26 @@ import pytest
 def test_demo_basic():
     """Test demo: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo()
+    result = demo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_edge_cases():
     """Test demo: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo()
+    result = demo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_error_handling():
 def test_get_player_skill_basic():
     """Test get_player_skill: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_player_skill()
+    result = get_player_skill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_player_skill_edge_cases():
     """Test get_player_skill: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_player_skill()
+    result = get_player_skill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_player_skill_property_idempotent(self, self, player_id, game_number
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_predict_property_idempotent(self, self, player_id, season, week, attemp
 def test_predict_batch_basic():
     """Test predict_batch: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_batch()
+    result = predict_batch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_batch_edge_cases():
     """Test predict_batch: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_batch()
+    result = predict_batch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

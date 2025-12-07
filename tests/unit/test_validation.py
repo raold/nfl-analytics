@@ -15,26 +15,26 @@ import pytest
 def test_placebo_test_basic():
     """Test placebo_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = placebo_test()
+    result = placebo_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_placebo_test_edge_cases():
     """Test placebo_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = placebo_test()
+    result = placebo_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_placebo_test_property_idempotent(self, self, df, estimator, outcome, tr
 def test_sensitivity_to_unmeasured_confounding_basic():
     """Test sensitivity_to_unmeasured_confounding: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sensitivity_to_unmeasured_confounding()
+    result = sensitivity_to_unmeasured_confounding()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sensitivity_to_unmeasured_confounding_edge_cases():
     """Test sensitivity_to_unmeasured_confounding: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sensitivity_to_unmeasured_confounding()
+    result = sensitivity_to_unmeasured_confounding()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_sensitivity_to_unmeasured_confounding_property_idempotent(self, self, a
 def test_heterogeneous_effects_by_subgroup_basic():
     """Test heterogeneous_effects_by_subgroup: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = heterogeneous_effects_by_subgroup()
+    result = heterogeneous_effects_by_subgroup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_heterogeneous_effects_by_subgroup_edge_cases():
     """Test heterogeneous_effects_by_subgroup: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = heterogeneous_effects_by_subgroup()
+    result = heterogeneous_effects_by_subgroup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_demo_book_router_basic():
     """Test demo_book_router: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo_book_router()
+    result = demo_book_router()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_book_router_edge_cases():
     """Test demo_book_router: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo_book_router()
+    result = demo_book_router()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_book_router_error_handling():
 def test_calculate_withdrawal_cost_basic():
     """Test calculate_withdrawal_cost: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_withdrawal_cost()
+    result = calculate_withdrawal_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_withdrawal_cost_edge_cases():
     """Test calculate_withdrawal_cost: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_withdrawal_cost()
+    result = calculate_withdrawal_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_calculate_withdrawal_cost_property_idempotent(self, amount, policy, las
 def test_calculate_bonus_cost_basic():
     """Test calculate_bonus_cost: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_bonus_cost()
+    result = calculate_bonus_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_bonus_cost_edge_cases():
     """Test calculate_bonus_cost: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_bonus_cost()
+    result = calculate_bonus_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_bonus_cost_property_idempotent(self, bet_amount, odds, bonus)
 def test_calculate_heat_cost_basic():
     """Test calculate_heat_cost: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_heat_cost()
+    result = calculate_heat_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_heat_cost_edge_cases():
     """Test calculate_heat_cost: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_heat_cost()
+    result = calculate_heat_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_heat_cost_property_idempotent(self, current_heat, lifetime_pr
 def test_calculate_total_friction_basic():
     """Test calculate_total_friction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_total_friction()
+    result = calculate_total_friction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_total_friction_edge_cases():
     """Test calculate_total_friction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_total_friction()
+    result = calculate_total_friction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_total_friction_property_idempotent(self, bet_amount, odds, bo
 def test_route_bet_basic():
     """Test route_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = route_bet()
+    result = route_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_route_bet_edge_cases():
     """Test route_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = route_bet()
+    result = route_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_route_bet_property_idempotent(self, self, bet_id, market, team, model_p
 def test_optimize_portfolio_basic():
     """Test optimize_portfolio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_portfolio_edge_cases():
     """Test optimize_portfolio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_optimize_portfolio_property_idempotent(self, self, bets, target_exposur
 def test_generate_routing_report_basic():
     """Test generate_routing_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_routing_report()
+    result = generate_routing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_routing_report_edge_cases():
     """Test generate_routing_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_routing_report()
+    result = generate_routing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

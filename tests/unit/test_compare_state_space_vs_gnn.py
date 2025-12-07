@@ -15,26 +15,26 @@ import pytest
 def test_load_metrics_basic():
     """Test load_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_metrics()
+    result = load_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_metrics_edge_cases():
     """Test load_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_metrics()
+    result = load_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_metrics_property_idempotent(self, model_dir, metrics_file):
 def test_calculate_improvement_basic():
     """Test calculate_improvement: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_improvement()
+    result = calculate_improvement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_improvement_edge_cases():
     """Test calculate_improvement: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_improvement()
+    result = calculate_improvement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_improvement_property_idempotent(self, baseline, improved):
 def test_mcnemar_test_basic():
     """Test mcnemar_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = mcnemar_test()
+    result = mcnemar_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_mcnemar_test_edge_cases():
     """Test mcnemar_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = mcnemar_test()
+    result = mcnemar_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_mcnemar_test_property_idempotent(self, predictions_a, predictions_b, ac
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

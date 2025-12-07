@@ -15,26 +15,26 @@ import pytest
 def test_read_frame_basic():
     """Test read_frame: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = read_frame()
+    result = read_frame()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_read_frame_edge_cases():
     """Test read_frame: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = read_frame()
+    result = read_frame()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_read_frame_property_idempotent(self, path):
 def test_mk_zero_week_table_basic():
     """Test mk_zero_week_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = mk_zero_week_table()
+    result = mk_zero_week_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_mk_zero_week_table_edge_cases():
     """Test mk_zero_week_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = mk_zero_week_table()
+    result = mk_zero_week_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_mk_zero_week_table_property_idempotent(self, stakes, season_col, week_c
 def test_write_latex_rows_basic():
     """Test write_latex_rows: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_latex_rows()
+    result = write_latex_rows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_latex_rows_edge_cases():
     """Test write_latex_rows: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_latex_rows()
+    result = write_latex_rows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_write_latex_rows_property_idempotent(self, df, path):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_main_error_handling():
 def test_pct_basic():
     """Test pct: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pct()
+    result = pct()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pct_edge_cases():
     """Test pct: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pct()
+    result = pct()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

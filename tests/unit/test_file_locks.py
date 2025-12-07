@@ -15,26 +15,26 @@ import pytest
 def test_file_lock_basic():
     """Test file_lock: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = file_lock()
+    result = file_lock()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_file_lock_edge_cases():
     """Test file_lock: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = file_lock()
+    result = file_lock()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_file_lock_property_idempotent(self, file_path, timeout):
 def test_database_lock_basic():
     """Test database_lock: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = database_lock()
+    result = database_lock()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_database_lock_edge_cases():
     """Test database_lock: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = database_lock()
+    result = database_lock()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_database_lock_property_idempotent(self, db_path, timeout):
 def test_acquire_basic():
     """Test acquire: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = acquire()
+    result = acquire()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_acquire_edge_cases():
     """Test acquire: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = acquire()
+    result = acquire()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_acquire_property_idempotent(self, self, blocking):
 def test_release_basic():
     """Test release: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = release()
+    result = release()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_release_edge_cases():
     """Test release: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = release()
+    result = release()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -178,39 +178,39 @@ def test_release_error_handling():
 
 
 @given(st.integers())
-def test_release_property_idempotent(self, self):
+def test_release_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = release(self)
+    result = release(val)
 
     # Assert property
-    assert release(self) == result, "idempotent violated"
+    assert release(val) == result, "idempotent violated"
 
 
 
 def test_is_locked_basic():
     """Test is_locked: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_locked()
+    result = is_locked()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_locked_edge_cases():
     """Test is_locked: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_locked()
+    result = is_locked()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,39 +222,39 @@ def test_is_locked_error_handling():
 
 
 @given(st.integers())
-def test_is_locked_property_idempotent(self, self):
+def test_is_locked_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = is_locked(self)
+    result = is_locked(val)
 
     # Assert property
-    assert is_locked(self) == result, "idempotent violated"
+    assert is_locked(val) == result, "idempotent violated"
 
 
 
 def test_acquire_basic():
     """Test acquire: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = acquire()
+    result = acquire()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_acquire_edge_cases():
     """Test acquire: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = acquire()
+    result = acquire()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_acquire_property_idempotent(self, self, blocking):
 def test_release_basic():
     """Test release: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = release()
+    result = release()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_release_edge_cases():
     """Test release: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = release()
+    result = release()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -310,39 +310,39 @@ def test_release_error_handling():
 
 
 @given(st.integers())
-def test_release_property_idempotent(self, self):
+def test_release_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = release(self)
+    result = release(val)
 
     # Assert property
-    assert release(self) == result, "idempotent violated"
+    assert release(val) == result, "idempotent violated"
 
 
 
 def test_safe_database_operation_basic():
     """Test safe_database_operation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = safe_database_operation()
+    result = safe_database_operation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_safe_database_operation_edge_cases():
     """Test safe_database_operation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = safe_database_operation()
+    result = safe_database_operation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_safe_database_operation_property_idempotent(self, self, db_path, timeou
 def test_checkpoint_database_basic():
     """Test checkpoint_database: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = checkpoint_database()
+    result = checkpoint_database()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_checkpoint_database_edge_cases():
     """Test checkpoint_database: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = checkpoint_database()
+    result = checkpoint_database()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_checkpoint_database_property_idempotent(self, self, db_path):
 def test_detect_sync_conflicts_basic():
     """Test detect_sync_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_sync_conflicts()
+    result = detect_sync_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_sync_conflicts_edge_cases():
     """Test detect_sync_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_sync_conflicts()
+    result = detect_sync_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -455,26 +455,26 @@ def test_detect_sync_conflicts_property_idempotent(self, self, file_path):
 def test_resolve_sync_conflicts_basic():
     """Test resolve_sync_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = resolve_sync_conflicts()
+    result = resolve_sync_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_resolve_sync_conflicts_edge_cases():
     """Test resolve_sync_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = resolve_sync_conflicts()
+    result = resolve_sync_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

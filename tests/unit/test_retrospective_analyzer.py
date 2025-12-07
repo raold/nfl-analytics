@@ -15,26 +15,26 @@ import pytest
 def test_prob_to_american_odds_basic():
     """Test prob_to_american_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prob_to_american_odds()
+    result = prob_to_american_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prob_to_american_odds_edge_cases():
     """Test prob_to_american_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prob_to_american_odds()
+    result = prob_to_american_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_prob_to_american_odds_property_idempotent(self, prob):
 def test_american_odds_to_prob_basic():
     """Test american_odds_to_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_odds_to_prob()
+    result = american_odds_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_odds_to_prob_edge_cases():
     """Test american_odds_to_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_odds_to_prob()
+    result = american_odds_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_american_odds_to_prob_property_idempotent(self, odds):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_main_error_handling():
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_get_connection_error_handling():
 
 
 @given(st.integers())
-def test_get_connection_property_idempotent(self, self):
+def test_get_connection_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_connection(self)
+    result = get_connection(val)
 
     # Assert property
-    assert get_connection(self) == result, "idempotent violated"
+    assert get_connection(val) == result, "idempotent violated"
 
 
 
 def test_fetch_games_needing_retrospective_basic():
     """Test fetch_games_needing_retrospective: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_games_needing_retrospective()
+    result = fetch_games_needing_retrospective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_games_needing_retrospective_edge_cases():
     """Test fetch_games_needing_retrospective: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_games_needing_retrospective()
+    result = fetch_games_needing_retrospective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_fetch_games_needing_retrospective_error_handling():
 
 
 @given(st.integers())
-def test_fetch_games_needing_retrospective_property_idempotent(self, self):
+def test_fetch_games_needing_retrospective_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = fetch_games_needing_retrospective(self)
+    result = fetch_games_needing_retrospective(val)
 
     # Assert property
-    assert fetch_games_needing_retrospective(self) == result, "idempotent violated"
+    assert fetch_games_needing_retrospective(val) == result, "idempotent violated"
 
 
 
 def test_classify_outcome_basic():
     """Test classify_outcome: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = classify_outcome()
+    result = classify_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_classify_outcome_edge_cases():
     """Test classify_outcome: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = classify_outcome()
+    result = classify_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_classify_outcome_property_idempotent(self, self, actual_margin, predict
 def test_compute_surprise_factor_basic():
     """Test compute_surprise_factor: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_surprise_factor()
+    result = compute_surprise_factor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_surprise_factor_edge_cases():
     """Test compute_surprise_factor: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_surprise_factor()
+    result = compute_surprise_factor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_compute_surprise_factor_property_idempotent(self, self, actual_margin, 
 def test_infer_failure_mode_basic():
     """Test infer_failure_mode: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = infer_failure_mode()
+    result = infer_failure_mode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_infer_failure_mode_edge_cases():
     """Test infer_failure_mode: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = infer_failure_mode()
+    result = infer_failure_mode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_infer_failure_mode_property_idempotent(self, self, game_info, outcome_t
 def test_extract_narrative_factors_basic():
     """Test extract_narrative_factors: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_narrative_factors()
+    result = extract_narrative_factors()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_narrative_factors_edge_cases():
     """Test extract_narrative_factors: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_narrative_factors()
+    result = extract_narrative_factors()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_extract_narrative_factors_property_idempotent(self, self, game_info, ga
 def test_analyze_game_basic():
     """Test analyze_game: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_game()
+    result = analyze_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_game_edge_cases():
     """Test analyze_game: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_game()
+    result = analyze_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_analyze_game_property_idempotent(self, self, game_row):
 def test_store_retrospective_basic():
     """Test store_retrospective: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = store_retrospective()
+    result = store_retrospective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_store_retrospective_edge_cases():
     """Test store_retrospective: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = store_retrospective()
+    result = store_retrospective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -488,26 +488,26 @@ def test_store_retrospective_property_idempotent(self, self, retro_data):
 def test_analyze_all_pending_basic():
     """Test analyze_all_pending: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_all_pending()
+    result = analyze_all_pending()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_all_pending_edge_cases():
     """Test analyze_all_pending: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_all_pending()
+    result = analyze_all_pending()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -519,11 +519,11 @@ def test_analyze_all_pending_error_handling():
 
 
 @given(st.integers())
-def test_analyze_all_pending_property_idempotent(self, self):
+def test_analyze_all_pending_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = analyze_all_pending(self)
+    result = analyze_all_pending(val)
 
     # Assert property
-    assert analyze_all_pending(self) == result, "idempotent violated"
+    assert analyze_all_pending(val) == result, "idempotent violated"
 

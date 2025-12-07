@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_initialize_models_basic():
     """Test initialize_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = initialize_models()
+    result = initialize_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_initialize_models_edge_cases():
     """Test initialize_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = initialize_models()
+    result = initialize_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_initialize_models_error_handling():
 
 
 @given(st.integers())
-def test_initialize_models_property_idempotent(self, self):
+def test_initialize_models_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = initialize_models(self)
+    result = initialize_models(val)
 
     # Assert property
-    assert initialize_models(self) == result, "idempotent violated"
+    assert initialize_models(val) == result, "idempotent violated"
 
 
 
 def test_get_model_stats_basic():
     """Test get_model_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_model_stats()
+    result = get_model_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_model_stats_edge_cases():
     """Test get_model_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_model_stats()
+    result = get_model_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_get_model_stats_property_idempotent(self, self, model_name):
 def test_select_model_basic():
     """Test select_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_model()
+    result = select_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_model_edge_cases():
     """Test select_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_model()
+    result = select_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_select_model_error_handling():
 
 
 @given(st.integers())
-def test_select_model_property_idempotent(self, self):
+def test_select_model_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = select_model(self)
+    result = select_model(val)
 
     # Assert property
-    assert select_model(self) == result, "idempotent violated"
+    assert select_model(val) == result, "idempotent violated"
 
 
 
 def test_update_model_basic():
     """Test update_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_model()
+    result = update_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_model_edge_cases():
     """Test update_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_model()
+    result = update_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -225,12 +225,12 @@ def test_update_model_no_temporal_leakage():
     """Ensure update_model doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -244,26 +244,26 @@ def test_update_model_no_temporal_leakage():
 def test_get_all_stats_basic():
     """Test get_all_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_all_stats()
+    result = get_all_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_all_stats_edge_cases():
     """Test get_all_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_all_stats()
+    result = get_all_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -275,39 +275,39 @@ def test_get_all_stats_error_handling():
 
 
 @given(st.integers())
-def test_get_all_stats_property_idempotent(self, self):
+def test_get_all_stats_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_all_stats(self)
+    result = get_all_stats(val)
 
     # Assert property
-    assert get_all_stats(self) == result, "idempotent violated"
+    assert get_all_stats(val) == result, "idempotent violated"
 
 
 
 def test_reset_basic():
     """Test reset: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reset()
+    result = reset()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reset_edge_cases():
     """Test reset: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reset()
+    result = reset()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,26 +332,26 @@ def test_reset_property_idempotent(self, self, model_name):
 def test_plot_distributions_basic():
     """Test plot_distributions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_distributions()
+    result = plot_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_distributions_edge_cases():
     """Test plot_distributions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_distributions()
+    result = plot_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -363,39 +363,39 @@ def test_plot_distributions_error_handling():
 
 
 @given(st.integers())
-def test_plot_distributions_property_idempotent(self, self):
+def test_plot_distributions_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = plot_distributions(self)
+    result = plot_distributions(val)
 
     # Assert property
-    assert plot_distributions(self) == result, "idempotent violated"
+    assert plot_distributions(val) == result, "idempotent violated"
 
 
 
 def test_simulate_regret_basic():
     """Test simulate_regret: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_regret()
+    result = simulate_regret()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_regret_edge_cases():
     """Test simulate_regret: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_regret()
+    result = simulate_regret()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

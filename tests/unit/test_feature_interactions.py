@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_calculate_interaction_features_basic():
     """Test calculate_interaction_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_interaction_features()
+    result = calculate_interaction_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_interaction_features_edge_cases():
     """Test calculate_interaction_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_interaction_features()
+    result = calculate_interaction_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_calculate_interaction_features_error_handling():
 
 
 @given(st.integers())
-def test_calculate_interaction_features_property_idempotent(self, self):
+def test_calculate_interaction_features_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = calculate_interaction_features(self)
+    result = calculate_interaction_features(val)
 
     # Assert property
-    assert calculate_interaction_features(self) == result, "idempotent violated"
+    assert calculate_interaction_features(val) == result, "idempotent violated"
 
 
 
 def test_get_high_value_interactions_basic():
     """Test get_high_value_interactions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_high_value_interactions()
+    result = get_high_value_interactions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_high_value_interactions_edge_cases():
     """Test get_high_value_interactions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_high_value_interactions()
+    result = get_high_value_interactions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_verify_model_exists_basic():
     """Test verify_model_exists: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = verify_model_exists()
+    result = verify_model_exists()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_verify_model_exists_edge_cases():
     """Test verify_model_exists: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = verify_model_exists()
+    result = verify_model_exists()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_verify_model_exists_error_handling():
 
 
 @given(st.integers())
-def test_verify_model_exists_property_idempotent(self, self):
+def test_verify_model_exists_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = verify_model_exists(self)
+    result = verify_model_exists(val)
 
     # Assert property
-    assert verify_model_exists(self) == result, "idempotent violated"
+    assert verify_model_exists(val) == result, "idempotent violated"
 
 
 
 def test_load_validation_metrics_basic():
     """Test load_validation_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_validation_metrics()
+    result = load_validation_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_validation_metrics_edge_cases():
     """Test load_validation_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_validation_metrics()
+    result = load_validation_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_load_validation_metrics_error_handling():
 
 
 @given(st.integers())
-def test_load_validation_metrics_property_idempotent(self, self):
+def test_load_validation_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_validation_metrics(self)
+    result = load_validation_metrics(val)
 
     # Assert property
-    assert load_validation_metrics(self) == result, "idempotent violated"
+    assert load_validation_metrics(val) == result, "idempotent violated"
 
 
 
 def test_create_deployment_record_basic():
     """Test create_deployment_record: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_deployment_record()
+    result = create_deployment_record()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_deployment_record_edge_cases():
     """Test create_deployment_record: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_deployment_record()
+    result = create_deployment_record()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_create_deployment_record_error_handling():
 
 
 @given(st.integers())
-def test_create_deployment_record_property_idempotent(self, self):
+def test_create_deployment_record_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_deployment_record(self)
+    result = create_deployment_record(val)
 
     # Assert property
-    assert create_deployment_record(self) == result, "idempotent violated"
+    assert create_deployment_record(val) == result, "idempotent violated"
 
 
 
 def test_generate_predictions_batch_basic():
     """Test generate_predictions_batch: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_predictions_batch()
+    result = generate_predictions_batch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_predictions_batch_edge_cases():
     """Test generate_predictions_batch: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_predictions_batch()
+    result = generate_predictions_batch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_generate_predictions_batch_property_idempotent(self, self, season, week
 def test_save_predictions_to_db_basic():
     """Test save_predictions_to_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_predictions_to_db()
+    result = save_predictions_to_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_predictions_to_db_edge_cases():
     """Test save_predictions_to_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_predictions_to_db()
+    result = save_predictions_to_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_save_predictions_to_db_property_idempotent(self, self, predictions_df):
 def test_setup_ab_test_basic():
     """Test setup_ab_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = setup_ab_test()
+    result = setup_ab_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_setup_ab_test_edge_cases():
     """Test setup_ab_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = setup_ab_test()
+    result = setup_ab_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_setup_ab_test_property_idempotent(self, self, initial_allocation):
 def test_run_deployment_tests_basic():
     """Test run_deployment_tests: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_deployment_tests()
+    result = run_deployment_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_deployment_tests_edge_cases():
     """Test run_deployment_tests: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_deployment_tests()
+    result = run_deployment_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,39 +343,39 @@ def test_run_deployment_tests_error_handling():
 
 
 @given(st.integers())
-def test_run_deployment_tests_property_idempotent(self, self):
+def test_run_deployment_tests_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_deployment_tests(self)
+    result = run_deployment_tests(val)
 
     # Assert property
-    assert run_deployment_tests(self) == result, "idempotent violated"
+    assert run_deployment_tests(val) == result, "idempotent violated"
 
 
 
 def test_deploy_basic():
     """Test deploy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = deploy()
+    result = deploy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_deploy_edge_cases():
     """Test deploy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = deploy()
+    result = deploy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

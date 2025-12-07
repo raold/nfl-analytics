@@ -15,26 +15,26 @@ import pytest
 def test_load_base_features_basic():
     """Test load_base_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_base_features()
+    result = load_base_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_base_features_edge_cases():
     """Test load_base_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_base_features()
+    result = load_base_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_base_features_property_idempotent(self, csv_path):
 def test_load_4th_down_features_basic():
     """Test load_4th_down_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_4th_down_features()
+    result = load_4th_down_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_4th_down_features_edge_cases():
     """Test load_4th_down_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_4th_down_features()
+    result = load_4th_down_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_4th_down_features_error_handling():
 def test_load_injury_features_basic():
     """Test load_injury_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_injury_features()
+    result = load_injury_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_injury_features_edge_cases():
     """Test load_injury_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_injury_features()
+    result = load_injury_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_load_injury_features_error_handling():
 def test_load_playoff_features_basic():
     """Test load_playoff_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_playoff_features()
+    result = load_playoff_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_playoff_features_edge_cases():
     """Test load_playoff_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_playoff_features()
+    result = load_playoff_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -158,26 +158,26 @@ def test_load_playoff_features_error_handling():
 def test_pivot_4th_down_features_basic():
     """Test pivot_4th_down_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pivot_4th_down_features()
+    result = pivot_4th_down_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pivot_4th_down_features_edge_cases():
     """Test pivot_4th_down_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pivot_4th_down_features()
+    result = pivot_4th_down_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -202,26 +202,26 @@ def test_pivot_4th_down_features_property_idempotent(self, df_4th, df_base):
 def test_merge_all_features_basic():
     """Test merge_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = merge_all_features()
+    result = merge_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_merge_all_features_edge_cases():
     """Test merge_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = merge_all_features()
+    result = merge_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -247,12 +247,12 @@ def test_merge_all_features_no_temporal_leakage():
     """Ensure merge_all_features doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -266,26 +266,26 @@ def test_merge_all_features_no_temporal_leakage():
 def test_validate_merged_data_basic():
     """Test validate_merged_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_merged_data()
+    result = validate_merged_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_merged_data_edge_cases():
     """Test validate_merged_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_merged_data()
+    result = validate_merged_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -311,12 +311,12 @@ def test_validate_merged_data_no_temporal_leakage():
     """Ensure validate_merged_data doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -330,26 +330,26 @@ def test_validate_merged_data_no_temporal_leakage():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_get_pending_trades_basic():
     """Test get_pending_trades: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_pending_trades()
+    result = get_pending_trades()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_pending_trades_edge_cases():
     """Test get_pending_trades: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_pending_trades()
+    result = get_pending_trades()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_pending_trades_property_idempotent(self, self, session_id, days_bac
 def test_get_actual_player_stat_basic():
     """Test get_actual_player_stat: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_actual_player_stat()
+    result = get_actual_player_stat()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_actual_player_stat_edge_cases():
     """Test get_actual_player_stat: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_actual_player_stat()
+    result = get_actual_player_stat()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_get_actual_player_stat_property_idempotent(self, self, player_id, game_
 def test_settle_trade_basic():
     """Test settle_trade: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = settle_trade()
+    result = settle_trade()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_settle_trade_edge_cases():
     """Test settle_trade: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = settle_trade()
+    result = settle_trade()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_settle_trade_property_idempotent(self, self, paper_trade_id, line_value
 def test_settle_all_pending_basic():
     """Test settle_all_pending: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = settle_all_pending()
+    result = settle_all_pending()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_settle_all_pending_edge_cases():
     """Test settle_all_pending: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = settle_all_pending()
+    result = settle_all_pending()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_settle_all_pending_property_idempotent(self, self, session_id):
 def test_update_session_metrics_basic():
     """Test update_session_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_session_metrics()
+    result = update_session_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_session_metrics_edge_cases():
     """Test update_session_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_session_metrics()
+    result = update_session_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -269,12 +269,12 @@ def test_update_session_metrics_no_temporal_leakage():
     """Ensure update_session_metrics doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -288,26 +288,26 @@ def test_update_session_metrics_no_temporal_leakage():
 def test_send_alert_email_basic():
     """Test send_alert_email: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = send_alert_email()
+    result = send_alert_email()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_send_alert_email_edge_cases():
     """Test send_alert_email: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = send_alert_email()
+    result = send_alert_email()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,26 +332,26 @@ def test_send_alert_email_property_idempotent(self, self, summary, session_id):
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -363,11 +363,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

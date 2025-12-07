@@ -15,26 +15,26 @@ import pytest
 def test_sample_size_calculation_basic():
     """Test sample_size_calculation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample_size_calculation()
+    result = sample_size_calculation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_size_calculation_edge_cases():
     """Test sample_size_calculation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample_size_calculation()
+    result = sample_size_calculation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_sample_size_calculation_property_idempotent(self, effect_size, power, a
 def test_power_calculation_basic():
     """Test power_calculation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = power_calculation()
+    result = power_calculation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_power_calculation_edge_cases():
     """Test power_calculation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = power_calculation()
+    result = power_calculation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_power_calculation_property_idempotent(self, effect_size, n, alpha, test
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_test_error_handling():
 def test_power_t_test_basic():
     """Test power_t_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = power_t_test()
+    result = power_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_power_t_test_edge_cases():
     """Test power_t_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = power_t_test()
+    result = power_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_power_t_test_property_idempotent(self, self, effect_size, n, alpha, tes
 def test_sample_size_t_test_basic():
     """Test sample_size_t_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample_size_t_test()
+    result = sample_size_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_size_t_test_edge_cases():
     """Test sample_size_t_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample_size_t_test()
+    result = sample_size_t_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_sample_size_t_test_property_idempotent(self, self, effect_size, power, 
 def test_power_proportion_test_basic():
     """Test power_proportion_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = power_proportion_test()
+    result = power_proportion_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_power_proportion_test_edge_cases():
     """Test power_proportion_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = power_proportion_test()
+    result = power_proportion_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_power_proportion_test_property_idempotent(self, self, p1, p2, n, alpha,
 def test_power_correlation_basic():
     """Test power_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = power_correlation()
+    result = power_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_power_correlation_edge_cases():
     """Test power_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = power_correlation()
+    result = power_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_power_correlation_property_idempotent(self, self, r, n, alpha, alternat
 def test_sequential_design_basic():
     """Test sequential_design: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sequential_design()
+    result = sequential_design()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sequential_design_edge_cases():
     """Test sequential_design: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sequential_design()
+    result = sequential_design()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_sequential_design_property_idempotent(self, self, effect_size, alpha, b
 def test_optimal_stopping_power_basic():
     """Test optimal_stopping_power: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimal_stopping_power()
+    result = optimal_stopping_power()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimal_stopping_power_edge_cases():
     """Test optimal_stopping_power: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimal_stopping_power()
+    result = optimal_stopping_power()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_optimal_stopping_power_property_idempotent(self, self, effect_sizes, n_
 def test_get_effect_size_convention_basic():
     """Test get_effect_size_convention: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_effect_size_convention()
+    result = get_effect_size_convention()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_effect_size_convention_edge_cases():
     """Test get_effect_size_convention: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_effect_size_convention()
+    result = get_effect_size_convention()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_get_effect_size_convention_property_idempotent(self, self, test_type, m
 def test_power_func_basic():
     """Test power_func: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = power_func()
+    result = power_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_power_func_edge_cases():
     """Test power_func: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = power_func()
+    result = power_func()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

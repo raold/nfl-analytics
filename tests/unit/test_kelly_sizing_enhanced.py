@@ -15,26 +15,26 @@ import pytest
 def test_demo_enhanced_kelly_basic():
     """Test demo_enhanced_kelly: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo_enhanced_kelly()
+    result = demo_enhanced_kelly()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_enhanced_kelly_edge_cases():
     """Test demo_enhanced_kelly: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo_enhanced_kelly()
+    result = demo_enhanced_kelly()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_enhanced_kelly_error_handling():
 def test_decimal_odds_basic():
     """Test decimal_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = decimal_odds()
+    result = decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_decimal_odds_edge_cases():
     """Test decimal_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = decimal_odds()
+    result = decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_decimal_odds_error_handling():
 
 
 @given(st.integers())
-def test_decimal_odds_property_idempotent(self, self):
+def test_decimal_odds_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = decimal_odds(self)
+    result = decimal_odds(val)
 
     # Assert property
-    assert decimal_odds(self) == result, "idempotent violated"
+    assert decimal_odds(val) == result, "idempotent violated"
 
 
 
 def test_confidence_decay_basic():
     """Test confidence_decay: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = confidence_decay()
+    result = confidence_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_confidence_decay_edge_cases():
     """Test confidence_decay: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = confidence_decay()
+    result = confidence_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_confidence_decay_property_idempotent(self, edge, confidence):
 def test_time_decay_basic():
     """Test time_decay: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = time_decay()
+    result = time_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_time_decay_edge_cases():
     """Test time_decay: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = time_decay()
+    result = time_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -181,12 +181,12 @@ def test_time_decay_no_temporal_leakage():
     """Ensure time_decay doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -200,26 +200,26 @@ def test_time_decay_no_temporal_leakage():
 def test_combined_decay_basic():
     """Test combined_decay: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = combined_decay()
+    result = combined_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_combined_decay_edge_cases():
     """Test combined_decay: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = combined_decay()
+    result = combined_decay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_combined_decay_property_idempotent(self, edge, confidence, minutes_to_g
 def test_calculate_var_basic():
     """Test calculate_var: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_var()
+    result = calculate_var()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_var_edge_cases():
     """Test calculate_var: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_var()
+    result = calculate_var()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_calculate_var_property_idempotent(self, returns, confidence_level):
 def test_calculate_cvar_basic():
     """Test calculate_cvar: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_cvar()
+    result = calculate_cvar()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_cvar_edge_cases():
     """Test calculate_cvar: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_cvar()
+    result = calculate_cvar()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,26 +332,26 @@ def test_calculate_cvar_property_idempotent(self, returns, confidence_level):
 def test_simulate_portfolio_returns_basic():
     """Test simulate_portfolio_returns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_portfolio_returns()
+    result = simulate_portfolio_returns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_portfolio_returns_edge_cases():
     """Test simulate_portfolio_returns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_portfolio_returns()
+    result = simulate_portfolio_returns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -376,26 +376,26 @@ def test_simulate_portfolio_returns_property_idempotent(self, bets, sizes, n_sim
 def test_calculate_base_kelly_basic():
     """Test calculate_base_kelly: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_base_kelly()
+    result = calculate_base_kelly()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_base_kelly_edge_cases():
     """Test calculate_base_kelly: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_base_kelly()
+    result = calculate_base_kelly()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -420,26 +420,26 @@ def test_calculate_base_kelly_property_idempotent(self, self, bet):
 def test_optimize_portfolio_basic():
     """Test optimize_portfolio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_portfolio_edge_cases():
     """Test optimize_portfolio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -464,26 +464,26 @@ def test_optimize_portfolio_property_idempotent(self, self, bets, bankroll, corr
 def test_adjust_for_regime_basic():
     """Test adjust_for_regime: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_for_regime()
+    result = adjust_for_regime()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_for_regime_edge_cases():
     """Test adjust_for_regime: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_for_regime()
+    result = adjust_for_regime()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -508,26 +508,26 @@ def test_adjust_for_regime_property_idempotent(self, self, base_size, volatility
 def test_generate_sizing_report_basic():
     """Test generate_sizing_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_sizing_report()
+    result = generate_sizing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_sizing_report_edge_cases():
     """Test generate_sizing_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_sizing_report()
+    result = generate_sizing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -552,26 +552,26 @@ def test_generate_sizing_report_property_idempotent(self, self, bets, portfolio_
 def test_objective_basic():
     """Test objective: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = objective()
+    result = objective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_objective_edge_cases():
     """Test objective: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = objective()
+    result = objective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -596,26 +596,26 @@ def test_objective_property_idempotent(self, sizes):
 def test_cvar_constraint_fn_basic():
     """Test cvar_constraint_fn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cvar_constraint_fn()
+    result = cvar_constraint_fn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cvar_constraint_fn_edge_cases():
     """Test cvar_constraint_fn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cvar_constraint_fn()
+    result = cvar_constraint_fn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

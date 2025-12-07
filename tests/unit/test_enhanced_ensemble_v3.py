@@ -15,26 +15,26 @@ import pytest
 def test_compare_enhancements_basic():
     """Test compare_enhancements: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_enhancements()
+    result = compare_enhancements()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_enhancements_edge_cases():
     """Test compare_enhancements: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_enhancements()
+    result = compare_enhancements()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_compare_enhancements_error_handling():
 def test_load_bayesian_predictions_basic():
     """Test load_bayesian_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_bayesian_predictions_edge_cases():
     """Test load_bayesian_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_bayesian_predictions_property_idempotent(self, self, model_version
 def test_load_bnn_model_basic():
     """Test load_bnn_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_bnn_model()
+    result = load_bnn_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_bnn_model_edge_cases():
     """Test load_bnn_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_bnn_model()
+    result = load_bnn_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_bnn_model_property_idempotent(self, self, model_path, metadata_pat
 def test_get_4way_ensemble_predictions_basic():
     """Test get_4way_ensemble_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_4way_ensemble_predictions()
+    result = get_4way_ensemble_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_4way_ensemble_predictions_edge_cases():
     """Test get_4way_ensemble_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_4way_ensemble_predictions()
+    result = get_4way_ensemble_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_4way_ensemble_predictions_property_idempotent(self, self, bayesian_
 def test_generate_recommendations_basic():
     """Test generate_recommendations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_recommendations()
+    result = generate_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_recommendations_edge_cases():
     """Test generate_recommendations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_recommendations()
+    result = generate_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_generate_recommendations_property_idempotent(self, self, week, season, 
 def test_train_bnn_basic():
     """Test train_bnn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_bnn()
+    result = train_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_bnn_edge_cases():
     """Test train_bnn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_bnn()
+    result = train_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_train_bnn_property_idempotent(self, self, X_train, y_train, save_path):
 def test_backtest_basic():
     """Test backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_backtest_edge_cases():
     """Test backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

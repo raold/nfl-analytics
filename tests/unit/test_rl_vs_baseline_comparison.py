@@ -15,26 +15,26 @@ import pytest
 def test_get_db_connection_basic():
     """Test get_db_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_db_connection()
+    result = get_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_db_connection_edge_cases():
     """Test get_db_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_db_connection()
+    result = get_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_db_connection_error_handling():
 def test_calculate_sharpe_basic():
     """Test calculate_sharpe: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_sharpe_edge_cases():
     """Test calculate_sharpe: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_calculate_sharpe_property_idempotent(self, returns, active_weeks, total
 def test_calculate_max_drawdown_basic():
     """Test calculate_max_drawdown: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_max_drawdown()
+    result = calculate_max_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_max_drawdown_edge_cases():
     """Test calculate_max_drawdown: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_max_drawdown()
+    result = calculate_max_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_max_drawdown_property_idempotent(self, cumulative_returns):
 def test_kelly_lcb_baseline_basic():
     """Test kelly_lcb_baseline: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_lcb_baseline()
+    result = kelly_lcb_baseline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_lcb_baseline_edge_cases():
     """Test kelly_lcb_baseline: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_lcb_baseline()
+    result = kelly_lcb_baseline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_kelly_lcb_baseline_property_idempotent(self, conn, season_start, season
 def test_rl_policy_simulation_basic():
     """Test rl_policy_simulation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rl_policy_simulation()
+    result = rl_policy_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rl_policy_simulation_edge_cases():
     """Test rl_policy_simulation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rl_policy_simulation()
+    result = rl_policy_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_rl_policy_simulation_property_idempotent(self, conn, season_start, seas
 def test_generate_comparison_table_basic():
     """Test generate_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_comparison_table()
+    result = generate_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_comparison_table_edge_cases():
     """Test generate_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_comparison_table()
+    result = generate_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_generate_comparison_table_property_idempotent(self, season_start, seaso
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

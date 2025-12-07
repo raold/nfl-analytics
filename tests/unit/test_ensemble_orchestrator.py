@@ -15,26 +15,26 @@ import pytest
 def test_train_model_basic():
     """Test train_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_model_edge_cases():
     """Test train_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_model_property_idempotent(self, self, model_type, training_window
 def test_train_all_models_basic():
     """Test train_all_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_all_models()
+    result = train_all_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_all_models_edge_cases():
     """Test train_all_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_all_models()
+    result = train_all_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_train_all_models_property_idempotent(self, self, training_window, paral
 def test_optimize_weights_basic():
     """Test optimize_weights: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_weights()
+    result = optimize_weights()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_weights_edge_cases():
     """Test optimize_weights: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_weights()
+    result = optimize_weights()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_optimize_weights_property_idempotent(self, self, predictions, actuals, 
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_predict_property_idempotent(self, self, features, use_weights):
 def test_get_performance_metrics_basic():
     """Test get_performance_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_performance_metrics()
+    result = get_performance_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_performance_metrics_edge_cases():
     """Test get_performance_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_performance_metrics()
+    result = get_performance_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,39 +222,39 @@ def test_get_performance_metrics_error_handling():
 
 
 @given(st.integers())
-def test_get_performance_metrics_property_idempotent(self, self):
+def test_get_performance_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_performance_metrics(self)
+    result = get_performance_metrics(val)
 
     # Assert property
-    assert get_performance_metrics(self) == result, "idempotent violated"
+    assert get_performance_metrics(val) == result, "idempotent violated"
 
 
 
 def test_save_state_basic():
     """Test save_state: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_state()
+    result = save_state()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_state_edge_cases():
     """Test save_state: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_state()
+    result = save_state()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

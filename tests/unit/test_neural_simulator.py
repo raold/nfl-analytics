@@ -15,26 +15,26 @@ import pytest
 def test_train_outcome_model_basic():
     """Test train_outcome_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_outcome_model()
+    result = train_outcome_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_outcome_model_edge_cases():
     """Test train_outcome_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_outcome_model()
+    result = train_outcome_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_outcome_model_property_idempotent(self, train_df, feature_cols, e
 def test_load_outcome_model_basic():
     """Test load_outcome_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_outcome_model()
+    result = load_outcome_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_outcome_model_edge_cases():
     """Test load_outcome_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_outcome_model()
+    result = load_outcome_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_outcome_model_property_idempotent(self, model_path, device):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_main_error_handling():
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_forward_property_idempotent(self, self, x):
 def test_simulate_game_basic():
     """Test simulate_game: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_game()
+    result = simulate_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_game_edge_cases():
     """Test simulate_game: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_game()
+    result = simulate_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_simulate_game_property_idempotent(self, self, features, spread, n_simul
 def test_simulate_season_basic():
     """Test simulate_season: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_season()
+    result = simulate_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_season_edge_cases():
     """Test simulate_season: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_season()
+    result = simulate_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_simulate_season_property_idempotent(self, self, games_df, strategy_acti
 def test_stress_test_basic():
     """Test stress_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = stress_test()
+    result = stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_stress_test_edge_cases():
     """Test stress_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = stress_test()
+    result = stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

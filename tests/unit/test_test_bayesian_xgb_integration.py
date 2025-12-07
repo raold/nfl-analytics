@@ -15,26 +15,26 @@ import pytest
 def test_load_bayesian_predictions_basic():
     """Test load_bayesian_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_bayesian_predictions_edge_cases():
     """Test load_bayesian_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_bayesian_predictions()
+    result = load_bayesian_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_bayesian_predictions_property_idempotent(self, conn, season, week,
 def test_create_mock_features_basic():
     """Test create_mock_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_mock_features()
+    result = create_mock_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_mock_features_edge_cases():
     """Test create_mock_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_mock_features()
+    result = create_mock_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_create_mock_features_property_idempotent(self, n_samples):
 def test_test_inverse_variance_weighting_basic():
     """Test test_inverse_variance_weighting: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_inverse_variance_weighting()
+    result = test_inverse_variance_weighting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_inverse_variance_weighting_edge_cases():
     """Test test_inverse_variance_weighting: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_inverse_variance_weighting()
+    result = test_inverse_variance_weighting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_test_inverse_variance_weighting_error_handling():
 def test_test_integration_with_mock_data_basic():
     """Test test_integration_with_mock_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_integration_with_mock_data()
+    result = test_integration_with_mock_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_integration_with_mock_data_edge_cases():
     """Test test_integration_with_mock_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_integration_with_mock_data()
+    result = test_integration_with_mock_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -169,26 +169,26 @@ def test_test_integration_with_mock_data_error_handling():
 def test_test_database_predictions_basic():
     """Test test_database_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_database_predictions()
+    result = test_database_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_database_predictions_edge_cases():
     """Test test_database_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_database_predictions()
+    result = test_database_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -202,26 +202,26 @@ def test_test_database_predictions_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

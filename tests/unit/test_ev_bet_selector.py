@@ -15,26 +15,26 @@ import pytest
 def test_calculate_edge_basic():
     """Test calculate_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_edge()
+    result = calculate_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_edge_edge_cases():
     """Test calculate_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_edge()
+    result = calculate_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_calculate_edge_property_idempotent(self, model_prob, market_odds, hold_
 def test_calculate_ev_basic():
     """Test calculate_ev: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_ev()
+    result = calculate_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_ev_edge_cases():
     """Test calculate_ev: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_ev()
+    result = calculate_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_ev_property_idempotent(self, model_prob, market_odds, bet_amo
 def test_load_clv_history_basic():
     """Test load_clv_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_clv_history()
+    result = load_clv_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_clv_history_edge_cases():
     """Test load_clv_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_clv_history()
+    result = load_clv_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_load_clv_history_property_idempotent(self, clv_file):
 def test_get_clv_percentile_basic():
     """Test get_clv_percentile: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_clv_percentile()
+    result = get_clv_percentile()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_clv_percentile_edge_cases():
     """Test get_clv_percentile: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_clv_percentile()
+    result = get_clv_percentile()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_get_clv_percentile_property_idempotent(self, model_prob, market_prob, c
 def test_get_clv_roi_by_decile_basic():
     """Test get_clv_roi_by_decile: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_clv_roi_by_decile()
+    result = get_clv_roi_by_decile()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_clv_roi_by_decile_edge_cases():
     """Test get_clv_roi_by_decile: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_clv_roi_by_decile()
+    result = get_clv_roi_by_decile()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_get_clv_roi_by_decile_property_idempotent(self, clv_history):
 def test_calculate_line_velocity_basic():
     """Test calculate_line_velocity: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_line_velocity()
+    result = calculate_line_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_line_velocity_edge_cases():
     """Test calculate_line_velocity: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_line_velocity()
+    result = calculate_line_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_calculate_line_velocity_property_idempotent(self, line_history):
 def test_calculate_cross_book_consensus_basic():
     """Test calculate_cross_book_consensus: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_cross_book_consensus()
+    result = calculate_cross_book_consensus()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_cross_book_consensus_edge_cases():
     """Test calculate_cross_book_consensus: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_cross_book_consensus()
+    result = calculate_cross_book_consensus()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_calculate_cross_book_consensus_property_idempotent(self, book_odds):
 def test_find_reduced_juice_windows_basic():
     """Test find_reduced_juice_windows: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = find_reduced_juice_windows()
+    result = find_reduced_juice_windows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_find_reduced_juice_windows_edge_cases():
     """Test find_reduced_juice_windows: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = find_reduced_juice_windows()
+    result = find_reduced_juice_windows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_find_reduced_juice_windows_property_idempotent(self, book, current_time
 def test_backtest_selector_basic():
     """Test backtest_selector: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = backtest_selector()
+    result = backtest_selector()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_backtest_selector_edge_cases():
     """Test backtest_selector: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = backtest_selector()
+    result = backtest_selector()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_backtest_selector_property_idempotent(self, predictions_file, results_f
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -477,26 +477,26 @@ def test_main_error_handling():
 def test_load_clv_history_basic():
     """Test load_clv_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_clv_history()
+    result = load_clv_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_clv_history_edge_cases():
     """Test load_clv_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_clv_history()
+    result = load_clv_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -521,26 +521,26 @@ def test_load_clv_history_property_idempotent(self, self, clv_file):
 def test_should_bet_basic():
     """Test should_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = should_bet()
+    result = should_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_should_bet_edge_cases():
     """Test should_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = should_bet()
+    result = should_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -565,26 +565,26 @@ def test_should_bet_property_idempotent(self, self, model_prob, market_odds, opp
 def test_select_bets_basic():
     """Test select_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_bets()
+    result = select_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_bets_edge_cases():
     """Test select_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_bets()
+    result = select_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

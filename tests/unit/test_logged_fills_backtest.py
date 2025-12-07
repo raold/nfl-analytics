@@ -15,26 +15,26 @@ import pytest
 def test_create_synthetic_policies_basic():
     """Test create_synthetic_policies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_synthetic_policies()
+    result = create_synthetic_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_synthetic_policies_edge_cases():
     """Test create_synthetic_policies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_synthetic_policies()
+    result = create_synthetic_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_create_synthetic_policies_property_idempotent(self, dataset):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_calculate_fill_probability_basic():
     """Test calculate_fill_probability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_fill_probability()
+    result = calculate_fill_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_fill_probability_edge_cases():
     """Test calculate_fill_probability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_fill_probability()
+    result = calculate_fill_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_fill_probability_property_idempotent(self, self, edge, bet_si
 def test_simulate_fills_basic():
     """Test simulate_fills: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_fills()
+    result = simulate_fills()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_fills_edge_cases():
     """Test simulate_fills: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_fills()
+    result = simulate_fills()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_simulate_fills_property_idempotent(self, self, actions, bet_sizes, mode
 def test_evaluate_policy_basic():
     """Test evaluate_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_policy()
+    result = evaluate_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_policy_edge_cases():
     """Test evaluate_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_policy()
+    result = evaluate_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_evaluate_policy_property_idempotent(self, self, policy_name, actions, b
 def test_compare_policies_basic():
     """Test compare_policies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_policies()
+    result = compare_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_policies_edge_cases():
     """Test compare_policies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_policies()
+    result = compare_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_compare_policies_property_idempotent(self, self, policies, n_simulation
 def test_generate_comparison_table_basic():
     """Test generate_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_comparison_table()
+    result = generate_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_comparison_table_edge_cases():
     """Test generate_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_comparison_table()
+    result = generate_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_generate_comparison_table_property_idempotent(self, self, comparison_df
 def test_generate_utilization_table_basic():
     """Test generate_utilization_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_utilization_table()
+    result = generate_utilization_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_utilization_table_edge_cases():
     """Test generate_utilization_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_utilization_table()
+    result = generate_utilization_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

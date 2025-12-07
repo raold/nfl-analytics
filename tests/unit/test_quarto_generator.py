@@ -15,26 +15,26 @@ import pytest
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_test_error_handling():
 def test_create_statistical_report_basic():
     """Test create_statistical_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_statistical_report()
+    result = create_statistical_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_statistical_report_edge_cases():
     """Test create_statistical_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_statistical_report()
+    result = create_statistical_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_create_statistical_report_property_idempotent(self, self, title, author
 def test_create_ab_test_report_basic():
     """Test create_ab_test_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_ab_test_report()
+    result = create_ab_test_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_ab_test_report_edge_cases():
     """Test create_ab_test_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_ab_test_report()
+    result = create_ab_test_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_create_ab_test_report_property_idempotent(self, self, test_results, tes
 def test_create_power_analysis_report_basic():
     """Test create_power_analysis_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_power_analysis_report()
+    result = create_power_analysis_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_power_analysis_report_edge_cases():
     """Test create_power_analysis_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_power_analysis_report()
+    result = create_power_analysis_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_create_power_analysis_report_property_idempotent(self, self, power_resu
 def test_render_document_basic():
     """Test render_document: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = render_document()
+    result = render_document()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_render_document_edge_cases():
     """Test render_document: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = render_document()
+    result = render_document()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_render_document_property_idempotent(self, self, doc, filename, render):
 def test_create_latex_table_basic():
     """Test create_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_latex_table()
+    result = create_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_latex_table_edge_cases():
     """Test create_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_latex_table()
+    result = create_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

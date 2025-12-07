@@ -15,26 +15,26 @@ import pytest
 def test_estimate_game_correlation_basic():
     """Test estimate_game_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_game_correlation()
+    result = estimate_game_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_game_correlation_edge_cases():
     """Test estimate_game_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_game_correlation()
+    result = estimate_game_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_estimate_game_correlation_property_idempotent(self, games_df):
 def test_backtest_parlay_pricing_basic():
     """Test backtest_parlay_pricing: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = backtest_parlay_pricing()
+    result = backtest_parlay_pricing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_backtest_parlay_pricing_edge_cases():
     """Test backtest_parlay_pricing: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = backtest_parlay_pricing()
+    result = backtest_parlay_pricing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_backtest_parlay_pricing_property_idempotent(self, games_df, model_probs
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_main_error_handling():
 def test_fit_correlation_basic():
     """Test fit_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_correlation()
+    result = fit_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_correlation_edge_cases():
     """Test fit_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_correlation()
+    result = fit_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_fit_correlation_property_idempotent(self, self, outcomes, features):
 def test_simulate_parlay_basic():
     """Test simulate_parlay: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_parlay()
+    result = simulate_parlay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_parlay_edge_cases():
     """Test simulate_parlay: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_parlay()
+    result = simulate_parlay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_simulate_parlay_property_idempotent(self, self, marginal_probs, correla
 def test_price_parlay_basic():
     """Test price_parlay: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = price_parlay()
+    result = price_parlay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_price_parlay_edge_cases():
     """Test price_parlay: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = price_parlay()
+    result = price_parlay()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_price_parlay_property_idempotent(self, self, marginal_probs, correlatio
 def test_price_teaser_basic():
     """Test price_teaser: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = price_teaser()
+    result = price_teaser()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_price_teaser_edge_cases():
     """Test price_teaser: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = price_teaser()
+    result = price_teaser()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

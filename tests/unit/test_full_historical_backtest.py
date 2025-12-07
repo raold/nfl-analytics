@@ -15,26 +15,26 @@ import pytest
 def test_kelly_criterion_basic():
     """Test kelly_criterion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_criterion()
+    result = kelly_criterion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_kelly_criterion_property_idempotent(self, p_win, odds, fraction):
 def test_simulate_betting_basic():
     """Test simulate_betting: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_betting()
+    result = simulate_betting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_betting_edge_cases():
     """Test simulate_betting: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_betting()
+    result = simulate_betting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_simulate_betting_property_idempotent(self, predictions, actuals, spread
 def test_calculate_max_drawdown_basic():
     """Test calculate_max_drawdown: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_max_drawdown()
+    result = calculate_max_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_max_drawdown_edge_cases():
     """Test calculate_max_drawdown: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_max_drawdown()
+    result = calculate_max_drawdown()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_calculate_max_drawdown_property_idempotent(self, history):
 def test_calculate_sharpe_basic():
     """Test calculate_sharpe: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_sharpe_edge_cases():
     """Test calculate_sharpe: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

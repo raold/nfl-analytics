@@ -15,26 +15,26 @@ import pytest
 def test_estimate_basic():
     """Test estimate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate()
+    result = estimate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_edge_cases():
     """Test estimate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate()
+    result = estimate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_estimate_property_idempotent(self, self, df, outcome, treatment, unit_f
 def test_parallel_trends_test_basic():
     """Test parallel_trends_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parallel_trends_test()
+    result = parallel_trends_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parallel_trends_test_edge_cases():
     """Test parallel_trends_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parallel_trends_test()
+    result = parallel_trends_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

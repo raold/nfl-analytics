@@ -14,7 +14,7 @@ Keep your PostgreSQL database synchronized across Mac, Linux, and Windows machin
 | User | `dro` |
 | Password | `sicillionbillions` |
 | Port | `5544` (host) → `5432` (container) |
-| Image | `timescale/timescaledb:latest-pg16` |
+| Image | `timescale/timescaledb:latest-pg17` |
 | Size | ~853 MB |
 | Data Dir | `./pgdata` (mounted volume) |
 

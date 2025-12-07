@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_results_basic():
     """Test load_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_results()
+    result = load_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_results_edge_cases():
     """Test load_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_results()
+    result = load_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_load_results_error_handling():
 
 
 @given(st.integers())
-def test_load_results_property_idempotent(self, self):
+def test_load_results_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_results(self)
+    result = load_results(val)
 
     # Assert property
-    assert load_results(self) == result, "idempotent violated"
+    assert load_results(val) == result, "idempotent violated"
 
 
 
 def test_create_summary_table_basic():
     """Test create_summary_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_summary_table()
+    result = create_summary_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_summary_table_edge_cases():
     """Test create_summary_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_summary_table()
+    result = create_summary_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_create_summary_table_error_handling():
 
 
 @given(st.integers())
-def test_create_summary_table_property_idempotent(self, self):
+def test_create_summary_table_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_summary_table(self)
+    result = create_summary_table(val)
 
     # Assert property
-    assert create_summary_table(self) == result, "idempotent violated"
+    assert create_summary_table(val) == result, "idempotent violated"
 
 
 
 def test_print_summary_basic():
     """Test print_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_print_summary_error_handling():
 
 
 @given(st.integers())
-def test_print_summary_property_idempotent(self, self):
+def test_print_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = print_summary(self)
+    result = print_summary(val)
 
     # Assert property
-    assert print_summary(self) == result, "idempotent violated"
+    assert print_summary(val) == result, "idempotent violated"
 
 
 
 def test_create_visualization_basic():
     """Test create_visualization: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_visualization()
+    result = create_visualization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_visualization_edge_cases():
     """Test create_visualization: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_visualization()
+    result = create_visualization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_create_visualization_property_idempotent(self, self, output_path):
 def test_save_latex_table_basic():
     """Test save_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_latex_table()
+    result = save_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_latex_table_edge_cases():
     """Test save_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_latex_table()
+    result = save_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

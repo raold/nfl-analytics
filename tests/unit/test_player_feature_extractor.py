@@ -15,26 +15,26 @@ import pytest
 def test_extract_features_basic():
     """Test extract_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_features()
+    result = extract_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_features_edge_cases():
     """Test extract_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_features()
+    result = extract_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

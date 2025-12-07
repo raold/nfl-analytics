@@ -15,26 +15,26 @@ import pytest
 def test_build_temporal_graph_basic():
     """Test build_temporal_graph: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_temporal_graph()
+    result = build_temporal_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_temporal_graph_edge_cases():
     """Test build_temporal_graph: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_temporal_graph()
+    result = build_temporal_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -60,12 +60,12 @@ def test_build_temporal_graph_no_temporal_leakage():
     """Ensure build_temporal_graph doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -79,26 +79,26 @@ def test_build_temporal_graph_no_temporal_leakage():
 def test_train_gnn_ratings_basic():
     """Test train_gnn_ratings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_gnn_ratings()
+    result = train_gnn_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_gnn_ratings_edge_cases():
     """Test train_gnn_ratings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_gnn_ratings()
+    result = train_gnn_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,26 +123,26 @@ def test_train_gnn_ratings_property_idempotent(self, train_df, val_df, embedding
 def test_extract_gnn_features_basic():
     """Test extract_gnn_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_gnn_features()
+    result = extract_gnn_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_gnn_features_edge_cases():
     """Test extract_gnn_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_gnn_features()
+    result = extract_gnn_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,26 +167,26 @@ def test_extract_gnn_features_property_idempotent(self, model, team_to_id, games
 def test_evaluate_gnn_features_basic():
     """Test evaluate_gnn_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_gnn_features()
+    result = evaluate_gnn_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_gnn_features_edge_cases():
     """Test evaluate_gnn_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_gnn_features()
+    result = evaluate_gnn_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,26 +211,26 @@ def test_evaluate_gnn_features_property_idempotent(self, features_df, test_seaso
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_main_error_handling():
 def test_message_pass_basic():
     """Test message_pass: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = message_pass()
+    result = message_pass()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_message_pass_edge_cases():
     """Test message_pass: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = message_pass()
+    result = message_pass()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_message_pass_property_idempotent(self, self, team_embeds, adjacency):
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,26 +332,26 @@ def test_forward_property_idempotent(self, self, home_ids, away_ids, adjacency):
 def test_get_team_strength_basic():
     """Test get_team_strength: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_team_strength()
+    result = get_team_strength()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_team_strength_edge_cases():
     """Test get_team_strength: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_team_strength()
+    result = get_team_strength()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

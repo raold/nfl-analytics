@@ -15,26 +15,26 @@ import pytest
 def test_load_rushing_data_with_features_basic():
     """Test load_rushing_data_with_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_rushing_data_with_features()
+    result = load_rushing_data_with_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_rushing_data_with_features_edge_cases():
     """Test load_rushing_data_with_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_rushing_data_with_features()
+    result = load_rushing_data_with_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_rushing_data_with_features_property_idempotent(self, start_season,
 def test_train_bnn_basic():
     """Test train_bnn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_bnn()
+    result = train_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_bnn_edge_cases():
     """Test train_bnn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_bnn()
+    result = train_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_train_bnn_property_idempotent(self, X_train, y_train, player_idx_train,
 def test_run_optimization_basic():
     """Test run_optimization: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_optimization()
+    result = run_optimization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_optimization_edge_cases():
     """Test run_optimization: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_optimization()
+    result = run_optimization()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_run_optimization_property_idempotent(self, n_trials, timeout, study_nam
 def test_save_results_basic():
     """Test save_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_save_results_property_idempotent(self, study):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

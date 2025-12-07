@@ -15,26 +15,26 @@ import pytest
 def test_calculate_implied_odds_basic():
     """Test calculate_implied_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_implied_odds()
+    result = calculate_implied_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_implied_odds_edge_cases():
     """Test calculate_implied_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_implied_odds()
+    result = calculate_implied_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_calculate_implied_odds_property_idempotent(self, win_prob, vig_pct):
 def test_simulate_bet_outcome_basic():
     """Test simulate_bet_outcome: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_bet_outcome()
+    result = simulate_bet_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_bet_outcome_edge_cases():
     """Test simulate_bet_outcome: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_bet_outcome()
+    result = simulate_bet_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_simulate_bet_outcome_property_idempotent(self, win_prob, actual_won, st
 def test_load_test_predictions_basic():
     """Test load_test_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_test_predictions()
+    result = load_test_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_test_predictions_edge_cases():
     """Test load_test_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_test_predictions()
+    result = load_test_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_load_test_predictions_property_idempotent(self, model_path, features_pa
 def test_run_exchange_simulation_basic():
     """Test run_exchange_simulation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_exchange_simulation()
+    result = run_exchange_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_exchange_simulation_edge_cases():
     """Test run_exchange_simulation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_exchange_simulation()
+    result = run_exchange_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_run_exchange_simulation_property_idempotent(self, predictions, vig_pct,
 def test_compare_vig_scenarios_basic():
     """Test compare_vig_scenarios: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_vig_scenarios()
+    result = compare_vig_scenarios()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_vig_scenarios_edge_cases():
     """Test compare_vig_scenarios: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_vig_scenarios()
+    result = compare_vig_scenarios()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_compare_vig_scenarios_property_idempotent(self, predictions, vig_scenar
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

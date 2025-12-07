@@ -15,26 +15,26 @@ import pytest
 def test_snis_basic():
     """Test snis: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = snis()
+    result = snis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_snis_edge_cases():
     """Test snis: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = snis()
+    result = snis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_snis_property_idempotent(self, df, clip, shrink):
 def test_dr_basic():
     """Test dr: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = dr()
+    result = dr()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_dr_edge_cases():
     """Test dr: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = dr()
+    result = dr()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

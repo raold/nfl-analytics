@@ -15,26 +15,26 @@ import pytest
 def test_generate_slippage_table_basic():
     """Test generate_slippage_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_slippage_table()
+    result = generate_slippage_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_slippage_table_edge_cases():
     """Test generate_slippage_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_slippage_table()
+    result = generate_slippage_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_generate_slippage_table_error_handling():
 def test_generate_acceptance_test_results_basic():
     """Test generate_acceptance_test_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_acceptance_test_results()
+    result = generate_acceptance_test_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_acceptance_test_results_edge_cases():
     """Test generate_acceptance_test_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_acceptance_test_results()
+    result = generate_acceptance_test_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_generate_acceptance_test_results_error_handling():
 def test_generate_convergence_diagnostics_basic():
     """Test generate_convergence_diagnostics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_convergence_diagnostics()
+    result = generate_convergence_diagnostics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_convergence_diagnostics_edge_cases():
     """Test generate_convergence_diagnostics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_convergence_diagnostics()
+    result = generate_convergence_diagnostics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_fit_fill_basic():
     """Test fit_fill: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_fill()
+    result = fit_fill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_fill_edge_cases():
     """Test fit_fill: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_fill()
+    result = fit_fill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fit_fill_property_idempotent(self, rows):
 def test_prob_fill_basic():
     """Test prob_fill: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prob_fill()
+    result = prob_fill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prob_fill_edge_cases():
     """Test prob_fill: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prob_fill()
+    result = prob_fill()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_simulate_parametric_games_basic():
     """Test simulate_parametric_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_parametric_games()
+    result = simulate_parametric_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_parametric_games_edge_cases():
     """Test simulate_parametric_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_parametric_games()
+    result = simulate_parametric_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_simulate_parametric_games_property_idempotent(self, mu_home, mu_away, n
 def test_compare_distributions_basic():
     """Test compare_distributions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_distributions()
+    result = compare_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_distributions_edge_cases():
     """Test compare_distributions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_distributions()
+    result = compare_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_compare_distributions_property_idempotent(self, cvae_model, conditions)
 def test_demonstrate_complex_derivatives_basic():
     """Test demonstrate_complex_derivatives: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demonstrate_complex_derivatives()
+    result = demonstrate_complex_derivatives()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demonstrate_complex_derivatives_edge_cases():
     """Test demonstrate_complex_derivatives: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demonstrate_complex_derivatives()
+    result = demonstrate_complex_derivatives()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_demonstrate_complex_derivatives_property_idempotent(self, cvae_model, c
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

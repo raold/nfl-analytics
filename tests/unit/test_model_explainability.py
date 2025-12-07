@@ -15,26 +15,26 @@ import pytest
 def test_select_features_basic():
     """Test select_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_features()
+    result = select_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_features_edge_cases():
     """Test select_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_features()
+    result = select_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_select_features_property_idempotent(self, df, feature_list):
 def test_train_logistic_regression_basic():
     """Test train_logistic_regression: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_logistic_regression()
+    result = train_logistic_regression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_logistic_regression_edge_cases():
     """Test train_logistic_regression: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_logistic_regression()
+    result = train_logistic_regression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_train_logistic_regression_property_idempotent(self, X, y):
 def test_train_gradient_boosting_basic():
     """Test train_gradient_boosting: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_gradient_boosting()
+    result = train_gradient_boosting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_gradient_boosting_edge_cases():
     """Test train_gradient_boosting: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_gradient_boosting()
+    result = train_gradient_boosting()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_train_gradient_boosting_property_idempotent(self, X, y):
 def test_compute_permutation_importance_basic():
     """Test compute_permutation_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_permutation_importance()
+    result = compute_permutation_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_permutation_importance_edge_cases():
     """Test compute_permutation_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_permutation_importance()
+    result = compute_permutation_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_compute_permutation_importance_property_idempotent(self, model, X, y, n
 def test_compute_shap_values_tree_basic():
     """Test compute_shap_values_tree: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_shap_values_tree()
+    result = compute_shap_values_tree()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_shap_values_tree_edge_cases():
     """Test compute_shap_values_tree: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_shap_values_tree()
+    result = compute_shap_values_tree()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_compute_shap_values_tree_property_idempotent(self, model, X, y):
 def test_compute_shap_values_linear_basic():
     """Test compute_shap_values_linear: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_shap_values_linear()
+    result = compute_shap_values_linear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_shap_values_linear_edge_cases():
     """Test compute_shap_values_linear: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_shap_values_linear()
+    result = compute_shap_values_linear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_compute_shap_values_linear_property_idempotent(self, model, X):
 def test_global_feature_importance_basic():
     """Test global_feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = global_feature_importance()
+    result = global_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_global_feature_importance_edge_cases():
     """Test global_feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = global_feature_importance()
+    result = global_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_global_feature_importance_property_idempotent(self, shap_values, featur
 def test_generate_global_importance_table_basic():
     """Test generate_global_importance_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_global_importance_table()
+    result = generate_global_importance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_global_importance_table_edge_cases():
     """Test generate_global_importance_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_global_importance_table()
+    result = generate_global_importance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_generate_global_importance_table_property_idempotent(self, importance_d
 def test_generate_local_examples_table_basic():
     """Test generate_local_examples_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_local_examples_table()
+    result = generate_local_examples_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_local_examples_table_edge_cases():
     """Test generate_local_examples_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_local_examples_table()
+    result = generate_local_examples_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_generate_local_examples_table_property_idempotent(self, df, shap_values
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

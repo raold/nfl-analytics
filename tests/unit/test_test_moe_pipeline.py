@@ -15,26 +15,26 @@ import pytest
 def test_test_pipeline_with_historical_data_basic():
     """Test test_pipeline_with_historical_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_pipeline_with_historical_data()
+    result = test_pipeline_with_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_pipeline_with_historical_data_edge_cases():
     """Test test_pipeline_with_historical_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_pipeline_with_historical_data()
+    result = test_pipeline_with_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_test_pipeline_with_historical_data_error_handling():
 def test_compare_to_actual_results_basic():
     """Test compare_to_actual_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_to_actual_results()
+    result = compare_to_actual_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_to_actual_results_edge_cases():
     """Test compare_to_actual_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_to_actual_results()
+    result = compare_to_actual_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

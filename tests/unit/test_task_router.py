@@ -15,26 +15,26 @@ import pytest
 def test_get_task_score_basic():
     """Test get_task_score: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_task_score()
+    result = get_task_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_task_score_edge_cases():
     """Test get_task_score: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_task_score()
+    result = get_task_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_get_task_score_property_idempotent(self, task_type, task_config):
 def test_should_defer_task_basic():
     """Test should_defer_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = should_defer_task()
+    result = should_defer_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_should_defer_task_edge_cases():
     """Test should_defer_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = should_defer_task()
+    result = should_defer_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_should_defer_task_property_idempotent(self, task_type, task_config):
 def test_optimize_config_basic():
     """Test optimize_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_config()
+    result = optimize_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_config_edge_cases():
     """Test optimize_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_config()
+    result = optimize_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_optimize_config_property_idempotent(self, task_type, config):
 def test_score_machine_for_task_basic():
     """Test score_machine_for_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = score_machine_for_task()
+    result = score_machine_for_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_score_machine_for_task_edge_cases():
     """Test score_machine_for_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = score_machine_for_task()
+    result = score_machine_for_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_score_machine_for_task_property_idempotent(self, self, task_type, task_
 def test_should_defer_task_basic():
     """Test should_defer_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = should_defer_task()
+    result = should_defer_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_should_defer_task_edge_cases():
     """Test should_defer_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = should_defer_task()
+    result = should_defer_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_should_defer_task_property_idempotent(self, self, task_type, task_confi
 def test_optimize_task_config_basic():
     """Test optimize_task_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_task_config()
+    result = optimize_task_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_task_config_edge_cases():
     """Test optimize_task_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_task_config()
+    result = optimize_task_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_optimize_task_config_property_idempotent(self, self, task_type, base_co
 def test_get_routing_report_basic():
     """Test get_routing_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_routing_report()
+    result = get_routing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_routing_report_edge_cases():
     """Test get_routing_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_routing_report()
+    result = get_routing_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -310,11 +310,11 @@ def test_get_routing_report_error_handling():
 
 
 @given(st.integers())
-def test_get_routing_report_property_idempotent(self, self):
+def test_get_routing_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_routing_report(self)
+    result = get_routing_report(val)
 
     # Assert property
-    assert get_routing_report(self) == result, "idempotent violated"
+    assert get_routing_report(val) == result, "idempotent violated"
 

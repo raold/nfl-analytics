@@ -15,26 +15,26 @@ import pytest
 def test_fetch_team_game_features_basic():
     """Test fetch_team_game_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_team_game_features()
+    result = fetch_team_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_team_game_features_edge_cases():
     """Test fetch_team_game_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_team_game_features()
+    result = fetch_team_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fetch_team_game_features_property_idempotent(self, conn):
 def test_compute_team_history_enhanced_basic():
     """Test compute_team_history_enhanced: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_team_history_enhanced()
+    result = compute_team_history_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_team_history_enhanced_edge_cases():
     """Test compute_team_history_enhanced: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_team_history_enhanced()
+    result = compute_team_history_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_compute_team_history_enhanced_property_idempotent(self, df):
 def test_pivot_to_games_enhanced_basic():
     """Test pivot_to_games_enhanced: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pivot_to_games_enhanced()
+    result = pivot_to_games_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pivot_to_games_enhanced_edge_cases():
     """Test pivot_to_games_enhanced: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pivot_to_games_enhanced()
+    result = pivot_to_games_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_pivot_to_games_enhanced_property_idempotent(self, df):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

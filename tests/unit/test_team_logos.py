@@ -15,26 +15,26 @@ import pytest
 def test_get_team_logo_basic():
     """Test get_team_logo: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_team_logo()
+    result = get_team_logo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_team_logo_edge_cases():
     """Test get_team_logo: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_team_logo()
+    result = get_team_logo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_get_team_logo_property_idempotent(self, team):
 def test_get_team_color_basic():
     """Test get_team_color: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_team_color()
+    result = get_team_color()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_team_color_edge_cases():
     """Test get_team_color: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_team_color()
+    result = get_team_color()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_get_team_color_property_idempotent(self, team):
 def test_format_team_with_logo_basic():
     """Test format_team_with_logo: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_team_with_logo()
+    result = format_team_with_logo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_team_with_logo_edge_cases():
     """Test format_team_with_logo: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_team_with_logo()
+    result = format_team_with_logo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_format_team_with_logo_property_idempotent(self, team, include_color):
 def test_print_all_teams_basic():
     """Test print_all_teams: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_all_teams()
+    result = print_all_teams()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_all_teams_edge_cases():
     """Test print_all_teams: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_all_teams()
+    result = print_all_teams()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_print_all_teams_error_handling():
 def test_format_matchup_basic():
     """Test format_matchup: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_matchup()
+    result = format_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_matchup_edge_cases():
     """Test format_matchup: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_matchup()
+    result = format_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

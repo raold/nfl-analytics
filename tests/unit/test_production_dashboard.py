@@ -15,26 +15,26 @@ import pytest
 def test_get_performance_monitor_basic():
     """Test get_performance_monitor: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_performance_monitor()
+    result = get_performance_monitor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_performance_monitor_edge_cases():
     """Test get_performance_monitor: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_performance_monitor()
+    result = get_performance_monitor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_performance_monitor_error_handling():
 def test_get_stress_test_monitor_basic():
     """Test get_stress_test_monitor: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_stress_test_monitor()
+    result = get_stress_test_monitor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_stress_test_monitor_edge_cases():
     """Test get_stress_test_monitor: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_stress_test_monitor()
+    result = get_stress_test_monitor()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_get_stress_test_monitor_error_handling():
 def test_get_thompson_sampler_basic():
     """Test get_thompson_sampler: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_thompson_sampler()
+    result = get_thompson_sampler()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_thompson_sampler_edge_cases():
     """Test get_thompson_sampler: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_thompson_sampler()
+    result = get_thompson_sampler()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

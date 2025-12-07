@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_passing_plays_basic():
     """Test load_passing_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_passing_plays_edge_cases():
     """Test load_passing_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_passing_plays_property_idempotent(self, self, start_season, end_se
 def test_infer_coverage_scheme_basic():
     """Test infer_coverage_scheme: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = infer_coverage_scheme()
+    result = infer_coverage_scheme()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_infer_coverage_scheme_edge_cases():
     """Test infer_coverage_scheme: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = infer_coverage_scheme()
+    result = infer_coverage_scheme()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_infer_coverage_scheme_property_idempotent(self, self, plays):
 def test_calculate_team_coverage_metrics_basic():
     """Test calculate_team_coverage_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_team_coverage_metrics()
+    result = calculate_team_coverage_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_team_coverage_metrics_edge_cases():
     """Test calculate_team_coverage_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_team_coverage_metrics()
+    result = calculate_team_coverage_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_team_coverage_metrics_property_idempotent(self, self, plays):
 def test_calculate_overall_team_metrics_basic():
     """Test calculate_overall_team_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_overall_team_metrics()
+    result = calculate_overall_team_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_overall_team_metrics_edge_cases():
     """Test calculate_overall_team_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_overall_team_metrics()
+    result = calculate_overall_team_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_overall_team_metrics_property_idempotent(self, self, plays):
 def test_calculate_situational_coverage_quality_basic():
     """Test calculate_situational_coverage_quality: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_situational_coverage_quality()
+    result = calculate_situational_coverage_quality()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_situational_coverage_quality_edge_cases():
     """Test calculate_situational_coverage_quality: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_situational_coverage_quality()
+    result = calculate_situational_coverage_quality()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_situational_coverage_quality_property_idempotent(self, self, 
 def test_calculate_coverage_differential_basic():
     """Test calculate_coverage_differential: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_coverage_differential()
+    result = calculate_coverage_differential()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_coverage_differential_edge_cases():
     """Test calculate_coverage_differential: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_coverage_differential()
+    result = calculate_coverage_differential()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_calculate_coverage_differential_property_idempotent(self, self, coverag
 def test_add_rolling_averages_basic():
     """Test add_rolling_averages: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_averages_edge_cases():
     """Test add_rolling_averages: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_averages()
+    result = add_rolling_averages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_add_rolling_averages_property_idempotent(self, self, metrics, value_col
 def test_run_full_pipeline_basic():
     """Test run_full_pipeline: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_full_pipeline()
+    result = run_full_pipeline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_full_pipeline_edge_cases():
     """Test run_full_pipeline: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_full_pipeline()
+    result = run_full_pipeline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

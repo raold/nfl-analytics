@@ -15,26 +15,26 @@ import pytest
 def test_fit_gaussian_copula_basic():
     """Test fit_gaussian_copula: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_gaussian_copula()
+    result = fit_gaussian_copula()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_gaussian_copula_edge_cases():
     """Test fit_gaussian_copula: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_gaussian_copula()
+    result = fit_gaussian_copula()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fit_gaussian_copula_property_idempotent(self, u, v):
 def test_joint_success_prob_gaussian_basic():
     """Test joint_success_prob_gaussian: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = joint_success_prob_gaussian()
+    result = joint_success_prob_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_joint_success_prob_gaussian_edge_cases():
     """Test joint_success_prob_gaussian: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = joint_success_prob_gaussian()
+    result = joint_success_prob_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -104,12 +104,12 @@ def test_joint_success_prob_gaussian_no_temporal_leakage():
     """Ensure joint_success_prob_gaussian doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function

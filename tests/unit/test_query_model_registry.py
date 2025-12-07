@@ -15,26 +15,26 @@ import pytest
 def test_get_db_connection_basic():
     """Test get_db_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_db_connection()
+    result = get_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_db_connection_edge_cases():
     """Test get_db_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_db_connection()
+    result = get_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_db_connection_error_handling():
 def test_format_datetime_basic():
     """Test format_datetime: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_datetime()
+    result = format_datetime()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_datetime_edge_cases():
     """Test format_datetime: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_datetime()
+    result = format_datetime()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -93,12 +93,12 @@ def test_format_datetime_no_temporal_leakage():
     """Ensure format_datetime doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -112,26 +112,26 @@ def test_format_datetime_no_temporal_leakage():
 def test_format_duration_basic():
     """Test format_duration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_duration()
+    result = format_duration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_duration_edge_cases():
     """Test format_duration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_duration()
+    result = format_duration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -156,26 +156,26 @@ def test_format_duration_property_idempotent(self, seconds):
 def test_format_bytes_basic():
     """Test format_bytes: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_bytes()
+    result = format_bytes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_bytes_edge_cases():
     """Test format_bytes: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_bytes()
+    result = format_bytes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_format_bytes_property_idempotent(self, bytes_val):
 def test_cli_basic():
     """Test cli: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cli()
+    result = cli()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cli_edge_cases():
     """Test cli: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cli()
+    result = cli()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -233,26 +233,26 @@ def test_cli_error_handling():
 def test_list_basic():
     """Test list: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list()
+    result = list()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_edge_cases():
     """Test list: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list()
+    result = list()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -277,26 +277,26 @@ def test_list_property_idempotent(self, status, training_window, model_type, mod
 def test_search_basic():
     """Test search: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = search()
+    result = search()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_search_edge_cases():
     """Test search: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = search()
+    result = search()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -321,26 +321,26 @@ def test_search_property_idempotent(self, model_type, status, min_accuracy, max_
 def test_compare_basic():
     """Test compare: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare()
+    result = compare()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_edge_cases():
     """Test compare: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare()
+    result = compare()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -365,26 +365,26 @@ def test_compare_property_idempotent(self, model1, model2, show_diff_only):
 def test_leaderboard_basic():
     """Test leaderboard: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = leaderboard()
+    result = leaderboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_leaderboard_edge_cases():
     """Test leaderboard: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = leaderboard()
+    result = leaderboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -409,26 +409,26 @@ def test_leaderboard_property_idempotent(self, metric, stat_type, limit, output_
 def test_check_safe_delete_basic():
     """Test check_safe_delete: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_safe_delete()
+    result = check_safe_delete()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_safe_delete_edge_cases():
     """Test check_safe_delete: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_safe_delete()
+    result = check_safe_delete()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -453,26 +453,26 @@ def test_check_safe_delete_property_idempotent(self, model_name):
 def test_info_basic():
     """Test info: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = info()
+    result = info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_info_edge_cases():
     """Test info: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = info()
+    result = info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -497,26 +497,26 @@ def test_info_property_idempotent(self, model_name, show_training, show_metrics,
 def test_export_basic():
     """Test export: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = export()
+    result = export()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_export_edge_cases():
     """Test export: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = export()
+    result = export()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

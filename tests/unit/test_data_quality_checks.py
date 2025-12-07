@@ -15,26 +15,26 @@ import pytest
 def test_validate_all_basic():
     """Test validate_all: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_all()
+    result = validate_all()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_all_edge_cases():
     """Test validate_all: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_all()
+    result = validate_all()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -60,12 +60,12 @@ def test_validate_all_no_temporal_leakage():
     """Ensure validate_all doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function

@@ -15,26 +15,26 @@ import pytest
 def test_calculate_cumulative_roi_basic():
     """Test calculate_cumulative_roi: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_cumulative_roi()
+    result = calculate_cumulative_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_cumulative_roi_edge_cases():
     """Test calculate_cumulative_roi: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_cumulative_roi()
+    result = calculate_cumulative_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_calculate_cumulative_roi_error_handling():
 
 
 @given(st.integers())
-def test_calculate_cumulative_roi_property_idempotent(self, self):
+def test_calculate_cumulative_roi_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = calculate_cumulative_roi(self)
+    result = calculate_cumulative_roi(val)
 
     # Assert property
-    assert calculate_cumulative_roi(self) == result, "idempotent violated"
+    assert calculate_cumulative_roi(val) == result, "idempotent violated"
 
 
 
 def test_total_compute_cost_basic():
     """Test total_compute_cost: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = total_compute_cost()
+    result = total_compute_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_total_compute_cost_edge_cases():
     """Test total_compute_cost: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = total_compute_cost()
+    result = total_compute_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_total_compute_cost_error_handling():
 
 
 @given(st.integers())
-def test_total_compute_cost_property_idempotent(self, self):
+def test_total_compute_cost_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = total_compute_cost(self)
+    result = total_compute_cost(val)
 
     # Assert property
-    assert total_compute_cost(self) == result, "idempotent violated"
+    assert total_compute_cost(val) == result, "idempotent violated"
 
 
 
 def test_total_teraflop_hours_basic():
     """Test total_teraflop_hours: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = total_teraflop_hours()
+    result = total_teraflop_hours()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_total_teraflop_hours_edge_cases():
     """Test total_teraflop_hours: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = total_teraflop_hours()
+    result = total_teraflop_hours()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_total_teraflop_hours_property_idempotent(self, self, hardware_type):
 def test_total_kilowatt_hours_basic():
     """Test total_kilowatt_hours: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = total_kilowatt_hours()
+    result = total_kilowatt_hours()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_total_kilowatt_hours_edge_cases():
     """Test total_kilowatt_hours: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = total_kilowatt_hours()
+    result = total_kilowatt_hours()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_total_kilowatt_hours_property_idempotent(self, self, hardware_type):
 def test_total_electricity_cost_basic():
     """Test total_electricity_cost: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = total_electricity_cost()
+    result = total_electricity_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_total_electricity_cost_edge_cases():
     """Test total_electricity_cost: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = total_electricity_cost()
+    result = total_electricity_cost()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_total_electricity_cost_property_idempotent(self, self, hardware_type, r
 def test_success_rate_basic():
     """Test success_rate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = success_rate()
+    result = success_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_success_rate_edge_cases():
     """Test success_rate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = success_rate()
+    result = success_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,39 +266,39 @@ def test_success_rate_error_handling():
 
 
 @given(st.integers())
-def test_success_rate_property_idempotent(self, self):
+def test_success_rate_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = success_rate(self)
+    result = success_rate(val)
 
     # Assert property
-    assert success_rate(self) == result, "idempotent violated"
+    assert success_rate(val) == result, "idempotent violated"
 
 
 
 def test_record_task_completion_basic():
     """Test record_task_completion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_task_completion()
+    result = record_task_completion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_task_completion_edge_cases():
     """Test record_task_completion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_task_completion()
+    result = record_task_completion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_record_task_completion_property_idempotent(self, self, task_id, task_ty
 def test_record_task_failure_basic():
     """Test record_task_failure: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_task_failure()
+    result = record_task_failure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_task_failure_edge_cases():
     """Test record_task_failure: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_task_failure()
+    result = record_task_failure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_record_task_failure_property_idempotent(self, self, task_id, task_type,
 def test_get_current_metrics_basic():
     """Test get_current_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_current_metrics()
+    result = get_current_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_current_metrics_edge_cases():
     """Test get_current_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_current_metrics()
+    result = get_current_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -398,39 +398,39 @@ def test_get_current_metrics_error_handling():
 
 
 @given(st.integers())
-def test_get_current_metrics_property_idempotent(self, self):
+def test_get_current_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_current_metrics(self)
+    result = get_current_metrics(val)
 
     # Assert property
-    assert get_current_metrics(self) == result, "idempotent violated"
+    assert get_current_metrics(val) == result, "idempotent violated"
 
 
 
 def test_display_odometer_basic():
     """Test display_odometer: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = display_odometer()
+    result = display_odometer()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_display_odometer_edge_cases():
     """Test display_odometer: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = display_odometer()
+    result = display_odometer()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -455,26 +455,26 @@ def test_display_odometer_property_idempotent(self, self, hardware_type):
 def test_get_summary_stats_basic():
     """Test get_summary_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_summary_stats()
+    result = get_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_summary_stats_edge_cases():
     """Test get_summary_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_summary_stats()
+    result = get_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -486,39 +486,39 @@ def test_get_summary_stats_error_handling():
 
 
 @given(st.integers())
-def test_get_summary_stats_property_idempotent(self, self):
+def test_get_summary_stats_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_summary_stats(self)
+    result = get_summary_stats(val)
 
     # Assert property
-    assert get_summary_stats(self) == result, "idempotent violated"
+    assert get_summary_stats(val) == result, "idempotent violated"
 
 
 
 def test_integrate_with_redis_tasks_basic():
     """Test integrate_with_redis_tasks: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = integrate_with_redis_tasks()
+    result = integrate_with_redis_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_integrate_with_redis_tasks_edge_cases():
     """Test integrate_with_redis_tasks: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = integrate_with_redis_tasks()
+    result = integrate_with_redis_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -530,39 +530,39 @@ def test_integrate_with_redis_tasks_error_handling():
 
 
 @given(st.integers())
-def test_integrate_with_redis_tasks_property_idempotent(self, self):
+def test_integrate_with_redis_tasks_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = integrate_with_redis_tasks(self)
+    result = integrate_with_redis_tasks(val)
 
     # Assert property
-    assert integrate_with_redis_tasks(self) == result, "idempotent violated"
+    assert integrate_with_redis_tasks(val) == result, "idempotent violated"
 
 
 
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -574,11 +574,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

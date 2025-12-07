@@ -15,26 +15,26 @@ import pytest
 def test_check_and_resolve_conflicts_basic():
     """Test check_and_resolve_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_and_resolve_conflicts()
+    result = check_and_resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_and_resolve_conflicts_edge_cases():
     """Test check_and_resolve_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_and_resolve_conflicts()
+    result = check_and_resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_check_and_resolve_conflicts_property_idempotent(self, db_path):
 def test_detect_database_conflicts_basic():
     """Test detect_database_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_database_conflicts()
+    result = detect_database_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_database_conflicts_edge_cases():
     """Test detect_database_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_database_conflicts()
+    result = detect_database_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_detect_database_conflicts_property_idempotent(self, self, db_path):
 def test_analyze_database_conflicts_basic():
     """Test analyze_database_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_database_conflicts()
+    result = analyze_database_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_database_conflicts_edge_cases():
     """Test analyze_database_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_database_conflicts()
+    result = analyze_database_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_analyze_database_conflicts_property_idempotent(self, self, db_path, con
 def test_resolve_conflicts_basic():
     """Test resolve_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = resolve_conflicts()
+    result = resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_resolve_conflicts_edge_cases():
     """Test resolve_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = resolve_conflicts()
+    result = resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_resolve_conflicts_property_idempotent(self, self, db_path, strategy):
 def test_check_all_databases_basic():
     """Test check_all_databases: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_all_databases()
+    result = check_all_databases()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_all_databases_edge_cases():
     """Test check_all_databases: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_all_databases()
+    result = check_all_databases()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,11 +222,11 @@ def test_check_all_databases_error_handling():
 
 
 @given(st.integers())
-def test_check_all_databases_property_idempotent(self, self):
+def test_check_all_databases_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = check_all_databases(self)
+    result = check_all_databases(val)
 
     # Assert property
-    assert check_all_databases(self) == result, "idempotent violated"
+    assert check_all_databases(val) == result, "idempotent violated"
 

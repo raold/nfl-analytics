@@ -15,26 +15,26 @@ import pytest
 def test_brier_score_basic():
     """Test brier_score: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = brier_score()
+    result = brier_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_brier_score_edge_cases():
     """Test brier_score: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = brier_score()
+    result = brier_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_brier_score_property_idempotent(self, y_true, p_hat):
 def test_log_loss_basic():
     """Test log_loss: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_loss()
+    result = log_loss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_loss_edge_cases():
     """Test log_loss: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_loss()
+    result = log_loss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_log_loss_property_idempotent(self, y_true, p_hat, eps):
 def test_reliability_curve_basic():
     """Test reliability_curve: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reliability_curve()
+    result = reliability_curve()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reliability_curve_edge_cases():
     """Test reliability_curve: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reliability_curve()
+    result = reliability_curve()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_reliability_curve_property_idempotent(self, y_true, p_hat, bins):
 def test_expected_calibration_error_basic():
     """Test expected_calibration_error: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = expected_calibration_error()
+    result = expected_calibration_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_expected_calibration_error_edge_cases():
     """Test expected_calibration_error: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = expected_calibration_error()
+    result = expected_calibration_error()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

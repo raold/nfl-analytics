@@ -15,26 +15,26 @@ import pytest
 def test_example_usage_basic():
     """Test example_usage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = example_usage()
+    result = example_usage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_example_usage_edge_cases():
     """Test example_usage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = example_usage()
+    result = example_usage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_example_usage_error_handling():
 def test_get_weights_basic():
     """Test get_weights: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_weights()
+    result = get_weights()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_weights_edge_cases():
     """Test get_weights: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_weights()
+    result = get_weights()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

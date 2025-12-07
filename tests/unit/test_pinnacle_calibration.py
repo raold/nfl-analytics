@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_adjust_edge_threshold_basic():
     """Test adjust_edge_threshold: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_edge_threshold()
+    result = adjust_edge_threshold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_edge_threshold_edge_cases():
     """Test adjust_edge_threshold: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_edge_threshold()
+    result = adjust_edge_threshold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_adjust_edge_threshold_property_idempotent(self, self, standard_min_edge
 def test_adjust_kelly_fraction_basic():
     """Test adjust_kelly_fraction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_kelly_fraction()
+    result = adjust_kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_kelly_fraction_edge_cases():
     """Test adjust_kelly_fraction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_kelly_fraction()
+    result = adjust_kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_adjust_kelly_fraction_property_idempotent(self, self, standard_kelly, a
 def test_estimate_roi_improvement_basic():
     """Test estimate_roi_improvement: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_roi_improvement()
+    result = estimate_roi_improvement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_roi_improvement_edge_cases():
     """Test estimate_roi_improvement: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_roi_improvement()
+    result = estimate_roi_improvement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_estimate_roi_improvement_property_idempotent(self, self, current_roi, c
 def test_calibrate_bet_opportunities_basic():
     """Test calibrate_bet_opportunities: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calibrate_bet_opportunities()
+    result = calibrate_bet_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calibrate_bet_opportunities_edge_cases():
     """Test calibrate_bet_opportunities: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calibrate_bet_opportunities()
+    result = calibrate_bet_opportunities()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calibrate_bet_opportunities_property_idempotent(self, self, predictions
 def test_get_calibration_summary_basic():
     """Test get_calibration_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_calibration_summary()
+    result = get_calibration_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_calibration_summary_edge_cases():
     """Test get_calibration_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_calibration_summary()
+    result = get_calibration_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,11 +255,11 @@ def test_get_calibration_summary_error_handling():
 
 
 @given(st.integers())
-def test_get_calibration_summary_property_idempotent(self, self):
+def test_get_calibration_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_calibration_summary(self)
+    result = get_calibration_summary(val)
 
     # Assert property
-    assert get_calibration_summary(self) == result, "idempotent violated"
+    assert get_calibration_summary(val) == result, "idempotent violated"
 

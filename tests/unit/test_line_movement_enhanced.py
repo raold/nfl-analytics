@@ -15,26 +15,26 @@ import pytest
 def test_american_to_implied_prob_basic():
     """Test american_to_implied_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_to_implied_prob()
+    result = american_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_to_implied_prob_edge_cases():
     """Test american_to_implied_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_to_implied_prob()
+    result = american_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_american_to_implied_prob_property_idempotent(self, odds):
 def test_calculate_weighted_velocity_basic():
     """Test calculate_weighted_velocity: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_weighted_velocity()
+    result = calculate_weighted_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_weighted_velocity_edge_cases():
     """Test calculate_weighted_velocity: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_weighted_velocity()
+    result = calculate_weighted_velocity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_weighted_velocity_property_idempotent(self, snapshots, half_l
 def test_analyze_microstructure_basic():
     """Test analyze_microstructure: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_microstructure()
+    result = analyze_microstructure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_microstructure_edge_cases():
     """Test analyze_microstructure: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_microstructure()
+    result = analyze_microstructure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_analyze_microstructure_property_idempotent(self, snapshots_by_book):
 def test_detect_public_sharp_split_basic():
     """Test detect_public_sharp_split: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_public_sharp_split()
+    result = detect_public_sharp_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_public_sharp_split_edge_cases():
     """Test detect_public_sharp_split: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_public_sharp_split()
+    result = detect_public_sharp_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_detect_public_sharp_split_property_idempotent(self, snapshots, public_b
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -257,26 +257,26 @@ def test_main_error_handling():
 def test_hold_basic():
     """Test hold: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = hold()
+    result = hold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_hold_edge_cases():
     """Test hold: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = hold()
+    result = hold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,39 +288,39 @@ def test_hold_error_handling():
 
 
 @given(st.integers())
-def test_hold_property_idempotent(self, self):
+def test_hold_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = hold(self)
+    result = hold(val)
 
     # Assert property
-    assert hold(self) == result, "idempotent violated"
+    assert hold(val) == result, "idempotent violated"
 
 
 
 def test_is_reduced_juice_basic():
     """Test is_reduced_juice: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_reduced_juice()
+    result = is_reduced_juice()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_reduced_juice_edge_cases():
     """Test is_reduced_juice: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_reduced_juice()
+    result = is_reduced_juice()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,39 +332,39 @@ def test_is_reduced_juice_error_handling():
 
 
 @given(st.integers())
-def test_is_reduced_juice_property_idempotent(self, self):
+def test_is_reduced_juice_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = is_reduced_juice(self)
+    result = is_reduced_juice(val)
 
     # Assert property
-    assert is_reduced_juice(self) == result, "idempotent violated"
+    assert is_reduced_juice(val) == result, "idempotent violated"
 
 
 
 def test_predicts_further_movement_basic():
     """Test predicts_further_movement: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predicts_further_movement()
+    result = predicts_further_movement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predicts_further_movement_edge_cases():
     """Test predicts_further_movement: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predicts_further_movement()
+    result = predicts_further_movement()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -376,39 +376,39 @@ def test_predicts_further_movement_error_handling():
 
 
 @given(st.integers())
-def test_predicts_further_movement_property_idempotent(self, self):
+def test_predicts_further_movement_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = predicts_further_movement(self)
+    result = predicts_further_movement(val)
 
     # Assert property
-    assert predicts_further_movement(self) == result, "idempotent violated"
+    assert predicts_further_movement(val) == result, "idempotent violated"
 
 
 
 def test_add_snapshot_basic():
     """Test add_snapshot: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_snapshot()
+    result = add_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_snapshot_edge_cases():
     """Test add_snapshot: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_snapshot()
+    result = add_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -433,26 +433,26 @@ def test_add_snapshot_property_idempotent(self, self, game_id, timestamp, book, 
 def test_is_reduced_juice_window_basic():
     """Test is_reduced_juice_window: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_reduced_juice_window()
+    result = is_reduced_juice_window()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_reduced_juice_window_edge_cases():
     """Test is_reduced_juice_window: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_reduced_juice_window()
+    result = is_reduced_juice_window()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -477,26 +477,26 @@ def test_is_reduced_juice_window_property_idempotent(self, self, book, timestamp
 def test_analyze_game_enhanced_basic():
     """Test analyze_game_enhanced: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_game_enhanced()
+    result = analyze_game_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_game_enhanced_edge_cases():
     """Test analyze_game_enhanced: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_game_enhanced()
+    result = analyze_game_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -521,26 +521,26 @@ def test_analyze_game_enhanced_property_idempotent(self, self, game_id, public_b
 def test_get_clv_conversion_rate_basic():
     """Test get_clv_conversion_rate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_clv_conversion_rate()
+    result = get_clv_conversion_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_clv_conversion_rate_edge_cases():
     """Test get_clv_conversion_rate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_clv_conversion_rate()
+    result = get_clv_conversion_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -552,11 +552,11 @@ def test_get_clv_conversion_rate_error_handling():
 
 
 @given(st.integers())
-def test_get_clv_conversion_rate_property_idempotent(self, self):
+def test_get_clv_conversion_rate_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_clv_conversion_rate(self)
+    result = get_clv_conversion_rate(val)
 
     # Assert property
-    assert get_clv_conversion_rate(self) == result, "idempotent violated"
+    assert get_clv_conversion_rate(val) == result, "idempotent violated"
 

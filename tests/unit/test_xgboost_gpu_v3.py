@@ -15,26 +15,26 @@ import pytest
 def test_check_gpu_availability_basic():
     """Test check_gpu_availability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_gpu_availability()
+    result = check_gpu_availability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_gpu_availability_edge_cases():
     """Test check_gpu_availability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_gpu_availability()
+    result = check_gpu_availability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_check_gpu_availability_error_handling():
 def test_load_and_prepare_data_basic():
     """Test load_and_prepare_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_and_prepare_data()
+    result = load_and_prepare_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_and_prepare_data_edge_cases():
     """Test load_and_prepare_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_and_prepare_data()
+    result = load_and_prepare_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_and_prepare_data_property_idempotent(self, csv_path, features, sta
 def test_train_xgboost_gpu_basic():
     """Test train_xgboost_gpu: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_xgboost_gpu()
+    result = train_xgboost_gpu()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_xgboost_gpu_edge_cases():
     """Test train_xgboost_gpu: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_xgboost_gpu()
+    result = train_xgboost_gpu()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_train_xgboost_gpu_property_idempotent(self, X_train, y_train, X_val, y_
 def test_multi_season_temporal_split_basic():
     """Test multi_season_temporal_split: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = multi_season_temporal_split()
+    result = multi_season_temporal_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_multi_season_temporal_split_edge_cases():
     """Test multi_season_temporal_split: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = multi_season_temporal_split()
+    result = multi_season_temporal_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -181,12 +181,12 @@ def test_multi_season_temporal_split_no_temporal_leakage():
     """Ensure multi_season_temporal_split doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -200,26 +200,26 @@ def test_multi_season_temporal_split_no_temporal_leakage():
 def test_run_multi_season_config_basic():
     """Test run_multi_season_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_multi_season_config()
+    result = run_multi_season_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_multi_season_config_edge_cases():
     """Test run_multi_season_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_multi_season_config()
+    result = run_multi_season_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_run_multi_season_config_property_idempotent(self, df, features, train_e
 def test_focused_hyperparameter_sweep_basic():
     """Test focused_hyperparameter_sweep: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = focused_hyperparameter_sweep()
+    result = focused_hyperparameter_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_focused_hyperparameter_sweep_edge_cases():
     """Test focused_hyperparameter_sweep: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = focused_hyperparameter_sweep()
+    result = focused_hyperparameter_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_focused_hyperparameter_sweep_property_idempotent(self, df, features, tr
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

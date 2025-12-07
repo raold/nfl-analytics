@@ -15,26 +15,26 @@ import pytest
 def test_define_injury_treatment_basic():
     """Test define_injury_treatment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = define_injury_treatment()
+    result = define_injury_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_define_injury_treatment_edge_cases():
     """Test define_injury_treatment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = define_injury_treatment()
+    result = define_injury_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_define_injury_treatment_property_idempotent(self, self, df, injury_thre
 def test_define_coaching_change_treatment_basic():
     """Test define_coaching_change_treatment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = define_coaching_change_treatment()
+    result = define_coaching_change_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_define_coaching_change_treatment_edge_cases():
     """Test define_coaching_change_treatment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = define_coaching_change_treatment()
+    result = define_coaching_change_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_define_coaching_change_treatment_property_idempotent(self, self, df, co
 def test_define_usage_increase_treatment_basic():
     """Test define_usage_increase_treatment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = define_usage_increase_treatment()
+    result = define_usage_increase_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_define_usage_increase_treatment_edge_cases():
     """Test define_usage_increase_treatment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = define_usage_increase_treatment()
+    result = define_usage_increase_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_define_usage_increase_treatment_property_idempotent(self, self, df, usa
 def test_extract_treatment_events_basic():
     """Test extract_treatment_events: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_treatment_events()
+    result = extract_treatment_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_treatment_events_edge_cases():
     """Test extract_treatment_events: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_treatment_events()
+    result = extract_treatment_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_extract_treatment_events_property_idempotent(self, self, df, treatment_
 def test_create_treatment_periods_basic():
     """Test create_treatment_periods: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_treatment_periods()
+    result = create_treatment_periods()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_treatment_periods_edge_cases():
     """Test create_treatment_periods: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_treatment_periods()
+    result = create_treatment_periods()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

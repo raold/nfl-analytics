@@ -15,26 +15,26 @@ import pytest
 def test_load_xgb_predictions_basic():
     """Test load_xgb_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_xgb_predictions()
+    result = load_xgb_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_xgb_predictions_edge_cases():
     """Test load_xgb_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_xgb_predictions()
+    result = load_xgb_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_xgb_predictions_property_idempotent(self, model_path, features_df)
 def test_evaluate_ensemble_basic():
     """Test evaluate_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_ensemble()
+    result = evaluate_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_ensemble_edge_cases():
     """Test evaluate_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_ensemble()
+    result = evaluate_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_evaluate_ensemble_property_idempotent(self, games_df, ensemble):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_main_error_handling():
 def test_compute_ensemble_probability_basic():
     """Test compute_ensemble_probability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_ensemble_probability()
+    result = compute_ensemble_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_ensemble_probability_edge_cases():
     """Test compute_ensemble_probability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_ensemble_probability()
+    result = compute_ensemble_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_compute_ensemble_probability_property_idempotent(self, self, bayesian_p
 def test_compute_betting_edge_basic():
     """Test compute_betting_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_betting_edge()
+    result = compute_betting_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_betting_edge_edge_cases():
     """Test compute_betting_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_betting_edge()
+    result = compute_betting_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_compute_betting_edge_property_idempotent(self, self, ensemble_prob, spr
 def test_compute_kelly_fraction_basic():
     """Test compute_kelly_fraction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_kelly_fraction()
+    result = compute_kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_kelly_fraction_edge_cases():
     """Test compute_kelly_fraction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_kelly_fraction()
+    result = compute_kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_compute_kelly_fraction_property_idempotent(self, self, edge, bayesian_s
 def test_make_bet_decision_basic():
     """Test make_bet_decision: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = make_bet_decision()
+    result = make_bet_decision()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_make_bet_decision_edge_cases():
     """Test make_bet_decision: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = make_bet_decision()
+    result = make_bet_decision()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

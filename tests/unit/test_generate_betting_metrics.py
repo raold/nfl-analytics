@@ -15,26 +15,26 @@ import pytest
 def test_calculate_clv_basic():
     """Test calculate_clv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_clv()
+    result = calculate_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_clv_edge_cases():
     """Test calculate_clv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_clv()
+    result = calculate_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_calculate_clv_property_idempotent(self, row, model_prob_col):
 def test_calculate_sharpe_basic():
     """Test calculate_sharpe: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_sharpe_edge_cases():
     """Test calculate_sharpe: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_sharpe()
+    result = calculate_sharpe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_sharpe_property_idempotent(self, returns):
 def test_calculate_sortino_basic():
     """Test calculate_sortino: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_sortino()
+    result = calculate_sortino()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_sortino_edge_cases():
     """Test calculate_sortino: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_sortino()
+    result = calculate_sortino()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_calculate_sortino_property_idempotent(self, returns):
 def test_calculate_mar_basic():
     """Test calculate_mar: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_mar()
+    result = calculate_mar()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_mar_edge_cases():
     """Test calculate_mar: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_mar()
+    result = calculate_mar()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_calculate_mar_property_idempotent(self, returns):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

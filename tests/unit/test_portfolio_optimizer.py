@@ -15,26 +15,26 @@ import pytest
 def test_edge_basic():
     """Test edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = edge()
+    result = edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_edge_edge_cases():
     """Test edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = edge()
+    result = edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_edge_error_handling():
 
 
 @given(st.integers())
-def test_edge_property_idempotent(self, self):
+def test_edge_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = edge(self)
+    result = edge(val)
 
     # Assert property
-    assert edge(self) == result, "idempotent violated"
+    assert edge(val) == result, "idempotent violated"
 
 
 
 def test_kelly_fraction_basic():
     """Test kelly_fraction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_fraction()
+    result = kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_fraction_edge_cases():
     """Test kelly_fraction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_fraction()
+    result = kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_kelly_fraction_error_handling():
 
 
 @given(st.integers())
-def test_kelly_fraction_property_idempotent(self, self):
+def test_kelly_fraction_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = kelly_fraction(self)
+    result = kelly_fraction(val)
 
     # Assert property
-    assert kelly_fraction(self) == result, "idempotent violated"
+    assert kelly_fraction(val) == result, "idempotent violated"
 
 
 
 def test_estimate_correlation_matrix_basic():
     """Test estimate_correlation_matrix: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_correlation_matrix()
+    result = estimate_correlation_matrix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_correlation_matrix_edge_cases():
     """Test estimate_correlation_matrix: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_correlation_matrix()
+    result = estimate_correlation_matrix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_estimate_correlation_matrix_property_idempotent(self, self, bets):
 def test_optimize_portfolio_basic():
     """Test optimize_portfolio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_portfolio_edge_cases():
     """Test optimize_portfolio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_portfolio()
+    result = optimize_portfolio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_optimize_portfolio_property_idempotent(self, self, bets, bankroll):
 def test_get_bet_recommendations_basic():
     """Test get_bet_recommendations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_bet_recommendations()
+    result = get_bet_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_bet_recommendations_edge_cases():
     """Test get_bet_recommendations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_bet_recommendations()
+    result = get_bet_recommendations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_get_bet_recommendations_property_idempotent(self, self, bets, bankroll,
 def test_optimize_bets_basic():
     """Test optimize_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = optimize_bets()
+    result = optimize_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_optimize_bets_edge_cases():
     """Test optimize_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = optimize_bets()
+    result = optimize_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

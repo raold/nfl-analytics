@@ -15,26 +15,26 @@ import pytest
 def test_empirical_tail_dependence_basic():
     """Test empirical_tail_dependence: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = empirical_tail_dependence()
+    result = empirical_tail_dependence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_empirical_tail_dependence_edge_cases():
     """Test empirical_tail_dependence: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = empirical_tail_dependence()
+    result = empirical_tail_dependence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_empirical_tail_dependence_property_idempotent(self, u, v, threshold, ta
 def test_theoretical_tail_dependence_t_basic():
     """Test theoretical_tail_dependence_t: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = theoretical_tail_dependence_t()
+    result = theoretical_tail_dependence_t()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_theoretical_tail_dependence_t_edge_cases():
     """Test theoretical_tail_dependence_t: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = theoretical_tail_dependence_t()
+    result = theoretical_tail_dependence_t()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_theoretical_tail_dependence_t_property_idempotent(self, df, rho):
 def test_theoretical_tail_dependence_gaussian_basic():
     """Test theoretical_tail_dependence_gaussian: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = theoretical_tail_dependence_gaussian()
+    result = theoretical_tail_dependence_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_theoretical_tail_dependence_gaussian_edge_cases():
     """Test theoretical_tail_dependence_gaussian: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = theoretical_tail_dependence_gaussian()
+    result = theoretical_tail_dependence_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_theoretical_tail_dependence_gaussian_property_idempotent(self, rho):
 def test_kendall_tau_to_rho_gaussian_basic():
     """Test kendall_tau_to_rho_gaussian: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kendall_tau_to_rho_gaussian()
+    result = kendall_tau_to_rho_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kendall_tau_to_rho_gaussian_edge_cases():
     """Test kendall_tau_to_rho_gaussian: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kendall_tau_to_rho_gaussian()
+    result = kendall_tau_to_rho_gaussian()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_kendall_tau_to_rho_gaussian_property_idempotent(self, tau):
 def test_kendall_tau_to_rho_t_basic():
     """Test kendall_tau_to_rho_t: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kendall_tau_to_rho_t()
+    result = kendall_tau_to_rho_t()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kendall_tau_to_rho_t_edge_cases():
     """Test kendall_tau_to_rho_t: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kendall_tau_to_rho_t()
+    result = kendall_tau_to_rho_t()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_kendall_tau_to_rho_t_property_idempotent(self, tau, df):
 def test_fit_copula_params_basic():
     """Test fit_copula_params: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_copula_params()
+    result = fit_copula_params()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_copula_params_edge_cases():
     """Test fit_copula_params: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_copula_params()
+    result = fit_copula_params()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_fit_copula_params_property_idempotent(self, u, v, copula):
 def test_load_spread_results_basic():
     """Test load_spread_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_spread_results()
+    result = load_spread_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_spread_results_edge_cases():
     """Test load_spread_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_spread_results()
+    result = load_spread_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_load_spread_results_property_idempotent(self, db_url, csv_path):
 def test_compute_era_tail_dependence_basic():
     """Test compute_era_tail_dependence: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_era_tail_dependence()
+    result = compute_era_tail_dependence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_era_tail_dependence_edge_cases():
     """Test compute_era_tail_dependence: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_era_tail_dependence()
+    result = compute_era_tail_dependence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_compute_era_tail_dependence_property_idempotent(self, df, era_col, eras
 def test_generate_latex_table_basic():
     """Test generate_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_generate_latex_table_property_idempotent(self, results_df, output_path)
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_main_error_handling():
 def test_loss_basic():
     """Test loss: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = loss()
+    result = loss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_loss_edge_cases():
     """Test loss: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = loss()
+    result = loss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

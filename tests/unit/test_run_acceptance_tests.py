@@ -15,26 +15,26 @@ import pytest
 def test_load_metrics_basic():
     """Test load_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_metrics()
+    result = load_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_metrics_edge_cases():
     """Test load_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_metrics()
+    result = load_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_metrics_property_idempotent(self, path):
 def test_pmf_to_arrays_basic():
     """Test pmf_to_arrays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pmf_to_arrays()
+    result = pmf_to_arrays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pmf_to_arrays_edge_cases():
     """Test pmf_to_arrays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pmf_to_arrays()
+    result = pmf_to_arrays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_pmf_to_arrays_property_idempotent(self, pmf_dict):
 def test_compute_emd_basic():
     """Test compute_emd: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_emd()
+    result = compute_emd()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_emd_edge_cases():
     """Test compute_emd: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_emd()
+    result = compute_emd()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_compute_emd_property_idempotent(self, hist_pmf, sim_pmf):
 def test_compute_key_mass_delta_basic():
     """Test compute_key_mass_delta: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_key_mass_delta()
+    result = compute_key_mass_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_key_mass_delta_edge_cases():
     """Test compute_key_mass_delta: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_key_mass_delta()
+    result = compute_key_mass_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_compute_key_mass_delta_property_idempotent(self, hist_masses, sim_masse
 def test_compute_dependence_delta_basic():
     """Test compute_dependence_delta: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_dependence_delta()
+    result = compute_dependence_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_dependence_delta_edge_cases():
     """Test compute_dependence_delta: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_dependence_delta()
+    result = compute_dependence_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_compute_dependence_delta_property_idempotent(self, hist_dep, sim_dep):
 def test_run_acceptance_tests_basic():
     """Test run_acceptance_tests: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_acceptance_tests()
+    result = run_acceptance_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_acceptance_tests_edge_cases():
     """Test run_acceptance_tests: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_acceptance_tests()
+    result = run_acceptance_tests()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

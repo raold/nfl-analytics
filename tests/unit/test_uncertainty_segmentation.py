@@ -15,26 +15,26 @@ import pytest
 def test_demo_uncertainty_segmentation_basic():
     """Test demo_uncertainty_segmentation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo_uncertainty_segmentation()
+    result = demo_uncertainty_segmentation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_uncertainty_segmentation_edge_cases():
     """Test demo_uncertainty_segmentation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo_uncertainty_segmentation()
+    result = demo_uncertainty_segmentation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_uncertainty_segmentation_error_handling():
 def test_calculate_epistemic_uncertainty_basic():
     """Test calculate_epistemic_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_epistemic_uncertainty()
+    result = calculate_epistemic_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_epistemic_uncertainty_edge_cases():
     """Test calculate_epistemic_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_epistemic_uncertainty()
+    result = calculate_epistemic_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_calculate_epistemic_uncertainty_property_idempotent(self, model, traini
 def test_calculate_aleatoric_uncertainty_basic():
     """Test calculate_aleatoric_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_aleatoric_uncertainty()
+    result = calculate_aleatoric_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_aleatoric_uncertainty_edge_cases():
     """Test calculate_aleatoric_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_aleatoric_uncertainty()
+    result = calculate_aleatoric_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_aleatoric_uncertainty_property_idempotent(self, context):
 def test_calculate_market_uncertainty_basic():
     """Test calculate_market_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_market_uncertainty()
+    result = calculate_market_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_market_uncertainty_edge_cases():
     """Test calculate_market_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_market_uncertainty()
+    result = calculate_market_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_market_uncertainty_property_idempotent(self, market):
 def test_calculate_composite_uncertainty_basic():
     """Test calculate_composite_uncertainty: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_composite_uncertainty()
+    result = calculate_composite_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_composite_uncertainty_edge_cases():
     """Test calculate_composite_uncertainty: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_composite_uncertainty()
+    result = calculate_composite_uncertainty()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_composite_uncertainty_property_idempotent(self, epistemic, al
 def test_segment_game_basic():
     """Test segment_game: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = segment_game()
+    result = segment_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_segment_game_edge_cases():
     """Test segment_game: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = segment_game()
+    result = segment_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_segment_game_property_idempotent(self, self, game_id, model_uncertainty
 def test_adjust_bet_strategy_basic():
     """Test adjust_bet_strategy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_bet_strategy()
+    result = adjust_bet_strategy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_bet_strategy_edge_cases():
     """Test adjust_bet_strategy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_bet_strategy()
+    result = adjust_bet_strategy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_adjust_bet_strategy_property_idempotent(self, self, base_edge, base_kel
 def test_generate_segmentation_report_basic():
     """Test generate_segmentation_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_segmentation_report()
+    result = generate_segmentation_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_segmentation_report_edge_cases():
     """Test generate_segmentation_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_segmentation_report()
+    result = generate_segmentation_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,11 +343,11 @@ def test_generate_segmentation_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_segmentation_report_property_idempotent(self, self):
+def test_generate_segmentation_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_segmentation_report(self)
+    result = generate_segmentation_report(val)
 
     # Assert property
-    assert generate_segmentation_report(self) == result, "idempotent violated"
+    assert generate_segmentation_report(val) == result, "idempotent violated"
 

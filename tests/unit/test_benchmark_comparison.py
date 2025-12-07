@@ -15,26 +15,26 @@ import pytest
 def test_get_benchmark_data_basic():
     """Test get_benchmark_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_benchmark_data()
+    result = get_benchmark_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_benchmark_data_edge_cases():
     """Test get_benchmark_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_benchmark_data()
+    result = get_benchmark_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_benchmark_data_error_handling():
 def test_calculate_statistical_significance_basic():
     """Test calculate_statistical_significance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_statistical_significance()
+    result = calculate_statistical_significance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_statistical_significance_edge_cases():
     """Test calculate_statistical_significance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_statistical_significance()
+    result = calculate_statistical_significance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_calculate_statistical_significance_property_idempotent(self, our_brier,
 def test_generate_latex_table_basic():
     """Test generate_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_generate_latex_table_property_idempotent(self, df, output_path):
 def test_generate_significance_table_basic():
     """Test generate_significance_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_significance_table()
+    result = generate_significance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_significance_table_edge_cases():
     """Test generate_significance_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_significance_table()
+    result = generate_significance_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_generate_significance_table_property_idempotent(self, df, output_path):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

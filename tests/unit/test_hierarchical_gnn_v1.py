@@ -15,26 +15,26 @@ import pytest
 def test_train_hierarchical_gnn_basic():
     """Test train_hierarchical_gnn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_hierarchical_gnn()
+    result = train_hierarchical_gnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_hierarchical_gnn_edge_cases():
     """Test train_hierarchical_gnn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_hierarchical_gnn()
+    result = train_hierarchical_gnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_hierarchical_gnn_property_idempotent(self, train_data, val_data, 
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_add_node_basic():
     """Test add_node: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_node()
+    result = add_node()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_node_edge_cases():
     """Test add_node: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_node()
+    result = add_node()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_add_node_property_idempotent(self, self, node_type, features, external_
 def test_add_edge_basic():
     """Test add_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_edge()
+    result = add_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_edge_edge_cases():
     """Test add_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_edge()
+    result = add_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_add_edge_property_idempotent(self, self, edge_type, src, dst, features)
 def test_get_adjacency_matrix_basic():
     """Test get_adjacency_matrix: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_adjacency_matrix()
+    result = get_adjacency_matrix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_adjacency_matrix_edge_cases():
     """Test get_adjacency_matrix: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_adjacency_matrix()
+    result = get_adjacency_matrix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_get_adjacency_matrix_property_idempotent(self, self, edge_type):
 def test_finalize_basic():
     """Test finalize: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = finalize()
+    result = finalize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_finalize_edge_cases():
     """Test finalize: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = finalize()
+    result = finalize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,39 +255,39 @@ def test_finalize_error_handling():
 
 
 @given(st.integers())
-def test_finalize_property_idempotent(self, self):
+def test_finalize_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = finalize(self)
+    result = finalize(val)
 
     # Assert property
-    assert finalize(self) == result, "idempotent violated"
+    assert finalize(val) == result, "idempotent violated"
 
 
 
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_forward_property_idempotent(self, self, src_embeddings, dst_embeddings,
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_forward_property_idempotent(self, self, embeddings, edge_index):
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
