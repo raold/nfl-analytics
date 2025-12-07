@@ -28,7 +28,7 @@ from torch.cuda.amp import autocast, GradScaler
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from gnn_graph_builder import NFLDatabase, NFLGraphBuilder
+from gnn_graph_builder_cuda import NFLDatabase, NFLGraphBuilder
 from hierarchical_gnn_v1 import HierarchicalGNN, NFLGraph
 
 logging.basicConfig(level=logging.INFO)
@@ -550,8 +550,7 @@ def evaluate(
 ) -> Tuple[Dict[str, float], np.ndarray, np.ndarray]:
     """Evaluate model on a dataset.
 
-    For single-season datasets (typical for val/test), uses that season's graph.
-    For multi-season datasets, uses the most recent season's graph.
+    Processes games by season using per-season graphs to avoid index mismatch.
 
     Returns:
         (metrics_dict, predictions_array, targets_array)
@@ -561,34 +560,54 @@ def evaluate(
     predictions = []
     targets = []
 
-    # Use _prepare_graph_tensors for consistent graph preparation
-    graph = dataset.graph
-    gt = _prepare_graph_tensors(graph, device)
+    # Group games by season
+    games_df = dataset.games
+    indices_by_season = {}
+    for idx in range(len(dataset)):
+        season = int(games_df.iloc[idx]['season'])
+        if season not in indices_by_season:
+            indices_by_season[season] = []
+        indices_by_season[season].append(idx)
 
-    with torch.no_grad():
-        for i in range(len(dataset)):
-            game = dataset[i]
-
-            # Map global team IDs to type-specific indices using graph tensors
-            home_team_idx_local = gt["team_id_to_idx"][game["home_team_idx"]]
-            away_team_idx_local = gt["team_id_to_idx"][game["away_team_idx"]]
-
-            logit = model(
-                player_features=gt["player_features"],
-                position_indices=gt["position_indices"],
-                team_indices=gt["team_indices"],
-                player_to_position_edges=gt["player_to_position_edges"],
-                position_to_team_edges=gt["position_to_team_edges"],
-                chemistry_edges=gt["chemistry_edges"],
-                home_team_idx=home_team_idx_local,
-                away_team_idx=away_team_idx_local,
+    # Prepare graph tensors for each season
+    graph_tensors_by_season = {}
+    for season in indices_by_season.keys():
+        if season in dataset.graphs_by_season:
+            graph_tensors_by_season[season] = _prepare_graph_tensors(
+                dataset.graphs_by_season[season], device
             )
 
-            # Convert logit to probability (BCEWithLogitsLoss expects logits, but metrics expect probs)
-            prob = torch.sigmoid(logit)
+    with torch.no_grad():
+        for season, season_indices in indices_by_season.items():
+            if season not in graph_tensors_by_season:
+                logger.warning(f"Season {season} not in graphs, skipping {len(season_indices)} games")
+                continue
 
-            predictions.append(prob.item())
-            targets.append(game["target"])
+            gt = graph_tensors_by_season[season]
+
+            for idx in season_indices:
+                game = dataset[idx]
+
+                # Map global team IDs to type-specific indices using season's graph
+                home_team_idx_local = gt["team_id_to_idx"][game["home_team_idx"]]
+                away_team_idx_local = gt["team_id_to_idx"][game["away_team_idx"]]
+
+                logit = model(
+                    player_features=gt["player_features"],
+                    position_indices=gt["position_indices"],
+                    team_indices=gt["team_indices"],
+                    player_to_position_edges=gt["player_to_position_edges"],
+                    position_to_team_edges=gt["position_to_team_edges"],
+                    chemistry_edges=gt["chemistry_edges"],
+                    home_team_idx=home_team_idx_local,
+                    away_team_idx=away_team_idx_local,
+                )
+
+                # Convert logit to probability
+                prob = torch.sigmoid(logit)
+
+                predictions.append(prob.item())
+                targets.append(game["target"])
 
     predictions = np.array(predictions)
     targets = np.array(targets)
