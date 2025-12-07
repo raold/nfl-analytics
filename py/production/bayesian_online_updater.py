@@ -32,7 +32,10 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 import logging
+import os
 from datetime import datetime, timedelta
+
+import json
 
 import numpy as np
 import pandas as pd
@@ -77,14 +80,16 @@ class BayesianOnlineUpdater:
         self.min_observations = min_observations
         self.drift_threshold = drift_threshold
 
-        # Database connection
+        # Database connection - uses environment variables
         self.db_config = {
-            "host": "localhost",
-            "port": 5544,
-            "database": "devdb01",
-            "user": "dro",
-            "password": "sicillionbillions",
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5544")),
+            "database": os.getenv("DB_NAME", "devdb01"),
+            "user": os.getenv("DB_USER", "dro"),
+            "password": os.getenv("DB_PASSWORD"),
         }
+        if not self.db_config["password"]:
+            logger.warning("DB_PASSWORD not set - database operations may fail")
 
         # State tracking
         self.posterior_params = {}
@@ -343,8 +348,8 @@ class BayesianOnlineUpdater:
                 (self.model_version, "Concept drift detected", "high", datetime.now(), "pending"),
             )
             conn.commit()
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Failed to insert retraining request: {e}")
         finally:
             conn.close()
 
@@ -469,12 +474,14 @@ class EnhancedBayesianOnlineUpdater:
         self.forgetting_factor = forgetting_factor
 
         self.db_config = {
-            "host": "localhost",
-            "port": 5544,
-            "database": "devdb01",
-            "user": "dro",
-            "password": "sicillionbillions",
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5544")),
+            "database": os.getenv("DB_NAME", "devdb01"),
+            "user": os.getenv("DB_USER", "dro"),
+            "password": os.getenv("DB_PASSWORD"),
         }
+        if not self.db_config["password"]:
+            logger.warning("DB_PASSWORD not set - database operations may fail")
 
         # Initialize Dirichlet stacker for ensemble weights
         try:
@@ -631,10 +638,10 @@ class EnhancedBayesianOnlineUpdater:
                 # Parse component predictions if stored as JSON
                 component_preds = row.get('component_predictions')
                 if isinstance(component_preds, str):
-                    import json
                     try:
                         component_preds = json.loads(component_preds)
-                    except:
+                    except (json.JSONDecodeError, ValueError) as e:
+                        logger.warning(f"Could not parse component_predictions: {e}")
                         continue
 
                 if not component_preds:
@@ -743,8 +750,15 @@ def run_online_updates():
     )
 
     # Load recent outcomes
+    db_password = os.getenv("DB_PASSWORD")
+    if not db_password:
+        raise ValueError("DB_PASSWORD environment variable required")
     conn = psycopg2.connect(
-        host="localhost", port=5544, database="devdb01", user="dro", password="sicillionbillions"
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5544")),
+        database=os.getenv("DB_NAME", "devdb01"),
+        user=os.getenv("DB_USER", "dro"),
+        password=db_password
     )
 
     query = """

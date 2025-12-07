@@ -65,6 +65,7 @@ XGBoost improves mid-season).
 
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -574,12 +575,14 @@ class DirichletBayesianStackingByStatType:
             prior_strength: Base strength for Dirichlet priors.
         """
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            'host': os.getenv('DB_HOST', 'localhost'),
+            'port': int(os.getenv('DB_PORT', '5544')),
+            'database': os.getenv('DB_NAME', 'devdb01'),
+            'user': os.getenv('DB_USER', 'dro'),
+            'password': os.getenv('DB_PASSWORD'),
         }
+        if not self.db_config['password']:
+            logger.warning("DB_PASSWORD not set - database operations may fail")
         self.use_db = use_db
         self.prior_strength = prior_strength
 

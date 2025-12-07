@@ -208,7 +208,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         std = np.sqrt(var)
 
         # Confidence based on Beta distribution concentrations
-        avg_concentration = np.mean([p.alpha + p.beta for p in self.params.values()])
+        avg_concentration = np.mean([params.alpha + params.beta for params in self.params.values()])
         confidence = min(0.95, avg_concentration / 100)
 
         weight_dict = {p.model_name: float(w) for p, w in zip(predictions, weight_list)}
