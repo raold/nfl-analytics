@@ -15,26 +15,26 @@ import pytest
 def test_add_issue_basic():
     """Test add_issue: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_issue_property_idempotent(self, self, issue):
 def test_has_critical_leakage_basic():
     """Test has_critical_leakage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = has_critical_leakage()
+    result = has_critical_leakage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_has_critical_leakage_edge_cases():
     """Test has_critical_leakage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = has_critical_leakage()
+    result = has_critical_leakage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_has_critical_leakage_error_handling():
 
 
 @given(st.integers())
-def test_has_critical_leakage_property_idempotent(self, self):
+def test_has_critical_leakage_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = has_critical_leakage(self)
+    result = has_critical_leakage(val)
 
     # Assert property
-    assert has_critical_leakage(self) == result, "idempotent violated"
+    assert has_critical_leakage(val) == result, "idempotent violated"
 
 
 
 def test_check_dataframe_basic():
     """Test check_dataframe: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_dataframe()
+    result = check_dataframe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_dataframe_edge_cases():
     """Test check_dataframe: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_dataframe()
+    result = check_dataframe()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_check_dataframe_property_idempotent(self, self, df, target_col, date_co
 def test_validate_split_basic():
     """Test validate_split: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_split()
+    result = validate_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_split_edge_cases():
     """Test validate_split: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_split()
+    result = validate_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -192,12 +192,12 @@ def test_validate_split_no_temporal_leakage():
     """Ensure validate_split doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -211,26 +211,26 @@ def test_validate_split_no_temporal_leakage():
 def test_check_feature_engineering_basic():
     """Test check_feature_engineering: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_feature_engineering()
+    result = check_feature_engineering()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_feature_engineering_edge_cases():
     """Test check_feature_engineering: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_feature_engineering()
+    result = check_feature_engineering()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,26 +255,26 @@ def test_check_feature_engineering_property_idempotent(self, self, code, file_pa
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -286,11 +286,11 @@ def test_generate_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_report_property_idempotent(self, self):
+def test_generate_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_report(self)
+    result = generate_report(val)
 
     # Assert property
-    assert generate_report(self) == result, "idempotent violated"
+    assert generate_report(val) == result, "idempotent violated"
 

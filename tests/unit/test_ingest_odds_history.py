@@ -15,26 +15,26 @@ import pytest
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_parse_args_error_handling():
 def test_daterange_basic():
     """Test daterange: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = daterange()
+    result = daterange()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_daterange_edge_cases():
     """Test daterange: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = daterange()
+    result = daterange()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -93,12 +93,12 @@ def test_daterange_no_temporal_leakage():
     """Ensure daterange doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -112,26 +112,26 @@ def test_daterange_no_temporal_leakage():
 def test_parse_date_basic():
     """Test parse_date: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_date()
+    result = parse_date()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_date_edge_cases():
     """Test parse_date: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_date()
+    result = parse_date()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -157,12 +157,12 @@ def test_parse_date_no_temporal_leakage():
     """Ensure parse_date doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -176,26 +176,26 @@ def test_parse_date_no_temporal_leakage():
 def test_parse_iso_basic():
     """Test parse_iso: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_iso()
+    result = parse_iso()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_iso_edge_cases():
     """Test parse_iso: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_iso()
+    result = parse_iso()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -220,26 +220,26 @@ def test_parse_iso_property_idempotent(self, value):
 def test_build_request_basic():
     """Test build_request: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_request()
+    result = build_request()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_request_edge_cases():
     """Test build_request: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_request()
+    result = build_request()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -253,26 +253,26 @@ def test_build_request_error_handling():
 def test_flatten_events_basic():
     """Test flatten_events: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = flatten_events()
+    result = flatten_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_flatten_events_edge_cases():
     """Test flatten_events: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = flatten_events()
+    result = flatten_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -297,26 +297,26 @@ def test_flatten_events_property_idempotent(self, events, snapshot_at):
 def test_upsert_rows_basic():
     """Test upsert_rows: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = upsert_rows()
+    result = upsert_rows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_upsert_rows_edge_cases():
     """Test upsert_rows: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = upsert_rows()
+    result = upsert_rows()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -341,26 +341,26 @@ def test_upsert_rows_property_idempotent(self, conn, rows):
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -374,26 +374,26 @@ def test_get_connection_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

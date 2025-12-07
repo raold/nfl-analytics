@@ -15,26 +15,26 @@ import pytest
 def test_load_passing_data_from_db_basic():
     """Test load_passing_data_from_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_passing_data_from_db()
+    result = load_passing_data_from_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_passing_data_from_db_edge_cases():
     """Test load_passing_data_from_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_passing_data_from_db()
+    result = load_passing_data_from_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_passing_data_from_db_error_handling():
 def test_engineer_features_basic():
     """Test engineer_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = engineer_features()
+    result = engineer_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_engineer_features_edge_cases():
     """Test engineer_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = engineer_features()
+    result = engineer_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_engineer_features_property_idempotent(self, df):
 def test_prepare_train_test_split_basic():
     """Test prepare_train_test_split: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_train_test_split()
+    result = prepare_train_test_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_train_test_split_edge_cases():
     """Test prepare_train_test_split: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_train_test_split()
+    result = prepare_train_test_split()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_prepare_train_test_split_property_idempotent(self, df):
 def test_grid_search_basic():
     """Test grid_search: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = grid_search()
+    result = grid_search()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_grid_search_edge_cases():
     """Test grid_search: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = grid_search()
+    result = grid_search()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

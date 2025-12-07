@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_get_all_experiments_basic():
     """Test get_all_experiments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_all_experiments()
+    result = get_all_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_all_experiments_edge_cases():
     """Test get_all_experiments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_all_experiments()
+    result = get_all_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_get_all_experiments_error_handling():
 
 
 @given(st.integers())
-def test_get_all_experiments_property_idempotent(self, self):
+def test_get_all_experiments_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_all_experiments(self)
+    result = get_all_experiments(val)
 
     # Assert property
-    assert get_all_experiments(self) == result, "idempotent violated"
+    assert get_all_experiments(val) == result, "idempotent violated"
 
 
 
 def test_export_to_json_basic():
     """Test export_to_json: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = export_to_json()
+    result = export_to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_export_to_json_edge_cases():
     """Test export_to_json: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = export_to_json()
+    result = export_to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

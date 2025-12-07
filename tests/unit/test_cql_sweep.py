@@ -15,26 +15,26 @@ import pytest
 def test_create_param_grid_basic():
     """Test create_param_grid: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_param_grid()
+    result = create_param_grid()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_param_grid_edge_cases():
     """Test create_param_grid: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_param_grid()
+    result = create_param_grid()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_create_param_grid_error_handling():
 def test_run_single_config_basic():
     """Test run_single_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_single_config()
+    result = run_single_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_single_config_edge_cases():
     """Test run_single_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_single_config()
+    result = run_single_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_run_single_config_property_idempotent(self, config, states, actions, re
 def test_run_sweep_basic():
     """Test run_sweep: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_sweep()
+    result = run_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_sweep_edge_cases():
     """Test run_sweep: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_sweep()
+    result = run_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_run_sweep_property_idempotent(self, dataset_path, output_dir, epochs, b
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

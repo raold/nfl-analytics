@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_get_recent_bets_basic():
     """Test get_recent_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_recent_bets()
+    result = get_recent_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_recent_bets_edge_cases():
     """Test get_recent_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_recent_bets()
+    result = get_recent_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_recent_bets_property_idempotent(self, self, weeks):
 def test_bootstrap_resample_basic():
     """Test bootstrap_resample: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bootstrap_resample()
+    result = bootstrap_resample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bootstrap_resample_edge_cases():
     """Test bootstrap_resample: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bootstrap_resample()
+    result = bootstrap_resample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_bootstrap_resample_property_idempotent(self, self, bets):
 def test_run_stress_test_basic():
     """Test run_stress_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_stress_test()
+    result = run_stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_stress_test_edge_cases():
     """Test run_stress_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_stress_test()
+    result = run_stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_run_stress_test_property_idempotent(self, self, weeks):
 def test_save_stress_test_basic():
     """Test save_stress_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_stress_test()
+    result = save_stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_stress_test_edge_cases():
     """Test save_stress_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_stress_test()
+    result = save_stress_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_save_stress_test_property_idempotent(self, self, result):
 def test_get_stress_test_history_basic():
     """Test get_stress_test_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_stress_test_history()
+    result = get_stress_test_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_stress_test_history_edge_cases():
     """Test get_stress_test_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_stress_test_history()
+    result = get_stress_test_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_get_stress_test_history_property_idempotent(self, self, limit):
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,39 +299,39 @@ def test_generate_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_report_property_idempotent(self, self):
+def test_generate_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_report(self)
+    result = generate_report(val)
 
     # Assert property
-    assert generate_report(self) == result, "idempotent violated"
+    assert generate_report(val) == result, "idempotent violated"
 
 
 
 def test_check_health_basic():
     """Test check_health: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_health()
+    result = check_health()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_health_edge_cases():
     """Test check_health: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_health()
+    result = check_health()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,11 +343,11 @@ def test_check_health_error_handling():
 
 
 @given(st.integers())
-def test_check_health_property_idempotent(self, self):
+def test_check_health_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = check_health(self)
+    result = check_health(val)
 
     # Assert property
-    assert check_health(self) == result, "idempotent violated"
+    assert check_health(val) == result, "idempotent violated"
 

@@ -15,26 +15,26 @@ import pytest
 def test_run_comparison_backtest_basic():
     """Test run_comparison_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_comparison_backtest()
+    result = run_comparison_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_comparison_backtest_edge_cases():
     """Test run_comparison_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_comparison_backtest()
+    result = run_comparison_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_comparison_backtest_property_idempotent(self, train_seasons, backte
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

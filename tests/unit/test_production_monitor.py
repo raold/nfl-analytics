@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_connect_db_basic():
     """Test connect_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_connect_db_error_handling():
 
 
 @given(st.integers())
-def test_connect_db_property_idempotent(self, self):
+def test_connect_db_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = connect_db(self)
+    result = connect_db(val)
 
     # Assert property
-    assert connect_db(self) == result, "idempotent violated"
+    assert connect_db(val) == result, "idempotent violated"
 
 
 
 def test_init_monitoring_tables_basic():
     """Test init_monitoring_tables: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = init_monitoring_tables()
+    result = init_monitoring_tables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_init_monitoring_tables_edge_cases():
     """Test init_monitoring_tables: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = init_monitoring_tables()
+    result = init_monitoring_tables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_init_monitoring_tables_error_handling():
 
 
 @given(st.integers())
-def test_init_monitoring_tables_property_idempotent(self, self):
+def test_init_monitoring_tables_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = init_monitoring_tables(self)
+    result = init_monitoring_tables(val)
 
     # Assert property
-    assert init_monitoring_tables(self) == result, "idempotent violated"
+    assert init_monitoring_tables(val) == result, "idempotent violated"
 
 
 
 def test_load_predictions_basic():
     """Test load_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_predictions()
+    result = load_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_predictions_edge_cases():
     """Test load_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_predictions()
+    result = load_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_load_predictions_property_idempotent(self, self, predictions_file):
 def test_load_actual_results_basic():
     """Test load_actual_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_actual_results()
+    result = load_actual_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_actual_results_edge_cases():
     """Test load_actual_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_actual_results()
+    result = load_actual_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_load_actual_results_property_idempotent(self, self, season, week):
 def test_evaluate_predictions_basic():
     """Test evaluate_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_predictions()
+    result = evaluate_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_predictions_edge_cases():
     """Test evaluate_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_predictions()
+    result = evaluate_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_evaluate_predictions_property_idempotent(self, self, predictions, actua
 def test_log_predictions_basic():
     """Test log_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_predictions()
+    result = log_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_predictions_edge_cases():
     """Test log_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_predictions()
+    result = log_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_log_predictions_property_idempotent(self, self, predictions, actuals):
 def test_log_metrics_basic():
     """Test log_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_metrics()
+    result = log_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_metrics_edge_cases():
     """Test log_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_metrics()
+    result = log_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_log_metrics_property_idempotent(self, self, model_version, season, week
 def test_generate_weekly_report_basic():
     """Test generate_weekly_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_weekly_report()
+    result = generate_weekly_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_weekly_report_edge_cases():
     """Test generate_weekly_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_weekly_report()
+    result = generate_weekly_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_generate_weekly_report_property_idempotent(self, self, season, week):
 def test_check_data_drift_basic():
     """Test check_data_drift: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_data_drift()
+    result = check_data_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_data_drift_edge_cases():
     """Test check_data_drift: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_data_drift()
+    result = check_data_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

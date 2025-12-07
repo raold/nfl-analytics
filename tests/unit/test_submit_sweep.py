@@ -15,26 +15,26 @@ import pytest
 def test_load_sweep_config_basic():
     """Test load_sweep_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_sweep_config()
+    result = load_sweep_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_sweep_config_edge_cases():
     """Test load_sweep_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_sweep_config()
+    result = load_sweep_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_sweep_config_property_idempotent(self, config_path):
 def test_estimate_sweep_basic():
     """Test estimate_sweep: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_sweep()
+    result = estimate_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_sweep_edge_cases():
     """Test estimate_sweep: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_sweep()
+    result = estimate_sweep()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_estimate_sweep_property_idempotent(self, sweep):
 def test_print_sweep_summary_basic():
     """Test print_sweep_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_sweep_summary()
+    result = print_sweep_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_sweep_summary_edge_cases():
     """Test print_sweep_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_sweep_summary()
+    result = print_sweep_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_print_sweep_summary_property_idempotent(self, sweep, estimate):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

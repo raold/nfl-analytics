@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_data_basic():
     """Test load_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_data_property_idempotent(self, self, start_season, end_season):
 def test_prepare_features_basic():
     """Test prepare_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_features()
+    result = prepare_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_features_edge_cases():
     """Test prepare_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_features()
+    result = prepare_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_prepare_features_property_idempotent(self, self, df):
 def test_train_basic():
     """Test train: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train()
+    result = train()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_edge_cases():
     """Test train: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train()
+    result = train()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_train_property_idempotent(self, self, X_train, y_train):
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_predict_property_idempotent(self, self, X_test):
 def test_save_model_basic():
     """Test save_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_model()
+    result = save_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_model_edge_cases():
     """Test save_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_model()
+    result = save_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

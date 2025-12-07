@@ -15,26 +15,26 @@ import pytest
 def test_train_model_basic():
     """Test train_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_model_edge_cases():
     """Test train_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_model_property_idempotent(self, model_cls, train_df, val_df, mode
 def test_run_comprehensive_comparison_basic():
     """Test run_comprehensive_comparison: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_comprehensive_comparison()
+    result = run_comprehensive_comparison()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_comprehensive_comparison_edge_cases():
     """Test run_comprehensive_comparison: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_comprehensive_comparison()
+    result = run_comprehensive_comparison()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_run_comprehensive_comparison_property_idempotent(self, train_seasons, v
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

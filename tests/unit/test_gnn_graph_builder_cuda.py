@@ -15,26 +15,26 @@ import pytest
 def test_normalize_team_abbr_basic():
     """Test normalize_team_abbr: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = normalize_team_abbr()
+    result = normalize_team_abbr()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_normalize_team_abbr_edge_cases():
     """Test normalize_team_abbr: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = normalize_team_abbr()
+    result = normalize_team_abbr()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_normalize_team_abbr_property_idempotent(self, team):
 def test_prepare_training_data_basic():
     """Test prepare_training_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_training_data()
+    result = prepare_training_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_training_data_edge_cases():
     """Test prepare_training_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_training_data()
+    result = prepare_training_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_prepare_training_data_property_idempotent(self, season, db_url):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_main_error_handling():
 def test_load_player_hierarchy_basic():
     """Test load_player_hierarchy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_player_hierarchy()
+    result = load_player_hierarchy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_player_hierarchy_edge_cases():
     """Test load_player_hierarchy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_player_hierarchy()
+    result = load_player_hierarchy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_load_player_hierarchy_property_idempotent(self, self, season):
 def test_load_player_game_stats_basic():
     """Test load_player_game_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_player_game_stats()
+    result = load_player_game_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_player_game_stats_edge_cases():
     """Test load_player_game_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_player_game_stats()
+    result = load_player_game_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_load_player_game_stats_property_idempotent(self, self, season, week, st
 def test_load_games_basic():
     """Test load_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_edge_cases():
     """Test load_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_load_games_property_idempotent(self, self, season, week):
 def test_build_multi_season_graph_basic():
     """Test build_multi_season_graph: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_multi_season_graph()
+    result = build_multi_season_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_multi_season_graph_edge_cases():
     """Test build_multi_season_graph: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_multi_season_graph()
+    result = build_multi_season_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_build_multi_season_graph_property_idempotent(self, self, seasons, inclu
 def test_build_season_graph_basic():
     """Test build_season_graph: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_season_graph()
+    result = build_season_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_season_graph_edge_cases():
     """Test build_season_graph: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_season_graph()
+    result = build_season_graph()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

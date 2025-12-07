@@ -15,26 +15,26 @@ import pytest
 def test_mean_reward_basic():
     """Test mean_reward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = mean_reward()
+    result = mean_reward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_mean_reward_edge_cases():
     """Test mean_reward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = mean_reward()
+    result = mean_reward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_mean_reward_error_handling():
 
 
 @given(st.integers())
-def test_mean_reward_property_idempotent(self, self):
+def test_mean_reward_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = mean_reward(self)
+    result = mean_reward(val)
 
     # Assert property
-    assert mean_reward(self) == result, "idempotent violated"
+    assert mean_reward(val) == result, "idempotent violated"
 
 
 
 def test_reward_variance_basic():
     """Test reward_variance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reward_variance()
+    result = reward_variance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reward_variance_edge_cases():
     """Test reward_variance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reward_variance()
+    result = reward_variance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_reward_variance_error_handling():
 
 
 @given(st.integers())
-def test_reward_variance_property_idempotent(self, self):
+def test_reward_variance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = reward_variance(self)
+    result = reward_variance(val)
 
     # Assert property
-    assert reward_variance(self) == result, "idempotent violated"
+    assert reward_variance(val) == result, "idempotent violated"
 
 
 
 def test_update_basic():
     """Test update: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update()
+    result = update()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_edge_cases():
     """Test update: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update()
+    result = update()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -148,12 +148,12 @@ def test_update_no_temporal_leakage():
     """Ensure update doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -167,26 +167,26 @@ def test_update_no_temporal_leakage():
 def test_expected_value_basic():
     """Test expected_value: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = expected_value()
+    result = expected_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_expected_value_edge_cases():
     """Test expected_value: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = expected_value()
+    result = expected_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -198,39 +198,39 @@ def test_expected_value_error_handling():
 
 
 @given(st.integers())
-def test_expected_value_property_idempotent(self, self):
+def test_expected_value_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = expected_value(self)
+    result = expected_value(val)
 
     # Assert property
-    assert expected_value(self) == result, "idempotent violated"
+    assert expected_value(val) == result, "idempotent violated"
 
 
 
 def test_get_or_create_arm_basic():
     """Test get_or_create_arm: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_or_create_arm()
+    result = get_or_create_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_or_create_arm_edge_cases():
     """Test get_or_create_arm: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_or_create_arm()
+    result = get_or_create_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,26 +255,26 @@ def test_get_or_create_arm_property_idempotent(self, self, task_type, config):
 def test_select_arm_basic():
     """Test select_arm: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_arm()
+    result = select_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_arm_edge_cases():
     """Test select_arm: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_arm()
+    result = select_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,26 +299,26 @@ def test_select_arm_property_idempotent(self, self, available_arms):
 def test_update_arm_basic():
     """Test update_arm: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_arm()
+    result = update_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_arm_edge_cases():
     """Test update_arm: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_arm()
+    result = update_arm()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -344,12 +344,12 @@ def test_update_arm_no_temporal_leakage():
     """Ensure update_arm doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -363,26 +363,26 @@ def test_update_arm_no_temporal_leakage():
 def test_get_arm_statistics_basic():
     """Test get_arm_statistics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_arm_statistics()
+    result = get_arm_statistics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_arm_statistics_edge_cases():
     """Test get_arm_statistics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_arm_statistics()
+    result = get_arm_statistics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -394,39 +394,39 @@ def test_get_arm_statistics_error_handling():
 
 
 @given(st.integers())
-def test_get_arm_statistics_property_idempotent(self, self):
+def test_get_arm_statistics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_arm_statistics(self)
+    result = get_arm_statistics(val)
 
     # Assert property
-    assert get_arm_statistics(self) == result, "idempotent violated"
+    assert get_arm_statistics(val) == result, "idempotent violated"
 
 
 
 def test_get_next_task_bandit_basic():
     """Test get_next_task_bandit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_next_task_bandit()
+    result = get_next_task_bandit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_next_task_bandit_edge_cases():
     """Test get_next_task_bandit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_next_task_bandit()
+    result = get_next_task_bandit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -438,39 +438,39 @@ def test_get_next_task_bandit_error_handling():
 
 
 @given(st.integers())
-def test_get_next_task_bandit_property_idempotent(self, self):
+def test_get_next_task_bandit_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_next_task_bandit(self)
+    result = get_next_task_bandit(val)
 
     # Assert property
-    assert get_next_task_bandit(self) == result, "idempotent violated"
+    assert get_next_task_bandit(val) == result, "idempotent violated"
 
 
 
 def test_report_task_completion_basic():
     """Test report_task_completion: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = report_task_completion()
+    result = report_task_completion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_report_task_completion_edge_cases():
     """Test report_task_completion: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = report_task_completion()
+    result = report_task_completion()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -495,26 +495,26 @@ def test_report_task_completion_property_idempotent(self, self, task_id, perform
 def test_get_next_task_adaptive_basic():
     """Test get_next_task_adaptive: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_next_task_adaptive()
+    result = get_next_task_adaptive()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_next_task_adaptive_edge_cases():
     """Test get_next_task_adaptive: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_next_task_adaptive()
+    result = get_next_task_adaptive()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -526,39 +526,39 @@ def test_get_next_task_adaptive_error_handling():
 
 
 @given(st.integers())
-def test_get_next_task_adaptive_property_idempotent(self, self):
+def test_get_next_task_adaptive_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_next_task_adaptive(self)
+    result = get_next_task_adaptive(val)
 
     # Assert property
-    assert get_next_task_adaptive(self) == result, "idempotent violated"
+    assert get_next_task_adaptive(val) == result, "idempotent violated"
 
 
 
 def test_get_bandit_performance_report_basic():
     """Test get_bandit_performance_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_bandit_performance_report()
+    result = get_bandit_performance_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_bandit_performance_report_edge_cases():
     """Test get_bandit_performance_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_bandit_performance_report()
+    result = get_bandit_performance_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -570,39 +570,39 @@ def test_get_bandit_performance_report_error_handling():
 
 
 @given(st.integers())
-def test_get_bandit_performance_report_property_idempotent(self, self):
+def test_get_bandit_performance_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_bandit_performance_report(self)
+    result = get_bandit_performance_report(val)
 
     # Assert property
-    assert get_bandit_performance_report(self) == result, "idempotent violated"
+    assert get_bandit_performance_report(val) == result, "idempotent violated"
 
 
 
 def test_compare_bandit_strategies_basic():
     """Test compare_bandit_strategies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_bandit_strategies()
+    result = compare_bandit_strategies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_bandit_strategies_edge_cases():
     """Test compare_bandit_strategies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_bandit_strategies()
+    result = compare_bandit_strategies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -627,26 +627,26 @@ def test_compare_bandit_strategies_property_idempotent(self, self, strategies, s
 def test_switch_bandit_strategy_basic():
     """Test switch_bandit_strategy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = switch_bandit_strategy()
+    result = switch_bandit_strategy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_switch_bandit_strategy_edge_cases():
     """Test switch_bandit_strategy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = switch_bandit_strategy()
+    result = switch_bandit_strategy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -671,26 +671,26 @@ def test_switch_bandit_strategy_property_idempotent(self, self, new_strategy):
 def test_rebalance_queue_basic():
     """Test rebalance_queue: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rebalance_queue()
+    result = rebalance_queue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rebalance_queue_edge_cases():
     """Test rebalance_queue: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rebalance_queue()
+    result = rebalance_queue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -702,39 +702,39 @@ def test_rebalance_queue_error_handling():
 
 
 @given(st.integers())
-def test_rebalance_queue_property_idempotent(self, self):
+def test_rebalance_queue_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = rebalance_queue(self)
+    result = rebalance_queue(val)
 
     # Assert property
-    assert rebalance_queue(self) == result, "idempotent violated"
+    assert rebalance_queue(val) == result, "idempotent violated"
 
 
 
 def test_suggest_new_tasks_basic():
     """Test suggest_new_tasks: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = suggest_new_tasks()
+    result = suggest_new_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_suggest_new_tasks_edge_cases():
     """Test suggest_new_tasks: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = suggest_new_tasks()
+    result = suggest_new_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -759,26 +759,26 @@ def test_suggest_new_tasks_property_idempotent(self, self, max_suggestions):
 def test_get_compute_allocation_report_basic():
     """Test get_compute_allocation_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_compute_allocation_report()
+    result = get_compute_allocation_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_compute_allocation_report_edge_cases():
     """Test get_compute_allocation_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_compute_allocation_report()
+    result = get_compute_allocation_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -790,39 +790,39 @@ def test_get_compute_allocation_report_error_handling():
 
 
 @given(st.integers())
-def test_get_compute_allocation_report_property_idempotent(self, self):
+def test_get_compute_allocation_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_compute_allocation_report(self)
+    result = get_compute_allocation_report(val)
 
     # Assert property
-    assert get_compute_allocation_report(self) == result, "idempotent violated"
+    assert get_compute_allocation_report(val) == result, "idempotent violated"
 
 
 
 def test_ucb_value_basic():
     """Test ucb_value: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = ucb_value()
+    result = ucb_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_ucb_value_edge_cases():
     """Test ucb_value: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = ucb_value()
+    result = ucb_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -847,26 +847,26 @@ def test_ucb_value_property_idempotent(self, arm):
 def test_sample_posterior_basic():
     """Test sample_posterior: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample_posterior()
+    result = sample_posterior()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_posterior_edge_cases():
     """Test sample_posterior: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample_posterior()
+    result = sample_posterior()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -891,26 +891,26 @@ def test_sample_posterior_property_idempotent(self, arm):
 def test_hardware_boosted_ucb_value_basic():
     """Test hardware_boosted_ucb_value: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = hardware_boosted_ucb_value()
+    result = hardware_boosted_ucb_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_hardware_boosted_ucb_value_edge_cases():
     """Test hardware_boosted_ucb_value: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = hardware_boosted_ucb_value()
+    result = hardware_boosted_ucb_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -935,26 +935,26 @@ def test_hardware_boosted_ucb_value_property_idempotent(self, arm):
 def test_boosted_reward_basic():
     """Test boosted_reward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = boosted_reward()
+    result = boosted_reward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_boosted_reward_edge_cases():
     """Test boosted_reward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = boosted_reward()
+    result = boosted_reward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -979,26 +979,26 @@ def test_boosted_reward_property_idempotent(self, arm):
 def test_hardware_influenced_sample_basic():
     """Test hardware_influenced_sample: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = hardware_influenced_sample()
+    result = hardware_influenced_sample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_hardware_influenced_sample_edge_cases():
     """Test hardware_influenced_sample: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = hardware_influenced_sample()
+    result = hardware_influenced_sample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

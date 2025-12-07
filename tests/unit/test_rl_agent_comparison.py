@@ -15,26 +15,26 @@ import pytest
 def test_load_training_logs_basic():
     """Test load_training_logs: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_training_logs()
+    result = load_training_logs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_training_logs_edge_cases():
     """Test load_training_logs: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_training_logs()
+    result = load_training_logs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_training_logs_property_idempotent(self, agent_type, epochs):
 def test_compare_training_curves_basic():
     """Test compare_training_curves: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_training_curves()
+    result = compare_training_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_training_curves_edge_cases():
     """Test compare_training_curves: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_training_curves()
+    result = compare_training_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_compare_training_curves_error_handling():
 def test_compare_action_distributions_basic():
     """Test compare_action_distributions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_action_distributions()
+    result = compare_action_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_action_distributions_edge_cases():
     """Test compare_action_distributions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_action_distributions()
+    result = compare_action_distributions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_compare_action_distributions_error_handling():
 def test_compare_loss_curves_basic():
     """Test compare_loss_curves: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_loss_curves()
+    result = compare_loss_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_loss_curves_edge_cases():
     """Test compare_loss_curves: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_loss_curves()
+    result = compare_loss_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -158,26 +158,26 @@ def test_compare_loss_curves_error_handling():
 def test_compare_final_performance_basic():
     """Test compare_final_performance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_final_performance()
+    result = compare_final_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_final_performance_edge_cases():
     """Test compare_final_performance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_final_performance()
+    result = compare_final_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_compare_final_performance_error_handling():
 def test_generate_latex_table_basic():
     """Test generate_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_generate_latex_table_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_analytic_joint_exceedance_basic():
     """Test analytic_joint_exceedance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analytic_joint_exceedance()
+    result = analytic_joint_exceedance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analytic_joint_exceedance_edge_cases():
     """Test analytic_joint_exceedance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analytic_joint_exceedance()
+    result = analytic_joint_exceedance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -60,12 +60,12 @@ def test_analytic_joint_exceedance_no_temporal_leakage():
     """Ensure analytic_joint_exceedance doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -79,26 +79,26 @@ def test_analytic_joint_exceedance_no_temporal_leakage():
 def test_empirical_joint_exceedance_basic():
     """Test empirical_joint_exceedance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = empirical_joint_exceedance()
+    result = empirical_joint_exceedance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_empirical_joint_exceedance_edge_cases():
     """Test empirical_joint_exceedance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = empirical_joint_exceedance()
+    result = empirical_joint_exceedance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -124,12 +124,12 @@ def test_empirical_joint_exceedance_no_temporal_leakage():
     """Ensure empirical_joint_exceedance doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -143,26 +143,26 @@ def test_empirical_joint_exceedance_no_temporal_leakage():
 def test_generate_copula_figure_basic():
     """Test generate_copula_figure: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_copula_figure()
+    result = generate_copula_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_copula_figure_edge_cases():
     """Test generate_copula_figure: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_copula_figure()
+    result = generate_copula_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -187,26 +187,26 @@ def test_generate_copula_figure_property_idempotent(self, rho_range, n_samples, 
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

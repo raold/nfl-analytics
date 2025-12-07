@@ -15,26 +15,26 @@ import pytest
 def test_coverage_comparison_bar_chart_basic():
     """Test coverage_comparison_bar_chart: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = coverage_comparison_bar_chart()
+    result = coverage_comparison_bar_chart()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_coverage_comparison_bar_chart_edge_cases():
     """Test coverage_comparison_bar_chart: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = coverage_comparison_bar_chart()
+    result = coverage_comparison_bar_chart()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_coverage_comparison_bar_chart_error_handling():
 def test_calibration_sharpness_scatter_basic():
     """Test calibration_sharpness_scatter: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calibration_sharpness_scatter()
+    result = calibration_sharpness_scatter()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calibration_sharpness_scatter_edge_cases():
     """Test calibration_sharpness_scatter: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calibration_sharpness_scatter()
+    result = calibration_sharpness_scatter()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_calibration_sharpness_scatter_error_handling():
 def test_feature_ablation_progression_basic():
     """Test feature_ablation_progression: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = feature_ablation_progression()
+    result = feature_ablation_progression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_feature_ablation_progression_edge_cases():
     """Test feature_ablation_progression: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = feature_ablation_progression()
+    result = feature_ablation_progression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -114,26 +114,26 @@ def test_feature_ablation_progression_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

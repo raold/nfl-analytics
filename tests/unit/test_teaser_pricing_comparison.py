@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_get_game_data_basic():
     """Test get_game_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_game_data()
+    result = get_game_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_game_data_edge_cases():
     """Test get_game_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_game_data()
+    result = get_game_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_game_data_property_idempotent(self, conn, season_start, season_end)
 def test_fit_copula_parameters_basic():
     """Test fit_copula_parameters: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit_copula_parameters()
+    result = fit_copula_parameters()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_copula_parameters_edge_cases():
     """Test fit_copula_parameters: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit_copula_parameters()
+    result = fit_copula_parameters()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fit_copula_parameters_property_idempotent(self, margins, totals):
 def test_probability_cover_spread_basic():
     """Test probability_cover_spread: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = probability_cover_spread()
+    result = probability_cover_spread()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_probability_cover_spread_edge_cases():
     """Test probability_cover_spread: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = probability_cover_spread()
+    result = probability_cover_spread()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_probability_cover_spread_property_idempotent(self, spread, teaser_point
 def test_probability_cover_total_basic():
     """Test probability_cover_total: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = probability_cover_total()
+    result = probability_cover_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_probability_cover_total_edge_cases():
     """Test probability_cover_total: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = probability_cover_total()
+    result = probability_cover_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_probability_cover_total_property_idempotent(self, total_line, teaser_po
 def test_teaser_ev_independent_basic():
     """Test teaser_ev_independent: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = teaser_ev_independent()
+    result = teaser_ev_independent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_teaser_ev_independent_edge_cases():
     """Test teaser_ev_independent: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = teaser_ev_independent()
+    result = teaser_ev_independent()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_teaser_ev_independent_property_idempotent(self, p_spread, p_total, payo
 def test_teaser_ev_copula_basic():
     """Test teaser_ev_copula: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = teaser_ev_copula()
+    result = teaser_ev_copula()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_teaser_ev_copula_edge_cases():
     """Test teaser_ev_copula: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = teaser_ev_copula()
+    result = teaser_ev_copula()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_teaser_ev_copula_property_idempotent(self, p_spread, p_total, rho, payo
 def test_generate_teaser_ev_table_basic():
     """Test generate_teaser_ev_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_teaser_ev_table()
+    result = generate_teaser_ev_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_teaser_ev_table_edge_cases():
     """Test generate_teaser_ev_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_teaser_ev_table()
+    result = generate_teaser_ev_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_generate_teaser_ev_table_property_idempotent(self, margins, totals, cop
 def test_generate_copula_impact_summary_basic():
     """Test generate_copula_impact_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_copula_impact_summary()
+    result = generate_copula_impact_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_copula_impact_summary_edge_cases():
     """Test generate_copula_impact_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_copula_impact_summary()
+    result = generate_copula_impact_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_generate_copula_impact_summary_property_idempotent(self, results, outpu
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -433,26 +433,26 @@ def test_main_error_handling():
 def test_convert_types_basic():
     """Test convert_types: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = convert_types()
+    result = convert_types()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_convert_types_edge_cases():
     """Test convert_types: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = convert_types()
+    result = convert_types()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

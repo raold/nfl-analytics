@@ -15,26 +15,26 @@ import pytest
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_forward_property_idempotent(self, self, state):
 def test_push_basic():
     """Test push: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = push()
+    result = push()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_push_edge_cases():
     """Test push: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = push()
+    result = push()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_push_property_idempotent(self, self, state, action, reward, next_state,
 def test_sample_basic():
     """Test sample: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sample()
+    result = sample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sample_edge_cases():
     """Test sample: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sample()
+    result = sample()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_sample_property_idempotent(self, self, batch_size):
 def test_select_action_basic():
     """Test select_action: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_action()
+    result = select_action()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_action_edge_cases():
     """Test select_action: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_action()
+    result = select_action()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_select_action_property_idempotent(self, self, state, training):
 def test_store_experience_basic():
     """Test store_experience: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = store_experience()
+    result = store_experience()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_store_experience_edge_cases():
     """Test store_experience: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = store_experience()
+    result = store_experience()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_store_experience_property_idempotent(self, self, state, action, reward,
 def test_train_step_basic():
     """Test train_step: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_step()
+    result = train_step()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_step_edge_cases():
     """Test train_step: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_step()
+    result = train_step()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,39 +266,39 @@ def test_train_step_error_handling():
 
 
 @given(st.integers())
-def test_train_step_property_idempotent(self, self):
+def test_train_step_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = train_step(self)
+    result = train_step(val)
 
     # Assert property
-    assert train_step(self) == result, "idempotent violated"
+    assert train_step(val) == result, "idempotent violated"
 
 
 
 def test_get_feature_importance_basic():
     """Test get_feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_feature_importance_edge_cases():
     """Test get_feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -310,39 +310,39 @@ def test_get_feature_importance_error_handling():
 
 
 @given(st.integers())
-def test_get_feature_importance_property_idempotent(self, self):
+def test_get_feature_importance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_feature_importance(self)
+    result = get_feature_importance(val)
 
     # Assert property
-    assert get_feature_importance(self) == result, "idempotent violated"
+    assert get_feature_importance(val) == result, "idempotent violated"
 
 
 
 def test_save_basic():
     """Test save: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_save_property_idempotent(self, self, path):
 def test_load_basic():
     """Test load: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_load_property_idempotent(self, self, path):
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -455,26 +455,26 @@ def test_forward_property_idempotent(self, self, state):
 def test_select_action_basic():
     """Test select_action: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_action()
+    result = select_action()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_action_edge_cases():
     """Test select_action: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_action()
+    result = select_action()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -499,26 +499,26 @@ def test_select_action_property_idempotent(self, self, state, training):
 def test_store_experience_basic():
     """Test store_experience: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = store_experience()
+    result = store_experience()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_store_experience_edge_cases():
     """Test store_experience: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = store_experience()
+    result = store_experience()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -543,26 +543,26 @@ def test_store_experience_property_idempotent(self, self, state, action, reward,
 def test_compute_gae_basic():
     """Test compute_gae: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_gae()
+    result = compute_gae()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_gae_edge_cases():
     """Test compute_gae: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_gae()
+    result = compute_gae()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -574,39 +574,39 @@ def test_compute_gae_error_handling():
 
 
 @given(st.integers())
-def test_compute_gae_property_idempotent(self, self):
+def test_compute_gae_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = compute_gae(self)
+    result = compute_gae(val)
 
     # Assert property
-    assert compute_gae(self) == result, "idempotent violated"
+    assert compute_gae(val) == result, "idempotent violated"
 
 
 
 def test_train_step_basic():
     """Test train_step: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_step()
+    result = train_step()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_step_edge_cases():
     """Test train_step: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_step()
+    result = train_step()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -618,39 +618,39 @@ def test_train_step_error_handling():
 
 
 @given(st.integers())
-def test_train_step_property_idempotent(self, self):
+def test_train_step_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = train_step(self)
+    result = train_step(val)
 
     # Assert property
-    assert train_step(self) == result, "idempotent violated"
+    assert train_step(val) == result, "idempotent violated"
 
 
 
 def test_get_feature_importance_basic():
     """Test get_feature_importance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_feature_importance_edge_cases():
     """Test get_feature_importance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_feature_importance()
+    result = get_feature_importance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -662,39 +662,39 @@ def test_get_feature_importance_error_handling():
 
 
 @given(st.integers())
-def test_get_feature_importance_property_idempotent(self, self):
+def test_get_feature_importance_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_feature_importance(self)
+    result = get_feature_importance(val)
 
     # Assert property
-    assert get_feature_importance(self) == result, "idempotent violated"
+    assert get_feature_importance(val) == result, "idempotent violated"
 
 
 
 def test_save_basic():
     """Test save: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -719,26 +719,26 @@ def test_save_property_idempotent(self, self, path):
 def test_load_basic():
     """Test load: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -763,26 +763,26 @@ def test_load_property_idempotent(self, self, path):
 def test_run_ablation_basic():
     """Test run_ablation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_ablation()
+    result = run_ablation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_ablation_edge_cases():
     """Test run_ablation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_ablation()
+    result = run_ablation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

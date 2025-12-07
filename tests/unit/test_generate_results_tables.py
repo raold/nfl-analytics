@@ -15,26 +15,26 @@ import pytest
 def test_format_roi_basic():
     """Test format_roi: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_roi()
+    result = format_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_roi_edge_cases():
     """Test format_roi: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_roi()
+    result = format_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_format_roi_property_idempotent(self, roi):
 def test_format_brier_basic():
     """Test format_brier: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_brier()
+    result = format_brier()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_brier_edge_cases():
     """Test format_brier: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_brier()
+    result = format_brier()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_format_brier_property_idempotent(self, b):
 def test_format_logloss_basic():
     """Test format_logloss: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_logloss()
+    result = format_logloss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_logloss_edge_cases():
     """Test format_logloss: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_logloss()
+    result = format_logloss()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_format_logloss_property_idempotent(self, ll):
 def test_format_acc_basic():
     """Test format_acc: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_acc()
+    result = format_acc()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_acc_edge_cases():
     """Test format_acc: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_acc()
+    result = format_acc()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_format_acc_property_idempotent(self, acc):
 def test_clean_model_name_basic():
     """Test clean_model_name: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = clean_model_name()
+    result = clean_model_name()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_clean_model_name_edge_cases():
     """Test clean_model_name: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = clean_model_name()
+    result = clean_model_name()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_clean_model_name_property_idempotent(self, name):
 def test_generate_multimodel_comparison_table_basic():
     """Test generate_multimodel_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_multimodel_comparison_table()
+    result = generate_multimodel_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_multimodel_comparison_table_edge_cases():
     """Test generate_multimodel_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_multimodel_comparison_table()
+    result = generate_multimodel_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_generate_multimodel_comparison_table_error_handling():
 def test_generate_per_season_summary_basic():
     """Test generate_per_season_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_per_season_summary()
+    result = generate_per_season_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_per_season_summary_edge_cases():
     """Test generate_per_season_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_per_season_summary()
+    result = generate_per_season_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -301,26 +301,26 @@ def test_generate_per_season_summary_error_handling():
 def test_generate_rl_comparison_table_basic():
     """Test generate_rl_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_rl_comparison_table()
+    result = generate_rl_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_rl_comparison_table_edge_cases():
     """Test generate_rl_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_rl_comparison_table()
+    result = generate_rl_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -334,26 +334,26 @@ def test_generate_rl_comparison_table_error_handling():
 def test_generate_zero_weeks_table_basic():
     """Test generate_zero_weeks_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_zero_weeks_table()
+    result = generate_zero_weeks_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_zero_weeks_table_edge_cases():
     """Test generate_zero_weeks_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_zero_weeks_table()
+    result = generate_zero_weeks_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_generate_zero_weeks_table_error_handling():
 def test_generate_core_ablation_table_basic():
     """Test generate_core_ablation_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_core_ablation_table()
+    result = generate_core_ablation_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_core_ablation_table_edge_cases():
     """Test generate_core_ablation_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_core_ablation_table()
+    result = generate_core_ablation_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_generate_core_ablation_table_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

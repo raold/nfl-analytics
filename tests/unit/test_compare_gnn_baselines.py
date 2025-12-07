@@ -15,26 +15,26 @@ import pytest
 def test_load_gnn_results_basic():
     """Test load_gnn_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_gnn_results()
+    result = load_gnn_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_gnn_results_edge_cases():
     """Test load_gnn_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_gnn_results()
+    result = load_gnn_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_gnn_results_error_handling():
 def test_load_xgboost_results_basic():
     """Test load_xgboost_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_xgboost_results()
+    result = load_xgboost_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_xgboost_results_edge_cases():
     """Test load_xgboost_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_xgboost_results()
+    result = load_xgboost_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_load_xgboost_results_error_handling():
 def test_create_baseline_comparison_table_basic():
     """Test create_baseline_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_baseline_comparison_table()
+    result = create_baseline_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_baseline_comparison_table_edge_cases():
     """Test create_baseline_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_baseline_comparison_table()
+    result = create_baseline_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -114,26 +114,26 @@ def test_create_baseline_comparison_table_error_handling():
 def test_generate_detailed_comparison_text_basic():
     """Test generate_detailed_comparison_text: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_detailed_comparison_text()
+    result = generate_detailed_comparison_text()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_detailed_comparison_text_edge_cases():
     """Test generate_detailed_comparison_text: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_detailed_comparison_text()
+    result = generate_detailed_comparison_text()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_detailed_comparison_text_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

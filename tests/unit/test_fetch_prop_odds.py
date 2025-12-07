@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_american_odds_to_implied_prob_basic():
     """Test american_odds_to_implied_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_odds_to_implied_prob()
+    result = american_odds_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_odds_to_implied_prob_edge_cases():
     """Test american_odds_to_implied_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_odds_to_implied_prob()
+    result = american_odds_to_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_american_odds_to_implied_prob_property_idempotent(self, self, odds):
 def test_calculate_hold_basic():
     """Test calculate_hold: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_hold()
+    result = calculate_hold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_hold_edge_cases():
     """Test calculate_hold: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_hold()
+    result = calculate_hold()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_hold_property_idempotent(self, self, over_odds, under_odds):
 def test_get_events_basic():
     """Test get_events: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_events()
+    result = get_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_events_edge_cases():
     """Test get_events: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_events()
+    result = get_events()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_events_property_idempotent(self, self, bookmakers):
 def test_get_player_props_basic():
     """Test get_player_props: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_player_props()
+    result = get_player_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_player_props_edge_cases():
     """Test get_player_props: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_player_props()
+    result = get_player_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_get_player_props_property_idempotent(self, self, event_id, markets, boo
 def test_parse_prop_data_basic():
     """Test parse_prop_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_prop_data()
+    result = parse_prop_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_prop_data_edge_cases():
     """Test parse_prop_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_prop_data()
+    result = parse_prop_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_parse_prop_data_property_idempotent(self, self, event_data, snapshot_ti
 def test_enrich_with_player_ids_basic():
     """Test enrich_with_player_ids: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = enrich_with_player_ids()
+    result = enrich_with_player_ids()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_enrich_with_player_ids_edge_cases():
     """Test enrich_with_player_ids: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = enrich_with_player_ids()
+    result = enrich_with_player_ids()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_enrich_with_player_ids_property_idempotent(self, self, records):
 def test_match_to_games_basic():
     """Test match_to_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = match_to_games()
+    result = match_to_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_match_to_games_edge_cases():
     """Test match_to_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = match_to_games()
+    result = match_to_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_match_to_games_property_idempotent(self, self, records):
 def test_insert_prop_lines_basic():
     """Test insert_prop_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = insert_prop_lines()
+    result = insert_prop_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_insert_prop_lines_edge_cases():
     """Test insert_prop_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = insert_prop_lines()
+    result = insert_prop_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_insert_prop_lines_property_idempotent(self, self, records):
 def test_fetch_and_store_all_props_basic():
     """Test fetch_and_store_all_props: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_and_store_all_props()
+    result = fetch_and_store_all_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_and_store_all_props_edge_cases():
     """Test fetch_and_store_all_props: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_and_store_all_props()
+    result = fetch_and_store_all_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

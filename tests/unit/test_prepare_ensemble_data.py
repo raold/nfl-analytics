@@ -15,26 +15,26 @@ import pytest
 def test_spread_to_prob_basic():
     """Test spread_to_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = spread_to_prob()
+    result = spread_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_spread_to_prob_edge_cases():
     """Test spread_to_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = spread_to_prob()
+    result = spread_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_spread_to_prob_property_idempotent(self, spread):
 def test_prepare_ensemble_data_basic():
     """Test prepare_ensemble_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_ensemble_data()
+    result = prepare_ensemble_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_ensemble_data_edge_cases():
     """Test prepare_ensemble_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_ensemble_data()
+    result = prepare_ensemble_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_prepare_ensemble_data_property_idempotent(self, input_path, output_path
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

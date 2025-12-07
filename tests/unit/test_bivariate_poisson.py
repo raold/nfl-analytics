@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_fetch_games_basic():
     """Test fetch_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_games()
+    result = fetch_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_games_edge_cases():
     """Test fetch_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_games()
+    result = fetch_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_games_property_idempotent(self, seasons):
 def test_tau_basic():
     """Test tau: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = tau()
+    result = tau()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_tau_edge_cases():
     """Test tau: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = tau()
+    result = tau()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_tau_property_idempotent(self, x, y, lambda_x, lambda_y, rho):
 def test_bivariate_poisson_pmf_basic():
     """Test bivariate_poisson_pmf: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bivariate_poisson_pmf()
+    result = bivariate_poisson_pmf()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bivariate_poisson_pmf_edge_cases():
     """Test bivariate_poisson_pmf: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bivariate_poisson_pmf()
+    result = bivariate_poisson_pmf()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_bivariate_poisson_pmf_property_idempotent(self, x, y, lambda_x, lambda_
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -213,26 +213,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -246,26 +246,26 @@ def test_main_error_handling():
 def test_generate_latex_table_basic():
     """Test generate_latex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_latex_table()
+    result = generate_latex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -290,26 +290,26 @@ def test_generate_latex_table_property_idempotent(self, model, output_path):
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -334,26 +334,26 @@ def test_fit_property_idempotent(self, self, df):
 def test_predict_score_distribution_basic():
     """Test predict_score_distribution: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_score_distribution()
+    result = predict_score_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_score_distribution_edge_cases():
     """Test predict_score_distribution: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_score_distribution()
+    result = predict_score_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -378,26 +378,26 @@ def test_predict_score_distribution_property_idempotent(self, self, home_team, a
 def test_predict_margin_distribution_basic():
     """Test predict_margin_distribution: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_margin_distribution()
+    result = predict_margin_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_margin_distribution_edge_cases():
     """Test predict_margin_distribution: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_margin_distribution()
+    result = predict_margin_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -422,26 +422,26 @@ def test_predict_margin_distribution_property_idempotent(self, self, home_team, 
 def test_predict_total_distribution_basic():
     """Test predict_total_distribution: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_total_distribution()
+    result = predict_total_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_total_distribution_edge_cases():
     """Test predict_total_distribution: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_total_distribution()
+    result = predict_total_distribution()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -466,26 +466,26 @@ def test_predict_total_distribution_property_idempotent(self, self, home_team, a
 def test_save_basic():
     """Test save: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -510,26 +510,26 @@ def test_save_property_idempotent(self, self, path):
 def test_load_basic():
     """Test load: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_test_ensemble_basic():
     """Test test_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_ensemble()
+    result = test_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_ensemble_edge_cases():
     """Test test_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_ensemble()
+    result = test_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

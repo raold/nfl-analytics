@@ -15,26 +15,26 @@ import pytest
 def test_kelly_fraction_basic():
     """Test kelly_fraction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_fraction()
+    result = kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_fraction_edge_cases():
     """Test kelly_fraction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_fraction()
+    result = kelly_fraction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_kelly_fraction_property_idempotent(self, prob, odds, kelly_multiplier, 
 def test_american_to_decimal_basic():
     """Test american_to_decimal: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_american_to_decimal_property_idempotent(self, american_odds):
 def test_get_implied_prob_basic():
     """Test get_implied_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_implied_prob()
+    result = get_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_implied_prob_edge_cases():
     """Test get_implied_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_implied_prob()
+    result = get_implied_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_get_implied_prob_property_idempotent(self, spread, vig):
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -213,26 +213,26 @@ def test_main_error_handling():
 def test_backtest_basic():
     """Test backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_backtest_edge_cases():
     """Test backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = backtest()
+    result = backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -257,26 +257,26 @@ def test_backtest_property_idempotent(self, self, ensemble, df, train_df):
 def test_save_results_basic():
     """Test save_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_build_features_basic():
     """Test build_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_features()
+    result = build_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_features_edge_cases():
     """Test build_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_features()
+    result = build_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

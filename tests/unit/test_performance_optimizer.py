@@ -15,26 +15,26 @@ import pytest
 def test_add_issue_basic():
     """Test add_issue: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_issue_property_idempotent(self, self, issue):
 def test_profile_python_basic():
     """Test profile_python: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = profile_python()
+    result = profile_python()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_profile_python_edge_cases():
     """Test profile_python: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = profile_python()
+    result = profile_python()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_profile_python_property_idempotent(self, self, file_path, function_name
 def test_analyze_query_basic():
     """Test analyze_query: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_query()
+    result = analyze_query()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_query_edge_cases():
     """Test analyze_query: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_query()
+    result = analyze_query()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_analyze_query_property_idempotent(self, self, query):
 def test_check_mcmc_config_basic():
     """Test check_mcmc_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_mcmc_config()
+    result = check_mcmc_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_mcmc_config_edge_cases():
     """Test check_mcmc_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_mcmc_config()
+    result = check_mcmc_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_check_mcmc_config_property_idempotent(self, self, chains, tune, draws, 
 def test_analyze_pandas_code_basic():
     """Test analyze_pandas_code: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_pandas_code()
+    result = analyze_pandas_code()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_pandas_code_edge_cases():
     """Test analyze_pandas_code: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_pandas_code()
+    result = analyze_pandas_code()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_analyze_pandas_code_property_idempotent(self, self, code, file_path):
 def test_estimate_backtest_time_basic():
     """Test estimate_backtest_time: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_backtest_time()
+    result = estimate_backtest_time()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_backtest_time_edge_cases():
     """Test estimate_backtest_time: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_backtest_time()
+    result = estimate_backtest_time()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -280,12 +280,12 @@ def test_estimate_backtest_time_no_temporal_leakage():
     """Ensure estimate_backtest_time doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -299,26 +299,26 @@ def test_estimate_backtest_time_no_temporal_leakage():
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -330,11 +330,11 @@ def test_generate_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_report_property_idempotent(self, self):
+def test_generate_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_report(self)
+    result = generate_report(val)
 
     # Assert property
-    assert generate_report(self) == result, "idempotent violated"
+    assert generate_report(val) == result, "idempotent violated"
 

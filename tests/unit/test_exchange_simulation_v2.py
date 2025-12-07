@@ -15,26 +15,26 @@ import pytest
 def test_spread_to_probability_basic():
     """Test spread_to_probability: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = spread_to_probability()
+    result = spread_to_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_spread_to_probability_edge_cases():
     """Test spread_to_probability: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = spread_to_probability()
+    result = spread_to_probability()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_spread_to_probability_property_idempotent(self, spread):
 def test_probability_to_decimal_odds_basic():
     """Test probability_to_decimal_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = probability_to_decimal_odds()
+    result = probability_to_decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_probability_to_decimal_odds_edge_cases():
     """Test probability_to_decimal_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = probability_to_decimal_odds()
+    result = probability_to_decimal_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_probability_to_decimal_odds_property_idempotent(self, prob, vig_pct):
 def test_calculate_expected_value_basic():
     """Test calculate_expected_value: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_expected_value()
+    result = calculate_expected_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_expected_value_edge_cases():
     """Test calculate_expected_value: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_expected_value()
+    result = calculate_expected_value()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_calculate_expected_value_property_idempotent(self, model_prob, market_p
 def test_load_predictions_with_market_basic():
     """Test load_predictions_with_market: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_predictions_with_market()
+    result = load_predictions_with_market()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_predictions_with_market_edge_cases():
     """Test load_predictions_with_market: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_predictions_with_market()
+    result = load_predictions_with_market()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_load_predictions_with_market_property_idempotent(self, model_path, feat
 def test_run_ev_simulation_basic():
     """Test run_ev_simulation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_ev_simulation()
+    result = run_ev_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_ev_simulation_edge_cases():
     """Test run_ev_simulation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_ev_simulation()
+    result = run_ev_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_run_ev_simulation_property_idempotent(self, predictions, vig_pct, ev_th
 def test_compare_ev_thresholds_basic():
     """Test compare_ev_thresholds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_ev_thresholds()
+    result = compare_ev_thresholds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_ev_thresholds_edge_cases():
     """Test compare_ev_thresholds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_ev_thresholds()
+    result = compare_ev_thresholds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_compare_ev_thresholds_property_idempotent(self, predictions, vig_pct, e
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

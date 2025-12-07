@@ -15,26 +15,26 @@ import pytest
 def test_add_issue_basic():
     """Test add_issue: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_issue_property_idempotent(self, self, issue):
 def test_has_critical_issues_basic():
     """Test has_critical_issues: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = has_critical_issues()
+    result = has_critical_issues()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_has_critical_issues_edge_cases():
     """Test has_critical_issues: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = has_critical_issues()
+    result = has_critical_issues()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_has_critical_issues_error_handling():
 
 
 @given(st.integers())
-def test_has_critical_issues_property_idempotent(self, self):
+def test_has_critical_issues_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = has_critical_issues(self)
+    result = has_critical_issues(val)
 
     # Assert property
-    assert has_critical_issues(self) == result, "idempotent violated"
+    assert has_critical_issues(val) == result, "idempotent violated"
 
 
 
 def test_to_json_basic():
     """Test to_json: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_json()
+    result = to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_json_edge_cases():
     """Test to_json: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_json()
+    result = to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -134,39 +134,39 @@ def test_to_json_error_handling():
 
 
 @given(st.integers())
-def test_to_json_property_idempotent(self, self):
+def test_to_json_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_json(self)
+    result = to_json(val)
 
     # Assert property
-    assert to_json(self) == result, "idempotent violated"
+    assert to_json(val) == result, "idempotent violated"
 
 
 
 def test_validate_rhat_basic():
     """Test validate_rhat: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_rhat()
+    result = validate_rhat()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_rhat_edge_cases():
     """Test validate_rhat: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_rhat()
+    result = validate_rhat()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -192,12 +192,12 @@ def test_validate_rhat_no_temporal_leakage():
     """Ensure validate_rhat doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -211,26 +211,26 @@ def test_validate_rhat_no_temporal_leakage():
 def test_validate_ess_basic():
     """Test validate_ess: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_ess()
+    result = validate_ess()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_ess_edge_cases():
     """Test validate_ess: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_ess()
+    result = validate_ess()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -256,12 +256,12 @@ def test_validate_ess_no_temporal_leakage():
     """Ensure validate_ess doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -275,26 +275,26 @@ def test_validate_ess_no_temporal_leakage():
 def test_validate_divergences_basic():
     """Test validate_divergences: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_divergences()
+    result = validate_divergences()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_divergences_edge_cases():
     """Test validate_divergences: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_divergences()
+    result = validate_divergences()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -320,12 +320,12 @@ def test_validate_divergences_no_temporal_leakage():
     """Ensure validate_divergences doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -339,26 +339,26 @@ def test_validate_divergences_no_temporal_leakage():
 def test_validate_calibration_basic():
     """Test validate_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_calibration()
+    result = validate_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_calibration_edge_cases():
     """Test validate_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_calibration()
+    result = validate_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -384,12 +384,12 @@ def test_validate_calibration_no_temporal_leakage():
     """Ensure validate_calibration doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -403,26 +403,26 @@ def test_validate_calibration_no_temporal_leakage():
 def test_validate_priors_basic():
     """Test validate_priors: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_priors()
+    result = validate_priors()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_priors_edge_cases():
     """Test validate_priors: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_priors()
+    result = validate_priors()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -448,12 +448,12 @@ def test_validate_priors_no_temporal_leakage():
     """Ensure validate_priors doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -467,26 +467,26 @@ def test_validate_priors_no_temporal_leakage():
 def test_validate_model_basic():
     """Test validate_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_model()
+    result = validate_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_model_edge_cases():
     """Test validate_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_model()
+    result = validate_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -512,12 +512,12 @@ def test_validate_model_no_temporal_leakage():
     """Ensure validate_model doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -531,26 +531,26 @@ def test_validate_model_no_temporal_leakage():
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

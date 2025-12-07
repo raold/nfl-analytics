@@ -15,26 +15,26 @@ import pytest
 def test_demo_basic():
     """Test demo: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo()
+    result = demo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_edge_cases():
     """Test demo: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo()
+    result = demo()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_error_handling():
 def test_get_model_assignment_basic():
     """Test get_model_assignment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_model_assignment()
+    result = get_model_assignment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_model_assignment_edge_cases():
     """Test get_model_assignment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_model_assignment()
+    result = get_model_assignment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_model_assignment_property_idempotent(self, self, player_id, week):
 def test_get_predictions_basic():
     """Test get_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_predictions()
+    result = get_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_predictions_edge_cases():
     """Test get_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_predictions()
+    result = get_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_get_predictions_property_idempotent(self, self, player_ids, week, seaso
 def test_record_outcome_basic():
     """Test record_outcome: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_outcome()
+    result = record_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_outcome_edge_cases():
     """Test record_outcome: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_outcome()
+    result = record_outcome()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_record_outcome_property_idempotent(self, self, player_id, week, actual_
 def test_get_current_metrics_basic():
     """Test get_current_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_current_metrics()
+    result = get_current_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_current_metrics_edge_cases():
     """Test get_current_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_current_metrics()
+    result = get_current_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_get_current_metrics_error_handling():
 
 
 @given(st.integers())
-def test_get_current_metrics_property_idempotent(self, self):
+def test_get_current_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_current_metrics(self)
+    result = get_current_metrics(val)
 
     # Assert property
-    assert get_current_metrics(self) == result, "idempotent violated"
+    assert get_current_metrics(val) == result, "idempotent violated"
 
 
 
 def test_rollback_basic():
     """Test rollback: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rollback()
+    result = rollback()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rollback_edge_cases():
     """Test rollback: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rollback()
+    result = rollback()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,39 +255,39 @@ def test_rollback_error_handling():
 
 
 @given(st.integers())
-def test_rollback_property_idempotent(self, self):
+def test_rollback_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = rollback(self)
+    result = rollback(val)
 
     # Assert property
-    assert rollback(self) == result, "idempotent violated"
+    assert rollback(val) == result, "idempotent violated"
 
 
 
 def test_promote_treatment_basic():
     """Test promote_treatment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = promote_treatment()
+    result = promote_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_promote_treatment_edge_cases():
     """Test promote_treatment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = promote_treatment()
+    result = promote_treatment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,11 +299,11 @@ def test_promote_treatment_error_handling():
 
 
 @given(st.integers())
-def test_promote_treatment_property_idempotent(self, self):
+def test_promote_treatment_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = promote_treatment(self)
+    result = promote_treatment(val)
 
     # Assert property
-    assert promote_treatment(self) == result, "idempotent violated"
+    assert promote_treatment(val) == result, "idempotent violated"
 

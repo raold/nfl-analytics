@@ -15,26 +15,26 @@ import pytest
 def test_get_default_cache_basic():
     """Test get_default_cache: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_default_cache()
+    result = get_default_cache()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_default_cache_edge_cases():
     """Test get_default_cache: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_default_cache()
+    result = get_default_cache()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_default_cache_error_handling():
 def test_get_basic():
     """Test get: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get()
+    result = get()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_edge_cases():
     """Test get: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get()
+    result = get()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_property_idempotent(self, self, key):
 def test_set_basic():
     """Test set: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = set()
+    result = set()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_set_edge_cases():
     """Test set: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = set()
+    result = set()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_set_property_idempotent(self, self, key, value, ttl):
 def test_delete_basic():
     """Test delete: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = delete()
+    result = delete()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_delete_edge_cases():
     """Test delete: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = delete()
+    result = delete()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_delete_property_idempotent(self, self, key):
 def test_exists_basic():
     """Test exists: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exists()
+    result = exists()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exists_edge_cases():
     """Test exists: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exists()
+    result = exists()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_exists_property_idempotent(self, self, key):
 def test_get_or_set_basic():
     """Test get_or_set: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_or_set()
+    result = get_or_set()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_or_set_edge_cases():
     """Test get_or_set: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_or_set()
+    result = get_or_set()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_get_or_set_property_idempotent(self, self, key, default_value, ttl):
 def test_clear_all_basic():
     """Test clear_all: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = clear_all()
+    result = clear_all()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_clear_all_edge_cases():
     """Test clear_all: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = clear_all()
+    result = clear_all()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,39 +299,39 @@ def test_clear_all_error_handling():
 
 
 @given(st.integers())
-def test_clear_all_property_idempotent(self, self):
+def test_clear_all_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = clear_all(self)
+    result = clear_all(val)
 
     # Assert property
-    assert clear_all(self) == result, "idempotent violated"
+    assert clear_all(val) == result, "idempotent violated"
 
 
 
 def test_get_hit_rate_basic():
     """Test get_hit_rate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_hit_rate()
+    result = get_hit_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_hit_rate_edge_cases():
     """Test get_hit_rate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_hit_rate()
+    result = get_hit_rate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,39 +343,39 @@ def test_get_hit_rate_error_handling():
 
 
 @given(st.integers())
-def test_get_hit_rate_property_idempotent(self, self):
+def test_get_hit_rate_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_hit_rate(self)
+    result = get_hit_rate(val)
 
     # Assert property
-    assert get_hit_rate(self) == result, "idempotent violated"
+    assert get_hit_rate(val) == result, "idempotent violated"
 
 
 
 def test_get_stats_basic():
     """Test get_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_stats()
+    result = get_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_stats_edge_cases():
     """Test get_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_stats()
+    result = get_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -387,39 +387,39 @@ def test_get_stats_error_handling():
 
 
 @given(st.integers())
-def test_get_stats_property_idempotent(self, self):
+def test_get_stats_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_stats(self)
+    result = get_stats(val)
 
     # Assert property
-    assert get_stats(self) == result, "idempotent violated"
+    assert get_stats(val) == result, "idempotent violated"
 
 
 
 def test_print_stats_basic():
     """Test print_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_stats()
+    result = print_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_stats_edge_cases():
     """Test print_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_stats()
+    result = print_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -431,39 +431,39 @@ def test_print_stats_error_handling():
 
 
 @given(st.integers())
-def test_print_stats_property_idempotent(self, self):
+def test_print_stats_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = print_stats(self)
+    result = print_stats(val)
 
     # Assert property
-    assert print_stats(self) == result, "idempotent violated"
+    assert print_stats(val) == result, "idempotent violated"
 
 
 
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -475,11 +475,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

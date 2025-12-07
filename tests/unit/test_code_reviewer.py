@@ -15,26 +15,26 @@ import pytest
 def test_add_issue_basic():
     """Test add_issue: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_issue()
+    result = add_issue()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_add_issue_property_idempotent(self, self, issue):
 def test_has_blocking_issues_basic():
     """Test has_blocking_issues: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = has_blocking_issues()
+    result = has_blocking_issues()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_has_blocking_issues_edge_cases():
     """Test has_blocking_issues: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = has_blocking_issues()
+    result = has_blocking_issues()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_has_blocking_issues_error_handling():
 
 
 @given(st.integers())
-def test_has_blocking_issues_property_idempotent(self, self):
+def test_has_blocking_issues_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = has_blocking_issues(self)
+    result = has_blocking_issues(val)
 
     # Assert property
-    assert has_blocking_issues(self) == result, "idempotent violated"
+    assert has_blocking_issues(val) == result, "idempotent violated"
 
 
 
 def test_review_file_basic():
     """Test review_file: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = review_file()
+    result = review_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_review_file_edge_cases():
     """Test review_file: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = review_file()
+    result = review_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_review_file_property_idempotent(self, self, file_path):
 def test_review_changes_basic():
     """Test review_changes: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = review_changes()
+    result = review_changes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_review_changes_edge_cases():
     """Test review_changes: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = review_changes()
+    result = review_changes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_review_changes_property_idempotent(self, self, git_diff):
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,11 +222,11 @@ def test_generate_report_error_handling():
 
 
 @given(st.integers())
-def test_generate_report_property_idempotent(self, self):
+def test_generate_report_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_report(self)
+    result = generate_report(val)
 
     # Assert property
-    assert generate_report(self) == result, "idempotent violated"
+    assert generate_report(val) == result, "idempotent violated"
 

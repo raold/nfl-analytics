@@ -15,26 +15,26 @@ import pytest
 def test_demo_bnn_basic():
     """Test demo_bnn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = demo_bnn()
+    result = demo_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_demo_bnn_edge_cases():
     """Test demo_bnn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = demo_bnn()
+    result = demo_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_demo_bnn_error_handling():
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fit_property_idempotent(self, self, X, y, verbose):
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_predict_property_idempotent(self, self, X, return_std, n_samples):
 def test_save_basic():
     """Test save: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save()
+    result = save()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_save_property_idempotent(self, self, path):
 def test_load_basic():
     """Test load: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load()
+    result = load()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_train_baseline_ensemble_basic():
     """Test train_baseline_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_baseline_ensemble()
+    result = train_baseline_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_baseline_ensemble_edge_cases():
     """Test train_baseline_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_baseline_ensemble()
+    result = train_baseline_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_train_baseline_ensemble_property_idempotent(self, train_df, return_dict
 def test_train_enhanced_ensemble_basic():
     """Test train_enhanced_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_enhanced_ensemble()
+    result = train_enhanced_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_enhanced_ensemble_edge_cases():
     """Test train_enhanced_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_enhanced_ensemble()
+    result = train_enhanced_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_train_enhanced_ensemble_property_idempotent(self, train_df, return_dict
 def test_run_comparison_backtest_optimized_basic():
     """Test run_comparison_backtest_optimized: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_comparison_backtest_optimized()
+    result = run_comparison_backtest_optimized()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_comparison_backtest_optimized_edge_cases():
     """Test run_comparison_backtest_optimized: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_comparison_backtest_optimized()
+    result = run_comparison_backtest_optimized()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_run_comparison_backtest_optimized_property_idempotent(self, train_seaso
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

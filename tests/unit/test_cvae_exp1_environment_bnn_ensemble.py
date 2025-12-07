@@ -15,26 +15,26 @@ import pytest
 def test_load_cvae_model_basic():
     """Test load_cvae_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_cvae_model()
+    result = load_cvae_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_cvae_model_edge_cases():
     """Test load_cvae_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_cvae_model()
+    result = load_cvae_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_cvae_model_property_idempotent(self, model_path):
 def test_load_environment_bnn_basic():
     """Test load_environment_bnn: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_environment_bnn()
+    result = load_environment_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_environment_bnn_edge_cases():
     """Test load_environment_bnn: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_environment_bnn()
+    result = load_environment_bnn()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_environment_bnn_property_idempotent(self, model_path):
 def test_generate_trajectory_features_basic():
     """Test generate_trajectory_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_trajectory_features()
+    result = generate_trajectory_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_trajectory_features_edge_cases():
     """Test generate_trajectory_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_trajectory_features()
+    result = generate_trajectory_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_trajectory_features_property_idempotent(self, cvae_model, scal
 def test_load_test_data_basic():
     """Test load_test_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_test_data()
+    result = load_test_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_test_data_edge_cases():
     """Test load_test_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_test_data()
+    result = load_test_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_load_test_data_error_handling():
 def test_run_experiment_basic():
     """Test run_experiment: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_experiment()
+    result = run_experiment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_experiment_edge_cases():
     """Test run_experiment: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_experiment()
+    result = run_experiment()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

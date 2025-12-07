@@ -15,26 +15,26 @@ import pytest
 def test_run_basic():
     """Test run: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_property_idempotent(self, self, config, progress_callback):
 def test_load_checkpoint_basic():
     """Test load_checkpoint: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_checkpoint()
+    result = load_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_checkpoint_edge_cases():
     """Test load_checkpoint: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_checkpoint()
+    result = load_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

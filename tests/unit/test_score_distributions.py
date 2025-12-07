@@ -15,26 +15,26 @@ import pytest
 def test_skellam_pmf_basic():
     """Test skellam_pmf: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = skellam_pmf()
+    result = skellam_pmf()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_skellam_pmf_edge_cases():
     """Test skellam_pmf: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = skellam_pmf()
+    result = skellam_pmf()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_skellam_pmf_property_idempotent(self, mu_home, mu_away, k):
 def test_skellam_pmf_range_basic():
     """Test skellam_pmf_range: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = skellam_pmf_range()
+    result = skellam_pmf_range()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_skellam_pmf_range_edge_cases():
     """Test skellam_pmf_range: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = skellam_pmf_range()
+    result = skellam_pmf_range()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_skellam_pmf_range_property_idempotent(self, mu_home, mu_away, k_min, k_
 def test_reweight_key_masses_basic():
     """Test reweight_key_masses: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reweight_key_masses()
+    result = reweight_key_masses()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reweight_key_masses_edge_cases():
     """Test reweight_key_masses: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reweight_key_masses()
+    result = reweight_key_masses()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_reweight_key_masses_property_idempotent(self, pmf, targets):
 def test_reweight_with_moments_basic():
     """Test reweight_with_moments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reweight_with_moments()
+    result = reweight_with_moments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reweight_with_moments_edge_cases():
     """Test reweight_with_moments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reweight_with_moments()
+    result = reweight_with_moments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_reweight_with_moments_property_idempotent(self, pmf, targets, mu, var):
 def test_cover_push_probs_basic():
     """Test cover_push_probs: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cover_push_probs()
+    result = cover_push_probs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cover_push_probs_edge_cases():
     """Test cover_push_probs: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cover_push_probs()
+    result = cover_push_probs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_cover_push_probs_property_idempotent(self, pmf, spread):
 def test_total_over_prob_basic():
     """Test total_over_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = total_over_prob()
+    result = total_over_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_total_over_prob_edge_cases():
     """Test total_over_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = total_over_prob()
+    result = total_over_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

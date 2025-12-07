@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_fetch_actual_outcomes_basic():
     """Test fetch_actual_outcomes: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_actual_outcomes()
+    result = fetch_actual_outcomes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_actual_outcomes_edge_cases():
     """Test fetch_actual_outcomes: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_actual_outcomes()
+    result = fetch_actual_outcomes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_actual_outcomes_property_idempotent(self, self, stat_type, season
 def test_run_weekly_backtest_basic():
     """Test run_weekly_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_weekly_backtest()
+    result = run_weekly_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_weekly_backtest_edge_cases():
     """Test run_weekly_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_weekly_backtest()
+    result = run_weekly_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_run_weekly_backtest_property_idempotent(self, self, stat_type, season, 
 def test_calculate_metrics_basic():
     """Test calculate_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_metrics_property_idempotent(self, self, results):
 def test_compare_with_baseline_basic():
     """Test compare_with_baseline: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_with_baseline()
+    result = compare_with_baseline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_with_baseline_edge_cases():
     """Test compare_with_baseline: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_with_baseline()
+    result = compare_with_baseline()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_compare_with_baseline_property_idempotent(self, self, results, baseline
 def test_simulate_betting_performance_basic():
     """Test simulate_betting_performance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_betting_performance()
+    result = simulate_betting_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_betting_performance_edge_cases():
     """Test simulate_betting_performance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_betting_performance()
+    result = simulate_betting_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_simulate_betting_performance_property_idempotent(self, self, results, p
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_generate_report_property_idempotent(self, self, results, metrics, outpu
 def test_run_full_backtest_basic():
     """Test run_full_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_full_backtest()
+    result = run_full_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_full_backtest_edge_cases():
     """Test run_full_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_full_backtest()
+    result = run_full_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

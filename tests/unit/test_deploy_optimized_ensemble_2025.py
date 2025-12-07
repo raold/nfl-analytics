@@ -15,26 +15,26 @@ import pytest
 def test_create_optimized_ensemble_basic():
     """Test create_optimized_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_optimized_ensemble()
+    result = create_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_optimized_ensemble_edge_cases():
     """Test create_optimized_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_optimized_ensemble()
+    result = create_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_create_optimized_ensemble_error_handling():
 def test_apply_betting_criteria_basic():
     """Test apply_betting_criteria: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = apply_betting_criteria()
+    result = apply_betting_criteria()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_apply_betting_criteria_edge_cases():
     """Test apply_betting_criteria: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = apply_betting_criteria()
+    result = apply_betting_criteria()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_apply_betting_criteria_property_idempotent(self, predictions, min_edge,
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_main_error_handling():
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -169,26 +169,26 @@ def test_fit_property_idempotent(self, self, probabilities, targets):
 def test_transform_basic():
     """Test transform: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = transform()
+    result = transform()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_transform_edge_cases():
     """Test transform: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = transform()
+    result = transform()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

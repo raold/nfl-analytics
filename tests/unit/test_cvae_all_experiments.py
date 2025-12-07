@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_cvae_model_basic():
     """Test load_cvae_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_cvae_model()
+    result = load_cvae_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_cvae_model_edge_cases():
     """Test load_cvae_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_cvae_model()
+    result = load_cvae_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_load_cvae_model_error_handling():
 
 
 @given(st.integers())
-def test_load_cvae_model_property_idempotent(self, self):
+def test_load_cvae_model_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_cvae_model(self)
+    result = load_cvae_model(val)
 
     # Assert property
-    assert load_cvae_model(self) == result, "idempotent violated"
+    assert load_cvae_model(val) == result, "idempotent violated"
 
 
 
 def test_exp1_environment_bnn_ensemble_basic():
     """Test exp1_environment_bnn_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp1_environment_bnn_ensemble()
+    result = exp1_environment_bnn_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp1_environment_bnn_ensemble_edge_cases():
     """Test exp1_environment_bnn_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp1_environment_bnn_ensemble()
+    result = exp1_environment_bnn_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_exp1_environment_bnn_ensemble_error_handling():
 
 
 @given(st.integers())
-def test_exp1_environment_bnn_ensemble_property_idempotent(self, self):
+def test_exp1_environment_bnn_ensemble_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp1_environment_bnn_ensemble(self)
+    result = exp1_environment_bnn_ensemble(val)
 
     # Assert property
-    assert exp1_environment_bnn_ensemble(self) == result, "idempotent violated"
+    assert exp1_environment_bnn_ensemble(val) == result, "idempotent violated"
 
 
 
 def test_exp2_same_game_parlay_pricing_basic():
     """Test exp2_same_game_parlay_pricing: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp2_same_game_parlay_pricing()
+    result = exp2_same_game_parlay_pricing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp2_same_game_parlay_pricing_edge_cases():
     """Test exp2_same_game_parlay_pricing: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp2_same_game_parlay_pricing()
+    result = exp2_same_game_parlay_pricing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_exp2_same_game_parlay_pricing_error_handling():
 
 
 @given(st.integers())
-def test_exp2_same_game_parlay_pricing_property_idempotent(self, self):
+def test_exp2_same_game_parlay_pricing_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp2_same_game_parlay_pricing(self)
+    result = exp2_same_game_parlay_pricing(val)
 
     # Assert property
-    assert exp2_same_game_parlay_pricing(self) == result, "idempotent violated"
+    assert exp2_same_game_parlay_pricing(val) == result, "idempotent violated"
 
 
 
 def test_exp3_causal_counterfactuals_basic():
     """Test exp3_causal_counterfactuals: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp3_causal_counterfactuals()
+    result = exp3_causal_counterfactuals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp3_causal_counterfactuals_edge_cases():
     """Test exp3_causal_counterfactuals: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp3_causal_counterfactuals()
+    result = exp3_causal_counterfactuals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_exp3_causal_counterfactuals_error_handling():
 
 
 @given(st.integers())
-def test_exp3_causal_counterfactuals_property_idempotent(self, self):
+def test_exp3_causal_counterfactuals_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp3_causal_counterfactuals(self)
+    result = exp3_causal_counterfactuals(val)
 
     # Assert property
-    assert exp3_causal_counterfactuals(self) == result, "idempotent violated"
+    assert exp3_causal_counterfactuals(val) == result, "idempotent violated"
 
 
 
 def test_exp4_live_trajectories_basic():
     """Test exp4_live_trajectories: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp4_live_trajectories()
+    result = exp4_live_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp4_live_trajectories_edge_cases():
     """Test exp4_live_trajectories: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp4_live_trajectories()
+    result = exp4_live_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,39 +255,39 @@ def test_exp4_live_trajectories_error_handling():
 
 
 @given(st.integers())
-def test_exp4_live_trajectories_property_idempotent(self, self):
+def test_exp4_live_trajectories_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp4_live_trajectories(self)
+    result = exp4_live_trajectories(val)
 
     # Assert property
-    assert exp4_live_trajectories(self) == result, "idempotent violated"
+    assert exp4_live_trajectories(val) == result, "idempotent violated"
 
 
 
 def test_exp5_key_numbers_basic():
     """Test exp5_key_numbers: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp5_key_numbers()
+    result = exp5_key_numbers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp5_key_numbers_edge_cases():
     """Test exp5_key_numbers: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp5_key_numbers()
+    result = exp5_key_numbers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,39 +299,39 @@ def test_exp5_key_numbers_error_handling():
 
 
 @given(st.integers())
-def test_exp5_key_numbers_property_idempotent(self, self):
+def test_exp5_key_numbers_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp5_key_numbers(self)
+    result = exp5_key_numbers(val)
 
     # Assert property
-    assert exp5_key_numbers(self) == result, "idempotent violated"
+    assert exp5_key_numbers(val) == result, "idempotent violated"
 
 
 
 def test_exp6_gnn_enhanced_basic():
     """Test exp6_gnn_enhanced: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp6_gnn_enhanced()
+    result = exp6_gnn_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp6_gnn_enhanced_edge_cases():
     """Test exp6_gnn_enhanced: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp6_gnn_enhanced()
+    result = exp6_gnn_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,39 +343,39 @@ def test_exp6_gnn_enhanced_error_handling():
 
 
 @given(st.integers())
-def test_exp6_gnn_enhanced_property_idempotent(self, self):
+def test_exp6_gnn_enhanced_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp6_gnn_enhanced(self)
+    result = exp6_gnn_enhanced(val)
 
     # Assert property
-    assert exp6_gnn_enhanced(self) == result, "idempotent violated"
+    assert exp6_gnn_enhanced(val) == result, "idempotent violated"
 
 
 
 def test_exp7_hierarchical_player_basic():
     """Test exp7_hierarchical_player: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = exp7_hierarchical_player()
+    result = exp7_hierarchical_player()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_exp7_hierarchical_player_edge_cases():
     """Test exp7_hierarchical_player: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = exp7_hierarchical_player()
+    result = exp7_hierarchical_player()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -387,39 +387,39 @@ def test_exp7_hierarchical_player_error_handling():
 
 
 @given(st.integers())
-def test_exp7_hierarchical_player_property_idempotent(self, self):
+def test_exp7_hierarchical_player_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = exp7_hierarchical_player(self)
+    result = exp7_hierarchical_player(val)
 
     # Assert property
-    assert exp7_hierarchical_player(self) == result, "idempotent violated"
+    assert exp7_hierarchical_player(val) == result, "idempotent violated"
 
 
 
 def test_run_all_experiments_basic():
     """Test run_all_experiments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_all_experiments()
+    result = run_all_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_all_experiments_edge_cases():
     """Test run_all_experiments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_all_experiments()
+    result = run_all_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -431,11 +431,11 @@ def test_run_all_experiments_error_handling():
 
 
 @given(st.integers())
-def test_run_all_experiments_property_idempotent(self, self):
+def test_run_all_experiments_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_all_experiments(self)
+    result = run_all_experiments(val)
 
     # Assert property
-    assert run_all_experiments(self) == result, "idempotent violated"
+    assert run_all_experiments(val) == result, "idempotent violated"
 

@@ -15,26 +15,26 @@ import pytest
 def test_load_sweep_results_basic():
     """Test load_sweep_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_sweep_results()
+    result = load_sweep_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_sweep_results_edge_cases():
     """Test load_sweep_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_sweep_results()
+    result = load_sweep_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_sweep_results_property_idempotent(self, results_path):
 def test_extract_grid_data_basic():
     """Test extract_grid_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_grid_data()
+    result = extract_grid_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_grid_data_edge_cases():
     """Test extract_grid_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_grid_data()
+    result = extract_grid_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_extract_grid_data_property_idempotent(self, results, param1, param2, me
 def test_plot_sensitivity_heatmap_basic():
     """Test plot_sensitivity_heatmap: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_sensitivity_heatmap()
+    result = plot_sensitivity_heatmap()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_sensitivity_heatmap_edge_cases():
     """Test plot_sensitivity_heatmap: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_sensitivity_heatmap()
+    result = plot_sensitivity_heatmap()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_plot_sensitivity_heatmap_property_idempotent(self, results_path, output
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

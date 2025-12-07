@@ -15,26 +15,26 @@ import pytest
 def test_get_redis_client_basic():
     """Test get_redis_client: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_redis_client()
+    result = get_redis_client()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_redis_client_edge_cases():
     """Test get_redis_client: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_redis_client()
+    result = get_redis_client()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_get_redis_client_property_idempotent(self, host, port, db, password):
 def test_get_queue_status_basic():
     """Test get_queue_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_queue_status()
+    result = get_queue_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_queue_status_edge_cases():
     """Test get_queue_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_queue_status()
+    result = get_queue_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_get_queue_status_property_idempotent(self, redis_client, queue_name):
 def test_list_tasks_basic():
     """Test list_tasks: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list_tasks()
+    result = list_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_tasks_edge_cases():
     """Test list_tasks: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list_tasks()
+    result = list_tasks()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_list_tasks_property_idempotent(self, redis_client, status_filter):
 def test_to_dict_basic():
     """Test to_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -178,39 +178,39 @@ def test_to_dict_error_handling():
 
 
 @given(st.integers())
-def test_to_dict_property_idempotent(self, self):
+def test_to_dict_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_dict(self)
+    result = to_dict(val)
 
     # Assert property
-    assert to_dict(self) == result, "idempotent violated"
+    assert to_dict(val) == result, "idempotent violated"
 
 
 
 def test_from_dict_basic():
     """Test from_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = from_dict()
+    result = from_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_from_dict_edge_cases():
     """Test from_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = from_dict()
+    result = from_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_from_dict_property_idempotent(self, cls, data):
 def test_to_json_basic():
     """Test to_json: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_json()
+    result = to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_json_edge_cases():
     """Test to_json: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_json()
+    result = to_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,39 +266,39 @@ def test_to_json_error_handling():
 
 
 @given(st.integers())
-def test_to_json_property_idempotent(self, self):
+def test_to_json_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_json(self)
+    result = to_json(val)
 
     # Assert property
-    assert to_json(self) == result, "idempotent violated"
+    assert to_json(val) == result, "idempotent violated"
 
 
 
 def test_from_json_basic():
     """Test from_json: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = from_json()
+    result = from_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_from_json_edge_cases():
     """Test from_json: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = from_json()
+    result = from_json()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_from_json_property_idempotent(self, cls, json_str):
 def test_submit_basic():
     """Test submit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = submit()
+    result = submit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_submit_edge_cases():
     """Test submit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = submit()
+    result = submit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_submit_property_idempotent(self, self, redis_client, queue_name):
 def test_claim_basic():
     """Test claim: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = claim()
+    result = claim()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_claim_edge_cases():
     """Test claim: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = claim()
+    result = claim()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_claim_property_idempotent(self, redis_client, worker_id, device_type, g
 def test_update_status_basic():
     """Test update_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_status()
+    result = update_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_status_edge_cases():
     """Test update_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_status()
+    result = update_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -456,12 +456,12 @@ def test_update_status_no_temporal_leakage():
     """Ensure update_status doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -475,26 +475,26 @@ def test_update_status_no_temporal_leakage():
 def test_save_checkpoint_basic():
     """Test save_checkpoint: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_checkpoint()
+    result = save_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_checkpoint_edge_cases():
     """Test save_checkpoint: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_checkpoint()
+    result = save_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -519,26 +519,26 @@ def test_save_checkpoint_property_idempotent(self, self, redis_client, epoch, me
 def test_generate_configs_basic():
     """Test generate_configs: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_configs()
+    result = generate_configs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_configs_edge_cases():
     """Test generate_configs: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_configs()
+    result = generate_configs()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -550,39 +550,39 @@ def test_generate_configs_error_handling():
 
 
 @given(st.integers())
-def test_generate_configs_property_idempotent(self, self):
+def test_generate_configs_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = generate_configs(self)
+    result = generate_configs(val)
 
     # Assert property
-    assert generate_configs(self) == result, "idempotent violated"
+    assert generate_configs(val) == result, "idempotent violated"
 
 
 
 def test_submit_basic():
     """Test submit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = submit()
+    result = submit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_submit_edge_cases():
     """Test submit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = submit()
+    result = submit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

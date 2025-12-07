@@ -15,26 +15,26 @@ import pytest
 def test_run_simulation_basic():
     """Test run_simulation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_simulation()
+    result = run_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_simulation_edge_cases():
     """Test run_simulation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_simulation()
+    result = run_simulation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_simulation_property_idempotent(self, ensemble, data, initial_bankro
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_calculate_bet_size_basic():
     """Test calculate_bet_size: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_bet_size()
+    result = calculate_bet_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_bet_size_edge_cases():
     """Test calculate_bet_size: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_bet_size()
+    result = calculate_bet_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_bet_size_property_idempotent(self, self, kelly_fraction):
 def test_execute_bet_basic():
     """Test execute_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = execute_bet()
+    result = execute_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_execute_bet_edge_cases():
     """Test execute_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = execute_bet()
+    result = execute_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_execute_bet_property_idempotent(self, self, game_id, action, bet_fracti
 def test_get_metrics_basic():
     """Test get_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_metrics()
+    result = get_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_metrics_edge_cases():
     """Test get_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_metrics()
+    result = get_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,11 +211,11 @@ def test_get_metrics_error_handling():
 
 
 @given(st.integers())
-def test_get_metrics_property_idempotent(self, self):
+def test_get_metrics_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_metrics(self)
+    result = get_metrics(val)
 
     # Assert property
-    assert get_metrics(self) == result, "idempotent violated"
+    assert get_metrics(val) == result, "idempotent violated"
 

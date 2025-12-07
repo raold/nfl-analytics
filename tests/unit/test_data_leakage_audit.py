@@ -15,26 +15,26 @@ import pytest
 def test_audit_feature_leakage_basic():
     """Test audit_feature_leakage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = audit_feature_leakage()
+    result = audit_feature_leakage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_audit_feature_leakage_edge_cases():
     """Test audit_feature_leakage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = audit_feature_leakage()
+    result = audit_feature_leakage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_audit_feature_leakage_error_handling():
 def test_audit_vegas_features_basic():
     """Test audit_vegas_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = audit_vegas_features()
+    result = audit_vegas_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_audit_vegas_features_edge_cases():
     """Test audit_vegas_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = audit_vegas_features()
+    result = audit_vegas_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_audit_vegas_features_error_handling():
 def test_audit_time_based_splits_basic():
     """Test audit_time_based_splits: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = audit_time_based_splits()
+    result = audit_time_based_splits()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_audit_time_based_splits_edge_cases():
     """Test audit_time_based_splits: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = audit_time_based_splits()
+    result = audit_time_based_splits()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -115,12 +115,12 @@ def test_audit_time_based_splits_no_temporal_leakage():
     """Ensure audit_time_based_splits doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -134,26 +134,26 @@ def test_audit_time_based_splits_no_temporal_leakage():
 def test_audit_kelly_sizing_basic():
     """Test audit_kelly_sizing: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = audit_kelly_sizing()
+    result = audit_kelly_sizing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_audit_kelly_sizing_edge_cases():
     """Test audit_kelly_sizing: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = audit_kelly_sizing()
+    result = audit_kelly_sizing()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,26 +167,26 @@ def test_audit_kelly_sizing_error_handling():
 def test_audit_win_rate_reality_check_basic():
     """Test audit_win_rate_reality_check: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = audit_win_rate_reality_check()
+    result = audit_win_rate_reality_check()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_audit_win_rate_reality_check_edge_cases():
     """Test audit_win_rate_reality_check: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = audit_win_rate_reality_check()
+    result = audit_win_rate_reality_check()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_audit_win_rate_reality_check_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

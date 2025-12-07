@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_predictions_with_outcomes_basic():
     """Test load_predictions_with_outcomes: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_predictions_with_outcomes()
+    result = load_predictions_with_outcomes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_predictions_with_outcomes_edge_cases():
     """Test load_predictions_with_outcomes: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_predictions_with_outcomes()
+    result = load_predictions_with_outcomes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_predictions_with_outcomes_property_idempotent(self, self, start_da
 def test_calculate_coverage_basic():
     """Test calculate_coverage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_coverage()
+    result = calculate_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_coverage_edge_cases():
     """Test calculate_coverage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_coverage()
+    result = calculate_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_coverage_property_idempotent(self, self, df, confidence_level
 def test_calculate_quantile_calibration_basic():
     """Test calculate_quantile_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_quantile_calibration()
+    result = calculate_quantile_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_quantile_calibration_edge_cases():
     """Test calculate_quantile_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_quantile_calibration()
+    result = calculate_quantile_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_quantile_calibration_property_idempotent(self, self, df):
 def test_create_reliability_diagram_basic():
     """Test create_reliability_diagram: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_reliability_diagram()
+    result = create_reliability_diagram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_reliability_diagram_edge_cases():
     """Test create_reliability_diagram: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_reliability_diagram()
+    result = create_reliability_diagram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_create_reliability_diagram_property_idempotent(self, self, df, n_bins):
 def test_create_calibration_plot_basic():
     """Test create_calibration_plot: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_calibration_plot()
+    result = create_calibration_plot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_calibration_plot_edge_cases():
     """Test create_calibration_plot: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_calibration_plot()
+    result = create_calibration_plot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_create_calibration_plot_property_idempotent(self, self, df):
 def test_detect_calibration_drift_basic():
     """Test detect_calibration_drift: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_calibration_drift()
+    result = detect_calibration_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_calibration_drift_edge_cases():
     """Test detect_calibration_drift: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_calibration_drift()
+    result = detect_calibration_drift()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_detect_calibration_drift_property_idempotent(self, self, df, window_siz
 def test_save_calibration_metrics_basic():
     """Test save_calibration_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_calibration_metrics()
+    result = save_calibration_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_calibration_metrics_edge_cases():
     """Test save_calibration_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_calibration_metrics()
+    result = save_calibration_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_save_calibration_metrics_property_idempotent(self, self, metrics, model
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

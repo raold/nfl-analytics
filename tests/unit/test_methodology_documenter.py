@@ -15,26 +15,26 @@ import pytest
 def test_generate_methods_section_basic():
     """Test generate_methods_section: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_methods_section()
+    result = generate_methods_section()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_methods_section_edge_cases():
     """Test generate_methods_section: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_methods_section()
+    result = generate_methods_section()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_generate_methods_section_property_idempotent(self, analysis_log, study_
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_test_error_handling():
 def test_document_analysis_basic():
     """Test document_analysis: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = document_analysis()
+    result = document_analysis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_document_analysis_edge_cases():
     """Test document_analysis: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = document_analysis()
+    result = document_analysis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_document_analysis_property_idempotent(self, self, methods_used, study_c
 def test_generate_methods_section_basic():
     """Test generate_methods_section: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_methods_section()
+    result = generate_methods_section()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_methods_section_edge_cases():
     """Test generate_methods_section: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_methods_section()
+    result = generate_methods_section()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_generate_methods_section_property_idempotent(self, self, doc):
 def test_generate_citation_list_basic():
     """Test generate_citation_list: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_citation_list()
+    result = generate_citation_list()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_citation_list_edge_cases():
     """Test generate_citation_list: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_citation_list()
+    result = generate_citation_list()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_generate_citation_list_property_idempotent(self, self, doc):
 def test_export_to_file_basic():
     """Test export_to_file: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = export_to_file()
+    result = export_to_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_export_to_file_edge_cases():
     """Test export_to_file: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = export_to_file()
+    result = export_to_file()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

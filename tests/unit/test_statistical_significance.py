@@ -15,26 +15,26 @@ import pytest
 def test_diebold_mariano_test_basic():
     """Test diebold_mariano_test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = diebold_mariano_test()
+    result = diebold_mariano_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_diebold_mariano_test_edge_cases():
     """Test diebold_mariano_test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = diebold_mariano_test()
+    result = diebold_mariano_test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_diebold_mariano_test_property_idempotent(self, losses1, losses2, h, alt
 def test_bootstrap_confidence_interval_basic():
     """Test bootstrap_confidence_interval: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = bootstrap_confidence_interval()
+    result = bootstrap_confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_bootstrap_confidence_interval_edge_cases():
     """Test bootstrap_confidence_interval: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = bootstrap_confidence_interval()
+    result = bootstrap_confidence_interval()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_bootstrap_confidence_interval_property_idempotent(self, data, statistic
 def test_paired_t_test_models_basic():
     """Test paired_t_test_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = paired_t_test_models()
+    result = paired_t_test_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_paired_t_test_models_edge_cases():
     """Test paired_t_test_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = paired_t_test_models()
+    result = paired_t_test_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_paired_t_test_models_property_idempotent(self, model1_preds, model2_pre
 def test_multiple_testing_correction_basic():
     """Test multiple_testing_correction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = multiple_testing_correction()
+    result = multiple_testing_correction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_multiple_testing_correction_edge_cases():
     """Test multiple_testing_correction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = multiple_testing_correction()
+    result = multiple_testing_correction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_multiple_testing_correction_property_idempotent(self, p_values, method)
 def test_generate_significance_tables_basic():
     """Test generate_significance_tables: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_significance_tables()
+    result = generate_significance_tables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_significance_tables_edge_cases():
     """Test generate_significance_tables: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_significance_tables()
+    result = generate_significance_tables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_generate_significance_tables_property_idempotent(self, output_dir):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_main_error_handling():
 def test_brier_score_basic():
     """Test brier_score: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = brier_score()
+    result = brier_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_brier_score_edge_cases():
     """Test brier_score: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = brier_score()
+    result = brier_score()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

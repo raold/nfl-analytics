@@ -15,26 +15,26 @@ import pytest
 def test_connect_db_basic():
     """Test connect_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_connect_db_error_handling():
 def test_fetch_betting_games_basic():
     """Test fetch_betting_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_betting_games()
+    result = fetch_betting_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_betting_games_edge_cases():
     """Test fetch_betting_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_betting_games()
+    result = fetch_betting_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_betting_games_property_idempotent(self, conn, start_season, min_w
 def test_load_model_params_basic():
     """Test load_model_params: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_model_params()
+    result = load_model_params()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_model_params_edge_cases():
     """Test load_model_params: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_model_params()
+    result = load_model_params()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_model_params_property_idempotent(self, path):
 def test_predict_spread_and_prob_basic():
     """Test predict_spread_and_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict_spread_and_prob()
+    result = predict_spread_and_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_spread_and_prob_edge_cases():
     """Test predict_spread_and_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict_spread_and_prob()
+    result = predict_spread_and_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_predict_spread_and_prob_property_idempotent(self, home_team, away_team,
 def test_compute_clv_basic():
     """Test compute_clv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_clv()
+    result = compute_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_clv_edge_cases():
     """Test compute_clv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_clv()
+    result = compute_clv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_compute_clv_property_idempotent(self, model_prob, closing_line):
 def test_compute_roi_basic():
     """Test compute_roi: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_roi()
+    result = compute_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_roi_edge_cases():
     """Test compute_roi: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_roi()
+    result = compute_roi()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_compute_roi_property_idempotent(self, df, model_probs, spreads, kelly_f
 def test_generate_live_metrics_basic():
     """Test generate_live_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_live_metrics()
+    result = generate_live_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_live_metrics_edge_cases():
     """Test generate_live_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_live_metrics()
+    result = generate_live_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

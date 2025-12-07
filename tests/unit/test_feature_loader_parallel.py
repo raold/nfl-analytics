@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_all_features_parallel_basic():
     """Test load_all_features_parallel: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_all_features_parallel()
+    result = load_all_features_parallel()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_all_features_parallel_edge_cases():
     """Test load_all_features_parallel: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_all_features_parallel()
+    result = load_all_features_parallel()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

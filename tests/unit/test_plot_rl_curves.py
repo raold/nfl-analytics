@@ -15,26 +15,26 @@ import pytest
 def test_load_training_log_basic():
     """Test load_training_log: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_training_log()
+    result = load_training_log()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_training_log_edge_cases():
     """Test load_training_log: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_training_log()
+    result = load_training_log()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_training_log_property_idempotent(self, log_path):
 def test_extract_epochs_and_rewards_basic():
     """Test extract_epochs_and_rewards: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_epochs_and_rewards()
+    result = extract_epochs_and_rewards()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_epochs_and_rewards_edge_cases():
     """Test extract_epochs_and_rewards: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_epochs_and_rewards()
+    result = extract_epochs_and_rewards()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_extract_epochs_and_rewards_property_idempotent(self, log):
 def test_compute_rolling_stats_basic():
     """Test compute_rolling_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_rolling_stats()
+    result = compute_rolling_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_rolling_stats_edge_cases():
     """Test compute_rolling_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_rolling_stats()
+    result = compute_rolling_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_compute_rolling_stats_property_idempotent(self, rewards, window):
 def test_plot_learning_curves_basic():
     """Test plot_learning_curves: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_learning_curves()
+    result = plot_learning_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_learning_curves_edge_cases():
     """Test plot_learning_curves: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_learning_curves()
+    result = plot_learning_curves()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_plot_learning_curves_property_idempotent(self, dqn_log_path, ppo_log_pa
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

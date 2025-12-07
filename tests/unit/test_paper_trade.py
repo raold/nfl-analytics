@@ -15,26 +15,26 @@ import pytest
 def test_run_command_basic():
     """Test run_command: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_command()
+    result = run_command()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_command_edge_cases():
     """Test run_command: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_command()
+    result = run_command()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_command_property_idempotent(self, cmd, description):
 def test_recommend_bets_basic():
     """Test recommend_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = recommend_bets()
+    result = recommend_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_recommend_bets_edge_cases():
     """Test recommend_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = recommend_bets()
+    result = recommend_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_recommend_bets_property_idempotent(self, week, season):
 def test_log_bet_basic():
     """Test log_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_bet()
+    result = log_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_bet_edge_cases():
     """Test log_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_bet()
+    result = log_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_log_bet_property_idempotent(self, args):
 def test_update_bet_basic():
     """Test update_bet: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_bet()
+    result = update_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_bet_edge_cases():
     """Test update_bet: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_bet()
+    result = update_bet()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -192,12 +192,12 @@ def test_update_bet_no_temporal_leakage():
     """Ensure update_bet doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -211,26 +211,26 @@ def test_update_bet_no_temporal_leakage():
 def test_list_bets_basic():
     """Test list_bets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list_bets()
+    result = list_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_bets_edge_cases():
     """Test list_bets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list_bets()
+    result = list_bets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_list_bets_error_handling():
 def test_generate_report_basic():
     """Test generate_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_report()
+    result = generate_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -277,26 +277,26 @@ def test_generate_report_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

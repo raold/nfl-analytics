@@ -15,26 +15,26 @@ import pytest
 def test_get_machine_id_basic():
     """Test get_machine_id: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_machine_id()
+    result = get_machine_id()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_machine_id_edge_cases():
     """Test get_machine_id: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_machine_id()
+    result = get_machine_id()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_machine_id_error_handling():
 def test_get_machine_summary_basic():
     """Test get_machine_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_machine_summary()
+    result = get_machine_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_machine_summary_edge_cases():
     """Test get_machine_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_machine_summary()
+    result = get_machine_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_get_machine_summary_error_handling():
 def test_is_gpu_available_basic():
     """Test is_gpu_available: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_gpu_available()
+    result = is_gpu_available()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_gpu_available_edge_cases():
     """Test is_gpu_available: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_gpu_available()
+    result = is_gpu_available()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -114,26 +114,26 @@ def test_is_gpu_available_error_handling():
 def test_get_optimal_config_basic():
     """Test get_optimal_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_optimal_config()
+    result = get_optimal_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_optimal_config_edge_cases():
     """Test get_optimal_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_optimal_config()
+    result = get_optimal_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -158,26 +158,26 @@ def test_get_optimal_config_property_idempotent(self, task_type):
 def test_get_machine_info_basic():
     """Test get_machine_info: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_machine_info()
+    result = get_machine_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_machine_info_edge_cases():
     """Test get_machine_info: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_machine_info()
+    result = get_machine_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -202,26 +202,26 @@ def test_get_machine_info_property_idempotent(self, self, force_refresh):
 def test_get_optimal_task_config_basic():
     """Test get_optimal_task_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_optimal_task_config()
+    result = get_optimal_task_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_optimal_task_config_edge_cases():
     """Test get_optimal_task_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_optimal_task_config()
+    result = get_optimal_task_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -246,26 +246,26 @@ def test_get_optimal_task_config_property_idempotent(self, self, task_type):
 def test_should_prefer_task_type_basic():
     """Test should_prefer_task_type: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = should_prefer_task_type()
+    result = should_prefer_task_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_should_prefer_task_type_edge_cases():
     """Test should_prefer_task_type: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = should_prefer_task_type()
+    result = should_prefer_task_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -290,26 +290,26 @@ def test_should_prefer_task_type_property_idempotent(self, self, task_type):
 def test_get_machine_summary_basic():
     """Test get_machine_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_machine_summary()
+    result = get_machine_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_machine_summary_edge_cases():
     """Test get_machine_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_machine_summary()
+    result = get_machine_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -321,11 +321,11 @@ def test_get_machine_summary_error_handling():
 
 
 @given(st.integers())
-def test_get_machine_summary_property_idempotent(self, self):
+def test_get_machine_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_machine_summary(self)
+    result = get_machine_summary(val)
 
     # Assert property
-    assert get_machine_summary(self) == result, "idempotent violated"
+    assert get_machine_summary(val) == result, "idempotent violated"
 

@@ -15,26 +15,26 @@ import pytest
 def test_get_db_config_basic():
     """Test get_db_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_db_config()
+    result = get_db_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_db_config_edge_cases():
     """Test get_db_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_db_config()
+    result = get_db_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_db_config_error_handling():
 def test_train_model_basic():
     """Test train_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_model_edge_cases():
     """Test train_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_model()
+    result = train_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_train_model_property_idempotent(self, start_season, end_season, epochs,
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

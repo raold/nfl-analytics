@@ -15,26 +15,26 @@ import pytest
 def test_create_simulated_data_basic():
     """Test create_simulated_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_simulated_data()
+    result = create_simulated_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_simulated_data_edge_cases():
     """Test create_simulated_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_simulated_data()
+    result = create_simulated_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_create_simulated_data_property_idempotent(self, n_samples):
 def test_connect_basic():
     """Test connect: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = connect()
+    result = connect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_connect_edge_cases():
     """Test connect: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = connect()
+    result = connect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -90,39 +90,39 @@ def test_connect_error_handling():
 
 
 @given(st.integers())
-def test_connect_property_idempotent(self, self):
+def test_connect_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = connect(self)
+    result = connect(val)
 
     # Assert property
-    assert connect(self) == result, "idempotent violated"
+    assert connect(val) == result, "idempotent violated"
 
 
 
 def test_disconnect_basic():
     """Test disconnect: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = disconnect()
+    result = disconnect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_disconnect_edge_cases():
     """Test disconnect: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = disconnect()
+    result = disconnect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -134,39 +134,39 @@ def test_disconnect_error_handling():
 
 
 @given(st.integers())
-def test_disconnect_property_idempotent(self, self):
+def test_disconnect_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = disconnect(self)
+    result = disconnect(val)
 
     # Assert property
-    assert disconnect(self) == result, "idempotent violated"
+    assert disconnect(val) == result, "idempotent violated"
 
 
 
 def test_extract_game_trajectories_basic():
     """Test extract_game_trajectories: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_game_trajectories()
+    result = extract_game_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_game_trajectories_edge_cases():
     """Test extract_game_trajectories: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_game_trajectories()
+    result = extract_game_trajectories()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_extract_game_trajectories_property_idempotent(self, self, start_season,
 def test_prepare_datasets_basic():
     """Test prepare_datasets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_datasets()
+    result = prepare_datasets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_datasets_edge_cases():
     """Test prepare_datasets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_datasets()
+    result = prepare_datasets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_prepare_datasets_property_idempotent(self, self, trajectories, conditio
 def test_save_processed_data_basic():
     """Test save_processed_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_processed_data()
+    result = save_processed_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_processed_data_edge_cases():
     """Test save_processed_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_processed_data()
+    result = save_processed_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_setup_plot_style_basic():
     """Test setup_plot_style: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = setup_plot_style()
+    result = setup_plot_style()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_setup_plot_style_edge_cases():
     """Test setup_plot_style: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = setup_plot_style()
+    result = setup_plot_style()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_setup_plot_style_error_handling():
 def test_save_figure_basic():
     """Test save_figure: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_figure()
+    result = save_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_figure_edge_cases():
     """Test save_figure: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_figure()
+    result = save_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_save_figure_property_idempotent(self, fig, path):
 def test_plot_with_confidence_basic():
     """Test plot_with_confidence: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_with_confidence()
+    result = plot_with_confidence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_with_confidence_edge_cases():
     """Test plot_with_confidence: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_with_confidence()
+    result = plot_with_confidence()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_plot_with_confidence_property_idempotent(self, ax, x, y, y_err, y_lower
 def test_plot_calibration_enhanced_basic():
     """Test plot_calibration_enhanced: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_calibration_enhanced()
+    result = plot_calibration_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_calibration_enhanced_edge_cases():
     """Test plot_calibration_enhanced: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_calibration_enhanced()
+    result = plot_calibration_enhanced()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_plot_calibration_enhanced_property_idempotent(self, ax, y_true, y_pred,
 def test_boxplot_with_outliers_basic():
     """Test boxplot_with_outliers: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = boxplot_with_outliers()
+    result = boxplot_with_outliers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_boxplot_with_outliers_edge_cases():
     """Test boxplot_with_outliers: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = boxplot_with_outliers()
+    result = boxplot_with_outliers()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_boxplot_with_outliers_property_idempotent(self, ax, data, positions, la
 def test_plot_importance_with_ci_basic():
     """Test plot_importance_with_ci: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_importance_with_ci()
+    result = plot_importance_with_ci()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_importance_with_ci_edge_cases():
     """Test plot_importance_with_ci: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_importance_with_ci()
+    result = plot_importance_with_ci()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_plot_importance_with_ci_property_idempotent(self, ax, features, importa
 def test_scatter_with_marginals_basic():
     """Test scatter_with_marginals: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = scatter_with_marginals()
+    result = scatter_with_marginals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_scatter_with_marginals_edge_cases():
     """Test scatter_with_marginals: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = scatter_with_marginals()
+    result = scatter_with_marginals()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_scatter_with_marginals_property_idempotent(self, x, y, figsize):
 def test_add_direct_labels_basic():
     """Test add_direct_labels: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_direct_labels()
+    result = add_direct_labels()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_direct_labels_edge_cases():
     """Test add_direct_labels: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_direct_labels()
+    result = add_direct_labels()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_add_direct_labels_property_idempotent(self, ax, lines, labels, offset):
 def test_add_risk_indicators_basic():
     """Test add_risk_indicators: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_risk_indicators()
+    result = add_risk_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_risk_indicators_edge_cases():
     """Test add_risk_indicators: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_risk_indicators()
+    result = add_risk_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_add_risk_indicators_property_idempotent(self, ax, data, var_level, cvar
 def test_shade_event_regions_basic():
     """Test shade_event_regions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = shade_event_regions()
+    result = shade_event_regions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_shade_event_regions_edge_cases():
     """Test shade_event_regions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = shade_event_regions()
+    result = shade_event_regions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_shade_event_regions_property_idempotent(self, ax, events, alpha):
 def test_create_multipanel_figure_basic():
     """Test create_multipanel_figure: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_multipanel_figure()
+    result = create_multipanel_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_multipanel_figure_edge_cases():
     """Test create_multipanel_figure: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_multipanel_figure()
+    result = create_multipanel_figure()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -488,26 +488,26 @@ def test_create_multipanel_figure_property_idempotent(self, nrows, ncols, figsiz
 def test_format_percentage_axis_basic():
     """Test format_percentage_axis: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_percentage_axis()
+    result = format_percentage_axis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_percentage_axis_edge_cases():
     """Test format_percentage_axis: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_percentage_axis()
+    result = format_percentage_axis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -532,26 +532,26 @@ def test_format_percentage_axis_property_idempotent(self, ax, axis):
 def test_format_currency_axis_basic():
     """Test format_currency_axis: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = format_currency_axis()
+    result = format_currency_axis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_format_currency_axis_edge_cases():
     """Test format_currency_axis: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = format_currency_axis()
+    result = format_currency_axis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

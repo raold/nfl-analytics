@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_connect_db_basic():
     """Test connect_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_connect_db_error_handling():
 
 
 @given(st.integers())
-def test_connect_db_property_idempotent(self, self):
+def test_connect_db_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = connect_db(self)
+    result = connect_db(val)
 
     # Assert property
-    assert connect_db(self) == result, "idempotent violated"
+    assert connect_db(val) == result, "idempotent violated"
 
 
 
 def test_normalize_team_basic():
     """Test normalize_team: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = normalize_team()
+    result = normalize_team()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_normalize_team_edge_cases():
     """Test normalize_team: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = normalize_team()
+    result = normalize_team()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_normalize_team_property_idempotent(self, self, team):
 def test_get_division_basic():
     """Test get_division: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_division()
+    result = get_division()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_division_edge_cases():
     """Test get_division: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_division()
+    result = get_division()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_division_property_idempotent(self, self, team):
 def test_is_divisional_matchup_basic():
     """Test is_divisional_matchup: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_divisional_matchup()
+    result = is_divisional_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_divisional_matchup_edge_cases():
     """Test is_divisional_matchup: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_divisional_matchup()
+    result = is_divisional_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_is_divisional_matchup_property_idempotent(self, self, home_team, away_t
 def test_is_conference_matchup_basic():
     """Test is_conference_matchup: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = is_conference_matchup()
+    result = is_conference_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_is_conference_matchup_edge_cases():
     """Test is_conference_matchup: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = is_conference_matchup()
+    result = is_conference_matchup()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_is_conference_matchup_property_idempotent(self, self, home_team, away_t
 def test_compute_matchup_features_basic():
     """Test compute_matchup_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_matchup_features()
+    result = compute_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_matchup_features_edge_cases():
     """Test compute_matchup_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_matchup_features()
+    result = compute_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,39 +299,39 @@ def test_compute_matchup_features_error_handling():
 
 
 @given(st.integers())
-def test_compute_matchup_features_property_idempotent(self, self):
+def test_compute_matchup_features_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = compute_matchup_features(self)
+    result = compute_matchup_features(val)
 
     # Assert property
-    assert compute_matchup_features(self) == result, "idempotent violated"
+    assert compute_matchup_features(val) == result, "idempotent violated"
 
 
 
 def test_save_features_basic():
     """Test save_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_features()
+    result = save_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_features_edge_cases():
     """Test save_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_features()
+    result = save_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

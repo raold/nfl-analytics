@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_check_api_quota_basic():
     """Test check_api_quota: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_api_quota()
+    result = check_api_quota()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_api_quota_edge_cases():
     """Test check_api_quota: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_api_quota()
+    result = check_api_quota()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_check_api_quota_property_idempotent(self, conn):
 def test_update_api_usage_basic():
     """Test update_api_usage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = update_api_usage()
+    result = update_api_usage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_update_api_usage_edge_cases():
     """Test update_api_usage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = update_api_usage()
+    result = update_api_usage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -137,12 +137,12 @@ def test_update_api_usage_no_temporal_leakage():
     """Ensure update_api_usage doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -156,26 +156,26 @@ def test_update_api_usage_no_temporal_leakage():
 def test_calculate_priority_basic():
     """Test calculate_priority: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_priority()
+    result = calculate_priority()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_priority_edge_cases():
     """Test calculate_priority: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_priority()
+    result = calculate_priority()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_calculate_priority_property_idempotent(self, kickoff, last_fetched, sna
 def test_get_games_needing_odds_basic():
     """Test get_games_needing_odds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_games_needing_odds()
+    result = get_games_needing_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_games_needing_odds_edge_cases():
     """Test get_games_needing_odds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_games_needing_odds()
+    result = get_games_needing_odds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_get_games_needing_odds_property_idempotent(self, conn):
 def test_fetch_odds_for_date_basic():
     """Test fetch_odds_for_date: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_odds_for_date()
+    result = fetch_odds_for_date()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_odds_for_date_edge_cases():
     """Test fetch_odds_for_date: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_odds_for_date()
+    result = fetch_odds_for_date()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -289,12 +289,12 @@ def test_fetch_odds_for_date_no_temporal_leakage():
     """Ensure fetch_odds_for_date doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -308,26 +308,26 @@ def test_fetch_odds_for_date_no_temporal_leakage():
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -341,26 +341,26 @@ def test_parse_args_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

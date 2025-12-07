@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_to_dict_basic():
     """Test to_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_to_dict_error_handling():
 
 
 @given(st.integers())
-def test_to_dict_property_idempotent(self, self):
+def test_to_dict_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_dict(self)
+    result = to_dict(val)
 
     # Assert property
-    assert to_dict(self) == result, "idempotent violated"
+    assert to_dict(val) == result, "idempotent violated"
 
 
 
 def test_from_dict_basic():
     """Test from_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = from_dict()
+    result = from_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_from_dict_edge_cases():
     """Test from_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = from_dict()
+    result = from_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_from_dict_property_idempotent(self, cls, data):
 def test_register_model_basic():
     """Test register_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = register_model()
+    result = register_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_register_model_edge_cases():
     """Test register_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = register_model()
+    result = register_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_register_model_property_idempotent(self, self, name, version, author, d
 def test_promote_model_basic():
     """Test promote_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = promote_model()
+    result = promote_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_promote_model_edge_cases():
     """Test promote_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = promote_model()
+    result = promote_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_promote_model_property_idempotent(self, self, name, version, new_status
 def test_rollback_model_basic():
     """Test rollback_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rollback_model()
+    result = rollback_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rollback_model_edge_cases():
     """Test rollback_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rollback_model()
+    result = rollback_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_rollback_model_property_idempotent(self, self, name, to_version):
 def test_compare_versions_basic():
     """Test compare_versions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_versions()
+    result = compare_versions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_versions_edge_cases():
     """Test compare_versions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_versions()
+    result = compare_versions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_compare_versions_property_idempotent(self, self, name, version1, versio
 def test_get_production_model_basic():
     """Test get_production_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_production_model()
+    result = get_production_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_production_model_edge_cases():
     """Test get_production_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_production_model()
+    result = get_production_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_get_production_model_property_idempotent(self, self, name):
 def test_get_version_basic():
     """Test get_version: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_version()
+    result = get_version()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_version_edge_cases():
     """Test get_version: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_version()
+    result = get_version()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_get_version_property_idempotent(self, self, name, version):
 def test_list_models_basic():
     """Test list_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list_models()
+    result = list_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_models_edge_cases():
     """Test list_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list_models()
+    result = list_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -431,39 +431,39 @@ def test_list_models_error_handling():
 
 
 @given(st.integers())
-def test_list_models_property_idempotent(self, self):
+def test_list_models_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = list_models(self)
+    result = list_models(val)
 
     # Assert property
-    assert list_models(self) == result, "idempotent violated"
+    assert list_models(val) == result, "idempotent violated"
 
 
 
 def test_list_versions_basic():
     """Test list_versions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list_versions()
+    result = list_versions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_versions_edge_cases():
     """Test list_versions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list_versions()
+    result = list_versions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -488,26 +488,26 @@ def test_list_versions_property_idempotent(self, self, name, status):
 def test_get_lineage_basic():
     """Test get_lineage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_lineage()
+    result = get_lineage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_lineage_edge_cases():
     """Test get_lineage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_lineage()
+    result = get_lineage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -532,26 +532,26 @@ def test_get_lineage_property_idempotent(self, self, name, version):
 def test_export_model_card_basic():
     """Test export_model_card: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = export_model_card()
+    result = export_model_card()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_export_model_card_edge_cases():
     """Test export_model_card: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = export_model_card()
+    result = export_model_card()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

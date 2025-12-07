@@ -15,26 +15,26 @@ import pytest
 def test_calculate_prop_edge_basic():
     """Test calculate_prop_edge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_prop_edge()
+    result = calculate_prop_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_prop_edge_edge_cases():
     """Test calculate_prop_edge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_prop_edge()
+    result = calculate_prop_edge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_calculate_prop_edge_property_idempotent(self, model_prediction, model_s
 def test_calculate_prop_ev_basic():
     """Test calculate_prop_ev: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_prop_ev()
+    result = calculate_prop_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_prop_ev_edge_cases():
     """Test calculate_prop_ev: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_prop_ev()
+    result = calculate_prop_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_prop_ev_property_idempotent(self, model_prob, odds, bet_amoun
 def test_check_injury_status_basic():
     """Test check_injury_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_injury_status()
+    result = check_injury_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_injury_status_edge_cases():
     """Test check_injury_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_injury_status()
+    result = check_injury_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_check_injury_status_property_idempotent(self, player_id, game_date, db_
 def test_calculate_prop_correlation_basic():
     """Test calculate_prop_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_prop_correlation()
+    result = calculate_prop_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_prop_correlation_edge_cases():
     """Test calculate_prop_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_prop_correlation()
+    result = calculate_prop_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_calculate_prop_correlation_property_idempotent(self, player_id, prop_ty
 def test_get_correlation_basic():
     """Test get_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_correlation()
+    result = get_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_correlation_edge_cases():
     """Test get_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_correlation()
+    result = get_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_get_correlation_property_idempotent(self, prop_type1, prop_type2):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_main_error_handling():
 def test_load_historical_data_basic():
     """Test load_historical_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_historical_data()
+    result = load_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_historical_data_edge_cases():
     """Test load_historical_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_historical_data()
+    result = load_historical_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_load_historical_data_property_idempotent(self, self, data):
 def test_set_db_connection_basic():
     """Test set_db_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = set_db_connection()
+    result = set_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_set_db_connection_edge_cases():
     """Test set_db_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = set_db_connection()
+    result = set_db_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_set_db_connection_property_idempotent(self, self, conn):
 def test_should_bet_prop_basic():
     """Test should_bet_prop: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = should_bet_prop()
+    result = should_bet_prop()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_should_bet_prop_edge_cases():
     """Test should_bet_prop: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = should_bet_prop()
+    result = should_bet_prop()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_should_bet_prop_property_idempotent(self, self, player_id, player_name,
 def test_select_props_basic():
     """Test select_props: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = select_props()
+    result = select_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_select_props_edge_cases():
     """Test select_props: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = select_props()
+    result = select_props()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

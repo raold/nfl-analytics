@@ -15,26 +15,26 @@ import pytest
 def test_extract_conditions_from_database_basic():
     """Test extract_conditions_from_database: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_conditions_from_database()
+    result = extract_conditions_from_database()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_conditions_from_database_edge_cases():
     """Test extract_conditions_from_database: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_conditions_from_database()
+    result = extract_conditions_from_database()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_extract_conditions_from_database_error_handling():
 def test_create_condition_vector_basic():
     """Test create_condition_vector: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_condition_vector()
+    result = create_condition_vector()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_condition_vector_edge_cases():
     """Test create_condition_vector: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_condition_vector()
+    result = create_condition_vector()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_create_condition_vector_property_idempotent(self, game):
 def test_create_scaler_basic():
     """Test create_scaler: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_scaler()
+    result = create_scaler()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_scaler_edge_cases():
     """Test create_scaler: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_scaler()
+    result = create_scaler()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_get_coordinator_basic():
     """Test get_coordinator: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_coordinator()
+    result = get_coordinator()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_coordinator_edge_cases():
     """Test get_coordinator: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_coordinator()
+    result = get_coordinator()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_coordinator_error_handling():
 def test_matches_basic():
     """Test matches: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = matches()
+    result = matches()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_matches_edge_cases():
     """Test matches: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = matches()
+    result = matches()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_matches_property_idempotent(self, self, task, files):
 def test_analyze_task_basic():
     """Test analyze_task: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_task()
+    result = analyze_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_task_edge_cases():
     """Test analyze_task: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_task()
+    result = analyze_task()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_analyze_task_property_idempotent(self, self, task, files, min_confidenc
 def test_get_agent_info_basic():
     """Test get_agent_info: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_agent_info()
+    result = get_agent_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_agent_info_edge_cases():
     """Test get_agent_info: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_agent_info()
+    result = get_agent_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_agent_info_property_idempotent(self, self, agent_type):
 def test_list_agents_basic():
     """Test list_agents: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = list_agents()
+    result = list_agents()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_list_agents_edge_cases():
     """Test list_agents: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = list_agents()
+    result = list_agents()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_list_agents_error_handling():
 
 
 @given(st.integers())
-def test_list_agents_property_idempotent(self, self):
+def test_list_agents_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = list_agents(self)
+    result = list_agents(val)
 
     # Assert property
-    assert list_agents(self) == result, "idempotent violated"
+    assert list_agents(val) == result, "idempotent violated"
 
 
 
 def test_get_routing_history_basic():
     """Test get_routing_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_routing_history()
+    result = get_routing_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_routing_history_edge_cases():
     """Test get_routing_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_routing_history()
+    result = get_routing_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_get_routing_history_property_idempotent(self, self, limit):
 def test_get_dependencies_basic():
     """Test get_dependencies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_dependencies()
+    result = get_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_dependencies_edge_cases():
     """Test get_dependencies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_dependencies()
+    result = get_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_get_dependencies_property_idempotent(self, self, agent_type):
 def test_suggest_workflow_basic():
     """Test suggest_workflow: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = suggest_workflow()
+    result = suggest_workflow()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_suggest_workflow_edge_cases():
     """Test suggest_workflow: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = suggest_workflow()
+    result = suggest_workflow()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_suggest_workflow_property_idempotent(self, self, agent_type):
 def test_print_summary_basic():
     """Test print_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -387,39 +387,39 @@ def test_print_summary_error_handling():
 
 
 @given(st.integers())
-def test_print_summary_property_idempotent(self, self):
+def test_print_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = print_summary(self)
+    result = print_summary(val)
 
     # Assert property
-    assert print_summary(self) == result, "idempotent violated"
+    assert print_summary(val) == result, "idempotent violated"
 
 
 
 def test_add_dependencies_basic():
     """Test add_dependencies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_dependencies()
+    result = add_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_dependencies_edge_cases():
     """Test add_dependencies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_dependencies()
+    result = add_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

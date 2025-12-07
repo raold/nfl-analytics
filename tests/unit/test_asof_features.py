@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_fetch_team_game_features_basic():
     """Test fetch_team_game_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_team_game_features()
+    result = fetch_team_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_team_game_features_edge_cases():
     """Test fetch_team_game_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_team_game_features()
+    result = fetch_team_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_team_game_features_property_idempotent(self, conn):
 def test_compute_team_history_basic():
     """Test compute_team_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_team_history()
+    result = compute_team_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_team_history_edge_cases():
     """Test compute_team_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_team_history()
+    result = compute_team_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_compute_team_history_property_idempotent(self, df):
 def test_validate_team_history_basic():
     """Test validate_team_history: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_team_history()
+    result = validate_team_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_team_history_edge_cases():
     """Test validate_team_history: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_team_history()
+    result = validate_team_history()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -181,12 +181,12 @@ def test_validate_team_history_no_temporal_leakage():
     """Ensure validate_team_history doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -200,26 +200,26 @@ def test_validate_team_history_no_temporal_leakage():
 def test_rename_with_prefix_basic():
     """Test rename_with_prefix: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rename_with_prefix()
+    result = rename_with_prefix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rename_with_prefix_edge_cases():
     """Test rename_with_prefix: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rename_with_prefix()
+    result = rename_with_prefix()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_rename_with_prefix_property_idempotent(self, columns, prefix):
 def test_pivot_to_games_basic():
     """Test pivot_to_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pivot_to_games()
+    result = pivot_to_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pivot_to_games_edge_cases():
     """Test pivot_to_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pivot_to_games()
+    result = pivot_to_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -288,26 +288,26 @@ def test_pivot_to_games_property_idempotent(self, df):
 def test_validate_game_features_basic():
     """Test validate_game_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_game_features()
+    result = validate_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_game_features_edge_cases():
     """Test validate_game_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_game_features()
+    result = validate_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -333,12 +333,12 @@ def test_validate_game_features_no_temporal_leakage():
     """Ensure validate_game_features doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -352,26 +352,26 @@ def test_validate_game_features_no_temporal_leakage():
 def test_write_csv_basic():
     """Test write_csv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_csv()
+    result = write_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_csv_edge_cases():
     """Test write_csv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_csv()
+    result = write_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -396,26 +396,26 @@ def test_write_csv_property_idempotent(self, df, path):
 def test_infer_sql_type_basic():
     """Test infer_sql_type: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = infer_sql_type()
+    result = infer_sql_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_infer_sql_type_edge_cases():
     """Test infer_sql_type: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = infer_sql_type()
+    result = infer_sql_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -440,26 +440,26 @@ def test_infer_sql_type_property_idempotent(self, series):
 def test_write_table_basic():
     """Test write_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_table()
+    result = write_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_table_edge_cases():
     """Test write_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_table()
+    result = write_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -484,26 +484,26 @@ def test_write_table_property_idempotent(self, conn, df, table_name):
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -517,26 +517,26 @@ def test_parse_args_error_handling():
 def test_maybe_filter_season_basic():
     """Test maybe_filter_season: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = maybe_filter_season()
+    result = maybe_filter_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_maybe_filter_season_edge_cases():
     """Test maybe_filter_season: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = maybe_filter_season()
+    result = maybe_filter_season()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -561,26 +561,26 @@ def test_maybe_filter_season_property_idempotent(self, df, season_start, season_
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

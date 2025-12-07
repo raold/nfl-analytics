@@ -15,26 +15,26 @@ import pytest
 def test_validate_stat_type_basic():
     """Test validate_stat_type: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_stat_type()
+    result = validate_stat_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_stat_type_edge_cases():
     """Test validate_stat_type: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_stat_type()
+    result = validate_stat_type()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -60,12 +60,12 @@ def test_validate_stat_type_no_temporal_leakage():
     """Ensure validate_stat_type doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -79,26 +79,26 @@ def test_validate_stat_type_no_temporal_leakage():
 def test_weights_sum_to_one_basic():
     """Test weights_sum_to_one: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = weights_sum_to_one()
+    result = weights_sum_to_one()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_weights_sum_to_one_edge_cases():
     """Test weights_sum_to_one: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = weights_sum_to_one()
+    result = weights_sum_to_one()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,26 +123,26 @@ def test_weights_sum_to_one_property_idempotent(self, cls, v):
 def test_load_models_basic():
     """Test load_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_models()
+    result = load_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_models_edge_cases():
     """Test load_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_models()
+    result = load_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -154,39 +154,39 @@ def test_load_models_error_handling():
 
 
 @given(st.integers())
-def test_load_models_property_idempotent(self, self):
+def test_load_models_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_models(self)
+    result = load_models(val)
 
     # Assert property
-    assert load_models(self) == result, "idempotent violated"
+    assert load_models(val) == result, "idempotent violated"
 
 
 
 def test_predict_basic():
     """Test predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = predict()
+    result = predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,26 +211,26 @@ def test_predict_property_idempotent(self, self, player_id, stat_type, week, sea
 def test_get_uptime_seconds_basic():
     """Test get_uptime_seconds: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_uptime_seconds()
+    result = get_uptime_seconds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_uptime_seconds_edge_cases():
     """Test get_uptime_seconds: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_uptime_seconds()
+    result = get_uptime_seconds()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -242,13 +242,13 @@ def test_get_uptime_seconds_error_handling():
 
 
 @given(st.integers())
-def test_get_uptime_seconds_property_idempotent(self, self):
+def test_get_uptime_seconds_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_uptime_seconds(self)
+    result = get_uptime_seconds(val)
 
     # Assert property
-    assert get_uptime_seconds(self) == result, "idempotent violated"
+    assert get_uptime_seconds(val) == result, "idempotent violated"
 
 
 
@@ -256,12 +256,12 @@ def test_get_uptime_seconds_no_temporal_leakage():
     """Ensure get_uptime_seconds doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function

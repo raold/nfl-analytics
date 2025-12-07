@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_connect_db_basic():
     """Test connect_db: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = connect_db()
+    result = connect_db()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_connect_db_error_handling():
 
 
 @given(st.integers())
-def test_connect_db_property_idempotent(self, self):
+def test_connect_db_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = connect_db(self)
+    result = connect_db(val)
 
     # Assert property
-    assert connect_db(self) == result, "idempotent violated"
+    assert connect_db(val) == result, "idempotent violated"
 
 
 
 def test_get_injuries_for_week_basic():
     """Test get_injuries_for_week: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_injuries_for_week()
+    result = get_injuries_for_week()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_injuries_for_week_edge_cases():
     """Test get_injuries_for_week: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_injuries_for_week()
+    result = get_injuries_for_week()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_get_injuries_for_week_property_idempotent(self, self, season, week):
 def test_get_depth_chart_position_basic():
     """Test get_depth_chart_position: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_depth_chart_position()
+    result = get_depth_chart_position()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_depth_chart_position_edge_cases():
     """Test get_depth_chart_position: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_depth_chart_position()
+    result = get_depth_chart_position()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_get_depth_chart_position_property_idempotent(self, self, gsis_id, team,
 def test_calculate_team_impact_basic():
     """Test calculate_team_impact: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_team_impact()
+    result = calculate_team_impact()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_team_impact_edge_cases():
     """Test calculate_team_impact: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_team_impact()
+    result = calculate_team_impact()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_team_impact_property_idempotent(self, self, injuries, team, s
 def test_adjust_predictions_basic():
     """Test adjust_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_predictions()
+    result = adjust_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_predictions_edge_cases():
     """Test adjust_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_predictions()
+    result = adjust_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_adjust_predictions_property_idempotent(self, self, predictions, season,
 def test_adjust_from_csv_basic():
     """Test adjust_from_csv: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = adjust_from_csv()
+    result = adjust_from_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_adjust_from_csv_edge_cases():
     """Test adjust_from_csv: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = adjust_from_csv()
+    result = adjust_from_csv()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_load_real_passing_data_basic():
     """Test load_real_passing_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_real_passing_data()
+    result = load_real_passing_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_real_passing_data_edge_cases():
     """Test load_real_passing_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_real_passing_data()
+    result = load_real_passing_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_real_passing_data_error_handling():
 def test_simulate_bnn_predictions_basic():
     """Test simulate_bnn_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_bnn_predictions()
+    result = simulate_bnn_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_bnn_predictions_edge_cases():
     """Test simulate_bnn_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_bnn_predictions()
+    result = simulate_bnn_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_simulate_bnn_predictions_property_idempotent(self, y_true, undercalibra
 def test_compute_calibration_basic():
     """Test compute_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_calibration_edge_cases():
     """Test compute_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_compute_calibration_property_idempotent(self, y_true, predictions, conf
 def test_apply_temperature_scaling_basic():
     """Test apply_temperature_scaling: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_apply_temperature_scaling_edge_cases():
     """Test apply_temperature_scaling: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_apply_temperature_scaling_property_idempotent(self, predictions, temper
 def test_run_temperature_scaling_experiments_basic():
     """Test run_temperature_scaling_experiments: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_temperature_scaling_experiments()
+    result = run_temperature_scaling_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_temperature_scaling_experiments_edge_cases():
     """Test run_temperature_scaling_experiments: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_temperature_scaling_experiments()
+    result = run_temperature_scaling_experiments()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

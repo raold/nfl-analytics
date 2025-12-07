@@ -15,26 +15,26 @@ import pytest
 def test_parse_args_basic():
     """Test parse_args: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = parse_args()
+    result = parse_args()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_parse_args_error_handling():
 def test_write_tex_basic():
     """Test write_tex: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_tex()
+    result = write_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_tex_edge_cases():
     """Test write_tex: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_tex()
+    result = write_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_write_tex_property_idempotent(self, df, path):
 def test_write_tex_overall_basic():
     """Test write_tex_overall: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_tex_overall()
+    result = write_tex_overall()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_tex_overall_edge_cases():
     """Test write_tex_overall: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_tex_overall()
+    result = write_tex_overall()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_write_tex_overall_property_idempotent(self, df, path):
 def test_write_panel_tex_basic():
     """Test write_panel_tex: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_panel_tex()
+    result = write_panel_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_panel_tex_edge_cases():
     """Test write_panel_tex: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_panel_tex()
+    result = write_panel_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_write_panel_tex_property_idempotent(self, image_paths, out_path, title)
 def test_write_dual_panel_tex_basic():
     """Test write_dual_panel_tex: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_dual_panel_tex()
+    result = write_dual_panel_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_dual_panel_tex_edge_cases():
     """Test write_dual_panel_tex: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_dual_panel_tex()
+    result = write_dual_panel_tex()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_write_dual_panel_tex_property_idempotent(self, left_images, right_image
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -257,26 +257,26 @@ def test_main_error_handling():
 def test_panel_lines_basic():
     """Test panel_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = panel_lines()
+    result = panel_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_panel_lines_edge_cases():
     """Test panel_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = panel_lines()
+    result = panel_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

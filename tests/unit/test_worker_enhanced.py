@@ -15,26 +15,26 @@ import pytest
 def test_get_device_info_basic():
     """Test get_device_info: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_device_info()
+    result = get_device_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_device_info_edge_cases():
     """Test get_device_info: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_device_info()
+    result = get_device_info()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_device_info_error_handling():
 def test_set_device_basic():
     """Test set_device: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = set_device()
+    result = set_device()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_set_device_edge_cases():
     """Test set_device: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = set_device()
+    result = set_device()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_set_device_property_idempotent(self, device_arg):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_main_error_handling():
 def test_run_basic():
     """Test run: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -156,11 +156,11 @@ def test_run_error_handling():
 
 
 @given(st.integers())
-def test_run_property_idempotent(self, self):
+def test_run_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run(self)
+    result = run(val)
 
     # Assert property
-    assert run(self) == result, "idempotent violated"
+    assert run(val) == result, "idempotent violated"
 

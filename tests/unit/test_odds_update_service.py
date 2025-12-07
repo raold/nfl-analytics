@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_from_env_basic():
     """Test from_env: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = from_env()
+    result = from_env()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_from_env_edge_cases():
     """Test from_env: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = from_env()
+    result = from_env()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_from_env_property_idempotent(self, cls):
 def test_to_dict_basic():
     """Test to_dict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = to_dict()
+    result = to_dict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -123,39 +123,39 @@ def test_to_dict_error_handling():
 
 
 @given(st.integers())
-def test_to_dict_property_idempotent(self, self):
+def test_to_dict_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = to_dict(self)
+    result = to_dict(val)
 
     # Assert property
-    assert to_dict(self) == result, "idempotent violated"
+    assert to_dict(val) == result, "idempotent violated"
 
 
 
 def test_log_summary_basic():
     """Test log_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = log_summary()
+    result = log_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_log_summary_edge_cases():
     """Test log_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = log_summary()
+    result = log_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,39 +167,39 @@ def test_log_summary_error_handling():
 
 
 @given(st.integers())
-def test_log_summary_property_idempotent(self, self):
+def test_log_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = log_summary(self)
+    result = log_summary(val)
 
     # Assert property
-    assert log_summary(self) == result, "idempotent violated"
+    assert log_summary(val) == result, "idempotent violated"
 
 
 
 def test_poll_once_basic():
     """Test poll_once: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = poll_once()
+    result = poll_once()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_poll_once_edge_cases():
     """Test poll_once: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = poll_once()
+    result = poll_once()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_poll_once_error_handling():
 
 
 @given(st.integers())
-def test_poll_once_property_idempotent(self, self):
+def test_poll_once_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = poll_once(self)
+    result = poll_once(val)
 
     # Assert property
-    assert poll_once(self) == result, "idempotent violated"
+    assert poll_once(val) == result, "idempotent violated"
 
 
 
 def test_run_basic():
     """Test run: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run()
+    result = run()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

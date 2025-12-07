@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_play_by_play_basic():
     """Test load_play_by_play: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_play_by_play()
+    result = load_play_by_play()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_play_by_play_edge_cases():
     """Test load_play_by_play: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_play_by_play()
+    result = load_play_by_play()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_play_by_play_property_idempotent(self, self, start_season, end_sea
 def test_load_rosters_basic():
     """Test load_rosters: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_rosters()
+    result = load_rosters()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_rosters_edge_cases():
     """Test load_rosters: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_rosters()
+    result = load_rosters()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_load_rosters_property_idempotent(self, self, start_season, end_season):
 def test_load_games_basic():
     """Test load_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_edge_cases():
     """Test load_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_load_games_property_idempotent(self, self, start_season, end_season):
 def test_aggregate_player_stats_basic():
     """Test aggregate_player_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = aggregate_player_stats()
+    result = aggregate_player_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_aggregate_player_stats_edge_cases():
     """Test aggregate_player_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = aggregate_player_stats()
+    result = aggregate_player_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_aggregate_player_stats_property_idempotent(self, self, pbp, position):
 def test_calculate_rolling_features_basic():
     """Test calculate_rolling_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_rolling_features()
+    result = calculate_rolling_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_rolling_features_edge_cases():
     """Test calculate_rolling_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_rolling_features()
+    result = calculate_rolling_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_rolling_features_property_idempotent(self, self, stats, windo
 def test_add_opponent_features_basic():
     """Test add_opponent_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_opponent_features()
+    result = add_opponent_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_opponent_features_edge_cases():
     """Test add_opponent_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_opponent_features()
+    result = add_opponent_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_add_opponent_features_property_idempotent(self, self, stats, pbp):
 def test_add_game_script_features_basic():
     """Test add_game_script_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_game_script_features()
+    result = add_game_script_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_game_script_features_edge_cases():
     """Test add_game_script_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_game_script_features()
+    result = add_game_script_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_add_game_script_features_property_idempotent(self, self, stats, games):
 def test_add_weather_features_basic():
     """Test add_weather_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_weather_features()
+    result = add_weather_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_weather_features_edge_cases():
     """Test add_weather_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_weather_features()
+    result = add_weather_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_add_weather_features_property_idempotent(self, self, stats, games):
 def test_generate_features_basic():
     """Test generate_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_features_edge_cases():
     """Test generate_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

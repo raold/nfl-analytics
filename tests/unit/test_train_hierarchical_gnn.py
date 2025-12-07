@@ -15,26 +15,26 @@ import pytest
 def test_get_gpu_stats_basic():
     """Test get_gpu_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_gpu_stats()
+    result = get_gpu_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_gpu_stats_edge_cases():
     """Test get_gpu_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_gpu_stats()
+    result = get_gpu_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_gpu_stats_error_handling():
 def test_load_multi_season_data_basic():
     """Test load_multi_season_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_multi_season_data()
+    result = load_multi_season_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_multi_season_data_edge_cases():
     """Test load_multi_season_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_multi_season_data()
+    result = load_multi_season_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_multi_season_data_property_idempotent(self, seasons, include_chemi
 def test_create_splits_basic():
     """Test create_splits: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_splits()
+    result = create_splits()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_splits_edge_cases():
     """Test create_splits: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_splits()
+    result = create_splits()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_create_splits_property_idempotent(self, games_by_season, train_seasons,
 def test_remap_edges_to_type_indices_basic():
     """Test remap_edges_to_type_indices: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = remap_edges_to_type_indices()
+    result = remap_edges_to_type_indices()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_remap_edges_to_type_indices_edge_cases():
     """Test remap_edges_to_type_indices: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = remap_edges_to_type_indices()
+    result = remap_edges_to_type_indices()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_remap_edges_to_type_indices_property_idempotent(self, edges, graph, src
 def test_train_epoch_basic():
     """Test train_epoch: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_epoch()
+    result = train_epoch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_epoch_edge_cases():
     """Test train_epoch: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_epoch()
+    result = train_epoch()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_train_epoch_property_idempotent(self, model, dataset, optimizer, criter
 def test_evaluate_basic():
     """Test evaluate: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_edge_cases():
     """Test evaluate: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate()
+    result = evaluate()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_evaluate_property_idempotent(self, model, dataset, device):
 def test_save_checkpoint_basic():
     """Test save_checkpoint: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_checkpoint()
+    result = save_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_checkpoint_edge_cases():
     """Test save_checkpoint: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_checkpoint()
+    result = save_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_save_checkpoint_property_idempotent(self, epoch, model, optimizer, best
 def test_load_checkpoint_basic():
     """Test load_checkpoint: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_checkpoint()
+    result = load_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_checkpoint_edge_cases():
     """Test load_checkpoint: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_checkpoint()
+    result = load_checkpoint()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_load_checkpoint_property_idempotent(self, checkpoint_dir, model, optimi
 def test_train_gnn_single_config_basic():
     """Test train_gnn_single_config: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_gnn_single_config()
+    result = train_gnn_single_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_gnn_single_config_edge_cases():
     """Test train_gnn_single_config: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_gnn_single_config()
+    result = train_gnn_single_config()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_train_gnn_single_config_property_idempotent(self, seasons, embedding_di
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

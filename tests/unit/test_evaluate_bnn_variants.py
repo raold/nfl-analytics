@@ -15,26 +15,26 @@ import pytest
 def test_load_test_data_basic():
     """Test load_test_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_test_data()
+    result = load_test_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_test_data_edge_cases():
     """Test load_test_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_test_data()
+    result = load_test_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_test_data_property_idempotent(self, season):
 def test_calculate_ci_coverage_basic():
     """Test calculate_ci_coverage: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_ci_coverage()
+    result = calculate_ci_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_ci_coverage_edge_cases():
     """Test calculate_ci_coverage: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_ci_coverage()
+    result = calculate_ci_coverage()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_calculate_ci_coverage_property_idempotent(self, y_true, y_pred_samples,
 def test_evaluate_model_basic():
     """Test evaluate_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_model()
+    result = evaluate_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_model_edge_cases():
     """Test evaluate_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_model()
+    result = evaluate_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_evaluate_model_property_idempotent(self, model_path, model_name, test_d
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

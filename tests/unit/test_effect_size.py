@@ -15,26 +15,26 @@ import pytest
 def test_cohens_d_basic():
     """Test cohens_d: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cohens_d()
+    result = cohens_d()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cohens_d_edge_cases():
     """Test cohens_d: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cohens_d()
+    result = cohens_d()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_cohens_d_property_idempotent(self, group1, group2):
 def test_cliffs_delta_basic():
     """Test cliffs_delta: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cliffs_delta()
+    result = cliffs_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cliffs_delta_edge_cases():
     """Test cliffs_delta: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cliffs_delta()
+    result = cliffs_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_cliffs_delta_property_idempotent(self, group1, group2):
 def test_eta_squared_basic():
     """Test eta_squared: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = eta_squared()
+    result = eta_squared()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_eta_squared_edge_cases():
     """Test eta_squared: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = eta_squared()
+    result = eta_squared()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_eta_squared_property_idempotent(self, groups, partial):
 def test_odds_ratio_basic():
     """Test odds_ratio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = odds_ratio()
+    result = odds_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_odds_ratio_edge_cases():
     """Test odds_ratio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = odds_ratio()
+    result = odds_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_odds_ratio_property_idempotent(self, group1_success, group1_total, grou
 def test_test_basic():
     """Test test: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test()
+    result = test()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_test_error_handling():
 def test_cohens_d_basic():
     """Test cohens_d: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cohens_d()
+    result = cohens_d()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cohens_d_edge_cases():
     """Test cohens_d: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cohens_d()
+    result = cohens_d()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_cohens_d_property_idempotent(self, self, group1, group2, pooled, bias_c
 def test_cliffs_delta_basic():
     """Test cliffs_delta: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cliffs_delta()
+    result = cliffs_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cliffs_delta_edge_cases():
     """Test cliffs_delta: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cliffs_delta()
+    result = cliffs_delta()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_cliffs_delta_property_idempotent(self, self, group1, group2):
 def test_eta_squared_basic():
     """Test eta_squared: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = eta_squared()
+    result = eta_squared()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_eta_squared_edge_cases():
     """Test eta_squared: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = eta_squared()
+    result = eta_squared()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -356,26 +356,26 @@ def test_eta_squared_property_idempotent(self, self, groups, partial):
 def test_odds_ratio_basic():
     """Test odds_ratio: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = odds_ratio()
+    result = odds_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_odds_ratio_edge_cases():
     """Test odds_ratio: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = odds_ratio()
+    result = odds_ratio()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -400,26 +400,26 @@ def test_odds_ratio_property_idempotent(self, self, group1_success, group1_total
 def test_correlation_effect_size_basic():
     """Test correlation_effect_size: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = correlation_effect_size()
+    result = correlation_effect_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_correlation_effect_size_edge_cases():
     """Test correlation_effect_size: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = correlation_effect_size()
+    result = correlation_effect_size()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_correlation_effect_size_property_idempotent(self, self, x, y, method):
 def test_rank_biserial_correlation_basic():
     """Test rank_biserial_correlation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = rank_biserial_correlation()
+    result = rank_biserial_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_rank_biserial_correlation_edge_cases():
     """Test rank_biserial_correlation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = rank_biserial_correlation()
+    result = rank_biserial_correlation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

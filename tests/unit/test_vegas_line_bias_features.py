@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_games_with_lines_basic():
     """Test load_games_with_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games_with_lines()
+    result = load_games_with_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_with_lines_edge_cases():
     """Test load_games_with_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games_with_lines()
+    result = load_games_with_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_games_with_lines_property_idempotent(self, self, start_season, end
 def test_calculate_team_line_performance_basic():
     """Test calculate_team_line_performance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_team_line_performance()
+    result = calculate_team_line_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_team_line_performance_edge_cases():
     """Test calculate_team_line_performance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_team_line_performance()
+    result = calculate_team_line_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_team_line_performance_property_idempotent(self, self, games):
 def test_calculate_market_efficiency_indicators_basic():
     """Test calculate_market_efficiency_indicators: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_market_efficiency_indicators()
+    result = calculate_market_efficiency_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_market_efficiency_indicators_edge_cases():
     """Test calculate_market_efficiency_indicators: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_market_efficiency_indicators()
+    result = calculate_market_efficiency_indicators()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_market_efficiency_indicators_property_idempotent(self, self, 
 def test_calculate_key_number_performance_basic():
     """Test calculate_key_number_performance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_key_number_performance()
+    result = calculate_key_number_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_key_number_performance_edge_cases():
     """Test calculate_key_number_performance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_key_number_performance()
+    result = calculate_key_number_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_key_number_performance_property_idempotent(self, self, games)
 def test_generate_all_features_basic():
     """Test generate_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_generate_all_features_property_idempotent(self, self, start_season, end
 def test_moneyline_to_prob_basic():
     """Test moneyline_to_prob: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = moneyline_to_prob()
+    result = moneyline_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_moneyline_to_prob_edge_cases():
     """Test moneyline_to_prob: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = moneyline_to_prob()
+    result = moneyline_to_prob()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

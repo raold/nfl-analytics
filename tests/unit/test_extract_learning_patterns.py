@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_get_connection_error_handling():
 
 
 @given(st.integers())
-def test_get_connection_property_idempotent(self, self):
+def test_get_connection_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_connection(self)
+    result = get_connection(val)
 
     # Assert property
-    assert get_connection(self) == result, "idempotent violated"
+    assert get_connection(val) == result, "idempotent violated"
 
 
 
 def test_fetch_retrospectives_basic():
     """Test fetch_retrospectives: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_retrospectives()
+    result = fetch_retrospectives()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_retrospectives_edge_cases():
     """Test fetch_retrospectives: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_retrospectives()
+    result = fetch_retrospectives()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fetch_retrospectives_property_idempotent(self, self, failure_mode):
 def test_extract_failure_mode_patterns_basic():
     """Test extract_failure_mode_patterns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_failure_mode_patterns()
+    result = extract_failure_mode_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_failure_mode_patterns_edge_cases():
     """Test extract_failure_mode_patterns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_failure_mode_patterns()
+    result = extract_failure_mode_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_extract_failure_mode_patterns_property_idempotent(self, self, min_sampl
 def test_extract_narrative_patterns_basic():
     """Test extract_narrative_patterns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_narrative_patterns()
+    result = extract_narrative_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_narrative_patterns_edge_cases():
     """Test extract_narrative_patterns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_narrative_patterns()
+    result = extract_narrative_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_extract_narrative_patterns_property_idempotent(self, self, min_sample_s
 def test_store_patterns_basic():
     """Test store_patterns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = store_patterns()
+    result = store_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_store_patterns_edge_cases():
     """Test store_patterns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = store_patterns()
+    result = store_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_store_patterns_property_idempotent(self, self, patterns):
 def test_extract_all_patterns_basic():
     """Test extract_all_patterns: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = extract_all_patterns()
+    result = extract_all_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_extract_all_patterns_edge_cases():
     """Test extract_all_patterns: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = extract_all_patterns()
+    result = extract_all_patterns()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

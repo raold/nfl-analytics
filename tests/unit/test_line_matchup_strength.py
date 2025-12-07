@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_rushing_plays_basic():
     """Test load_rushing_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_rushing_plays()
+    result = load_rushing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_rushing_plays_edge_cases():
     """Test load_rushing_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_rushing_plays()
+    result = load_rushing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_rushing_plays_property_idempotent(self, self, start_season, end_se
 def test_calculate_offensive_line_rankings_basic():
     """Test calculate_offensive_line_rankings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_offensive_line_rankings()
+    result = calculate_offensive_line_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_offensive_line_rankings_edge_cases():
     """Test calculate_offensive_line_rankings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_offensive_line_rankings()
+    result = calculate_offensive_line_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_offensive_line_rankings_property_idempotent(self, self, plays
 def test_calculate_defensive_line_rankings_basic():
     """Test calculate_defensive_line_rankings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_defensive_line_rankings()
+    result = calculate_defensive_line_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_defensive_line_rankings_edge_cases():
     """Test calculate_defensive_line_rankings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_defensive_line_rankings()
+    result = calculate_defensive_line_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_defensive_line_rankings_property_idempotent(self, self, plays
 def test_calculate_directional_tendencies_basic():
     """Test calculate_directional_tendencies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_directional_tendencies()
+    result = calculate_directional_tendencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_directional_tendencies_edge_cases():
     """Test calculate_directional_tendencies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_directional_tendencies()
+    result = calculate_directional_tendencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_directional_tendencies_property_idempotent(self, self, plays)
 def test_calculate_rb_team_features_basic():
     """Test calculate_rb_team_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_rb_team_features()
+    result = calculate_rb_team_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_rb_team_features_edge_cases():
     """Test calculate_rb_team_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_rb_team_features()
+    result = calculate_rb_team_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_rb_team_features_property_idempotent(self, self, plays, ol_ra
 def test_add_rolling_line_features_basic():
     """Test add_rolling_line_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_line_features()
+    result = add_rolling_line_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_line_features_edge_cases():
     """Test add_rolling_line_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_line_features()
+    result = add_rolling_line_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_add_rolling_line_features_property_idempotent(self, self, rb_games):
 def test_generate_features_basic():
     """Test generate_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_features_edge_cases():
     """Test generate_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_analyze_prediction_bias_basic():
     """Test analyze_prediction_bias: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = analyze_prediction_bias()
+    result = analyze_prediction_bias()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_analyze_prediction_bias_edge_cases():
     """Test analyze_prediction_bias: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = analyze_prediction_bias()
+    result = analyze_prediction_bias()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

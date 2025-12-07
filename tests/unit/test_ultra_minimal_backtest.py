@@ -15,26 +15,26 @@ import pytest
 def test_load_games_basic():
     """Test load_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_edge_cases():
     """Test load_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games()
+    result = load_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_games_error_handling():
 def test_test_spread_only_basic():
     """Test test_spread_only: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_spread_only()
+    result = test_spread_only()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_spread_only_edge_cases():
     """Test test_spread_only: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_spread_only()
+    result = test_spread_only()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_test_spread_only_property_idempotent(self, df):
 def test_test_spread_and_total_basic():
     """Test test_spread_and_total: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_spread_and_total()
+    result = test_spread_and_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_spread_and_total_edge_cases():
     """Test test_spread_and_total: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_spread_and_total()
+    result = test_spread_and_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_test_spread_and_total_property_idempotent(self, df):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

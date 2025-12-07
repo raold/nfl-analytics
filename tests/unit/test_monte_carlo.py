@@ -15,26 +15,26 @@ import pytest
 def test_simulate_prob_row_basic():
     """Test simulate_prob_row: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = simulate_prob_row()
+    result = simulate_prob_row()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_simulate_prob_row_edge_cases():
     """Test simulate_prob_row: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = simulate_prob_row()
+    result = simulate_prob_row()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

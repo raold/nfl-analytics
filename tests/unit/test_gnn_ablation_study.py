@@ -15,26 +15,26 @@ import pytest
 def test_run_single_ablation_basic():
     """Test run_single_ablation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_single_ablation()
+    result = run_single_ablation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_single_ablation_edge_cases():
     """Test run_single_ablation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_single_ablation()
+    result = run_single_ablation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_run_single_ablation_property_idempotent(self, config_name, config, seas
 def test_run_ablation_study_basic():
     """Test run_ablation_study: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_ablation_study()
+    result = run_ablation_study()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_ablation_study_edge_cases():
     """Test run_ablation_study: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_ablation_study()
+    result = run_ablation_study()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_run_ablation_study_property_idempotent(self, configs, seasons, epochs, 
 def test_generate_summary_table_basic():
     """Test generate_summary_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_summary_table()
+    result = generate_summary_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_summary_table_edge_cases():
     """Test generate_summary_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_summary_table()
+    result = generate_summary_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_summary_table_property_idempotent(self, results, output_dir):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

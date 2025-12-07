@@ -15,26 +15,26 @@ import pytest
 def test_load_cql_model_basic():
     """Test load_cql_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_cql_model()
+    result = load_cql_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_cql_model_edge_cases():
     """Test load_cql_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_cql_model()
+    result = load_cql_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_cql_model_property_idempotent(self, model_path, device):
 def test_load_ensemble_basic():
     """Test load_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_ensemble()
+    result = load_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_ensemble_edge_cases():
     """Test load_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_ensemble()
+    result = load_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_ensemble_property_idempotent(self, ensemble_dir, ensemble_ids, dev
 def test_random_policy_basic():
     """Test random_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = random_policy()
+    result = random_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_random_policy_edge_cases():
     """Test random_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = random_policy()
+    result = random_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_random_policy_property_idempotent(self, df):
 def test_market_policy_basic():
     """Test market_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = market_policy()
+    result = market_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_market_policy_edge_cases():
     """Test market_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = market_policy()
+    result = market_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_market_policy_property_idempotent(self, df, threshold):
 def test_kelly_lcb_policy_basic():
     """Test kelly_lcb_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = kelly_lcb_policy()
+    result = kelly_lcb_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_kelly_lcb_policy_edge_cases():
     """Test kelly_lcb_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = kelly_lcb_policy()
+    result = kelly_lcb_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_kelly_lcb_policy_property_idempotent(self, df, alpha, threshold):
 def test_cql_single_policy_basic():
     """Test cql_single_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cql_single_policy()
+    result = cql_single_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cql_single_policy_edge_cases():
     """Test cql_single_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cql_single_policy()
+    result = cql_single_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -279,26 +279,26 @@ def test_cql_single_policy_property_idempotent(self, df, model, state_cols):
 def test_cql_ensemble_policy_basic():
     """Test cql_ensemble_policy: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = cql_ensemble_policy()
+    result = cql_ensemble_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_cql_ensemble_policy_edge_cases():
     """Test cql_ensemble_policy: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = cql_ensemble_policy()
+    result = cql_ensemble_policy()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -323,26 +323,26 @@ def test_cql_ensemble_policy_property_idempotent(self, df, models, state_cols, c
 def test_calculate_metrics_basic():
     """Test calculate_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -367,26 +367,26 @@ def test_calculate_metrics_property_idempotent(self, df):
 def test_evaluate_all_policies_basic():
     """Test evaluate_all_policies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = evaluate_all_policies()
+    result = evaluate_all_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_evaluate_all_policies_edge_cases():
     """Test evaluate_all_policies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = evaluate_all_policies()
+    result = evaluate_all_policies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -411,26 +411,26 @@ def test_evaluate_all_policies_property_idempotent(self, df, best_model, ensembl
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -444,26 +444,26 @@ def test_main_error_handling():
 def test_forward_basic():
     """Test forward: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = forward()
+    result = forward()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

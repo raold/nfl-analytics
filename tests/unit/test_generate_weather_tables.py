@@ -15,26 +15,26 @@ import pytest
 def test_generate_weather_comparison_table_basic():
     """Test generate_weather_comparison_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_weather_comparison_table()
+    result = generate_weather_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_weather_comparison_table_edge_cases():
     """Test generate_weather_comparison_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_weather_comparison_table()
+    result = generate_weather_comparison_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_generate_weather_comparison_table_error_handling():
 def test_generate_extreme_conditions_table_basic():
     """Test generate_extreme_conditions_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_extreme_conditions_table()
+    result = generate_extreme_conditions_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_extreme_conditions_table_edge_cases():
     """Test generate_extreme_conditions_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_extreme_conditions_table()
+    result = generate_extreme_conditions_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_generate_extreme_conditions_table_error_handling():
 def test_generate_precipitation_interaction_table_basic():
     """Test generate_precipitation_interaction_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_precipitation_interaction_table()
+    result = generate_precipitation_interaction_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_precipitation_interaction_table_edge_cases():
     """Test generate_precipitation_interaction_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_precipitation_interaction_table()
+    result = generate_precipitation_interaction_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -114,26 +114,26 @@ def test_generate_precipitation_interaction_table_error_handling():
 def test_generate_weather_coverage_table_basic():
     """Test generate_weather_coverage_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_weather_coverage_table()
+    result = generate_weather_coverage_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_weather_coverage_table_edge_cases():
     """Test generate_weather_coverage_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_weather_coverage_table()
+    result = generate_weather_coverage_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_generate_weather_coverage_table_error_handling():
 def test_generate_weather_summary_stats_basic():
     """Test generate_weather_summary_stats: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_weather_summary_stats()
+    result = generate_weather_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_weather_summary_stats_edge_cases():
     """Test generate_weather_summary_stats: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_weather_summary_stats()
+    result = generate_weather_summary_stats()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_generate_weather_summary_stats_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

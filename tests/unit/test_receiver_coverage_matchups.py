@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_receiving_plays_basic():
     """Test load_receiving_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_receiving_plays()
+    result = load_receiving_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_receiving_plays_edge_cases():
     """Test load_receiving_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_receiving_plays()
+    result = load_receiving_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_receiving_plays_property_idempotent(self, self, start_season, end_
 def test_calculate_defensive_backfield_rankings_basic():
     """Test calculate_defensive_backfield_rankings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_defensive_backfield_rankings()
+    result = calculate_defensive_backfield_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_defensive_backfield_rankings_edge_cases():
     """Test calculate_defensive_backfield_rankings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_defensive_backfield_rankings()
+    result = calculate_defensive_backfield_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_defensive_backfield_rankings_property_idempotent(self, self, 
 def test_infer_coverage_schemes_basic():
     """Test infer_coverage_schemes: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = infer_coverage_schemes()
+    result = infer_coverage_schemes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_infer_coverage_schemes_edge_cases():
     """Test infer_coverage_schemes: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = infer_coverage_schemes()
+    result = infer_coverage_schemes()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_infer_coverage_schemes_property_idempotent(self, self, plays):
 def test_calculate_receiver_matchup_features_basic():
     """Test calculate_receiver_matchup_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_receiver_matchup_features()
+    result = calculate_receiver_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_receiver_matchup_features_edge_cases():
     """Test calculate_receiver_matchup_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_receiver_matchup_features()
+    result = calculate_receiver_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_receiver_matchup_features_property_idempotent(self, self, pla
 def test_add_rolling_matchup_features_basic():
     """Test add_rolling_matchup_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_matchup_features()
+    result = add_rolling_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_matchup_features_edge_cases():
     """Test add_rolling_matchup_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_matchup_features()
+    result = add_rolling_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_add_rolling_matchup_features_property_idempotent(self, self, receiver_g
 def test_generate_features_basic():
     """Test generate_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_features_edge_cases():
     """Test generate_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

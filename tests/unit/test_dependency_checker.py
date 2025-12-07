@@ -15,26 +15,26 @@ import pytest
 def test_quick_check_redis_mode_basic():
     """Test quick_check_redis_mode: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = quick_check_redis_mode()
+    result = quick_check_redis_mode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_quick_check_redis_mode_edge_cases():
     """Test quick_check_redis_mode: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = quick_check_redis_mode()
+    result = quick_check_redis_mode()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_quick_check_redis_mode_error_handling():
 def test_get_missing_dependencies_basic():
     """Test get_missing_dependencies: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_missing_dependencies()
+    result = get_missing_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_missing_dependencies_edge_cases():
     """Test get_missing_dependencies: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_missing_dependencies()
+    result = get_missing_dependencies()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_get_missing_dependencies_error_handling():
 def test_check_package_basic():
     """Test check_package: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_package()
+    result = check_package()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_package_edge_cases():
     """Test check_package: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_package()
+    result = check_package()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -125,26 +125,26 @@ def test_check_package_property_idempotent(self, self, package_name, import_name
 def test_check_redis_connection_basic():
     """Test check_redis_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_redis_connection()
+    result = check_redis_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_redis_connection_edge_cases():
     """Test check_redis_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_redis_connection()
+    result = check_redis_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -169,26 +169,26 @@ def test_check_redis_connection_property_idempotent(self, self, host, port):
 def test_check_system_command_basic():
     """Test check_system_command: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_system_command()
+    result = check_system_command()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_system_command_edge_cases():
     """Test check_system_command: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_system_command()
+    result = check_system_command()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -213,26 +213,26 @@ def test_check_system_command_property_idempotent(self, self, command):
 def test_check_gpu_support_basic():
     """Test check_gpu_support: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = check_gpu_support()
+    result = check_gpu_support()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_check_gpu_support_edge_cases():
     """Test check_gpu_support: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = check_gpu_support()
+    result = check_gpu_support()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,39 +244,39 @@ def test_check_gpu_support_error_handling():
 
 
 @given(st.integers())
-def test_check_gpu_support_property_idempotent(self, self):
+def test_check_gpu_support_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = check_gpu_support(self)
+    result = check_gpu_support(val)
 
     # Assert property
-    assert check_gpu_support(self) == result, "idempotent violated"
+    assert check_gpu_support(val) == result, "idempotent violated"
 
 
 
 def test_install_missing_packages_basic():
     """Test install_missing_packages: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = install_missing_packages()
+    result = install_missing_packages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_install_missing_packages_edge_cases():
     """Test install_missing_packages: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = install_missing_packages()
+    result = install_missing_packages()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -301,26 +301,26 @@ def test_install_missing_packages_property_idempotent(self, self, packages, dry_
 def test_get_comprehensive_status_basic():
     """Test get_comprehensive_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_comprehensive_status()
+    result = get_comprehensive_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_comprehensive_status_edge_cases():
     """Test get_comprehensive_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_comprehensive_status()
+    result = get_comprehensive_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -332,39 +332,39 @@ def test_get_comprehensive_status_error_handling():
 
 
 @given(st.integers())
-def test_get_comprehensive_status_property_idempotent(self, self):
+def test_get_comprehensive_status_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_comprehensive_status(self)
+    result = get_comprehensive_status(val)
 
     # Assert property
-    assert get_comprehensive_status(self) == result, "idempotent violated"
+    assert get_comprehensive_status(val) == result, "idempotent violated"
 
 
 
 def test_ensure_minimal_requirements_basic():
     """Test ensure_minimal_requirements: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = ensure_minimal_requirements()
+    result = ensure_minimal_requirements()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_ensure_minimal_requirements_edge_cases():
     """Test ensure_minimal_requirements: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = ensure_minimal_requirements()
+    result = ensure_minimal_requirements()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

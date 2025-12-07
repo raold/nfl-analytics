@@ -15,26 +15,26 @@ import pytest
 def test_detect_conflicts_basic():
     """Test detect_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_conflicts()
+    result = detect_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_conflicts_edge_cases():
     """Test detect_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_conflicts()
+    result = detect_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_detect_conflicts_property_idempotent(self, self, local_dump, remote_dum
 def test_resolve_conflicts_basic():
     """Test resolve_conflicts: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = resolve_conflicts()
+    result = resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_resolve_conflicts_edge_cases():
     """Test resolve_conflicts: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = resolve_conflicts()
+    result = resolve_conflicts()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_resolve_conflicts_property_idempotent(self, self, local_dump, remote_du
 def test_create_redis_snapshot_basic():
     """Test create_redis_snapshot: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_redis_snapshot()
+    result = create_redis_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_redis_snapshot_edge_cases():
     """Test create_redis_snapshot: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_redis_snapshot()
+    result = create_redis_snapshot()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -134,39 +134,39 @@ def test_create_redis_snapshot_error_handling():
 
 
 @given(st.integers())
-def test_create_redis_snapshot_property_idempotent(self, self):
+def test_create_redis_snapshot_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_redis_snapshot(self)
+    result = create_redis_snapshot(val)
 
     # Assert property
-    assert create_redis_snapshot(self) == result, "idempotent violated"
+    assert create_redis_snapshot(val) == result, "idempotent violated"
 
 
 
 def test_sync_redis_data_basic():
     """Test sync_redis_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sync_redis_data()
+    result = sync_redis_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sync_redis_data_edge_cases():
     """Test sync_redis_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sync_redis_data()
+    result = sync_redis_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -178,39 +178,39 @@ def test_sync_redis_data_error_handling():
 
 
 @given(st.integers())
-def test_sync_redis_data_property_idempotent(self, self):
+def test_sync_redis_data_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = sync_redis_data(self)
+    result = sync_redis_data(val)
 
     # Assert property
-    assert sync_redis_data(self) == result, "idempotent violated"
+    assert sync_redis_data(val) == result, "idempotent violated"
 
 
 
 def test_sync_results_basic():
     """Test sync_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = sync_results()
+    result = sync_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_sync_results_edge_cases():
     """Test sync_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = sync_results()
+    result = sync_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -222,39 +222,39 @@ def test_sync_results_error_handling():
 
 
 @given(st.integers())
-def test_sync_results_property_idempotent(self, self):
+def test_sync_results_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = sync_results(self)
+    result = sync_results(val)
 
     # Assert property
-    assert sync_results(self) == result, "idempotent violated"
+    assert sync_results(val) == result, "idempotent violated"
 
 
 
 def test_full_sync_basic():
     """Test full_sync: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = full_sync()
+    result = full_sync()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_full_sync_edge_cases():
     """Test full_sync: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = full_sync()
+    result = full_sync()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,39 +266,39 @@ def test_full_sync_error_handling():
 
 
 @given(st.integers())
-def test_full_sync_property_idempotent(self, self):
+def test_full_sync_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = full_sync(self)
+    result = full_sync(val)
 
     # Assert property
-    assert full_sync(self) == result, "idempotent violated"
+    assert full_sync(val) == result, "idempotent violated"
 
 
 
 def test_start_background_sync_basic():
     """Test start_background_sync: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = start_background_sync()
+    result = start_background_sync()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_start_background_sync_edge_cases():
     """Test start_background_sync: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = start_background_sync()
+    result = start_background_sync()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -310,39 +310,39 @@ def test_start_background_sync_error_handling():
 
 
 @given(st.integers())
-def test_start_background_sync_property_idempotent(self, self):
+def test_start_background_sync_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = start_background_sync(self)
+    result = start_background_sync(val)
 
     # Assert property
-    assert start_background_sync(self) == result, "idempotent violated"
+    assert start_background_sync(val) == result, "idempotent violated"
 
 
 
 def test_get_sync_status_basic():
     """Test get_sync_status: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_sync_status()
+    result = get_sync_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_sync_status_edge_cases():
     """Test get_sync_status: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_sync_status()
+    result = get_sync_status()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -354,11 +354,11 @@ def test_get_sync_status_error_handling():
 
 
 @given(st.integers())
-def test_get_sync_status_property_idempotent(self, self):
+def test_get_sync_status_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_sync_status(self)
+    result = get_sync_status(val)
 
     # Assert property
-    assert get_sync_status(self) == result, "idempotent violated"
+    assert get_sync_status(val) == result, "idempotent violated"
 

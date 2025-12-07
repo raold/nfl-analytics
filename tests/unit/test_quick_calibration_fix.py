@@ -15,26 +15,26 @@ import pytest
 def test_compute_calibration_basic():
     """Test compute_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_calibration_edge_cases():
     """Test compute_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_compute_calibration_property_idempotent(self, y_true, predictions, conf
 def test_apply_temperature_scaling_basic():
     """Test apply_temperature_scaling: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_apply_temperature_scaling_edge_cases():
     """Test apply_temperature_scaling: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_apply_temperature_scaling_property_idempotent(self, predictions, temper
 def test_test_temperature_values_basic():
     """Test test_temperature_values: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = test_temperature_values()
+    result = test_temperature_values()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_test_temperature_values_edge_cases():
     """Test test_temperature_values: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = test_temperature_values()
+    result = test_temperature_values()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_test_temperature_values_property_idempotent(self, y_true, base_predicti
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

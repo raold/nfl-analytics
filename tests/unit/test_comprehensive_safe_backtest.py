@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_games_with_safe_features_basic():
     """Test load_games_with_safe_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games_with_safe_features()
+    result = load_games_with_safe_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_with_safe_features_edge_cases():
     """Test load_games_with_safe_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games_with_safe_features()
+    result = load_games_with_safe_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -79,39 +79,39 @@ def test_load_games_with_safe_features_error_handling():
 
 
 @given(st.integers())
-def test_load_games_with_safe_features_property_idempotent(self, self):
+def test_load_games_with_safe_features_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = load_games_with_safe_features(self)
+    result = load_games_with_safe_features(val)
 
     # Assert property
-    assert load_games_with_safe_features(self) == result, "idempotent violated"
+    assert load_games_with_safe_features(val) == result, "idempotent violated"
 
 
 
 def test_add_rolling_features_basic():
     """Test add_rolling_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_features()
+    result = add_rolling_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_features_edge_cases():
     """Test add_rolling_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_features()
+    result = add_rolling_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_add_rolling_features_property_idempotent(self, self, df):
 def test_prepare_matchup_features_basic():
     """Test prepare_matchup_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = prepare_matchup_features()
+    result = prepare_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_prepare_matchup_features_edge_cases():
     """Test prepare_matchup_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = prepare_matchup_features()
+    result = prepare_matchup_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_prepare_matchup_features_property_idempotent(self, self, df):
 def test_run_backtest_basic():
     """Test run_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_backtest()
+    result = run_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_backtest_edge_cases():
     """Test run_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_backtest()
+    result = run_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_run_backtest_property_idempotent(self, self, matchups):
 def test_save_results_basic():
     """Test save_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_save_results_property_idempotent(self, self, results):
 def test_print_summary_basic():
     """Test print_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_summary()
+    result = print_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

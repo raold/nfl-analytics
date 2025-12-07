@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_fetch_bayesian_ratings_basic():
     """Test fetch_bayesian_ratings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_bayesian_ratings()
+    result = fetch_bayesian_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_bayesian_ratings_edge_cases():
     """Test fetch_bayesian_ratings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_bayesian_ratings()
+    result = fetch_bayesian_ratings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_bayesian_ratings_property_idempotent(self, conn):
 def test_merge_bayesian_features_basic():
     """Test merge_bayesian_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = merge_bayesian_features()
+    result = merge_bayesian_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_merge_bayesian_features_edge_cases():
     """Test merge_bayesian_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = merge_bayesian_features()
+    result = merge_bayesian_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -137,12 +137,12 @@ def test_merge_bayesian_features_no_temporal_leakage():
     """Ensure merge_bayesian_features doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -156,26 +156,26 @@ def test_merge_bayesian_features_no_temporal_leakage():
 def test_add_bayesian_prediction_basic():
     """Test add_bayesian_prediction: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_bayesian_prediction()
+    result = add_bayesian_prediction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_bayesian_prediction_edge_cases():
     """Test add_bayesian_prediction: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_bayesian_prediction()
+    result = add_bayesian_prediction()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -200,26 +200,26 @@ def test_add_bayesian_prediction_property_idempotent(self, games_df, home_advant
 def test_print_feature_summary_basic():
     """Test print_feature_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = print_feature_summary()
+    result = print_feature_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_print_feature_summary_edge_cases():
     """Test print_feature_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = print_feature_summary()
+    result = print_feature_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -244,26 +244,26 @@ def test_print_feature_summary_property_idempotent(self, games_df):
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

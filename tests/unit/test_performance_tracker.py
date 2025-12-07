@@ -15,26 +15,26 @@ import pytest
 def test_efficiency_basic():
     """Test efficiency: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = efficiency()
+    result = efficiency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_efficiency_edge_cases():
     """Test efficiency: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = efficiency()
+    result = efficiency()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -46,39 +46,39 @@ def test_efficiency_error_handling():
 
 
 @given(st.integers())
-def test_efficiency_property_idempotent(self, self):
+def test_efficiency_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = efficiency(self)
+    result = efficiency(val)
 
     # Assert property
-    assert efficiency(self) == result, "idempotent violated"
+    assert efficiency(val) == result, "idempotent violated"
 
 
 
 def test_record_performance_basic():
     """Test record_performance: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = record_performance()
+    result = record_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_record_performance_edge_cases():
     """Test record_performance: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = record_performance()
+    result = record_performance()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_record_performance_property_idempotent(self, self, task_id, model_id, m
 def test_compare_models_statistically_basic():
     """Test compare_models_statistically: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_models_statistically()
+    result = compare_models_statistically()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_models_statistically_edge_cases():
     """Test compare_models_statistically: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_models_statistically()
+    result = compare_models_statistically()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_compare_models_statistically_property_idempotent(self, self, baseline_m
 def test_detect_performance_regression_basic():
     """Test detect_performance_regression: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = detect_performance_regression()
+    result = detect_performance_regression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_detect_performance_regression_edge_cases():
     """Test detect_performance_regression: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = detect_performance_regression()
+    result = detect_performance_regression()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -191,26 +191,26 @@ def test_detect_performance_regression_property_idempotent(self, self, model_id,
 def test_compare_multiple_models_basic():
     """Test compare_multiple_models: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_multiple_models()
+    result = compare_multiple_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_multiple_models_edge_cases():
     """Test compare_multiple_models: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_multiple_models()
+    result = compare_multiple_models()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -235,26 +235,26 @@ def test_compare_multiple_models_property_idempotent(self, self, model_ids, metr
 def test_get_performance_summary_basic():
     """Test get_performance_summary: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_performance_summary()
+    result = get_performance_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_performance_summary_edge_cases():
     """Test get_performance_summary: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_performance_summary()
+    result = get_performance_summary()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -266,39 +266,39 @@ def test_get_performance_summary_error_handling():
 
 
 @given(st.integers())
-def test_get_performance_summary_property_idempotent(self, self):
+def test_get_performance_summary_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = get_performance_summary(self)
+    result = get_performance_summary(val)
 
     # Assert property
-    assert get_performance_summary(self) == result, "idempotent violated"
+    assert get_performance_summary(val) == result, "idempotent violated"
 
 
 
 def test_run_automated_analysis_basic():
     """Test run_automated_analysis: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_automated_analysis()
+    result = run_automated_analysis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_automated_analysis_edge_cases():
     """Test run_automated_analysis: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_automated_analysis()
+    result = run_automated_analysis()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -310,39 +310,39 @@ def test_run_automated_analysis_error_handling():
 
 
 @given(st.integers())
-def test_run_automated_analysis_property_idempotent(self, self):
+def test_run_automated_analysis_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_automated_analysis(self)
+    result = run_automated_analysis(val)
 
     # Assert property
-    assert run_automated_analysis(self) == result, "idempotent violated"
+    assert run_automated_analysis(val) == result, "idempotent violated"
 
 
 
 def test_close_basic():
     """Test close: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = close()
+    result = close()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -354,11 +354,11 @@ def test_close_error_handling():
 
 
 @given(st.integers())
-def test_close_property_idempotent(self, self):
+def test_close_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = close(self)
+    result = close(val)
 
     # Assert property
-    assert close(self) == result, "idempotent violated"
+    assert close(val) == result, "idempotent violated"
 

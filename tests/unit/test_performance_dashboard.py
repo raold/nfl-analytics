@@ -15,26 +15,26 @@ import pytest
 def test_create_cli_dashboard_basic():
     """Test create_cli_dashboard: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_cli_dashboard()
+    result = create_cli_dashboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_cli_dashboard_edge_cases():
     """Test create_cli_dashboard: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_cli_dashboard()
+    result = create_cli_dashboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_create_cli_dashboard_error_handling():
 def test_load_performance_data_basic():
     """Test load_performance_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_performance_data()
+    result = load_performance_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_performance_data_edge_cases():
     """Test load_performance_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_performance_data()
+    result = load_performance_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_performance_data_property_idempotent(self, self, start_date, end_d
 def test_calculate_metrics_basic():
     """Test calculate_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_metrics()
+    result = calculate_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_metrics_property_idempotent(self, self, df):
 def test_create_dashboard_basic():
     """Test create_dashboard: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_dashboard()
+    result = create_dashboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_dashboard_edge_cases():
     """Test create_dashboard: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_dashboard()
+    result = create_dashboard()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -167,11 +167,11 @@ def test_create_dashboard_error_handling():
 
 
 @given(st.integers())
-def test_create_dashboard_property_idempotent(self, self):
+def test_create_dashboard_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_dashboard(self)
+    result = create_dashboard(val)
 
     # Assert property
-    assert create_dashboard(self) == result, "idempotent violated"
+    assert create_dashboard(val) == result, "idempotent violated"
 

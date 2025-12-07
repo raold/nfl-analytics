@@ -15,26 +15,26 @@ import pytest
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_get_connection_error_handling():
 def test_fetch_game_features_basic():
     """Test fetch_game_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_game_features()
+    result = fetch_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_game_features_edge_cases():
     """Test fetch_game_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_game_features()
+    result = fetch_game_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_game_features_property_idempotent(self, conn, season_start):
 def test_fetch_player_features_basic():
     """Test fetch_player_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_player_features()
+    result = fetch_player_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_player_features_edge_cases():
     """Test fetch_player_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_player_features()
+    result = fetch_player_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fetch_player_features_property_idempotent(self, conn, season_start):
 def test_compute_differentials_basic():
     """Test compute_differentials: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_differentials()
+    result = compute_differentials()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_differentials_edge_cases():
     """Test compute_differentials: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_differentials()
+    result = compute_differentials()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_compute_differentials_property_idempotent(self, df):
 def test_add_target_variables_basic():
     """Test add_target_variables: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_target_variables()
+    result = add_target_variables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_target_variables_edge_cases():
     """Test add_target_variables: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_target_variables()
+    result = add_target_variables()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_add_target_variables_property_idempotent(self, df):
 def test_validate_features_basic():
     """Test validate_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_features()
+    result = validate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_features_edge_cases():
     """Test validate_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_features()
+    result = validate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -269,12 +269,12 @@ def test_validate_features_no_temporal_leakage():
     """Ensure validate_features doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -288,26 +288,26 @@ def test_validate_features_no_temporal_leakage():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

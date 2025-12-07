@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_fetch_actual_outcomes_multiyear_basic():
     """Test fetch_actual_outcomes_multiyear: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_actual_outcomes_multiyear()
+    result = fetch_actual_outcomes_multiyear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_actual_outcomes_multiyear_edge_cases():
     """Test fetch_actual_outcomes_multiyear: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_actual_outcomes_multiyear()
+    result = fetch_actual_outcomes_multiyear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_fetch_actual_outcomes_multiyear_property_idempotent(self, self, stat_ty
 def test_get_bayesian_predictions_multiyear_basic():
     """Test get_bayesian_predictions_multiyear: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_bayesian_predictions_multiyear()
+    result = get_bayesian_predictions_multiyear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_bayesian_predictions_multiyear_edge_cases():
     """Test get_bayesian_predictions_multiyear: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_bayesian_predictions_multiyear()
+    result = get_bayesian_predictions_multiyear()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_get_bayesian_predictions_multiyear_property_idempotent(self, self, stat
 def test_calculate_season_metrics_basic():
     """Test calculate_season_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_season_metrics()
+    result = calculate_season_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_season_metrics_edge_cases():
     """Test calculate_season_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_season_metrics()
+    result = calculate_season_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_season_metrics_property_idempotent(self, self, results, seaso
 def test_run_multiyear_backtest_basic():
     """Test run_multiyear_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_multiyear_backtest()
+    result = run_multiyear_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_multiyear_backtest_edge_cases():
     """Test run_multiyear_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_multiyear_backtest()
+    result = run_multiyear_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_run_multiyear_backtest_property_idempotent(self, self, stat_type, seaso
 def test_generate_comparative_report_basic():
     """Test generate_comparative_report: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_comparative_report()
+    result = generate_comparative_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_comparative_report_edge_cases():
     """Test generate_comparative_report: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_comparative_report()
+    result = generate_comparative_report()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_generate_comparative_report_property_idempotent(self, self, results, se
 def test_run_full_multiyear_backtest_basic():
     """Test run_full_multiyear_backtest: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_full_multiyear_backtest()
+    result = run_full_multiyear_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_full_multiyear_backtest_edge_cases():
     """Test run_full_multiyear_backtest: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_full_multiyear_backtest()
+    result = run_full_multiyear_backtest()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

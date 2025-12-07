@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_games_with_lines_basic():
     """Test load_games_with_lines: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games_with_lines()
+    result = load_games_with_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_with_lines_edge_cases():
     """Test load_games_with_lines: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games_with_lines()
+    result = load_games_with_lines()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_games_with_lines_property_idempotent(self, self, start_season, end
 def test_build_team_features_basic():
     """Test build_team_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = build_team_features()
+    result = build_team_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_build_team_features_edge_cases():
     """Test build_team_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = build_team_features()
+    result = build_team_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_build_team_features_property_idempotent(self, self, df, include_outcome
 def test_compute_rolling_line_features_basic():
     """Test compute_rolling_line_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_rolling_line_features()
+    result = compute_rolling_line_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_rolling_line_features_edge_cases():
     """Test compute_rolling_line_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_rolling_line_features()
+    result = compute_rolling_line_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_load_actual_bnn_model_basic():
     """Test load_actual_bnn_model: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_actual_bnn_model()
+    result = load_actual_bnn_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_actual_bnn_model_edge_cases():
     """Test load_actual_bnn_model: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_actual_bnn_model()
+    result = load_actual_bnn_model()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_load_actual_bnn_model_error_handling():
 def test_compute_calibration_basic():
     """Test compute_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_calibration_edge_cases():
     """Test compute_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_calibration()
+    result = compute_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_compute_calibration_property_idempotent(self, y_true, predictions, conf
 def test_apply_temperature_scaling_basic():
     """Test apply_temperature_scaling: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_apply_temperature_scaling_edge_cases():
     """Test apply_temperature_scaling: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = apply_temperature_scaling()
+    result = apply_temperature_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_apply_temperature_scaling_property_idempotent(self, predictions, temper
 def test_validate_bnn_calibration_basic():
     """Test validate_bnn_calibration: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_bnn_calibration()
+    result = validate_bnn_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_bnn_calibration_edge_cases():
     """Test validate_bnn_calibration: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_bnn_calibration()
+    result = validate_bnn_calibration()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -170,12 +170,12 @@ def test_validate_bnn_calibration_no_temporal_leakage():
     """Ensure validate_bnn_calibration doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function

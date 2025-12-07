@@ -15,26 +15,26 @@ import pytest
 def test_calculate_calibration_metrics_basic():
     """Test calculate_calibration_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_calibration_metrics()
+    result = calculate_calibration_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_calibration_metrics_edge_cases():
     """Test calculate_calibration_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_calibration_metrics()
+    result = calculate_calibration_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_calculate_calibration_metrics_property_idempotent(self, y_true, y_pred)
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_main_error_handling():
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fit_property_idempotent(self, self, probabilities, targets):
 def test_transform_basic():
     """Test transform: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = transform()
+    result = transform()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_transform_edge_cases():
     """Test transform: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = transform()
+    result = transform()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_transform_property_idempotent(self, self, probabilities):
 def test_create_optimized_ensemble_basic():
     """Test create_optimized_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = create_optimized_ensemble()
+    result = create_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_create_optimized_ensemble_edge_cases():
     """Test create_optimized_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = create_optimized_ensemble()
+    result = create_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,39 +211,39 @@ def test_create_optimized_ensemble_error_handling():
 
 
 @given(st.integers())
-def test_create_optimized_ensemble_property_idempotent(self, self):
+def test_create_optimized_ensemble_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = create_optimized_ensemble(self)
+    result = create_optimized_ensemble(val)
 
     # Assert property
-    assert create_optimized_ensemble(self) == result, "idempotent violated"
+    assert create_optimized_ensemble(val) == result, "idempotent violated"
 
 
 
 def test_run_step1_3_optimized_ensemble_basic():
     """Test run_step1_3_optimized_ensemble: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_step1_3_optimized_ensemble()
+    result = run_step1_3_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_step1_3_optimized_ensemble_edge_cases():
     """Test run_step1_3_optimized_ensemble: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_step1_3_optimized_ensemble()
+    result = run_step1_3_optimized_ensemble()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -255,39 +255,39 @@ def test_run_step1_3_optimized_ensemble_error_handling():
 
 
 @given(st.integers())
-def test_run_step1_3_optimized_ensemble_property_idempotent(self, self):
+def test_run_step1_3_optimized_ensemble_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_step1_3_optimized_ensemble(self)
+    result = run_step1_3_optimized_ensemble(val)
 
     # Assert property
-    assert run_step1_3_optimized_ensemble(self) == result, "idempotent violated"
+    assert run_step1_3_optimized_ensemble(val) == result, "idempotent violated"
 
 
 
 def test_run_step4_platt_scaling_basic():
     """Test run_step4_platt_scaling: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_step4_platt_scaling()
+    result = run_step4_platt_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_step4_platt_scaling_edge_cases():
     """Test run_step4_platt_scaling: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_step4_platt_scaling()
+    result = run_step4_platt_scaling()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -299,39 +299,39 @@ def test_run_step4_platt_scaling_error_handling():
 
 
 @given(st.integers())
-def test_run_step4_platt_scaling_property_idempotent(self, self):
+def test_run_step4_platt_scaling_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_step4_platt_scaling(self)
+    result = run_step4_platt_scaling(val)
 
     # Assert property
-    assert run_step4_platt_scaling(self) == result, "idempotent violated"
+    assert run_step4_platt_scaling(val) == result, "idempotent violated"
 
 
 
 def test_run_step5_temporal_validation_basic():
     """Test run_step5_temporal_validation: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = run_step5_temporal_validation()
+    result = run_step5_temporal_validation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_run_step5_temporal_validation_edge_cases():
     """Test run_step5_temporal_validation: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = run_step5_temporal_validation()
+    result = run_step5_temporal_validation()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -343,13 +343,13 @@ def test_run_step5_temporal_validation_error_handling():
 
 
 @given(st.integers())
-def test_run_step5_temporal_validation_property_idempotent(self, self):
+def test_run_step5_temporal_validation_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = run_step5_temporal_validation(self)
+    result = run_step5_temporal_validation(val)
 
     # Assert property
-    assert run_step5_temporal_validation(self) == result, "idempotent violated"
+    assert run_step5_temporal_validation(val) == result, "idempotent violated"
 
 
 
@@ -357,12 +357,12 @@ def test_run_step5_temporal_validation_no_temporal_leakage():
     """Ensure run_step5_temporal_validation doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -376,26 +376,26 @@ def test_run_step5_temporal_validation_no_temporal_leakage():
 def test_compare_all_configurations_basic():
     """Test compare_all_configurations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compare_all_configurations()
+    result = compare_all_configurations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compare_all_configurations_edge_cases():
     """Test compare_all_configurations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compare_all_configurations()
+    result = compare_all_configurations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -407,39 +407,39 @@ def test_compare_all_configurations_error_handling():
 
 
 @given(st.integers())
-def test_compare_all_configurations_property_idempotent(self, self):
+def test_compare_all_configurations_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = compare_all_configurations(self)
+    result = compare_all_configurations(val)
 
     # Assert property
-    assert compare_all_configurations(self) == result, "idempotent violated"
+    assert compare_all_configurations(val) == result, "idempotent violated"
 
 
 
 def test_save_results_basic():
     """Test save_results: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = save_results()
+    result = save_results()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -451,11 +451,11 @@ def test_save_results_error_handling():
 
 
 @given(st.integers())
-def test_save_results_property_idempotent(self, self):
+def test_save_results_property_idempotent(val):
     """Property test: function is idempotent."""
     # Act
-    result = save_results(self)
+    result = save_results(val)
 
     # Assert property
-    assert save_results(self) == result, "idempotent violated"
+    assert save_results(val) == result, "idempotent violated"
 

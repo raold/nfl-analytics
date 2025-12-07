@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_passing_plays_basic():
     """Test load_passing_plays: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_passing_plays_edge_cases():
     """Test load_passing_plays: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_passing_plays()
+    result = load_passing_plays()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_passing_plays_property_idempotent(self, self, start_season, end_se
 def test_calculate_defensive_pressure_rankings_basic():
     """Test calculate_defensive_pressure_rankings: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_defensive_pressure_rankings()
+    result = calculate_defensive_pressure_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_defensive_pressure_rankings_edge_cases():
     """Test calculate_defensive_pressure_rankings: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_defensive_pressure_rankings()
+    result = calculate_defensive_pressure_rankings()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_defensive_pressure_rankings_property_idempotent(self, self, p
 def test_classify_pressure_situations_basic():
     """Test classify_pressure_situations: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = classify_pressure_situations()
+    result = classify_pressure_situations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_classify_pressure_situations_edge_cases():
     """Test classify_pressure_situations: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = classify_pressure_situations()
+    result = classify_pressure_situations()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_classify_pressure_situations_property_idempotent(self, self, plays):
 def test_calculate_qb_pressure_features_basic():
     """Test calculate_qb_pressure_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_qb_pressure_features()
+    result = calculate_qb_pressure_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_qb_pressure_features_edge_cases():
     """Test calculate_qb_pressure_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_qb_pressure_features()
+    result = calculate_qb_pressure_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_qb_pressure_features_property_idempotent(self, self, plays, d
 def test_add_rolling_pressure_features_basic():
     """Test add_rolling_pressure_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = add_rolling_pressure_features()
+    result = add_rolling_pressure_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_add_rolling_pressure_features_edge_cases():
     """Test add_rolling_pressure_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = add_rolling_pressure_features()
+    result = add_rolling_pressure_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_add_rolling_pressure_features_property_idempotent(self, self, qb_games)
 def test_generate_features_basic():
     """Test generate_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_features_edge_cases():
     """Test generate_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_features()
+    result = generate_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

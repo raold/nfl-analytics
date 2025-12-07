@@ -15,26 +15,26 @@ import pytest
 def test_load_predictions_basic():
     """Test load_predictions: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_predictions()
+    result = load_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_predictions_edge_cases():
     """Test load_predictions: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_predictions()
+    result = load_predictions()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_predictions_property_idempotent(self, predictions_path):
 def test_load_features_basic():
     """Test load_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_features()
+    result = load_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_features_edge_cases():
     """Test load_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_features()
+    result = load_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_load_features_property_idempotent(self, features_path):
 def test_merge_predictions_features_basic():
     """Test merge_predictions_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = merge_predictions_features()
+    result = merge_predictions_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_merge_predictions_features_edge_cases():
     """Test merge_predictions_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = merge_predictions_features()
+    result = merge_predictions_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -148,12 +148,12 @@ def test_merge_predictions_features_no_temporal_leakage():
     """Ensure merge_predictions_features doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -167,26 +167,26 @@ def test_merge_predictions_features_no_temporal_leakage():
 def test_compute_derived_metrics_basic():
     """Test compute_derived_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = compute_derived_metrics()
+    result = compute_derived_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_compute_derived_metrics_edge_cases():
     """Test compute_derived_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = compute_derived_metrics()
+    result = compute_derived_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -211,26 +211,26 @@ def test_compute_derived_metrics_property_idempotent(self, df):
 def test_validate_merge_basic():
     """Test validate_merge: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = validate_merge()
+    result = validate_merge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_validate_merge_edge_cases():
     """Test validate_merge: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = validate_merge()
+    result = validate_merge()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -256,12 +256,12 @@ def test_validate_merge_no_temporal_leakage():
     """Ensure validate_merge doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -275,26 +275,26 @@ def test_validate_merge_no_temporal_leakage():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

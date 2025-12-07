@@ -15,26 +15,26 @@ import pytest
 def test_load_data_basic():
     """Test load_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_data()
+    result = load_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_load_data_property_idempotent(self, csv_path):
 def test_train_and_predict_basic():
     """Test train_and_predict: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = train_and_predict()
+    result = train_and_predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_train_and_predict_edge_cases():
     """Test train_and_predict: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = train_and_predict()
+    result = train_and_predict()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_train_and_predict_property_idempotent(self, df, test_season, features, 
 def test_plot_reliability_diagram_basic():
     """Test plot_reliability_diagram: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = plot_reliability_diagram()
+    result = plot_reliability_diagram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_plot_reliability_diagram_edge_cases():
     """Test plot_reliability_diagram: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = plot_reliability_diagram()
+    result = plot_reliability_diagram()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -147,26 +147,26 @@ def test_plot_reliability_diagram_property_idempotent(self, y_true, y_pred_proba
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

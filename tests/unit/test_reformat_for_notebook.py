@@ -15,26 +15,26 @@ import pytest
 def test_reformat_acceptance_data_basic():
     """Test reformat_acceptance_data: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reformat_acceptance_data()
+    result = reformat_acceptance_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reformat_acceptance_data_edge_cases():
     """Test reformat_acceptance_data: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reformat_acceptance_data()
+    result = reformat_acceptance_data()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_reformat_acceptance_data_error_handling():
 def test_reformat_live_metrics_basic():
     """Test reformat_live_metrics: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = reformat_live_metrics()
+    result = reformat_live_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_reformat_live_metrics_edge_cases():
     """Test reformat_live_metrics: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = reformat_live_metrics()
+    result = reformat_live_metrics()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -81,26 +81,26 @@ def test_reformat_live_metrics_error_handling():
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

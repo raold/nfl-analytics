@@ -15,26 +15,26 @@ import pytest
 def test_american_to_decimal_basic():
     """Test american_to_decimal: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = american_to_decimal()
+    result = american_to_decimal()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_american_to_decimal_property_idempotent(self, odds):
 def test_get_connection_basic():
     """Test get_connection: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = get_connection()
+    result = get_connection()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_get_connection_error_handling():
 def test_fetch_games_basic():
     """Test fetch_games: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_games()
+    result = fetch_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_games_edge_cases():
     """Test fetch_games: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_games()
+    result = fetch_games()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_fetch_games_property_idempotent(self, conn, start_season, end_season):
 def test_fetch_key_targets_basic():
     """Test fetch_key_targets: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fetch_key_targets()
+    result = fetch_key_targets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fetch_key_targets_edge_cases():
     """Test fetch_key_targets: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fetch_key_targets()
+    result = fetch_key_targets()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_fetch_key_targets_property_idempotent(self, conn, start_season, end_sea
 def test_pmf_from_spread_total_basic():
     """Test pmf_from_spread_total: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pmf_from_spread_total()
+    result = pmf_from_spread_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pmf_from_spread_total_edge_cases():
     """Test pmf_from_spread_total: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pmf_from_spread_total()
+    result = pmf_from_spread_total()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_pmf_from_spread_total_property_idempotent(self, total_close, spread_clo
 def test_crosses_keys_basic():
     """Test crosses_keys: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = crosses_keys()
+    result = crosses_keys()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_crosses_keys_edge_cases():
     """Test crosses_keys: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = crosses_keys()
+    result = crosses_keys()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_crosses_keys_property_idempotent(self, th0, th1):
 def test_leg_success_probs_for_game_basic():
     """Test leg_success_probs_for_game: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = leg_success_probs_for_game()
+    result = leg_success_probs_for_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_leg_success_probs_for_game_edge_cases():
     """Test leg_success_probs_for_game: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = leg_success_probs_for_game()
+    result = leg_success_probs_for_game()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -312,26 +312,26 @@ def test_leg_success_probs_for_game_property_idempotent(self, pmf_margin, spread
 def test_joint_success_basic():
     """Test joint_success: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = joint_success()
+    result = joint_success()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_joint_success_edge_cases():
     """Test joint_success: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = joint_success()
+    result = joint_success()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -357,12 +357,12 @@ def test_joint_success_no_temporal_leakage():
     """Ensure joint_success doesn't use future data."""
     # Arrange: Create temporal data
     train = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-01', periods=10),
-        'value': range(10)
+    'kickoff': pd.date_range('2024-01-01', periods=10),
+    'value': range(10)
     })
     test = pd.DataFrame({
-        'kickoff': pd.date_range('2024-01-11', periods=5),
-        'value': range(10, 15)
+    'kickoff': pd.date_range('2024-01-11', periods=5),
+    'value': range(10, 15)
     })
 
     # Act: Call function
@@ -376,26 +376,26 @@ def test_joint_success_no_temporal_leakage():
 def test_pairwise_ev_basic():
     """Test pairwise_ev: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = pairwise_ev()
+    result = pairwise_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_pairwise_ev_edge_cases():
     """Test pairwise_ev: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = pairwise_ev()
+    result = pairwise_ev()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -420,26 +420,26 @@ def test_pairwise_ev_property_idempotent(self, legs, payout_decimal, dep_model, 
 def test_write_tex_table_basic():
     """Test write_tex_table: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_tex_table()
+    result = write_tex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_tex_table_edge_cases():
     """Test write_tex_table: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_tex_table()
+    result = write_tex_table()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -464,26 +464,26 @@ def test_write_tex_table_property_idempotent(self, path, rows):
 def test_write_copula_delta_png_basic():
     """Test write_copula_delta_png: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_copula_delta_png()
+    result = write_copula_delta_png()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_copula_delta_png_edge_cases():
     """Test write_copula_delta_png: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_copula_delta_png()
+    result = write_copula_delta_png()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -508,26 +508,26 @@ def test_write_copula_delta_png_property_idempotent(self, path, price_american, 
 def test_write_tex_sensitivity_basic():
     """Test write_tex_sensitivity: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = write_tex_sensitivity()
+    result = write_tex_sensitivity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_write_tex_sensitivity_edge_cases():
     """Test write_tex_sensitivity: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = write_tex_sensitivity()
+    result = write_tex_sensitivity()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -552,26 +552,26 @@ def test_write_tex_sensitivity_property_idempotent(self, path, indep_bps, indep_
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -585,26 +585,26 @@ def test_main_error_handling():
 def test_summarize_basic():
     """Test summarize: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = summarize()
+    result = summarize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_summarize_edge_cases():
     """Test summarize: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = summarize()
+    result = summarize()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

@@ -15,26 +15,26 @@ import pytest
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = fit()
+    result = fit()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -59,26 +59,26 @@ def test_fit_property_idempotent(self, self, df, treated_unit, outcome, time_var
 def test_estimate_treatment_effect_basic():
     """Test estimate_treatment_effect: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = estimate_treatment_effect()
+    result = estimate_treatment_effect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_estimate_treatment_effect_edge_cases():
     """Test estimate_treatment_effect: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = estimate_treatment_effect()
+    result = estimate_treatment_effect()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -103,26 +103,26 @@ def test_estimate_treatment_effect_property_idempotent(self, self, df, outcome, 
 def test_objective_basic():
     """Test objective: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = objective()
+    result = objective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_objective_edge_cases():
     """Test objective: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = objective()
+    result = objective()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 

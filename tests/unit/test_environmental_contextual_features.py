@@ -15,26 +15,26 @@ import pytest
 def test_main_basic():
     """Test main: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = main()
+    result = main()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -48,26 +48,26 @@ def test_main_error_handling():
 def test_load_games_with_context_basic():
     """Test load_games_with_context: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = load_games_with_context()
+    result = load_games_with_context()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_load_games_with_context_edge_cases():
     """Test load_games_with_context: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = load_games_with_context()
+    result = load_games_with_context()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -92,26 +92,26 @@ def test_load_games_with_context_property_idempotent(self, self, start_season, e
 def test_calculate_thursday_night_features_basic():
     """Test calculate_thursday_night_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_thursday_night_features()
+    result = calculate_thursday_night_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_thursday_night_features_edge_cases():
     """Test calculate_thursday_night_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_thursday_night_features()
+    result = calculate_thursday_night_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -136,26 +136,26 @@ def test_calculate_thursday_night_features_property_idempotent(self, self, games
 def test_calculate_travel_impact_features_basic():
     """Test calculate_travel_impact_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_travel_impact_features()
+    result = calculate_travel_impact_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_travel_impact_features_edge_cases():
     """Test calculate_travel_impact_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_travel_impact_features()
+    result = calculate_travel_impact_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -180,26 +180,26 @@ def test_calculate_travel_impact_features_property_idempotent(self, self, games)
 def test_calculate_venue_adaptation_features_basic():
     """Test calculate_venue_adaptation_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_venue_adaptation_features()
+    result = calculate_venue_adaptation_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_venue_adaptation_features_edge_cases():
     """Test calculate_venue_adaptation_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_venue_adaptation_features()
+    result = calculate_venue_adaptation_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -224,26 +224,26 @@ def test_calculate_venue_adaptation_features_property_idempotent(self, self, gam
 def test_calculate_rivalry_features_basic():
     """Test calculate_rivalry_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = calculate_rivalry_features()
+    result = calculate_rivalry_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_calculate_rivalry_features_edge_cases():
     """Test calculate_rivalry_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = calculate_rivalry_features()
+    result = calculate_rivalry_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
@@ -268,26 +268,26 @@ def test_calculate_rivalry_features_property_idempotent(self, self, games):
 def test_generate_all_features_basic():
     """Test generate_all_features: basic functionality."""
     # Arrange
-        # TODO: Set up test data
+    # TODO: Set up test data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
-        # TODO: Set up edge case data
+    # TODO: Set up edge case data
 
     # Act
-        result = generate_all_features()
+    result = generate_all_features()
 
     # Assert
-        assert result is not None
+    assert result is not None
 
 
 
