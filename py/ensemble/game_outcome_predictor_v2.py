@@ -8,9 +8,9 @@ ignoring 231 of 232 available features. This version uses ALL features from
 GameFeatureExtractor plus QB predictions.
 
 Features Used:
-- 280 game features from GameFeatureExtractor (14 feature groups)
+- 293 game features from GameFeatureExtractor (14 feature groups)
 - 4 QB prediction features (home/away yards + uncertainties)
-- Total: 284 features for spread/total/win_prob prediction
+- Total: 297 features for spread/total/win_prob prediction
 
 Prediction Models:
 - XGBoost spread model (trained on 2018-2023, validated 2024)
@@ -62,13 +62,13 @@ DEFAULT_TOTAL = 47.0  # League average
 
 class GameOutcomePredictorV2:
     """
-    Game outcome predictor using full 284-feature set.
+    Game outcome predictor using full 297-feature set.
 
     Key improvement over V1: Uses ALL available features instead of just QB yards.
 
-    Feature Groups (280 game features):
-    - TeamOffensive (24 × 2 teams = 48)
-    - TeamDefensive (24 × 2 teams = 48)
+    Feature Groups (293 game features):
+    - TeamOffensive (27 × 2 teams = 54)
+    - TeamDefensive (27 × 2 teams = 54)
     - MatchupDerived (4)
     - Injury (12)
     - NextGenStats (23 × 2 = 46)
@@ -78,7 +78,7 @@ class GameOutcomePredictorV2:
     - OpponentAdjusted (7 × 2 = 14)
     - TurnoverLuck (25)
     - Primetime (9)
-    - StrengthOfVictory (14)
+    - StrengthOfVictory (15)
 
     Plus 4 QB prediction features:
     - home_qb_predicted_yards
