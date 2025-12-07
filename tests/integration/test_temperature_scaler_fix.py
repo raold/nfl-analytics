@@ -15,20 +15,20 @@ Author: Claude Code (Haiku 4.5)
 Date: November 16, 2025
 """
 
-import pytest
-import pickle
 import json
-import numpy as np
-import pandas as pd
-from pathlib import Path
-from scipy import stats
-from typing import Dict, Tuple
+import pickle
 
 # Add project root to path
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytest
+from scipy import stats
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.calibration.temperature_scaling import TemperatureScaler
 
 
 class TestTemperatureScalerFix:
@@ -49,7 +49,7 @@ class TestTemperatureScalerFix:
         return df
 
     @pytest.fixture(scope="class")
-    def scaler_files(self) -> Dict[str, Path]:
+    def scaler_files(self) -> dict[str, Path]:
         """Get paths to temperature scaler files."""
         return {
             'pkl': Path('models/calibration/temperature_scaler_4way.pkl'),
@@ -57,9 +57,9 @@ class TestTemperatureScalerFix:
         }
 
     @pytest.fixture(scope="class")
-    def scaler_data(self, scaler_files) -> Dict:
+    def scaler_data(self, scaler_files) -> dict:
         """Load temperature scaler metadata."""
-        with open(scaler_files['json'], 'r') as f:
+        with open(scaler_files['json']) as f:
             return json.load(f)
 
     # =========================================================================
@@ -279,7 +279,7 @@ class TestTemperatureScalerFix:
 
     def test_training_date_is_recent(self, scaler_data):
         """Test that training date is recent (within last 24 hours)."""
-        from datetime import datetime, timedelta
+        from datetime import datetime
 
         training_date_str = scaler_data['training_date']
         training_date = datetime.fromisoformat(training_date_str)
@@ -314,7 +314,7 @@ class TestTemperatureScalerComparison:
     """Compare new scaler (T=0.5992) with previous versions."""
 
     @pytest.fixture(scope="class")
-    def previous_metadata(self) -> Dict:
+    def previous_metadata(self) -> dict:
         """Load metadata from previous temperature scaler (v4)."""
         # This is the T=0.5534 from November 13
         return {
@@ -326,9 +326,9 @@ class TestTemperatureScalerComparison:
         }
 
     @pytest.fixture(scope="class")
-    def new_metadata(self) -> Dict:
+    def new_metadata(self) -> dict:
         """Load metadata from new temperature scaler."""
-        with open(Path('models/calibration/temperature_scaler_4way_metadata.json'), 'r') as f:
+        with open(Path('models/calibration/temperature_scaler_4way_metadata.json')) as f:
             return json.load(f)
 
     def test_new_scaler_based_on_larger_dataset(self, previous_metadata, new_metadata):

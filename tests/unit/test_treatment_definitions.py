@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.521198
 Test count: 20
 """
 
+import pytest
 from causal.treatment_definitions import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_define_injury_treatment_basic():

@@ -58,11 +58,10 @@ Research: Sagarin Methodology Analysis
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, Optional, List, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy.optimize import minimize, LinearConstraint
+from scipy.optimize import minimize
 
 logging.basicConfig(
     level=logging.INFO,
@@ -89,7 +88,7 @@ class AdaptiveWLSWeights:
     def __init__(
         self,
         predictions_df: pd.DataFrame,
-        model_names: Optional[List[str]] = None,
+        model_names: list[str] | None = None,
         actual_col: str = 'actual',
         halflife: float = 4.0,
         min_observations: int = 10,
@@ -130,7 +129,7 @@ class AdaptiveWLSWeights:
         # Optimization history
         self.optimization_history = []
 
-        logger.info(f"Initialized AdaptiveWLSWeights:")
+        logger.info("Initialized AdaptiveWLSWeights:")
         logger.info(f"  Models: {self.model_names}")
         logger.info(f"  Observations: {len(predictions_df):,}")
         logger.info(f"  Halflife: {halflife} time units")
@@ -185,8 +184,8 @@ class AdaptiveWLSWeights:
     def optimize_weights(
         self,
         method: str = 'SLSQP',
-        initial_weights: Optional[Dict[str, float]] = None,
-    ) -> Dict[str, float]:
+        initial_weights: dict[str, float] | None = None,
+    ) -> dict[str, float]:
         """
         Optimize ensemble weights using weighted least squares.
 
@@ -288,11 +287,11 @@ class AdaptiveWLSWeights:
         optimal_sse = result.fun
         improvement_pct = 100 * (1 - optimal_sse / baseline_sse)
 
-        logger.info(f"\nOptimization Results:")
+        logger.info("\nOptimization Results:")
         logger.info(f"  Baseline SSE: {baseline_sse:.2f}")
         logger.info(f"  Optimal SSE: {optimal_sse:.2f}")
         logger.info(f"  Improvement: {improvement_pct:.2f}%")
-        logger.info(f"\nOptimal Weights:")
+        logger.info("\nOptimal Weights:")
         for name, weight in optimal_weights.items():
             old_weight = self.current_weights[name]
             change = weight - old_weight
@@ -400,11 +399,11 @@ class AdaptiveWLSWeights:
         logger.info(f"✅ Saved optimal weights to: {output_path}")
 
     @classmethod
-    def load_weights(cls, weights_path: str) -> Dict[str, float]:
+    def load_weights(cls, weights_path: str) -> dict[str, float]:
         """Load optimal weights from JSON file."""
         import json
 
-        with open(weights_path, 'r') as f:
+        with open(weights_path) as f:
             weights_data = json.load(f)
 
         logger.info(f"Loaded weights from: {weights_path}")

@@ -7,16 +7,20 @@ Author: Claude Code
 Date: November 2025
 """
 
-from typing import Optional, List
-import pandas as pd
 import logging
+
+import pandas as pd
 import psycopg
 
 logger = logging.getLogger(__name__)
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -29,8 +33,8 @@ class PredictionQueries:
     @staticmethod
     def retrospective_metrics(
         conn,
-        model_version: Optional[str] = None,
-        season: Optional[int] = None,
+        model_version: str | None = None,
+        season: int | None = None,
         limit: int = 1000
     ) -> pd.DataFrame:
         """

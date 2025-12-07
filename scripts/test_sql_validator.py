@@ -7,9 +7,10 @@ Usage:
 """
 
 import sys
+
 sys.path.insert(0, '/Users/dro/rice/nfl-analytics')
 
-from py.utils.sql_validator import SQLValidator, validate_query
+from py.utils.sql_validator import SQLValidator
 
 
 def test_cases():

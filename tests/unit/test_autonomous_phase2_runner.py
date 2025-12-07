@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.933773
 Test count: 16
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.autonomous_phase2_runner import *
-import pandas as pd
-import pytest
 
 
 def test_wait_for_phase21_completion_basic():

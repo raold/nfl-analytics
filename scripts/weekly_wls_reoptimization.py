@@ -26,9 +26,8 @@ import argparse
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -103,7 +102,7 @@ logger = logging.getLogger(__name__)
 
 def query_recent_predictions(
     weeks: int = 6,
-    season: Optional[int] = None,
+    season: int | None = None,
 ) -> pd.DataFrame:
     """
     Query component predictions and actuals for last N weeks.
@@ -204,11 +203,11 @@ def query_recent_predictions(
 
 def optimize_weekly_weights(
     predictions_df: pd.DataFrame,
-    halflife_candidates: List[float] = HALFLIFE_CANDIDATES,
+    halflife_candidates: list[float] = HALFLIFE_CANDIDATES,
     validation_split: float = VALIDATION_SPLIT,
     metric: str = METRIC,
-    weight_constraints: Optional[Dict[str, Tuple[float, float]]] = None,
-) -> Tuple[Dict[str, float], float, Dict[str, float]]:
+    weight_constraints: dict[str, tuple[float, float]] | None = None,
+) -> tuple[dict[str, float], float, dict[str, float]]:
     """
     Run WLS optimization with grid search.
 
@@ -256,7 +255,7 @@ def optimize_weekly_weights(
 
 
 def compare_with_previous_weights(
-    new_weights: Dict[str, float],
+    new_weights: dict[str, float],
     previous_weights_path: Path = WEIGHTS_OUTPUT_PATH,
 ) -> None:
     """
@@ -269,7 +268,7 @@ def compare_with_previous_weights(
         return
 
     # Load previous weights
-    with open(previous_weights_path, 'r') as f:
+    with open(previous_weights_path) as f:
         prev_data = json.load(f)
         prev_weights = prev_data['weights']
 
@@ -291,7 +290,7 @@ def compare_with_previous_weights(
 
 def main(
     weeks: int = LOOKBACK_WEEKS,
-    season: Optional[int] = None,
+    season: int | None = None,
     dry_run: bool = False,
 ):
     """

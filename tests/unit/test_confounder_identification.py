@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.519105
 Test count: 8
 """
 
+import pytest
 from causal.confounder_identification import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_propensity_score_matching_basic():

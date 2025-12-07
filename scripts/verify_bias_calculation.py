@@ -5,7 +5,6 @@ validation data has LOWER average than training?
 """
 
 import pandas as pd
-import numpy as np
 import psycopg2
 from psycopg2.extras import RealDictCursor
 

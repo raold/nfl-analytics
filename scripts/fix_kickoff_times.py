@@ -13,9 +13,9 @@ Standard NFL kickoff times (ET):
 - Black Friday: 3:00 PM
 """
 
-import psycopg
-from datetime import datetime, timezone
 import logging
+
+import psycopg
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)

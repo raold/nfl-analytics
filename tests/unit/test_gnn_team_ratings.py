@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.685568
 Test count: 32
 """
 
+import pandas as pd
+import pytest
 from features.gnn_team_ratings import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_build_temporal_graph_basic():

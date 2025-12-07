@@ -26,11 +26,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import numpy as np
 import pandas as pd
-from py.ensemble.bayesian_stacking import (
-    BayesianStacker,
-    ValidationFramework,
-    ModelLoader
-)
+
+from py.ensemble.bayesian_stacking import BayesianStacker, ModelLoader, ValidationFramework
 
 print("="*70)
 print("BAYESIAN STACKING EXAMPLE")
@@ -238,7 +235,7 @@ stacking_errors = np.array(stacking_errors)
 heuristic_mae = np.mean(np.abs(heuristic_errors))
 stacking_mae = np.mean(np.abs(stacking_errors))
 
-print(f"\nMean Absolute Error:")
+print("\nMean Absolute Error:")
 print(f"  Heuristic: {heuristic_mae:.2f} yards")
 print(f"  Stacking:  {stacking_mae:.2f} yards")
 print(f"  Improvement: {heuristic_mae - stacking_mae:.2f} yards ({(heuristic_mae - stacking_mae) / heuristic_mae * 100:.1f}%)")
@@ -247,7 +244,7 @@ print(f"  Improvement: {heuristic_mae - stacking_mae:.2f} yards ({(heuristic_mae
 framework = ValidationFramework()
 test_results = framework.statistical_tests(heuristic_errors, stacking_errors)
 
-print(f"\nDiebold-Mariano Test:")
+print("\nDiebold-Mariano Test:")
 print(f"  t-statistic: {test_results['t_statistic']:.3f}")
 print(f"  p-value:     {test_results['p_value']:.4f}")
 print(f"  Significant? {'✅ YES (p < 0.05)' if test_results['significant_at_05'] else '❌ NO (p ≥ 0.05)'}")

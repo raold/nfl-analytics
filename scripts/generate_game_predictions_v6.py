@@ -15,7 +15,6 @@ import argparse
 import logging
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import psycopg2
@@ -109,7 +108,7 @@ def main():
     args = parser.parse_args()
 
     logger.info(f"\n{'='*80}")
-    logger.info(f"GENERATING GAME PREDICTIONS - Ensemble v6.1")
+    logger.info("GENERATING GAME PREDICTIONS - Ensemble v6.1")
     logger.info(f"{'='*80}\n")
     logger.info(f"Season: {args.season}, Week: {args.week}")
 

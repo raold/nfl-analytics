@@ -30,11 +30,10 @@ Date: November 16, 2025
 """
 
 import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -113,7 +112,7 @@ class InternationalFeatureValidator:
         print(f"✅ All {len(required_columns)} required columns present")
         return True
 
-    def check_missing_values(self) -> Dict[str, int]:
+    def check_missing_values(self) -> dict[str, int]:
         """Check for missing values in critical columns."""
         feature_cols = [
             'jet_lag_penalty', 'body_clock_hour', 'early_morning_penalty',
@@ -137,7 +136,7 @@ class InternationalFeatureValidator:
         self.validation_results['missing_values'] = missing_counts
         return missing_counts
 
-    def validate_feature_ranges(self) -> Dict[str, Dict]:
+    def validate_feature_ranges(self) -> dict[str, dict]:
         """Validate features are within theoretical bounds."""
         range_results = {}
 
@@ -242,7 +241,7 @@ class InternationalFeatureValidator:
         self.validation_results['correlations'] = corr_df
         return corr_df
 
-    def detect_statistical_outliers(self) -> Dict[str, List]:
+    def detect_statistical_outliers(self) -> dict[str, list]:
         """Detect outliers using IQR method."""
         feature_cols = [
             'passing_yards', 'jet_lag_penalty', 'body_clock_hour',

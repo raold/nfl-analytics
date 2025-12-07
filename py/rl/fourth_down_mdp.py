@@ -49,12 +49,10 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
 
 import numpy as np
 import pandas as pd
 import psycopg2
-
 
 # ============================================================================
 # Constants
@@ -486,7 +484,7 @@ def split_train_test(
     train_df = df[train_mask].reset_index(drop=True)
     test_df = df[~train_mask].reset_index(drop=True)
 
-    print(f"\n=== Train/Test Split ===")
+    print("\n=== Train/Test Split ===")
     print(f"Train: {len(train_df):,} plays ({train_df['season'].min()}-{train_df['season'].max()})")
     print(f"Test: {len(test_df):,} plays ({test_df['season'].min()}-{test_df['season'].max()})")
 

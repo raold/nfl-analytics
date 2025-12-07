@@ -21,17 +21,18 @@ Date: 2025-11-13
 """
 
 import argparse
-import sys
-from pathlib import Path
-from datetime import datetime
 import json
+import sys
+from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 import pandas as pd
 import psycopg
+
+from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
 # Configuration
 DB_CONFIG = {
@@ -98,7 +99,7 @@ class TemporalSafetyValidator:
                 print(f"⊘ {module_path} - File not found (skipped)")
                 continue
 
-            with open(path, 'r') as f:
+            with open(path) as f:
                 code = f.read()
 
             # Reset detector
@@ -202,7 +203,7 @@ class TemporalSafetyValidator:
             elif report.high_count > 0:
                 print(f"  🟠 HIGH severity ({report.high_count} issues)")
             else:
-                print(f"  ✅ CLEAN")
+                print("  ✅ CLEAN")
 
         except Exception as e:
             print(f"  ⚠️  Could not check table: {e}")
@@ -219,14 +220,14 @@ class TemporalSafetyValidator:
         lines.append(f"Timestamp: {self.results['summary']['timestamp']}")
         lines.append(f"Files Checked: {self.results['summary']['files_checked']}")
 
-        lines.append(f"\nIssues Summary:")
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {self.results['summary']['critical_count']}")
         lines.append(f"  🟠 HIGH:     {self.results['summary']['high_count']}")
         lines.append(f"  🟡 MEDIUM:   {self.results['summary']['medium_count']}")
         lines.append(f"  🟢 LOW:      {self.results['summary']['low_count']}")
 
         # Production readiness
-        lines.append(f"\n" + "=" * 80)
+        lines.append("\n" + "=" * 80)
         if self.results['summary']['critical_count'] == 0:
             lines.append("✅ PRODUCTION READY - No critical leakage detected")
             lines.append("   Safe to deploy to production betting system")
@@ -238,7 +239,7 @@ class TemporalSafetyValidator:
         lines.append("=" * 80)
 
         # Risk gates
-        lines.append(f"\nRisk Gates:")
+        lines.append("\nRisk Gates:")
         lines.append(f"  ✓ Zero critical leakage required: {'PASS' if self.results['summary']['critical_count'] == 0 else 'FAIL'}")
         lines.append(f"  ✓ High severity issues < 5: {'PASS' if self.results['summary']['high_count'] < 5 else 'FAIL'}")
 

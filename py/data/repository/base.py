@@ -19,26 +19,23 @@ Date: November 9, 2025
 
 import logging
 import os
-from typing import Optional, List, Dict, Any, TypeVar, Generic, Callable
-from contextlib import contextmanager
-from datetime import datetime, timedelta
 import time
+from collections.abc import Callable
+from contextlib import contextmanager
 from dataclasses import dataclass
-import hashlib
-import json
+from typing import Any, TypeVar
 
 import psycopg2
-from psycopg2 import pool, extras
+from psycopg2 import extras, pool
 from psycopg2.extensions import connection as Connection
 from psycopg2.extensions import cursor as Cursor
 
 # Retry logic for connection resilience
 from tenacity import (
     retry,
+    retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
-    retry_if_exception_type,
-    RetryError
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 # Redis caching (Phase 2 integration)
 try:
-    from py.utils.claude_cache import get_default_cache, ClaudeRedisCache
+    from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -91,12 +88,12 @@ class DatabaseConfig:
 @dataclass
 class QueryResult:
     """Standardized query result container."""
-    rows: List[Dict[str, Any]]
+    rows: list[dict[str, Any]]
     row_count: int
     execution_time_ms: float
     cached: bool = False
 
-    def first(self) -> Optional[Dict[str, Any]]:
+    def first(self) -> dict[str, Any] | None:
         """Get first row or None."""
         return self.rows[0] if self.rows else None
 
@@ -144,7 +141,7 @@ class QueryCache:
         self._default_ttl = default_ttl_seconds
 
         # Try to initialize Redis cache
-        self._redis_cache: Optional[ClaudeRedisCache] = None
+        self._redis_cache: ClaudeRedisCache | None = None
         if REDIS_AVAILABLE:
             try:
                 self._redis_cache = get_default_cache()
@@ -158,11 +155,11 @@ class QueryCache:
                 self._redis_cache = None
 
         # Fallback: in-memory cache
-        self._memory_cache: Dict[str, tuple[Any, float]] = {}
+        self._memory_cache: dict[str, tuple[Any, float]] = {}
         self._hits = 0
         self._misses = 0
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         Get value from cache (Redis L1, memory L2 fallback).
 
@@ -202,7 +199,7 @@ class QueryCache:
         self._hits += 1
         return value
 
-    def set(self, key: str, value: Any, ttl_seconds: Optional[int] = None):
+    def set(self, key: str, value: Any, ttl_seconds: int | None = None):
         """
         Set value in cache with TTL (Redis L1, memory L2 fallback).
 
@@ -260,7 +257,7 @@ class QueryCache:
         self._misses = 0
         logger.info("Query cache cleared")
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         """Get cache statistics (combines Redis + memory)."""
         stats = {
             "hits": self._hits,
@@ -316,13 +313,13 @@ class BaseRepository:
     """
 
     # Shared connection pool across all repositories
-    _pool: Optional[pool.ThreadedConnectionPool] = None
-    _pool_config: Optional[DatabaseConfig] = None
+    _pool: pool.ThreadedConnectionPool | None = None
+    _pool_config: DatabaseConfig | None = None
 
     # Shared query cache
     _cache = QueryCache(default_ttl_seconds=300)  # 5 minutes default
 
-    def __init__(self, config: Optional[DatabaseConfig] = None):
+    def __init__(self, config: DatabaseConfig | None = None):
         """
         Initialize repository with database configuration.
 
@@ -444,9 +441,9 @@ class BaseRepository:
     def query(
         self,
         sql: str,
-        params: Optional[tuple] = None,
-        cache_key: Optional[str] = None,
-        cache_ttl: Optional[int] = None,
+        params: tuple | None = None,
+        cache_key: str | None = None,
+        cache_ttl: int | None = None,
         validate_temporal: bool = True,
     ) -> QueryResult:
         """
@@ -565,8 +562,8 @@ class BaseRepository:
     def execute(
         self,
         sql: str,
-        params: Optional[tuple] = None,
-        invalidate_cache: Optional[List[str]] = None,
+        params: tuple | None = None,
+        invalidate_cache: list[str] | None = None,
     ) -> int:
         """
         Execute INSERT/UPDATE/DELETE query.
@@ -595,8 +592,8 @@ class BaseRepository:
     def execute_many(
         self,
         sql: str,
-        params_list: List[tuple],
-        invalidate_cache: Optional[List[str]] = None,
+        params_list: list[tuple],
+        invalidate_cache: list[str] | None = None,
     ) -> int:
         """
         Execute batch INSERT/UPDATE/DELETE.
@@ -647,7 +644,7 @@ class BaseRepository:
             return result
 
     @classmethod
-    def cache_stats(cls) -> Dict[str, Any]:
+    def cache_stats(cls) -> dict[str, Any]:
         """Get cache statistics for monitoring."""
         return cls._cache.stats()
 
@@ -668,7 +665,6 @@ class BaseRepository:
 
 if __name__ == "__main__":
     """Test the base repository."""
-    import sys
 
     # Configure logging
     logging.getLogger().setLevel(logging.DEBUG)

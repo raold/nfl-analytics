@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.797963
 Test count: 49
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.bivariate_poisson import *
-import pandas as pd
-import pytest
 
 
 def test_get_connection_basic():

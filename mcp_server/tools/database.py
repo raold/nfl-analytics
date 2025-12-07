@@ -8,18 +8,15 @@ Redis Phase 2 Enhancement:
 - Graceful fallback to uncached execution if Redis unavailable
 """
 
-import psycopg2
-from psycopg2 import pool, sql
-from psycopg2.extras import RealDictCursor
-from typing import Dict, List, Any, Optional
 import logging
 from contextlib import contextmanager
+from typing import Any
 
-from mcp_server.config import (
-    DATABASE_URL,
-    MAX_QUERY_ROWS,
-    MAX_QUERY_TIME_SECONDS
-)
+import psycopg2
+from psycopg2 import pool
+from psycopg2.extras import RealDictCursor
+
+from mcp_server.config import DATABASE_URL, MAX_QUERY_ROWS, MAX_QUERY_TIME_SECONDS
 
 try:
     from mcp_server.tools.cache_wrapper import cache_database_query
@@ -30,7 +27,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 # Connection pool (lazy initialization)
-_connection_pool: Optional[pool.SimpleConnectionPool] = None
+_connection_pool: pool.SimpleConnectionPool | None = None
 
 
 def _get_connection_pool() -> pool.SimpleConnectionPool:
@@ -61,7 +58,7 @@ def get_db_connection():
         conn_pool.putconn(conn)
 
 
-def _query_database_uncached(sql: str, params: Optional[tuple] = None) -> Dict[str, Any]:
+def _query_database_uncached(sql: str, params: tuple | None = None) -> dict[str, Any]:
     """
     Execute SQL query without caching (internal implementation).
 
@@ -140,10 +137,10 @@ def _query_database_uncached(sql: str, params: Optional[tuple] = None) -> Dict[s
 
 
 def get_recent_games(
-    team: Optional[str] = None,
+    team: str | None = None,
     limit: int = 10,
-    season: Optional[int] = None
-) -> Dict[str, Any]:
+    season: int | None = None
+) -> dict[str, Any]:
     """
     Convenience function to get recent games.
 
@@ -190,7 +187,7 @@ def get_recent_games(
     return query_database(sql, tuple(params))
 
 
-def get_team_stats(team: str, season: Optional[int] = None) -> Dict[str, Any]:
+def get_team_stats(team: str, season: int | None = None) -> dict[str, Any]:
     """
     Get aggregated statistics for a team.
 

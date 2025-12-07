@@ -33,10 +33,9 @@ Usage:
     python py/models/bnn_laplace.py
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
-from typing import Tuple
 
 import joblib
 import numpy as np
@@ -45,7 +44,6 @@ import psycopg2
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Add parent directory to path for imports
@@ -69,7 +67,7 @@ class DeterministicNN(nn.Module):
     - No dropout (train to convergence for MAP estimate)
     """
 
-    def __init__(self, input_dim: int, hidden_dims: Tuple[int]):
+    def __init__(self, input_dim: int, hidden_dims: tuple[int]):
         super().__init__()
 
         self.input_dim = input_dim
@@ -105,7 +103,7 @@ class DeterministicNN(nn.Module):
         """Count trainable parameters"""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass
 
@@ -270,12 +268,12 @@ def train_map_model(
     y_train: np.ndarray,
     X_val: np.ndarray,
     y_val: np.ndarray,
-    hidden_dims: Tuple[int],
+    hidden_dims: tuple[int],
     epochs: int = 150,
     batch_size: int = 64,
     lr: float = 1e-3,
     device: str = "cpu"
-) -> Tuple[DeterministicNN, StandardScaler, float, float]:
+) -> tuple[DeterministicNN, StandardScaler, float, float]:
     """
     Train deterministic NN to find MAP estimate
 
@@ -411,7 +409,7 @@ def fit_laplace_approximation(
     y_train_t = torch.FloatTensor(y_train_norm).to(device)
 
     # Create dataset
-    from torch.utils.data import TensorDataset, DataLoader
+    from torch.utils.data import DataLoader, TensorDataset
     train_dataset = TensorDataset(X_train_t, y_train_t)
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False)
 
@@ -460,7 +458,7 @@ def predict_with_laplace(
     y_mean: float,
     y_std: float,
     device: str = "cpu"
-) -> Tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Predict with Laplace approximation
 

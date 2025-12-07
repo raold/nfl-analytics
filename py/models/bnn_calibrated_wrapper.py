@@ -9,9 +9,10 @@ Author: Claude Code
 Date: November 7, 2025
 """
 
-import torch
-import numpy as np
 from dataclasses import dataclass
+
+import numpy as np
+import torch
 
 
 @dataclass

@@ -11,11 +11,8 @@ import sys
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import logging
-from datetime import datetime
-from typing import Optional
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,7 +30,7 @@ class PropsPredictionStore:
             "password": "sicillionbillions",
         }
 
-    def get_model_id(self, model_name: str) -> Optional[int]:
+    def get_model_id(self, model_name: str) -> int | None:
         """Get model_id from ml.model_registry by model name."""
         conn = psycopg2.connect(**self.db_config)
         cursor = conn.cursor()
@@ -77,7 +74,7 @@ class PropsPredictionStore:
         line: float = None,
         side: str = None,
         odds: int = None,
-    ) -> Optional[int]:
+    ) -> int | None:
         """
         Store a single prediction in ml.predictions table.
 

@@ -20,18 +20,17 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional
+import logging
 from dataclasses import dataclass
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import psycopg2
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
-import seaborn as sns
-from pathlib import Path
-import psycopg2
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -48,7 +47,7 @@ class PSMResult:
     n_treated: int
     n_control: int
     n_matched: int
-    balance_diagnostics: Dict[str, float]
+    balance_diagnostics: dict[str, float]
     common_support_pct: float
 
     def __str__(self) -> str:
@@ -84,7 +83,7 @@ class PSMWeatherFamiliarityAnalyzer:
 
     def _fetch_game_data_with_weather(
         self,
-        seasons: List[int]
+        seasons: list[int]
     ) -> pd.DataFrame:
         """
         Fetch game data and merge with weather information.
@@ -150,9 +149,9 @@ class PSMWeatherFamiliarityAnalyzer:
 
     def analyze_cold_weather_home_advantage(
         self,
-        seasons: List[int] = list(range(2018, 2025)),
+        seasons: list[int] = list(range(2018, 2025)),
         n_matches: int = 3,
-        output_dir: Optional[Path] = None
+        output_dir: Path | None = None
     ) -> PSMResult:
         """
         Analyze home field advantage for cold-weather teams in cold conditions.
@@ -246,9 +245,9 @@ class PSMWeatherFamiliarityAnalyzer:
 
     def analyze_dome_team_outdoor_penalty(
         self,
-        seasons: List[int] = list(range(2018, 2025)),
+        seasons: list[int] = list(range(2018, 2025)),
         n_matches: int = 3,
-        output_dir: Optional[Path] = None
+        output_dir: Path | None = None
     ) -> PSMResult:
         """
         Analyze performance penalty for dome teams playing outdoors.
@@ -342,7 +341,7 @@ class PSMWeatherFamiliarityAnalyzer:
         self,
         df: pd.DataFrame,
         treatment_var: str,
-        covariates: List[str]
+        covariates: list[str]
     ) -> np.ndarray:
         """Estimate propensity scores using logistic regression."""
         X = df[covariates].values
@@ -366,7 +365,7 @@ class PSMWeatherFamiliarityAnalyzer:
         treatment_var: str,
         n_matches: int = 1,
         caliper: float = 0.1
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Match treated and control observations using nearest neighbor."""
         df = df.copy()
         df['propensity_score'] = propensity_scores
@@ -397,8 +396,8 @@ class PSMWeatherFamiliarityAnalyzer:
         self,
         matched_treated: pd.DataFrame,
         matched_control: pd.DataFrame,
-        covariates: List[str]
-    ) -> Dict[str, float]:
+        covariates: list[str]
+    ) -> dict[str, float]:
         """Calculate standardized mean difference (SMD) for balance."""
         balance = {}
 
@@ -419,7 +418,7 @@ class PSMWeatherFamiliarityAnalyzer:
         self,
         treated_outcome: pd.Series,
         control_outcome: pd.Series
-    ) -> Tuple[float, float, float, float, float]:
+    ) -> tuple[float, float, float, float, float]:
         """Estimate ATT with standard error and confidence intervals."""
         att = treated_outcome.mean() - control_outcome.mean()
 
@@ -437,7 +436,7 @@ class PSMWeatherFamiliarityAnalyzer:
 
     def _plot_balance_diagnostics(
         self,
-        balance: Dict[str, float],
+        balance: dict[str, float],
         output_dir: Path,
         filename: str
     ):

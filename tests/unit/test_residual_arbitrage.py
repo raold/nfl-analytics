@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.428857
 Test count: 39
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.residual_arbitrage import *
-import pandas as pd
-import pytest
 
 
 def test_demo_residual_arbitrage_basic():

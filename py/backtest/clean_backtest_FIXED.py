@@ -5,13 +5,14 @@ Uses asof_FIXED_v2.csv (na_position='last' applied)
 Expected ROI: 1-3% (not 51,000%)
 """
 
-import numpy as np
-import pandas as pd
-from pathlib import Path
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 import json
 import warnings
+from pathlib import Path
+
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+
 warnings.filterwarnings('ignore')
 
 print("=" * 70)
@@ -94,7 +95,7 @@ print("\nOriginal (with NULL kickoff leakage):")
 print("  Test Accuracy: 62.4%")
 print("  ROI: +51,106%")
 
-print(f"\nFixed (na_position='last'):")
+print("\nFixed (na_position='last'):")
 print(f"  Test Accuracy: {test_acc:.1%}")
 print(f"  Improvement: {test_acc - 0.624:.1%} pp")
 

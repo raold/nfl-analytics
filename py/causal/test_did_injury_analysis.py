@@ -7,20 +7,18 @@ Run with:
     pytest py/causal/test_did_injury_analysis.py -v
 """
 
-import pytest
-import pandas as pd
-import numpy as np
-from datetime import datetime
+
 import matplotlib.pyplot as plt
-
+import numpy as np
+import pandas as pd
+import pytest
 from did_injury_analysis import (
-    InjuryEvent,
     DIDResults,
-    InjuryShockDatabase,
     DifferenceInDifferencesEstimator,
-    InjuryShockModeler
+    InjuryEvent,
+    InjuryShockDatabase,
+    InjuryShockModeler,
 )
-
 
 # =============================================================================
 # FIXTURES

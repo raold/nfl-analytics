@@ -8,11 +8,11 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import numpy as np
-from typing import List, Dict, Optional
 import logging
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+import numpy as np
+
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +41,8 @@ class WeightedAverageStrategy(EnsembleStrategy):
 
     def __init__(
         self,
-        weights: Optional[Dict[str, float]] = None,
-        model_correlations: Optional[Dict[tuple[str, str], float]] = None
+        weights: dict[str, float] | None = None,
+        model_correlations: dict[tuple[str, str], float] | None = None
     ):
         """
         Initialize weighted average strategy.
@@ -71,7 +71,7 @@ class WeightedAverageStrategy(EnsembleStrategy):
                     for name, w in self.weights.items()
                 }
 
-    def _default_correlations(self) -> Dict[tuple[str, str], float]:
+    def _default_correlations(self) -> dict[tuple[str, str], float]:
         """
         Default model correlations from empirical backtest (2022-2024 season).
 
@@ -111,7 +111,7 @@ class WeightedAverageStrategy(EnsembleStrategy):
 
     def combine(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         **kwargs
     ) -> EnsemblePrediction:
         """
@@ -204,8 +204,8 @@ class WeightedAverageStrategy(EnsembleStrategy):
 
     def _confidence_based_weights(
         self,
-        predictions: List[ModelPrediction]
-    ) -> Dict[str, float]:
+        predictions: list[ModelPrediction]
+    ) -> dict[str, float]:
         """
         Compute weights based on model confidence scores.
 
@@ -230,6 +230,7 @@ class WeightedAverageStrategy(EnsembleStrategy):
 if __name__ == "__main__":
     """Test weighted average strategy."""
     import logging
+
     from .base import ModelType
 
     logging.basicConfig(level=logging.INFO)

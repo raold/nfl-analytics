@@ -14,7 +14,6 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 21, 2025
 """
 
-import os
 import sys
 from pathlib import Path
 from unittest.mock import Mock, patch

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.455698
 Test count: 38
 """
 
+import pytest
 from analysis.ewb_strategy_backtest import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_parse_args_basic():

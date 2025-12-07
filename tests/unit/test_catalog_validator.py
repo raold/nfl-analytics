@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.611359
 Test count: 38
 """
 
+import pandas as pd
+import pytest
 from features.catalog_validator import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_validate_feature_list_basic():

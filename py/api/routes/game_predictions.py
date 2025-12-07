@@ -24,13 +24,13 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path as PathLib
-from typing import List, Optional, Dict, Any
+from typing import Any
 
 import psycopg2
 from fastapi import APIRouter, HTTPException, Path, Query, status
 from prometheus_client import Counter, Histogram
 from psycopg2.extras import RealDictCursor
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 # Add project root to path
 project_root = str(PathLib(__file__).parent.parent.parent.parent)
@@ -120,7 +120,7 @@ class WeekPredictionRequest(BaseModel):
 class BatchGamePredictionRequest(BaseModel):
     """Request for batch game predictions."""
 
-    games: List[GamePredictionRequest] = Field(
+    games: list[GamePredictionRequest] = Field(
         ..., min_items=1, max_items=50, description="List of games to predict (max 50)"
     )
 
@@ -149,8 +149,8 @@ class BatchGamePredictionResponse(BaseModel):
     total_requested: int
     total_successful: int
     total_failed: int
-    predictions: List["GamePredictionResponse"]  # Forward reference - class defined below
-    errors: List[PredictionError]
+    predictions: list["GamePredictionResponse"]  # Forward reference - class defined below
+    errors: list[PredictionError]
     processing_ms: float
     cache_hit_rate: float = Field(
         ..., description="Percentage of predictions served from cache (0-1)"
@@ -209,19 +209,19 @@ class GamePredictionResponse(BaseModel):
     total_std: float
 
     # Sportsbook lines (if available)
-    sportsbook_spread: Optional[float] = None
-    sportsbook_total: Optional[float] = None
-    sportsbook_home_ml: Optional[float] = None
-    sportsbook_away_ml: Optional[float] = None
+    sportsbook_spread: float | None = None
+    sportsbook_total: float | None = None
+    sportsbook_home_ml: float | None = None
+    sportsbook_away_ml: float | None = None
 
     # Edge calculations (if sportsbook lines available)
-    spread_edge: Optional[float] = None  # Our spread - sportsbook spread
-    total_edge: Optional[float] = None  # Our total - sportsbook total
-    ml_edge: Optional[float] = None  # Our win prob - sportsbook implied prob
+    spread_edge: float | None = None  # Our spread - sportsbook spread
+    total_edge: float | None = None  # Our total - sportsbook total
+    ml_edge: float | None = None  # Our win prob - sportsbook implied prob
 
     # Metadata
     predicted_at: datetime
-    ensemble_version: Optional[str] = None
+    ensemble_version: str | None = None
     processing_ms: float
 
     class Config:
@@ -259,7 +259,7 @@ class WeekPredictionResponse(BaseModel):
     season: int
     week: int
     total_games: int
-    predictions: List[GamePredictionResponse]
+    predictions: list[GamePredictionResponse]
     processing_ms: float
 
     class Config:
@@ -323,10 +323,10 @@ def calculate_edges(
     predicted_spread: float,
     predicted_total: float,
     predicted_home_win_prob: float,
-    sportsbook_spread: Optional[float],
-    sportsbook_total: Optional[float],
-    sportsbook_home_ml: Optional[float],
-) -> Dict[str, Optional[float]]:
+    sportsbook_spread: float | None,
+    sportsbook_total: float | None,
+    sportsbook_home_ml: float | None,
+) -> dict[str, float | None]:
     """
     Calculate betting edges against sportsbook lines.
 
@@ -367,16 +367,15 @@ def calculate_edges(
 
 
 # Import GameOutcomePredictor
-from py.ensemble.game_outcome_predictor import GameOutcomePredictor
-
 # Import Ensemble v6.1 for QB predictions
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from py.ensemble.game_outcome_predictor import GameOutcomePredictor
 
 # Import Redis cache decorator
 from py.utils.game_prediction_cache import (
     cache_game_prediction,
-    invalidate_game_cache,
     get_cache_stats,
+    invalidate_game_cache,
 )
 
 # Initialize predictors (singleton pattern)
@@ -408,11 +407,11 @@ def generate_game_prediction(
     week: int,
     home_team: str,
     away_team: str,
-    sportsbook_spread: Optional[float],
-    sportsbook_total: Optional[float],
-    sportsbook_home_ml: Optional[float],
-    sportsbook_away_ml: Optional[float],
-) -> Dict[str, Any]:
+    sportsbook_spread: float | None,
+    sportsbook_total: float | None,
+    sportsbook_home_ml: float | None,
+    sportsbook_away_ml: float | None,
+) -> dict[str, Any]:
     """
     Generate real game prediction using Ensemble v6.1.
 
@@ -469,7 +468,7 @@ def generate_game_prediction(
 
 
 def store_game_prediction(
-    conn, prediction_data: Dict[str, Any], ensemble_version: str = "mock_v1.0"
+    conn, prediction_data: dict[str, Any], ensemble_version: str = "mock_v1.0"
 ):
     """
     Store game prediction in ml.game_predictions table.
@@ -900,8 +899,8 @@ async def predict_games_batch(
     """
     processing_start = time.time()
 
-    predictions: List[GamePredictionResponse] = []
-    errors: List[PredictionError] = []
+    predictions: list[GamePredictionResponse] = []
+    errors: list[PredictionError] = []
     cache_hits = 0
     total_games = len(request.games)
 
@@ -1065,7 +1064,7 @@ async def predict_games_batch(
 )
 async def get_game_prediction(
     game_id: str = Path(..., description="Game ID (e.g., '2025_12_BUF_HOU')"),
-    ensemble_version: Optional[str] = Query(
+    ensemble_version: str | None = Query(
         None, description="Filter by ensemble version"
     ),
 ) -> GamePredictionResponse:
@@ -1383,9 +1382,9 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
 class CacheInvalidateRequest(BaseModel):
     """Request for cache invalidation."""
 
-    game_id: Optional[str] = Field(None, description="Specific game to invalidate")
-    season: Optional[int] = Field(None, ge=1999, le=2030, description="Season to invalidate")
-    week: Optional[int] = Field(None, ge=1, le=22, description="Week to invalidate")
+    game_id: str | None = Field(None, description="Specific game to invalidate")
+    season: int | None = Field(None, ge=1999, le=2030, description="Season to invalidate")
+    week: int | None = Field(None, ge=1, le=22, description="Week to invalidate")
     invalidate_all: bool = Field(False, description="Invalidate all game predictions")
 
     class Config:

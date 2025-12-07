@@ -28,15 +28,15 @@ from pathlib import Path
 
 import numpy as np
 
+from py.rl.cql_agent import CQLAgent, get_device, set_seed
+
 # Import training infrastructure
 from py.rl.fourth_down_agent import (
+    evaluate_fourth_down_policy,
     load_fourth_down_dataset,
     train_fourth_down_agent,
-    evaluate_fourth_down_policy,
 )
-from py.rl.cql_agent import CQLAgent, set_seed, get_device
-from py.rl.fourth_down_mdp import STATE_DIM, ACTION_DIM
-
+from py.rl.fourth_down_mdp import ACTION_DIM, STATE_DIM
 
 # ============================================================================
 # Single Training Run

@@ -23,7 +23,6 @@ Date: November 15, 2025
 """
 
 import sys
-import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -31,10 +30,8 @@ sys.path.insert(0, str(Path(__file__).parent))
 import logging
 import time
 import traceback
-from typing import Dict, List
 
 import numpy as np
-import pandas as pd
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -112,7 +109,7 @@ def test_elo_predictions(ensemble):
             )
 
             if result is None:
-                logger.warning(f"  ⚠ ELO prediction returned None (missing data)")
+                logger.warning("  ⚠ ELO prediction returned None (missing data)")
                 results.append({
                     "player": test["name"],
                     "error": "No ELO data available"
@@ -127,9 +124,9 @@ def test_elo_predictions(ensemble):
             is_realistic = 100 <= elo_pred <= 450
 
             if is_realistic:
-                logger.info(f"  ✓ Realistic prediction")
+                logger.info("  ✓ Realistic prediction")
             else:
-                logger.warning(f"  ⚠ Potentially unrealistic prediction")
+                logger.warning("  ⚠ Potentially unrealistic prediction")
 
             results.append({
                 "player": test["name"],
@@ -201,7 +198,7 @@ def test_prediction_latency(ensemble):
     # Summary
     if latencies:
         logger.info("\n" + "=" * 60)
-        logger.info(f"Latency Summary:")
+        logger.info("Latency Summary:")
         logger.info(f"  Mean: {np.mean(latencies):.3f}s")
         logger.info(f"  Median: {np.median(latencies):.3f}s")
         logger.info(f"  Min: {np.min(latencies):.3f}s")
@@ -223,7 +220,7 @@ def test_temperature_scaling(ensemble):
     has_scaler = ensemble.temperature_scaler is not None
 
     if has_scaler:
-        logger.info(f"✓ Temperature scaler loaded")
+        logger.info("✓ Temperature scaler loaded")
         logger.info(f"  Temperature: {ensemble.temperature:.4f}")
     else:
         logger.warning("✗ No temperature scaler found")
@@ -253,7 +250,7 @@ def test_graceful_degradation(ensemble):
         return {"graceful": True, "error": str(e)}
 
 
-def generate_health_report(test_results: Dict):
+def generate_health_report(test_results: dict):
     """Generate final health report"""
     logger.info("\n" + "=" * 80)
     logger.info("ENSEMBLE HEALTH REPORT - v6_elo (Post Bug Fix)")

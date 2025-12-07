@@ -15,12 +15,12 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
+from dataclasses import dataclass
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple, Dict, Optional
-import numpy as np
-from dataclasses import dataclass
 
 
 @dataclass
@@ -106,8 +106,8 @@ class DriveLSTM(nn.Module):
     def forward(
         self,
         x: torch.Tensor,
-        hidden: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
-    ) -> Dict[str, torch.Tensor]:
+        hidden: tuple[torch.Tensor, torch.Tensor] | None = None
+    ) -> dict[str, torch.Tensor]:
         """
         Forward pass.
 
@@ -148,7 +148,7 @@ class DriveLSTM(nn.Module):
         self,
         x: torch.Tensor,
         return_probs: bool = True
-    ) -> Dict[str, torch.Tensor]:
+    ) -> dict[str, torch.Tensor]:
         """
         Make predictions (inference mode).
 
@@ -200,9 +200,9 @@ class MultiTaskLoss(nn.Module):
 
     def forward(
         self,
-        predictions: Dict[str, torch.Tensor],
-        targets: Dict[str, torch.Tensor]
-    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        predictions: dict[str, torch.Tensor],
+        targets: dict[str, torch.Tensor]
+    ) -> tuple[torch.Tensor, dict[str, float]]:
         """
         Compute multi-task loss.
 
@@ -369,7 +369,7 @@ def create_dataloaders(
     val_game_ids: np.ndarray,
     sequence_length: int = 10,
     batch_size: int = 64
-) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Create train and validation dataloaders.
 

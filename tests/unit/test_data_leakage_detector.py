@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.745282
 Test count: 25
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from utils.data_leakage_detector import *
-import pandas as pd
-import pytest
 
 
 def test_add_issue_basic():

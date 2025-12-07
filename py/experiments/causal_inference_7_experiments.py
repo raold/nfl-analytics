@@ -8,18 +8,14 @@ demonstrating the full power of the causal inference framework for NFL analytics
 Each experiment answers a specific causal question using REAL data from 2020-2024.
 """
 
-import sys
-import os
 import json
 import logging
-from pathlib import Path
-from typing import Dict, List
+import os
+import sys
 import warnings
+from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import psycopg2
-from datetime import datetime
 
 # Add project root to path
 project_root = "/Users/dro/rice/nfl-analytics"
@@ -29,13 +25,13 @@ if project_root not in sys.path:
 os.chdir(project_root)
 
 # Import causal modules
-from py.causal.panel_constructor import PanelConstructor
-from py.causal.treatment_definitions import TreatmentDefiner
-from py.causal.diff_in_diff import DifferenceInDifferences
-from py.causal.synthetic_control import SyntheticControl
-from py.causal.structural_causal_models import CausalDAG, create_nfl_rushing_dag
 from py.causal.confounder_identification import ConfounderIdentifier
+from py.causal.diff_in_diff import DifferenceInDifferences
 from py.causal.model_integration import CausalModelIntegrator
+from py.causal.panel_constructor import PanelConstructor
+from py.causal.structural_causal_models import create_nfl_rushing_dag
+from py.causal.synthetic_control import SyntheticControl
+from py.causal.treatment_definitions import TreatmentDefiner
 from py.causal.validation import CausalValidator
 
 warnings.filterwarnings('ignore')

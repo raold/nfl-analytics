@@ -14,8 +14,9 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 13, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import logging
@@ -54,7 +55,7 @@ def test_database_pool():
 
         # Verify speed improvement
         if elapsed < 0.1:  # Should be <100ms for 10 queries
-            logger.info(f"  ✅ Connection pooling working (fast queries)")
+            logger.info("  ✅ Connection pooling working (fast queries)")
         else:
             logger.warning(f"  ⚠️  Queries slower than expected ({elapsed*1000:.1f}ms)")
 

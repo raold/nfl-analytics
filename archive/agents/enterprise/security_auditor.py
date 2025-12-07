@@ -31,17 +31,14 @@ Integration:
     - CI/CD pipeline (dependency checks)
 """
 
-import hashlib
 import json
-import os
+import logging
 import re
 import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -76,15 +73,15 @@ class SecurityIssue:
     title: str
     description: str
     remediation: str
-    cve_id: Optional[str] = None
-    code_snippet: Optional[str] = None
+    cve_id: str | None = None
+    code_snippet: str | None = None
 
 
 @dataclass
 class SecurityReport:
     """Comprehensive security audit report."""
     scan_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    issues: List[SecurityIssue] = field(default_factory=list)
+    issues: list[SecurityIssue] = field(default_factory=list)
     files_scanned: int = 0
     critical_count: int = 0
     high_count: int = 0
@@ -200,7 +197,7 @@ class SecurityAuditor:
         ],
     }
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """
         Initialize security auditor.
 
@@ -520,15 +517,15 @@ class SecurityAuditor:
         lines.append("=" * 80)
         lines.append(f"\nScan Date: {self.report.scan_date}")
         lines.append(f"Files Scanned: {self.report.files_scanned}")
-        lines.append(f"\nIssues Summary:")
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {self.report.critical_count}")
         lines.append(f"  🟠 HIGH:     {self.report.high_count}")
         lines.append(f"  🟡 MEDIUM:   {self.report.medium_count}")
         lines.append(f"  🟢 LOW:      {self.report.low_count}")
 
         if self.report.has_critical_issues():
-            lines.append(f"\n⛔ CRITICAL SECURITY ISSUES FOUND")
-            lines.append(f"   IMMEDIATE ACTION REQUIRED")
+            lines.append("\n⛔ CRITICAL SECURITY ISSUES FOUND")
+            lines.append("   IMMEDIATE ACTION REQUIRED")
 
         # Group by severity
         for severity in [SecuritySeverity.CRITICAL, SecuritySeverity.HIGH,
@@ -555,7 +552,7 @@ class SecurityAuditor:
 
         return "\n".join(lines)
 
-    def save_report(self, output_path: Optional[Path] = None):
+    def save_report(self, output_path: Path | None = None):
         """Save report to file."""
         if output_path is None:
             output_path = self.project_root / "security_audit_report.json"

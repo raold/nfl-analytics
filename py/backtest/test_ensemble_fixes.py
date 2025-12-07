@@ -15,8 +15,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.models.player_props_ensemble import PlayerPropsEnsemble
 import logging
+
+from py.models.player_props_ensemble import PlayerPropsEnsemble
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

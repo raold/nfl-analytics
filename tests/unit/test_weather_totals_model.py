@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.964177
 Test count: 31
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.weather_totals_model import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

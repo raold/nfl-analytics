@@ -248,12 +248,12 @@ def main():
 
     # Betting recommendations
     n_bets = predictions['bet_recommended'].sum()
-    print(f"\nBetting Recommendations:")
+    print("\nBetting Recommendations:")
     print(f"  Total games:        {len(predictions)}")
     print(f"  Bets recommended:   {n_bets} ({n_bets/len(predictions):.1%})")
 
     if n_bets > 0:
-        print(f"\nBetting Breakdown:")
+        print("\nBetting Breakdown:")
         print(f"  Home bets: {(predictions['bet_side'] == 'home').sum()}")
         print(f"  Away bets: {(predictions['bet_side'] == 'away').sum()}")
         print(f"\n  Average edge:        {predictions[predictions['bet_recommended']]['edge'].abs().mean():.1%}")

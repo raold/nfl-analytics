@@ -43,25 +43,24 @@ Version: 7.0-backtest-2024
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
-import warnings
-import pickle
 import json
+import logging
+import os
+import pickle
+import warnings
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
-from sklearn.linear_model import RidgeCV
-from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 from dotenv import load_dotenv
-import os
+from sklearn.linear_model import RidgeCV
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 # Load environment variables
 load_dotenv()
@@ -207,7 +206,7 @@ class RidgeResidualsBacktest2024:
     def prepare_features(
         self,
         df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare feature sets for Ridge and XGBoost.
 
@@ -305,7 +304,7 @@ class RidgeResidualsBacktest2024:
         y_train: pd.Series,
         y_test: pd.Series,
         X_ridge_train_scaled: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
         """
         Calculate residuals: yards_beyond_opponent = actual - ridge.predict(opp_features).
 
@@ -424,13 +423,13 @@ class RidgeResidualsBacktest2024:
         improvement_2024 = baseline_mae - test_mae_2024
         improvement_pct_2024 = (improvement_2024 / baseline_mae) * 100
 
-        logger.info(f"\n2024 Backtest Results:")
+        logger.info("\n2024 Backtest Results:")
         logger.info(f"  Test MAE (2024): {test_mae_2024:.2f} yards")
         logger.info(f"  Test RMSE (2024): {self.results['test_rmse_2024']:.2f} yards")
         logger.info(f"  Baseline MAE: {baseline_mae:.2f} yards")
         logger.info(f"  Improvement: {improvement_2024:+.2f} yards ({improvement_pct_2024:+.2f}%)")
 
-        logger.info(f"\nComparison to 2025 Test:")
+        logger.info("\nComparison to 2025 Test:")
         logger.info(f"  2025 Test MAE: {test_mae_2025:.2f} yards")
         logger.info(f"  2024 Test MAE: {test_mae_2024:.2f} yards")
         logger.info(f"  Difference: {abs(test_mae_2024 - test_mae_2025):.2f} yards")
@@ -440,7 +439,7 @@ class RidgeResidualsBacktest2024:
         gate2_pass = improvement_2024 > 30.0
         gate3_pass = self.results['test_rmse_2024'] < 15.0
 
-        logger.info(f"\nProduction Gates:")
+        logger.info("\nProduction Gates:")
         logger.info(f"  Gate 1 (MAE < 8 yards): {'✅ PASS' if gate1_pass else '❌ FAIL'} ({test_mae_2024:.2f})")
         logger.info(f"  Gate 2 (Improvement > 30 yards): {'✅ PASS' if gate2_pass else '❌ FAIL'} ({improvement_2024:.2f})")
         logger.info(f"  Gate 3 (RMSE < 15 yards): {'✅ PASS' if gate3_pass else '❌ FAIL'} ({self.results['test_rmse_2024']:.2f})")
@@ -448,11 +447,11 @@ class RidgeResidualsBacktest2024:
         production_ready = gate1_pass and gate2_pass and gate3_pass
 
         if production_ready:
-            logger.info(f"\n✅ PRODUCTION READY: All gates passed")
-            logger.info(f"   Recommendation: Integrate into ensemble v6 (20% weight)")
+            logger.info("\n✅ PRODUCTION READY: All gates passed")
+            logger.info("   Recommendation: Integrate into ensemble v6 (20% weight)")
         else:
             logger.info(f"\n❌ NOT PRODUCTION READY: {sum([gate1_pass, gate2_pass, gate3_pass])}/3 gates passed")
-            logger.info(f"   Recommendation: Further investigation required")
+            logger.info("   Recommendation: Further investigation required")
 
         self.results['baseline_mae'] = baseline_mae
         self.results['improvement_mae_2024'] = improvement_2024
@@ -475,19 +474,19 @@ class RidgeResidualsBacktest2024:
                 'scaler': self.ridge_scaler,
                 'features': self.ridge_features
             }, f)
-        logger.info(f"Saved Ridge model")
+        logger.info("Saved Ridge model")
 
         # Save XGBoost model
         self.xgb_model.save_model(f"models/xgb_ridge_residuals_v7_backtest2024_{timestamp}.json")
-        logger.info(f"Saved XGBoost model")
+        logger.info("Saved XGBoost model")
 
         # Save results
         with open(f"results/xgb_exp7_backtest2024_results_{timestamp}.json", 'w') as f:
             json.dump(self.results, f, indent=2)
-        logger.info(f"Saved results")
+        logger.info("Saved results")
 
         # Log summary
-        logger.info(f"\nResults Summary:")
+        logger.info("\nResults Summary:")
         logger.info(json.dumps({
             'test_mae_2024': self.results['test_mae_2024'],
             'improvement_vs_baseline': self.results['improvement_mae_2024'],

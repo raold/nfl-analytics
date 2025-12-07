@@ -9,9 +9,9 @@ Run:
 """
 
 import pandas as pd
+
 from py.utils.sports_analytics_validator import (
     SportsAnalyticsValidator,
-    Severity,
 )
 
 

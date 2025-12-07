@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.487541
 Test count: 4
 """
 
+import pytest
 from analysis.diagnose_prediction_bias import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_analyze_prediction_bias_basic():

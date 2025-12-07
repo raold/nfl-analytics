@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.299287
 Test count: 12
 """
 
+import pytest
 from execution.depth_model import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_tau_bucket_basic():

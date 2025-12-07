@@ -27,18 +27,17 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import time
-import pickle
 import logging
-from typing import Dict, List, Optional, Tuple
-from unittest.mock import Mock, patch, MagicMock
+import pickle
 import sys
+import time
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy as np
+import psycopg2
+import pytest
+from psycopg2.extras import RealDictCursor
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -88,6 +87,7 @@ def ensemble_v5():
     """Load Ensemble v5.1 (baseline) for comparison tests."""
     try:
         import os
+
         from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
         return EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
     except Exception as e:
@@ -402,6 +402,7 @@ class TestComponentFailureHandling:
         with patch("psycopg2.connect", side_effect=Exception("Database unavailable")):
             try:
                 import os
+
                 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
                 ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
                 # Should fail gracefully with informative error

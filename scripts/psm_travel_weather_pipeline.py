@@ -12,20 +12,19 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 16, 2025
 """
 
-import os
 import sys
 import warnings
-import pandas as pd
-import numpy as np
-from pathlib import Path
-from typing import Tuple, Dict, List
 from dataclasses import dataclass
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 # Statistical libraries
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
-from scipy import stats
+from sklearn.preprocessing import StandardScaler
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -45,7 +44,7 @@ class PSMResults:
     n_treated: int
     n_control: int
     n_matched_pairs: int
-    covariate_balance: Dict[str, float]
+    covariate_balance: dict[str, float]
     treated_mean: float
     control_mean: float
 
@@ -81,8 +80,8 @@ def prepare_psm_data(
     df: pd.DataFrame,
     treatment_col: str,
     outcome_col: str,
-    covariate_cols: List[str]
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    covariate_cols: list[str]
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Prepare data for PSM analysis.
 
@@ -113,7 +112,7 @@ def prepare_psm_data(
 def estimate_propensity_scores(
     df: pd.DataFrame,
     treatment_col: str,
-    covariate_cols: List[str]
+    covariate_cols: list[str]
 ) -> np.ndarray:
     """
     Estimate propensity scores using logistic regression.
@@ -148,7 +147,7 @@ def nearest_neighbor_matching(
     treated_ps: np.ndarray,
     control_ps: np.ndarray,
     caliper: float = 0.2
-) -> Dict[int, List[int]]:
+) -> dict[int, list[int]]:
     """
     Perform nearest-neighbor matching with replacement.
 
@@ -188,7 +187,7 @@ def nearest_neighbor_matching(
 def compute_treatment_effect(
     df_treated: pd.DataFrame,
     df_control: pd.DataFrame,
-    matches: Dict[int, List[int]],
+    matches: dict[int, list[int]],
     outcome_col: str
 ) -> PSMResults:
     """
@@ -265,9 +264,9 @@ def compute_treatment_effect(
 def compute_covariate_balance(
     df_treated: pd.DataFrame,
     df_control: pd.DataFrame,
-    matches: Dict[int, List[int]],
-    covariate_cols: List[str]
-) -> Dict[str, float]:
+    matches: dict[int, list[int]],
+    covariate_cols: list[str]
+) -> dict[str, float]:
     """
     Compute standardized mean differences for covariate balance.
 
@@ -319,7 +318,7 @@ def run_psm_analysis(
     df: pd.DataFrame,
     treatment_col: str,
     outcome_col: str,
-    covariate_cols: List[str],
+    covariate_cols: list[str],
     caliper: float = 0.2
 ) -> PSMResults:
     """
@@ -389,9 +388,9 @@ def sensitivity_analysis(
     df: pd.DataFrame,
     treatment_col: str,
     outcome_col: str,
-    covariate_cols: List[str],
-    calipers: List[float] = [0.1, 0.2, 0.3]
-) -> Dict[float, PSMResults]:
+    covariate_cols: list[str],
+    calipers: list[float] = [0.1, 0.2, 0.3]
+) -> dict[float, PSMResults]:
     """
     Run sensitivity analysis with different caliper values.
 
@@ -421,7 +420,7 @@ def sensitivity_analysis(
 def export_matched_pairs(
     df_treated: pd.DataFrame,
     df_control: pd.DataFrame,
-    matches: Dict[int, List[int]],
+    matches: dict[int, list[int]],
     output_path: Path
 ):
     """
@@ -583,14 +582,14 @@ def main():
     print("=" * 80)
     print()
     print("1. LONG-DISTANCE TRAVEL EFFECT:")
-    print(f"   Treatment: ≥2000 miles coast-to-coast travel")
+    print("   Treatment: ≥2000 miles coast-to-coast travel")
     print(f"   Effect:    {travel_results.treatment_effect:.1f} yards "
           f"[{travel_results.conf_int_lower:.1f}, {travel_results.conf_int_upper:.1f}]")
     print(f"   P-value:   {travel_results.p_value:.4f}")
     print(f"   Matched:   {travel_results.n_matched_pairs} pairs")
     print()
     print("2. EXTREME WEATHER EFFECT:")
-    print(f"   Treatment: Temp <32°F OR wind >20mph OR precipitation")
+    print("   Treatment: Temp <32°F OR wind >20mph OR precipitation")
     print(f"   Effect:    {weather_results.treatment_effect:.1f} yards "
           f"[{weather_results.conf_int_lower:.1f}, {weather_results.conf_int_upper:.1f}]")
     print(f"   P-value:   {weather_results.p_value:.4f}")

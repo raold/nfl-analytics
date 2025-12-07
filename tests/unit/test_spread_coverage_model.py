@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.818424
 Test count: 23
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.spread_coverage_model import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

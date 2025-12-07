@@ -82,8 +82,6 @@ Reference: CLAUDE.md § Feature Engineering Patterns
 
 import logging
 import warnings
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -156,7 +154,7 @@ class TeamDefensiveFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -226,7 +224,7 @@ class TeamDefensiveFeatures:
         target_season: int,
         target_week: int,
         lookback: int = None
-    ) -> List[Tuple[str, int, int]]:
+    ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
 
@@ -277,9 +275,9 @@ class TeamDefensiveFeatures:
     def _compute_epa_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]],
+        games: list[tuple[str, int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute EPA-based defensive features with exponential decay weighting.
 
@@ -374,9 +372,9 @@ class TeamDefensiveFeatures:
     def _compute_explosive_efficiency_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]],
+        games: list[tuple[str, int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute explosive play and efficiency features with exponential decay.
 
@@ -481,9 +479,9 @@ class TeamDefensiveFeatures:
     def _compute_passing_defense_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]],
+        games: list[tuple[str, int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute passing defense features with exponential decay.
 
@@ -585,9 +583,9 @@ class TeamDefensiveFeatures:
     def _compute_rushing_defense_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]],
+        games: list[tuple[str, int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute rushing defense features with exponential decay.
 
@@ -663,9 +661,9 @@ class TeamDefensiveFeatures:
     def _compute_game_level_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]],
+        games: list[tuple[str, int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute game-level defensive features with exponential decay.
 
@@ -804,8 +802,8 @@ class TeamDefensiveFeatures:
     def _compute_variance_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute defensive performance variance features.
 
@@ -899,7 +897,7 @@ class TeamDefensiveFeatures:
         team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 27 defensive features for a team at a specific game.
 

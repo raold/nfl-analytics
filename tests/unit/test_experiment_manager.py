@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.251165
 Test count: 31
 """
 
+import pytest
 from experimental_design.experiment_manager import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_test_basic():

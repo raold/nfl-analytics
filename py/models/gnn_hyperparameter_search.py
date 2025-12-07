@@ -24,7 +24,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, Any
 
 import optuna
 from optuna.pruners import MedianPruner
@@ -204,22 +203,21 @@ def run_hyperparameter_search(args: argparse.Namespace):
 
     # Plot optimization history
     try:
-        import matplotlib.pyplot as plt
 
         # Optimization history
         fig = optuna.visualization.matplotlib.plot_optimization_history(study)
         fig.savefig(output_dir / "optimization_history.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved optimization history plot")
+        logger.info("✓ Saved optimization history plot")
 
         # Parallel coordinate plot
         fig = optuna.visualization.matplotlib.plot_parallel_coordinate(study)
         fig.savefig(output_dir / "parallel_coordinate.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved parallel coordinate plot")
+        logger.info("✓ Saved parallel coordinate plot")
 
         # Parameter importances
         fig = optuna.visualization.matplotlib.plot_param_importances(study)
         fig.savefig(output_dir / "param_importances.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved parameter importances plot")
+        logger.info("✓ Saved parameter importances plot")
 
     except Exception as e:
         logger.warning(f"Failed to generate plots: {e}")

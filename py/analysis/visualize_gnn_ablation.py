@@ -16,13 +16,12 @@ Outputs:
 """
 
 import json
-import sys
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Set up paths
@@ -40,13 +39,13 @@ plt.style.use('seaborn-v0_8-paper')
 sns.set_palette("husl")
 
 
-def load_results() -> List[Dict[str, Any]]:
+def load_results() -> list[dict[str, Any]]:
     """Load ablation study results from JSON."""
-    with open(RESULTS_PATH, 'r') as f:
+    with open(RESULTS_PATH) as f:
         return json.load(f)
 
 
-def create_summary_dataframe(results: List[Dict[str, Any]]) -> pd.DataFrame:
+def create_summary_dataframe(results: list[dict[str, Any]]) -> pd.DataFrame:
     """Create a summary DataFrame from results."""
     data = []
     for r in results:
@@ -403,21 +402,21 @@ def generate_text_analysis(df: pd.DataFrame, output_path: Path):
     report.append("2. Most Promising Architecture:")
     if best_val['Configuration'] != best_test['Configuration']:
         report.append(f"   → {best_val['Configuration']} (best val Brier: {best_val['Val Brier']:.4f})")
-        report.append(f"   → May benefit from regularization to improve generalization")
+        report.append("   → May benefit from regularization to improve generalization")
     else:
         report.append(f"   → {best_val['Configuration']} excels in both validation and test")
     report.append("")
 
     report.append("3. Key Architectural Insights:")
     report.append(f"   → Message passing: {msg_analysis['Test Brier'].idxmin()} rounds optimal for test performance")
-    report.append(f"   → Embedding dimension: Larger (128) helps validation but test is stable")
+    report.append("   → Embedding dimension: Larger (128) helps validation but test is stable")
     report.append(f"   → Chemistry edges: Minimal impact ({delta_brier:+.4f} test Brier)")
     report.append("")
 
     report.append("4. For Deployment:")
     report.append(f"   → Consider Small Model for efficiency: Test Brier {df[df['Configuration'] == 'Small Model']['Test Brier'].values[0]:.4f}")
     report.append(f"   → Only {abs(df[df['Configuration'] == 'Small Model']['Test Brier'].values[0] - best_test['Test Brier']):.4f} worse than best")
-    report.append(f"   → Much faster training/inference with fewer parameters")
+    report.append("   → Much faster training/inference with fewer parameters")
     report.append("")
 
     report.append("=" * 80)

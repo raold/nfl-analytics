@@ -20,10 +20,13 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+
 import numpy as np
+
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +41,7 @@ def test_model_loading():
 
     try:
         ensemble = EnhancedEnsemble5Way()
-        print(f"✅ Ensemble initialized")
+        print("✅ Ensemble initialized")
         print(f"   Weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
         print(f"   Version: {ensemble.ensemble_version}")
@@ -80,7 +83,7 @@ def test_feature_shapes(ensemble):
         "home_away_encoded": 1,  # home game
     }
 
-    print(f"Sample features (Patrick Mahomes-like):")
+    print("Sample features (Patrick Mahomes-like):")
     for k, v in features.items():
         print(f"   {k}: {v}")
 
@@ -175,7 +178,7 @@ def test_ensemble_aggregation(ensemble, predictions):
         for model in ensemble.weights.keys()
     )
 
-    print(f"\nWeighted predictions:")
+    print("\nWeighted predictions:")
     for model, (pred, std) in predictions.items():
         weight = ensemble.weights[model]
         contribution = pred * weight
@@ -258,12 +261,12 @@ def main():
         print("\n" + "="*70)
         print("SUMMARY")
         print("="*70)
-        print(f"\n✅ All tests passed!")
-        print(f"\nFinal ensemble prediction:")
+        print("\n✅ All tests passed!")
+        print("\nFinal ensemble prediction:")
         print(f"   Mean: {result['ensemble_mean']:.1f} yards")
         print(f"   Std (calibrated): {result['calibrated_std']:.1f} yards")
         print(f"   90% PI: [{result['lower_90']:.1f}, {result['upper_90']:.1f}]")
-        print(f"\nModel weights:")
+        print("\nModel weights:")
         for model, weight in ensemble.weights.items():
             print(f"   {model:30s}: {weight:.2%}")
         print(f"\nTemperature scaling: T = {ensemble.temperature:.4f}")

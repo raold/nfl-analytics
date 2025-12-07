@@ -24,12 +24,12 @@ Output:
     - models/xgboost/passing_xgboost_v3_with_opponent_strength_metadata.json
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
+import os
+import sys
+import time
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -218,7 +218,7 @@ def load_opponent_strength_features():
 
     # Count non-null values
     non_null_counts = opp_features[['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].notna().sum()
-    logger.info(f"\nNon-null feature counts:")
+    logger.info("\nNon-null feature counts:")
     for col, count in non_null_counts.items():
         logger.info(f"  {col}: {count:,} ({count/len(opp_features)*100:.1f}%)")
 
@@ -334,8 +334,8 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
             if col in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']:
                 logger.info(f"  Filled {col} NaNs with median: {median_val:.4f}")
 
-    logger.info(f"\n✓ Feature engineering complete")
-    logger.info(f"  Total features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("\n✓ Feature engineering complete")
+    logger.info("  Total features: 16 (13 baseline + 3 opponent strength)")
     logger.info(f"  Samples: {len(df):,}")
 
     return df
@@ -441,11 +441,11 @@ def prepare_train_test_split(df: pd.DataFrame):
     # Apply exponential decay weights to training set
     sample_weights = apply_exponential_decay_weights(train_df)
 
-    logger.info(f"\n✓ Train/test split complete")
+    logger.info("\n✓ Train/test split complete")
     logger.info(f"  Train: {len(X_train):,} samples (2015-2024)")
     logger.info(f"  Test: {len(X_test):,} samples (2025)")
     logger.info(f"  Features: {len(feature_cols)}")
-    logger.info(f"\n16 Features (13 Baseline + 3 Opponent Strength):")
+    logger.info("\n16 Features (13 Baseline + 3 Opponent Strength):")
     for i, col in enumerate(feature_cols, 1):
         marker = " [NEW]" if col in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty'] else ""
         logger.info(f"  {i:2d}. {col}{marker}")
@@ -485,7 +485,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols, sample_w
 
     logger.info(f"Training with {NUM_BOOST_ROUNDS} boost rounds...")
     logger.info(f"Early stopping: {EARLY_STOPPING_ROUNDS} rounds")
-    logger.info(f"Hyperparameters:")
+    logger.info("Hyperparameters:")
     for key, val in XGBOOST_PARAMS.items():
         logger.info(f"  {key}: {val}")
 
@@ -552,16 +552,16 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info("MODEL EVALUATION - 2025 HOLDOUT SET")
     logger.info("=" * 70)
 
-    logger.info(f"\nPerformance Metrics:")
+    logger.info("\nPerformance Metrics:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
     logger.info(f"  R²: {metrics['r2']:.4f}")
     logger.info(f"  Mean Prediction: {y_pred.mean():.1f} yards")
     logger.info(f"  Mean Actual: {y_test.mean():.1f} yards")
-    logger.info(f"\nBaseline Comparison:")
+    logger.info("\nBaseline Comparison:")
     logger.info(f"  Baseline MAE: {metrics['baseline_mae']:.2f} yards")
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
-    logger.info(f"\nTraining Info:")
+    logger.info("\nTraining Info:")
     logger.info(f"  Training time: {metrics['training_time_minutes']:.2f} minutes")
     logger.info(f"  Best iteration: {metrics['best_iteration']}")
     logger.info(f"  Features: {metrics['num_features']}")
@@ -629,10 +629,10 @@ def main():
     logger.info("\n" + "=" * 70)
     logger.info("XGBOOST v3 TRAINING (WITH OPPONENT STRENGTH)")
     logger.info("=" * 70)
-    logger.info(f"Training Window: 2018-2024 + H=4 decay (2015-2017)")
-    logger.info(f"Test Set: 2025 season")
-    logger.info(f"Features: 16 (13 baseline + 3 opponent strength)")
-    logger.info(f"Target: MAE < 53.5 yards (v2 baseline: ~54 yards)")
+    logger.info("Training Window: 2018-2024 + H=4 decay (2015-2017)")
+    logger.info("Test Set: 2025 season")
+    logger.info("Features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("Target: MAE < 53.5 yards (v2 baseline: ~54 yards)")
     logger.info("=" * 70 + "\n")
 
     pipeline_start = time.time()
@@ -666,12 +666,12 @@ def main():
     logger.info("=" * 70)
     logger.info(f"Total time: {pipeline_time/60:.2f} minutes")
     logger.info(f"MAE: {metrics['mae']:.2f} yards (Target: <53.5, v2 baseline: ~54)")
-    logger.info(f"Features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("Features: 16 (13 baseline + 3 opponent strength)")
 
     # Compare to v2 baseline
     v2_baseline = 54.0
     improvement_vs_v2 = ((v2_baseline - metrics['mae']) / v2_baseline) * 100
-    logger.info(f"\nv2 → v3 Improvement:")
+    logger.info("\nv2 → v3 Improvement:")
     logger.info(f"  v2 MAE: {v2_baseline:.2f} yards")
     logger.info(f"  v3 MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  Improvement: {improvement_vs_v2:+.2f}%")
@@ -679,8 +679,8 @@ def main():
     status = "✓ PASS" if metrics['mae'] < 53.5 else "⚠ BORDERLINE" if metrics['mae'] < 54.0 else "✗ NEEDS IMPROVEMENT"
     logger.info(f"Status: {status}")
 
-    logger.info(f"\nModel ready for 4-way ensemble integration (30% weight)")
-    logger.info(f"New features: opp_def_epa_exp, opp_pass_def_rank, matchup_difficulty")
+    logger.info("\nModel ready for 4-way ensemble integration (30% weight)")
+    logger.info("New features: opp_def_epa_exp, opp_pass_def_rank, matchup_difficulty")
     logger.info("=" * 70 + "\n")
 
 

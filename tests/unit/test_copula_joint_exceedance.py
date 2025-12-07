@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.122126
 Test count: 17
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.copula_joint_exceedance import *
-import pandas as pd
-import pytest
 
 
 def test_analytic_joint_exceedance_basic():

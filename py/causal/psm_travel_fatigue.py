@@ -21,18 +21,18 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional, Literal
+import logging
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Literal
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import psycopg2
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
-import seaborn as sns
-from pathlib import Path
-import psycopg2
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class PSMResult:
     n_treated: int
     n_control: int
     n_matched: int
-    balance_diagnostics: Dict[str, float]  # SMD for each covariate
+    balance_diagnostics: dict[str, float]  # SMD for each covariate
     common_support_pct: float  # % of observations in common support
 
     def __str__(self) -> str:
@@ -84,7 +84,7 @@ class PSMTravelFatigueAnalyzer:
 
     def _fetch_game_data_with_travel(
         self,
-        seasons: List[int],
+        seasons: list[int],
         min_distance: float = 0.0
     ) -> pd.DataFrame:
         """
@@ -182,7 +182,7 @@ class PSMTravelFatigueAnalyzer:
         self,
         df: pd.DataFrame,
         treatment_var: str,
-        covariates: List[str]
+        covariates: list[str]
     ) -> np.ndarray:
         """
         Estimate propensity scores using logistic regression.
@@ -221,7 +221,7 @@ class PSMTravelFatigueAnalyzer:
         treatment_var: str,
         n_matches: int = 1,
         caliper: float = 0.1
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Match treated and control observations using nearest neighbor matching.
 
@@ -271,8 +271,8 @@ class PSMTravelFatigueAnalyzer:
         self,
         matched_treated: pd.DataFrame,
         matched_control: pd.DataFrame,
-        covariates: List[str]
-    ) -> Dict[str, float]:
+        covariates: list[str]
+    ) -> dict[str, float]:
         """
         Calculate standardized mean difference (SMD) for balance diagnostics.
 
@@ -304,10 +304,10 @@ class PSMTravelFatigueAnalyzer:
 
     def analyze_long_distance_travel(
         self,
-        seasons: List[int] = list(range(2018, 2025)),
+        seasons: list[int] = list(range(2018, 2025)),
         distance_threshold: float = 2000.0,
         n_matches: int = 3,
-        output_dir: Optional[Path] = None
+        output_dir: Path | None = None
     ) -> PSMResult:
         """
         Analyze effect of long-distance travel (>2000 miles) on performance.
@@ -405,10 +405,10 @@ class PSMTravelFatigueAnalyzer:
 
     def analyze_timezone_crossing(
         self,
-        seasons: List[int] = list(range(2018, 2025)),
+        seasons: list[int] = list(range(2018, 2025)),
         direction: Literal['west_to_east', 'east_to_west', 'both'] = 'west_to_east',
         n_matches: int = 3,
-        output_dir: Optional[Path] = None
+        output_dir: Path | None = None
     ) -> PSMResult:
         """
         Analyze effect of timezone crossing on performance.
@@ -506,7 +506,7 @@ class PSMTravelFatigueAnalyzer:
 
     def _plot_balance_diagnostics(
         self,
-        balance: Dict[str, float],
+        balance: dict[str, float],
         output_dir: Path,
         filename: str
     ):

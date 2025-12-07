@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.544498
 Test count: 77
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from rl.iql_agent import *
-import pandas as pd
-import pytest
 
 
 def test_set_seed_basic():

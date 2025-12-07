@@ -13,7 +13,6 @@ Expected runtime: ~15 minutes
 
 import logging
 from datetime import datetime
-from typing import Dict, Optional
 
 import pandas as pd
 import psycopg
@@ -48,7 +47,7 @@ class WeeklyPipeline(BasePipeline):
         db_conn: psycopg.Connection,
         collector=None,
         alert_manager=None,
-        config: Optional[Dict] = None
+        config: dict | None = None
     ):
         """
         Initialize weekly pipeline.
@@ -303,7 +302,8 @@ class WeeklyPipeline(BasePipeline):
 # Example usage
 if __name__ == "__main__":
     import os
-    from etl.monitoring import MetricsCollector, AlertManager
+
+    from etl.monitoring import AlertManager, MetricsCollector
 
     # Setup
     conn = psycopg.connect(

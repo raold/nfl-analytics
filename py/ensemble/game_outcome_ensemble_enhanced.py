@@ -22,16 +22,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, get_team_season_stats
 from py.features.feature_loader import AdvancedFeatureLoader
-from py.models.state_space import StateSpaceRatings
 
 
 class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):

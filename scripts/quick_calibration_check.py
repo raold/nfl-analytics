@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Quick calibration check - minimal dependencies"""
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # Load data
 df = pd.read_csv("analysis/results/historical_validation_4way_EMERGENCY_FIX.csv")

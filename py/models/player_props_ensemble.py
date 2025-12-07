@@ -49,7 +49,6 @@ import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -87,11 +86,11 @@ class EnsemblePrediction:
     q95: float  # 95th percentile
 
     # Individual model outputs
-    bayesian_mean: Optional[float] = None
-    xgboost_mean: Optional[float] = None
-    bnn_mean: Optional[float] = None
-    bnn_calibrated_mean: Optional[float] = None  # 5th model
-    state_space_mean: Optional[float] = None
+    bayesian_mean: float | None = None
+    xgboost_mean: float | None = None
+    bnn_mean: float | None = None
+    bnn_calibrated_mean: float | None = None  # 5th model
+    state_space_mean: float | None = None
 
     # Betting metrics
     over_prob: float = 0.0
@@ -102,7 +101,7 @@ class EnsemblePrediction:
     recommendation: str = "PASS"  # "OVER", "UNDER", or "PASS"
 
     # Model weights
-    weights: Optional[Dict[str, float]] = None
+    weights: dict[str, float] | None = None
 
 
 class PlayerPropsEnsemble:
@@ -338,7 +337,7 @@ class PlayerPropsEnsemble:
                 logger.info(f"  ✓ Loaded BNN Calibrated (T={self.bnn_calibrated.temperature:.2f})")
             else:
                 logger.info("  ✗ BNN Calibrated not found (requires separate training)")
-                logger.info(f"    To train: python py/models/train_bnn_calibrated.py")
+                logger.info("    To train: python py/models/train_bnn_calibrated.py")
                 self.use_bnn_calibrated = False
 
         except Exception as e:
@@ -410,7 +409,7 @@ class PlayerPropsEnsemble:
         mean: float,
         std: float,
         model_name: str
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Apply temperature scaling to widen confidence intervals for better calibration.
 
         Temperature scaling: σ_calibrated = σ_raw / T
@@ -476,7 +475,7 @@ class PlayerPropsEnsemble:
         season: int = 2025,
         week: int = 10,
         model_version: str = "hierarchical_v1.0"
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get Bayesian hierarchical prediction from database.
 
@@ -569,8 +568,8 @@ class PlayerPropsEnsemble:
         self,
         player_id: str,
         prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        features: dict
+    ) -> tuple[float, float]:
         """
         Get XGBoost prediction.
 
@@ -635,8 +634,8 @@ class PlayerPropsEnsemble:
         self,
         player_id: str,
         prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        features: dict
+    ) -> tuple[float, float]:
         """
         Get BNN prediction (PyTorch multi-output).
 
@@ -732,8 +731,8 @@ class PlayerPropsEnsemble:
         self,
         player_id: str,
         prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        features: dict
+    ) -> tuple[float, float]:
         """
         Get BNN Calibrated prediction (temperature-scaled for better calibration).
 
@@ -799,7 +798,7 @@ class PlayerPropsEnsemble:
         prop_type: str,
         season: int,  # No default - must be provided explicitly
         week: int
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get state-space prediction from pre-loaded CSV data.
 
@@ -920,7 +919,7 @@ class PlayerPropsEnsemble:
         is_home: bool = False,
         season: int = 2025,
         week: int = 10,
-        features: Optional[Dict] = None,
+        features: dict | None = None,
         bankroll: float = 10000.0
     ) -> EnsemblePrediction:
         """
@@ -956,7 +955,7 @@ class PlayerPropsEnsemble:
             if features:
                 logger.info(f"  ✓ Extracted {len(features)} features")
             else:
-                logger.warning(f"  ✗ Feature extraction failed - XGBoost/BNN will be skipped")
+                logger.warning("  ✗ Feature extraction failed - XGBoost/BNN will be skipped")
 
         # Collect predictions from each model
         predictions = []
@@ -1168,7 +1167,7 @@ def main():
     print(f"Line: {prediction.line}")
     print(f"\nEnsemble Prediction: {prediction.mean:.1f} ± {prediction.std:.1f}")
     print(f"90% CI: [{prediction.q05:.1f}, {prediction.q95:.1f}]")
-    print(f"\nIndividual Models:")
+    print("\nIndividual Models:")
     if prediction.bayesian_mean:
         print(f"  Bayesian: {prediction.bayesian_mean:.1f}")
     if prediction.xgboost_mean:
@@ -1177,10 +1176,10 @@ def main():
         print(f"  BNN:      {prediction.bnn_mean:.1f}")
     if prediction.state_space_mean:
         print(f"  State-Space: {prediction.state_space_mean:.1f}")
-    print(f"\nModel Weights:")
+    print("\nModel Weights:")
     for name, weight in prediction.weights.items():
         print(f"  {name}: {weight:.2%}")
-    print(f"\nBetting Analysis:")
+    print("\nBetting Analysis:")
     print(f"  Over probability:  {prediction.over_prob:.1%}")
     print(f"  Under probability: {prediction.under_prob:.1%}")
     print(f"  Edge: {prediction.edge:+.2%}")

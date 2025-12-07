@@ -19,18 +19,19 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 14, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
 import logging
-import pandas as pd
+
 import numpy as np
-import xgboost as xgb
+import pandas as pd
 import psycopg2
+import xgboost as xgb
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import TimeSeriesSplit
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

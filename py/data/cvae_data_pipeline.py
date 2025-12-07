@@ -5,18 +5,18 @@ Extracts quarter-by-quarter scores, key events, and momentum indicators
 from the database to create training data for the deep generative model.
 """
 
-import pandas as pd
+import json
+import logging
+import sys
+from dataclasses import asdict
+from pathlib import Path
+
 import numpy as np
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import torch
-from torch.utils.data import Dataset, DataLoader
-from typing import Dict, List, Tuple, Optional
-import logging
-from dataclasses import dataclass, asdict
-import json
-from pathlib import Path
-import sys
+from psycopg2.extras import RealDictCursor
+from torch.utils.data import DataLoader, Dataset
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from models.game_trajectory_cvae import GameTrajectory
@@ -32,7 +32,7 @@ class GameTrajectoryDataset(Dataset):
 
     def __init__(
         self,
-        trajectories: List[GameTrajectory],
+        trajectories: list[GameTrajectory],
         conditions: np.ndarray,
         transform=None
     ):
@@ -58,7 +58,7 @@ class CVAEDataPipeline:
     Extracts and prepares game trajectory data for cVAE training.
     """
 
-    def __init__(self, db_config: Dict[str, str]):
+    def __init__(self, db_config: dict[str, str]):
         self.db_config = db_config
         self.conn = None
         self.cursor = None
@@ -81,7 +81,7 @@ class CVAEDataPipeline:
         self,
         start_season: int = 2020,
         end_season: int = 2024
-    ) -> Tuple[List[GameTrajectory], np.ndarray]:
+    ) -> tuple[list[GameTrajectory], np.ndarray]:
         """
         Extract game trajectories and pre-game conditions from database.
 
@@ -263,7 +263,7 @@ class CVAEDataPipeline:
         conditions_array = np.array(conditions_list)
         return trajectories, conditions_array
 
-    def _create_trajectory(self, game: Dict) -> GameTrajectory:
+    def _create_trajectory(self, game: dict) -> GameTrajectory:
         """
         Create GameTrajectory from database record.
         """
@@ -289,7 +289,7 @@ class CVAEDataPipeline:
             lead_changes=lead_changes
         )
 
-    def _calculate_momentum(self, game: Dict) -> Tuple[float, int]:
+    def _calculate_momentum(self, game: dict) -> tuple[float, int]:
         """
         Calculate momentum indicators from quarter scores.
         """
@@ -320,7 +320,7 @@ class CVAEDataPipeline:
 
         return largest_lead, lead_changes
 
-    def _create_condition_vector(self, game: Dict) -> np.ndarray:
+    def _create_condition_vector(self, game: dict) -> np.ndarray:
         """
         Create pre-game condition vector from database record.
 
@@ -371,12 +371,12 @@ class CVAEDataPipeline:
 
     def prepare_datasets(
         self,
-        trajectories: List[GameTrajectory],
+        trajectories: list[GameTrajectory],
         conditions: np.ndarray,
         train_split: float = 0.7,
         val_split: float = 0.15,
         batch_size: int = 32
-    ) -> Tuple[DataLoader, DataLoader, DataLoader]:
+    ) -> tuple[DataLoader, DataLoader, DataLoader]:
         """
         Prepare train/val/test data loaders.
         """
@@ -435,7 +435,7 @@ class CVAEDataPipeline:
         logger.info(f"Saved {len(trajectories)} trajectories to {output_path}")
 
 
-def create_simulated_data(n_samples: int = 1000) -> Tuple[List[GameTrajectory], np.ndarray]:
+def create_simulated_data(n_samples: int = 1000) -> tuple[list[GameTrajectory], np.ndarray]:
     """
     Create simulated data for testing the pipeline.
     """
@@ -494,7 +494,7 @@ if __name__ == "__main__":
     # Test data loading
     for batch_idx, (traj_batch, cond_batch) in enumerate(train_loader):
         if batch_idx == 0:
-            print(f"\nFirst batch:")
+            print("\nFirst batch:")
             print(f"  Trajectory shape: {traj_batch.shape}")
             print(f"  Condition shape: {cond_batch.shape}")
             print(f"  Trajectory sample: {traj_batch[0][:5]}...")

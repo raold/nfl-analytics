@@ -3,9 +3,10 @@
 Inline Calibration Analysis - Extract key metrics from backtest CSV
 """
 
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 # Load data
 csv_file = Path("/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv")
@@ -147,45 +148,45 @@ print("TOP 3 RECOMMENDATIONS (Ranked by Expected Impact):")
 print()
 
 # Recommendation 1: Temperature scaling
-print(f"1. AGGRESSIVE TEMPERATURE SCALING")
+print("1. AGGRESSIVE TEMPERATURE SCALING")
 print(f"   Expected Impact: +{temp_improvement:.1f} pp")
-print(f"   Current: T = 0.75-0.80 (33% widening)")
+print("   Current: T = 0.75-0.80 (33% widening)")
 print(f"   Recommended: T = {temp_reduction:.2f} ({temp_widening:.1f}x widening)")
-print(f"   Implementation:")
-print(f"     - File: py/models/player_props_ensemble.py")
-print(f"     - Method: _apply_temperature_scaling() (lines 398-451)")
+print("   Implementation:")
+print("     - File: py/models/player_props_ensemble.py")
+print("     - Method: _apply_temperature_scaling() (lines 398-451)")
 print(f"     - Change temperature_map values to {temp_reduction:.2f}")
 print()
 
 # Recommendation 2: Equal weighting
 equal_weight_improvement = 7
-print(f"2. SWITCH TO EQUAL WEIGHTING")
+print("2. SWITCH TO EQUAL WEIGHTING")
 print(f"   Expected Impact: +{equal_weight_improvement:.1f} pp")
-print(f"   Current: Inverse variance weighting (amplifies overconfident models)")
-print(f"   Recommended: Equal weighting (1/N for N models)")
-print(f"   Implementation:")
-print(f"     - File: py/models/player_props_ensemble.py")
-print(f"     - Lines: 924-926 (ensemble aggregation)")
-print(f"     - Replace: weights = np.ones(len(predictions)) / len(predictions)")
+print("   Current: Inverse variance weighting (amplifies overconfident models)")
+print("   Recommended: Equal weighting (1/N for N models)")
+print("   Implementation:")
+print("     - File: py/models/player_props_ensemble.py")
+print("     - Lines: 924-926 (ensemble aggregation)")
+print("     - Replace: weights = np.ones(len(predictions)) / len(predictions)")
 print()
 
 # Recommendation 3: Model training (if severe)
 if coverage_pct < 50:
     training_improvement = 15
-    print(f"3. RETRAIN MODELS WITH STRONGER REGULARIZATION")
+    print("3. RETRAIN MODELS WITH STRONGER REGULARIZATION")
     print(f"   Expected Impact: +{training_improvement:.1f} pp")
-    print(f"   Current: Models severely overconfident (suggests overfitting)")
-    print(f"   Recommended:")
-    print(f"     - Increase L2 regularization (weight decay)")
-    print(f"     - Validation-based early stopping")
-    print(f"     - Cross-validation instead of single train/test split")
+    print("   Current: Models severely overconfident (suggests overfitting)")
+    print("   Recommended:")
+    print("     - Increase L2 regularization (weight decay)")
+    print("     - Validation-based early stopping")
+    print("     - Cross-validation instead of single train/test split")
 else:
     training_improvement = 5
-    print(f"3. FINE-TUNE MODEL CALIBRATION")
+    print("3. FINE-TUNE MODEL CALIBRATION")
     print(f"   Expected Impact: +{training_improvement:.1f} pp")
-    print(f"   Recommended:")
-    print(f"     - Use Platt scaling or isotonic regression")
-    print(f"     - Calibration plots to identify specific biases")
+    print("   Recommended:")
+    print("     - Use Platt scaling or isotonic regression")
+    print("     - Calibration plots to identify specific biases")
 
 print()
 total_improvement = temp_improvement + equal_weight_improvement + training_improvement
@@ -211,12 +212,12 @@ output_dir.mkdir(exist_ok=True, parents=True)
 with open(output_dir / "calibration_summary_nov7.txt", 'w') as f:
     f.write("CALIBRATION DIAGNOSTIC SUMMARY\n")
     f.write("=" * 90 + "\n\n")
-    f.write(f"Date: November 7, 2025\n")
+    f.write("Date: November 7, 2025\n")
     f.write(f"File: {csv_file.name}\n\n")
     f.write(f"ENSEMBLE COVERAGE: {coverage_pct:.2f}% (target: 85-95%)\n")
     f.write(f"COVERAGE GAP: {gap:+.2f} pp\n")
     f.write(f"SEVERITY: {severity}\n\n")
-    f.write(f"TOP 3 RECOMMENDATIONS:\n")
+    f.write("TOP 3 RECOMMENDATIONS:\n")
     f.write(f"1. Temperature Scaling: +{temp_improvement:.1f} pp (reduce T to {temp_reduction:.2f})\n")
     f.write(f"2. Equal Weighting: +{equal_weight_improvement:.1f} pp\n")
     f.write(f"3. Model Training/Calibration: +{training_improvement:.1f} pp\n\n")

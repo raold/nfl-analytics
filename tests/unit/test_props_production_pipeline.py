@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.370989
 Test count: 39
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.props_production_pipeline import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

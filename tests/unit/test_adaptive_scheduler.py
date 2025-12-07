@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.172684
 Test count: 90
 """
 
+import pandas as pd
+import pytest
 from compute.adaptive_scheduler import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_mean_reward_basic():

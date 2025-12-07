@@ -21,14 +21,13 @@ Created: November 9, 2025
 
 import os
 import sys
-from pathlib import Path
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from pathlib import Path
+from typing import Any
 
+import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_batch
-import pandas as pd
-import numpy as np
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -55,7 +54,7 @@ MODEL_COLUMN_MAPPING = {
 }
 
 
-def load_model_registry(cursor) -> Dict[str, int]:
+def load_model_registry(cursor) -> dict[str, int]:
     """Load model registry and return mapping of model_name -> model_id."""
     cursor.execute("""
         SELECT model_id, model_name, model_type, status
@@ -93,7 +92,7 @@ def prepare_prediction_row(
     row: pd.Series,
     model_id: int,
     stat_type: str = 'passing_yards'
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Convert CSV row to ml.predictions insert format.
 
@@ -174,7 +173,7 @@ def prepare_prediction_row(
 
 def insert_predictions_batch(
     cursor,
-    predictions: List[Dict[str, Any]],
+    predictions: list[dict[str, Any]],
     batch_size: int = 500
 ):
     """
@@ -221,7 +220,7 @@ def insert_predictions_batch(
     execute_batch(cursor, insert_sql, predictions, page_size=batch_size)
 
 
-def store_predictions(cursor, model_registry: Dict[str, int], df: pd.DataFrame):
+def store_predictions(cursor, model_registry: dict[str, int], df: pd.DataFrame):
     """
     Store all predictions from CSV into ml.predictions.
 

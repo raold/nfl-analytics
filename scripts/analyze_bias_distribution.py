@@ -6,12 +6,13 @@ Compare training (2018-2021) vs validation (2022-2024) distributions
 to identify potential causes of systematic under-prediction.
 """
 
-import pandas as pd
+
 import numpy as np
-from scipy import stats
+import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import sys
+from scipy import stats
+
 
 # Database connection
 def get_db_connection():
@@ -59,19 +60,19 @@ def analyze_passing_yards_distribution():
     # Overall statistics
     print("1. OVERALL STATISTICS")
     print("-" * 80)
-    print(f"Training (2018-2021):")
+    print("Training (2018-2021):")
     print(f"  Games: {len(train):,}")
     print(f"  Mean: {train['passing_yards'].mean():.2f} yards")
     print(f"  Median: {train['passing_yards'].median():.2f} yards")
     print(f"  Std Dev: {train['passing_yards'].std():.2f} yards")
     print()
-    print(f"Validation (2022-2024):")
+    print("Validation (2022-2024):")
     print(f"  Games: {len(val):,}")
     print(f"  Mean: {val['passing_yards'].mean():.2f} yards")
     print(f"  Median: {val['passing_yards'].median():.2f} yards")
     print(f"  Std Dev: {val['passing_yards'].std():.2f} yards")
     print()
-    print(f"DIFFERENCE:")
+    print("DIFFERENCE:")
     print(f"  Mean difference: {val['passing_yards'].mean() - train['passing_yards'].mean():.2f} yards")
     print(f"  ({(val['passing_yards'].mean() / train['passing_yards'].mean() - 1) * 100:.2f}% increase)")
     print()
@@ -110,9 +111,9 @@ def analyze_passing_yards_distribution():
     # Attempts analysis (check if game pace changed)
     print("4. PASSING ATTEMPTS ANALYSIS")
     print("-" * 80)
-    print(f"Training (2018-2021):")
+    print("Training (2018-2021):")
     print(f"  Mean attempts: {train['stat_attempts'].mean():.2f}")
-    print(f"Validation (2022-2024):")
+    print("Validation (2022-2024):")
     print(f"  Mean attempts: {val['stat_attempts'].mean():.2f}")
     print(f"Difference: {val['stat_attempts'].mean() - train['stat_attempts'].mean():.2f} attempts/game")
     print(f"  ({(val['stat_attempts'].mean() / train['stat_attempts'].mean() - 1) * 100:.2f}% change)")
@@ -162,12 +163,12 @@ def analyze_betting_lines():
 
     print("1. TOTAL SCORE PREDICTIONS")
     print("-" * 80)
-    print(f"Training (2018-2021):")
+    print("Training (2018-2021):")
     print(f"  Avg actual total: {train['actual_total'].mean():.2f}")
     print(f"  Avg betting total: {train['betting_total'].mean():.2f}")
     print(f"  Avg deviation: {train['total_deviation'].mean():.2f}")
     print()
-    print(f"Validation (2022-2024):")
+    print("Validation (2022-2024):")
     print(f"  Avg actual total: {val['actual_total'].mean():.2f}")
     print(f"  Avg betting total: {val['betting_total'].mean():.2f}")
     print(f"  Avg deviation: {val['total_deviation'].mean():.2f}")

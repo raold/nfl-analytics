@@ -8,19 +8,17 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-import pytest
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
 import sys
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from dashboard.queries.predictions_batched import (
-    BatchedPredictionQueries,
-    create_lookup_dict
-)
+from dashboard.queries.predictions_batched import BatchedPredictionQueries, create_lookup_dict
 
 
 class TestBatchedPredictionQueries:

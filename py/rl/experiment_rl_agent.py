@@ -10,15 +10,15 @@ Agents support:
 - Kelly-aware reward shaping for proper bet sizing
 """
 
+import random
+from collections import deque
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
-import numpy as np
-from typing import Dict, List, Tuple, Optional
-from collections import deque
-import random
 
 
 class DQNNetwork(nn.Module):
@@ -29,7 +29,7 @@ class DQNNetwork(nn.Module):
     """
 
     def __init__(self, state_dim: int = 44, action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128, 64]):
+                 hidden_dims: list[int] = [128, 128, 64]):
         super(DQNNetwork, self).__init__()
 
         layers = []
@@ -60,7 +60,7 @@ class ReplayBuffer:
         """Add experience to buffer"""
         self.buffer.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size: int) -> Tuple:
+    def sample(self, batch_size: int) -> tuple:
         """Sample random batch from buffer"""
         batch = random.sample(self.buffer, batch_size)
 
@@ -89,7 +89,7 @@ class DQNAgent:
     def __init__(self,
                  state_dim: int = 44,
                  action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128, 64],
+                 hidden_dims: list[int] = [128, 128, 64],
                  learning_rate: float = 1e-4,
                  gamma: float = 0.99,
                  epsilon_start: float = 1.0,
@@ -149,7 +149,7 @@ class DQNAgent:
         """Store experience in replay buffer"""
         self.replay_buffer.push(state, action, reward, next_state, done)
 
-    def train_step(self) -> Optional[float]:
+    def train_step(self) -> float | None:
         """
         Perform one training step using experience replay.
 
@@ -257,7 +257,7 @@ class PPOActorCritic(nn.Module):
     """
 
     def __init__(self, state_dim: int = 44, action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128]):
+                 hidden_dims: list[int] = [128, 128]):
         super(PPOActorCritic, self).__init__()
 
         # Shared base network
@@ -277,7 +277,7 @@ class PPOActorCritic(nn.Module):
         # Critic head (value function)
         self.critic = nn.Linear(prev_dim, 1)
 
-    def forward(self, state: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, state: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass.
 
@@ -307,7 +307,7 @@ class PPOAgent:
     def __init__(self,
                  state_dim: int = 44,
                  action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128],
+                 hidden_dims: list[int] = [128, 128],
                  learning_rate: float = 3e-4,
                  gamma: float = 0.99,
                  gae_lambda: float = 0.95,
@@ -343,7 +343,7 @@ class PPOAgent:
         self.policy_losses = []
         self.value_losses = []
 
-    def select_action(self, state: np.ndarray, training: bool = True) -> Tuple[int, float, float]:
+    def select_action(self, state: np.ndarray, training: bool = True) -> tuple[int, float, float]:
         """
         Select action using current policy.
 
@@ -378,7 +378,7 @@ class PPOAgent:
         self.values.append(value)
         self.dones.append(done)
 
-    def compute_gae(self) -> Tuple[np.ndarray, np.ndarray]:
+    def compute_gae(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Compute Generalized Advantage Estimation.
 
@@ -409,7 +409,7 @@ class PPOAgent:
 
         return advantages, returns
 
-    def train_step(self) -> Tuple[float, float]:
+    def train_step(self) -> tuple[float, float]:
         """
         Perform PPO update using collected experiences.
 
@@ -529,15 +529,15 @@ class AblationStudyRunner:
     Trains agents with different feature subsets to isolate experiment impact.
     """
 
-    def __init__(self, base_agent_class, base_agent_params: Dict):
+    def __init__(self, base_agent_class, base_agent_params: dict):
         self.base_agent_class = base_agent_class
         self.base_agent_params = base_agent_params
 
     def run_ablation(self,
                      env,
-                     experiment_indices: List[int],
+                     experiment_indices: list[int],
                      num_episodes: int = 100,
-                     experiment_name: str = "ablation") -> Dict:
+                     experiment_name: str = "ablation") -> dict:
         """
         Run ablation study by training agent with specific features removed.
 

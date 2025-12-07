@@ -45,7 +45,6 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -101,7 +100,7 @@ OUTPUT_FILE = Path("results/dirichlet_hyperparameter_tuning_v8.json")
 
 def generate_synthetic_predictions(
     n_games_per_season: int = 180
-) -> Dict[int, pd.DataFrame]:
+) -> dict[int, pd.DataFrame]:
     """
     Generate synthetic component predictions for testing the algorithm.
 
@@ -182,7 +181,7 @@ def generate_synthetic_predictions(
 # Data Loading
 # ============================================================================
 
-def load_component_predictions() -> Dict[int, pd.DataFrame]:
+def load_component_predictions() -> dict[int, pd.DataFrame]:
     """
     Load component predictions from v6 backtest CSV files.
 
@@ -242,8 +241,8 @@ def evaluate_configuration(
     prior_strength: float,
     likelihood_scale: float,
     scoring_rule: str,
-    predictions_by_season: Dict[int, pd.DataFrame]
-) -> Dict:
+    predictions_by_season: dict[int, pd.DataFrame]
+) -> dict:
     """
     Evaluate single hyperparameter configuration using prequential protocol.
 
@@ -346,10 +345,10 @@ def evaluate_configuration(
 # ============================================================================
 
 def run_grid_search(
-    predictions_by_season: Dict[int, pd.DataFrame],
+    predictions_by_season: dict[int, pd.DataFrame],
     test_mode: bool = False,
     checkpoint_file: Path = None
-) -> List[Dict]:
+) -> list[dict]:
     """
     Run grid search over hyperparameter space.
 
@@ -385,7 +384,7 @@ def run_grid_search(
     results = []
     if checkpoint_file and checkpoint_file.exists():
         logger.info(f"Resuming from checkpoint: {checkpoint_file}")
-        with open(checkpoint_file, "r") as f:
+        with open(checkpoint_file) as f:
             checkpoint_data = json.load(f)
         results = checkpoint_data.get("results", [])
         for result in results:
@@ -448,7 +447,7 @@ def run_grid_search(
 # Analysis & Reporting
 # ============================================================================
 
-def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.DataFrame]) -> Dict:
+def analyze_results(results: list[dict], predictions_by_season: dict[int, pd.DataFrame]) -> dict:
     """
     Analyze grid search results and identify best configuration.
 
@@ -500,14 +499,14 @@ def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.Dat
     logger.info(f"Baseline (v6.0 static):      {baseline_mae:.2f} yards MAE")
     logger.info(f"Best (Dirichlet adaptive):   {best['mae_2024']:.2f} yards MAE")
     logger.info(f"Improvement:                 {improvement:.2f} yards ({pct_improvement:.1f}%)")
-    logger.info(f"\nBest Configuration:")
+    logger.info("\nBest Configuration:")
     logger.info(f"  Prior strength:            {best['prior_strength']}")
     logger.info(f"  Likelihood scale:          {best['likelihood_scale']}")
     logger.info(f"  Scoring rule:              {best['scoring_rule']}")
-    logger.info(f"\nLearned Weights (after 2022-2023 warmup):")
+    logger.info("\nLearned Weights (after 2022-2023 warmup):")
     for name, weight in best["final_weights"].items():
         logger.info(f"  {name:30s} {weight:.3f}")
-    logger.info(f"\nWeight Statistics:")
+    logger.info("\nWeight Statistics:")
     logger.info(f"  Min weight:                {best['min_weight']:.3f}")
     logger.info(f"  Max weight:                {best['max_weight']:.3f}")
     logger.info(f"  Variance:                  {best['weight_variance']:.4f}")
@@ -624,7 +623,7 @@ def main():
 
     # Check if target improvement achieved
     if analysis["improvement_yards"] >= 1.5:
-        logger.info(f"\n🎯 SUCCESS: Target improvement ≥1.5 yards achieved!")
+        logger.info("\n🎯 SUCCESS: Target improvement ≥1.5 yards achieved!")
     else:
         logger.warning(
             f"\n⚠️  Target improvement (≥1.5 yards) not achieved. "

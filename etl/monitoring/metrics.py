@@ -10,10 +10,10 @@ Tracks ETL pipeline performance metrics:
 
 import json
 import logging
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import psycopg
 
@@ -27,7 +27,7 @@ class PipelineMetrics:
     pipeline_name: str
     run_id: str
     start_time: datetime
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
     status: str = "running"  # running, success, failed, partial
 
     # Row counts
@@ -51,8 +51,8 @@ class PipelineMetrics:
     # Metadata
     source: str = ""
     target_table: str = ""
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    error_message: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def total_duration(self) -> float:
@@ -74,14 +74,14 @@ class PipelineMetrics:
         """Pipeline completed successfully."""
         return self.status == "success"
 
-    def complete(self, status: str = "success", error_message: Optional[str] = None):
+    def complete(self, status: str = "success", error_message: str | None = None):
         """Mark pipeline as complete."""
         self.end_time = datetime.now()
         self.status = status
         if error_message:
             self.error_message = error_message
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         data = asdict(self)
         # Convert datetime to ISO format
@@ -119,8 +119,8 @@ class MetricsCollector:
 
     def __init__(
         self,
-        db_conn: Optional[psycopg.Connection] = None,
-        metrics_dir: Optional[Path] = None
+        db_conn: psycopg.Connection | None = None,
+        metrics_dir: Path | None = None
     ):
         """
         Initialize metrics collector.
@@ -136,7 +136,7 @@ class MetricsCollector:
         self.metrics_dir.mkdir(parents=True, exist_ok=True)
 
         # In-memory cache of recent metrics
-        self.recent_metrics: List[PipelineMetrics] = []
+        self.recent_metrics: list[PipelineMetrics] = []
         self.max_recent = 100
 
     def record(self, metrics: PipelineMetrics):
@@ -255,7 +255,7 @@ class MetricsCollector:
         except Exception as e:
             logger.error(f"Failed to save metrics to database: {e}")
 
-    def get_recent(self, limit: int = 10) -> List[PipelineMetrics]:
+    def get_recent(self, limit: int = 10) -> list[PipelineMetrics]:
         """Get most recent metrics."""
         return self.recent_metrics[-limit:]
 
@@ -263,7 +263,7 @@ class MetricsCollector:
         self,
         pipeline_name: str,
         lookback_hours: int = 24
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get statistics for a pipeline.
 
@@ -302,7 +302,7 @@ class MetricsCollector:
             "last_run": max(m.start_time for m in recent).isoformat(),
         }
 
-    def get_summary(self, lookback_hours: int = 24) -> Dict[str, Any]:
+    def get_summary(self, lookback_hours: int = 24) -> dict[str, Any]:
         """
         Get summary of all pipeline activity.
 

@@ -8,11 +8,10 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-import streamlit as st
 import logging
-from typing import Optional, List
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -439,7 +438,7 @@ def add_rank_column(df: pd.DataFrame, metric_column: str, lower_is_better: bool 
     return df_ranked[cols]
 
 
-def filter_table_by_status(df: pd.DataFrame, status_values: List[str], status_column: str = 'Status') -> pd.DataFrame:
+def filter_table_by_status(df: pd.DataFrame, status_values: list[str], status_column: str = 'Status') -> pd.DataFrame:
     """
     Filter table by status values.
 

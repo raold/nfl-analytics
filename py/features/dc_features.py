@@ -23,10 +23,9 @@ Date: November 26, 2025
 
 import logging
 import math
-from typing import Dict, Optional, Tuple
+from functools import lru_cache
 
 import psycopg2
-from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class DCFeatureGenerator:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         cache_size: int = 1024,
         halflife_weeks: float = 4.0
     ):
@@ -72,7 +71,7 @@ class DCFeatureGenerator:
             self._conn = None
 
     @lru_cache(maxsize=1024)
-    def get_dc_continuity(self, team: str, season: int) -> Tuple[int, str, str]:
+    def get_dc_continuity(self, team: str, season: int) -> tuple[int, str, str]:
         """
         Check if DC is same as previous season.
 
@@ -162,8 +161,8 @@ class DCFeatureGenerator:
         team: str,
         season: int,
         week: int,
-        opponent: Optional[str] = None
-    ) -> Dict[str, float]:
+        opponent: str | None = None
+    ) -> dict[str, float]:
         """
         Get all DC features for a team-season-week.
 
@@ -220,7 +219,7 @@ class DCFeatureGenerator:
         opponent: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get DC features adjusted for opponent's defensive coordinator situation.
 
@@ -251,7 +250,6 @@ class DCFeatureGenerator:
 
 def main():
     """Test DC feature generation."""
-    import sys
 
     logging.basicConfig(level=logging.INFO)
 

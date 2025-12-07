@@ -5,22 +5,20 @@ NFL Analytics Monitoring Dashboard
 Real-time monitoring of prediction performance, CLV, and model metrics.
 """
 
-import streamlit as st
+import hashlib
+import logging
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
 import psycopg
-from datetime import datetime, timedelta
-import numpy as np
-import os
-import logging
-from zoneinfo import ZoneInfo
 import requests
-import time
-import hashlib
-import sys
-from pathlib import Path
+import streamlit as st
+from plotly.subplots import make_subplots
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -287,7 +285,7 @@ def fetch_model_comparison():
 def fetch_live_scores(season, week):
     """Fetch live scores from ESPN API."""
     try:
-        url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+        url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
         params = {
             'limit': 100
         }
@@ -361,7 +359,7 @@ def fetch_live_scores(season, week):
                             'period': period,
                             'detail': detail
                         }
-                except Exception as e:
+                except Exception:
                     continue
 
         return live_scores
@@ -885,7 +883,7 @@ def check_service_health(host, port, service_name):
         result = sock.connect_ex((host, port))
         sock.close()
         return result == 0
-    except Exception as e:
+    except Exception:
         return False
 
 def fetch_database_stats():
@@ -945,7 +943,7 @@ def fetch_model_registry():
         with psycopg.connect(**DB_CONFIG) as conn:
             df = pd.read_sql_query(query, conn)
         return df
-    except Exception as e:
+    except Exception:
         return pd.DataFrame()
 
 def fetch_training_runs():
@@ -967,7 +965,7 @@ def fetch_training_runs():
         with psycopg.connect(**DB_CONFIG) as conn:
             df = pd.read_sql_query(query, conn)
         return df
-    except Exception as e:
+    except Exception:
         return pd.DataFrame()
 
 def render_game_predictions_page():
@@ -1387,8 +1385,8 @@ def render_model_status_page():
 
     # Check models directory (handle both local and Docker paths)
     try:
-        import os
         import glob
+        import os
 
         # Try multiple possible model directory locations
         possible_dirs = [
@@ -1419,7 +1417,7 @@ def render_model_status_page():
                             'size_mb': stat.st_size / (1024 * 1024),
                             'modified': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
                         })
-                    except Exception as e:
+                    except Exception:
                         continue
 
             if model_files:

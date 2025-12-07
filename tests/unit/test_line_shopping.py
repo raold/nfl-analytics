@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.339693
 Test count: 66
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.line_shopping import *
-import pandas as pd
-import pytest
 
 
 def test_american_odds_to_prob_basic():

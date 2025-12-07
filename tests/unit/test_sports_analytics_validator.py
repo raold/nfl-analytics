@@ -10,14 +10,12 @@ Tests NFL domain rule validation:
 - SQL query logic checking
 """
 
-import pytest
 import pandas as pd
+
 from py.utils.sports_analytics_validator import (
-    SportsAnalyticsValidator,
-    Severity,
-    ValidationIssue,
     NFL_TEAMS,
-    STAT_LIMITS,
+    Severity,
+    SportsAnalyticsValidator,
 )
 
 

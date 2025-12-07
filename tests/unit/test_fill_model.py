@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.294398
 Test count: 8
 """
 
+import pytest
 from execution.fill_model import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_fit_fill_basic():

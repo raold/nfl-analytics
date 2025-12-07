@@ -127,9 +127,9 @@ def test_grid_search():
         metric='mae',
     )
 
-    print(f"\n4. Grid search results:")
+    print("\n4. Grid search results:")
     print(f"   Optimal halflife: {optimal_halflife} weeks")
-    print(f"   Optimal weights:")
+    print("   Optimal weights:")
     for name in sorted(optimal_weights.keys(), key=lambda x: -optimal_weights[x]):
         print(f"     {name:25s}: {optimal_weights[name]:.4f} ({optimal_weights[name]*100:.1f}%)")
 

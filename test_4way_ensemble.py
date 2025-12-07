@@ -10,7 +10,6 @@ Date: November 9, 2025
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
@@ -18,7 +17,9 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import logging
 import time
+
 import numpy as np
+
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 # Setup logging
@@ -172,7 +173,7 @@ def main():
         logger.info("✅ ALL TESTS PASSED")
         logger.info("="*80)
         logger.info(f"Total time: {elapsed:.2f}s")
-        
+
         # Determine ensemble configuration
         num_models = len(result.get('weights', {}))
         if num_models == 4:
@@ -182,7 +183,7 @@ def main():
             logger.info("Recommendation: Retrain brms models with better convergence")
         else:
             logger.info(f"\n⚠️  PARTIAL ENSEMBLE ({num_models} models)")
-        
+
         logger.info("\nNEXT STEPS:")
         logger.info("1. Review individual model predictions for reasonableness")
         logger.info("2. Run batch predictions for Week 10 2024")

@@ -23,13 +23,10 @@ import argparse
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
-from datetime import datetime
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from scipy import stats
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -138,7 +135,7 @@ class ABTestRunner:
         season: int,
         week: int,
         actual_yards: float
-    ) -> Dict:
+    ) -> dict:
         """
         Test PostgreSQL lookup method.
 
@@ -202,7 +199,7 @@ class ABTestRunner:
         season: int,
         week: int,
         actual_yards: float
-    ) -> Dict:
+    ) -> dict:
         """
         Test rpy2 real-time prediction method.
 
@@ -281,7 +278,7 @@ class ABTestRunner:
         self,
         season: int = 2024,
         sample_size: int = None
-    ) -> Dict:
+    ) -> dict:
         """
         Run A/B test comparing lookup vs rpy2.
 
@@ -347,7 +344,7 @@ class ABTestRunner:
         # Analyze results
         return self.analyze_results()
 
-    def analyze_results(self) -> Dict:
+    def analyze_results(self) -> dict:
         """
         Analyze A/B test results and determine success/failure.
 
@@ -398,11 +395,11 @@ class ABTestRunner:
 
     def _analyze_method_results(
         self,
-        results: List[Dict],
-        latencies: List[float],
-        errors: List[str],
+        results: list[dict],
+        latencies: list[float],
+        errors: list[str],
         method_name: str
-    ) -> Dict:
+    ) -> dict:
         """Analyze results for a single method."""
         print(f"\n{method_name} Method Results:")
         print("-" * 80)
@@ -418,7 +415,7 @@ class ABTestRunner:
 
         # Latency stats
         if len(latencies) > 0:
-            print(f"Latency Statistics:")
+            print("Latency Statistics:")
             print(f"  Mean: {np.mean(latencies):.2f} ms")
             print(f"  Median (p50): {np.median(latencies):.2f} ms")
             print(f"  p95: {np.percentile(latencies, 95):.2f} ms")
@@ -443,7 +440,7 @@ class ABTestRunner:
                 model_mae[model] = np.mean(errors)
 
         if model_mae:
-            print(f"Prediction Accuracy (MAE):")
+            print("Prediction Accuracy (MAE):")
             for model, mae in model_mae.items():
                 print(f"  {model}: {mae:.2f} yards")
             print(f"  Average: {np.mean(list(model_mae.values())):.2f} yards")
@@ -476,9 +473,9 @@ class ABTestRunner:
 
     def _compare_methods(
         self,
-        lookup_stats: Dict,
-        rpy2_stats: Dict
-    ) -> Dict:
+        lookup_stats: dict,
+        rpy2_stats: dict
+    ) -> dict:
         """Compare lookup vs rpy2."""
         print("\n" + "=" * 80)
         print("METHOD COMPARISON")
@@ -497,7 +494,7 @@ class ABTestRunner:
             mae_diff = abs(lookup_mae - rpy2_mae)
             mae_within_tolerance = mae_diff <= self.MAE_TOLERANCE_YARDS
 
-            print(f"Prediction Accuracy (MAE):")
+            print("Prediction Accuracy (MAE):")
             print(f"  Lookup: {lookup_mae:.2f} yards")
             print(f"  rpy2: {rpy2_mae:.2f} yards")
             print(f"  Difference: {mae_diff:.2f} yards")
@@ -514,7 +511,7 @@ class ABTestRunner:
         if lookup_latency is not None and rpy2_latency is not None:
             speedup = rpy2_latency / lookup_latency
 
-            print(f"Latency:")
+            print("Latency:")
             print(f"  Lookup: {lookup_latency:.2f} ms")
             print(f"  rpy2: {rpy2_latency:.2f} ms")
             print(f"  Speedup: {speedup:.1f}x faster")
@@ -527,7 +524,7 @@ class ABTestRunner:
         lookup_success_rate = lookup_stats.get('success_rate', 0.0) / 100
         rpy2_success_rate = rpy2_stats.get('success_rate', 0.0) / 100
 
-        print(f"Reliability:")
+        print("Reliability:")
         print(f"  Lookup success rate: {lookup_success_rate*100:.1f}%")
         print(f"  rpy2 success rate: {rpy2_success_rate*100:.1f}%")
         print(f"  Lookup meets target (≥{self.MIN_SUCCESS_RATE*100:.0f}%)? {'✅ YES' if lookup_success_rate >= self.MIN_SUCCESS_RATE else '❌ NO'}")
@@ -543,8 +540,8 @@ class ABTestRunner:
 
     def _evaluate_success_criteria(
         self,
-        lookup_stats: Dict,
-        comparison: Dict
+        lookup_stats: dict,
+        comparison: dict
     ) -> bool:
         """
         Evaluate if success criteria are met.
@@ -567,7 +564,7 @@ class ABTestRunner:
             criteria_met.append(mae_within_tolerance)
             print(f"1. MAE within ±{self.MAE_TOLERANCE_YARDS} yards: {'✅ PASS' if mae_within_tolerance else '❌ FAIL'}")
         else:
-            print(f"1. MAE tolerance: ⚠️  SKIPPED (rpy2 not available)")
+            print("1. MAE tolerance: ⚠️  SKIPPED (rpy2 not available)")
 
         # Criterion 2: Latency
         lookup_latency = lookup_stats.get('mean_latency_ms')

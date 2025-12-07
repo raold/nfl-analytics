@@ -14,20 +14,20 @@ Author: Claude (Anthropic)
 Date: November 9, 2025
 """
 
-import pytest
+import os
+import sys
+
 import numpy as np
+import pytest
 import torch
-import torch.nn as nn
 from sklearn.datasets import make_regression
 
-import sys
-import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from py.models.evidential_regression import (
-    EvidentialNeuralNetwork,
     EvidentialLoss,
-    EvidentialRegressor
+    EvidentialNeuralNetwork,
+    EvidentialRegressor,
 )
 
 

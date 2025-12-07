@@ -32,19 +32,16 @@ Integration:
     - Weekly: Check database query performance
 """
 
-import ast
 import cProfile
 import io
+import logging
 import pstats
 import re
-import subprocess
-import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-import logging
+from typing import Any
 
 try:
     import psycopg2
@@ -53,8 +50,8 @@ except ImportError:
     POSTGRES_AVAILABLE = False
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -93,16 +90,16 @@ class OptimizationIssue:
     current_performance: str
     expected_improvement: str
     suggestion: str
-    location: Optional[str] = None
-    line_number: Optional[int] = None
-    code_snippet: Optional[str] = None
+    location: str | None = None
+    line_number: int | None = None
+    code_snippet: str | None = None
 
 
 @dataclass
 class PerformanceReport:
     """Performance optimization report."""
     scan_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    issues: List[OptimizationIssue] = field(default_factory=list)
+    issues: list[OptimizationIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
@@ -181,8 +178,8 @@ class PerformanceOptimizer:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        db_connection_string: Optional[str] = None
+        project_root: Path | None = None,
+        db_connection_string: str | None = None
     ):
         """
         Initialize performance optimizer.
@@ -209,7 +206,7 @@ class PerformanceOptimizer:
 
         logger.info(f"PerformanceOptimizer initialized for {project_root}")
 
-    def profile_python(self, file_path: str, function_name: Optional[str] = None) -> Dict[str, Any]:
+    def profile_python(self, file_path: str, function_name: str | None = None) -> dict[str, Any]:
         """
         Profile Python script or function.
 
@@ -297,7 +294,7 @@ class PerformanceOptimizer:
                 except (ValueError, IndexError):
                     continue
 
-    def analyze_query(self, query: str) -> List[OptimizationIssue]:
+    def analyze_query(self, query: str) -> list[OptimizationIssue]:
         """
         Analyze SQL query for performance issues.
 
@@ -359,7 +356,7 @@ class PerformanceOptimizer:
         tune: int,
         draws: int,
         sampler: str = "NUTS"
-    ) -> List[OptimizationIssue]:
+    ) -> list[OptimizationIssue]:
         """
         Check MCMC configuration for efficiency.
 
@@ -412,7 +409,7 @@ class PerformanceOptimizer:
 
         return issues
 
-    def analyze_pandas_code(self, code: str, file_path: Optional[str] = None) -> List[OptimizationIssue]:
+    def analyze_pandas_code(self, code: str, file_path: str | None = None) -> list[OptimizationIssue]:
         """
         Analyze Pandas code for inefficiencies.
 
@@ -482,7 +479,7 @@ class PerformanceOptimizer:
         num_games: int = 148,
         models_per_game: int = 5,
         avg_prediction_time: float = 1.0
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Estimate backtest completion time.
 
@@ -531,15 +528,15 @@ class PerformanceOptimizer:
         lines.append("PERFORMANCE OPTIMIZATION REPORT")
         lines.append("=" * 80)
         lines.append(f"\nScan Date: {self.report.scan_date}")
-        lines.append(f"\nOptimization Opportunities:")
+        lines.append("\nOptimization Opportunities:")
         lines.append(f"  🔴 CRITICAL: {self.report.critical_count} (>10x speedup)")
         lines.append(f"  🟠 HIGH:     {self.report.high_count} (>3x speedup)")
         lines.append(f"  🟡 MEDIUM:   {self.report.medium_count} (>1.5x speedup)")
         lines.append(f"  🟢 LOW:      {self.report.low_count} (minor)")
 
         if self.report.critical_count > 0:
-            lines.append(f"\n⚠️  CRITICAL PERFORMANCE ISSUES")
-            lines.append(f"   Immediate optimization recommended")
+            lines.append("\n⚠️  CRITICAL PERFORMANCE ISSUES")
+            lines.append("   Immediate optimization recommended")
 
         # Group by severity
         for severity in [OptimizationSeverity.CRITICAL, OptimizationSeverity.HIGH,

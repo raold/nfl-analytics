@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.271506
 Test count: 28
 """
 
+import pytest
 from hardware.task_router import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_get_task_score_basic():

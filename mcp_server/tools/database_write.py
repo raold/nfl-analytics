@@ -3,11 +3,11 @@ Database write operations for NFL analytics MCP server.
 Provides safe INSERT/UPDATE operations for model registry and predictions.
 """
 
-import psycopg2
 import json
-from typing import Dict, Any, Optional
 import logging
-from datetime import datetime
+from typing import Any
+
+import psycopg2
 
 from mcp_server.tools.database import get_db_connection
 
@@ -20,10 +20,10 @@ def insert_model_metadata(
     model_type: str,
     model_family: str,
     model_path: str,
-    description: Optional[str] = None,
-    notes: Optional[str] = None,
+    description: str | None = None,
+    notes: str | None = None,
     **kwargs
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Insert model metadata into ml.model_registry.
 
@@ -106,8 +106,8 @@ def insert_model_metadata(
 def update_model_status(
     model_id: int,
     status: str,
-    notes: Optional[str] = None
-) -> Dict[str, Any]:
+    notes: str | None = None
+) -> dict[str, Any]:
     """
     Update model status in registry.
 
@@ -186,7 +186,7 @@ def insert_prediction_batch(
     model_id: int,
     game_week: str,
     predictions: list
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Insert a batch of predictions for a game week.
 

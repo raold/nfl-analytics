@@ -174,7 +174,7 @@ def run_comparison_backtest(
         se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
         z_score = (p2 - p1) / se if se > 0 else 0
 
-        print(f"\nStatistical Significance:")
+        print("\nStatistical Significance:")
         print(f"  Z-score: {z_score:.2f}")
         print(f"  {'Significant at p<0.05' if abs(z_score) > 1.96 else 'Not significant at p<0.05'}")
 
@@ -189,9 +189,9 @@ def run_comparison_backtest(
         print(f"✓ Baseline model profit: ${baseline_summary['final_bankroll'] - initial_bankroll:+,.2f}")
         print(f"✓ Additional profit from Phase 5: ${profit_improvement:+,.2f}")
     else:
-        print(f"\n✗ Phase 5 features did NOT improve ROI")
+        print("\n✗ Phase 5 features did NOT improve ROI")
         print(f"  ROI change: {roi_improvement:.2%}")
-        print(f"  Possible reasons: overfitting, insufficient data, or features not capturing edge")
+        print("  Possible reasons: overfitting, insufficient data, or features not capturing edge")
 
     # Package results
     results = {

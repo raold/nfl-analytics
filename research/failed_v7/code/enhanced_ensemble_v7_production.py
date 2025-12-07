@@ -56,7 +56,6 @@ import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -237,7 +236,7 @@ class EnhancedEnsemble7Way:
                     ridge_data = pickle.load(f)
                     self.ridge_model = ridge_data['ridge']
                     self.ridge_scaler = ridge_data['scaler']
-                logger.info(f"✅ Ridge model loaded")
+                logger.info("✅ Ridge model loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load Ridge model: {e}")
 
@@ -246,7 +245,7 @@ class EnhancedEnsemble7Way:
             try:
                 self.xgboost_v4_model = xgb.Booster()
                 self.xgboost_v4_model.load_model(str(self.xgboost_v4_path))
-                logger.info(f"✅ XGBoost v4 loaded")
+                logger.info("✅ XGBoost v4 loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load XGBoost v4: {e}")
 
@@ -271,7 +270,7 @@ class EnhancedEnsemble7Way:
         if self.use_meta_learning and self.meta_model_path.exists():
             try:
                 self.meta_model = MetaLearningWeightPredictor.load(str(self.meta_model_path))
-                logger.info(f"✅ Meta-learning model loaded")
+                logger.info("✅ Meta-learning model loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load meta-model: {e}")
                 self.use_meta_learning = False
@@ -279,7 +278,7 @@ class EnhancedEnsemble7Way:
         # Load WLS weights (v7.0)
         if self.use_wls_recency and self.wls_weights_path.exists():
             try:
-                with open(self.wls_weights_path, 'r') as f:
+                with open(self.wls_weights_path) as f:
                     wls_data = json.load(f)
                     self.wls_weights = wls_data['weights']
                     self.wls_halflife = wls_data['metadata'].get('halflife', 4.0)
@@ -298,7 +297,7 @@ class EnhancedEnsemble7Way:
                     db_user=self.db_config['user'],
                     db_password=self.db_config['password'],
                 )
-                logger.info(f"✅ Context engine initialized")
+                logger.info("✅ Context engine initialized")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to initialize context engine: {e}")
                 self.use_meta_learning = False
@@ -341,7 +340,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get XGBoost v4 prediction (Ridge baseline + residual).
 
@@ -413,7 +412,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get Hierarchical v2 prediction via R model interface.
 
@@ -449,7 +448,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get Informative Priors v2 prediction via R model interface.
 
@@ -485,7 +484,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get State-Space v2 prediction via R model interface.
 
@@ -526,7 +525,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get ELO-based prediction using simple linear conversion.
 
@@ -614,7 +613,7 @@ class EnhancedEnsemble7Way:
         ensemble_version: str = 'v7.0',
         n_recent: int = 50,
         halflife_weeks: float = 4.0,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Get recent ensemble prediction errors for WLS bias correction.
 
@@ -693,7 +692,7 @@ class EnhancedEnsemble7Way:
         ensemble_mean_raw: float,
         ensemble_version: str = 'v7.0',
         halflife_weeks: float = 4.0,
-    ) -> Tuple[float, float, Dict]:
+    ) -> tuple[float, float, dict]:
         """
         Apply WLS bias correction to WHOLE ENSEMBLE prediction.
 
@@ -759,7 +758,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Tuple[Dict[str, float], Dict]:
+    ) -> tuple[dict[str, float], dict]:
         """
         Compute adaptive ensemble weights using meta-learning + WLS.
 
@@ -847,7 +846,7 @@ class EnhancedEnsemble7Way:
         season: int,
         week: int,
         return_components: bool = False,
-    ) -> Dict:
+    ) -> dict:
         """
         Generate ensemble prediction with adaptive weights.
 

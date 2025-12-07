@@ -15,13 +15,13 @@ Date: November 26, 2025
 """
 
 import argparse
+import logging
+import re
 import time
-from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import logging
-import re
 
 # Setup logging
 logging.basicConfig(
@@ -82,7 +82,7 @@ class WikipediaCoachingScraper:
 
     def scrape_team_season(
         self, team_abbr: str, season: int, retry_count: int = 3
-    ) -> Optional[Dict[str, str]]:
+    ) -> dict[str, str] | None:
         """
         Scrape coaching staff for a single team-season from Wikipedia.
 
@@ -149,7 +149,7 @@ class WikipediaCoachingScraper:
 
         return None
 
-    def _extract_from_infobox(self, soup: BeautifulSoup, team_abbr: str, season: int) -> Optional[Dict[str, str]]:
+    def _extract_from_infobox(self, soup: BeautifulSoup, team_abbr: str, season: int) -> dict[str, str] | None:
         """
         Extract coaching staff from Wikipedia infobox.
 
@@ -194,7 +194,7 @@ class WikipediaCoachingScraper:
 
         return coaches_data
 
-    def _extract_from_text(self, soup: BeautifulSoup, team_abbr: str, season: int) -> Optional[Dict[str, str]]:
+    def _extract_from_text(self, soup: BeautifulSoup, team_abbr: str, season: int) -> dict[str, str] | None:
         """
         Extract coaching staff from article text (fallback method).
 
@@ -239,7 +239,7 @@ class WikipediaCoachingScraper:
 
         return coaches_data
 
-    def _clean_coach_name(self, text: str) -> Optional[str]:
+    def _clean_coach_name(self, text: str) -> str | None:
         """
         Clean coach name from Wikipedia text.
 
@@ -301,7 +301,7 @@ class WikipediaCoachingScraper:
         df = pd.DataFrame(all_data)
         return df
 
-    def validate_data(self, df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    def validate_data(self, df: pd.DataFrame) -> tuple[bool, list[str]]:
         """Validate scraped coaching data."""
         if len(df) == 0:
             return False, ["DataFrame is empty - no data scraped"]

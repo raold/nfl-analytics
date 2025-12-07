@@ -31,13 +31,11 @@ Date: November 9, 2025
 import argparse
 import json
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 logging.basicConfig(
     level=logging.INFO,
@@ -67,23 +65,23 @@ class ModelPerformance:
 class WeightingResult:
     """Results from a weighting method."""
     method: str
-    weights: Dict[str, float]
+    weights: dict[str, float]
     ensemble_mae: float
     ensemble_rmse: float
     ensemble_std: float
     calibration_90: float
     improvement_vs_best_single: float
-    sharpe_ratio: Optional[float] = None
+    sharpe_ratio: float | None = None
 
 
 @dataclass
 class OptimizationResult:
     """Final optimization result."""
     optimal_method: str
-    optimal_weights: Dict[str, float]
-    all_methods: List[WeightingResult]
+    optimal_weights: dict[str, float]
+    all_methods: list[WeightingResult]
     comparison_table: pd.DataFrame
-    metadata: Dict
+    metadata: dict
 
 
 # ============================================================================
@@ -135,7 +133,7 @@ def compute_model_performance(
     df: pd.DataFrame,
     model_name: str,
     pred_col: str,
-    std_col: Optional[str] = None
+    std_col: str | None = None
 ) -> ModelPerformance:
     """
     Compute performance metrics for a single model.
@@ -188,7 +186,7 @@ def compute_model_performance(
     )
 
 
-def inverse_variance_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def inverse_variance_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute weights using inverse variance weighting.
 
@@ -211,7 +209,7 @@ def inverse_variance_weighting(performances: List[ModelPerformance]) -> Dict[str
     return {p.name: float(w) for p, w in zip(performances, weights)}
 
 
-def equal_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def equal_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute equal weights (baseline).
 
@@ -228,7 +226,7 @@ def equal_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
     return {p.name: weight for p in performances}
 
 
-def performance_based_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def performance_based_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute weights based on inverse MAE.
 
@@ -253,8 +251,8 @@ def performance_based_weighting(performances: List[ModelPerformance]) -> Dict[st
 
 def compute_ensemble_predictions(
     df: pd.DataFrame,
-    weights: Dict[str, float],
-    model_columns: Dict[str, str]
+    weights: dict[str, float],
+    model_columns: dict[str, str]
 ) -> np.ndarray:
     """
     Compute weighted ensemble predictions.
@@ -278,9 +276,9 @@ def compute_ensemble_predictions(
 
 def evaluate_weighting_method(
     df: pd.DataFrame,
-    weights: Dict[str, float],
-    model_columns: Dict[str, str],
-    std_columns: Dict[str, str],
+    weights: dict[str, float],
+    model_columns: dict[str, str],
+    std_columns: dict[str, str],
     method_name: str,
     best_single_mae: float
 ) -> WeightingResult:
@@ -346,7 +344,7 @@ def evaluate_weighting_method(
     )
 
 
-def select_optimal_method(results: List[WeightingResult]) -> WeightingResult:
+def select_optimal_method(results: list[WeightingResult]) -> WeightingResult:
     """
     Select optimal weighting method based on multiple criteria.
 
@@ -371,15 +369,15 @@ def select_optimal_method(results: List[WeightingResult]) -> WeightingResult:
     else:
         # Fallback: select lowest MAE (even if not well-calibrated)
         best = min(results, key=lambda r: r.ensemble_mae)
-        logger.warning(f"⚠ No method meets calibration threshold (89%)")
+        logger.warning("⚠ No method meets calibration threshold (89%)")
         logger.warning(f"  Selected {best.method} (lowest MAE, calibration: {best.calibration_90:.1f}%)")
 
     return best
 
 
 def create_comparison_table(
-    performances: List[ModelPerformance],
-    results: List[WeightingResult]
+    performances: list[ModelPerformance],
+    results: list[WeightingResult]
 ) -> pd.DataFrame:
     """
     Create comparison table of all methods.

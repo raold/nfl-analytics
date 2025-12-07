@@ -184,7 +184,7 @@ class RealisticBacktest(GameOutcomeBacktest):
         print(f"Backtest period: {df['season'].min()}-{df['season'].max()}")
         print(f"Games: {len(df)}")
         print(f"Initial bankroll: ${self.initial_bankroll:,.2f}")
-        print(f"\nSTRICT CONSTRAINTS:")
+        print("\nSTRICT CONSTRAINTS:")
         print(f"  Max bet fraction: {self.max_bet_frac:.1%} (vs 10% standard)")
         print(f"  Max bet absolute: ${self.max_bet_absolute:,.0f}")
         print(f"  Probability clipping: [{self.prob_clip_min:.2f}, {self.prob_clip_max:.2f}] (vs [0.05, 0.95] standard)")

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.455702
 Test count: 4
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from sim.execution import *
-import pandas as pd
-import pytest
 
 
 def test_simulate_order_basic():

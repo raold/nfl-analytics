@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:29.436446
 Test count: 9
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from viz.production_dashboard import *
-import pandas as pd
 import pytest
+from viz.production_dashboard import *
 
 
 def test_get_performance_monitor_basic():

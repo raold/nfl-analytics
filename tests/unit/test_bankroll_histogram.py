@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.115259
 Test count: 7
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.bankroll_histogram import *
-import pandas as pd
-import pytest
 
 
 def test_generate_bankroll_histogram_basic():

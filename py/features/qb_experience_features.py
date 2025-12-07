@@ -21,7 +21,6 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -99,7 +98,7 @@ class QBExperienceFeatures:
         player_id: str,
         season: int,
         week: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract QB experience features for a given player-game.
 
@@ -181,7 +180,7 @@ class QBExperienceFeatures:
             conn.close()
             return self._get_default_features()
 
-    def _get_default_features(self) -> Dict[str, float]:
+    def _get_default_features(self) -> dict[str, float]:
         """
         Return default features when extraction fails.
 
@@ -197,8 +196,8 @@ class QBExperienceFeatures:
 
     def one_hot_encode(
         self,
-        features: Dict[str, float]
-    ) -> Dict[str, float]:
+        features: dict[str, float]
+    ) -> dict[str, float]:
         """
         One-hot encode experience category for model input.
 
@@ -230,7 +229,7 @@ class QBExperienceFeatures:
 
 def query_qb_experience_batch(
     player_season_weeks: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract QB experience for multiple player-games.

@@ -17,7 +17,6 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 try:
     import psycopg
@@ -37,8 +36,8 @@ class CheckResult:
     name: str
     status: Status
     message: str
-    row_count: Optional[int] = None
-    expected_min: Optional[int] = None
+    row_count: int | None = None
+    expected_min: int | None = None
 
 
 def get_connection():
@@ -109,7 +108,7 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                 return CheckResult(
                     name=table,
                     status=Status.FAIL if criticality == "critical" else Status.WARN,
-                    message=f"Table/view does not exist",
+                    message="Table/view does not exist",
                     expected_min=min_rows
                 )
 

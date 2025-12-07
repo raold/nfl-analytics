@@ -8,17 +8,17 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-import torch
-from pathlib import Path
 import logging
-from typing import Dict, List
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import torch
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.models.lstm_drive_prediction import DriveLSTM, LSTMConfig
+from py.models.lstm_drive_prediction import DriveLSTM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,8 +62,8 @@ class DriveToGameAggregator:
     def predict_game_drives(
         self,
         game_drives: pd.DataFrame,
-        feature_cols: List[str]
-    ) -> Dict[str, np.ndarray]:
+        feature_cols: list[str]
+    ) -> dict[str, np.ndarray]:
         """
         Predict outcomes for all drives in a game.
 
@@ -114,7 +114,7 @@ class DriveToGameAggregator:
     def aggregate_to_game_level(
         self,
         games_df: pd.DataFrame,
-        feature_cols: List[str]
+        feature_cols: list[str]
     ) -> pd.DataFrame:
         """
         Aggregate drive predictions to game level.
@@ -168,7 +168,7 @@ class DriveToGameAggregator:
 
         return results_df
 
-    def compute_metrics(self, results_df: pd.DataFrame) -> Dict[str, float]:
+    def compute_metrics(self, results_df: pd.DataFrame) -> dict[str, float]:
         """
         Compute evaluation metrics.
 

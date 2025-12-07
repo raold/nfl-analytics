@@ -252,7 +252,7 @@ def test_meta_model_training():
     predictor.save(output_path)
 
     loaded_predictor = MetaLearningWeightPredictor.load(output_path)
-    print(f"  ✅ Model saved and loaded successfully")
+    print("  ✅ Model saved and loaded successfully")
 
     print("\n" + "=" * 80)
     print("✅ All tests passed!")

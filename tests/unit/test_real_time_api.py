@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.394683
 Test count: 8
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.real_time_api import *
-import pandas as pd
-import pytest
 
 
 def test_get_cache_key_basic():

@@ -14,12 +14,12 @@ Created: November 19, 2025
 Purpose: Re-validate ensemble after XGBoost v4 Ridge recovery
 """
 
-import sys
 import json
+import sys
 import time
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -74,7 +74,7 @@ def validate_season(
     ensemble: EnhancedEnsemble5Way,
     season: int,
     output_file: Path
-) -> Dict:
+) -> dict:
     """Validate ensemble on a single season."""
     print(f"\n{'=' * 80}")
     print(f"VALIDATING SEASON {season}")

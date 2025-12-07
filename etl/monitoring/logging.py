@@ -11,7 +11,7 @@ import uuid
 from contextvars import ContextVar
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Context variable for correlation ID (thread-safe)
 correlation_id_var: ContextVar[str] = ContextVar('correlation_id', default='')
@@ -104,7 +104,7 @@ class HumanReadableFormatter(logging.Formatter):
 def get_pipeline_logger(
     name: str,
     log_level: str = "INFO",
-    log_dir: Optional[Path] = None,
+    log_dir: Path | None = None,
     format_type: str = "human"  # "human" or "json"
 ) -> logging.Logger:
     """
@@ -148,7 +148,7 @@ def get_pipeline_logger(
     return logger
 
 
-def set_correlation_id(correlation_id: Optional[str] = None) -> str:
+def set_correlation_id(correlation_id: str | None = None) -> str:
     """
     Set correlation ID for current context.
 
@@ -174,7 +174,7 @@ def log_pipeline_event(
     logger: logging.Logger,
     level: str,
     message: str,
-    context: Optional[Dict[str, Any]] = None
+    context: dict[str, Any] | None = None
 ):
     """
     Log a pipeline event with context.

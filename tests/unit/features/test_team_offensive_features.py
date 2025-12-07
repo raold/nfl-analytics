@@ -18,15 +18,13 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 21, 2025
 """
 
-import pytest
+from unittest.mock import MagicMock, patch
+
 import numpy as np
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Tuple
+import pytest
 
 # Import the module under test
 from py.features.team_offensive_features import TeamOffensiveFeatures
-
 
 # ============================================================================
 # Fixtures

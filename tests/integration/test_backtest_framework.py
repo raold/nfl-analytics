@@ -26,19 +26,16 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import time
-import pickle
 import logging
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
-from collections import defaultdict
 import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import psycopg2
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 

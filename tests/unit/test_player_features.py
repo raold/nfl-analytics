@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.636843
 Test count: 39
 """
 
+import pytest
 from features.player_features import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

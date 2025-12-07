@@ -19,28 +19,26 @@ Date: 2025-11-15 (Updated with authentication)
 """
 
 import logging
-import time
 import os
+import time
 from datetime import datetime
-from typing import Dict
 
-from fastapi import FastAPI, HTTPException, status, Depends, Request
-from fastapi.responses import PlainTextResponse
-from fastapi.middleware.cors import CORSMiddleware
 import psycopg
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from redis import Redis
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 
+from api.auth import APIKey, get_authenticator, require_api_key
 from api.models import (
+    ErrorResponse,
+    HealthResponse,
+    ModelsListResponse,
     PredictionRequest,
     PredictionResponse,
-    ModelsListResponse,
-    HealthResponse,
-    ErrorResponse
 )
 from api.prediction import EnsemblePredictor
-from api.auth import require_api_key, APIKey, get_authenticator
-from api.middleware import RateLimitMiddleware
 from py.api.routes import game_predictions
 
 # Setup logging

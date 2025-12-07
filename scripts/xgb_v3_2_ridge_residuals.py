@@ -15,13 +15,14 @@ Expected runtime: 30 minutes (most promising from research)
 Target: MAE < 40.20 (v2 baseline)
 """
 
-import pandas as pd
+import sys
+import time
+
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sklearn.linear_model import RidgeCV
 from sqlalchemy import create_engine
-import time
-import sys
 
 # Database connection
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -97,7 +98,7 @@ def train_ridge_model(train_df):
     y_pred_ridge = ridge.predict(X_opp)
     mae_ridge = np.mean(np.abs(y - y_pred_ridge))
 
-    print(f"\nRidge Regression Results:")
+    print("\nRidge Regression Results:")
     print(f"  Best alpha: {ridge.alpha_:.2f}")
     print(f"  Train MAE: {mae_ridge:.2f} yards")
     print(f"  R²: {ridge.score(X_opp, y):.4f}")
@@ -127,7 +128,7 @@ def calculate_residuals(df, ridge_model):
     print("="*60)
     print("STEP 2: CALCULATE RESIDUALS (YARDS BEYOND OPPONENT EXPECTATION)")
     print("="*60)
-    print(f"\nResiduals Statistics:")
+    print("\nResiduals Statistics:")
     print(f"  Mean: {df['yards_beyond_opponent'].mean():.2f} yards")
     print(f"  Std: {df['yards_beyond_opponent'].std():.2f} yards")
     print(f"  Min: {df['yards_beyond_opponent'].min():.2f} yards")
@@ -216,7 +217,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     print(f"MAE: {mae:.2f} yards")
     print(f"RMSE: {rmse:.2f} yards")
     print(f"Training time: {train_time:.1f}s")
-    print(f"v2 baseline: 40.20 yards")
+    print("v2 baseline: 40.20 yards")
 
     improvement_pct = ((40.20 - mae) / 40.20) * 100
     print(f"Improvement: {improvement_pct:+.1f}%")
@@ -233,7 +234,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     residual_importance = importance_df[importance_df['feature'] == 'yards_beyond_opponent']['importance'].values[0]
     residual_rank = importance_df[importance_df['feature'] == 'yards_beyond_opponent'].index[0] + 1
 
-    print(f"\nRidge Residual Feature:")
+    print("\nRidge Residual Feature:")
     print(f"  yards_beyond_opponent rank: {residual_rank}/17")
     print(f"  yards_beyond_opponent importance: {residual_importance:.4f}")
 

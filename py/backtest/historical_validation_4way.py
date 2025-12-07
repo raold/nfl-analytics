@@ -32,18 +32,16 @@ Date: November 13, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
 import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from typing import Dict, List, Tuple, Optional
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import time
-from collections import defaultdict
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logging.basicConfig(
     level=logging.INFO,
@@ -155,7 +153,7 @@ class HistoricalValidator4Way:
 
         return df
 
-    def process_game(self, row: pd.Series) -> Optional[Dict]:
+    def process_game(self, row: pd.Series) -> dict | None:
         """Process a single player-game and generate prediction."""
         try:
             # Generate ensemble prediction
@@ -257,14 +255,14 @@ class HistoricalValidator4Way:
         # Convert to DataFrame
         results_df = pd.DataFrame(positions)
 
-        logger.info(f"\n✅ Backtest complete!")
+        logger.info("\n✅ Backtest complete!")
         logger.info(f"  Total predictions: {len(results_df)}")
         logger.info(f"  Failed predictions: {failed_count}")
         logger.info(f"  Processing time: {elapsed:.1f}s ({len(games_df)/elapsed:.1f} games/sec)")
 
         return results_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame) -> dict:
         """Calculate comprehensive performance metrics."""
         if len(results_df) == 0:
             logger.error("No predictions to analyze!")
@@ -368,7 +366,7 @@ class HistoricalValidator4Way:
 
         return metrics
 
-    def validate_risk_gates(self, metrics: Dict) -> Dict[str, bool]:
+    def validate_risk_gates(self, metrics: dict) -> dict[str, bool]:
         """Validate against production risk gates."""
         gates = {
             'mae': metrics['mae'] < 45.2,
@@ -378,7 +376,7 @@ class HistoricalValidator4Way:
 
         return gates
 
-    def print_summary(self, metrics: Dict, gates: Dict[str, bool]):
+    def print_summary(self, metrics: dict, gates: dict[str, bool]):
         """Print comprehensive validation summary."""
         logger.info("\n" + "="*80)
         logger.info("4-WAY ENSEMBLE HISTORICAL VALIDATION RESULTS")
@@ -388,22 +386,22 @@ class HistoricalValidator4Way:
             logger.error("❌ No metrics to display (0 predictions)")
             return
 
-        logger.info(f"\n📊 Dataset:")
+        logger.info("\n📊 Dataset:")
         logger.info(f"  Seasons: {self.start_season} - {self.end_season}")
         logger.info(f"  Total Predictions: {metrics['total_predictions']}")
         logger.info(f"  Temperature Scaling: {'✅ Enabled' if self.use_temperature_scaling else '❌ Disabled'}")
 
-        logger.info(f"\n📈 Overall Performance:")
+        logger.info("\n📈 Overall Performance:")
         logger.info(f"  MAE: {metrics['mae']:.2f} yards")
         logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
         logger.info(f"  MAPE: {metrics['mape']:.2f}%")
         logger.info(f"  90% CI Calibration: {metrics['calibration_90']:.2f}%")
 
-        logger.info(f"\n⚡ Inference Performance:")
+        logger.info("\n⚡ Inference Performance:")
         logger.info(f"  Average: {metrics['avg_inference_time_ms']:.1f}ms")
         logger.info(f"  Median: {metrics['median_inference_time_ms']:.1f}ms")
 
-        logger.info(f"\n📊 By-Season Breakdown:")
+        logger.info("\n📊 By-Season Breakdown:")
         for season_data in metrics['season_breakdown']:
             logger.info(
                 f"  {season_data['season']}: {season_data['games']} games | "
@@ -412,7 +410,7 @@ class HistoricalValidator4Way:
                 f"Cal: {season_data['calibration_90']:.1f}%"
             )
 
-        logger.info(f"\n👤 Top 10 Players (by games):")
+        logger.info("\n👤 Top 10 Players (by games):")
         for player_data in metrics['player_breakdown'][:10]:
             logger.info(
                 f"  {player_data['player']:25s} | {player_data['games']:3d} games | "
@@ -420,7 +418,7 @@ class HistoricalValidator4Way:
                 f"Cal: {player_data['calibration_90']:5.1f}%"
             )
 
-        logger.info(f"\n🤖 Individual Model Performance:")
+        logger.info("\n🤖 Individual Model Performance:")
         for model_name, model_data in metrics['model_performance'].items():
             logger.info(
                 f"  {model_name:25s} | {model_data['predictions']:4d} preds | "
@@ -428,7 +426,7 @@ class HistoricalValidator4Way:
                 f"RMSE: {model_data['rmse']:5.2f}"
             )
 
-        logger.info(f"\n🎯 Risk Gate Validation:")
+        logger.info("\n🎯 Risk Gate Validation:")
         mae_status = "✅ PASS" if gates['mae'] else "❌ FAIL"
         logger.info(f"  {mae_status} MAE: {metrics['mae']:.2f} < 45.2 yards")
 

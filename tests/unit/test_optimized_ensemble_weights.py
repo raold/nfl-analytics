@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.407771
 Test count: 7
 """
 
+import pytest
 from ensemble.optimized_ensemble_weights import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_example_usage_basic():

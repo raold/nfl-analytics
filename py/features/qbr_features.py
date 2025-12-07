@@ -76,8 +76,6 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 
 import logging
 import warnings
-from datetime import datetime
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -129,7 +127,7 @@ class QBRFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -170,7 +168,7 @@ class QBRFeatures:
         team: str,
         target_season: int,
         target_week: int
-    ) -> Optional[str]:
+    ) -> str | None:
         """
         Identify team's starting QB based on most recent qualified appearance.
 
@@ -258,7 +256,7 @@ class QBRFeatures:
         player_id: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute rolling 4-week QBR features (QBR avg, pts added avg).
 
@@ -329,7 +327,7 @@ class QBRFeatures:
         player_id: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute season-to-date QBR features (season avg, season pts added).
 
@@ -385,7 +383,7 @@ class QBRFeatures:
         player_id: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute QBR component features (pass, run, sack components).
 
@@ -650,7 +648,7 @@ class QBRFeatures:
         team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 10 QBR features for a team's QB.
 
@@ -780,7 +778,7 @@ def get_team_qbr_features(
     team: str,
     season: int,
     week: int
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Convenience function to extract QBR features for a team's QB.
 

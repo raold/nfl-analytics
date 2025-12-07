@@ -22,15 +22,12 @@ Usage:
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
-from dataclasses import dataclass, asdict, field
-from datetime import datetime, timedelta
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-from urllib.parse import urlparse
 
 try:
     import psycopg2
@@ -57,8 +54,8 @@ class ValidationResult:
     check_name: str
     passed: bool
     message: str
-    details: Dict = field(default_factory=dict)
-    suggestion: Optional[str] = None
+    details: dict = field(default_factory=dict)
+    suggestion: str | None = None
 
 
 @dataclass
@@ -66,14 +63,14 @@ class ValidationReport:
     """Complete validation report."""
     timestamp: str
     claude_md_path: str
-    results: List[ValidationResult] = field(default_factory=list)
-    summary: Dict = field(default_factory=dict)
+    results: list[ValidationResult] = field(default_factory=list)
+    summary: dict = field(default_factory=dict)
 
     def add_result(self, result: ValidationResult) -> None:
         """Add a validation result to the report."""
         self.results.append(result)
 
-    def get_summary(self) -> Dict:
+    def get_summary(self) -> dict:
         """Calculate summary statistics."""
         by_category = {}
         for result in self.results:
@@ -125,7 +122,7 @@ class CLAUDEMDValidator:
     def _read_claude_md(self) -> str:
         """Read CLAUDE.md content."""
         try:
-            with open(self.claude_md_path, "r") as f:
+            with open(self.claude_md_path) as f:
                 return f.read()
         except FileNotFoundError:
             print(f"❌ FATAL: CLAUDE.md not found at {self.claude_md_path}")
@@ -756,7 +753,7 @@ class CLAUDEMDValidator:
         registry_file = self.project_root / "models" / "MODEL_REGISTRY.yaml"
         if registry_file.exists():
             try:
-                with open(registry_file, "r") as f:
+                with open(registry_file) as f:
                     content = f.read()
                     # Count models in YAML (simplified)
                     model_count = content.count("- name:")
@@ -773,7 +770,7 @@ class CLAUDEMDValidator:
             except Exception as e:
                 self._vprint(f"⚠️  Cannot read MODEL_REGISTRY.yaml: {e}")
         else:
-            self._vprint(f"⚠️  MODEL_REGISTRY.yaml not found")
+            self._vprint("⚠️  MODEL_REGISTRY.yaml not found")
 
     # ========================================================================
     # MAIN VALIDATION RUNNER

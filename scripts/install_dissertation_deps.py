@@ -10,8 +10,6 @@ Phase 5: torchuncertainty (evidential deep learning)
 
 import subprocess
 import sys
-from pathlib import Path
-from packaging import version
 
 # Required packages with details
 PACKAGES = {

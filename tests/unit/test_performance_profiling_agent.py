@@ -17,22 +17,20 @@ Date: November 22, 2025
 """
 
 import json
-import tempfile
 import time
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from py.utils.performance_profiling_agent import (
+    Bottleneck,
     BottleneckSeverity,
     BottleneckType,
-    PerformanceProfilingAgent,
-    QueryReport,
-    ProfileReport,
     EndpointReport,
-    Bottleneck,
-    Recommendation,
+    PerformanceProfilingAgent,
+    ProfileReport,
+    QueryReport,
 )
 
 

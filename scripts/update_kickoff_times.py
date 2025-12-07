@@ -6,13 +6,14 @@ This script fetches real kickoff times from the ESPN API and updates
 the database for games that have placeholder midnight kickoff times.
 """
 
+import logging
 import os
 import sys
-from pathlib import Path
-import requests
-import psycopg
 from datetime import datetime, timedelta
-import logging
+from pathlib import Path
+
+import psycopg
+import requests
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -60,7 +61,7 @@ def fetch_espn_kickoffs(season: int, week: int):
         date_str = check_date.strftime("%Y%m%d")
 
         try:
-            url = f"https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+            url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
             params = {
                 'dates': date_str,
                 'limit': 100

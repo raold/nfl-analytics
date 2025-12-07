@@ -193,7 +193,7 @@ if __name__ == '__main__':
     optimizer = XGBoostOptunaOptimizer(n_trials=50)
     study, model, val_mae = optimizer.optimize()
     print(f"\n{'='*60}")
-    print(f"OPTUNA OPTIMIZATION COMPLETE")
+    print("OPTUNA OPTIMIZATION COMPLETE")
     print(f"Best CV MAE: {study.best_trial.value:.2f}")
     print(f"2024 Holdout MAE: {val_mae:.2f}")
     print(f"{'='*60}")

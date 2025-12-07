@@ -17,9 +17,10 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-03
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path
 
 # Dissertation styling
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -181,12 +182,12 @@ def main():
     print(f"✅ Generated: {fig2}")
 
     print(f"\n{'='*70}")
-    print(f"BNN IMPROVEMENT FIGURES GENERATION COMPLETE")
+    print("BNN IMPROVEMENT FIGURES GENERATION COMPLETE")
     print(f"{'='*70}")
-    print(f"Output directory: analysis/dissertation/figures/out/")
-    print(f"\nFigures ready for dissertation inclusion:")
-    print(f"  - phase_improvements_breakdown.pdf")
-    print(f"  - improvement_hierarchy.pdf")
+    print("Output directory: analysis/dissertation/figures/out/")
+    print("\nFigures ready for dissertation inclusion:")
+    print("  - phase_improvements_breakdown.pdf")
+    print("  - improvement_hierarchy.pdf")
 
 if __name__ == "__main__":
     main()

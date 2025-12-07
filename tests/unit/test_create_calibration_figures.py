@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:29.082305
 Test count: 12
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from visualizations.create_calibration_figures import *
-import pandas as pd
 import pytest
+from visualizations.create_calibration_figures import *
 
 
 def test_coverage_comparison_bar_chart_basic():

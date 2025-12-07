@@ -5,7 +5,7 @@ df = pd.read_csv("/Users/dro/rice/nfl-analytics/analysis/results/historical_vali
 
 print(f"Total rows: {len(df)}")
 print(f"\nColumns: {list(df.columns)}")
-print(f"\nFirst few rows of key columns:\n")
+print("\nFirst few rows of key columns:\n")
 print(df[['player_name', 'actual_yards', 'prediction_mean', 'prediction_std', 'prediction_q05', 'prediction_q95', 'bayesian_mean', 'xgboost_mean', 'bnn_mean']].head(10).to_string())
 
 # Calculate coverage
@@ -17,5 +17,5 @@ in_interval = (actual >= q05) & (actual <= q95)
 coverage = in_interval.mean() * 100
 
 print(f"\n\nENSEMBLE COVERAGE: {coverage:.2f}%")
-print(f"Target: 85-95%")
+print("Target: 85-95%")
 print(f"Gap: {90 - coverage:+.2f} pp")

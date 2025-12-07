@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Quick API test for ensemble v5.1 integration"""
 
-import requests
 import json
+
+import requests
 
 API_BASE = "http://localhost:8000"
 
@@ -44,7 +45,7 @@ def test_player_prediction():
                 print(f"✅ 90% CI: [{result.get('ci_lower', 0):.1f}, {result.get('ci_upper', 0):.1f}]")
 
                 if "components" in result:
-                    print(f"\n✅ Model Components (v5.1 integrated):")
+                    print("\n✅ Model Components (v5.1 integrated):")
                     for model, value in result["components"].items():
                         print(f"   {model}: {value:.1f} yards")
             else:
@@ -74,7 +75,7 @@ def test_game_prediction():
         if response.status_code == 200:
             result = response.json()
             print(json.dumps(result, indent=2))
-            print(f"\n✅ Game prediction successful!")
+            print("\n✅ Game prediction successful!")
 
             if "home_prediction" in result and "away_prediction" in result:
                 home = result["home_prediction"]
@@ -83,7 +84,7 @@ def test_game_prediction():
                 print(f"Away Team ({away.get('team')}): {away.get('predicted_passing_yards', 0):.1f} ± {away.get('predicted_passing_yards_std', 0):.1f} yards")
                 print(f"Total Passing: {result.get('total_predicted_yards', 0):.1f} yards")
         elif response.status_code == 404:
-            print(f"Game not found. Try different game_id.")
+            print("Game not found. Try different game_id.")
         else:
             print(f"Error: {response.text}")
     except Exception as e:

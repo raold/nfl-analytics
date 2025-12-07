@@ -11,8 +11,6 @@ Date: November 16, 2025
 
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple
-
 
 # ============================================================================
 # NFL DOMAIN KNOWLEDGE
@@ -62,9 +60,9 @@ VALID_RANGES = {
 # VALIDATION FUNCTIONS
 # ============================================================================
 
-def extract_sql_queries(file_path: Path) -> List[str]:
+def extract_sql_queries(file_path: Path) -> list[str]:
     """Extract SQL queries from Python file."""
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     # Find all multiline SQL strings (in triple quotes)
@@ -78,7 +76,7 @@ def extract_sql_queries(file_path: Path) -> List[str]:
     return queries
 
 
-def validate_sql_schema_compliance(queries: List[str]) -> List[Dict]:
+def validate_sql_schema_compliance(queries: list[str]) -> list[dict]:
     """Check SQL queries for known schema violations."""
     violations = []
 
@@ -113,9 +111,9 @@ def validate_sql_schema_compliance(queries: List[str]) -> List[Dict]:
     return violations
 
 
-def validate_divisions_dict(file_path: Path) -> List[Dict]:
+def validate_divisions_dict(file_path: Path) -> list[dict]:
     """Validate DIVISIONS dictionary against current NFL alignment."""
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     violations = []
@@ -135,9 +133,9 @@ def validate_divisions_dict(file_path: Path) -> List[Dict]:
     return violations
 
 
-def validate_feature_ranges(file_path: Path) -> List[Dict]:
+def validate_feature_ranges(file_path: Path) -> list[dict]:
     """Check numeric feature ranges are sensible."""
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     violations = []
@@ -152,7 +150,7 @@ def validate_feature_ranges(file_path: Path) -> List[Dict]:
                 violations.append({
                     'severity': 'WARNING',
                     'issue': f'Temperature default {temp_val}°F outside valid range (30-100°F)',
-                    'fix': f'Use 65°F (neutral) or adjust to valid range',
+                    'fix': 'Use 65°F (neutral) or adjust to valid range',
                 })
 
     # Check wind defaults
@@ -164,7 +162,7 @@ def validate_feature_ranges(file_path: Path) -> List[Dict]:
                 violations.append({
                     'severity': 'WARNING',
                     'issue': f'Wind default {wind_val}mph outside valid range (0-30mph)',
-                    'fix': f'Use 5mph (calm) or adjust to valid range',
+                    'fix': 'Use 5mph (calm) or adjust to valid range',
                 })
 
     # Check QB thresholds
@@ -222,9 +220,9 @@ def validate_feature_ranges(file_path: Path) -> List[Dict]:
     return violations
 
 
-def validate_domain_logic(file_path: Path) -> List[Dict]:
+def validate_domain_logic(file_path: Path) -> list[dict]:
     """Validate NFL domain rules and business logic."""
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     violations = []
@@ -264,7 +262,7 @@ def validate_domain_logic(file_path: Path) -> List[Dict]:
     return violations
 
 
-def validate_file(file_path: Path) -> Tuple[str, List[Dict]]:
+def validate_file(file_path: Path) -> tuple[str, list[dict]]:
     """Run all validators on a file."""
     all_violations = []
 

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.557370
 Test count: 10
 """
 
+import pytest
 from backtests.phase5_comparison_backtest import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_run_comparison_backtest_basic():

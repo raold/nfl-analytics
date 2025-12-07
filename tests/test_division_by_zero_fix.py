@@ -13,6 +13,7 @@ instead of crashing with division by zero.
 
 import sys
 from pathlib import Path
+
 import numpy as np
 
 # Add project root to path
@@ -21,6 +22,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # Now import from absolute path
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
     "player_props_ensemble",
     PROJECT_ROOT / "py" / "models" / "player_props_ensemble.py"
@@ -52,7 +54,7 @@ def test_zero_std_handling():
         model_name="state_space"
     )
 
-    print(f"Input: mean=200.0, std=0.0")
+    print("Input: mean=200.0, std=0.0")
     print(f"Output: mean={mean:.1f}, std={std:.1f}")
 
     if std == 50.0:
@@ -84,7 +86,7 @@ def test_near_zero_std_handling():
         model_name="state_space"
     )
 
-    print(f"Input: mean=200.0, std=1e-8")
+    print("Input: mean=200.0, std=1e-8")
     print(f"Output: mean={mean:.1f}, std={std:.1f}")
 
     if std == 50.0:
@@ -206,7 +208,7 @@ def test_normal_std_unchanged():
         model_name="state_space"
     )
 
-    print(f"Input: mean=200.0, std=30.0")
+    print("Input: mean=200.0, std=30.0")
     print(f"Output: mean={mean:.1f}, std={std:.1f}")
 
     # With T=0.85 for state_space: std_out = 30.0 / 0.85 = 35.3

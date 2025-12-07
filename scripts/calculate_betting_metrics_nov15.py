@@ -13,8 +13,8 @@ Takes the Nov 15 ensemble_4way_backtest_2022_2024_CORRECTED.csv file
 Compares to dissertation claims (60.8% win rate, +6.45% ROI, Sharpe 2.51)
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # Load Nov 15 backtest results
 df = pd.read_csv('analysis/results/ensemble_4way_backtest_2022_2024_CORRECTED.csv')

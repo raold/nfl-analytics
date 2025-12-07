@@ -19,19 +19,17 @@ Author: Claude Code
 Date: November 29, 2025
 """
 
-import os
 import json
-import time
-import pickle
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+import pickle
+import time
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import xgboost as xgb
 import shap
+import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
 from py.features.game_feature_extractor import GameFeatureExtractor
@@ -105,11 +103,11 @@ class GameOutcomeModel:
 
     def train(
         self,
-        seasons: List[int],
+        seasons: list[int],
         validation_split: float = 0.2,
-        xgb_params: Optional[Dict] = None,
+        xgb_params: dict | None = None,
         n_jobs: int = -1
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Train game outcome models on historical data.
 
@@ -187,8 +185,8 @@ class GameOutcomeModel:
 
         # 4. Train models in parallel on M4 Mac
         logger.info("Training 3 XGBoost models in parallel...")
-        from concurrent.futures import ThreadPoolExecutor, as_completed
         import multiprocessing
+        from concurrent.futures import ThreadPoolExecutor, as_completed
 
         # Detect number of cores (M4 Mac has excellent parallelization)
         n_cores = multiprocessing.cpu_count()
@@ -282,7 +280,7 @@ class GameOutcomeModel:
 
         return metrics
 
-    def _load_training_data_batch(self, seasons: List[int]) -> pd.DataFrame:
+    def _load_training_data_batch(self, seasons: list[int]) -> pd.DataFrame:
         """
         Load training data with batch feature extraction for performance.
 
@@ -369,7 +367,7 @@ class GameOutcomeModel:
         away_team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict game outcome.
 
@@ -455,7 +453,7 @@ class GameOutcomeModel:
         y_spread_val: np.ndarray,
         y_total_val: np.ndarray,
         y_win_val: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Evaluate models on validation data."""
         # Predictions
         spread_pred = self.spread_model.predict(X_val)
@@ -572,10 +570,10 @@ class GameOutcomeModel:
             self.win_prob_model.load_model(str(self.model_dir / "win_prob_model.json"))
 
             # Load metadata and feature names
-            with open(self.model_dir / "metadata.json", 'r') as f:
+            with open(self.model_dir / "metadata.json") as f:
                 self.metadata = json.load(f)
 
-            with open(self.model_dir / "feature_names.json", 'r') as f:
+            with open(self.model_dir / "feature_names.json") as f:
                 self.feature_names = json.load(f)
 
             # Load uncertainty estimates from metadata
@@ -606,7 +604,7 @@ def main():
         validation_split=0.2
     )
 
-    print(f"Validation Metrics:")
+    print("Validation Metrics:")
     print(f"  Spread MAE: {metrics['spread_mae']:.2f}")
     print(f"  Total MAE: {metrics['total_mae']:.2f}")
     print(f"  Win Prob AUC: {metrics['win_prob_auc']:.3f}")
@@ -622,14 +620,14 @@ def main():
             season=2024,
             week=11
         )
-        print(f"\nSample Prediction:")
+        print("\nSample Prediction:")
         print(json.dumps(prediction, indent=2))
     except Exception as e:
         print(f"Prediction failed: {e}")
 
     # Feature importance
     importance = model.get_feature_importance('spread')
-    print(f"\nTop 10 Features for Spread Prediction:")
+    print("\nTop 10 Features for Spread Prediction:")
     print(importance.head(10))
 
 

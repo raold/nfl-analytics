@@ -17,7 +17,6 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import List, Tuple
 
 import psycopg
 import pytest
@@ -116,7 +115,7 @@ class TestMigrationIdempotency:
         """Path to migrations directory."""
         return Path("db/migrations")
 
-    def _run_migration(self, conn: psycopg.Connection, migration_file: Path) -> Tuple[bool, str]:
+    def _run_migration(self, conn: psycopg.Connection, migration_file: Path) -> tuple[bool, str]:
         """
         Run a single migration file.
 
@@ -470,7 +469,7 @@ class TestMigrationDataPreservation:
                     null_counts.append(f"{table}.{column}: {null_count} NULLs")
 
         if null_counts:
-            pytest.fail(f"Primary key columns with NULLs:\n" + "\n".join(null_counts))
+            pytest.fail("Primary key columns with NULLs:\n" + "\n".join(null_counts))
 
         print(f"✅ All {len(pk_columns)} primary key columns are non-NULL")
 
@@ -509,7 +508,7 @@ class TestMigrationRollback:
                 missing_rollbacks.append(rollback_name)
 
         if missing_rollbacks:
-            pytest.fail(f"Missing rollback scripts:\n" + "\n".join(missing_rollbacks))
+            pytest.fail("Missing rollback scripts:\n" + "\n".join(missing_rollbacks))
 
         print(f"✅ All {len(migration_files)} migrations have rollback scripts")
 

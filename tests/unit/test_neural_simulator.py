@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.707325
 Test count: 27
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from simulation.neural_simulator import *
-import pandas as pd
-import pytest
 
 
 def test_train_outcome_model_basic():

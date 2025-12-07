@@ -60,22 +60,18 @@ Version: 6.0 (ELO + Adaptive Weights)
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import logging
-import json
-import warnings
-from typing import Dict, List, Tuple, Optional
 import time
+import warnings
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import xgboost as xgb
 
 logging.basicConfig(
@@ -118,8 +114,8 @@ class EnhancedEnsemble6Way:
         hierarchical_path: str = "models/bayesian/passing_yards_hierarchical_v2.rds",
         informative_path: str = "models/bayesian/passing_informative_priors_v2.rds",
         xgboost_path: str = "models/xgboost/passing_xgboost_v2_canonical.pkl",
-        weights: Optional[Dict[str, float]] = None,
-        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_4way.pkl",
+        weights: dict[str, float] | None = None,
+        temperature_scaler_path: str | None = "models/calibration/temperature_scaler_4way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -235,7 +231,7 @@ class EnhancedEnsemble6Way:
         week: int,
         model_path: Path,
         model_name: str
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get predictions from R/brms model using rpy2.
 
@@ -343,7 +339,7 @@ class EnhancedEnsemble6Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get state-space prediction using player skills.
 
@@ -433,7 +429,7 @@ class EnhancedEnsemble6Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get XGBoost prediction.
 
@@ -544,7 +540,7 @@ class EnhancedEnsemble6Way:
         season: int,
         week: int,
         return_individual: bool = False
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 5-way ensemble prediction with uncertainty quantification.
 
@@ -663,7 +659,7 @@ class EnhancedEnsemble6Way:
         inference_time = (time.time() - start_time) * 1000
 
         logger.info(f"\n{'='*70}")
-        logger.info(f"📈 ENSEMBLE RESULT")
+        logger.info("📈 ENSEMBLE RESULT")
         logger.info(f"{'='*70}")
         logger.info(f"Active weights: {dict(zip(active_models, active_weights))}")
         logger.info(f"Prediction: {ensemble_mean:.1f} ± {ensemble_std:.1f} yards")
@@ -686,8 +682,8 @@ class EnhancedEnsemble6Way:
 
     def predict_batch(
         self,
-        games: List[Dict],
-        output_csv: Optional[str] = None
+        games: list[dict],
+        output_csv: str | None = None
     ) -> pd.DataFrame:
         """
         Generate ensemble predictions for multiple games.

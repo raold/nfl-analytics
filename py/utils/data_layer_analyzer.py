@@ -15,14 +15,12 @@ Author: Claude Code
 Date: November 13, 2025
 """
 
-import re
-import os
-import logging
-from pathlib import Path
-from typing import Dict, List, Set, Optional, Tuple
-from dataclasses import dataclass, field
-from collections import defaultdict
 import json
+import logging
+import re
+from collections import defaultdict
+from dataclasses import dataclass, field
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,11 +45,11 @@ class ImpactReport:
 
     column: str
     change_type: str  # 'add', 'modify', 'remove'
-    breaking_changes: List[ColumnUsage] = field(default_factory=list)
-    affected_models: Set[str] = field(default_factory=set)
-    affected_features: Set[str] = field(default_factory=set)
-    affected_backtests: Set[str] = field(default_factory=set)
-    opportunities: List[str] = field(default_factory=list)
+    breaking_changes: list[ColumnUsage] = field(default_factory=list)
+    affected_models: set[str] = field(default_factory=set)
+    affected_features: set[str] = field(default_factory=set)
+    affected_backtests: set[str] = field(default_factory=set)
+    opportunities: list[str] = field(default_factory=list)
     estimated_impact_hours: float = 0.0
     risk_level: str = "low"  # 'low', 'medium', 'high', 'critical'
 
@@ -95,7 +93,7 @@ class DataLayerAnalyzer:
         self.logger = logging.getLogger(self.__class__.__name__)
 
         # Column lineage: {table.column: [usages]}
-        self.lineage: Dict[str, List[ColumnUsage]] = defaultdict(list)
+        self.lineage: dict[str, list[ColumnUsage]] = defaultdict(list)
 
         # File patterns to scan
         self.python_dirs = ['py/', 'scripts/', 'tests/', 'etl/']
@@ -184,7 +182,7 @@ class DataLayerAnalyzer:
     def _scan_python_file(self, file_path: Path) -> None:
         """Scan a Python file for SQL queries and column references."""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             # Extract SQL queries using various patterns
@@ -212,7 +210,7 @@ class DataLayerAnalyzer:
     def _scan_r_file(self, file_path: Path) -> None:
         """Scan an R file for SQL queries and column references."""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             # Extract SQL queries from R database calls
@@ -235,7 +233,7 @@ class DataLayerAnalyzer:
     def _scan_sql_file(self, file_path: Path) -> None:
         """Scan a raw SQL file for column references."""
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
             # SQL files may have multiple statements
@@ -355,7 +353,7 @@ class DataLayerAnalyzer:
 
         return query[:80]
 
-    def trace_column(self, column: str) -> List[ColumnUsage]:
+    def trace_column(self, column: str) -> list[ColumnUsage]:
         """
         Get all usages of a specific column.
 
@@ -421,7 +419,7 @@ class DataLayerAnalyzer:
 
         return report
 
-    def _identify_opportunities(self, new_column: str) -> List[str]:
+    def _identify_opportunities(self, new_column: str) -> list[str]:
         """
         Identify code that could benefit from a new column.
 
@@ -463,7 +461,7 @@ class DataLayerAnalyzer:
         # Check if any keyword appears in file path
         return any(keyword in path_lower for keyword in keywords if len(keyword) > 3)
 
-    def find_unused_columns(self, known_columns: Optional[Dict[str, List[str]]] = None) -> Dict[str, List[str]]:
+    def find_unused_columns(self, known_columns: dict[str, list[str]] | None = None) -> dict[str, list[str]]:
         """
         Find database columns that are never used in code.
 
@@ -583,7 +581,7 @@ class DataLayerAnalyzer:
 
     def load_lineage(self, input_path: str) -> None:
         """Load lineage from JSON file (faster than re-scanning)."""
-        with open(input_path, 'r') as f:
+        with open(input_path) as f:
             data = json.load(f)
 
         self.lineage.clear()

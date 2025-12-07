@@ -27,15 +27,14 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import logging
 import os
-import pytest
-import psycopg2
-import numpy as np
+import time
+
 import pandas as pd
 import psutil
-import logging
-import time
-from typing import List, Dict
+import psycopg2
+import pytest
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -92,7 +91,7 @@ def ensemble():
 
 
 @pytest.fixture(scope="module")
-def small_batch(db_connection) -> List[Dict]:
+def small_batch(db_connection) -> list[dict]:
     """
     Small batch of 10 games for correctness testing.
 
@@ -123,7 +122,7 @@ def small_batch(db_connection) -> List[Dict]:
 
 
 @pytest.fixture(scope="module")
-def large_batch(db_connection) -> List[Dict]:
+def large_batch(db_connection) -> list[dict]:
     """
     Large batch of 100 games for performance testing.
 

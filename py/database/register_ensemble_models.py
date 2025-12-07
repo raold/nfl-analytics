@@ -14,13 +14,13 @@ Created: November 9, 2025
 
 import os
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import yaml
+from psycopg2.extras import RealDictCursor
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -39,12 +39,12 @@ DB_CONFIG = {
 MODEL_REGISTRY_YAML = PROJECT_ROOT / 'models' / 'MODEL_REGISTRY.yaml'
 
 
-def load_model_registry() -> Dict[str, Any]:
+def load_model_registry() -> dict[str, Any]:
     """Load MODEL_REGISTRY.yaml and return parsed data."""
     if not MODEL_REGISTRY_YAML.exists():
         raise FileNotFoundError(f"MODEL_REGISTRY.yaml not found at {MODEL_REGISTRY_YAML}")
 
-    with open(MODEL_REGISTRY_YAML, 'r') as f:
+    with open(MODEL_REGISTRY_YAML) as f:
         registry = yaml.safe_load(f)
 
     print(f"✓ Loaded MODEL_REGISTRY.yaml (version {registry.get('version', 'unknown')})")
@@ -65,7 +65,7 @@ def validate_model_file(file_path: str) -> bool:
 def insert_or_update_model(
     cursor,
     model_key: str,
-    model_data: Dict[str, Any],
+    model_data: dict[str, Any],
     status: str = 'production'
 ) -> int:
     """

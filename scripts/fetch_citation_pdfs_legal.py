@@ -14,25 +14,24 @@ Usage:
 Note: Provide your email for Unpaywall API (required, they use it to track usage).
 """
 
-import re
-import os
-import time
-import requests
 import argparse
+import os
+import re
+import time
 from pathlib import Path
-from typing import Dict, List, Optional
+
 import bibtexparser
-from urllib.parse import urljoin
+import requests
 
 
-def parse_bibtex(bib_path: str) -> List[Dict]:
+def parse_bibtex(bib_path: str) -> list[dict]:
     """Parse BibTeX file and extract entries."""
-    with open(bib_path, 'r', encoding='utf-8') as f:
+    with open(bib_path, encoding='utf-8') as f:
         bib_database = bibtexparser.load(f)
     return bib_database.entries
 
 
-def extract_doi(entry: Dict) -> Optional[str]:
+def extract_doi(entry: dict) -> str | None:
     """Extract DOI from BibTeX entry."""
     if 'doi' in entry:
         doi = entry['doi'].strip()
@@ -57,7 +56,7 @@ def sanitize_filename(filename: str) -> str:
     return filename
 
 
-def get_pdf_filename(entry: Dict) -> str:
+def get_pdf_filename(entry: dict) -> str:
     """Generate PDF filename from BibTeX entry."""
     author = entry.get('author', 'Unknown').split(' and ')[0].split(',')[0].strip()
     year = entry.get('year', 'XXXX')
@@ -91,7 +90,7 @@ def download_from_unpaywall(doi: str, email: str, output_path: str) -> bool:
     try:
         # Unpaywall API endpoint
         api_url = f"https://api.unpaywall.org/v2/{doi}?email={email}"
-        print(f"  Checking Unpaywall API...")
+        print("  Checking Unpaywall API...")
 
         response = requests.get(api_url, timeout=10)
         response.raise_for_status()
@@ -116,15 +115,15 @@ def download_from_unpaywall(doi: str, email: str, output_path: str) -> bool:
                     print(f"  ✓ Downloaded: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)")
                     return True
                 else:
-                    print(f"  ✗ Response was not a PDF")
+                    print("  ✗ Response was not a PDF")
             else:
-                print(f"  ⚠ Open access version exists but no PDF URL")
+                print("  ⚠ Open access version exists but no PDF URL")
         else:
-            print(f"  ✗ Not available as open access")
+            print("  ✗ Not available as open access")
 
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 404:
-            print(f"  ✗ DOI not found in Unpaywall")
+            print("  ✗ DOI not found in Unpaywall")
         else:
             print(f"  ✗ HTTP error: {e}")
     except Exception as e:
@@ -133,7 +132,7 @@ def download_from_unpaywall(doi: str, email: str, output_path: str) -> bool:
     return False
 
 
-def try_arxiv(entry: Dict, output_path: str) -> bool:
+def try_arxiv(entry: dict, output_path: str) -> bool:
     """
     Try to find paper on arXiv (preprint server).
 
@@ -177,18 +176,18 @@ def try_arxiv(entry: Dict, output_path: str) -> bool:
     return False
 
 
-def suggest_manual_methods(entry: Dict, doi: Optional[str]):
+def suggest_manual_methods(entry: dict, doi: str | None):
     """Print manual methods to try for getting the paper."""
     title = entry.get('title', 'Unknown')
     author = entry.get('author', 'Unknown').split(' and ')[0]
 
-    print(f"\n  💡 Manual methods to try:")
+    print("\n  💡 Manual methods to try:")
     print(f"     1. Google Scholar: https://scholar.google.com/scholar?q={title.replace(' ', '+')}")
     if doi:
         print(f"     2. Publisher page: https://doi.org/{doi}")
     print(f"     3. Email author: {author} (often respond with PDFs)")
     print(f"     4. ResearchGate: https://www.researchgate.net/search?q={title.replace(' ', '+')}")
-    print(f"     5. Your university library (check subscriptions)")
+    print("     5. Your university library (check subscriptions)")
 
 
 def main():
@@ -261,7 +260,7 @@ def main():
         print(f"   Limiting to first {args.limit} entries")
 
     print(f"\n🔽 Downloading PDFs to: {output_dir}")
-    print(f"   Using legal sources: Unpaywall, arXiv, PMC")
+    print("   Using legal sources: Unpaywall, arXiv, PMC")
     print(f"   Delay between requests: {args.delay}s\n")
 
     successful = 0
@@ -280,7 +279,7 @@ def main():
         output_path = output_dir / filename
 
         if args.skip_existing and output_path.exists():
-            print(f"  ⊘ Skipped: File already exists")
+            print("  ⊘ Skipped: File already exists")
             skipped += 1
             continue
 
@@ -305,7 +304,7 @@ def main():
 
     # Summary
     print("=" * 70)
-    print(f"📊 Summary:")
+    print("📊 Summary:")
     print(f"   ✓ Successful: {successful}")
     print(f"   ✗ Failed: {failed}")
     print(f"   ⊘ Skipped: {skipped}")
@@ -314,10 +313,10 @@ def main():
 
     if failed > 0:
         print(f"\n💡 For {failed} failed downloads, try:")
-        print(f"   1. Run with --suggest-manual to see specific methods")
-        print(f"   2. Check your university library subscriptions")
-        print(f"   3. Email authors directly (they usually respond!)")
-        print(f"   4. Try Google Scholar's PDF links")
+        print("   1. Run with --suggest-manual to see specific methods")
+        print("   2. Check your university library subscriptions")
+        print("   3. Email authors directly (they usually respond!)")
+        print("   4. Try Google Scholar's PDF links")
 
 
 if __name__ == '__main__':

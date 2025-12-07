@@ -14,20 +14,21 @@ Date: November 7, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, TensorDataset
+import argparse
+import logging
+
 import numpy as np
 import pandas as pd
 import psycopg
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import argparse
-import json
-import logging
+from torch.utils.data import DataLoader, TensorDataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -255,7 +256,7 @@ def train_bnn(args):
     y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
     y_val_scaled = scaler_y.transform(y_val.reshape(-1, 1)).ravel()
 
-    logger.info(f"\nTarget statistics:")
+    logger.info("\nTarget statistics:")
     logger.info(f"  y_train mean: {y_train.mean():.2f}, std: {y_train.std():.2f}")
     logger.info(f"  y_train_scaled mean: {y_train_scaled.mean():.4f}, std: {y_train_scaled.std():.4f}")
 
@@ -281,11 +282,11 @@ def train_bnn(args):
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
-    logger.info(f"\nModel Architecture:")
+    logger.info("\nModel Architecture:")
     logger.info(f"  Input: {len(feature_cols)} features")
     logger.info(f"  Hidden: {args.hidden_dim}")
-    logger.info(f"  Output: yards_mean, yards_log_std")
-    logger.info(f"\nTraining Settings:")
+    logger.info("  Output: yards_mean, yards_log_std")
+    logger.info("\nTraining Settings:")
     logger.info(f"  Epochs: {args.epochs}")
     logger.info(f"  Batch size: {args.batch_size}")
     logger.info(f"  Learning rate: {args.learning_rate}")
@@ -369,7 +370,7 @@ def train_bnn(args):
             output_path.parent.mkdir(parents=True, exist_ok=True)
             torch.save(checkpoint, output_path)
 
-    logger.info(f"\n✅ Training complete!")
+    logger.info("\n✅ Training complete!")
     logger.info(f"Best validation loss: {best_val_loss:.4f}")
     logger.info(f"Best validation MAE: {best_val_mae:.2f} yards")
     logger.info(f"Model saved: {args.output}")

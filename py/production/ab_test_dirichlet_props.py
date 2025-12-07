@@ -30,16 +30,15 @@ Date: November 27, 2025
 import hashlib
 import logging
 import os
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Dict, Optional
-
-import psycopg2
-from psycopg2.extras import RealDictCursor
 
 # Set up path for imports
 import sys
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
+
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -69,7 +68,7 @@ class ABTestResult:
     inference_time_ms: float
     test_name: str
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
             'player_id': self.player_id,
@@ -127,7 +126,7 @@ class DirichletABTestRouter:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: Optional[str] = None,
+        db_password: str | None = None,
         enabled: bool = True
     ):
         """
@@ -358,7 +357,7 @@ class DirichletABTestRouter:
                 )
             )
             conn.commit()
-            logger.debug(f"Logged prediction to ml.ab_test_results")
+            logger.debug("Logged prediction to ml.ab_test_results")
 
         except Exception as e:
             conn.rollback()
@@ -368,7 +367,7 @@ class DirichletABTestRouter:
             cursor.close()
             conn.close()
 
-    def get_test_summary(self) -> Dict:
+    def get_test_summary(self) -> dict:
         """
         Get summary statistics for A/B test.
 

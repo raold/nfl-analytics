@@ -45,17 +45,16 @@ Date: November 13, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
-import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-import time
-import pickle
 import hashlib
+import logging
+import time
+
+import numpy as np
+import pandas as pd
 
 from py.utils.database_pool import DatabasePoolManager
 from py.utils.feature_cache import FeatureCache
@@ -126,7 +125,7 @@ class OptimizedHistoricalValidator:
 
         # Tracking
         self.bankroll = initial_bankroll
-        self.positions: List[Dict] = []
+        self.positions: list[dict] = []
 
         # OPTIMIZATION 1: Database connection pooling
         logger.info("Initializing database connection pool...")
@@ -205,7 +204,7 @@ class OptimizedHistoricalValidator:
             if hier_path.exists():
                 ro.r(f'hierarchical_model <- readRDS("{hier_path}")')
                 self.r_models['hierarchical_v2'] = 'hierarchical_model'  # Store R variable name
-                logger.info(f"  ✅ Hierarchical v2 loaded")
+                logger.info("  ✅ Hierarchical v2 loaded")
             else:
                 logger.warning(f"  ⚠️  Hierarchical v2 not found: {hier_path}")
 
@@ -214,7 +213,7 @@ class OptimizedHistoricalValidator:
             if inf_path.exists():
                 ro.r(f'informative_model <- readRDS("{inf_path}")')
                 self.r_models['informative_priors_v2'] = 'informative_model'  # Store R variable name
-                logger.info(f"  ✅ Informative Priors v2 loaded")
+                logger.info("  ✅ Informative Priors v2 loaded")
             else:
                 logger.warning(f"  ⚠️  Informative Priors v2 not found: {inf_path}")
 
@@ -289,7 +288,7 @@ class OptimizedHistoricalValidator:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Get player features with caching.
 
@@ -363,7 +362,7 @@ class OptimizedHistoricalValidator:
         season: int,
         week: int,
         model_name: str
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get R model prediction using cached model object.
 
@@ -416,7 +415,7 @@ class OptimizedHistoricalValidator:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get state-space prediction using cached skills dataframe.
 
@@ -469,7 +468,7 @@ class OptimizedHistoricalValidator:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get XGBoost prediction with caching (deterministic).
 
@@ -556,7 +555,7 @@ class OptimizedHistoricalValidator:
         player_id: str,
         season: int,
         week: int
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 4-way ensemble prediction with all optimizations.
 
@@ -663,7 +662,7 @@ class OptimizedHistoricalValidator:
 
         return max(bet_size, 0)
 
-    def process_game(self, row: pd.Series) -> Optional[Dict]:
+    def process_game(self, row: pd.Series) -> dict | None:
         """Process a single player-game and generate prediction."""
         try:
             is_home = (row['team'] == row['home_team'])
@@ -804,7 +803,7 @@ class OptimizedHistoricalValidator:
         elapsed = time.time() - start_time
         results_df = pd.DataFrame(positions)
 
-        logger.info(f"\n✅ Backtest complete!")
+        logger.info("\n✅ Backtest complete!")
         logger.info(f"  Total positions: {len(results_df)}")
         logger.info(f"  Filtered out: {failed_count}")
         logger.info(f"  Processing time: {elapsed/60:.1f} minutes ({len(games_df)/elapsed:.1f} games/sec)")
@@ -815,15 +814,15 @@ class OptimizedHistoricalValidator:
         logger.info("="*80)
         self.feature_cache.print_stats()
 
-        logger.info(f"\nXGBoost Prediction Cache:")
+        logger.info("\nXGBoost Prediction Cache:")
         logger.info(f"  Entries: {len(self.xgboost_pred_cache):,}")
 
-        logger.info(f"\nDatabase Pool:")
+        logger.info("\nDatabase Pool:")
         logger.info(f"  Connections: {self.db_pool.minconn}-{self.db_pool.maxconn}")
 
         return results_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame) -> dict:
         """Calculate performance metrics."""
         if len(results_df) == 0:
             return {}
@@ -873,7 +872,7 @@ class OptimizedHistoricalValidator:
             'profit_pct': ((self.bankroll - self.initial_bankroll) / self.initial_bankroll) * 100
         }
 
-    def print_summary(self, metrics: Dict):
+    def print_summary(self, metrics: dict):
         """Print validation summary."""
         logger.info("\n" + "="*80)
         logger.info("OPTIMIZED VALIDATION RESULTS")
@@ -883,18 +882,18 @@ class OptimizedHistoricalValidator:
             logger.error("❌ No metrics to display")
             return
 
-        logger.info(f"\n💰 Performance:")
+        logger.info("\n💰 Performance:")
         logger.info(f"  Win Rate: {metrics['win_rate_pct']:.2f}%")
         logger.info(f"  ROI: {metrics['roi_pct']:+.2f}%")
         logger.info(f"  Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
         logger.info(f"  Max Drawdown: {metrics['max_drawdown_pct']:.2f}%")
 
-        logger.info(f"\n📈 Bankroll:")
+        logger.info("\n📈 Bankroll:")
         logger.info(f"  Starting: ${metrics['starting_bankroll']:,.2f}")
         logger.info(f"  Ending: ${metrics['ending_bankroll']:,.2f}")
         logger.info(f"  Profit: ${metrics['profit']:,.2f} ({metrics['profit_pct']:+.2f}%)")
 
-        logger.info(f"\n🎯 Accuracy:")
+        logger.info("\n🎯 Accuracy:")
         logger.info(f"  MAE (Ensemble): {metrics['mae_ensemble']:.2f} yards")
 
     def close(self):

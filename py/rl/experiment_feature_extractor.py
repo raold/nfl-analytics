@@ -11,12 +11,11 @@ Based on empirical results from experiment_executor.py:
 All successful +ROI/EV experiments are integrated as features.
 """
 
-import psycopg2
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+
+import numpy as np
+import psycopg2
 
 
 class ExperimentFeature(Enum):
@@ -149,7 +148,7 @@ class ExperimentFeatureExtractor:
     Based on dissertation Chapter: Empirical Validation (40 Experiments)
     """
 
-    def __init__(self, db_params: Optional[Dict] = None):
+    def __init__(self, db_params: dict | None = None):
         """
         Initialize feature extractor with database connection.
 
@@ -252,7 +251,7 @@ class ExperimentFeatureExtractor:
         # Placeholder: Would use trained cVAE model
         return 0.0
 
-    def _extract_multi_horizon(self, game_id: str) -> Tuple[float, float, float, float]:
+    def _extract_multi_horizon(self, game_id: str) -> tuple[float, float, float, float]:
         """
         CVAE-008: Multi-Horizon Forecasting
         Q1 MAE=3.2, Q2=2.8, Q3=2.5, Q4=3.1, ROI=6.2%
@@ -382,7 +381,7 @@ class ExperimentFeatureExtractor:
         return 0.0
 
     def _extract_ol_quality(self, home_team: str, away_team: str,
-                           season: int) -> Tuple[float, float]:
+                           season: int) -> tuple[float, float]:
         """
         CAUSAL-008: Offensive Line Quality Effect
         Rushing ATE=-12.5 yards, Passing ATE=-18.2 yards
@@ -399,7 +398,7 @@ class ExperimentFeatureExtractor:
         return 0.0
 
     def _extract_personnel_effects(self, home_team: str,
-                                   away_team: str) -> Tuple[float, float]:
+                                   away_team: str) -> tuple[float, float]:
         """
         CAUSAL-012: Personnel Grouping Effect
         Heavy ATE=-3.5, Spread ATE=-1.8
@@ -455,7 +454,7 @@ class ExperimentFeatureExtractor:
         """
         return 0.0
 
-    def extract_batch(self, games: List[Tuple[str, int, int, str, str]]) -> List[ExperimentFeatures]:
+    def extract_batch(self, games: list[tuple[str, int, int, str, str]]) -> list[ExperimentFeatures]:
         """
         Extract features for multiple games in batch.
 

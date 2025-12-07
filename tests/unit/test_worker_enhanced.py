@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.162220
 Test count: 14
 """
 
+import pytest
 from compute.worker_enhanced import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_get_device_info_basic():

@@ -11,10 +11,11 @@ This helps identify if remaining performance is due to legitimate skill,
 overconfidence, or subtle remaining leakage.
 """
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
 
 def load_trades():
     """Load backtest trades."""
@@ -89,7 +90,7 @@ def analyze_win_rate_by_confidence(df):
         high_conf_win_rate = high_conf['outcome'].mean()
         high_conf_pred_prob = high_conf['bet_prob'].mean()
 
-        print(f"\nHigh Confidence Bets (edge >= 15%):")
+        print("\nHigh Confidence Bets (edge >= 15%):")
         print(f"  Count: {len(high_conf)}")
         print(f"  Predicted prob: {high_conf_pred_prob:.1%}")
         print(f"  Actual win rate: {high_conf_win_rate:.1%}")

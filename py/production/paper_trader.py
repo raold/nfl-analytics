@@ -48,8 +48,7 @@ Usage:
 
 import os
 import uuid
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Tuple
+from datetime import UTC, datetime
 
 import numpy as np
 import psycopg2
@@ -72,7 +71,7 @@ class PaperTradingEngine:
     def __init__(
         self,
         initial_bankroll: float = 10000.0,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         strategy: str = 'paper_trading'
     ):
         """
@@ -98,7 +97,7 @@ class PaperTradingEngine:
 
     def _generate_session_id(self) -> str:
         """Generate unique session ID."""
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now(UTC).strftime('%Y%m%d_%H%M%S')
         random_suffix = uuid.uuid4().hex[:8]
         return f"paper_{timestamp}_{random_suffix}"
 
@@ -129,7 +128,7 @@ class PaperTradingEngine:
                 ON CONFLICT (session_id) DO NOTHING
             """, (
                 self.session_id,
-                datetime.now(timezone.utc),
+                datetime.now(UTC),
                 self.initial_bankroll,
                 self.strategy
             ))
@@ -146,11 +145,11 @@ class PaperTradingEngine:
         odds: float,
         bookmaker_key: str,
         bet_amount: float,
-        edge: Optional[float] = None,
-        model_prediction: Optional[float] = None,
-        model_std: Optional[float] = None,
-        confidence: Optional[float] = None,
-        model_version: Optional[str] = None
+        edge: float | None = None,
+        model_prediction: float | None = None,
+        model_std: float | None = None,
+        confidence: float | None = None,
+        model_version: str | None = None
     ) -> int:
         """
         Place a paper bet (hypothetical, no real money).
@@ -203,7 +202,7 @@ class PaperTradingEngine:
                 )
                 RETURNING paper_trade_id
             """, (
-                datetime.now(timezone.utc),
+                datetime.now(UTC),
                 game_id,
                 player_id,
                 player_name,
@@ -241,7 +240,7 @@ class PaperTradingEngine:
         self,
         paper_trade_id: int,
         actual_result: float
-    ) -> Tuple[str, float]:
+    ) -> tuple[str, float]:
         """
         Settle a paper bet with actual game result.
 
@@ -303,7 +302,7 @@ class PaperTradingEngine:
             """, (
                 actual_result,
                 outcome,
-                datetime.now(timezone.utc),
+                datetime.now(UTC),
                 profit_loss,
                 paper_trade_id
             ))
@@ -345,7 +344,7 @@ class PaperTradingEngine:
 
         return bet_amount + winnings
 
-    def get_performance_metrics(self) -> Dict:
+    def get_performance_metrics(self) -> dict:
         """
         Calculate performance metrics for paper trading session.
 
@@ -473,7 +472,7 @@ class PaperTradingEngine:
                     max_drawdown = %s
                 WHERE session_id = %s
             """, (
-                datetime.now(timezone.utc),
+                datetime.now(UTC),
                 self.bankroll,
                 metrics['total_bets'],
                 metrics['win_rate'],

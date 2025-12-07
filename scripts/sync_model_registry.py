@@ -16,12 +16,9 @@ Date: 2025-11-03
 """
 
 import argparse
-import json
 import os
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -62,7 +59,7 @@ def get_db_connection():
     return psycopg2.connect(**DB_CONFIG, cursor_factory=DictCursor)
 
 
-def scan_models_directory(base_path: Path = Path("models")) -> List[Dict]:
+def scan_models_directory(base_path: Path = Path("models")) -> list[dict]:
     """Scan models/ directory and catalog all model files"""
 
     models = []
@@ -94,7 +91,7 @@ def scan_models_directory(base_path: Path = Path("models")) -> List[Dict]:
     return models
 
 
-def extract_model_info(file_path: Path) -> Optional[Dict]:
+def extract_model_info(file_path: Path) -> dict | None:
     """Extract model information from file path and name"""
 
     # Get file stats
@@ -133,7 +130,7 @@ def extract_model_info(file_path: Path) -> Optional[Dict]:
     }
 
 
-def get_db_models(conn) -> List[Dict]:
+def get_db_models(conn) -> list[dict]:
     """Get all models from database"""
 
     with conn.cursor() as cur:
@@ -157,7 +154,7 @@ def get_db_models(conn) -> List[Dict]:
         return [dict(row) for row in cur.fetchall()]
 
 
-def compare_db_filesystem(db_models: List[Dict], fs_models: List[Dict]) -> Dict:
+def compare_db_filesystem(db_models: list[dict], fs_models: list[dict]) -> dict:
     """Compare database models with filesystem"""
 
     db_names = {m["model_name"] for m in db_models}
@@ -206,12 +203,12 @@ def check_sync_status(verbose: bool = True):
     print(f"⚠️  Only in filesystem: {len(comparison['only_in_fs'])} models")
 
     if comparison["only_in_db"]:
-        print(f"\n🗄️  Models in database but not on filesystem:")
+        print("\n🗄️  Models in database but not on filesystem:")
         for name in sorted(comparison["only_in_db"]):
             print(f"   - {name}")
 
     if comparison["only_in_fs"]:
-        print(f"\n📁 Models on filesystem but not in database:")
+        print("\n📁 Models on filesystem but not in database:")
         for name in sorted(comparison["only_in_fs"]):
             fs_model = next(m for m in fs_models if m["model_name"] == name)
             print(f"   - {name:40s} ({fs_model['file_size_mb']:6.1f} MB, {fs_model['model_type']})")

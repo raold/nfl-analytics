@@ -16,7 +16,6 @@ import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -40,10 +39,10 @@ class CacheStats:
     cache_size_mb: float
     hit_rate: float
     avg_lookup_time_ms: float
-    oldest_prediction: Optional[datetime]
-    newest_prediction: Optional[datetime]
-    predictions_by_model: Dict[str, int]
-    predictions_by_stat_type: Dict[str, int]
+    oldest_prediction: datetime | None
+    newest_prediction: datetime | None
+    predictions_by_model: dict[str, int]
+    predictions_by_stat_type: dict[str, int]
 
 
 @dataclass
@@ -57,7 +56,7 @@ class ValidationReport:
     nan_predictions: int
     out_of_range_predictions: int
     orphaned_predictions: int
-    issues: List[str]
+    issues: list[str]
 
     def is_valid(self) -> bool:
         """Check if cache passed validation."""
@@ -70,7 +69,7 @@ class ValidationReport:
     def summary(self) -> str:
         """Generate human-readable summary."""
         lines = [
-            f"Cache Validation Report",
+            "Cache Validation Report",
             f"  Total Checked: {self.total_checked:,}",
             f"  Valid: {self.valid_predictions:,}",
             f"  Invalid: {self.invalid_predictions:,}",
@@ -80,7 +79,7 @@ class ValidationReport:
             f"  Orphaned: {self.orphaned_predictions:,}",
         ]
         if self.issues:
-            lines.append(f"\nIssues Found:")
+            lines.append("\nIssues Found:")
             for issue in self.issues[:10]:  # Show first 10 issues
                 lines.append(f"  - {issue}")
             if len(self.issues) > 10:
@@ -116,7 +115,7 @@ class PredictionCacheManager:
     BATCH_SIZE = 1000
     BACKFILL_BATCH_SIZE = 5000
 
-    def __init__(self, db_url: Optional[str] = None):
+    def __init__(self, db_url: str | None = None):
         """
         Initialize cache manager.
 
@@ -263,9 +262,9 @@ class PredictionCacheManager:
         stat_type: str,
         season: int,
         week: int,
-        model_name: Optional[str] = None,
-        max_age_hours: Optional[int] = None,
-    ) -> Optional[float]:
+        model_name: str | None = None,
+        max_age_hours: int | None = None,
+    ) -> float | None:
         """
         Fast lookup of cached prediction.
 
@@ -338,10 +337,10 @@ class PredictionCacheManager:
 
     def invalidate_cache(
         self,
-        model_name: Optional[str] = None,
-        stat_type: Optional[str] = None,
-        season: Optional[int] = None,
-        older_than_hours: Optional[int] = None,
+        model_name: str | None = None,
+        stat_type: str | None = None,
+        season: int | None = None,
+        older_than_hours: int | None = None,
     ) -> int:
         """
         Invalidate (delete) cached predictions matching criteria.
@@ -491,7 +490,7 @@ class PredictionCacheManager:
         finally:
             cursor.close()
 
-    def validate_cache_integrity(self, sample_size: Optional[int] = None) -> ValidationReport:
+    def validate_cache_integrity(self, sample_size: int | None = None) -> ValidationReport:
         """
         Validate cache data integrity.
 
@@ -627,7 +626,7 @@ class PredictionCacheManager:
         finally:
             cursor.close()
 
-    def optimize_indexes(self) -> Dict[str, bool]:
+    def optimize_indexes(self) -> dict[str, bool]:
         """
         Optimize cache table indexes for performance.
 
@@ -707,10 +706,10 @@ class PredictionCacheManager:
         self,
         model_name: str,
         stat_type: str,
-        seasons: List[int],
+        seasons: list[int],
         rpy2_prediction_function,
-        player_ids: Optional[List[str]] = None,
-    ) -> Tuple[int, int]:
+        player_ids: list[str] | None = None,
+    ) -> tuple[int, int]:
         """
         Backfill cache from existing rpy2 model predictions.
 
@@ -857,10 +856,10 @@ def main():
         print(f"Avg Lookup Time: {stats.avg_lookup_time_ms:.2f} ms")
         print(f"Oldest Prediction: {stats.oldest_prediction}")
         print(f"Newest Prediction: {stats.newest_prediction}")
-        print(f"\nPredictions by Model:")
+        print("\nPredictions by Model:")
         for model, count in stats.predictions_by_model.items():
             print(f"  {model}: {count:,}")
-        print(f"\nPredictions by Stat Type:")
+        print("\nPredictions by Stat Type:")
         for stat, count in stats.predictions_by_stat_type.items():
             print(f"  {stat}: {count:,}")
         print(f"{'='*60}\n")

@@ -16,7 +16,6 @@ import argparse
 import json
 import sys
 import time
-from typing import Dict, Any
 
 import requests
 
@@ -138,7 +137,7 @@ class APITester:
         }
 
         try:
-            print(f"\nRequest Payload:")
+            print("\nRequest Payload:")
             print(json.dumps(payload, indent=2))
 
             start_time = time.time()
@@ -152,14 +151,14 @@ class APITester:
             response.raise_for_status()
 
             data = response.json()
-            print(f"\nResponse:")
+            print("\nResponse:")
             print(f"Prediction: {data['prediction']:.1f}")
             print(f"Confidence: {data['confidence']:.2f}")
             print(f"90% CI: [{data['lower_bound']:.1f}, {data['upper_bound']:.1f}]")
             print(f"Ensemble Method: {data['ensemble_method']}")
             print(f"Latency: {latency:.3f}s")
 
-            print(f"\nModel Contributions:")
+            print("\nModel Contributions:")
             for model in data["models_used"]:
                 print(f"  - {model['model_name']}: {model['prediction']:.1f} "
                       f"± {model['uncertainty']:.1f} (weight: {model['weight']:.2f})")
@@ -245,7 +244,7 @@ class APITester:
             assert response.status_code == 422, f"Expected 422, got {response.status_code}"
 
             error_data = response.json()
-            print(f"Error Response:")
+            print("Error Response:")
             print(json.dumps(error_data, indent=2))
 
             self.print_success("Error handling working correctly")

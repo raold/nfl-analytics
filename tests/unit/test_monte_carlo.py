@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.363324
 Test count: 4
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
+
 from py.monte_carlo import *
-import pandas as pd
-import pytest
 
 
 def test_simulate_prob_row_basic():

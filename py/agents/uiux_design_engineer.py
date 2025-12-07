@@ -53,16 +53,13 @@ Date: November 22, 2025
 Phase: 6 (Frontend Agents)
 """
 
-import ast
 import logging
-import os
 import re
-from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # Configure logging
 logging.basicConfig(
@@ -117,7 +114,7 @@ class DesignSystemColors:
     TEXT_SECONDARY: str = "#6B7280"
     TEXT_TERTIARY: str = "#9CA3AF"
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Export color palette as dictionary."""
         return {
             "primary_blue": self.PRIMARY_BLUE,
@@ -161,7 +158,7 @@ class DesignSystemTypography:
     FONT_WEIGHT_SEMIBOLD: int = 600
     FONT_WEIGHT_BOLD: int = 700
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Export typography system as dictionary."""
         return {
             "font_family_primary": self.FONT_FAMILY_PRIMARY,
@@ -197,7 +194,7 @@ class DesignSystemSpacing:
     SPACE_12: str = "48px"  # 3rem
     SPACE_16: str = "64px"  # 4rem
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Export spacing scale as dictionary."""
         return {
             "1": self.SPACE_1,
@@ -221,9 +218,9 @@ class DesignIssue:
     location: str
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "issue_type": self.issue_type.value,
@@ -244,11 +241,11 @@ class WorkflowOptimization:
     current_clicks: int
     optimized_clicks: int
     click_reduction_pct: float
-    current_workflow: List[str]
-    optimized_workflow: List[str]
+    current_workflow: list[str]
+    optimized_workflow: list[str]
     implementation_notes: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "task": self.task,
@@ -269,12 +266,12 @@ class AccessibilityReport:
     issues_critical: int
     issues_warning: int
     issues_info: int
-    color_contrast_violations: List[Dict[str, Any]]
-    keyboard_nav_issues: List[Dict[str, Any]]
-    missing_alt_text: List[str]
-    recommendations: List[str]
+    color_contrast_violations: list[dict[str, Any]]
+    keyboard_nav_issues: list[dict[str, Any]]
+    missing_alt_text: list[str]
+    recommendations: list[str]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "wcag_level": self.wcag_level.value,
@@ -320,14 +317,14 @@ class UIUXDesignEngineer:
         self.spacing = DesignSystemSpacing()
 
         # Issue tracking
-        self.detected_issues: List[DesignIssue] = []
+        self.detected_issues: list[DesignIssue] = []
 
         logger.info(f"UIUXDesignEngineer initialized (dashboard={dashboard_path})")
 
     def audit_design_system(
         self,
-        dashboard_path: Optional[str] = None
-    ) -> Dict[str, Any]:
+        dashboard_path: str | None = None
+    ) -> dict[str, Any]:
         """
         Audit dashboard for design system compliance.
 
@@ -342,7 +339,7 @@ class UIUXDesignEngineer:
 
         # Scan Python files for inline styles
         for py_file in path.rglob("*.py"):
-            with open(py_file, 'r') as f:
+            with open(py_file) as f:
                 content = f.read()
 
                 # Detect inline styles (st.markdown with unsafe_allow_html)
@@ -396,7 +393,7 @@ class UIUXDesignEngineer:
         self,
         task: str,
         current_clicks: int,
-        current_workflow: Optional[List[str]] = None
+        current_workflow: list[str] | None = None
     ) -> WorkflowOptimization:
         """
         Analyze user workflow and suggest optimizations.
@@ -443,7 +440,7 @@ class UIUXDesignEngineer:
 
     def validate_accessibility(
         self,
-        page_path: Optional[str] = None,
+        page_path: str | None = None,
         wcag_level: WCAGLevel = WCAGLevel.AA
     ) -> AccessibilityReport:
         """
@@ -503,7 +500,7 @@ class UIUXDesignEngineer:
             ]
         )
 
-    def generate_component_library(self) -> Dict[str, str]:
+    def generate_component_library(self) -> dict[str, str]:
         """
         Generate standardized component library code.
 
@@ -553,7 +550,7 @@ def section_header(title: str, subtitle: Optional[str] = None):
 
         return components
 
-    def suggest_navigation_improvements(self) -> List[Dict[str, Any]]:
+    def suggest_navigation_improvements(self) -> list[dict[str, Any]]:
         """
         Suggest navigation improvements based on information architecture.
 
@@ -650,7 +647,7 @@ SPACING = Spacing()
 
         logger.info(f"Design system exported to {output_path}")
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get design system audit summary."""
         audit = self.audit_design_system()
 
@@ -682,7 +679,7 @@ if __name__ == "__main__":
         task="Generate game predictions",
         current_clicks=8
     )
-    print(f"\nWorkflow Optimization:")
+    print("\nWorkflow Optimization:")
     print(f"  Task: {workflow.task}")
     print(f"  Current clicks: {workflow.current_clicks}")
     print(f"  Optimized clicks: {workflow.optimized_clicks}")
@@ -690,4 +687,4 @@ if __name__ == "__main__":
 
     # Export design system
     designer.export_design_system(output_path="/tmp/design_system.py")
-    print(f"\n✅ Design system exported to /tmp/design_system.py")
+    print("\n✅ Design system exported to /tmp/design_system.py")

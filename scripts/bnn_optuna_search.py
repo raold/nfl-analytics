@@ -1,15 +1,16 @@
 
-import optuna
-import torch
-import torch.nn as nn
-import numpy as np
-import pandas as pd
-import psycopg2
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 import json
 from pathlib import Path
+
+import numpy as np
+import optuna
+import pandas as pd
+import psycopg2
+import torch
+import torch.nn as nn
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 print("[*] Loading data from database...")
 conn = psycopg2.connect(

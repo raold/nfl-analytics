@@ -25,7 +25,6 @@ import argparse
 import json
 import logging
 from pathlib import Path
-from typing import Dict
 
 import numpy as np
 import pandas as pd
@@ -34,9 +33,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def load_weights(weights_path: Path) -> Dict:
+def load_weights(weights_path: Path) -> dict:
     """Load optimized weights from JSON."""
-    with open(weights_path, 'r') as f:
+    with open(weights_path) as f:
         weights_data = json.load(f)
 
     logger.info(f"✓ Loaded weights from {weights_path}")
@@ -48,7 +47,7 @@ def load_weights(weights_path: Path) -> Dict:
 
 def apply_weights(
     predictions_df: pd.DataFrame,
-    weights: Dict[str, float]
+    weights: dict[str, float]
 ) -> pd.DataFrame:
     """
     Apply optimized weights to predictions.
@@ -97,7 +96,7 @@ def apply_weights(
     return predictions_df
 
 
-def display_weights_info(weights_data: Dict):
+def display_weights_info(weights_data: dict):
     """Display weights configuration information."""
     print("\n" + "=" * 80)
     print("OPTIMIZED ENSEMBLE WEIGHTS")
@@ -219,15 +218,15 @@ Examples:
     print("=" * 80)
     print(f"\nMethod: {weights_data['method'].upper()}")
     print(f"N Predictions: {len(ensemble_df)}")
-    print(f"\nEnsemble Predictions:")
+    print("\nEnsemble Predictions:")
     print(f"  Mean: {ensemble_df['ensemble_pred'].mean():.2f} yards")
     print(f"  Std: {ensemble_df['ensemble_pred'].std():.2f} yards")
     print(f"  Min: {ensemble_df['ensemble_pred'].min():.2f} yards")
     print(f"  Max: {ensemble_df['ensemble_pred'].max():.2f} yards")
-    print(f"\nEnsemble Uncertainty:")
+    print("\nEnsemble Uncertainty:")
     print(f"  Mean: {ensemble_df['ensemble_std'].mean():.2f} yards")
     print(f"  Median: {ensemble_df['ensemble_std'].median():.2f} yards")
-    print(f"\n✓ COMPLETE")
+    print("\n✓ COMPLETE")
 
 
 if __name__ == "__main__":

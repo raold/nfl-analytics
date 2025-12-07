@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.108655
 Test count: 15
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.hparam_sensitivity_grid import *
-import pandas as pd
-import pytest
 
 
 def test_load_sweep_results_basic():

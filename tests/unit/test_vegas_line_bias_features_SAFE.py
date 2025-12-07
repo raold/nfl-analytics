@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.638060
 Test count: 15
 """
 
+import pytest
 from features.vegas_line_bias_features_SAFE import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

@@ -8,10 +8,8 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-from typing import Optional, List
-from datetime import datetime
 
-from .base import BaseRepository, QueryResult, DatabaseConfig
+from .base import BaseRepository, DatabaseConfig, QueryResult
 
 
 class GameRepository(BaseRepository):
@@ -21,14 +19,14 @@ class GameRepository(BaseRepository):
     Provides high-level methods for common game queries with automatic caching.
     """
 
-    def __init__(self, config: Optional[DatabaseConfig] = None):
+    def __init__(self, config: DatabaseConfig | None = None):
         """Initialize game repository."""
         super().__init__(config)
 
     def get_games_by_season(
         self,
         season: int,
-        week: Optional[int] = None,
+        week: int | None = None,
         cache_ttl: int = 3600,
     ) -> QueryResult:
         """
@@ -96,7 +94,7 @@ class GameRepository(BaseRepository):
         self,
         game_id: str,
         cache_ttl: int = 3600,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Get game by ID.
 
@@ -184,7 +182,7 @@ class GameRepository(BaseRepository):
     def get_completed_games(
         self,
         season: int,
-        through_week: Optional[int] = None,
+        through_week: int | None = None,
         cache_ttl: int = 3600,
     ) -> QueryResult:
         """
@@ -251,7 +249,7 @@ class GameRepository(BaseRepository):
         # Invalidate affected cache keys
         invalidate = [
             f"game_{game_id}",
-            f"upcoming_games_20",  # Game no longer upcoming
+            "upcoming_games_20",  # Game no longer upcoming
         ]
 
         return self.execute(sql, (home_score, away_score, game_id), invalidate_cache=invalidate)

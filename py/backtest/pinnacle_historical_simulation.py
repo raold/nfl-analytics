@@ -28,8 +28,6 @@ Usage:
 import argparse
 import json
 import logging
-from datetime import datetime
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -56,7 +54,7 @@ class PinnacleSimulator:
         pinnacle_min_edge: float = 0.025,  # Pinnacle
         baseline_kelly: float = 0.25,  # Square books
         pinnacle_kelly: float = 0.35,  # Pinnacle
-        db_config: Dict = None
+        db_config: dict = None
     ):
         """Initialize simulator with vig and strategy parameters."""
 
@@ -227,7 +225,7 @@ class PinnacleSimulator:
     def simulate_pinnacle_performance(
         self,
         historical_bets: pd.DataFrame
-    ) -> Dict:
+    ) -> dict:
         """
         Simulate what performance would have been with Pinnacle.
 
@@ -381,7 +379,7 @@ class PinnacleSimulator:
             }
         }
 
-    def generate_report(self, results: Dict, output_path: str = None):
+    def generate_report(self, results: dict, output_path: str = None):
         """Generate human-readable report."""
 
         report = []
@@ -484,7 +482,7 @@ def main():
     logger.info(f"Results saved to {args.output}")
 
     # Summary
-    print(f"\n📊 SUMMARY:")
+    print("\n📊 SUMMARY:")
     print(f"   Baseline ROI:  {results['baseline']['roi']:+.2%}")
     print(f"   Pinnacle ROI:  {results['pinnacle']['roi']:+.2%}")
     print(f"   Improvement:   {results['improvement']['roi_delta']:+.2%}")

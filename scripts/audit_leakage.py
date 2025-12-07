@@ -22,7 +22,6 @@ Date: 2025-10-17
 """
 
 import argparse
-import ast
 import json
 import re
 from pathlib import Path
@@ -73,7 +72,7 @@ class LeakageAuditor:
                 f"Run this script from repository root."
             )
 
-        with open(self.catalog_path, "r") as f:
+        with open(self.catalog_path) as f:
             return yaml.safe_load(f)
 
     def get_safe_features(self) -> set[str]:

@@ -35,19 +35,16 @@ Created: November 22, 2025
 
 import logging
 import os
-import yaml
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
+import yaml
+from prometheus_client import Counter, Gauge, Histogram, Info
 from scipy import stats
-from prometheus_client import Gauge, Counter, Histogram, Info
 
 # Configure logging
 logging.basicConfig(
@@ -94,12 +91,12 @@ class GuardrailConfig:
 class GuardrailStatus:
     """Guardrail violation status."""
     violated: bool
-    violations: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    metrics: Dict[str, float] = field(default_factory=dict)
+    violations: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    metrics: dict[str, float] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
             'violated': self.violated,
@@ -120,13 +117,13 @@ class SignificanceReport:
     difference_pct: float
     p_value: float
     significant: bool
-    confidence_interval_95: Tuple[float, float]
+    confidence_interval_95: tuple[float, float]
     test_type: str  # 't-test', 'bootstrap', 'bayesian'
     sample_size_control: int
     sample_size_treatment: int
     effect_size: float  # Cohen's d
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
             'metric': self.metric,
@@ -184,9 +181,9 @@ class ABTestMonitor:
 
     def __init__(
         self,
-        config_path: Optional[str] = None,
-        db_url: Optional[str] = None,
-        guardrails: Optional[GuardrailConfig] = None
+        config_path: str | None = None,
+        db_url: str | None = None,
+        guardrails: GuardrailConfig | None = None
     ):
         """
         Initialize A/B test monitor.
@@ -220,10 +217,10 @@ class ABTestMonitor:
 
         logger.info(f"A/B Test Monitor initialized for test: {self.config['test_config']['name']}")
 
-    def _load_config(self) -> Dict:
+    def _load_config(self) -> dict:
         """Load A/B test configuration from YAML."""
         try:
-            with open(self.config_path, 'r') as f:
+            with open(self.config_path) as f:
                 config = yaml.safe_load(f)
             logger.info(f"Loaded A/B test config from {self.config_path}")
             return config
@@ -254,7 +251,7 @@ class ABTestMonitor:
     # Data Retrieval
     # ========================================================================
 
-    def get_ab_test_results(self, start_date: Optional[datetime] = None) -> pd.DataFrame:
+    def get_ab_test_results(self, start_date: datetime | None = None) -> pd.DataFrame:
         """
         Retrieve A/B test results from database.
 
@@ -291,7 +288,7 @@ class ABTestMonitor:
         logger.info(f"Retrieved {len(df)} A/B test results from database")
         return df
 
-    def get_current_metrics(self) -> Dict[str, Dict[str, float]]:
+    def get_current_metrics(self) -> dict[str, dict[str, float]]:
         """
         Calculate current metrics for control and treatment groups.
 
@@ -464,7 +461,7 @@ class ABTestMonitor:
 
         return False
 
-    def _update_test_status(self, status: TestStatus, reason: List[str]):
+    def _update_test_status(self, status: TestStatus, reason: list[str]):
         """Update A/B test status in database."""
         query = """
         INSERT INTO ml.ab_test_status (test_name, status, reason, timestamp)
@@ -620,7 +617,7 @@ class ABTestMonitor:
         control: np.ndarray,
         n_iterations: int = 10000,
         alpha: float = 0.05
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Calculate 95% confidence interval using bootstrap."""
         diffs = []
         for _ in range(n_iterations):
@@ -638,7 +635,7 @@ class ABTestMonitor:
         self,
         treatment: np.ndarray,
         control: np.ndarray
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         Bayesian hypothesis test using normal-normal conjugate prior.
 

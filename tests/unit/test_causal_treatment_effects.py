@@ -20,14 +20,13 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
+from datetime import datetime, timedelta
+
 import numpy as np
 import pandas as pd
 import pytest
-from datetime import datetime, timedelta
-from unittest.mock import Mock, patch
 
 from py.causal.treatment_definitions import TreatmentDefiner, TreatmentEvent
-
 
 # ============================================================================
 # FIXTURES

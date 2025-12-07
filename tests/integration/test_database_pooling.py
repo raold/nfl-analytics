@@ -28,14 +28,13 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import pytest
-import psycopg2
-from psycopg2 import pool
 import logging
 import time
-import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List
+
+import psycopg2
+import pytest
+from psycopg2 import pool
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

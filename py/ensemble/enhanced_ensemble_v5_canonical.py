@@ -22,23 +22,21 @@ Expected:
 - Expected Impact: +1.5-2.5% ROI improvement vs single models
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-import logging
-from pathlib import Path
 import json
-from typing import Dict, List, Tuple, Optional
+import logging
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import psycopg2
 import xgboost as xgb
-import pickle
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -128,7 +126,7 @@ class EnhancedEnsemble5Way:
         week: int,
         model_path: Path,
         model_name: str
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get predictions from R model using rpy2
 
@@ -138,7 +136,6 @@ class EnhancedEnsemble5Way:
         try:
             import rpy2.robjects as ro
             from rpy2.robjects import pandas2ri
-            from rpy2.robjects.conversion import localconverter
 
             # Load brms library (needed for posterior_predict)
             ro.r('library(brms)')
@@ -236,7 +233,7 @@ class EnhancedEnsemble5Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Get player game data (attempts, home/away) for prediction"""
         try:
             conn = psycopg2.connect(
@@ -290,7 +287,7 @@ class EnhancedEnsemble5Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """Get BNN prediction"""
         try:
             conn = psycopg2.connect(
@@ -439,7 +436,7 @@ class EnhancedEnsemble5Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """Get XGBoost prediction (point estimate only, no uncertainty)"""
         try:
             conn = psycopg2.connect(
@@ -563,7 +560,7 @@ class EnhancedEnsemble5Way:
         season: int,
         week: int,
         combination_method: str = "inverse_variance"
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 5-way ensemble prediction
 
@@ -655,7 +652,7 @@ class EnhancedEnsemble5Way:
             ensemble_var = np.sum((weights ** 2) * (stds ** 2))
             ensemble_std = np.sqrt(ensemble_var)
 
-            logger.info(f"\nEnsemble (inverse variance weighting):")
+            logger.info("\nEnsemble (inverse variance weighting):")
             logger.info(f"  Weights: {dict(zip(predictions.keys(), weights))}")
             logger.info(f"  Mean: {ensemble_mean:.1f} yards")
             logger.info(f"  Uncertainty: ±{ensemble_std:.1f} yards")
@@ -671,7 +668,7 @@ class EnhancedEnsemble5Way:
             between_var = ((means - ensemble_mean) ** 2).mean()
             ensemble_std = np.sqrt(within_var + between_var)
 
-            logger.info(f"\nEnsemble (simple mean):")
+            logger.info("\nEnsemble (simple mean):")
             logger.info(f"  Mean: {ensemble_mean:.1f} yards")
             logger.info(f"  Uncertainty: ±{ensemble_std:.1f} yards")
 

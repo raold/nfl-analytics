@@ -18,15 +18,15 @@ Usage:
     python py/models/bnn_nuts_comparison.py --config 1
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import argparse
 import logging
-from pathlib import Path
-import json
 import time
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -197,8 +197,8 @@ def train_and_evaluate_config(
         )
 
         # Train with NUTS
-        logger.info(f"Training with NUTS (MCMC sampling)...")
-        logger.info(f"Expected runtime: 3-6 hours")
+        logger.info("Training with NUTS (MCMC sampling)...")
+        logger.info("Expected runtime: 3-6 hours")
 
         bnn.fit(X_train, y_train_norm, verbose=True)
 
@@ -375,8 +375,8 @@ def main(config_to_run: int | None = None):
         logger.info(f"  Training time: {best['training_time_hours']:.2f} hours")
 
         # Compare to ADVI baseline
-        logger.info(f"\nCOMPARISON TO ADVI BASELINE:")
-        logger.info(f"  ADVI Calibration: 93.8% (over-confident)")
+        logger.info("\nCOMPARISON TO ADVI BASELINE:")
+        logger.info("  ADVI Calibration: 93.8% (over-confident)")
         logger.info(f"  NUTS Calibration: {best['calibration']:.1%}")
         logger.info(f"  Improvement: {93.8 - best['calibration']*100:.1f} pp closer to 68% target")
 

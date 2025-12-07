@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.677660
 Test count: 31
 """
 
+import pytest
 from features.defensive_pressure_effectiveness import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

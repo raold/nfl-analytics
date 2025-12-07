@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.642349
 Test count: 4
 """
 
+import pytest
 from features.player_feature_extractor import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_extract_features_basic():

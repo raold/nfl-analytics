@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.028483
 Test count: 94
 """
 
+import pytest
 from backtest.harness_multimodel import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_parse_seasons_basic():

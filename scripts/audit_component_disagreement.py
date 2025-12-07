@@ -33,7 +33,6 @@ sys.path.insert(0, str(project_root))
 
 import argparse
 import json
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -76,7 +75,7 @@ OUTPUT_FILE = "results/component_disagreement_audit.json"
 # ==============================================================================
 
 
-def get_validation_games(seasons: List[int]) -> pd.DataFrame:
+def get_validation_games(seasons: list[int]) -> pd.DataFrame:
     """Get all QB games from specified seasons with component predictions."""
     conn = psycopg2.connect(**DB_CONFIG)
 
@@ -104,7 +103,7 @@ def get_validation_games(seasons: List[int]) -> pd.DataFrame:
     return df
 
 
-def get_opponent_epa_stats(seasons: List[int]) -> pd.DataFrame:
+def get_opponent_epa_stats(seasons: list[int]) -> pd.DataFrame:
     """Get defensive EPA stats for opponent strength context."""
     conn = psycopg2.connect(**DB_CONFIG)
 
@@ -142,7 +141,7 @@ class ContextFeatureExtractor:
 
     def extract(
         self, player_id: str, team: str, opponent: str, season: int, week: int
-    ) -> Dict:
+    ) -> dict:
         """Extract all context features for a player-game."""
         # QB Experience
         try:
@@ -291,7 +290,7 @@ def collect_component_predictions(
 # ==============================================================================
 
 
-def segment_by_qb_experience(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_qb_experience(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by QB experience level."""
     return {
         "rookie": df[df["qb_games_with_stats"] < QB_EXPERIENCE_ROOKIE_THRESHOLD],
@@ -303,7 +302,7 @@ def segment_by_qb_experience(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     }
 
 
-def segment_by_roster_stability(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_roster_stability(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by roster stability."""
     return {
         "high_stability": df[
@@ -319,7 +318,7 @@ def segment_by_roster_stability(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     }
 
 
-def segment_by_market_dispersion(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_market_dispersion(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by market dispersion (bookmaker disagreement)."""
     # NOTE: Currently all 0.0 due to missing odds_history data
     return {
@@ -335,7 +334,7 @@ def segment_by_market_dispersion(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
 # ==============================================================================
 
 
-def calculate_component_correlations(df: pd.DataFrame) -> Dict:
+def calculate_component_correlations(df: pd.DataFrame) -> dict:
     """
     Calculate pairwise Pearson correlations between components.
 
@@ -392,7 +391,7 @@ def calculate_component_correlations(df: pd.DataFrame) -> Dict:
 # ==============================================================================
 
 
-def analyze_component_disagreement(seasons: List[int]) -> Dict:
+def analyze_component_disagreement(seasons: list[int]) -> dict:
     """
     Main analysis workflow:
     1. Load ensemble
@@ -424,7 +423,7 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
 
     # Save raw predictions for analysis
     results_df.to_csv("results/component_predictions_by_context.csv", index=False)
-    print(f"✅ Saved raw predictions to results/component_predictions_by_context.csv")
+    print("✅ Saved raw predictions to results/component_predictions_by_context.csv")
     print()
 
     # Step 4: Overall correlation (baseline)

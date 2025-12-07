@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.231351
 Test count: 39
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from reporting.latex_tables import *
-import pandas as pd
-import pytest
 
 
 def test_format_p_value_basic():

@@ -31,7 +31,6 @@ Version: 1.0
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -62,7 +61,7 @@ class RModelInterface:
         rpy2_initialized (bool): Whether rpy2 has been initialized
     """
 
-    def __init__(self, db_config: Dict, db_pool=None):
+    def __init__(self, db_config: dict, db_pool=None):
         """
         Initialize R model interface.
 
@@ -127,7 +126,7 @@ class RModelInterface:
 
     def _fetch_player_features(
         self, player_id: str, season: int, week: int
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Fetch player-game features from database.
 
@@ -205,7 +204,7 @@ class RModelInterface:
         model_path: Path,
         model_name: str,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Generate predictions from a brms model.
 
@@ -283,7 +282,7 @@ class RModelInterface:
         week: int,
         model_path: Path,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using Hierarchical Bayesian v2 model.
 
@@ -308,7 +307,7 @@ class RModelInterface:
         week: int,
         model_path: Path,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using Informative Priors v2 model.
 
@@ -332,7 +331,7 @@ class RModelInterface:
         season: int,
         week: int,
         skills_df: pd.DataFrame,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using State-Space Random Walk v2 (vectorized skills method).
 

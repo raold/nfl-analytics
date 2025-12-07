@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.461018
 Test count: 15
 """
 
+import pytest
 from analysis.evaluate_bnn_variants import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_load_test_data_basic():

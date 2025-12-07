@@ -31,12 +31,11 @@ Usage:
     )
 """
 
-import json
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
 from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +60,12 @@ class AgentCapability:
     agent_type: AgentType
     name: str
     description: str
-    responsibilities: List[str]
-    file_patterns: List[str] = field(default_factory=list)
-    keywords: Set[str] = field(default_factory=set)
-    dependencies: List[AgentType] = field(default_factory=list)
+    responsibilities: list[str]
+    file_patterns: list[str] = field(default_factory=list)
+    keywords: set[str] = field(default_factory=set)
+    dependencies: list[AgentType] = field(default_factory=list)
 
-    def matches(self, task: str, files: Optional[List[str]] = None) -> float:
+    def matches(self, task: str, files: list[str] | None = None) -> float:
         """
         Calculate match score for this agent given a task description.
 
@@ -111,9 +110,9 @@ class TaskRouting:
 
     task: str
     primary_agent: AgentType
-    supporting_agents: List[AgentType] = field(default_factory=list)
+    supporting_agents: list[AgentType] = field(default_factory=list)
     confidence: float = 0.0
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -128,13 +127,13 @@ class AgentCoordinator:
     def __init__(self):
         """Initialize coordinator with agent registry."""
         self.agents = self._initialize_agents()
-        self.routing_history: List[TaskRouting] = []
+        self.routing_history: list[TaskRouting] = []
 
         logger.info(
             f"AgentCoordinator initialized with {len(self.agents)} specialized agents"
         )
 
-    def _initialize_agents(self) -> Dict[AgentType, AgentCapability]:
+    def _initialize_agents(self) -> dict[AgentType, AgentCapability]:
         """
         Initialize registry of specialized agents with capabilities.
 
@@ -513,7 +512,7 @@ class AgentCoordinator:
     def analyze_task(
         self,
         task: str,
-        files: Optional[List[str]] = None,
+        files: list[str] | None = None,
         min_confidence: float = 0.3
     ) -> TaskRouting:
         """
@@ -577,7 +576,7 @@ class AgentCoordinator:
         """
         return self.agents[agent_type]
 
-    def list_agents(self) -> Dict[str, Dict[str, Any]]:
+    def list_agents(self) -> dict[str, dict[str, Any]]:
         """
         List all available agents with their capabilities.
 
@@ -595,7 +594,7 @@ class AgentCoordinator:
             for agent_type, capability in self.agents.items()
         }
 
-    def get_routing_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_routing_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """
         Get recent task routing history.
 
@@ -616,7 +615,7 @@ class AgentCoordinator:
             for routing in self.routing_history[-limit:]
         ]
 
-    def get_dependencies(self, agent_type: AgentType) -> List[AgentType]:
+    def get_dependencies(self, agent_type: AgentType) -> list[AgentType]:
         """
         Get dependencies for a specific agent type.
 
@@ -628,7 +627,7 @@ class AgentCoordinator:
         """
         return self.agents[agent_type].dependencies
 
-    def suggest_workflow(self, agent_type: AgentType) -> List[AgentType]:
+    def suggest_workflow(self, agent_type: AgentType) -> list[AgentType]:
         """
         Suggest workflow order when executing tasks for an agent.
 
@@ -656,7 +655,7 @@ class AgentCoordinator:
         add_dependencies(agent_type)
         return workflow
 
-    def execute_workflow(self, workflow_name: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute_workflow(self, workflow_name: str, context: dict[str, Any] | None = None) -> dict[str, Any]:
         """
         Execute a predefined workflow (dissertation → models → dashboard).
         
@@ -691,45 +690,45 @@ class AgentCoordinator:
                 ("data_leakage", "Temporal safety check"),
             ],
         }
-        
+
         if workflow_name not in workflows:
             raise ValueError(f"Unknown workflow: {workflow_name}. Available: {list(workflows.keys())}")
-        
+
         results = {
             "workflow": workflow_name,
             "started_at": datetime.now().isoformat(),
             "steps": [],
             "success": True,
         }
-        
+
         logger.info(f"Executing workflow: {workflow_name}")
-        
+
         for step_name, step_description in workflows[workflow_name]:
             logger.info(f"  Step: {step_description}")
-            
+
             step_result = {
                 "name": step_name,
                 "description": step_description,
                 "success": True,
                 "message": f"{step_description} completed",
             }
-            
+
             # In a full implementation, this would call actual validators
             # For now, it's a framework for execution
-            
+
             results["steps"].append(step_result)
-        
+
         results["completed_at"] = datetime.now().isoformat()
         logger.info(f"Workflow {workflow_name} completed successfully")
-        
+
         return results
 
     def execute_task(
         self,
         task: str,
-        files: Optional[List[str]] = None,
-        agents: Optional[List[AgentType]] = None,
-    ) -> Dict[str, Any]:
+        files: list[str] | None = None,
+        agents: list[AgentType] | None = None,
+    ) -> dict[str, Any]:
         """
         Execute a task by routing to appropriate agents and running them.
         
@@ -747,7 +746,7 @@ class AgentCoordinator:
             agents_to_run = [routing.primary_agent] + routing.supporting_agents
         else:
             agents_to_run = agents
-        
+
         results = {
             "task": task,
             "agents": [a.value for a in agents_to_run],
@@ -755,29 +754,29 @@ class AgentCoordinator:
             "success": True,
             "outputs": [],
         }
-        
+
         logger.info(f"Executing task: {task}")
         logger.info(f"Using agents: {[a.value for a in agents_to_run]}")
-        
+
         # Execute each agent
         for agent_type in agents_to_run:
             agent_info = self.agents[agent_type]
-            
+
             output = {
                 "agent": agent_type.value,
                 "agent_name": agent_info.name,
                 "success": True,
                 "message": f"Agent {agent_info.name} executed successfully",
             }
-            
+
             # In a full implementation, this would call actual agent executors
             # For now, it's a framework for execution
-            
+
             results["outputs"].append(output)
-        
+
         results["completed_at"] = datetime.now().isoformat()
-        logger.info(f"Task execution completed")
-        
+        logger.info("Task execution completed")
+
         return results
 
     def print_summary(self):

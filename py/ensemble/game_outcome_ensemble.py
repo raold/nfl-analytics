@@ -26,9 +26,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import psycopg
 import xgboost as xgb
-from scipy.special import expit
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.neural_network import MLPClassifier
@@ -37,7 +35,6 @@ from sklearn.preprocessing import StandardScaler
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.models.state_space import StateSpaceRatings, fetch_games, get_connection
-
 
 # ============================================================================
 # Feature Engineering for Game Outcomes

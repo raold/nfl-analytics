@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.657216
 Test count: 23
 """
 
+import pytest
 from features.bayesian_player_features import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

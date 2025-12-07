@@ -45,7 +45,6 @@ Research: Sagarin Methodology Analysis
 """
 
 import logging
-from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
@@ -106,7 +105,7 @@ def exponential_rolling(
     df: pd.DataFrame,
     column: str,
     halflife: float = 4.0,
-    groupby: Optional[Union[str, List[str]]] = None,
+    groupby: str | list[str] | None = None,
     min_periods: int = 1,
     shift_periods: int = 1,
 ) -> pd.Series:
@@ -191,7 +190,7 @@ def exponential_ewm(
     df: pd.DataFrame,
     column: str,
     halflife: float = 4.0,
-    groupby: Optional[Union[str, List[str]]] = None,
+    groupby: str | list[str] | None = None,
     min_periods: int = 1,
 ) -> pd.Series:
     """
@@ -243,8 +242,8 @@ def compare_linear_vs_exponential(
     df: pd.DataFrame,
     column: str,
     window: int = 4,
-    halflife: Optional[float] = None,
-    groupby: Optional[Union[str, List[str]]] = None,
+    halflife: float | None = None,
+    groupby: str | list[str] | None = None,
 ) -> pd.DataFrame:
     """
     Compare linear rolling average vs exponential rolling average.
@@ -326,7 +325,7 @@ def main():
 
     print("\nLinear weights (rolling(4).mean()):")
     print(f"  [oldest → newest]: {weights_linear}")
-    print(f"  All games equally weighted")
+    print("  All games equally weighted")
 
     print("\nExponential weights (halflife=4):")
     print(f"  [oldest → newest]: {weights_exp}")

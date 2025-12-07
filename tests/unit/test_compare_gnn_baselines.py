@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.471579
 Test count: 15
 """
 
-from analysis.compare_gnn_baselines import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from analysis.compare_gnn_baselines import *
 
 
 def test_load_gnn_results_basic():

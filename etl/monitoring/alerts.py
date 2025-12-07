@@ -12,7 +12,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +34,7 @@ class Alert:
     message: str
     timestamp: datetime
     source: str = "ETL Pipeline"
-    context: Optional[Dict] = None
+    context: dict | None = None
 
     def __str__(self) -> str:
         level_emoji = {
@@ -62,8 +61,8 @@ class AlertManager:
 
     def __init__(
         self,
-        alert_log_path: Optional[Path] = None,
-        email_config: Optional[Dict] = None,
+        alert_log_path: Path | None = None,
+        email_config: dict | None = None,
         min_level: AlertLevel = AlertLevel.WARNING
     ):
         """
@@ -83,7 +82,7 @@ class AlertManager:
         self.alert_log_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Alert history (in-memory)
-        self.alert_history: List[Alert] = []
+        self.alert_history: list[Alert] = []
         self.max_history = 1000
 
         logger.info(f"AlertManager initialized (min_level={min_level.value})")
@@ -93,7 +92,7 @@ class AlertManager:
         level: AlertLevel,
         title: str,
         message: str,
-        context: Optional[Dict] = None
+        context: dict | None = None
     ):
         """
         Send an alert.
@@ -222,11 +221,11 @@ This is an automated alert from the NFL Analytics ETL system.
         except Exception as e:
             logger.error(f"Failed to send email alert: {e}")
 
-    def get_recent_alerts(self, limit: int = 10) -> List[Alert]:
+    def get_recent_alerts(self, limit: int = 10) -> list[Alert]:
         """Get most recent alerts."""
         return self.alert_history[-limit:]
 
-    def get_alert_summary(self) -> Dict[str, int]:
+    def get_alert_summary(self) -> dict[str, int]:
         """Get summary of alerts by level."""
         summary = {level.value: 0 for level in AlertLevel}
         for alert in self.alert_history:
@@ -234,7 +233,7 @@ This is an automated alert from the NFL Analytics ETL system.
         return summary
 
     # Convenience methods for common alerts
-    def pipeline_failed(self, pipeline_name: str, error_message: str, context: Optional[Dict] = None):
+    def pipeline_failed(self, pipeline_name: str, error_message: str, context: dict | None = None):
         """Send pipeline failure alert."""
         self.send(
             level=AlertLevel.ERROR,
@@ -243,7 +242,7 @@ This is an automated alert from the NFL Analytics ETL system.
             context=context
         )
 
-    def data_quality_issue(self, table: str, issue: str, severity: str = "warning", context: Optional[Dict] = None):
+    def data_quality_issue(self, table: str, issue: str, severity: str = "warning", context: dict | None = None):
         """Send data quality issue alert."""
         level = AlertLevel.WARNING if severity == "warning" else AlertLevel.ERROR
         self.send(

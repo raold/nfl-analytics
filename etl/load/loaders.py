@@ -12,11 +12,10 @@ import io
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 import psycopg
-from psycopg import sql
 
 logger = logging.getLogger(__name__)
 
@@ -32,8 +31,8 @@ class LoadResult:
     load_time: datetime
     duration_seconds: float
     table_name: str
-    error: Optional[str] = None
-    metadata: Dict[str, Any] = None
+    error: str | None = None
+    metadata: dict[str, Any] = None
 
     @property
     def total_rows(self) -> int:
@@ -80,8 +79,8 @@ class DatabaseLoader:
         self,
         df: pd.DataFrame,
         table_name: str,
-        conflict_columns: List[str],
-        update_columns: Optional[List[str]] = None
+        conflict_columns: list[str],
+        update_columns: list[str] | None = None
     ) -> LoadResult:
         """
         Upsert DataFrame into table.
@@ -325,7 +324,7 @@ class BulkLoader:
         self,
         df: pd.DataFrame,
         table_name: str,
-        columns: Optional[List[str]] = None
+        columns: list[str] | None = None
     ) -> LoadResult:
         """
         Load DataFrame using COPY command.

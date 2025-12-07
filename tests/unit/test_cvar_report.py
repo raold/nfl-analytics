@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.492256
 Test count: 10
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from risk.cvar_report import *
-import pandas as pd
-import pytest
 
 
 def test_parse_args_basic():

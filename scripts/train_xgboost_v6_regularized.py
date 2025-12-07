@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.metrics import mean_absolute_error, r2_score
+from sklearn.metrics import mean_absolute_error
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -187,7 +187,7 @@ class RegularizedXGBoostTrainer:
             json.dump(metadata, f, indent=2, default=str)
 
         logger.info(f"\n{'='*60}")
-        logger.info(f"REGULARIZATION COMPARISON")
+        logger.info("REGULARIZATION COMPARISON")
         logger.info(f"{'='*60}")
         for r in results:
             logger.info(f"{r['config']:10s}: Val MAE={r['val_mae']:.2f}, Overfit={r['overfit_ratio']:.2f}, vs Market={r['vs_market']:+.2f}")

@@ -8,10 +8,10 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import numpy as np
-from typing import List
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+import numpy as np
+
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 
 class SimpleAverageStrategy(EnsembleStrategy):
@@ -43,7 +43,7 @@ class SimpleAverageStrategy(EnsembleStrategy):
 
     def combine(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         **kwargs
     ) -> EnsemblePrediction:
         """
@@ -93,6 +93,7 @@ class SimpleAverageStrategy(EnsembleStrategy):
 if __name__ == "__main__":
     """Test simple average strategy."""
     import logging
+
     from .base import ModelType
 
     logging.basicConfig(level=logging.INFO)

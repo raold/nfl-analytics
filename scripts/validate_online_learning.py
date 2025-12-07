@@ -22,33 +22,29 @@ Author: Claude Code (Phase 4 Dissertation Enhancement)
 Created: November 9, 2025
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
-import logging
-from pathlib import Path
-from typing import Dict, List, Tuple
 import json
+import logging
 import time
 from datetime import datetime
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
-from scipy import stats
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 from py.online.online_learning_adapter import (
     OnlinePredictionPipeline,
-    AdaptiveRetrainer,
-    compare_online_vs_static,
-    detect_known_drift_events,
     calculate_adaptation_speed,
+    detect_known_drift_events,
 )
 
 logging.basicConfig(
@@ -66,7 +62,7 @@ sns.set_style('whitegrid')
 
 def load_player_stats_by_week(
     season: int,
-    db_params: Dict[str, str],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """
@@ -176,7 +172,7 @@ def run_prequential_evaluation(
     df: pd.DataFrame,
     pipeline: OnlinePredictionPipeline,
     target_col: str = 'passing_yards',
-) -> Dict[str, any]:
+) -> dict[str, any]:
     """
     Run prequential evaluation (test-then-train) on 2024 season
 
@@ -209,9 +205,9 @@ def run_prequential_evaluation(
 
 def evaluate_drift_detection(
     df: pd.DataFrame,
-    detected_indices: List[int],
-    known_events: List[Dict],
-) -> Dict[str, float]:
+    detected_indices: list[int],
+    known_events: list[dict],
+) -> dict[str, float]:
     """
     Evaluate drift detection accuracy
 
@@ -269,9 +265,9 @@ def evaluate_drift_detection(
 # =============================================================================
 
 def measure_adaptation_speed(
-    mae_history: List[float],
-    drift_indices: List[int],
-) -> Dict[str, float]:
+    mae_history: list[float],
+    drift_indices: list[int],
+) -> dict[str, float]:
     """
     Measure how fast model adapts after drift
 
@@ -383,8 +379,8 @@ def compare_static_vs_online(
 # =============================================================================
 
 def plot_prequential_results(
-    mae_history: List[float],
-    drift_indices: List[int],
+    mae_history: list[float],
+    drift_indices: list[int],
     output_path: str,
 ):
     """
@@ -554,16 +550,16 @@ def main():
     print("=" * 60)
     print(f"Season: {args.season}")
     print(f"Records analyzed: {len(df)}")
-    print(f"\nPrequential Evaluation:")
+    print("\nPrequential Evaluation:")
     print(f"  MAE: {prequential_results['mean_mae']:.2f} yards")
     print(f"  Drift events: {prequential_results['num_drift_events']}")
-    print(f"\nDrift Detection Accuracy:")
+    print("\nDrift Detection Accuracy:")
     print(f"  Precision: {drift_accuracy['precision']:.2%}")
     print(f"  Recall: {drift_accuracy['recall']:.2%}")
     print(f"  F1 Score: {drift_accuracy['f1_score']:.2%}")
-    print(f"\nAdaptation Speed:")
+    print("\nAdaptation Speed:")
     print(f"  Mean recovery: {adaptation_speed['mean_recovery_time']:.1f} games")
-    print(f"\nStatic vs Online:")
+    print("\nStatic vs Online:")
     print(comparison)
     print("=" * 60)
 

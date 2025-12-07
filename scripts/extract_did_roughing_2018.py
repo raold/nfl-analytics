@@ -33,15 +33,15 @@ Author: NFL Analytics Research Team
 Date: November 16, 2025
 """
 
-import os
-import sys
 import json
+import os
+import warnings
+
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine
 from scipy import stats
-from typing import Dict, Tuple, List
-import warnings
+from sqlalchemy import create_engine
+
 warnings.filterwarnings('ignore')
 
 # Database connection
@@ -265,13 +265,13 @@ def extract_qb_performance_data(defense_classifications: pd.DataFrame) -> pd.Dat
         print("   These observations will be excluded from DiD analysis")
 
     # Summary statistics
-    print(f"\nData Summary:")
+    print("\nData Summary:")
     print(f"  Total observations: {len(df):,}")
     print(f"  Unique QBs: {df['player_id'].nunique()}")
     print(f"  Seasons: {df['season'].min()}-{df['season'].max()}")
     print(f"  Pre-treatment (2015-2017): {len(df[df['pre_treatment']==1]):,} games")
     print(f"  Post-treatment (2018-2024): {len(df[df['post_treatment']==1]):,} games")
-    print(f"\nTreatment Assignment:")
+    print("\nTreatment Assignment:")
     print(f"  High-roughing defenses (treated): {df['is_treated'].sum():,} games")
     print(f"  Low-roughing defenses (control): {(~df['is_treated']).sum():,} games")
 
@@ -283,7 +283,7 @@ def extract_qb_performance_data(defense_classifications: pd.DataFrame) -> pd.Dat
     return df
 
 
-def calculate_did_treatment_effect(df: pd.DataFrame) -> Dict:
+def calculate_did_treatment_effect(df: pd.DataFrame) -> dict:
     """
     Calculate Difference-in-Differences treatment effect.
 
@@ -314,13 +314,13 @@ def calculate_did_treatment_effect(df: pd.DataFrame) -> Dict:
     # DiD estimator
     did_effect = (treated_post - treated_pre) - (control_post - control_pre)
 
-    print(f"\nGroup Means (Average Passing Yards):")
+    print("\nGroup Means (Average Passing Yards):")
     print(f"  Treated (High Roughing) - Pre-2018:  {treated_pre:.2f} yards")
     print(f"  Treated (High Roughing) - Post-2018: {treated_post:.2f} yards")
     print(f"  Control (Low Roughing) - Pre-2018:   {control_pre:.2f} yards")
     print(f"  Control (Low Roughing) - Post-2018:  {control_post:.2f} yards")
 
-    print(f"\nFirst Differences:")
+    print("\nFirst Differences:")
     print(f"  Treated group change: {treated_post - treated_pre:+.2f} yards")
     print(f"  Control group change: {control_post - control_pre:+.2f} yards")
 
@@ -352,19 +352,19 @@ def calculate_did_treatment_effect(df: pd.DataFrame) -> Dict:
     ci_lower = did_effect - 1.96 * se_did
     ci_upper = did_effect + 1.96 * se_did
 
-    print(f"\nStatistical Inference:")
+    print("\nStatistical Inference:")
     print(f"  Standard Error: {se_did:.2f} yards")
     print(f"  t-statistic: {t_stat:.3f}")
     print(f"  p-value: {p_value:.6f}")
     print(f"  95% CI: [{ci_lower:.2f}, {ci_upper:.2f}] yards")
 
     if p_value < 0.05:
-        print(f"\n✅ Treatment effect is statistically significant at α=0.05")
+        print("\n✅ Treatment effect is statistically significant at α=0.05")
     else:
-        print(f"\n⚠️  Treatment effect is NOT statistically significant at α=0.05")
+        print("\n⚠️  Treatment effect is NOT statistically significant at α=0.05")
 
     # Bootstrap confidence intervals for robustness
-    print(f"\nCalculating bootstrap confidence intervals (1000 iterations)...")
+    print("\nCalculating bootstrap confidence intervals (1000 iterations)...")
     bootstrap_effects = []
     n_bootstrap = 1000
 
@@ -411,7 +411,7 @@ def calculate_did_treatment_effect(df: pd.DataFrame) -> Dict:
     return results
 
 
-def validate_parallel_trends(df: pd.DataFrame) -> Dict:
+def validate_parallel_trends(df: pd.DataFrame) -> dict:
     """
     Validate parallel trends assumption using pre-treatment period (2015-2017).
 
@@ -454,7 +454,7 @@ def validate_parallel_trends(df: pd.DataFrame) -> Dict:
     slope_diff_t = slope_diff / slope_diff_se
     slope_diff_p = 2 * (1 - stats.t.cdf(abs(slope_diff_t), len(years) - 2))
 
-    print(f"\nLinear Trend Analysis:")
+    print("\nLinear Trend Analysis:")
     print(f"  Treated group slope: {treated_slope:+.2f} yards/year (p={treated_p:.4f})")
     print(f"  Control group slope: {control_slope:+.2f} yards/year (p={control_p:.4f})")
     print(f"  Difference in slopes: {slope_diff:+.2f} yards/year")
@@ -485,7 +485,7 @@ def validate_parallel_trends(df: pd.DataFrame) -> Dict:
     return results
 
 
-def placebo_test(df: pd.DataFrame) -> Dict:
+def placebo_test(df: pd.DataFrame) -> dict:
     """
     Placebo test: Run DiD on 2016-2017 period (should show no effect).
 
@@ -511,7 +511,7 @@ def placebo_test(df: pd.DataFrame) -> Dict:
 
     placebo_effect = (treated_post - treated_pre) - (control_post - control_pre)
 
-    print(f"\nPlacebo DiD (2016 → 2017):")
+    print("\nPlacebo DiD (2016 → 2017):")
     print(f"  Treated (High Roughing) - 2016: {treated_pre:.2f} yards")
     print(f"  Treated (High Roughing) - 2017: {treated_post:.2f} yards")
     print(f"  Control (Low Roughing) - 2016:  {control_pre:.2f} yards")
@@ -553,7 +553,7 @@ def placebo_test(df: pd.DataFrame) -> Dict:
     return results
 
 
-def robustness_checks(df: pd.DataFrame) -> Dict:
+def robustness_checks(df: pd.DataFrame) -> dict:
     """
     Robustness checks: Try different treatment definitions.
 

@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.431423
 Test count: 9
 """
 
-from analysis.generate_slippage_model import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from analysis.generate_slippage_model import *
 
 
 def test_generate_slippage_table_basic():

@@ -5,7 +5,6 @@ Converts PDF pages to PNG images for visual inspection, then auto-deletes them.
 """
 
 import subprocess
-import os
 import sys
 from pathlib import Path
 
@@ -18,7 +17,7 @@ DPI = 150  # Balance between quality and file size
 def get_page_count():
     """Get total number of pages from LaTeX log."""
     log_path = Path(PDF_PATH).parent / "main.log"
-    with open(log_path, 'r') as f:
+    with open(log_path) as f:
         for line in f:
             if "Output written on main.pdf" in line:
                 # Extract page count from: "Output written on main.pdf (362 pages, 5356034 bytes)."

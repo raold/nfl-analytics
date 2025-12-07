@@ -4,10 +4,13 @@ Quick smoke test for Ensemble v6.1 with PostgreSQL R lookup
 """
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 import time
+
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
 
 def main():
     print("\n" + "="*80)
@@ -29,7 +32,7 @@ def main():
     season = 2024
     week = 9
 
-    print(f"Test prediction for:")
+    print("Test prediction for:")
     print(f"  Player: {player_id}")
     print(f"  Season: {season}")
     print(f"  Week: {week}\n")

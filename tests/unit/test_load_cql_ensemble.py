@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.811289
 Test count: 35
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.load_cql_ensemble import *
-import pandas as pd
-import pytest
 
 
 def test_example_usage_basic():

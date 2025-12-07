@@ -5,12 +5,13 @@ Generate predictions for all Week 12 2025 games using GameOutcomePredictor.
 This script creates baseline predictions for display in the dashboard.
 """
 
+import logging
 import os
 import sys
-from pathlib import Path
-import psycopg
 from datetime import datetime
-import logging
+from pathlib import Path
+
+import psycopg
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))

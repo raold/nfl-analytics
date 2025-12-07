@@ -22,10 +22,11 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import os
 import logging
+import os
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
+
 import streamlit as st
 
 # Try to import psycopg3 and connection pooling

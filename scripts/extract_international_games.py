@@ -24,9 +24,9 @@ Original: November 16, 2025
 """
 
 import os
-import pandas as pd
+
 import numpy as np
-from datetime import datetime
+import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 
@@ -397,7 +397,7 @@ def analyze_international_effects(df):
     # Effect 5: Compare to Expected Domestic Performance
     print("\n5. INTERNATIONAL vs DOMESTIC BASELINE")
     print(f"   International avg: {df['passing_yards'].mean():.1f} ± {df['passing_yards'].std():.1f} yards")
-    print(f"   Expected domestic baseline: ~250 yards (typical QB average)")
+    print("   Expected domestic baseline: ~250 yards (typical QB average)")
     print(f"   International penalty: {df['passing_yards'].mean() - 250:.1f} yards")
 
     return df
@@ -430,9 +430,9 @@ if __name__ == '__main__':
     print(f"Total games: {df['game_id'].nunique()}")
     print(f"Total player-games: {len(df)}")
     print(f"Seasons: {df['season'].min()}-{df['season'].max()}")
-    print(f"\nCities:")
+    print("\nCities:")
     print(df['city'].value_counts())
-    print(f"\nTeams (sorted by appearances):")
+    print("\nTeams (sorted by appearances):")
     print(df['player_team'].value_counts().head(10))
 
     print("\n✅ International games extraction complete!")

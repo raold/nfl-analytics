@@ -14,20 +14,19 @@ Author: Claude Code (Anthropic)
 Date: November 12, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-import pytest
+import tempfile
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
-import tempfile
-import shutil
+import pytest
 
 from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
-from py.online.incremental_xgboost import IncrementalXGBoost
-
 
 # =============================================================================
 # Fixtures

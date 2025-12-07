@@ -24,12 +24,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import logging
 import os
 
-import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 
-from py.ensemble.r_model_interface import RModelInterface
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from py.ensemble.r_model_interface import RModelInterface
 
 # Load environment
 load_dotenv()
@@ -83,9 +82,9 @@ def test_r_interface():
             mean, std = result
             print(f"   ✅ Hierarchical v2: {mean:.1f} ± {std:.1f} yards")
             if 150 <= mean <= 400 and 20 <= std <= 100:
-                print(f"   ✅ Prediction is reasonable")
+                print("   ✅ Prediction is reasonable")
             else:
-                print(f"   ⚠️  Prediction may be unreasonable")
+                print("   ⚠️  Prediction may be unreasonable")
         else:
             print("   ❌ Prediction failed")
             return False
@@ -103,9 +102,9 @@ def test_r_interface():
             mean, std = result
             print(f"   ✅ Informative Priors v2: {mean:.1f} ± {std:.1f} yards")
             if 150 <= mean <= 400 and 20 <= std <= 100:
-                print(f"   ✅ Prediction is reasonable")
+                print("   ✅ Prediction is reasonable")
             else:
-                print(f"   ⚠️  Prediction may be unreasonable")
+                print("   ⚠️  Prediction may be unreasonable")
         else:
             print("   ❌ Prediction failed")
             return False
@@ -123,9 +122,9 @@ def test_r_interface():
             mean, std = result
             print(f"   ✅ State-Space v2: {mean:.1f} ± {std:.1f} yards")
             if 150 <= mean <= 400 and 20 <= std <= 100:
-                print(f"   ✅ Prediction is reasonable")
+                print("   ✅ Prediction is reasonable")
             else:
-                print(f"   ⚠️  Prediction may be unreasonable")
+                print("   ⚠️  Prediction may be unreasonable")
         else:
             print("   ❌ Prediction failed")
             return False
@@ -146,7 +145,7 @@ def test_ensemble_v6():
     print("\n1. Initializing ensemble v6.0...")
     try:
         ensemble = EnhancedEnsemble5Way()
-        print(f"   ✅ Ensemble initialized")
+        print("   ✅ Ensemble initialized")
         print(f"   Weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
     except Exception as e:
@@ -218,7 +217,7 @@ def test_ensemble_v6():
             print("✅ Prediction interval has positive width")
             checks_passed += 1
         else:
-            print(f"❌ Invalid prediction interval")
+            print("❌ Invalid prediction interval")
 
         # Check 4: At least 3 models contributed
         if "components" in result and len(result["components"]) >= 3:

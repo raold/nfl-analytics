@@ -6,8 +6,7 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-from typing import Optional, List
-from .base import BaseRepository, QueryResult, DatabaseConfig
+from .base import BaseRepository
 
 
 class FeatureRepository(BaseRepository):
@@ -18,7 +17,7 @@ class FeatureRepository(BaseRepository):
         game_id: str,
         feature_set: str = "baseline",
         cache_ttl: int = 3600,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Get ML features for a game.
 
@@ -53,7 +52,7 @@ class FeatureRepository(BaseRepository):
         player_id: str,
         game_id: str,
         cache_ttl: int = 3600,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Get ML features for a player in a specific game.
 

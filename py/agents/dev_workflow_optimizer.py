@@ -35,13 +35,12 @@ Phase: 6 (Frontend Agents - Week 4)
 """
 
 import logging
-import subprocess
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import docker
 import yaml
@@ -77,13 +76,13 @@ class DevelopmentCycle:
 
     cycle_id: int
     started_at: datetime
-    ended_at: Optional[datetime]
+    ended_at: datetime | None
     change_type: ChangeType
     rebuild_type: RebuildType
-    duration_seconds: Optional[float]
-    files_changed: List[str]
+    duration_seconds: float | None
+    files_changed: list[str]
     success: bool
-    error: Optional[str]
+    error: str | None
 
 
 @dataclass
@@ -92,8 +91,8 @@ class DevelopmentSession:
 
     session_id: str
     started_at: datetime
-    ended_at: Optional[datetime]
-    cycles: List[DevelopmentCycle] = field(default_factory=list)
+    ended_at: datetime | None
+    cycles: list[DevelopmentCycle] = field(default_factory=list)
 
 
 @dataclass
@@ -104,8 +103,8 @@ class CycleTimeReport:
     avg_cycle_time_seconds: float
     median_cycle_time_seconds: float
     p95_cycle_time_seconds: float
-    cycles_by_type: Dict[ChangeType, int]
-    rebuilds_by_type: Dict[RebuildType, int]
+    cycles_by_type: dict[ChangeType, int]
+    rebuilds_by_type: dict[RebuildType, int]
     hot_reload_rate: float  # % of cycles with no rebuild
     generated_at: datetime = field(default_factory=datetime.now)
 
@@ -139,8 +138,8 @@ class DevWorkflowOptimizer:
         self.docker_compose_file = self.project_root / docker_compose_file
         self.docker_compose_dev_file = self.project_root / docker_compose_dev_file
 
-        self.sessions: List[DevelopmentSession] = []
-        self.current_session: Optional[DevelopmentSession] = None
+        self.sessions: list[DevelopmentSession] = []
+        self.current_session: DevelopmentSession | None = None
 
         self.docker_client = docker.from_env()
 
@@ -176,7 +175,7 @@ class DevWorkflowOptimizer:
     def track_cycle(
         self,
         change_type: ChangeType,
-        files_changed: List[str]
+        files_changed: list[str]
     ) -> DevelopmentCycle:
         """
         Track a development cycle (code change → result visible).
@@ -214,7 +213,7 @@ class DevWorkflowOptimizer:
         self,
         cycle: DevelopmentCycle,
         success: bool,
-        error: Optional[str] = None
+        error: str | None = None
     ) -> None:
         """
         Mark a cycle as complete.
@@ -293,7 +292,7 @@ class DevWorkflowOptimizer:
             hot_reload_rate=hot_reload_rate
         )
 
-    def suggest_optimizations(self) -> List[OptimizationSuggestion]:
+    def suggest_optimizations(self) -> list[OptimizationSuggestion]:
         """
         Suggest workflow optimizations based on analysis.
 
@@ -386,7 +385,7 @@ class DevWorkflowOptimizer:
 
         return suggestions
 
-    def check_docker_dev_config(self) -> Dict[str, Any]:
+    def check_docker_dev_config(self) -> dict[str, Any]:
         """
         Check if docker-compose.dev.yml is configured correctly.
 
@@ -451,7 +450,7 @@ class DevWorkflowOptimizer:
     def _determine_rebuild_type(
         self,
         change_type: ChangeType,
-        files_changed: List[str]
+        files_changed: list[str]
     ) -> RebuildType:
         """Determine what type of rebuild is required."""
 
@@ -476,12 +475,12 @@ if __name__ == "__main__":
 
     # Check dev configuration
     dev_config = optimizer.check_docker_dev_config()
-    print(f"\n=== Docker Dev Configuration ===")
+    print("\n=== Docker Dev Configuration ===")
     print(f"Configured: {dev_config['configured']}")
     print(f"Message: {dev_config['message']}")
 
     if dev_config["recommendations"]:
-        print(f"\nRecommendations:")
+        print("\nRecommendations:")
         for rec in dev_config["recommendations"]:
             if rec:
                 print(f"  - {rec}")
@@ -499,14 +498,14 @@ if __name__ == "__main__":
 
     # Get report
     report = optimizer.analyze_cycle_times()
-    print(f"\n=== Cycle Time Report ===")
+    print("\n=== Cycle Time Report ===")
     print(f"Total cycles: {report.total_cycles}")
     print(f"Avg cycle time: {report.avg_cycle_time_seconds:.1f}s")
     print(f"Hot reload rate: {report.hot_reload_rate:.0%}")
 
     # Get suggestions
     suggestions = optimizer.suggest_optimizations()
-    print(f"\n=== Optimization Suggestions ===")
+    print("\n=== Optimization Suggestions ===")
     for sug in suggestions[:3]:
         print(f"\n{sug.priority}: {sug.title}")
         print(f"  {sug.description}")

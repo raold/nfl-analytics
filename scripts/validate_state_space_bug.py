@@ -7,8 +7,8 @@ Confirms that state-space predictions (5-7 range) are dominating ensemble
 due to low variance, causing 191-yard MAE.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # Load backtest results
 df = pd.read_csv('/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_FIXED_2022_2024.csv')
@@ -58,7 +58,7 @@ print()
 print("5. PREDICTION UNCERTAINTY")
 print("-" * 80)
 print(f"   Ensemble std:    {df['prediction_std'].mean():.2f} yards ❌ TINY (unrealistic)")
-print(f"   Expected std:    ~30-50 yards (realistic)")
+print("   Expected std:    ~30-50 yards (realistic)")
 print()
 
 print("6. CORRELATION WITH ACTUAL")

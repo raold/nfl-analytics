@@ -8,12 +8,10 @@ This script:
 3. Creates initial records for all trained models
 """
 
+import hashlib
 import json
-import os
 import sys
 from pathlib import Path
-from datetime import datetime
-import hashlib
 
 import psycopg2
 from psycopg2.extras import Json
@@ -36,7 +34,7 @@ def apply_migration(conn):
 
     migration_path = PROJECT_ROOT / "db" / "migrations" / "025_model_registry.sql"
 
-    with open(migration_path, 'r') as f:
+    with open(migration_path) as f:
         sql = f.read()
 
     with conn.cursor() as cur:
@@ -63,7 +61,7 @@ def scan_models(models_dir):
     bnn_final = models_dir / "bayesian" / "bnn_multioutput_v1_final.pt"
     bnn_results = models_dir / "bayesian" / "bnn_multioutput_results.json"
     if bnn_final.exists():
-        with open(bnn_results, 'r') as f:
+        with open(bnn_results) as f:
             results = json.load(f)
 
         models.append({
@@ -91,7 +89,7 @@ def scan_models(models_dir):
     xgb_model = models_dir / "xgboost" / "xgboost_full_1999_2025.json"
     xgb_metadata = models_dir / "xgboost" / "xgboost_full_metadata.json"
     if xgb_model.exists() and xgb_metadata.exists():
-        with open(xgb_metadata, 'r') as f:
+        with open(xgb_metadata) as f:
             metadata = json.load(f)
 
         models.append({
@@ -120,7 +118,7 @@ def scan_models(models_dir):
     if gnn_ablation_dir.exists():
         results_file = gnn_ablation_dir / "ablation_results.json"
         if results_file.exists():
-            with open(results_file, 'r') as f:
+            with open(results_file) as f:
                 results = json.load(f)
 
             models.append({
@@ -141,7 +139,7 @@ def scan_models(models_dir):
     cvae_dir = models_dir / "cvae"
     cvae_metrics = cvae_dir / "cvae_metrics.json"
     if cvae_metrics.exists():
-        with open(cvae_metrics, 'r') as f:
+        with open(cvae_metrics) as f:
             metrics = json.load(f)
 
         models.append({
@@ -165,7 +163,7 @@ def scan_models(models_dir):
     if cql_model.exists():
         metrics = {}
         if cql_log.exists():
-            with open(cql_log, 'r') as f:
+            with open(cql_log) as f:
                 log_data = json.load(f)
                 metrics = log_data
 
@@ -187,7 +185,7 @@ def scan_models(models_dir):
     state_space_dir = models_dir / "state_space"
     state_metrics = state_space_dir / "state_space_metrics.json"
     if state_metrics.exists():
-        with open(state_metrics, 'r') as f:
+        with open(state_metrics) as f:
             metrics = json.load(f)
 
         models.append({
@@ -208,7 +206,7 @@ def scan_models(models_dir):
     ensemble_dir = models_dir / "ensemble"
     ensemble_config = ensemble_dir / "ensemble_config.json"
     if ensemble_config.exists():
-        with open(ensemble_config, 'r') as f:
+        with open(ensemble_config) as f:
             config = json.load(f)
 
         models.append({
@@ -340,7 +338,7 @@ def print_summary(conn):
         cur.execute("SELECT COUNT(*) FROM ml.model_registry;")
         total = cur.fetchone()[0]
 
-        print(f"\nStatus:")
+        print("\nStatus:")
         print(f"  Completed: {completed}/{total}")
         print(f"  Production: 0/{total}")
 

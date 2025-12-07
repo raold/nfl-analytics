@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.546587
 Test count: 27
 """
 
+import pytest
 from backtests.bayesian_props_multiyear_backtest import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

@@ -133,15 +133,13 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 import logging
 import time
 import warnings
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
 
-from py.features.team_offensive_features import TeamOffensiveFeatures
 from py.features.team_defensive_features import TeamDefensiveFeatures
+from py.features.team_offensive_features import TeamOffensiveFeatures
 
 # Optional advanced feature modules (graceful degradation if unavailable)
 try:
@@ -185,8 +183,9 @@ try:
 except ImportError:
     OpponentStrengthEngine = None
 
-import psycopg2
 import os
+
+import psycopg2
 
 logging.basicConfig(
     level=logging.INFO,
@@ -222,7 +221,7 @@ class GameFeatureExtractor:
     # Cache TTL in seconds (5 minutes)
     CACHE_TTL = 300
 
-    def __init__(self, db_config: Optional[Dict] = None):
+    def __init__(self, db_config: dict | None = None):
         """
         Initialize game feature extractor with database connection.
 
@@ -323,7 +322,7 @@ class GameFeatureExtractor:
         season: int,
         week: int,
         use_cache: bool = True
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 232 features for a game matchup (includes injury and advanced features).
 
@@ -653,7 +652,7 @@ class GameFeatureExtractor:
         week: int,
         feature_type: str,
         use_cache: bool
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get features with caching.
 
@@ -710,8 +709,8 @@ class GameFeatureExtractor:
 
     def _compute_offensive_mismatch(
         self,
-        home_off: Dict[str, float],
-        away_def: Dict[str, float]
+        home_off: dict[str, float],
+        away_def: dict[str, float]
     ) -> float:
         """
         Compute offensive mismatch: home offense vs away defense.
@@ -734,8 +733,8 @@ class GameFeatureExtractor:
 
     def _compute_defensive_mismatch(
         self,
-        away_off: Dict[str, float],
-        home_def: Dict[str, float]
+        away_off: dict[str, float],
+        home_def: dict[str, float]
     ) -> float:
         """
         Compute defensive mismatch: away offense vs home defense.
@@ -758,8 +757,8 @@ class GameFeatureExtractor:
 
     def _compute_pace_difference(
         self,
-        home_off: Dict[str, float],
-        away_off: Dict[str, float]
+        home_off: dict[str, float],
+        away_off: dict[str, float]
     ) -> float:
         """
         Compute pace difference: home plays/game - away plays/game.
@@ -786,7 +785,7 @@ class GameFeatureExtractor:
         away_team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract injury load features for both teams.
 
@@ -983,10 +982,10 @@ def main():
     elapsed_ms = (time.time() - start_time) * 1000
 
     # Display results
-    logger.info(f"\nFeature Extraction Complete:")
+    logger.info("\nFeature Extraction Complete:")
     logger.info(f"- Total features: {len(features)}")
     logger.info(f"- Extraction time: {elapsed_ms:.1f}ms")
-    logger.info(f"\nSample Features:")
+    logger.info("\nSample Features:")
 
     sample_keys = [
         'home_off_epa_per_play',
@@ -1004,13 +1003,13 @@ def main():
             logger.info(f"  {key}: {features[key]:.4f}")
 
     # Validate temporal safety
-    logger.info(f"\nTemporal Safety Check:")
+    logger.info("\nTemporal Safety Check:")
     is_safe = extractor.validate_temporal_safety(home_team, away_team, season, week)
     logger.info(f"  Temporal safety: {'✓ PASSED' if is_safe else '✗ FAILED'}")
 
     # Check for NaN values
     nan_count = sum(1 for v in features.values() if pd.isna(v))
-    logger.info(f"\nData Quality:")
+    logger.info("\nData Quality:")
     logger.info(f"  NaN values: {nan_count}/{len(features)} {'✓' if nan_count == 0 else '✗'}")
 
     logger.info(f"\n{'='*80}\n")

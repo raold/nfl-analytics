@@ -16,9 +16,9 @@ Date: 2025-10-30
 """
 
 import logging
+
 import pandas as pd
 import psycopg
-from typing import Dict, Optional
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class AdvancedFeatureLoader:
         self.db_url = db_url
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def load_defensive_situational_features(self, game_ids: Optional[list] = None) -> pd.DataFrame:
+    def load_defensive_situational_features(self, game_ids: list | None = None) -> pd.DataFrame:
         """
         Load defensive situational strength features.
 
@@ -110,7 +110,7 @@ class AdvancedFeatureLoader:
         self.logger.info(f"Loaded defensive situational features for {len(df)} games")
         return df
 
-    def load_vegas_features(self, game_ids: Optional[list] = None) -> pd.DataFrame:
+    def load_vegas_features(self, game_ids: list | None = None) -> pd.DataFrame:
         """
         Load Vegas line bias features.
 
@@ -160,7 +160,7 @@ class AdvancedFeatureLoader:
         self.logger.info(f"Loaded Vegas features for {len(df)} games")
         return df
 
-    def load_environmental_features(self, game_ids: Optional[list] = None) -> pd.DataFrame:
+    def load_environmental_features(self, game_ids: list | None = None) -> pd.DataFrame:
         """
         Load environmental and contextual features.
 
@@ -225,7 +225,7 @@ class AdvancedFeatureLoader:
         self.logger.info(f"Loaded environmental features for {len(df)} games")
         return df
 
-    def load_feature_interactions(self, game_ids: Optional[list] = None) -> pd.DataFrame:
+    def load_feature_interactions(self, game_ids: list | None = None) -> pd.DataFrame:
         """
         Load feature interactions.
 
@@ -277,7 +277,7 @@ class AdvancedFeatureLoader:
         self.logger.info(f"Loaded feature interactions for {len(result)} games")
         return result
 
-    def load_all_features(self, game_ids: Optional[list] = None) -> pd.DataFrame:
+    def load_all_features(self, game_ids: list | None = None) -> pd.DataFrame:
         """
         Load all advanced features and merge into a single DataFrame.
 

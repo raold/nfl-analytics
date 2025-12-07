@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.515301
 Test count: 8
 """
 
+import pytest
 from causal.model_integration import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_adjust_bnn_prior_basic():

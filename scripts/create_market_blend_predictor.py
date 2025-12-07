@@ -14,7 +14,6 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -67,7 +66,7 @@ class MarketBlendPredictor:
 
         self._loader = None
 
-        logger.info(f"MarketBlendPredictor initialized")
+        logger.info("MarketBlendPredictor initialized")
         logger.info(f"  Market weight: {self.market_weight:.0%}")
         logger.info(f"  Model weight: {self.model_weight:.0%}")
 
@@ -83,8 +82,8 @@ class MarketBlendPredictor:
         away_team: str,
         season: int,
         week: int,
-        market_spread: Optional[float] = None
-    ) -> Dict:
+        market_spread: float | None = None
+    ) -> dict:
         """Generate blended prediction.
 
         Args:
@@ -218,7 +217,7 @@ class MarketBlendPredictor:
         market_mae = mean_absolute_error(actuals, market)
 
         logger.info(f"\n{'='*60}")
-        logger.info(f"BLEND WEIGHT OPTIMIZATION (2024)")
+        logger.info("BLEND WEIGHT OPTIMIZATION (2024)")
         logger.info(f"{'='*60}")
         logger.info(f"Model-only MAE: {model_mae:.2f}")
         logger.info(f"Market-only MAE: {market_mae:.2f}")
@@ -249,11 +248,11 @@ def create_blend_predictor_module():
     with open('models/xgboost/market_blend_config.json', 'w') as f:
         json.dump(config, f, indent=2)
 
-    logger.info(f"\nSaved config to models/xgboost/market_blend_config.json")
+    logger.info("\nSaved config to models/xgboost/market_blend_config.json")
 
     # Test prediction
     pred = predictor.predict('KC', 'DEN', 2024, 10)
-    logger.info(f"\nSample prediction (KC vs DEN Week 10):")
+    logger.info("\nSample prediction (KC vs DEN Week 10):")
     logger.info(f"  Blended: {pred.get('blended_spread', 'N/A'):.1f}")
     logger.info(f"  Model: {pred.get('model_spread', 'N/A'):.1f}")
     logger.info(f"  Market: {pred.get('market_spread', 'N/A')}")

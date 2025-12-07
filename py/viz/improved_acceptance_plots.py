@@ -3,11 +3,12 @@ Improved visualizations for simulator acceptance test results.
 Creates heat map and violin plot for Chapter 7 Figures 7.2 and 7.3.
 """
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
 
 # Set publication-quality matplotlib params
 plt.rcParams['figure.dpi'] = 150

@@ -14,12 +14,12 @@ Date: November 19, 2025
 """
 
 import argparse
+import logging
 import time
-from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import logging
 
 # Setup logging
 logging.basicConfig(
@@ -64,7 +64,7 @@ class CoachingScraper:
 
     def scrape_team_season(
         self, pfr_team: str, season: int, retry_count: int = 3
-    ) -> Optional[Dict[str, str]]:
+    ) -> dict[str, str] | None:
         """
         Scrape coaching staff for a single team-season.
 
@@ -144,7 +144,7 @@ class CoachingScraper:
 
         return None
 
-    def _extract_coach(self, text: str, position: str) -> Optional[str]:
+    def _extract_coach(self, text: str, position: str) -> str | None:
         """
         Extract coach name for a given position from coaches text.
 
@@ -170,7 +170,7 @@ class CoachingScraper:
                         return name
         return None
 
-    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> Optional[str]:
+    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> str | None:
         """
         Alternative method to extract coach name using HTML structure.
 
@@ -230,7 +230,7 @@ class CoachingScraper:
         df = pd.DataFrame(all_data)
         return df
 
-    def validate_data(self, df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    def validate_data(self, df: pd.DataFrame) -> tuple[bool, list[str]]:
         """
         Validate scraped coaching data.
 

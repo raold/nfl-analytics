@@ -18,10 +18,7 @@ Created: November 22, 2025
 
 import logging
 import subprocess
-import sys
 import time
-from pathlib import Path
-from typing import Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -185,7 +182,7 @@ def example_prometheus_monitoring():
         print("Install: pip install prometheus-client")
         return
 
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent, Severity
+    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     # Define metrics
     schema_errors = Counter(
@@ -262,8 +259,8 @@ def example_custom_validation_rules():
 
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
+        Severity,
         ValidationIssue,
-        Severity
     )
 
     class CustomFrontendAgent(FrontendEngineeringAgent):
@@ -348,8 +345,8 @@ def example_sports_analytics_integration():
 
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
+        Severity,
         ValidationIssue,
-        Severity
     )
 
     try:
@@ -423,7 +420,6 @@ def example_automated_migration():
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
         MigrationUpdate,
-        Severity
     )
 
     def apply_migration_update(update: MigrationUpdate, dry_run: bool = True) -> bool:
@@ -433,7 +429,7 @@ def example_automated_migration():
             return False
 
         if dry_run:
-            print(f"\n[DRY RUN] Would apply update:")
+            print("\n[DRY RUN] Would apply update:")
             print(f"  File: {update.file_path}")
             if update.line_number:
                 print(f"  Line: {update.line_number}")
@@ -442,7 +438,7 @@ def example_automated_migration():
             return True
 
         # Actual application (not executed in dry run)
-        with open(update.file_path, 'r') as f:
+        with open(update.file_path) as f:
             content = f.read()
 
         # Only apply if old_code is unique

@@ -62,7 +62,6 @@ import time
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -75,8 +74,8 @@ from sklearn.model_selection import train_test_split
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.features.game_feature_extractor import GameFeatureExtractor
 from py.features.feature_loader_parallel import ParallelFeatureLoader
+from py.features.game_feature_extractor import GameFeatureExtractor
 
 # Optional: Optuna for hyperparameter tuning
 try:
@@ -118,9 +117,9 @@ class XGBoostV6AdvancedTrainer:
     def __init__(
         self,
         target: str = 'spread',
-        seasons: Optional[List[int]] = None,
+        seasons: list[int] | None = None,
         holdout_season: int = 2024,
-        db_config: Optional[Dict] = None
+        db_config: dict | None = None
     ):
         """
         Initialize XGBoost v6 advanced trainer.
@@ -167,11 +166,11 @@ class XGBoostV6AdvancedTrainer:
         self.feature_names = None
         self.metrics = {}
 
-        logger.info(f"Initialized XGBoostV6AdvancedTrainer")
+        logger.info("Initialized XGBoostV6AdvancedTrainer")
         logger.info(f"  Target: {target}")
         logger.info(f"  Training seasons: {seasons}")
         logger.info(f"  Holdout season: {holdout_season}")
-        logger.info(f"  Feature loader: ParallelFeatureLoader (10-20x speedup)")
+        logger.info("  Feature loader: ParallelFeatureLoader (10-20x speedup)")
 
     def load_game_data(self) -> pd.DataFrame:
         """
@@ -240,7 +239,7 @@ class XGBoostV6AdvancedTrainer:
             DataFrame with games + features + outcomes
         """
         logger.info("\n" + "=" * 80)
-        logger.info(f"EXTRACTING FEATURES (BATCH MODE with ParallelFeatureLoader)")
+        logger.info("EXTRACTING FEATURES (BATCH MODE with ParallelFeatureLoader)")
         logger.info("=" * 80)
         logger.info("  Optimization: Connection pooling + Batch SQL + Redis caching")
         logger.info("  Expected speedup: 10-20x vs per-game extraction")
@@ -284,7 +283,7 @@ class XGBoostV6AdvancedTrainer:
 
             except Exception as e:
                 logger.warning(f"    ⚠ Batch extraction failed for {season}: {e}")
-                logger.warning(f"      Falling back to per-game extraction...")
+                logger.warning("      Falling back to per-game extraction...")
 
                 # Fallback: use per-game extraction for failed seasons
                 for _, row in season_df.iterrows():
@@ -319,7 +318,7 @@ class XGBoostV6AdvancedTrainer:
 
         throughput = len(df_features) / elapsed_total if elapsed_total > 0 else 0
 
-        logger.info(f"\n✓ Feature extraction complete:")
+        logger.info("\n✓ Feature extraction complete:")
         logger.info(f"  Total games: {len(df_features)}/{len(df)} ({100*len(df_features)/len(df):.1f}%)")
         logger.info(f"  Total features: {len(df_features.columns)} columns")
         logger.info(f"  Extraction time: {elapsed_total:.1f} seconds ({throughput:.1f} games/sec)")
@@ -336,7 +335,7 @@ class XGBoostV6AdvancedTrainer:
     def prepare_training_data(
         self,
         df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, List[str]]:
+    ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list[str]]:
         """
         Prepare train/test split with temporal separation.
 
@@ -380,7 +379,7 @@ class XGBoostV6AdvancedTrainer:
         X_test = df.loc[test_mask, feature_cols]
         y_test = df.loc[test_mask, target_col]
 
-        logger.info(f"\nTrain/Test Split:")
+        logger.info("\nTrain/Test Split:")
         logger.info(f"  Training: {len(X_train)} games ({self.seasons})")
         logger.info(f"  Test: {len(X_test)} games ({self.holdout_season})")
         logger.info(f"  Features: {X_train.shape[1]}")
@@ -397,7 +396,7 @@ class XGBoostV6AdvancedTrainer:
         if n_samples < min_samples_required:
             logger.warning(f"⚠️ Data sufficiency warning: {n_samples} samples for {n_features} features")
             logger.warning(f"  Recommended: {min_samples_required}+ samples (50+ per feature)")
-            logger.warning(f"  Model may underperform with insufficient data")
+            logger.warning("  Model may underperform with insufficient data")
         else:
             logger.info(f"✅ Data sufficiency check passed: {n_samples} samples >= {min_samples_required} required")
 
@@ -449,7 +448,7 @@ class XGBoostV6AdvancedTrainer:
         X_train: pd.DataFrame,
         y_train: pd.Series,
         n_trials: int = 100
-    ) -> Dict:
+    ) -> dict:
         """
         Tune XGBoost hyperparameters using Optuna.
 
@@ -508,7 +507,7 @@ class XGBoostV6AdvancedTrainer:
         study = optuna.create_study(direction='minimize')
         study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
 
-        logger.info(f"\n✓ Hyperparameter tuning complete:")
+        logger.info("\n✓ Hyperparameter tuning complete:")
         logger.info(f"  Best MAE: {study.best_value:.2f}")
         logger.info(f"  Best params: {study.best_params}")
 
@@ -523,7 +522,7 @@ class XGBoostV6AdvancedTrainer:
 
         return best_params
 
-    def _get_default_hyperparameters(self) -> Dict:
+    def _get_default_hyperparameters(self) -> dict:
         """Get default hyperparameters (if tuning unavailable)."""
         return {
             'objective': 'reg:squarederror',
@@ -547,7 +546,7 @@ class XGBoostV6AdvancedTrainer:
         y_train: pd.Series,
         X_test: pd.DataFrame,
         y_test: pd.Series,
-        params: Dict
+        params: dict
     ) -> xgb.XGBRegressor:
         """
         Train XGBoost model with specified hyperparameters.
@@ -567,7 +566,7 @@ class XGBoostV6AdvancedTrainer:
         logger.info(f"Training samples: {len(X_train)}")
         logger.info(f"Features: {X_train.shape[1]}")
         logger.info(f"Target: {self.target}")
-        logger.info(f"Hyperparameters:")
+        logger.info("Hyperparameters:")
         for k, v in params.items():
             if k not in ['random_state', 'n_jobs', 'objective', 'eval_metric']:
                 logger.info(f"  {k}: {v}")
@@ -592,7 +591,7 @@ class XGBoostV6AdvancedTrainer:
         model: xgb.XGBRegressor,
         X_test: pd.DataFrame,
         y_test: pd.Series
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate model performance on holdout set.
 
@@ -644,7 +643,7 @@ class XGBoostV6AdvancedTrainer:
         logger.info(f"  Baseline MAE: {baseline_mae:.2f} {self._get_target_units()}")
         logger.info(f"  Improvement: {improvement:.1f}%")
 
-        logger.info(f"\nError Distribution:")
+        logger.info("\nError Distribution:")
         logger.info(f"  50th percentile: {error_percentiles['p50']:.2f}")
         logger.info(f"  75th percentile: {error_percentiles['p75']:.2f}")
         logger.info(f"  90th percentile: {error_percentiles['p90']:.2f}")
@@ -719,9 +718,9 @@ class XGBoostV6AdvancedTrainer:
     def save_model(
         self,
         model: xgb.XGBRegressor,
-        metrics: Dict,
+        metrics: dict,
         feature_importance: pd.DataFrame,
-        params: Dict
+        params: dict
     ):
         """Save trained model, metadata, and feature importance."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -898,7 +897,7 @@ def main():
     logger.info("✓ XGBOOST V6 ADVANCED FEATURES TRAINING COMPLETE")
     logger.info("=" * 80)
     logger.info(f"Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    logger.info(f"\nFinal Results:")
+    logger.info("\nFinal Results:")
     logger.info(f"  MAE: {metrics['mae']:.2f} {trainer._get_target_units()}")
     logger.info(f"  Improvement over baseline: {metrics['improvement_pct']:.1f}%")
     logger.info(f"  R²: {metrics['r2']:.3f}")

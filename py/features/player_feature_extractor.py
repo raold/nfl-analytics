@@ -12,9 +12,7 @@ Date: November 7, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg
 
@@ -53,7 +51,7 @@ class PlayerFeatureExtractor:
         is_home: bool,
         season: int = 2025,
         week: int = 10
-    ) -> Optional[Dict[str, float]]:
+    ) -> dict[str, float] | None:
         """
         Extract features for a player prop prediction.
 
@@ -131,7 +129,7 @@ class PlayerFeatureExtractor:
         stat_category: str,
         season: int,
         week: int
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Get player's recent game stats (before prediction week).
 
@@ -187,7 +185,7 @@ class PlayerFeatureExtractor:
         stat_category: str,
         season: int,
         week: int
-    ) -> Optional[Dict[str, float]]:
+    ) -> dict[str, float] | None:
         """
         Get opponent defensive strength (yards allowed per game).
 
@@ -249,7 +247,7 @@ class PlayerFeatureExtractor:
         is_home: bool,
         season: int,
         week: int
-    ) -> Optional[Dict[str, float]]:
+    ) -> dict[str, float] | None:
         """
         Get game context (spread, total) from games table.
 
@@ -263,7 +261,7 @@ class PlayerFeatureExtractor:
         self,
         player_stats: pd.DataFrame,
         prop_type: str
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute rolling average features from player's game log.
 

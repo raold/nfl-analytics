@@ -20,13 +20,12 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
-import pytest
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, mock_open
-import tempfile
 import os
 import stat
+import tempfile
+from pathlib import Path
 
+import pytest
 
 # ============================================================================
 # FIXTURES

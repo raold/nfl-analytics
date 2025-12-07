@@ -23,13 +23,13 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+import os
 import time
 import traceback
-from typing import Optional, Tuple
-import os
 
 # Current NFL season (update annually in December)
 CURRENT_SEASON = 2024  # pragma: allowlist temporal
@@ -145,7 +145,7 @@ class RModelDiagnostic:
             logger.info(f"  Path: {model_path}")
 
             if not model_path.exists():
-                logger.error(f"  ❌ File not found")
+                logger.error("  ❌ File not found")
                 all_accessible = False
                 continue
 
@@ -268,10 +268,10 @@ class RModelDiagnostic:
         logger.info("="*80)
 
         try:
+            import pandas as pd
             import rpy2.robjects as ro
             from rpy2.robjects import pandas2ri
             from rpy2.robjects.conversion import localconverter
-            import pandas as pd
 
             # Load model
             logger.info("Loading Hierarchical v2...")
@@ -317,7 +317,7 @@ class RModelDiagnostic:
             ro.r("batch_preds <- posterior_predict(model, newdata = batch_data, ndraws = 1000, allow_new_levels = TRUE)")
             elapsed = time.time() - start
 
-            logger.info(f"  ✅ Batch prediction successful")
+            logger.info("  ✅ Batch prediction successful")
             logger.info(f"  Time: {elapsed:.2f}s ({elapsed/len(test_data):.2f}s per game)")
             logger.info(f"  Speedup vs sequential: ~{5*5/elapsed:.1f}x faster")
 
@@ -366,7 +366,7 @@ class RModelDiagnostic:
             mem_final = self.get_memory_usage_mb()
             mem_total_delta = mem_final - mem_start
 
-            logger.info(f"\n✅ Memory leak check complete")
+            logger.info("\n✅ Memory leak check complete")
             logger.info(f"  Initial: {mem_start:.1f} MB")
             logger.info(f"  Final: {mem_final:.1f} MB")
             logger.info(f"  Delta: +{mem_total_delta:.1f} MB")

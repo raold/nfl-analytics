@@ -9,11 +9,11 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-import os
-import logging
-import requests
-from typing import List, Dict, Optional
 import concurrent.futures
+import logging
+import os
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 class BatchedAPIClient:
     """Batched API client for game and player predictions."""
 
-    def __init__(self, base_url: Optional[str] = None, timeout: int = 30):
+    def __init__(self, base_url: str | None = None, timeout: int = 30):
         """
         Initialize batched API client.
 
@@ -34,11 +34,11 @@ class BatchedAPIClient:
 
     def get_game_predictions_batch(
         self,
-        game_ids: List[str],
+        game_ids: list[str],
         season: int,
         week: int,
         max_workers: int = 10
-    ) -> Dict[str, Dict]:
+    ) -> dict[str, dict]:
         """
         Fetch game predictions for multiple games using parallel HTTP requests.
 
@@ -163,12 +163,12 @@ class BatchedAPIClient:
 
     def get_player_predictions_batch(
         self,
-        player_ids: List[int],
+        player_ids: list[int],
         season: int,
         week: int,
         stat_type: str = 'passing_yards',
         max_workers: int = 10
-    ) -> Dict[int, Dict]:
+    ) -> dict[int, dict]:
         """
         Fetch player predictions for multiple players using parallel HTTP requests.
 
@@ -238,7 +238,7 @@ class BatchedAPIClient:
 
 
 # Convenience function for backward compatibility
-def get_game_predictions_batch(game_ids: List[str], season: int, week: int) -> Dict[str, Dict]:
+def get_game_predictions_batch(game_ids: list[str], season: int, week: int) -> dict[str, dict]:
     """
     Convenience function to fetch game predictions batch without instantiating client.
 

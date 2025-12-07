@@ -25,19 +25,18 @@ Features:
 """
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
-import json
+from typing import Any
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.ensemble.strategy import (
-    UnifiedEnsemblePredictor,
     EnsembleConfig,
-    ModelType,
+    UnifiedEnsemblePredictor,
 )
 
 logging.basicConfig(
@@ -94,7 +93,7 @@ class ProductionEnsemblePredictor:
     def __init__(
         self,
         strategy_name: str = "weighted_average",
-        custom_weights: Optional[Dict[str, float]] = None,
+        custom_weights: dict[str, float] | None = None,
         confidence_threshold: float = 0.6,
     ):
         """
@@ -134,8 +133,8 @@ class ProductionEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        features: dict | None = None,
+    ) -> dict[str, Any]:
         """
         Generate ensemble prediction for a player.
 
@@ -197,7 +196,7 @@ class ProductionEnsemblePredictor:
 
         return prediction_dict
 
-    def switch_strategy(self, strategy_name: str, weights: Optional[Dict[str, float]] = None):
+    def switch_strategy(self, strategy_name: str, weights: dict[str, float] | None = None):
         """
         Switch ensemble strategy at runtime.
 
@@ -221,7 +220,7 @@ class ProductionEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-    ) -> Dict[str, Dict[str, Any]]:
+    ) -> dict[str, dict[str, Any]]:
         """
         Compare all available strategies on same prediction.
 

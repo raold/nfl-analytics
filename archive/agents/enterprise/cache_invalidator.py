@@ -10,12 +10,10 @@ Date: November 10, 2025
 """
 
 import logging
-from typing import List, Optional, Dict, Any, Set
 from dataclasses import dataclass
-from datetime import datetime
-import re
+from typing import Any
 
-from py.utils.claude_cache import get_default_cache, ClaudeRedisCache
+from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +23,9 @@ class InvalidationResult:
     """Result of cache invalidation operation."""
     keys_matched: int
     keys_deleted: int
-    patterns_used: List[str]
+    patterns_used: list[str]
     execution_time_ms: float
-    errors: List[str]
+    errors: list[str]
 
 
 class CacheInvalidator:
@@ -56,7 +54,7 @@ class CacheInvalidator:
         ```
     """
 
-    def __init__(self, redis_cache: Optional[ClaudeRedisCache] = None):
+    def __init__(self, redis_cache: ClaudeRedisCache | None = None):
         """
         Initialize cache invalidator.
 
@@ -160,7 +158,7 @@ class CacheInvalidator:
     def invalidate_model(
         self,
         model_name: str,
-        model_type: Optional[str] = None
+        model_type: str | None = None
     ) -> InvalidationResult:
         """
         Invalidate cached model(s).
@@ -190,8 +188,8 @@ class CacheInvalidator:
     def invalidate_player(
         self,
         player_id: str,
-        season: Optional[int] = None,
-        week: Optional[int] = None
+        season: int | None = None,
+        week: int | None = None
     ) -> InvalidationResult:
         """
         Invalidate player-specific caches.
@@ -255,7 +253,7 @@ class CacheInvalidator:
             errors=all_errors
         )
 
-    def invalidate_queries(self, query_keys: List[str]) -> InvalidationResult:
+    def invalidate_queries(self, query_keys: list[str]) -> InvalidationResult:
         """
         Invalidate specific query caches.
 
@@ -387,7 +385,7 @@ class CacheInvalidator:
             errors=all_errors
         )
 
-    def stats(self) -> Dict[str, Any]:
+    def stats(self) -> dict[str, Any]:
         """
         Get cache statistics for monitoring.
 
@@ -409,7 +407,7 @@ class CacheInvalidator:
 def invalidate_after_model_training(
     model_name: str,
     model_type: str,
-    player_ids: Optional[List[str]] = None
+    player_ids: list[str] | None = None
 ) -> InvalidationResult:
     """
     Invalidate caches after model retraining.
@@ -453,8 +451,8 @@ def invalidate_after_model_training(
 
 
 def invalidate_after_data_ingestion(
-    season: Optional[int] = None,
-    week: Optional[int] = None
+    season: int | None = None,
+    week: int | None = None
 ) -> InvalidationResult:
     """
     Invalidate caches after new data ingestion.
@@ -514,7 +512,6 @@ def invalidate_after_data_ingestion(
 
 if __name__ == "__main__":
     """Test cache invalidator."""
-    import sys
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'

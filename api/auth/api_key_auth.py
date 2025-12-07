@@ -14,16 +14,16 @@ Author: Claude Code
 Date: 2025-11-15
 """
 
-import os
-import uuid
 import hashlib
 import logging
+import os
+import uuid
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Any
 
-from fastapi import Security, HTTPException, status, Request
-from fastapi.security import APIKeyHeader
 import psycopg
+from fastapi import HTTPException, Request, Security, status
+from fastapi.security import APIKeyHeader
 from psycopg.rows import dict_row
 
 logger = logging.getLogger(__name__)
@@ -43,9 +43,9 @@ class APIKey:
         owner_email: str,
         rate_limit_per_hour: int,
         rate_limit_per_day: int,
-        allowed_endpoints: Optional[List[str]] = None,
-        allowed_ip_ranges: Optional[List[str]] = None,
-        expires_at: Optional[datetime] = None,
+        allowed_endpoints: list[str] | None = None,
+        allowed_ip_ranges: list[str] | None = None,
+        expires_at: datetime | None = None,
     ):
         self.key_id = key_id
         self.api_key = api_key
@@ -79,7 +79,7 @@ class APIKey:
 class APIKeyAuthenticator:
     """Handles API key authentication and validation"""
 
-    def __init__(self, db_url: Optional[str] = None):
+    def __init__(self, db_url: str | None = None):
         """
         Initialize authenticator
 
@@ -90,7 +90,7 @@ class APIKeyAuthenticator:
             "DATABASE_URL",
             "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
         )
-        self._conn: Optional[psycopg.Connection] = None
+        self._conn: psycopg.Connection | None = None
 
     def _get_connection(self) -> psycopg.Connection:
         """Get or create database connection"""
@@ -107,7 +107,7 @@ class APIKeyAuthenticator:
         self,
         api_key: str,
         endpoint: str,
-        request: Optional[Request] = None
+        request: Request | None = None
     ) -> APIKey:
         """
         Validate API key against database
@@ -307,10 +307,10 @@ class APIKeyAuthenticator:
         method: str,
         status_code: int,
         response_time_ms: float,
-        ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None,
-        error_type: Optional[str] = None,
-        error_message: Optional[str] = None
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        error_type: str | None = None,
+        error_message: str | None = None
     ):
         """
         Log API key usage
@@ -371,12 +371,12 @@ class APIKeyAuthenticator:
         self,
         key_name: str,
         owner_email: str,
-        owner_name: Optional[str] = None,
+        owner_name: str | None = None,
         rate_limit_per_hour: int = 100,
         rate_limit_per_day: int = 1000,
-        allowed_endpoints: Optional[List[str]] = None,
-        expires_in_days: Optional[int] = None
-    ) -> Dict[str, Any]:
+        allowed_endpoints: list[str] | None = None,
+        expires_in_days: int | None = None
+    ) -> dict[str, Any]:
         """
         Create a new API key
 
@@ -446,7 +446,7 @@ class APIKeyAuthenticator:
 
 
 # Global authenticator instance
-_authenticator: Optional[APIKeyAuthenticator] = None
+_authenticator: APIKeyAuthenticator | None = None
 
 
 def get_authenticator() -> APIKeyAuthenticator:
@@ -459,7 +459,7 @@ def get_authenticator() -> APIKeyAuthenticator:
 
 async def require_api_key(
     request: Request,
-    api_key: Optional[str] = Security(API_KEY_HEADER)
+    api_key: str | None = Security(API_KEY_HEADER)
 ) -> APIKey:
     """
     FastAPI dependency for API key authentication

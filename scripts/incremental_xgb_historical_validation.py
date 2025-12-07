@@ -22,23 +22,23 @@ Author: Claude Code (Week 1 Production Validation - November 12, 2025)
 Based on: validate_online_learning_fixed.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
-import logging
 import json
+import logging
 import time
-from pathlib import Path
-from typing import Dict, List, Tuple
-from datetime import datetime
 from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
-import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
@@ -59,7 +59,7 @@ sns.set_style('whitegrid')
 
 def load_player_stats_by_week(
     season: int,
-    db_params: Dict[str, str],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """
@@ -183,7 +183,7 @@ def run_prequential_evaluation(
     season: int,
     window_size: int = 100,
     retrain_every: int = 20,
-) -> Dict[str, any]:
+) -> dict[str, any]:
     """
     Run prequential evaluation (test-then-train) for a season
 
@@ -273,7 +273,7 @@ def run_prequential_evaluation(
     return results
 
 
-def compute_static_baseline(df: pd.DataFrame, season: int) -> Dict[str, any]:
+def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, any]:
     """
     Compute static XGBoost baseline (train on first 50%, test on second 50%)
 
@@ -332,7 +332,7 @@ def compute_static_baseline(df: pd.DataFrame, season: int) -> Dict[str, any]:
 # =============================================================================
 
 def plot_multi_season_comparison(
-    season_results: Dict[int, Dict],
+    season_results: dict[int, dict],
     output_path: str,
 ):
     """
@@ -369,7 +369,7 @@ def plot_multi_season_comparison(
 
 
 def plot_cumulative_mae(
-    season_results: Dict[int, Dict],
+    season_results: dict[int, dict],
     output_path: str,
 ):
     """
@@ -404,8 +404,8 @@ def plot_cumulative_mae(
 
 
 def plot_win_loss_heatmap(
-    season_results: Dict[int, Dict],
-    baseline_results: Dict[int, Dict],
+    season_results: dict[int, dict],
+    baseline_results: dict[int, dict],
     output_path: str,
 ):
     """

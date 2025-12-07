@@ -21,15 +21,14 @@ Date: November 23, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pandas as pd
-import numpy as np
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from typing import Dict, List
 import logging
-from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
@@ -40,7 +39,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def calculate_betting_metrics(df: pd.DataFrame) -> Dict:
+def calculate_betting_metrics(df: pd.DataFrame) -> dict:
     """Calculate comprehensive betting metrics from predictions."""
     # Simulate betting with standard assumptions
     # - $100 bets on lines we have edge on
@@ -98,7 +97,7 @@ def calculate_betting_metrics(df: pd.DataFrame) -> Dict:
     }
 
 
-def fetch_historical_games(seasons: List[int]) -> pd.DataFrame:
+def fetch_historical_games(seasons: list[int]) -> pd.DataFrame:
     """Fetch historical player-games with lines and actuals."""
 
     conn = psycopg2.connect(

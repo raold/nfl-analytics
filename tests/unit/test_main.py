@@ -5,11 +5,12 @@ Generated: 2025-11-09T13:26:29.440515
 Test count: 22
 """
 
-from api.main import *
-from hypothesis import given
-from hypothesis import strategies as st
 import pandas as pd
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+
+from api.main import *
 
 
 def test_validate_stat_type_basic():

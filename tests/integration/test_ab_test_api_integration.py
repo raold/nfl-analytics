@@ -27,14 +27,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import os
+from unittest.mock import Mock, patch
+
 import pytest
-import asyncio
-from unittest.mock import Mock, patch, MagicMock
-from datetime import datetime
 from fastapi.testclient import TestClient
 
 from py.production.real_time_api import app
-
 
 # ============================================================================
 # FIXTURES

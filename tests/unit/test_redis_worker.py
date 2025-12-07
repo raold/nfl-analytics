@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.187604
 Test count: 24
 """
 
+import pytest
 from compute.redis_worker import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_initialize_basic():

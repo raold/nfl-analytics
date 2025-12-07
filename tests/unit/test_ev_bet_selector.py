@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.401396
 Test count: 54
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.ev_bet_selector import *
-import pandas as pd
-import pytest
 
 
 def test_calculate_edge_basic():

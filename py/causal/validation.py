@@ -2,10 +2,10 @@
 Validation and Sensitivity Analysis for Causal Inference
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple
 import logging
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class CausalValidator:
         outcome: str,
         treatment: str,
         n_placebo: int = 100
-    ) -> Dict:
+    ) -> dict:
         """
         Placebo test: randomly assign treatment and check if effect is zero.
 
@@ -73,7 +73,7 @@ class CausalValidator:
         se: float,
         r2_confounder_outcome: float = 0.1,
         r2_confounder_treatment: float = 0.1
-    ) -> Dict:
+    ) -> dict:
         """
         Rosenbaum bounds sensitivity analysis.
 

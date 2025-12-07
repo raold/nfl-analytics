@@ -4,10 +4,9 @@ Model Integration for Causal Inference
 Integrate causal estimates with BNN/props models.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict
 import logging
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ class CausalModelIntegrator:
         treatment_effect: float,
         treatment_effect_se: float,
         is_treated: bool
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Adjust BNN prior based on causal treatment effect.
 
@@ -56,8 +55,8 @@ class CausalModelIntegrator:
         player_id: str,
         game_id: str,
         baseline_prediction: float,
-        treatment_effects: Dict[str, float]
-    ) -> Dict:
+        treatment_effects: dict[str, float]
+    ) -> dict:
         """
         Adjust live game prediction for observed treatments.
 

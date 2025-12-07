@@ -9,13 +9,12 @@ Ensures all posterior_predict() calls have both:
 
 import re
 import sys
-from pathlib import Path
 
 
 def check_file(filepath: str) -> int:
     """Check R file for incomplete brms predictions."""
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath) as f:
             content = f.read()
     except Exception as e:
         print(f"Error reading {filepath}: {e}")

@@ -5,9 +5,7 @@ Test script for Redis-based NFL Analytics infrastructure.
 Tests the Redis task queue, sync manager, and worker coordination.
 """
 
-import json
 import sys
-import time
 from pathlib import Path
 
 # Add compute modules to path
@@ -15,9 +13,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "py" / "compute"))
 
 try:
     import redis
-    from redis_task_queue import RedisTaskQueue, HardwareProfile, QueueType
-    from sync_manager import GoogleDriveSyncManager
+    from redis_task_queue import HardwareProfile, QueueType, RedisTaskQueue
     from redis_worker import RedisComputeWorker
+    from sync_manager import GoogleDriveSyncManager
     print("✅ All Redis modules imported successfully")
 except ImportError as e:
     print(f"❌ Import failed: {e}")
@@ -64,7 +62,7 @@ def test_hardware_detection():
             capabilities=["pytorch", "cuda", "scipy"]
         )
 
-        print(f"✅ Hardware profile created:")
+        print("✅ Hardware profile created:")
         print(f"   Machine ID: {profile.machine_id}")
         print(f"   CPU: {profile.cpu_cores} cores")
         print(f"   Memory: {profile.total_memory / (1024**3):.1f} GB")

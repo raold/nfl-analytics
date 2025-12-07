@@ -116,7 +116,7 @@ def process_app_py(file_path: Path) -> tuple[str, int]:
     Returns:
         (modified_content, replacement_count)
     """
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     original_count = content.count('unsafe_allow_html=True')
@@ -144,7 +144,7 @@ def process_game_predictions_patch(file_path: Path) -> tuple[str, int]:
     Returns:
         (modified_content, replacement_count)
     """
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     original_count = content.count('unsafe_allow_html=True')

@@ -17,7 +17,6 @@ Date: November 13, 2025
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
@@ -67,7 +66,7 @@ def validate_ensemble_v5_1():
     }
 
     if ensemble.weights != expected_weights:
-        logger.error(f"❌ Weights mismatch!")
+        logger.error("❌ Weights mismatch!")
         logger.error(f"   Expected: {expected_weights}")
         logger.error(f"   Got: {ensemble.weights}")
         return False
@@ -132,7 +131,7 @@ def validate_ensemble_v5_1():
             logger.error("❌ Prediction failed (None returned)")
             return False
 
-        logger.info(f"✅ Prediction successful!")
+        logger.info("✅ Prediction successful!")
         logger.info(f"   Ensemble: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
         logger.info(f"   90% CI: [{result['quantile_10']:.1f}, {result['quantile_90']:.1f}] yards")
         logger.info(f"   Inference time: {result['inference_time_ms']:.1f}ms")
@@ -148,7 +147,7 @@ def validate_ensemble_v5_1():
         actual_models = set(predictions.keys())
 
         if expected_models == actual_models:
-            logger.info(f"✅ All 4 models contributed predictions")
+            logger.info("✅ All 4 models contributed predictions")
         else:
             missing = expected_models - actual_models
             logger.warning(f"⚠️  Some models missing: {missing}")
@@ -157,7 +156,7 @@ def validate_ensemble_v5_1():
         if not (150 <= result['ensemble_mean'] <= 400):
             logger.warning(f"⚠️  Prediction outside reasonable range: {result['ensemble_mean']:.1f}")
         else:
-            logger.info(f"✅ Prediction within reasonable range")
+            logger.info("✅ Prediction within reasonable range")
 
     except Exception as e:
         logger.error(f"❌ Prediction failed: {e}")

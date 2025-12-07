@@ -11,10 +11,12 @@ Usage:
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 import logging
+
+from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

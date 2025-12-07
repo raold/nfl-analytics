@@ -39,14 +39,13 @@ Reference: Angrist & Pischke (2009), "Mostly Harmless Econometrics"
 
 import logging
 import warnings
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from scipy import stats
 import statsmodels.api as sm
-from linearmodels.iv import IV2SLS  # pip install linearmodels
+from scipy import stats
 
 logging.basicConfig(
     level=logging.INFO,
@@ -213,9 +212,9 @@ class CoachingChangeIV:
     def first_stage_regression(
         self,
         df: pd.DataFrame,
-        instruments: List[str] = ['gm_change', 'contract_expired'],
-        controls: List[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
-    ) -> Dict[str, Any]:
+        instruments: list[str] = ['gm_change', 'contract_expired'],
+        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+    ) -> dict[str, Any]:
         """
         First stage: Predict coaching change from instruments.
 
@@ -267,9 +266,9 @@ class CoachingChangeIV:
     def second_stage_regression(
         self,
         df: pd.DataFrame,
-        instruments: List[str] = ['gm_change', 'contract_expired'],
-        controls: List[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
-    ) -> Dict[str, Any]:
+        instruments: list[str] = ['gm_change', 'contract_expired'],
+        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+    ) -> dict[str, Any]:
         """
         Second stage: Estimate causal effect using IV2SLS.
 
@@ -314,15 +313,15 @@ class CoachingChangeIV:
             logger.info(f"\n{'='*60}")
             logger.info("Second Stage: EPA ~ Coaching Change (instrumented)")
             logger.info(f"{'='*60}")
-            logger.info(f"\n  IV (Causal) Estimate:")
+            logger.info("\n  IV (Causal) Estimate:")
             logger.info(f"    Effect: {iv_effect:.4f} EPA/play")
             logger.info(f"    SE: {iv_se:.4f}")
             logger.info(f"    p-value: {iv_pval:.4f}")
-            logger.info(f"\n  OLS (Biased) Estimate:")
+            logger.info("\n  OLS (Biased) Estimate:")
             logger.info(f"    Effect: {ols_effect:.4f} EPA/play")
             logger.info(f"    SE: {ols_se:.4f}")
             logger.info(f"    p-value: {ols_pval:.4f}")
-            logger.info(f"\n  Endogeneity Test (Hausman):")
+            logger.info("\n  Endogeneity Test (Hausman):")
             logger.info(f"    Chi-sq: {hausman_stat:.2f}, p-value: {hausman_pval:.4f}")
             logger.info(f"    Endogeneity detected? {'YES' if hausman_pval < 0.05 else 'NO'}")
 
@@ -346,9 +345,9 @@ class CoachingChangeIV:
     def _manual_2sls(
         self,
         df: pd.DataFrame,
-        instruments: List[str],
-        controls: List[str]
-    ) -> Dict[str, Any]:
+        instruments: list[str],
+        controls: list[str]
+    ) -> dict[str, Any]:
         """Fallback manual 2SLS implementation."""
         # Stage 1: Predict coaching change
         X_first = sm.add_constant(pd.concat([df[instruments], df[controls]], axis=1))
@@ -380,9 +379,9 @@ class CoachingChangeIV:
         self,
         start_season: int = 2018,
         end_season: int = 2024,
-        instruments: List[str] = ['gm_change', 'contract_expired'],
-        controls: List[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
-    ) -> Dict[str, Any]:
+        instruments: list[str] = ['gm_change', 'contract_expired'],
+        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+    ) -> dict[str, Any]:
         """
         Full 2SLS estimation of coaching change causal effect.
 

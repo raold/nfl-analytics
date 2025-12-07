@@ -28,10 +28,9 @@ Usage:
     python py/models/bnn_mc_dropout.py
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
-from typing import Tuple
 
 import joblib
 import numpy as np
@@ -40,7 +39,6 @@ import psycopg2
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Add parent directory to path for imports
@@ -69,7 +67,7 @@ class MCDropoutBNN(nn.Module):
     - Aggregate: mean for prediction, std for uncertainty
     """
 
-    def __init__(self, input_dim: int, hidden_dims: Tuple[int], dropout_p: float = 0.1):
+    def __init__(self, input_dim: int, hidden_dims: tuple[int], dropout_p: float = 0.1):
         super().__init__()
 
         self.input_dim = input_dim
@@ -109,7 +107,7 @@ class MCDropoutBNN(nn.Module):
         """Count trainable parameters"""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass
 
@@ -132,7 +130,7 @@ class MCDropoutBNN(nn.Module):
 
     def predict_with_uncertainty(
         self, x: torch.Tensor, n_samples: int = 100
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         MC Dropout inference for uncertainty quantification
 
@@ -314,13 +312,13 @@ def train_mc_dropout_bnn(
     y_train: np.ndarray,
     X_val: np.ndarray,
     y_val: np.ndarray,
-    hidden_dims: Tuple[int],
+    hidden_dims: tuple[int],
     dropout_p: float = 0.1,
     epochs: int = 100,
     batch_size: int = 64,
     lr: float = 1e-3,
     device: str = "cpu"
-) -> Tuple[MCDropoutBNN, StandardScaler, float, float]:
+) -> tuple[MCDropoutBNN, StandardScaler, float, float]:
     """
     Train MC Dropout BNN
 

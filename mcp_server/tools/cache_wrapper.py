@@ -15,9 +15,9 @@ Date: November 13, 2025
 import hashlib
 import json
 import logging
-from typing import Any, Callable, Optional, Dict
+from collections.abc import Callable
 from functools import wraps
-from datetime import datetime
+from typing import Any
 
 try:
     from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
@@ -63,7 +63,7 @@ class MCPCacheWrapper:
         "default": 7 * 24 * 3600     # 7 days (ClaudeRedisCache default)
     }
 
-    def __init__(self, redis_cache: Optional[ClaudeRedisCache] = None):
+    def __init__(self, redis_cache: ClaudeRedisCache | None = None):
         """
         Initialize MCP cache wrapper.
 
@@ -113,7 +113,7 @@ class MCPCacheWrapper:
 
     def cached(
         self,
-        ttl: Optional[int] = None,
+        ttl: int | None = None,
         key_prefix: str = "default"
     ) -> Callable:
         """
@@ -232,7 +232,7 @@ class MCPCacheWrapper:
             logger.error(f"Error invalidating cache prefix {key_prefix}: {e}")
             return 0
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         Get cache statistics.
 
@@ -250,7 +250,7 @@ class MCPCacheWrapper:
 
 
 # Global singleton instance
-_cache_wrapper: Optional[MCPCacheWrapper] = None
+_cache_wrapper: MCPCacheWrapper | None = None
 
 
 def get_mcp_cache_wrapper() -> MCPCacheWrapper:

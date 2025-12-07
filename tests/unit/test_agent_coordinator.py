@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.757173
 Test count: 39
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from utils.agent_coordinator import *
-import pandas as pd
-import pytest
 
 
 def test_get_coordinator_basic():

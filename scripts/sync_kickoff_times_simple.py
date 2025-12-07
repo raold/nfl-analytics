@@ -6,13 +6,14 @@ This script fetches the current week's schedule from ESPN and updates
 our database with the actual kickoff times.
 """
 
+import logging
 import os
 import sys
-from pathlib import Path
-import requests
-import psycopg
 from datetime import datetime
-import logging
+from pathlib import Path
+
+import psycopg
+import requests
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))

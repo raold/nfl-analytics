@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.689001
 Test count: 36
 """
 
+import pandas as pd
+import pytest
 from features.defensive_game_script_indicators import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

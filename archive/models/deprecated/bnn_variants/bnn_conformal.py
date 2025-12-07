@@ -35,11 +35,10 @@ References:
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import logging
-from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import torch
@@ -112,8 +111,8 @@ class BNNConformalPredictor:
 
     def __init__(
         self,
-        bnn_model_path: Optional[str] = None,
-        bnn_model: Optional[nn.Module] = None,
+        bnn_model_path: str | None = None,
+        bnn_model: nn.Module | None = None,
         alpha: float = 0.10,  # 90% coverage
         method: str = "plus",  # 'plus', 'base', 'minmax'
         cv: int = 10,
@@ -146,7 +145,7 @@ class BNNConformalPredictor:
         else:
             self.device = device
 
-        logger.info(f"BNN Conformal Predictor initialized:")
+        logger.info("BNN Conformal Predictor initialized:")
         logger.info(f"  Coverage target: {1-alpha:.1%}")
         logger.info(f"  Method: {method}")
         logger.info(f"  Device: {self.device}")
@@ -210,7 +209,7 @@ class BNNConformalPredictor:
             verbose: Print calibration statistics
         """
         if verbose:
-            logger.info(f"\nCalibrating conformal prediction...")
+            logger.info("\nCalibrating conformal prediction...")
             logger.info(f"  Calibration set size: {len(X_calib)}")
             logger.info(f"  Target coverage: {1-self.alpha:.1%}")
 
@@ -245,20 +244,20 @@ class BNNConformalPredictor:
 
             width = np.mean(upper_bounds - lower_bounds)
 
-            logger.info(f"\n  Calibration results:")
+            logger.info("\n  Calibration results:")
             logger.info(f"    Empirical coverage: {coverage:.1%} (target: {1-self.alpha:.1%})")
             logger.info(f"    Average interval width: {width:.1f} yards")
 
             if coverage >= (1 - self.alpha - 0.02):
-                logger.info(f"    ✓ Coverage guarantee achieved!")
+                logger.info("    ✓ Coverage guarantee achieved!")
             else:
-                logger.warning(f"    ⚠ Coverage below target (may need more calibration data)")
+                logger.warning("    ⚠ Coverage below target (may need more calibration data)")
 
     def predict(
         self,
         X_test: np.ndarray,
         return_std: bool = True
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Make predictions with conformal intervals.
 
@@ -307,7 +306,7 @@ class BNNConformalPredictor:
         X_test: np.ndarray,
         y_test: np.ndarray,
         verbose: bool = True
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Evaluate empirical coverage on test set.
 
@@ -344,16 +343,16 @@ class BNNConformalPredictor:
         }
 
         if verbose:
-            logger.info(f"\nTest Set Evaluation:")
+            logger.info("\nTest Set Evaluation:")
             logger.info(f"  Empirical coverage: {coverage:.1%} (target: {1-self.alpha:.1%})")
             logger.info(f"  Coverage gap: {results['coverage_gap']:+.1%}")
             logger.info(f"  Average interval width: {width:.1f} yards")
             logger.info(f"  MAE: {mae:.2f} yards")
 
             if abs(results['coverage_gap']) <= 0.02:
-                logger.info(f"  ✓ Coverage within ±2% of target")
+                logger.info("  ✓ Coverage within ±2% of target")
             else:
-                logger.warning(f"  ⚠ Coverage deviates from target")
+                logger.warning("  ⚠ Coverage deviates from target")
 
         return results
 

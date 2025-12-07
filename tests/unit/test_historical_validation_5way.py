@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.042892
 Test count: 43
 """
 
+import pytest
 from backtest.historical_validation_5way import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

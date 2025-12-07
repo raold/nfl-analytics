@@ -28,13 +28,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import pytest
-import psycopg2
+import logging
+
 import numpy as np
 import pandas as pd
-import logging
-from datetime import datetime, timedelta
-from typing import List, Tuple
+import psycopg2
+import pytest
 
 from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
@@ -74,7 +73,7 @@ def leakage_detector():
 
 
 @pytest.fixture(scope="module")
-def sample_train_test_split(db_connection) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def sample_train_test_split(db_connection) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Create realistic train/test split for 2024 season.
 
@@ -432,7 +431,7 @@ def test_feature_code_patterns():
             warnings.append(f"{message}: {count} occurrences")
 
     if warnings:
-        logger.warning(f"⚠️ Potential leakage patterns detected:\n" + "\n".join(warnings))
+        logger.warning("⚠️ Potential leakage patterns detected:\n" + "\n".join(warnings))
 
     logger.info("✅ Feature code patterns checked")
 

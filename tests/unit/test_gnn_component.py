@@ -17,7 +17,6 @@ Author: Claude Code (Sonnet 4.5)
 Date: December 7, 2025
 """
 
-import os
 import sys
 from pathlib import Path
 

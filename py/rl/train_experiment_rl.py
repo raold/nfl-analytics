@@ -13,22 +13,21 @@ Features:
 """
 
 import argparse
+import json
+import os
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List
-import json
-from datetime import datetime
-import os
-
 from experiment_augmented_env import ExperimentAugmentedBettingEnv
-from experiment_rl_agent import DQNAgent, PPOAgent, AblationStudyRunner
+from experiment_rl_agent import AblationStudyRunner, DQNAgent, PPOAgent
 
 
 def train_agent(env,
                 agent,
                 num_episodes: int = 1000,
                 eval_freq: int = 100,
-                verbose: bool = True) -> Dict:
+                verbose: bool = True) -> dict:
     """
     Train RL agent on betting environment.
 
@@ -105,7 +104,7 @@ def train_agent(env,
     }
 
 
-def evaluate_agent(env, agent, num_eval_episodes: int = 20) -> Dict:
+def evaluate_agent(env, agent, num_eval_episodes: int = 20) -> dict:
     """
     Evaluate agent performance.
 
@@ -154,8 +153,8 @@ def evaluate_agent(env, agent, num_eval_episodes: int = 20) -> Dict:
 
 def run_ablation_studies(env,
                         agent_class,
-                        agent_params: Dict,
-                        num_episodes: int = 100) -> List[Dict]:
+                        agent_params: dict,
+                        num_episodes: int = 100) -> list[dict]:
     """
     Run ablation studies to measure individual experiment contributions.
 
@@ -235,7 +234,7 @@ def run_ablation_studies(env,
 
 
 def compare_baseline_vs_experiments(num_episodes: int = 500,
-                                   eval_freq: int = 50) -> Dict:
+                                   eval_freq: int = 50) -> dict:
     """
     Compare agent performance with vs without experiment features.
 
@@ -348,7 +347,7 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
     }
 
 
-def analyze_feature_importance(agent, feature_names: List[str]) -> pd.DataFrame:
+def analyze_feature_importance(agent, feature_names: list[str]) -> pd.DataFrame:
     """
     Analyze and display feature importance.
 

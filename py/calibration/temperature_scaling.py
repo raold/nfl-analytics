@@ -17,12 +17,10 @@ Date: November 13, 2025
 
 import logging
 from pathlib import Path
-from typing import Dict, Tuple, Optional
 
 import numpy as np
 import pandas as pd
-from scipy import optimize
-from scipy import stats
+from scipy import optimize, stats
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +50,8 @@ class TemperatureScaler:
         """
         self.target_coverage = target_coverage
         self.method = method
-        self.temperature: Optional[float] = None
-        self.calibration_data: Optional[pd.DataFrame] = None
+        self.temperature: float | None = None
+        self.calibration_data: pd.DataFrame | None = None
 
     def fit(self, predictions: pd.DataFrame) -> float:
         """
@@ -128,7 +126,7 @@ class TemperatureScaler:
                     xtol=0.001,
                     maxiter=100
                 )
-                logger.info(f"✓ Brent optimization converged")
+                logger.info("✓ Brent optimization converged")
             except ValueError:
                 # If no root in range, fall back to minimize
                 logger.warning("Brent method failed, falling back to minimize")
@@ -199,7 +197,7 @@ class TemperatureScaler:
         self.fit(predictions)
         return self.transform(predictions)
 
-    def get_calibration_report(self) -> Dict:
+    def get_calibration_report(self) -> dict:
         """
         Generate calibration report with before/after metrics.
 
@@ -272,7 +270,7 @@ class TemperatureScaler:
 def calculate_calibration_metrics(
     predictions: pd.DataFrame,
     target_coverage: float = 0.90
-) -> Dict:
+) -> dict:
     """
     Calculate calibration metrics for regression predictions.
 
@@ -349,10 +347,10 @@ if __name__ == '__main__':
     logger.info("=" * 80)
     logger.info(f"Temperature: T = {report['temperature']:.4f}")
     logger.info(f"Target Coverage: {report['target_coverage']:.1%}")
-    logger.info(f"\nBefore Temperature Scaling:")
+    logger.info("\nBefore Temperature Scaling:")
     logger.info(f"  Coverage: {report['coverage_before']:.1%}")
     logger.info(f"  Mean Interval Width: {report['width_before']:.1f} yards")
-    logger.info(f"\nAfter Temperature Scaling:")
+    logger.info("\nAfter Temperature Scaling:")
     logger.info(f"  Coverage: {report['coverage_after']:.1%}")
     logger.info(f"  Mean Interval Width: {report['width_after']:.1f} yards")
     logger.info(f"\nMAE: {report['mae']:.2f} yards (unchanged)")

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.596002
 Test count: 19
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from optimization.bnn_hyperparameter_search import *
-import pandas as pd
-import pytest
 
 
 def test_load_rushing_data_with_features_basic():

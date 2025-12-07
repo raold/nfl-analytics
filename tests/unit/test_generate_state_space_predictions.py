@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.828931
 Test count: 11
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.generate_state_space_predictions import *
-import pandas as pd
-import pytest
 
 
 def test_generate_game_id_basic():

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.606622
 Test count: 35
 """
 
+import pytest
 from features.target_share_coverage import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

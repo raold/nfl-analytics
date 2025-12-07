@@ -9,10 +9,10 @@ Date: November 9, 2025
 """
 
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional, Any
 import pickle
 import sys
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,16 +24,16 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from .base import (
+    EnsembleConfig,
+    EnsemblePrediction,
     EnsembleStrategy,
     ModelPrediction,
-    EnsemblePrediction,
-    EnsembleConfig,
     ModelType,
 )
 from .simple_average import SimpleAverageStrategy
-from .weighted_average import WeightedAverageStrategy
-from .thompson_sampling import ThompsonSamplingStrategy
 from .stacking import StackingStrategy
+from .thompson_sampling import ThompsonSamplingStrategy
+from .weighted_average import WeightedAverageStrategy
 
 # Import model loading dependencies (lazy import to avoid circular dependencies)
 try:
@@ -49,14 +49,15 @@ except ImportError:
     logger.warning("BNN module not found - BNN predictions will fail")
 
 try:
-    from py.utils.r_service import get_r_service, RServiceError
+    from py.utils.r_service import RServiceError, get_r_service
 except ImportError:
     get_r_service = None
     logger.warning("R Service not found - R model predictions will fail")
 
 try:
-    from py.utils.claude_cache import get_default_cache
     import base64
+
+    from py.utils.claude_cache import get_default_cache
 except ImportError:
     get_default_cache = None
     logger.warning("ClaudeRedisCache not found - model caching disabled")
@@ -163,7 +164,7 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
+        features: dict | None = None,
     ) -> EnsemblePrediction:
         """
         Generate ensemble prediction for a player.
@@ -223,8 +224,8 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
-    ) -> List[ModelPrediction]:
+        features: dict | None = None,
+    ) -> list[ModelPrediction]:
         """
         Get predictions from all available models.
 
@@ -266,8 +267,8 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
-    ) -> Optional[ModelPrediction]:
+        features: dict | None = None,
+    ) -> ModelPrediction | None:
         """
         Get prediction from a single model.
 
@@ -400,7 +401,7 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[ModelPrediction]:
+    ) -> ModelPrediction | None:
         """
         Get prediction from R model (brms/Stan) via RService.
 
@@ -518,8 +519,8 @@ class UnifiedEnsemblePredictor:
         model_name: str,
         path: Path,
         player_id: str,
-        features: Optional[Dict]
-    ) -> Optional[ModelPrediction]:
+        features: dict | None
+    ) -> ModelPrediction | None:
         """
         Get prediction from BNN model.
 
@@ -591,8 +592,8 @@ class UnifiedEnsemblePredictor:
         model_name: str,
         path: Path,
         player_id: str,
-        features: Optional[Dict]
-    ) -> Optional[ModelPrediction]:
+        features: dict | None
+    ) -> ModelPrediction | None:
         """
         Get prediction from XGBoost model.
 
@@ -670,9 +671,9 @@ class UnifiedEnsemblePredictor:
 
     def _features_dict_to_array(
         self,
-        features: Dict[str, Any],
+        features: dict[str, Any],
         model_type: str
-    ) -> Optional[np.ndarray]:
+    ) -> np.ndarray | None:
         """
         Convert features dictionary to numpy array for model prediction.
 

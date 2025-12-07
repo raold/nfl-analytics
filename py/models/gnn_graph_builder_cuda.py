@@ -19,14 +19,10 @@ Date: 2025-01-24
 """
 
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import psycopg
 import torch
-
 from hierarchical_gnn_v1 import NFLGraph
 
 logging.basicConfig(level=logging.INFO)
@@ -60,7 +56,7 @@ class NFLDatabase:
     def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         self.db_url = db_url
 
-    def load_player_hierarchy(self, season: Optional[int] = None) -> pd.DataFrame:
+    def load_player_hierarchy(self, season: int | None = None) -> pd.DataFrame:
         """
         Load player hierarchy from materialized view.
 
@@ -97,9 +93,9 @@ class NFLDatabase:
 
     def load_player_game_stats(
         self,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
-        stat_category: Optional[str] = None
+        season: int | None = None,
+        week: int | None = None,
+        stat_category: str | None = None
     ) -> pd.DataFrame:
         """
         Load player game stats from materialized view.
@@ -146,7 +142,7 @@ class NFLDatabase:
         logger.info(f"Loaded {len(df)} player-game stats")
         return df
 
-    def load_games(self, season: int, week: Optional[int] = None) -> pd.DataFrame:
+    def load_games(self, season: int, week: int | None = None) -> pd.DataFrame:
         """
         Load game data.
 
@@ -327,7 +323,7 @@ class NFLGraphBuilder:
 
     def build_multi_season_graph(
         self,
-        seasons: List[int],
+        seasons: list[int],
         include_chemistry: bool = True,
         include_matchups: bool = False
     ) -> NFLGraph:
@@ -654,12 +650,12 @@ class NFLGraphBuilder:
     def _create_player_features(
         self,
         player_stats: pd.DataFrame,
-        nextgen_passing: Optional[pd.DataFrame] = None,
-        nextgen_rushing: Optional[pd.DataFrame] = None,
-        nextgen_receiving: Optional[pd.DataFrame] = None,
-        player_info: Optional[pd.DataFrame] = None,
-        bayesian_ratings: Optional[pd.DataFrame] = None,
-    ) -> Dict[str, torch.Tensor]:
+        nextgen_passing: pd.DataFrame | None = None,
+        nextgen_rushing: pd.DataFrame | None = None,
+        nextgen_receiving: pd.DataFrame | None = None,
+        player_info: pd.DataFrame | None = None,
+        bayesian_ratings: pd.DataFrame | None = None,
+    ) -> dict[str, torch.Tensor]:
         """
         Create comprehensive player feature tensors from all available data sources.
 
@@ -810,7 +806,7 @@ class NFLGraphBuilder:
 
         return player_features
 
-    def _find_chemistry_edges(self, player_hierarchy: pd.DataFrame) -> List[Tuple[str, str]]:
+    def _find_chemistry_edges(self, player_hierarchy: pd.DataFrame) -> list[tuple[str, str]]:
         """
         Find QB-WR chemistry edges (players on same team).
 
@@ -849,7 +845,7 @@ class NFLGraphBuilder:
 def prepare_training_data(
     season: int,
     db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-) -> Tuple[NFLGraph, pd.DataFrame]:
+) -> tuple[NFLGraph, pd.DataFrame]:
     """
     Prepare data for training hierarchical GNN.
 

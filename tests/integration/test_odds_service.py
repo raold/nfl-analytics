@@ -10,8 +10,6 @@ Version: 1.0
 """
 
 import os
-import time
-from datetime import datetime, timedelta
 
 import psycopg2
 import pytest

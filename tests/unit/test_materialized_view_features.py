@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.627535
 Test count: 27
 """
 
+import pandas as pd
+import pytest
 from features.materialized_view_features import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_get_connection_basic():

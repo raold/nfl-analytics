@@ -35,15 +35,13 @@ Version: 2.0 (Batched)
 """
 
 import logging
+import time
 import warnings
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import time
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2 import pool
 
 # Suppress R warnings
 warnings.filterwarnings("ignore")
@@ -72,7 +70,7 @@ class BatchedRModelInterface:
 
     def __init__(
         self,
-        db_config: Dict,
+        db_config: dict,
         hierarchical_path: str = "models/bayesian/passing_yards_hierarchical_v2.rds",
         informative_path: str = "models/bayesian/passing_informative_priors_v2.rds",
         pool_size: int = 5,
@@ -184,9 +182,9 @@ class BatchedRModelInterface:
 
     def _fetch_batch_features(
         self,
-        player_ids: List[str],
-        seasons: List[int],
-        weeks: List[int]
+        player_ids: list[str],
+        seasons: list[int],
+        weeks: list[int]
     ) -> pd.DataFrame:
         """
         Fetch features for multiple player-games in single query.
@@ -269,11 +267,11 @@ class BatchedRModelInterface:
 
     def predict_hierarchical_batch(
         self,
-        player_ids: List[str],
-        seasons: List[int],
-        weeks: List[int],
+        player_ids: list[str],
+        seasons: list[int],
+        weeks: list[int],
         ndraws: int = 1000,
-    ) -> List[Tuple[float, float]]:
+    ) -> list[tuple[float, float]]:
         """
         Predict using Hierarchical v2 for multiple player-games (FAST).
 
@@ -358,11 +356,11 @@ class BatchedRModelInterface:
 
     def predict_informative_priors_batch(
         self,
-        player_ids: List[str],
-        seasons: List[int],
-        weeks: List[int],
+        player_ids: list[str],
+        seasons: list[int],
+        weeks: list[int],
         ndraws: int = 1000,
-    ) -> List[Tuple[float, float]]:
+    ) -> list[tuple[float, float]]:
         """
         Predict using Informative Priors v2 for multiple player-games (FAST).
 

@@ -46,22 +46,18 @@ Date: November 14, 2025
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
 import json
-import pickle
+import logging
 from datetime import datetime
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
@@ -255,7 +251,7 @@ def apply_decay_weights(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def prepare_train_test_split(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def prepare_train_test_split(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Split data into train (2015-2023) and validation (2024).
 
@@ -344,7 +340,7 @@ def train_hybrid_model(train_df: pd.DataFrame) -> HybridStaticIncrementalXGBoost
     return model
 
 
-def evaluate_model(model: HybridStaticIncrementalXGBoost, test_df: pd.DataFrame) -> Dict:
+def evaluate_model(model: HybridStaticIncrementalXGBoost, test_df: pd.DataFrame) -> dict:
     """
     Evaluate hybrid model on 2024 validation set.
 
@@ -408,7 +404,7 @@ def evaluate_model(model: HybridStaticIncrementalXGBoost, test_df: pd.DataFrame)
 
 def save_model_and_metadata(
     model: HybridStaticIncrementalXGBoost,
-    metrics: Dict,
+    metrics: dict,
     train_df: pd.DataFrame
 ):
     """

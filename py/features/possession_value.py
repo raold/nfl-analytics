@@ -87,11 +87,9 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 
 import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
@@ -439,7 +437,7 @@ def get_team_possession_value_features(
     season: int,
     week: int,
     n_games: int = 4
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Get team's historical possession value metrics.
 

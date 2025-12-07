@@ -27,16 +27,12 @@ Date: November 16, 2025
 import sys
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
-
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.ensemble.enhanced_ensemble_v7_production import (
-    EnhancedEnsemble7Way,
-    load_ensemble_v7,
     DEFAULT_WEIGHTS_V6,
+    load_ensemble_v7,
 )
 
 
@@ -87,7 +83,7 @@ def test_v7_adaptive_weights():
     season = 2024
     week = 10
 
-    print(f"\nComputing adaptive weights for:")
+    print("\nComputing adaptive weights for:")
     print(f"  Player: {player_id} (Patrick Mahomes)")
     print(f"  Season: {season}, Week: {week}")
 
@@ -103,7 +99,7 @@ def test_v7_adaptive_weights():
             print(f"  {name:25s}: {weights[name]:.4f} ({weights[name]*100:.1f}%)")
 
         # Compare with baseline
-        print(f"\nBaseline Weights (v6.0 static):")
+        print("\nBaseline Weights (v6.0 static):")
         for name in sorted(DEFAULT_WEIGHTS_V6.keys(), key=lambda x: -DEFAULT_WEIGHTS_V6[x]):
             baseline_w = DEFAULT_WEIGHTS_V6[name]
             adaptive_w = weights[name]
@@ -138,7 +134,7 @@ def test_v7_prediction():
     season = 2024
     week = 10
 
-    print(f"\nGenerating prediction for Mahomes Week 10:")
+    print("\nGenerating prediction for Mahomes Week 10:")
 
     try:
         prediction = ensemble.predict(
@@ -148,18 +144,18 @@ def test_v7_prediction():
             return_components=True,
         )
 
-        print(f"\nPrediction Results:")
+        print("\nPrediction Results:")
         print(f"  Ensemble Mean:       {prediction['ensemble_mean']:.1f} yards")
         print(f"  Ensemble Std:        {prediction['ensemble_std']:.1f} yards")
         print(f"  90% CI:              [{prediction['ensemble_ci_lower']:.1f}, {prediction['ensemble_ci_upper']:.1f}]")
         print(f"  Weight Source:       {prediction['metadata']['source']}")
 
-        print(f"\nFinal Weights:")
+        print("\nFinal Weights:")
         for name, weight in sorted(prediction['weights'].items(), key=lambda x: -x[1]):
             print(f"  {name:25s}: {weight:.4f} ({weight*100:.1f}%)")
 
         if 'components' in prediction:
-            print(f"\nComponent Predictions (placeholder):")
+            print("\nComponent Predictions (placeholder):")
             for name, pred in prediction['components'].items():
                 print(f"  {name:25s}: {pred['mean']:.1f} ± {pred['std']:.1f} yards")
 
@@ -189,7 +185,7 @@ def test_v7_ablation():
     season = 2024
     week = 10
 
-    print(f"\nComparing configurations for Mahomes Week 10:\n")
+    print("\nComparing configurations for Mahomes Week 10:\n")
 
     results = []
 

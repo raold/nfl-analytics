@@ -24,6 +24,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+
 from dotenv import load_dotenv
 
 # Load environment
@@ -47,7 +48,7 @@ def test_gnn_component():
         from py.ensemble.components.gnn_component import GNNComponent
 
         gnn = GNNComponent(device="cpu")
-        print(f"✓ GNN component initialized")
+        print("✓ GNN component initialized")
         print(f"  Model path: {gnn.model_path}")
         print(f"  Available: {gnn.is_available}")
         print(f"  Device: {gnn.device}")
@@ -57,20 +58,20 @@ def test_gnn_component():
             pred = gnn.predict("KC", "BUF", 2024, 1)
 
             if pred is not None:
-                print(f"  ✓ Prediction successful:")
+                print("  ✓ Prediction successful:")
                 print(f"    KC vs BUF: {pred.prediction_mean:.3f} ± {pred.prediction_std:.3f}")
                 print(f"    Model: {pred.model_name}")
                 print(f"    Confidence: {pred.confidence}")
             else:
-                print(f"  ✗ Prediction returned None")
+                print("  ✗ Prediction returned None")
         else:
-            print(f"  ℹ Model not available (expected if not trained yet)")
+            print("  ℹ Model not available (expected if not trained yet)")
 
         print("\nTEST 1: PASSED ✓")
         return True
 
     except Exception as e:
-        print(f"\nTEST 1: FAILED ✗")
+        print("\nTEST 1: FAILED ✗")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
@@ -91,7 +92,7 @@ def test_ensemble_v6_2_initialization():
             enable_gnn=True
         )
 
-        print(f"✓ Ensemble initialized")
+        print("✓ Ensemble initialized")
         print(f"  Components: {len(ensemble.weights)}")
         print(f"  Weights: {ensemble.weights}")
         print(f"  GNN enabled: {ensemble.enable_gnn}")
@@ -99,16 +100,16 @@ def test_ensemble_v6_2_initialization():
 
         # Validate weights sum to 1.0
         total_weight = sum(ensemble.weights.values())
-        print(f"\n  Weight validation:")
+        print("\n  Weight validation:")
         print(f"    Sum: {total_weight:.4f}")
         assert abs(total_weight - 1.0) < 0.01, f"Weights don't sum to 1.0: {total_weight}"
-        print(f"    ✓ Weights sum to 1.0")
+        print("    ✓ Weights sum to 1.0")
 
         print("\nTEST 2: PASSED ✓")
         return True
 
     except Exception as e:
-        print(f"\nTEST 2: FAILED ✗")
+        print("\nTEST 2: FAILED ✗")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
@@ -144,8 +145,8 @@ def test_game_outcome_prediction():
         )
 
         if result.get("ensemble_mean") is not None:
-            print(f"✓ Prediction successful:")
-            print(f"  KC vs BUF (2024 Week 1):")
+            print("✓ Prediction successful:")
+            print("  KC vs BUF (2024 Week 1):")
             print(f"    Win Prob: {result['ensemble_mean']:.1%} ± {result['ensemble_std']:.1%}")
             print(f"    90% CI: [{result['lower_90']:.1%}, {result['upper_90']:.1%}]")
             print(f"    GNN used: {result['gnn_used']}")
@@ -157,7 +158,7 @@ def test_game_outcome_prediction():
             assert result['gnn_used'], "GNN should be used"
 
             if "components" in result:
-                print(f"\n  Component predictions:")
+                print("\n  Component predictions:")
                 for name, pred in result["components"].items():
                     print(f"    {name}: {pred['mean']:.3f} ± {pred['std']:.3f}")
 
@@ -169,7 +170,7 @@ def test_game_outcome_prediction():
             return False
 
     except Exception as e:
-        print(f"\nTEST 3: FAILED ✗")
+        print("\nTEST 3: FAILED ✗")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
@@ -191,7 +192,7 @@ def test_graceful_degradation():
             enable_gnn=False
         )
 
-        print(f"✓ Ensemble initialized with GNN disabled")
+        print("✓ Ensemble initialized with GNN disabled")
         print(f"  Components: {len(ensemble.weights)}")
         print(f"  GNN enabled: {ensemble.enable_gnn}")
         print(f"  GNN available: {ensemble.gnn_available}")
@@ -206,7 +207,7 @@ def test_graceful_degradation():
         return True
 
     except Exception as e:
-        print(f"\nTEST 4: FAILED ✗")
+        print("\nTEST 4: FAILED ✗")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
@@ -220,10 +221,7 @@ def test_weight_strategies():
     print("=" * 80)
 
     try:
-        from py.ensemble.strategy.base import (
-            DEFAULT_WEIGHTS_V6,
-            DEFAULT_WEIGHTS_V6_1_GNN
-        )
+        from py.ensemble.strategy.base import DEFAULT_WEIGHTS_V6, DEFAULT_WEIGHTS_V6_1_GNN
 
         print("v6.0 weights (5-way):")
         for name, weight in DEFAULT_WEIGHTS_V6.items():
@@ -244,7 +242,7 @@ def test_weight_strategies():
         return True
 
     except Exception as e:
-        print(f"\nTEST 5: FAILED ✗")
+        print("\nTEST 5: FAILED ✗")
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()

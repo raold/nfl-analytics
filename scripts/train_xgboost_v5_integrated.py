@@ -27,17 +27,14 @@ import pandas as pd
 import psycopg2
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.causal_features_v1 import CausalFeaturesV1
-from py.features.player_aggregation_features import (
-    aggregate_player_projections_multi_season
-)
+from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.oc_features import OCFeatureGenerator
+from py.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
     level=logging.INFO,
@@ -207,7 +204,7 @@ class XGBoostV5Integrated:
         # Track C1: Enhanced Travel Features (12 features)
         logger.info("\n2. Track C1: Enhanced Travel Features...")
         df_with_travel = self.travel_features.calculate_all_features(df_with_agg)
-        logger.info(f"   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
+        logger.info("   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
         logger.info(f"   Shape after travel: {df_with_travel.shape}")
 
         # Track C2: Causal Features (8 features: DiD + PSM + 5 weather)
@@ -237,7 +234,7 @@ class XGBoostV5Integrated:
         # Merge causal features
         causal_df = pd.DataFrame(causal_features_list)
         df_with_causal = pd.concat([df_with_travel, causal_df], axis=1)
-        logger.info(f"   ✓ Added causal + weather features")
+        logger.info("   ✓ Added causal + weather features")
         logger.info(f"   Shape after causal: {df_with_causal.shape}")
 
         # Add rest features (if not already present)
@@ -260,7 +257,7 @@ class XGBoostV5Integrated:
                 week = int(row['week'])
                 oc_feat = self.oc_features.get_features(team, season, week)
                 oc_features_list.append(oc_feat)
-            except Exception as e:
+            except Exception:
                 # Fallback to defaults if coaching data not available
                 oc_features_list.append({
                     'oc_continuity': 0,
@@ -272,7 +269,7 @@ class XGBoostV5Integrated:
         # Merge OC features
         oc_df = pd.DataFrame(oc_features_list)
         df_with_oc = pd.concat([df_with_causal.reset_index(drop=True), oc_df], axis=1)
-        logger.info(f"   ✓ Added 4 OC coaching features")
+        logger.info("   ✓ Added 4 OC coaching features")
         logger.info(f"   Shape after OC features: {df_with_oc.shape}")
 
         logger.info(f"\n✓ Feature engineering complete: {df_with_oc.shape[1]} total columns")
@@ -535,7 +532,7 @@ def main():
     X_test = df_features.loc[test_mask, feature_cols]
     y_test = df_features.loc[test_mask, 'passing_yards']
 
-    logger.info(f"\nTrain/Test Split:")
+    logger.info("\nTrain/Test Split:")
     logger.info(f"  Training: {len(X_train)} samples (2020-2023)")
     logger.info(f"  Test: {len(X_test)} samples (2024)")
 

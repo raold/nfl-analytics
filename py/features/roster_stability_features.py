@@ -22,9 +22,7 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
 
@@ -74,7 +72,7 @@ class RosterStabilityFeatures:
         team: str,
         season: int,
         week: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract roster stability features for a team-game.
 
@@ -187,7 +185,7 @@ class RosterStabilityFeatures:
             conn.close()
             return self._get_default_features()
 
-    def _get_default_features(self) -> Dict[str, float]:
+    def _get_default_features(self) -> dict[str, float]:
         """
         Return default features when extraction fails.
 
@@ -203,7 +201,7 @@ class RosterStabilityFeatures:
 # MATERIALIZED VIEW CREATION (OPTIONAL OPTIMIZATION)
 # ============================================================================
 
-def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
+def create_roster_stability_view(db_config: dict | None = None) -> None:
     """
     Create materialized view for roster stability (speeds up queries).
 
@@ -306,7 +304,7 @@ def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
 
 def query_roster_stability_batch(
     team_season_weeks: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract roster stability for multiple team-games.

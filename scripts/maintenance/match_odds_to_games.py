@@ -7,10 +7,8 @@ the games table and odds_history table.
 """
 
 import os
-import sys
-from datetime import datetime, timedelta
+
 import psycopg
-from typing import Dict, List, Tuple
 
 # Database connection parameters
 DB_PARAMS = {
@@ -27,7 +25,7 @@ def get_connection():
     return psycopg.connect(**DB_PARAMS)
 
 
-def load_team_mappings(conn) -> Dict[str, str]:
+def load_team_mappings(conn) -> dict[str, str]:
     """Load team abbreviation to full name mappings."""
     with conn.cursor() as cur:
         cur.execute("""
@@ -40,7 +38,7 @@ def load_team_mappings(conn) -> Dict[str, str]:
         return mappings
 
 
-def load_games_without_odds(conn) -> List[Dict]:
+def load_games_without_odds(conn) -> list[dict]:
     """Load all games that don't have odds_api_event_id."""
     with conn.cursor() as cur:
         cur.execute("""
@@ -63,7 +61,7 @@ def load_games_without_odds(conn) -> List[Dict]:
         return games
 
 
-def load_odds_events(conn) -> List[Dict]:
+def load_odds_events(conn) -> list[dict]:
     """Load unique odds events."""
     with conn.cursor() as cur:
         cur.execute("""
@@ -89,11 +87,11 @@ def load_odds_events(conn) -> List[Dict]:
 
 
 def match_game_to_event(
-    game: Dict,
-    events: List[Dict],
-    team_mappings: Dict[str, str],
+    game: dict,
+    events: list[dict],
+    team_mappings: dict[str, str],
     date_tolerance_days: int = 2
-) -> Tuple[str, float, str]:
+) -> tuple[str, float, str]:
     """
     Match a game to an odds event.
 
@@ -148,7 +146,7 @@ def match_game_to_event(
     return best_match, best_confidence, best_type
 
 
-def update_games_with_event_ids(conn, matches: List[Tuple[str, str, float, str]]):
+def update_games_with_event_ids(conn, matches: list[tuple[str, str, float, str]]):
     """Update games table with matched event IDs."""
     with conn.cursor() as cur:
         for game_id, event_id, confidence, match_type in matches:

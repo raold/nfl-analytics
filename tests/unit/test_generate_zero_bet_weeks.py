@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.468865
 Test count: 6
 """
 
-from analysis.generate_zero_bet_weeks import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from analysis.generate_zero_bet_weeks import *
 
 
 def test_generate_zero_bet_table_basic():

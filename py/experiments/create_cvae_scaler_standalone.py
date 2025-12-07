@@ -6,9 +6,10 @@ the same data used during training (2020-2024 seasons).
 This bypasses import issues by inlining all necessary code.
 """
 
-import pickle
 import logging
+import pickle
 from pathlib import Path
+
 import numpy as np
 import psycopg2
 from psycopg2.extras import RealDictCursor

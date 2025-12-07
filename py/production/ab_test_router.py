@@ -50,9 +50,9 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
+from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
-from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
 
 # Load environment variables
 load_dotenv()

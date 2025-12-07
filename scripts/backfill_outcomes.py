@@ -18,12 +18,12 @@ Usage:
 Schedule: Run via cron Wednesday 6am ET (after all games complete)
 Expected: <1 minute for typical weekly workload (~32 QBs)
 """
-import sys
 import argparse
 import logging
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -68,10 +68,10 @@ class OutcomeBackfiller:
 
     def get_pending_predictions(
         self,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
-        game_id: Optional[str] = None
-    ) -> List[Dict]:
+        season: int | None = None,
+        week: int | None = None,
+        game_id: str | None = None
+    ) -> list[dict]:
         """
         Get predictions awaiting outcomes
 
@@ -136,7 +136,7 @@ class OutcomeBackfiller:
         self,
         game_id: str,
         player_id: str
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Get actual passing yards for a player in a game
 
@@ -172,7 +172,7 @@ class OutcomeBackfiller:
         prediction_std: float,
         prediction_q05: float,
         prediction_q95: float,
-        line: Optional[float] = None
+        line: float | None = None
     ) -> bool:
         """
         Update prediction with actual outcome and calculate errors
@@ -239,10 +239,10 @@ class OutcomeBackfiller:
 
     def backfill(
         self,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
-        game_id: Optional[str] = None
-    ) -> Dict:
+        season: int | None = None,
+        week: int | None = None,
+        game_id: str | None = None
+    ) -> dict:
         """
         Backfill outcomes for predictions
 
@@ -284,7 +284,7 @@ class OutcomeBackfiller:
             'updated': 0,
             'missing_data': 0,
             'calibrated': 0,
-            'start_time': datetime.now(timezone.utc)
+            'start_time': datetime.now(UTC)
         }
 
         # Process each prediction
@@ -334,9 +334,9 @@ class OutcomeBackfiller:
                 )
                 stats['updated'] += 1
             else:
-                logger.error(f"  ❌ Failed to update prediction")
+                logger.error("  ❌ Failed to update prediction")
 
-        stats['end_time'] = datetime.now(timezone.utc)
+        stats['end_time'] = datetime.now(UTC)
         stats['duration_seconds'] = (stats['end_time'] - stats['start_time']).total_seconds()
 
         # Print summary

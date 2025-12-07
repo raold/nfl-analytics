@@ -8,9 +8,9 @@ Tests:
 3. Game prediction (WAS @ PHI Week 11)
 """
 
-import requests
-import json
 import sys
+
+import requests
 
 API_BASE = "http://localhost:8000"
 
@@ -63,15 +63,15 @@ def test_player_prediction():
 
         if response.status_code == 200:
             data = response.json()
-            print(f"\n✅ PREDICTION SUCCESS")
+            print("\n✅ PREDICTION SUCCESS")
             print(f"   Player: {data['player_id']}")
             print(f"   Prediction: {data['prediction']:.1f} ± {data['uncertainty']:.1f} yards")
             print(f"   90% CI: [{data['confidence_interval']['lower']:.1f}, {data['confidence_interval']['upper']:.1f}]")
-            print(f"   Actual: 221 yards")
+            print("   Actual: 221 yards")
             print(f"   Processing Time: {data['processing_ms']:.1f}ms")
             print(f"   Cache Hit: {data['cache_hit']}")
             print(f"   Ensemble Version: {data['model_versions']['ensemble']}")
-            print(f"\n   Weights:")
+            print("\n   Weights:")
             for model, weight in data['ensemble_weights'].items():
                 print(f"      {model}: {weight:.1%}")
 
@@ -116,7 +116,7 @@ def test_game_prediction():
 
         if response.status_code == 200:
             data = response.json()
-            print(f"\n✅ GAME PREDICTION SUCCESS")
+            print("\n✅ GAME PREDICTION SUCCESS")
             print(f"   Game: {data['away_team']} @ {data['home_team']}")
             print(f"   Season {data['season']}, Week {data['week']}")
 
@@ -124,21 +124,21 @@ def test_game_prediction():
             if data['away_prediction']['predicted_passing_yards']:
                 print(f"      QB: {data['away_prediction']['qb_id']}")
                 print(f"      Prediction: {data['away_prediction']['predicted_passing_yards']:.1f} ± {data['away_prediction']['predicted_passing_yards_std']:.1f} yards")
-                print(f"      Actual: 191 yards")
+                print("      Actual: 191 yards")
             else:
-                print(f"      No prediction available")
+                print("      No prediction available")
 
             print(f"\n   Home ({data['home_team']}):")
             if data['home_prediction']['predicted_passing_yards']:
                 print(f"      QB: {data['home_prediction']['qb_id']}")
                 print(f"      Prediction: {data['home_prediction']['predicted_passing_yards']:.1f} ± {data['home_prediction']['predicted_passing_yards_std']:.1f} yards")
-                print(f"      Actual: 221 yards")
+                print("      Actual: 221 yards")
             else:
-                print(f"      No prediction available")
+                print("      No prediction available")
 
             if data['total_predicted_yards']:
                 print(f"\n   Total Predicted: {data['total_predicted_yards']:.1f} yards")
-                print(f"   Total Actual: 412 yards")
+                print("   Total Actual: 412 yards")
                 print(f"   Error: {abs(data['total_predicted_yards'] - 412):.1f} yards")
 
             print(f"\n   Processing Time: {data['processing_ms']:.1f}ms")
@@ -164,8 +164,8 @@ def main():
     except Exception as e:
         print(f"\n❌ API not running at {API_BASE}")
         print(f"   Error: {e}")
-        print(f"\n   Start the API with:")
-        print(f"   uvicorn py.api.main:app --reload --port 8000")
+        print("\n   Start the API with:")
+        print("   uvicorn py.api.main:app --reload --port 8000")
         sys.exit(1)
 
     # Run tests

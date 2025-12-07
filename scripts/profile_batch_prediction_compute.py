@@ -32,18 +32,19 @@ Date: November 15, 2025
 import sys
 import time
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import argparse
+import cProfile
+import io
 import logging
+import pstats
+import tracemalloc
+
 import numpy as np
 import pandas as pd
 import psycopg2
-from typing import Dict, List, Tuple
-import tracemalloc
-import cProfile
-import pstats
-import io
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -263,7 +264,7 @@ def profile_assembly_loop(ensemble, games):
     print(f"Assembly loop time: {loop_time:.2f}ms ({loop_time/len(games):.3f}ms per game)")
     print(f"DataFrame creation: {df_time:.2f}ms ({df_time/len(games):.3f}ms per game)")
     print(f"Total compute time: {(loop_time + df_time):.2f}ms")
-    print(f"\nLoop time breakdown (total time in ms):")
+    print("\nLoop time breakdown (total time in ms):")
     print("-" * 80)
 
     # Sort by time
@@ -373,7 +374,7 @@ def profile_memory_allocation(ensemble, games):
     def mb(bytes_val):
         return bytes_val / 1024 / 1024
 
-    print(f"\nMemory usage breakdown:")
+    print("\nMemory usage breakdown:")
     print("-" * 80)
     print(f"After state-space: {mb(mem_after_state_space[0]):8.2f} MB (peak: {mb(mem_after_state_space[1]):8.2f} MB)")
     print(f"After hierarchical: {mb(mem_after_hierarchical[0]):8.2f} MB (peak: {mb(mem_after_hierarchical[1]):8.2f} MB)")
@@ -475,17 +476,17 @@ def analyze_vectorization_opportunities(ensemble, games):
             if key not in informative_preds:
                 missing_models['informative_priors_v2'] += 1
 
-    print(f"\nGame prediction coverage:")
+    print("\nGame prediction coverage:")
     print(f"  Complete (all 4 models): {complete_games}/{len(games)} ({complete_games/len(games)*100:.1f}%)")
     print(f"  Incomplete (missing ≥1): {incomplete_games}/{len(games)} ({incomplete_games/len(games)*100:.1f}%)")
 
     if incomplete_games > 0:
-        print(f"\nMissing predictions by model:")
+        print("\nMissing predictions by model:")
         for model, count in missing_models.items():
             pct = (count / len(games)) * 100
             print(f"  {model:25s}: {count:4d} ({pct:5.1f}%)")
 
-    print(f"\n🎯 VECTORIZATION FEASIBILITY:")
+    print("\n🎯 VECTORIZATION FEASIBILITY:")
     if complete_games == len(games):
         print("  ✅ All games have complete predictions - FULL VECTORIZATION POSSIBLE")
         print("  ✅ Can create pre-allocated arrays for all games")
@@ -535,10 +536,10 @@ def main():
     print("="*80)
     print("BATCH PREDICTION COMPUTE TIME PROFILING")
     print("="*80)
-    print(f"Test configuration:")
+    print("Test configuration:")
     print(f"  Games: {len(games)}")
     print(f"  Season: {args.season}")
-    print(f"  Target: <8ms compute time per game (current)")
+    print("  Target: <8ms compute time per game (current)")
 
     # 1. Manual assembly loop profiling
     times, loop_time, df_time = profile_assembly_loop(ensemble, games)
@@ -579,27 +580,27 @@ def main():
     ) * 1000
 
     if dict_lookup_time > loop_time * 0.1:
-        print(f"\n1. OPTIMIZE DICTIONARY LOOKUPS (Priority: HIGH)")
+        print("\n1. OPTIMIZE DICTIONARY LOOKUPS (Priority: HIGH)")
         print(f"   Current: {dict_lookup_time:.2f}ms ({dict_lookup_time/len(games):.4f}ms/game)")
-        print(f"   Strategy: Pre-allocate arrays, use index-based lookup instead of dict")
-        print(f"   Expected speedup: 50-70%")
-        print(f"   Implementation: 30 minutes")
+        print("   Strategy: Pre-allocate arrays, use index-based lookup instead of dict")
+        print("   Expected speedup: 50-70%")
+        print("   Implementation: 30 minutes")
 
     # Check if array creation is slow
     if times['array_creation'] * 1000 > loop_time * 0.05:
-        print(f"\n2. PRE-ALLOCATE ARRAYS (Priority: MEDIUM)")
+        print("\n2. PRE-ALLOCATE ARRAYS (Priority: MEDIUM)")
         print(f"   Current: {times['array_creation']*1000:.2f}ms")
-        print(f"   Strategy: Create result arrays upfront, fill in-place")
-        print(f"   Expected speedup: 30-40%")
-        print(f"   Implementation: 20 minutes")
+        print("   Strategy: Create result arrays upfront, fill in-place")
+        print("   Expected speedup: 30-40%")
+        print("   Implementation: 20 minutes")
 
     # Check if DataFrame creation is slow
     if df_time > 5:
-        print(f"\n3. OPTIMIZE DATAFRAME CREATION (Priority: LOW)")
+        print("\n3. OPTIMIZE DATAFRAME CREATION (Priority: LOW)")
         print(f"   Current: {df_time:.2f}ms")
-        print(f"   Strategy: Use dict of arrays instead of list of dicts")
-        print(f"   Expected speedup: 20-30%")
-        print(f"   Implementation: 15 minutes")
+        print("   Strategy: Use dict of arrays instead of list of dicts")
+        print("   Expected speedup: 20-30%")
+        print("   Implementation: 15 minutes")
 
     print("\n" + "="*80)
 

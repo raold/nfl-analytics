@@ -15,17 +15,16 @@ Usage:
     python scripts/validate_xgboost_v3_1.py [--sample-size 100]
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import argparse
+
 import pandas as pd
 import psycopg2
-import numpy as np
-from typing import Dict
 
 # Database connection
 DB_CONFIG = {
@@ -40,7 +39,7 @@ COVERAGE_THRESHOLD = 0.80
 COVERAGE_TARGET = 0.95
 
 
-def check_feature_coverage(sample_size: int = 100) -> Dict:
+def check_feature_coverage(sample_size: int = 100) -> dict:
     """
     Validate feature coverage on small sample before full training.
 
@@ -96,18 +95,18 @@ def check_feature_coverage(sample_size: int = 100) -> Dict:
 
     print(f"✓ Loaded {len(df)} games")
     print(f"  Seasons: {df.season.min()}-{df.season.max()}")
-    print(f"  Season distribution:")
+    print("  Season distribution:")
     for season, count in df.season.value_counts().sort_index().items():
         print(f"    {season}: {count} games")
 
     # Load opponent strength features
-    print(f"\nLoading opponent strength features...")
+    print("\nLoading opponent strength features...")
     features_path = Path('data/processed/features/opponent_strength_features.csv')
 
     if not features_path.exists():
-        print(f"✗ FAILED: Opponent strength features not found")
+        print("✗ FAILED: Opponent strength features not found")
         print(f"  Path: {features_path}")
-        print(f"  Run: python py/features/opponent_strength.py")
+        print("  Run: python py/features/opponent_strength.py")
         return {'status': 'FAILED', 'reason': 'Missing opponent features file'}
 
     opp_df = pd.read_csv(features_path)
@@ -117,7 +116,7 @@ def check_feature_coverage(sample_size: int = 100) -> Dict:
     opp_features = opp_df[['game_id', 'team', 'opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].copy()
 
     # Merge
-    print(f"\nMerging opponent features with sample...")
+    print("\nMerging opponent features with sample...")
     before_merge = len(df)
     merged_df = df.merge(opp_features, on=['game_id', 'team'], how='left')
     after_merge = len(merged_df)
@@ -168,14 +167,14 @@ def check_feature_coverage(sample_size: int = 100) -> Dict:
     if all_pass:
         print("✓ GO - PROCEED WITH FULL TRAINING")
         print(f"  All features meet {COVERAGE_THRESHOLD:.0%} threshold")
-        print(f"  Expected to replicate on full 2018-2024 dataset")
+        print("  Expected to replicate on full 2018-2024 dataset")
         print("\nNext step:")
         print("  python py/models/train_xgboost_v3_1_aligned_window.py")
         decision = 'GO'
     else:
         print("✗ NO-GO - DO NOT TRAIN")
         print(f"  Some features below {COVERAGE_THRESHOLD:.0%} threshold")
-        print(f"  Training would fail coverage audit")
+        print("  Training would fail coverage audit")
         print("\nOptions:")
         print("  1. Investigate missing data causes")
         print("  2. Regenerate opponent features (py/features/opponent_strength.py)")

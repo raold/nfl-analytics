@@ -7,9 +7,11 @@ Expected: Predictions should be ~200-300 yards (not 400-900 yards)
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+
 
 def test_predictions():
     """Test state-space predictions on known games."""
@@ -47,7 +49,7 @@ def test_predictions():
             print(f"❌ FAIL: {player_id} W{week} {season}")
             print(f"   Prediction: {pred_mean:.1f} ± {pred_std:.1f} yards")
             print(f"   Actual: {actual_yards} yards")
-            print(f"   ERROR: Prediction out of range (50-500 yards)")
+            print("   ERROR: Prediction out of range (50-500 yards)")
             all_pass = False
         else:
             error = abs(pred_mean - actual_yards)

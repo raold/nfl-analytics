@@ -11,11 +11,9 @@ Track 28: Backtest XGBoost v6 against 2022-2024
 import argparse
 import json
 import logging
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -40,7 +38,7 @@ class XGBoostV6Backtester:
     def __init__(
         self,
         model_path: str,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         use_redis: bool = True
     ):
         """Initialize backtester.
@@ -85,12 +83,12 @@ class XGBoostV6Backtester:
         model.load_model(str(self.model_path))
         return model
 
-    def _load_metadata(self) -> Dict:
+    def _load_metadata(self) -> dict:
         """Load model metadata."""
         with open(self.metadata_path) as f:
             return json.load(f)
 
-    def _get_game_outcomes(self, seasons: List[int]) -> pd.DataFrame:
+    def _get_game_outcomes(self, seasons: list[int]) -> pd.DataFrame:
         """Get game outcomes (actual spreads) from database."""
         import psycopg2
 
@@ -131,7 +129,7 @@ class XGBoostV6Backtester:
     def _extract_features_batch(
         self,
         season: int,
-        weeks: List[int]
+        weeks: list[int]
     ) -> pd.DataFrame:
         """Extract features for all games in season/weeks using ParallelFeatureLoader."""
         features = self.parallel_loader.extract_season_features(
@@ -170,9 +168,9 @@ class XGBoostV6Backtester:
 
     def backtest(
         self,
-        test_seasons: List[int] = [2022, 2023, 2024],
-        output_dir: Optional[str] = None
-    ) -> Dict:
+        test_seasons: list[int] = [2022, 2023, 2024],
+        output_dir: str | None = None
+    ) -> dict:
         """Run walk-forward backtest.
 
         Args:
@@ -292,8 +290,8 @@ class XGBoostV6Backtester:
         predictions: np.ndarray,
         actuals: np.ndarray,
         market: np.ndarray,
-        game_details: List[Dict]
-    ) -> Dict:
+        game_details: list[dict]
+    ) -> dict:
         """Calculate comprehensive backtest metrics."""
         # Basic metrics
         mae = mean_absolute_error(actuals, predictions)
@@ -371,8 +369,8 @@ class XGBoostV6Backtester:
 
     def _save_results(
         self,
-        results: Dict,
-        game_details: List[Dict],
+        results: dict,
+        game_details: list[dict],
         output_dir: str
     ):
         """Save backtest results to files."""
@@ -449,22 +447,22 @@ def main():
     print(f"\nSeasons: {results['test_seasons']}")
     print(f"Games: {results['n_games']}")
     print(f"Runtime: {results['runtime_seconds']:.1f}s")
-    print(f"\n--- Model Performance ---")
+    print("\n--- Model Performance ---")
     print(f"MAE: {results['mae']:.2f} points")
     print(f"RMSE: {results['rmse']:.2f} points")
     print(f"R²: {results['r2']:.4f}")
-    print(f"\n--- Error Distribution ---")
+    print("\n--- Error Distribution ---")
     print(f"Median Error: {results['error_p50']:.2f}")
     print(f"75th Percentile: {results['error_p75']:.2f}")
     print(f"90th Percentile: {results['error_p90']:.2f}")
     print(f"95th Percentile: {results['error_p95']:.2f}")
-    print(f"\n--- vs Market ---")
+    print("\n--- vs Market ---")
     print(f"Market MAE: {results['market_mae']:.2f}")
     print(f"Model vs Market: {results['vs_market']:+.2f} (positive = model better)")
-    print(f"\n--- Betting Simulation ---")
+    print("\n--- Betting Simulation ---")
     print(f"Win Rate (≥1pt edge): {results['betting_win_rate']:.1%}")
     print(f"Number of Bets: {results['n_bets']}")
-    print(f"\n--- By Season ---")
+    print("\n--- By Season ---")
     for season, metrics in results['by_season'].items():
         print(f"  {season}: MAE={metrics['model_error']:.2f}, Market={metrics['market_error']:.2f}, N={metrics['n_games']}")
     print("="*60)

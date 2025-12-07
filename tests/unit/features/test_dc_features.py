@@ -19,15 +19,14 @@ Author: Claude Code (Opus 4.5)
 Date: November 27, 2025
 """
 
-import unittest
-from unittest.mock import MagicMock, patch
 import math
-
-import numpy as np
 
 # Add project root to path
 import sys
+import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from py.features.dc_features import DCFeatureGenerator

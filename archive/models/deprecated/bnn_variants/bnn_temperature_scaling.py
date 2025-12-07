@@ -25,8 +25,8 @@ Usage:
 """
 
 #!/usr/bin/env python3
-import sys
 import logging
+import sys
 from pathlib import Path
 
 import joblib
@@ -34,7 +34,6 @@ import numpy as np
 import pandas as pd
 import psycopg2
 from scipy.optimize import minimize_scalar
-from sklearn.model_selection import train_test_split
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -295,12 +294,12 @@ def main():
     calib_val = compute_calibration(y_val, pred_mean_val, pred_std_val)
     calib_test = compute_calibration(y_test, pred_mean_test, pred_std_test)
 
-    logger.info(f"\nValidation Set (2023):")
+    logger.info("\nValidation Set (2023):")
     logger.info(f"  MAE: {mae_val:.2f} yards")
     logger.info(f"  Calibration: {calib_val:.1%} (target: 68%)")
     logger.info(f"  Mean Uncertainty: {pred_std_val.mean():.1f} yards")
 
-    logger.info(f"\nTest Set (2024):")
+    logger.info("\nTest Set (2024):")
     logger.info(f"  MAE: {mae_test:.2f} yards")
     logger.info(f"  Calibration: {calib_test:.1%} (target: 68%)")
     logger.info(f"  Mean Uncertainty: {pred_std_test.mean():.1f} yards")
@@ -324,13 +323,13 @@ def main():
     calib_val_scaled = compute_calibration(y_val, pred_mean_val, pred_std_val_scaled)
     calib_test_scaled = compute_calibration(y_test, pred_mean_test, pred_std_test_scaled)
 
-    logger.info(f"\nValidation Set (2023) - CALIBRATED:")
+    logger.info("\nValidation Set (2023) - CALIBRATED:")
     logger.info(f"  MAE: {mae_val:.2f} yards (unchanged)")
     logger.info(f"  Calibration: {calib_val_scaled:.1%} (target: 68%)")
     logger.info(f"  Mean Uncertainty: {pred_std_val_scaled.mean():.1f} yards")
     logger.info(f"  Temperature: T = {T_opt:.3f}")
 
-    logger.info(f"\nTest Set (2024) - CALIBRATED:")
+    logger.info("\nTest Set (2024) - CALIBRATED:")
     logger.info(f"  MAE: {mae_test:.2f} yards (unchanged)")
     logger.info(f"  Calibration: {calib_test_scaled:.1%} (target: 68%)")
     logger.info(f"  Mean Uncertainty: {pred_std_test_scaled.mean():.1f} yards")
@@ -380,7 +379,7 @@ def main():
     logger.info("\n" + "="*80)
     logger.info("TEMPERATURE SCALING SUMMARY")
     logger.info("="*80)
-    logger.info(f"\n✓ Temperature Scaling Complete")
+    logger.info("\n✓ Temperature Scaling Complete")
     logger.info(f"  Optimal Temperature: T = {T_opt:.3f}")
     logger.info(f"  Test MAE: {mae_test:.2f} yards (unchanged)")
     logger.info(f"  Test Calibration: {calib_test:.1%} → {calib_test_scaled:.1%}")

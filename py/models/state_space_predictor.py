@@ -32,7 +32,6 @@ Usage:
 
 import logging
 from pathlib import Path
-from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -135,8 +134,8 @@ class StateSpacePredictor:
     def get_player_skill(
         self,
         player_id: str,
-        game_number: Optional[int] = None
-    ) -> Tuple[float, float]:
+        game_number: int | None = None
+    ) -> tuple[float, float]:
         """
         Get player's skill at specific game number
 
@@ -182,9 +181,9 @@ class StateSpacePredictor:
         week: int,
         attempts: float,
         is_home: int,
-        game_number: Optional[int] = None,
+        game_number: int | None = None,
         n_samples: int = 1000,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Generate prediction with uncertainty for a single game
 

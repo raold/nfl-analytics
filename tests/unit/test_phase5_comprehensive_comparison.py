@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.537720
 Test count: 14
 """
 
+import pytest
 from backtests.phase5_comprehensive_comparison import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_train_model_basic():

@@ -22,25 +22,23 @@ Author: Claude Code (Anthropic)
 Date: November 12, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
-import logging
-from pathlib import Path
-from typing import Dict, List, Tuple
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
-from scipy import stats
-import matplotlib.pyplot as plt
 import seaborn as sns
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
@@ -60,8 +58,8 @@ sns.set_style('whitegrid')
 # =============================================================================
 
 def load_player_stats(
-    seasons: List[int],
-    db_params: Dict[str, str],
+    seasons: list[int],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """
@@ -190,7 +188,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 def train_static_baseline(
     X_train: pd.DataFrame,
     y_train: pd.Series,
-) -> Tuple[xgb.XGBRegressor, StandardScaler]:
+) -> tuple[xgb.XGBRegressor, StandardScaler]:
     """
     Train static XGBoost baseline
 
@@ -226,9 +224,9 @@ def train_static_baseline(
 def prequential_evaluation(
     model,
     test_data: pd.DataFrame,
-    feature_cols: List[str],
+    feature_cols: list[str],
     model_type: str,
-) -> Dict:
+) -> dict:
     """
     Prequential evaluation (test-then-train) on test data
 
@@ -291,8 +289,8 @@ def evaluate_static_baseline(
     model,
     scaler,
     test_data: pd.DataFrame,
-    feature_cols: List[str],
-) -> Dict:
+    feature_cols: list[str],
+) -> dict:
     """
     Evaluate static baseline on test data
 
@@ -318,7 +316,7 @@ def evaluate_static_baseline(
     rmse = np.sqrt(np.mean((y_test - predictions)**2))
     median_ae = np.median(errors)
 
-    logger.info(f"Static XGBoost Results:")
+    logger.info("Static XGBoost Results:")
     logger.info(f"  MAE: {mae:.2f} yards")
     logger.info(f"  RMSE: {rmse:.2f} yards")
     logger.info(f"  Median AE: {median_ae:.2f} yards")
@@ -339,7 +337,7 @@ def evaluate_static_baseline(
 # =============================================================================
 
 def plot_mae_comparison(
-    results: Dict[str, Dict],
+    results: dict[str, dict],
     output_dir: Path,
 ):
     """
@@ -387,7 +385,7 @@ def plot_mae_comparison(
 
 
 def plot_error_distributions(
-    results: Dict[str, Dict],
+    results: dict[str, dict],
     output_dir: Path,
 ):
     """
@@ -419,7 +417,7 @@ def plot_error_distributions(
 
 
 def plot_predictions_vs_actuals(
-    results: Dict[str, Dict],
+    results: dict[str, dict],
     output_dir: Path,
 ):
     """

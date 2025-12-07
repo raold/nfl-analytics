@@ -19,14 +19,16 @@ Usage:
 import sys
 import time
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import argparse
 import logging
+import os
+
 import numpy as np
 import pandas as pd
 import psycopg2
-import os
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -171,8 +173,8 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
     logger.info(f"Sequential time per game: {sequential_per_game:.1f}ms")
     logger.info(f"Batch time per game: {batch_per_game:.1f}ms")
     logger.info(f"Speedup: {speedup:.1f}x")
-    logger.info(f"")
-    logger.info(f"Estimated time for 1,984 games:")
+    logger.info("")
+    logger.info("Estimated time for 1,984 games:")
     logger.info(f"  Sequential: {(sequential_per_game * 1984):.0f}ms ({(sequential_per_game * 1984)/1000:.1f}s)")
     logger.info(f"  Batch: {estimated_full_batch_time:.0f}ms ({estimated_full_batch_time/1000:.1f}s)")
 
@@ -187,9 +189,9 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
     logger.info(f"Actual: {batch_per_game:.1f}ms")
 
     if inference_passes:
-        logger.info(f"✅ PASS - Inference time meets target")
+        logger.info("✅ PASS - Inference time meets target")
     else:
-        logger.warning(f"❌ FAIL - Inference time exceeds target")
+        logger.warning("❌ FAIL - Inference time exceeds target")
 
     # Final summary
     logger.info("\n" + "="*70)

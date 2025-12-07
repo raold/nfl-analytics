@@ -8,21 +8,21 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import pytest
-import pandas as pd
-import numpy as np
-from datetime import datetime
 import sys
+from datetime import datetime
 from pathlib import Path
+
+import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from dashboard.utils.schema_validator import (
-    validate_schema,
-    validate_query_result,
-    get_common_schemas,
     ValidationError,
+    get_common_schemas,
+    validate_query_result,
+    validate_schema,
 )
 
 

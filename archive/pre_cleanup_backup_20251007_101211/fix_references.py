@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Convert manual Figure~\ref and Table~\ref to \Cref{}.
+Convert manual Figure~\ref and Table~\ref to \\Cref{}.
 """
 
 import re
 from pathlib import Path
+
 
 def fix_references(tex_dir):
     """Convert manual references to cleveref commands."""
@@ -15,7 +16,7 @@ def fix_references(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding='utf-8') as f:
                 content = f.read()
 
             original_content = content

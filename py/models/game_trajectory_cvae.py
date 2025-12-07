@@ -17,14 +17,13 @@ Key advantages over parametric models:
 4. Generates full trajectories for derivative pricing (parlays, teasers, live betting)
 """
 
+import logging
+from dataclasses import dataclass
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.distributions import Normal
-import numpy as np
-from typing import Dict, Tuple, List, Optional
-import logging
-from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +110,7 @@ class ConditionalVAE(nn.Module):
         trajectory_dim: int = 16,  # GameTrajectory tensor dimension
         condition_dim: int = 20,   # Pre-game features dimension
         latent_dim: int = 32,       # Latent space dimension
-        hidden_dims: List[int] = None,
+        hidden_dims: list[int] = None,
         beta: float = 1.0,          # KL divergence weight
         device: str = 'cpu'
     ):
@@ -169,7 +168,7 @@ class ConditionalVAE(nn.Module):
 
         self.to(device)
 
-    def encode(self, x: torch.Tensor, c: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def encode(self, x: torch.Tensor, c: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Encode trajectory and conditions to latent distribution parameters.
 
@@ -202,7 +201,7 @@ class ConditionalVAE(nn.Module):
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    def decode(self, z: torch.Tensor, c: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def decode(self, z: torch.Tensor, c: torch.Tensor) -> dict[str, torch.Tensor]:
         """
         Decode from latent code and conditions to game trajectory.
 
@@ -234,7 +233,7 @@ class ConditionalVAE(nn.Module):
             'scales': torch.exp(self.score_log_scales)
         }
 
-    def forward(self, x: torch.Tensor, c: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def forward(self, x: torch.Tensor, c: torch.Tensor) -> dict[str, torch.Tensor]:
         """
         Full forward pass through VAE.
 
@@ -273,10 +272,10 @@ class ConditionalVAE(nn.Module):
 
     def loss_function(
         self,
-        outputs: Dict[str, torch.Tensor],
+        outputs: dict[str, torch.Tensor],
         targets: torch.Tensor,
-        mask: Optional[torch.Tensor] = None
-    ) -> Dict[str, torch.Tensor]:
+        mask: torch.Tensor | None = None
+    ) -> dict[str, torch.Tensor]:
         """
         Compute VAE loss with separate components for different trajectory parts.
 
@@ -345,7 +344,7 @@ class ConditionalVAE(nn.Module):
         conditions: torch.Tensor,
         n_samples: int = 1000,
         temperature: float = 1.0
-    ) -> List[GameTrajectory]:
+    ) -> list[GameTrajectory]:
         """
         Generate game trajectories from conditions.
 
@@ -390,7 +389,7 @@ class ConditionalVAE(nn.Module):
         spread: float,
         total: float,
         n_samples: int = 10000
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute betting probabilities via sampling.
 
@@ -435,7 +434,7 @@ class CVAESimulator:
     Drop-in replacement for parametric simulators.
     """
 
-    def __init__(self, model_path: Optional[str] = None, device: str = 'cpu'):
+    def __init__(self, model_path: str | None = None, device: str = 'cpu'):
         self.device = device
         self.model = ConditionalVAE(device=device)
 
@@ -451,9 +450,9 @@ class CVAESimulator:
 
     def simulate_game(
         self,
-        features: Dict[str, float],
+        features: dict[str, float],
         n_samples: int = 10000
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Simulate game outcomes from pre-game features.
 
@@ -490,11 +489,11 @@ class CVAESimulator:
 
     def price_derivative(
         self,
-        features: Dict[str, float],
+        features: dict[str, float],
         derivative_type: str,
-        params: Dict,
+        params: dict,
         n_samples: int = 100000
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Price complex derivatives using deep generative model.
 
@@ -518,7 +517,7 @@ class CVAESimulator:
         else:
             raise ValueError(f"Unknown derivative type: {derivative_type}")
 
-    def _prepare_conditions(self, features: Dict[str, float]) -> torch.Tensor:
+    def _prepare_conditions(self, features: dict[str, float]) -> torch.Tensor:
         """Convert feature dictionary to condition tensor."""
         # Standard feature ordering
         feature_names = [
@@ -538,17 +537,17 @@ class CVAESimulator:
 
         return torch.tensor([conditions], dtype=torch.float32).to(self.device)
 
-    def _price_parlay(self, sims: Dict[str, np.ndarray], params: Dict) -> Dict[str, float]:
+    def _price_parlay(self, sims: dict[str, np.ndarray], params: dict) -> dict[str, float]:
         """Price multi-game parlay."""
         # Implementation for parlay pricing
         pass
 
-    def _price_teaser(self, sims: Dict[str, np.ndarray], params: Dict) -> Dict[str, float]:
+    def _price_teaser(self, sims: dict[str, np.ndarray], params: dict) -> dict[str, float]:
         """Price teaser with adjusted lines."""
         # Implementation for teaser pricing
         pass
 
-    def _price_sgp(self, sims: Dict[str, np.ndarray], params: Dict) -> Dict[str, float]:
+    def _price_sgp(self, sims: dict[str, np.ndarray], params: dict) -> dict[str, float]:
         """Price same-game parlay with correlated legs."""
         # Implementation for SGP pricing using quarter-level correlations
         pass

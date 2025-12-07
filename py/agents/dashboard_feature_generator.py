@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Dashboard Feature Generator Agent for NFL Analytics
 ====================================================
 
@@ -65,16 +65,12 @@ Date: November 22, 2025
 Phase: 6 (Frontend Agents)
 """
 
-import argparse
 import ast
-import inspect
 import logging
-import re
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 # Configure logging
 logging.basicConfig(
@@ -102,13 +98,13 @@ class ArgumentSpec:
     """CLI argument specification."""
     name: str
     arg_type: str  # "str", "int", "float", "bool", "list"
-    default: Optional[Any]
-    help_text: Optional[str]
-    choices: Optional[List[Any]]
+    default: Any | None
+    help_text: str | None
+    choices: list[Any] | None
     required: bool
     widget_type: WidgetType
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "name": self.name,
@@ -126,12 +122,12 @@ class DashboardPageSpec:
     """Specification for generated dashboard page."""
     page_title: str
     page_description: str
-    arguments: List[ArgumentSpec]
+    arguments: list[ArgumentSpec]
     function_call: str  # Python code to execute
     result_display: str  # How to display results
     generated_code: str  # Full Streamlit page code
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "page_title": self.page_title,
@@ -154,7 +150,7 @@ class DashboardFeatureGenerator:
         self,
         scripts_dir: str = "scripts/",
         dashboard_dir: str = "dashboard/",
-        db_config: Optional[Dict[str, str]] = None
+        db_config: dict[str, str] | None = None
     ):
         """
         Initialize Dashboard Feature Generator.
@@ -176,9 +172,9 @@ class DashboardFeatureGenerator:
             "password": "sicillionbillions"
         }
 
-        logger.info(f"DashboardFeatureGenerator initialized")
+        logger.info("DashboardFeatureGenerator initialized")
 
-    def analyze_cli_script(self, script_path: str) -> List[ArgumentSpec]:
+    def analyze_cli_script(self, script_path: str) -> list[ArgumentSpec]:
         """
         Analyze CLI script and extract argument specifications.
 
@@ -189,7 +185,7 @@ class DashboardFeatureGenerator:
             List of argument specifications
         """
         try:
-            with open(script_path, 'r') as f:
+            with open(script_path) as f:
                 content = f.read()
 
             # Parse Python AST
@@ -266,7 +262,7 @@ class DashboardFeatureGenerator:
         self,
         script_path: str,
         page_title: str,
-        page_description: Optional[str] = None
+        page_description: str | None = None
     ) -> DashboardPageSpec:
         """
         Generate complete Streamlit page from CLI script.
@@ -498,7 +494,7 @@ if st.button("🔍 Execute Query", type="primary"):
 
     def generate_training_form(
         self,
-        model_types: List[str] = ["xgboost", "bayesian", "lstm"]
+        model_types: list[str] = ["xgboost", "bayesian", "lstm"]
     ) -> str:
         """
         Generate model training submission form.
@@ -797,7 +793,7 @@ if selected_schema:
     def _infer_widget_type(
         self,
         arg_type: str,
-        choices: Optional[List],
+        choices: list | None,
         arg_name: str
     ) -> WidgetType:
         """Infer appropriate Streamlit widget type from argument properties."""

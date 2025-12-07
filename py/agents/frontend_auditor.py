@@ -17,7 +17,6 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -34,12 +33,12 @@ class AuditIssue:
     title: str
     description: str
     location: str  # File path + line number
-    fix_suggestion: Optional[str] = None
+    fix_suggestion: str | None = None
     auto_fixable: bool = False
-    wcag_violation: Optional[str] = None  # e.g., "1.4.3 Contrast (Minimum)"
-    screenshot_path: Optional[str] = None
+    wcag_violation: str | None = None  # e.g., "1.4.3 Contrast (Minimum)"
+    screenshot_path: str | None = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
             'severity': self.severity,
@@ -60,7 +59,7 @@ class AuditReport:
 
     timestamp: datetime
     pages_audited: int
-    issues: List[AuditIssue] = field(default_factory=list)
+    issues: list[AuditIssue] = field(default_factory=list)
 
     @property
     def critical_count(self) -> int:
@@ -78,15 +77,15 @@ class AuditReport:
     def low_count(self) -> int:
         return len([i for i in self.issues if i.severity == 'low'])
 
-    def filter_by_severity(self, *severities: str) -> List[AuditIssue]:
+    def filter_by_severity(self, *severities: str) -> list[AuditIssue]:
         """Filter issues by severity level(s)."""
         return [i for i in self.issues if i.severity in severities]
 
-    def filter_by_category(self, *categories: str) -> List[AuditIssue]:
+    def filter_by_category(self, *categories: str) -> list[AuditIssue]:
         """Filter issues by category."""
         return [i for i in self.issues if i.category in categories]
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
             'timestamp': self.timestamp.isoformat(),
@@ -118,7 +117,7 @@ class UIUXAnalyzer:
         self.dashboard_path = dashboard_path
         self.issues = []
 
-    def analyze(self) -> List[AuditIssue]:
+    def analyze(self) -> list[AuditIssue]:
         """Run all UI/UX analyses."""
         logger.info("Running UI/UX analysis...")
 
@@ -134,7 +133,7 @@ class UIUXAnalyzer:
 
     def _analyze_file(self, file_path: Path):
         """Analyze a single file for UI/UX issues."""
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             lines = f.readlines()
 
         for line_num, line in enumerate(lines, 1):
@@ -162,10 +161,10 @@ class UIUXAnalyzer:
                     self.issues.append(AuditIssue(
                         severity='high',
                         category='ui_ux',
-                        title=f'Low contrast color combination detected',
+                        title='Low contrast color combination detected',
                         description=f'Foreground {fg} on background {bg} may not meet WCAG AA contrast ratio',
                         location=f'{file_path}:{line_num}',
-                        fix_suggestion=f'Increase contrast by darkening text or lightening background',
+                        fix_suggestion='Increase contrast by darkening text or lightening background',
                         auto_fixable=False,
                         wcag_violation='1.4.3 Contrast (Minimum)'
                     ))
@@ -180,9 +179,9 @@ class UIUXAnalyzer:
                     severity='medium',
                     category='ui_ux',
                     title=f'Font size too small ({size}px)',
-                    description=f'Minimum recommended font size is 12px for readability',
+                    description='Minimum recommended font size is 12px for readability',
                     location=f'{file_path}:{line_num}',
-                    fix_suggestion=f'Increase font-size to at least 12px',
+                    fix_suggestion='Increase font-size to at least 12px',
                     auto_fixable=True
                 ))
 
@@ -202,11 +201,11 @@ class UIUXAnalyzer:
 class DataValidator:
     """Validates data completeness and accuracy against database."""
 
-    def __init__(self, db_config: Dict):
+    def __init__(self, db_config: dict):
         self.db_config = db_config
         self.issues = []
 
-    def analyze(self, page_name: str = None) -> List[AuditIssue]:
+    def analyze(self, page_name: str = None) -> list[AuditIssue]:
         """Run data validation checks."""
         logger.info("Running data validation...")
 
@@ -266,7 +265,7 @@ class FrontendAuditor:
     def __init__(
         self,
         dashboard_path: str = "dashboard",
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         output_dir: str = "docs/audits"
     ):
         """
@@ -286,11 +285,11 @@ class FrontendAuditor:
         self.uiux_analyzer = UIUXAnalyzer(self.dashboard_path)
         self.data_validator = DataValidator(self.db_config)
 
-        logger.info(f"Initialized FrontendAuditor")
+        logger.info("Initialized FrontendAuditor")
         logger.info(f"  Dashboard: {self.dashboard_path}")
         logger.info(f"  Output: {self.output_dir}")
 
-    def _get_default_db_config(self) -> Dict:
+    def _get_default_db_config(self) -> dict:
         """Get default database configuration from environment."""
         return {
             'host': os.getenv('DB_HOST', 'localhost'),
@@ -335,7 +334,7 @@ class FrontendAuditor:
 
         return report
 
-    def audit_page(self, page_name: str) -> List[AuditIssue]:
+    def audit_page(self, page_name: str) -> list[AuditIssue]:
         """Audit a specific page."""
         logger.info(f"Auditing page: {page_name}")
         # TODO: Implement single-page audit
@@ -359,12 +358,12 @@ class FrontendAuditor:
     def _generate_markdown_report(self, report: AuditReport, output_path: Path):
         """Generate human-readable markdown report."""
         with open(output_path, 'w') as f:
-            f.write(f"# Frontend Audit Report\n\n")
+            f.write("# Frontend Audit Report\n\n")
             f.write(f"**Date**: {report.timestamp.strftime('%B %d, %Y %H:%M:%S')}\n")
             f.write(f"**Pages Audited**: {report.pages_audited}\n")
             f.write(f"**Total Issues**: {len(report.issues)}\n\n")
 
-            f.write(f"**Severity Breakdown**:\n")
+            f.write("**Severity Breakdown**:\n")
             f.write(f"- ❌ **Critical**: {report.critical_count}\n")
             f.write(f"- ⚠️  **High**: {report.high_count}\n")
             f.write(f"- ℹ️  **Medium**: {report.medium_count}\n")
@@ -394,7 +393,7 @@ class FrontendAuditor:
                         f.write(f"**Fix**: {issue.fix_suggestion}\n\n")
 
                     if issue.auto_fixable:
-                        f.write(f"🤖 *Auto-fixable*\n\n")
+                        f.write("🤖 *Auto-fixable*\n\n")
 
                     f.write("---\n\n")
 
@@ -410,7 +409,7 @@ if __name__ == "__main__":
     report = auditor.audit_all_pages()
 
     print(f"\n{'='*80}")
-    print(f"AUDIT COMPLETE")
+    print("AUDIT COMPLETE")
     print(f"{'='*80}")
     print(f"Total Issues: {len(report.issues)}")
     print(f"  Critical: {report.critical_count}")

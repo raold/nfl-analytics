@@ -7,6 +7,7 @@ Run with:
 """
 
 import pytest
+
 from py.utils.sql_validator import SQLValidator, validate_query
 
 

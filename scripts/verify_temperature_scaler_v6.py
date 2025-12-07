@@ -14,6 +14,7 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
@@ -45,7 +46,7 @@ def verify_temperature_scaler():
         with open(scaler_path, 'rb') as f:
             scaler_data = pickle.load(f)
 
-        logger.info(f"✅ Temperature scaler loaded successfully")
+        logger.info("✅ Temperature scaler loaded successfully")
         logger.info(f"   Temperature: T = {scaler_data['temperature']:.4f}")
         logger.info(f"   Target coverage: {scaler_data['target_coverage']:.1%}")
 
@@ -77,7 +78,7 @@ def verify_ensemble_integration():
             temperature_scaler_path="models/calibration/temperature_scaler_v6.pkl"
         )
 
-        logger.info(f"✅ Ensemble initialized successfully")
+        logger.info("✅ Ensemble initialized successfully")
         logger.info(f"   Version: {ensemble.ensemble_version}")
         logger.info(f"   Weights: {ensemble.weights}")
         logger.info(f"   Temperature: T = {ensemble.temperature:.4f}")

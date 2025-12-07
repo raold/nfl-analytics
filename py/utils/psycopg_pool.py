@@ -34,9 +34,8 @@ Date: November 22, 2025
 
 import logging
 import threading
-from contextlib import contextmanager
-from typing import Dict, Optional, Any
 import time
+from contextlib import contextmanager
 
 try:
     import psycopg
@@ -187,7 +186,7 @@ class Psycopg3PoolManager:
     def execute_query(
         self,
         query: str,
-        params: Optional[tuple] = None,
+        params: tuple | None = None,
     ) -> list:
         """
         Execute query with connection pooling.
@@ -221,7 +220,7 @@ class Psycopg3PoolManager:
             except Exception as e:
                 logger.error(f"Error closing pool: {e}")
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """
         Get pool statistics.
 
@@ -246,7 +245,7 @@ class Psycopg3PoolManager:
 
 
 # Singleton instance for global access
-_global_pool: Optional[Psycopg3PoolManager] = None
+_global_pool: Psycopg3PoolManager | None = None
 
 
 def get_connection_pool(

@@ -45,9 +45,6 @@ Usage:
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
-import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -74,12 +71,12 @@ class BetProposal:
     bankroll: float  # Current bankroll ($)
 
     # Optional fields (must come after required fields)
-    book_hold: Optional[float] = None  # Bookmaker vig
+    book_hold: float | None = None  # Bookmaker vig
     player_id: str = ""
     player_name: str = ""
     prop_type: str = ""
     game_id: str = ""
-    session_metrics: Optional[Dict] = None  # Daily/session stats
+    session_metrics: dict | None = None  # Daily/session stats
 
 
 @dataclass
@@ -88,9 +85,9 @@ class GateResult:
 
     gate_name: str
     passed: bool
-    rejection_reason: Optional[str] = None
-    warnings: List[str] = None
-    metrics: Optional[Dict] = None
+    rejection_reason: str | None = None
+    warnings: list[str] = None
+    metrics: dict | None = None
 
     def __post_init__(self):
         if self.warnings is None:
@@ -161,7 +158,7 @@ class RiskGateSystem:
             f"max_bet={max_bet_pct:.1%}"
         )
 
-    def evaluate_bet(self, bet: BetProposal) -> Dict:
+    def evaluate_bet(self, bet: BetProposal) -> dict:
         """
         Evaluate a bet through all 4 risk gates.
 
@@ -455,7 +452,7 @@ class RiskGateSystem:
             metrics=metrics
         )
 
-    def _format_rejection(self, gate_results: List[GateResult], reason: str) -> Dict:
+    def _format_rejection(self, gate_results: list[GateResult], reason: str) -> dict:
         """Format rejection response."""
         logger.warning(f"❌ Bet REJECTED: {reason}")
 
@@ -467,7 +464,7 @@ class RiskGateSystem:
             'metrics': self._aggregate_metrics(gate_results)
         }
 
-    def _aggregate_metrics(self, gate_results: List[GateResult]) -> Dict:
+    def _aggregate_metrics(self, gate_results: list[GateResult]) -> dict:
         """Aggregate metrics from all gates."""
         metrics = {}
 
@@ -477,7 +474,7 @@ class RiskGateSystem:
 
         return metrics
 
-    def get_configuration(self) -> Dict:
+    def get_configuration(self) -> dict:
         """Get current gate configuration."""
         return {
             'gate1_statistical': {
@@ -561,16 +558,16 @@ def main():
         print(f"Rejection Reason: {result['rejection_reason']}")
 
     if result['warnings']:
-        print(f"\nWarnings:")
+        print("\nWarnings:")
         for warning in result['warnings']:
             print(f"  ⚠️  {warning}")
 
-    print(f"\nGate Results:")
+    print("\nGate Results:")
     for gate_result in result['gate_results']:
         status = "✅ PASS" if gate_result.passed else "❌ FAIL"
         print(f"  {gate_result.gate_name}: {status}")
 
-    print(f"\nMetrics:")
+    print("\nMetrics:")
     for key, value in result['metrics'].items():
         if isinstance(value, float) and value < 1:
             print(f"  {key}: {value:.2%}")

@@ -5,26 +5,24 @@ Executes cVAE and Causal experiments on 2020-2024 NFL data and validates
 empirical results against predicted ROI/EV scores.
 """
 
-import pandas as pd
-import numpy as np
-import torch
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
-import logging
 import json
-from pathlib import Path
-from datetime import datetime
-import sys
+import logging
 import os
+import sys
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 # Import causal modules
 from causal.panel_constructor import PanelConstructor
+
 # Causal imports will be done per-method as needed to avoid import errors
 
 logger = logging.getLogger(__name__)
@@ -36,10 +34,10 @@ class ExperimentResult:
     experiment_id: str
     category: str
     status: str  # 'success', 'failed', 'partial'
-    metrics: Dict[str, float]
+    metrics: dict[str, float]
     execution_time: float
     sample_size: int
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class ExperimentExecutor:
@@ -58,7 +56,7 @@ class ExperimentExecutor:
             'port': 5544
         }
         self.conn = None
-        self.results: List[ExperimentResult] = []
+        self.results: list[ExperimentResult] = []
 
         # Initialize panel constructor
         self.panel_constructor = PanelConstructor(self.db_params)
@@ -76,7 +74,7 @@ class ExperimentExecutor:
         conn = self._get_connection()
         return pd.read_sql_query(query, conn)
 
-    def execute_all_experiments(self) -> List[ExperimentResult]:
+    def execute_all_experiments(self) -> list[ExperimentResult]:
         """Execute all 40 experiments"""
 
         logger.info("="*80)
@@ -253,7 +251,7 @@ class ExperimentExecutor:
 
     # ==================== cVAE EXPERIMENT IMPLEMENTATIONS ====================
 
-    def _cvae_001_baseline_trajectory(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_001_baseline_trajectory(self) -> tuple[dict[str, float], int]:
         """CVAE-001: Baseline Game Trajectory Synthesis"""
 
         query = """
@@ -278,7 +276,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_002_rushing_yards(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_002_rushing_yards(self) -> tuple[dict[str, float], int]:
         """CVAE-002: Rushing Yard Trajectory Prediction"""
 
         query = """
@@ -306,7 +304,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_003_passing_yards(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_003_passing_yards(self) -> tuple[dict[str, float], int]:
         """CVAE-003: Passing Yard Trajectory Prediction"""
 
         query = """
@@ -333,7 +331,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_004_reception_trajectory(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_004_reception_trajectory(self) -> tuple[dict[str, float], int]:
         """CVAE-004: Reception Trajectory (PPR Scoring)"""
 
         query = """
@@ -356,7 +354,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_005_td_timing(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_005_td_timing(self) -> tuple[dict[str, float], int]:
         """CVAE-005: TD Timing Prediction"""
 
         query = """
@@ -376,7 +374,7 @@ class ExperimentExecutor:
 
         return metrics, int(result['td_count'].iloc[0])
 
-    def _cvae_006_game_script(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_006_game_script(self) -> tuple[dict[str, float], int]:
         """CVAE-006: Game Script Emergence"""
 
         query = """
@@ -396,7 +394,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_007_blowout_detection(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_007_blowout_detection(self) -> tuple[dict[str, float], int]:
         """CVAE-007: Blowout vs Close Game Trajectories"""
 
         query = """
@@ -419,7 +417,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_008_multi_horizon(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_008_multi_horizon(self) -> tuple[dict[str, float], int]:
         """CVAE-008: Multi-Horizon Trajectory Forecasting"""
 
         # Simplified - would need play-by-play for real implementation
@@ -434,7 +432,7 @@ class ExperimentExecutor:
 
         return metrics, 1343  # Approximate games 2020-2024
 
-    def _cvae_009_weather_conditioning(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_009_weather_conditioning(self) -> tuple[dict[str, float], int]:
         """CVAE-009: Weather-Conditioned Trajectories"""
 
         query = """
@@ -456,7 +454,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_010_injury_adjusted(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_010_injury_adjusted(self) -> tuple[dict[str, float], int]:
         """CVAE-010: Injury-Adjusted Trajectories"""
 
         # Would need injury data - simplified
@@ -469,7 +467,7 @@ class ExperimentExecutor:
 
         return metrics, 250  # Estimated injury events
 
-    def _cvae_011_home_away(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_011_home_away(self) -> tuple[dict[str, float], int]:
         """CVAE-011: Home/Away Trajectory Asymmetry"""
 
         query = """
@@ -492,7 +490,7 @@ class ExperimentExecutor:
 
         return metrics, int(result['total_games'].iloc[0])
 
-    def _cvae_012_divisional(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_012_divisional(self) -> tuple[dict[str, float], int]:
         """CVAE-012: Divisional Rivalry Trajectories"""
 
         # Simplified - would check division matchups
@@ -505,7 +503,7 @@ class ExperimentExecutor:
 
         return metrics, 384  # ~96 divisional games per season × 4 seasons
 
-    def _cvae_013_primetime(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_013_primetime(self) -> tuple[dict[str, float], int]:
         """CVAE-013: Prime Time Game Trajectories"""
 
         query = """
@@ -526,7 +524,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_014_playoff_bound(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_014_playoff_bound(self) -> tuple[dict[str, float], int]:
         """CVAE-014: Playoff-Bound Team Trajectories"""
 
         # Week 17-18 games where playoff seeding locked
@@ -548,7 +546,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_015_rookie_qb(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_015_rookie_qb(self) -> tuple[dict[str, float], int]:
         """CVAE-015: Rookie QB Trajectory Patterns"""
 
         # Simplified - would need QB experience data
@@ -561,7 +559,7 @@ class ExperimentExecutor:
 
         return metrics, 180  # Estimated rookie QB games
 
-    def _cvae_016_two_minute_drill(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_016_two_minute_drill(self) -> tuple[dict[str, float], int]:
         """CVAE-016: Two-Minute Drill Trajectories"""
 
         # Would need play-by-play data
@@ -573,7 +571,7 @@ class ExperimentExecutor:
 
         return metrics, 2686  # 2 per game × 1343 games
 
-    def _cvae_017_oc_change(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_017_oc_change(self) -> tuple[dict[str, float], int]:
         """CVAE-017: Offensive Coordinator Change Trajectories"""
 
         # Rare events - simplified
@@ -586,7 +584,7 @@ class ExperimentExecutor:
 
         return metrics, 25  # Estimated OC changes
 
-    def _cvae_018_stack_correlation(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_018_stack_correlation(self) -> tuple[dict[str, float], int]:
         """CVAE-018: Stack Correlation Trajectories"""
 
         query = """
@@ -622,7 +620,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _cvae_019_defense_adjusted(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_019_defense_adjusted(self) -> tuple[dict[str, float], int]:
         """CVAE-019: Defense-Adjusted Trajectory Variance"""
 
         query = """
@@ -657,7 +655,7 @@ class ExperimentExecutor:
 
         return metrics, len(df) * 17  # Teams × games per season
 
-    def _cvae_020_season_progression(self) -> Tuple[Dict[str, float], int]:
+    def _cvae_020_season_progression(self) -> tuple[dict[str, float], int]:
         """CVAE-020: Season Progression Meta-Learning"""
 
         query = """
@@ -681,7 +679,7 @@ class ExperimentExecutor:
 
     # ==================== CAUSAL EXPERIMENT IMPLEMENTATIONS ====================
 
-    def _causal_001_weather_impact(self) -> Tuple[Dict[str, float], int]:
+    def _causal_001_weather_impact(self) -> tuple[dict[str, float], int]:
         """CAUSAL-001: Weather Impact on Rushing Performance"""
 
         # Build panel data
@@ -718,7 +716,7 @@ class ExperimentExecutor:
 
         return metrics, summary['n_obs']
 
-    def _causal_002_injury_causation(self) -> Tuple[Dict[str, float], int]:
+    def _causal_002_injury_causation(self) -> tuple[dict[str, float], int]:
         """CAUSAL-002: Injury Causation on Team Performance"""
 
         # Synthetic control for QB injuries
@@ -733,7 +731,7 @@ class ExperimentExecutor:
 
         return metrics, 45  # Estimated QB injury events
 
-    def _causal_003_home_field(self) -> Tuple[Dict[str, float], int]:
+    def _causal_003_home_field(self) -> tuple[dict[str, float], int]:
         """CAUSAL-003: Home Field Advantage Causal Effect"""
 
         query = """
@@ -763,7 +761,7 @@ class ExperimentExecutor:
 
         return metrics, df['season'].count() * 256  # Games per season
 
-    def _causal_004_rest_days(self) -> Tuple[Dict[str, float], int]:
+    def _causal_004_rest_days(self) -> tuple[dict[str, float], int]:
         """CAUSAL-004: Rest Days Impact on Performance"""
 
         # Thursday night games (short rest) vs normal rest
@@ -795,7 +793,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _causal_005_qb_change(self) -> Tuple[Dict[str, float], int]:
+    def _causal_005_qb_change(self) -> tuple[dict[str, float], int]:
         """CAUSAL-005: QB Change Causal Effect on Offense"""
 
         # Simplified - would need QB change events
@@ -810,7 +808,7 @@ class ExperimentExecutor:
 
         return metrics, 85  # Estimated QB change events
 
-    def _causal_006_play_calling(self) -> Tuple[Dict[str, float], int]:
+    def _causal_006_play_calling(self) -> tuple[dict[str, float], int]:
         """CAUSAL-006: Play-Calling Tendency Causal Analysis"""
 
         # Would need play-by-play data
@@ -822,7 +820,7 @@ class ExperimentExecutor:
 
         return metrics, 50000  # Estimated play-by-play observations
 
-    def _causal_007_coaching_change(self) -> Tuple[Dict[str, float], int]:
+    def _causal_007_coaching_change(self) -> tuple[dict[str, float], int]:
         """CAUSAL-007: Coaching Change Impact on Win Rate"""
 
         # Rare events
@@ -836,7 +834,7 @@ class ExperimentExecutor:
 
         return metrics, 18  # Estimated coaching changes
 
-    def _causal_008_ol_quality(self) -> Tuple[Dict[str, float], int]:
+    def _causal_008_ol_quality(self) -> tuple[dict[str, float], int]:
         """CAUSAL-008: Offensive Line Quality Causal Effect"""
 
         # Simplified
@@ -849,7 +847,7 @@ class ExperimentExecutor:
 
         return metrics, 320  # Estimated OL injury events
 
-    def _causal_009_target_share(self) -> Tuple[Dict[str, float], int]:
+    def _causal_009_target_share(self) -> tuple[dict[str, float], int]:
         """CAUSAL-009: Target Share Causal Effect on WR Production"""
 
         panel_df = self.panel_constructor.build_player_game_panel(
@@ -883,7 +881,7 @@ class ExperimentExecutor:
 
         return metrics, summary['n_obs']
 
-    def _causal_010_defensive_scheme(self) -> Tuple[Dict[str, float], int]:
+    def _causal_010_defensive_scheme(self) -> tuple[dict[str, float], int]:
         """CAUSAL-010: Defensive Scheme Change Causal Effect"""
 
         metrics = {
@@ -895,7 +893,7 @@ class ExperimentExecutor:
 
         return metrics, 12  # Estimated DC changes
 
-    def _causal_011_altitude(self) -> Tuple[Dict[str, float], int]:
+    def _causal_011_altitude(self) -> tuple[dict[str, float], int]:
         """CAUSAL-011: Altitude Causal Effect on Passing"""
 
         query = """
@@ -927,7 +925,7 @@ class ExperimentExecutor:
 
         return metrics, len(df)
 
-    def _causal_012_travel_distance(self) -> Tuple[Dict[str, float], int]:
+    def _causal_012_travel_distance(self) -> tuple[dict[str, float], int]:
         """CAUSAL-012: Travel Distance Causal Effect on Performance"""
 
         # Simplified - would need travel distance calculations
@@ -940,7 +938,7 @@ class ExperimentExecutor:
 
         return metrics, 400  # Cross-country games
 
-    def _causal_013_play_action(self) -> Tuple[Dict[str, float], int]:
+    def _causal_013_play_action(self) -> tuple[dict[str, float], int]:
         """CAUSAL-013: Play-Action Usage Causal Effect"""
 
         # Would need play-by-play
@@ -952,7 +950,7 @@ class ExperimentExecutor:
 
         return metrics, 15000  # Play-action plays
 
-    def _causal_014_fourth_down(self) -> Tuple[Dict[str, float], int]:
+    def _causal_014_fourth_down(self) -> tuple[dict[str, float], int]:
         """CAUSAL-014: Fourth Down Aggression Causal Effect"""
 
         # Would need 4th down decision data
@@ -965,7 +963,7 @@ class ExperimentExecutor:
 
         return metrics, 2500  # 4th down attempts
 
-    def _causal_015_red_zone_personnel(self) -> Tuple[Dict[str, float], int]:
+    def _causal_015_red_zone_personnel(self) -> tuple[dict[str, float], int]:
         """CAUSAL-015: Red Zone Personnel Causal Effect"""
 
         # Would need personnel data
@@ -977,7 +975,7 @@ class ExperimentExecutor:
 
         return metrics, 8000  # Red zone plays
 
-    def _causal_016_crowd_noise(self) -> Tuple[Dict[str, float], int]:
+    def _causal_016_crowd_noise(self) -> tuple[dict[str, float], int]:
         """CAUSAL-016: Crowd Noise Causal Effect on Penalties"""
 
         # COVID empty stadiums as natural experiment
@@ -1006,7 +1004,7 @@ class ExperimentExecutor:
 
         return metrics, 256 * 3  # 3 seasons
 
-    def _causal_017_game_script_causal(self) -> Tuple[Dict[str, float], int]:
+    def _causal_017_game_script_causal(self) -> tuple[dict[str, float], int]:
         """CAUSAL-017: Game Script Causal Effect on Play Distribution"""
 
         # Simplified
@@ -1018,7 +1016,7 @@ class ExperimentExecutor:
 
         return metrics, 1343  # Games
 
-    def _causal_018_turf_type(self) -> Tuple[Dict[str, float], int]:
+    def _causal_018_turf_type(self) -> tuple[dict[str, float], int]:
         """CAUSAL-018: Turf Type Causal Effect on Injuries"""
 
         # Would need injury and turf data
@@ -1030,7 +1028,7 @@ class ExperimentExecutor:
 
         return metrics, 1343
 
-    def _causal_019_timeout_strategy(self) -> Tuple[Dict[str, float], int]:
+    def _causal_019_timeout_strategy(self) -> tuple[dict[str, float], int]:
         """CAUSAL-019: Timeout Strategy Causal Effect on Drive Success"""
 
         # Would need timeout usage data
@@ -1042,7 +1040,7 @@ class ExperimentExecutor:
 
         return metrics, 10000  # Drives
 
-    def _causal_020_draft_capital(self) -> Tuple[Dict[str, float], int]:
+    def _causal_020_draft_capital(self) -> tuple[dict[str, float], int]:
         """CAUSAL-020: Draft Capital Causal Effect on Player Usage"""
 
         # Regression discontinuity

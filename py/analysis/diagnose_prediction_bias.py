@@ -12,10 +12,11 @@ Analyzes:
 4. Extreme error examples
 """
 
-import pandas as pd
-import numpy as np
 import sys
-from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
 
 def analyze_prediction_bias(csv_path: str):
     """Comprehensive bias analysis."""
@@ -46,7 +47,7 @@ def analyze_prediction_bias(csv_path: str):
     print(f"\nMAE (mean abs error):  {df['abs_error'].mean():.2f} yards")
     print(f"RMSE:                  {np.sqrt((df['error']**2).mean()):.2f} yards")
 
-    print(f"\nError Percentiles:")
+    print("\nError Percentiles:")
     print(f"  5th percentile:      {df['error'].quantile(0.05):+.2f} yards")
     print(f"  25th percentile:     {df['error'].quantile(0.25):+.2f} yards")
     print(f"  50th percentile:     {df['error'].quantile(0.50):+.2f} yards")
@@ -91,13 +92,13 @@ def analyze_prediction_bias(csv_path: str):
         print("  ✅ GOOD: Strong correlation")
 
     # Prediction range sanity
-    print(f"\nPrediction Range:")
+    print("\nPrediction Range:")
     print(f"  Min prediction:      {df['prediction_mean'].min():.2f} yards")
     print(f"  Max prediction:      {df['prediction_mean'].max():.2f} yards")
     print(f"  Mean prediction:     {df['prediction_mean'].mean():.2f} yards")
     print(f"  Std dev:             {df['prediction_mean'].std():.2f} yards")
 
-    print(f"\nActual Range:")
+    print("\nActual Range:")
     print(f"  Min actual:          {df['actual_yards'].min():.2f} yards")
     print(f"  Max actual:          {df['actual_yards'].max():.2f} yards")
     print(f"  Mean actual:         {df['actual_yards'].mean():.2f} yards")
@@ -108,7 +109,7 @@ def analyze_prediction_bias(csv_path: str):
     unreasonable_high = (df['prediction_mean'] > 600).sum()
 
     if unreasonable_low > 0 or unreasonable_high > 0:
-        print(f"\n⚠️  UNREASONABLE PREDICTIONS DETECTED:")
+        print("\n⚠️  UNREASONABLE PREDICTIONS DETECTED:")
         print(f"  Predictions < 0 yards:   {unreasonable_low}")
         print(f"  Predictions > 600 yards: {unreasonable_high}")
 
@@ -162,7 +163,7 @@ def analyze_prediction_bias(csv_path: str):
         print(f"  Error:     {row['error']:+7.2f} yards (MAE: {row['abs_error']:.2f})")
 
         if model_cols:
-            print(f"  Individual models:")
+            print("  Individual models:")
             for col in model_cols:
                 if pd.notna(row[col]):
                     model_err = row['actual_yards'] - row[col]

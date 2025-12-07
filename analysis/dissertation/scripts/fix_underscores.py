@@ -2,15 +2,15 @@
 """
 Intelligent LaTeX underscore fixer.
 Escapes underscores ONLY in plain text, not in:
-- Math mode (between $ or \[ \])
+- Math mode (between $ or \\[ \\])
 - \texttt{} commands
 - lstlisting environments
 - verbatim environments
 - Comments (after %)
 """
 
-import re
 import sys
+
 
 def fix_underscores_in_line(line, in_lstlisting, in_verbatim, in_algorithm):
     """Fix underscores in a single line, respecting context."""
@@ -103,7 +103,7 @@ def fix_underscores_in_text(text):
 def process_file(filepath):
     """Process a LaTeX file to fix underscores."""
 
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, encoding='utf-8') as f:
         lines = f.readlines()
 
     output_lines = []

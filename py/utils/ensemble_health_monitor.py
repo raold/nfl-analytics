@@ -58,15 +58,12 @@ Date: November 14, 2025
 """
 
 import logging
-import os
 import pickle
 import time
-from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -101,12 +98,12 @@ class ComponentHealth:
     file_path: str
     file_exists: bool
     file_size_mb: float
-    last_modified: Optional[datetime] = None
-    load_time_ms: Optional[float] = None
+    last_modified: datetime | None = None
+    load_time_ms: float | None = None
     rpy2_test_passed: bool = False
-    test_prediction_mean: Optional[float] = None
-    test_prediction_std: Optional[float] = None
-    error_message: Optional[str] = None
+    test_prediction_mean: float | None = None
+    test_prediction_std: float | None = None
+    error_message: str | None = None
 
 
 @dataclass
@@ -139,31 +136,31 @@ class EnsembleHealthReport:
 
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
     overall_status: HealthStatus = HealthStatus.HEALTHY
-    components: Dict[str, ComponentHealth] = field(default_factory=dict)
+    components: dict[str, ComponentHealth] = field(default_factory=dict)
 
     # Calibration tracking
-    ensemble_calibration: Optional[CalibrationMetrics] = None
-    component_calibration: Dict[str, CalibrationMetrics] = field(default_factory=dict)
+    ensemble_calibration: CalibrationMetrics | None = None
+    component_calibration: dict[str, CalibrationMetrics] = field(default_factory=dict)
 
     # Drift detection
-    drift_metrics: Dict[str, DriftMetrics] = field(default_factory=dict)
+    drift_metrics: dict[str, DriftMetrics] = field(default_factory=dict)
 
     # Inter-model agreement
-    mean_pairwise_correlation: Optional[float] = None
-    mean_prediction_variance: Optional[float] = None  # High variance = high disagreement
+    mean_pairwise_correlation: float | None = None
+    mean_prediction_variance: float | None = None  # High variance = high disagreement
 
     # Performance tracking
-    ensemble_mae: Optional[float] = None
-    component_mae: Dict[str, float] = field(default_factory=dict)
+    ensemble_mae: float | None = None
+    component_mae: dict[str, float] = field(default_factory=dict)
 
     # Weight monitoring
-    current_weights: Dict[str, float] = field(default_factory=dict)
-    optimal_weights: Optional[Dict[str, float]] = None
-    weight_deviation: Optional[float] = None  # L2 norm of (current - optimal)
+    current_weights: dict[str, float] = field(default_factory=dict)
+    optimal_weights: dict[str, float] | None = None
+    weight_deviation: float | None = None  # L2 norm of (current - optimal)
 
     # Issue tracking
-    critical_issues: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
+    critical_issues: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
     @property
     def is_healthy(self) -> bool:
@@ -223,8 +220,8 @@ class EnsembleHealthMonitor:
 
     def __init__(
         self,
-        model_paths: Optional[Dict[str, str]] = None,
-        project_root: Optional[Path] = None,
+        model_paths: dict[str, str] | None = None,
+        project_root: Path | None = None,
     ):
         """
         Initialize ensemble health monitor.
@@ -237,9 +234,9 @@ class EnsembleHealthMonitor:
         self.models_config = model_paths or self.DEFAULT_MODEL_PATHS.copy()
 
         # Tracking state
-        self.prediction_history: List[Dict] = []  # List of tracked predictions
+        self.prediction_history: list[dict] = []  # List of tracked predictions
         self.calibration_baseline = None  # Baseline calibration metrics
-        self.last_check_time: Optional[datetime] = None
+        self.last_check_time: datetime | None = None
 
         logger.info(f"Initialized EnsembleHealthMonitor at {self.project_root}")
 
@@ -298,7 +295,7 @@ class EnsembleHealthMonitor:
 
     def test_r_model_loading(
         self, component_name: str, model_path: Path
-    ) -> Tuple[bool, Optional[str], Optional[float]]:
+    ) -> tuple[bool, str | None, float | None]:
         """
         Test R model loading via rpy2 (CRITICAL for preventing Nov 13 failure).
 
@@ -342,7 +339,7 @@ class EnsembleHealthMonitor:
 
     def test_r_model_prediction(
         self, component_name: str, model_path: Path
-    ) -> Tuple[bool, Optional[float], Optional[float], Optional[str]]:
+    ) -> tuple[bool, float | None, float | None, str | None]:
         """
         Test R model prediction with dummy data.
 
@@ -532,9 +529,9 @@ class EnsembleHealthMonitor:
         player_id: str,
         season: int,
         week: int,
-        component_predictions: Dict[str, Tuple[float, float]],
-        actual_yards: Optional[float] = None,
-        ensemble_prediction: Optional[Tuple[float, float]] = None,
+        component_predictions: dict[str, tuple[float, float]],
+        actual_yards: float | None = None,
+        ensemble_prediction: tuple[float, float] | None = None,
     ):
         """
         Track a prediction for drift detection and calibration monitoring.
@@ -570,7 +567,7 @@ class EnsembleHealthMonitor:
         )
 
     def calculate_calibration(
-        self, predictions: List[Dict], component_name: Optional[str] = None
+        self, predictions: list[dict], component_name: str | None = None
     ) -> CalibrationMetrics:
         """
         Calculate calibration metrics from prediction history.
@@ -642,7 +639,7 @@ class EnsembleHealthMonitor:
         )
 
     def detect_drift(
-        self, baseline_predictions: List[Dict], current_predictions: List[Dict], component_name: str
+        self, baseline_predictions: list[dict], current_predictions: list[dict], component_name: str
     ) -> DriftMetrics:
         """
         Detect drift in component predictions.
@@ -782,7 +779,7 @@ class EnsembleHealthMonitor:
 
         return report
 
-    def save_report(self, report: EnsembleHealthReport, output_path: Optional[str] = None):
+    def save_report(self, report: EnsembleHealthReport, output_path: str | None = None):
         """
         Save health report to disk.
 
@@ -866,7 +863,7 @@ def main():
         print(f"Predictions: {len(monitor.prediction_history)}")
 
         if report.ensemble_calibration:
-            print(f"\nEnsemble Calibration:")
+            print("\nEnsemble Calibration:")
             print(f"  90% Coverage: {report.ensemble_calibration.coverage_90pct:.1f}%")
             print(f"  50% Coverage: {report.ensemble_calibration.coverage_50pct:.1f}%")
             print(

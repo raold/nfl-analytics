@@ -9,20 +9,20 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
-import logging
-from pathlib import Path
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from sklearn.model_selection import train_test_split
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

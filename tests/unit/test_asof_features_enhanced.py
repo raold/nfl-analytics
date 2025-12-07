@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.696620
 Test count: 15
 """
 
+import pytest
 from features.asof_features_enhanced import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_fetch_team_game_features_basic():

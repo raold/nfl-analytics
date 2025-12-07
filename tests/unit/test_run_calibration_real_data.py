@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.018401
 Test count: 18
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.run_calibration_real_data import *
-import pandas as pd
-import pytest
 
 
 def test_load_real_passing_data_basic():

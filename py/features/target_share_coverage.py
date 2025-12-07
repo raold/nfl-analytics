@@ -11,11 +11,11 @@ Author: NFL Analytics Pipeline
 Created: 2025-10-30
 """
 
-import pandas as pd
-import numpy as np
 import logging
 import sys
-from typing import Optional
+
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
 # Configure logging
@@ -623,7 +623,7 @@ def main():
         print(f"  Avg catch rate: {man_targeted['catch_rate_man'].mean():.2f}%")
 
     # Role distribution
-    print(f"\nReceiver roles:")
+    print("\nReceiver roles:")
     print(f"  Primary targets: {receiver_features['is_primary_target'].sum():,} receiver-games")
     print(f"  Secondary targets: {receiver_features['is_secondary_target'].sum():,} receiver-games")
     print(f"  Tertiary targets: {receiver_features['is_tertiary_target'].sum():,} receiver-games")

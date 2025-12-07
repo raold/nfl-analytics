@@ -22,24 +22,23 @@ Created: November 9, 2025
 """
 
 import json
-import pytest
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock, mock_open
-import psycopg2
 
 # Import CLI functions
 import sys
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import psycopg2
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from scripts.sync_model_registry import (
-    scan_models_directory,
+    compare_db_filesystem,
     extract_model_info,
     get_db_models,
-    compare_db_filesystem,
-    MODEL_TYPE_MAP,
-    MODEL_FAMILY_MAP,
+    scan_models_directory,
 )
-
 
 # ============================================================================
 # FIXTURES

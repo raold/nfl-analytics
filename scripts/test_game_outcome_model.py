@@ -58,7 +58,7 @@ def test_feature_extraction():
             week=1
         )
 
-        logger.info(f"✅ Feature extraction successful")
+        logger.info("✅ Feature extraction successful")
         logger.info(f"   Total features: {len(features)}")
         logger.info(f"   Sample features: {list(features.keys())[:5]}")
 
@@ -80,14 +80,15 @@ def test_model_architecture():
     """Test model architecture (without training)."""
     logger.info("\nTest 3: Model architecture")
 
-    from py.models.game_outcome_model import GameOutcomeModel
     import xgboost as xgb
+
+    from py.models.game_outcome_model import GameOutcomeModel
 
     try:
         model = GameOutcomeModel()
 
         # Check default parameters
-        logger.info(f"✅ Model architecture validated")
+        logger.info("✅ Model architecture validated")
         logger.info(f"   XGBoost version: {xgb.__version__}")
         logger.info(f"   Default params: max_depth={model.DEFAULT_PARAMS['max_depth']}, "
                    f"n_estimators={model.DEFAULT_PARAMS['n_estimators']}")

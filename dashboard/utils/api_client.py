@@ -33,10 +33,11 @@ Date: 2025-11-22
 """
 
 import logging
-import requests
-from typing import TypedDict, Optional, List, Dict, Any
-from datetime import datetime
 import os
+from datetime import datetime
+from typing import Any, TypedDict
+
+import requests
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ class ModelContribution(TypedDict, total=False):
     """Individual model contribution to ensemble prediction"""
     model_name: str
     prediction: float
-    uncertainty: Optional[float]
+    uncertainty: float | None
     weight: float
 
 
@@ -63,7 +64,7 @@ class SinglePlayerPrediction(TypedDict, total=False):
     confidence: float
     lower_bound: float
     upper_bound: float
-    models_used: List[ModelContribution]
+    models_used: list[ModelContribution]
     timestamp: str
     ensemble_method: str
 
@@ -120,12 +121,12 @@ class ModelInfo(TypedDict, total=False):
     file_size_mb: float
     loaded_at: str
     status: str  # 'loaded', 'failed', 'unavailable'
-    metadata: Optional[Dict[str, Any]]
+    metadata: dict[str, Any] | None
 
 
 class ModelsListResponse(TypedDict, total=False):
     """Response listing all loaded models"""
-    models: List[ModelInfo]
+    models: list[ModelInfo]
     total_models: int
     loaded_models: int
     ensemble_ready: bool
@@ -135,7 +136,7 @@ class APIError(TypedDict, total=False):
     """API error response"""
     error: str
     message: str
-    details: Optional[Dict[str, Any]]
+    details: dict[str, Any] | None
     timestamp: str
 
 
@@ -143,7 +144,7 @@ class APIError(TypedDict, total=False):
 # Validation Helpers
 # ============================================================================
 
-def validate_game_prediction(data: Dict[str, Any]) -> Optional[GamePrediction]:
+def validate_game_prediction(data: dict[str, Any]) -> GamePrediction | None:
     """
     Validate and extract game prediction response.
 
@@ -218,7 +219,7 @@ def validate_game_prediction(data: Dict[str, Any]) -> Optional[GamePrediction]:
     )
 
 
-def validate_single_player_prediction(data: Dict[str, Any]) -> Optional[SinglePlayerPrediction]:
+def validate_single_player_prediction(data: dict[str, Any]) -> SinglePlayerPrediction | None:
     """
     Validate and extract single player prediction response.
 
@@ -266,7 +267,7 @@ def validate_single_player_prediction(data: Dict[str, Any]) -> Optional[SinglePl
     )
 
 
-def validate_health_response(data: Dict[str, Any]) -> Optional[HealthStatus]:
+def validate_health_response(data: dict[str, Any]) -> HealthStatus | None:
     """Validate health check response"""
     required_fields = ['status']
 
@@ -375,7 +376,7 @@ class APIClient:
                 logger.warning(f"Redis cache unavailable: {e}")
                 self._redis_cache = None
 
-    def _get_cached(self, key: str) -> Optional[Dict[str, Any]]:
+    def _get_cached(self, key: str) -> dict[str, Any] | None:
         """Get value from Redis cache"""
         if not self._redis_cache:
             return None
@@ -390,7 +391,7 @@ class APIClient:
 
         return None
 
-    def _set_cached(self, key: str, value: Dict[str, Any], ttl: int = 300) -> None:
+    def _set_cached(self, key: str, value: dict[str, Any], ttl: int = 300) -> None:
         """Set value in Redis cache"""
         if not self._redis_cache:
             return
@@ -405,7 +406,7 @@ class APIClient:
         except Exception as e:
             logger.debug(f"Cache set error: {e}")
 
-    def get_health(self) -> Optional[HealthStatus]:
+    def get_health(self) -> HealthStatus | None:
         """
         Check API health status.
 
@@ -432,7 +433,7 @@ class APIClient:
             logger.error(f"Health response validation failed: {e}")
             return None
 
-    def get_models(self) -> Optional[ModelsListResponse]:
+    def get_models(self) -> ModelsListResponse | None:
         """
         Get list of loaded models.
 
@@ -475,7 +476,7 @@ class APIClient:
         player_id: str,
         stat_type: str,
         use_cache: bool = True
-    ) -> Optional[SinglePlayerPrediction]:
+    ) -> SinglePlayerPrediction | None:
         """
         Get single player prediction.
 
@@ -532,7 +533,7 @@ class APIClient:
         season: int,
         week: int,
         use_cache: bool = True
-    ) -> Optional[GamePrediction]:
+    ) -> GamePrediction | None:
         """
         Get game-level prediction with QB passing yards.
 

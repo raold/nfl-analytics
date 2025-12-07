@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.451793
 Test count: 43
 """
 
+import pytest
 from analysis.dependence_calibration import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_empirical_tail_dependence_basic():

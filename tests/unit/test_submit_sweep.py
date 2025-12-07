@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.153730
 Test count: 15
 """
 
+import pytest
 from compute.submit_sweep import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_load_sweep_config_basic():

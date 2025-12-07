@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.263911
 Test count: 53
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from tasks.training_task import *
-import pandas as pd
-import pytest
 
 
 def test_get_redis_client_basic():

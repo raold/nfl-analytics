@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.343971
 Test count: 34
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.majority_betting_system import *
-import pandas as pd
-import pytest
 
 
 def test_kelly_criterion_basic():

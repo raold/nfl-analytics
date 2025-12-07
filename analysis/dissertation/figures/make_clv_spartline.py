@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 """
 make_clv_sparkline.py — CLV sparkline (margin figure)
 
 Summary
 -------
 Generates a compact sparkline showing cumulative expected value (CLV) across a
-sequence of bets. Designed to be placed in the LaTeX margin via \marginfig{}.
+sequence of bets. Designed to be placed in the LaTeX margin via \\marginfig{}.
 
 Inputs
 ------
@@ -23,11 +22,12 @@ CLI
       --input analysis/figures/data/bets.csv \
       --output analysis/figures/out/clv_sparkline_2025.pdf
 """
-import os
 import argparse
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 OUT_DEFAULT = "analysis/figures/out/clv_sparkline_2025.pdf"
 

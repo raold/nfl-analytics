@@ -43,13 +43,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import argparse
 import logging
 import time
-from typing import Dict, List, Tuple
-from datetime import datetime
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -219,8 +216,8 @@ class EnsembleBacktest:
 
         # Tracking
         self.bankroll = initial_bankroll
-        self.positions: List[Dict] = []
-        self.daily_pnl: List[Dict] = []
+        self.positions: list[dict] = []
+        self.daily_pnl: list[dict] = []
 
     def fetch_historical_games(self) -> pd.DataFrame:
         """
@@ -383,7 +380,7 @@ class EnsembleBacktest:
 
         return results_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame) -> dict:
         """
         Calculate performance metrics.
 
@@ -463,12 +460,12 @@ class EnsembleBacktest:
         logger.info(f"Period: {self.start_season}-{self.end_season}")
         logger.info(f"Total Bets: {metrics.get('total_bets', 0):,}")
         logger.info(f"Total Wagered: ${metrics.get('total_wagered', 0):,.2f}")
-        logger.info(f"\nPERFORMANCE METRICS:")
+        logger.info("\nPERFORMANCE METRICS:")
         logger.info(f"  ROI: {metrics.get('roi', 0):.2f}% (Target: +5-7%)")
         logger.info(f"  Win Rate: {metrics.get('win_rate', 0):.1f}% (Target: 59-61%)")
         logger.info(f"  Sharpe Ratio: {metrics.get('sharpe_ratio', 0):.2f} (Target: 2.2-2.6)")
         logger.info(f"  Max Drawdown: {metrics.get('max_drawdown', 0):.1f}% (Target: -8 to -10%)")
-        logger.info(f"\nPREDICTION ACCURACY:")
+        logger.info("\nPREDICTION ACCURACY:")
         logger.info(f"  MAE: {metrics.get('mae', 0):.2f} yards (Target: <45.2)")
         logger.info(f"  RMSE: {metrics.get('rmse', 0):.2f} yards")
         logger.info(f"  Calibration (90% PI): {metrics.get('calibration_90', 0):.1f}% (Target: ≥89%)")

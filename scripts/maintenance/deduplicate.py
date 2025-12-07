@@ -5,13 +5,11 @@ Safely removes duplicates while preserving data integrity.
 """
 
 import os
-import sys
-from datetime import datetime
+
+import click
 import psycopg
 from psycopg.rows import dict_row
-import click
 from rich.console import Console
-from rich.table import Table
 from rich.prompt import Confirm
 
 console = Console()

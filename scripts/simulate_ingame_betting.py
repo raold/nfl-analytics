@@ -12,17 +12,17 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-import torch
-from pathlib import Path
 import logging
-from typing import Dict, List, Tuple
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import torch
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.models.lstm_drive_prediction import DriveLSTM, LSTMConfig
+from py.models.lstm_drive_prediction import DriveLSTM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,8 +70,8 @@ class InGameBettingSimulator:
     def predict_next_drive(
         self,
         previous_drives: pd.DataFrame,
-        feature_cols: List[str]
-    ) -> Dict[str, float]:
+        feature_cols: list[str]
+    ) -> dict[str, float]:
         """
         Predict next drive outcome given previous drives.
 
@@ -118,12 +118,12 @@ class InGameBettingSimulator:
 
     def simulate_next_drive_bet(
         self,
-        prediction: Dict[str, float],
-        ground_truth: Dict[str, float],
+        prediction: dict[str, float],
+        ground_truth: dict[str, float],
         line: float = 25.0,
         odds_over: float = -110,
         odds_under: float = -110
-    ) -> Dict:
+    ) -> dict:
         """
         Simulate next drive total bet (O/U).
 
@@ -195,11 +195,11 @@ class InGameBettingSimulator:
 
     def simulate_scoring_bet(
         self,
-        prediction: Dict[str, float],
-        ground_truth: Dict[str, float],
+        prediction: dict[str, float],
+        ground_truth: dict[str, float],
         odds_yes: float = -120,
         odds_no: float = +100
-    ) -> Dict:
+    ) -> dict:
         """
         Simulate next drive scoring bet (Yes/No).
 
@@ -267,8 +267,8 @@ class InGameBettingSimulator:
     def simulate_game(
         self,
         game_drives: pd.DataFrame,
-        feature_cols: List[str]
-    ) -> List[Dict]:
+        feature_cols: list[str]
+    ) -> list[dict]:
         """
         Simulate in-game betting for entire game.
 
@@ -314,7 +314,7 @@ class InGameBettingSimulator:
     def simulate_season(
         self,
         drives_df: pd.DataFrame,
-        feature_cols: List[str]
+        feature_cols: list[str]
     ) -> pd.DataFrame:
         """
         Simulate in-game betting for entire season.

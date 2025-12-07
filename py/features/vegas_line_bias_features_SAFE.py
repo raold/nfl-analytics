@@ -20,9 +20,8 @@ Date: 2025-11-03
 """
 
 import logging
+
 import pandas as pd
-import numpy as np
-from typing import Optional
 from sqlalchemy import create_engine
 
 logging.basicConfig(
@@ -47,7 +46,7 @@ class VegasLineBiasSafeEngine:
     ):
         """Initialize the engine."""
         self.engine = create_engine(db_url)
-        logger.info(f"Connected to database (SAFE mode - no implied probs)")
+        logger.info("Connected to database (SAFE mode - no implied probs)")
 
     def load_games_with_lines(
         self,

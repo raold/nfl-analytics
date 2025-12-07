@@ -19,19 +19,19 @@ International Games Backtest Script
 **Phase:** Phase 0 - International Games Analysis (Hour 4-5)
 """
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
 import json
-from scipy import stats
-from typing import Dict, Tuple
-import psycopg2
 from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import psycopg2
+from scipy import stats
 
 # Database connection
 DB_CONN = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
 
-def get_player_season_averages(player_ids: list, season: int) -> Dict[str, float]:
+def get_player_season_averages(player_ids: list, season: int) -> dict[str, float]:
     """
     Get player season averages for passing yards.
 
@@ -132,7 +132,7 @@ def bootstrap_test(baseline_errors: np.ndarray,
     return p_value
 
 
-def calculate_metrics(errors: np.ndarray) -> Dict[str, float]:
+def calculate_metrics(errors: np.ndarray) -> dict[str, float]:
     """
     Calculate comprehensive error metrics.
 
@@ -152,7 +152,7 @@ def calculate_metrics(errors: np.ndarray) -> Dict[str, float]:
     }
 
 
-def run_backtest(data_path: str = "data/international_games_2018_2024.csv") -> Dict:
+def run_backtest(data_path: str = "data/international_games_2018_2024.csv") -> dict:
     """
     Run international games backtest.
 

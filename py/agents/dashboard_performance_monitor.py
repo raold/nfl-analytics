@@ -50,22 +50,21 @@ Phase: 6 (Frontend Agents)
 import functools
 import logging
 import time
-import traceback
 import tracemalloc
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Optional imports
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -116,9 +115,9 @@ class PerformanceIssue:
     duration_ms: float
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "severity": self.severity.value,
@@ -141,9 +140,9 @@ class OptimizationRecommendation:
     recommendation: str
     expected_improvement: str
     implementation_difficulty: str  # Easy, Medium, Hard
-    code_example: Optional[str] = None
+    code_example: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "issue": self.issue.to_dict(),
@@ -164,10 +163,10 @@ class CachePerformanceReport:
     hit_rate: float
     avg_cache_lookup_ms: float
     functions_using_cache: int
-    functions_missing_cache: List[str]
-    recommendations: List[OptimizationRecommendation]
+    functions_missing_cache: list[str]
+    recommendations: list[OptimizationRecommendation]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "total_cache_calls": self.total_cache_calls,
@@ -193,7 +192,7 @@ class DashboardPerformanceMonitor:
         self,
         page_load_threshold_ms: float = 2000,
         slow_query_threshold_ms: float = 500,
-        db_config: Optional[Dict[str, str]] = None,
+        db_config: dict[str, str] | None = None,
         prometheus_export: bool = True
     ):
         """
@@ -210,10 +209,10 @@ class DashboardPerformanceMonitor:
         self.prometheus_export = prometheus_export
 
         # Performance tracking
-        self.page_loads: List[Dict[str, Any]] = []
-        self.query_executions: List[Dict[str, Any]] = []
-        self.cache_stats: Dict[str, Any] = defaultdict(lambda: {"hits": 0, "misses": 0})
-        self.memory_snapshots: List[Tuple[float, int]] = []  # (timestamp, memory_mb)
+        self.page_loads: list[dict[str, Any]] = []
+        self.query_executions: list[dict[str, Any]] = []
+        self.cache_stats: dict[str, Any] = defaultdict(lambda: {"hits": 0, "misses": 0})
+        self.memory_snapshots: list[tuple[float, int]] = []  # (timestamp, memory_mb)
 
         # Database connection
         self.db_config = db_config or {
@@ -225,7 +224,7 @@ class DashboardPerformanceMonitor:
         }
 
         # Prometheus metrics (if enabled)
-        self.prometheus_metrics: Dict[str, float] = {}
+        self.prometheus_metrics: dict[str, float] = {}
 
         logger.info(
             f"DashboardPerformanceMonitor initialized (threshold={page_load_threshold_ms}ms)"
@@ -233,7 +232,7 @@ class DashboardPerformanceMonitor:
 
     def monitor_performance(
         self,
-        threshold_ms: Optional[float] = None,
+        threshold_ms: float | None = None,
         alert: bool = True,
         alert_destination: str = "log"
     ) -> Callable:
@@ -358,7 +357,7 @@ class DashboardPerformanceMonitor:
     def detect_n_plus_one_queries(
         self,
         time_window_seconds: int = 60
-    ) -> List[PerformanceIssue]:
+    ) -> list[PerformanceIssue]:
         """
         Detect N+1 query patterns in dashboard code.
 
@@ -469,7 +468,7 @@ class DashboardPerformanceMonitor:
             recommendations=recommendations
         )
 
-    def generate_recommendations(self) -> List[OptimizationRecommendation]:
+    def generate_recommendations(self) -> list[OptimizationRecommendation]:
         """
         Generate actionable optimization recommendations based on detected issues.
 
@@ -594,7 +593,7 @@ class DashboardPerformanceMonitor:
             self.prometheus_metrics[f"dashboard_alert_{issue.bottleneck_type.value}"] = 1
         # TODO: Add Grafana webhook integration
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get performance monitoring summary."""
         if not self.page_loads:
             return {"status": "No data collected yet"}
@@ -650,7 +649,7 @@ if __name__ == "__main__":
 
     # Get performance summary
     summary = monitor.get_summary()
-    print(f"\nPerformance Summary:")
+    print("\nPerformance Summary:")
     print(f"  Page loads tracked: {summary['page_loads_tracked']}")
     print(f"  Avg page load: {summary['avg_page_load_ms']:.0f}ms")
     print(f"  Status: {summary['performance_status']}")
@@ -658,6 +657,6 @@ if __name__ == "__main__":
     # Get recommendations
     recommendations = monitor.generate_recommendations()
     if recommendations:
-        print(f"\nTop Recommendation:")
+        print("\nTop Recommendation:")
         print(f"  {recommendations[0].recommendation}")
         print(f"  Expected improvement: {recommendations[0].expected_improvement}")

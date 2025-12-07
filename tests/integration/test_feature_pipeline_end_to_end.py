@@ -20,18 +20,17 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
+from datetime import timedelta
+from unittest.mock import MagicMock
+
 import numpy as np
 import pandas as pd
-import pytest
-from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
 import psycopg2
+import pytest
 
 # Import feature modules
 from py.features.asof_features import TEAM_FEATURE_COLUMNS
 from py.utils.data_leakage_detector import DataLeakageDetector
-
 
 # ============================================================================
 # FIXTURES

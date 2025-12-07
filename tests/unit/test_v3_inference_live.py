@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.093923
 Test count: 23
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from predict.v3_inference_live import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

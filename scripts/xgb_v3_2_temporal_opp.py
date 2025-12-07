@@ -14,12 +14,13 @@ Expected runtime: 25 minutes
 Target: MAE < 40.20 (v2 baseline)
 """
 
-import pandas as pd
+import sys
+import time
+
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
-import time
-import sys
 
 # Database connection
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -177,7 +178,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     print(f"MAE: {mae:.2f} yards")
     print(f"RMSE: {rmse:.2f} yards")
     print(f"Training time: {train_time:.1f}s")
-    print(f"v2 baseline: 40.20 yards")
+    print("v2 baseline: 40.20 yards")
 
     improvement_pct = ((40.20 - mae) / 40.20) * 100
     print(f"Improvement: {improvement_pct:+.1f}%")

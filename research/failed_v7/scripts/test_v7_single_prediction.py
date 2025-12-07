@@ -46,7 +46,7 @@ def test_single_prediction():
     test_season = 2024
     test_week = 10
 
-    logger.info(f"\n2. Generating prediction for:")
+    logger.info("\n2. Generating prediction for:")
     logger.info(f"   Player ID: {test_player_id} (Patrick Mahomes)")
     logger.info(f"   Season:    {test_season}")
     logger.info(f"   Week:      {test_week}")
@@ -66,26 +66,26 @@ def test_single_prediction():
             logger.error(f"   Required minimum: {result.get('required_minimum', 3)}")
             return False
 
-        logger.info(f"\n3. Prediction Results:")
+        logger.info("\n3. Prediction Results:")
         logger.info(f"   Ensemble Mean:  {result['ensemble_mean']:.1f} yards")
         logger.info(f"   Ensemble Std:   {result['ensemble_std']:.1f} yards")
         logger.info(f"   90% CI:         [{result['ensemble_ci_lower']:.1f}, {result['ensemble_ci_upper']:.1f}]")
 
-        logger.info(f"\n4. Component Predictions:")
+        logger.info("\n4. Component Predictions:")
         if 'components' in result:
             for component_name, pred in result['components'].items():
                 logger.info(f"   {component_name:25s}: {pred['mean']:6.1f} ± {pred['std']:5.1f} yards")
 
-        logger.info(f"\n5. Adaptive Weights:")
+        logger.info("\n5. Adaptive Weights:")
         for component_name, weight in result['weights'].items():
             logger.info(f"   {component_name:25s}: {weight:.3f} ({weight*100:.1f}%)")
 
-        logger.info(f"\n6. Metadata:")
+        logger.info("\n6. Metadata:")
         for key, value in result['metadata'].items():
             logger.info(f"   {key:25s}: {value}")
 
         # Validate: Check that predictions are NOT placeholders
-        logger.info(f"\n7. Validation Checks:")
+        logger.info("\n7. Validation Checks:")
 
         checks_passed = 0
         checks_total = 3
@@ -115,15 +115,15 @@ def test_single_prediction():
             else:
                 logger.warning(f"   ⚠️  Component predictions suspiciously similar ({variance:.1f} yard range)")
 
-        logger.info(f"\n" + "=" * 80)
+        logger.info("\n" + "=" * 80)
         if checks_passed == checks_total:
             logger.info(f"✅ ALL VALIDATION CHECKS PASSED ({checks_passed}/{checks_total})")
-            logger.info(f"✅ Ensemble v7.0 is generating REAL predictions (not placeholders)")
+            logger.info("✅ Ensemble v7.0 is generating REAL predictions (not placeholders)")
             logger.info("=" * 80)
             return True
         else:
             logger.warning(f"⚠️  SOME VALIDATION CHECKS FAILED ({checks_passed}/{checks_total})")
-            logger.warning(f"⚠️  Review output above for details")
+            logger.warning("⚠️  Review output above for details")
             logger.info("=" * 80)
             return False
 

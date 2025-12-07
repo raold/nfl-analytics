@@ -27,9 +27,7 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
 
@@ -89,7 +87,7 @@ class MarketDispersionFeatures:
         away_team: str,
         season: int,
         week: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract market dispersion features for a game.
 
@@ -192,7 +190,7 @@ class MarketDispersionFeatures:
             conn.close()
             return self._get_default_features()
 
-    def _get_default_features(self) -> Dict[str, float]:
+    def _get_default_features(self) -> dict[str, float]:
         """
         Return default features when extraction fails.
 
@@ -209,7 +207,7 @@ class MarketDispersionFeatures:
 # MATERIALIZED VIEW CREATION (OPTIONAL OPTIMIZATION)
 # ============================================================================
 
-def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
+def create_market_dispersion_view(db_config: dict | None = None) -> None:
     """
     Create materialized view for market dispersion (speeds up queries).
 
@@ -316,7 +314,7 @@ def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
 
 def query_market_dispersion_batch(
     game_ids: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract market dispersion for multiple games.

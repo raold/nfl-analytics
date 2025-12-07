@@ -8,10 +8,10 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import numpy as np
-from typing import List
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+import numpy as np
+
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 
 class StackingStrategy(EnsembleStrategy):
@@ -28,7 +28,7 @@ class StackingStrategy(EnsembleStrategy):
 
     def combine(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         **kwargs
     ) -> EnsemblePrediction:
         """Combine using stacking (stub - uses simple average)."""

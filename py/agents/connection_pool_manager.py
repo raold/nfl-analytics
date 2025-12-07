@@ -61,16 +61,14 @@ import os
 import threading
 import time
 import traceback
-from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from queue import Queue
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2 import pool
-from psycopg2.extras import RealDictCursor
 
 # Configure logging
 logging.basicConfig(
@@ -109,7 +107,7 @@ class ConnectionMetrics:
     connection_errors: int
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "total_connections": self.total_connections,
@@ -132,9 +130,9 @@ class ConnectionIssue:
     description: str
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "issue_type": self.issue_type.value,
@@ -155,9 +153,9 @@ class OptimizationRecommendation:
     recommendation: str
     expected_improvement: str
     implementation_difficulty: str  # Easy, Medium, Hard
-    code_example: Optional[str] = None
+    code_example: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "issue": self.issue.to_dict(),
@@ -184,7 +182,7 @@ class ConnectionPoolManager:
         self,
         min_size: int = 5,
         max_size: int = 20,
-        db_config: Optional[Dict[str, str]] = None,
+        db_config: dict[str, str] | None = None,
         leak_detection_enabled: bool = True
     ):
         """
@@ -222,13 +220,13 @@ class ConnectionPoolManager:
             raise
 
         # Connection tracking
-        self.active_connections: Dict[int, Dict[str, Any]] = {}
-        self.connection_history: List[Dict[str, Any]] = []
-        self.wait_times: List[float] = []
+        self.active_connections: dict[int, dict[str, Any]] = {}
+        self.connection_history: list[dict[str, Any]] = []
+        self.wait_times: list[float] = []
         self.connection_errors: int = 0
 
         # Metrics tracking
-        self.metrics_history: List[ConnectionMetrics] = []
+        self.metrics_history: list[ConnectionMetrics] = []
 
         # Lock for thread safety
         self.lock = threading.Lock()
@@ -337,7 +335,7 @@ class ConnectionPoolManager:
     def detect_connection_leaks(
         self,
         threshold_seconds: int = 60
-    ) -> List[ConnectionIssue]:
+    ) -> list[ConnectionIssue]:
         """
         Detect connections that haven't been released.
 
@@ -376,7 +374,7 @@ class ConnectionPoolManager:
 
         return issues
 
-    def get_pool_health(self) -> Tuple[PoolStatus, ConnectionMetrics]:
+    def get_pool_health(self) -> tuple[PoolStatus, ConnectionMetrics]:
         """
         Get current pool health status.
 
@@ -414,7 +412,7 @@ class ConnectionPoolManager:
 
         return status, metrics
 
-    def generate_recommendations(self) -> List[OptimizationRecommendation]:
+    def generate_recommendations(self) -> list[OptimizationRecommendation]:
         """
         Generate connection pool optimization recommendations.
 
@@ -478,7 +476,7 @@ class ConnectionPoolManager:
 
         return recommendations
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get connection pool summary."""
         status, metrics = self.get_pool_health()
 
@@ -522,7 +520,7 @@ if __name__ == "__main__":
     # Get recommendations
     recommendations = pool_manager.generate_recommendations()
     if recommendations:
-        print(f"\nTop Recommendation:")
+        print("\nTop Recommendation:")
         print(f"  {recommendations[0].recommendation}")
         print(f"  Expected improvement: {recommendations[0].expected_improvement}")
 

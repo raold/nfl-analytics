@@ -6,8 +6,8 @@ Usage:
     python scripts/check_model_integrity.py model.pkl
 """
 
-import sys
 import pickle
+import sys
 from pathlib import Path
 
 

@@ -4,14 +4,12 @@ ROI/EV Scoring Framework for Experiment Prioritization
 Ranks 40 experiments by expected impact on betting ROI/EV using composite metric.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple
-from dataclasses import dataclass
-import logging
 import json
+import logging
+from dataclasses import dataclass
 from pathlib import Path
-from scipy import stats
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +25,7 @@ class ROIScore:
     sharpe_potential: float  # Expected Sharpe ratio improvement
     confidence: float  # Score confidence (0-1)
     rank: int  # Overall rank (1-40)
-    components: Dict[str, float]  # Detailed breakdown
+    components: dict[str, float]  # Detailed breakdown
 
 
 class ExperimentROIEvaluator:
@@ -63,7 +61,7 @@ class ExperimentROIEvaluator:
         self.cvae_priors = self._initialize_cvae_priors()
         self.causal_priors = self._initialize_causal_priors()
 
-    def _initialize_cvae_priors(self) -> Dict:
+    def _initialize_cvae_priors(self) -> dict:
         """
         Initialize priors for cVAE experiments based on literature and domain knowledge.
 
@@ -96,7 +94,7 @@ class ExperimentROIEvaluator:
             'CVAE-020': {'lift': 19, 'inefficiency': 0.8, 'feasibility': 0.5, 'sharpe': 0.75},
         }
 
-    def _initialize_causal_priors(self) -> Dict:
+    def _initialize_causal_priors(self) -> dict:
         """
         Initialize priors for causal experiments.
 
@@ -198,7 +196,7 @@ class ExperimentROIEvaluator:
             components=components
         )
 
-    def rank_all_experiments(self) -> Tuple[List[ROIScore], List[ROIScore], List[ROIScore]]:
+    def rank_all_experiments(self) -> tuple[list[ROIScore], list[ROIScore], list[ROIScore]]:
         """
         Score and rank all 40 experiments.
 
@@ -228,15 +226,15 @@ class ExperimentROIEvaluator:
         top_10_cvae = cvae_scores[:10]
         top_10_causal = causal_scores[:10]
 
-        logger.info(f"Ranked 40 experiments: Top 10 cVAE + Top 10 Causal selected")
+        logger.info("Ranked 40 experiments: Top 10 cVAE + Top 10 Causal selected")
 
         return all_scores, top_10_cvae, top_10_causal
 
     def export_rankings(
         self,
-        all_scores: List[ROIScore],
-        top_10_cvae: List[ROIScore],
-        top_10_causal: List[ROIScore],
+        all_scores: list[ROIScore],
+        top_10_cvae: list[ROIScore],
+        top_10_causal: list[ROIScore],
         output_dir: str = "experiments"
     ):
         """Export rankings to JSON and CSV"""
@@ -274,7 +272,7 @@ class ExperimentROIEvaluator:
 
         return all_df, cvae_df, causal_df
 
-    def _scores_to_dataframe(self, scores: List[ROIScore]) -> pd.DataFrame:
+    def _scores_to_dataframe(self, scores: list[ROIScore]) -> pd.DataFrame:
         """Convert scores to DataFrame"""
 
         data = []
@@ -293,7 +291,7 @@ class ExperimentROIEvaluator:
 
         return pd.DataFrame(data)
 
-    def _score_to_dict(self, score: ROIScore) -> Dict:
+    def _score_to_dict(self, score: ROIScore) -> dict:
         """Convert ROIScore to dict for JSON export"""
 
         return {
@@ -308,19 +306,19 @@ class ExperimentROIEvaluator:
             'components': {k: round(v, 2) for k, v in score.components.items()}
         }
 
-    def print_summary(self, all_scores: List[ROIScore], top_10_cvae: List[ROIScore], top_10_causal: List[ROIScore]):
+    def print_summary(self, all_scores: list[ROIScore], top_10_cvae: list[ROIScore], top_10_causal: list[ROIScore]):
         """Print summary of rankings"""
 
         print("\n" + "="*100)
         print("EXPERIMENT RANKINGS - TOP 10 cVAE + TOP 10 CAUSAL")
         print("="*100)
 
-        print(f"\n📊 Composite Scoring Weights:")
+        print("\n📊 Composite Scoring Weights:")
         for component, weight in self.weights.items():
             print(f"   - {component}: {weight:.0%}")
 
         # Overall top 10
-        print(f"\n🏆 TOP 10 EXPERIMENTS (Overall):")
+        print("\n🏆 TOP 10 EXPERIMENTS (Overall):")
         print(f"{'Rank':<6} {'ID':<15} {'Category':<10} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
         print("-" * 100)
 
@@ -334,7 +332,7 @@ class ExperimentROIEvaluator:
             )
 
         # Top 10 cVAE
-        print(f"\n\n🔬 TOP 10 cVAE EXPERIMENTS:")
+        print("\n\n🔬 TOP 10 cVAE EXPERIMENTS:")
         print(f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
         print("-" * 100)
 
@@ -347,7 +345,7 @@ class ExperimentROIEvaluator:
             )
 
         # Top 10 Causal
-        print(f"\n\n🧪 TOP 10 CAUSAL EXPERIMENTS:")
+        print("\n\n🧪 TOP 10 CAUSAL EXPERIMENTS:")
         print(f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
         print("-" * 100)
 
@@ -362,7 +360,7 @@ class ExperimentROIEvaluator:
         # Statistics
         all_df = self._scores_to_dataframe(all_scores)
 
-        print(f"\n\n📈 SUMMARY STATISTICS:")
+        print("\n\n📈 SUMMARY STATISTICS:")
         print(f"   Composite Score Range: {all_df['composite_score'].min():.1f} - {all_df['composite_score'].max():.1f}")
         print(f"   Mean Score: {all_df['composite_score'].mean():.1f}")
         print(f"   Median Score: {all_df['composite_score'].median():.1f}")

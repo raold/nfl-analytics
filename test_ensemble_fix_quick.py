@@ -5,11 +5,14 @@ Quick test: Verify ensemble predictions are reasonable on 10 games from 2022.
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 import pandas as pd
 import psycopg2
+
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+
 
 def main():
     # Connect to DB
@@ -75,7 +78,7 @@ def main():
 
         print(f"Actual yards: {row['actual_yards']:.0f}")
         print(f"Ensemble: {pred['ensemble_mean']:.1f} ± {pred['ensemble_std']:.1f} yards")
-        print(f"Individual models:")
+        print("Individual models:")
         if state_space[0]: print(f"  State-Space v2: {state_space[0]:.1f} ± {state_space[1]:.1f}")
         if hierarchical[0]: print(f"  Hierarchical v2: {hierarchical[0]:.1f} ± {hierarchical[1]:.1f}")
         if xgboost[0]: print(f"  XGBoost v2: {xgboost[0]:.1f} ± {xgboost[1]:.1f}")
@@ -104,7 +107,7 @@ def main():
     xgb_coverage = df_results['xgboost'].notna().sum() / len(df_results) * 100
     inf_coverage = df_results['informative'].notna().sum() / len(df_results) * 100
 
-    print(f"\nModel Coverage:")
+    print("\nModel Coverage:")
     print(f"  State-Space v2: {ss_coverage:.0f}% ({df_results['state_space'].notna().sum()}/{len(df_results)})")
     print(f"  Hierarchical v2: {hier_coverage:.0f}% ({df_results['hierarchical'].notna().sum()}/{len(df_results)})")
     print(f"  XGBoost v2: {xgb_coverage:.0f}% ({df_results['xgboost'].notna().sum()}/{len(df_results)})")
@@ -125,15 +128,15 @@ def main():
         ss_min = ss_valid['state_space'].min()
         ss_max = ss_valid['state_space'].max()
 
-        print(f"\nState-Space v2 Prediction Range:")
+        print("\nState-Space v2 Prediction Range:")
         print(f"  Min: {ss_min:.1f} yards")
         print(f"  Mean: {ss_mean:.1f} yards")
         print(f"  Max: {ss_max:.1f} yards")
 
         if ss_min > 50 and ss_max < 500:
-            print(f"  ✅ PASS: Predictions are reasonable (50-500 yards)")
+            print("  ✅ PASS: Predictions are reasonable (50-500 yards)")
         else:
-            print(f"  ❌ FAIL: Predictions are out of range (expected 50-500 yards)")
+            print("  ❌ FAIL: Predictions are out of range (expected 50-500 yards)")
 
     print("\n" + "="*80)
 

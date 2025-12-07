@@ -15,14 +15,12 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from pathlib import Path
 import logging
 from dataclasses import dataclass
+from pathlib import Path
+
+import pandas as pd
 import psycopg2
-from psycopg2.extras import execute_values
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -105,7 +103,7 @@ class DriveAggregator:
             self.conn.close()
             logger.info("Disconnected from database")
 
-    def load_plays(self, seasons: List[int]) -> pd.DataFrame:
+    def load_plays(self, seasons: list[int]) -> pd.DataFrame:
         """
         Load play-by-play data for specified seasons.
 
@@ -522,7 +520,7 @@ class DriveAggregator:
         df[available_cols].to_csv(output_path, index=False)
         logger.info(f"Saved {len(available_cols)} features")
 
-    def run_pipeline(self, seasons: List[int], output_path: Path):
+    def run_pipeline(self, seasons: list[int], output_path: Path):
         """
         Run full drive aggregation pipeline.
 
@@ -566,11 +564,11 @@ class DriveAggregator:
         logger.info(f"Total drives: {len(df):,}")
         logger.info(f"Total games: {df['game_id'].nunique():,}")
         logger.info(f"Avg drives per game: {len(df) / df['game_id'].nunique():.1f}")
-        logger.info(f"\nDrive outcomes:")
+        logger.info("\nDrive outcomes:")
         logger.info(df['result'].value_counts())
-        logger.info(f"\nYards distribution:")
+        logger.info("\nYards distribution:")
         logger.info(df['yards_gained'].describe())
-        logger.info(f"\nPoints distribution:")
+        logger.info("\nPoints distribution:")
         logger.info(df['points_scored'].value_counts().sort_index())
         logger.info("="*60)
 

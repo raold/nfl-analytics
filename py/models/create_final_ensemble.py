@@ -4,14 +4,14 @@ Create final ensemble of all trained models.
 Combines XGBoost, BNNs, CQL, and any other trained models.
 """
 
-import numpy as np
-import pandas as pd
-import xgboost as xgb
-import joblib
 import json
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 import psycopg2
-from sklearn.metrics import accuracy_score, roc_auc_score, log_loss
+import xgboost as xgb
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 
 print("=" * 70)
 print(" FINAL ENSEMBLE MODEL CREATION ".center(70))
@@ -30,7 +30,7 @@ if xgb_models:
     print(f"[OK] Found {len(xgb_models)} XGBoost models")
     models_found['xgboost'] = xgb_models
 
-# BNN models  
+# BNN models
 bnn_models = list(model_dir.glob("*.pth")) + list(model_dir.glob("*bnn*.pth"))
 if bnn_models:
     print(f"[OK] Found {len(bnn_models)} BNN models")
@@ -166,7 +166,7 @@ if 'xgboost' in models_found:
 
 # Simulate BNN predictions (with uncertainty)
 if 'bnn' in models_found:
-    print(f"  Simulating BNN predictions (torch not available)")
+    print("  Simulating BNN predictions (torch not available)")
     bnn_pred = 1 / (1 + np.exp(-df['epa_diff'].values * 10))  # Logistic based on EPA diff
     bnn_pred += np.random.randn(len(bnn_pred)) * 0.05  # Add uncertainty
     bnn_pred = np.clip(bnn_pred, 0.01, 0.99)
@@ -175,7 +175,7 @@ if 'bnn' in models_found:
 
 # Simulate CQL predictions
 if 'cql' in models_found:
-    print(f"  Simulating CQL predictions")
+    print("  Simulating CQL predictions")
     cql_pred = 1 / (1 + np.exp(-(df['epa_diff'].values + df['wp_diff'].values) * 5))
     predictions['cql'] = cql_pred
     print(f"    [OK] CQL predictions: shape {cql_pred.shape}")
@@ -266,7 +266,7 @@ for method_name, pred in ensemble_methods.items():
     auc = roc_auc_score(y_test, pred)
     loss = log_loss(y_test, pred)
     print(f"  {method_name:12s}: Acc={acc:.3f}, AUC={auc:.3f}, LogLoss={loss:.3f}")
-    
+
     if acc > best_acc:
         best_acc = acc
         best_method = method_name

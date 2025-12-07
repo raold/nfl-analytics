@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.464921
 Test count: 14
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from sim.acceptance import *
-import pandas as pd
-import pytest
 
 
 def test_parse_args_basic():

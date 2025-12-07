@@ -40,13 +40,12 @@ Decision Gates:
     - v3.1 MAE < v2 MAE (40.20): DEPLOY/INVESTIGATE
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
-from typing import Dict, List, Tuple
+import os
+import sys
+import time
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -109,10 +108,10 @@ V2_BASELINE_MAE = 40.20  # From postmortem
 
 def audit_feature_coverage(
     df: pd.DataFrame,
-    features: List[str],
+    features: list[str],
     threshold: float = COVERAGE_THRESHOLD,
     fail_on_low_coverage: bool = True
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Audit feature coverage before model training (CRITICAL GATE).
 
@@ -286,7 +285,7 @@ def load_data_from_db():
     logger.info(f"✓ Loaded {len(df):,} QB games")
     logger.info(f"  Seasons: {df.season.min()}-{df.season.max()}")
     logger.info(f"  Unique QBs: {df.player_id.nunique()}")
-    logger.info(f"  Note: 2016-2017 excluded (no EPA data)")
+    logger.info("  Note: 2016-2017 excluded (no EPA data)")
 
     return df
 
@@ -325,7 +324,7 @@ def load_opponent_strength_features():
 
     # Check coverage
     non_null_counts = opp_features[['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].notna().sum()
-    logger.info(f"\nOpponent feature availability:")
+    logger.info("\nOpponent feature availability:")
     for col, count in non_null_counts.items():
         logger.info(f"  {col}: {count:,} ({count/len(opp_features)*100:.1f}%)")
 
@@ -413,15 +412,15 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
             df[col].fillna(median_val, inplace=True)
 
     # DO NOT FILL opponent features - let coverage audit catch issues
-    logger.info(f"\n✓ Feature engineering complete")
-    logger.info(f"  Total features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("\n✓ Feature engineering complete")
+    logger.info("  Total features: 16 (13 baseline + 3 opponent strength)")
     logger.info(f"  Samples: {len(df):,}")
-    logger.info(f"  Note: Opponent features NOT imputed (coverage audit will verify)")
+    logger.info("  Note: Opponent features NOT imputed (coverage audit will verify)")
 
     return df
 
 
-def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
+def prepare_train_test_split(df: pd.DataFrame) -> tuple:
     """
     Split data into train/test sets with coverage validation.
 
@@ -472,13 +471,13 @@ def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
     )].copy()
     test_df = df[df['season'] == ALIGNED_WINDOW['test_season']].copy()
 
-    logger.info(f"\n✓ Split complete:")
+    logger.info("\n✓ Split complete:")
     logger.info(f"  Train: {len(train_df):,} samples ({ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']})")
     logger.info(f"  Test: {len(test_df):,} samples ({ALIGNED_WINDOW['test_season']})")
     logger.info(f"  Features: {len(feature_cols)}")
 
     # ===== CRITICAL: FEATURE COVERAGE AUDIT =====
-    logger.info(f"\nRunning coverage audit on training set...")
+    logger.info("\nRunning coverage audit on training set...")
     coverage_report = audit_feature_coverage(
         train_df,
         feature_cols,
@@ -493,7 +492,7 @@ def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
     X_test = test_df[feature_cols].values
     y_test = test_df['yards'].values
 
-    logger.info(f"\n16 Features (13 Baseline + 3 Opponent Strength):")
+    logger.info("\n16 Features (13 Baseline + 3 Opponent Strength):")
     for i, col in enumerate(feature_cols, 1):
         coverage = coverage_report.get(col, 0.0)
         marker = " [NEW]" if col in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty'] else ""
@@ -528,7 +527,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols):
 
     logger.info(f"Training with {NUM_BOOST_ROUNDS} boost rounds...")
     logger.info(f"Early stopping: {EARLY_STOPPING_ROUNDS} rounds")
-    logger.info(f"Note: No exponential decay weights (uniform 2018-2024)")
+    logger.info("Note: No exponential decay weights (uniform 2018-2024)")
 
     # Training
     evals = [(dtrain, 'train'), (dtest, 'test')]
@@ -593,25 +592,25 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info("MODEL EVALUATION - 2025 HOLDOUT SET")
     logger.info("=" * 70)
 
-    logger.info(f"\nPerformance Metrics:")
+    logger.info("\nPerformance Metrics:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
     logger.info(f"  R²: {metrics['r2']:.4f}")
     logger.info(f"  Mean Prediction: {y_pred.mean():.1f} yards")
     logger.info(f"  Mean Actual: {y_test.mean():.1f} yards")
 
-    logger.info(f"\nBaseline Comparison:")
+    logger.info("\nBaseline Comparison:")
     logger.info(f"  Baseline MAE: {metrics['baseline_mae']:.2f} yards")
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
 
     # Compare to v2 baseline
     improvement_vs_v2 = ((V2_BASELINE_MAE - metrics['mae']) / V2_BASELINE_MAE) * 100
-    logger.info(f"\nv2 Baseline Comparison:")
+    logger.info("\nv2 Baseline Comparison:")
     logger.info(f"  v2 MAE: {V2_BASELINE_MAE:.2f} yards")
     logger.info(f"  v3.1 MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  Improvement: {improvement_vs_v2:+.2f}%")
 
-    logger.info(f"\nTraining Info:")
+    logger.info("\nTraining Info:")
     logger.info(f"  Training time: {metrics['training_time_minutes']:.2f} minutes")
     logger.info(f"  Best iteration: {metrics['best_iteration']}")
     logger.info(f"  Features: {metrics['num_features']}")
@@ -693,7 +692,7 @@ def main():
     logger.info("=" * 70)
     logger.info(f"Training Window: {ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']} (aligned with EPA)")
     logger.info(f"Test Set: {ALIGNED_WINDOW['test_season']} season")
-    logger.info(f"Features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("Features: 16 (13 baseline + 3 opponent strength)")
     logger.info(f"Target: Beat v2 baseline (MAE < {V2_BASELINE_MAE:.2f} yards)")
     logger.info(f"Coverage Gate: >{COVERAGE_THRESHOLD:.0%} required (target: >{COVERAGE_TARGET:.0%})")
     logger.info("=" * 70 + "\n")
@@ -713,10 +712,10 @@ def main():
     try:
         X_train, y_train, X_test, y_test, feature_cols, train_df = prepare_train_test_split(df)
     except ValueError as e:
-        logger.error(f"\n✗ COVERAGE AUDIT FAILED - TRAINING BLOCKED")
+        logger.error("\n✗ COVERAGE AUDIT FAILED - TRAINING BLOCKED")
         logger.error(f"  {str(e)}")
-        logger.error(f"\nDO NOT PROCEED WITH TRAINING")
-        logger.error(f"See docs/postmortems/XGBOOST_V3_PERFORMANCE_REGRESSION.md for guidance")
+        logger.error("\nDO NOT PROCEED WITH TRAINING")
+        logger.error("See docs/postmortems/XGBOOST_V3_PERFORMANCE_REGRESSION.md for guidance")
         return
 
     # 5. Train model (only if coverage audit passed)
@@ -749,20 +748,20 @@ def main():
     elif metrics['mae'] < V2_BASELINE_MAE * 1.02:  # Within 2% margin
         decision = "⚠ BORDERLINE"
         recommendation = (
-            f"v3.1 performance within 2% of v2 baseline.\n"
-            f"Opponent strength features show marginal value.\n"
-            f"RECOMMENDED: Further investigation (feature ablation, longer window)"
+            "v3.1 performance within 2% of v2 baseline.\n"
+            "Opponent strength features show marginal value.\n"
+            "RECOMMENDED: Further investigation (feature ablation, longer window)"
         )
     else:
         decision = "✗ DO NOT DEPLOY"
         recommendation = (
-            f"v3.1 still regresses vs v2 baseline.\n"
-            f"Alignment did not solve the issue.\n"
-            f"RECOMMENDED: Investigate feature redundancy or alternative opponent proxies"
+            "v3.1 still regresses vs v2 baseline.\n"
+            "Alignment did not solve the issue.\n"
+            "RECOMMENDED: Investigate feature redundancy or alternative opponent proxies"
         )
 
     logger.info(f"\nDecision: {decision}")
-    logger.info(f"\nRecommendation:")
+    logger.info("\nRecommendation:")
     for line in recommendation.split('\n'):
         logger.info(f"  {line}")
 

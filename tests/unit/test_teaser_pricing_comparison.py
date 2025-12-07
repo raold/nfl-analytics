@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.467527
 Test count: 42
 """
 
+import pytest
 from analysis.teaser_pricing_comparison import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_get_connection_basic():

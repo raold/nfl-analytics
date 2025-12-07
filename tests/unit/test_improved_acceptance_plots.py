@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.104450
 Test count: 14
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.improved_acceptance_plots import *
-import pandas as pd
-import pytest
 
 
 def test_load_data_basic():

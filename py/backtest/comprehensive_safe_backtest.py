@@ -19,17 +19,17 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import psycopg
+import json
+from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
-import numpy as np
+import psycopg
+import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-import xgboost as xgb
-from sklearn.metrics import accuracy_score, roc_auc_score, log_loss, classification_report
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 from sklearn.model_selection import cross_val_score
-import json
-from pathlib import Path
-from datetime import datetime
 
 DB_CONFIG = {
     "host": "localhost",
@@ -309,7 +309,7 @@ class ComprehensiveSafeBacktest:
         # Cross-validation on training set
         cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
 
-        print(f"\nResults:")
+        print("\nResults:")
         print(f"  Test Accuracy: {acc:.3f} ({acc*100:.1f}%)")
         print(f"  Test AUC: {auc:.3f}")
         print(f"  Test Log Loss: {logloss:.3f}")

@@ -58,18 +58,14 @@ Date: November 22, 2025
 Phase: 6 (Frontend Agents)
 """
 
-import hashlib
 import json
 import logging
-import os
 import re
-import subprocess
-from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 # Optional imports
 try:
@@ -104,13 +100,13 @@ class SchemaChange:
     change_type: ChangeType
     is_breaking: bool
     endpoint: str
-    field: Optional[str]
-    old_value: Optional[Any]
-    new_value: Optional[Any]
+    field: str | None
+    old_value: Any | None
+    new_value: Any | None
     description: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "change_type": self.change_type.value,
@@ -130,11 +126,11 @@ class ContractTestResult:
     endpoint: str
     method: str
     passed: bool
-    errors: List[str]
-    warnings: List[str]
-    response_data: Optional[Dict[str, Any]]
+    errors: list[str]
+    warnings: list[str]
+    response_data: dict[str, Any] | None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "endpoint": self.endpoint,
@@ -173,15 +169,15 @@ class BackendFrontendSync:
         self.openapi_snapshot_path = Path(openapi_snapshot_path)
 
         # Current and previous OpenAPI schemas
-        self.current_schema: Optional[Dict[str, Any]] = None
-        self.previous_schema: Optional[Dict[str, Any]] = None
+        self.current_schema: dict[str, Any] | None = None
+        self.previous_schema: dict[str, Any] | None = None
 
         # Detected changes
-        self.schema_changes: List[SchemaChange] = []
+        self.schema_changes: list[SchemaChange] = []
 
         logger.info(f"BackendFrontendSync initialized (api_url={api_url})")
 
-    def fetch_openapi_schema(self) -> Dict[str, Any]:
+    def fetch_openapi_schema(self) -> dict[str, Any]:
         """
         Fetch current OpenAPI schema from API.
 
@@ -205,7 +201,7 @@ class BackendFrontendSync:
             logger.error(f"Failed to fetch OpenAPI schema: {e}")
             raise
 
-    def load_previous_schema(self) -> Optional[Dict[str, Any]]:
+    def load_previous_schema(self) -> dict[str, Any] | None:
         """
         Load previously saved OpenAPI schema snapshot.
 
@@ -214,7 +210,7 @@ class BackendFrontendSync:
         """
         try:
             if self.openapi_snapshot_path.exists():
-                with open(self.openapi_snapshot_path, 'r') as f:
+                with open(self.openapi_snapshot_path) as f:
                     self.previous_schema = json.load(f)
                 logger.info("Loaded previous OpenAPI schema snapshot")
                 return self.previous_schema
@@ -226,7 +222,7 @@ class BackendFrontendSync:
             logger.error(f"Failed to load previous schema: {e}")
             return None
 
-    def save_schema_snapshot(self, schema: Optional[Dict[str, Any]] = None):
+    def save_schema_snapshot(self, schema: dict[str, Any] | None = None):
         """
         Save OpenAPI schema snapshot for future comparison.
 
@@ -248,7 +244,7 @@ class BackendFrontendSync:
             logger.error(f"Failed to save schema snapshot: {e}")
             raise
 
-    def monitor_openapi_schema(self) -> Dict[str, Any]:
+    def monitor_openapi_schema(self) -> dict[str, Any]:
         """
         Monitor OpenAPI schema for changes.
 
@@ -342,7 +338,7 @@ class BackendFrontendSync:
 
         logger.info(f"Generated TypedDict definitions: {output_path}")
 
-    def run_contract_tests(self) -> Dict[str, Any]:
+    def run_contract_tests(self) -> dict[str, Any]:
         """
         Run contract tests to validate API responses match schema.
 
@@ -379,7 +375,7 @@ class BackendFrontendSync:
             "results": [r.to_dict() for r in results]
         }
 
-    def discover_new_endpoints(self) -> List[Dict[str, Any]]:
+    def discover_new_endpoints(self) -> list[dict[str, Any]]:
         """
         Discover new endpoints not yet in dashboard API client.
 
@@ -435,9 +431,9 @@ class BackendFrontendSync:
 
     def _compare_schemas(
         self,
-        old_schema: Dict[str, Any],
-        new_schema: Dict[str, Any]
-    ) -> List[SchemaChange]:
+        old_schema: dict[str, Any],
+        new_schema: dict[str, Any]
+    ) -> list[SchemaChange]:
         """Compare two OpenAPI schemas and detect changes."""
         changes = []
 
@@ -484,9 +480,9 @@ class BackendFrontendSync:
     def _compare_endpoint_schemas(
         self,
         endpoint: str,
-        old_spec: Dict[str, Any],
-        new_spec: Dict[str, Any]
-    ) -> List[SchemaChange]:
+        old_spec: dict[str, Any],
+        new_spec: dict[str, Any]
+    ) -> list[SchemaChange]:
         """Compare endpoint specifications for changes."""
         changes = []
 
@@ -520,7 +516,7 @@ class BackendFrontendSync:
         self,
         path: str,
         method: str,
-        details: Dict[str, Any]
+        details: dict[str, Any]
     ) -> ContractTestResult:
         """Test if endpoint response matches contract."""
         errors = []
@@ -593,7 +589,7 @@ class BackendFrontendSync:
     def _generate_typeddict_code(
         self,
         name: str,
-        schema: Dict[str, Any]
+        schema: dict[str, Any]
     ) -> str:
         """Generate TypedDict code from schema."""
         properties = schema.get("properties", {})
@@ -619,7 +615,7 @@ class BackendFrontendSync:
 
         return code
 
-    def _openapi_type_to_python(self, schema: Dict[str, Any]) -> str:
+    def _openapi_type_to_python(self, schema: dict[str, Any]) -> str:
         """Convert OpenAPI type to Python type hint."""
         schema_type = schema.get("type", "string")
 
@@ -634,13 +630,13 @@ class BackendFrontendSync:
 
         return type_map.get(schema_type, "Any")
 
-    def _scan_dashboard_for_endpoints(self) -> Set[str]:
+    def _scan_dashboard_for_endpoints(self) -> set[str]:
         """Scan dashboard code for API endpoint references."""
         endpoints = set()
 
         # Scan dashboard Python files for API calls
         for py_file in self.dashboard_path.rglob("*.py"):
-            with open(py_file, 'r') as f:
+            with open(py_file) as f:
                 content = f.read()
 
                 # Look for requests.get/post patterns
@@ -674,7 +670,7 @@ else:
 '''
         return suggestion
 
-    def _generate_changes_summary(self, changes: List[SchemaChange]) -> str:
+    def _generate_changes_summary(self, changes: list[SchemaChange]) -> str:
         """Generate human-readable summary of changes."""
         if not changes:
             return "No changes detected"
@@ -705,7 +701,7 @@ if __name__ == "__main__":
     print("Monitoring OpenAPI schema...")
     changes = sync.monitor_openapi_schema()
 
-    print(f"\nSchema Changes:")
+    print("\nSchema Changes:")
     print(f"  Total: {changes['total_changes']}")
     print(f"  Breaking: {changes['breaking_changes']}")
 

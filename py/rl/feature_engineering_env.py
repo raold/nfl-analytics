@@ -53,19 +53,17 @@ Reference: CLAUDE.md § Agent Infrastructure, RL Components
 """
 
 import logging
-import os
 import time
 import warnings
-from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import gymnasium as gym
 import numpy as np
 import pandas as pd
 import psycopg2
 from gymnasium import spaces
-from sklearn.metrics import mean_absolute_error, roc_auc_score
+from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 # XGBoost for fast model evaluation
@@ -149,10 +147,10 @@ class FeatureEngineeringEnv(gym.Env):
 
     def __init__(
         self,
-        db_config: Optional[Dict[str, Any]] = None,
-        base_features: Optional[List[str]] = None,
+        db_config: dict[str, Any] | None = None,
+        base_features: list[str] | None = None,
         max_steps: int = 50,
-        render_mode: Optional[str] = None,
+        render_mode: str | None = None,
         seed: int = 42
     ):
         """
@@ -245,15 +243,15 @@ class FeatureEngineeringEnv(gym.Env):
         self.episode_history = []
         self.best_configs = []  # Store top-5 configurations found
 
-        logger.info(f"FeatureEngineeringEnv initialized successfully")
+        logger.info("FeatureEngineeringEnv initialized successfully")
         logger.info(f"Action space: {self.action_space.n} actions")
         logger.info(f"State space: {self.observation_space.shape}")
 
     def reset(
         self,
-        seed: Optional[int] = None,
-        options: Optional[Dict[str, Any]] = None
-    ) -> Tuple[np.ndarray, Dict[str, Any]]:
+        seed: int | None = None,
+        options: dict[str, Any] | None = None
+    ) -> tuple[np.ndarray, dict[str, Any]]:
         """
         Reset environment to initial state (baseline feature set).
 
@@ -294,7 +292,7 @@ class FeatureEngineeringEnv(gym.Env):
 
         return state, info
 
-    def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
+    def step(self, action: int) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
         """
         Execute feature engineering action and return new state.
 
@@ -362,7 +360,7 @@ class FeatureEngineeringEnv(gym.Env):
         """Render current environment state (for debugging)."""
         if self.render_mode == "human" or self.render_mode == "ansi":
             active_count = int(self.active_features.sum()) if self.active_features is not None else 0
-            print(f"\n=== Feature Engineering Environment ===")
+            print("\n=== Feature Engineering Environment ===")
             print(f"Step: {self.current_step}/{self.max_steps}")
             print(f"Active features: {active_count}/{self.n_base_features}")
             print(f"Best MAE: {self.best_mae:.4f}")
@@ -377,7 +375,7 @@ class FeatureEngineeringEnv(gym.Env):
     # Internal Methods
     # ========================================================================
 
-    def _get_base_features(self) -> List[str]:
+    def _get_base_features(self) -> list[str]:
         """
         Extract base feature names from GameFeatureExtractor.
 
@@ -405,7 +403,7 @@ class FeatureEngineeringEnv(gym.Env):
                 'offensive_mismatch', 'defensive_mismatch', 'pace_difference'
             ]
 
-    def _load_training_data(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, List[str]]:
+    def _load_training_data(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
         """
         Load training data from database (games 2020-2024).
 
@@ -495,7 +493,7 @@ class FeatureEngineeringEnv(gym.Env):
             logger.error(f"Failed to load training data: {e}")
             raise RuntimeError(f"Database error: {e}")
 
-    def _execute_action(self, action: int) -> Tuple[str, Dict[str, Any]]:
+    def _execute_action(self, action: int) -> tuple[str, dict[str, Any]]:
         """
         Execute feature engineering action.
 

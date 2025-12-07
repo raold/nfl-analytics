@@ -17,11 +17,9 @@ Date: 2025-10-30
 """
 
 import logging
+
 import pandas as pd
-import numpy as np
-from typing import Optional, Tuple
 from sqlalchemy import create_engine
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
@@ -443,7 +441,7 @@ class DefensiveRunDisruptionEngine:
         self,
         start_season: int = 2024,
         end_season: int = 2025
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all run defense disruption features.
 

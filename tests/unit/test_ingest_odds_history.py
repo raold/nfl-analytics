@@ -5,11 +5,12 @@ Generated: 2025-11-09T13:26:28.359427
 Test count: 34
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from py.ingest_odds_history import *
 import pandas as pd
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+
+from py.ingest_odds_history import *
 
 
 def test_parse_args_basic():

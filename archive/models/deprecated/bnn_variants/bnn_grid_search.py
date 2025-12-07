@@ -15,13 +15,13 @@ Usage:
     python py/models/bnn_grid_search.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
 from pathlib import Path
-import json
 
 import numpy as np
 import pandas as pd
@@ -208,7 +208,7 @@ def grid_search():
                 )
 
                 # Train
-                logger.info(f"Training with ADVI (fast, ~2-5 min)...")
+                logger.info("Training with ADVI (fast, ~2-5 min)...")
                 bnn.fit(X_train, y_train_norm, verbose=False)
 
                 # Predict
@@ -290,7 +290,7 @@ def grid_search():
         logger.info(f"  Calibration: {best['calibration']:.1%}")
         logger.info(f"\n✓ Grid search results saved to: {results_path}")
 
-        logger.info(f"\nNEXT STEP: Retrain best model with NUTS for production")
+        logger.info("\nNEXT STEP: Retrain best model with NUTS for production")
         logger.info(f"  python py/models/train_bnn_passing_nuts.py --prior-scale {best['prior_scale']} " +
                    f"--hidden-dims {best['hidden_dims']}")
     else:

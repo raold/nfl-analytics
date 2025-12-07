@@ -36,8 +36,6 @@ import json
 import logging
 import time
 import warnings
-from datetime import datetime
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -66,7 +64,7 @@ class ELOWLSMultiSeasonValidator:
     - Consistency metrics across seasons
     """
 
-    def __init__(self, db_password: Optional[str] = None):
+    def __init__(self, db_password: str | None = None):
         """
         Initialize validator.
 
@@ -256,8 +254,8 @@ class ELOWLSMultiSeasonValidator:
         self,
         actual: np.ndarray,
         predicted: np.ndarray,
-        std: Optional[np.ndarray] = None
-    ) -> Dict[str, float]:
+        std: np.ndarray | None = None
+    ) -> dict[str, float]:
         """
         Calculate performance metrics.
 
@@ -293,7 +291,7 @@ class ELOWLSMultiSeasonValidator:
         actual: np.ndarray,
         pred1: np.ndarray,
         pred2: np.ndarray
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Diebold-Mariano test for forecast comparison.
 
@@ -331,7 +329,7 @@ class ELOWLSMultiSeasonValidator:
         self,
         season: int,
         baseline_method: str = "ensemble_v5"
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Validate ELO+WLS for a single season.
 
@@ -406,8 +404,8 @@ class ELOWLSMultiSeasonValidator:
 
     def validate_all_seasons(
         self,
-        seasons: List[int] = [2022, 2023, 2024]
-    ) -> Dict[str, any]:
+        seasons: list[int] = [2022, 2023, 2024]
+    ) -> dict[str, any]:
         """
         Validate across all seasons and compute aggregate metrics.
 

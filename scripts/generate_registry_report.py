@@ -11,8 +11,8 @@ Outputs:
 """
 
 import sys
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.766853
 Test count: 19
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.bayesian_neural_network import *
-import pandas as pd
-import pytest
 
 
 def test_demo_bnn_basic():

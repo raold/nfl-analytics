@@ -25,10 +25,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
-import numpy as np
+
 import pandas as pd
 import psycopg2
-from typing import Dict, List, Tuple
 
 from py.ensemble.r_model_interface import RModelInterface
 from py.ensemble.r_prediction_lookup import RPredictionLookup
@@ -108,7 +107,7 @@ class RMigrationValidator:
         season: int,
         week: int,
         model_name: str
-    ) -> Dict:
+    ) -> dict:
         """
         Compare rpy2 vs PostgreSQL prediction for a single case.
 
@@ -273,12 +272,12 @@ class RMigrationValidator:
         n_pg_success = results_df['pg_mean'].notna().sum()
         n_rpy2_success = results_df['rpy2_mean'].notna().sum() if 'rpy2_mean' in results_df.columns else 0
 
-        print(f"\n📊 Success Rates:")
+        print("\n📊 Success Rates:")
         print(f"   PostgreSQL: {n_pg_success}/{n_total} ({100*n_pg_success/n_total:.1f}%)")
         if self.rpy2_available:
             print(f"   rpy2:       {n_rpy2_success}/{n_total} ({100*n_rpy2_success/n_total:.1f}%)")
         else:
-            print(f"   rpy2:       N/A (not available)")
+            print("   rpy2:       N/A (not available)")
 
         # Prediction equivalence (if rpy2 available)
         if self.rpy2_available and n_rpy2_success > 0:
@@ -295,14 +294,14 @@ class RMigrationValidator:
                 mean_match_rate = (valid_comparisons['mean_diff'] < 0.01).sum() / len(valid_comparisons)
                 std_match_rate = (valid_comparisons['std_diff'] < 0.01).sum() / len(valid_comparisons)
 
-                print(f"\n   Exact matches (<0.01 yards):")
+                print("\n   Exact matches (<0.01 yards):")
                 print(f"      Mean: {100*mean_match_rate:.1f}%")
                 print(f"      Std:  {100*std_match_rate:.1f}%")
 
                 if mean_match_rate > 0.99 and std_match_rate > 0.99:
-                    print(f"\n   ✅ VALIDATION PASSED: Predictions are equivalent!")
+                    print("\n   ✅ VALIDATION PASSED: Predictions are equivalent!")
                 else:
-                    print(f"\n   ⚠️  WARNING: Some predictions differ significantly")
+                    print("\n   ⚠️  WARNING: Some predictions differ significantly")
 
         # Performance comparison
         if self.rpy2_available and n_rpy2_success > 0:
@@ -319,7 +318,7 @@ class RMigrationValidator:
                 elif valid_perf['speedup'].mean() > 10:
                     print(f"\n   ✅ SIGNIFICANT SPEEDUP: PostgreSQL is {valid_perf['speedup'].mean():.0f}x faster!")
                 else:
-                    print(f"\n   ⚠️  WARNING: Speedup lower than expected")
+                    print("\n   ⚠️  WARNING: Speedup lower than expected")
 
         else:
             # PostgreSQL-only validation
@@ -332,14 +331,14 @@ class RMigrationValidator:
                 print(f"   P95:      {pg_times['pg_time_ms'].quantile(0.95):.2f}ms")
 
                 if pg_times['pg_time_ms'].mean() < 50:
-                    print(f"\n   ✅ EXCELLENT: Sub-50ms average latency!")
+                    print("\n   ✅ EXCELLENT: Sub-50ms average latency!")
                 elif pg_times['pg_time_ms'].mean() < 100:
-                    print(f"\n   ✅ GOOD: Sub-100ms average latency")
+                    print("\n   ✅ GOOD: Sub-100ms average latency")
                 else:
-                    print(f"\n   ⚠️  WARNING: Latency higher than expected")
+                    print("\n   ⚠️  WARNING: Latency higher than expected")
 
         # Model breakdown
-        print(f"\n📈 Results by Model:")
+        print("\n📈 Results by Model:")
         for model in results_df['model_name'].unique():
             model_df = results_df[results_df['model_name'] == model]
             n_success = model_df['pg_mean'].notna().sum()

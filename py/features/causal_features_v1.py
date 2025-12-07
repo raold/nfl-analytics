@@ -30,11 +30,8 @@ Version: 1.0
 
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
-import numpy as np
 import pandas as pd
-import psycopg2
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -84,7 +81,7 @@ class CausalFeaturesV1:
     PSM_TRAVEL_WEIGHT = 0.0       # Zero weight (null finding)
     PSM_WEATHER_WEIGHT = 0.0      # Zero weight (null finding)
 
-    def __init__(self, db_config: Dict):
+    def __init__(self, db_config: dict):
         """
         Initialize causal features calculator.
 
@@ -151,8 +148,8 @@ class CausalFeaturesV1:
         week: int,
         opponent_team: str,
         player_team: str,
-        game_weather: Optional[Dict] = None,
-    ) -> Dict[str, float]:
+        game_weather: dict | None = None,
+    ) -> dict[str, float]:
         """
         Calculate all causal features for a given QB game.
 
@@ -287,7 +284,7 @@ class CausalFeaturesV1:
             )
             return 0.0
 
-    def _calculate_psm_weather(self, game_weather: Optional[Dict]) -> float:
+    def _calculate_psm_weather(self, game_weather: dict | None) -> float:
         """
         Calculate PSM weather treatment effect.
 

@@ -6,10 +6,9 @@ Date: 2025-11-08
 """
 
 from datetime import datetime
-from typing import Optional, List, Dict
 from enum import Enum
 
-from pydantic import BaseModel, Field, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class StatType(str, Enum):
@@ -53,7 +52,7 @@ class ModelContribution(BaseModel):
     """Individual model contribution to ensemble"""
     model_name: str = Field(..., description="Model identifier")
     prediction: float = Field(..., description="Model prediction value")
-    uncertainty: Optional[float] = Field(None, description="Prediction uncertainty (std)")
+    uncertainty: float | None = Field(None, description="Prediction uncertainty (std)")
     weight: float = Field(..., description="Weight in ensemble (0-1)")
 
 
@@ -70,7 +69,7 @@ class PredictionResponse(BaseModel):
     upper_bound: float = Field(..., description="90% credible interval upper bound")
 
     # Model breakdown
-    models_used: List[ModelContribution] = Field(
+    models_used: list[ModelContribution] = Field(
         ...,
         description="Individual model contributions"
     )
@@ -131,12 +130,12 @@ class ModelInfo(BaseModel):
     file_size_mb: float
     loaded_at: datetime
     status: str = Field(..., description="'loaded', 'failed', 'unavailable'")
-    metadata: Optional[Dict] = Field(default=None, description="Additional model metadata")
+    metadata: dict | None = Field(default=None, description="Additional model metadata")
 
 
 class ModelsListResponse(BaseModel):
     """List of loaded models with metadata"""
-    models: List[ModelInfo]
+    models: list[ModelInfo]
     total_models: int = Field(..., description="Total number of models")
     loaded_models: int = Field(..., description="Successfully loaded models")
     ensemble_ready: bool = Field(..., description="Whether ensemble is ready for predictions")
@@ -157,5 +156,5 @@ class ErrorResponse(BaseModel):
     """Error response"""
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Human-readable error message")
-    details: Optional[Dict] = Field(default=None, description="Additional error details")
+    details: dict | None = Field(default=None, description="Additional error details")
     timestamp: datetime = Field(default_factory=datetime.utcnow)

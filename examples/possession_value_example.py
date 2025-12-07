@@ -21,16 +21,18 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import psycopg2
 import pandas as pd
+import psycopg2
+
 from py.features.possession_value import (
+    compute_possession_value,
+    compute_possession_value_features,
     get_expected_points,
+    get_team_possession_value_features,
     time_value_factor,
     urgency_factor,
-    compute_possession_value,
-    get_team_possession_value_features,
-    compute_possession_value_features
 )
+
 
 def example_1_expected_points():
     """Example 1: Basic expected points calculation."""

@@ -27,20 +27,18 @@ Version: 1.0
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
-import logging
-import pickle
 import json
+import logging
+import os
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-from sklearn.isotonic import IsotonicRegression
 from dotenv import load_dotenv
+from scipy import stats
 
 # Load environment variables
 load_dotenv()
@@ -60,8 +58,8 @@ except ImportError:
     logger.warning("matplotlib not available - calibration plots will be skipped")
 
 # Import ensemble and temperature scaling
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 from py.calibration.temperature_scaling import TemperatureScaler
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 class TemperatureScalerTrainerV6:
@@ -226,7 +224,7 @@ class TemperatureScalerTrainerV6:
         # Convert to DataFrame
         predictions_df = pd.DataFrame(predictions)
 
-        logger.info(f"\n✅ Predictions complete!")
+        logger.info("\n✅ Predictions complete!")
         logger.info(f"  Valid predictions: {len(predictions_df)}")
         logger.info(f"  Failed predictions: {failed_count}")
 
@@ -236,7 +234,7 @@ class TemperatureScalerTrainerV6:
 
         return predictions_df
 
-    def train_temperature_scaler(self, predictions_df: pd.DataFrame) -> Tuple[TemperatureScaler, Dict]:
+    def train_temperature_scaler(self, predictions_df: pd.DataFrame) -> tuple[TemperatureScaler, dict]:
         """
         Train isotonic regression temperature scaler.
 
@@ -268,10 +266,10 @@ class TemperatureScalerTrainerV6:
         logger.info("=" * 80)
         logger.info(f"Optimal Temperature: T = {report['temperature']:.4f}")
         logger.info(f"Target Coverage: {report['target_coverage']:.1%}")
-        logger.info(f"\nBefore Temperature Scaling:")
+        logger.info("\nBefore Temperature Scaling:")
         logger.info(f"  Coverage: {report['coverage_before']:.1%}")
         logger.info(f"  Mean Interval Width: {report['width_before']:.1f} yards")
-        logger.info(f"\nAfter Temperature Scaling:")
+        logger.info("\nAfter Temperature Scaling:")
         logger.info(f"  Coverage: {report['coverage_after']:.1%}")
         logger.info(f"  Mean Interval Width: {report['width_after']:.1f} yards")
         logger.info(f"\nMAE: {report['mae']:.2f} yards (unchanged by scaling)")
@@ -291,7 +289,7 @@ class TemperatureScalerTrainerV6:
         self,
         predictions_df: pd.DataFrame,
         scaler: TemperatureScaler,
-        report: Dict
+        report: dict
     ):
         """
         Generate calibration plot (reliability diagram).
@@ -370,7 +368,7 @@ class TemperatureScalerTrainerV6:
 
         plt.close()
 
-    def save_temperature_scaler(self, scaler: TemperatureScaler, report: Dict):
+    def save_temperature_scaler(self, scaler: TemperatureScaler, report: dict):
         """
         Save temperature scaler and metadata.
 

@@ -60,23 +60,18 @@ Version: 6.0 (ELO + Adaptive Weights)
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import logging
 import json
+import logging
 import warnings
-from typing import Dict, List, Tuple, Optional
-import time
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
-import xgboost as xgb
 
 logging.basicConfig(
     level=logging.INFO,
@@ -178,7 +173,7 @@ class EnhancedEnsemble6Way:
         week: int,
         model_path: Path,
         model_name: str
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get predictions from R model using rpy2
 
@@ -188,7 +183,6 @@ class EnhancedEnsemble6Way:
         try:
             import rpy2.robjects as ro
             from rpy2.robjects import pandas2ri
-            from rpy2.robjects.conversion import localconverter
 
             # Load brms library (needed for posterior_predict)
             ro.r('library(brms)')
@@ -286,7 +280,7 @@ class EnhancedEnsemble6Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """Get player game data (attempts, home/away) for prediction"""
         try:
             conn = psycopg2.connect(
@@ -340,7 +334,7 @@ class EnhancedEnsemble6Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """Get BNN prediction"""
         try:
             conn = psycopg2.connect(
@@ -472,7 +466,7 @@ class EnhancedEnsemble6Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """Get hybrid XGBoost prediction (70% static + 30% incremental)"""
         try:
             conn = psycopg2.connect(
@@ -593,7 +587,7 @@ class EnhancedEnsemble6Way:
         season: int,
         week: int,
         combination_method: str = "weighted_average"
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 4-way ensemble prediction
 
@@ -683,7 +677,7 @@ class EnhancedEnsemble6Way:
             ensemble_var = np.sum((weights ** 2) * (stds ** 2))
             ensemble_std = np.sqrt(ensemble_var)
 
-            logger.info(f"\nEnsemble (weighted average):")
+            logger.info("\nEnsemble (weighted average):")
             logger.info(f"  Weights: {dict(zip(predictions.keys(), weights))}")
             logger.info(f"  Mean: {ensemble_mean:.1f} yards")
             logger.info(f"  Uncertainty: ±{ensemble_std:.1f} yards")
@@ -702,7 +696,7 @@ class EnhancedEnsemble6Way:
             ensemble_var = np.sum((weights ** 2) * (stds ** 2))
             ensemble_std = np.sqrt(ensemble_var)
 
-            logger.info(f"\nEnsemble (inverse variance weighting):")
+            logger.info("\nEnsemble (inverse variance weighting):")
             logger.info(f"  Weights: {dict(zip(predictions.keys(), weights))}")
             logger.info(f"  Mean: {ensemble_mean:.1f} yards")
             logger.info(f"  Uncertainty: ±{ensemble_std:.1f} yards")

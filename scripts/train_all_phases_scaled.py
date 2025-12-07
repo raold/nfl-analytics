@@ -6,9 +6,6 @@ RTX 4090 is barely being used - let's CRUSH these models with massive scale.
 
 import subprocess
 import time
-import json
-from pathlib import Path
-from datetime import datetime
 
 print("=" * 80)
 print(" SCALED-UP TRAINING PIPELINE - PHASES 2-4 ".center(80))
@@ -43,10 +40,10 @@ def run_and_log(command, log_file, job_name):
 
 def git_checkpoint(message):
     """Create Git checkpoint."""
-    print(f"\n[*] Creating Git checkpoint...")
+    print("\n[*] Creating Git checkpoint...")
     subprocess.run(['git', 'add', 'models/', 'logs/training/'], check=False)
     subprocess.run(['git', 'commit', '-m', message], check=False)
-    print(f"[+] Checkpoint created")
+    print("[+] Checkpoint created")
 
 # ============================================================================
 # PHASE 2: REINFORCEMENT LEARNING (Scaled 3x)

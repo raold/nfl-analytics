@@ -15,8 +15,9 @@ Date: November 15, 2025
 """
 
 import os
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 

@@ -20,15 +20,15 @@ Usage:
 Schedule: Run via cron 3x daily (10am, 4pm, 10pm ET)
 Free Tier Budget: 84 requests/month (500 limit - plenty of headroom)
 """
-import sys
 import argparse
 import logging
+import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.odds.odds_fetcher import OddsFetcher, OddsAPIRateLimitError
+from py.odds.odds_fetcher import OddsAPIRateLimitError, OddsFetcher
 
 # Configure logging
 logging.basicConfig(

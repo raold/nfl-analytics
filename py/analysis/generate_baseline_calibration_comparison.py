@@ -14,12 +14,12 @@ Author: Claude Code
 Date: 2025-10-26
 """
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from sklearn.calibration import calibration_curve
-import json
 
 
 class BaselineCalibrationComparator:
@@ -256,8 +256,8 @@ def main():
         )
         comparator.generate_latex_figure(latex_path)
 
-        print(f"\n✓ Baseline calibration comparison generated successfully")
-        print(f"\nOutputs:")
+        print("\n✓ Baseline calibration comparison generated successfully")
+        print("\nOutputs:")
         print(f"  - Figure: {figure_path}")
         print(f"  - LaTeX:  {latex_path}")
 

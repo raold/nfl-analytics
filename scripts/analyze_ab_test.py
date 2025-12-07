@@ -39,12 +39,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import argparse
 import logging
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 from scipy import stats
 
 logging.basicConfig(
@@ -144,7 +142,7 @@ class ABTestAnalyzer:
 
         return df
 
-    def compute_metrics(self, df: pd.DataFrame) -> Dict:
+    def compute_metrics(self, df: pd.DataFrame) -> dict:
         """
         Compute performance metrics for each A/B group.
 
@@ -201,7 +199,7 @@ class ABTestAnalyzer:
     def statistical_tests(
         self,
         df: pd.DataFrame
-    ) -> Dict:
+    ) -> dict:
         """
         Perform statistical significance tests.
 
@@ -333,9 +331,9 @@ class ABTestAnalyzer:
 
     def make_deployment_decision(
         self,
-        metrics: Dict,
-        statistical_tests: Dict
-    ) -> Dict:
+        metrics: dict,
+        statistical_tests: dict
+    ) -> dict:
         """
         Make deployment decision based on metrics and tests.
 
@@ -453,9 +451,9 @@ class ABTestAnalyzer:
     def generate_report(
         self,
         df: pd.DataFrame,
-        metrics: Dict,
-        statistical_tests: Dict,
-        decision: Dict,
+        metrics: dict,
+        statistical_tests: dict,
+        decision: dict,
         output_format: str = "text"
     ) -> str:
         """
@@ -479,9 +477,9 @@ class ABTestAnalyzer:
     def _generate_text_report(
         self,
         df: pd.DataFrame,
-        metrics: Dict,
-        statistical_tests: Dict,
-        decision: Dict
+        metrics: dict,
+        statistical_tests: dict,
+        decision: dict
     ) -> str:
         """Generate plain text report."""
         lines = []
@@ -577,9 +575,9 @@ class ABTestAnalyzer:
     def _generate_html_report(
         self,
         df: pd.DataFrame,
-        metrics: Dict,
-        statistical_tests: Dict,
-        decision: Dict
+        metrics: dict,
+        statistical_tests: dict,
+        decision: dict
     ) -> str:
         """Generate HTML report (simplified version)."""
         # For brevity, using same text format wrapped in <pre>
@@ -603,9 +601,9 @@ class ABTestAnalyzer:
 
     def run_analysis(
         self,
-        output_file: Optional[str] = None,
+        output_file: str | None = None,
         output_format: str = "text"
-    ) -> Dict:
+    ) -> dict:
         """
         Run complete A/B test analysis.
 

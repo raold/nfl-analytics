@@ -21,23 +21,23 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
+
 import numpy as np
 import pandas as pd
 import pytest
 import torch
 import torch.nn as nn
-from unittest.mock import Mock, patch, MagicMock
-import tempfile
-from pathlib import Path
 
 from py.rl.cql_agent import (
+    CQLAgent,
     QNetwork,
     ReplayBuffer,
-    CQLAgent,
     get_device,
     set_seed,
 )
-
 
 # ============================================================================
 # FIXTURES

@@ -4,13 +4,12 @@ Expanded Experiment Suite: 20 cVAE + 20 Causal Inference Experiments
 Design and execute 40 experiments, then rank by likelihood to increase ROI/EV.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass
-import logging
 import json
+import logging
+from dataclasses import dataclass
 from pathlib import Path
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +25,8 @@ class ExperimentSpec:
     expected_roi_impact: str  # 'high', 'medium', 'low'
     market_inefficiency: str  # 'high', 'medium', 'low'
     implementation_complexity: str  # 'low', 'medium', 'high'
-    data_requirements: List[str]
-    success_metrics: List[str]
+    data_requirements: list[str]
+    success_metrics: list[str]
 
 
 class ExpandedExperimentSuite:
@@ -37,7 +36,7 @@ class ExpandedExperimentSuite:
         self.cvae_experiments = self._define_cvae_experiments()
         self.causal_experiments = self._define_causal_experiments()
 
-    def _define_cvae_experiments(self) -> List[ExperimentSpec]:
+    def _define_cvae_experiments(self) -> list[ExperimentSpec]:
         """Define 20 cVAE experiments"""
 
         return [
@@ -305,7 +304,7 @@ class ExpandedExperimentSuite:
             ),
         ]
 
-    def _define_causal_experiments(self) -> List[ExperimentSpec]:
+    def _define_causal_experiments(self) -> list[ExperimentSpec]:
         """Define 20 causal inference experiments"""
 
         return [
@@ -573,7 +572,7 @@ class ExpandedExperimentSuite:
             ),
         ]
 
-    def get_all_experiments(self) -> List[ExperimentSpec]:
+    def get_all_experiments(self) -> list[ExperimentSpec]:
         """Return all 40 experiments"""
         return self.cvae_experiments + self.causal_experiments
 
@@ -645,7 +644,7 @@ def main():
     roi_medium = sum(1 for e in all_exps if e.expected_roi_impact == 'medium')
     roi_low = sum(1 for e in all_exps if e.expected_roi_impact == 'low')
 
-    print(f"\n💰 Expected ROI Impact:")
+    print("\n💰 Expected ROI Impact:")
     print(f"   - High:   {roi_high} experiments ({roi_high/40*100:.0f}%)")
     print(f"   - Medium: {roi_medium} experiments ({roi_medium/40*100:.0f}%)")
     print(f"   - Low:    {roi_low} experiments ({roi_low/40*100:.0f}%)")
@@ -655,7 +654,7 @@ def main():
     ineff_medium = sum(1 for e in all_exps if e.market_inefficiency == 'medium')
     ineff_low = sum(1 for e in all_exps if e.market_inefficiency == 'low')
 
-    print(f"\n🎯 Market Inefficiency:")
+    print("\n🎯 Market Inefficiency:")
     print(f"   - High:   {ineff_high} experiments ({ineff_high/40*100:.0f}%)")
     print(f"   - Medium: {ineff_medium} experiments ({ineff_medium/40*100:.0f}%)")
     print(f"   - Low:    {ineff_low} experiments ({ineff_low/40*100:.0f}%)")
@@ -665,7 +664,7 @@ def main():
     complex_medium = sum(1 for e in all_exps if e.implementation_complexity == 'medium')
     complex_high = sum(1 for e in all_exps if e.implementation_complexity == 'high')
 
-    print(f"\n⚙️  Implementation Complexity:")
+    print("\n⚙️  Implementation Complexity:")
     print(f"   - Low:    {complex_low} experiments ({complex_low/40*100:.0f}%)")
     print(f"   - Medium: {complex_medium} experiments ({complex_medium/40*100:.0f}%)")
     print(f"   - High:   {complex_high} experiments ({complex_high/40*100:.0f}%)")
@@ -678,7 +677,7 @@ def main():
         and e.implementation_complexity in ['low', 'medium']
     ]
 
-    print(f"\n🏆 Prime Candidates (High ROI + High Inefficiency + Feasible):")
+    print("\n🏆 Prime Candidates (High ROI + High Inefficiency + Feasible):")
     print(f"   {len(top_candidates)} experiments")
     for exp in top_candidates[:5]:
         print(f"   - {exp.id}: {exp.name}")

@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.434747
 Test count: 40
 """
 
+import pandas as pd
+import pytest
 from analysis.optimized_ensemble_study import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_calculate_calibration_metrics_basic():

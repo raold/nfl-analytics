@@ -17,10 +17,10 @@ Date: 2025-10-30
 """
 
 import logging
+
 import numpy as np
 import pandas as pd
 import psycopg
-from typing import Dict, Tuple, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

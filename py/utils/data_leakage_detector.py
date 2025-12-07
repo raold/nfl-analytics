@@ -32,19 +32,15 @@ Integration:
     - CI/CD pipeline (blocks commits with leakage)
 """
 
-import ast
-import inspect
+import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
-import logging
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -81,14 +77,14 @@ class LeakageIssue:
     description: str
     evidence: str
     remediation: str
-    location: Optional[str] = None
-    line_number: Optional[int] = None
+    location: str | None = None
+    line_number: int | None = None
 
 
 @dataclass
 class LeakageReport:
     """Data leakage detection report."""
-    issues: List[LeakageIssue] = field(default_factory=list)
+    issues: list[LeakageIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
@@ -165,9 +161,9 @@ class DataLeakageDetector:
     def check_dataframe(
         self,
         df: pd.DataFrame,
-        target_col: Optional[str] = None,
+        target_col: str | None = None,
         date_col: str = "kickoff",
-        player_col: Optional[str] = "player_id",
+        player_col: str | None = "player_id",
     ) -> LeakageReport:
         """
         Check DataFrame for data leakage.
@@ -205,7 +201,7 @@ class DataLeakageDetector:
 
         return self.report
 
-    def _check_column_names(self, df: pd.DataFrame, target_col: Optional[str]):
+    def _check_column_names(self, df: pd.DataFrame, target_col: str | None):
         """Check for suspicious column names."""
         for col in df.columns:
             # Check if feature columns contain suspicious patterns
@@ -289,7 +285,7 @@ class DataLeakageDetector:
         self,
         df: pd.DataFrame,
         date_col: str,
-        player_col: Optional[str]
+        player_col: str | None
     ):
         """Check for duplicate records."""
         if player_col and player_col in df.columns and date_col in df.columns:
@@ -339,7 +335,7 @@ class DataLeakageDetector:
         train_df: pd.DataFrame,
         test_df: pd.DataFrame,
         date_col: str = "kickoff",
-        player_col: Optional[str] = "player_id",
+        player_col: str | None = "player_id",
     ) -> LeakageReport:
         """
         Validate train/test split for temporal and player leakage.
@@ -414,7 +410,7 @@ class DataLeakageDetector:
 
         return self.report
 
-    def check_feature_engineering(self, code: str, file_path: Optional[str] = None) -> LeakageReport:
+    def check_feature_engineering(self, code: str, file_path: str | None = None) -> LeakageReport:
         """
         Check feature engineering code for leakage patterns.
 
@@ -487,15 +483,15 @@ class DataLeakageDetector:
         lines.append("=" * 80)
         lines.append("DATA LEAKAGE DETECTION REPORT")
         lines.append("=" * 80)
-        lines.append(f"\nIssues Summary:")
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {self.report.critical_count}")
         lines.append(f"  🟠 HIGH:     {self.report.high_count}")
         lines.append(f"  🟡 MEDIUM:   {self.report.medium_count}")
         lines.append(f"  🟢 LOW:      {self.report.low_count}")
 
         if self.report.has_critical_leakage():
-            lines.append(f"\n⛔ CRITICAL DATA LEAKAGE DETECTED")
-            lines.append(f"   MODEL IS INVALID - DO NOT USE FOR BETTING")
+            lines.append("\n⛔ CRITICAL DATA LEAKAGE DETECTED")
+            lines.append("   MODEL IS INVALID - DO NOT USE FOR BETTING")
 
         # Group by severity
         for severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH,

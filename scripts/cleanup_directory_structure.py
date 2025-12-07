@@ -4,10 +4,9 @@ Directory Cleanup Script for NFL Analytics Project
 Organizes scattered root-level files into logical directory structure.
 """
 
-import os
 import shutil
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Root directory
 ROOT = Path('/Users/dro/rice/nfl-analytics')
@@ -162,7 +161,7 @@ def execute_cleanup(dry_run=True):
 
     # Report
     print("\n" + "="*60)
-    print(f"CLEANUP SUMMARY")
+    print("CLEANUP SUMMARY")
     print("="*60)
     print(f"Files to move: {len(moves_executed)}")
     print(f"Files not found: {len(files_not_found)}")
