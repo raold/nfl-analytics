@@ -22,6 +22,7 @@ from gymnasium import spaces
 @dataclass
 class BettingAction:
     """Represents a betting decision"""
+
     action_type: str  # 'no_bet', 'home', 'away', 'over', 'under'
     stake: float  # Fraction of bankroll (0.0 to 0.10)
     expected_value: float
@@ -50,16 +51,18 @@ class ExperimentAugmentedBettingEnv(gym.Env):
     Reward: Profit/loss as fraction of bankroll + Kelly optimality bonus
     """
 
-    metadata = {'render.modes': ['human']}
+    metadata = {"render.modes": ["human"]}
 
-    def __init__(self,
-                 db_params: dict | None = None,
-                 start_season: int = 2020,
-                 end_season: int = 2023,
-                 initial_bankroll: float = 10000.0,
-                 max_bet_fraction: float = 0.10,
-                 kelly_aggressiveness: float = 0.25,
-                 vigorish: float = 0.045):
+    def __init__(
+        self,
+        db_params: dict | None = None,
+        start_season: int = 2020,
+        end_season: int = 2023,
+        initial_bankroll: float = 10000.0,
+        max_bet_fraction: float = 0.10,
+        kelly_aggressiveness: float = 0.25,
+        vigorish: float = 0.045,
+    ):
         """
         Initialize experiment-augmented betting environment.
 
@@ -75,11 +78,11 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         super().__init__()
 
         self.db_params = db_params or {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
 
         self.start_season = start_season
@@ -98,7 +101,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
             low=-np.inf,
             high=np.inf,
             shape=(44,),  # 15 base + 29 experiment features
-            dtype=np.float32
+            dtype=np.float32,
         )
 
         # Environment state
@@ -132,11 +135,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
             ORDER BY season, week, game_id
         """
 
-        self.games_data = pd.read_sql(
-            query,
-            conn,
-            params=(self.start_season, self.end_season)
-        )
+        self.games_data = pd.read_sql(query, conn, params=(self.start_season, self.end_season))
 
         conn.close()
 
@@ -152,31 +151,35 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         # Spread to win probability approximation (logistic function)
         # P(home wins) ≈ 1 / (1 + exp(-spread / 3.4))
         # where 3.4 is empirically derived spread-to-probability conversion factor
-        spread = float(game_row['spread_close'])
+        spread = float(game_row["spread_close"])
 
         # Negative spread means home team is favored
         # Convert spread to home win probability
         import math
+
         home_prob_true = 1 / (1 + math.exp(spread / 3.4))
         away_prob_true = 1 - home_prob_true
 
-        base_features = np.array([
-            home_prob_true,                          # 0: Home win probability
-            away_prob_true,                          # 1: Away win probability
-            float(game_row['spread_close']),          # 2: Point spread
-            float(game_row['total_close']),           # 3: Total points line
-            float(game_row['home_score']),           # 4: Home score (for post-game eval)
-            float(game_row['away_score']),           # 5: Away score
-            float(game_row['season']),               # 6: Season
-            float(game_row['week']),                 # 7: Week number
-            float(game_row['week']) / 18.0,          # 8: Normalized week progress
-            home_prob_true - 0.5,                    # 9: Market edge (deviation from 50/50)
-            abs(float(game_row['spread_close'])),     # 10: Absolute spread (game closeness)
-            float(game_row['total_close']) / 50.0,    # 11: Normalized total
-            float(game_row['home_score'] + game_row['away_score']),  # 12: Actual total
-            float(abs(game_row['home_score'] - game_row['away_score'])),  # 13: Margin
-            float(game_row['home_score'] - game_row['away_score']),  # 14: Signed margin
-        ], dtype=np.float32)
+        base_features = np.array(
+            [
+                home_prob_true,  # 0: Home win probability
+                away_prob_true,  # 1: Away win probability
+                float(game_row["spread_close"]),  # 2: Point spread
+                float(game_row["total_close"]),  # 3: Total points line
+                float(game_row["home_score"]),  # 4: Home score (for post-game eval)
+                float(game_row["away_score"]),  # 5: Away score
+                float(game_row["season"]),  # 6: Season
+                float(game_row["week"]),  # 7: Week number
+                float(game_row["week"]) / 18.0,  # 8: Normalized week progress
+                home_prob_true - 0.5,  # 9: Market edge (deviation from 50/50)
+                abs(float(game_row["spread_close"])),  # 10: Absolute spread (game closeness)
+                float(game_row["total_close"]) / 50.0,  # 11: Normalized total
+                float(game_row["home_score"] + game_row["away_score"]),  # 12: Actual total
+                float(abs(game_row["home_score"] - game_row["away_score"])),  # 13: Margin
+                float(game_row["home_score"] - game_row["away_score"]),  # 14: Signed margin
+            ],
+            dtype=np.float32,
+        )
 
         return base_features
 
@@ -193,11 +196,11 @@ class ExperimentAugmentedBettingEnv(gym.Env):
 
         # Extract experiment features
         experiment_features = self.feature_extractor.extract_features(
-            game_id=game_row['game_id'],
-            season=int(game_row['season']),
-            week=int(game_row['week']),
-            home_team=game_row['home_team'],
-            away_team=game_row['away_team']
+            game_id=game_row["game_id"],
+            season=int(game_row["season"]),
+            week=int(game_row["week"]),
+            home_team=game_row["home_team"],
+            away_team=game_row["away_team"],
         )
 
         experiment_array = experiment_features.to_array()
@@ -225,12 +228,15 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         kelly_full = (b * win_prob - q) / b
 
         # Apply fractional Kelly and constraints
-        kelly_fraction = max(0.0, min(kelly_full * self.kelly_aggressiveness, self.max_bet_fraction))
+        kelly_fraction = max(
+            0.0, min(kelly_full * self.kelly_aggressiveness, self.max_bet_fraction)
+        )
 
         return kelly_fraction
 
-    def _execute_bet(self, action: int, game_row: pd.Series,
-                     experiment_features: ExperimentFeatures) -> tuple[float, dict]:
+    def _execute_bet(
+        self, action: int, game_row: pd.Series, experiment_features: ExperimentFeatures
+    ) -> tuple[float, dict]:
         """
         Execute betting action and compute reward.
 
@@ -243,13 +249,13 @@ class ExperimentAugmentedBettingEnv(gym.Env):
             (reward, info_dict)
         """
         if action == 0:  # No bet
-            return 0.0, {'action': 'no_bet', 'stake': 0.0}
+            return 0.0, {"action": "no_bet", "stake": 0.0}
 
-        home_score = game_row['home_score']
-        away_score = game_row['away_score']
+        home_score = game_row["home_score"]
+        away_score = game_row["away_score"]
         total_score = home_score + away_score
-        spread = game_row['spread_close']
-        total_line = game_row['total_close']
+        spread = game_row["spread_close"]
+        total_line = game_row["total_close"]
 
         # Determine win probability and odds based on action
         if action == 1:  # Bet home
@@ -292,17 +298,19 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         reward = profit / self.initial_bankroll
 
         # Bonus for Kelly optimality (reward good sizing)
-        kelly_optimality_bonus = 1.0 - abs(kelly_fraction - self.max_bet_fraction * 0.5) / self.max_bet_fraction
+        kelly_optimality_bonus = (
+            1.0 - abs(kelly_fraction - self.max_bet_fraction * 0.5) / self.max_bet_fraction
+        )
         reward += 0.1 * kelly_optimality_bonus if win else 0.0
 
         info = {
-            'action': ['no_bet', 'home', 'away', 'over', 'under'][action],
-            'stake': stake,
-            'profit': profit,
-            'win': win,
-            'kelly_fraction': kelly_fraction,
-            'bankroll': self.current_bankroll,
-            'game_id': game_row['game_id']
+            "action": ["no_bet", "home", "away", "over", "under"][action],
+            "stake": stake,
+            "profit": profit,
+            "win": win,
+            "kelly_fraction": kelly_fraction,
+            "bankroll": self.current_bankroll,
+            "game_id": game_row["game_id"],
         }
 
         return reward, info
@@ -329,11 +337,11 @@ class ExperimentAugmentedBettingEnv(gym.Env):
 
         # Extract experiment features for bet execution
         experiment_features = self.feature_extractor.extract_features(
-            game_id=game_row['game_id'],
-            season=int(game_row['season']),
-            week=int(game_row['week']),
-            home_team=game_row['home_team'],
-            away_team=game_row['away_team']
+            game_id=game_row["game_id"],
+            season=int(game_row["season"]),
+            week=int(game_row["week"]),
+            home_team=game_row["home_team"],
+            away_team=game_row["away_team"],
         )
 
         # Execute bet and get reward
@@ -349,17 +357,19 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         else:
             next_state = np.zeros(44, dtype=np.float32)
 
-        info['episode_return'] = sum(self.episode_returns)
-        info['total_roi'] = (self.current_bankroll - self.initial_bankroll) / self.initial_bankroll
+        info["episode_return"] = sum(self.episode_returns)
+        info["total_roi"] = (self.current_bankroll - self.initial_bankroll) / self.initial_bankroll
 
         return next_state, reward, done, info
 
-    def render(self, mode='human'):
+    def render(self, mode="human"):
         """Render environment state"""
-        if mode == 'human':
+        if mode == "human":
             print(f"Game {self.current_game_idx + 1}/{len(self.games_data)}")
-            print(f"Bankroll: ${self.current_bankroll:,.2f} "
-                  f"(ROI: {(self.current_bankroll / self.initial_bankroll - 1) * 100:.2f}%)")
+            print(
+                f"Bankroll: ${self.current_bankroll:,.2f} "
+                f"(ROI: {(self.current_bankroll / self.initial_bankroll - 1) * 100:.2f}%)"
+            )
             print(f"Episode return: {sum(self.episode_returns):.4f}")
 
     def close(self):
@@ -369,11 +379,14 @@ class ExperimentAugmentedBettingEnv(gym.Env):
     def get_episode_stats(self) -> dict:
         """Get statistics for completed episode"""
         return {
-            'total_games': len(self.games_data),
-            'final_bankroll': self.current_bankroll,
-            'roi': (self.current_bankroll - self.initial_bankroll) / self.initial_bankroll,
-            'total_return': sum(self.episode_returns),
-            'avg_return_per_game': np.mean(self.episode_returns) if self.episode_returns else 0.0,
-            'sharpe_ratio': np.mean(self.episode_returns) / (np.std(self.episode_returns) + 1e-8)
-                            if len(self.episode_returns) > 1 else 0.0
+            "total_games": len(self.games_data),
+            "final_bankroll": self.current_bankroll,
+            "roi": (self.current_bankroll - self.initial_bankroll) / self.initial_bankroll,
+            "total_return": sum(self.episode_returns),
+            "avg_return_per_game": np.mean(self.episode_returns) if self.episode_returns else 0.0,
+            "sharpe_ratio": (
+                np.mean(self.episode_returns) / (np.std(self.episode_returns) + 1e-8)
+                if len(self.episode_returns) > 1
+                else 0.0
+            ),
         }

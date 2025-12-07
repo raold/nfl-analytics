@@ -25,10 +25,10 @@ import pytest
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
-
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def project_root():
@@ -51,6 +51,7 @@ def models_directory(project_root):
 # ============================================================================
 # TESTS: Causal Features Data Files
 # ============================================================================
+
 
 class TestCausalFeaturesData:
     """Test causal features data files (DiD Roughing, Travel Distance)."""
@@ -88,6 +89,7 @@ class TestCausalFeaturesData:
 # ============================================================================
 # TESTS: Model Files Existence
 # ============================================================================
+
 
 class TestModelFilesExistence:
     """Test model file paths are resolvable."""
@@ -176,6 +178,7 @@ class TestModelFilesExistence:
 # ============================================================================
 # TESTS: Database Schema Validation
 # ============================================================================
+
 
 class TestDatabaseSchema:
     """Test database schema assumptions."""

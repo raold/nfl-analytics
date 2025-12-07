@@ -40,7 +40,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
 
 FEATURE_MODULES = [
@@ -68,16 +68,16 @@ class TemporalSafetyValidator:
     def __init__(self):
         self.detector = DataLeakageDetector()
         self.results = {
-            'code_analysis': {},
-            'database_validation': {},
-            'summary': {
-                'critical_count': 0,
-                'high_count': 0,
-                'medium_count': 0,
-                'low_count': 0,
-                'files_checked': 0,
-                'timestamp': datetime.now().isoformat()
-            }
+            "code_analysis": {},
+            "database_validation": {},
+            "summary": {
+                "critical_count": 0,
+                "high_count": 0,
+                "medium_count": 0,
+                "low_count": 0,
+                "files_checked": 0,
+                "timestamp": datetime.now().isoformat(),
+            },
         }
 
     def validate_code_modules(self) -> bool:
@@ -113,18 +113,18 @@ class TemporalSafetyValidator:
             report = self.detector.check_feature_engineering(code, str(path))
 
             # Store results
-            self.results['code_analysis'][module_path] = {
-                'critical': report.critical_count,
-                'high': report.high_count,
-                'medium': report.medium_count,
-                'low': report.low_count,
+            self.results["code_analysis"][module_path] = {
+                "critical": report.critical_count,
+                "high": report.high_count,
+                "medium": report.medium_count,
+                "low": report.low_count,
             }
 
-            self.results['summary']['files_checked'] += 1
-            self.results['summary']['critical_count'] += report.critical_count
-            self.results['summary']['high_count'] += report.high_count
-            self.results['summary']['medium_count'] += report.medium_count
-            self.results['summary']['low_count'] += report.low_count
+            self.results["summary"]["files_checked"] += 1
+            self.results["summary"]["critical_count"] += report.critical_count
+            self.results["summary"]["high_count"] += report.high_count
+            self.results["summary"]["medium_count"] += report.medium_count
+            self.results["summary"]["low_count"] += report.low_count
 
             # Print status
             if report.critical_count > 0:
@@ -186,15 +186,15 @@ class TemporalSafetyValidator:
             # Check for leakage
             report = self.detector.check_dataframe(
                 df,
-                target_col='home_margin' if 'home_margin' in df.columns else None,
-                date_col='kickoff',
-                player_col=None
+                target_col="home_margin" if "home_margin" in df.columns else None,
+                date_col="kickoff",
+                player_col=None,
             )
 
-            self.results['database_validation']['mart.asof_team_features'] = {
-                'critical': report.critical_count,
-                'high': report.high_count,
-                'rows_checked': len(df),
+            self.results["database_validation"]["mart.asof_team_features"] = {
+                "critical": report.critical_count,
+                "high": report.high_count,
+                "rows_checked": len(df),
             }
 
             if report.critical_count > 0:
@@ -228,7 +228,7 @@ class TemporalSafetyValidator:
 
         # Production readiness
         lines.append("\n" + "=" * 80)
-        if self.results['summary']['critical_count'] == 0:
+        if self.results["summary"]["critical_count"] == 0:
             lines.append("✅ PRODUCTION READY - No critical leakage detected")
             lines.append("   Safe to deploy to production betting system")
         else:
@@ -240,8 +240,12 @@ class TemporalSafetyValidator:
 
         # Risk gates
         lines.append("\nRisk Gates:")
-        lines.append(f"  ✓ Zero critical leakage required: {'PASS' if self.results['summary']['critical_count'] == 0 else 'FAIL'}")
-        lines.append(f"  ✓ High severity issues < 5: {'PASS' if self.results['summary']['high_count'] < 5 else 'FAIL'}")
+        lines.append(
+            f"  ✓ Zero critical leakage required: {'PASS' if self.results['summary']['critical_count'] == 0 else 'FAIL'}"
+        )
+        lines.append(
+            f"  ✓ High severity issues < 5: {'PASS' if self.results['summary']['high_count'] < 5 else 'FAIL'}"
+        )
 
         lines.append("\n" + "=" * 80)
 
@@ -249,7 +253,7 @@ class TemporalSafetyValidator:
 
     def save_report(self, output_path: str = "temporal_safety_report.json"):
         """Save validation report to JSON."""
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(self.results, f, indent=2)
         print(f"\n📝 Report saved to: {output_path}")
 
@@ -258,26 +262,11 @@ def main():
     parser = argparse.ArgumentParser(
         description="Validate temporal safety for production deployment"
     )
+    parser.add_argument("--full", action="store_true", help="Run full validation (code + database)")
+    parser.add_argument("--code-only", action="store_true", help="Validate code only")
+    parser.add_argument("--db-only", action="store_true", help="Validate database only")
     parser.add_argument(
-        '--full',
-        action='store_true',
-        help='Run full validation (code + database)'
-    )
-    parser.add_argument(
-        '--code-only',
-        action='store_true',
-        help='Validate code only'
-    )
-    parser.add_argument(
-        '--db-only',
-        action='store_true',
-        help='Validate database only'
-    )
-    parser.add_argument(
-        '--output',
-        type=str,
-        default='temporal_safety_report.json',
-        help='Output report path'
+        "--output", type=str, default="temporal_safety_report.json", help="Output report path"
     )
 
     args = parser.parse_args()
@@ -305,10 +294,10 @@ def main():
     validator.save_report(args.output)
 
     # Exit code
-    if validator.results['summary']['critical_count'] > 0:
+    if validator.results["summary"]["critical_count"] > 0:
         print("\n⛔ CRITICAL LEAKAGE DETECTED - Deployment BLOCKED")
         sys.exit(1)
-    elif validator.results['summary']['high_count'] > 0:
+    elif validator.results["summary"]["high_count"] > 0:
         print("\n⚠️  HIGH severity issues found - Review required")
         sys.exit(2)
     else:
@@ -316,5 +305,5 @@ def main():
         sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

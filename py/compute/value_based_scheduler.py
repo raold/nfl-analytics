@@ -82,7 +82,7 @@ class ValueBasedScheduler:
             port=redis_port,
             username="default" if redis_password else None,
             password=redis_password,
-            decode_responses=True
+            decode_responses=True,
         )
 
         # Value estimation models (can be ML models later)

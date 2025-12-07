@@ -14,7 +14,7 @@ import numpy as np
 
 def validate_multi_season_results(results_path: str) -> int:
     """Validate multi-season backtest results."""
-    with open(results_path, 'rb') as f:
+    with open(results_path, "rb") as f:
         results = pickle.load(f)
 
     if not isinstance(results, dict):
@@ -27,7 +27,7 @@ def validate_multi_season_results(results_path: str) -> int:
         return 1
 
     # Check consistency
-    maes = [results[s]['mae'] for s in seasons]
+    maes = [results[s]["mae"] for s in seasons]
     cv = np.std(maes) / np.mean(maes)
 
     print("Multi-Season Validation Results:")
@@ -43,7 +43,7 @@ def validate_multi_season_results(results_path: str) -> int:
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: validate_multi_season.py <results.pkl>")
         sys.exit(1)

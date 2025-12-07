@@ -57,15 +57,17 @@ logger = logging.getLogger(__name__)
 
 class Severity(Enum):
     """Issue severity levels."""
+
     CRITICAL = "CRITICAL"  # Blocks commit/merge
-    HIGH = "HIGH"          # Should fix before merge
-    MEDIUM = "MEDIUM"      # Should fix soon
-    LOW = "LOW"            # Nice to have
-    INFO = "INFO"          # Informational
+    HIGH = "HIGH"  # Should fix before merge
+    MEDIUM = "MEDIUM"  # Should fix soon
+    LOW = "LOW"  # Nice to have
+    INFO = "INFO"  # Informational
 
 
 class IssueCategory(Enum):
     """Categories of code review issues."""
+
     DATA_LEAKAGE = "data_leakage"
     SECURITY = "security"
     BAYESIAN_MODELING = "bayesian_modeling"
@@ -78,6 +80,7 @@ class IssueCategory(Enum):
 @dataclass
 class ReviewIssue:
     """Represents a code review finding."""
+
     file_path: str
     line_number: int
     severity: Severity
@@ -91,6 +94,7 @@ class ReviewIssue:
 @dataclass
 class ReviewReport:
     """Comprehensive code review report."""
+
     issues: list[ReviewIssue] = field(default_factory=list)
     files_reviewed: int = 0
     lines_reviewed: int = 0
@@ -135,13 +139,11 @@ class CodeReviewer:
             r"df\[.*>\s*date\]",  # Filter for future dates
             r"merge.*how=['\"]outer['\"]",  # Outer joins can leak
         ],
-
         # Missing asof joins (should use for temporal data)
         "missing_asof": [
             r"pd\.merge.*on=['\"]date['\"]",  # Regular merge on date
             r"\.merge\(.*left_on=['\"].*date",  # Date merge without asof
         ],
-
         # Target leakage
         "target_leakage": [
             r"train.*test.*split.*shuffle\s*=\s*True",  # Shuffling temporal data
@@ -158,13 +160,11 @@ class CodeReviewer:
             r"api_key\s*=\s*['\"][^'\"]+['\"]",
             r"secret\s*=\s*['\"][^'\"]+['\"]",
         ],
-
         "sql_injection": [
             r"execute\(f['\"]",  # f-string in SQL execute
             r"execute\(['\"].*\{",  # String formatting in SQL
             r"%\s*%.*execute",  # % formatting in SQL
         ],
-
         "command_injection": [
             r"subprocess.*shell\s*=\s*True",  # Shell=True is dangerous
             r"os\.system\(",  # os.system is vulnerable
@@ -213,13 +213,11 @@ class CodeReviewer:
             r"normal\(0,\s*1000\)",  # Unreasonably wide prior
             r"cauchy\(0,\s*100\)",  # Very wide Cauchy prior
         ],
-
         "mcmc_config": [
             r"chains\s*=\s*1\b",  # Single chain (should be 4+)
             r"tune\s*=\s*\d{1,3}\b",  # Very short tuning (<1000)
             r"draws\s*=\s*\d{1,3}\b",  # Very few samples (<1000)
         ],
-
         "missing_diagnostics": [
             r"sample\(",  # PyMC sampling
             r"brm\(",  # brms model
@@ -312,14 +310,16 @@ class CodeReviewer:
                 tree = ast.parse(content)
                 issues.extend(self._check_python_ast(path, tree))
             except SyntaxError as e:
-                issues.append(ReviewIssue(
-                    file_path=str(path),
-                    line_number=e.lineno or 0,
-                    severity=Severity.CRITICAL,
-                    category=IssueCategory.CODE_QUALITY,
-                    title="Syntax error",
-                    description=f"Python syntax error: {e.msg}",
-                ))
+                issues.append(
+                    ReviewIssue(
+                        file_path=str(path),
+                        line_number=e.lineno or 0,
+                        severity=Severity.CRITICAL,
+                        category=IssueCategory.CODE_QUALITY,
+                        title="Syntax error",
+                        description=f"Python syntax error: {e.msg}",
+                    )
+                )
 
         except Exception as e:
             logger.error(f"Error reviewing {path}: {e}")
@@ -334,44 +334,50 @@ class CodeReviewer:
         for i, line in enumerate(lines, 1):
             for pattern in self.LEAKAGE_PATTERNS["future_data"]:
                 if re.search(pattern, line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.CRITICAL,
-                        category=IssueCategory.DATA_LEAKAGE,
-                        title="Potential future data leakage",
-                        description=f"Pattern '{pattern}' suggests using future data",
-                        suggestion="Use asof join or ensure temporal ordering",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.CRITICAL,
+                            category=IssueCategory.DATA_LEAKAGE,
+                            title="Potential future data leakage",
+                            description=f"Pattern '{pattern}' suggests using future data",
+                            suggestion="Use asof join or ensure temporal ordering",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Check for missing asof joins on dates
             for pattern in self.LEAKAGE_PATTERNS["missing_asof"]:
                 if re.search(pattern, line) and "asof" not in line.lower():
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.HIGH,
-                        category=IssueCategory.DATA_LEAKAGE,
-                        title="Date merge without asof join",
-                        description="Merging on date without asof join risks temporal leakage",
-                        suggestion="Use pd.merge_asof() for temporal joins",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.HIGH,
+                            category=IssueCategory.DATA_LEAKAGE,
+                            title="Date merge without asof join",
+                            description="Merging on date without asof join risks temporal leakage",
+                            suggestion="Use pd.merge_asof() for temporal joins",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Check target leakage
             for pattern in self.LEAKAGE_PATTERNS["target_leakage"]:
                 if re.search(pattern, line, re.IGNORECASE):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.CRITICAL,
-                        category=IssueCategory.DATA_LEAKAGE,
-                        title="Potential target leakage",
-                        description="Using outcome variable in features or shuffling temporal data",
-                        suggestion="Remove outcome from features, use temporal split",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.CRITICAL,
+                            category=IssueCategory.DATA_LEAKAGE,
+                            title="Potential target leakage",
+                            description="Using outcome variable in features or shuffling temporal data",
+                            suggestion="Remove outcome from features, use temporal split",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         return issues
 
@@ -382,45 +388,55 @@ class CodeReviewer:
         for i, line in enumerate(lines, 1):
             # Hardcoded credentials
             for pattern in self.SECURITY_PATTERNS["hardcoded_credentials"]:
-                if re.search(pattern, line) and "os.getenv" not in line and "env" not in line.lower():
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.CRITICAL,
-                        category=IssueCategory.SECURITY,
-                        title="Hardcoded credentials detected",
-                        description="Credentials should be in environment variables, not code",
-                        suggestion="Use os.getenv() or .env file",
-                        code_snippet=line.strip(),
-                    ))
+                if (
+                    re.search(pattern, line)
+                    and "os.getenv" not in line
+                    and "env" not in line.lower()
+                ):
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.CRITICAL,
+                            category=IssueCategory.SECURITY,
+                            title="Hardcoded credentials detected",
+                            description="Credentials should be in environment variables, not code",
+                            suggestion="Use os.getenv() or .env file",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # SQL injection
             for pattern in self.SECURITY_PATTERNS["sql_injection"]:
                 if re.search(pattern, line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.CRITICAL,
-                        category=IssueCategory.SECURITY,
-                        title="Potential SQL injection vulnerability",
-                        description="String formatting in SQL execute() can allow injection",
-                        suggestion="Use parameterized queries with %s placeholders",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.CRITICAL,
+                            category=IssueCategory.SECURITY,
+                            title="Potential SQL injection vulnerability",
+                            description="String formatting in SQL execute() can allow injection",
+                            suggestion="Use parameterized queries with %s placeholders",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Command injection
             for pattern in self.SECURITY_PATTERNS["command_injection"]:
                 if re.search(pattern, line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.HIGH,
-                        category=IssueCategory.SECURITY,
-                        title="Potential command injection",
-                        description="shell=True or os.system() can allow command injection",
-                        suggestion="Use subprocess with shell=False and list arguments",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.HIGH,
+                            category=IssueCategory.SECURITY,
+                            title="Potential command injection",
+                            description="shell=True or os.system() can allow command injection",
+                            suggestion="Use subprocess with shell=False and list arguments",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         return issues
 
@@ -435,54 +451,65 @@ class CodeReviewer:
             # Check prior specifications
             for pattern in self.BAYESIAN_PATTERNS["prior_issues"]:
                 if re.search(pattern, line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.MEDIUM,
-                        category=IssueCategory.BAYESIAN_MODELING,
-                        title="Questionable prior specification",
-                        description="Prior may be too wide or missing",
-                        suggestion="Use informative priors based on domain knowledge",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.MEDIUM,
+                            category=IssueCategory.BAYESIAN_MODELING,
+                            title="Questionable prior specification",
+                            description="Prior may be too wide or missing",
+                            suggestion="Use informative priors based on domain knowledge",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Check MCMC configuration
             for pattern in self.BAYESIAN_PATTERNS["mcmc_config"]:
                 if re.search(pattern, line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.HIGH,
-                        category=IssueCategory.BAYESIAN_MODELING,
-                        title="Insufficient MCMC sampling",
-                        description="MCMC config may lead to poor convergence",
-                        suggestion="Use chains=4, tune=1000, draws=2000 minimum",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.HIGH,
+                            category=IssueCategory.BAYESIAN_MODELING,
+                            title="Insufficient MCMC sampling",
+                            description="MCMC config may lead to poor convergence",
+                            suggestion="Use chains=4, tune=1000, draws=2000 minimum",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Track if model uses sampling
             if "sample(" in line or "brm(" in line:
                 has_sampling = True
 
             # Track if diagnostics are run
-            if any(diag in line.lower() for diag in ["rhat", "ess", "divergences", "summary", "diagnose"]):
+            if any(
+                diag in line.lower()
+                for diag in ["rhat", "ess", "divergences", "summary", "diagnose"]
+            ):
                 has_diagnostics = True
 
         # Check for missing diagnostics
         if has_sampling and not has_diagnostics:
-            issues.append(ReviewIssue(
-                file_path=str(path),
-                line_number=0,
-                severity=Severity.HIGH,
-                category=IssueCategory.BAYESIAN_MODELING,
-                title="Missing MCMC diagnostics",
-                description="Bayesian model trained without diagnostic checks",
-                suggestion="Add R-hat, ESS, divergence checks after sampling",
-            ))
+            issues.append(
+                ReviewIssue(
+                    file_path=str(path),
+                    line_number=0,
+                    severity=Severity.HIGH,
+                    category=IssueCategory.BAYESIAN_MODELING,
+                    title="Missing MCMC diagnostics",
+                    description="Bayesian model trained without diagnostic checks",
+                    suggestion="Add R-hat, ESS, divergence checks after sampling",
+                )
+            )
 
         return issues
 
-    def _check_python_quality(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
+    def _check_python_quality(
+        self, path: Path, content: str, lines: list[str]
+    ) -> list[ReviewIssue]:
         """Check Python code quality."""
         issues = []
 
@@ -490,16 +517,18 @@ class CodeReviewer:
         for i, line in enumerate(lines, 1):
             if line.strip().startswith("def ") and "(" in line:
                 if "->" not in line and "__init__" not in line and "__" not in line:
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.LOW,
-                        category=IssueCategory.CODE_QUALITY,
-                        title="Missing return type hint",
-                        description="Function lacks return type annotation",
-                        suggestion="Add -> Type annotation to function",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.LOW,
+                            category=IssueCategory.CODE_QUALITY,
+                            title="Missing return type hint",
+                            description="Function lacks return type annotation",
+                            suggestion="Add -> Type annotation to function",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         # Check docstrings for public functions/classes
         func_pattern = r"^(def|class)\s+([a-zA-Z_][a-zA-Z0-9_]*)"
@@ -511,16 +540,18 @@ class CodeReviewer:
                     next_line = lines[j].strip()
                     if next_line and not next_line.startswith("#"):
                         if '"""' not in next_line and "'''" not in next_line:
-                            issues.append(ReviewIssue(
-                                file_path=str(path),
-                                line_number=i,
-                                severity=Severity.LOW,
-                                category=IssueCategory.DOCUMENTATION,
-                                title="Missing docstring",
-                                description=f"Public {match.group(1)} lacks docstring",
-                                suggestion="Add Google-style docstring",
-                                code_snippet=line.strip(),
-                            ))
+                            issues.append(
+                                ReviewIssue(
+                                    file_path=str(path),
+                                    line_number=i,
+                                    severity=Severity.LOW,
+                                    category=IssueCategory.DOCUMENTATION,
+                                    title="Missing docstring",
+                                    description=f"Public {match.group(1)} lacks docstring",
+                                    suggestion="Add Google-style docstring",
+                                    code_snippet=line.strip(),
+                                )
+                            )
                         break
 
         return issues
@@ -532,15 +563,17 @@ class CodeReviewer:
         for node in ast.walk(tree):
             # Check for bare except clauses
             if isinstance(node, ast.ExceptHandler) and node.type is None:
-                issues.append(ReviewIssue(
-                    file_path=str(path),
-                    line_number=node.lineno,
-                    severity=Severity.MEDIUM,
-                    category=IssueCategory.CODE_QUALITY,
-                    title="Bare except clause",
-                    description="Catching all exceptions can hide bugs",
-                    suggestion="Catch specific exceptions (ValueError, KeyError, etc.)",
-                ))
+                issues.append(
+                    ReviewIssue(
+                        file_path=str(path),
+                        line_number=node.lineno,
+                        severity=Severity.MEDIUM,
+                        category=IssueCategory.CODE_QUALITY,
+                        title="Bare except clause",
+                        description="Catching all exceptions can hide bugs",
+                        suggestion="Catch specific exceptions (ValueError, KeyError, etc.)",
+                    )
+                )
 
         return issues
 
@@ -555,29 +588,37 @@ class CodeReviewer:
             for i, line in enumerate(lines, 1):
                 # Check for assignment operator (should use <-)
                 if re.search(r"\w+\s*=\s*\w+", line) and not re.search(r"[=!<>]=", line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.LOW,
-                        category=IssueCategory.CODE_QUALITY,
-                        title="Use <- for assignment",
-                        description="R style guide recommends <- over =",
-                        suggestion="Replace = with <-",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.LOW,
+                            category=IssueCategory.CODE_QUALITY,
+                            title="Use <- for assignment",
+                            description="R style guide recommends <- over =",
+                            suggestion="Replace = with <-",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
                 # Check for data leakage in brms models
-                if "brm(" in line and "prior" not in content[max(0, content.find(line)-500):content.find(line)]:
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.MEDIUM,
-                        category=IssueCategory.BAYESIAN_MODELING,
-                        title="Missing prior specification in brms",
-                        description="brms model may be using default priors",
-                        suggestion="Specify priors explicitly with set_prior()",
-                        code_snippet=line.strip(),
-                    ))
+                if (
+                    "brm(" in line
+                    and "prior"
+                    not in content[max(0, content.find(line) - 500) : content.find(line)]
+                ):
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.MEDIUM,
+                            category=IssueCategory.BAYESIAN_MODELING,
+                            title="Missing prior specification in brms",
+                            description="brms model may be using default priors",
+                            suggestion="Specify priors explicitly with set_prior()",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Error reviewing R file {path}: {e}")
@@ -598,35 +639,41 @@ class CodeReviewer:
             for i, line in enumerate(lines, 1):
                 # Check for SELECT *
                 if re.search(r"SELECT\s+\*", line, re.IGNORECASE):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.LOW,
-                        category=IssueCategory.PERFORMANCE,
-                        title="Avoid SELECT *",
-                        description="SELECT * can be slow and fragile",
-                        suggestion="List specific columns",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.LOW,
+                            category=IssueCategory.PERFORMANCE,
+                            title="Avoid SELECT *",
+                            description="SELECT * can be slow and fragile",
+                            suggestion="List specific columns",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
                 # Check for missing indexes on date columns
                 if re.search(r"WHERE.*date", line, re.IGNORECASE) and "CREATE INDEX" not in content:
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.MEDIUM,
-                        category=IssueCategory.PERFORMANCE,
-                        title="Consider index on date column",
-                        description="Filtering by date without index can be slow",
-                        suggestion="Add CREATE INDEX ON table(date_column)",
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.MEDIUM,
+                            category=IssueCategory.PERFORMANCE,
+                            title="Consider index on date column",
+                            description="Filtering by date without index can be slow",
+                            suggestion="Add CREATE INDEX ON table(date_column)",
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Error reviewing SQL file {path}: {e}")
 
         return issues
 
-    def _check_sql_schema_errors(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
+    def _check_sql_schema_errors(
+        self, path: Path, content: str, lines: list[str]
+    ) -> list[ReviewIssue]:
         """
         Check for project-specific SQL schema errors.
 
@@ -664,16 +711,18 @@ class CodeReviewer:
                     if "examples" in anti_pattern:
                         suggestion_parts.append("\n\n" + "\n".join(anti_pattern["examples"]))
 
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=anti_pattern["severity"],
-                        category=IssueCategory.DATA_LEAKAGE,  # Schema errors can cause data issues
-                        title=anti_pattern["message"],
-                        description=error_msg,
-                        suggestion="\n".join(suggestion_parts),
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=anti_pattern["severity"],
+                            category=IssueCategory.DATA_LEAKAGE,  # Schema errors can cause data issues
+                            title=anti_pattern["message"],
+                            description=error_msg,
+                            suggestion="\n".join(suggestion_parts),
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         return issues
 
@@ -688,16 +737,18 @@ class CodeReviewer:
             for i, line in enumerate(lines, 1):
                 # Check for undefined references
                 if "???" in line or "ref{}" in line:
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.MEDIUM,
-                        category=IssueCategory.DOCUMENTATION,
-                        title="Undefined reference",
-                        description="LaTeX reference may be undefined",
-                        suggestion="Check label exists and compile twice",
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.MEDIUM,
+                            category=IssueCategory.DOCUMENTATION,
+                            title="Undefined reference",
+                            description="LaTeX reference may be undefined",
+                            suggestion="Check label exists and compile twice",
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Error reviewing LaTeX file {path}: {e}")
@@ -720,16 +771,18 @@ class CodeReviewer:
             for i, line in enumerate(lines, 1):
                 # Check for unquoted variables
                 if re.search(r"\$\w+", line) and not re.search(r'"\$\w+"', line):
-                    issues.append(ReviewIssue(
-                        file_path=str(path),
-                        line_number=i,
-                        severity=Severity.MEDIUM,
-                        category=IssueCategory.CODE_QUALITY,
-                        title="Unquoted variable",
-                        description="Unquoted variables can cause word splitting",
-                        suggestion='Use "$VAR" instead of $VAR',
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        ReviewIssue(
+                            file_path=str(path),
+                            line_number=i,
+                            severity=Severity.MEDIUM,
+                            category=IssueCategory.CODE_QUALITY,
+                            title="Unquoted variable",
+                            description="Unquoted variables can cause word splitting",
+                            suggestion='Use "$VAR" instead of $VAR',
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Error reviewing shell script {path}: {e}")

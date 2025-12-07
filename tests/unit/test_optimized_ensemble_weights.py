@@ -23,7 +23,6 @@ def test_example_usage_basic():
     assert result is not None
 
 
-
 def test_example_usage_edge_cases():
     """Test example_usage: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_example_usage_edge_cases():
     assert result is not None
 
 
-
 def test_example_usage_error_handling():
     """Test example_usage error handling."""
     with pytest.raises(ValueError):
         example_usage(invalid_input)
-
 
 
 def test_get_weights_basic():
@@ -56,7 +53,6 @@ def test_get_weights_basic():
     assert result is not None
 
 
-
 def test_get_weights_edge_cases():
     """Test get_weights: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_weights_edge_cases():
     assert result is not None
 
 
-
 def test_get_weights_error_handling():
     """Test get_weights error handling."""
     with pytest.raises(ValueError):
         get_weights(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100), st.integers())
@@ -85,4 +79,3 @@ def test_get_weights_property_idempotent(self, self, model_names, context):
 
     # Assert property
     assert get_weights(self, model_names, context) == result, "idempotent violated"
-

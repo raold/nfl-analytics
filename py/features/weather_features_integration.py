@@ -34,10 +34,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 
-def compute_weather_features(
-    game_id: str,
-    db_config: dict
-) -> dict[str, float]:
+def compute_weather_features(game_id: str, db_config: dict) -> dict[str, float]:
     """
     Compute weather features for a specific game.
 
@@ -86,33 +83,33 @@ def compute_weather_features(
     # Return defaults if no weather data found or dome game
     if not result:
         return {
-            'high_wind': None,
-            'cold_weather': None,
-            'dome_game': None,
-            'precipitation': None,
-            'temp_c': None,
-            'wind_kph': None,
+            "high_wind": None,
+            "cold_weather": None,
+            "dome_game": None,
+            "precipitation": None,
+            "temp_c": None,
+            "wind_kph": None,
         }
 
     # Dome games have controlled environment (no weather effects)
-    if result.get('dome_game') == 1.0:
+    if result.get("dome_game") == 1.0:
         return {
-            'high_wind': 0.0,
-            'cold_weather': 0.0,
-            'dome_game': 1.0,
-            'precipitation': 0.0,
-            'temp_c': result.get('temp_c'),  # Still track temp for dome games
-            'wind_kph': 0.0,  # Dome games have no wind
+            "high_wind": 0.0,
+            "cold_weather": 0.0,
+            "dome_game": 1.0,
+            "precipitation": 0.0,
+            "temp_c": result.get("temp_c"),  # Still track temp for dome games
+            "wind_kph": 0.0,  # Dome games have no wind
         }
 
     # Extract weather features for outdoor games
     return {
-        'high_wind': float(result.get('high_wind') or 0.0),
-        'cold_weather': float(result.get('cold_weather') or 0.0),
-        'dome_game': float(result.get('dome_game') or 0.0),
-        'precipitation': float(result.get('precipitation') or 0.0),
-        'temp_c': float(result.get('temp_c')) if result.get('temp_c') is not None else None,
-        'wind_kph': float(result.get('wind_kph') or 0.0),
+        "high_wind": float(result.get("high_wind") or 0.0),
+        "cold_weather": float(result.get("cold_weather") or 0.0),
+        "dome_game": float(result.get("dome_game") or 0.0),
+        "precipitation": float(result.get("precipitation") or 0.0),
+        "temp_c": float(result.get("temp_c")) if result.get("temp_c") is not None else None,
+        "wind_kph": float(result.get("wind_kph") or 0.0),
     }
 
 

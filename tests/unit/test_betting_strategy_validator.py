@@ -21,7 +21,6 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -39,21 +38,19 @@ def good_backtest_results():
 
     # Simulate good betting performance
     # Win rate ~61%, avg win > avg loss
-    outcomes = np.random.choice(
-        [1, -1],
-        size=n,
-        p=[0.61, 0.39]  # 61% win rate
-    )
+    outcomes = np.random.choice([1, -1], size=n, p=[0.61, 0.39])  # 61% win rate
 
     # Wins: +1 unit, Losses: -1 unit
     returns = outcomes.copy().astype(float)
     cumulative_returns = np.cumsum(returns)
 
-    return pd.DataFrame({
-        'bet_outcome': outcomes,
-        'return': returns,
-        'cumulative_return': cumulative_returns,
-    })
+    return pd.DataFrame(
+        {
+            "bet_outcome": outcomes,
+            "return": returns,
+            "cumulative_return": cumulative_returns,
+        }
+    )
 
 
 @pytest.fixture
@@ -64,20 +61,18 @@ def bad_backtest_results():
 
     # Simulate poor betting performance
     # Win rate ~48%, losing strategy
-    outcomes = np.random.choice(
-        [1, -1],
-        size=n,
-        p=[0.48, 0.52]  # 48% win rate (LOSING)
-    )
+    outcomes = np.random.choice([1, -1], size=n, p=[0.48, 0.52])  # 48% win rate (LOSING)
 
     returns = outcomes.copy().astype(float)
     cumulative_returns = np.cumsum(returns)
 
-    return pd.DataFrame({
-        'bet_outcome': outcomes,
-        'return': returns,
-        'cumulative_return': cumulative_returns,
-    })
+    return pd.DataFrame(
+        {
+            "bet_outcome": outcomes,
+            "return": returns,
+            "cumulative_return": cumulative_returns,
+        }
+    )
 
 
 # ============================================================================
@@ -93,7 +88,7 @@ def test_roi_calculation(good_backtest_results):
     initial_bankroll = 10000
     total_wagered = len(df) * 100  # $100 per bet
 
-    total_return = df['return'].sum() * 100  # Convert to dollars
+    total_return = df["return"].sum() * 100  # Convert to dollars
     roi = (total_return / total_wagered) * 100
 
     # Good results should have positive ROI
@@ -105,7 +100,7 @@ def test_roi_gate_pass(good_backtest_results):
     df = good_backtest_results
 
     total_wagered = len(df)
-    total_return = df['return'].sum()
+    total_return = df["return"].sum()
     roi = (total_return / total_wagered) * 100
 
     # Gate: ROI > 5%
@@ -119,7 +114,7 @@ def test_roi_gate_fail(bad_backtest_results):
     df = bad_backtest_results
 
     total_wagered = len(df)
-    total_return = df['return'].sum()
+    total_return = df["return"].sum()
     roi = (total_return / total_wagered) * 100
 
     # Gate: ROI > 5%
@@ -137,7 +132,7 @@ def test_win_rate_calculation(good_backtest_results):
     """Test win rate calculation."""
     df = good_backtest_results
 
-    win_rate = (df['bet_outcome'] == 1).mean() * 100
+    win_rate = (df["bet_outcome"] == 1).mean() * 100
 
     # Good results should have ~61% win rate
     assert 59 < win_rate < 65, f"Win rate = {win_rate:.1f}%"
@@ -147,7 +142,7 @@ def test_win_rate_gate_pass(good_backtest_results):
     """Test that good results pass win rate gate (> 59%)."""
     df = good_backtest_results
 
-    win_rate = (df['bet_outcome'] == 1).mean() * 100
+    win_rate = (df["bet_outcome"] == 1).mean() * 100
 
     # Gate: Win Rate > 59%
     passes_gate = win_rate > 59.0
@@ -159,7 +154,7 @@ def test_win_rate_gate_fail(bad_backtest_results):
     """Test that bad results fail win rate gate."""
     df = bad_backtest_results
 
-    win_rate = (df['bet_outcome'] == 1).mean() * 100
+    win_rate = (df["bet_outcome"] == 1).mean() * 100
 
     # Gate: Win Rate > 59%
     passes_gate = win_rate > 59.0
@@ -178,8 +173,8 @@ def test_sharpe_ratio_calculation(good_backtest_results):
 
     # Sharpe = mean(returns) / std(returns) * sqrt(252)
     # For daily betting, use sqrt(365)
-    mean_return = df['return'].mean()
-    std_return = df['return'].std()
+    mean_return = df["return"].mean()
+    std_return = df["return"].std()
 
     sharpe = (mean_return / std_return) * np.sqrt(252)  # Annualized
 
@@ -191,8 +186,8 @@ def test_sharpe_ratio_gate_pass(good_backtest_results):
     """Test that good results pass Sharpe ratio gate (> 2.2)."""
     df = good_backtest_results
 
-    mean_return = df['return'].mean()
-    std_return = df['return'].std()
+    mean_return = df["return"].mean()
+    std_return = df["return"].std()
     sharpe = (mean_return / std_return) * np.sqrt(252)
 
     # Gate: Sharpe > 2.2
@@ -205,8 +200,8 @@ def test_sharpe_ratio_gate_fail(bad_backtest_results):
     """Test that bad results fail Sharpe ratio gate."""
     df = bad_backtest_results
 
-    mean_return = df['return'].mean()
-    std_return = df['return'].std()
+    mean_return = df["return"].mean()
+    std_return = df["return"].std()
     sharpe = (mean_return / std_return) * np.sqrt(252)
 
     # Gate: Sharpe > 2.2
@@ -225,10 +220,10 @@ def test_max_drawdown_calculation(good_backtest_results):
     df = good_backtest_results
 
     # Calculate cumulative max
-    cummax = df['cumulative_return'].cummax()
+    cummax = df["cumulative_return"].cummax()
 
     # Drawdown = current - cummax
-    drawdown = df['cumulative_return'] - cummax
+    drawdown = df["cumulative_return"] - cummax
 
     # Max drawdown (most negative)
     max_drawdown = drawdown.min()
@@ -245,8 +240,8 @@ def test_max_drawdown_gate_pass(good_backtest_results):
     """Test that good results pass max drawdown gate (< -8%)."""
     df = good_backtest_results
 
-    cummax = df['cumulative_return'].cummax()
-    drawdown = df['cumulative_return'] - cummax
+    cummax = df["cumulative_return"].cummax()
+    drawdown = df["cumulative_return"] - cummax
     max_drawdown = drawdown.min()
 
     # As percentage (assuming $100 bet size)
@@ -284,7 +279,7 @@ def test_kelly_criterion_calculation():
     # Where: p = win probability, q = 1-p, b = net odds (decimal_odds - 1)
 
     win_prob = 0.60  # 60% win rate
-    odds = 2.0       # Decimal odds (you get back $2 for every $1 bet)
+    odds = 2.0  # Decimal odds (you get back $2 for every $1 bet)
 
     # Kelly fraction with correct formula for decimal odds
     b = odds - 1  # Net profit per dollar (b = 1.0 for 2.0 decimal odds)
@@ -297,9 +292,9 @@ def test_kelly_criterion_calculation():
 def test_kelly_with_edge():
     """Test Kelly criterion with different edge sizes."""
     test_cases = [
-        (0.55, 2.0, 0.05),   # 5% edge → small Kelly
-        (0.60, 2.0, 0.10),   # 10% edge → moderate Kelly
-        (0.65, 2.0, 0.15),   # 15% edge → large Kelly
+        (0.55, 2.0, 0.05),  # 5% edge → small Kelly
+        (0.60, 2.0, 0.10),  # 10% edge → moderate Kelly
+        (0.65, 2.0, 0.15),  # 15% edge → large Kelly
     ]
 
     for win_prob, odds, expected_edge in test_cases:
@@ -319,7 +314,7 @@ def test_fractional_kelly():
     half_kelly = full_kelly * 0.50
 
     assert quarter_kelly == 0.05  # 5% of bankroll
-    assert half_kelly == 0.10     # 10% of bankroll
+    assert half_kelly == 0.10  # 10% of bankroll
 
     # Recommendation: Use fractional Kelly to reduce variance
     recommended = half_kelly
@@ -329,7 +324,7 @@ def test_fractional_kelly():
 def test_kelly_no_edge():
     """Test Kelly criterion with no edge (should be zero)."""
     win_prob = 0.50  # Fair coin flip
-    odds = 2.0       # Decimal odds
+    odds = 2.0  # Decimal odds
 
     b = odds - 1  # Net profit per dollar
     kelly = (win_prob * b - (1 - win_prob)) / b
@@ -354,7 +349,7 @@ def test_monte_carlo_stress_test(good_backtest_results):
 
     for _ in range(n_sims):
         # Resample returns
-        sim_returns = np.random.choice(df['return'].values, size=len(df), replace=True)
+        sim_returns = np.random.choice(df["return"].values, size=len(df), replace=True)
         final_return = sim_returns.sum()
         final_returns.append(final_return)
 
@@ -405,20 +400,20 @@ def test_all_gates_pass(good_backtest_results):
     df = good_backtest_results
 
     # Gate 1: ROI > 5%
-    roi = (df['return'].sum() / len(df)) * 100
+    roi = (df["return"].sum() / len(df)) * 100
     roi_pass = roi > 5.0
 
     # Gate 2: Win Rate > 59%
-    win_rate = (df['bet_outcome'] == 1).mean() * 100
+    win_rate = (df["bet_outcome"] == 1).mean() * 100
     win_rate_pass = win_rate > 59.0
 
     # Gate 3: Sharpe > 2.2
-    sharpe = (df['return'].mean() / df['return'].std()) * np.sqrt(252)
+    sharpe = (df["return"].mean() / df["return"].std()) * np.sqrt(252)
     sharpe_pass = sharpe > 2.2
 
     # Gate 4: Max DD > -8%
-    cummax = df['cumulative_return'].cummax()
-    drawdown = df['cumulative_return'] - cummax
+    cummax = df["cumulative_return"].cummax()
+    drawdown = df["cumulative_return"] - cummax
     max_dd_pct = (drawdown.min() / len(df)) * 100
     dd_pass = max_dd_pct > -8.0
 
@@ -426,8 +421,9 @@ def test_all_gates_pass(good_backtest_results):
     all_pass = roi_pass and win_rate_pass and sharpe_pass and dd_pass
 
     # Good results should pass (may fail dd_pass due to randomness)
-    assert roi_pass and win_rate_pass and sharpe_pass, \
-        f"ROI={roi:.1f}%, WR={win_rate:.1f}%, Sharpe={sharpe:.2f}"
+    assert (
+        roi_pass and win_rate_pass and sharpe_pass
+    ), f"ROI={roi:.1f}%, WR={win_rate:.1f}%, Sharpe={sharpe:.2f}"
 
 
 def test_any_gate_fail_blocks_deployment(bad_backtest_results):
@@ -435,15 +431,15 @@ def test_any_gate_fail_blocks_deployment(bad_backtest_results):
     df = bad_backtest_results
 
     # Gate 1: ROI
-    roi = (df['return'].sum() / len(df)) * 100
+    roi = (df["return"].sum() / len(df)) * 100
     roi_pass = roi > 5.0
 
     # Gate 2: Win Rate
-    win_rate = (df['bet_outcome'] == 1).mean() * 100
+    win_rate = (df["bet_outcome"] == 1).mean() * 100
     win_rate_pass = win_rate > 59.0
 
     # Gate 3: Sharpe
-    sharpe = (df['return'].mean() / df['return'].std()) * np.sqrt(252)
+    sharpe = (df["return"].mean() / df["return"].std()) * np.sqrt(252)
     sharpe_pass = sharpe > 2.2
 
     # At least one should fail
@@ -460,23 +456,23 @@ def test_any_gate_fail_blocks_deployment(bad_backtest_results):
 def test_gate_failure_report():
     """Test detailed gate failure reporting."""
     gates = {
-        'roi': {'passed': False, 'value': 3.2, 'threshold': 5.0},
-        'win_rate': {'passed': False, 'value': 56.5, 'threshold': 59.0},
-        'sharpe': {'passed': True, 'value': 2.5, 'threshold': 2.2},
-        'max_dd': {'passed': True, 'value': -6.8, 'threshold': -8.0},
+        "roi": {"passed": False, "value": 3.2, "threshold": 5.0},
+        "win_rate": {"passed": False, "value": 56.5, "threshold": 59.0},
+        "sharpe": {"passed": True, "value": 2.5, "threshold": 2.2},
+        "max_dd": {"passed": True, "value": -6.8, "threshold": -8.0},
     }
 
     # Identify failures
-    failures = [name for name, gate in gates.items() if not gate['passed']]
+    failures = [name for name, gate in gates.items() if not gate["passed"]]
 
     assert len(failures) == 2
-    assert 'roi' in failures
-    assert 'win_rate' in failures
+    assert "roi" in failures
+    assert "win_rate" in failures
 
     # Generate report
     report_lines = []
     for name, gate in gates.items():
-        status = "✅ PASS" if gate['passed'] else "❌ FAIL"
+        status = "✅ PASS" if gate["passed"] else "❌ FAIL"
         report_lines.append(
             f"{status} {name.upper()}: {gate['value']:.2f} (threshold: {gate['threshold']:.2f})"
         )
@@ -508,11 +504,13 @@ def test_zero_variance_returns():
 
 def test_single_bet_result():
     """Test validation with single bet (insufficient data)."""
-    df = pd.DataFrame({
-        'bet_outcome': [1],
-        'return': [1.0],
-        'cumulative_return': [1.0],
-    })
+    df = pd.DataFrame(
+        {
+            "bet_outcome": [1],
+            "return": [1.0],
+            "cumulative_return": [1.0],
+        }
+    )
 
     # Should handle gracefully but warn about insufficient data
     assert len(df) < 100, "Insufficient data for reliable validation"

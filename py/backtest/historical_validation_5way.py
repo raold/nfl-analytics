@@ -40,8 +40,7 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -57,7 +56,7 @@ class HistoricalValidator:
         initial_bankroll: float,
         use_cql: bool,
         kelly_fraction: float = 0.25,
-        min_edge: float = 0.02
+        min_edge: float = 0.02,
     ):
         self.start_season = start_season
         self.end_season = end_season
@@ -80,7 +79,7 @@ class HistoricalValidator:
             use_qb_wr_chemistry=False,  # Only for receiving
             use_cql_sizer=use_cql,
             min_edge=min_edge,
-            kelly_fraction=kelly_fraction
+            kelly_fraction=kelly_fraction,
         )
 
         # Initialize tracking
@@ -94,7 +93,7 @@ class HistoricalValidator:
             port=5544,
             database="devdb01",
             user="dro",
-            password="sicillionbillions"
+            password="sicillionbillions",
         )
 
     def fetch_historical_games(self) -> pd.DataFrame:
@@ -142,10 +141,10 @@ class HistoricalValidator:
             query,
             self.conn,
             params={
-                'start_season': self.start_season,
-                'end_season': self.end_season,
-                'end_week': self.end_week
-            }
+                "start_season": self.start_season,
+                "end_season": self.end_season,
+                "end_week": self.end_week,
+            },
         )
 
         logger.info(f"Loaded {len(df)} player-game records from {df['game_id'].nunique()} games")
@@ -180,11 +179,7 @@ class HistoricalValidator:
             return (100 / abs(american_odds)) + 1
 
     def calculate_kelly_bet_size(
-        self,
-        edge: float,
-        prob_win: float,
-        odds: int,
-        bankroll: float
+        self, edge: float, prob_win: float, odds: int, bankroll: float
     ) -> float:
         """Calculate Kelly criterion bet size."""
         decimal_odds = self.american_to_decimal(odds)
@@ -207,22 +202,22 @@ class HistoricalValidator:
         """Process a single player-game and generate prediction."""
         try:
             # Determine if home or away
-            is_home = (row['team'] == row['home_team'])
+            is_home = row["team"] == row["home_team"]
 
             # Simulate betting line (in production, fetch from odds_history)
-            line = self.simulate_betting_line(row['passing_yards'])
+            line = self.simulate_betting_line(row["passing_yards"])
 
             # Generate ensemble prediction
             prediction = self.ensemble.predict(
-                player_id=row['player_id'],
-                player_name=row['player_name'],
+                player_id=row["player_id"],
+                player_name=row["player_name"],
                 prop_type="passing_yards",
                 line=line,
-                opponent=row['away_team'] if is_home else row['home_team'],
+                opponent=row["away_team"] if is_home else row["home_team"],
                 is_home=is_home,
-                season=row['season'],
-                week=row['week'],
-                bankroll=self.bankroll
+                season=row["season"],
+                week=row["week"],
+                bankroll=self.bankroll,
             )
 
             # Determine bet side
@@ -248,10 +243,7 @@ class HistoricalValidator:
                 bet_size = prediction.bet_size
             else:
                 bet_size = self.calculate_kelly_bet_size(
-                    edge=edge,
-                    prob_win=prob_win,
-                    odds=odds,
-                    bankroll=self.bankroll
+                    edge=edge, prob_win=prob_win, odds=odds, bankroll=self.bankroll
                 )
 
             # Skip if bet size too small
@@ -259,13 +251,13 @@ class HistoricalValidator:
                 return None
 
             # Determine outcome
-            actual = row['passing_yards']
+            actual = row["passing_yards"]
             if side == "over":
-                win = (actual > line)
+                win = actual > line
             else:
-                win = (actual < line)
+                win = actual < line
 
-            push = (actual == line)
+            push = actual == line
 
             # Calculate P&L
             if push:
@@ -282,35 +274,35 @@ class HistoricalValidator:
             self.bankroll += pnl
 
             return {
-                'game_id': row['game_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'player_name': row['player_name'],
-                'player_id': row['player_id'],
-                'team': row['team'],
-                'opponent': row['away_team'] if is_home else row['home_team'],
-                'is_home': is_home,
-                'line': line,
-                'side': side,
-                'odds': odds,
-                'bet_size': bet_size,
-                'prediction_mean': prediction.mean,
-                'prediction_std': prediction.std,
-                'prediction_q05': prediction.q05,
-                'prediction_q95': prediction.q95,
-                'bayesian_mean': prediction.bayesian_mean,
-                'xgboost_mean': prediction.xgboost_mean,
-                'bnn_mean': prediction.bnn_mean,
-                'bnn_calibrated_mean': prediction.bnn_calibrated_mean,
-                'state_space_mean': prediction.state_space_mean,
-                'edge': edge,
-                'prob_win': prob_win,
-                'actual_yards': actual,
-                'status': status,
-                'pnl': pnl,
-                'bankroll': self.bankroll,
-                'kelly_fraction': self.kelly_fraction,
-                'used_cql': self.use_cql
+                "game_id": row["game_id"],
+                "season": row["season"],
+                "week": row["week"],
+                "player_name": row["player_name"],
+                "player_id": row["player_id"],
+                "team": row["team"],
+                "opponent": row["away_team"] if is_home else row["home_team"],
+                "is_home": is_home,
+                "line": line,
+                "side": side,
+                "odds": odds,
+                "bet_size": bet_size,
+                "prediction_mean": prediction.mean,
+                "prediction_std": prediction.std,
+                "prediction_q05": prediction.q05,
+                "prediction_q95": prediction.q95,
+                "bayesian_mean": prediction.bayesian_mean,
+                "xgboost_mean": prediction.xgboost_mean,
+                "bnn_mean": prediction.bnn_mean,
+                "bnn_calibrated_mean": prediction.bnn_calibrated_mean,
+                "state_space_mean": prediction.state_space_mean,
+                "edge": edge,
+                "prob_win": prob_win,
+                "actual_yards": actual,
+                "status": status,
+                "pnl": pnl,
+                "bankroll": self.bankroll,
+                "kelly_fraction": self.kelly_fraction,
+                "used_cql": self.use_cql,
             }
 
         except Exception as e:
@@ -319,9 +311,9 @@ class HistoricalValidator:
 
     def run_backtest(self) -> pd.DataFrame:
         """Run historical validation backtest with vectorized processing."""
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("STARTING HISTORICAL VALIDATION")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Fetch data
         games_df = self.fetch_historical_games()
@@ -392,23 +384,23 @@ class HistoricalValidator:
 
         # Basic metrics
         total_bets = len(results_df)
-        wins = (results_df['status'] == 'win').sum()
-        losses = (results_df['status'] == 'loss').sum()
-        pushes = (results_df['status'] == 'push').sum()
+        wins = (results_df["status"] == "win").sum()
+        losses = (results_df["status"] == "loss").sum()
+        pushes = (results_df["status"] == "push").sum()
 
         win_rate = wins / (wins + losses) if (wins + losses) > 0 else 0
 
         # ROI
-        total_wagered = results_df['bet_size'].sum()
-        total_pnl = results_df['pnl'].sum()
+        total_wagered = results_df["bet_size"].sum()
+        total_pnl = results_df["pnl"].sum()
         roi = (total_pnl / total_wagered) if total_wagered > 0 else 0
 
         # Sharpe Ratio
-        returns = results_df['pnl'] / results_df['bet_size']
+        returns = results_df["pnl"] / results_df["bet_size"]
         sharpe = (returns.mean() / returns.std()) * np.sqrt(252) if returns.std() > 0 else 0
 
         # Max Drawdown
-        cumulative_pnl = results_df['pnl'].cumsum()
+        cumulative_pnl = results_df["pnl"].cumsum()
         running_max = cumulative_pnl.expanding().max()
         drawdown = cumulative_pnl - running_max
         max_drawdown = drawdown.min()
@@ -416,46 +408,46 @@ class HistoricalValidator:
 
         # Calibration (90% CI coverage)
         within_ci = (
-            (results_df['actual_yards'] >= results_df['prediction_q05']) &
-            (results_df['actual_yards'] <= results_df['prediction_q95'])
+            (results_df["actual_yards"] >= results_df["prediction_q05"])
+            & (results_df["actual_yards"] <= results_df["prediction_q95"])
         ).sum()
         calibration_90 = within_ci / total_bets if total_bets > 0 else 0
 
         # MAE
-        mae_ensemble = (results_df['actual_yards'] - results_df['prediction_mean']).abs().mean()
+        mae_ensemble = (results_df["actual_yards"] - results_df["prediction_mean"]).abs().mean()
 
         metrics = {
-            'total_bets': total_bets,
-            'wins': wins,
-            'losses': losses,
-            'pushes': pushes,
-            'win_rate': win_rate,
-            'win_rate_pct': win_rate * 100,
-            'total_wagered': total_wagered,
-            'total_pnl': total_pnl,
-            'roi': roi,
-            'roi_pct': roi * 100,
-            'sharpe_ratio': sharpe,
-            'max_drawdown': max_drawdown,
-            'max_drawdown_pct': max_drawdown_pct,
-            'calibration_90': calibration_90,
-            'calibration_90_pct': calibration_90 * 100,
-            'mae_ensemble': mae_ensemble,
-            'avg_bet_size': results_df['bet_size'].mean(),
-            'median_bet_size': results_df['bet_size'].median(),
-            'starting_bankroll': self.initial_bankroll,
-            'ending_bankroll': self.bankroll,
-            'profit': self.bankroll - self.initial_bankroll,
-            'profit_pct': ((self.bankroll - self.initial_bankroll) / self.initial_bankroll) * 100
+            "total_bets": total_bets,
+            "wins": wins,
+            "losses": losses,
+            "pushes": pushes,
+            "win_rate": win_rate,
+            "win_rate_pct": win_rate * 100,
+            "total_wagered": total_wagered,
+            "total_pnl": total_pnl,
+            "roi": roi,
+            "roi_pct": roi * 100,
+            "sharpe_ratio": sharpe,
+            "max_drawdown": max_drawdown,
+            "max_drawdown_pct": max_drawdown_pct,
+            "calibration_90": calibration_90,
+            "calibration_90_pct": calibration_90 * 100,
+            "mae_ensemble": mae_ensemble,
+            "avg_bet_size": results_df["bet_size"].mean(),
+            "median_bet_size": results_df["bet_size"].median(),
+            "starting_bankroll": self.initial_bankroll,
+            "ending_bankroll": self.bankroll,
+            "profit": self.bankroll - self.initial_bankroll,
+            "profit_pct": ((self.bankroll - self.initial_bankroll) / self.initial_bankroll) * 100,
         }
 
         return metrics
 
     def print_summary(self, metrics: dict):
         """Print validation summary."""
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("HISTORICAL VALIDATION RESULTS")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         if not metrics:
             logger.error("❌ No metrics to display (0 positions created)")
@@ -467,7 +459,9 @@ class HistoricalValidator:
         logger.info(f"  CQL Bet Sizing: {'✅ Enabled' if self.use_cql else '❌ Disabled'}")
 
         logger.info("\n💰 Performance:")
-        logger.info(f"  Win Rate: {metrics['win_rate_pct']:.2f}% ({metrics['wins']}/{metrics['wins']+metrics['losses']})")
+        logger.info(
+            f"  Win Rate: {metrics['win_rate_pct']:.2f}% ({metrics['wins']}/{metrics['wins']+metrics['losses']})"
+        )
         logger.info(f"  ROI: {metrics['roi_pct']:+.2f}%")
         logger.info(f"  Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
         logger.info(f"  Max Drawdown: {metrics['max_drawdown_pct']:.2f}%")
@@ -488,22 +482,40 @@ class HistoricalValidator:
 
         # Compare to targets
         logger.info("\n🎯 Target Comparison:")
-        roi_status = "✅" if metrics['roi_pct'] >= 7 else "⚠️" if metrics['roi_pct'] >= 5 else "❌"
+        roi_status = "✅" if metrics["roi_pct"] >= 7 else "⚠️" if metrics["roi_pct"] >= 5 else "❌"
         logger.info(f"  {roi_status} ROI: {metrics['roi_pct']:.2f}% (target: 7-10%)")
 
-        wr_status = "✅" if metrics['win_rate_pct'] >= 60 else "⚠️" if metrics['win_rate_pct'] >= 58 else "❌"
+        wr_status = (
+            "✅"
+            if metrics["win_rate_pct"] >= 60
+            else "⚠️" if metrics["win_rate_pct"] >= 58 else "❌"
+        )
         logger.info(f"  {wr_status} Win Rate: {metrics['win_rate_pct']:.2f}% (target: 60-62%)")
 
-        sharpe_status = "✅" if metrics['sharpe_ratio'] >= 2.8 else "⚠️" if metrics['sharpe_ratio'] >= 2.2 else "❌"
-        logger.info(f"  {sharpe_status} Sharpe Ratio: {metrics['sharpe_ratio']:.2f} (target: 2.8-3.2)")
+        sharpe_status = (
+            "✅"
+            if metrics["sharpe_ratio"] >= 2.8
+            else "⚠️" if metrics["sharpe_ratio"] >= 2.2 else "❌"
+        )
+        logger.info(
+            f"  {sharpe_status} Sharpe Ratio: {metrics['sharpe_ratio']:.2f} (target: 2.8-3.2)"
+        )
 
-        dd_status = "✅" if metrics['max_drawdown_pct'] >= -7 else "⚠️" if metrics['max_drawdown_pct'] >= -10 else "❌"
-        logger.info(f"  {dd_status} Max Drawdown: {metrics['max_drawdown_pct']:.2f}% (target: -5 to -7%)")
+        dd_status = (
+            "✅"
+            if metrics["max_drawdown_pct"] >= -7
+            else "⚠️" if metrics["max_drawdown_pct"] >= -10 else "❌"
+        )
+        logger.info(
+            f"  {dd_status} Max Drawdown: {metrics['max_drawdown_pct']:.2f}% (target: -5 to -7%)"
+        )
 
-        cal_status = "✅" if 85 <= metrics['calibration_90_pct'] <= 95 else "⚠️"
-        logger.info(f"  {cal_status} Calibration: {metrics['calibration_90_pct']:.2f}% (target: 88-92%)")
+        cal_status = "✅" if 85 <= metrics["calibration_90_pct"] <= 95 else "⚠️"
+        logger.info(
+            f"  {cal_status} Calibration: {metrics['calibration_90_pct']:.2f}% (target: 88-92%)"
+        )
 
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
 
     def close(self):
         """Close database connection."""
@@ -512,24 +524,30 @@ class HistoricalValidator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Historical validation of 5-way ensemble')
-    parser.add_argument('--start-season', type=int, default=2022,
-                        help='Start season (default: 2022)')
-    parser.add_argument('--end-season', type=int, default=2025,
-                        help='End season (default: 2025)')
-    parser.add_argument('--end-week', type=int, default=10,
-                        help='End week for final season (default: 10)')
-    parser.add_argument('--bankroll', type=float, default=10000.0,
-                        help='Initial bankroll (default: 10000)')
-    parser.add_argument('--use-cql', action='store_true',
-                        help='Use CQL bet sizer (default: False)')
-    parser.add_argument('--kelly-fraction', type=float, default=0.25,
-                        help='Kelly fraction (default: 0.25)')
-    parser.add_argument('--min-edge', type=float, default=0.02,
-                        help='Minimum edge to bet (default: 0.02)')
-    parser.add_argument('--output', type=str,
-                        default='analysis/results/historical_validation_5way.csv',
-                        help='Output CSV path')
+    parser = argparse.ArgumentParser(description="Historical validation of 5-way ensemble")
+    parser.add_argument(
+        "--start-season", type=int, default=2022, help="Start season (default: 2022)"
+    )
+    parser.add_argument("--end-season", type=int, default=2025, help="End season (default: 2025)")
+    parser.add_argument(
+        "--end-week", type=int, default=10, help="End week for final season (default: 10)"
+    )
+    parser.add_argument(
+        "--bankroll", type=float, default=10000.0, help="Initial bankroll (default: 10000)"
+    )
+    parser.add_argument("--use-cql", action="store_true", help="Use CQL bet sizer (default: False)")
+    parser.add_argument(
+        "--kelly-fraction", type=float, default=0.25, help="Kelly fraction (default: 0.25)"
+    )
+    parser.add_argument(
+        "--min-edge", type=float, default=0.02, help="Minimum edge to bet (default: 0.02)"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="analysis/results/historical_validation_5way.csv",
+        help="Output CSV path",
+    )
 
     args = parser.parse_args()
 
@@ -541,7 +559,7 @@ def main():
         initial_bankroll=args.bankroll,
         use_cql=args.use_cql,
         kelly_fraction=args.kelly_fraction,
-        min_edge=args.min_edge
+        min_edge=args.min_edge,
     )
 
     try:
@@ -583,7 +601,7 @@ def main():
 
         metrics_native = convert_to_native(metrics)
 
-        with open(metrics_path, 'w') as f:
+        with open(metrics_path, "w") as f:
             json.dump(metrics_native, f, indent=2)
         logger.info(f"✅ Metrics saved to: {metrics_path}")
 

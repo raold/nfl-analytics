@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "py"))
 def db_connection():
     """Database connection for integration tests."""
     import os
+
     try:
         conn = psycopg.connect(
             dbname=os.getenv("POSTGRES_DB", "devdb01"),
@@ -49,12 +50,12 @@ class TestDatabaseSchema:
             columns = {row[0]: row[1] for row in cur.fetchall()}
 
         # Check key columns
-        assert 'game_id' in columns
-        assert 'season' in columns
-        assert 'home_team' in columns
-        assert 'away_team' in columns
-        assert 'home_score' in columns
-        assert 'away_score' in columns
+        assert "game_id" in columns
+        assert "season" in columns
+        assert "home_team" in columns
+        assert "away_team" in columns
+        assert "home_score" in columns
+        assert "away_score" in columns
 
     def test_weather_table_exists(self, db_connection):
         """Test that weather table exists."""

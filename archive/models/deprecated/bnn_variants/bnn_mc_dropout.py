@@ -95,7 +95,7 @@ class MCDropoutBNN(nn.Module):
             nn.Linear(prev_dim, prev_dim // 2),
             nn.ReLU(),
             nn.Dropout(p=dropout_p),
-            nn.Linear(prev_dim // 2, 1)
+            nn.Linear(prev_dim // 2, 1),
         )
 
         logger.info(
@@ -232,9 +232,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
@@ -317,7 +315,7 @@ def train_mc_dropout_bnn(
     epochs: int = 100,
     batch_size: int = 64,
     lr: float = 1e-3,
-    device: str = "cpu"
+    device: str = "cpu",
 ) -> tuple[MCDropoutBNN, StandardScaler, float, float]:
     """
     Train MC Dropout BNN
@@ -347,9 +345,7 @@ def train_mc_dropout_bnn(
 
     # Initialize model
     model = MCDropoutBNN(
-        input_dim=X_train.shape[1],
-        hidden_dims=hidden_dims,
-        dropout_p=dropout_p
+        input_dim=X_train.shape[1], hidden_dims=hidden_dims, dropout_p=dropout_p
     ).to(device)
 
     # Optimizer
@@ -358,7 +354,7 @@ def train_mc_dropout_bnn(
     # Training loop
     logger.info(f"Training MC Dropout BNN (epochs={epochs}, batch_size={batch_size})...")
 
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
     patience = 20
     patience_counter = 0
 
@@ -370,7 +366,7 @@ def train_mc_dropout_bnn(
         train_loss = 0.0
 
         for i in range(0, len(X_train_t), batch_size):
-            batch_idx = indices[i:i+batch_size]
+            batch_idx = indices[i : i + batch_size]
             X_batch = X_train_t[batch_idx]
             y_batch = y_train_t[batch_idx]
 
@@ -381,25 +377,26 @@ def train_mc_dropout_bnn(
             std = torch.exp(log_std)
 
             # Negative log-likelihood loss (Gaussian)
-            loss = 0.5 * torch.mean(
-                torch.log(2 * np.pi * std**2) + ((y_batch - mean) / std)**2
-            )
+            loss = 0.5 * torch.mean(torch.log(2 * np.pi * std**2) + ((y_batch - mean) / std) ** 2)
 
             loss.backward()
             optimizer.step()
 
             train_loss += loss.item()
 
-        train_loss /= (len(X_train_t) // batch_size)
+        train_loss /= len(X_train_t) // batch_size
 
         # Validation
         model.eval()
         with torch.no_grad():
             val_mean, val_log_std = model(X_val_t)
             val_std = torch.exp(val_log_std)
-            val_loss = 0.5 * torch.mean(
-                torch.log(2 * np.pi * val_std**2) + ((y_val_t - val_mean) / val_std)**2
-            ).item()
+            val_loss = (
+                0.5
+                * torch.mean(
+                    torch.log(2 * np.pi * val_std**2) + ((y_val_t - val_mean) / val_std) ** 2
+                ).item()
+            )
 
         # Early stopping
         if val_loss < best_val_loss:
@@ -430,7 +427,7 @@ def evaluate_model(
     y_mean: float,
     y_std: float,
     n_samples: int = 100,
-    device: str = "cpu"
+    device: str = "cpu",
 ) -> dict:
     """Evaluate MC Dropout BNN"""
     # Normalize features
@@ -446,22 +443,17 @@ def evaluate_model(
 
     # Metrics
     mae = np.mean(np.abs(pred_mean - y))
-    rmse = np.sqrt(np.mean((pred_mean - y)**2))
+    rmse = np.sqrt(np.mean((pred_mean - y) ** 2))
     calibration = compute_calibration(y, pred_mean, pred_std)
 
-    return {
-        "mae": mae,
-        "rmse": rmse,
-        "calibration": calibration,
-        "mean_pred_std": pred_std.mean()
-    }
+    return {"mae": mae, "rmse": rmse, "calibration": calibration, "mean_pred_std": pred_std.mean()}
 
 
 def main():
     """Main MC Dropout BNN training pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("MC DROPOUT BNN - Comprehensive Evaluation")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Load and prepare data
     df = load_passing_data_from_db()
@@ -490,13 +482,16 @@ def main():
 
         # Train model
         model, scaler, y_mean, y_std = train_mc_dropout_bnn(
-            X_train, y_train, X_val, y_val,
+            X_train,
+            y_train,
+            X_val,
+            y_val,
             hidden_dims=config["hidden_dims"],
             dropout_p=config["dropout_p"],
             epochs=100,
             batch_size=64,
             lr=1e-3,
-            device=device
+            device=device,
         )
 
         # Evaluate on validation set
@@ -526,25 +521,27 @@ def main():
             "y_std": y_std,
             "hidden_dims": config["hidden_dims"],
             "dropout_p": config["dropout_p"],
-            "input_dim": X_train.shape[1]
+            "input_dim": X_train.shape[1],
         }
 
         joblib.dump(save_dict, model_path)
         logger.info(f"\n✓ Model saved to {model_path}")
 
         # Store results
-        results.append({
-            "config_name": config["name"],
-            "hidden_dims": str(config["hidden_dims"]),
-            "dropout_p": config["dropout_p"],
-            "val_mae": val_metrics["mae"],
-            "val_calibration": val_metrics["calibration"],
-            "val_uncertainty": val_metrics["mean_pred_std"],
-            "test_mae": test_metrics["mae"],
-            "test_calibration": test_metrics["calibration"],
-            "test_uncertainty": test_metrics["mean_pred_std"],
-            "timestamp": pd.Timestamp.now().isoformat()
-        })
+        results.append(
+            {
+                "config_name": config["name"],
+                "hidden_dims": str(config["hidden_dims"]),
+                "dropout_p": config["dropout_p"],
+                "val_mae": val_metrics["mae"],
+                "val_calibration": val_metrics["calibration"],
+                "val_uncertainty": val_metrics["mean_pred_std"],
+                "test_mae": test_metrics["mae"],
+                "test_calibration": test_metrics["calibration"],
+                "test_uncertainty": test_metrics["mean_pred_std"],
+                "timestamp": pd.Timestamp.now().isoformat(),
+            }
+        )
 
     # Save results
     results_df = pd.DataFrame(results)

@@ -25,7 +25,7 @@ Based on: validate_online_learning_fixed.py
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
 import json
@@ -45,17 +45,17 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from py.online.incremental_xgboost import IncrementalXGBoost
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-sns.set_style('whitegrid')
+sns.set_style("whitegrid")
 
 
 # =============================================================================
 # Data Loading
 # =============================================================================
+
 
 def load_player_stats_by_week(
     season: int,
@@ -137,37 +137,45 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info(f"Starting with {len(df)} records")
 
     df = df.copy()
-    df = df.sort_values(['player_id', 'kickoff'])
+    df = df.sort_values(["player_id", "kickoff"])
 
     # L3 rolling windows (preserves 85%+ of data)
     for window in [3]:
-        df[f'passing_yards_L{window}'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(window).mean()
-        df[f'attempts_L{window}'] = df.groupby('player_id')['attempts'].shift(1).rolling(window).mean()
-        df[f'completions_L{window}'] = df.groupby('player_id')['completions'].shift(1).rolling(window).mean()
+        df[f"passing_yards_L{window}"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(window).mean()
+        )
+        df[f"attempts_L{window}"] = (
+            df.groupby("player_id")["attempts"].shift(1).rolling(window).mean()
+        )
+        df[f"completions_L{window}"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(window).mean()
+        )
 
     # Lagged completion percentage (no target leakage)
-    df['completion_pct_L3'] = (
-        df.groupby('player_id')['completions'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["completion_pct_L3"] = (
+        df.groupby("player_id")["completions"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Lagged yards per attempt (no target leakage)
-    df['yards_per_attempt_L3'] = (
-        df.groupby('player_id')['passing_yards'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["yards_per_attempt_L3"] = (
+        df.groupby("player_id")["passing_yards"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Game context features
-    df['home_favorite'] = (df['spread_close'] < 0).astype(int)
-    df['high_total'] = (df['total_close'] > 47).astype(int)
+    df["home_favorite"] = (df["spread_close"] < 0).astype(int)
+    df["high_total"] = (df["total_close"] > 47).astype(int)
 
     # Drop rows with NaN in critical features
-    critical_features = ['passing_yards_L3', 'attempts_L3', 'completions_L3']
+    critical_features = ["passing_yards_L3", "attempts_L3", "completions_L3"]
     df = df.dropna(subset=critical_features)
 
     # Fill remaining NaN with median
-    df['completion_pct_L3'] = df['completion_pct_L3'].fillna(df['completion_pct_L3'].median())
-    df['yards_per_attempt_L3'] = df['yards_per_attempt_L3'].fillna(df['yards_per_attempt_L3'].median())
+    df["completion_pct_L3"] = df["completion_pct_L3"].fillna(df["completion_pct_L3"].median())
+    df["yards_per_attempt_L3"] = df["yards_per_attempt_L3"].fillna(
+        df["yards_per_attempt_L3"].median()
+    )
 
     logger.info(f"After feature engineering: {len(df)} records")
 
@@ -177,6 +185,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 # =============================================================================
 # Prequential Evaluation
 # =============================================================================
+
 
 def run_prequential_evaluation(
     df: pd.DataFrame,
@@ -208,9 +217,23 @@ def run_prequential_evaluation(
     )
 
     # Feature columns (exclude target and identifiers)
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
-                    'season', 'week', 'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c for c in df.columns if c not in exclude_cols and df[c].dtype in ["int64", "float64"]
+    ]
 
     # Prequential evaluation
     predictions = []
@@ -221,7 +244,7 @@ def run_prequential_evaluation(
     for idx, row in df.iterrows():
         # Extract features as dict
         x = {col: row[col] for col in feature_cols}
-        y = row['passing_yards']
+        y = row["passing_yards"]
 
         # Predict (before observing true value)
         pred = model.predict_one(x)
@@ -230,15 +253,15 @@ def run_prequential_evaluation(
         errors.append(abs(y - pred))
 
         # Assign to quarter (Q1: weeks 1-6, Q2: weeks 7-12, Q3: weeks 13-18, Q4: playoffs)
-        week = row['week']
+        week = row["week"]
         if week <= 6:
-            quarter = 'Q1'
+            quarter = "Q1"
         elif week <= 12:
-            quarter = 'Q2'
+            quarter = "Q2"
         elif week <= 18:
-            quarter = 'Q3'
+            quarter = "Q3"
         else:
-            quarter = 'Q4'
+            quarter = "Q4"
 
         quarterly_stats[quarter].append(abs(y - pred))
 
@@ -254,16 +277,16 @@ def run_prequential_evaluation(
     quarterly_mae = {q: np.mean(errs) for q, errs in quarterly_stats.items()}
 
     results = {
-        'season': season,
-        'num_samples': len(df),
-        'mae': mae,
-        'rmse': rmse,
-        'bias': bias,
-        'quarterly_mae': quarterly_mae,
-        'predictions': predictions,
-        'actuals': actuals,
-        'errors': errors,
-        'model_metrics': model.get_metrics(),
+        "season": season,
+        "num_samples": len(df),
+        "mae": mae,
+        "rmse": rmse,
+        "bias": bias,
+        "quarterly_mae": quarterly_mae,
+        "predictions": predictions,
+        "actuals": actuals,
+        "errors": errors,
+        "model_metrics": model.get_metrics(),
     }
 
     logger.info(f"{season} Season - MAE: {mae:.2f} yards, RMSE: {rmse:.2f} yards")
@@ -287,12 +310,26 @@ def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, any]:
     logger.info(f"Computing static baseline for {season} season...")
 
     # Feature columns
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
-                    'season', 'week', 'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c for c in df.columns if c not in exclude_cols and df[c].dtype in ["int64", "float64"]
+    ]
 
     X = df[feature_cols].values
-    y = df['passing_yards'].values
+    y = df["passing_yards"].values
 
     # Train/test split (50/50)
     split_idx = len(df) // 2
@@ -301,6 +338,7 @@ def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, any]:
 
     # Train static XGBoost
     import xgboost as xgb
+
     model = xgb.XGBRegressor(
         n_estimators=100,
         max_depth=6,
@@ -315,11 +353,11 @@ def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, any]:
     rmse = np.sqrt(mean_squared_error(y_test, predictions))
 
     results = {
-        'season': season,
-        'mae': mae,
-        'rmse': rmse,
-        'num_train': len(X_train),
-        'num_test': len(X_test),
+        "season": season,
+        "mae": mae,
+        "rmse": rmse,
+        "num_train": len(X_train),
+        "num_test": len(X_test),
     }
 
     logger.info(f"{season} Static Baseline - MAE: {mae:.2f} yards")
@@ -330,6 +368,7 @@ def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, any]:
 # =============================================================================
 # Visualization
 # =============================================================================
+
 
 def plot_multi_season_comparison(
     season_results: dict[int, dict],
@@ -347,22 +386,24 @@ def plot_multi_season_comparison(
     # Prepare data for box plot
     data = []
     for season, results in season_results.items():
-        for error in results['errors']:
-            data.append({'Season': season, 'Model': 'Incremental XGB', 'MAE': error})
+        for error in results["errors"]:
+            data.append({"Season": season, "Model": "Incremental XGB", "MAE": error})
 
     df_plot = pd.DataFrame(data)
 
     fig, ax = plt.subplots(figsize=(12, 6))
-    sns.boxplot(x='Season', y='MAE', data=df_plot, ax=ax, color='steelblue')
+    sns.boxplot(x="Season", y="MAE", data=df_plot, ax=ax, color="steelblue")
 
-    ax.set_xlabel('Season', fontsize=12)
-    ax.set_ylabel('Absolute Error (yards)', fontsize=12)
-    ax.set_title('Incremental XGBoost Performance by Season', fontsize=14, fontweight='bold')
-    ax.axhline(y=65, color='red', linestyle='--', linewidth=1, label='Rejection Threshold (65 yards)')
+    ax.set_xlabel("Season", fontsize=12)
+    ax.set_ylabel("Absolute Error (yards)", fontsize=12)
+    ax.set_title("Incremental XGBoost Performance by Season", fontsize=14, fontweight="bold")
+    ax.axhline(
+        y=65, color="red", linestyle="--", linewidth=1, label="Rejection Threshold (65 yards)"
+    )
     ax.legend()
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
     logger.info(f"Plot saved to {output_path}")
@@ -385,19 +426,19 @@ def plot_cumulative_mae(
 
     for season in sorted(season_results.keys()):
         results = season_results[season]
-        errors = results['errors']
-        cumulative_mae = [np.mean(errors[:i+1]) for i in range(len(errors))]
-        ax.plot(cumulative_mae, label=f'{season}', linewidth=2)
+        errors = results["errors"]
+        cumulative_mae = [np.mean(errors[: i + 1]) for i in range(len(errors))]
+        ax.plot(cumulative_mae, label=f"{season}", linewidth=2)
 
-    ax.set_xlabel('Game Number', fontsize=12)
-    ax.set_ylabel('Cumulative MAE (yards)', fontsize=12)
-    ax.set_title('Cumulative MAE Evolution (Prequential)', fontsize=14, fontweight='bold')
-    ax.axhline(y=65, color='red', linestyle='--', linewidth=1, alpha=0.5, label='Threshold')
+    ax.set_xlabel("Game Number", fontsize=12)
+    ax.set_ylabel("Cumulative MAE (yards)", fontsize=12)
+    ax.set_title("Cumulative MAE Evolution (Prequential)", fontsize=14, fontweight="bold")
+    ax.axhline(y=65, color="red", linestyle="--", linewidth=1, alpha=0.5, label="Threshold")
     ax.legend()
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
     logger.info(f"Plot saved to {output_path}")
@@ -428,23 +469,25 @@ def plot_win_loss_heatmap(
     win_rates = []
     for season in sorted(season_results.keys()):
         inc_results = season_results[season]
-        quarterly_mae = inc_results['quarterly_mae']
-        row = [quarterly_mae.get(q, 0) for q in ['Q1', 'Q2', 'Q3', 'Q4']]
+        quarterly_mae = inc_results["quarterly_mae"]
+        row = [quarterly_mae.get(q, 0) for q in ["Q1", "Q2", "Q3", "Q4"]]
         win_rates.append(row)
 
     win_rates_df = pd.DataFrame(
         win_rates,
         index=sorted(season_results.keys()),
-        columns=['Q1 (Sep-Oct)', 'Q2 (Nov)', 'Q3 (Dec)', 'Q4 (Playoffs)']
+        columns=["Q1 (Sep-Oct)", "Q2 (Nov)", "Q3 (Dec)", "Q4 (Playoffs)"],
     )
 
-    sns.heatmap(win_rates_df, annot=True, fmt='.1f', cmap='RdYlGn_r', ax=ax, center=55)
-    ax.set_title('Incremental XGBoost MAE by Quarter (Green=Better)', fontsize=14, fontweight='bold')
-    ax.set_xlabel('Quarter', fontsize=12)
-    ax.set_ylabel('Season', fontsize=12)
+    sns.heatmap(win_rates_df, annot=True, fmt=".1f", cmap="RdYlGn_r", ax=ax, center=55)
+    ax.set_title(
+        "Incremental XGBoost MAE by Quarter (Green=Better)", fontsize=14, fontweight="bold"
+    )
+    ax.set_xlabel("Quarter", fontsize=12)
+    ax.set_ylabel("Season", fontsize=12)
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
     logger.info(f"Plot saved to {output_path}")
@@ -454,17 +497,26 @@ def plot_win_loss_heatmap(
 # Main Workflow
 # =============================================================================
 
+
 def main():
     """Run Week 1 historical validation"""
-    parser = argparse.ArgumentParser(description='Incremental XGBoost Historical Validation')
-    parser.add_argument('--seasons', nargs='+', type=int, default=[2022, 2023, 2024],
-                        help='Seasons to validate (default: 2022 2023 2024)')
-    parser.add_argument('--window-size', type=int, default=100,
-                        help='Sliding window size (default: 100)')
-    parser.add_argument('--retrain-every', type=int, default=20,
-                        help='Retrain every N samples (default: 20)')
-    parser.add_argument('--output-dir', type=str, default='results',
-                        help='Output directory for results')
+    parser = argparse.ArgumentParser(description="Incremental XGBoost Historical Validation")
+    parser.add_argument(
+        "--seasons",
+        nargs="+",
+        type=int,
+        default=[2022, 2023, 2024],
+        help="Seasons to validate (default: 2022 2023 2024)",
+    )
+    parser.add_argument(
+        "--window-size", type=int, default=100, help="Sliding window size (default: 100)"
+    )
+    parser.add_argument(
+        "--retrain-every", type=int, default=20, help="Retrain every N samples (default: 20)"
+    )
+    parser.add_argument(
+        "--output-dir", type=str, default="results", help="Output directory for results"
+    )
     args = parser.parse_args()
 
     logger.info("=" * 60)
@@ -478,11 +530,11 @@ def main():
 
     # Database connection
     db_params = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
+        "host": "localhost",
+        "port": 5544,
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     # Create output directories
@@ -517,11 +569,14 @@ def main():
 
         # Save individual season results
         output_file = f"{args.output_dir}/incremental_xgb_{season}_validation.json"
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             # Remove large arrays before saving
-            save_results = {k: v for k, v in inc_results.items()
-                          if k not in ['predictions', 'actuals', 'errors']}
-            save_results['baseline'] = base_results
+            save_results = {
+                k: v
+                for k, v in inc_results.items()
+                if k not in ["predictions", "actuals", "errors"]
+            }
+            save_results["baseline"] = base_results
             json.dump(save_results, f, indent=2, default=str)
         logger.info(f"Results saved to {output_file}")
 
@@ -532,27 +587,29 @@ def main():
 
     comparison_table = []
     for season in args.seasons:
-        inc_mae = season_results[season]['mae']
-        base_mae = baseline_results[season]['mae']
+        inc_mae = season_results[season]["mae"]
+        base_mae = baseline_results[season]["mae"]
         improvement = (base_mae - inc_mae) / base_mae * 100
 
-        comparison_table.append({
-            'Season': season,
-            'Games': season_results[season]['num_samples'],
-            'Incremental XGB MAE': inc_mae,
-            'Static MAE': base_mae,
-            'Improvement': improvement,
-        })
+        comparison_table.append(
+            {
+                "Season": season,
+                "Games": season_results[season]["num_samples"],
+                "Incremental XGB MAE": inc_mae,
+                "Static MAE": base_mae,
+                "Improvement": improvement,
+            }
+        )
 
     comparison_df = pd.DataFrame(comparison_table)
 
     # Add average row
     avg_row = {
-        'Season': 'Average',
-        'Games': comparison_df['Games'].sum(),
-        'Incremental XGB MAE': comparison_df['Incremental XGB MAE'].mean(),
-        'Static MAE': comparison_df['Static MAE'].mean(),
-        'Improvement': comparison_df['Improvement'].mean(),
+        "Season": "Average",
+        "Games": comparison_df["Games"].sum(),
+        "Incremental XGB MAE": comparison_df["Incremental XGB MAE"].mean(),
+        "Static MAE": comparison_df["Static MAE"].mean(),
+        "Improvement": comparison_df["Improvement"].mean(),
     }
     comparison_df = pd.concat([comparison_df, pd.DataFrame([avg_row])], ignore_index=True)
 
@@ -563,11 +620,13 @@ def main():
     print("=" * 80)
 
     # Success criteria check
-    avg_improvement = comparison_df[comparison_df['Season'] != 'Average']['Improvement'].mean()
-    max_mae = comparison_df[comparison_df['Season'] != 'Average']['Incremental XGB MAE'].max()
+    avg_improvement = comparison_df[comparison_df["Season"] != "Average"]["Improvement"].mean()
+    max_mae = comparison_df[comparison_df["Season"] != "Average"]["Incremental XGB MAE"].max()
 
     print("\nSUCCESS CRITERIA:")
-    print(f"  [{'✓' if avg_improvement > 15 else '✗'}] Average improvement > 15%: {avg_improvement:.1f}%")
+    print(
+        f"  [{'✓' if avg_improvement > 15 else '✗'}] Average improvement > 15%: {avg_improvement:.1f}%"
+    )
     print(f"  [{'✓' if max_mae < 65 else '✗'}] No season with MAE > 65 yards: {max_mae:.2f} yards")
 
     # Production decision
@@ -606,34 +665,34 @@ def main():
 
     # Save comprehensive report
     report = {
-        'metadata': {
-            'timestamp': datetime.now().isoformat(),
-            'seasons': args.seasons,
-            'window_size': args.window_size,
-            'retrain_every': args.retrain_every,
-            'validation_time_seconds': time.time() - start_time,
+        "metadata": {
+            "timestamp": datetime.now().isoformat(),
+            "seasons": args.seasons,
+            "window_size": args.window_size,
+            "retrain_every": args.retrain_every,
+            "validation_time_seconds": time.time() - start_time,
         },
-        'comparison_table': comparison_df.to_dict('records'),
-        'decision': {
-            'recommendation': decision,
-            'status': status,
-            'avg_improvement': avg_improvement,
-            'max_mae': max_mae,
+        "comparison_table": comparison_df.to_dict("records"),
+        "decision": {
+            "recommendation": decision,
+            "status": status,
+            "avg_improvement": avg_improvement,
+            "max_mae": max_mae,
         },
-        'season_details': {
+        "season_details": {
             season: {
-                'mae': results['mae'],
-                'rmse': results['rmse'],
-                'bias': results['bias'],
-                'quarterly_mae': results['quarterly_mae'],
-                'model_metrics': results['model_metrics'],
+                "mae": results["mae"],
+                "rmse": results["rmse"],
+                "bias": results["bias"],
+                "quarterly_mae": results["quarterly_mae"],
+                "model_metrics": results["model_metrics"],
             }
             for season, results in season_results.items()
         },
     }
 
     report_file = f"{args.output_dir}/incremental_xgb_historical_validation.json"
-    with open(report_file, 'w') as f:
+    with open(report_file, "w") as f:
         json.dump(report, f, indent=2, default=str)
 
     logger.info(f"\nComprehensive report saved to {report_file}")

@@ -37,10 +37,7 @@ import time
 import numpy as np
 import pandas as pd
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -91,9 +88,9 @@ def run_mini_backtest():
     """Run mini backtest with batched R interface."""
     from py.ensemble.r_model_interface_batched import BatchedRModelInterface
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("R MODEL FIX VALIDATION - MINI BACKTEST (10 GAMES)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Initialize
     db_config = {
@@ -120,9 +117,9 @@ def run_mini_backtest():
     # Batch predictions
     logger.info("\n4. Running batch predictions...")
 
-    player_ids = df['player_id'].tolist()
-    seasons = df['season'].tolist()
-    weeks = df['week'].tolist()
+    player_ids = df["player_id"].tolist()
+    seasons = df["season"].tolist()
+    weeks = df["week"].tolist()
 
     # Hierarchical v2
     logger.info("   Hierarchical v2...")
@@ -139,19 +136,21 @@ def run_mini_backtest():
     logger.info(f"   ✅ Complete in {ip_time:.2f}s ({ip_time/len(df):.3f}s per game)")
 
     # Add predictions to df
-    df['hier_mean'] = [r[0] if r[0] is not None else np.nan for r in hier_results]
-    df['hier_std'] = [r[1] if r[1] is not None else np.nan for r in hier_results]
-    df['ip_mean'] = [r[0] if r[0] is not None else np.nan for r in ip_results]
-    df['ip_std'] = [r[1] if r[1] is not None else np.nan for r in ip_results]
+    df["hier_mean"] = [r[0] if r[0] is not None else np.nan for r in hier_results]
+    df["hier_std"] = [r[1] if r[1] is not None else np.nan for r in hier_results]
+    df["ip_mean"] = [r[0] if r[0] is not None else np.nan for r in ip_results]
+    df["ip_std"] = [r[1] if r[1] is not None else np.nan for r in ip_results]
 
     # Calculate metrics
     logger.info("\n5. Calculating metrics...")
 
     # Filter successful predictions
-    df_valid_hier = df[df['hier_mean'].notna()].copy()
-    df_valid_ip = df[df['ip_mean'].notna()].copy()
+    df_valid_hier = df[df["hier_mean"].notna()].copy()
+    df_valid_ip = df[df["ip_mean"].notna()].copy()
 
-    logger.info(f"   Valid predictions: {len(df_valid_hier)}/10 (Hierarchical), {len(df_valid_ip)}/10 (IP)")
+    logger.info(
+        f"   Valid predictions: {len(df_valid_hier)}/10 (Hierarchical), {len(df_valid_ip)}/10 (IP)"
+    )
 
     if len(df_valid_hier) == 0:
         logger.error("❌ No valid Hierarchical predictions - FAILED")
@@ -159,14 +158,14 @@ def run_mini_backtest():
         return 1
 
     # MAE
-    hier_mae = np.abs(df_valid_hier['actual_yards'] - df_valid_hier['hier_mean']).mean()
-    ip_mae = np.abs(df_valid_ip['actual_yards'] - df_valid_ip['ip_mean']).mean()
+    hier_mae = np.abs(df_valid_hier["actual_yards"] - df_valid_hier["hier_mean"]).mean()
+    ip_mae = np.abs(df_valid_ip["actual_yards"] - df_valid_ip["ip_mean"]).mean()
 
     # Average ensemble MAE (50/50 blend)
-    df_valid_both = df[(df['hier_mean'].notna()) & (df['ip_mean'].notna())].copy()
+    df_valid_both = df[(df["hier_mean"].notna()) & (df["ip_mean"].notna())].copy()
     if len(df_valid_both) > 0:
-        ensemble_mean = (df_valid_both['hier_mean'] + df_valid_both['ip_mean']) / 2
-        ensemble_mae = np.abs(df_valid_both['actual_yards'] - ensemble_mean).mean()
+        ensemble_mean = (df_valid_both["hier_mean"] + df_valid_both["ip_mean"]) / 2
+        ensemble_mae = np.abs(df_valid_both["actual_yards"] - ensemble_mean).mean()
     else:
         ensemble_mae = np.nan
 
@@ -187,16 +186,18 @@ def run_mini_backtest():
         )
 
     # Validate gates
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("VALIDATION RESULTS")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     total_time = load_time + hier_time + ip_time
     mae_pass = ensemble_mae < 45.0
     coverage_pass = len(df_valid_hier) == 10 and len(df_valid_ip) == 10
     speed_pass = total_time < 30.0
 
-    logger.info(f"\n✅ Coverage: {'PASS' if coverage_pass else 'FAIL'} ({len(df_valid_hier)}/10 games)")
+    logger.info(
+        f"\n✅ Coverage: {'PASS' if coverage_pass else 'FAIL'} ({len(df_valid_hier)}/10 games)"
+    )
     logger.info(f"✅ MAE: {'PASS' if mae_pass else 'FAIL'} ({ensemble_mae:.2f} < 45.0 yards)")
     logger.info(f"✅ Speed: {'PASS' if speed_pass else 'FAIL'} ({total_time:.2f}s < 30s)")
 
@@ -204,14 +205,14 @@ def run_mini_backtest():
 
     if all_pass:
         logger.info("\n🎉 ALL GATES PASSED - R MODEL FIX VALIDATED")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("✅ Production ready - proceed with full backtest")
-        logger.info("="*80)
+        logger.info("=" * 80)
         interface.close()
         return 0
     else:
         logger.error("\n❌ SOME GATES FAILED - Further investigation required")
-        logger.error("="*80)
+        logger.error("=" * 80)
         interface.close()
         return 1
 
@@ -222,6 +223,7 @@ def main():
     except Exception as e:
         logger.error(f"❌ Mini backtest crashed: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return 1
 

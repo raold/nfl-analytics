@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fetch_historical_games_basic():
@@ -56,7 +53,6 @@ def test_fetch_historical_games_basic():
     assert result is not None
 
 
-
 def test_fetch_historical_games_edge_cases():
     """Test fetch_historical_games: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_historical_games_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_historical_games_error_handling():
     """Test fetch_historical_games error handling."""
     with pytest.raises(ValueError):
         fetch_historical_games(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_fetch_historical_games_property_idempotent(val):
 
     # Assert property
     assert fetch_historical_games(val) == result, "idempotent violated"
-
 
 
 def test_simulate_betting_line_basic():
@@ -100,7 +93,6 @@ def test_simulate_betting_line_basic():
     assert result is not None
 
 
-
 def test_simulate_betting_line_edge_cases():
     """Test simulate_betting_line: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_simulate_betting_line_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_betting_line_error_handling():
     """Test simulate_betting_line error handling."""
     with pytest.raises(ValueError):
         simulate_betting_line(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_simulate_betting_line_property_idempotent(self, self, actual_yards):
 
     # Assert property
     assert simulate_betting_line(self, actual_yards) == result, "idempotent violated"
-
 
 
 def test_american_to_decimal_basic():
@@ -144,7 +133,6 @@ def test_american_to_decimal_basic():
     assert result is not None
 
 
-
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_american_to_decimal_edge_cases():
     assert result is not None
 
 
-
 def test_american_to_decimal_error_handling():
     """Test american_to_decimal error handling."""
     with pytest.raises(ValueError):
         american_to_decimal(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_american_to_decimal_property_idempotent(self, self, american_odds):
 
     # Assert property
     assert american_to_decimal(self, american_odds) == result, "idempotent violated"
-
 
 
 def test_calculate_kelly_bet_size_basic():
@@ -188,7 +173,6 @@ def test_calculate_kelly_bet_size_basic():
     assert result is not None
 
 
-
 def test_calculate_kelly_bet_size_edge_cases():
     """Test calculate_kelly_bet_size: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_calculate_kelly_bet_size_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_kelly_bet_size_error_handling():
     """Test calculate_kelly_bet_size error handling."""
     with pytest.raises(ValueError):
         calculate_kelly_bet_size(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -216,8 +198,9 @@ def test_calculate_kelly_bet_size_property_idempotent(self, self, edge, prob_win
     result = calculate_kelly_bet_size(self, edge, prob_win, odds, bankroll)
 
     # Assert property
-    assert calculate_kelly_bet_size(self, edge, prob_win, odds, bankroll) == result, "idempotent violated"
-
+    assert (
+        calculate_kelly_bet_size(self, edge, prob_win, odds, bankroll) == result
+    ), "idempotent violated"
 
 
 def test_process_game_basic():
@@ -232,7 +215,6 @@ def test_process_game_basic():
     assert result is not None
 
 
-
 def test_process_game_edge_cases():
     """Test process_game: edge cases."""
     # Arrange
@@ -245,12 +227,10 @@ def test_process_game_edge_cases():
     assert result is not None
 
 
-
 def test_process_game_error_handling():
     """Test process_game error handling."""
     with pytest.raises(ValueError):
         process_game(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,7 +241,6 @@ def test_process_game_property_idempotent(self, self, row):
 
     # Assert property
     assert process_game(self, row) == result, "idempotent violated"
-
 
 
 def test_run_backtest_basic():
@@ -276,7 +255,6 @@ def test_run_backtest_basic():
     assert result is not None
 
 
-
 def test_run_backtest_edge_cases():
     """Test run_backtest: edge cases."""
     # Arrange
@@ -289,12 +267,10 @@ def test_run_backtest_edge_cases():
     assert result is not None
 
 
-
 def test_run_backtest_error_handling():
     """Test run_backtest error handling."""
     with pytest.raises(ValueError):
         run_backtest(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,7 +281,6 @@ def test_run_backtest_property_idempotent(val):
 
     # Assert property
     assert run_backtest(val) == result, "idempotent violated"
-
 
 
 def test_calculate_metrics_basic():
@@ -320,7 +295,6 @@ def test_calculate_metrics_basic():
     assert result is not None
 
 
-
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
@@ -333,12 +307,10 @@ def test_calculate_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_metrics_error_handling():
     """Test calculate_metrics error handling."""
     with pytest.raises(ValueError):
         calculate_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -349,7 +321,6 @@ def test_calculate_metrics_property_idempotent(self, self, results_df):
 
     # Assert property
     assert calculate_metrics(self, results_df) == result, "idempotent violated"
-
 
 
 def test_print_summary_basic():
@@ -364,7 +335,6 @@ def test_print_summary_basic():
     assert result is not None
 
 
-
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
@@ -377,12 +347,10 @@ def test_print_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_summary_error_handling():
     """Test print_summary error handling."""
     with pytest.raises(ValueError):
         print_summary(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -393,7 +361,6 @@ def test_print_summary_property_idempotent(self, self, metrics):
 
     # Assert property
     assert print_summary(self, metrics) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -408,7 +375,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -421,12 +387,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -437,7 +401,6 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-
 
 
 def test_convert_to_native_basic():
@@ -452,7 +415,6 @@ def test_convert_to_native_basic():
     assert result is not None
 
 
-
 def test_convert_to_native_edge_cases():
     """Test convert_to_native: edge cases."""
     # Arrange
@@ -465,12 +427,10 @@ def test_convert_to_native_edge_cases():
     assert result is not None
 
 
-
 def test_convert_to_native_error_handling():
     """Test convert_to_native error handling."""
     with pytest.raises(ValueError):
         convert_to_native(invalid_input)
-
 
 
 @given(st.integers())
@@ -481,4 +441,3 @@ def test_convert_to_native_property_idempotent(self, obj):
 
     # Assert property
     assert convert_to_native(obj) == result, "idempotent violated"
-

@@ -28,17 +28,16 @@ def example_1_single_season():
 
     Use case: Training XGBoost on historical data (2020-2024).
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 1: Extract Full Season (Batch Mode)")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
     # Extract all games from 2023 season (weeks 1-18)
     start = time.time()
     features_df = loader.extract_season_features(
-        season=2023,
-        weeks=list(range(1, 19))  # Weeks 1-18
+        season=2023, weeks=list(range(1, 19))  # Weeks 1-18
     )
     elapsed = time.time() - start
 
@@ -50,7 +49,9 @@ def example_1_single_season():
     # Display sample features
     print("\n  Sample game:")
     sample = features_df.iloc[0]
-    print(f"    Game: {sample['home_team']} vs {sample['away_team']} ({sample['season']} Week {sample['week']})")
+    print(
+        f"    Game: {sample['home_team']} vs {sample['away_team']} ({sample['season']} Week {sample['week']})"
+    )
     print(f"    Spread: {sample['spread_close']:.1f}")
     print(f"    Home EPA: {sample.get('home_off_epa_per_play', 0):.3f}")
     print(f"    Away EPA: {sample.get('away_off_epa_per_play', 0):.3f}")
@@ -64,19 +65,21 @@ def example_2_batch_extraction():
 
     Use case: Dashboard fetching predictions for Week 12 games.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 2: Batch Game Extraction (API Endpoint)")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
     # Create batch request for Week 12 games
-    games_df = pd.DataFrame({
-        'season': [2024] * 5,
-        'week': [12] * 5,
-        'home_team': ['KC', 'BUF', 'SF', 'PHI', 'BAL'],
-        'away_team': ['LAC', 'MIA', 'GB', 'LAR', 'PIT']
-    })
+    games_df = pd.DataFrame(
+        {
+            "season": [2024] * 5,
+            "week": [12] * 5,
+            "home_team": ["KC", "BUF", "SF", "PHI", "BAL"],
+            "away_team": ["LAC", "MIA", "GB", "LAR", "PIT"],
+        }
+    )
 
     # Extract features with caching
     start = time.time()
@@ -105,9 +108,9 @@ def example_3_backtest_workflow():
 
     Use case: Validating ensemble model on 2022-2024 seasons.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 3: Multi-Season Backtest Workflow")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
@@ -118,13 +121,14 @@ def example_3_backtest_workflow():
     for season in [2022, 2023, 2024]:
         start = time.time()
         season_features = loader.extract_season_features(
-            season=season,
-            weeks=list(range(1, 13))  # First 12 weeks only
+            season=season, weeks=list(range(1, 13))  # First 12 weeks only
         )
         elapsed = time.time() - start
 
         all_seasons_features.append(season_features)
-        print(f"  {season}: {len(season_features)} games in {elapsed:.2f}s ({len(season_features)/elapsed:.1f} games/sec)")
+        print(
+            f"  {season}: {len(season_features)} games in {elapsed:.2f}s ({len(season_features)/elapsed:.1f} games/sec)"
+        )
 
     # Combine all seasons
     combined_df = pd.concat(all_seasons_features, ignore_index=True)
@@ -144,9 +148,9 @@ def example_4_cache_management():
 
     Use case: Production monitoring and cache invalidation.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 4: Cache Management")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
@@ -175,9 +179,9 @@ def example_5_feature_selection():
 
     Use case: When you only need certain feature categories.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 5: Selective Feature Extraction")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
@@ -186,7 +190,7 @@ def example_5_feature_selection():
     features_df = loader.extract_season_features(
         season=2024,
         weeks=[1, 2, 3, 4, 5],
-        feature_types=['vegas', 'environmental']  # Subset of features
+        feature_types=["vegas", "environmental"],  # Subset of features
     )
     elapsed = time.time() - start
 
@@ -203,9 +207,9 @@ def example_6_integration_with_xgboost():
 
     Use case: Training XGBoost v5 model on historical data.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Example 6: XGBoost Training Integration")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
@@ -213,10 +217,7 @@ def example_6_integration_with_xgboost():
     print("\n  Extracting training data (2020-2023)...")
     train_features = []
     for season in [2020, 2021, 2022, 2023]:
-        season_data = loader.extract_season_features(
-            season=season,
-            weeks=list(range(1, 19))
-        )
+        season_data = loader.extract_season_features(season=season, weeks=list(range(1, 19)))
         train_features.append(season_data)
 
     train_df = pd.concat(train_features, ignore_index=True)
@@ -224,17 +225,18 @@ def example_6_integration_with_xgboost():
 
     # Extract validation data (2024)
     print("\n  Extracting validation data (2024 weeks 1-10)...")
-    val_df = loader.extract_season_features(
-        season=2024,
-        weeks=list(range(1, 11))
-    )
+    val_df = loader.extract_season_features(season=2024, weeks=list(range(1, 11)))
     print(f"✓ Validation set: {len(val_df)} games, {len(val_df.columns)} features")
 
     # Prepare feature matrix (X) and target (y)
     # NOTE: This assumes you have actual outcomes in the database
     # For demo purposes, we'll just show the feature preparation step
 
-    feature_cols = [col for col in train_df.columns if col not in ['game_id', 'season', 'week', 'home_team', 'away_team']]
+    feature_cols = [
+        col
+        for col in train_df.columns
+        if col not in ["game_id", "season", "week", "home_team", "away_team"]
+    ]
     X_train = train_df[feature_cols]
     X_val = val_df[feature_cols]
 
@@ -261,9 +263,9 @@ def benchmark_comparison():
     """
     Benchmark: Compare sequential vs parallel vs cached extraction.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("BENCHMARK: Sequential vs Parallel vs Cached")
-    print("="*80)
+    print("=" * 80)
 
     loader = ParallelFeatureLoader(use_redis=True, n_workers=8)
 
@@ -281,7 +283,7 @@ def benchmark_comparison():
 
     # Run 2: Warm start (cache populated)
     start = time.time()
-    games_sample = df1[['season', 'week', 'home_team', 'away_team']]
+    games_sample = df1[["season", "week", "home_team", "away_team"]]
     df2 = loader.extract_game_features_batch(games_sample, use_cache=True)
     time_warm = time.time() - start
 
@@ -294,7 +296,9 @@ def benchmark_comparison():
     print("\n  Results:")
     print(f"    Cold start (batch SQL):     {time_cold:.2f}s ({len(df1)/time_cold:.1f} games/sec)")
     print(f"    Warm start (Redis cache):   {time_warm:.2f}s ({len(df2)/time_warm:.1f} games/sec)")
-    print(f"    No cache (batch SQL):       {time_no_cache:.2f}s ({len(df3)/time_no_cache:.1f} games/sec)")
+    print(
+        f"    No cache (batch SQL):       {time_no_cache:.2f}s ({len(df3)/time_no_cache:.1f} games/sec)"
+    )
     print("\n  Speedup:")
     print(f"    Batch vs Sequential (est): {len(df1) / time_cold:.1f}x")
     print(f"    Cache vs Cold start:        {time_cold / time_warm:.1f}x")
@@ -310,9 +314,9 @@ def main():
     """
     Run all examples and benchmark.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ULTRA-FAST PARALLEL FEATURE LOADER - USAGE EXAMPLES")
-    print("="*80)
+    print("=" * 80)
 
     try:
         # Example 1: Single season batch extraction
@@ -336,13 +340,14 @@ def main():
         # Benchmark
         benchmark_comparison()
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ALL EXAMPLES COMPLETE!")
-        print("="*80)
+        print("=" * 80)
 
     except Exception as e:
         print(f"\n✗ Error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

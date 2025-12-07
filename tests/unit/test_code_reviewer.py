@@ -23,7 +23,6 @@ def test_add_issue_basic():
     assert result is not None
 
 
-
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_add_issue_edge_cases():
     assert result is not None
 
 
-
 def test_add_issue_error_handling():
     """Test add_issue error handling."""
     with pytest.raises(ValueError):
         add_issue(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_add_issue_property_idempotent(self, self, issue):
 
     # Assert property
     assert add_issue(self, issue) == result, "idempotent violated"
-
 
 
 def test_has_blocking_issues_basic():
@@ -67,7 +63,6 @@ def test_has_blocking_issues_basic():
     assert result is not None
 
 
-
 def test_has_blocking_issues_edge_cases():
     """Test has_blocking_issues: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_has_blocking_issues_edge_cases():
     assert result is not None
 
 
-
 def test_has_blocking_issues_error_handling():
     """Test has_blocking_issues error handling."""
     with pytest.raises(ValueError):
         has_blocking_issues(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_has_blocking_issues_property_idempotent(val):
 
     # Assert property
     assert has_blocking_issues(val) == result, "idempotent violated"
-
 
 
 def test_review_file_basic():
@@ -111,7 +103,6 @@ def test_review_file_basic():
     assert result is not None
 
 
-
 def test_review_file_edge_cases():
     """Test review_file: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_review_file_edge_cases():
     assert result is not None
 
 
-
 def test_review_file_error_handling():
     """Test review_file error handling."""
     with pytest.raises(ValueError):
         review_file(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_review_file_property_idempotent(self, self, file_path):
 
     # Assert property
     assert review_file(self, file_path) == result, "idempotent violated"
-
 
 
 def test_review_changes_basic():
@@ -155,7 +143,6 @@ def test_review_changes_basic():
     assert result is not None
 
 
-
 def test_review_changes_edge_cases():
     """Test review_changes: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_review_changes_edge_cases():
     assert result is not None
 
 
-
 def test_review_changes_error_handling():
     """Test review_changes error handling."""
     with pytest.raises(ValueError):
         review_changes(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_review_changes_property_idempotent(self, self, git_diff):
 
     # Assert property
     assert review_changes(self, git_diff) == result, "idempotent violated"
-
 
 
 def test_generate_report_basic():
@@ -199,7 +183,6 @@ def test_generate_report_basic():
     assert result is not None
 
 
-
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_generate_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_report_error_handling():
     """Test generate_report error handling."""
     with pytest.raises(ValueError):
         generate_report(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,4 +209,3 @@ def test_generate_report_property_idempotent(val):
 
     # Assert property
     assert generate_report(val) == result, "idempotent violated"
-

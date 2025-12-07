@@ -17,7 +17,7 @@ import logging
 
 import psycopg
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Database config
@@ -26,8 +26,9 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
+
 
 def fix_kickoff_times(season, week):
     """Fix kickoff times for a specific week to standard NFL times."""
@@ -37,7 +38,8 @@ def fix_kickoff_times(season, week):
 
     try:
         # Get current kickoff times
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT game_id, home_team, away_team, kickoff,
                    EXTRACT(DOW FROM kickoff) as day_of_week,
                    EXTRACT(HOUR FROM kickoff AT TIME ZONE 'America/New_York') as hour_et,
@@ -45,7 +47,9 @@ def fix_kickoff_times(season, week):
             FROM games
             WHERE season = %s AND week = %s
             ORDER BY kickoff
-        """, (season, week))
+        """,
+            (season, week),
+        )
 
         games = cursor.fetchall()
         logger.info(f"Found {len(games)} games in Week {week}, {season}")
@@ -56,11 +60,15 @@ def fix_kickoff_times(season, week):
 
             # Check if time needs fixing (non-standard minutes)
             if minute_et not in [0, 5, 15, 20, 25, 30]:
-                logger.info(f"Fixing {game_id}: {home} vs {away} - current time {hour_et:02.0f}:{minute_et:02.0f} ET")
+                logger.info(
+                    f"Fixing {game_id}: {home} vs {away} - current time {hour_et:02.0f}:{minute_et:02.0f} ET"
+                )
 
                 # Determine proper kickoff time based on day and approximate time
                 if dow == 4:  # Thursday
-                    new_kickoff = kickoff.replace(hour=1, minute=15, second=0)  # 8:15 PM ET next day in UTC
+                    new_kickoff = kickoff.replace(
+                        hour=1, minute=15, second=0
+                    )  # 8:15 PM ET next day in UTC
                 elif dow == 5:  # Friday
                     new_kickoff = kickoff.replace(hour=20, minute=0, second=0)  # 3:00 PM ET
                 elif dow == 0:  # Sunday
@@ -84,25 +92,31 @@ def fix_kickoff_times(season, week):
 
         # Apply updates
         if updates:
-            cursor.executemany("""
+            cursor.executemany(
+                """
                 UPDATE games
                 SET kickoff = %s
                 WHERE game_id = %s
-            """, updates)
+            """,
+                updates,
+            )
             conn.commit()
             logger.info(f"Updated {len(updates)} kickoff times")
         else:
             logger.info("All kickoff times appear correct")
 
         # Show final times
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT game_id,
                    home_team || ' vs ' || away_team as matchup,
                    TO_CHAR(kickoff AT TIME ZONE 'America/New_York', 'Dy MM/DD HH12:MI AM TZ') as kickoff_display
             FROM games
             WHERE season = %s AND week = %s
             ORDER BY kickoff
-        """, (season, week))
+        """,
+            (season, week),
+        )
 
         logger.info("\nFinal kickoff times:")
         for game_id, matchup, kickoff_display in cursor.fetchall():
@@ -114,6 +128,7 @@ def fix_kickoff_times(season, week):
     finally:
         cursor.close()
         conn.close()
+
 
 if __name__ == "__main__":
     import sys

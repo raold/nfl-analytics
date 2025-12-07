@@ -92,10 +92,7 @@ class NFLDatabase:
         return df
 
     def load_player_game_stats(
-        self,
-        season: int | None = None,
-        week: int | None = None,
-        stat_category: str | None = None
+        self, season: int | None = None, week: int | None = None, stat_category: str | None = None
     ) -> pd.DataFrame:
         """
         Load player game stats from materialized view.
@@ -312,20 +309,45 @@ class NFLGraphBuilder:
 
     # Team abbreviations (all 32 NFL teams)
     NFL_TEAMS = [
-        "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
-        "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
-        "LAC", "LAR", "LV", "MIA", "MIN", "NE", "NO", "NYG",
-        "NYJ", "PHI", "PIT", "SEA", "SF", "TB", "TEN", "WAS"
+        "ARI",
+        "ATL",
+        "BAL",
+        "BUF",
+        "CAR",
+        "CHI",
+        "CIN",
+        "CLE",
+        "DAL",
+        "DEN",
+        "DET",
+        "GB",
+        "HOU",
+        "IND",
+        "JAX",
+        "KC",
+        "LAC",
+        "LAR",
+        "LV",
+        "MIA",
+        "MIN",
+        "NE",
+        "NO",
+        "NYG",
+        "NYJ",
+        "PHI",
+        "PIT",
+        "SEA",
+        "SF",
+        "TB",
+        "TEN",
+        "WAS",
     ]
 
     def __init__(self, db: NFLDatabase):
         self.db = db
 
     def build_multi_season_graph(
-        self,
-        seasons: list[int],
-        include_chemistry: bool = True,
-        include_matchups: bool = False
+        self, seasons: list[int], include_chemistry: bool = True, include_matchups: bool = False
     ) -> NFLGraph:
         """
         Build unified graph across multiple seasons.
@@ -352,17 +374,23 @@ class NFLGraphBuilder:
         player_hierarchy = pd.concat(all_players, ignore_index=True)
         logger.info(f"  Total player records before dedup: {len(player_hierarchy)}")
 
-        player_hierarchy = player_hierarchy.sort_values('current_team').drop_duplicates(
-            subset='player_id', keep='last'
+        player_hierarchy = player_hierarchy.sort_values("current_team").drop_duplicates(
+            subset="player_id", keep="last"
         )
         logger.info(f"  After deduplication: {len(player_hierarchy)} unique players")
 
         # DEBUG: Check for any duplicates
-        if player_hierarchy['player_id'].duplicated().any():
-            logger.warning(f"  ⚠ WARNING: Still have {player_hierarchy['player_id'].duplicated().sum()} duplicate player_ids!")
-            logger.warning(f"    Sample duplicates: {player_hierarchy[player_hierarchy['player_id'].duplicated()]['player_id'].head()}")
+        if player_hierarchy["player_id"].duplicated().any():
+            logger.warning(
+                f"  ⚠ WARNING: Still have {player_hierarchy['player_id'].duplicated().sum()} duplicate player_ids!"
+            )
+            logger.warning(
+                f"    Sample duplicates: {player_hierarchy[player_hierarchy['player_id'].duplicated()]['player_id'].head()}"
+            )
 
-        logger.info(f"  Unified player hierarchy: {len(player_hierarchy)} unique players across {len(seasons)} seasons")
+        logger.info(
+            f"  Unified player hierarchy: {len(player_hierarchy)} unique players across {len(seasons)} seasons"
+        )
 
         # Load player stats from ALL seasons
         all_stats = []
@@ -423,7 +451,9 @@ class NFLGraphBuilder:
             player_id = player["player_id"]
             features = player_features.get(
                 player_id,
-                torch.zeros(self.PLAYER_FEATURE_DIM, dtype=torch.float32)  # Zero features if no stats
+                torch.zeros(
+                    self.PLAYER_FEATURE_DIM, dtype=torch.float32
+                ),  # Zero features if no stats
             )
             graph.add_node("player", features=features, external_id=player_id)
 
@@ -501,10 +531,7 @@ class NFLGraphBuilder:
     PLAYER_FEATURE_DIM = 51
 
     def build_season_graph(
-        self,
-        season: int,
-        include_chemistry: bool = True,
-        include_matchups: bool = False
+        self, season: int, include_chemistry: bool = True, include_matchups: bool = False
     ) -> NFLGraph:
         """
         Build graph for an entire season with comprehensive player features.
@@ -573,7 +600,9 @@ class NFLGraphBuilder:
             player_id = player["player_id"]
             features = player_features.get(
                 player_id,
-                torch.zeros(self.PLAYER_FEATURE_DIM, dtype=torch.float32)  # Zero features if no stats
+                torch.zeros(
+                    self.PLAYER_FEATURE_DIM, dtype=torch.float32
+                ),  # Zero features if no stats
             )
             graph.add_node("player", features=features, external_id=player_id)
 
@@ -704,7 +733,11 @@ class NFLGraphBuilder:
             """Safely get a value, handling NaN."""
             if data is None:
                 return default
-            val = data.get(key, default) if isinstance(data, dict) else data[key] if key in data.index else default
+            val = (
+                data.get(key, default)
+                if isinstance(data, dict)
+                else data[key] if key in data.index else default
+            )
             return float(val) if not pd.isna(val) else default
 
         # Group by player and aggregate
@@ -718,8 +751,14 @@ class NFLGraphBuilder:
             completions = group["stat_completions"].sum() if "stat_completions" in group else 0
             attempts = group["stat_attempts"].sum() if "stat_attempts" in group else 1
             features.append(completions / max(attempts, 1))
-            features.append(group["avg_time_to_throw"].mean() if "avg_time_to_throw" in group else 0.0)
-            features.append(group["avg_air_yards_differential"].mean() if "avg_air_yards_differential" in group else 0.0)
+            features.append(
+                group["avg_time_to_throw"].mean() if "avg_time_to_throw" in group else 0.0
+            )
+            features.append(
+                group["avg_air_yards_differential"].mean()
+                if "avg_air_yards_differential" in group
+                else 0.0
+            )
             features.append(group["cpoe"].mean() if "cpoe" in group else 0.0)
             features.append(group["stat_negative"].mean() if "stat_negative" in group else 0.0)
             features.append(len(group))  # games played
@@ -782,8 +821,7 @@ class NFLGraphBuilder:
 
             # Convert to tensor and handle NaNs
             feature_tensor = torch.tensor(
-                [float(f) if not pd.isna(f) else 0.0 for f in features],
-                dtype=torch.float32
+                [float(f) if not pd.isna(f) else 0.0 for f in features], dtype=torch.float32
             )
 
             player_features[player_id] = feature_tensor
@@ -824,9 +862,9 @@ class NFLGraphBuilder:
             qbs = team_players[team_players["position_group"] == "QB"]["player_id"].tolist()
 
             # Find WRs/TEs on this team
-            receivers = team_players[
-                team_players["position_group"].isin(["WR", "TE"])
-            ]["player_id"].tolist()
+            receivers = team_players[team_players["position_group"].isin(["WR", "TE"])][
+                "player_id"
+            ].tolist()
 
             # Create QB-WR edges
             for qb_id in qbs:
@@ -843,8 +881,7 @@ class NFLGraphBuilder:
 
 
 def prepare_training_data(
-    season: int,
-    db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+    season: int, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
 ) -> tuple[NFLGraph, pd.DataFrame]:
     """
     Prepare data for training hierarchical GNN.
@@ -861,9 +898,7 @@ def prepare_training_data(
 
     # Build season graph
     graph = builder.build_season_graph(
-        season=season,
-        include_chemistry=True,
-        include_matchups=False
+        season=season, include_chemistry=True, include_matchups=False
     )
 
     # Load game outcomes
@@ -891,9 +926,7 @@ def main():
     builder = NFLGraphBuilder(db)
 
     graph = builder.build_multi_season_graph(
-        seasons=seasons,
-        include_chemistry=True,
-        include_matchups=False
+        seasons=seasons, include_chemistry=True, include_matchups=False
     )
 
     # Load games for all seasons

@@ -11,6 +11,7 @@ Free Tier Limits:
 
 API Documentation: https://the-odds-api.com/liveapi/guides/v4/
 """
+
 import logging
 import os
 import time
@@ -34,6 +35,7 @@ RATE_LIMIT_WINDOW = 24 * 60 * 60  # 24 hours in seconds
 
 class OddsAPIRateLimitError(Exception):
     """Raised when rate limit would be exceeded"""
+
     pass
 
 
@@ -43,11 +45,11 @@ class OddsFetcher:
     def __init__(
         self,
         api_key: str | None = None,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions'
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """
         Initialize odds fetcher
@@ -56,7 +58,7 @@ class OddsFetcher:
             api_key: The Odds API key (defaults to ODDS_API_KEY env var)
             db_*: PostgreSQL connection parameters
         """
-        self.api_key = api_key or os.getenv('ODDS_API_KEY')
+        self.api_key = api_key or os.getenv("ODDS_API_KEY")
         if not self.api_key:
             raise ValueError(
                 "The Odds API key required. Set ODDS_API_KEY environment variable "
@@ -64,17 +66,15 @@ class OddsFetcher:
             )
 
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'dbname': db_name,
-            'user': db_user,
-            'password': db_password
+            "host": db_host,
+            "port": db_port,
+            "dbname": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'NFL-Analytics-System/1.0'
-        })
+        self.session.headers.update({"User-Agent": "NFL-Analytics-System/1.0"})
 
     def check_rate_limit(self) -> tuple[int, int]:
         """
@@ -86,12 +86,15 @@ class OddsFetcher:
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
                 # Count requests in last 24 hours
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT COUNT(DISTINCT snapshot_at)
                     FROM prop_lines_history
                     WHERE snapshot_at >= NOW() - INTERVAL '24 hours'
                       AND sport_key = %s
-                """, (SPORT_KEY,))
+                """,
+                    (SPORT_KEY,),
+                )
                 result = cur.fetchone()
                 requests_today = result[0] if result else 0
                 remaining = MAX_REQUESTS_PER_DAY - requests_today
@@ -108,35 +111,31 @@ class OddsFetcher:
         try:
             response = self.session.get(
                 f"{API_BASE_URL}/sports/{SPORT_KEY}/odds",
-                params={'apiKey': self.api_key},
-                timeout=10
+                params={"apiKey": self.api_key},
+                timeout=10,
             )
 
             # Extract quota from response headers
-            requests_used = response.headers.get('x-requests-used', 'unknown')
-            requests_remaining = response.headers.get('x-requests-remaining', 'unknown')
+            requests_used = response.headers.get("x-requests-used", "unknown")
+            requests_remaining = response.headers.get("x-requests-remaining", "unknown")
 
             return {
-                'requests_used': requests_used,
-                'requests_remaining': requests_remaining,
-                'response_code': response.status_code
+                "requests_used": requests_used,
+                "requests_remaining": requests_remaining,
+                "response_code": response.status_code,
             }
 
         except Exception as e:
             logger.error(f"Failed to get quota status: {e}")
-            return {
-                'requests_used': 'unknown',
-                'requests_remaining': 'unknown',
-                'error': str(e)
-            }
+            return {"requests_used": "unknown", "requests_remaining": "unknown", "error": str(e)}
 
     def fetch_player_props(
         self,
-        regions: str = 'us',
+        regions: str = "us",
         markets: str = None,
-        oddsFormat: str = 'american',
+        oddsFormat: str = "american",
         bookmakers: list[str] | None = None,
-        max_events: int = 10
+        max_events: int = 10,
     ) -> list[dict]:
         """
         Fetch player props from The Odds API
@@ -180,16 +179,14 @@ class OddsFetcher:
 
         try:
             response = self.session.get(
-                events_endpoint,
-                params={'apiKey': self.api_key},
-                timeout=30
+                events_endpoint, params={"apiKey": self.api_key}, timeout=30
             )
             response.raise_for_status()
             events = response.json()
 
             # Log quota usage
-            requests_used = response.headers.get('x-requests-used', 'unknown')
-            requests_remaining = response.headers.get('x-requests-remaining', 'unknown')
+            requests_used = response.headers.get("x-requests-used", "unknown")
+            requests_remaining = response.headers.get("x-requests-remaining", "unknown")
             logger.info(
                 f"API quota: {requests_used} used, {requests_remaining} remaining "
                 f"(free tier: 500/month)"
@@ -217,21 +214,23 @@ class OddsFetcher:
         events_with_odds = []
 
         for i, event in enumerate(events[:max_events]):
-            event_id = event['id']
+            event_id = event["id"]
             event_name = f"{event['home_team']} vs {event['away_team']}"
 
-            logger.info(f"Fetching odds for event {i+1}/{min(len(events), max_events)}: {event_name}")
+            logger.info(
+                f"Fetching odds for event {i+1}/{min(len(events), max_events)}: {event_name}"
+            )
 
             odds_endpoint = f"{API_BASE_URL}/sports/{SPORT_KEY}/events/{event_id}/odds"
             params = {
-                'apiKey': self.api_key,
-                'regions': regions,
-                'markets': market_key,
-                'oddsFormat': oddsFormat
+                "apiKey": self.api_key,
+                "regions": regions,
+                "markets": market_key,
+                "oddsFormat": oddsFormat,
             }
 
             if bookmakers:
-                params['bookmakers'] = ','.join(bookmakers)
+                params["bookmakers"] = ",".join(bookmakers)
 
             try:
                 response = self.session.get(odds_endpoint, params=params, timeout=30)
@@ -241,7 +240,7 @@ class OddsFetcher:
                 events_with_odds.append(odds_data)
 
                 # Log progress
-                num_bookmakers = len(odds_data.get('bookmakers', []))
+                num_bookmakers = len(odds_data.get("bookmakers", []))
                 logger.info(f"  → Retrieved odds from {num_bookmakers} bookmakers")
 
                 # Small delay between requests to be respectful
@@ -262,11 +261,7 @@ class OddsFetcher:
         logger.info(f"Successfully fetched odds for {len(events_with_odds)} events")
         return events_with_odds
 
-    def parse_and_store(
-        self,
-        api_response: dict,
-        snapshot_at: datetime | None = None
-    ) -> dict:
+    def parse_and_store(self, api_response: dict, snapshot_at: datetime | None = None) -> dict:
         """
         Parse API response and store in prop_lines_history
 
@@ -282,82 +277,82 @@ class OddsFetcher:
 
         lines_to_insert = []
         stats = {
-            'events': 0,
-            'players': 0,
-            'bookmakers': 0,
-            'lines_stored': 0,
-            'snapshot_at': snapshot_at
+            "events": 0,
+            "players": 0,
+            "bookmakers": 0,
+            "lines_stored": 0,
+            "snapshot_at": snapshot_at,
         }
 
         # Parse events
         for event in api_response:
-            stats['events'] += 1
-            event_id = event['id']
-            commence_time = datetime.fromisoformat(event['commence_time'].replace('Z', '+00:00'))
+            stats["events"] += 1
+            event_id = event["id"]
+            commence_time = datetime.fromisoformat(event["commence_time"].replace("Z", "+00:00"))
 
             # Extract bookmakers
-            bookmakers = event.get('bookmakers', [])
-            stats['bookmakers'] += len(bookmakers)
+            bookmakers = event.get("bookmakers", [])
+            stats["bookmakers"] += len(bookmakers)
 
             for bookmaker in bookmakers:
-                bookmaker_key = bookmaker['key']
-                bookmaker_title = bookmaker.get('title', bookmaker_key)
+                bookmaker_key = bookmaker["key"]
+                bookmaker_title = bookmaker.get("title", bookmaker_key)
 
                 # last_update might not be present in all endpoints
-                last_update_str = bookmaker.get('last_update')
+                last_update_str = bookmaker.get("last_update")
                 if last_update_str:
                     market_last_update = datetime.fromisoformat(
-                        last_update_str.replace('Z', '+00:00')
+                        last_update_str.replace("Z", "+00:00")
                     )
                 else:
                     market_last_update = snapshot_at
 
                 # Extract markets
-                markets = bookmaker.get('markets', [])
+                markets = bookmaker.get("markets", [])
 
                 for market in markets:
-                    if market['key'] != MARKET_KEY:
+                    if market["key"] != MARKET_KEY:
                         continue  # Skip non-passing-yards markets
 
                     # Extract player outcomes
                     # Player props API structure: outcome['name'] = "Over"/"Under", outcome['description'] = player name
-                    outcomes = market.get('outcomes', [])
+                    outcomes = market.get("outcomes", [])
 
                     # Group outcomes by player and line to match Over/Under pairs
                     player_lines = {}
 
                     for outcome in outcomes:
                         # Player name is in 'description', not 'name'
-                        player_name = outcome.get('description')
+                        player_name = outcome.get("description")
                         if not player_name:
                             logger.warning(f"Outcome missing description (player name): {outcome}")
                             continue
 
-                        line_value = outcome.get('point')
-                        bet_type = outcome.get('name')  # "Over" or "Under"
-                        price = outcome.get('price')
+                        line_value = outcome.get("point")
+                        bet_type = outcome.get("name")  # "Over" or "Under"
+                        price = outcome.get("price")
 
                         # Create unique key for this player+line combination
                         key = (player_name, line_value)
 
                         if key not in player_lines:
                             player_lines[key] = {
-                                'player_name': player_name,
-                                'line_value': line_value,
-                                'over_odds': None,
-                                'under_odds': None
+                                "player_name": player_name,
+                                "line_value": line_value,
+                                "over_odds": None,
+                                "under_odds": None,
                             }
 
                         # Set over or under odds
-                        if bet_type == 'Over':
-                            player_lines[key]['over_odds'] = price
-                        elif bet_type == 'Under':
-                            player_lines[key]['under_odds'] = price
+                        if bet_type == "Over":
+                            player_lines[key]["over_odds"] = price
+                        elif bet_type == "Under":
+                            player_lines[key]["under_odds"] = price
 
                     # Create database entries for each player+line combination
                     for (player_name, line_value), line_data in player_lines.items():
-                        over_odds = line_data['over_odds']
-                        under_odds = line_data['under_odds']
+                        over_odds = line_data["over_odds"]
+                        under_odds = line_data["under_odds"]
 
                         # Calculate implied probabilities and hold
                         over_prob, under_prob, hold = self._calculate_implied_probs(
@@ -368,44 +363,44 @@ class OddsFetcher:
                         player_team = self._get_player_team(player_name, event)
 
                         # Generate a pseudo player_id from player name (required by NOT NULL constraint)
-                        player_id = player_name.lower().replace(' ', '_')
+                        player_id = player_name.lower().replace(" ", "_")
 
-                        lines_to_insert.append({
-                            'event_id': event_id,
-                            'game_id': None,  # Will be matched later
-                            'sport_key': SPORT_KEY,
-                            'commence_time': commence_time,
-                            'player_id': player_id,
-                            'player_name': player_name,
-                            'player_position': 'QB',  # Passing yards = QB
-                            'player_team': player_team,
-                            'prop_type': 'passing_yards',
-                            'market_key': MARKET_KEY,
-                            'line_value': line_value,
-                            'over_odds': over_odds,
-                            'under_odds': under_odds,
-                            'bookmaker_key': bookmaker_key,
-                            'bookmaker_title': bookmaker_title,
-                            'snapshot_at': snapshot_at,
-                            'market_last_update': market_last_update,
-                            'over_implied_prob': over_prob,
-                            'under_implied_prob': under_prob,
-                            'book_hold': hold,
-                            'is_exchange': bookmaker_key in ['betfair', 'matchbook']
-                        })
+                        lines_to_insert.append(
+                            {
+                                "event_id": event_id,
+                                "game_id": None,  # Will be matched later
+                                "sport_key": SPORT_KEY,
+                                "commence_time": commence_time,
+                                "player_id": player_id,
+                                "player_name": player_name,
+                                "player_position": "QB",  # Passing yards = QB
+                                "player_team": player_team,
+                                "prop_type": "passing_yards",
+                                "market_key": MARKET_KEY,
+                                "line_value": line_value,
+                                "over_odds": over_odds,
+                                "under_odds": under_odds,
+                                "bookmaker_key": bookmaker_key,
+                                "bookmaker_title": bookmaker_title,
+                                "snapshot_at": snapshot_at,
+                                "market_last_update": market_last_update,
+                                "over_implied_prob": over_prob,
+                                "under_implied_prob": under_prob,
+                                "book_hold": hold,
+                                "is_exchange": bookmaker_key in ["betfair", "matchbook"],
+                            }
+                        )
 
-                        stats['players'] += 1
+                        stats["players"] += 1
 
         # Bulk insert
         if lines_to_insert:
-            stats['lines_stored'] = self._bulk_insert_lines(lines_to_insert)
+            stats["lines_stored"] = self._bulk_insert_lines(lines_to_insert)
 
         return stats
 
     def _calculate_implied_probs(
-        self,
-        over_odds: float | None,
-        under_odds: float | None
+        self, over_odds: float | None, under_odds: float | None
     ) -> tuple[float | None, float | None, float | None]:
         """
         Calculate implied probabilities and bookmaker hold
@@ -433,11 +428,7 @@ class OddsFetcher:
         # Hold = sum of implied probs - 1
         hold = (over_prob + under_prob) - 1.0
 
-        return (
-            round(over_prob, 4),
-            round(under_prob, 4),
-            round(hold, 4)
-        )
+        return (round(over_prob, 4), round(under_prob, 4), round(hold, 4))
 
     def _get_player_team(self, player_name: str, event: dict) -> str | None:
         """Extract player team from event data (if available)"""
@@ -456,20 +447,30 @@ class OddsFetcher:
             with conn.cursor() as cur:
                 # Prepare values for execute_values
                 columns = [
-                    'event_id', 'game_id', 'sport_key', 'commence_time',
-                    'player_id', 'player_name', 'player_position', 'player_team',
-                    'prop_type', 'market_key', 'line_value',
-                    'over_odds', 'under_odds',
-                    'bookmaker_key', 'bookmaker_title',
-                    'snapshot_at', 'market_last_update',
-                    'over_implied_prob', 'under_implied_prob', 'book_hold',
-                    'is_exchange'
+                    "event_id",
+                    "game_id",
+                    "sport_key",
+                    "commence_time",
+                    "player_id",
+                    "player_name",
+                    "player_position",
+                    "player_team",
+                    "prop_type",
+                    "market_key",
+                    "line_value",
+                    "over_odds",
+                    "under_odds",
+                    "bookmaker_key",
+                    "bookmaker_title",
+                    "snapshot_at",
+                    "market_last_update",
+                    "over_implied_prob",
+                    "under_implied_prob",
+                    "book_hold",
+                    "is_exchange",
                 ]
 
-                values = [
-                    tuple(line.get(col) for col in columns)
-                    for line in lines
-                ]
+                values = [tuple(line.get(col) for col in columns) for line in lines]
 
                 # Bulk insert with ON CONFLICT DO NOTHING (snapshot_at is part of PK)
                 execute_values(
@@ -481,7 +482,7 @@ class OddsFetcher:
                     DO NOTHING
                     """,
                     values,
-                    page_size=100
+                    page_size=100,
                 )
 
                 inserted = cur.rowcount
@@ -495,10 +496,10 @@ class OddsFetcher:
 
     def fetch_and_store(
         self,
-        regions: str = 'us',
+        regions: str = "us",
         bookmakers: list[str] | None = None,
         dry_run: bool = False,
-        max_events: int = 10
+        max_events: int = 10,
     ) -> dict:
         """
         Convenience method: fetch from API and store in database
@@ -516,19 +517,14 @@ class OddsFetcher:
 
         # Fetch from API - returns list of event dicts
         events_with_odds = self.fetch_player_props(
-            regions=regions,
-            bookmakers=bookmakers,
-            max_events=max_events
+            regions=regions, bookmakers=bookmakers, max_events=max_events
         )
 
         logger.info(f"Retrieved {len(events_with_odds)} events from API")
 
         if dry_run:
             logger.info("Dry run mode - skipping database storage")
-            return {
-                'events': len(events_with_odds),
-                'dry_run': True
-            }
+            return {"events": len(events_with_odds), "dry_run": True}
 
         # Parse and store - pass list of events
         stats = self.parse_and_store(events_with_odds)

@@ -26,8 +26,7 @@ from did_injury_analysis import InjuryShockDatabase, InjuryShockModeler
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -35,6 +34,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 # EXAMPLE 1: BACKUP RB PERFORMANCE AFTER STAR RB INJURY
 # =============================================================================
+
 
 def example_1_backup_rb_analysis():
     """
@@ -58,11 +58,11 @@ def example_1_backup_rb_analysis():
     results = modeler.analyze_injury_shock(
         start_season=2018,
         end_season=2024,
-        outcome_type='backup_rushing_yards',
-        positions=['RB'],  # Only RB injuries
+        outcome_type="backup_rushing_yards",
+        positions=["RB"],  # Only RB injuries
         pre_periods=4,
         post_periods=6,
-        run_placebo=False
+        run_placebo=False,
     )
 
     # Print results
@@ -73,7 +73,9 @@ def example_1_backup_rb_analysis():
     print(f"95% CI: [{results.ci_lower:.2f}, {results.ci_upper:.2f}]")
     print(f"P-value: {results.pvalue_overall:.4f}")
     print(f"Significant: {'YES ✓' if results.pvalue_overall < 0.05 else 'NO ✗'}")
-    print(f"\nParallel Trends: {'SATISFIED ✓' if results.parallel_trends_test['parallel_trends'] else 'VIOLATED ✗'}")
+    print(
+        f"\nParallel Trends: {'SATISFIED ✓' if results.parallel_trends_test['parallel_trends'] else 'VIOLATED ✗'}"
+    )
     print(f"Sample Size: {results.n_treated} treated, {results.n_control} control")
     print(f"Treatment Cohorts: {results.n_cohorts}")
 
@@ -83,11 +85,15 @@ def example_1_backup_rb_analysis():
     print("-" * 70)
 
     if results.att_overall > 0 and results.pvalue_overall < 0.05:
-        print(f"When a star RB is injured, backup RBs gain +{results.att_overall:.1f} rushing yards")
+        print(
+            f"When a star RB is injured, backup RBs gain +{results.att_overall:.1f} rushing yards"
+        )
         print("per game on average. This suggests they receive significantly more usage.")
         print("\nBetting Implication: Consider OVER on backup RB rushing props when RB1 is out.")
     elif results.att_overall < 0 and results.pvalue_overall < 0.05:
-        print(f"When a star RB is injured, backup RBs LOSE {abs(results.att_overall):.1f} rushing yards")
+        print(
+            f"When a star RB is injured, backup RBs LOSE {abs(results.att_overall):.1f} rushing yards"
+        )
         print("per game. The offense may struggle, or defenses focus more on stopping the run.")
         print("\nBetting Implication: Consider UNDER on backup RB props despite increased usage.")
     else:
@@ -95,19 +101,15 @@ def example_1_backup_rb_analysis():
         print("Backup RB performance may be too variable to predict consistently.")
 
     # Visualize
-    output_dir = Path('output/did_analysis')
+    output_dir = Path("output/did_analysis")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    fig = modeler.visualize_results(
-        results,
-        save_path=str(output_dir / 'example1_backup_rb.pdf')
-    )
+    fig = modeler.visualize_results(results, save_path=str(output_dir / "example1_backup_rb.pdf"))
     plt.show()
 
     # Generate report
     report = modeler.generate_report(
-        results,
-        output_path=str(output_dir / 'example1_backup_rb_report.md')
+        results, output_path=str(output_dir / "example1_backup_rb_report.md")
     )
 
     print(f"\n✓ Visualizations saved to {output_dir / 'example1_backup_rb.pdf'}")
@@ -119,6 +121,7 @@ def example_1_backup_rb_analysis():
 # =============================================================================
 # EXAMPLE 2: QB INJURY ANALYSIS (PASSING GAME)
 # =============================================================================
+
 
 def example_2_qb_injury_analysis():
     """
@@ -142,11 +145,11 @@ def example_2_qb_injury_analysis():
     results = modeler.analyze_injury_shock(
         start_season=2018,
         end_season=2024,
-        outcome_type='backup_rushing_yards',  # Would be 'team_passing_yards' in real analysis
-        positions=['QB'],
+        outcome_type="backup_rushing_yards",  # Would be 'team_passing_yards' in real analysis
+        positions=["QB"],
         pre_periods=3,
         post_periods=5,
-        run_placebo=False
+        run_placebo=False,
     )
 
     print("\n" + "-" * 70)
@@ -170,6 +173,7 @@ def example_2_qb_injury_analysis():
 # EXAMPLE 3: WR TARGET REDISTRIBUTION
 # =============================================================================
 
+
 def example_3_wr_target_redistribution():
     """
     Research Question:
@@ -191,11 +195,11 @@ def example_3_wr_target_redistribution():
     results = modeler.analyze_injury_shock(
         start_season=2018,
         end_season=2024,
-        outcome_type='backup_rushing_yards',  # Would be 'wr2_targets' in real analysis
-        positions=['WR'],
+        outcome_type="backup_rushing_yards",  # Would be 'wr2_targets' in real analysis
+        positions=["WR"],
         pre_periods=4,
         post_periods=4,
-        run_placebo=False
+        run_placebo=False,
     )
 
     print("\n" + "-" * 70)
@@ -220,6 +224,7 @@ def example_3_wr_target_redistribution():
 # EXAMPLE 4: TEAM-LEVEL ANALYSIS (OVERALL OFFENSIVE PRODUCTION)
 # =============================================================================
 
+
 def example_4_team_offensive_production():
     """
     Research Question:
@@ -242,11 +247,11 @@ def example_4_team_offensive_production():
     results = modeler.analyze_injury_shock(
         start_season=2018,
         end_season=2024,
-        outcome_type='backup_rushing_yards',  # Would be 'team_points' in real analysis
-        positions=['QB', 'RB', 'WR'],  # All skill positions
+        outcome_type="backup_rushing_yards",  # Would be 'team_points' in real analysis
+        positions=["QB", "RB", "WR"],  # All skill positions
         pre_periods=4,
         post_periods=4,
-        run_placebo=False
+        run_placebo=False,
     )
 
     print("\n" + "-" * 70)
@@ -271,6 +276,7 @@ def example_4_team_offensive_production():
 # EXAMPLE 5: HETEROGENEITY ANALYSIS (BY INJURY SEVERITY)
 # =============================================================================
 
+
 def example_5_heterogeneity_by_severity():
     """
     Research Question:
@@ -290,10 +296,7 @@ def example_5_heterogeneity_by_severity():
     logger.info("\n[1/2] Analyzing 'Out' status injuries...")
     db_out = InjuryShockDatabase()
     events_out = db_out.load_injury_events(
-        start_season=2018,
-        end_season=2024,
-        positions=['RB'],
-        severity=['Out']
+        start_season=2018, end_season=2024, positions=["RB"], severity=["Out"]
     )
     star_out = db_out.identify_star_injuries(events_out)
     panel_out = db_out.create_panel_data(star_out, pre_periods=4, post_periods=4)
@@ -301,26 +304,25 @@ def example_5_heterogeneity_by_severity():
     modeler = InjuryShockModeler()
     modeler.estimator.panel_data = panel_out
     group_time_out = modeler.estimator.estimate_group_time_att(panel_out, bootstrap_reps=50)
-    agg_out = modeler.estimator.aggregate_effects(group_time_out, 'overall')
-    att_out = agg_out.iloc[0]['att'] if not agg_out.empty else 0
-    se_out = agg_out.iloc[0]['se'] if not agg_out.empty else 0
+    agg_out = modeler.estimator.aggregate_effects(group_time_out, "overall")
+    att_out = agg_out.iloc[0]["att"] if not agg_out.empty else 0
+    se_out = agg_out.iloc[0]["se"] if not agg_out.empty else 0
 
     # Analyze "Doubtful" status
     logger.info("\n[2/2] Analyzing 'Doubtful' status injuries...")
     db_doubtful = InjuryShockDatabase()
     events_doubtful = db_doubtful.load_injury_events(
-        start_season=2018,
-        end_season=2024,
-        positions=['RB'],
-        severity=['Doubtful']
+        start_season=2018, end_season=2024, positions=["RB"], severity=["Doubtful"]
     )
     star_doubtful = db_doubtful.identify_star_injuries(events_doubtful)
     panel_doubtful = db_doubtful.create_panel_data(star_doubtful, pre_periods=4, post_periods=4)
 
-    group_time_doubtful = modeler.estimator.estimate_group_time_att(panel_doubtful, bootstrap_reps=50)
-    agg_doubtful = modeler.estimator.aggregate_effects(group_time_doubtful, 'overall')
-    att_doubtful = agg_doubtful.iloc[0]['att'] if not agg_doubtful.empty else 0
-    se_doubtful = agg_doubtful.iloc[0]['se'] if not agg_doubtful.empty else 0
+    group_time_doubtful = modeler.estimator.estimate_group_time_att(
+        panel_doubtful, bootstrap_reps=50
+    )
+    agg_doubtful = modeler.estimator.aggregate_effects(group_time_doubtful, "overall")
+    att_doubtful = agg_doubtful.iloc[0]["att"] if not agg_doubtful.empty else 0
+    se_doubtful = agg_doubtful.iloc[0]["se"] if not agg_doubtful.empty else 0
 
     # Compare
     print("\n" + "-" * 70)
@@ -346,6 +348,7 @@ def example_5_heterogeneity_by_severity():
 # EXAMPLE 6: COMPARISON TO TWO-WAY FIXED EFFECTS (TWFE)
 # =============================================================================
 
+
 def example_6_comparison_to_twfe():
     """
     Methodological Example:
@@ -366,10 +369,10 @@ def example_6_comparison_to_twfe():
     true_att = 10.0
 
     panel_rows = []
-    cohorts = ['2020W4', '2020W8', '2021W4']
+    cohorts = ["2020W4", "2020W8", "2021W4"]
 
     for cohort in cohorts:
-        season, week = cohort.split('W')
+        season, week = cohort.split("W")
         season = int(season)
         treatment_week = int(week)
 
@@ -384,15 +387,17 @@ def example_6_comparison_to_twfe():
 
                 outcome = baseline + (true_att if is_treated else 0) + np.random.randn() * 5
 
-                panel_rows.append({
-                    'player_id': player_id,
-                    'season': season,
-                    'week': week_num,
-                    'outcome': outcome,
-                    'treated': is_treated,
-                    'time_to_treatment': t,
-                    'cohort': cohort
-                })
+                panel_rows.append(
+                    {
+                        "player_id": player_id,
+                        "season": season,
+                        "week": week_num,
+                        "outcome": outcome,
+                        "treated": is_treated,
+                        "time_to_treatment": t,
+                        "cohort": cohort,
+                    }
+                )
 
     # Control group
     for i in range(20):
@@ -400,31 +405,34 @@ def example_6_comparison_to_twfe():
         baseline = 50
 
         for week_num in range(1, 18):
-            panel_rows.append({
-                'player_id': player_id,
-                'season': 2020,
-                'week': week_num,
-                'outcome': baseline + np.random.randn() * 5,
-                'treated': 0,
-                'time_to_treatment': np.nan,
-                'cohort': 'never_treated'
-            })
+            panel_rows.append(
+                {
+                    "player_id": player_id,
+                    "season": 2020,
+                    "week": week_num,
+                    "outcome": baseline + np.random.randn() * 5,
+                    "treated": 0,
+                    "time_to_treatment": np.nan,
+                    "cohort": "never_treated",
+                }
+            )
 
     df = pd.DataFrame(panel_rows)
 
     # Estimate with Callaway-Sant'Anna
     from did_injury_analysis import DifferenceInDifferencesEstimator
+
     estimator = DifferenceInDifferencesEstimator()
 
     group_time_atts = estimator.estimate_group_time_att(df, bootstrap_reps=100)
-    cs_agg = estimator.aggregate_effects(group_time_atts, 'overall')
-    cs_att = cs_agg.iloc[0]['att']
-    cs_se = cs_agg.iloc[0]['se']
+    cs_agg = estimator.aggregate_effects(group_time_atts, "overall")
+    cs_att = cs_agg.iloc[0]["att"]
+    cs_se = cs_agg.iloc[0]["se"]
 
     # Estimate with TWFE (simplified)
-    treated_post = df[(df['treated'] == 1)]['outcome'].mean()
-    treated_pre = df[(df['treated'] == 0) & (df['cohort'] != 'never_treated')]['outcome'].mean()
-    control = df[df['cohort'] == 'never_treated']['outcome'].mean()
+    treated_post = df[(df["treated"] == 1)]["outcome"].mean()
+    treated_pre = df[(df["treated"] == 0) & (df["cohort"] != "never_treated")]["outcome"].mean()
+    control = df[df["cohort"] == "never_treated"]["outcome"].mean()
 
     twfe_att = (treated_post - treated_pre) - 0  # Simplified
 
@@ -453,28 +461,26 @@ def example_6_comparison_to_twfe():
 # MAIN
 # =============================================================================
 
+
 def main():
     """Run examples"""
-    parser = argparse.ArgumentParser(description='DiD Injury Analysis Examples')
+    parser = argparse.ArgumentParser(description="DiD Injury Analysis Examples")
     parser.add_argument(
-        '--example',
-        type=str,
-        default='1',
-        help='Example number to run (1-6) or "all"'
+        "--example", type=str, default="1", help='Example number to run (1-6) or "all"'
     )
 
     args = parser.parse_args()
 
     examples = {
-        '1': ('Backup RB Analysis', example_1_backup_rb_analysis),
-        '2': ('QB Injury Analysis', example_2_qb_injury_analysis),
-        '3': ('WR Target Redistribution', example_3_wr_target_redistribution),
-        '4': ('Team Offensive Production', example_4_team_offensive_production),
-        '5': ('Heterogeneity by Severity', example_5_heterogeneity_by_severity),
-        '6': ('CS vs TWFE Comparison', example_6_comparison_to_twfe)
+        "1": ("Backup RB Analysis", example_1_backup_rb_analysis),
+        "2": ("QB Injury Analysis", example_2_qb_injury_analysis),
+        "3": ("WR Target Redistribution", example_3_wr_target_redistribution),
+        "4": ("Team Offensive Production", example_4_team_offensive_production),
+        "5": ("Heterogeneity by Severity", example_5_heterogeneity_by_severity),
+        "6": ("CS vs TWFE Comparison", example_6_comparison_to_twfe),
     }
 
-    if args.example.lower() == 'all':
+    if args.example.lower() == "all":
         for num, (name, func) in examples.items():
             logger.info(f"\nRunning Example {num}: {name}")
             try:
@@ -491,5 +497,5 @@ def main():
             logger.info(f"Available examples: {', '.join(examples.keys())}, all")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

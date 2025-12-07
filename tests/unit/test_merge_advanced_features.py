@@ -24,7 +24,6 @@ def test_load_base_features_basic():
     assert result is not None
 
 
-
 def test_load_base_features_edge_cases():
     """Test load_base_features: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_load_base_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_base_features_error_handling():
     """Test load_base_features error handling."""
     with pytest.raises(ValueError):
         load_base_features(invalid_input)
-
 
 
 @given(st.integers())
@@ -53,7 +50,6 @@ def test_load_base_features_property_idempotent(self, csv_path):
 
     # Assert property
     assert load_base_features(csv_path) == result, "idempotent violated"
-
 
 
 def test_load_4th_down_features_basic():
@@ -68,7 +64,6 @@ def test_load_4th_down_features_basic():
     assert result is not None
 
 
-
 def test_load_4th_down_features_edge_cases():
     """Test load_4th_down_features: edge cases."""
     # Arrange
@@ -81,12 +76,10 @@ def test_load_4th_down_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_4th_down_features_error_handling():
     """Test load_4th_down_features error handling."""
     with pytest.raises(ValueError):
         load_4th_down_features(invalid_input)
-
 
 
 def test_load_injury_features_basic():
@@ -101,7 +94,6 @@ def test_load_injury_features_basic():
     assert result is not None
 
 
-
 def test_load_injury_features_edge_cases():
     """Test load_injury_features: edge cases."""
     # Arrange
@@ -114,12 +106,10 @@ def test_load_injury_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_injury_features_error_handling():
     """Test load_injury_features error handling."""
     with pytest.raises(ValueError):
         load_injury_features(invalid_input)
-
 
 
 def test_load_playoff_features_basic():
@@ -134,7 +124,6 @@ def test_load_playoff_features_basic():
     assert result is not None
 
 
-
 def test_load_playoff_features_edge_cases():
     """Test load_playoff_features: edge cases."""
     # Arrange
@@ -147,12 +136,10 @@ def test_load_playoff_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_playoff_features_error_handling():
     """Test load_playoff_features error handling."""
     with pytest.raises(ValueError):
         load_playoff_features(invalid_input)
-
 
 
 def test_pivot_4th_down_features_basic():
@@ -167,7 +154,6 @@ def test_pivot_4th_down_features_basic():
     assert result is not None
 
 
-
 def test_pivot_4th_down_features_edge_cases():
     """Test pivot_4th_down_features: edge cases."""
     # Arrange
@@ -180,12 +166,10 @@ def test_pivot_4th_down_features_edge_cases():
     assert result is not None
 
 
-
 def test_pivot_4th_down_features_error_handling():
     """Test pivot_4th_down_features error handling."""
     with pytest.raises(ValueError):
         pivot_4th_down_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -196,7 +180,6 @@ def test_pivot_4th_down_features_property_idempotent(self, df_4th, df_base):
 
     # Assert property
     assert pivot_4th_down_features(df_4th, df_base) == result, "idempotent violated"
-
 
 
 def test_merge_all_features_basic():
@@ -211,7 +194,6 @@ def test_merge_all_features_basic():
     assert result is not None
 
 
-
 def test_merge_all_features_edge_cases():
     """Test merge_all_features: edge cases."""
     # Arrange
@@ -224,12 +206,10 @@ def test_merge_all_features_edge_cases():
     assert result is not None
 
 
-
 def test_merge_all_features_error_handling():
     """Test merge_all_features error handling."""
     with pytest.raises(ValueError):
         merge_all_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -239,28 +219,22 @@ def test_merge_all_features_property_idempotent(self, df_base, df_4th, df_injury
     result = merge_all_features(df_base, df_4th, df_injury, df_playoff)
 
     # Assert property
-    assert merge_all_features(df_base, df_4th, df_injury, df_playoff) == result, "idempotent violated"
-
+    assert (
+        merge_all_features(df_base, df_4th, df_injury, df_playoff) == result
+    ), "idempotent violated"
 
 
 def test_merge_all_features_no_temporal_leakage():
     """Ensure merge_all_features doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = merge_all_features(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_validate_merged_data_basic():
@@ -275,7 +249,6 @@ def test_validate_merged_data_basic():
     assert result is not None
 
 
-
 def test_validate_merged_data_edge_cases():
     """Test validate_merged_data: edge cases."""
     # Arrange
@@ -288,12 +261,10 @@ def test_validate_merged_data_edge_cases():
     assert result is not None
 
 
-
 def test_validate_merged_data_error_handling():
     """Test validate_merged_data error handling."""
     with pytest.raises(ValueError):
         validate_merged_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -306,25 +277,17 @@ def test_validate_merged_data_property_idempotent(self, df, df_base):
     assert validate_merged_data(df, df_base) == result, "idempotent violated"
 
 
-
 def test_validate_merged_data_no_temporal_leakage():
     """Ensure validate_merged_data doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = validate_merged_data(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_main_basic():
@@ -339,7 +302,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -352,9 +314,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

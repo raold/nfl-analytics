@@ -35,7 +35,9 @@ def test_ensemble_initialization():
     xgb_path = project_root / "models" / "xgb_ridge_residuals_v7_backtest2024_20251114_184552.json"
 
     if ridge_path.exists():
-        print(f"✅ Ridge model found: {ridge_path.name} ({ridge_path.stat().st_size / 1024:.1f} KB)")
+        print(
+            f"✅ Ridge model found: {ridge_path.name} ({ridge_path.stat().st_size / 1024:.1f} KB)"
+        )
     else:
         print(f"❌ Ridge model NOT FOUND: {ridge_path}")
         return False
@@ -72,6 +74,7 @@ def test_ensemble_initialization():
         except Exception as e:
             print(f"❌ ERROR during model loading: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -82,22 +85,22 @@ def test_ensemble_initialization():
 
         components_loaded_after = []
 
-        if hasattr(ensemble, 'ridge_model') and ensemble.ridge_model is not None:
+        if hasattr(ensemble, "ridge_model") and ensemble.ridge_model is not None:
             print("✅ Ridge opponent baseline loaded")
             components_loaded_after.append("Ridge")
 
-        if hasattr(ensemble, 'xgboost_v4_model') and ensemble.xgboost_v4_model is not None:
+        if hasattr(ensemble, "xgboost_v4_model") and ensemble.xgboost_v4_model is not None:
             print("✅ XGBoost v4 residual learner loaded (CRITICAL)")
             components_loaded_after.append("XGBoost v4")
         else:
             print("❌ XGBoost v4 NOT loaded (BLOCKER)")
             return False
 
-        if hasattr(ensemble, 'hybrid_model') and ensemble.hybrid_model is not None:
+        if hasattr(ensemble, "hybrid_model") and ensemble.hybrid_model is not None:
             print("✅ Hybrid Static-Incremental loaded")
             components_loaded_after.append("Hybrid")
 
-        if hasattr(ensemble, 'r_interface') and ensemble.r_interface is not None:
+        if hasattr(ensemble, "r_interface") and ensemble.r_interface is not None:
             print("✅ R model interface loaded (State-Space, Hierarchical, Informative Priors)")
             components_loaded_after.append("R Models")
 
@@ -124,6 +127,7 @@ def test_ensemble_initialization():
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

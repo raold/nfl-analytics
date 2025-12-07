@@ -56,7 +56,7 @@ try:
         db=0,
         username="default" if redis_password else None,
         password=redis_password,
-        decode_responses=True
+        decode_responses=True,
     )
     redis_client.ping()
     logger.info("✓ Redis connected for caching")
@@ -147,13 +147,14 @@ async def startup_event():
     # Initialize A/B test router (v5 vs v6 Sagarin integration)
     try:
         import os
+
         ab_test_enabled = os.getenv("AB_TEST_ENABLED", "true").lower() == "true"
         ab_test_split_ratio = float(os.getenv("AB_TEST_SPLIT_RATIO", "0.5"))
 
         ab_router = ABTestRouter(
             split_ratio=ab_test_split_ratio,
             enabled=ab_test_enabled,
-            test_name="ensemble_v5_vs_v6_sagarin"
+            test_name="ensemble_v5_vs_v6_sagarin",
         )
         logger.info(f"✓ A/B test router initialized: {ab_test_split_ratio:.0%} to v6 (Sagarin)")
     except Exception as e:
@@ -367,7 +368,7 @@ async def predict(request: PredictionRequest):
             player_id=request.player_id,
             season=request.season,
             week=request.week,
-            log_to_db=True  # Automatically logs to ml.predictions
+            log_to_db=True,  # Automatically logs to ml.predictions
         )
     except Exception as e:
         logger.error(f"Prediction failed: {e}")
@@ -444,7 +445,7 @@ async def predict_ensemble(request: PredictionRequest):
         season=request.season,
         week=request.week,
         return_individual=True,
-        log_to_db=True
+        log_to_db=True,
     )
 
     # Extract model predictions if available
@@ -554,7 +555,7 @@ async def submit_feedback(
         "status": "recorded",
         "error": abs(predicted - actual),
         "percentage_error": abs(predicted - actual) / actual * 100,
-        "note": "Predictions auto-logged via A/B router"
+        "note": "Predictions auto-logged via A/B router",
     }
 
 

@@ -21,7 +21,7 @@ Usage:
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import argparse
 import logging
@@ -34,10 +34,7 @@ import psycopg2
 
 from py.models.bayesian_neural_network import BayesianNeuralNetwork
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -104,9 +101,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
@@ -175,7 +170,7 @@ def train_and_evaluate_config(
     X_test: np.ndarray,
     y_test: np.ndarray,
     y_train_mean: float,
-    y_train_std: float
+    y_train_std: float,
 ):
     """Train single NUTS configuration and evaluate"""
 
@@ -193,7 +188,7 @@ def train_and_evaluate_config(
             inference_method="nuts",
             n_samples=2000,  # 4 chains × 500 draws
             prior_scale=prior_scale,
-            heteroscedastic=heteroscedastic  # CRITICAL: Pass architecture parameter
+            heteroscedastic=heteroscedastic,  # CRITICAL: Pass architecture parameter
         )
 
         # Train with NUTS
@@ -236,7 +231,7 @@ def train_and_evaluate_config(
             "calibration": float(calibration),
             "sharpness": float(sharpness),
             "training_time_hours": elapsed_time / 3600,
-            "timestamp": pd.Timestamp.now().isoformat()
+            "timestamp": pd.Timestamp.now().isoformat(),
         }
 
         logger.info(f"\n✓ CONFIG {config_num} RESULTS:")
@@ -267,7 +262,7 @@ def train_and_evaluate_config(
             "inference": "nuts",
             "error": str(e),
             "training_time_hours": elapsed_time / 3600,
-            "timestamp": pd.Timestamp.now().isoformat()
+            "timestamp": pd.Timestamp.now().isoformat(),
         }
 
         return result, False
@@ -275,9 +270,9 @@ def train_and_evaluate_config(
 
 def main(config_to_run: int | None = None):
     """Main NUTS comparison pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("BNN NUTS COMPARISON - Homoscedastic vs Heteroscedastic")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Load and prepare data
     df = load_passing_data_from_db()
@@ -312,7 +307,7 @@ def main(config_to_run: int | None = None):
     logger.info("3. Homoscedastic + σ=0.5 + (24,12)")
     logger.info("4. Heteroscedastic + σ=0.5 + (24,12)")
     logger.info(f"Total: {len(configs)} configurations\n")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     results = []
 
@@ -326,7 +321,7 @@ def main(config_to_run: int | None = None):
             X_test=X_test,
             y_test=y_test,
             y_train_mean=y_train_mean,
-            y_train_std=y_train_std
+            y_train_std=y_train_std,
         )
 
         results.append(result)
@@ -340,29 +335,31 @@ def main(config_to_run: int | None = None):
         logger.info(f"\n✓ Incremental results saved to {results_path}\n")
 
     # Final summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("NUTS COMPARISON COMPLETE - SUMMARY")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     results_df = pd.DataFrame(results)
-    valid_results = results_df[~results_df['mae'].isna()].copy()
+    valid_results = results_df[~results_df["mae"].isna()].copy()
 
     if len(valid_results) > 0:
         # Compare calibration (closer to 68% is better)
-        valid_results['calib_error'] = np.abs(valid_results['calibration'] - 0.68)
+        valid_results["calib_error"] = np.abs(valid_results["calibration"] - 0.68)
 
         # Composite score: 60% MAE + 30% calibration + 10% sharpness
-        valid_results['mae_score'] = valid_results['mae'] / valid_results['mae'].min()
-        valid_results['calib_score'] = valid_results['calib_error'] / valid_results['calib_error'].min()
-        valid_results['sharp_score'] = valid_results['sharpness'] / valid_results['sharpness'].min()
+        valid_results["mae_score"] = valid_results["mae"] / valid_results["mae"].min()
+        valid_results["calib_score"] = (
+            valid_results["calib_error"] / valid_results["calib_error"].min()
+        )
+        valid_results["sharp_score"] = valid_results["sharpness"] / valid_results["sharpness"].min()
 
-        valid_results['composite_score'] = (
-            0.6 * valid_results['mae_score'] +
-            0.3 * valid_results['calib_score'] +
-            0.1 * valid_results['sharp_score']
+        valid_results["composite_score"] = (
+            0.6 * valid_results["mae_score"]
+            + 0.3 * valid_results["calib_score"]
+            + 0.1 * valid_results["sharp_score"]
         )
 
-        best_idx = valid_results['composite_score'].idxmin()
+        best_idx = valid_results["composite_score"].idxmin()
         best = valid_results.loc[best_idx]
 
         logger.info(f"BEST CONFIGURATION (Config #{int(best['config_num'])}):")
@@ -391,10 +388,7 @@ def main(config_to_run: int | None = None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="BNN NUTS Comparison Study")
     parser.add_argument(
-        "--config",
-        type=int,
-        choices=[1, 2, 3, 4],
-        help="Run specific config only (1-4)"
+        "--config", type=int, choices=[1, 2, 3, 4], help="Run specific config only (1-4)"
     )
 
     args = parser.parse_args()

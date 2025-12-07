@@ -60,9 +60,7 @@ class BaselineCalibrationComparator:
 
     def calculate_calibration(self, y_true, y_pred, n_bins=10):
         """Calculate calibration curve with bin counts"""
-        prob_true, prob_pred = calibration_curve(
-            y_true, y_pred, n_bins=n_bins, strategy='uniform'
-        )
+        prob_true, prob_pred = calibration_curve(y_true, y_pred, n_bins=n_bins, strategy="uniform")
 
         # Calculate Brier score
         brier = np.mean((y_pred - y_true) ** 2)
@@ -73,7 +71,7 @@ class BaselineCalibrationComparator:
 
         for i in range(len(prob_true)):
             # Find samples in this bin
-            bin_mask = (y_pred >= i/n_bins) & (y_pred < (i+1)/n_bins)
+            bin_mask = (y_pred >= i / n_bins) & (y_pred < (i + 1) / n_bins)
             n_in_bin = np.sum(bin_mask)
             bin_counts.append(n_in_bin)
 
@@ -106,9 +104,7 @@ class BaselineCalibrationComparator:
             y_true = data_to_plot["target"].values
             y_pred = data_to_plot[col].values
 
-            prob_true, prob_pred, brier, ece = self.calculate_calibration(
-                y_true, y_pred, n_bins=10
-            )
+            prob_true, prob_pred, brier, ece = self.calculate_calibration(y_true, y_pred, n_bins=10)
 
             # Plot calibration curve
             ax.plot([0, 1], [0, 1], "k--", lw=2, label="Perfect calibration")

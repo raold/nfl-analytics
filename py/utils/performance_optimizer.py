@@ -45,6 +45,7 @@ from typing import Any
 
 try:
     import psycopg2
+
     POSTGRES_AVAILABLE = True
 except ImportError:
     POSTGRES_AVAILABLE = False
@@ -52,6 +53,7 @@ except ImportError:
 try:
     import numpy as np
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -63,15 +65,17 @@ logger = logging.getLogger(__name__)
 
 class OptimizationSeverity(Enum):
     """Performance issue severity levels."""
+
     CRITICAL = "CRITICAL"  # >10x slowdown
-    HIGH = "HIGH"          # >3x slowdown
-    MEDIUM = "MEDIUM"      # >1.5x slowdown
-    LOW = "LOW"            # Minor optimization
-    INFO = "INFO"          # Best practice
+    HIGH = "HIGH"  # >3x slowdown
+    MEDIUM = "MEDIUM"  # >1.5x slowdown
+    LOW = "LOW"  # Minor optimization
+    INFO = "INFO"  # Best practice
 
 
 class OptimizationCategory(Enum):
     """Categories of performance issues."""
+
     DATABASE = "database"
     MCMC = "mcmc"
     PANDAS = "pandas"
@@ -83,6 +87,7 @@ class OptimizationCategory(Enum):
 @dataclass
 class OptimizationIssue:
     """Represents a performance optimization opportunity."""
+
     severity: OptimizationSeverity
     category: OptimizationCategory
     title: str
@@ -98,6 +103,7 @@ class OptimizationIssue:
 @dataclass
 class PerformanceReport:
     """Performance optimization report."""
+
     scan_date: str = field(default_factory=lambda: datetime.now().isoformat())
     issues: list[OptimizationIssue] = field(default_factory=list)
     critical_count: int = 0
@@ -176,11 +182,7 @@ class PerformanceOptimizer:
         ],
     }
 
-    def __init__(
-        self,
-        project_root: Path | None = None,
-        db_connection_string: str | None = None
-    ):
+    def __init__(self, project_root: Path | None = None, db_connection_string: str | None = None):
         """
         Initialize performance optimizer.
 
@@ -200,8 +202,9 @@ class PerformanceOptimizer:
                 project_root = Path.cwd()
 
         self.project_root = project_root
-        self.db_connection_string = db_connection_string or \
-            "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+        self.db_connection_string = (
+            db_connection_string or "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+        )
         self.report = PerformanceReport()
 
         logger.info(f"PerformanceOptimizer initialized for {project_root}")
@@ -238,7 +241,7 @@ class PerformanceOptimizer:
             # Get statistics
             stream = io.StringIO()
             stats = pstats.Stats(profiler, stream=stream)
-            stats.sort_stats('cumulative')
+            stats.sort_stats("cumulative")
             stats.print_stats(20)  # Top 20 functions
 
             # Parse for slow operations
@@ -269,27 +272,31 @@ class PerformanceOptimizer:
                     cumtime = float(parts[3])
 
                     if cumtime > 10.0:
-                        self.report.add_issue(OptimizationIssue(
-                            severity=OptimizationSeverity.CRITICAL,
-                            category=OptimizationCategory.ALGORITHM,
-                            title=f"Very slow operation: {cumtime:.1f}s",
-                            description=f"Operation takes {cumtime:.1f}s cumulative time",
-                            current_performance=f"{cumtime:.1f}s",
-                            expected_improvement="10x faster possible",
-                            suggestion="Profile this function and optimize hot path",
-                            location=file_path,
-                        ))
+                        self.report.add_issue(
+                            OptimizationIssue(
+                                severity=OptimizationSeverity.CRITICAL,
+                                category=OptimizationCategory.ALGORITHM,
+                                title=f"Very slow operation: {cumtime:.1f}s",
+                                description=f"Operation takes {cumtime:.1f}s cumulative time",
+                                current_performance=f"{cumtime:.1f}s",
+                                expected_improvement="10x faster possible",
+                                suggestion="Profile this function and optimize hot path",
+                                location=file_path,
+                            )
+                        )
                     elif cumtime > 3.0:
-                        self.report.add_issue(OptimizationIssue(
-                            severity=OptimizationSeverity.HIGH,
-                            category=OptimizationCategory.ALGORITHM,
-                            title=f"Slow operation: {cumtime:.1f}s",
-                            description=f"Operation takes {cumtime:.1f}s cumulative time",
-                            current_performance=f"{cumtime:.1f}s",
-                            expected_improvement="3x faster possible",
-                            suggestion="Consider algorithmic optimization",
-                            location=file_path,
-                        ))
+                        self.report.add_issue(
+                            OptimizationIssue(
+                                severity=OptimizationSeverity.HIGH,
+                                category=OptimizationCategory.ALGORITHM,
+                                title=f"Slow operation: {cumtime:.1f}s",
+                                description=f"Operation takes {cumtime:.1f}s cumulative time",
+                                current_performance=f"{cumtime:.1f}s",
+                                expected_improvement="3x faster possible",
+                                suggestion="Consider algorithmic optimization",
+                                location=file_path,
+                            )
+                        )
 
                 except (ValueError, IndexError):
                     continue
@@ -309,53 +316,55 @@ class PerformanceOptimizer:
         # Check for SELECT *
         for pattern in self.SLOW_QUERY_PATTERNS["select_star"]:
             if re.search(pattern, query, re.IGNORECASE):
-                issues.append(OptimizationIssue(
-                    severity=OptimizationSeverity.MEDIUM,
-                    category=OptimizationCategory.DATABASE,
-                    title="SELECT * detected",
-                    description="Selecting all columns can be slow and fragile",
-                    current_performance="Full table scan on all columns",
-                    expected_improvement="2-5x faster with explicit columns",
-                    suggestion="List specific columns: SELECT col1, col2, ...",
-                    code_snippet=query[:100],
-                ))
+                issues.append(
+                    OptimizationIssue(
+                        severity=OptimizationSeverity.MEDIUM,
+                        category=OptimizationCategory.DATABASE,
+                        title="SELECT * detected",
+                        description="Selecting all columns can be slow and fragile",
+                        current_performance="Full table scan on all columns",
+                        expected_improvement="2-5x faster with explicit columns",
+                        suggestion="List specific columns: SELECT col1, col2, ...",
+                        code_snippet=query[:100],
+                    )
+                )
 
         # Check for missing indexes
         for pattern in self.SLOW_QUERY_PATTERNS["missing_index"]:
             if re.search(pattern, query, re.IGNORECASE):
-                issues.append(OptimizationIssue(
-                    severity=OptimizationSeverity.HIGH,
-                    category=OptimizationCategory.DATABASE,
-                    title="Potential missing index",
-                    description="WHERE clause on column that may need index",
-                    current_performance="Sequential scan",
-                    expected_improvement="10-100x faster with index",
-                    suggestion="Add index: CREATE INDEX ON table(column)",
-                    code_snippet=query[:100],
-                ))
+                issues.append(
+                    OptimizationIssue(
+                        severity=OptimizationSeverity.HIGH,
+                        category=OptimizationCategory.DATABASE,
+                        title="Potential missing index",
+                        description="WHERE clause on column that may need index",
+                        current_performance="Sequential scan",
+                        expected_improvement="10-100x faster with index",
+                        suggestion="Add index: CREATE INDEX ON table(column)",
+                        code_snippet=query[:100],
+                    )
+                )
 
         # Check for suboptimal joins
         for pattern in self.SLOW_QUERY_PATTERNS["suboptimal_join"]:
             if re.search(pattern, query, re.IGNORECASE):
-                issues.append(OptimizationIssue(
-                    severity=OptimizationSeverity.HIGH,
-                    category=OptimizationCategory.DATABASE,
-                    title="Suboptimal JOIN pattern",
-                    description="JOIN condition or filter can be optimized",
-                    current_performance="Slow join execution",
-                    expected_improvement="5-10x faster",
-                    suggestion="Rewrite JOIN or move filter to WHERE clause",
-                    code_snippet=query[:100],
-                ))
+                issues.append(
+                    OptimizationIssue(
+                        severity=OptimizationSeverity.HIGH,
+                        category=OptimizationCategory.DATABASE,
+                        title="Suboptimal JOIN pattern",
+                        description="JOIN condition or filter can be optimized",
+                        current_performance="Slow join execution",
+                        expected_improvement="5-10x faster",
+                        suggestion="Rewrite JOIN or move filter to WHERE clause",
+                        code_snippet=query[:100],
+                    )
+                )
 
         return issues
 
     def check_mcmc_config(
-        self,
-        chains: int,
-        tune: int,
-        draws: int,
-        sampler: str = "NUTS"
+        self, chains: int, tune: int, draws: int, sampler: str = "NUTS"
     ) -> list[OptimizationIssue]:
         """
         Check MCMC configuration for efficiency.
@@ -373,43 +382,51 @@ class PerformanceOptimizer:
 
         # Check chains
         if chains < 4:
-            issues.append(OptimizationIssue(
-                severity=OptimizationSeverity.HIGH,
-                category=OptimizationCategory.MCMC,
-                title="Insufficient chains",
-                description=f"Using {chains} chains, should use 4+ for convergence",
-                current_performance=f"{chains} chains",
-                expected_improvement="Better convergence diagnostics",
-                suggestion="Use chains=4 for parallel sampling",
-            ))
+            issues.append(
+                OptimizationIssue(
+                    severity=OptimizationSeverity.HIGH,
+                    category=OptimizationCategory.MCMC,
+                    title="Insufficient chains",
+                    description=f"Using {chains} chains, should use 4+ for convergence",
+                    current_performance=f"{chains} chains",
+                    expected_improvement="Better convergence diagnostics",
+                    suggestion="Use chains=4 for parallel sampling",
+                )
+            )
 
         # Check tuning
         if tune < 1000:
-            issues.append(OptimizationIssue(
-                severity=OptimizationSeverity.MEDIUM,
-                category=OptimizationCategory.MCMC,
-                title="Insufficient tuning",
-                description=f"Using {tune} tuning steps, should use 1000+",
-                current_performance=f"{tune} tuning steps",
-                expected_improvement="Better adaptation, faster sampling",
-                suggestion="Use tune=1000 or tune=2000",
-            ))
+            issues.append(
+                OptimizationIssue(
+                    severity=OptimizationSeverity.MEDIUM,
+                    category=OptimizationCategory.MCMC,
+                    title="Insufficient tuning",
+                    description=f"Using {tune} tuning steps, should use 1000+",
+                    current_performance=f"{tune} tuning steps",
+                    expected_improvement="Better adaptation, faster sampling",
+                    suggestion="Use tune=1000 or tune=2000",
+                )
+            )
 
         # Check draws
         if draws < 2000:
-            issues.append(OptimizationIssue(
-                severity=OptimizationSeverity.MEDIUM,
-                category=OptimizationCategory.MCMC,
-                title="Insufficient draws",
-                description=f"Using {draws} draws, should use 2000+",
-                current_performance=f"{draws} draws",
-                expected_improvement="Better posterior approximation",
-                suggestion="Use draws=2000 or draws=4000",
-            ))
+            issues.append(
+                OptimizationIssue(
+                    severity=OptimizationSeverity.MEDIUM,
+                    category=OptimizationCategory.MCMC,
+                    title="Insufficient draws",
+                    description=f"Using {draws} draws, should use 2000+",
+                    current_performance=f"{draws} draws",
+                    expected_improvement="Better posterior approximation",
+                    suggestion="Use draws=2000 or draws=4000",
+                )
+            )
 
         return issues
 
-    def analyze_pandas_code(self, code: str, file_path: str | None = None) -> list[OptimizationIssue]:
+    def analyze_pandas_code(
+        self, code: str, file_path: str | None = None
+    ) -> list[OptimizationIssue]:
         """
         Analyze Pandas code for inefficiencies.
 
@@ -427,58 +444,61 @@ class PerformanceOptimizer:
             # Check for iterrows
             for pattern in self.SLOW_PANDAS_PATTERNS["iterrows"]:
                 if re.search(pattern, line):
-                    issues.append(OptimizationIssue(
-                        severity=OptimizationSeverity.CRITICAL,
-                        category=OptimizationCategory.PANDAS,
-                        title="Using iterrows() - VERY SLOW",
-                        description="iterrows() is 100x slower than vectorization",
-                        current_performance="100x slower than vectorized",
-                        expected_improvement="100x faster with vectorization",
-                        suggestion="Use vectorized operations or .apply() with NumPy",
-                        location=file_path,
-                        line_number=i,
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        OptimizationIssue(
+                            severity=OptimizationSeverity.CRITICAL,
+                            category=OptimizationCategory.PANDAS,
+                            title="Using iterrows() - VERY SLOW",
+                            description="iterrows() is 100x slower than vectorization",
+                            current_performance="100x slower than vectorized",
+                            expected_improvement="100x faster with vectorization",
+                            suggestion="Use vectorized operations or .apply() with NumPy",
+                            location=file_path,
+                            line_number=i,
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Check for apply with lambda
             for pattern in self.SLOW_PANDAS_PATTERNS["apply_lambda"]:
                 if re.search(pattern, line):
-                    issues.append(OptimizationIssue(
-                        severity=OptimizationSeverity.HIGH,
-                        category=OptimizationCategory.PANDAS,
-                        title="apply() with lambda - often slow",
-                        description="apply() with lambda may be vectorizable",
-                        current_performance="10x slower than vectorized",
-                        expected_improvement="10x faster",
-                        suggestion="Try vectorized operation or NumPy ufunc",
-                        location=file_path,
-                        line_number=i,
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        OptimizationIssue(
+                            severity=OptimizationSeverity.HIGH,
+                            category=OptimizationCategory.PANDAS,
+                            title="apply() with lambda - often slow",
+                            description="apply() with lambda may be vectorizable",
+                            current_performance="10x slower than vectorized",
+                            expected_improvement="10x faster",
+                            suggestion="Try vectorized operation or NumPy ufunc",
+                            location=file_path,
+                            line_number=i,
+                            code_snippet=line.strip(),
+                        )
+                    )
 
             # Check for chained indexing
             for pattern in self.SLOW_PANDAS_PATTERNS["chained_indexing"]:
                 if re.search(pattern, line) and "df" in line.lower():
-                    issues.append(OptimizationIssue(
-                        severity=OptimizationSeverity.MEDIUM,
-                        category=OptimizationCategory.PANDAS,
-                        title="Chained indexing detected",
-                        description="Chained indexing (df[...][...]) can be slow",
-                        current_performance="2x slower, may trigger warning",
-                        expected_improvement="2x faster, no warnings",
-                        suggestion="Use .loc[] or .iloc[] instead",
-                        location=file_path,
-                        line_number=i,
-                        code_snippet=line.strip(),
-                    ))
+                    issues.append(
+                        OptimizationIssue(
+                            severity=OptimizationSeverity.MEDIUM,
+                            category=OptimizationCategory.PANDAS,
+                            title="Chained indexing detected",
+                            description="Chained indexing (df[...][...]) can be slow",
+                            current_performance="2x slower, may trigger warning",
+                            expected_improvement="2x faster, no warnings",
+                            suggestion="Use .loc[] or .iloc[] instead",
+                            location=file_path,
+                            line_number=i,
+                            code_snippet=line.strip(),
+                        )
+                    )
 
         return issues
 
     def estimate_backtest_time(
-        self,
-        num_games: int = 148,
-        models_per_game: int = 5,
-        avg_prediction_time: float = 1.0
+        self, num_games: int = 148, models_per_game: int = 5, avg_prediction_time: float = 1.0
     ) -> dict[str, Any]:
         """
         Estimate backtest completion time.
@@ -508,15 +528,17 @@ class PerformanceOptimizer:
 
         if estimated_time > 3600:
             speedup_needed = estimated_time / 3600
-            self.report.add_issue(OptimizationIssue(
-                severity=OptimizationSeverity.CRITICAL,
-                category=OptimizationCategory.ALGORITHM,
-                title="Backtest too slow",
-                description=f"Estimated {estimated_time/3600:.1f}h, target <1h",
-                current_performance=f"{estimated_time/3600:.1f}h",
-                expected_improvement=f"{speedup_needed:.1f}x speedup needed",
-                suggestion="Optimize prediction pipeline, use caching, parallelize",
-            ))
+            self.report.add_issue(
+                OptimizationIssue(
+                    severity=OptimizationSeverity.CRITICAL,
+                    category=OptimizationCategory.ALGORITHM,
+                    title="Backtest too slow",
+                    description=f"Estimated {estimated_time/3600:.1f}h, target <1h",
+                    current_performance=f"{estimated_time/3600:.1f}h",
+                    expected_improvement=f"{speedup_needed:.1f}x speedup needed",
+                    suggestion="Optimize prediction pipeline, use caching, parallelize",
+                )
+            )
 
         return result
 
@@ -539,8 +561,12 @@ class PerformanceOptimizer:
             lines.append("   Immediate optimization recommended")
 
         # Group by severity
-        for severity in [OptimizationSeverity.CRITICAL, OptimizationSeverity.HIGH,
-                        OptimizationSeverity.MEDIUM, OptimizationSeverity.LOW]:
+        for severity in [
+            OptimizationSeverity.CRITICAL,
+            OptimizationSeverity.HIGH,
+            OptimizationSeverity.MEDIUM,
+            OptimizationSeverity.LOW,
+        ]:
             severity_issues = [i for i in self.report.issues if i.severity == severity]
 
             if severity_issues:
@@ -581,9 +607,7 @@ if __name__ == "__main__":
     # Estimate backtest time
     print("\nEstimating backtest time...")
     estimate = optimizer.estimate_backtest_time(
-        num_games=148,
-        models_per_game=5,
-        avg_prediction_time=2.0  # 2 seconds per prediction
+        num_games=148, models_per_game=5, avg_prediction_time=2.0  # 2 seconds per prediction
     )
 
     print(f"Estimated backtest time: {estimate['estimated_time_hours']:.1f}h")

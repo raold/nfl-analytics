@@ -23,7 +23,6 @@ def test_get_cache_key_basic():
     assert result is not None
 
 
-
 def test_get_cache_key_edge_cases():
     """Test get_cache_key: edge cases."""
     # Arrange
@@ -36,23 +35,28 @@ def test_get_cache_key_edge_cases():
     assert result is not None
 
 
-
 def test_get_cache_key_error_handling():
     """Test get_cache_key error handling."""
     with pytest.raises(ValueError):
         get_cache_key(invalid_input)
 
 
-
-@given(st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers())
+@given(
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
 def test_get_cache_key_property_idempotent(self, player_id, prop_type, week, season, model_version):
     """Property test: function is idempotent."""
     # Act
     result = get_cache_key(player_id, prop_type, week, season, model_version)
 
     # Assert property
-    assert get_cache_key(player_id, prop_type, week, season, model_version) == result, "idempotent violated"
-
+    assert (
+        get_cache_key(player_id, prop_type, week, season, model_version) == result
+    ), "idempotent violated"
 
 
 def test_load_prediction_from_db_basic():
@@ -67,7 +71,6 @@ def test_load_prediction_from_db_basic():
     assert result is not None
 
 
-
 def test_load_prediction_from_db_edge_cases():
     """Test load_prediction_from_db: edge cases."""
     # Arrange
@@ -80,20 +83,21 @@ def test_load_prediction_from_db_edge_cases():
     assert result is not None
 
 
-
 def test_load_prediction_from_db_error_handling():
     """Test load_prediction_from_db error handling."""
     with pytest.raises(ValueError):
         load_prediction_from_db(invalid_input)
 
 
-
 @given(st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers())
-def test_load_prediction_from_db_property_idempotent(self, player_id, prop_type, season, model_version):
+def test_load_prediction_from_db_property_idempotent(
+    self, player_id, prop_type, season, model_version
+):
     """Property test: function is idempotent."""
     # Act
     result = load_prediction_from_db(player_id, prop_type, season, model_version)
 
     # Assert property
-    assert load_prediction_from_db(player_id, prop_type, season, model_version) == result, "idempotent violated"
-
+    assert (
+        load_prediction_from_db(player_id, prop_type, season, model_version) == result
+    ), "idempotent violated"

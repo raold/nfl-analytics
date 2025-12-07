@@ -39,11 +39,10 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class TurnoverLuckEngine:
@@ -101,11 +100,7 @@ class TurnoverLuckEngine:
         return psycopg2.connect(**self.db_config)
 
     def _fetch_team_turnover_history(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        lookback_games: int = 10
+        self, team: str, season: int, week: int, lookback_games: int = 10
     ) -> pd.DataFrame:
         """
         Fetch turnover history for a team prior to the specified game.
@@ -162,19 +157,15 @@ class TurnoverLuckEngine:
                     "season": season,
                     "week": week,
                     "min_season": season - 2,  # Look back up to 2 seasons
-                    "lookback": lookback_games
-                }
+                    "lookback": lookback_games,
+                },
             )
 
         logger.debug(f"Fetched {len(df)} games for {team} before {season} week {week}")
         return df
 
     def _compute_fumble_recovery_rate(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        window: int = 5
+        self, team: str, season: int, week: int, window: int = 5
     ) -> float:
         """
         Compute fumble recovery rate from play-by-play data.
@@ -234,15 +225,15 @@ class TurnoverLuckEngine:
                         "season": season,
                         "week": week,
                         "min_season": season - 1,
-                        "window": window
-                    }
+                        "window": window,
+                    },
                 )
 
             if len(result) == 0:
                 return self.EXPECTED_FUMBLE_RECOVERY_RATE
 
-            total = result.iloc[0]['total_fumbles']
-            recovered = result.iloc[0]['fumbles_recovered']
+            total = result.iloc[0]["total_fumbles"]
+            recovered = result.iloc[0]["fumbles_recovered"]
 
             if total is None or total < 3:
                 # Insufficient data, return baseline
@@ -254,12 +245,7 @@ class TurnoverLuckEngine:
             logger.warning(f"Fumble recovery query failed: {e}, using baseline")
             return self.EXPECTED_FUMBLE_RECOVERY_RATE
 
-    def compute_turnover_luck_features(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def compute_turnover_luck_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Compute all turnover luck features for a team.
 
@@ -272,9 +258,7 @@ class TurnoverLuckEngine:
             Dictionary of turnover luck features
         """
         # Fetch turnover history
-        history = self._fetch_team_turnover_history(
-            team, season, week, lookback_games=10
-        )
+        history = self._fetch_team_turnover_history(team, season, week, lookback_games=10)
 
         features = {}
 
@@ -282,32 +266,32 @@ class TurnoverLuckEngine:
             # Insufficient data - return neutral values
             logger.warning(f"Insufficient turnover data for {team} ({len(history)} games)")
             features = {
-                'turnover_luck_last_3': 0.0,
-                'turnover_luck_last_5': 0.0,
-                'turnover_margin_l3': 0.0,
-                'turnover_margin_l5': 0.0,
-                'fumble_recovery_rate_l5': 0.50,
-                'fumble_recovery_luck': 0.0,
-                'int_regression_indicator': 0,
-                'expected_regression_points': 0.0,
-                'turnovers_committed_l3': self.EXPECTED_TURNOVERS_PER_GAME,
-                'turnovers_forced_l3': self.EXPECTED_TURNOVERS_PER_GAME,
+                "turnover_luck_last_3": 0.0,
+                "turnover_luck_last_5": 0.0,
+                "turnover_margin_l3": 0.0,
+                "turnover_margin_l5": 0.0,
+                "fumble_recovery_rate_l5": 0.50,
+                "fumble_recovery_luck": 0.0,
+                "int_regression_indicator": 0,
+                "expected_regression_points": 0.0,
+                "turnovers_committed_l3": self.EXPECTED_TURNOVERS_PER_GAME,
+                "turnovers_forced_l3": self.EXPECTED_TURNOVERS_PER_GAME,
             }
             return features
 
         # Sort by most recent first for rolling calculations
-        history = history.sort_values('kickoff', ascending=False)
+        history = history.sort_values("kickoff", ascending=False)
 
         # Last 3 games stats
         last_3 = history.head(min(3, len(history)))
-        turnovers_committed_l3 = last_3['turnovers_committed'].mean()
-        turnovers_forced_l3 = last_3['turnovers_forced'].mean()
+        turnovers_committed_l3 = last_3["turnovers_committed"].mean()
+        turnovers_forced_l3 = last_3["turnovers_forced"].mean()
         turnover_margin_l3 = turnovers_forced_l3 - turnovers_committed_l3
 
         # Last 5 games stats
         last_5 = history.head(min(5, len(history)))
-        turnovers_committed_l5 = last_5['turnovers_committed'].mean()
-        turnovers_forced_l5 = last_5['turnovers_forced'].mean()
+        turnovers_committed_l5 = last_5["turnovers_committed"].mean()
+        turnovers_forced_l5 = last_5["turnovers_forced"].mean()
         turnover_margin_l5 = turnovers_forced_l5 - turnovers_committed_l5
 
         # Turnover luck = Actual margin - Expected margin (0)
@@ -317,9 +301,7 @@ class TurnoverLuckEngine:
         turnover_luck_l5 = turnover_margin_l5 - 0
 
         # Fumble recovery rate (more precise luck measure)
-        fumble_recovery_rate = self._compute_fumble_recovery_rate(
-            team, season, week, window=5
-        )
+        fumble_recovery_rate = self._compute_fumble_recovery_rate(team, season, week, window=5)
         fumble_recovery_luck = fumble_recovery_rate - self.EXPECTED_FUMBLE_RECOVERY_RATE
 
         # INT regression indicator
@@ -340,27 +322,23 @@ class TurnoverLuckEngine:
         expected_regression_points = -turnover_luck_l3 * self.POINTS_PER_TURNOVER
 
         features = {
-            'turnover_luck_last_3': round(turnover_luck_l3, 3),
-            'turnover_luck_last_5': round(turnover_luck_l5, 3),
-            'turnover_margin_l3': round(turnover_margin_l3, 3),
-            'turnover_margin_l5': round(turnover_margin_l5, 3),
-            'fumble_recovery_rate_l5': round(fumble_recovery_rate, 3),
-            'fumble_recovery_luck': round(fumble_recovery_luck, 3),
-            'int_regression_indicator': int_regression_indicator,
-            'expected_regression_points': round(expected_regression_points, 2),
-            'turnovers_committed_l3': round(turnovers_committed_l3, 3),
-            'turnovers_forced_l3': round(turnovers_forced_l3, 3),
+            "turnover_luck_last_3": round(turnover_luck_l3, 3),
+            "turnover_luck_last_5": round(turnover_luck_l5, 3),
+            "turnover_margin_l3": round(turnover_margin_l3, 3),
+            "turnover_margin_l5": round(turnover_margin_l5, 3),
+            "fumble_recovery_rate_l5": round(fumble_recovery_rate, 3),
+            "fumble_recovery_luck": round(fumble_recovery_luck, 3),
+            "int_regression_indicator": int_regression_indicator,
+            "expected_regression_points": round(expected_regression_points, 2),
+            "turnovers_committed_l3": round(turnovers_committed_l3, 3),
+            "turnovers_forced_l3": round(turnovers_forced_l3, 3),
         }
 
         logger.debug(f"Turnover luck features for {team}: {features}")
         return features
 
     def compute_game_turnover_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> dict[str, float]:
         """
         Compute turnover luck features for a matchup.
@@ -384,44 +362,38 @@ class TurnoverLuckEngine:
 
         # Home team features
         for key, value in home_features.items():
-            result[f'home_{key}'] = value
+            result[f"home_{key}"] = value
 
         # Away team features
         for key, value in away_features.items():
-            result[f'away_{key}'] = value
+            result[f"away_{key}"] = value
 
         # Differential features (home - away)
         # Positive differential = home team is luckier (likely to regress)
-        result['turnover_luck_diff'] = (
-            home_features['turnover_luck_last_3'] -
-            away_features['turnover_luck_last_3']
+        result["turnover_luck_diff"] = (
+            home_features["turnover_luck_last_3"] - away_features["turnover_luck_last_3"]
         )
-        result['turnover_margin_diff'] = (
-            home_features['turnover_margin_l3'] -
-            away_features['turnover_margin_l3']
+        result["turnover_margin_diff"] = (
+            home_features["turnover_margin_l3"] - away_features["turnover_margin_l3"]
         )
-        result['fumble_recovery_luck_diff'] = (
-            home_features['fumble_recovery_luck'] -
-            away_features['fumble_recovery_luck']
+        result["fumble_recovery_luck_diff"] = (
+            home_features["fumble_recovery_luck"] - away_features["fumble_recovery_luck"]
         )
-        result['expected_regression_diff'] = (
-            home_features['expected_regression_points'] -
-            away_features['expected_regression_points']
+        result["expected_regression_diff"] = (
+            home_features["expected_regression_points"]
+            - away_features["expected_regression_points"]
         )
 
         # Composite luck indicator
         # Combines turnover luck and fumble recovery luck
-        result['composite_luck_diff'] = (
-            result['turnover_luck_diff'] * 0.7 +
-            result['fumble_recovery_luck_diff'] * 10 * 0.3  # Scale fumble luck
+        result["composite_luck_diff"] = (
+            result["turnover_luck_diff"] * 0.7
+            + result["fumble_recovery_luck_diff"] * 10 * 0.3  # Scale fumble luck
         )
 
         return result
 
-    def compute_batch_features(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def compute_batch_features(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Compute turnover luck features for multiple games efficiently.
 
@@ -436,21 +408,23 @@ class TurnoverLuckEngine:
         for _, row in games.iterrows():
             try:
                 features = self.compute_game_turnover_features(
-                    home_team=row['home_team'],
-                    away_team=row['away_team'],
-                    season=row['season'],
-                    week=row['week']
+                    home_team=row["home_team"],
+                    away_team=row["away_team"],
+                    season=row["season"],
+                    week=row["week"],
                 )
-                features['game_id'] = row['game_id']
+                features["game_id"] = row["game_id"]
                 all_features.append(features)
             except Exception as e:
-                logger.error(f"Error computing turnover features for game {row.get('game_id')}: {e}")
+                logger.error(
+                    f"Error computing turnover features for game {row.get('game_id')}: {e}"
+                )
                 # Return neutral features
-                features = {'game_id': row['game_id']}
+                features = {"game_id": row["game_id"]}
                 all_features.append(features)
 
         features_df = pd.DataFrame(all_features)
-        result = games.merge(features_df, on='game_id', how='left')
+        result = games.merge(features_df, on="game_id", how="left")
 
         return result
 
@@ -459,33 +433,33 @@ def get_turnover_luck_feature_names() -> list:
     """Return list of all turnover luck feature names for integration."""
     return [
         # Home team features
-        'home_turnover_luck_last_3',
-        'home_turnover_luck_last_5',
-        'home_turnover_margin_l3',
-        'home_turnover_margin_l5',
-        'home_fumble_recovery_rate_l5',
-        'home_fumble_recovery_luck',
-        'home_int_regression_indicator',
-        'home_expected_regression_points',
-        'home_turnovers_committed_l3',
-        'home_turnovers_forced_l3',
+        "home_turnover_luck_last_3",
+        "home_turnover_luck_last_5",
+        "home_turnover_margin_l3",
+        "home_turnover_margin_l5",
+        "home_fumble_recovery_rate_l5",
+        "home_fumble_recovery_luck",
+        "home_int_regression_indicator",
+        "home_expected_regression_points",
+        "home_turnovers_committed_l3",
+        "home_turnovers_forced_l3",
         # Away team features
-        'away_turnover_luck_last_3',
-        'away_turnover_luck_last_5',
-        'away_turnover_margin_l3',
-        'away_turnover_margin_l5',
-        'away_fumble_recovery_rate_l5',
-        'away_fumble_recovery_luck',
-        'away_int_regression_indicator',
-        'away_expected_regression_points',
-        'away_turnovers_committed_l3',
-        'away_turnovers_forced_l3',
+        "away_turnover_luck_last_3",
+        "away_turnover_luck_last_5",
+        "away_turnover_margin_l3",
+        "away_turnover_margin_l5",
+        "away_fumble_recovery_rate_l5",
+        "away_fumble_recovery_luck",
+        "away_int_regression_indicator",
+        "away_expected_regression_points",
+        "away_turnovers_committed_l3",
+        "away_turnovers_forced_l3",
         # Differential features
-        'turnover_luck_diff',
-        'turnover_margin_diff',
-        'fumble_recovery_luck_diff',
-        'expected_regression_diff',
-        'composite_luck_diff',
+        "turnover_luck_diff",
+        "turnover_margin_diff",
+        "fumble_recovery_luck_diff",
+        "expected_regression_diff",
+        "composite_luck_diff",
     ]
 
 
@@ -495,15 +469,15 @@ if __name__ == "__main__":
 
     # Test single team features
     print("\n=== KC Turnover Luck (Week 12, 2024) ===")
-    kc_features = engine.compute_turnover_luck_features('KC', 2024, 12)
+    kc_features = engine.compute_turnover_luck_features("KC", 2024, 12)
     for k, v in kc_features.items():
         print(f"  {k}: {v}")
 
     # Test matchup features
     print("\n=== KC vs BUF Turnover Luck Comparison ===")
-    matchup = engine.compute_game_turnover_features('KC', 'BUF', 2024, 12)
+    matchup = engine.compute_game_turnover_features("KC", "BUF", 2024, 12)
     for k, v in matchup.items():
-        if 'diff' in k or 'composite' in k:
+        if "diff" in k or "composite" in k:
             print(f"  {k}: {v}")
 
     print(f"\n=== Total features: {len(get_turnover_luck_feature_names())} ===")

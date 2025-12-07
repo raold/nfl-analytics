@@ -18,13 +18,13 @@ def check_notation_consistency(tex_dir):
 
     # Check for common notation patterns
     patterns = {
-        'Expected value': [r'\\E\[', r'\\mathbb\{E\}\[', r'E\[', r'\\text\{E\}\['],
-        'Probability': [r'\\Prob', r'\\mathbb\{P\}', r'P\(', r'\\text\{Pr\}'],
-        'Variance': [r'\\Var', r'\\text\{Var\}', r'Var\('],
-        'CVaR': [r'CVaR', r'\\text\{CVaR\}', r'C-VaR'],
-        'CLV': [r'CLV', r'\\text\{CLV\}'],
-        'EPA': [r'EPA', r'\\text\{EPA\}'],
-        'NFL': [r'NFL', r'\\text\{NFL\}'],
+        "Expected value": [r"\\E\[", r"\\mathbb\{E\}\[", r"E\[", r"\\text\{E\}\["],
+        "Probability": [r"\\Prob", r"\\mathbb\{P\}", r"P\(", r"\\text\{Pr\}"],
+        "Variance": [r"\\Var", r"\\text\{Var\}", r"Var\("],
+        "CVaR": [r"CVaR", r"\\text\{CVaR\}", r"C-VaR"],
+        "CLV": [r"CLV", r"\\text\{CLV\}"],
+        "EPA": [r"EPA", r"\\text\{EPA\}"],
+        "NFL": [r"NFL", r"\\text\{NFL\}"],
     }
 
     print("=" * 70)
@@ -36,11 +36,11 @@ def check_notation_consistency(tex_dir):
         found_variations = set()
 
         for tex_file in tex_files:
-            if 'main.tex' in str(tex_file) or 'figures' in str(tex_file):
+            if "main.tex" in str(tex_file) or "figures" in str(tex_file):
                 continue
 
             try:
-                with open(tex_file, encoding='utf-8') as f:
+                with open(tex_file, encoding="utf-8") as f:
                     content = f.read()
 
                 for variant in variations:
@@ -62,6 +62,7 @@ def check_notation_consistency(tex_dir):
 
     return issues
 
+
 def check_table_formatting(tex_dir):
     """Check for consistent table formatting."""
 
@@ -79,11 +80,11 @@ def check_table_formatting(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, encoding='utf-8') as f:
+            with open(tex_file, encoding="utf-8") as f:
                 content = f.read()
 
-            if r'\begin{table}' in content:
-                if r'\begin{threeparttable}' in content:
+            if r"\begin{table}" in content:
+                if r"\begin{threeparttable}" in content:
                     tables_with_threeparttable += 1
                 else:
                     tables_without_threeparttable += 1
@@ -99,6 +100,7 @@ def check_table_formatting(tex_dir):
 
     return issues
 
+
 def check_citation_style(tex_dir):
     """Check for consistent citation style."""
 
@@ -112,14 +114,14 @@ def check_citation_style(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, encoding='utf-8') as f:
+            with open(tex_file, encoding="utf-8") as f:
                 content = f.read()
 
             # Count different citation commands
-            cite_commands['\\cite{'] += len(re.findall(r'\\cite\{', content))
-            cite_commands['\\citep{'] += len(re.findall(r'\\citep\{', content))
-            cite_commands['\\citet{'] += len(re.findall(r'\\citet\{', content))
-            cite_commands['\\citeauthor{'] += len(re.findall(r'\\citeauthor\{', content))
+            cite_commands["\\cite{"] += len(re.findall(r"\\cite\{", content))
+            cite_commands["\\citep{"] += len(re.findall(r"\\citep\{", content))
+            cite_commands["\\citet{"] += len(re.findall(r"\\citet\{", content))
+            cite_commands["\\citeauthor{"] += len(re.findall(r"\\citeauthor\{", content))
         except:
             pass
 
@@ -127,10 +129,11 @@ def check_citation_style(tex_dir):
     for cmd, count in sorted(cite_commands.items(), key=lambda x: -x[1]):
         print(f"  {cmd}: {count} occurrences")
 
-    if cite_commands['\\cite{'] > 0:
+    if cite_commands["\\cite{"] > 0:
         print("\n⚠️  Using \\cite{} - consider \\citep{} for parenthetical or \\citet{} for textual")
 
     return []
+
 
 def check_figure_references(tex_dir):
     """Check for consistent figure/table references."""
@@ -145,15 +148,15 @@ def check_figure_references(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, encoding='utf-8') as f:
+            with open(tex_file, encoding="utf-8") as f:
                 content = f.read()
 
             # Count different reference styles
-            ref_styles['\\ref{'] += len(re.findall(r'\\ref\{', content))
-            ref_styles['\\Cref{'] += len(re.findall(r'\\Cref\{', content))
-            ref_styles['\\cref{'] += len(re.findall(r'\\cref\{', content))
-            ref_styles['Figure~\\ref'] += len(re.findall(r'Figure~\\ref', content))
-            ref_styles['Table~\\ref'] += len(re.findall(r'Table~\\ref', content))
+            ref_styles["\\ref{"] += len(re.findall(r"\\ref\{", content))
+            ref_styles["\\Cref{"] += len(re.findall(r"\\Cref\{", content))
+            ref_styles["\\cref{"] += len(re.findall(r"\\cref\{", content))
+            ref_styles["Figure~\\ref"] += len(re.findall(r"Figure~\\ref", content))
+            ref_styles["Table~\\ref"] += len(re.findall(r"Table~\\ref", content))
         except:
             pass
 
@@ -161,10 +164,11 @@ def check_figure_references(tex_dir):
     for cmd, count in sorted(ref_styles.items(), key=lambda x: -x[1]):
         print(f"  {cmd}: {count} occurrences")
 
-    if ref_styles['Figure~\\ref'] > 0 or ref_styles['Table~\\ref'] > 0:
+    if ref_styles["Figure~\\ref"] > 0 or ref_styles["Table~\\ref"] > 0:
         print("\n⚠️  Using manual 'Figure~\\ref' - consider \\Cref{} for consistency")
 
     return []
+
 
 def main():
     """Run all consistency checks."""
@@ -200,6 +204,7 @@ def main():
     print("  4. Use \\Cref{} or \\cref{} for all cross-references")
     print("  5. Use \\citep{} for parenthetical citations, \\citet{} for textual")
     print("  6. Ensure all tables use threeparttable environment")
+
 
 if __name__ == "__main__":
     main()

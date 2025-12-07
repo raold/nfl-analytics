@@ -97,9 +97,9 @@ def example_batch_extraction():
     # Show top CPOE teams
     print("\nTop CPOE Teams (QB Accuracy):")
     cpoe_rankings = sorted(
-        [(team, features['ngs_cpoe']) for team, features in results.items()],
+        [(team, features["ngs_cpoe"]) for team, features in results.items()],
         key=lambda x: x[1],
-        reverse=True
+        reverse=True,
     )
     for rank, (team, cpoe) in enumerate(cpoe_rankings, 1):
         print(f"  {rank}. {team}: {cpoe:+.2f} pp")

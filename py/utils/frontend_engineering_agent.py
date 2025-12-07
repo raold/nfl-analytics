@@ -83,12 +83,14 @@ from typing import Any
 
 try:
     import psycopg
+
     PSYCOPG_AVAILABLE = True
 except ImportError:
     PSYCOPG_AVAILABLE = False
 
 try:
     import requests
+
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
@@ -102,8 +104,10 @@ logger = logging.getLogger(__name__)
 # Data Structures
 # ============================================================================
 
+
 class Severity(Enum):
     """Validation issue severity levels"""
+
     INFO = "INFO"
     WARNING = "WARNING"
     ERROR = "ERROR"
@@ -113,6 +117,7 @@ class Severity(Enum):
 @dataclass
 class ValidationIssue:
     """Single validation issue"""
+
     severity: Severity
     category: str
     message: str
@@ -135,6 +140,7 @@ class ValidationIssue:
 @dataclass
 class SchemaValidationReport:
     """Report of schema validation results"""
+
     timestamp: datetime = field(default_factory=datetime.now)
     issues: list[ValidationIssue] = field(default_factory=list)
     queries_checked: int = 0
@@ -197,13 +203,18 @@ class SchemaValidationReport:
 @dataclass
 class SchemaDrift:
     """Represents schema drift between database and frontend"""
+
     timestamp: datetime = field(default_factory=datetime.now)
     added_tables: list[str] = field(default_factory=list)
     removed_tables: list[str] = field(default_factory=list)
     added_columns: dict[str, list[str]] = field(default_factory=dict)
     removed_columns: dict[str, list[str]] = field(default_factory=dict)
-    renamed_columns: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # table -> [(old, new)]
-    type_changes: dict[str, list[tuple[str, str, str]]] = field(default_factory=dict)  # table -> [(col, old_type, new_type)]
+    renamed_columns: dict[str, list[tuple[str, str]]] = field(
+        default_factory=dict
+    )  # table -> [(old, new)]
+    type_changes: dict[str, list[tuple[str, str, str]]] = field(
+        default_factory=dict
+    )  # table -> [(col, old_type, new_type)]
 
     @property
     def has_breaking_changes(self) -> bool:
@@ -214,15 +225,19 @@ class SchemaDrift:
     def has_any_changes(self) -> bool:
         """Returns True if any drift detected"""
         return bool(
-            self.added_tables or self.removed_tables or
-            self.added_columns or self.removed_columns or
-            self.renamed_columns or self.type_changes
+            self.added_tables
+            or self.removed_tables
+            or self.added_columns
+            or self.removed_columns
+            or self.renamed_columns
+            or self.type_changes
         )
 
 
 @dataclass
 class APIContractReport:
     """Report of API contract validation"""
+
     timestamp: datetime = field(default_factory=datetime.now)
     endpoints_checked: int = 0
     endpoints_valid: int = 0
@@ -269,6 +284,7 @@ class APIContractReport:
 @dataclass
 class MigrationUpdate:
     """Represents a suggested frontend update"""
+
     update_type: str  # "sql_query", "api_call", "schema_validator", "error_handling"
     file_path: str
     line_number: int | None
@@ -282,6 +298,7 @@ class MigrationUpdate:
 # ============================================================================
 # Frontend Engineering Agent
 # ============================================================================
+
 
 class FrontendEngineeringAgent:
     """
@@ -299,7 +316,7 @@ class FrontendEngineeringAgent:
         db_config: dict[str, Any] | None = None,
         api_base_url: str = "http://localhost:8000",
         dashboard_path: Path | None = None,
-        schema_snapshot_path: Path | None = None
+        schema_snapshot_path: Path | None = None,
     ):
         """
         Initialize Frontend Engineering Agent.
@@ -316,7 +333,9 @@ class FrontendEngineeringAgent:
         # Paths
         project_root = Path(__file__).parent.parent.parent
         self.dashboard_path = dashboard_path or project_root / "dashboard" / "app.py"
-        self.schema_snapshot_path = schema_snapshot_path or project_root / "docs" / "database" / "schema_snapshot.json"
+        self.schema_snapshot_path = (
+            schema_snapshot_path or project_root / "docs" / "database" / "schema_snapshot.json"
+        )
 
         # Cached schema information
         self._schema_cache: dict[str, Any] | None = None
@@ -326,12 +345,13 @@ class FrontendEngineeringAgent:
     def _default_db_config() -> dict[str, Any]:
         """Default database configuration from environment"""
         import os
+
         return {
             "host": os.getenv("DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", "5544")),
             "dbname": os.getenv("DB_NAME", "devdb01"),
             "user": os.getenv("DB_USER", "dro"),
-            "password": os.getenv("DB_PASSWORD", "sicillionbillions")  # pragma: allowlist secret
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),  # pragma: allowlist secret
         }
 
     # ========================================================================
@@ -368,7 +388,8 @@ class FrontendEngineeringAgent:
             with psycopg.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
                     # Get all tables and views
-                    cur.execute("""
+                    cur.execute(
+                        """
                         SELECT
                             table_schema,
                             table_name,
@@ -376,13 +397,15 @@ class FrontendEngineeringAgent:
                         FROM information_schema.tables
                         WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
                         ORDER BY table_schema, table_name
-                    """)
+                    """
+                    )
 
                     for schema_name, table_name, table_type in cur.fetchall():
                         full_name = f"{schema_name}.{table_name}"
 
                         # Get column information
-                        cur.execute("""
+                        cur.execute(
+                            """
                             SELECT
                                 column_name,
                                 data_type,
@@ -391,7 +414,9 @@ class FrontendEngineeringAgent:
                             FROM information_schema.columns
                             WHERE table_schema = %s AND table_name = %s
                             ORDER BY ordinal_position
-                        """, (schema_name, table_name))
+                        """,
+                            (schema_name, table_name),
+                        )
 
                         columns = []
                         column_types = {}
@@ -401,17 +426,20 @@ class FrontendEngineeringAgent:
                         for col_name, col_type, is_null, col_default in cur.fetchall():
                             columns.append(col_name)
                             column_types[col_name] = col_type
-                            nullable[col_name] = (is_null == 'YES')
+                            nullable[col_name] = is_null == "YES"
                             if col_default:
                                 defaults[col_name] = col_default
 
                         # Get primary keys
-                        cur.execute("""
+                        cur.execute(
+                            """
                             SELECT a.attname
                             FROM pg_index i
                             JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
                             WHERE i.indrelid = %s::regclass AND i.indisprimary
-                        """, (full_name,))
+                        """,
+                            (full_name,),
+                        )
 
                         primary_keys = [row[0] for row in cur.fetchall()]
 
@@ -420,7 +448,7 @@ class FrontendEngineeringAgent:
                             "column_types": column_types,
                             "primary_keys": primary_keys,
                             "nullable": nullable,
-                            "defaults": defaults
+                            "defaults": defaults,
                         }
 
                         # Categorize by table type
@@ -448,14 +476,11 @@ class FrontendEngineeringAgent:
         schema = self.get_database_schema()
 
         # Add metadata
-        snapshot = {
-            "timestamp": datetime.now().isoformat(),
-            "schema": schema
-        }
+        snapshot = {"timestamp": datetime.now().isoformat(), "schema": schema}
 
         self.schema_snapshot_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(self.schema_snapshot_path, 'w') as f:
+        with open(self.schema_snapshot_path, "w") as f:
             json.dump(snapshot, f, indent=2)
 
         logger.info(f"Schema snapshot saved to {self.schema_snapshot_path}")
@@ -493,7 +518,7 @@ class FrontendEngineeringAgent:
         multi_line_pattern = r'["\']{{3}}(.*?SELECT.*?)["\']{{3}}'
         for match in re.finditer(multi_line_pattern, content, re.DOTALL | re.IGNORECASE):
             query = match.group(1).strip()
-            line_num = content[:match.start()].count('\n') + 1
+            line_num = content[: match.start()].count("\n") + 1
             queries.append((query, line_num))
 
         # Pattern 2: Single-line SQL strings
@@ -503,15 +528,15 @@ class FrontendEngineeringAgent:
             query = match.group(1).strip()
             # Skip if already captured in multi-line
             if not any(query in q[0] for q in queries):
-                line_num = content[:match.start()].count('\n') + 1
+                line_num = content[: match.start()].count("\n") + 1
                 queries.append((query, line_num))
 
         # Pattern 3: conn.execute() and cur.execute() calls
         execute_pattern = r'(?:conn|cur|cursor)\.execute\s*\(\s*["\']([^"\']+)["\']'
         for match in re.finditer(execute_pattern, content, re.IGNORECASE):
             query = match.group(1).strip()
-            if 'SELECT' in query.upper():
-                line_num = content[:match.start()].count('\n') + 1
+            if "SELECT" in query.upper():
+                line_num = content[: match.start()].count("\n") + 1
                 queries.append((query, line_num))
 
         return queries
@@ -534,32 +559,38 @@ class FrontendEngineeringAgent:
 
         # Extract table references
         # Pattern: FROM schema.table or JOIN schema.table
-        table_pattern = r'(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*\.?[a-zA-Z_][a-zA-Z0-9_]*)'
+        table_pattern = r"(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*\.?[a-zA-Z_][a-zA-Z0-9_]*)"
         table_matches = re.findall(table_pattern, query, re.IGNORECASE)
 
-        all_tables = {**schema.get("tables", {}), **schema.get("views", {}), **schema.get("materialized_views", {})}
+        all_tables = {
+            **schema.get("tables", {}),
+            **schema.get("views", {}),
+            **schema.get("materialized_views", {}),
+        }
 
         for table_ref in table_matches:
             # Normalize table reference
-            if '.' not in table_ref:
+            if "." not in table_ref:
                 # Assume public schema
                 table_ref = f"public.{table_ref}"
 
             # Check if table exists
             if table_ref not in all_tables:
-                issues.append(ValidationIssue(
-                    severity=Severity.ERROR,
-                    category="schema_validation",
-                    message=f"Table '{table_ref}' does not exist in database",
-                    query=query,
-                    suggestion=f"Available tables: {', '.join(list(all_tables.keys())[:5])}..."
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=Severity.ERROR,
+                        category="schema_validation",
+                        message=f"Table '{table_ref}' does not exist in database",
+                        query=query,
+                        suggestion=f"Available tables: {', '.join(list(all_tables.keys())[:5])}...",
+                    )
+                )
                 continue
 
             # Extract column references for this table
             # Pattern: table_alias.column_name
-            table_alias = table_ref.split('.')[-1]
-            col_pattern = rf'{table_alias}\.([a-zA-Z_][a-zA-Z0-9_]*)'
+            table_alias = table_ref.split(".")[-1]
+            col_pattern = rf"{table_alias}\.([a-zA-Z_][a-zA-Z0-9_]*)"
             col_matches = re.findall(col_pattern, query, re.IGNORECASE)
 
             table_info = all_tables[table_ref]
@@ -567,35 +598,41 @@ class FrontendEngineeringAgent:
 
             for col_name in col_matches:
                 if col_name not in available_columns:
-                    issues.append(ValidationIssue(
-                        severity=Severity.ERROR,
-                        category="schema_validation",
-                        message=f"Column '{col_name}' does not exist in table '{table_ref}'",
-                        query=query,
-                        suggestion=f"Available columns: {', '.join(list(available_columns)[:10])}..."
-                    ))
+                    issues.append(
+                        ValidationIssue(
+                            severity=Severity.ERROR,
+                            category="schema_validation",
+                            message=f"Column '{col_name}' does not exist in table '{table_ref}'",
+                            query=query,
+                            suggestion=f"Available columns: {', '.join(list(available_columns)[:10])}...",
+                        )
+                    )
 
         # Check for common anti-patterns
-        if 'SELECT *' in query_upper:
-            issues.append(ValidationIssue(
-                severity=Severity.WARNING,
-                category="best_practice",
-                message="SELECT * detected - specify columns explicitly",
-                query=query,
-                suggestion="List specific columns to prevent breakage on schema changes"
-            ))
+        if "SELECT *" in query_upper:
+            issues.append(
+                ValidationIssue(
+                    severity=Severity.WARNING,
+                    category="best_practice",
+                    message="SELECT * detected - specify columns explicitly",
+                    query=query,
+                    suggestion="List specific columns to prevent breakage on schema changes",
+                )
+            )
 
         # Check for missing WHERE clause on large tables
-        large_tables = {'plays', 'odds_history', 'injuries'}
+        large_tables = {"plays", "odds_history", "injuries"}
         for table in large_tables:
-            if table in query.lower() and 'WHERE' not in query_upper and 'LIMIT' not in query_upper:
-                issues.append(ValidationIssue(
-                    severity=Severity.WARNING,
-                    category="performance",
-                    message=f"Query on large table '{table}' without WHERE or LIMIT clause",
-                    query=query,
-                    suggestion="Add WHERE clause or LIMIT to prevent full table scan"
-                ))
+            if table in query.lower() and "WHERE" not in query_upper and "LIMIT" not in query_upper:
+                issues.append(
+                    ValidationIssue(
+                        severity=Severity.WARNING,
+                        category="performance",
+                        message=f"Query on large table '{table}' without WHERE or LIMIT clause",
+                        query=query,
+                        suggestion="Add WHERE clause or LIMIT to prevent full table scan",
+                    )
+                )
 
         return issues
 
@@ -609,12 +646,14 @@ class FrontendEngineeringAgent:
         report = SchemaValidationReport()
 
         if not self.dashboard_path.exists():
-            report.add_issue(ValidationIssue(
-                severity=Severity.CRITICAL,
-                category="file_not_found",
-                message=f"Dashboard file not found: {self.dashboard_path}",
-                file_path=str(self.dashboard_path)
-            ))
+            report.add_issue(
+                ValidationIssue(
+                    severity=Severity.CRITICAL,
+                    category="file_not_found",
+                    message=f"Dashboard file not found: {self.dashboard_path}",
+                    file_path=str(self.dashboard_path),
+                )
+            )
             return report
 
         # Get current schema
@@ -663,13 +702,13 @@ class FrontendEngineeringAgent:
         current_tables = {
             **current_schema.get("tables", {}),
             **current_schema.get("views", {}),
-            **current_schema.get("materialized_views", {})
+            **current_schema.get("materialized_views", {}),
         }
 
         previous_tables = {
             **previous_schema.get("tables", {}),
             **previous_schema.get("views", {}),
-            **previous_schema.get("materialized_views", {})
+            **previous_schema.get("materialized_views", {}),
         }
 
         # Detect added/removed tables
@@ -752,12 +791,14 @@ class FrontendEngineeringAgent:
         report = APIContractReport()
 
         if not REQUESTS_AVAILABLE:
-            report.violations.append(ValidationIssue(
-                severity=Severity.ERROR,
-                category="dependency",
-                message="requests library not available - cannot validate API",
-                suggestion="pip install requests"
-            ))
+            report.violations.append(
+                ValidationIssue(
+                    severity=Severity.ERROR,
+                    category="dependency",
+                    message="requests library not available - cannot validate API",
+                    suggestion="pip install requests",
+                )
+            )
             return report
 
         # Check if API is available
@@ -770,24 +811,28 @@ class FrontendEngineeringAgent:
             report.api_version = health_data.get("version", "unknown")
 
         except Exception:
-            report.violations.append(ValidationIssue(
-                severity=Severity.CRITICAL,
-                category="api_availability",
-                message=f"API not reachable at {self.api_base_url}",
-                suggestion="Ensure API is running: docker-compose up api"
-            ))
+            report.violations.append(
+                ValidationIssue(
+                    severity=Severity.CRITICAL,
+                    category="api_availability",
+                    message=f"API not reachable at {self.api_base_url}",
+                    suggestion="Ensure API is running: docker-compose up api",
+                )
+            )
             return report
 
         # Get API schema
         api_schema = self.get_api_schema()
 
         if not api_schema:
-            report.violations.append(ValidationIssue(
-                severity=Severity.ERROR,
-                category="api_schema",
-                message="Failed to fetch API schema",
-                suggestion="Check API server logs"
-            ))
+            report.violations.append(
+                ValidationIssue(
+                    severity=Severity.ERROR,
+                    category="api_schema",
+                    message="Failed to fetch API schema",
+                    suggestion="Check API server logs",
+                )
+            )
             return report
 
         # Validate expected endpoints exist
@@ -795,7 +840,7 @@ class FrontendEngineeringAgent:
             ("/health", "GET"),
             ("/predict", "POST"),
             ("/models", "GET"),
-            ("/metrics", "GET")
+            ("/metrics", "GET"),
         ]
 
         paths = api_schema.get("paths", {})
@@ -805,19 +850,23 @@ class FrontendEngineeringAgent:
             method_lower = method.lower()
 
             if endpoint not in paths:
-                report.violations.append(ValidationIssue(
-                    severity=Severity.ERROR,
-                    category="api_contract",
-                    message=f"Expected endpoint '{method} {endpoint}' not found in API",
-                    suggestion="Update API or fix dashboard to use correct endpoint"
-                ))
+                report.violations.append(
+                    ValidationIssue(
+                        severity=Severity.ERROR,
+                        category="api_contract",
+                        message=f"Expected endpoint '{method} {endpoint}' not found in API",
+                        suggestion="Update API or fix dashboard to use correct endpoint",
+                    )
+                )
             elif method_lower not in paths[endpoint]:
-                report.violations.append(ValidationIssue(
-                    severity=Severity.ERROR,
-                    category="api_contract",
-                    message=f"Method '{method}' not supported for endpoint '{endpoint}'",
-                    suggestion=f"Available methods: {', '.join(paths[endpoint].keys())}"
-                ))
+                report.violations.append(
+                    ValidationIssue(
+                        severity=Severity.ERROR,
+                        category="api_contract",
+                        message=f"Method '{method}' not supported for endpoint '{endpoint}'",
+                        suggestion=f"Available methods: {', '.join(paths[endpoint].keys())}",
+                    )
+                )
             else:
                 report.endpoints_valid += 1
 
@@ -826,19 +875,29 @@ class FrontendEngineeringAgent:
             predict_schema = paths["/predict"]["post"].get("responses", {}).get("200", {})
 
             # Check for required fields in PredictionResponse
-            required_fields = ["prediction", "confidence", "lower_bound", "upper_bound", "models_used"]
+            required_fields = [
+                "prediction",
+                "confidence",
+                "lower_bound",
+                "upper_bound",
+                "models_used",
+            ]
 
-            response_schema = predict_schema.get("content", {}).get("application/json", {}).get("schema", {})
+            response_schema = (
+                predict_schema.get("content", {}).get("application/json", {}).get("schema", {})
+            )
             properties = response_schema.get("properties", {})
 
             for field in required_fields:
                 if field not in properties:
-                    report.violations.append(ValidationIssue(
-                        severity=Severity.ERROR,
-                        category="api_contract",
-                        message=f"Required field '{field}' missing from /predict response schema",
-                        suggestion="Update API models.py or fix dashboard expectations"
-                    ))
+                    report.violations.append(
+                        ValidationIssue(
+                            severity=Severity.ERROR,
+                            category="api_contract",
+                            message=f"Required field '{field}' missing from /predict response schema",
+                            suggestion="Update API models.py or fix dashboard expectations",
+                        )
+                    )
 
         return report
 
@@ -861,43 +920,49 @@ class FrontendEngineeringAgent:
         # Handle removed columns (CRITICAL - will break queries)
         for table, columns in drift.removed_columns.items():
             for col in columns:
-                updates.append(MigrationUpdate(
-                    update_type="sql_query",
-                    file_path=str(self.dashboard_path),
-                    line_number=None,
-                    old_code=None,
-                    new_code=f"# TODO: Column '{col}' removed from '{table}' - update queries",
-                    reason=f"Column '{col}' no longer exists in table '{table}'",
-                    priority=Severity.CRITICAL,
-                    automated=False
-                ))
+                updates.append(
+                    MigrationUpdate(
+                        update_type="sql_query",
+                        file_path=str(self.dashboard_path),
+                        line_number=None,
+                        old_code=None,
+                        new_code=f"# TODO: Column '{col}' removed from '{table}' - update queries",
+                        reason=f"Column '{col}' no longer exists in table '{table}'",
+                        priority=Severity.CRITICAL,
+                        automated=False,
+                    )
+                )
 
         # Handle type changes (WARNING - may cause runtime errors)
         for table, changes in drift.type_changes.items():
             for col, old_type, new_type in changes:
-                updates.append(MigrationUpdate(
-                    update_type="schema_validator",
-                    file_path=str(self.dashboard_path),
-                    line_number=None,
-                    old_code=None,
-                    new_code=f"# TODO: Column '{col}' in '{table}' changed from {old_type} to {new_type}",
-                    reason="Type change may require casting or value conversion",
-                    priority=Severity.WARNING,
-                    automated=False
-                ))
+                updates.append(
+                    MigrationUpdate(
+                        update_type="schema_validator",
+                        file_path=str(self.dashboard_path),
+                        line_number=None,
+                        old_code=None,
+                        new_code=f"# TODO: Column '{col}' in '{table}' changed from {old_type} to {new_type}",
+                        reason="Type change may require casting or value conversion",
+                        priority=Severity.WARNING,
+                        automated=False,
+                    )
+                )
 
         # Handle added tables (INFO - opportunity for new features)
         for table in drift.added_tables:
-            updates.append(MigrationUpdate(
-                update_type="sql_query",
-                file_path=str(self.dashboard_path),
-                line_number=None,
-                old_code=None,
-                new_code=f"# INFO: New table '{table}' available",
-                reason=f"New table '{table}' added to database",
-                priority=Severity.INFO,
-                automated=False
-            ))
+            updates.append(
+                MigrationUpdate(
+                    update_type="sql_query",
+                    file_path=str(self.dashboard_path),
+                    line_number=None,
+                    old_code=None,
+                    new_code=f"# INFO: New table '{table}' available",
+                    reason=f"New table '{table}' added to database",
+                    priority=Severity.INFO,
+                    automated=False,
+                )
+            )
 
         return updates
 
@@ -912,15 +977,15 @@ class FrontendEngineeringAgent:
 
         lines = [
             '"""',
-            'Auto-generated Pydantic models from database schema',
-            f'Generated: {datetime.now().isoformat()}',
-            'DO NOT EDIT MANUALLY - regenerate using frontend_engineering_agent.py',
+            "Auto-generated Pydantic models from database schema",
+            f"Generated: {datetime.now().isoformat()}",
+            "DO NOT EDIT MANUALLY - regenerate using frontend_engineering_agent.py",
             '"""',
-            '',
-            'from typing import Optional',
-            'from datetime import datetime, date',
-            'from pydantic import BaseModel, Field',
-            '',
+            "",
+            "from typing import Optional",
+            "from datetime import datetime, date",
+            "from pydantic import BaseModel, Field",
+            "",
         ]
 
         # Generate model for each table
@@ -928,9 +993,11 @@ class FrontendEngineeringAgent:
 
         for table_name, table_info in all_tables.items():
             # Convert table name to class name
-            class_name = ''.join(word.capitalize() for word in table_name.replace('.', '_').split('_'))
+            class_name = "".join(
+                word.capitalize() for word in table_name.replace(".", "_").split("_")
+            )
 
-            lines.append(f'class {class_name}(BaseModel):')
+            lines.append(f"class {class_name}(BaseModel):")
             lines.append(f'    """Auto-generated model for {table_name}"""')
 
             # Generate fields
@@ -954,29 +1021,29 @@ class FrontendEngineeringAgent:
 
                 lines.append(field_str)
 
-            lines.append('')
+            lines.append("")
 
-        return '\n'.join(lines)
+        return "\n".join(lines)
 
     @staticmethod
     def _sql_type_to_python(sql_type: str) -> str:
         """Map SQL types to Python types"""
         type_map = {
-            'integer': 'int',
-            'bigint': 'int',
-            'smallint': 'int',
-            'numeric': 'float',
-            'real': 'float',
-            'double precision': 'float',
-            'text': 'str',
-            'character varying': 'str',
-            'varchar': 'str',
-            'char': 'str',
-            'boolean': 'bool',
-            'date': 'date',
-            'timestamp': 'datetime',
-            'timestamp with time zone': 'datetime',
-            'timestamp without time zone': 'datetime',
+            "integer": "int",
+            "bigint": "int",
+            "smallint": "int",
+            "numeric": "float",
+            "real": "float",
+            "double precision": "float",
+            "text": "str",
+            "character varying": "str",
+            "varchar": "str",
+            "char": "str",
+            "boolean": "bool",
+            "date": "date",
+            "timestamp": "datetime",
+            "timestamp with time zone": "datetime",
+            "timestamp without time zone": "datetime",
         }
 
         sql_type_lower = sql_type.lower()
@@ -985,7 +1052,7 @@ class FrontendEngineeringAgent:
             if sql_type_lower.startswith(sql_t):
                 return py_t
 
-        return 'str'  # Default fallback
+        return "str"  # Default fallback
 
     # ========================================================================
     # CLI Interface
@@ -1078,7 +1145,7 @@ class FrontendEngineeringAgent:
 
         output_path = Path(__file__).parent.parent.parent / "dashboard" / "schema_validators.py"
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(validators)
 
         print(f"✅ Schema validators generated: {output_path}")
@@ -1115,6 +1182,7 @@ class FrontendEngineeringAgent:
 # ============================================================================
 # Main CLI
 # ============================================================================
+
 
 def main():
     """CLI entry point"""

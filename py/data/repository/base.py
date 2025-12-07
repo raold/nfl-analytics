@@ -44,12 +44,13 @@ logger = logging.getLogger(__name__)
 # Redis caching (Phase 2 integration)
 try:
     from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
     logger.warning("Redis caching unavailable - using in-memory cache fallback")
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 @dataclass
@@ -60,6 +61,7 @@ class DatabaseConfig:
     SECURITY: Never hardcode credentials! All sensitive values should come
     from environment variables. See .env.example for configuration template.
     """
+
     host: str = os.getenv("DB_HOST", "localhost")
     port: int = int(os.getenv("DB_PORT", "5544"))
     dbname: str = os.getenv("DB_NAME", "devdb01")
@@ -88,6 +90,7 @@ class DatabaseConfig:
 @dataclass
 class QueryResult:
     """Standardized query result container."""
+
     rows: list[dict[str, Any]]
     row_count: int
     execution_time_ms: float
@@ -110,11 +113,13 @@ class QueryResult:
 
 class RepositoryError(Exception):
     """Base exception for repository errors."""
+
     pass
 
 
 class ConnectionPoolError(RepositoryError):
     """Raised when connection pool is exhausted."""
+
     pass
 
 
@@ -356,12 +361,14 @@ class BaseRepository:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=1, max=10),
-        retry=retry_if_exception_type((
-            psycopg2.OperationalError,  # Connection failures
-            psycopg2.InterfaceError,    # Interface errors
-            ConnectionPoolError,         # Pool exhaustion
-        )),
-        reraise=True
+        retry=retry_if_exception_type(
+            (
+                psycopg2.OperationalError,  # Connection failures
+                psycopg2.InterfaceError,  # Interface errors
+                ConnectionPoolError,  # Pool exhaustion
+            )
+        ),
+        reraise=True,
     )
     def _get_connection_with_retry(self) -> Connection:
         """
@@ -495,9 +502,7 @@ class BaseRepository:
             self._cache.set(cache_key, rows_as_dicts, cache_ttl)
             logger.debug(f"Cached: {cache_key} ({len(rows_as_dicts)} rows)")
 
-        logger.debug(
-            f"Query executed: {len(rows_as_dicts)} rows in {execution_time_ms:.2f}ms"
-        )
+        logger.debug(f"Query executed: {len(rows_as_dicts)} rows in {execution_time_ms:.2f}ms")
 
         return QueryResult(
             rows=rows_as_dicts,
@@ -525,7 +530,7 @@ class BaseRepository:
         sql_lower = sql.lower()
 
         # Check 1: Detect deprecated 'game_date' column usage
-        if 'game_date' in sql_lower and 'games' in sql_lower:
+        if "game_date" in sql_lower and "games" in sql_lower:
             raise RepositoryError(
                 "⛔ TEMPORAL LEAKAGE RISK: Use 'kickoff' column, not 'game_date'. "
                 "Per database schema: kickoff is the authoritative timestamp. "
@@ -533,27 +538,31 @@ class BaseRepository:
             )
 
         # Check 2: Ensure temporal filtering exists for game/play queries
-        is_game_query = any(table in sql_lower for table in ['games', 'plays', 'player_stats'])
+        is_game_query = any(table in sql_lower for table in ["games", "plays", "player_stats"])
 
         if is_game_query:
-            has_temporal_filter = any([
-                'where' in sql_lower and 'kickoff' in sql_lower,
-                'where' in sql_lower and 'game_date' in sql_lower,  # Allow if explicit filter
-                'asof' in sql_lower,  # ASOF join
-                'lag(' in sql_lower,  # Lag window function
-                'lead(' in sql_lower,  # Lead window function
-                'row_number()' in sql_lower and 'partition by' in sql_lower,  # Window with partition
-            ])
+            has_temporal_filter = any(
+                [
+                    "where" in sql_lower and "kickoff" in sql_lower,
+                    "where" in sql_lower and "game_date" in sql_lower,  # Allow if explicit filter
+                    "asof" in sql_lower,  # ASOF join
+                    "lag(" in sql_lower,  # Lag window function
+                    "lead(" in sql_lower,  # Lead window function
+                    "row_number()" in sql_lower
+                    and "partition by" in sql_lower,  # Window with partition
+                ]
+            )
 
             if not has_temporal_filter:
                 logger.warning(
                     "⚠️  TEMPORAL SAFETY WARNING: Game/play query missing explicit date filter. "
                     "Ensure features use ASOF joins or WHERE kickoff < prediction_date. "
-                    "Query: %s...", sql[:100]
+                    "Query: %s...",
+                    sql[:100],
                 )
 
         # Check 3: Warn on SELECT * from games without date filter
-        if 'select *' in sql_lower and 'games' in sql_lower and 'where' not in sql_lower:
+        if "select *" in sql_lower and "games" in sql_lower and "where" not in sql_lower:
             logger.warning(
                 "⚠️  TEMPORAL SAFETY WARNING: SELECT * FROM games without WHERE clause. "
                 "This may include future data. Add explicit date filtering."

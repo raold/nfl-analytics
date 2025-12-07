@@ -85,6 +85,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ============================================================================
 
+
 @dataclass
 class OddsServiceConfig:
     """Configuration for odds update service."""
@@ -162,6 +163,7 @@ class OddsServiceConfig:
 # Metrics Tracking
 # ============================================================================
 
+
 @dataclass
 class ServiceMetrics:
     """Service metrics for monitoring."""
@@ -194,10 +196,7 @@ class ServiceMetrics:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary."""
-        return {
-            k: v.isoformat() if isinstance(v, datetime) else v
-            for k, v in asdict(self).items()
-        }
+        return {k: v.isoformat() if isinstance(v, datetime) else v for k, v in asdict(self).items()}
 
     def log_summary(self):
         """Log metrics summary."""
@@ -217,6 +216,7 @@ class ServiceMetrics:
 # ============================================================================
 # Odds Update Service
 # ============================================================================
+
 
 class OddsUpdateService:
     """
@@ -301,7 +301,7 @@ class OddsUpdateService:
                     raise
                 # Exponential backoff with jitter
                 backoff = min(
-                    self.config.retry_backoff_base ** retries,
+                    self.config.retry_backoff_base**retries,
                     self.config.retry_backoff_max,
                 )
                 jitter = backoff * 0.1 * (2 * (time.time() % 1) - 1)
@@ -323,7 +323,7 @@ class OddsUpdateService:
                 if retries >= self.config.max_retries:
                     raise
                 backoff = min(
-                    self.config.retry_backoff_base ** retries,
+                    self.config.retry_backoff_base**retries,
                     self.config.retry_backoff_max,
                 )
                 logger.warning(
@@ -471,9 +471,7 @@ class OddsUpdateService:
         except Exception as e:
             logger.error(f"Failed to send alert: {e}")
 
-    def _parse_and_insert_props(
-        self, event_data: dict[str, Any], snapshot_time: datetime
-    ) -> int:
+    def _parse_and_insert_props(self, event_data: dict[str, Any], snapshot_time: datetime) -> int:
         """
         Parse prop data and insert into database.
 
@@ -594,10 +592,7 @@ class OddsUpdateService:
                 if commence_time > now and commence_time < now + timedelta(days=7):
                     future_events.append(event)
 
-            logger.info(
-                f"Processing {len(future_events)}/{len(events)} events "
-                f"(next 7 days)"
-            )
+            logger.info(f"Processing {len(future_events)}/{len(events)} events " f"(next 7 days)")
 
             snapshot_time = datetime.utcnow()
             total_inserted = 0
@@ -638,9 +633,7 @@ class OddsUpdateService:
             self._update_api_usage_tracker()
 
             logger.info("=" * 80)
-            logger.info(
-                f"Poll complete: {total_inserted} props inserted in {poll_duration:.1f}s"
-            )
+            logger.info(f"Poll complete: {total_inserted} props inserted in {poll_duration:.1f}s")
             logger.info("=" * 80)
 
             return True
@@ -713,11 +706,10 @@ class OddsUpdateService:
 # CLI
 # ============================================================================
 
+
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="Real-time odds update service for NFL Analytics"
-    )
+    parser = argparse.ArgumentParser(description="Real-time odds update service for NFL Analytics")
 
     parser.add_argument(
         "--once",

@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_load_bets_basic():
@@ -56,7 +53,6 @@ def test_load_bets_basic():
     assert result is not None
 
 
-
 def test_load_bets_edge_cases():
     """Test load_bets: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_bets_edge_cases():
     assert result is not None
 
 
-
 def test_load_bets_error_handling():
     """Test load_bets error handling."""
     with pytest.raises(ValueError):
         load_bets(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_bets_property_idempotent(self, path):
 
     # Assert property
     assert load_bets(path) == result, "idempotent violated"
-
 
 
 def test_simulate_returns_basic():
@@ -100,7 +93,6 @@ def test_simulate_returns_basic():
     assert result is not None
 
 
-
 def test_simulate_returns_edge_cases():
     """Test simulate_returns: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_simulate_returns_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_returns_error_handling():
     """Test simulate_returns error handling."""
     with pytest.raises(ValueError):
         simulate_returns(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_simulate_returns_property_idempotent(self, bets, sims):
 
     # Assert property
     assert simulate_returns(bets, sims) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -144,7 +133,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +145,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

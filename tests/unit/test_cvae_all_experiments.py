@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_cvae_model_basic():
@@ -56,7 +53,6 @@ def test_load_cvae_model_basic():
     assert result is not None
 
 
-
 def test_load_cvae_model_edge_cases():
     """Test load_cvae_model: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_cvae_model_edge_cases():
     assert result is not None
 
 
-
 def test_load_cvae_model_error_handling():
     """Test load_cvae_model error handling."""
     with pytest.raises(ValueError):
         load_cvae_model(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_cvae_model_property_idempotent(val):
 
     # Assert property
     assert load_cvae_model(val) == result, "idempotent violated"
-
 
 
 def test_exp1_environment_bnn_ensemble_basic():
@@ -100,7 +93,6 @@ def test_exp1_environment_bnn_ensemble_basic():
     assert result is not None
 
 
-
 def test_exp1_environment_bnn_ensemble_edge_cases():
     """Test exp1_environment_bnn_ensemble: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_exp1_environment_bnn_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_exp1_environment_bnn_ensemble_error_handling():
     """Test exp1_environment_bnn_ensemble error handling."""
     with pytest.raises(ValueError):
         exp1_environment_bnn_ensemble(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_exp1_environment_bnn_ensemble_property_idempotent(val):
 
     # Assert property
     assert exp1_environment_bnn_ensemble(val) == result, "idempotent violated"
-
 
 
 def test_exp2_same_game_parlay_pricing_basic():
@@ -144,7 +133,6 @@ def test_exp2_same_game_parlay_pricing_basic():
     assert result is not None
 
 
-
 def test_exp2_same_game_parlay_pricing_edge_cases():
     """Test exp2_same_game_parlay_pricing: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_exp2_same_game_parlay_pricing_edge_cases():
     assert result is not None
 
 
-
 def test_exp2_same_game_parlay_pricing_error_handling():
     """Test exp2_same_game_parlay_pricing error handling."""
     with pytest.raises(ValueError):
         exp2_same_game_parlay_pricing(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +159,6 @@ def test_exp2_same_game_parlay_pricing_property_idempotent(val):
 
     # Assert property
     assert exp2_same_game_parlay_pricing(val) == result, "idempotent violated"
-
 
 
 def test_exp3_causal_counterfactuals_basic():
@@ -188,7 +173,6 @@ def test_exp3_causal_counterfactuals_basic():
     assert result is not None
 
 
-
 def test_exp3_causal_counterfactuals_edge_cases():
     """Test exp3_causal_counterfactuals: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_exp3_causal_counterfactuals_edge_cases():
     assert result is not None
 
 
-
 def test_exp3_causal_counterfactuals_error_handling():
     """Test exp3_causal_counterfactuals error handling."""
     with pytest.raises(ValueError):
         exp3_causal_counterfactuals(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +199,6 @@ def test_exp3_causal_counterfactuals_property_idempotent(val):
 
     # Assert property
     assert exp3_causal_counterfactuals(val) == result, "idempotent violated"
-
 
 
 def test_exp4_live_trajectories_basic():
@@ -232,7 +213,6 @@ def test_exp4_live_trajectories_basic():
     assert result is not None
 
 
-
 def test_exp4_live_trajectories_edge_cases():
     """Test exp4_live_trajectories: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_exp4_live_trajectories_edge_cases():
     assert result is not None
 
 
-
 def test_exp4_live_trajectories_error_handling():
     """Test exp4_live_trajectories error handling."""
     with pytest.raises(ValueError):
         exp4_live_trajectories(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,7 +239,6 @@ def test_exp4_live_trajectories_property_idempotent(val):
 
     # Assert property
     assert exp4_live_trajectories(val) == result, "idempotent violated"
-
 
 
 def test_exp5_key_numbers_basic():
@@ -276,7 +253,6 @@ def test_exp5_key_numbers_basic():
     assert result is not None
 
 
-
 def test_exp5_key_numbers_edge_cases():
     """Test exp5_key_numbers: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_exp5_key_numbers_edge_cases():
     assert result is not None
 
 
-
 def test_exp5_key_numbers_error_handling():
     """Test exp5_key_numbers error handling."""
     with pytest.raises(ValueError):
         exp5_key_numbers(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,7 +279,6 @@ def test_exp5_key_numbers_property_idempotent(val):
 
     # Assert property
     assert exp5_key_numbers(val) == result, "idempotent violated"
-
 
 
 def test_exp6_gnn_enhanced_basic():
@@ -320,7 +293,6 @@ def test_exp6_gnn_enhanced_basic():
     assert result is not None
 
 
-
 def test_exp6_gnn_enhanced_edge_cases():
     """Test exp6_gnn_enhanced: edge cases."""
     # Arrange
@@ -333,12 +305,10 @@ def test_exp6_gnn_enhanced_edge_cases():
     assert result is not None
 
 
-
 def test_exp6_gnn_enhanced_error_handling():
     """Test exp6_gnn_enhanced error handling."""
     with pytest.raises(ValueError):
         exp6_gnn_enhanced(invalid_input)
-
 
 
 @given(st.integers())
@@ -349,7 +319,6 @@ def test_exp6_gnn_enhanced_property_idempotent(val):
 
     # Assert property
     assert exp6_gnn_enhanced(val) == result, "idempotent violated"
-
 
 
 def test_exp7_hierarchical_player_basic():
@@ -364,7 +333,6 @@ def test_exp7_hierarchical_player_basic():
     assert result is not None
 
 
-
 def test_exp7_hierarchical_player_edge_cases():
     """Test exp7_hierarchical_player: edge cases."""
     # Arrange
@@ -377,12 +345,10 @@ def test_exp7_hierarchical_player_edge_cases():
     assert result is not None
 
 
-
 def test_exp7_hierarchical_player_error_handling():
     """Test exp7_hierarchical_player error handling."""
     with pytest.raises(ValueError):
         exp7_hierarchical_player(invalid_input)
-
 
 
 @given(st.integers())
@@ -393,7 +359,6 @@ def test_exp7_hierarchical_player_property_idempotent(val):
 
     # Assert property
     assert exp7_hierarchical_player(val) == result, "idempotent violated"
-
 
 
 def test_run_all_experiments_basic():
@@ -408,7 +373,6 @@ def test_run_all_experiments_basic():
     assert result is not None
 
 
-
 def test_run_all_experiments_edge_cases():
     """Test run_all_experiments: edge cases."""
     # Arrange
@@ -421,12 +385,10 @@ def test_run_all_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_run_all_experiments_error_handling():
     """Test run_all_experiments error handling."""
     with pytest.raises(ValueError):
         run_all_experiments(invalid_input)
-
 
 
 @given(st.integers())
@@ -437,4 +399,3 @@ def test_run_all_experiments_property_idempotent(val):
 
     # Assert property
     assert run_all_experiments(val) == result, "idempotent violated"
-

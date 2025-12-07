@@ -17,7 +17,7 @@ import streamlit as st
 logger = logging.getLogger(__name__)
 
 
-def calculate_win_rate(df: pd.DataFrame, status_column: str = 'status') -> float:
+def calculate_win_rate(df: pd.DataFrame, status_column: str = "status") -> float:
     """
     Calculate win rate from predictions.
 
@@ -31,15 +31,15 @@ def calculate_win_rate(df: pd.DataFrame, status_column: str = 'status') -> float
     if df.empty or status_column not in df.columns:
         return 0.0
 
-    wins = (df[status_column] == 'win').sum()
+    wins = (df[status_column] == "win").sum()
     total = len(df)
 
     return wins / total if total > 0 else 0.0
 
 
-def calculate_mae(df: pd.DataFrame,
-                  predicted_column: str = 'predicted_value',
-                  actual_column: str = 'actual_value') -> float:
+def calculate_mae(
+    df: pd.DataFrame, predicted_column: str = "predicted_value", actual_column: str = "actual_value"
+) -> float:
     """
     Calculate Mean Absolute Error.
 
@@ -63,9 +63,9 @@ def calculate_mae(df: pd.DataFrame,
     return float(mae)
 
 
-def calculate_rmse(df: pd.DataFrame,
-                   predicted_column: str = 'predicted_value',
-                   actual_column: str = 'actual_value') -> float:
+def calculate_rmse(
+    df: pd.DataFrame, predicted_column: str = "predicted_value", actual_column: str = "actual_value"
+) -> float:
     """
     Calculate Root Mean Squared Error.
 
@@ -88,7 +88,7 @@ def calculate_rmse(df: pd.DataFrame,
     return float(rmse)
 
 
-def calculate_calibration_rate(df: pd.DataFrame, calibrated_column: str = 'calibrated') -> float:
+def calculate_calibration_rate(df: pd.DataFrame, calibrated_column: str = "calibrated") -> float:
     """
     Calculate calibration rate (fraction of well-calibrated predictions).
 
@@ -108,7 +108,7 @@ def calculate_calibration_rate(df: pd.DataFrame, calibrated_column: str = 'calib
     return calibrated_count / total if total > 0 else 0.0
 
 
-def calculate_roi(df: pd.DataFrame, pnl_column: str = 'pnl', stake: float = 110.0) -> float:
+def calculate_roi(df: pd.DataFrame, pnl_column: str = "pnl", stake: float = 110.0) -> float:
     """
     Calculate Return on Investment (ROI).
 
@@ -131,7 +131,9 @@ def calculate_roi(df: pd.DataFrame, pnl_column: str = 'pnl', stake: float = 110.
     return float(roi)
 
 
-def calculate_sharpe_ratio(df: pd.DataFrame, pnl_column: str = 'pnl', risk_free_rate: float = 0.0) -> float:
+def calculate_sharpe_ratio(
+    df: pd.DataFrame, pnl_column: str = "pnl", risk_free_rate: float = 0.0
+) -> float:
     """
     Calculate Sharpe Ratio for betting performance.
 
@@ -160,7 +162,7 @@ def calculate_sharpe_ratio(df: pd.DataFrame, pnl_column: str = 'pnl', risk_free_
     return float(sharpe)
 
 
-def calculate_max_drawdown(df: pd.DataFrame, pnl_column: str = 'weekly_pnl') -> float:
+def calculate_max_drawdown(df: pd.DataFrame, pnl_column: str = "weekly_pnl") -> float:
     """
     Calculate maximum drawdown from cumulative P&L.
 
@@ -223,25 +225,17 @@ def display_summary_metrics(df: pd.DataFrame, stake: float = 110.0) -> None:
     with col2:
         win_rate = calculate_win_rate(df)
         win_rate_delta = (win_rate - 0.5) * 100
-        st.metric(
-            "Win Rate",
-            f"{win_rate*100:.1f}%",
-            delta=f"{win_rate_delta:+.1f}% vs 50%"
-        )
+        st.metric("Win Rate", f"{win_rate*100:.1f}%", delta=f"{win_rate_delta:+.1f}% vs 50%")
 
     with col3:
         mae = calculate_mae(df)
         st.metric("Mean Absolute Error", f"{mae:.2f} yards")
 
     with col4:
-        if 'pnl' in df.columns:
-            total_pnl = df['pnl'].sum()
-            avg_pnl = df['pnl'].mean()
-            st.metric(
-                "Total P&L",
-                f"${total_pnl:,.2f}",
-                delta=f"${avg_pnl:.2f} avg"
-            )
+        if "pnl" in df.columns:
+            total_pnl = df["pnl"].sum()
+            avg_pnl = df["pnl"].mean()
+            st.metric("Total P&L", f"${total_pnl:,.2f}", delta=f"${avg_pnl:.2f} avg")
         else:
             st.metric("Total P&L", "N/A")
 
@@ -265,16 +259,18 @@ def display_advanced_metrics(df: pd.DataFrame, stake: float = 110.0) -> None:
         st.metric("Sharpe Ratio", f"{sharpe:.2f}", help="Risk-adjusted returns")
 
     with col3:
-        if 'weekly_pnl' in df.columns:
+        if "weekly_pnl" in df.columns:
             max_dd = calculate_max_drawdown(df)
             st.metric("Max Drawdown", f"${max_dd:,.2f}", help="Largest cumulative loss")
         else:
             st.metric("Max Drawdown", "N/A")
 
     with col4:
-        if 'calibrated' in df.columns:
+        if "calibrated" in df.columns:
             calibration = calculate_calibration_rate(df)
-            st.metric("Calibration Rate", f"{calibration*100:.1f}%", help="Well-calibrated predictions")
+            st.metric(
+                "Calibration Rate", f"{calibration*100:.1f}%", help="Well-calibrated predictions"
+            )
         else:
             st.metric("Calibration Rate", "N/A")
 
@@ -290,7 +286,8 @@ def display_kelly_recommendation(df: pd.DataFrame, odds: float = 1.91) -> None:
     win_rate = calculate_win_rate(df)
     kelly_frac = calculate_kelly_fraction(win_rate, odds)
 
-    st.info(f"""
+    st.info(
+        f"""
     **Kelly Criterion Recommendation**
 
     Based on historical win rate of {win_rate*100:.1f}%:
@@ -299,10 +296,11 @@ def display_kelly_recommendation(df: pd.DataFrame, odds: float = 1.91) -> None:
     - **Quarter Kelly** (very conservative): {kelly_frac*25:.1f}% of bankroll per bet
 
     ⚠️ Note: Kelly can be aggressive. Most professionals use fractional Kelly (1/4 to 1/2).
-    """)
+    """
+    )
 
 
-def calculate_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> dict[str, float]:
+def calculate_edge_statistics(df: pd.DataFrame, edge_column: str = "edge") -> dict[str, float]:
     """
     Calculate statistics about betting edges.
 
@@ -315,27 +313,27 @@ def calculate_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> di
     """
     if df.empty or edge_column not in df.columns:
         return {
-            'mean_edge': 0.0,
-            'median_edge': 0.0,
-            'std_edge': 0.0,
-            'positive_edge_rate': 0.0,
-            'max_edge': 0.0,
-            'min_edge': 0.0
+            "mean_edge": 0.0,
+            "median_edge": 0.0,
+            "std_edge": 0.0,
+            "positive_edge_rate": 0.0,
+            "max_edge": 0.0,
+            "min_edge": 0.0,
         }
 
     edges = df[edge_column].dropna()
 
     return {
-        'mean_edge': float(edges.mean()),
-        'median_edge': float(edges.median()),
-        'std_edge': float(edges.std()),
-        'positive_edge_rate': float((edges > 0).mean()),
-        'max_edge': float(edges.max()),
-        'min_edge': float(edges.min())
+        "mean_edge": float(edges.mean()),
+        "median_edge": float(edges.median()),
+        "std_edge": float(edges.std()),
+        "positive_edge_rate": float((edges > 0).mean()),
+        "max_edge": float(edges.max()),
+        "min_edge": float(edges.min()),
     }
 
 
-def display_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> None:
+def display_edge_statistics(df: pd.DataFrame, edge_column: str = "edge") -> None:
     """
     Display edge statistics in Streamlit.
 
@@ -373,13 +371,13 @@ def calculate_model_performance_summary(df: pd.DataFrame) -> dict[str, any]:
         Dictionary with all key metrics
     """
     return {
-        'total_predictions': len(df),
-        'win_rate': calculate_win_rate(df),
-        'mae': calculate_mae(df),
-        'rmse': calculate_rmse(df),
-        'calibration_rate': calculate_calibration_rate(df),
-        'roi': calculate_roi(df),
-        'sharpe_ratio': calculate_sharpe_ratio(df),
-        'max_drawdown': calculate_max_drawdown(df),
-        'edge_stats': calculate_edge_statistics(df)
+        "total_predictions": len(df),
+        "win_rate": calculate_win_rate(df),
+        "mae": calculate_mae(df),
+        "rmse": calculate_rmse(df),
+        "calibration_rate": calculate_calibration_rate(df),
+        "roi": calculate_roi(df),
+        "sharpe_ratio": calculate_sharpe_ratio(df),
+        "max_drawdown": calculate_max_drawdown(df),
+        "edge_stats": calculate_edge_statistics(df),
     }

@@ -25,8 +25,7 @@ from sqlalchemy import create_engine
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -47,18 +46,40 @@ class EnvironmentalContextualEngine:
     # NFL team timezones (for travel calculations)
     TEAM_TIMEZONES = {
         # Pacific (UTC-8)
-        "SEA": "Pacific", "SF": "Pacific", "LA": "Pacific", "LV": "Pacific",
+        "SEA": "Pacific",
+        "SF": "Pacific",
+        "LA": "Pacific",
+        "LV": "Pacific",
         # Mountain (UTC-7)
-        "DEN": "Mountain", "ARI": "Mountain",
+        "DEN": "Mountain",
+        "ARI": "Mountain",
         # Central (UTC-6)
-        "KC": "Central", "DAL": "Central", "HOU": "Central", "TEN": "Central",
-        "NO": "Central", "MIN": "Central", "CHI": "Central", "GB": "Central",
+        "KC": "Central",
+        "DAL": "Central",
+        "HOU": "Central",
+        "TEN": "Central",
+        "NO": "Central",
+        "MIN": "Central",
+        "CHI": "Central",
+        "GB": "Central",
         "DET": "Central",
         # Eastern (UTC-5)
-        "BUF": "Eastern", "NE": "Eastern", "NYJ": "Eastern", "NYG": "Eastern",
-        "PHI": "Eastern", "WAS": "Eastern", "BAL": "Eastern", "PIT": "Eastern",
-        "CLE": "Eastern", "CIN": "Eastern", "IND": "Eastern", "JAX": "Eastern",
-        "MIA": "Eastern", "TB": "Eastern", "CAR": "Eastern", "ATL": "Eastern",
+        "BUF": "Eastern",
+        "NE": "Eastern",
+        "NYJ": "Eastern",
+        "NYG": "Eastern",
+        "PHI": "Eastern",
+        "WAS": "Eastern",
+        "BAL": "Eastern",
+        "PIT": "Eastern",
+        "CLE": "Eastern",
+        "CIN": "Eastern",
+        "IND": "Eastern",
+        "JAX": "Eastern",
+        "MIA": "Eastern",
+        "TB": "Eastern",
+        "CAR": "Eastern",
+        "ATL": "Eastern",
     }
 
     # Timezone to numeric (for distance calculation)
@@ -83,18 +104,13 @@ class EnvironmentalContextualEngine:
         "DAL": "Retractable",  # AT&T Stadium
     }
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the environmental contextual engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
     def load_games_with_context(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> pd.DataFrame:
         """
         Load games with environmental and contextual information.
@@ -182,9 +198,7 @@ class EnvironmentalContextualEngine:
         Add venue-related features (indoor/outdoor, dome, retractable).
         """
         # Indoor/outdoor classification
-        df["venue_type"] = df["home_team"].map(
-            lambda x: self.INDOOR_TEAMS.get(x, "Outdoor")
-        )
+        df["venue_type"] = df["home_team"].map(lambda x: self.INDOOR_TEAMS.get(x, "Outdoor"))
 
         df["is_dome_game"] = (df["venue_type"] == "Dome").astype(int)
         df["is_retractable_roof"] = (df["venue_type"] == "Retractable").astype(int)
@@ -192,14 +206,13 @@ class EnvironmentalContextualEngine:
 
         # Outdoor team playing indoors (adjustment)
         df["away_outdoor_at_indoor"] = (
-            (df["venue_type"].isin(["Dome", "Retractable"])) &
-            (~df["away_team"].isin(self.INDOOR_TEAMS.keys()))
+            (df["venue_type"].isin(["Dome", "Retractable"]))
+            & (~df["away_team"].isin(self.INDOOR_TEAMS.keys()))
         ).astype(int)
 
         # Indoor team playing outdoors (adjustment)
         df["away_indoor_at_outdoor"] = (
-            (df["venue_type"] == "Outdoor") &
-            (df["away_team"].isin(self.INDOOR_TEAMS.keys()))
+            (df["venue_type"] == "Outdoor") & (df["away_team"].isin(self.INDOOR_TEAMS.keys()))
         ).astype(int)
 
     def _add_rivalry_features(self, df: pd.DataFrame) -> None:
@@ -214,32 +227,32 @@ class EnvironmentalContextualEngine:
         """
         # Division rivalry game (same division)
         df["is_division_game"] = (
-            (df["home_division"] == df["away_division"]) &
-            (df["home_conference"] == df["away_conference"])
+            (df["home_division"] == df["away_division"])
+            & (df["home_conference"] == df["away_conference"])
         ).astype(int)
 
         # Conference game (same conference)
-        df["is_conference_game"] = (
-            df["home_conference"] == df["away_conference"]
-        ).astype(int)
+        df["is_conference_game"] = (df["home_conference"] == df["away_conference"]).astype(int)
 
         # Inter-conference game (different conferences)
-        df["is_interconference_game"] = (
-            df["home_conference"] != df["away_conference"]
-        ).astype(int)
+        df["is_interconference_game"] = (df["home_conference"] != df["away_conference"]).astype(int)
 
         # Conference non-divisional (same conference, different division)
         df["is_conference_nondiv_game"] = (
-            (df["home_conference"] == df["away_conference"]) &
-            (df["home_division"] != df["away_division"])
+            (df["home_conference"] == df["away_conference"])
+            & (df["home_division"] != df["away_division"])
         ).astype(int)
 
         # Create specific division matchup identifier
         # Format: "home_conf home_div vs away_conf away_div"
         df["division_matchup"] = (
-            df["home_conference"].astype(str) + " " + df["home_division"].astype(str) +
-            " vs " +
-            df["away_conference"].astype(str) + " " + df["away_division"].astype(str)
+            df["home_conference"].astype(str)
+            + " "
+            + df["home_division"].astype(str)
+            + " vs "
+            + df["away_conference"].astype(str)
+            + " "
+            + df["away_division"].astype(str)
         )
 
         # Create conference matchup identifier (ignoring division)
@@ -258,24 +271,19 @@ class EnvironmentalContextualEngine:
         df["temp_numeric"] = pd.to_numeric(df["temp"], errors="coerce")
 
         # Parse wind (may have "mph" suffix)
-        df["wind_numeric"] = df["wind"].astype(str).str.extract(r'(\d+)')[0].astype(float)
+        df["wind_numeric"] = df["wind"].astype(str).str.extract(r"(\d+)")[0].astype(float)
 
         # Weather categories
         df["is_cold_game"] = (df["temp_numeric"] < 40).astype(int)  # Below 40°F
-        df["is_hot_game"] = (df["temp_numeric"] > 85).astype(int)   # Above 85°F
+        df["is_hot_game"] = (df["temp_numeric"] > 85).astype(int)  # Above 85°F
         df["is_windy_game"] = (df["wind_numeric"] > 15).astype(int)  # Wind > 15mph
 
         # Extreme weather
         df["extreme_weather"] = (
-            (df["is_cold_game"] == 1) |
-            (df["is_hot_game"] == 1) |
-            (df["is_windy_game"] == 1)
+            (df["is_cold_game"] == 1) | (df["is_hot_game"] == 1) | (df["is_windy_game"] == 1)
         ).astype(int)
 
-    def calculate_thursday_night_features(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_thursday_night_features(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate Thursday night game features.
 
@@ -295,7 +303,9 @@ class EnvironmentalContextualEngine:
                 "team": row["home_team"],
                 "location": "home",
                 "is_thursday_night": row["is_thursday_night"],
-                "thursday_home_advantage": row["is_thursday_night"] if row["is_thursday_night"] else 0,
+                "thursday_home_advantage": (
+                    row["is_thursday_night"] if row["is_thursday_night"] else 0
+                ),
             }
             results.append(home_metrics)
 
@@ -314,10 +324,7 @@ class EnvironmentalContextualEngine:
 
         return df
 
-    def calculate_travel_impact_features(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_travel_impact_features(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate travel impact features for each team.
 
@@ -357,10 +364,7 @@ class EnvironmentalContextualEngine:
 
         return df
 
-    def calculate_venue_adaptation_features(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_venue_adaptation_features(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate venue adaptation features.
 
@@ -400,10 +404,7 @@ class EnvironmentalContextualEngine:
 
         return df
 
-    def calculate_rivalry_features(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_rivalry_features(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate rivalry and conference features.
 
@@ -418,7 +419,7 @@ class EnvironmentalContextualEngine:
             # Both teams have same rivalry context
             for team, opponent, location in [
                 (row["home_team"], row["away_team"], "home"),
-                (row["away_team"], row["home_team"], "away")
+                (row["away_team"], row["home_team"], "away"),
             ]:
                 metrics = {
                     "game_id": row["game_id"],
@@ -440,9 +441,7 @@ class EnvironmentalContextualEngine:
         return df
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all environmental and contextual features.
@@ -471,12 +470,7 @@ class EnvironmentalContextualEngine:
         logger.info(f"  Rivalry features: {len(rivalry):,} records")
         logger.info("=" * 70)
 
-        return (
-            thursday_night,
-            travel_impact,
-            venue_adaptation,
-            rivalry
-        )
+        return (thursday_night, travel_impact, venue_adaptation, rivalry)
 
 
 def main():
@@ -484,14 +478,8 @@ def main():
     engine = EnvironmentalContextualEngine()
 
     # Generate ALL features for 2020-2025 seasons
-    (
-        thursday_night,
-        travel_impact,
-        venue_adaptation,
-        rivalry
-    ) = engine.generate_all_features(
-        start_season=2020,
-        end_season=2025
+    (thursday_night, travel_impact, venue_adaptation, rivalry) = engine.generate_all_features(
+        start_season=2020, end_season=2025
     )
 
     # Display sample statistics
@@ -500,7 +488,9 @@ def main():
     print("=" * 70)
     if len(thursday_night) > 0:
         thursday_games = thursday_night[thursday_night["is_thursday_night"] == True]
-        print(f"Total Thursday night games: {len(thursday_games) // 2}")  # Divide by 2 (home + away)
+        print(
+            f"Total Thursday night games: {len(thursday_games) // 2}"
+        )  # Divide by 2 (home + away)
         print(thursday_games.head(10).to_string())
 
     print("\n" + "=" * 70)
@@ -557,12 +547,7 @@ def main():
         conf_counts = rivalry.groupby("conference_matchup").size().sort_values(ascending=False)
         print(conf_counts.to_string())
 
-    return (
-        thursday_night,
-        travel_impact,
-        venue_adaptation,
-        rivalry
-    )
+    return (thursday_night, travel_impact, venue_adaptation, rivalry)
 
 
 if __name__ == "__main__":

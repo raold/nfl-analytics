@@ -50,7 +50,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         default_limit: int = 100,
         window_seconds: int = 3600,
         identifier_func: Callable | None = None,
-        endpoint_limits: dict[str, int] | None = None
+        endpoint_limits: dict[str, int] | None = None,
     ):
         """
         Initialize rate limiter
@@ -76,8 +76,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if not self._redis_available:
             logger.warning(
-                "Redis unavailable - rate limiting in DEGRADED MODE "
-                "(in-memory, not distributed)"
+                "Redis unavailable - rate limiting in DEGRADED MODE " "(in-memory, not distributed)"
             )
 
     def _create_redis_client(self) -> Redis:
@@ -184,11 +183,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "details": {
                         "limit": limit,
                         "remaining": 0,
-                        "reset_at": datetime.fromtimestamp(reset_time).isoformat()
+                        "reset_at": datetime.fromtimestamp(reset_time).isoformat(),
                     },
-                    "timestamp": datetime.utcnow().isoformat()
+                    "timestamp": datetime.utcnow().isoformat(),
                 },
-                headers=headers
+                headers=headers,
             )
 
         # Process request
@@ -201,10 +200,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         return response
 
     async def _check_rate_limit(
-        self,
-        identifier: str,
-        endpoint: str,
-        limit: int
+        self, identifier: str, endpoint: str, limit: int
     ) -> tuple[bool, int, int]:
         """
         Check rate limit using sliding window algorithm
@@ -223,10 +219,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await self._check_rate_limit_memory(identifier, endpoint, limit)
 
     async def _check_rate_limit_redis(
-        self,
-        identifier: str,
-        endpoint: str,
-        limit: int
+        self, identifier: str, endpoint: str, limit: int
     ) -> tuple[bool, int, int]:
         """
         Redis-based rate limiting with sliding window
@@ -277,10 +270,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return True, limit - 1, int(now + self.window_seconds)
 
     async def _check_rate_limit_memory(
-        self,
-        identifier: str,
-        endpoint: str,
-        limit: int
+        self, identifier: str, endpoint: str, limit: int
     ) -> tuple[bool, int, int]:
         """
         In-memory fallback rate limiting (not distributed)
@@ -304,10 +294,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             self._memory_store[key] = []
 
         # Remove old entries
-        self._memory_store[key] = [
-            ts for ts in self._memory_store[key]
-            if ts > window_start
-        ]
+        self._memory_store[key] = [ts for ts in self._memory_store[key] if ts > window_start]
 
         # Count requests in window
         count = len(self._memory_store[key])
@@ -353,7 +340,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "remaining": max(0, limit - count),
                     "window_seconds": self.window_seconds,
                     "window_start": datetime.fromtimestamp(window_start).isoformat(),
-                    "window_end": datetime.fromtimestamp(now).isoformat()
+                    "window_end": datetime.fromtimestamp(now).isoformat(),
                 }
             else:
                 # In-memory fallback
@@ -368,22 +355,16 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "limit": limit,
                     "remaining": max(0, limit - count),
                     "window_seconds": self.window_seconds,
-                    "mode": "memory_fallback"
+                    "mode": "memory_fallback",
                 }
 
         except Exception as e:
             logger.error(f"Error getting usage stats: {e}")
-            return {
-                "error": str(e),
-                "identifier": identifier,
-                "endpoint": endpoint
-            }
+            return {"error": str(e), "identifier": identifier, "endpoint": endpoint}
 
 
 def create_rate_limiter(
-    redis_client: Redis | None = None,
-    default_limit: int = 100,
-    window_seconds: int = 3600
+    redis_client: Redis | None = None, default_limit: int = 100, window_seconds: int = 3600
 ) -> RateLimitMiddleware:
     """
     Factory function to create rate limiter middleware
@@ -408,5 +389,5 @@ def create_rate_limiter(
         redis_client=redis_client,
         default_limit=default_limit,
         window_seconds=window_seconds,
-        endpoint_limits=endpoint_limits
+        endpoint_limits=endpoint_limits,
     )

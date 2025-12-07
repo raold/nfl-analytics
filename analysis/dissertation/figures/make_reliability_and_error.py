@@ -4,6 +4,7 @@ Outputs:
   • reliability_calibration_wk01_wk18.pdf
   • calibration_error_sparkline.pdf (only if 'week' exists)
 """
+
 import argparse
 import os
 
@@ -11,9 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-REL_OUT_DEFAULT = (
-    "analysis/dissertation/figures/out/reliability_calibration_wk01_wk18.pdf"
-)
+REL_OUT_DEFAULT = "analysis/dissertation/figures/out/reliability_calibration_wk01_wk18.pdf"
 ERR_OUT_DEFAULT = "analysis/dissertation/figures/out/calibration_error_sparkline.pdf"
 
 
@@ -22,9 +21,7 @@ def bin_calibration(probs, outcomes, n_bins=10):
     centers = 0.5 * (bins[:-1] + bins[1:])
     emp = np.full(n_bins, np.nan)
     for i in range(n_bins):
-        m = (probs >= bins[i]) & (
-            probs < bins[i + 1] if i < n_bins - 1 else probs <= bins[i + 1]
-        )
+        m = (probs >= bins[i]) & (probs < bins[i + 1] if i < n_bins - 1 else probs <= bins[i + 1])
         if m.any():
             emp[i] = outcomes[m].mean()
     return centers, emp
@@ -35,9 +32,7 @@ def ece_absolute(probs, outcomes, n_bins=10):
     total = len(probs)
     ece = 0.0
     for i in range(n_bins):
-        m = (probs >= bins[i]) & (
-            probs < bins[i + 1] if i < n_bins - 1 else probs <= bins[i + 1]
-        )
+        m = (probs >= bins[i]) & (probs < bins[i + 1] if i < n_bins - 1 else probs <= bins[i + 1])
         if m.any():
             p_hat = outcomes[m].mean()
             p_bar = probs[m].mean()
@@ -72,9 +67,7 @@ def main():
         for j, wk in enumerate([1, 18]):
             if (df["week"] == wk).any():
                 m = df["week"] == wk
-                c, emp = bin_calibration(
-                    df.loc[m, "prob"].values, df.loc[m, "outcome"].values
-                )
+                c, emp = bin_calibration(df.loc[m, "prob"].values, df.loc[m, "outcome"].values)
                 ax.plot(c, emp, marker="o", lw=1.5, color=colors[j], label=f"Week {wk}")
                 drawn += 1
     if drawn == 0:
@@ -93,9 +86,7 @@ def main():
         errs = []
         for wk in weeks:
             m = df["week"] == wk
-            errs.append(
-                ece_absolute(df.loc[m, "prob"].values, df.loc[m, "outcome"].values)
-            )
+            errs.append(ece_absolute(df.loc[m, "prob"].values, df.loc[m, "outcome"].values))
         fig2 = plt.figure(figsize=(1.6, 0.35), dpi=150)
         ax2 = fig2.add_axes([0, 0, 1, 1])
         ax2.plot(weeks, errs, lw=1.2, color="0.2")

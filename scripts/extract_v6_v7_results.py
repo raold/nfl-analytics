@@ -43,9 +43,7 @@ DB_CONFIG = {
 }
 
 
-def get_predictions(
-    config: str, season: int, conn
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def get_predictions(config: str, season: int, conn) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Get predictions for a specific configuration and season.
 

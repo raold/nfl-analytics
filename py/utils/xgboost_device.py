@@ -59,22 +59,26 @@ def get_xgboost_params(
     if prefer_gpu:
         if has_cuda:
             # CUDA GPU (NVIDIA) - STABLE
-            params.update({
-                'tree_method': 'gpu_hist',
-                'device': 'cuda',
-                'predictor': 'gpu_predictor',
-            })
+            params.update(
+                {
+                    "tree_method": "gpu_hist",
+                    "device": "cuda",
+                    "predictor": "gpu_predictor",
+                }
+            )
             if verbose:
                 logger.info("✅ Using XGBoost CUDA GPU acceleration (STABLE)")
                 logger.info(f"   GPU: {torch.cuda.get_device_name(0)}")
 
         elif has_mps and experimental_mps:
             # MPS GPU (Apple Silicon) - EXPERIMENTAL
-            params.update({
-                'tree_method': 'gpu_hist',
-                'device': 'mps',
-                'predictor': 'gpu_predictor',
-            })
+            params.update(
+                {
+                    "tree_method": "gpu_hist",
+                    "device": "mps",
+                    "predictor": "gpu_predictor",
+                }
+            )
             if verbose:
                 logger.warning("⚠️  Using EXPERIMENTAL XGBoost MPS GPU support")
                 logger.warning("    - Requires XGBoost 2.1.0+ built with Metal support")
@@ -83,22 +87,28 @@ def get_xgboost_params(
 
         else:
             # CPU fallback
-            params.update({
-                'tree_method': 'hist',
-                'n_jobs': -1,  # Use all CPU cores
-            })
+            params.update(
+                {
+                    "tree_method": "hist",
+                    "n_jobs": -1,  # Use all CPU cores
+                }
+            )
             if verbose:
                 cpu_count = multiprocessing.cpu_count()
                 logger.info(f"ℹ️  Using XGBoost CPU acceleration ({cpu_count} cores)")
                 if has_mps:
-                    logger.info("   MPS GPU detected but DISABLED (set experimental_mps=True to enable)")
+                    logger.info(
+                        "   MPS GPU detected but DISABLED (set experimental_mps=True to enable)"
+                    )
 
     else:
         # Force CPU (for debugging or validation)
-        params.update({
-            'tree_method': 'hist',
-            'n_jobs': -1,
-        })
+        params.update(
+            {
+                "tree_method": "hist",
+                "n_jobs": -1,
+            }
+        )
         if verbose:
             cpu_count = multiprocessing.cpu_count()
             logger.info(f"ℹ️  Using XGBoost CPU (GPU disabled, {cpu_count} cores)")
@@ -132,27 +142,27 @@ def validate_xgboost_gpu_support() -> dict:
 
     # Determine recommended device
     if has_cuda:
-        recommended_device = 'cuda'
+        recommended_device = "cuda"
     elif has_mps:
-        recommended_device = 'mps (experimental)'
+        recommended_device = "mps (experimental)"
         warnings.append("MPS GPU support is experimental. Use with caution.")
     else:
-        recommended_device = 'cpu'
+        recommended_device = "cpu"
         warnings.append("No GPU available. Training will be slower.")
 
     # Check XGBoost version
     xgb_version = xgb.__version__
-    xgb_major, xgb_minor = map(int, xgb_version.split('.')[:2])
+    xgb_major, xgb_minor = map(int, xgb_version.split(".")[:2])
 
     if xgb_major < 2 or (xgb_major == 2 and xgb_minor < 1):
         warnings.append(f"XGBoost {xgb_version} detected. MPS support requires 2.1.0+")
 
     return {
-        'has_cuda': has_cuda,
-        'has_mps': has_mps,
-        'xgboost_version': xgb_version,
-        'recommended_device': recommended_device,
-        'warnings': warnings,
+        "has_cuda": has_cuda,
+        "has_mps": has_mps,
+        "xgboost_version": xgb_version,
+        "recommended_device": recommended_device,
+        "warnings": warnings,
     }
 
 
@@ -205,10 +215,10 @@ def benchmark_xgboost_devices(
         elapsed = time.time() - start
         cpu_times.append(elapsed)
 
-    results['cpu'] = {
-        'mean_time': np.mean(cpu_times),
-        'std_time': np.std(cpu_times),
-        'params': params_cpu,
+    results["cpu"] = {
+        "mean_time": np.mean(cpu_times),
+        "std_time": np.std(cpu_times),
+        "params": params_cpu,
     }
 
     # Benchmark CUDA (if available)
@@ -224,11 +234,11 @@ def benchmark_xgboost_devices(
             elapsed = time.time() - start
             cuda_times.append(elapsed)
 
-        results['cuda'] = {
-            'mean_time': np.mean(cuda_times),
-            'std_time': np.std(cuda_times),
-            'params': params_cuda,
-            'speedup_vs_cpu': np.mean(cpu_times) / np.mean(cuda_times),
+        results["cuda"] = {
+            "mean_time": np.mean(cuda_times),
+            "std_time": np.std(cuda_times),
+            "params": params_cuda,
+            "speedup_vs_cpu": np.mean(cpu_times) / np.mean(cuda_times),
         }
 
     # Benchmark MPS (if available and experimental flag set)
@@ -247,17 +257,17 @@ def benchmark_xgboost_devices(
                 elapsed = time.time() - start
                 mps_times.append(elapsed)
 
-            results['mps'] = {
-                'mean_time': np.mean(mps_times),
-                'std_time': np.std(mps_times),
-                'params': params_mps,
-                'speedup_vs_cpu': np.mean(cpu_times) / np.mean(mps_times),
+            results["mps"] = {
+                "mean_time": np.mean(mps_times),
+                "std_time": np.std(mps_times),
+                "params": params_mps,
+                "speedup_vs_cpu": np.mean(cpu_times) / np.mean(mps_times),
             }
 
         except Exception as e:
             logger.error(f"MPS benchmark failed: {e}")
-            results['mps'] = {
-                'error': str(e),
+            results["mps"] = {
+                "error": str(e),
             }
 
     return results
@@ -265,7 +275,7 @@ def benchmark_xgboost_devices(
 
 # Export public API
 __all__ = [
-    'get_xgboost_params',
-    'validate_xgboost_gpu_support',
-    'benchmark_xgboost_devices',
+    "get_xgboost_params",
+    "validate_xgboost_gpu_support",
+    "benchmark_xgboost_devices",
 ]

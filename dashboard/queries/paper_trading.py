@@ -7,7 +7,6 @@ Author: Claude Code
 Date: November 2025
 """
 
-
 import pandas as pd
 
 
@@ -15,10 +14,7 @@ class PaperTradingQueries:
     """Centralized queries for paper trading tables."""
 
     @staticmethod
-    def active_sessions(
-        conn,
-        days_back: int = 7
-    ) -> pd.DataFrame:
+    def active_sessions(conn, days_back: int = 7) -> pd.DataFrame:
         """
         Fetch active and recent paper trading sessions.
 
@@ -54,11 +50,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def session_trades(
-        conn,
-        session_id: str,
-        limit: int = 1000
-    ) -> pd.DataFrame:
+    def session_trades(conn, session_id: str, limit: int = 1000) -> pd.DataFrame:
         """
         Fetch all trades for a specific paper trading session.
 
@@ -101,10 +93,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=(session_id,))
 
     @staticmethod
-    def pending_trades(
-        conn,
-        limit: int = 20
-    ) -> pd.DataFrame:
+    def pending_trades(conn, limit: int = 20) -> pd.DataFrame:
         """
         Fetch all pending trades awaiting settlement.
 
@@ -138,10 +127,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def performance_by_prop_type(
-        conn,
-        session_id: str | None = None
-    ) -> pd.DataFrame:
+    def performance_by_prop_type(conn, session_id: str | None = None) -> pd.DataFrame:
         """
         Fetch performance breakdown by prop type.
 
@@ -178,10 +164,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=params if params else None)
 
     @staticmethod
-    def performance_by_bookmaker(
-        conn,
-        session_id: str | None = None
-    ) -> pd.DataFrame:
+    def performance_by_bookmaker(conn, session_id: str | None = None) -> pd.DataFrame:
         """
         Fetch performance breakdown by bookmaker.
 
@@ -216,10 +199,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=params if params else None)
 
     @staticmethod
-    def session_summary(
-        conn,
-        session_id: str
-    ) -> pd.DataFrame:
+    def session_summary(conn, session_id: str) -> pd.DataFrame:
         """
         Fetch summary statistics for a specific session.
 
@@ -259,10 +239,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=(session_id,))
 
     @staticmethod
-    def bankroll_progression(
-        conn,
-        session_id: str
-    ) -> pd.DataFrame:
+    def bankroll_progression(conn, session_id: str) -> pd.DataFrame:
         """
         Fetch bankroll progression over time for a session.
 
@@ -301,10 +278,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=(session_id, session_id))
 
     @staticmethod
-    def edge_analysis(
-        conn,
-        session_id: str | None = None
-    ) -> pd.DataFrame:
+    def edge_analysis(conn, session_id: str | None = None) -> pd.DataFrame:
         """
         Analyze performance by edge size categories.
 
@@ -336,10 +310,7 @@ class PaperTradingQueries:
 
         params = []
         if session_id:
-            query = query.replace(
-                "FROM paper_trades",
-                "FROM paper_trades WHERE session_id = %s"
-            )
+            query = query.replace("FROM paper_trades", "FROM paper_trades WHERE session_id = %s")
             params.append(session_id)
 
         query += """
@@ -358,10 +329,7 @@ class PaperTradingQueries:
         return pd.read_sql_query(query, conn, params=params if params else None)
 
     @staticmethod
-    def session_comparison(
-        conn,
-        limit: int = 10
-    ) -> pd.DataFrame:
+    def session_comparison(conn, limit: int = 10) -> pd.DataFrame:
         """
         Compare performance across all sessions.
 

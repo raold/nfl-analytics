@@ -9,18 +9,20 @@ import numpy as np
 import pandas as pd
 
 # Load data
-csv_file = Path("/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv")
+csv_file = Path(
+    "/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv"
+)
 df = pd.read_csv(csv_file)
 
 # Filter to ensemble predictions
-ensemble_df = df[df['prediction_mean'].notna()].copy()
+ensemble_df = df[df["prediction_mean"].notna()].copy()
 
 # Key metrics
-actual = ensemble_df['actual_yards'].values
-pred_mean = ensemble_df['prediction_mean'].values
-pred_std = ensemble_df['prediction_std'].values
-q05 = ensemble_df['prediction_q05'].values
-q95 = ensemble_df['prediction_q95'].values
+actual = ensemble_df["actual_yards"].values
+pred_mean = ensemble_df["prediction_mean"].values
+pred_std = ensemble_df["prediction_std"].values
+q05 = ensemble_df["prediction_q05"].values
+q95 = ensemble_df["prediction_q95"].values
 
 # Coverage
 in_interval = (actual >= q05) & (actual <= q95)
@@ -58,20 +60,15 @@ calibration_error = np.abs(np.array(actual_percentiles) - np.array(predicted_per
 
 # Model availability
 model_stats = {}
-for model in ['bayesian', 'xgboost', 'bnn', 'bnn_calibrated']:
+for model in ["bayesian", "xgboost", "bnn", "bnn_calibrated"]:
     col = f"{model}_mean"
     if col in df.columns:
         model_df = df[df[col].notna()].copy()
         n = len(model_df)
         pct = n / len(df) * 100
-        model_mae = np.abs(model_df[col].values - model_df['actual_yards'].values).mean()
+        model_mae = np.abs(model_df[col].values - model_df["actual_yards"].values).mean()
         mean_pred = model_df[col].mean()
-        model_stats[model] = {
-            'n': n,
-            'pct': pct,
-            'mae': model_mae,
-            'mean_pred': mean_pred
-        }
+        model_stats[model] = {"n": n, "pct": pct, "mae": model_mae, "mean_pred": mean_pred}
 
 # Print results
 print("=" * 90)
@@ -113,7 +110,9 @@ print("-" * 90)
 print(f"{'Model':<15} {'N':>8} {'%':>7} {'MAE':>8} {'Mean Pred':>10}")
 print("-" * 90)
 for model, stats in model_stats.items():
-    print(f"{model.upper():<15} {stats['n']:>8,} {stats['pct']:>6.1f}% {stats['mae']:>8.1f} {stats['mean_pred']:>10.1f}")
+    print(
+        f"{model.upper():<15} {stats['n']:>8,} {stats['pct']:>6.1f}% {stats['mae']:>8.1f} {stats['mean_pred']:>10.1f}"
+    )
 print()
 
 print("=" * 90)
@@ -209,7 +208,7 @@ print("=" * 90)
 output_dir = Path("/Users/dro/rice/nfl-analytics/docs/diagnostics")
 output_dir.mkdir(exist_ok=True, parents=True)
 
-with open(output_dir / "calibration_summary_nov7.txt", 'w') as f:
+with open(output_dir / "calibration_summary_nov7.txt", "w") as f:
     f.write("CALIBRATION DIAGNOSTIC SUMMARY\n")
     f.write("=" * 90 + "\n\n")
     f.write("Date: November 7, 2025\n")
@@ -218,7 +217,9 @@ with open(output_dir / "calibration_summary_nov7.txt", 'w') as f:
     f.write(f"COVERAGE GAP: {gap:+.2f} pp\n")
     f.write(f"SEVERITY: {severity}\n\n")
     f.write("TOP 3 RECOMMENDATIONS:\n")
-    f.write(f"1. Temperature Scaling: +{temp_improvement:.1f} pp (reduce T to {temp_reduction:.2f})\n")
+    f.write(
+        f"1. Temperature Scaling: +{temp_improvement:.1f} pp (reduce T to {temp_reduction:.2f})\n"
+    )
     f.write(f"2. Equal Weighting: +{equal_weight_improvement:.1f} pp\n")
     f.write(f"3. Model Training/Calibration: +{training_improvement:.1f} pp\n\n")
     f.write(f"TOTAL EXPECTED IMPROVEMENT: +{total_improvement:.1f} pp\n")

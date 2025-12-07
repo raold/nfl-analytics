@@ -17,11 +17,11 @@ from scripts.train_bnn_passing_ensemble import PassingYardsBNN
 
 # Load checkpoint
 checkpoint_path = "models/bayesian/bnn_passing_ensemble_v1.pt"
-checkpoint = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
+checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
 
-print("="*80)
+print("=" * 80)
 print("BNN DIAGNOSTIC")
-print("="*80)
+print("=" * 80)
 
 # Check checkpoint contents
 print("\nCheckpoint keys:")
@@ -29,9 +29,9 @@ for key in checkpoint.keys():
     print(f"  - {key}")
 
 # Check scaler
-if 'scaler_mean' in checkpoint:
-    scaler_mean = checkpoint['scaler_mean']
-    scaler_scale = checkpoint['scaler_scale']
+if "scaler_mean" in checkpoint:
+    scaler_mean = checkpoint["scaler_mean"]
+    scaler_scale = checkpoint["scaler_scale"]
     print("\nScaler:")
     print(f"  Mean: {scaler_mean[:5]} ... (shape: {scaler_mean.shape})")
     print(f"  Scale: {scaler_scale[:5]} ... (shape: {scaler_scale.shape})")
@@ -39,60 +39,60 @@ else:
     print("\n⚠️  No scaler found in checkpoint")
 
 # Check training stats
-if 'best_val_loss' in checkpoint:
+if "best_val_loss" in checkpoint:
     print("\nTraining stats:")
     print(f"  Best val loss: {checkpoint['best_val_loss']:.4f}")
     print(f"  Best val MAE: {checkpoint['val_mae']:.2f} yards")
 
 # Reconstruct model
-args = checkpoint.get('args', {})
-hidden_dim = args.get('hidden_dim', 64)
-dropout = args.get('dropout', 0.2)
-input_dim = len(checkpoint['feature_cols'])
+args = checkpoint.get("args", {})
+hidden_dim = args.get("hidden_dim", 64)
+dropout = args.get("dropout", 0.2)
+input_dim = len(checkpoint["feature_cols"])
 
 print("\nModel architecture:")
 print(f"  Input: {input_dim} features")
 print(f"  Hidden: {hidden_dim}")
 print(f"  Dropout: {dropout}")
 
-model = PassingYardsBNN(
-    input_dim=input_dim,
-    hidden_dim=hidden_dim,
-    dropout_rate=dropout
-)
+model = PassingYardsBNN(input_dim=input_dim, hidden_dim=hidden_dim, dropout_rate=dropout)
 
-model.load_state_dict(checkpoint['model_state_dict'])
+model.load_state_dict(checkpoint["model_state_dict"])
 model.eval()
 
 print("\n✓ Model loaded successfully")
 
 # Test prediction with dummy data
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print("TEST PREDICTIONS")
-print("="*80)
+print("=" * 80)
 
 # Create test features (around typical Mahomes values)
-test_features = np.array([[
-    226.33,  # passing_yards_last3
-    251.80,  # passing_yards_last5
-    239.90,  # passing_yards_season
-    27.67,   # pass_attempts_last3
-    32.40,   # pass_attempts_last5
-    18.33,   # completions_last3
-    22.40,   # completions_last5
-    1.67,    # passing_tds_last3
-    0.67,    # interceptions_last3
-    2.5,     # sacks_last3
-    270.40,  # opponent_passing_yards_allowed_avg
-    22.0,    # implied_team_total
-    0.0,     # spread
-    1.0,     # is_home
-    5.0,     # weather_wind_mph
-    60.0,    # weather_temp
-    7.0,     # days_rest
-    0.0,     # is_dome
-    1.0,     # is_outdoors
-]])
+test_features = np.array(
+    [
+        [
+            226.33,  # passing_yards_last3
+            251.80,  # passing_yards_last5
+            239.90,  # passing_yards_season
+            27.67,  # pass_attempts_last3
+            32.40,  # pass_attempts_last5
+            18.33,  # completions_last3
+            22.40,  # completions_last5
+            1.67,  # passing_tds_last3
+            0.67,  # interceptions_last3
+            2.5,  # sacks_last3
+            270.40,  # opponent_passing_yards_allowed_avg
+            22.0,  # implied_team_total
+            0.0,  # spread
+            1.0,  # is_home
+            5.0,  # weather_wind_mph
+            60.0,  # weather_temp
+            7.0,  # days_rest
+            0.0,  # is_dome
+            1.0,  # is_outdoors
+        ]
+    ]
+)
 
 print("\n1. RAW FEATURES (unnormalized):")
 print(f"   Features: {test_features[0, :5]} ... (shape: {test_features.shape})")
@@ -140,4 +140,4 @@ print(f"   yards_mean bias_mu: {model.yards_mean.bias_mu.item():.6f}")
 if abs(model.yards_mean.bias_mu.item()) > 100:
     print(f"   ⚠️  Large bias in output layer: {model.yards_mean.bias_mu.item():.2f}")
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)

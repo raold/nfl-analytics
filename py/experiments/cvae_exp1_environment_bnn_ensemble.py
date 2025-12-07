@@ -34,20 +34,20 @@ def load_cvae_model(model_path: Path):
     """Load trained cVAE model"""
     checkpoint = torch.load(model_path, map_location="cpu")
 
-    config = checkpoint['config']
+    config = checkpoint["config"]
     model = ConditionalVAE(
-        trajectory_dim=config['trajectory_dim'],
-        condition_dim=config['condition_dim'],
-        latent_dim=config['latent_dim'],
-        hidden_dims=config['hidden_dims'],
-        beta=config['beta']
+        trajectory_dim=config["trajectory_dim"],
+        condition_dim=config["condition_dim"],
+        latent_dim=config["latent_dim"],
+        hidden_dims=config["hidden_dims"],
+        beta=config["beta"],
     )
 
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
     logger.info(f"✓ cVAE model loaded from {model_path}")
-    return model, checkpoint['scaler_conditions']
+    return model, checkpoint["scaler_conditions"]
 
 
 def load_environment_bnn(model_path: Path):
@@ -60,20 +60,24 @@ def load_environment_bnn(model_path: Path):
     return model_data
 
 
-def generate_trajectory_features(cvae_model, scaler, game_conditions: torch.Tensor, n_samples: int = 100):
+def generate_trajectory_features(
+    cvae_model, scaler, game_conditions: torch.Tensor, n_samples: int = 100
+):
     """Generate trajectory features from cVAE for a game"""
     with torch.no_grad():
         trajectories = cvae_model.generate(game_conditions, n_samples=n_samples, temperature=1.0)
 
     # Extract summary statistics from generated trajectories
     features = {
-        'mean_margin': np.mean([t.get_margin() for t in trajectories]),
-        'std_margin': np.std([t.get_margin() for t in trajectories]),
-        'prob_blowout': np.mean([abs(t.get_margin()) > 14 for t in trajectories]),
-        'mean_lead_changes': np.mean([t.lead_changes for t in trajectories]),
-        'mean_largest_lead': np.mean([t.largest_lead for t in trajectories]),
-        'prob_defensive_td': np.mean([t.home_defensive_td or t.away_defensive_td for t in trajectories]),
-        'mean_total_score': np.mean([t.get_total_score() for t in trajectories]),
+        "mean_margin": np.mean([t.get_margin() for t in trajectories]),
+        "std_margin": np.std([t.get_margin() for t in trajectories]),
+        "prob_blowout": np.mean([abs(t.get_margin()) > 14 for t in trajectories]),
+        "mean_lead_changes": np.mean([t.lead_changes for t in trajectories]),
+        "mean_largest_lead": np.mean([t.largest_lead for t in trajectories]),
+        "prob_defensive_td": np.mean(
+            [t.home_defensive_td or t.away_defensive_td for t in trajectories]
+        ),
+        "mean_total_score": np.mean([t.get_total_score() for t in trajectories]),
     }
 
     return features
@@ -82,8 +86,7 @@ def generate_trajectory_features(cvae_model, scaler, game_conditions: torch.Tens
 def load_test_data():
     """Load 2024 test data with both environmental and Vegas features"""
     conn = psycopg2.connect(
-        host="localhost", port=5544, database="devdb01",
-        user="dro", password="sicillionbillions"
+        host="localhost", port=5544, database="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = """
@@ -172,20 +175,26 @@ def run_experiment():
     logger.info("Generating cVAE trajectory features...")
 
     game_trajectory_features = {}
-    unique_games = test_data[['game_id', 'spread_close', 'total_close',
-                               'is_dome', 'is_turf', 'temp', 'wind']].drop_duplicates()
+    unique_games = test_data[
+        ["game_id", "spread_close", "total_close", "is_dome", "is_turf", "temp", "wind"]
+    ].drop_duplicates()
 
     for idx, row in unique_games.iterrows():
         # Prepare cVAE conditions (simplified - using available features)
-        conditions = np.array([
-            row['spread_close'], row['total_close'],
-            row['is_dome'], row['is_turf'],
-            row['temp'], row['wind']
-        ])
+        conditions = np.array(
+            [
+                row["spread_close"],
+                row["total_close"],
+                row["is_dome"],
+                row["is_turf"],
+                row["temp"],
+                row["wind"],
+            ]
+        )
 
         # Pad to 20 dimensions (cVAE expects 20-dim input)
         conditions_padded = np.zeros(20)
-        conditions_padded[:len(conditions)] = conditions
+        conditions_padded[: len(conditions)] = conditions
 
         # Normalize using cVAE's scaler
         conditions_scaled = cvae_scaler.transform(conditions_padded.reshape(1, -1))
@@ -193,30 +202,41 @@ def run_experiment():
 
         # Generate trajectory features
         traj_features = generate_trajectory_features(cvae_model, cvae_scaler, conditions_tensor)
-        game_trajectory_features[row['game_id']] = traj_features
+        game_trajectory_features[row["game_id"]] = traj_features
 
     logger.info(f"✓ Generated trajectory features for {len(game_trajectory_features)} games")
 
     # Merge trajectory features with test data
-    traj_df = pd.DataFrame.from_dict(game_trajectory_features, orient='index')
-    traj_df.index.name = 'game_id'
-    test_data_with_traj = test_data.merge(traj_df, left_on='game_id', right_index=True, how='left')
+    traj_df = pd.DataFrame.from_dict(game_trajectory_features, orient="index")
+    traj_df.index.name = "game_id"
+    test_data_with_traj = test_data.merge(traj_df, left_on="game_id", right_index=True, how="left")
 
     # Baseline: Environment BNN with original 10 features
     baseline_features = [
-        "carries", "avg_rushing_l3", "season_avg", "week",
-        "spread_close", "total_close",
-        "is_dome", "is_turf", "temp", "wind"
+        "carries",
+        "avg_rushing_l3",
+        "season_avg",
+        "week",
+        "spread_close",
+        "total_close",
+        "is_dome",
+        "is_turf",
+        "temp",
+        "wind",
     ]
 
     X_baseline = test_data_with_traj[baseline_features].fillna(0).values
-    X_baseline_scaled = env_bnn['scaler'].transform(X_baseline)
+    X_baseline_scaled = env_bnn["scaler"].transform(X_baseline)
 
     # Enhanced: Environment BNN + cVAE trajectory features (17 features)
     enhanced_features = baseline_features + [
-        'mean_margin', 'std_margin', 'prob_blowout',
-        'mean_lead_changes', 'mean_largest_lead',
-        'prob_defensive_td', 'mean_total_score'
+        "mean_margin",
+        "std_margin",
+        "prob_blowout",
+        "mean_lead_changes",
+        "mean_largest_lead",
+        "prob_defensive_td",
+        "mean_total_score",
     ]
 
     X_enhanced = test_data_with_traj[enhanced_features].fillna(0).values
@@ -225,7 +245,7 @@ def run_experiment():
     scaler_enhanced = StandardScaler()
     X_enhanced_scaled = scaler_enhanced.fit_transform(X_enhanced)
 
-    y_true = test_data_with_traj['stat_yards'].values
+    y_true = test_data_with_traj["stat_yards"].values
 
     # For this experiment, we'll simulate predictions since we'd need to retrain
     # In production, you'd retrain Environment BNN with enhanced features
@@ -248,20 +268,20 @@ def run_experiment():
     enhanced_mae = baseline_mae * (1 - expected_improvement)
 
     results = {
-        'experiment': 'cvae_environment_bnn_ensemble',
-        'baseline_features': len(baseline_features),
-        'enhanced_features': len(enhanced_features),
-        'n_test_samples': len(y_true),
-        'baseline_mae': baseline_mae,
-        'enhanced_mae_expected': enhanced_mae,
-        'expected_improvement_pct': expected_improvement * 100,
-        'trajectory_features': list(traj_df.columns),
-        'next_steps': [
-            'Retrain Environment BNN with 17 features (10 env + 7 trajectory)',
-            'Validate on 2024 test set',
-            'Measure actual MAE improvement',
-            'Test if trajectory features reduce uncertainty (CI width)',
-        ]
+        "experiment": "cvae_environment_bnn_ensemble",
+        "baseline_features": len(baseline_features),
+        "enhanced_features": len(enhanced_features),
+        "n_test_samples": len(y_true),
+        "baseline_mae": baseline_mae,
+        "enhanced_mae_expected": enhanced_mae,
+        "expected_improvement_pct": expected_improvement * 100,
+        "trajectory_features": list(traj_df.columns),
+        "next_steps": [
+            "Retrain Environment BNN with 17 features (10 env + 7 trajectory)",
+            "Validate on 2024 test set",
+            "Measure actual MAE improvement",
+            "Test if trajectory features reduce uncertainty (CI width)",
+        ],
     }
 
     # Save results

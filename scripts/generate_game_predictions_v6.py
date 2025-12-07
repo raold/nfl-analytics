@@ -25,18 +25,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.ensemble.game_outcome_predictor import GameOutcomePredictor
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', '5544')),
-    'dbname': os.getenv('DB_NAME', 'devdb01'),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "dbname": os.getenv("DB_NAME", "devdb01"),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 
@@ -44,13 +41,16 @@ def get_games(season: int, week: int):
     """Get games for a given season/week."""
     with psycopg2.connect(**DB_CONFIG) as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT game_id, home_team, away_team, season, week,
                        kickoff, spread_close, total_close
                 FROM games
                 WHERE season = %s AND week = %s AND game_type = 'REG'
                 ORDER BY kickoff
-            """, (season, week))
+            """,
+                (season, week),
+            )
             return cur.fetchall()
 
 
@@ -59,13 +59,17 @@ def store_prediction(game_prediction: dict):
     with psycopg2.connect(**DB_CONFIG) as conn:
         with conn.cursor() as cur:
             # Delete existing prediction for this game_id + ensemble_version
-            cur.execute("""
+            cur.execute(
+                """
                 DELETE FROM ml.game_predictions
                 WHERE game_id = %(game_id)s AND ensemble_version = 'v6.1'
-            """, game_prediction)
+            """,
+                game_prediction,
+            )
 
             # Insert new prediction
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO ml.game_predictions (
                     game_id, season, week, home_team, away_team,
                     ensemble_version,
@@ -97,14 +101,16 @@ def store_prediction(game_prediction: dict):
                     %(total_edge)s,
                     NOW()
                 )
-            """, game_prediction)
+            """,
+                game_prediction,
+            )
         conn.commit()
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--season', type=int, required=True)
-    parser.add_argument('--week', type=int, required=True)
+    parser.add_argument("--season", type=int, required=True)
+    parser.add_argument("--week", type=int, required=True)
     args = parser.parse_args()
 
     logger.info(f"\n{'='*80}")
@@ -127,42 +133,48 @@ def main():
         try:
             # Predict game outcome
             result = predictor.predict_game(
-                home_team=game['home_team'],
-                away_team=game['away_team'],
-                season=game['season'],
-                week=game['week']
+                home_team=game["home_team"],
+                away_team=game["away_team"],
+                season=game["season"],
+                week=game["week"],
             )
 
             # Calculate edges
-            spread_edge = result['predicted_spread'] - (game['spread_close'] or 0)
-            total_edge = result['predicted_total'] - (game['total_close'] or 0)
+            spread_edge = result["predicted_spread"] - (game["spread_close"] or 0)
+            total_edge = result["predicted_total"] - (game["total_close"] or 0)
 
             # Prepare for storage (convert NumPy types to Python types)
             prediction = {
-                'game_id': game['game_id'],
-                'season': int(game['season']),
-                'week': int(game['week']),
-                'home_team': game['home_team'],
-                'away_team': game['away_team'],
-                'predicted_home_score': float(result['predicted_home_score']),
-                'predicted_away_score': float(result['predicted_away_score']),
-                'predicted_spread': float(result['predicted_spread']),
-                'predicted_total': float(result['predicted_total']),
-                'predicted_home_win_prob': float(result['predicted_home_win_prob']),
-                'spread_std': float(result['spread_std']),
-                'total_std': float(result['total_std']),
-                'sportsbook_spread': float(game['spread_close']) if game['spread_close'] is not None else None,
-                'sportsbook_total': float(game['total_close']) if game['total_close'] is not None else None,
-                'spread_edge': float(spread_edge),
-                'total_edge': float(total_edge)
+                "game_id": game["game_id"],
+                "season": int(game["season"]),
+                "week": int(game["week"]),
+                "home_team": game["home_team"],
+                "away_team": game["away_team"],
+                "predicted_home_score": float(result["predicted_home_score"]),
+                "predicted_away_score": float(result["predicted_away_score"]),
+                "predicted_spread": float(result["predicted_spread"]),
+                "predicted_total": float(result["predicted_total"]),
+                "predicted_home_win_prob": float(result["predicted_home_win_prob"]),
+                "spread_std": float(result["spread_std"]),
+                "total_std": float(result["total_std"]),
+                "sportsbook_spread": (
+                    float(game["spread_close"]) if game["spread_close"] is not None else None
+                ),
+                "sportsbook_total": (
+                    float(game["total_close"]) if game["total_close"] is not None else None
+                ),
+                "spread_edge": float(spread_edge),
+                "total_edge": float(total_edge),
             }
 
             # Store in database
             store_prediction(prediction)
             predictions_stored += 1
 
-            logger.info(f"  ✅ {result['predicted_away_score']:.1f} @ {result['predicted_home_score']:.1f} "
-                       f"(spread: {result['predicted_spread']:+.1f}, total: {result['predicted_total']:.1f})")
+            logger.info(
+                f"  ✅ {result['predicted_away_score']:.1f} @ {result['predicted_home_score']:.1f} "
+                f"(spread: {result['predicted_spread']:+.1f}, total: {result['predicted_total']:.1f})"
+            )
 
         except Exception as e:
             logger.error(f"  ❌ Failed: {e}")
@@ -172,5 +184,5 @@ def main():
     logger.info(f"{'='*80}\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

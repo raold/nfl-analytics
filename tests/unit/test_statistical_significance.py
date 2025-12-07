@@ -23,7 +23,6 @@ def test_diebold_mariano_test_basic():
     assert result is not None
 
 
-
 def test_diebold_mariano_test_edge_cases():
     """Test diebold_mariano_test: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_diebold_mariano_test_edge_cases():
     assert result is not None
 
 
-
 def test_diebold_mariano_test_error_handling():
     """Test diebold_mariano_test error handling."""
     with pytest.raises(ValueError):
         diebold_mariano_test(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_diebold_mariano_test_property_idempotent(self, losses1, losses2, h, alt
 
     # Assert property
     assert diebold_mariano_test(losses1, losses2, h, alternative) == result, "idempotent violated"
-
 
 
 def test_bootstrap_confidence_interval_basic():
@@ -67,7 +63,6 @@ def test_bootstrap_confidence_interval_basic():
     assert result is not None
 
 
-
 def test_bootstrap_confidence_interval_edge_cases():
     """Test bootstrap_confidence_interval: edge cases."""
     # Arrange
@@ -80,23 +75,24 @@ def test_bootstrap_confidence_interval_edge_cases():
     assert result is not None
 
 
-
 def test_bootstrap_confidence_interval_error_handling():
     """Test bootstrap_confidence_interval error handling."""
     with pytest.raises(ValueError):
         bootstrap_confidence_interval(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100))
-def test_bootstrap_confidence_interval_property_idempotent(self, data, statistic_func, alpha, n_bootstrap):
+def test_bootstrap_confidence_interval_property_idempotent(
+    self, data, statistic_func, alpha, n_bootstrap
+):
     """Property test: function is idempotent."""
     # Act
     result = bootstrap_confidence_interval(data, statistic_func, alpha, n_bootstrap)
 
     # Assert property
-    assert bootstrap_confidence_interval(data, statistic_func, alpha, n_bootstrap) == result, "idempotent violated"
-
+    assert (
+        bootstrap_confidence_interval(data, statistic_func, alpha, n_bootstrap) == result
+    ), "idempotent violated"
 
 
 def test_paired_t_test_models_basic():
@@ -111,7 +107,6 @@ def test_paired_t_test_models_basic():
     assert result is not None
 
 
-
 def test_paired_t_test_models_edge_cases():
     """Test paired_t_test_models: edge cases."""
     # Arrange
@@ -124,23 +119,24 @@ def test_paired_t_test_models_edge_cases():
     assert result is not None
 
 
-
 def test_paired_t_test_models_error_handling():
     """Test paired_t_test_models error handling."""
     with pytest.raises(ValueError):
         paired_t_test_models(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_paired_t_test_models_property_idempotent(self, model1_preds, model2_preds, actuals, loss_func):
+def test_paired_t_test_models_property_idempotent(
+    self, model1_preds, model2_preds, actuals, loss_func
+):
     """Property test: function is idempotent."""
     # Act
     result = paired_t_test_models(model1_preds, model2_preds, actuals, loss_func)
 
     # Assert property
-    assert paired_t_test_models(model1_preds, model2_preds, actuals, loss_func) == result, "idempotent violated"
-
+    assert (
+        paired_t_test_models(model1_preds, model2_preds, actuals, loss_func) == result
+    ), "idempotent violated"
 
 
 def test_multiple_testing_correction_basic():
@@ -155,7 +151,6 @@ def test_multiple_testing_correction_basic():
     assert result is not None
 
 
-
 def test_multiple_testing_correction_edge_cases():
     """Test multiple_testing_correction: edge cases."""
     # Arrange
@@ -168,12 +163,10 @@ def test_multiple_testing_correction_edge_cases():
     assert result is not None
 
 
-
 def test_multiple_testing_correction_error_handling():
     """Test multiple_testing_correction error handling."""
     with pytest.raises(ValueError):
         multiple_testing_correction(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +177,6 @@ def test_multiple_testing_correction_property_idempotent(self, p_values, method)
 
     # Assert property
     assert multiple_testing_correction(p_values, method) == result, "idempotent violated"
-
 
 
 def test_generate_significance_tables_basic():
@@ -199,7 +191,6 @@ def test_generate_significance_tables_basic():
     assert result is not None
 
 
-
 def test_generate_significance_tables_edge_cases():
     """Test generate_significance_tables: edge cases."""
     # Arrange
@@ -212,12 +203,10 @@ def test_generate_significance_tables_edge_cases():
     assert result is not None
 
 
-
 def test_generate_significance_tables_error_handling():
     """Test generate_significance_tables error handling."""
     with pytest.raises(ValueError):
         generate_significance_tables(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +217,6 @@ def test_generate_significance_tables_property_idempotent(self, output_dir):
 
     # Assert property
     assert generate_significance_tables(output_dir) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -243,7 +231,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -256,12 +243,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_brier_score_basic():
@@ -276,7 +261,6 @@ def test_brier_score_basic():
     assert result is not None
 
 
-
 def test_brier_score_edge_cases():
     """Test brier_score: edge cases."""
     # Arrange
@@ -289,12 +273,10 @@ def test_brier_score_edge_cases():
     assert result is not None
 
 
-
 def test_brier_score_error_handling():
     """Test brier_score error handling."""
     with pytest.raises(ValueError):
         brier_score(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,4 +287,3 @@ def test_brier_score_property_idempotent(self, preds):
 
     # Assert property
     assert brier_score(preds) == result, "idempotent violated"
-

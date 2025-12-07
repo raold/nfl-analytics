@@ -23,7 +23,6 @@ def test_extract_conditions_from_database_basic():
     assert result is not None
 
 
-
 def test_extract_conditions_from_database_edge_cases():
     """Test extract_conditions_from_database: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_extract_conditions_from_database_edge_cases():
     assert result is not None
 
 
-
 def test_extract_conditions_from_database_error_handling():
     """Test extract_conditions_from_database error handling."""
     with pytest.raises(ValueError):
         extract_conditions_from_database(invalid_input)
-
 
 
 def test_create_condition_vector_basic():
@@ -56,7 +53,6 @@ def test_create_condition_vector_basic():
     assert result is not None
 
 
-
 def test_create_condition_vector_edge_cases():
     """Test create_condition_vector: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_create_condition_vector_edge_cases():
     assert result is not None
 
 
-
 def test_create_condition_vector_error_handling():
     """Test create_condition_vector error handling."""
     with pytest.raises(ValueError):
         create_condition_vector(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_create_condition_vector_property_idempotent(self, game):
 
     # Assert property
     assert create_condition_vector(game) == result, "idempotent violated"
-
 
 
 def test_create_scaler_basic():
@@ -100,7 +93,6 @@ def test_create_scaler_basic():
     assert result is not None
 
 
-
 def test_create_scaler_edge_cases():
     """Test create_scaler: edge cases."""
     # Arrange
@@ -113,9 +105,7 @@ def test_create_scaler_edge_cases():
     assert result is not None
 
 
-
 def test_create_scaler_error_handling():
     """Test create_scaler error handling."""
     with pytest.raises(ValueError):
         create_scaler(invalid_input)
-

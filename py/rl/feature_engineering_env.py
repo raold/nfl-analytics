@@ -69,6 +69,7 @@ from sklearn.model_selection import train_test_split
 # XGBoost for fast model evaluation
 try:
     import xgboost as xgb
+
     XGBOOST_AVAILABLE = True
 except ImportError:
     XGBOOST_AVAILABLE = False
@@ -77,17 +78,17 @@ except ImportError:
 # Import GameFeatureExtractor for feature loading
 try:
     from py.features.game_feature_extractor import GameFeatureExtractor
+
     FEATURE_EXTRACTOR_AVAILABLE = True
 except ImportError:
     FEATURE_EXTRACTOR_AVAILABLE = False
     warnings.warn("GameFeatureExtractor not available")
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 class FeatureEngineeringEnv(gym.Env):
@@ -118,23 +119,23 @@ class FeatureEngineeringEnv(gym.Env):
 
     # Default DB config (can override via __init__)
     DEFAULT_DB_CONFIG = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': 'sicillionbillions'
+        "host": "localhost",
+        "port": 5544,
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": "sicillionbillions",
     }
 
     # XGBoost hyperparameters (fast evaluation)
     XGBOOST_PARAMS = {
-        'objective': 'reg:squarederror',
-        'max_depth': 3,
-        'learning_rate': 0.1,
-        'n_estimators': 50,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'random_state': 42,
-        'n_jobs': -1
+        "objective": "reg:squarederror",
+        "max_depth": 3,
+        "learning_rate": 0.1,
+        "n_estimators": 50,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "random_state": 42,
+        "n_jobs": -1,
     }
 
     # Episode configuration
@@ -151,7 +152,7 @@ class FeatureEngineeringEnv(gym.Env):
         base_features: list[str] | None = None,
         max_steps: int = 50,
         render_mode: str | None = None,
-        seed: int = 42
+        seed: int = 42,
     ):
         """
         Initialize RL feature engineering environment.
@@ -211,31 +212,30 @@ class FeatureEngineeringEnv(gym.Env):
         self.n_special_actions = 2  # Remove correlated, reset
 
         self.action_space = spaces.Discrete(
-            self.n_toggle_actions +
-            self.n_interaction_actions +
-            self.n_transform_actions +
-            self.n_special_actions
+            self.n_toggle_actions
+            + self.n_interaction_actions
+            + self.n_transform_actions
+            + self.n_special_actions
         )
 
         # State space: feature configuration + performance metrics
         # [280 binary flags, mae, feature_count, correlation_max, steps_remaining]
         state_dim = self.n_base_features + 4
-        self.observation_space = spaces.Box(
-            low=0.0,
-            high=1.0,
-            shape=(state_dim,),
-            dtype=np.float32
-        )
+        self.observation_space = spaces.Box(low=0.0, high=1.0, shape=(state_dim,), dtype=np.float32)
 
         # Load training data once (reuse across episodes)
         logger.info("Loading training data from database...")
-        self.X_train, self.X_val, self.y_train, self.y_val, self.feature_names = self._load_training_data()
-        logger.info(f"Loaded {len(self.X_train)} training samples, {len(self.X_val)} validation samples")
+        self.X_train, self.X_val, self.y_train, self.y_val, self.feature_names = (
+            self._load_training_data()
+        )
+        logger.info(
+            f"Loaded {len(self.X_train)} training samples, {len(self.X_val)} validation samples"
+        )
 
         # Episode state
         self.current_step = 0
         self.active_features = None  # Binary array: 1=active, 0=inactive
-        self.best_mae = float('inf')
+        self.best_mae = float("inf")
         self.best_features = None
         self.steps_since_improvement = 0
 
@@ -248,9 +248,7 @@ class FeatureEngineeringEnv(gym.Env):
         logger.info(f"State space: {self.observation_space.shape}")
 
     def reset(
-        self,
-        seed: int | None = None,
-        options: dict[str, Any] | None = None
+        self, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[np.ndarray, dict[str, Any]]:
         """
         Reset environment to initial state (baseline feature set).
@@ -282,13 +280,15 @@ class FeatureEngineeringEnv(gym.Env):
         state = self._get_state()
 
         info = {
-            'mae': baseline_mae,
-            'active_features': int(self.active_features.sum()),
-            'step': self.current_step,
-            'best_mae': self.best_mae
+            "mae": baseline_mae,
+            "active_features": int(self.active_features.sum()),
+            "step": self.current_step,
+            "best_mae": self.best_mae,
         }
 
-        logger.info(f"Episode reset: Baseline MAE={baseline_mae:.4f}, Active features={int(self.active_features.sum())}")
+        logger.info(
+            f"Episode reset: Baseline MAE={baseline_mae:.4f}, Active features={int(self.active_features.sum())}"
+        )
 
         return state, info
 
@@ -326,7 +326,9 @@ class FeatureEngineeringEnv(gym.Env):
             self.best_mae = mae
             self.best_features = self.active_features.copy()
             self.steps_since_improvement = 0
-            logger.info(f"Step {self.current_step}: New best MAE={mae:.4f} (improved by {improvement:.4f})")
+            logger.info(
+                f"Step {self.current_step}: New best MAE={mae:.4f} (improved by {improvement:.4f})"
+            )
             self._save_best_config(mae, self.active_features)
         else:
             self.steps_since_improvement += 1
@@ -340,13 +342,13 @@ class FeatureEngineeringEnv(gym.Env):
 
         # Build info dict
         info = {
-            'mae': mae,
-            'active_features': int(self.active_features.sum()),
-            'step': self.current_step,
-            'best_mae': self.best_mae,
-            'action_type': action_type,
-            'action_info': action_info,
-            'steps_since_improvement': self.steps_since_improvement
+            "mae": mae,
+            "active_features": int(self.active_features.sum()),
+            "step": self.current_step,
+            "best_mae": self.best_mae,
+            "action_type": action_type,
+            "action_info": action_info,
+            "steps_since_improvement": self.steps_since_improvement,
         }
 
         if terminated:
@@ -359,7 +361,9 @@ class FeatureEngineeringEnv(gym.Env):
     def render(self):
         """Render current environment state (for debugging)."""
         if self.render_mode == "human" or self.render_mode == "ansi":
-            active_count = int(self.active_features.sum()) if self.active_features is not None else 0
+            active_count = (
+                int(self.active_features.sum()) if self.active_features is not None else 0
+            )
             print("\n=== Feature Engineering Environment ===")
             print(f"Step: {self.current_step}/{self.max_steps}")
             print(f"Active features: {active_count}/{self.n_base_features}")
@@ -385,25 +389,28 @@ class FeatureEngineeringEnv(gym.Env):
         # Extract features for a sample game to get feature names
         try:
             from datetime import datetime
+
             current_year = datetime.now().year
             sample_features = self.feature_extractor.extract_game_features(
-                home_team='KC',
-                away_team='BUF',
-                season=current_year,
-                week=1,
-                use_cache=False
+                home_team="KC", away_team="BUF", season=current_year, week=1, use_cache=False
             )
             return list(sample_features.keys())
         except Exception as e:
             logger.warning(f"Failed to extract sample features: {e}. Using fallback feature list.")
             # Fallback: minimal feature set
             return [
-                'home_off_epa_per_play', 'home_def_epa_allowed_per_play',
-                'away_off_epa_per_play', 'away_def_epa_allowed_per_play',
-                'offensive_mismatch', 'defensive_mismatch', 'pace_difference'
+                "home_off_epa_per_play",
+                "home_def_epa_allowed_per_play",
+                "away_off_epa_per_play",
+                "away_def_epa_allowed_per_play",
+                "offensive_mismatch",
+                "defensive_mismatch",
+                "pace_difference",
             ]
 
-    def _load_training_data(self) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
+    def _load_training_data(
+        self,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
         """
         Load training data from database (games 2020-2024).
 
@@ -451,11 +458,11 @@ class FeatureEngineeringEnv(gym.Env):
                 try:
                     # Extract features using GameFeatureExtractor
                     features = self.feature_extractor.extract_game_features(
-                        home_team=row['home_team'],
-                        away_team=row['away_team'],
-                        season=row['season'],
-                        week=row['week'],
-                        use_cache=True
+                        home_team=row["home_team"],
+                        away_team=row["away_team"],
+                        season=row["season"],
+                        week=row["week"],
+                        use_cache=True,
                     )
 
                     # Convert to array (same order as base_features)
@@ -463,7 +470,7 @@ class FeatureEngineeringEnv(gym.Env):
                     features_list.append(feature_array)
 
                     # Label: point spread margin (home_score - away_score)
-                    labels_list.append(row['margin'])
+                    labels_list.append(row["margin"])
 
                 except Exception as e:
                     logger.warning(f"Failed to extract features for game {row['game_id']}: {e}")
@@ -510,9 +517,9 @@ class FeatureEngineeringEnv(gym.Env):
             self.active_features[feature_idx] = 1 - self.active_features[feature_idx]
             action_type = "toggle"
             action_info = {
-                'feature_idx': feature_idx,
-                'feature_name': self.base_features[feature_idx],
-                'new_state': int(self.active_features[feature_idx])
+                "feature_idx": feature_idx,
+                "feature_name": self.base_features[feature_idx],
+                "new_state": int(self.active_features[feature_idx]),
             }
 
         # Add interaction term (actions n_toggle to n_toggle + 19)
@@ -520,26 +527,26 @@ class FeatureEngineeringEnv(gym.Env):
             # For now, interaction terms require extending feature space (future enhancement)
             # Placeholder: toggle a random pair of features
             action_type = "interaction"
-            action_info = {'status': 'not_implemented'}
+            action_info = {"status": "not_implemented"}
 
         # Apply transformation (actions n_toggle + 20 to n_toggle + 29)
         elif action < self.n_toggle_actions + self.n_interaction_actions + self.n_transform_actions:
             # Transformations require feature engineering pipeline (future enhancement)
             action_type = "transform"
-            action_info = {'status': 'not_implemented'}
+            action_info = {"status": "not_implemented"}
 
         # Remove correlated features
         elif action == self.action_space.n - 2:
             # Compute correlation matrix and remove features with |r| > 0.95
             action_type = "remove_correlated"
             removed = self._remove_correlated_features()
-            action_info = {'removed_count': removed}
+            action_info = {"removed_count": removed}
 
         # Reset to baseline
         elif action == self.action_space.n - 1:
             self.active_features = np.ones(self.n_base_features, dtype=np.float32)
             action_type = "reset"
-            action_info = {'active_features': int(self.active_features.sum())}
+            action_info = {"active_features": int(self.active_features.sum())}
 
         else:
             raise ValueError(f"Invalid action: {action}")
@@ -637,10 +644,12 @@ class FeatureEngineeringEnv(gym.Env):
         steps_remaining_ratio = (self.max_steps - self.current_step) / self.max_steps
 
         # Concatenate
-        state = np.concatenate([
-            self.active_features,
-            [mae_normalized, feature_count_ratio, max_correlation, steps_remaining_ratio]
-        ]).astype(np.float32)
+        state = np.concatenate(
+            [
+                self.active_features,
+                [mae_normalized, feature_count_ratio, max_correlation, steps_remaining_ratio],
+            ]
+        ).astype(np.float32)
 
         return state
 
@@ -687,21 +696,26 @@ class FeatureEngineeringEnv(gym.Env):
 
         # Save configuration
         config = {
-            'mae': float(mae),
-            'active_features': active_features.tolist(),
-            'feature_names': [self.base_features[i] for i in range(len(active_features)) if active_features[i] > 0.5],
-            'n_features': int(active_features.sum()),
-            'timestamp': time.strftime('%Y-%m-%d %H:%M:%S')
+            "mae": float(mae),
+            "active_features": active_features.tolist(),
+            "feature_names": [
+                self.base_features[i]
+                for i in range(len(active_features))
+                if active_features[i] > 0.5
+            ],
+            "n_features": int(active_features.sum()),
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
 
         # Add to best configs (keep top-5)
         self.best_configs.append(config)
-        self.best_configs = sorted(self.best_configs, key=lambda x: x['mae'])[:5]
+        self.best_configs = sorted(self.best_configs, key=lambda x: x["mae"])[:5]
 
         # Save to file
         import json
+
         output_path = output_dir / f"best_config_mae_{mae:.4f}.json"
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(config, f, indent=2)
 
         logger.info(f"Saved best config to {output_path}")

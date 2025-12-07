@@ -24,7 +24,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_get_pending_trades_basic():
@@ -57,7 +54,6 @@ def test_get_pending_trades_basic():
     assert result is not None
 
 
-
 def test_get_pending_trades_edge_cases():
     """Test get_pending_trades: edge cases."""
     # Arrange
@@ -70,12 +66,10 @@ def test_get_pending_trades_edge_cases():
     assert result is not None
 
 
-
 def test_get_pending_trades_error_handling():
     """Test get_pending_trades error handling."""
     with pytest.raises(ValueError):
         get_pending_trades(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers())
@@ -86,7 +80,6 @@ def test_get_pending_trades_property_idempotent(self, self, session_id, days_bac
 
     # Assert property
     assert get_pending_trades(self, session_id, days_back) == result, "idempotent violated"
-
 
 
 def test_get_actual_player_stat_basic():
@@ -101,7 +94,6 @@ def test_get_actual_player_stat_basic():
     assert result is not None
 
 
-
 def test_get_actual_player_stat_edge_cases():
     """Test get_actual_player_stat: edge cases."""
     # Arrange
@@ -114,23 +106,27 @@ def test_get_actual_player_stat_edge_cases():
     assert result is not None
 
 
-
 def test_get_actual_player_stat_error_handling():
     """Test get_actual_player_stat error handling."""
     with pytest.raises(ValueError):
         get_actual_player_stat(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(min_value=1, max_value=1000), st.integers())
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+)
 def test_get_actual_player_stat_property_idempotent(self, self, player_id, game_id, prop_type):
     """Property test: function is idempotent."""
     # Act
     result = get_actual_player_stat(self, player_id, game_id, prop_type)
 
     # Assert property
-    assert get_actual_player_stat(self, player_id, game_id, prop_type) == result, "idempotent violated"
-
+    assert (
+        get_actual_player_stat(self, player_id, game_id, prop_type) == result
+    ), "idempotent violated"
 
 
 def test_settle_trade_basic():
@@ -145,7 +141,6 @@ def test_settle_trade_basic():
     assert result is not None
 
 
-
 def test_settle_trade_edge_cases():
     """Test settle_trade: edge cases."""
     # Arrange
@@ -158,23 +153,35 @@ def test_settle_trade_edge_cases():
     assert result is not None
 
 
-
 def test_settle_trade_error_handling():
     """Test settle_trade error handling."""
     with pytest.raises(ValueError):
         settle_trade(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers())
-def test_settle_trade_property_idempotent(self, self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_settle_trade_property_idempotent(
+    self, self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result
+):
     """Property test: function is idempotent."""
     # Act
-    result = settle_trade(self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result)
+    result = settle_trade(
+        self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result
+    )
 
     # Assert property
-    assert settle_trade(self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result) == result, "idempotent violated"
-
+    assert (
+        settle_trade(self, paper_trade_id, line_value, bet_side, bet_amount, odds, actual_result)
+        == result
+    ), "idempotent violated"
 
 
 def test_settle_all_pending_basic():
@@ -189,7 +196,6 @@ def test_settle_all_pending_basic():
     assert result is not None
 
 
-
 def test_settle_all_pending_edge_cases():
     """Test settle_all_pending: edge cases."""
     # Arrange
@@ -202,12 +208,10 @@ def test_settle_all_pending_edge_cases():
     assert result is not None
 
 
-
 def test_settle_all_pending_error_handling():
     """Test settle_all_pending error handling."""
     with pytest.raises(ValueError):
         settle_all_pending(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000))
@@ -218,7 +222,6 @@ def test_settle_all_pending_property_idempotent(self, self, session_id):
 
     # Assert property
     assert settle_all_pending(self, session_id) == result, "idempotent violated"
-
 
 
 def test_update_session_metrics_basic():
@@ -233,7 +236,6 @@ def test_update_session_metrics_basic():
     assert result is not None
 
 
-
 def test_update_session_metrics_edge_cases():
     """Test update_session_metrics: edge cases."""
     # Arrange
@@ -246,12 +248,10 @@ def test_update_session_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_update_session_metrics_error_handling():
     """Test update_session_metrics error handling."""
     with pytest.raises(ValueError):
         update_session_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000))
@@ -264,25 +264,17 @@ def test_update_session_metrics_property_idempotent(self, self, session_id):
     assert update_session_metrics(self, session_id) == result, "idempotent violated"
 
 
-
 def test_update_session_metrics_no_temporal_leakage():
     """Ensure update_session_metrics doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_session_metrics(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_send_alert_email_basic():
@@ -297,7 +289,6 @@ def test_send_alert_email_basic():
     assert result is not None
 
 
-
 def test_send_alert_email_edge_cases():
     """Test send_alert_email: edge cases."""
     # Arrange
@@ -310,12 +301,10 @@ def test_send_alert_email_edge_cases():
     assert result is not None
 
 
-
 def test_send_alert_email_error_handling():
     """Test send_alert_email error handling."""
     with pytest.raises(ValueError):
         send_alert_email(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -326,7 +315,6 @@ def test_send_alert_email_property_idempotent(self, self, summary, session_id):
 
     # Assert property
     assert send_alert_email(self, summary, session_id) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -341,7 +329,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -354,12 +341,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -370,4 +355,3 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-

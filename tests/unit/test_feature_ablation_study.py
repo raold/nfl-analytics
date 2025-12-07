@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_create_ensemble_config_basic():
@@ -56,7 +53,6 @@ def test_create_ensemble_config_basic():
     assert result is not None
 
 
-
 def test_create_ensemble_config_edge_cases():
     """Test create_ensemble_config: edge cases."""
     # Arrange
@@ -69,23 +65,26 @@ def test_create_ensemble_config_edge_cases():
     assert result is not None
 
 
-
 def test_create_ensemble_config_error_handling():
     """Test create_ensemble_config error handling."""
     with pytest.raises(ValueError):
         create_ensemble_config(invalid_input)
 
 
-
-@given(st.integers(), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers())
-def test_create_ensemble_config_property_idempotent(self, self, config_name, features_to_include, alpha, lambda_):
+@given(
+    st.integers(), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers()
+)
+def test_create_ensemble_config_property_idempotent(
+    self, self, config_name, features_to_include, alpha, lambda_
+):
     """Property test: function is idempotent."""
     # Act
     result = create_ensemble_config(self, config_name, features_to_include, alpha, lambda_)
 
     # Assert property
-    assert create_ensemble_config(self, config_name, features_to_include, alpha, lambda_) == result, "idempotent violated"
-
+    assert (
+        create_ensemble_config(self, config_name, features_to_include, alpha, lambda_) == result
+    ), "idempotent violated"
 
 
 def test_train_and_evaluate_basic():
@@ -100,7 +99,6 @@ def test_train_and_evaluate_basic():
     assert result is not None
 
 
-
 def test_train_and_evaluate_edge_cases():
     """Test train_and_evaluate: edge cases."""
     # Arrange
@@ -113,23 +111,26 @@ def test_train_and_evaluate_edge_cases():
     assert result is not None
 
 
-
 def test_train_and_evaluate_error_handling():
     """Test train_and_evaluate error handling."""
     with pytest.raises(ValueError):
         train_and_evaluate(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100))
-def test_train_and_evaluate_property_idempotent(self, self, ensemble, train_df, test_df, config_name):
+@given(
+    st.integers(), st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100)
+)
+def test_train_and_evaluate_property_idempotent(
+    self, self, ensemble, train_df, test_df, config_name
+):
     """Property test: function is idempotent."""
     # Act
     result = train_and_evaluate(self, ensemble, train_df, test_df, config_name)
 
     # Assert property
-    assert train_and_evaluate(self, ensemble, train_df, test_df, config_name) == result, "idempotent violated"
-
+    assert (
+        train_and_evaluate(self, ensemble, train_df, test_df, config_name) == result
+    ), "idempotent violated"
 
 
 def test_run_full_study_basic():
@@ -144,7 +145,6 @@ def test_run_full_study_basic():
     assert result is not None
 
 
-
 def test_run_full_study_edge_cases():
     """Test run_full_study: edge cases."""
     # Arrange
@@ -157,12 +157,10 @@ def test_run_full_study_edge_cases():
     assert result is not None
 
 
-
 def test_run_full_study_error_handling():
     """Test run_full_study error handling."""
     with pytest.raises(ValueError):
         run_full_study(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +171,6 @@ def test_run_full_study_property_idempotent(val):
 
     # Assert property
     assert run_full_study(val) == result, "idempotent violated"
-
 
 
 def test_save_results_basic():
@@ -188,7 +185,6 @@ def test_save_results_basic():
     assert result is not None
 
 
-
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
@@ -201,12 +197,10 @@ def test_save_results_edge_cases():
     assert result is not None
 
 
-
 def test_save_results_error_handling():
     """Test save_results error handling."""
     with pytest.raises(ValueError):
         save_results(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +211,6 @@ def test_save_results_property_idempotent(self, self, output_path):
 
     # Assert property
     assert save_results(self, output_path) == result, "idempotent violated"
-
 
 
 def test_print_summary_basic():
@@ -232,7 +225,6 @@ def test_print_summary_basic():
     assert result is not None
 
 
-
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
@@ -245,12 +237,10 @@ def test_print_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_summary_error_handling():
     """Test print_summary error handling."""
     with pytest.raises(ValueError):
         print_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,4 +251,3 @@ def test_print_summary_property_idempotent(val):
 
     # Assert property
     assert print_summary(val) == result, "idempotent violated"
-

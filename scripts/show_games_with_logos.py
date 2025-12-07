@@ -12,16 +12,16 @@ from datetime import datetime
 import psycopg2
 
 # Add parent directory to path to import team_logos
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from py.utils.team_logos import format_matchup, format_team_with_logo, get_team_logo
 
 # Database connection parameters
 DB_PARAMS = {
-    'host': os.environ.get('POSTGRES_HOST', 'localhost'),
-    'port': os.environ.get('POSTGRES_PORT', '5544'),
-    'dbname': os.environ.get('POSTGRES_DB', 'devdb01'),
-    'user': os.environ.get('POSTGRES_USER', 'dro'),
-    'password': os.environ.get('POSTGRES_PASSWORD', 'sicillionbillions')
+    "host": os.environ.get("POSTGRES_HOST", "localhost"),
+    "port": os.environ.get("POSTGRES_PORT", "5544"),
+    "dbname": os.environ.get("POSTGRES_DB", "devdb01"),
+    "user": os.environ.get("POSTGRES_USER", "dro"),
+    "password": os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
 }
 
 
@@ -47,7 +47,7 @@ def show_recent_games(weeks_back: int = 1):
         LIMIT 20
     """
 
-    cur.execute(query, (f'{weeks_back} weeks',))
+    cur.execute(query, (f"{weeks_back} weeks",))
     games = cur.fetchall()
 
     print(f"\n🏈 RECENT GAMES (Last {weeks_back} Week{'s' if weeks_back > 1 else ''}) 🏈")
@@ -117,7 +117,7 @@ def show_upcoming_games(days_ahead: int = 7):
         LIMIT 20
     """
 
-    cur.execute(query, (f'{days_ahead} days',))
+    cur.execute(query, (f"{days_ahead} days",))
     games = cur.fetchall()
 
     print(f"\n🎮 UPCOMING GAMES (Next {days_ahead} Days) 🎮")
@@ -212,13 +212,14 @@ def show_division_standings():
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Show NFL games with team logos')
-    parser.add_argument('--recent', type=int, metavar='WEEKS',
-                       help='Show games from the last N weeks')
-    parser.add_argument('--upcoming', type=int, metavar='DAYS',
-                       help='Show games in the next N days')
-    parser.add_argument('--standings', action='store_true',
-                       help='Show current standings')
+    parser = argparse.ArgumentParser(description="Show NFL games with team logos")
+    parser.add_argument(
+        "--recent", type=int, metavar="WEEKS", help="Show games from the last N weeks"
+    )
+    parser.add_argument(
+        "--upcoming", type=int, metavar="DAYS", help="Show games in the next N days"
+    )
+    parser.add_argument("--standings", action="store_true", help="Show current standings")
 
     args = parser.parse_args()
 

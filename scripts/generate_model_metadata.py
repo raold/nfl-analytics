@@ -189,7 +189,9 @@ def scan_models_directory(base_path: Path = Path("models")) -> list[Path]:
     return model_files
 
 
-def generate_all_metadata(output_dir: Path = Path("models/metadata"), production_only: bool = False):
+def generate_all_metadata(
+    output_dir: Path = Path("models/metadata"), production_only: bool = False
+):
     """Generate metadata for all models"""
 
     output_dir.mkdir(parents=True, exist_ok=True)

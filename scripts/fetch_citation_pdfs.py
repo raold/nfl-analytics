@@ -40,7 +40,7 @@ LIBGEN_MIRRORS = [
 
 def parse_bibtex(bib_path: str) -> list[dict]:
     """Parse BibTeX file and extract entries."""
-    with open(bib_path, encoding='utf-8') as f:
+    with open(bib_path, encoding="utf-8") as f:
         bib_database = bibtexparser.load(f)
     return bib_database.entries
 
@@ -48,16 +48,16 @@ def parse_bibtex(bib_path: str) -> list[dict]:
 def extract_doi(entry: dict) -> str | None:
     """Extract DOI from BibTeX entry."""
     # Check DOI field
-    if 'doi' in entry:
-        doi = entry['doi'].strip()
+    if "doi" in entry:
+        doi = entry["doi"].strip()
         # Clean up DOI (remove URL prefix if present)
-        doi = re.sub(r'https?://doi\.org/', '', doi)
+        doi = re.sub(r"https?://doi\.org/", "", doi)
         return doi
 
     # Check URL field for DOI
-    if 'url' in entry:
-        url = entry['url']
-        match = re.search(r'doi\.org/(.+)$', url)
+    if "url" in entry:
+        url = entry["url"]
+        match = re.search(r"doi\.org/(.+)$", url)
         if match:
             return match.group(1)
 
@@ -67,9 +67,9 @@ def extract_doi(entry: dict) -> str | None:
 def sanitize_filename(filename: str) -> str:
     """Sanitize filename by removing invalid characters."""
     # Replace invalid characters with underscore
-    filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
+    filename = re.sub(r'[<>:"/\\|?*]', "_", filename)
     # Remove multiple consecutive underscores
-    filename = re.sub(r'_+', '_', filename)
+    filename = re.sub(r"_+", "_", filename)
     # Limit length
     if len(filename) > 200:
         filename = filename[:200]
@@ -79,13 +79,13 @@ def sanitize_filename(filename: str) -> str:
 def get_pdf_filename(entry: dict) -> str:
     """Generate PDF filename from BibTeX entry."""
     # Try to use: FirstAuthorYear_ShortTitle.pdf
-    author = entry.get('author', 'Unknown').split(' and ')[0].split(',')[0].strip()
-    year = entry.get('year', 'XXXX')
-    title = entry.get('title', 'untitled')
+    author = entry.get("author", "Unknown").split(" and ")[0].split(",")[0].strip()
+    year = entry.get("year", "XXXX")
+    title = entry.get("title", "untitled")
 
     # Clean title (take first few words)
-    title_words = re.sub(r'[^\w\s]', '', title).split()[:5]
-    short_title = '_'.join(title_words)
+    title_words = re.sub(r"[^\w\s]", "", title).split()[:5]
+    short_title = "_".join(title_words)
 
     filename = f"{author}{year}_{short_title}.pdf"
     return sanitize_filename(filename)
@@ -105,16 +105,16 @@ def download_from_scihub(doi: str, output_path: str, mirrors: list[str]) -> bool
     """
     # More complete headers to avoid detection
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'none',
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
     }
 
     # Create a session to maintain cookies
@@ -138,19 +138,23 @@ def download_from_scihub(doi: str, output_path: str, mirrors: list[str]) -> bool
 
             # Look for PDF iframe or direct link
             # Sci-Hub typically embeds PDF in iframe with src="//..."
-            pdf_match = re.search(r'<iframe[^>]+src="([^"]+\.pdf[^"]*)"', response.text, re.IGNORECASE)
+            pdf_match = re.search(
+                r'<iframe[^>]+src="([^"]+\.pdf[^"]*)"', response.text, re.IGNORECASE
+            )
 
             if not pdf_match:
                 # Try alternative pattern
-                pdf_match = re.search(r'location\.href\s*=\s*["\']([^"\']+\.pdf[^"\']*)["\']', response.text)
+                pdf_match = re.search(
+                    r'location\.href\s*=\s*["\']([^"\']+\.pdf[^"\']*)["\']', response.text
+                )
 
             if pdf_match:
                 pdf_url = pdf_match.group(1)
 
                 # Handle protocol-relative URLs
-                if pdf_url.startswith('//'):
-                    pdf_url = 'https:' + pdf_url
-                elif not pdf_url.startswith('http'):
+                if pdf_url.startswith("//"):
+                    pdf_url = "https:" + pdf_url
+                elif not pdf_url.startswith("http"):
                     pdf_url = urljoin(mirror, pdf_url)
 
                 print(f"  Found PDF URL: {pdf_url[:80]}...")
@@ -160,10 +164,12 @@ def download_from_scihub(doi: str, output_path: str, mirrors: list[str]) -> bool
                 pdf_response.raise_for_status()
 
                 # Check if we got a PDF (check magic bytes)
-                if pdf_response.content[:4] == b'%PDF':
-                    with open(output_path, 'wb') as f:
+                if pdf_response.content[:4] == b"%PDF":
+                    with open(output_path, "wb") as f:
                         f.write(pdf_response.content)
-                    print(f"  ✓ Downloaded: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)")
+                    print(
+                        f"  ✓ Downloaded: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)"
+                    )
                     return True
                 else:
                     print("  ✗ Response was not a PDF")
@@ -195,7 +201,7 @@ def download_from_libgen(doi: str, output_path: str, mirrors: list[str]) -> bool
         True if successful, False otherwise
     """
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     }
 
     for mirror in mirrors:
@@ -222,14 +228,18 @@ def download_from_libgen(doi: str, output_path: str, mirrors: list[str]) -> bool
                 print("  Found LibGen link...")
 
                 # Follow the link to get actual PDF
-                pdf_response = requests.get(pdf_url, headers=headers, timeout=60, allow_redirects=True)
+                pdf_response = requests.get(
+                    pdf_url, headers=headers, timeout=60, allow_redirects=True
+                )
                 pdf_response.raise_for_status()
 
                 # Check if we got a PDF
-                if pdf_response.content[:4] == b'%PDF':
-                    with open(output_path, 'wb') as f:
+                if pdf_response.content[:4] == b"%PDF":
+                    with open(output_path, "wb") as f:
                         f.write(pdf_response.content)
-                    print(f"  ✓ Downloaded from LibGen: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)")
+                    print(
+                        f"  ✓ Downloaded from LibGen: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)"
+                    )
                     return True
 
         except Exception as e:
@@ -241,34 +251,27 @@ def download_from_libgen(doi: str, output_path: str, mirrors: list[str]) -> bool
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Fetch PDFs for bibliography citations from Sci-Hub',
-        epilog='Note: Try legitimate sources first (university library, author websites).'
+        description="Fetch PDFs for bibliography citations from Sci-Hub",
+        epilog="Note: Try legitimate sources first (university library, author websites).",
     )
     parser.add_argument(
-        '--bib',
-        default='analysis/dissertation/main/references.bib',
-        help='Path to BibTeX file (default: analysis/dissertation/main/references.bib)'
+        "--bib",
+        default="analysis/dissertation/main/references.bib",
+        help="Path to BibTeX file (default: analysis/dissertation/main/references.bib)",
     )
     parser.add_argument(
-        '--output',
-        default='analysis/dissertation/pdfs',
-        help='Output directory for PDFs (default: analysis/dissertation/pdfs)'
+        "--output",
+        default="analysis/dissertation/pdfs",
+        help="Output directory for PDFs (default: analysis/dissertation/pdfs)",
     )
     parser.add_argument(
-        '--limit',
-        type=int,
-        help='Limit number of papers to download (for testing)'
+        "--limit", type=int, help="Limit number of papers to download (for testing)"
     )
     parser.add_argument(
-        '--delay',
-        type=float,
-        default=2.0,
-        help='Delay between requests in seconds (default: 2.0)'
+        "--delay", type=float, default=2.0, help="Delay between requests in seconds (default: 2.0)"
     )
     parser.add_argument(
-        '--skip-existing',
-        action='store_true',
-        help='Skip files that already exist'
+        "--skip-existing", action="store_true", help="Skip files that already exist"
     )
 
     args = parser.parse_args()
@@ -291,7 +294,7 @@ def main():
     print(f"   {len(entries_with_doi)} have DOIs")
 
     if args.limit:
-        entries_with_doi = entries_with_doi[:args.limit]
+        entries_with_doi = entries_with_doi[: args.limit]
         print(f"   Limiting to first {args.limit} entries")
 
     # Download PDFs
@@ -304,8 +307,8 @@ def main():
     skipped = 0
 
     for i, (entry, doi) in enumerate(entries_with_doi, 1):
-        cite_key = entry.get('ID', 'unknown')
-        title = entry.get('title', 'Unknown title')[:60]
+        cite_key = entry.get("ID", "unknown")
+        title = entry.get("title", "Unknown title")[:60]
 
         print(f"[{i}/{len(entries_with_doi)}] {cite_key}")
         print(f"  Title: {title}...")
@@ -351,5 +354,5 @@ def main():
     print("=" * 70)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

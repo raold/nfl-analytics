@@ -25,60 +25,56 @@ from py.utils.database_migration_agent import DatabaseMigrationAgent
 
 def demo_migration_generation():
     """Demo 1: Generate migration from schema diff."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO 1: MIGRATION GENERATION")
-    print("="*70)
+    print("=" * 70)
 
     # Create temporary directory for migrations
     with tempfile.TemporaryDirectory() as tmpdir:
-        agent = DatabaseMigrationAgent(
-            migrations_dir=tmpdir,
-            project_root=tmpdir
-        )
+        agent = DatabaseMigrationAgent(migrations_dir=tmpdir, project_root=tmpdir)
 
         # Define schema changes
         schema_diff = {
-            'add_tables': [
+            "add_tables": [
                 {
-                    'name': 'ensemble_weights',
-                    'schema': 'ml',
-                    'columns': [
-                        {'name': 'weight_id', 'type': 'SERIAL', 'primary_key': True},
-                        {'name': 'ensemble_id', 'type': 'INTEGER', 'nullable': False},
-                        {'name': 'model_id', 'type': 'INTEGER', 'nullable': False},
-                        {'name': 'weight', 'type': 'NUMERIC(5,4)', 'nullable': False},
-                        {'name': 'created_at', 'type': 'TIMESTAMP', 'default': 'NOW()'}
-                    ]
+                    "name": "ensemble_weights",
+                    "schema": "ml",
+                    "columns": [
+                        {"name": "weight_id", "type": "SERIAL", "primary_key": True},
+                        {"name": "ensemble_id", "type": "INTEGER", "nullable": False},
+                        {"name": "model_id", "type": "INTEGER", "nullable": False},
+                        {"name": "weight", "type": "NUMERIC(5,4)", "nullable": False},
+                        {"name": "created_at", "type": "TIMESTAMP", "default": "NOW()"},
+                    ],
                 }
             ],
-            'add_columns': [
+            "add_columns": [
                 {
-                    'table': 'games',
-                    'schema': 'public',
-                    'column': {
-                        'name': 'prediction_count',
-                        'type': 'INTEGER',
-                        'default': '0',
-                        'nullable': False
-                    }
+                    "table": "games",
+                    "schema": "public",
+                    "column": {
+                        "name": "prediction_count",
+                        "type": "INTEGER",
+                        "default": "0",
+                        "nullable": False,
+                    },
                 }
             ],
-            'add_indexes': [
+            "add_indexes": [
                 {
-                    'table': 'ensemble_weights',
-                    'schema': 'ml',
-                    'name': 'idx_ensemble_weights_model',
-                    'columns': ['ensemble_id', 'model_id'],
-                    'unique': True
+                    "table": "ensemble_weights",
+                    "schema": "ml",
+                    "name": "idx_ensemble_weights_model",
+                    "columns": ["ensemble_id", "model_id"],
+                    "unique": True,
                 }
-            ]
+            ],
         }
 
         # Generate migration
         print("\n📝 Generating migration from schema diff...")
         migration_file = agent.generate_migration(
-            schema_diff,
-            migration_name='add_ensemble_tracking'
+            schema_diff, migration_name="add_ensemble_tracking"
         )
 
         print(f"✅ Generated: {migration_file}")
@@ -94,21 +90,23 @@ def demo_migration_generation():
 
 def demo_migration_validation():
     """Demo 2: Validate migration."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO 2: MIGRATION VALIDATION")
-    print("="*70)
+    print("=" * 70)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create test migration file
-        migration_file = Path(tmpdir) / '001_test_migration.sql'
-        migration_file.write_text("""
+        migration_file = Path(tmpdir) / "001_test_migration.sql"
+        migration_file.write_text(
+            """
             -- Test migration
             CREATE TABLE IF NOT EXISTS test_table (
                 id SERIAL PRIMARY KEY,
                 name TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT NOW()
             );
-        """)
+        """
+        )
 
         print(f"\n📝 Validating migration: {migration_file.name}")
         print("\nNote: This demo uses a mock database connection")
@@ -122,9 +120,9 @@ def demo_migration_validation():
 
 def demo_backfill():
     """Demo 3: Backfill column (conceptual - requires database)."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO 3: BACKFILL COLUMN")
-    print("="*70)
+    print("=" * 70)
 
     print("\n📝 Backfill Example (conceptual - requires database):")
     print("\nSequential backfill (small tables):")
@@ -151,9 +149,9 @@ def demo_backfill():
 
 def demo_schema_drift():
     """Demo 4: Schema drift detection (conceptual)."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO 4: SCHEMA DRIFT DETECTION")
-    print("="*70)
+    print("=" * 70)
 
     print("\n📝 Schema Drift Example (conceptual - requires two databases):")
     print("\nProduction config:")
@@ -192,9 +190,9 @@ def demo_schema_drift():
 
 def demo_data_structures():
     """Demo 5: Data structures."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO 5: DATA STRUCTURES")
-    print("="*70)
+    print("=" * 70)
 
     from py.utils.database_migration_agent import (
         DriftReport,
@@ -206,23 +204,19 @@ def demo_data_structures():
     # ValidationReport
     print("\n📊 ValidationReport:")
     report = ValidationReport(
-        migration_file='050_test.sql',
+        migration_file="050_test.sql",
         is_valid=False,
         errors=[
             ValidationError(
-                severity='ERROR',
-                category='foreign_key',
-                message='Referenced table does not exist'
+                severity="ERROR", category="foreign_key", message="Referenced table does not exist"
             )
         ],
         warnings=[
             ValidationError(
-                severity='WARNING',
-                category='orphaned_record',
-                message='15 orphaned records found'
+                severity="WARNING", category="orphaned_record", message="15 orphaned records found"
             )
         ],
-        validation_time=1.45
+        validation_time=1.45,
     )
 
     print(report.summary())
@@ -230,29 +224,26 @@ def demo_data_structures():
     # MigrationResult
     print("\n📊 MigrationResult:")
     result = MigrationResult(
-        migration_file='050_test.sql',
-        success=True,
-        migration_id=42,
-        duration=3.45
+        migration_file="050_test.sql", success=True, migration_id=42, duration=3.45
     )
 
     print(result.summary())
 
     # DriftReport
     print("\n📊 DriftReport:")
-    drift = DriftReport(source_env='dev', target_env='prod')
-    drift.tables_added = ['ml.ensemble_configs']
-    drift.columns_added = [('public.games', 'prediction_count')]
-    drift.indexes_added = ['idx_games_prediction_count']
+    drift = DriftReport(source_env="dev", target_env="prod")
+    drift.tables_added = ["ml.ensemble_configs"]
+    drift.columns_added = [("public.games", "prediction_count")]
+    drift.indexes_added = ["idx_games_prediction_count"]
 
     print(drift.summary())
 
 
 def main():
     """Run all demos."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DATABASE MIGRATION AGENT DEMO")
-    print("="*70)
+    print("=" * 70)
 
     # Run demos
     demo_migration_generation()
@@ -261,9 +252,9 @@ def main():
     demo_schema_drift()
     demo_data_structures()
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DEMO COMPLETE")
-    print("="*70)
+    print("=" * 70)
 
     print("\n📚 Next Steps:")
     print("  1. Review docs/tools/DATABASE_MIGRATION_AGENT.md")
@@ -273,5 +264,5 @@ def main():
     print("  5. Apply: ./scripts/manage_migrations.sh apply db/migrations/050_test.sql")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

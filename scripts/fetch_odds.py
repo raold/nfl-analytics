@@ -33,34 +33,33 @@ from py.odds.odds_fetcher import OddsAPIRateLimitError, OddsFetcher
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('/tmp/odds_fetcher.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("/tmp/odds_fetcher.log"), logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Fetch NFL player props odds')
-    parser.add_argument('--dry-run', action='store_true', help='Fetch but don\'t store')
-    parser.add_argument('--quota', action='store_true', help='Check API quota status only')
-    parser.add_argument('--bookmakers', help='Comma-separated bookmaker keys (e.g., draftkings,fanduel)')
-    parser.add_argument('--regions', default='us', help='Comma-separated regions (default: us)')
-    parser.add_argument('--api-key', help='The Odds API key (or set ODDS_API_KEY env var)')
-    parser.add_argument('--db-host', default='localhost', help='Database host')
-    parser.add_argument('--db-port', type=int, default=5544, help='Database port')
-    parser.add_argument('--db-name', default='devdb01', help='Database name')
-    parser.add_argument('--db-user', default='dro', help='Database user')
-    parser.add_argument('--db-password', default='sicillionbillions', help='Database password')
+    parser = argparse.ArgumentParser(description="Fetch NFL player props odds")
+    parser.add_argument("--dry-run", action="store_true", help="Fetch but don't store")
+    parser.add_argument("--quota", action="store_true", help="Check API quota status only")
+    parser.add_argument(
+        "--bookmakers", help="Comma-separated bookmaker keys (e.g., draftkings,fanduel)"
+    )
+    parser.add_argument("--regions", default="us", help="Comma-separated regions (default: us)")
+    parser.add_argument("--api-key", help="The Odds API key (or set ODDS_API_KEY env var)")
+    parser.add_argument("--db-host", default="localhost", help="Database host")
+    parser.add_argument("--db-port", type=int, default=5544, help="Database port")
+    parser.add_argument("--db-name", default="devdb01", help="Database name")
+    parser.add_argument("--db-user", default="dro", help="Database user")
+    parser.add_argument("--db-password", default="sicillionbillions", help="Database password")
 
     args = parser.parse_args()
 
     try:
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("ODDS FETCHER - The Odds API Integration")
-        logger.info("="*80 + "\n")
+        logger.info("=" * 80 + "\n")
 
         # Initialize fetcher
         fetcher = OddsFetcher(
@@ -69,7 +68,7 @@ def main():
             db_port=args.db_port,
             db_name=args.db_name,
             db_user=args.db_user,
-            db_password=args.db_password
+            db_password=args.db_password,
         )
 
         # Check quota status only
@@ -81,7 +80,9 @@ def main():
 
             # Also check local rate limit
             requests_today, remaining_today = fetcher.check_rate_limit()
-            logger.info(f"\nLocal rate limit: {requests_today} requests today ({remaining_today} remaining)")
+            logger.info(
+                f"\nLocal rate limit: {requests_today} requests today ({remaining_today} remaining)"
+            )
             logger.info(f"Daily budget: {remaining_today} requests available before limit")
 
             return 0
@@ -89,7 +90,7 @@ def main():
         # Parse bookmakers
         bookmakers = None
         if args.bookmakers:
-            bookmakers = [b.strip() for b in args.bookmakers.split(',')]
+            bookmakers = [b.strip() for b in args.bookmakers.split(",")]
             logger.info(f"Filtering to bookmakers: {bookmakers}")
 
         # Fetch and store
@@ -100,13 +101,13 @@ def main():
             regions=args.regions,
             bookmakers=bookmakers,
             dry_run=args.dry_run,
-            max_events=5  # Production limit: 504 API calls/month
+            max_events=5,  # Production limit: 504 API calls/month
         )
 
         # Print summary
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("SUMMARY")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         if args.dry_run:
             logger.info(f"Dry run: Retrieved {stats['events']} events (not stored)")
@@ -117,7 +118,7 @@ def main():
             logger.info(f"Lines stored: {stats['lines_stored']}")
             logger.info(f"Snapshot time: {stats['snapshot_at']}")
 
-        logger.info("="*80 + "\n")
+        logger.info("=" * 80 + "\n")
 
         logger.info("✅ Odds fetch complete")
         return 0
@@ -135,5 +136,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

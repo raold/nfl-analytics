@@ -23,7 +23,6 @@ def test_tau_bucket_basic():
     assert result is not None
 
 
-
 def test_tau_bucket_edge_cases():
     """Test tau_bucket: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_tau_bucket_edge_cases():
     assert result is not None
 
 
-
 def test_tau_bucket_error_handling():
     """Test tau_bucket error handling."""
     with pytest.raises(ValueError):
         tau_bucket(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_tau_bucket_property_idempotent(self, tau_min):
 
     # Assert property
     assert tau_bucket(tau_min) == result, "idempotent violated"
-
 
 
 def test_fit_depth_basic():
@@ -67,7 +63,6 @@ def test_fit_depth_basic():
     assert result is not None
 
 
-
 def test_fit_depth_edge_cases():
     """Test fit_depth: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_fit_depth_edge_cases():
     assert result is not None
 
 
-
 def test_fit_depth_error_handling():
     """Test fit_depth error handling."""
     with pytest.raises(ValueError):
         fit_depth(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_fit_depth_property_idempotent(self, rows):
 
     # Assert property
     assert fit_depth(rows) == result, "idempotent violated"
-
 
 
 def test_sample_depth_basic():
@@ -111,7 +103,6 @@ def test_sample_depth_basic():
     assert result is not None
 
 
-
 def test_sample_depth_edge_cases():
     """Test sample_depth: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_sample_depth_edge_cases():
     assert result is not None
 
 
-
 def test_sample_depth_error_handling():
     """Test sample_depth error handling."""
     with pytest.raises(ValueError):
         sample_depth(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -140,4 +129,3 @@ def test_sample_depth_property_idempotent(self, beta, q, velocity):
 
     # Assert property
     assert sample_depth(beta, q, velocity) == result, "idempotent violated"
-

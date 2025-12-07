@@ -28,38 +28,39 @@ models_found = {}
 xgb_models = list(model_dir.glob("xgboost/*.json"))
 if xgb_models:
     print(f"[OK] Found {len(xgb_models)} XGBoost models")
-    models_found['xgboost'] = xgb_models
+    models_found["xgboost"] = xgb_models
 
 # BNN models
 bnn_models = list(model_dir.glob("*.pth")) + list(model_dir.glob("*bnn*.pth"))
 if bnn_models:
     print(f"[OK] Found {len(bnn_models)} BNN models")
-    models_found['bnn'] = bnn_models
+    models_found["bnn"] = bnn_models
 
 # CQL model
 cql_models = list(model_dir.glob("cql/*.pth"))
 if cql_models:
     print(f"[OK] Found {len(cql_models)} CQL models")
-    models_found['cql'] = cql_models
+    models_found["cql"] = cql_models
 
 # State-space model
 state_models = list(model_dir.glob("state_space/*.json"))
 if state_models:
     print(f"[OK] Found {len(state_models)} State-Space models")
-    models_found['state_space'] = state_models
+    models_found["state_space"] = state_models
 
 # CVAE models
 cvae_models = list(model_dir.glob("cvae/*.pkl"))
 if cvae_models:
     print(f"[OK] Found {len(cvae_models)} CVAE component files")
-    models_found['cvae'] = cvae_models
+    models_found["cvae"] = cvae_models
 
-print(f"\nTotal: {sum(len(v) for v in models_found.values())} model files across {len(models_found)} model types")
+print(
+    f"\nTotal: {sum(len(v) for v in models_found.values())} model files across {len(models_found)} model types"
+)
 
 # Load test data for ensemble evaluation
 conn = psycopg2.connect(
-    host='localhost', port=5544, dbname='devdb01',
-    user='dro', password='sicillionbillions'
+    host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
 )
 
 print("\n2. Loading test data...")
@@ -116,28 +117,30 @@ if len(df) == 0:
     # Create synthetic test data
     np.random.seed(42)
     n_samples = 500
-    df = pd.DataFrame({
-        'team1_epa': np.random.randn(n_samples) * 0.1,
-        'team1_yards': np.random.uniform(4, 7, n_samples),
-        'team1_wp': np.random.uniform(0.3, 0.7, n_samples),
-        'team1_pass_rate': np.random.uniform(0.4, 0.7, n_samples),
-        'team1_td_rate': np.random.uniform(0.15, 0.35, n_samples),
-        'team2_epa': np.random.randn(n_samples) * 0.1,
-        'team2_yards': np.random.uniform(4, 7, n_samples),
-        'team2_wp': np.random.uniform(0.3, 0.7, n_samples),
-        'team2_pass_rate': np.random.uniform(0.4, 0.7, n_samples),
-        'team2_td_rate': np.random.uniform(0.15, 0.35, n_samples),
-    })
-    df['epa_diff'] = df['team1_epa'] - df['team2_epa']
-    df['yards_diff'] = df['team1_yards'] - df['team2_yards']
-    df['wp_diff'] = df['team1_wp'] - df['team2_wp']
-    df['pass_rate_diff'] = df['team1_pass_rate'] - df['team2_pass_rate']
-    df['team1_win'] = (df['epa_diff'] + np.random.randn(n_samples) * 0.05 > 0).astype(float)
+    df = pd.DataFrame(
+        {
+            "team1_epa": np.random.randn(n_samples) * 0.1,
+            "team1_yards": np.random.uniform(4, 7, n_samples),
+            "team1_wp": np.random.uniform(0.3, 0.7, n_samples),
+            "team1_pass_rate": np.random.uniform(0.4, 0.7, n_samples),
+            "team1_td_rate": np.random.uniform(0.15, 0.35, n_samples),
+            "team2_epa": np.random.randn(n_samples) * 0.1,
+            "team2_yards": np.random.uniform(4, 7, n_samples),
+            "team2_wp": np.random.uniform(0.3, 0.7, n_samples),
+            "team2_pass_rate": np.random.uniform(0.4, 0.7, n_samples),
+            "team2_td_rate": np.random.uniform(0.15, 0.35, n_samples),
+        }
+    )
+    df["epa_diff"] = df["team1_epa"] - df["team2_epa"]
+    df["yards_diff"] = df["team1_yards"] - df["team2_yards"]
+    df["wp_diff"] = df["team1_wp"] - df["team2_wp"]
+    df["pass_rate_diff"] = df["team1_pass_rate"] - df["team2_pass_rate"]
+    df["team1_win"] = (df["epa_diff"] + np.random.randn(n_samples) * 0.05 > 0).astype(float)
 
 # Prepare features
-feature_cols = [c for c in df.columns if c not in ['game_id', 'season', 'team1_win']]
+feature_cols = [c for c in df.columns if c not in ["game_id", "season", "team1_win"]]
 X_test = df[feature_cols].fillna(0).values
-y_test = df['team1_win'].values
+y_test = df["team1_win"].values
 
 print(f"[OK] Features: {len(feature_cols)}")
 print(f"[OK] Test samples: {len(X_test)}")
@@ -148,15 +151,15 @@ predictions = {}
 print("\n3. Generating predictions from each model type...")
 
 # XGBoost predictions
-if 'xgboost' in models_found:
-    xgb_path = models_found['xgboost'][0]  # Use first/best XGBoost model
+if "xgboost" in models_found:
+    xgb_path = models_found["xgboost"][0]  # Use first/best XGBoost model
     print(f"  Loading XGBoost: {xgb_path.name}")
     try:
         bst = xgb.Booster()
         bst.load_model(str(xgb_path))
         dtest = xgb.DMatrix(X_test)
         xgb_pred = bst.predict(dtest)
-        predictions['xgboost'] = xgb_pred
+        predictions["xgboost"] = xgb_pred
         print(f"    [OK] XGBoost predictions: shape {xgb_pred.shape}")
     except Exception as e:
         print(f"    [FAIL] Failed to load XGBoost: {e}")
@@ -165,35 +168,35 @@ if 'xgboost' in models_found:
 # In production, you'd load these properly
 
 # Simulate BNN predictions (with uncertainty)
-if 'bnn' in models_found:
+if "bnn" in models_found:
     print("  Simulating BNN predictions (torch not available)")
-    bnn_pred = 1 / (1 + np.exp(-df['epa_diff'].values * 10))  # Logistic based on EPA diff
+    bnn_pred = 1 / (1 + np.exp(-df["epa_diff"].values * 10))  # Logistic based on EPA diff
     bnn_pred += np.random.randn(len(bnn_pred)) * 0.05  # Add uncertainty
     bnn_pred = np.clip(bnn_pred, 0.01, 0.99)
-    predictions['bnn'] = bnn_pred
+    predictions["bnn"] = bnn_pred
     print(f"    [OK] BNN predictions: shape {bnn_pred.shape}")
 
 # Simulate CQL predictions
-if 'cql' in models_found:
+if "cql" in models_found:
     print("  Simulating CQL predictions")
-    cql_pred = 1 / (1 + np.exp(-(df['epa_diff'].values + df['wp_diff'].values) * 5))
-    predictions['cql'] = cql_pred
+    cql_pred = 1 / (1 + np.exp(-(df["epa_diff"].values + df["wp_diff"].values) * 5))
+    predictions["cql"] = cql_pred
     print(f"    [OK] CQL predictions: shape {cql_pred.shape}")
 
 # State-space predictions
-if 'state_space' in models_found:
+if "state_space" in models_found:
     try:
         state_path = model_dir / "state_space" / "state_space_metrics.json"
         if state_path.exists():
             with open(state_path) as f:
                 state_metrics = json.load(f)
             # Simple baseline using test accuracy
-            base_acc = state_metrics.get('test_accuracy', 0.55)
+            base_acc = state_metrics.get("test_accuracy", 0.55)
             state_pred = np.full(len(X_test), base_acc)
             # Add some variance based on features
-            state_pred += df['epa_diff'].values * 0.2
+            state_pred += df["epa_diff"].values * 0.2
             state_pred = np.clip(state_pred, 0.01, 0.99)
-            predictions['state_space'] = state_pred
+            predictions["state_space"] = state_pred
             print(f"    [OK] State-Space predictions: shape {state_pred.shape}")
     except Exception as e:
         print(f"    [FAIL] Failed to load State-Space: {e}")
@@ -212,15 +215,10 @@ ensemble_methods = {}
 
 # Method 1: Simple average
 ensemble_avg = np.mean(list(predictions.values()), axis=0)
-ensemble_methods['average'] = ensemble_avg
+ensemble_methods["average"] = ensemble_avg
 
 # Method 2: Weighted average (weight by assumed accuracy)
-weights = {
-    'xgboost': 0.4,
-    'bnn': 0.3,
-    'cql': 0.2,
-    'state_space': 0.1
-}
+weights = {"xgboost": 0.4, "bnn": 0.3, "cql": 0.2, "state_space": 0.1}
 weighted_sum = np.zeros(len(X_test))
 total_weight = 0
 for model_name, pred in predictions.items():
@@ -228,18 +226,18 @@ for model_name, pred in predictions.items():
     weighted_sum += pred * w
     total_weight += w
 ensemble_weighted = weighted_sum / total_weight
-ensemble_methods['weighted'] = ensemble_weighted
+ensemble_methods["weighted"] = ensemble_weighted
 
 # Method 3: Median ensemble (robust to outliers)
 ensemble_median = np.median(list(predictions.values()), axis=0)
-ensemble_methods['median'] = ensemble_median
+ensemble_methods["median"] = ensemble_median
 
 # Method 4: Max confidence (pick most confident prediction)
 all_preds = np.array(list(predictions.values()))
 distances_from_half = np.abs(all_preds - 0.5)
 max_confidence_idx = np.argmax(distances_from_half, axis=0)
 ensemble_max = all_preds[max_confidence_idx, np.arange(len(X_test))]
-ensemble_methods['max_confidence'] = ensemble_max
+ensemble_methods["max_confidence"] = ensemble_max
 
 print(f"[OK] Created {len(ensemble_methods)} ensemble methods")
 
@@ -278,33 +276,35 @@ output_dir = Path("models/ensemble")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 # Save predictions
-ensemble_df = pd.DataFrame({
-    'y_true': y_test,
-    **{f'pred_{name}': pred for name, pred in predictions.items()},
-    **{f'ensemble_{name}': pred for name, pred in ensemble_methods.items()}
-})
+ensemble_df = pd.DataFrame(
+    {
+        "y_true": y_test,
+        **{f"pred_{name}": pred for name, pred in predictions.items()},
+        **{f"ensemble_{name}": pred for name, pred in ensemble_methods.items()},
+    }
+)
 ensemble_df.to_csv(output_dir / "ensemble_predictions.csv", index=False)
 
 # Save ensemble config
 ensemble_config = {
-    'models_used': list(predictions.keys()),
-    'n_models': len(predictions),
-    'ensemble_methods': list(ensemble_methods.keys()),
-    'best_method': best_method,
-    'best_accuracy': float(best_acc),
-    'model_files': {
+    "models_used": list(predictions.keys()),
+    "n_models": len(predictions),
+    "ensemble_methods": list(ensemble_methods.keys()),
+    "best_method": best_method,
+    "best_accuracy": float(best_acc),
+    "model_files": {
         model_type: [str(p) for p in paths[:3]]  # Save first 3 paths
         for model_type, paths in models_found.items()
     },
-    'test_samples': len(X_test),
-    'feature_cols': feature_cols
+    "test_samples": len(X_test),
+    "feature_cols": feature_cols,
 }
 
-with open(output_dir / "ensemble_config.json", 'w') as f:
+with open(output_dir / "ensemble_config.json", "w") as f:
     json.dump(ensemble_config, f, indent=2)
 
 # Save weights for weighted ensemble
-with open(output_dir / "ensemble_weights.json", 'w') as f:
+with open(output_dir / "ensemble_weights.json", "w") as f:
     json.dump(weights, f, indent=2)
 
 print(f"\n[DONE] Ensemble saved to {output_dir}/")

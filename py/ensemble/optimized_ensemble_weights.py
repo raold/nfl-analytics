@@ -99,8 +99,7 @@ class WeightConfig:
         weights_arr = sharpes / sharpes.sum()
 
         return {
-            model: float(weight)
-            for model, weight in zip(self.model_sharpes.keys(), weights_arr)
+            model: float(weight) for model, weight in zip(self.model_sharpes.keys(), weights_arr)
         }
 
 
@@ -219,9 +218,7 @@ class EnsembleWeighter:
 
         return {name: float(w) for name, w in zip(model_names, weights)}
 
-    def _adaptive_weights(
-        self, model_names: list[str], context: dict
-    ) -> dict[str, float]:
+    def _adaptive_weights(self, model_names: list[str], context: dict) -> dict[str, float]:
         """
         Context-aware weighting based on player type and game situation.
 
@@ -262,14 +259,10 @@ class EnsembleWeighter:
         total = sum(weights.values())
         weights = {k: v / total for k, v in weights.items()}
 
-        logger.debug(
-            f"Adaptive weights (n_games={n_games}, wind={wind:.1f}): {weights}"
-        )
+        logger.debug(f"Adaptive weights (n_games={n_games}, wind={wind:.1f}): {weights}")
         return weights
 
-    def _meta_learner_weights(
-        self, model_names: list[str], context: dict
-    ) -> dict[str, float]:
+    def _meta_learner_weights(self, model_names: list[str], context: dict) -> dict[str, float]:
         """
         Meta-learner weighting (ML-based).
 
@@ -294,9 +287,7 @@ class EnsembleWeighter:
                 "bnn_pred": [preds.get("bnn", 0.0)],
                 "bnn_calibrated_pred": [preds.get("bnn_calibrated", 0.0)],
                 # Disagreement signals
-                "bayesian_xgb_diff": [
-                    abs(preds.get("bayesian", 0) - preds.get("xgboost", 0))
-                ],
+                "bayesian_xgb_diff": [abs(preds.get("bayesian", 0) - preds.get("xgboost", 0))],
                 "pred_std": [np.std(list(preds.values()))],
                 # Uncertainty
                 "bayesian_uncertainty": [uncertainties.get("bayesian", 10.0)],

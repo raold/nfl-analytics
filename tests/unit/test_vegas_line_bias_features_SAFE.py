@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_games_with_lines_basic():
@@ -56,7 +53,6 @@ def test_load_games_with_lines_basic():
     assert result is not None
 
 
-
 def test_load_games_with_lines_edge_cases():
     """Test load_games_with_lines: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_games_with_lines_edge_cases():
     assert result is not None
 
 
-
 def test_load_games_with_lines_error_handling():
     """Test load_games_with_lines error handling."""
     with pytest.raises(ValueError):
         load_games_with_lines(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_games_with_lines_property_idempotent(self, self, start_season, end
 
     # Assert property
     assert load_games_with_lines(self, start_season, end_season) == result, "idempotent violated"
-
 
 
 def test_build_team_features_basic():
@@ -100,7 +93,6 @@ def test_build_team_features_basic():
     assert result is not None
 
 
-
 def test_build_team_features_edge_cases():
     """Test build_team_features: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_build_team_features_edge_cases():
     assert result is not None
 
 
-
 def test_build_team_features_error_handling():
     """Test build_team_features error handling."""
     with pytest.raises(ValueError):
         build_team_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_build_team_features_property_idempotent(self, self, df, include_outcome
 
     # Assert property
     assert build_team_features(self, df, include_outcomes) == result, "idempotent violated"
-
 
 
 def test_compute_rolling_line_features_basic():
@@ -144,7 +133,6 @@ def test_compute_rolling_line_features_basic():
     assert result is not None
 
 
-
 def test_compute_rolling_line_features_edge_cases():
     """Test compute_rolling_line_features: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_compute_rolling_line_features_edge_cases():
     assert result is not None
 
 
-
 def test_compute_rolling_line_features_error_handling():
     """Test compute_rolling_line_features error handling."""
     with pytest.raises(ValueError):
         compute_rolling_line_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,4 +159,3 @@ def test_compute_rolling_line_features_property_idempotent(self, self, team_df, 
 
     # Assert property
     assert compute_rolling_line_features(self, team_df, windows) == result, "idempotent violated"
-

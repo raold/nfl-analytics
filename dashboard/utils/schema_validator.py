@@ -51,12 +51,14 @@ logger = logging.getLogger(__name__)
 
 class ValidationError(Exception):
     """Raised when DataFrame schema validation fails."""
+
     pass
 
 
 @dataclass
 class ColumnSchema:
     """Schema definition for a single DataFrame column."""
+
     type: str
     required: bool = True
     default: Any = None
@@ -67,9 +69,7 @@ class ColumnSchema:
 
 
 def validate_schema(
-    df: pd.DataFrame,
-    schema: dict[str, dict[str, Any]],
-    strict: bool = False
+    df: pd.DataFrame, schema: dict[str, dict[str, Any]], strict: bool = False
 ) -> pd.DataFrame:
     """
     Validate DataFrame against expected schema.
@@ -110,8 +110,8 @@ def validate_schema(
         logger.info("Received empty DataFrame - returning empty DataFrame with schema")
         empty_df = pd.DataFrame()
         for col_name, col_spec in schema.items():
-            if col_spec.get('required', True):
-                empty_df[col_name] = pd.Series(dtype=col_spec['type'])
+            if col_spec.get("required", True):
+                empty_df[col_name] = pd.Series(dtype=col_spec["type"])
         return empty_df
 
     validated_df = df.copy()
@@ -120,20 +120,20 @@ def validate_schema(
 
     # Check for required columns
     for col_name, col_spec in schema.items():
-        if col_spec.get('required', True) and col_name not in validated_df.columns:
+        if col_spec.get("required", True) and col_name not in validated_df.columns:
             msg = f"Required column '{col_name}' missing from DataFrame"
             if strict:
                 errors.append(msg)
             else:
                 warnings.append(msg)
                 # Add column with default value or NaN
-                default = col_spec.get('default', None)
+                default = col_spec.get("default", None)
                 validated_df[col_name] = default
 
     # Check for optional columns and add defaults if missing
     for col_name, col_spec in schema.items():
-        if not col_spec.get('required', True) and col_name not in validated_df.columns:
-            default = col_spec.get('default', None)
+        if not col_spec.get("required", True) and col_name not in validated_df.columns:
+            default = col_spec.get("default", None)
             validated_df[col_name] = default
             logger.debug(f"Added optional column '{col_name}' with default value: {default}")
 
@@ -142,26 +142,25 @@ def validate_schema(
         if col_name not in validated_df.columns:
             continue  # Already handled above
 
-        expected_type = col_spec['type']
+        expected_type = col_spec["type"]
         actual_type = str(validated_df[col_name].dtype)
 
         # Type validation and coercion
         if actual_type != expected_type:
             try:
-                validated_df[col_name] = _coerce_type(
-                    validated_df[col_name],
-                    expected_type
-                )
+                validated_df[col_name] = _coerce_type(validated_df[col_name], expected_type)
                 logger.debug(f"Coerced column '{col_name}' from {actual_type} to {expected_type}")
             except Exception as e:
-                msg = f"Cannot coerce column '{col_name}' from {actual_type} to {expected_type}: {e}"
+                msg = (
+                    f"Cannot coerce column '{col_name}' from {actual_type} to {expected_type}: {e}"
+                )
                 if strict:
                     errors.append(msg)
                 else:
                     warnings.append(msg)
 
         # Null checking
-        if not col_spec.get('nullable', True):
+        if not col_spec.get("nullable", True):
             null_count = validated_df[col_name].isna().sum()
             if null_count > 0:
                 msg = f"Column '{col_name}' has {null_count} null values (not nullable)"
@@ -170,13 +169,15 @@ def validate_schema(
                 else:
                     warnings.append(msg)
                     # Fill nulls with default or 0
-                    default = col_spec.get('default', 0 if 'int' in expected_type or 'float' in expected_type else '')
+                    default = col_spec.get(
+                        "default", 0 if "int" in expected_type or "float" in expected_type else ""
+                    )
                     validated_df[col_name].fillna(default, inplace=True)
 
         # Range validation for numeric columns
-        if expected_type in ['int64', 'float64', 'int32', 'float32']:
-            min_val = col_spec.get('min_value')
-            max_val = col_spec.get('max_value')
+        if expected_type in ["int64", "float64", "int32", "float32"]:
+            min_val = col_spec.get("min_value")
+            max_val = col_spec.get("max_value")
 
             if min_val is not None:
                 invalid_count = (validated_df[col_name] < min_val).sum()
@@ -191,7 +192,7 @@ def validate_schema(
                     warnings.append(msg)
 
         # Allowed values validation
-        allowed_values = col_spec.get('allowed_values')
+        allowed_values = col_spec.get("allowed_values")
         if allowed_values is not None:
             invalid_mask = ~validated_df[col_name].isin(allowed_values + [None, np.nan])
             invalid_count = invalid_mask.sum()
@@ -226,16 +227,16 @@ def _coerce_type(series: pd.Series, target_type: str) -> pd.Series:
     Raises:
         ValueError: If coercion fails
     """
-    if target_type == 'int64':
-        return pd.to_numeric(series, errors='coerce').astype('Int64')  # Nullable int
-    elif target_type == 'float64':
-        return pd.to_numeric(series, errors='coerce').astype('float64')
-    elif target_type == 'object':
+    if target_type == "int64":
+        return pd.to_numeric(series, errors="coerce").astype("Int64")  # Nullable int
+    elif target_type == "float64":
+        return pd.to_numeric(series, errors="coerce").astype("float64")
+    elif target_type == "object":
         return series.astype(str)
-    elif target_type == 'bool':
+    elif target_type == "bool":
         return series.astype(bool)
-    elif target_type.startswith('datetime64'):
-        return pd.to_datetime(series, errors='coerce')
+    elif target_type.startswith("datetime64"):
+        return pd.to_datetime(series, errors="coerce")
     else:
         return series.astype(target_type)
 
@@ -252,76 +253,86 @@ def get_common_schemas() -> dict[str, dict[str, dict[str, Any]]]:
         >>> df = validate_schema(df, schemas['predictions_with_odds'])
     """
     return {
-        'predictions_with_odds': {
-            'player_id': {'type': 'int64', 'required': True},
-            'player_name': {'type': 'object', 'required': True},
-            'team': {'type': 'object', 'required': True},
-            'opponent': {'type': 'object', 'required': True},
-            'is_home': {'type': 'bool', 'required': True},
-            'game_id': {'type': 'object', 'required': True},
-            'kickoff': {'type': 'datetime64[ns]', 'required': True},
-            'prediction_mean': {'type': 'float64', 'required': True, 'min_value': 0},
-            'prediction_std': {'type': 'float64', 'required': True, 'min_value': 0},
-            'prediction_q10': {'type': 'float64', 'required': False, 'default': None},
-            'prediction_q90': {'type': 'float64', 'required': False, 'default': None},
-            'ensemble_version': {'type': 'object', 'required': False, 'default': None},
-            'actual_value': {'type': 'float64', 'required': False, 'default': None},
-            'book_line': {'type': 'float64', 'required': False, 'default': None},
-            'over_odds': {'type': 'int64', 'required': False, 'default': None},
-            'under_odds': {'type': 'int64', 'required': False, 'default': None},
-            'bookmaker_key': {'type': 'object', 'required': False, 'default': None},
-            'edge': {'type': 'float64', 'required': False, 'default': 0.0},
+        "predictions_with_odds": {
+            "player_id": {"type": "int64", "required": True},
+            "player_name": {"type": "object", "required": True},
+            "team": {"type": "object", "required": True},
+            "opponent": {"type": "object", "required": True},
+            "is_home": {"type": "bool", "required": True},
+            "game_id": {"type": "object", "required": True},
+            "kickoff": {"type": "datetime64[ns]", "required": True},
+            "prediction_mean": {"type": "float64", "required": True, "min_value": 0},
+            "prediction_std": {"type": "float64", "required": True, "min_value": 0},
+            "prediction_q10": {"type": "float64", "required": False, "default": None},
+            "prediction_q90": {"type": "float64", "required": False, "default": None},
+            "ensemble_version": {"type": "object", "required": False, "default": None},
+            "actual_value": {"type": "float64", "required": False, "default": None},
+            "book_line": {"type": "float64", "required": False, "default": None},
+            "over_odds": {"type": "int64", "required": False, "default": None},
+            "under_odds": {"type": "int64", "required": False, "default": None},
+            "bookmaker_key": {"type": "object", "required": False, "default": None},
+            "edge": {"type": "float64", "required": False, "default": 0.0},
         },
-        'paper_trading_sessions': {
-            'session_id': {'type': 'object', 'required': True},
-            'started_at': {'type': 'datetime64[ns]', 'required': True},
-            'ended_at': {'type': 'datetime64[ns]', 'required': False, 'default': None},
-            'initial_bankroll': {'type': 'float64', 'required': True, 'min_value': 0},
-            'final_bankroll': {'type': 'float64', 'required': False, 'default': None},
-            'total_bets': {'type': 'int64', 'required': False, 'default': 0},
-            'win_rate': {'type': 'float64', 'required': False, 'default': 0.0, 'min_value': 0, 'max_value': 1},
-            'roi': {'type': 'float64', 'required': False, 'default': 0.0},
-            'sharpe_ratio': {'type': 'float64', 'required': False, 'default': 0.0},
-            'max_drawdown': {'type': 'float64', 'required': False, 'default': 0.0},
-            'strategy': {'type': 'object', 'required': False, 'default': 'unknown'},
+        "paper_trading_sessions": {
+            "session_id": {"type": "object", "required": True},
+            "started_at": {"type": "datetime64[ns]", "required": True},
+            "ended_at": {"type": "datetime64[ns]", "required": False, "default": None},
+            "initial_bankroll": {"type": "float64", "required": True, "min_value": 0},
+            "final_bankroll": {"type": "float64", "required": False, "default": None},
+            "total_bets": {"type": "int64", "required": False, "default": 0},
+            "win_rate": {
+                "type": "float64",
+                "required": False,
+                "default": 0.0,
+                "min_value": 0,
+                "max_value": 1,
+            },
+            "roi": {"type": "float64", "required": False, "default": 0.0},
+            "sharpe_ratio": {"type": "float64", "required": False, "default": 0.0},
+            "max_drawdown": {"type": "float64", "required": False, "default": 0.0},
+            "strategy": {"type": "object", "required": False, "default": "unknown"},
         },
-        'paper_trades': {
-            'paper_trade_id': {'type': 'int64', 'required': True},
-            'trade_timestamp': {'type': 'datetime64[ns]', 'required': True},
-            'player_name': {'type': 'object', 'required': True},
-            'prop_type': {'type': 'object', 'required': True},
-            'line_value': {'type': 'float64', 'required': True},
-            'bet_side': {'type': 'object', 'required': True, 'allowed_values': ['over', 'under']},
-            'odds': {'type': 'int64', 'required': True},
-            'bet_amount': {'type': 'float64', 'required': True, 'min_value': 0},
-            'edge': {'type': 'float64', 'required': False, 'default': 0.0},
-            'model_prediction': {'type': 'float64', 'required': False, 'default': None},
-            'model_std': {'type': 'float64', 'required': False, 'default': None},
-            'actual_result': {'type': 'float64', 'required': False, 'default': None},
-            'outcome': {'type': 'object', 'required': False, 'default': 'pending',
-                       'allowed_values': ['win', 'loss', 'push', 'pending']},
-            'profit_loss': {'type': 'float64', 'required': False, 'default': 0.0},
-            'bookmaker_key': {'type': 'object', 'required': False, 'default': None},
+        "paper_trades": {
+            "paper_trade_id": {"type": "int64", "required": True},
+            "trade_timestamp": {"type": "datetime64[ns]", "required": True},
+            "player_name": {"type": "object", "required": True},
+            "prop_type": {"type": "object", "required": True},
+            "line_value": {"type": "float64", "required": True},
+            "bet_side": {"type": "object", "required": True, "allowed_values": ["over", "under"]},
+            "odds": {"type": "int64", "required": True},
+            "bet_amount": {"type": "float64", "required": True, "min_value": 0},
+            "edge": {"type": "float64", "required": False, "default": 0.0},
+            "model_prediction": {"type": "float64", "required": False, "default": None},
+            "model_std": {"type": "float64", "required": False, "default": None},
+            "actual_result": {"type": "float64", "required": False, "default": None},
+            "outcome": {
+                "type": "object",
+                "required": False,
+                "default": "pending",
+                "allowed_values": ["win", "loss", "push", "pending"],
+            },
+            "profit_loss": {"type": "float64", "required": False, "default": 0.0},
+            "bookmaker_key": {"type": "object", "required": False, "default": None},
         },
-        'games': {
-            'game_id': {'type': 'object', 'required': True},
-            'season': {'type': 'int64', 'required': True, 'min_value': 2018},
-            'week': {'type': 'int64', 'required': True, 'min_value': 1, 'max_value': 22},
-            'game_type': {'type': 'object', 'required': True},
-            'home_team': {'type': 'object', 'required': True},
-            'away_team': {'type': 'object', 'required': True},
-            'home_score': {'type': 'int64', 'required': False, 'default': None},
-            'away_score': {'type': 'int64', 'required': False, 'default': None},
-            'spread_close': {'type': 'float64', 'required': False, 'default': None},
-            'total_close': {'type': 'float64', 'required': False, 'default': None},
-            'kickoff': {'type': 'datetime64[ns]', 'required': True},
+        "games": {
+            "game_id": {"type": "object", "required": True},
+            "season": {"type": "int64", "required": True, "min_value": 2018},
+            "week": {"type": "int64", "required": True, "min_value": 1, "max_value": 22},
+            "game_type": {"type": "object", "required": True},
+            "home_team": {"type": "object", "required": True},
+            "away_team": {"type": "object", "required": True},
+            "home_score": {"type": "int64", "required": False, "default": None},
+            "away_score": {"type": "int64", "required": False, "default": None},
+            "spread_close": {"type": "float64", "required": False, "default": None},
+            "total_close": {"type": "float64", "required": False, "default": None},
+            "kickoff": {"type": "datetime64[ns]", "required": True},
         },
-        'line_movement': {
-            'snapshot_at': {'type': 'datetime64[ns]', 'required': True},
-            'line_value': {'type': 'float64', 'required': True},
-            'over_odds': {'type': 'int64', 'required': False, 'default': None},
-            'under_odds': {'type': 'int64', 'required': False, 'default': None},
-            'bookmaker_title': {'type': 'object', 'required': True},
+        "line_movement": {
+            "snapshot_at": {"type": "datetime64[ns]", "required": True},
+            "line_value": {"type": "float64", "required": True},
+            "over_odds": {"type": "int64", "required": False, "default": None},
+            "under_odds": {"type": "int64", "required": False, "default": None},
+            "bookmaker_title": {"type": "object", "required": True},
         },
     }
 
@@ -330,7 +341,7 @@ def validate_query_result(
     df: pd.DataFrame,
     query_name: str,
     expected_min_rows: int = 0,
-    expected_max_rows: int | None = None
+    expected_max_rows: int | None = None,
 ) -> pd.DataFrame:
     """
     Validate query result DataFrame with row count checks.
@@ -368,9 +379,9 @@ def validate_query_result(
 
 # Export public API
 __all__ = [
-    'validate_schema',
-    'validate_query_result',
-    'get_common_schemas',
-    'ValidationError',
-    'ColumnSchema',
+    "validate_schema",
+    "validate_query_result",
+    "get_common_schemas",
+    "ValidationError",
+    "ColumnSchema",
 ]

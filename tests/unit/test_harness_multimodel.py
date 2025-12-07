@@ -23,7 +23,6 @@ def test_parse_seasons_basic():
     assert result is not None
 
 
-
 def test_parse_seasons_edge_cases():
     """Test parse_seasons: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_seasons_edge_cases():
     assert result is not None
 
 
-
 def test_parse_seasons_error_handling():
     """Test parse_seasons error handling."""
     with pytest.raises(ValueError):
         parse_seasons(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_parse_seasons_property_idempotent(self, spec):
 
     # Assert property
     assert parse_seasons(spec) == result, "idempotent violated"
-
 
 
 def test_ensure_dir_basic():
@@ -67,7 +63,6 @@ def test_ensure_dir_basic():
     assert result is not None
 
 
-
 def test_ensure_dir_edge_cases():
     """Test ensure_dir: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_ensure_dir_edge_cases():
     assert result is not None
 
 
-
 def test_ensure_dir_error_handling():
     """Test ensure_dir error handling."""
     with pytest.raises(ValueError):
         ensure_dir(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_ensure_dir_property_idempotent(self, path):
 
     # Assert property
     assert ensure_dir(path) == result, "idempotent violated"
-
 
 
 def test_load_feature_data_basic():
@@ -111,7 +103,6 @@ def test_load_feature_data_basic():
     assert result is not None
 
 
-
 def test_load_feature_data_edge_cases():
     """Test load_feature_data: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_load_feature_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_feature_data_error_handling():
     """Test load_feature_data error handling."""
     with pytest.raises(ValueError):
         load_feature_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_load_feature_data_property_idempotent(self, path, seasons):
 
     # Assert property
     assert load_feature_data(path, seasons) == result, "idempotent violated"
-
 
 
 def test_walk_forward_predictions_basic():
@@ -155,7 +143,6 @@ def test_walk_forward_predictions_basic():
     assert result is not None
 
 
-
 def test_walk_forward_predictions_edge_cases():
     """Test walk_forward_predictions: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_walk_forward_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_walk_forward_predictions_error_handling():
     """Test walk_forward_predictions error handling."""
     with pytest.raises(ValueError):
         walk_forward_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_walk_forward_predictions_property_idempotent(self, df, base_models, fea
 
     # Assert property
     assert walk_forward_predictions(df, base_models, feature_cols) == result, "idempotent violated"
-
 
 
 def test_all_combinations_basic():
@@ -199,7 +183,6 @@ def test_all_combinations_basic():
     assert result is not None
 
 
-
 def test_all_combinations_edge_cases():
     """Test all_combinations: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_all_combinations_edge_cases():
     assert result is not None
 
 
-
 def test_all_combinations_error_handling():
     """Test all_combinations error handling."""
     with pytest.raises(ValueError):
         all_combinations(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +209,6 @@ def test_all_combinations_property_idempotent(self, items):
 
     # Assert property
     assert all_combinations(items) == result, "idempotent violated"
-
 
 
 def test_add_equal_weight_ensembles_basic():
@@ -243,7 +223,6 @@ def test_add_equal_weight_ensembles_basic():
     assert result is not None
 
 
-
 def test_add_equal_weight_ensembles_edge_cases():
     """Test add_equal_weight_ensembles: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_add_equal_weight_ensembles_edge_cases():
     assert result is not None
 
 
-
 def test_add_equal_weight_ensembles_error_handling():
     """Test add_equal_weight_ensembles error handling."""
     with pytest.raises(ValueError):
         add_equal_weight_ensembles(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -272,7 +249,6 @@ def test_add_equal_weight_ensembles_property_idempotent(self, pred_df, base_mode
 
     # Assert property
     assert add_equal_weight_ensembles(pred_df, base_models) == result, "idempotent violated"
-
 
 
 def test_add_stack_ensembles_basic():
@@ -287,7 +263,6 @@ def test_add_stack_ensembles_basic():
     assert result is not None
 
 
-
 def test_add_stack_ensembles_edge_cases():
     """Test add_stack_ensembles: edge cases."""
     # Arrange
@@ -300,12 +275,10 @@ def test_add_stack_ensembles_edge_cases():
     assert result is not None
 
 
-
 def test_add_stack_ensembles_error_handling():
     """Test add_stack_ensembles error handling."""
     with pytest.raises(ValueError):
         add_stack_ensembles(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -316,7 +289,6 @@ def test_add_stack_ensembles_property_idempotent(self, pred_df, base_models):
 
     # Assert property
     assert add_stack_ensembles(pred_df, base_models) == result, "idempotent violated"
-
 
 
 def test_compute_roi_basic():
@@ -331,7 +303,6 @@ def test_compute_roi_basic():
     assert result is not None
 
 
-
 def test_compute_roi_edge_cases():
     """Test compute_roi: edge cases."""
     # Arrange
@@ -344,12 +315,10 @@ def test_compute_roi_edge_cases():
     assert result is not None
 
 
-
 def test_compute_roi_error_handling():
     """Test compute_roi error handling."""
     with pytest.raises(ValueError):
         compute_roi(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -360,7 +329,6 @@ def test_compute_roi_property_idempotent(self, probs, actuals, threshold, decima
 
     # Assert property
     assert compute_roi(probs, actuals, threshold, decimal_payout) == result, "idempotent violated"
-
 
 
 def test_overall_metrics_basic():
@@ -375,7 +343,6 @@ def test_overall_metrics_basic():
     assert result is not None
 
 
-
 def test_overall_metrics_edge_cases():
     """Test overall_metrics: edge cases."""
     # Arrange
@@ -388,12 +355,10 @@ def test_overall_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_overall_metrics_error_handling():
     """Test overall_metrics error handling."""
     with pytest.raises(ValueError):
         overall_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -403,8 +368,9 @@ def test_overall_metrics_property_idempotent(self, pred_df, model_cols, threshol
     result = overall_metrics(pred_df, model_cols, threshold, decimal_payout)
 
     # Assert property
-    assert overall_metrics(pred_df, model_cols, threshold, decimal_payout) == result, "idempotent violated"
-
+    assert (
+        overall_metrics(pred_df, model_cols, threshold, decimal_payout) == result
+    ), "idempotent violated"
 
 
 def test_per_season_metrics_basic():
@@ -419,7 +385,6 @@ def test_per_season_metrics_basic():
     assert result is not None
 
 
-
 def test_per_season_metrics_edge_cases():
     """Test per_season_metrics: edge cases."""
     # Arrange
@@ -432,23 +397,24 @@ def test_per_season_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_per_season_metrics_error_handling():
     """Test per_season_metrics error handling."""
     with pytest.raises(ValueError):
         per_season_metrics(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_per_season_metrics_property_idempotent(self, pred_df, model_cols, threshold, decimal_payout):
+def test_per_season_metrics_property_idempotent(
+    self, pred_df, model_cols, threshold, decimal_payout
+):
     """Property test: function is idempotent."""
     # Act
     result = per_season_metrics(pred_df, model_cols, threshold, decimal_payout)
 
     # Assert property
-    assert per_season_metrics(pred_df, model_cols, threshold, decimal_payout) == result, "idempotent violated"
-
+    assert (
+        per_season_metrics(pred_df, model_cols, threshold, decimal_payout) == result
+    ), "idempotent violated"
 
 
 def test_bootstrap_confidence_intervals_basic():
@@ -463,7 +429,6 @@ def test_bootstrap_confidence_intervals_basic():
     assert result is not None
 
 
-
 def test_bootstrap_confidence_intervals_edge_cases():
     """Test bootstrap_confidence_intervals: edge cases."""
     # Arrange
@@ -476,23 +441,36 @@ def test_bootstrap_confidence_intervals_edge_cases():
     assert result is not None
 
 
-
 def test_bootstrap_confidence_intervals_error_handling():
     """Test bootstrap_confidence_intervals error handling."""
     with pytest.raises(ValueError):
         bootstrap_confidence_intervals(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100), st.integers())
-def test_bootstrap_confidence_intervals_property_idempotent(self, pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+)
+def test_bootstrap_confidence_intervals_property_idempotent(
+    self, pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed
+):
     """Property test: function is idempotent."""
     # Act
-    result = bootstrap_confidence_intervals(pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed)
+    result = bootstrap_confidence_intervals(
+        pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed
+    )
 
     # Assert property
-    assert bootstrap_confidence_intervals(pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed) == result, "idempotent violated"
-
+    assert (
+        bootstrap_confidence_intervals(
+            pred_df, model_cols, threshold, decimal_payout, n_bootstrap, seed
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_prediction_covariance_basic():
@@ -507,7 +485,6 @@ def test_prediction_covariance_basic():
     assert result is not None
 
 
-
 def test_prediction_covariance_edge_cases():
     """Test prediction_covariance: edge cases."""
     # Arrange
@@ -520,12 +497,10 @@ def test_prediction_covariance_edge_cases():
     assert result is not None
 
 
-
 def test_prediction_covariance_error_handling():
     """Test prediction_covariance error handling."""
     with pytest.raises(ValueError):
         prediction_covariance(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -536,7 +511,6 @@ def test_prediction_covariance_property_idempotent(self, pred_df, model_cols):
 
     # Assert property
     assert prediction_covariance(pred_df, model_cols) == result, "idempotent violated"
-
 
 
 def test_parse_args_basic():
@@ -551,7 +525,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -564,12 +537,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -584,7 +555,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -597,14 +567,12 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
 
 
-
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
@@ -615,7 +583,6 @@ def test_fit_basic():
 
     # Assert
     assert result is not None
-
 
 
 def test_fit_edge_cases():
@@ -630,12 +597,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -646,7 +611,6 @@ def test_fit_property_idempotent(self, self, train_df):
 
     # Assert property
     assert fit(self, train_df) == result, "idempotent violated"
-
 
 
 def test_predict_proba_basic():
@@ -661,7 +625,6 @@ def test_predict_proba_basic():
     assert result is not None
 
 
-
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
@@ -674,12 +637,10 @@ def test_predict_proba_edge_cases():
     assert result is not None
 
 
-
 def test_predict_proba_error_handling():
     """Test predict_proba error handling."""
     with pytest.raises(ValueError):
         predict_proba(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -690,7 +651,6 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 
     # Assert property
     assert predict_proba(self, test_df) == result, "idempotent violated"
-
 
 
 def test_fit_basic():
@@ -705,7 +665,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -718,12 +677,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -734,7 +691,6 @@ def test_fit_property_idempotent(self, self, train_df):
 
     # Assert property
     assert fit(self, train_df) == result, "idempotent violated"
-
 
 
 def test_predict_proba_basic():
@@ -749,7 +705,6 @@ def test_predict_proba_basic():
     assert result is not None
 
 
-
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
@@ -762,12 +717,10 @@ def test_predict_proba_edge_cases():
     assert result is not None
 
 
-
 def test_predict_proba_error_handling():
     """Test predict_proba error handling."""
     with pytest.raises(ValueError):
         predict_proba(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -778,7 +731,6 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 
     # Assert property
     assert predict_proba(self, test_df) == result, "idempotent violated"
-
 
 
 def test_feature_importance_basic():
@@ -793,7 +745,6 @@ def test_feature_importance_basic():
     assert result is not None
 
 
-
 def test_feature_importance_edge_cases():
     """Test feature_importance: edge cases."""
     # Arrange
@@ -806,12 +757,10 @@ def test_feature_importance_edge_cases():
     assert result is not None
 
 
-
 def test_feature_importance_error_handling():
     """Test feature_importance error handling."""
     with pytest.raises(ValueError):
         feature_importance(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -824,7 +773,6 @@ def test_feature_importance_property_idempotent(self, self, df):
     assert feature_importance(self, df) == result, "idempotent violated"
 
 
-
 def test_fit_basic():
     """Test fit: basic functionality."""
     # Arrange
@@ -835,7 +783,6 @@ def test_fit_basic():
 
     # Assert
     assert result is not None
-
 
 
 def test_fit_edge_cases():
@@ -850,12 +797,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -866,7 +811,6 @@ def test_fit_property_idempotent(self, self, train_df):
 
     # Assert property
     assert fit(self, train_df) == result, "idempotent violated"
-
 
 
 def test_predict_proba_basic():
@@ -881,7 +825,6 @@ def test_predict_proba_basic():
     assert result is not None
 
 
-
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
@@ -894,12 +837,10 @@ def test_predict_proba_edge_cases():
     assert result is not None
 
 
-
 def test_predict_proba_error_handling():
     """Test predict_proba error handling."""
     with pytest.raises(ValueError):
         predict_proba(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -910,7 +851,6 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 
     # Assert property
     assert predict_proba(self, test_df) == result, "idempotent violated"
-
 
 
 def test_feature_importance_basic():
@@ -925,7 +865,6 @@ def test_feature_importance_basic():
     assert result is not None
 
 
-
 def test_feature_importance_edge_cases():
     """Test feature_importance: edge cases."""
     # Arrange
@@ -938,12 +877,10 @@ def test_feature_importance_edge_cases():
     assert result is not None
 
 
-
 def test_feature_importance_error_handling():
     """Test feature_importance error handling."""
     with pytest.raises(ValueError):
         feature_importance(invalid_input)
-
 
 
 @given(st.integers())
@@ -954,7 +891,6 @@ def test_feature_importance_property_idempotent(val):
 
     # Assert property
     assert feature_importance(val) == result, "idempotent violated"
-
 
 
 def test_fit_basic():
@@ -969,7 +905,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -982,12 +917,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -998,7 +931,6 @@ def test_fit_property_idempotent(self, self, train_df):
 
     # Assert property
     assert fit(self, train_df) == result, "idempotent violated"
-
 
 
 def test_predict_proba_basic():
@@ -1013,7 +945,6 @@ def test_predict_proba_basic():
     assert result is not None
 
 
-
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
@@ -1026,12 +957,10 @@ def test_predict_proba_edge_cases():
     assert result is not None
 
 
-
 def test_predict_proba_error_handling():
     """Test predict_proba error handling."""
     with pytest.raises(ValueError):
         predict_proba(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -1042,4 +971,3 @@ def test_predict_proba_property_idempotent(self, self, test_df):
 
     # Assert property
     assert predict_proba(self, test_df) == result, "idempotent violated"
-

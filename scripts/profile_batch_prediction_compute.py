@@ -50,7 +50,7 @@ from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(
     level=logging.WARNING,  # Suppress info logs during profiling
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -58,11 +58,7 @@ logger = logging.getLogger(__name__)
 def get_test_games(n_games: int = 50, season: int = 2024) -> list:
     """Fetch test games from database."""
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = f"""
@@ -82,7 +78,7 @@ def get_test_games(n_games: int = 50, season: int = 2024) -> list:
     df = pd.read_sql_query(query, conn)
     conn.close()
 
-    games = df.to_dict('records')
+    games = df.to_dict("records")
     return games
 
 
@@ -92,9 +88,9 @@ def profile_assembly_loop(ensemble, games):
 
     This replicates the loop with fine-grained timing to identify bottlenecks.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ASSEMBLY LOOP PROFILING (Manual Instrumentation)")
-    print("="*80)
+    print("=" * 80)
 
     # Get batch predictions (mimic predict_batch)
     state_space_preds = ensemble._get_state_space_predictions_batch(games)
@@ -120,23 +116,23 @@ def profile_assembly_loop(ensemble, games):
 
     # Timing buckets
     times = {
-        'key_creation': 0,
-        'dict_lookup_state': 0,
-        'dict_lookup_hier': 0,
-        'dict_lookup_xgb': 0,
-        'dict_lookup_info': 0,
-        'list_append_means': 0,
-        'list_append_stds': 0,
-        'list_append_weights': 0,
-        'array_creation': 0,
-        'weight_normalize': 0,
-        'ensemble_mean_calc': 0,
-        'variance_calc': 0,
-        'sqrt_calc': 0,
-        'temp_scaling': 0,
-        'quantile_calc': 0,
-        'result_dict_creation': 0,
-        'result_append': 0,
+        "key_creation": 0,
+        "dict_lookup_state": 0,
+        "dict_lookup_hier": 0,
+        "dict_lookup_xgb": 0,
+        "dict_lookup_info": 0,
+        "list_append_means": 0,
+        "list_append_stds": 0,
+        "list_append_weights": 0,
+        "array_creation": 0,
+        "weight_normalize": 0,
+        "ensemble_mean_calc": 0,
+        "variance_calc": 0,
+        "sqrt_calc": 0,
+        "temp_scaling": 0,
+        "quantile_calc": 0,
+        "result_dict_creation": 0,
+        "result_append": 0,
     }
 
     loop_start = time.perf_counter()
@@ -148,7 +144,7 @@ def profile_assembly_loop(ensemble, games):
         season = game["season"]
         week = game["week"]
         key = (player_id, season, week)
-        times['key_creation'] += time.perf_counter() - t0
+        times["key_creation"] += time.perf_counter() - t0
 
         # Dictionary lookups
         predictions = {}
@@ -156,22 +152,22 @@ def profile_assembly_loop(ensemble, games):
         t0 = time.perf_counter()
         if key in state_space_preds:
             predictions["state_space_v2"] = state_space_preds[key]
-        times['dict_lookup_state'] += time.perf_counter() - t0
+        times["dict_lookup_state"] += time.perf_counter() - t0
 
         t0 = time.perf_counter()
         if key in hierarchical_preds:
             predictions["hierarchical_v2"] = hierarchical_preds[key]
-        times['dict_lookup_hier'] += time.perf_counter() - t0
+        times["dict_lookup_hier"] += time.perf_counter() - t0
 
         t0 = time.perf_counter()
         if key in xgboost_preds:
             predictions["xgboost_v2"] = xgboost_preds[key]
-        times['dict_lookup_xgb'] += time.perf_counter() - t0
+        times["dict_lookup_xgb"] += time.perf_counter() - t0
 
         t0 = time.perf_counter()
         if key in informative_preds:
             predictions["informative_priors_v2"] = informative_preds[key]
-        times['dict_lookup_info'] += time.perf_counter() - t0
+        times["dict_lookup_info"] += time.perf_counter() - t0
 
         # Skip if no predictions
         if len(predictions) == 0:
@@ -182,58 +178,63 @@ def profile_assembly_loop(ensemble, games):
         stds = []
         active_weights = []
 
-        for model_name in ["state_space_v2", "hierarchical_v2", "xgboost_v2", "informative_priors_v2"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "xgboost_v2",
+            "informative_priors_v2",
+        ]:
             if model_name in predictions:
                 t0 = time.perf_counter()
                 means.append(predictions[model_name][0])
-                times['list_append_means'] += time.perf_counter() - t0
+                times["list_append_means"] += time.perf_counter() - t0
 
                 t0 = time.perf_counter()
                 stds.append(predictions[model_name][1])
-                times['list_append_stds'] += time.perf_counter() - t0
+                times["list_append_stds"] += time.perf_counter() - t0
 
                 t0 = time.perf_counter()
                 active_weights.append(ensemble.weights[model_name])
-                times['list_append_weights'] += time.perf_counter() - t0
+                times["list_append_weights"] += time.perf_counter() - t0
 
         # Array creation
         t0 = time.perf_counter()
         means = np.array(means)
         stds = np.array(stds)
         active_weights = np.array(active_weights)
-        times['array_creation'] += time.perf_counter() - t0
+        times["array_creation"] += time.perf_counter() - t0
 
         # Weight normalization
         t0 = time.perf_counter()
         active_weights /= active_weights.sum()
-        times['weight_normalize'] += time.perf_counter() - t0
+        times["weight_normalize"] += time.perf_counter() - t0
 
         # Ensemble mean
         t0 = time.perf_counter()
         ensemble_mean = np.sum(active_weights * means)
-        times['ensemble_mean_calc'] += time.perf_counter() - t0
+        times["ensemble_mean_calc"] += time.perf_counter() - t0
 
         # Variance calculation
         t0 = time.perf_counter()
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
-        times['variance_calc'] += time.perf_counter() - t0
+        times["variance_calc"] += time.perf_counter() - t0
 
         t0 = time.perf_counter()
         ensemble_std_raw = np.sqrt(ensemble_var)
-        times['sqrt_calc'] += time.perf_counter() - t0
+        times["sqrt_calc"] += time.perf_counter() - t0
 
         # Temperature scaling
         t0 = time.perf_counter()
         ensemble_std = ensemble_std_raw * np.sqrt(ensemble.temperature)
-        times['temp_scaling'] += time.perf_counter() - t0
+        times["temp_scaling"] += time.perf_counter() - t0
 
         # Quantile calculation
         t0 = time.perf_counter()
         quantile_10 = ensemble_mean - 1.645 * ensemble_std
         quantile_90 = ensemble_mean + 1.645 * ensemble_std
-        times['quantile_calc'] += time.perf_counter() - t0
+        times["quantile_calc"] += time.perf_counter() - t0
 
         # Result dict creation
         t0 = time.perf_counter()
@@ -246,11 +247,11 @@ def profile_assembly_loop(ensemble, games):
             "quantile_10": quantile_10,
             "quantile_90": quantile_90,
         }
-        times['result_dict_creation'] += time.perf_counter() - t0
+        times["result_dict_creation"] += time.perf_counter() - t0
 
         t0 = time.perf_counter()
         results.append(result)
-        times['result_append'] += time.perf_counter() - t0
+        times["result_append"] += time.perf_counter() - t0
 
     loop_time = (time.perf_counter() - loop_start) * 1000
 
@@ -288,9 +289,9 @@ def profile_assembly_loop(ensemble, games):
 
 def profile_memory_allocation(ensemble, games):
     """Profile memory allocation patterns."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("MEMORY ALLOCATION PROFILING")
-    print("="*80)
+    print("=" * 80)
 
     tracemalloc.start()
 
@@ -338,7 +339,12 @@ def profile_memory_allocation(ensemble, games):
         means = []
         stds = []
         active_weights = []
-        for model_name in ["state_space_v2", "hierarchical_v2", "xgboost_v2", "informative_priors_v2"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "xgboost_v2",
+            "informative_priors_v2",
+        ]:
             if model_name in predictions:
                 means.append(predictions[model_name][0])
                 stds.append(predictions[model_name][1])
@@ -350,18 +356,20 @@ def profile_memory_allocation(ensemble, games):
         active_weights /= active_weights.sum()
 
         ensemble_mean = np.sum(active_weights * means)
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
         ensemble_std = np.sqrt(ensemble_var) * np.sqrt(ensemble.temperature)
 
-        results.append({
-            "player_id": game["player_id"],
-            "season": game["season"],
-            "week": game["week"],
-            "ensemble_mean": ensemble_mean,
-            "ensemble_std": ensemble_std,
-        })
+        results.append(
+            {
+                "player_id": game["player_id"],
+                "season": game["season"],
+                "week": game["week"],
+                "ensemble_mean": ensemble_mean,
+                "ensemble_std": ensemble_std,
+            }
+        )
 
     mem_after_loop = tracemalloc.get_traced_memory()
 
@@ -376,11 +384,21 @@ def profile_memory_allocation(ensemble, games):
 
     print("\nMemory usage breakdown:")
     print("-" * 80)
-    print(f"After state-space: {mb(mem_after_state_space[0]):8.2f} MB (peak: {mb(mem_after_state_space[1]):8.2f} MB)")
-    print(f"After hierarchical: {mb(mem_after_hierarchical[0]):8.2f} MB (peak: {mb(mem_after_hierarchical[1]):8.2f} MB)")
-    print(f"After XGBoost: {mb(mem_after_xgboost[0]):8.2f} MB (peak: {mb(mem_after_xgboost[1]):8.2f} MB)")
-    print(f"After informative: {mb(mem_after_informative[0]):8.2f} MB (peak: {mb(mem_after_informative[1]):8.2f} MB)")
-    print(f"After assembly loop: {mb(mem_after_loop[0]):8.2f} MB (peak: {mb(mem_after_loop[1]):8.2f} MB)")
+    print(
+        f"After state-space: {mb(mem_after_state_space[0]):8.2f} MB (peak: {mb(mem_after_state_space[1]):8.2f} MB)"
+    )
+    print(
+        f"After hierarchical: {mb(mem_after_hierarchical[0]):8.2f} MB (peak: {mb(mem_after_hierarchical[1]):8.2f} MB)"
+    )
+    print(
+        f"After XGBoost: {mb(mem_after_xgboost[0]):8.2f} MB (peak: {mb(mem_after_xgboost[1]):8.2f} MB)"
+    )
+    print(
+        f"After informative: {mb(mem_after_informative[0]):8.2f} MB (peak: {mb(mem_after_informative[1]):8.2f} MB)"
+    )
+    print(
+        f"After assembly loop: {mb(mem_after_loop[0]):8.2f} MB (peak: {mb(mem_after_loop[1]):8.2f} MB)"
+    )
     print(f"After DataFrame: {mb(mem_after_df[0]):8.2f} MB (peak: {mb(mem_after_df[1]):8.2f} MB)")
     print("-" * 80)
 
@@ -393,9 +411,9 @@ def profile_memory_allocation(ensemble, games):
 
 def profile_with_cprofile(ensemble, games):
     """Use cProfile for comprehensive profiling."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("cProfile COMPREHENSIVE PROFILING")
-    print("="*80)
+    print("=" * 80)
 
     profiler = cProfile.Profile()
     profiler.enable()
@@ -409,7 +427,7 @@ def profile_with_cprofile(ensemble, games):
     s = io.StringIO()
     ps = pstats.Stats(profiler, stream=s)
     ps.strip_dirs()
-    ps.sort_stats('cumulative')
+    ps.sort_stats("cumulative")
     ps.print_stats(30)  # Top 30 functions
 
     print("\nTop 30 functions by cumulative time:")
@@ -420,9 +438,9 @@ def analyze_vectorization_opportunities(ensemble, games):
     """
     Analyze whether the assembly loop can be vectorized.
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("VECTORIZATION OPPORTUNITY ANALYSIS")
-    print("="*80)
+    print("=" * 80)
 
     # Get batch predictions
     state_space_preds = ensemble._get_state_space_predictions_batch(games)
@@ -447,20 +465,20 @@ def analyze_vectorization_opportunities(ensemble, games):
     complete_games = 0
     incomplete_games = 0
     missing_models = {
-        'state_space_v2': 0,
-        'hierarchical_v2': 0,
-        'xgboost_v2': 0,
-        'informative_priors_v2': 0,
+        "state_space_v2": 0,
+        "hierarchical_v2": 0,
+        "xgboost_v2": 0,
+        "informative_priors_v2": 0,
     }
 
     for game in games:
         key = (game["player_id"], game["season"], game["week"])
 
         has_all = (
-            key in state_space_preds and
-            key in hierarchical_preds and
-            key in xgboost_preds and
-            key in informative_preds
+            key in state_space_preds
+            and key in hierarchical_preds
+            and key in xgboost_preds
+            and key in informative_preds
         )
 
         if has_all:
@@ -468,17 +486,21 @@ def analyze_vectorization_opportunities(ensemble, games):
         else:
             incomplete_games += 1
             if key not in state_space_preds:
-                missing_models['state_space_v2'] += 1
+                missing_models["state_space_v2"] += 1
             if key not in hierarchical_preds:
-                missing_models['hierarchical_v2'] += 1
+                missing_models["hierarchical_v2"] += 1
             if key not in xgboost_preds:
-                missing_models['xgboost_v2'] += 1
+                missing_models["xgboost_v2"] += 1
             if key not in informative_preds:
-                missing_models['informative_priors_v2'] += 1
+                missing_models["informative_priors_v2"] += 1
 
     print("\nGame prediction coverage:")
-    print(f"  Complete (all 4 models): {complete_games}/{len(games)} ({complete_games/len(games)*100:.1f}%)")
-    print(f"  Incomplete (missing ≥1): {incomplete_games}/{len(games)} ({incomplete_games/len(games)*100:.1f}%)")
+    print(
+        f"  Complete (all 4 models): {complete_games}/{len(games)} ({complete_games/len(games)*100:.1f}%)"
+    )
+    print(
+        f"  Incomplete (missing ≥1): {incomplete_games}/{len(games)} ({incomplete_games/len(games)*100:.1f}%)"
+    )
 
     if incomplete_games > 0:
         print("\nMissing predictions by model:")
@@ -492,31 +514,21 @@ def analyze_vectorization_opportunities(ensemble, games):
         print("  ✅ Can create pre-allocated arrays for all games")
         print("  ✅ Can eliminate assembly loop entirely")
     else:
-        print(f"  ⚠️  Only {complete_games/len(games)*100:.1f}% of games complete - PARTIAL VECTORIZATION ONLY")
+        print(
+            f"  ⚠️  Only {complete_games/len(games)*100:.1f}% of games complete - PARTIAL VECTORIZATION ONLY"
+        )
         print("  ⚠️  Must handle missing predictions (conditional logic)")
         print("  ⚠️  Loop required for ragged data structure")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Profile batch prediction compute time"
-    )
+    parser = argparse.ArgumentParser(description="Profile batch prediction compute time")
     parser.add_argument(
-        "--n-games",
-        type=int,
-        default=50,
-        help="Number of games to test (default: 50)"
+        "--n-games", type=int, default=50, help="Number of games to test (default: 50)"
     )
+    parser.add_argument("--season", type=int, default=2024, help="Season to test (default: 2024)")
     parser.add_argument(
-        "--season",
-        type=int,
-        default=2024,
-        help="Season to test (default: 2024)"
-    )
-    parser.add_argument(
-        "--skip-cprofile",
-        action="store_true",
-        help="Skip cProfile (verbose output)"
+        "--skip-cprofile", action="store_true", help="Skip cProfile (verbose output)"
     )
 
     args = parser.parse_args()
@@ -533,9 +545,9 @@ def main():
     print("Models loaded\n")
 
     # Run profiling
-    print("="*80)
+    print("=" * 80)
     print("BATCH PREDICTION COMPUTE TIME PROFILING")
-    print("="*80)
+    print("=" * 80)
     print("Test configuration:")
     print(f"  Games: {len(games)}")
     print(f"  Season: {args.season}")
@@ -555,9 +567,9 @@ def main():
         profile_with_cprofile(ensemble, games)
 
     # Final recommendations
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("OPTIMIZATION RECOMMENDATIONS")
-    print("="*80)
+    print("=" * 80)
 
     # Analyze bottlenecks
     sorted_times = sorted(times.items(), key=lambda x: x[1], reverse=True)
@@ -573,10 +585,10 @@ def main():
 
     # Check if dictionary lookups are slow
     dict_lookup_time = (
-        times['dict_lookup_state'] +
-        times['dict_lookup_hier'] +
-        times['dict_lookup_xgb'] +
-        times['dict_lookup_info']
+        times["dict_lookup_state"]
+        + times["dict_lookup_hier"]
+        + times["dict_lookup_xgb"]
+        + times["dict_lookup_info"]
     ) * 1000
 
     if dict_lookup_time > loop_time * 0.1:
@@ -587,7 +599,7 @@ def main():
         print("   Implementation: 30 minutes")
 
     # Check if array creation is slow
-    if times['array_creation'] * 1000 > loop_time * 0.05:
+    if times["array_creation"] * 1000 > loop_time * 0.05:
         print("\n2. PRE-ALLOCATE ARRAYS (Priority: MEDIUM)")
         print(f"   Current: {times['array_creation']*1000:.2f}ms")
         print("   Strategy: Create result arrays upfront, fill in-place")
@@ -602,7 +614,7 @@ def main():
         print("   Expected speedup: 20-30%")
         print("   Implementation: 15 minutes")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
 if __name__ == "__main__":

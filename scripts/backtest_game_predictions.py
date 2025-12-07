@@ -208,9 +208,7 @@ class SimpleGamePredictor:
         ) / 2 + self.home_field_advantage
 
         # Away score = away offense vs home defense
-        predicted_away_score = (
-            away_stats["avg_points_for"] + home_stats["avg_points_against"]
-        ) / 2
+        predicted_away_score = (away_stats["avg_points_for"] + home_stats["avg_points_against"]) / 2
 
         # Derive spread and total
         predicted_spread = predicted_home_score - predicted_away_score  # Positive = home favored
@@ -279,9 +277,7 @@ class GamePredictionBacktest:
         self.conn = get_db_connection()
         self.predictor = SimpleGamePredictor(self.conn)
 
-        logger.info(
-            f"Initialized GamePredictionBacktest: seasons {start_season}-{end_season}"
-        )
+        logger.info(f"Initialized GamePredictionBacktest: seasons {start_season}-{end_season}")
 
     def _fetch_completed_games(self) -> list[dict[str, Any]]:
         """
@@ -441,10 +437,18 @@ class GamePredictionBacktest:
             "total_std": float(prediction["total_std"]),
             "home_score_std": float(prediction["home_score_std"]),
             "away_score_std": float(prediction["away_score_std"]),
-            "sportsbook_spread": float(game["spread_close"]) if game["spread_close"] is not None else None,
-            "sportsbook_total": float(game["total_close"]) if game["total_close"] is not None else None,
-            "sportsbook_home_ml": float(game["home_moneyline"]) if game["home_moneyline"] is not None else None,
-            "sportsbook_away_ml": float(game["away_moneyline"]) if game["away_moneyline"] is not None else None,
+            "sportsbook_spread": (
+                float(game["spread_close"]) if game["spread_close"] is not None else None
+            ),
+            "sportsbook_total": (
+                float(game["total_close"]) if game["total_close"] is not None else None
+            ),
+            "sportsbook_home_ml": (
+                float(game["home_moneyline"]) if game["home_moneyline"] is not None else None
+            ),
+            "sportsbook_away_ml": (
+                float(game["away_moneyline"]) if game["away_moneyline"] is not None else None
+            ),
             "spread_edge": spread_edge,
             "total_edge": total_edge,
             "ml_edge": ml_edge,
@@ -558,9 +562,7 @@ class GamePredictionBacktest:
             except Exception as e:
                 # Rollback failed transaction
                 self.conn.rollback()
-                logger.error(
-                    f"Error processing game {game['game_id']}: {e}", exc_info=True
-                )
+                logger.error(f"Error processing game {game['game_id']}: {e}", exc_info=True)
                 continue
 
         logger.info(f"Backtest complete: {len(results)} games processed")
@@ -589,11 +591,7 @@ class GamePredictionBacktest:
 
         # Over/Under rate (only games with totals)
         total_correct_df = df[df["total_correct"].notna()]
-        ou_rate = (
-            total_correct_df["total_correct"].mean()
-            if len(total_correct_df) > 0
-            else None
-        )
+        ou_rate = total_correct_df["total_correct"].mean() if len(total_correct_df) > 0 else None
 
         # Edge analysis (games with >4 point edge - optimized via grid search Nov 27, 2025)
         # Grid search results: 2pt=36% ROI, 4pt=48% ROI, 5.5pt=58% ROI
@@ -688,27 +686,23 @@ class GamePredictionBacktest:
             "| Metric | Value | Target | Status |",
             "|--------|-------|--------|--------|",
             f"| Spread MAE | {metrics['overall']['spread_mae']:.2f} pts | <10 pts | "
-            + ("✅ PASS" if metrics['overall']['spread_mae'] < 10 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["spread_mae"] < 10 else "❌ FAIL")
             + " |",
             f"| Total MAE | {metrics['overall']['total_mae']:.2f} pts | <12 pts | "
-            + ("✅ PASS" if metrics['overall']['total_mae'] < 12 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["total_mae"] < 12 else "❌ FAIL")
             + " |",
             f"| Brier Score | {metrics['overall']['brier_score']:.4f} | <0.25 | "
-            + ("✅ PASS" if metrics['overall']['brier_score'] < 0.25 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["brier_score"] < 0.25 else "❌ FAIL")
             + " |",
             f"| Cover Rate | {metrics['overall']['cover_rate']:.1%} | >52% | "
-            + ("✅ PASS" if metrics['overall']['cover_rate'] > 0.52 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["cover_rate"] > 0.52 else "❌ FAIL")
             + " |",
         ]
 
         if metrics["overall"]["ou_rate"] is not None:
             report_lines.append(
                 f"| O/U Rate | {metrics['overall']['ou_rate']:.1%} | >52% | "
-                + (
-                    "✅ PASS"
-                    if metrics["overall"]["ou_rate"] > 0.52
-                    else "❌ FAIL"
-                )
+                + ("✅ PASS" if metrics["overall"]["ou_rate"] > 0.52 else "❌ FAIL")
                 + " |"
             )
 
@@ -746,7 +740,7 @@ class GamePredictionBacktest:
                     f"- **Estimated ROI:** {metrics['edge_analysis']['estimated_roi']:+.1f}% "
                     + (
                         "(✅ Profitable!)"
-                        if metrics['edge_analysis']['estimated_roi'] > 0
+                        if metrics["edge_analysis"]["estimated_roi"] > 0
                         else "(❌ Unprofitable)"
                     ),
                 ]

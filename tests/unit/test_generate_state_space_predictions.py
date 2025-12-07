@@ -23,7 +23,6 @@ def test_generate_game_id_basic():
     assert result is not None
 
 
-
 def test_generate_game_id_edge_cases():
     """Test generate_game_id: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_generate_game_id_edge_cases():
     assert result is not None
 
 
-
 def test_generate_game_id_error_handling():
     """Test generate_game_id error handling."""
     with pytest.raises(ValueError):
         generate_game_id(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_generate_game_id_property_idempotent(self, row):
 
     # Assert property
     assert generate_game_id(row) == result, "idempotent violated"
-
 
 
 def test_generate_predictions_basic():
@@ -67,7 +63,6 @@ def test_generate_predictions_basic():
     assert result is not None
 
 
-
 def test_generate_predictions_edge_cases():
     """Test generate_predictions: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_generate_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_generate_predictions_error_handling():
     """Test generate_predictions error handling."""
     with pytest.raises(ValueError):
         generate_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_generate_predictions_property_idempotent(self, model, games_df, output_
 
     # Assert property
     assert generate_predictions(model, games_df, output_path) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -111,7 +103,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -124,9 +115,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -25,7 +25,7 @@ Date: November 12, 2025
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
 import json
@@ -45,17 +45,17 @@ from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 from py.online.incremental_xgboost import IncrementalXGBoost
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-sns.set_style('whitegrid')
+sns.set_style("whitegrid")
 
 
 # =============================================================================
 # Data Loading
 # =============================================================================
+
 
 def load_player_stats(
     seasons: list[int],
@@ -140,43 +140,53 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info(f"Starting with {len(df)} records")
 
     df = df.copy()
-    df = df.sort_values(['player_id', 'kickoff'])
+    df = df.sort_values(["player_id", "kickoff"])
 
     # Lag features (rolling averages)
     for window in [3, 5, 10]:
-        df[f'passing_yards_L{window}'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(window).mean()
-        df[f'attempts_L{window}'] = df.groupby('player_id')['attempts'].shift(1).rolling(window).mean()
-        df[f'completions_L{window}'] = df.groupby('player_id')['completions'].shift(1).rolling(window).mean()
+        df[f"passing_yards_L{window}"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(window).mean()
+        )
+        df[f"attempts_L{window}"] = (
+            df.groupby("player_id")["attempts"].shift(1).rolling(window).mean()
+        )
+        df[f"completions_L{window}"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(window).mean()
+        )
 
     # Lagged completion percentage (no target leakage)
-    df['completion_pct_L3'] = (
-        df.groupby('player_id')['completions'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["completion_pct_L3"] = (
+        df.groupby("player_id")["completions"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Lagged yards per attempt
-    df['yards_per_attempt_L3'] = (
-        df.groupby('player_id')['passing_yards'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["yards_per_attempt_L3"] = (
+        df.groupby("player_id")["passing_yards"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Game context features
-    df['home_favorite'] = (df['spread_close'] < 0).astype(int)
-    df['high_total'] = (df['total_close'] > 47).astype(int)
-    df['spread_abs'] = df['spread_close'].abs()
+    df["home_favorite"] = (df["spread_close"] < 0).astype(int)
+    df["high_total"] = (df["total_close"] > 47).astype(int)
+    df["spread_abs"] = df["spread_close"].abs()
 
     logger.info(f"Before dropna: {len(df)} records")
 
     # Drop rows with NaN in critical features
-    critical_features = ['passing_yards_L3', 'attempts_L3', 'completions_L3']
+    critical_features = ["passing_yards_L3", "attempts_L3", "completions_L3"]
     df = df.dropna(subset=critical_features)
 
     # Fill remaining NaN with median
-    df['completion_pct_L3'] = df['completion_pct_L3'].fillna(df['completion_pct_L3'].median())
-    df['yards_per_attempt_L3'] = df['yards_per_attempt_L3'].fillna(df['yards_per_attempt_L3'].median())
+    df["completion_pct_L3"] = df["completion_pct_L3"].fillna(df["completion_pct_L3"].median())
+    df["yards_per_attempt_L3"] = df["yards_per_attempt_L3"].fillna(
+        df["yards_per_attempt_L3"].median()
+    )
 
     logger.info(f"After dropna: {len(df)} records")
-    logger.info(f"Data retention: {len(df) / (len(df) + df['passing_yards_L3'].isna().sum()) * 100:.1f}%")
+    logger.info(
+        f"Data retention: {len(df) / (len(df) + df['passing_yards_L3'].isna().sum()) * 100:.1f}%"
+    )
 
     return df
 
@@ -184,6 +194,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 # =============================================================================
 # Model Training & Evaluation
 # =============================================================================
+
 
 def train_static_baseline(
     X_train: pd.DataFrame,
@@ -211,7 +222,7 @@ def train_static_baseline(
         subsample=0.8,
         colsample_bytree=0.8,
         random_state=42,
-        objective='reg:squarederror',
+        objective="reg:squarederror",
     )
 
     model.fit(X_scaled, y_train, verbose=False)
@@ -249,7 +260,7 @@ def prequential_evaluation(
     for i, row in test_data.iterrows():
         # Extract features and target
         x = row[feature_cols].to_dict()
-        y = row['passing_yards']
+        y = row["passing_yards"]
 
         # Predict
         pred = model.predict_one(x)
@@ -260,13 +271,13 @@ def prequential_evaluation(
         # Learn
         model.learn_one(x, y)
 
-        if (len(predictions) % 100 == 0):
+        if len(predictions) % 100 == 0:
             mae = np.mean(errors[-100:])
             logger.info(f"  Sample {len(predictions)}: Rolling MAE (100) = {mae:.2f} yards")
 
     # Calculate metrics
     mae = np.mean(errors)
-    rmse = np.sqrt(np.mean([(y - p)**2 for y, p in zip(actuals, predictions)]))
+    rmse = np.sqrt(np.mean([(y - p) ** 2 for y, p in zip(actuals, predictions)]))
     median_ae = np.median(errors)
 
     logger.info(f"\n{model_type} Results:")
@@ -275,13 +286,13 @@ def prequential_evaluation(
     logger.info(f"  Median AE: {median_ae:.2f} yards")
 
     return {
-        'model_type': model_type,
-        'mae': mae,
-        'rmse': rmse,
-        'median_ae': median_ae,
-        'predictions': predictions,
-        'actuals': actuals,
-        'errors': errors,
+        "model_type": model_type,
+        "mae": mae,
+        "rmse": rmse,
+        "median_ae": median_ae,
+        "predictions": predictions,
+        "actuals": actuals,
+        "errors": errors,
     }
 
 
@@ -306,14 +317,14 @@ def evaluate_static_baseline(
     logger.info("\nEvaluating static XGBoost baseline...")
 
     X_test = test_data[feature_cols].values
-    y_test = test_data['passing_yards'].values
+    y_test = test_data["passing_yards"].values
 
     X_scaled = scaler.transform(X_test)
     predictions = model.predict(X_scaled)
 
     errors = np.abs(y_test - predictions)
     mae = np.mean(errors)
-    rmse = np.sqrt(np.mean((y_test - predictions)**2))
+    rmse = np.sqrt(np.mean((y_test - predictions) ** 2))
     median_ae = np.median(errors)
 
     logger.info("Static XGBoost Results:")
@@ -322,19 +333,20 @@ def evaluate_static_baseline(
     logger.info(f"  Median AE: {median_ae:.2f} yards")
 
     return {
-        'model_type': 'Static XGBoost',
-        'mae': mae,
-        'rmse': rmse,
-        'median_ae': median_ae,
-        'predictions': predictions.tolist(),
-        'actuals': y_test.tolist(),
-        'errors': errors.tolist(),
+        "model_type": "Static XGBoost",
+        "mae": mae,
+        "rmse": rmse,
+        "median_ae": median_ae,
+        "predictions": predictions.tolist(),
+        "actuals": y_test.tolist(),
+        "errors": errors.tolist(),
     }
 
 
 # =============================================================================
 # Visualization
 # =============================================================================
+
 
 def plot_mae_comparison(
     results: dict[str, dict],
@@ -350,12 +362,12 @@ def plot_mae_comparison(
     logger.info("\nGenerating MAE comparison plot...")
 
     models = list(results.keys())
-    maes = [results[m]['mae'] for m in models]
+    maes = [results[m]["mae"] for m in models]
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
-    bars = ax.bar(models, maes, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c"]
+    bars = ax.bar(models, maes, color=colors, alpha=0.8, edgecolor="black", linewidth=1.5)
 
     # Add value labels on bars
     for bar, mae in zip(bars, maes):
@@ -363,24 +375,31 @@ def plot_mae_comparison(
         ax.text(
             bar.get_x() + bar.get_width() / 2,
             height + 1,
-            f'{mae:.2f}',
-            ha='center',
-            va='bottom',
+            f"{mae:.2f}",
+            ha="center",
+            va="bottom",
             fontsize=12,
-            fontweight='bold'
+            fontweight="bold",
         )
 
     # Add horizontal line at static baseline
-    static_mae = results['Static XGBoost']['mae']
-    ax.axhline(static_mae, color='red', linestyle='--', linewidth=2, alpha=0.7, label=f'Static Baseline ({static_mae:.2f})')
+    static_mae = results["Static XGBoost"]["mae"]
+    ax.axhline(
+        static_mae,
+        color="red",
+        linestyle="--",
+        linewidth=2,
+        alpha=0.7,
+        label=f"Static Baseline ({static_mae:.2f})",
+    )
 
-    ax.set_ylabel('Mean Absolute Error (yards)', fontsize=12, fontweight='bold')
-    ax.set_title('Model Comparison: MAE on 2024 Season', fontsize=14, fontweight='bold')
+    ax.set_ylabel("Mean Absolute Error (yards)", fontsize=12, fontweight="bold")
+    ax.set_title("Model Comparison: MAE on 2024 Season", fontsize=14, fontweight="bold")
     ax.legend(fontsize=10)
-    ax.grid(axis='y', alpha=0.3)
+    ax.grid(axis="y", alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig(output_dir / 'mae_comparison.png', dpi=300, bbox_inches='tight')
+    plt.savefig(output_dir / "mae_comparison.png", dpi=300, bbox_inches="tight")
     logger.info(f"  Saved: {output_dir / 'mae_comparison.png'}")
 
 
@@ -400,19 +419,31 @@ def plot_error_distributions(
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     for i, (model_name, result) in enumerate(results.items()):
-        errors = result['errors']
+        errors = result["errors"]
 
-        axes[i].hist(errors, bins=30, color=f'C{i}', alpha=0.7, edgecolor='black')
-        axes[i].axvline(result['mae'], color='red', linestyle='--', linewidth=2, label=f'MAE: {result["mae"]:.2f}')
-        axes[i].axvline(result['median_ae'], color='green', linestyle='--', linewidth=2, label=f'Median: {result["median_ae"]:.2f}')
-        axes[i].set_xlabel('Absolute Error (yards)', fontsize=11)
-        axes[i].set_ylabel('Frequency', fontsize=11)
-        axes[i].set_title(model_name, fontsize=12, fontweight='bold')
+        axes[i].hist(errors, bins=30, color=f"C{i}", alpha=0.7, edgecolor="black")
+        axes[i].axvline(
+            result["mae"],
+            color="red",
+            linestyle="--",
+            linewidth=2,
+            label=f'MAE: {result["mae"]:.2f}',
+        )
+        axes[i].axvline(
+            result["median_ae"],
+            color="green",
+            linestyle="--",
+            linewidth=2,
+            label=f'Median: {result["median_ae"]:.2f}',
+        )
+        axes[i].set_xlabel("Absolute Error (yards)", fontsize=11)
+        axes[i].set_ylabel("Frequency", fontsize=11)
+        axes[i].set_title(model_name, fontsize=12, fontweight="bold")
         axes[i].legend(fontsize=9)
-        axes[i].grid(axis='y', alpha=0.3)
+        axes[i].grid(axis="y", alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig(output_dir / 'error_distributions.png', dpi=300, bbox_inches='tight')
+    plt.savefig(output_dir / "error_distributions.png", dpi=300, bbox_inches="tight")
     logger.info(f"  Saved: {output_dir / 'error_distributions.png'}")
 
 
@@ -432,21 +463,23 @@ def plot_predictions_vs_actuals(
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     for i, (model_name, result) in enumerate(results.items()):
-        predictions = result['predictions']
-        actuals = result['actuals']
+        predictions = result["predictions"]
+        actuals = result["actuals"]
 
-        axes[i].scatter(actuals, predictions, alpha=0.5, s=20, color=f'C{i}')
-        axes[i].plot([0, 500], [0, 500], 'r--', linewidth=2, label='Perfect Prediction')
-        axes[i].set_xlabel('Actual Passing Yards', fontsize=11)
-        axes[i].set_ylabel('Predicted Passing Yards', fontsize=11)
-        axes[i].set_title(f'{model_name}\n(MAE: {result["mae"]:.2f})', fontsize=12, fontweight='bold')
+        axes[i].scatter(actuals, predictions, alpha=0.5, s=20, color=f"C{i}")
+        axes[i].plot([0, 500], [0, 500], "r--", linewidth=2, label="Perfect Prediction")
+        axes[i].set_xlabel("Actual Passing Yards", fontsize=11)
+        axes[i].set_ylabel("Predicted Passing Yards", fontsize=11)
+        axes[i].set_title(
+            f'{model_name}\n(MAE: {result["mae"]:.2f})', fontsize=12, fontweight="bold"
+        )
         axes[i].legend(fontsize=9)
         axes[i].grid(alpha=0.3)
         axes[i].set_xlim([0, 500])
         axes[i].set_ylim([0, 500])
 
     plt.tight_layout()
-    plt.savefig(output_dir / 'predictions_vs_actuals.png', dpi=300, bbox_inches='tight')
+    plt.savefig(output_dir / "predictions_vs_actuals.png", dpi=300, bbox_inches="tight")
     logger.info(f"  Saved: {output_dir / 'predictions_vs_actuals.png'}")
 
 
@@ -454,24 +487,30 @@ def plot_predictions_vs_actuals(
 # Main
 # =============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Validate hybrid static-incremental XGBoost')
-    parser.add_argument('--train-seasons', nargs='+', type=int, default=[2018, 2019, 2020, 2021, 2022, 2023],
-                       help='Training seasons (default: 2018-2023)')
-    parser.add_argument('--test-season', type=int, default=2024,
-                       help='Test season (default: 2024)')
-    parser.add_argument('--output-dir', type=str, default='results/hybrid_validation',
-                       help='Output directory for results')
-    parser.add_argument('--db-host', type=str, default='localhost',
-                       help='Database host')
-    parser.add_argument('--db-port', type=int, default=5544,
-                       help='Database port')
-    parser.add_argument('--db-name', type=str, default='devdb01',
-                       help='Database name')
-    parser.add_argument('--db-user', type=str, default='dro',
-                       help='Database user')
-    parser.add_argument('--db-password', type=str, default='sicillionbillions',
-                       help='Database password')
+    parser = argparse.ArgumentParser(description="Validate hybrid static-incremental XGBoost")
+    parser.add_argument(
+        "--train-seasons",
+        nargs="+",
+        type=int,
+        default=[2018, 2019, 2020, 2021, 2022, 2023],
+        help="Training seasons (default: 2018-2023)",
+    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season (default: 2024)")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="results/hybrid_validation",
+        help="Output directory for results",
+    )
+    parser.add_argument("--db-host", type=str, default="localhost", help="Database host")
+    parser.add_argument("--db-port", type=int, default=5544, help="Database port")
+    parser.add_argument("--db-name", type=str, default="devdb01", help="Database name")
+    parser.add_argument("--db-user", type=str, default="dro", help="Database user")
+    parser.add_argument(
+        "--db-password", type=str, default="sicillionbillions", help="Database password"
+    )
 
     args = parser.parse_args()
 
@@ -480,16 +519,16 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     db_params = {
-        'host': args.db_host,
-        'port': args.db_port,
-        'dbname': args.db_name,
-        'user': args.db_user,
-        'password': args.db_password,
+        "host": args.db_host,
+        "port": args.db_port,
+        "dbname": args.db_name,
+        "user": args.db_user,
+        "password": args.db_password,
     }
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("HYBRID STATIC-INCREMENTAL XGBOOST VALIDATION")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Load data
     logger.info("\n[1/5] Loading data...")
@@ -503,17 +542,26 @@ def main():
 
     # Define feature columns
     feature_cols = [
-        'passing_yards_L3', 'passing_yards_L5', 'passing_yards_L10',
-        'attempts_L3', 'attempts_L5', 'attempts_L10',
-        'completions_L3', 'completions_L5', 'completions_L10',
-        'completion_pct_L3', 'yards_per_attempt_L3',
-        'home_favorite', 'high_total', 'spread_abs',
+        "passing_yards_L3",
+        "passing_yards_L5",
+        "passing_yards_L10",
+        "attempts_L3",
+        "attempts_L5",
+        "attempts_L10",
+        "completions_L3",
+        "completions_L5",
+        "completions_L10",
+        "completion_pct_L3",
+        "yards_per_attempt_L3",
+        "home_favorite",
+        "high_total",
+        "spread_abs",
     ]
 
     X_train = train_data[feature_cols]
-    y_train = train_data['passing_yards']
+    y_train = train_data["passing_yards"]
     X_test = test_data[feature_cols]
-    y_test = test_data['passing_yards']
+    y_test = test_data["passing_yards"]
 
     logger.info(f"\nTrain samples: {len(X_train)}")
     logger.info(f"Test samples: {len(X_test)}")
@@ -536,10 +584,7 @@ def main():
         learning_rate=0.1,
     )
     incremental_results = prequential_evaluation(
-        incremental_model,
-        test_data.copy(),
-        feature_cols,
-        'Pure Incremental XGBoost'
+        incremental_model, test_data.copy(), feature_cols, "Pure Incremental XGBoost"
     )
 
     # Evaluate hybrid model
@@ -547,37 +592,34 @@ def main():
     hybrid_model = HybridStaticIncrementalXGBoost(
         static_weight=0.7,
         static_params={
-            'n_estimators': 100,
-            'max_depth': 6,
-            'learning_rate': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'random_state': 42,
+            "n_estimators": 100,
+            "max_depth": 6,
+            "learning_rate": 0.1,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "random_state": 42,
         },
         incremental_params={
-            'window_size': 150,
-            'retrain_every': 20,
-            'n_estimators': 50,
-            'max_depth': 5,
-            'learning_rate': 0.1,
-        }
+            "window_size": 150,
+            "retrain_every": 20,
+            "n_estimators": 50,
+            "max_depth": 5,
+            "learning_rate": 0.1,
+        },
     )
 
     # Train hybrid static component
     hybrid_model.fit_static(X_train, y_train)
 
     hybrid_results = prequential_evaluation(
-        hybrid_model,
-        test_data.copy(),
-        feature_cols,
-        'Hybrid (70% Static + 30% Incremental)'
+        hybrid_model, test_data.copy(), feature_cols, "Hybrid (70% Static + 30% Incremental)"
     )
 
     # Compile results
     results = {
-        'Static XGBoost': static_results,
-        'Pure Incremental': incremental_results,
-        'Hybrid (70/30)': hybrid_results,
+        "Static XGBoost": static_results,
+        "Pure Incremental": incremental_results,
+        "Hybrid (70/30)": hybrid_results,
     }
 
     # Generate plots
@@ -587,37 +629,49 @@ def main():
     plot_predictions_vs_actuals(results, output_dir)
 
     # Save results to JSON
-    output_file = output_dir / 'validation_results.json'
-    with open(output_file, 'w') as f:
+    output_file = output_dir / "validation_results.json"
+    with open(output_file, "w") as f:
         # Convert numpy arrays to lists for JSON serialization
         results_serializable = {}
         for model_name, result in results.items():
             results_serializable[model_name] = {
-                'mae': float(result['mae']),
-                'rmse': float(result['rmse']),
-                'median_ae': float(result['median_ae']),
+                "mae": float(result["mae"]),
+                "rmse": float(result["rmse"]),
+                "median_ae": float(result["median_ae"]),
             }
 
-        json.dump({
-            'timestamp': datetime.now().isoformat(),
-            'train_seasons': args.train_seasons,
-            'test_season': args.test_season,
-            'results': results_serializable,
-            'improvement_vs_static': {
-                'hybrid': (static_results['mae'] - hybrid_results['mae']) / static_results['mae'] * 100,
-                'incremental': (static_results['mae'] - incremental_results['mae']) / static_results['mae'] * 100,
-            }
-        }, f, indent=2)
+        json.dump(
+            {
+                "timestamp": datetime.now().isoformat(),
+                "train_seasons": args.train_seasons,
+                "test_season": args.test_season,
+                "results": results_serializable,
+                "improvement_vs_static": {
+                    "hybrid": (static_results["mae"] - hybrid_results["mae"])
+                    / static_results["mae"]
+                    * 100,
+                    "incremental": (static_results["mae"] - incremental_results["mae"])
+                    / static_results["mae"]
+                    * 100,
+                },
+            },
+            f,
+            indent=2,
+        )
 
     logger.info(f"\n✓ Results saved to: {output_file}")
 
     # Print summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("VALIDATION SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"\nStatic XGBoost (baseline):    {static_results['mae']:.2f} MAE")
-    logger.info(f"Pure Incremental XGBoost:     {incremental_results['mae']:.2f} MAE ({(static_results['mae'] - incremental_results['mae']) / static_results['mae'] * 100:+.1f}%)")
-    logger.info(f"Hybrid (70/30):               {hybrid_results['mae']:.2f} MAE ({(static_results['mae'] - hybrid_results['mae']) / static_results['mae'] * 100:+.1f}%)")
+    logger.info(
+        f"Pure Incremental XGBoost:     {incremental_results['mae']:.2f} MAE ({(static_results['mae'] - incremental_results['mae']) / static_results['mae'] * 100:+.1f}%)"
+    )
+    logger.info(
+        f"Hybrid (70/30):               {hybrid_results['mae']:.2f} MAE ({(static_results['mae'] - hybrid_results['mae']) / static_results['mae'] * 100:+.1f}%)"
+    )
 
     logger.info("\nExpected performance (2022-2024 average):")
     logger.info("  Static: 39.66 MAE")

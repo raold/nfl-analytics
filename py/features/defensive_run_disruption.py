@@ -23,8 +23,7 @@ from sqlalchemy import create_engine
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -43,19 +42,12 @@ class DefensiveRunDisruptionEngine:
     - Goal line/short yardage defense
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the run disruption engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_rushing_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_rushing_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load rushing plays from the database.
 
@@ -111,10 +103,7 @@ class DefensiveRunDisruptionEngine:
 
         return df
 
-    def calculate_team_run_defense_metrics(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_team_run_defense_metrics(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate team-level run defense metrics per game.
 
@@ -142,23 +131,19 @@ class DefensiveRunDisruptionEngine:
                 "game_id": game_id,
                 "defense_team": defense_team,
                 "n_rush_plays": len(group),
-
                 # Primary disruption indicators
                 "stuffed_run_rate": group["stuffed"].mean() * 100,
                 "stuffed_runs": group["stuffed"].sum(),
                 "short_gain_rate": group["short_gain"].mean() * 100,
-
                 # Performance metrics
                 "yards_per_carry_allowed": group["yards_gained"].mean(),
                 "success_rate_allowed": group["success"].mean() * 100,
                 "epa_per_rush_allowed": group["epa"].mean(),
                 "wpa_per_rush_allowed": group["wpa"].mean(),
-
                 # Big play prevention
                 "big_run_rate_allowed": group["big_run"].mean() * 100,
                 "explosive_run_rate_allowed": group["explosive_run"].mean() * 100,
                 "touchdown_rate_allowed": group["touchdown"].mean() * 100,
-
                 # Distribution metrics
                 "median_yards_allowed": group["yards_gained"].median(),
                 "max_run_allowed": group["yards_gained"].max(),
@@ -167,10 +152,10 @@ class DefensiveRunDisruptionEngine:
             # Run disruption score (composite metric)
             # Higher is better for defense
             metrics["run_disruption_score"] = (
-                metrics["stuffed_run_rate"] * 2.0 +  # Stuffs are very valuable
-                metrics["short_gain_rate"] * 1.0 +  # Short gains are good
-                -metrics["big_run_rate_allowed"] * 2.0 +  # Big runs are very bad
-                -metrics["explosive_run_rate_allowed"] * 3.0  # Explosive runs are terrible
+                metrics["stuffed_run_rate"] * 2.0  # Stuffs are very valuable
+                + metrics["short_gain_rate"] * 1.0  # Short gains are good
+                + -metrics["big_run_rate_allowed"] * 2.0  # Big runs are very bad
+                + -metrics["explosive_run_rate_allowed"] * 3.0  # Explosive runs are terrible
             )
 
             results.append(metrics)
@@ -180,10 +165,7 @@ class DefensiveRunDisruptionEngine:
 
         return df
 
-    def calculate_situational_run_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_situational_run_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate run defense effectiveness by game situation.
 
@@ -203,13 +185,13 @@ class DefensiveRunDisruptionEngine:
             plays["ydstogo"],
             bins=[0, 3, 7, 100],
             labels=["short", "medium", "long"],
-            include_lowest=True
+            include_lowest=True,
         )
 
         plays["score_situation"] = pd.cut(
             plays["score_differential"],
             bins=[-100, -7, 7, 100],
-            labels=["losing", "tied", "winning"]
+            labels=["losing", "tied", "winning"],
         )
 
         results = []
@@ -303,10 +285,7 @@ class DefensiveRunDisruptionEngine:
 
         return df
 
-    def calculate_short_yardage_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_short_yardage_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate run defense effectiveness in short yardage situations.
 
@@ -329,7 +308,9 @@ class DefensiveRunDisruptionEngine:
 
         # Add goal line indicator (assuming inside 5-yard line based on yards_gained distribution)
         # Note: We don't have yardline_100, so we can't directly identify goal line
-        short_yardage["likely_goal_line"] = (short_yardage["touchdown"] == 1) | (short_yardage["yards_gained"] < 0)
+        short_yardage["likely_goal_line"] = (short_yardage["touchdown"] == 1) | (
+            short_yardage["yards_gained"] < 0
+        )
 
         results = []
 
@@ -358,11 +339,7 @@ class DefensiveRunDisruptionEngine:
 
         return df
 
-    def add_rolling_averages(
-        self,
-        metrics: pd.DataFrame,
-        window: int = 4
-    ) -> pd.DataFrame:
+    def add_rolling_averages(self, metrics: pd.DataFrame, window: int = 4) -> pd.DataFrame:
         """
         Add rolling averages for trend analysis.
 
@@ -387,19 +364,15 @@ class DefensiveRunDisruptionEngine:
 
         for col in rolling_cols:
             if col in metrics.columns:
-                metrics[f"{col}_roll{window}"] = (
-                    metrics.groupby("defense_team")[col]
-                    .transform(lambda x: x.rolling(window, min_periods=1).mean())
+                metrics[f"{col}_roll{window}"] = metrics.groupby("defense_team")[col].transform(
+                    lambda x: x.rolling(window, min_periods=1).mean()
                 )
 
         logger.info(f"Added rolling averages for {len(rolling_cols)} metrics")
 
         return metrics
 
-    def add_percentile_ranks(
-        self,
-        metrics: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_percentile_ranks(self, metrics: pd.DataFrame) -> pd.DataFrame:
         """
         Add percentile ranks within each game week.
 
@@ -423,14 +396,12 @@ class DefensiveRunDisruptionEngine:
                 # Lower yards/carry is better for defense, so reverse the rank
                 if "allowed" in col.lower():
                     metrics[f"{col}_pctile"] = (
-                        metrics.groupby("game_id")[col]
-                        .rank(pct=True, ascending=True) * 100
+                        metrics.groupby("game_id")[col].rank(pct=True, ascending=True) * 100
                     )
                 else:
                     # Higher stuffed rate and disruption score is better
                     metrics[f"{col}_pctile"] = (
-                        metrics.groupby("game_id")[col]
-                        .rank(pct=True, ascending=False) * 100
+                        metrics.groupby("game_id")[col].rank(pct=True, ascending=False) * 100
                     )
 
         logger.info(f"Added percentile ranks for {len(rank_cols)} metrics")
@@ -438,9 +409,7 @@ class DefensiveRunDisruptionEngine:
         return metrics
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all run defense disruption features.
@@ -482,8 +451,7 @@ def main():
 
     # Generate features for 2024-2025 seasons
     team_metrics, situational_metrics, short_yardage_metrics = engine.generate_all_features(
-        start_season=2024,
-        end_season=2025
+        start_season=2024, end_season=2025
     )
 
     # Display sample statistics
@@ -495,13 +463,17 @@ def main():
     print("\n" + "=" * 70)
     print("TEAM RUN DEFENSE STATISTICS")
     print("=" * 70)
-    print(team_metrics[[
-        "stuffed_run_rate",
-        "yards_per_carry_allowed",
-        "run_disruption_score",
-        "epa_per_rush_allowed",
-        "big_run_rate_allowed"
-    ]].describe())
+    print(
+        team_metrics[
+            [
+                "stuffed_run_rate",
+                "yards_per_carry_allowed",
+                "run_disruption_score",
+                "epa_per_rush_allowed",
+                "big_run_rate_allowed",
+            ]
+        ].describe()
+    )
 
     print("\n" + "=" * 70)
     print("SITUATIONAL RUN DEFENSE SAMPLE")
@@ -517,10 +489,16 @@ def main():
     print("\n" + "=" * 70)
     print("TOP 10 RUN DEFENSES (by disruption score)")
     print("=" * 70)
-    top_run_d = team_metrics.nlargest(10, "run_disruption_score")[[
-        "defense_team", "game_id", "stuffed_run_rate", "yards_per_carry_allowed",
-        "run_disruption_score", "big_run_rate_allowed"
-    ]]
+    top_run_d = team_metrics.nlargest(10, "run_disruption_score")[
+        [
+            "defense_team",
+            "game_id",
+            "stuffed_run_rate",
+            "yards_per_carry_allowed",
+            "run_disruption_score",
+            "big_run_rate_allowed",
+        ]
+    ]
     print(top_run_d.to_string(index=False))
 
     return team_metrics, situational_metrics, short_yardage_metrics

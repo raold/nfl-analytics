@@ -95,9 +95,7 @@ class PropsPredictionResponse(BaseModel):
     confidence_interval_upper: float
     model_used: str = Field(..., description="Model version used")
     ab_group: str | None = Field(None, description="A/B test group (control/treatment)")
-    calibration_score: float | None = Field(
-        None, description="Calibration score (if available)"
-    )
+    calibration_score: float | None = Field(None, description="Calibration score (if available)")
     timestamp: str
     processing_ms: float
 
@@ -174,9 +172,7 @@ class PropsModelManager:
         try:
             from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-            self._ensemble = EnhancedEnsemble5Way(
-                db_password=self.db_config["password"]
-            )
+            self._ensemble = EnhancedEnsemble5Way(db_password=self.db_config["password"])
             self._ensemble_available = True
             logger.info("✅ EnhancedEnsemble5Way v6.1 loaded (production)")
             return self._ensemble
@@ -198,7 +194,7 @@ class PropsModelManager:
                 split_ratio=0.5,  # 50/50 split
                 test_name="ensemble_v6_vs_v6.1_dirichlet_props",
                 db_password=self.db_config["password"],
-                enabled=True
+                enabled=True,
             )
             self._ab_router_available = True
             logger.info("✅ DirichletABTestRouter loaded (A/B test enabled)")
@@ -248,7 +244,7 @@ class PropsModelManager:
                 WHERE player_id = %s
                 LIMIT 1
                 """,
-                (player_id,)
+                (player_id,),
             )
             row = cursor.fetchone()
             cursor.close()
@@ -259,12 +255,7 @@ class PropsModelManager:
             logger.warning(f"Could not lookup player name: {e}")
             return None
 
-    def _calculate_ci(
-        self,
-        mean: float,
-        std: float,
-        confidence_level: float
-    ) -> tuple:
+    def _calculate_ci(self, mean: float, std: float, confidence_level: float) -> tuple:
         """Calculate confidence interval from mean and std."""
         from scipy import stats
 
@@ -286,7 +277,7 @@ class PropsModelManager:
         season: int,
         stat_type: str = "passing_yards",
         confidence_level: float = 0.90,
-        use_ab_test: bool = True
+        use_ab_test: bool = True,
     ) -> dict | None:
         """
         Predict yards using EnhancedEnsemble5Way.
@@ -317,7 +308,7 @@ class PropsModelManager:
                         season=season,
                         week=week,
                         stat_type=stat_type,
-                        log_to_db=True
+                        log_to_db=True,
                     )
 
                     # Extract results from A/B test
@@ -334,13 +325,19 @@ class PropsModelManager:
                         "uncertainty": std,
                         "confidence_interval_lower": lower,
                         "confidence_interval_upper": upper,
-                        "model_used": f"ensemble_{model_version}_dirichlet" if result.use_dirichlet else f"ensemble_{model_version}",
+                        "model_used": (
+                            f"ensemble_{model_version}_dirichlet"
+                            if result.use_dirichlet
+                            else f"ensemble_{model_version}"
+                        ),
                         "ab_group": ab_group,
                         "calibration_score": 0.895,  # v6.1 calibration
                     }
 
                 except Exception as e:
-                    logger.warning(f"A/B router prediction failed, falling back to direct ensemble: {e}")
+                    logger.warning(
+                        f"A/B router prediction failed, falling back to direct ensemble: {e}"
+                    )
 
         # Fallback to direct ensemble (no A/B test)
         ensemble = self._load_ensemble()
@@ -355,7 +352,7 @@ class PropsModelManager:
                 season=season,
                 week=week,
                 return_components=False,
-                return_uncertainty=True
+                return_uncertainty=True,
             )
 
             mean = result.get("ensemble_mean", 0.0)
@@ -391,7 +388,7 @@ class PropsModelManager:
             week=week,
             season=season,
             stat_type="rushing_yards",
-            confidence_level=confidence_level
+            confidence_level=confidence_level,
         )
 
     def predict_receiving_yards(
@@ -403,7 +400,7 @@ class PropsModelManager:
             week=week,
             season=season,
             stat_type="receiving_yards",
-            confidence_level=confidence_level
+            confidence_level=confidence_level,
         )
 
     def predict_passing_yards(
@@ -416,12 +413,10 @@ class PropsModelManager:
             season=season,
             stat_type="passing_yards",
             confidence_level=confidence_level,
-            use_ab_test=True
+            use_ab_test=True,
         )
 
-    def predict_touchdown_probability(
-        self, player_id: str, week: int, season: int
-    ) -> dict | None:
+    def predict_touchdown_probability(self, player_id: str, week: int, season: int) -> dict | None:
         """
         Predict touchdown probability using XGBoost v1.
 
@@ -456,7 +451,7 @@ class PropsModelManager:
                 AND season = %s
                 AND week < %s
                 """,
-                (player_id, season, week)
+                (player_id, season, week),
             )
 
             row = cursor.fetchone()
@@ -475,15 +470,28 @@ class PropsModelManager:
 
             # Create feature array for XGBoost
             # Features: avg_pass_tds, avg_rush_tds, avg_rec_tds, total_tds, games
-            avg_pass_tds, avg_rush_tds, avg_rec_tds, total_pass_tds, total_rush_tds, total_rec_tds, games = row
+            (
+                avg_pass_tds,
+                avg_rush_tds,
+                avg_rec_tds,
+                total_pass_tds,
+                total_rush_tds,
+                total_rec_tds,
+                games,
+            ) = row
 
-            features = np.array([[
-                float(avg_pass_tds),
-                float(avg_rush_tds),
-                float(avg_rec_tds),
-                float(total_pass_tds + total_rush_tds + total_rec_tds),
-                float(games)
-            ]], dtype=np.float32)
+            features = np.array(
+                [
+                    [
+                        float(avg_pass_tds),
+                        float(avg_rush_tds),
+                        float(avg_rec_tds),
+                        float(total_pass_tds + total_rush_tds + total_rec_tds),
+                        float(games),
+                    ]
+                ],
+                dtype=np.float32,
+            )
 
             # Get prediction from XGBoost
             dmatrix = xgb.DMatrix(features)

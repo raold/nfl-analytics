@@ -34,8 +34,8 @@ from py.causal.synthetic_control import SyntheticControl
 from py.causal.treatment_definitions import TreatmentDefiner
 from py.causal.validation import CausalValidator
 
-warnings.filterwarnings('ignore')
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
+warnings.filterwarnings("ignore")
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -49,11 +49,11 @@ class CausalInferenceExperimentSuite:
 
         # Database connection
         self.db_params = {
-            'dbname': 'nfl_data',
-            'user': 'nfl_user',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "nfl_data",
+            "user": "nfl_user",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
         self.conn = None
 
@@ -83,60 +83,56 @@ class CausalInferenceExperimentSuite:
         # Build panel dataset
         constructor = PanelConstructor(self.conn)
         panel = constructor.build_player_game_panel(
-            start_season=2020,
-            end_season=2024,
-            position_groups=['RB']
+            start_season=2020, end_season=2024, position_groups=["RB"]
         )
 
         # Define injury treatment
         definer = TreatmentDefiner()
-        panel = definer.define_injury_treatment(
-            panel,
-            min_games_missed=1,
-            star_players_only=False
-        )
+        panel = definer.define_injury_treatment(panel, min_games_missed=1, star_players_only=False)
 
         # Estimate causal effect with DiD
-        did = DifferenceInDifferences(cluster_var='player_id')
+        did = DifferenceInDifferences(cluster_var="player_id")
         did.fit(
             df=panel,
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Test parallel trends
         pt_test = did.test_parallel_trends(
             df=panel,
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week',
-            pre_periods=3
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
+            pre_periods=3,
         )
 
         results = {
-            'experiment': 'exp1_injury_treatment_effects',
-            'causal_question': 'What is the causal effect of injury on rushing yards?',
-            'method': 'Difference-in-Differences',
-            'treatment_effect': float(did.treatment_effect_['estimate']),
-            'ci_lower': float(did.treatment_effect_['ci_lower']),
-            'ci_upper': float(did.treatment_effect_['ci_upper']),
-            'p_value': float(did.treatment_effect_['p_value']),
-            'parallel_trends_pass': pt_test['passes'],
-            'n_treated': int(panel[panel['injury_treatment'] == 1].shape[0]),
-            'n_control': int(panel[panel['injury_treatment'] == 0].shape[0]),
-            'interpretation': f"Injury causes {abs(did.treatment_effect_['estimate']):.1f} yard decrease in rushing performance",
-            'status': 'COMPLETED'
+            "experiment": "exp1_injury_treatment_effects",
+            "causal_question": "What is the causal effect of injury on rushing yards?",
+            "method": "Difference-in-Differences",
+            "treatment_effect": float(did.treatment_effect_["estimate"]),
+            "ci_lower": float(did.treatment_effect_["ci_lower"]),
+            "ci_upper": float(did.treatment_effect_["ci_upper"]),
+            "p_value": float(did.treatment_effect_["p_value"]),
+            "parallel_trends_pass": pt_test["passes"],
+            "n_treated": int(panel[panel["injury_treatment"] == 1].shape[0]),
+            "n_control": int(panel[panel["injury_treatment"] == 0].shape[0]),
+            "interpretation": f"Injury causes {abs(did.treatment_effect_['estimate']):.1f} yard decrease in rushing performance",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ Treatment effect: {did.treatment_effect_['estimate']:.2f} yards")
-        logger.info(f"✓ 95% CI: [{did.treatment_effect_['ci_lower']:.2f}, {did.treatment_effect_['ci_upper']:.2f}]")
+        logger.info(
+            f"✓ 95% CI: [{did.treatment_effect_['ci_lower']:.2f}, {did.treatment_effect_['ci_upper']:.2f}]"
+        )
         logger.info(f"✓ P-value: {did.treatment_effect_['p_value']:.4f}")
         logger.info(f"✓ Parallel trends: {'PASS' if pt_test['passes'] else 'FAIL'}")
 
-        self.results['exp1'] = results
+        self.results["exp1"] = results
         return results
 
     def exp2_coaching_change_team_performance(self):
@@ -155,70 +151,66 @@ class CausalInferenceExperimentSuite:
 
         # Build team-level panel
         constructor = PanelConstructor(self.conn)
-        panel = constructor.build_team_game_panel(
-            start_season=2020,
-            end_season=2024
-        )
+        panel = constructor.build_team_game_panel(start_season=2020, end_season=2024)
 
         # Define coaching change treatment
         definer = TreatmentDefiner()
         panel = definer.define_coaching_change_treatment(panel)
 
         # Find a treated team (e.g., Panthers 2022)
-        treated_teams = panel[panel['coaching_change_treatment'] == 1]['team'].unique()
+        treated_teams = panel[panel["coaching_change_treatment"] == 1]["team"].unique()
 
         if len(treated_teams) > 0:
             treated_team = treated_teams[0]
             treatment_week = panel[
-                (panel['team'] == treated_team) &
-                (panel['coaching_change_treatment'] == 1)
-            ]['week'].min()
+                (panel["team"] == treated_team) & (panel["coaching_change_treatment"] == 1)
+            ]["week"].min()
 
             # Synthetic Control
-            sc = SyntheticControl(method='optimization')
+            sc = SyntheticControl(method="optimization")
             sc.fit(
                 df=panel,
                 treated_unit_id=treated_team,
-                unit_col='team',
-                time_col='week',
-                outcome_col='team_points',
-                treatment_time=treatment_week
+                unit_col="team",
+                time_col="week",
+                outcome_col="team_points",
+                treatment_time=treatment_week,
             )
 
             # Placebo test
             placebo = sc.placebo_test(
                 df=panel,
-                unit_col='team',
-                time_col='week',
-                outcome_col='team_points',
-                treatment_time=treatment_week
+                unit_col="team",
+                time_col="week",
+                outcome_col="team_points",
+                treatment_time=treatment_week,
             )
 
             results = {
-                'experiment': 'exp2_coaching_change',
-                'causal_question': 'What is the causal effect of coaching change on team performance?',
-                'method': 'Synthetic Control',
-                'treated_team': treated_team,
-                'treatment_week': int(treatment_week),
-                'average_effect': float(sc.treatment_effect_['average_effect']),
-                'cumulative_effect': float(sc.treatment_effect_['cumulative_effect']),
-                'pre_treatment_rmse': float(sc.pre_treatment_fit_['rmse']),
-                'placebo_p_value': float(placebo['p_value']),
-                'placebo_rank': f"{placebo['rank']}/{placebo['total']}",
-                'interpretation': f"Coaching change caused {sc.treatment_effect_['average_effect']:.1f} point change per game",
-                'status': 'COMPLETED'
+                "experiment": "exp2_coaching_change",
+                "causal_question": "What is the causal effect of coaching change on team performance?",
+                "method": "Synthetic Control",
+                "treated_team": treated_team,
+                "treatment_week": int(treatment_week),
+                "average_effect": float(sc.treatment_effect_["average_effect"]),
+                "cumulative_effect": float(sc.treatment_effect_["cumulative_effect"]),
+                "pre_treatment_rmse": float(sc.pre_treatment_fit_["rmse"]),
+                "placebo_p_value": float(placebo["p_value"]),
+                "placebo_rank": f"{placebo['rank']}/{placebo['total']}",
+                "interpretation": f"Coaching change caused {sc.treatment_effect_['average_effect']:.1f} point change per game",
+                "status": "COMPLETED",
             }
         else:
             results = {
-                'experiment': 'exp2_coaching_change',
-                'status': 'NO_TREATMENT_EVENTS',
-                'note': 'No coaching changes found in 2020-2024 data'
+                "experiment": "exp2_coaching_change",
+                "status": "NO_TREATMENT_EVENTS",
+                "note": "No coaching changes found in 2020-2024 data",
             }
 
         logger.info(f"✓ Average effect: {results.get('average_effect', 'N/A')}")
         logger.info(f"✓ Placebo p-value: {results.get('placebo_p_value', 'N/A')}")
 
-        self.results['exp2'] = results
+        self.results["exp2"] = results
         return results
 
     def exp3_carries_on_yards_confounding(self):
@@ -238,9 +230,7 @@ class CausalInferenceExperimentSuite:
         # Build panel
         constructor = PanelConstructor(self.conn)
         panel = constructor.build_player_game_panel(
-            start_season=2020,
-            end_season=2024,
-            position_groups=['RB']
+            start_season=2020, end_season=2024, position_groups=["RB"]
         )
 
         # Create causal DAG
@@ -248,49 +238,50 @@ class CausalInferenceExperimentSuite:
 
         # Find backdoor adjustment set
         adjustment_set = dag.find_backdoor_adjustment_set(
-            treatment='carries',
-            outcome='rushing_yards'
+            treatment="carries", outcome="rushing_yards"
         )
 
         # Identify confounders empirically
         identifier = ConfounderIdentifier(alpha=0.05)
         confounders = identifier.identify_confounders(
             df=panel,
-            treatment_col='stat_carries',
-            outcome_col='stat_yards',
+            treatment_col="stat_carries",
+            outcome_col="stat_yards",
             candidate_confounders=[
-                'player_ability_proxy',
-                'team_quality',
-                'opponent_defense_rank',
-                'is_home',
-                'temperature'
-            ]
+                "player_ability_proxy",
+                "team_quality",
+                "opponent_defense_rank",
+                "is_home",
+                "temperature",
+            ],
         )
 
         # Compute covariate balance
         balance = identifier.compute_covariate_balance(
-            panel,
-            'stat_carries',
-            list(adjustment_set) if adjustment_set else []
+            panel, "stat_carries", list(adjustment_set) if adjustment_set else []
         )
 
         results = {
-            'experiment': 'exp3_confounding_adjustment',
-            'causal_question': 'What is the causal effect of carries on yards?',
-            'method': 'Backdoor Criterion + Confounder Identification',
-            'dag_adjustment_set': list(adjustment_set) if adjustment_set else [],
-            'empirical_confounders': [c['variable'] for c in confounders if c['is_confounder']],
-            'covariate_balance': {k: float(v['abs_smd']) for k, v in balance.items()},
-            'n_observations': len(panel),
-            'interpretation': f"Must adjust for {len(adjustment_set) if adjustment_set else 0} variables to identify causal effect",
-            'status': 'COMPLETED'
+            "experiment": "exp3_confounding_adjustment",
+            "causal_question": "What is the causal effect of carries on yards?",
+            "method": "Backdoor Criterion + Confounder Identification",
+            "dag_adjustment_set": list(adjustment_set) if adjustment_set else [],
+            "empirical_confounders": [c["variable"] for c in confounders if c["is_confounder"]],
+            "covariate_balance": {k: float(v["abs_smd"]) for k, v in balance.items()},
+            "n_observations": len(panel),
+            "interpretation": f"Must adjust for {len(adjustment_set) if adjustment_set else 0} variables to identify causal effect",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ DAG adjustment set: {adjustment_set}")
-        logger.info(f"✓ Empirical confounders: {[c['variable'] for c in confounders if c['is_confounder']]}")
-        logger.info(f"✓ Covariate balance: {len([v for v in balance.values() if v['abs_smd'] < 0.1])}/{len(balance)} balanced")
+        logger.info(
+            f"✓ Empirical confounders: {[c['variable'] for c in confounders if c['is_confounder']]}"
+        )
+        logger.info(
+            f"✓ Covariate balance: {len([v for v in balance.values() if v['abs_smd'] < 0.1])}/{len(balance)} balanced"
+        )
 
-        self.results['exp3'] = results
+        self.results["exp3"] = results
         return results
 
     def exp4_real_time_injury_adjustment(self):
@@ -312,8 +303,7 @@ class CausalInferenceExperimentSuite:
 
         # Estimate injury treatment effect priors
         injury_prior = integrator.estimate_treatment_effect_priors(
-            treatment_type='injury',
-            outcome='rushing_yards'
+            treatment_type="injury", outcome="rushing_yards"
         )
 
         # Simulate real-time adjustment
@@ -323,39 +313,41 @@ class CausalInferenceExperimentSuite:
         # Apply causal adjustment for injury return
         adjusted = integrator.adjust_prediction_for_shock(
             base_prediction=base_prediction,
-            shock_type='injury',
-            shock_magnitude=0.7  # 70% recovered
+            shock_type="injury",
+            shock_magnitude=0.7,  # 70% recovered
         )
 
         # Compute betting edge
         edge = integrator.compute_betting_edge_with_causality(
-            prediction=adjusted['adjusted_prediction'],
+            prediction=adjusted["adjusted_prediction"],
             market_line=vegas_line,
-            causal_adjustments={'injury': 0.7}
+            causal_adjustments={"injury": 0.7},
         )
 
         results = {
-            'experiment': 'exp4_real_time_adjustment',
-            'causal_question': 'How to adjust predictions for breaking injury news?',
-            'method': 'Treatment Effect Priors + Real-Time Integration',
-            'injury_prior_mean': float(injury_prior['prior_mean']),
-            'injury_prior_std': float(injury_prior['prior_std']),
-            'base_prediction': base_prediction,
-            'adjusted_prediction': float(adjusted['adjusted_prediction']),
-            'vegas_line': vegas_line,
-            'betting_edge': float(edge['edge']),
-            'edge_yards': float(adjusted['adjusted_prediction'] - vegas_line),
-            'recommendation': 'BET OVER' if edge['edge'] > 5 else 'NO BET',
-            'interpretation': f"Injury adjustment: {adjusted['adjusted_prediction'] - base_prediction:.1f} yards",
-            'status': 'COMPLETED'
+            "experiment": "exp4_real_time_adjustment",
+            "causal_question": "How to adjust predictions for breaking injury news?",
+            "method": "Treatment Effect Priors + Real-Time Integration",
+            "injury_prior_mean": float(injury_prior["prior_mean"]),
+            "injury_prior_std": float(injury_prior["prior_std"]),
+            "base_prediction": base_prediction,
+            "adjusted_prediction": float(adjusted["adjusted_prediction"]),
+            "vegas_line": vegas_line,
+            "betting_edge": float(edge["edge"]),
+            "edge_yards": float(adjusted["adjusted_prediction"] - vegas_line),
+            "recommendation": "BET OVER" if edge["edge"] > 5 else "NO BET",
+            "interpretation": f"Injury adjustment: {adjusted['adjusted_prediction'] - base_prediction:.1f} yards",
+            "status": "COMPLETED",
         }
 
-        logger.info(f"✓ Injury prior: μ={injury_prior['prior_mean']:.1f}, σ={injury_prior['prior_std']:.1f}")
+        logger.info(
+            f"✓ Injury prior: μ={injury_prior['prior_mean']:.1f}, σ={injury_prior['prior_std']:.1f}"
+        )
         logger.info(f"✓ Adjusted prediction: {adjusted['adjusted_prediction']:.1f} yards")
         logger.info(f"✓ Betting edge: {edge['edge']:+.1f} yards")
         logger.info(f"✓ Recommendation: {results['recommendation']}")
 
-        self.results['exp4'] = results
+        self.results["exp4"] = results
         return results
 
     def exp5_sensitivity_analysis_unmeasured_confounding(self):
@@ -375,9 +367,7 @@ class CausalInferenceExperimentSuite:
         # Build panel
         constructor = PanelConstructor(self.conn)
         panel = constructor.build_player_game_panel(
-            start_season=2020,
-            end_season=2024,
-            position_groups=['RB']
+            start_season=2020, end_season=2024, position_groups=["RB"]
         )
 
         # Define treatment
@@ -385,43 +375,41 @@ class CausalInferenceExperimentSuite:
         panel = definer.define_injury_treatment(panel, min_games_missed=1)
 
         # Fit DiD
-        did = DifferenceInDifferences(cluster_var='player_id')
+        did = DifferenceInDifferences(cluster_var="player_id")
         did.fit(
             df=panel,
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Sensitivity analysis
         validator = CausalValidator()
         sensitivity = validator.sensitivity_analysis(
-            estimator=did,
-            df=panel,
-            confounder_strength_range=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+            estimator=did, df=panel, confounder_strength_range=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
         )
 
         results = {
-            'experiment': 'exp5_sensitivity_analysis',
-            'causal_question': 'How robust are injury effects to unmeasured confounding?',
-            'method': 'Rosenbaum Sensitivity Analysis',
-            'baseline_effect': float(did.treatment_effect_['estimate']),
-            'sensitivity_bounds': {
+            "experiment": "exp5_sensitivity_analysis",
+            "causal_question": "How robust are injury effects to unmeasured confounding?",
+            "method": "Rosenbaum Sensitivity Analysis",
+            "baseline_effect": float(did.treatment_effect_["estimate"]),
+            "sensitivity_bounds": {
                 str(gamma): float(effect)
-                for gamma, effect in sensitivity['effects_by_gamma'].items()
+                for gamma, effect in sensitivity["effects_by_gamma"].items()
             },
-            'critical_gamma': float(sensitivity.get('critical_gamma', 0)),
-            'robustness': sensitivity.get('robustness_level', 'UNKNOWN'),
-            'interpretation': f"Estimates remain valid up to Γ={sensitivity.get('critical_gamma', 0):.2f}",
-            'status': 'COMPLETED'
+            "critical_gamma": float(sensitivity.get("critical_gamma", 0)),
+            "robustness": sensitivity.get("robustness_level", "UNKNOWN"),
+            "interpretation": f"Estimates remain valid up to Γ={sensitivity.get('critical_gamma', 0):.2f}",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ Baseline effect: {did.treatment_effect_['estimate']:.2f} yards")
         logger.info(f"✓ Critical Γ: {results['critical_gamma']:.2f}")
         logger.info(f"✓ Robustness: {results['robustness']}")
 
-        self.results['exp5'] = results
+        self.results["exp5"] = results
         return results
 
     def exp6_mediation_analysis_usage_mechanism(self):
@@ -441,9 +429,7 @@ class CausalInferenceExperimentSuite:
         # Build panel
         constructor = PanelConstructor(self.conn)
         panel = constructor.build_player_game_panel(
-            start_season=2020,
-            end_season=2024,
-            position_groups=['RB']
+            start_season=2020, end_season=2024, position_groups=["RB"]
         )
 
         # Define treatment
@@ -451,43 +437,43 @@ class CausalInferenceExperimentSuite:
         panel = definer.define_injury_treatment(panel, min_games_missed=1)
 
         # Estimate total effect (Injury → Yards)
-        did_total = DifferenceInDifferences(cluster_var='player_id')
+        did_total = DifferenceInDifferences(cluster_var="player_id")
         did_total.fit(
             df=panel,
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Estimate effect on mediator (Injury → Carries)
-        did_mediator = DifferenceInDifferences(cluster_var='player_id')
+        did_mediator = DifferenceInDifferences(cluster_var="player_id")
         did_mediator.fit(
             df=panel,
-            outcome_col='stat_carries',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            outcome_col="stat_carries",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Approximate mediation decomposition
         # Total effect = Direct effect + Indirect effect (mediated by carries)
         # Indirect ≈ effect_on_mediator × mediator_outcome_relationship
-        yards_per_carry = panel['stat_yards'].mean() / panel['stat_carries'].mean()
-        indirect_effect = did_mediator.treatment_effect_['estimate'] * yards_per_carry
-        direct_effect = did_total.treatment_effect_['estimate'] - indirect_effect
+        yards_per_carry = panel["stat_yards"].mean() / panel["stat_carries"].mean()
+        indirect_effect = did_mediator.treatment_effect_["estimate"] * yards_per_carry
+        direct_effect = did_total.treatment_effect_["estimate"] - indirect_effect
 
         results = {
-            'experiment': 'exp6_mediation_analysis',
-            'causal_question': 'Does injury affect yards directly or through usage?',
-            'method': 'Mediation Analysis',
-            'total_effect': float(did_total.treatment_effect_['estimate']),
-            'effect_on_carries': float(did_mediator.treatment_effect_['estimate']),
-            'indirect_effect_via_usage': float(indirect_effect),
-            'direct_effect': float(direct_effect),
-            'proportion_mediated': float(indirect_effect / did_total.treatment_effect_['estimate']),
-            'interpretation': f"{abs(indirect_effect/did_total.treatment_effect_['estimate'])*100:.1f}% of effect mediated by usage",
-            'status': 'COMPLETED'
+            "experiment": "exp6_mediation_analysis",
+            "causal_question": "Does injury affect yards directly or through usage?",
+            "method": "Mediation Analysis",
+            "total_effect": float(did_total.treatment_effect_["estimate"]),
+            "effect_on_carries": float(did_mediator.treatment_effect_["estimate"]),
+            "indirect_effect_via_usage": float(indirect_effect),
+            "direct_effect": float(direct_effect),
+            "proportion_mediated": float(indirect_effect / did_total.treatment_effect_["estimate"]),
+            "interpretation": f"{abs(indirect_effect/did_total.treatment_effect_['estimate'])*100:.1f}% of effect mediated by usage",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ Total effect: {did_total.treatment_effect_['estimate']:.2f} yards")
@@ -496,7 +482,7 @@ class CausalInferenceExperimentSuite:
         logger.info(f"✓ Direct: {direct_effect:.2f} yards")
         logger.info(f"✓ Proportion mediated: {results['proportion_mediated']:.1%}")
 
-        self.results['exp6'] = results
+        self.results["exp6"] = results
         return results
 
     def exp7_heterogeneous_treatment_effects(self):
@@ -516,9 +502,7 @@ class CausalInferenceExperimentSuite:
         # Build panel
         constructor = PanelConstructor(self.conn)
         panel = constructor.build_player_game_panel(
-            start_season=2020,
-            end_season=2024,
-            position_groups=['RB']
+            start_season=2020, end_season=2024, position_groups=["RB"]
         )
 
         # Define treatment
@@ -526,44 +510,54 @@ class CausalInferenceExperimentSuite:
         panel = definer.define_injury_treatment(panel, min_games_missed=1)
 
         # Stratify by player ability (star vs role player)
-        panel['is_star'] = panel['player_ability_proxy'] > panel['player_ability_proxy'].quantile(0.75)
+        panel["is_star"] = panel["player_ability_proxy"] > panel["player_ability_proxy"].quantile(
+            0.75
+        )
 
         # Estimate for star players
-        did_stars = DifferenceInDifferences(cluster_var='player_id')
+        did_stars = DifferenceInDifferences(cluster_var="player_id")
         did_stars.fit(
-            df=panel[panel['is_star']],
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            df=panel[panel["is_star"]],
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Estimate for role players
-        did_role = DifferenceInDifferences(cluster_var='player_id')
+        did_role = DifferenceInDifferences(cluster_var="player_id")
         did_role.fit(
-            df=panel[~panel['is_star']],
-            outcome_col='stat_yards',
-            treatment_col='injury_treatment',
-            unit_col='player_id',
-            time_col='week'
+            df=panel[~panel["is_star"]],
+            outcome_col="stat_yards",
+            treatment_col="injury_treatment",
+            unit_col="player_id",
+            time_col="week",
         )
 
         # Heterogeneity
-        heterogeneity = did_stars.treatment_effect_['estimate'] - did_role.treatment_effect_['estimate']
+        heterogeneity = (
+            did_stars.treatment_effect_["estimate"] - did_role.treatment_effect_["estimate"]
+        )
 
         results = {
-            'experiment': 'exp7_heterogeneous_effects',
-            'causal_question': 'Do injury effects vary by player ability?',
-            'method': 'Stratified DiD + Heterogeneity Analysis',
-            'star_effect': float(did_stars.treatment_effect_['estimate']),
-            'star_ci': [float(did_stars.treatment_effect_['ci_lower']), float(did_stars.treatment_effect_['ci_upper'])],
-            'role_effect': float(did_role.treatment_effect_['estimate']),
-            'role_ci': [float(did_role.treatment_effect_['ci_lower']), float(did_role.treatment_effect_['ci_upper'])],
-            'heterogeneity': float(heterogeneity),
-            'n_star_players': int(panel[panel['is_star']]['player_id'].nunique()),
-            'n_role_players': int(panel[~panel['is_star']]['player_id'].nunique()),
-            'interpretation': f"Star players lose {abs(did_stars.treatment_effect_['estimate']):.1f} yards vs {abs(did_role.treatment_effect_['estimate']):.1f} for role players",
-            'status': 'COMPLETED'
+            "experiment": "exp7_heterogeneous_effects",
+            "causal_question": "Do injury effects vary by player ability?",
+            "method": "Stratified DiD + Heterogeneity Analysis",
+            "star_effect": float(did_stars.treatment_effect_["estimate"]),
+            "star_ci": [
+                float(did_stars.treatment_effect_["ci_lower"]),
+                float(did_stars.treatment_effect_["ci_upper"]),
+            ],
+            "role_effect": float(did_role.treatment_effect_["estimate"]),
+            "role_ci": [
+                float(did_role.treatment_effect_["ci_lower"]),
+                float(did_role.treatment_effect_["ci_upper"]),
+            ],
+            "heterogeneity": float(heterogeneity),
+            "n_star_players": int(panel[panel["is_star"]]["player_id"].nunique()),
+            "n_role_players": int(panel[~panel["is_star"]]["player_id"].nunique()),
+            "interpretation": f"Star players lose {abs(did_stars.treatment_effect_['estimate']):.1f} yards vs {abs(did_role.treatment_effect_['estimate']):.1f} for role players",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ Star effect: {did_stars.treatment_effect_['estimate']:.2f} yards")
@@ -572,7 +566,7 @@ class CausalInferenceExperimentSuite:
         logger.info(f"✓ Star players (n={results['n_star_players']})")
         logger.info(f"✓ Role players (n={results['n_role_players']})")
 
-        self.results['exp7'] = results
+        self.results["exp7"] = results
         return results
 
     def run_all_experiments(self):
@@ -614,7 +608,7 @@ class CausalInferenceExperimentSuite:
         logger.info("")
 
         for exp_name, exp_data in self.results.items():
-            status = exp_data.get('status', 'UNKNOWN')
+            status = exp_data.get("status", "UNKNOWN")
             logger.info(f"✓ {exp_data['experiment']}: {status}")
 
         logger.info("")

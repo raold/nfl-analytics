@@ -23,7 +23,6 @@ def test_estimate_game_correlation_basic():
     assert result is not None
 
 
-
 def test_estimate_game_correlation_edge_cases():
     """Test estimate_game_correlation: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_estimate_game_correlation_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_game_correlation_error_handling():
     """Test estimate_game_correlation error handling."""
     with pytest.raises(ValueError):
         estimate_game_correlation(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_estimate_game_correlation_property_idempotent(self, games_df):
 
     # Assert property
     assert estimate_game_correlation(games_df) == result, "idempotent violated"
-
 
 
 def test_backtest_parlay_pricing_basic():
@@ -67,7 +63,6 @@ def test_backtest_parlay_pricing_basic():
     assert result is not None
 
 
-
 def test_backtest_parlay_pricing_edge_cases():
     """Test backtest_parlay_pricing: edge cases."""
     # Arrange
@@ -80,23 +75,24 @@ def test_backtest_parlay_pricing_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_parlay_pricing_error_handling():
     """Test backtest_parlay_pricing error handling."""
     with pytest.raises(ValueError):
         backtest_parlay_pricing(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_backtest_parlay_pricing_property_idempotent(self, games_df, model_probs, parlay_size, n_trials):
+def test_backtest_parlay_pricing_property_idempotent(
+    self, games_df, model_probs, parlay_size, n_trials
+):
     """Property test: function is idempotent."""
     # Act
     result = backtest_parlay_pricing(games_df, model_probs, parlay_size, n_trials)
 
     # Assert property
-    assert backtest_parlay_pricing(games_df, model_probs, parlay_size, n_trials) == result, "idempotent violated"
-
+    assert (
+        backtest_parlay_pricing(games_df, model_probs, parlay_size, n_trials) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -111,7 +107,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -124,12 +119,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fit_correlation_basic():
@@ -144,7 +137,6 @@ def test_fit_correlation_basic():
     assert result is not None
 
 
-
 def test_fit_correlation_edge_cases():
     """Test fit_correlation: edge cases."""
     # Arrange
@@ -157,12 +149,10 @@ def test_fit_correlation_edge_cases():
     assert result is not None
 
 
-
 def test_fit_correlation_error_handling():
     """Test fit_correlation error handling."""
     with pytest.raises(ValueError):
         fit_correlation(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +163,6 @@ def test_fit_correlation_property_idempotent(self, self, outcomes, features):
 
     # Assert property
     assert fit_correlation(self, outcomes, features) == result, "idempotent violated"
-
 
 
 def test_simulate_parlay_basic():
@@ -188,7 +177,6 @@ def test_simulate_parlay_basic():
     assert result is not None
 
 
-
 def test_simulate_parlay_edge_cases():
     """Test simulate_parlay: edge cases."""
     # Arrange
@@ -201,23 +189,24 @@ def test_simulate_parlay_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_parlay_error_handling():
     """Test simulate_parlay error handling."""
     with pytest.raises(ValueError):
         simulate_parlay(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_simulate_parlay_property_idempotent(self, self, marginal_probs, correlation_matrix, n_simulations):
+def test_simulate_parlay_property_idempotent(
+    self, self, marginal_probs, correlation_matrix, n_simulations
+):
     """Property test: function is idempotent."""
     # Act
     result = simulate_parlay(self, marginal_probs, correlation_matrix, n_simulations)
 
     # Assert property
-    assert simulate_parlay(self, marginal_probs, correlation_matrix, n_simulations) == result, "idempotent violated"
-
+    assert (
+        simulate_parlay(self, marginal_probs, correlation_matrix, n_simulations) == result
+    ), "idempotent violated"
 
 
 def test_price_parlay_basic():
@@ -232,7 +221,6 @@ def test_price_parlay_basic():
     assert result is not None
 
 
-
 def test_price_parlay_edge_cases():
     """Test price_parlay: edge cases."""
     # Arrange
@@ -245,23 +233,24 @@ def test_price_parlay_edge_cases():
     assert result is not None
 
 
-
 def test_price_parlay_error_handling():
     """Test price_parlay error handling."""
     with pytest.raises(ValueError):
         price_parlay(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_price_parlay_property_idempotent(self, self, marginal_probs, correlation_matrix, parlay_odds, n_simulations):
+def test_price_parlay_property_idempotent(
+    self, self, marginal_probs, correlation_matrix, parlay_odds, n_simulations
+):
     """Property test: function is idempotent."""
     # Act
     result = price_parlay(self, marginal_probs, correlation_matrix, parlay_odds, n_simulations)
 
     # Assert property
-    assert price_parlay(self, marginal_probs, correlation_matrix, parlay_odds, n_simulations) == result, "idempotent violated"
-
+    assert (
+        price_parlay(self, marginal_probs, correlation_matrix, parlay_odds, n_simulations) == result
+    ), "idempotent violated"
 
 
 def test_price_teaser_basic():
@@ -276,7 +265,6 @@ def test_price_teaser_basic():
     assert result is not None
 
 
-
 def test_price_teaser_edge_cases():
     """Test price_teaser: edge cases."""
     # Arrange
@@ -289,20 +277,47 @@ def test_price_teaser_edge_cases():
     assert result is not None
 
 
-
 def test_price_teaser_error_handling():
     """Test price_teaser error handling."""
     with pytest.raises(ValueError):
         price_teaser(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_price_teaser_property_idempotent(self, self, marginal_probs, spreads, teaser_points, correlation_matrix, teaser_odds, n_simulations):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_price_teaser_property_idempotent(
+    self,
+    self,
+    marginal_probs,
+    spreads,
+    teaser_points,
+    correlation_matrix,
+    teaser_odds,
+    n_simulations,
+):
     """Property test: function is idempotent."""
     # Act
-    result = price_teaser(self, marginal_probs, spreads, teaser_points, correlation_matrix, teaser_odds, n_simulations)
+    result = price_teaser(
+        self, marginal_probs, spreads, teaser_points, correlation_matrix, teaser_odds, n_simulations
+    )
 
     # Assert property
-    assert price_teaser(self, marginal_probs, spreads, teaser_points, correlation_matrix, teaser_odds, n_simulations) == result, "idempotent violated"
-
+    assert (
+        price_teaser(
+            self,
+            marginal_probs,
+            spreads,
+            teaser_points,
+            correlation_matrix,
+            teaser_odds,
+            n_simulations,
+        )
+        == result
+    ), "idempotent violated"

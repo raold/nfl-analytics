@@ -21,7 +21,6 @@ def test_load_gnn_results_basic():
     assert result is not None
 
 
-
 def test_load_gnn_results_edge_cases():
     """Test load_gnn_results: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_load_gnn_results_edge_cases():
     assert result is not None
 
 
-
 def test_load_gnn_results_error_handling():
     """Test load_gnn_results error handling."""
     with pytest.raises(ValueError):
         load_gnn_results(invalid_input)
-
 
 
 def test_load_xgboost_results_basic():
@@ -54,7 +51,6 @@ def test_load_xgboost_results_basic():
     assert result is not None
 
 
-
 def test_load_xgboost_results_edge_cases():
     """Test load_xgboost_results: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_load_xgboost_results_edge_cases():
     assert result is not None
 
 
-
 def test_load_xgboost_results_error_handling():
     """Test load_xgboost_results error handling."""
     with pytest.raises(ValueError):
         load_xgboost_results(invalid_input)
-
 
 
 def test_create_baseline_comparison_table_basic():
@@ -87,7 +81,6 @@ def test_create_baseline_comparison_table_basic():
     assert result is not None
 
 
-
 def test_create_baseline_comparison_table_edge_cases():
     """Test create_baseline_comparison_table: edge cases."""
     # Arrange
@@ -100,12 +93,10 @@ def test_create_baseline_comparison_table_edge_cases():
     assert result is not None
 
 
-
 def test_create_baseline_comparison_table_error_handling():
     """Test create_baseline_comparison_table error handling."""
     with pytest.raises(ValueError):
         create_baseline_comparison_table(invalid_input)
-
 
 
 def test_generate_detailed_comparison_text_basic():
@@ -120,7 +111,6 @@ def test_generate_detailed_comparison_text_basic():
     assert result is not None
 
 
-
 def test_generate_detailed_comparison_text_edge_cases():
     """Test generate_detailed_comparison_text: edge cases."""
     # Arrange
@@ -133,12 +123,10 @@ def test_generate_detailed_comparison_text_edge_cases():
     assert result is not None
 
 
-
 def test_generate_detailed_comparison_text_error_handling():
     """Test generate_detailed_comparison_text error handling."""
     with pytest.raises(ValueError):
         generate_detailed_comparison_text(invalid_input)
-
 
 
 def test_main_basic():
@@ -153,7 +141,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -166,9 +153,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

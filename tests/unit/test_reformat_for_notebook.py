@@ -21,7 +21,6 @@ def test_reformat_acceptance_data_basic():
     assert result is not None
 
 
-
 def test_reformat_acceptance_data_edge_cases():
     """Test reformat_acceptance_data: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_reformat_acceptance_data_edge_cases():
     assert result is not None
 
 
-
 def test_reformat_acceptance_data_error_handling():
     """Test reformat_acceptance_data error handling."""
     with pytest.raises(ValueError):
         reformat_acceptance_data(invalid_input)
-
 
 
 def test_reformat_live_metrics_basic():
@@ -54,7 +51,6 @@ def test_reformat_live_metrics_basic():
     assert result is not None
 
 
-
 def test_reformat_live_metrics_edge_cases():
     """Test reformat_live_metrics: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_reformat_live_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_reformat_live_metrics_error_handling():
     """Test reformat_live_metrics error handling."""
     with pytest.raises(ValueError):
         reformat_live_metrics(invalid_input)
-
 
 
 def test_main_basic():
@@ -87,7 +81,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -100,9 +93,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_load_json_basic():
@@ -56,7 +53,6 @@ def test_load_json_basic():
     assert result is not None
 
 
-
 def test_load_json_edge_cases():
     """Test load_json: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_json_edge_cases():
     assert result is not None
 
 
-
 def test_load_json_error_handling():
     """Test load_json error handling."""
     with pytest.raises(ValueError):
         load_json(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_json_property_idempotent(self, path):
 
     # Assert property
     assert load_json(path) == result, "idempotent violated"
-
 
 
 def test_compare_basic():
@@ -100,7 +93,6 @@ def test_compare_basic():
     assert result is not None
 
 
-
 def test_compare_edge_cases():
     """Test compare: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_compare_edge_cases():
     assert result is not None
 
 
-
 def test_compare_error_handling():
     """Test compare error handling."""
     with pytest.raises(ValueError):
         compare(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_compare_property_idempotent(self, hist, sim, args):
 
     # Assert property
     assert compare(hist, sim, args) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -144,7 +133,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +145,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -230,7 +230,9 @@ class EnhancedEnsemble5Way:
                         scaler_data = pickle.load(f)
                         self.temperature = scaler_data.get("temperature", 1.0)
                         self.temperature_scaler = scaler_data
-                    logger.info(f"Loaded v4 temperature scaler (fallback): T = {self.temperature:.4f}")
+                    logger.info(
+                        f"Loaded v4 temperature scaler (fallback): T = {self.temperature:.4f}"
+                    )
                 else:
                     logger.warning("Predictions will be UNCALIBRATED (overcalibrated)")
 
@@ -349,7 +351,9 @@ class EnhancedEnsemble5Way:
 
             self.hybrid_model.static_trained = True
 
-            logger.info(f"✅ Hybrid Static-Incremental XGBoost loaded from {self.hybrid_base_path.name}")
+            logger.info(
+                f"✅ Hybrid Static-Incremental XGBoost loaded from {self.hybrid_base_path.name}"
+            )
             logger.info("   Static weight: 70%, Incremental weight: 30%")
         except Exception as e:
             raise Exception(
@@ -396,7 +400,7 @@ class EnhancedEnsemble5Way:
         season: int,
         week: int,
         opponent_team: str | None = None,  # NEW: required for causal features
-        player_team: str | None = None,    # NEW: required for causal features
+        player_team: str | None = None,  # NEW: required for causal features
         game_weather: dict | None = None,  # OPTIONAL: for future weather features
         return_components: bool = False,
         return_uncertainty: bool = True,
@@ -511,8 +515,7 @@ class EnhancedEnsemble5Way:
 
         # Weighted average (only using valid components)
         base_ensemble_mean = sum(
-            components[model]["mean"] * self.weights[model]
-            for model in valid_predictions
+            components[model]["mean"] * self.weights[model] for model in valid_predictions
         )
 
         # Variance pooling for uncertainty
@@ -600,8 +603,7 @@ class EnhancedEnsemble5Way:
 
         if return_components:
             result["components"] = {
-                k: {"mean": float(v["mean"]), "std": float(v["std"])}
-                for k, v in components.items()
+                k: {"mean": float(v["mean"]), "std": float(v["std"])} for k, v in components.items()
             }
 
         return result
@@ -708,9 +710,7 @@ class EnhancedEnsemble5Way:
 
         # Fallback: Use R interface for state-space prediction (SLOW)
         if self.r_interface is not None and self.skills_df is not None:
-            result = self.r_interface.predict_state_space(
-                player_id, season, week, self.skills_df
-            )
+            result = self.r_interface.predict_state_space(player_id, season, week, self.skills_df)
             if result is not None:
                 return result
 
@@ -733,8 +733,7 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.hierarchical_path.exists():
             result = self.r_interface.predict_hierarchical(
-                player_id, season, week, self.hierarchical_path,
-                ndraws=1000
+                player_id, season, week, self.hierarchical_path, ndraws=1000
             )
             if result is not None:
                 return result
@@ -756,24 +755,24 @@ class EnhancedEnsemble5Way:
         """
         # Stage 1: Ridge opponent baseline
         matchup_difficulty = features["opponent_epa"] * features["opponent_points_allowed"] / 20.0
-        ridge_X = np.array([[
-            features["opponent_epa"],
-            features["opponent_points_allowed"],
-            matchup_difficulty
-        ]])
+        ridge_X = np.array(
+            [[features["opponent_epa"], features["opponent_points_allowed"], matchup_difficulty]]
+        )
         ridge_X_scaled = self.ridge_scaler.transform(ridge_X)
         ridge_pred = self.ridge_model.predict(ridge_X_scaled)[0]
 
         # Stage 2: XGBoost residual
         xgb_X = np.array(
-            [[
-                features["pass_yards_l3"],
-                features["pass_attempts_l3"],
-                features["completions_l3"],
-                features["completions_pct_l3"],
-                features["home_away_encoded"],
-                0.0,  # residual_feature (unknown at prediction time)
-            ]]
+            [
+                [
+                    features["pass_yards_l3"],
+                    features["pass_attempts_l3"],
+                    features["completions_l3"],
+                    features["completions_pct_l3"],
+                    features["home_away_encoded"],
+                    0.0,  # residual_feature (unknown at prediction time)
+                ]
+            ]
         )
         xgb_feature_names = self.xgb_v4_features + ["residual_feature"]
         xgb_dmatrix = xgb.DMatrix(xgb_X, feature_names=xgb_feature_names)
@@ -802,8 +801,7 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.informative_path.exists():
             result = self.r_interface.predict_informative_priors(
-                player_id, season, week, self.informative_path,
-                ndraws=1000
+                player_id, season, week, self.informative_path, ndraws=1000
             )
             if result is not None:
                 return result
@@ -821,7 +819,9 @@ class EnhancedEnsemble5Way:
         """
         # Calculate derived features
         log_attempts = np.log1p(features.get("pass_attempts_l3", 30.0))
-        yards_per_attempt = features.get("pass_yards_l3", 200.0) / max(features.get("pass_attempts_l3", 30.0), 1.0)
+        yards_per_attempt = features.get("pass_yards_l3", 200.0) / max(
+            features.get("pass_attempts_l3", 30.0), 1.0
+        )
         td_rate = 0.04  # Default TD rate (~4%)
         is_home = features.get("home_away_encoded", 0)
         spread_abs = 3.0  # Default spread
@@ -835,21 +835,25 @@ class EnhancedEnsemble5Way:
         wind = 5.0  # Default wind
 
         # Prepare features for hybrid model (13 features)
-        X = np.array([[
-            log_attempts,
-            yards_per_attempt,
-            td_rate,
-            is_home,
-            spread_abs,
-            total_line,
-            is_bad_weather,
-            yards_L3,
-            yards_per_attempt_L3,
-            td_rate_L3,
-            week_in_season,
-            temp,
-            wind
-        ]])
+        X = np.array(
+            [
+                [
+                    log_attempts,
+                    yards_per_attempt,
+                    td_rate,
+                    is_home,
+                    spread_abs,
+                    total_line,
+                    is_bad_weather,
+                    yards_L3,
+                    yards_per_attempt_L3,
+                    td_rate_L3,
+                    week_in_season,
+                    temp,
+                    wind,
+                ]
+            ]
+        )
 
         # Get hybrid prediction (static component only for batch inference)
         X_scaled = self.hybrid_model.static_scaler.transform(X)
@@ -897,4 +901,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()

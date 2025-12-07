@@ -362,7 +362,9 @@ class SportsAnalyticsValidator:
             eligible_stats = POSITION_STAT_ELIGIBILITY.get(position, set())
 
             # Type narrowing: Convert stat_category to str for comparison
-            stat_category_str = str(stat_category) if not isinstance(stat_category, str) else stat_category
+            stat_category_str = (
+                str(stat_category) if not isinstance(stat_category, str) else stat_category
+            )
 
             # Check if stat category is eligible
             if stat_category_str not in eligible_stats:
@@ -568,7 +570,9 @@ class SportsAnalyticsValidator:
                                     category="team_abbreviation",
                                     message=f"Outdated team abbreviation: '{team}' in {season}",
                                     details=f"Team relocated to '{new_abbrev}' in {relocation_year}",
-                                    row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
+                                    row_index=(
+                                        int(idx) if isinstance(idx, (int, np.integer)) else None
+                                    ),
                                     column=col,
                                     value=team,
                                 )

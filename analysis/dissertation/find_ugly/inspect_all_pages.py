@@ -12,15 +12,17 @@ PDF_PATH = "/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf"
 OUTPUT_DIR = Path(__file__).parent / "pages"
 DPI = 150
 
+
 def get_page_count():
     """Get total pages from log file."""
     log_path = Path(PDF_PATH).parent / "main.log"
     with open(log_path) as f:
         for line in f:
             if "Output written on main.pdf" in line:
-                parts = line.split('(')[1].split()[0]
+                parts = line.split("(")[1].split()[0]
                 return int(parts)
     return None
+
 
 def convert_all_pages(total_pages):
     """Convert ALL pages to PNG sequentially."""
@@ -41,7 +43,7 @@ def convert_all_pages(total_pages):
         "-dFirstPage=1",
         f"-dLastPage={total_pages}",
         f"-sOutputFile={OUTPUT_DIR}/page_%03d.png",
-        PDF_PATH
+        PDF_PATH,
     ]
 
     print("Starting conversion (this will take a few minutes)...")
@@ -56,6 +58,7 @@ def convert_all_pages(total_pages):
     print(f"\n✓ Successfully converted {len(created)} pages")
 
     return True
+
 
 if __name__ == "__main__":
     page_count = get_page_count()
@@ -73,9 +76,9 @@ if __name__ == "__main__":
         existing = len(list(OUTPUT_DIR.glob("page_*.png")))
         print(f"Found {existing} existing PNGs (use --convert to reconvert)")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ALL PAGES CONVERTED - Ready for systematic inspection")
-    print("="*80)
+    print("=" * 80)
     print(f"\nImages location: {OUTPUT_DIR}/")
     print(f"Total pages: {page_count}")
     print("\nNext: Use Claude to inspect each page systematically")

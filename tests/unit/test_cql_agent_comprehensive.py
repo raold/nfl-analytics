@@ -59,7 +59,7 @@ def n_actions():
 @pytest.fixture
 def mock_device():
     """Create mock device (CPU for testing)."""
-    return torch.device('cpu')
+    return torch.device("cpu")
 
 
 @pytest.fixture
@@ -99,13 +99,15 @@ def mock_logged_dataset():
     next_states = np.random.randn(n, 20)
     dones = np.zeros(n)  # One-step episodes
 
-    return pd.DataFrame({
-        'state': list(states),
-        'action': actions,
-        'reward': rewards,
-        'next_state': list(next_states),
-        'done': dones,
-    })
+    return pd.DataFrame(
+        {
+            "state": list(states),
+            "action": actions,
+            "reward": rewards,
+            "next_state": list(next_states),
+            "done": dones,
+        }
+    )
 
 
 # ============================================================================
@@ -124,16 +126,18 @@ def test_qnetwork_initialization(state_dim, n_actions, mock_device):
     dummy_state = torch.randn(1, state_dim).to(mock_device)
     q_values = q_net(dummy_state)
 
-    assert q_values.shape == (1, n_actions), \
-        f"Expected shape (1, {n_actions}), got {q_values.shape}"
+    assert q_values.shape == (
+        1,
+        n_actions,
+    ), f"Expected shape (1, {n_actions}), got {q_values.shape}"
 
 
 def test_qnetwork_flexible_architectures(state_dim, n_actions, mock_device):
     """Test Q-network with different architectures."""
     architectures = [
-        [128, 64],           # 4 layers
-        [128, 64, 32],       # 5 layers
-        [256, 128, 64],      # 6 layers
+        [128, 64],  # 4 layers
+        [128, 64, 32],  # 5 layers
+        [256, 128, 64],  # 6 layers
     ]
 
     for hidden_dims in architectures:
@@ -142,8 +146,7 @@ def test_qnetwork_flexible_architectures(state_dim, n_actions, mock_device):
         dummy_state = torch.randn(1, state_dim).to(mock_device)
         q_values = q_net(dummy_state)
 
-        assert q_values.shape == (1, n_actions), \
-            f"Failed for architecture {hidden_dims}"
+        assert q_values.shape == (1, n_actions), f"Failed for architecture {hidden_dims}"
 
 
 def test_qnetwork_layernorm_presence(qnetwork):
@@ -165,8 +168,10 @@ def test_qnetwork_forward_batch(state_dim, n_actions, qnetwork):
 
     q_values = qnetwork(batch_states)
 
-    assert q_values.shape == (batch_size, n_actions), \
-        f"Expected batch shape ({batch_size}, {n_actions}), got {q_values.shape}"
+    assert q_values.shape == (
+        batch_size,
+        n_actions,
+    ), f"Expected batch shape ({batch_size}, {n_actions}), got {q_values.shape}"
 
 
 # ============================================================================
@@ -224,13 +229,7 @@ def test_replay_buffer_capacity_limit(replay_buffer):
 
     # Add more than capacity
     for i in range(capacity + 50):
-        small_buffer.push(
-            np.array([i]),
-            0,
-            0.0,
-            np.array([i+1]),
-            False
-        )
+        small_buffer.push(np.array([i]), 0, 0.0, np.array([i + 1]), False)
 
     # Should not exceed capacity
     assert len(small_buffer) == capacity
@@ -242,7 +241,7 @@ def test_replay_buffer_sample_smaller_than_batch():
 
     # Add only 5 experiences
     for i in range(5):
-        buffer.push(np.array([i]), 0, 0.0, np.array([i+1]), False)
+        buffer.push(np.array([i]), 0, 0.0, np.array([i + 1]), False)
 
     # Request batch of 32 (larger than buffer)
     states, actions, rewards, next_states, dones = buffer.sample(batch_size=32)
@@ -274,8 +273,8 @@ def test_cql_agent_initialization(state_dim, n_actions, mock_device):
 
 def test_cql_agent_has_target_network(cql_agent):
     """Test that CQL agent has target network."""
-    assert hasattr(cql_agent, 'q_network'), "Agent should have Q-network"
-    assert hasattr(cql_agent, 'target_network'), "Agent should have target network"
+    assert hasattr(cql_agent, "q_network"), "Agent should have Q-network"
+    assert hasattr(cql_agent, "target_network"), "Agent should have target network"
 
 
 def test_cql_agent_different_alphas(state_dim, n_actions, mock_device):
@@ -340,24 +339,26 @@ def test_cql_penalty_zero_when_uniform():
 
 def test_get_device_cpu():
     """Test device selection defaults to CPU when no GPU available."""
-    with patch('torch.cuda.is_available', return_value=False), \
-         patch('torch.backends.mps.is_available', return_value=False):
+    with (
+        patch("torch.cuda.is_available", return_value=False),
+        patch("torch.backends.mps.is_available", return_value=False),
+    ):
 
-        device = get_device('auto')
-        assert device.type == 'cpu'
+        device = get_device("auto")
+        assert device.type == "cpu"
 
 
 def test_get_device_manual_selection():
     """Test manual device selection."""
-    device = get_device('cpu')
-    assert device.type == 'cpu'
+    device = get_device("cpu")
+    assert device.type == "cpu"
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 def test_get_device_cuda():
     """Test CUDA device detection."""
-    device = get_device('auto')
-    assert device.type == 'cuda'
+    device = get_device("auto")
+    assert device.type == "cuda"
 
 
 # ============================================================================
@@ -433,8 +434,7 @@ def test_save_and_load_model(cql_agent):
         q2 = new_agent.q_network(state)
 
         # Should be identical
-        assert torch.allclose(q1, q2, atol=1e-6), \
-            "Loaded model should produce identical Q-values"
+        assert torch.allclose(q1, q2, atol=1e-6), "Loaded model should produce identical Q-values"
 
 
 def test_save_with_metadata(cql_agent):
@@ -444,10 +444,10 @@ def test_save_with_metadata(cql_agent):
 
         # Save with custom metadata
         metadata = {
-            'alpha': cql_agent.alpha,
-            'lr': 1e-4,
-            'training_steps': 10000,
-            'final_reward': 1.75,
+            "alpha": cql_agent.alpha,
+            "lr": 1e-4,
+            "training_steps": 10000,
+            "final_reward": 1.75,
         }
 
         cql_agent.save(model_path, metadata=metadata)
@@ -455,7 +455,7 @@ def test_save_with_metadata(cql_agent):
         # Load and check metadata
         checkpoint = torch.load(model_path)
 
-        assert 'metadata' in checkpoint or 'alpha' in checkpoint  # Depends on implementation
+        assert "metadata" in checkpoint or "alpha" in checkpoint  # Depends on implementation
 
 
 # ============================================================================
@@ -488,8 +488,8 @@ def test_training_step_reduces_loss(cql_agent):
     # Loss should decrease (not a strict requirement, but generally true)
     # Note: With random data, loss may not always decrease monotonically
     assert isinstance(final_result, dict), "Update should return dict"
-    assert 'loss' in final_result, "Dict should contain 'loss' key"
-    assert isinstance(final_result['loss'], (float, int)), "Loss should be numeric"
+    assert "loss" in final_result, "Dict should contain 'loss' key"
+    assert isinstance(final_result["loss"], (float, int)), "Loss should be numeric"
 
 
 def test_cql_loss_includes_penalty(cql_agent):
@@ -501,7 +501,7 @@ def test_cql_loss_includes_penalty(cql_agent):
             np.random.randint(0, 4),
             np.random.uniform(-1, 1),
             np.random.randn(20),
-            False
+            False,
         )
 
     # Train with alpha=0 (no CQL penalty, just TD loss)
@@ -516,7 +516,7 @@ def test_cql_loss_includes_penalty(cql_agent):
     # Note: This is not always guaranteed due to randomness
     assert isinstance(result_no_penalty, dict), "Update should return dict"
     assert isinstance(result_with_penalty, dict), "Update should return dict"
-    assert 'loss' in result_no_penalty and 'loss' in result_with_penalty
+    assert "loss" in result_no_penalty and "loss" in result_with_penalty
 
 
 # ============================================================================
@@ -528,10 +528,10 @@ def test_action_to_bet_size_mapping():
     """Test mapping from discrete actions to bet sizes."""
     # Define action-to-bet mapping
     action_to_bet = {
-        0: 0.00,   # No bet
-        1: 0.02,   # Small bet (2% bankroll)
-        2: 0.04,   # Medium bet (4% bankroll)
-        3: 0.06,   # Large bet (6% bankroll)
+        0: 0.00,  # No bet
+        1: 0.02,  # Small bet (2% bankroll)
+        2: 0.04,  # Medium bet (4% bankroll)
+        3: 0.06,  # Large bet (6% bankroll)
     }
 
     bankroll = 10000.0
@@ -582,7 +582,7 @@ def test_single_action_space():
     agent = CQLAgent(
         state_dim=10,
         n_actions=1,
-        device=torch.device('cpu'),
+        device=torch.device("cpu"),
     )
 
     state = np.random.randn(10)
@@ -598,7 +598,7 @@ def test_very_high_dimensional_state():
     agent = CQLAgent(
         state_dim=state_dim,
         n_actions=4,
-        device=torch.device('cpu'),
+        device=torch.device("cpu"),
         hidden_dims=[256, 128],  # Need larger network
     )
 
@@ -617,13 +617,13 @@ def test_negative_rewards_handling(cql_agent):
             np.random.randint(0, 4),
             np.random.uniform(-5, -1),  # Only losses
             np.random.randn(20),
-            False
+            False,
         )
 
     # Should train without errors
     result = cql_agent.update()
     assert isinstance(result, dict), "Update should return dict"
-    assert 'loss' in result, "Dict should contain 'loss' key"
+    assert "loss" in result, "Dict should contain 'loss' key"
 
 
 # ============================================================================

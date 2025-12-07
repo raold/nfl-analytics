@@ -7,7 +7,6 @@ Author: Claude Code
 Date: November 2025
 """
 
-
 import pandas as pd
 
 
@@ -75,10 +74,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn, params=(model_id,))
 
     @staticmethod
-    def models_by_status(
-        conn,
-        status: str = 'production'
-    ) -> pd.DataFrame:
+    def models_by_status(conn, status: str = "production") -> pd.DataFrame:
         """
         Fetch models filtered by status.
 
@@ -109,11 +105,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn, params=(status,))
 
     @staticmethod
-    def training_runs(
-        conn,
-        model_id: int | None = None,
-        limit: int = 10
-    ) -> pd.DataFrame:
+    def training_runs(conn, model_id: int | None = None, limit: int = 10) -> pd.DataFrame:
         """
         Fetch recent training runs.
 
@@ -149,10 +141,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn, params=params if params else None)
 
     @staticmethod
-    def latest_training_run(
-        conn,
-        model_id: int
-    ) -> pd.DataFrame | None:
+    def latest_training_run(conn, model_id: int) -> pd.DataFrame | None:
         """
         Fetch latest training run for a specific model.
 
@@ -181,10 +170,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn, params=(model_id,))
 
     @staticmethod
-    def model_family_comparison(
-        conn,
-        model_family: str
-    ) -> pd.DataFrame:
+    def model_family_comparison(conn, model_family: str) -> pd.DataFrame:
         """
         Compare all versions of a specific model family.
 
@@ -252,11 +238,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def training_run_history(
-        conn,
-        model_id: int,
-        limit: int = 50
-    ) -> pd.DataFrame:
+    def training_run_history(conn, model_id: int, limit: int = 50) -> pd.DataFrame:
         """
         Fetch training run history for a model with summary stats.
 
@@ -287,10 +269,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn, params=(model_id,))
 
     @staticmethod
-    def model_update_timeline(
-        conn,
-        days_back: int = 30
-    ) -> pd.DataFrame:
+    def model_update_timeline(conn, days_back: int = 30) -> pd.DataFrame:
         """
         Fetch timeline of model updates.
 

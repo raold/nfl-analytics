@@ -23,7 +23,6 @@ def test_load_trades_basic():
     assert result is not None
 
 
-
 def test_load_trades_edge_cases():
     """Test load_trades: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_trades_edge_cases():
     assert result is not None
 
 
-
 def test_load_trades_error_handling():
     """Test load_trades error handling."""
     with pytest.raises(ValueError):
         load_trades(invalid_input)
-
 
 
 def test_analyze_calibration_basic():
@@ -56,7 +53,6 @@ def test_analyze_calibration_basic():
     assert result is not None
 
 
-
 def test_analyze_calibration_edge_cases():
     """Test analyze_calibration: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_analyze_calibration_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_calibration_error_handling():
     """Test analyze_calibration error handling."""
     with pytest.raises(ValueError):
         analyze_calibration(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_analyze_calibration_property_idempotent(self, df):
 
     # Assert property
     assert analyze_calibration(df) == result, "idempotent violated"
-
 
 
 def test_analyze_win_rate_by_confidence_basic():
@@ -100,7 +93,6 @@ def test_analyze_win_rate_by_confidence_basic():
     assert result is not None
 
 
-
 def test_analyze_win_rate_by_confidence_edge_cases():
     """Test analyze_win_rate_by_confidence: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_analyze_win_rate_by_confidence_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_win_rate_by_confidence_error_handling():
     """Test analyze_win_rate_by_confidence error handling."""
     with pytest.raises(ValueError):
         analyze_win_rate_by_confidence(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_analyze_win_rate_by_confidence_property_idempotent(self, df):
 
     # Assert property
     assert analyze_win_rate_by_confidence(df) == result, "idempotent violated"
-
 
 
 def test_analyze_seasonal_patterns_basic():
@@ -144,7 +133,6 @@ def test_analyze_seasonal_patterns_basic():
     assert result is not None
 
 
-
 def test_analyze_seasonal_patterns_edge_cases():
     """Test analyze_seasonal_patterns: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_analyze_seasonal_patterns_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_seasonal_patterns_error_handling():
     """Test analyze_seasonal_patterns error handling."""
     with pytest.raises(ValueError):
         analyze_seasonal_patterns(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +159,6 @@ def test_analyze_seasonal_patterns_property_idempotent(self, df):
 
     # Assert property
     assert analyze_seasonal_patterns(df) == result, "idempotent violated"
-
 
 
 def test_analyze_edge_realization_basic():
@@ -188,7 +173,6 @@ def test_analyze_edge_realization_basic():
     assert result is not None
 
 
-
 def test_analyze_edge_realization_edge_cases():
     """Test analyze_edge_realization: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_analyze_edge_realization_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_edge_realization_error_handling():
     """Test analyze_edge_realization error handling."""
     with pytest.raises(ValueError):
         analyze_edge_realization(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +199,6 @@ def test_analyze_edge_realization_property_idempotent(self, df):
 
     # Assert property
     assert analyze_edge_realization(df) == result, "idempotent violated"
-
 
 
 def test_check_for_anomalies_basic():
@@ -232,7 +213,6 @@ def test_check_for_anomalies_basic():
     assert result is not None
 
 
-
 def test_check_for_anomalies_edge_cases():
     """Test check_for_anomalies: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_check_for_anomalies_edge_cases():
     assert result is not None
 
 
-
 def test_check_for_anomalies_error_handling():
     """Test check_for_anomalies error handling."""
     with pytest.raises(ValueError):
         check_for_anomalies(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,7 +239,6 @@ def test_check_for_anomalies_property_idempotent(self, df):
 
     # Assert property
     assert check_for_anomalies(df) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -276,7 +253,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -289,9 +265,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

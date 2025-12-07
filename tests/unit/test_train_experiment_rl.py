@@ -23,7 +23,6 @@ def test_train_agent_basic():
     assert result is not None
 
 
-
 def test_train_agent_edge_cases():
     """Test train_agent: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_train_agent_edge_cases():
     assert result is not None
 
 
-
 def test_train_agent_error_handling():
     """Test train_agent error handling."""
     with pytest.raises(ValueError):
         train_agent(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -51,8 +48,9 @@ def test_train_agent_property_idempotent(self, env, agent, num_episodes, eval_fr
     result = train_agent(env, agent, num_episodes, eval_freq, verbose)
 
     # Assert property
-    assert train_agent(env, agent, num_episodes, eval_freq, verbose) == result, "idempotent violated"
-
+    assert (
+        train_agent(env, agent, num_episodes, eval_freq, verbose) == result
+    ), "idempotent violated"
 
 
 def test_evaluate_agent_basic():
@@ -67,7 +65,6 @@ def test_evaluate_agent_basic():
     assert result is not None
 
 
-
 def test_evaluate_agent_edge_cases():
     """Test evaluate_agent: edge cases."""
     # Arrange
@@ -80,12 +77,10 @@ def test_evaluate_agent_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_agent_error_handling():
     """Test evaluate_agent error handling."""
     with pytest.raises(ValueError):
         evaluate_agent(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +91,6 @@ def test_evaluate_agent_property_idempotent(self, env, agent, num_eval_episodes)
 
     # Assert property
     assert evaluate_agent(env, agent, num_eval_episodes) == result, "idempotent violated"
-
 
 
 def test_run_ablation_studies_basic():
@@ -111,7 +105,6 @@ def test_run_ablation_studies_basic():
     assert result is not None
 
 
-
 def test_run_ablation_studies_edge_cases():
     """Test run_ablation_studies: edge cases."""
     # Arrange
@@ -124,23 +117,24 @@ def test_run_ablation_studies_edge_cases():
     assert result is not None
 
 
-
 def test_run_ablation_studies_error_handling():
     """Test run_ablation_studies error handling."""
     with pytest.raises(ValueError):
         run_ablation_studies(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_ablation_studies_property_idempotent(self, env, agent_class, agent_params, num_episodes):
+def test_run_ablation_studies_property_idempotent(
+    self, env, agent_class, agent_params, num_episodes
+):
     """Property test: function is idempotent."""
     # Act
     result = run_ablation_studies(env, agent_class, agent_params, num_episodes)
 
     # Assert property
-    assert run_ablation_studies(env, agent_class, agent_params, num_episodes) == result, "idempotent violated"
-
+    assert (
+        run_ablation_studies(env, agent_class, agent_params, num_episodes) == result
+    ), "idempotent violated"
 
 
 def test_compare_baseline_vs_experiments_basic():
@@ -155,7 +149,6 @@ def test_compare_baseline_vs_experiments_basic():
     assert result is not None
 
 
-
 def test_compare_baseline_vs_experiments_edge_cases():
     """Test compare_baseline_vs_experiments: edge cases."""
     # Arrange
@@ -168,12 +161,10 @@ def test_compare_baseline_vs_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_compare_baseline_vs_experiments_error_handling():
     """Test compare_baseline_vs_experiments error handling."""
     with pytest.raises(ValueError):
         compare_baseline_vs_experiments(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +175,6 @@ def test_compare_baseline_vs_experiments_property_idempotent(self, num_episodes,
 
     # Assert property
     assert compare_baseline_vs_experiments(num_episodes, eval_freq) == result, "idempotent violated"
-
 
 
 def test_analyze_feature_importance_basic():
@@ -199,7 +189,6 @@ def test_analyze_feature_importance_basic():
     assert result is not None
 
 
-
 def test_analyze_feature_importance_edge_cases():
     """Test analyze_feature_importance: edge cases."""
     # Arrange
@@ -212,12 +201,10 @@ def test_analyze_feature_importance_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_feature_importance_error_handling():
     """Test analyze_feature_importance error handling."""
     with pytest.raises(ValueError):
         analyze_feature_importance(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100))
@@ -228,7 +215,6 @@ def test_analyze_feature_importance_property_idempotent(self, agent, feature_nam
 
     # Assert property
     assert analyze_feature_importance(agent, feature_names) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -243,7 +229,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -256,9 +241,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -41,6 +41,7 @@ from enum import Enum
 try:
     import numpy as np
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -52,15 +53,17 @@ logger = logging.getLogger(__name__)
 
 class LeakageSeverity(Enum):
     """Data leakage severity levels."""
+
     CRITICAL = "CRITICAL"  # Model invalid, must fix
-    HIGH = "HIGH"          # Likely leakage
-    MEDIUM = "MEDIUM"      # Possible leakage
-    LOW = "LOW"            # Suspicious pattern
-    INFO = "INFO"          # Informational
+    HIGH = "HIGH"  # Likely leakage
+    MEDIUM = "MEDIUM"  # Possible leakage
+    LOW = "LOW"  # Suspicious pattern
+    INFO = "INFO"  # Informational
 
 
 class LeakageType(Enum):
     """Types of data leakage."""
+
     TEMPORAL = "temporal"
     TARGET = "target"
     GROUP = "group"
@@ -71,6 +74,7 @@ class LeakageType(Enum):
 @dataclass
 class LeakageIssue:
     """Represents a data leakage finding."""
+
     severity: LeakageSeverity
     leakage_type: LeakageType
     title: str
@@ -84,6 +88,7 @@ class LeakageIssue:
 @dataclass
 class LeakageReport:
     """Data leakage detection report."""
+
     issues: list[LeakageIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
@@ -208,14 +213,16 @@ class DataLeakageDetector:
             if target_col and col != target_col:
                 for pattern in self.SUSPICIOUS_COLUMNS:
                     if pattern in col.lower():
-                        self.report.add_issue(LeakageIssue(
-                            severity=LeakageSeverity.HIGH,
-                            leakage_type=LeakageType.TARGET,
-                            title=f"Suspicious feature column: {col}",
-                            description=f"Column contains '{pattern}' which often indicates outcome leakage",
-                            evidence=f"Column name: {col}",
-                            remediation=f"Verify {col} doesn't contain future/outcome information",
-                        ))
+                        self.report.add_issue(
+                            LeakageIssue(
+                                severity=LeakageSeverity.HIGH,
+                                leakage_type=LeakageType.TARGET,
+                                title=f"Suspicious feature column: {col}",
+                                description=f"Column contains '{pattern}' which often indicates outcome leakage",
+                                evidence=f"Column name: {col}",
+                                remediation=f"Verify {col} doesn't contain future/outcome information",
+                            )
+                        )
 
     def _check_temporal_ordering(self, df: pd.DataFrame, date_col: str):
         """Check temporal ordering of data."""
@@ -230,25 +237,29 @@ class DataLeakageDetector:
 
         # Check if data is sorted by date
         if not dates.is_monotonic_increasing:
-            self.report.add_issue(LeakageIssue(
-                severity=LeakageSeverity.MEDIUM,
-                leakage_type=LeakageType.TEMPORAL,
-                title="Data not sorted by date",
-                description="Temporal data should be sorted chronologically",
-                evidence=f"Dates are not monotonic increasing in {date_col}",
-                remediation="Sort data by date before feature engineering",
-            ))
+            self.report.add_issue(
+                LeakageIssue(
+                    severity=LeakageSeverity.MEDIUM,
+                    leakage_type=LeakageType.TEMPORAL,
+                    title="Data not sorted by date",
+                    description="Temporal data should be sorted chronologically",
+                    evidence=f"Dates are not monotonic increasing in {date_col}",
+                    remediation="Sort data by date before feature engineering",
+                )
+            )
 
         # Check for future dates
         if dates.max() > datetime.now():
-            self.report.add_issue(LeakageIssue(
-                severity=LeakageSeverity.HIGH,
-                leakage_type=LeakageType.TEMPORAL,
-                title="Future dates detected",
-                description="Dataset contains dates in the future",
-                evidence=f"Max date: {dates.max()}, current: {datetime.now()}",
-                remediation="Filter to dates <= current date",
-            ))
+            self.report.add_issue(
+                LeakageIssue(
+                    severity=LeakageSeverity.HIGH,
+                    leakage_type=LeakageType.TEMPORAL,
+                    title="Future dates detected",
+                    description="Dataset contains dates in the future",
+                    evidence=f"Max date: {dates.max()}, current: {datetime.now()}",
+                    remediation="Filter to dates <= current date",
+                )
+            )
 
     def _check_target_correlation(self, df: pd.DataFrame, target_col: str):
         """Check for suspiciously high correlations with target."""
@@ -263,44 +274,45 @@ class DataLeakageDetector:
         # Check for perfect or near-perfect correlations (excluding target itself)
         for col, corr in correlations.items():
             if col != target_col and corr > 0.99:
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.CRITICAL,
-                    leakage_type=LeakageType.TARGET,
-                    title=f"Perfect correlation: {col}",
-                    description=f"Feature {col} has {corr:.4f} correlation with target",
-                    evidence=f"Correlation: {corr:.4f}",
-                    remediation=f"Verify {col} is not derived from target or outcome",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.CRITICAL,
+                        leakage_type=LeakageType.TARGET,
+                        title=f"Perfect correlation: {col}",
+                        description=f"Feature {col} has {corr:.4f} correlation with target",
+                        evidence=f"Correlation: {corr:.4f}",
+                        remediation=f"Verify {col} is not derived from target or outcome",
+                    )
+                )
             elif col != target_col and corr > 0.95:
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.HIGH,
-                    leakage_type=LeakageType.TARGET,
-                    title=f"Very high correlation: {col}",
-                    description=f"Feature {col} has {corr:.4f} correlation with target",
-                    evidence=f"Correlation: {corr:.4f}",
-                    remediation=f"Investigate if {col} contains leaked information",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.HIGH,
+                        leakage_type=LeakageType.TARGET,
+                        title=f"Very high correlation: {col}",
+                        description=f"Feature {col} has {corr:.4f} correlation with target",
+                        evidence=f"Correlation: {corr:.4f}",
+                        remediation=f"Investigate if {col} contains leaked information",
+                    )
+                )
 
-    def _check_duplicates(
-        self,
-        df: pd.DataFrame,
-        date_col: str,
-        player_col: str | None
-    ):
+    def _check_duplicates(self, df: pd.DataFrame, date_col: str, player_col: str | None):
         """Check for duplicate records."""
         if player_col and player_col in df.columns and date_col in df.columns:
             duplicates = df.duplicated(subset=[player_col, date_col], keep=False)
 
             if duplicates.any():
                 dup_count = duplicates.sum()
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.MEDIUM,
-                    leakage_type=LeakageType.GROUP,
-                    title="Duplicate player-date records",
-                    description=f"Found {dup_count} duplicate player-date combinations",
-                    evidence=f"{dup_count} duplicates found",
-                    remediation="Deduplicate or aggregate player-date records",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.MEDIUM,
+                        leakage_type=LeakageType.GROUP,
+                        title="Duplicate player-date records",
+                        description=f"Found {dup_count} duplicate player-date combinations",
+                        evidence=f"{dup_count} duplicates found",
+                        remediation="Deduplicate or aggregate player-date records",
+                    )
+                )
 
     def _check_statistical_anomalies(self, df: pd.DataFrame):
         """Check for statistical anomalies that might indicate leakage."""
@@ -309,26 +321,30 @@ class DataLeakageDetector:
         for col in numeric_cols:
             # Check for zero variance (all same value)
             if df[col].nunique() == 1:
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.LOW,
-                    leakage_type=LeakageType.STATISTICAL,
-                    title=f"Zero variance: {col}",
-                    description=f"Column {col} has only one unique value",
-                    evidence=f"All values are {df[col].iloc[0]}",
-                    remediation=f"Remove {col} or investigate data collection",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.LOW,
+                        leakage_type=LeakageType.STATISTICAL,
+                        title=f"Zero variance: {col}",
+                        description=f"Column {col} has only one unique value",
+                        evidence=f"All values are {df[col].iloc[0]}",
+                        remediation=f"Remove {col} or investigate data collection",
+                    )
+                )
 
             # Check for extreme skewness
             skew = df[col].skew()
             if abs(skew) >= 10:
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.LOW,
-                    leakage_type=LeakageType.STATISTICAL,
-                    title=f"Extreme skewness: {col}",
-                    description=f"Column {col} has skewness {skew:.2f}",
-                    evidence=f"Skewness: {skew:.2f}",
-                    remediation="Check for data quality issues or outliers",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.LOW,
+                        leakage_type=LeakageType.STATISTICAL,
+                        title=f"Extreme skewness: {col}",
+                        description=f"Column {col} has skewness {skew:.2f}",
+                        evidence=f"Skewness: {skew:.2f}",
+                        remediation="Check for data quality issues or outliers",
+                    )
+                )
 
     def validate_split(
         self,
@@ -357,14 +373,16 @@ class DataLeakageDetector:
             test_min = pd.to_datetime(test_df[date_col]).min()
 
             if test_min < train_max:
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.CRITICAL,
-                    leakage_type=LeakageType.TEMPORAL,
-                    title="Temporal leakage in split",
-                    description="Test set contains dates before training set maximum",
-                    evidence=f"Train max: {train_max}, Test min: {test_min}",
-                    remediation="Ensure test dates are all after training dates",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.CRITICAL,
+                        leakage_type=LeakageType.TEMPORAL,
+                        title="Temporal leakage in split",
+                        description="Test set contains dates before training set maximum",
+                        evidence=f"Train max: {train_max}, Test min: {test_min}",
+                        remediation="Ensure test dates are all after training dates",
+                    )
+                )
 
         # Check for player overlap (if applicable)
         if player_col and player_col in train_df.columns and player_col in test_df.columns:
@@ -374,14 +392,16 @@ class DataLeakageDetector:
 
             if overlap:
                 overlap_pct = len(overlap) / len(test_players) * 100
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.MEDIUM,
-                    leakage_type=LeakageType.PLAYER,
-                    title="Player overlap in split",
-                    description=f"{len(overlap)} players appear in both train and test",
-                    evidence=f"{overlap_pct:.1f}% of test players in training",
-                    remediation="Consider player-level split or grouped time series split",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.MEDIUM,
+                        leakage_type=LeakageType.PLAYER,
+                        title="Player overlap in split",
+                        description=f"{len(overlap)} players appear in both train and test",
+                        evidence=f"{overlap_pct:.1f}% of test players in training",
+                        remediation="Consider player-level split or grouped time series split",
+                    )
+                )
 
         # Check for identical rows
         if train_df.shape[1] == test_df.shape[1]:
@@ -392,21 +412,21 @@ class DataLeakageDetector:
             # Check if any test rows are in training
             common_cols = list(set(train_df.columns) & set(test_df.columns))
             merged = test_sample[common_cols].merge(
-                train_df[common_cols],
-                how='inner',
-                indicator=False
+                train_df[common_cols], how="inner", indicator=False
             )
 
             if len(merged) > 0:
                 leak_pct = len(merged) / sample_size * 100
-                self.report.add_issue(LeakageIssue(
-                    severity=LeakageSeverity.CRITICAL,
-                    leakage_type=LeakageType.GROUP,
-                    title="Identical rows in train and test",
-                    description=f"Found {len(merged)} identical rows in sample",
-                    evidence=f"~{leak_pct:.1f}% of test rows appear in training",
-                    remediation="Remove duplicate rows or fix split logic",
-                ))
+                self.report.add_issue(
+                    LeakageIssue(
+                        severity=LeakageSeverity.CRITICAL,
+                        leakage_type=LeakageType.GROUP,
+                        title="Identical rows in train and test",
+                        description=f"Found {len(merged)} identical rows in sample",
+                        evidence=f"~{leak_pct:.1f}% of test rows appear in training",
+                        remediation="Remove duplicate rows or fix split logic",
+                    )
+                )
 
         return self.report
 
@@ -432,47 +452,53 @@ class DataLeakageDetector:
             # Check for target in features
             for pattern in self.LEAKAGE_PATTERNS["target_in_features"]:
                 if re.search(pattern, line):
-                    self.report.add_issue(LeakageIssue(
-                        severity=LeakageSeverity.CRITICAL,
-                        leakage_type=LeakageType.TARGET,
-                        title="Target variable used in features",
-                        description="Feature engineering uses target variable",
-                        evidence=line.strip(),
-                        remediation="Remove target from feature calculation",
-                        location=file_path,
-                        line_number=i,
-                    ))
+                    self.report.add_issue(
+                        LeakageIssue(
+                            severity=LeakageSeverity.CRITICAL,
+                            leakage_type=LeakageType.TARGET,
+                            title="Target variable used in features",
+                            description="Feature engineering uses target variable",
+                            evidence=line.strip(),
+                            remediation="Remove target from feature calculation",
+                            location=file_path,
+                            line_number=i,
+                        )
+                    )
 
             # Check for future data
             for pattern in self.LEAKAGE_PATTERNS["future_data"]:
                 if re.search(pattern, line):
-                    self.report.add_issue(LeakageIssue(
-                        severity=LeakageSeverity.HIGH,
-                        leakage_type=LeakageType.TEMPORAL,
-                        title="Potential future data usage",
-                        description="Code may access future data",
-                        evidence=line.strip(),
-                        remediation="Verify temporal correctness of data access",
-                        location=file_path,
-                        line_number=i,
-                    ))
+                    self.report.add_issue(
+                        LeakageIssue(
+                            severity=LeakageSeverity.HIGH,
+                            leakage_type=LeakageType.TEMPORAL,
+                            title="Potential future data usage",
+                            description="Code may access future data",
+                            evidence=line.strip(),
+                            remediation="Verify temporal correctness of data access",
+                            location=file_path,
+                            line_number=i,
+                        )
+                    )
 
             # Check for unsafe merges
             for pattern in self.LEAKAGE_PATTERNS["unsafe_merge"]:
                 if re.search(pattern, line):
                     # Check only code part (before comment)
-                    code_part = line.split('#')[0].lower()
+                    code_part = line.split("#")[0].lower()
                     if "asof" not in code_part:
-                        self.report.add_issue(LeakageIssue(
-                            severity=LeakageSeverity.HIGH,
-                            leakage_type=LeakageType.TEMPORAL,
-                            title="Unsafe temporal merge",
-                            description="Merge on date without asof can leak",
-                            evidence=line.strip(),
-                            remediation="Use pd.merge_asof() for temporal joins",
-                            location=file_path,
-                            line_number=i,
-                        ))
+                        self.report.add_issue(
+                            LeakageIssue(
+                                severity=LeakageSeverity.HIGH,
+                                leakage_type=LeakageType.TEMPORAL,
+                                title="Unsafe temporal merge",
+                                description="Merge on date without asof can leak",
+                                evidence=line.strip(),
+                                remediation="Use pd.merge_asof() for temporal joins",
+                                location=file_path,
+                                line_number=i,
+                            )
+                        )
 
         return self.report
 
@@ -494,8 +520,12 @@ class DataLeakageDetector:
             lines.append("   MODEL IS INVALID - DO NOT USE FOR BETTING")
 
         # Group by severity
-        for severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH,
-                        LeakageSeverity.MEDIUM, LeakageSeverity.LOW]:
+        for severity in [
+            LeakageSeverity.CRITICAL,
+            LeakageSeverity.HIGH,
+            LeakageSeverity.MEDIUM,
+            LeakageSeverity.LOW,
+        ]:
             severity_issues = [i for i in self.report.issues if i.severity == severity]
 
             if severity_issues:
@@ -524,19 +554,21 @@ if __name__ == "__main__":
         detector = DataLeakageDetector()
 
         # Create sample DataFrame
-        df = pd.DataFrame({
-            'kickoff': pd.date_range('2024-01-01', periods=100),
-            'player_id': np.random.randint(1, 20, 100),
-            'passing_yards': np.random.randint(100, 400, 100),
-            'feature_1': np.random.randn(100),
-            'feature_2': np.random.randn(100),
-        })
+        df = pd.DataFrame(
+            {
+                "kickoff": pd.date_range("2024-01-01", periods=100),
+                "player_id": np.random.randint(1, 20, 100),
+                "passing_yards": np.random.randint(100, 400, 100),
+                "feature_1": np.random.randn(100),
+                "feature_2": np.random.randn(100),
+            }
+        )
 
         # Add suspicious feature (high correlation with target)
-        df['suspicious_feature'] = df['passing_yards'] * 0.99 + np.random.randn(100)
+        df["suspicious_feature"] = df["passing_yards"] * 0.99 + np.random.randn(100)
 
         # Check for leakage
-        report = detector.check_dataframe(df, target_col='passing_yards')
+        report = detector.check_dataframe(df, target_col="passing_yards")
 
         print(detector.generate_report())
     else:

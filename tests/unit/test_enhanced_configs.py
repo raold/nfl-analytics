@@ -23,7 +23,6 @@ def test_get_config_by_name_basic():
     assert result is not None
 
 
-
 def test_get_config_by_name_edge_cases():
     """Test get_config_by_name: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_config_by_name_edge_cases():
     assert result is not None
 
 
-
 def test_get_config_by_name_error_handling():
     """Test get_config_by_name error handling."""
     with pytest.raises(ValueError):
         get_config_by_name(invalid_input)
-
 
 
 @given(st.text(min_size=1, max_size=100))
@@ -52,7 +49,6 @@ def test_get_config_by_name_property_idempotent(self, name):
 
     # Assert property
     assert get_config_by_name(name) == result, "idempotent violated"
-
 
 
 def test_list_config_names_basic():
@@ -67,7 +63,6 @@ def test_list_config_names_basic():
     assert result is not None
 
 
-
 def test_list_config_names_edge_cases():
     """Test list_config_names: edge cases."""
     # Arrange
@@ -80,9 +75,7 @@ def test_list_config_names_edge_cases():
     assert result is not None
 
 
-
 def test_list_config_names_error_handling():
     """Test list_config_names error handling."""
     with pytest.raises(ValueError):
         list_config_names(invalid_input)
-

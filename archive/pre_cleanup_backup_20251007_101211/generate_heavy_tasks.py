@@ -25,36 +25,36 @@ def generate_tasks(count: int = 100, continuous: bool = False):
             "name_template": "Monte Carlo Simulation ({}M scenarios)",
             "iterations_range": (5000000, 50000000),
             "priority_range": (1, 5),
-            "queue": "analysis:standard"
+            "queue": "analysis:standard",
         },
         {
             "type": "feature_engineering",
             "name_template": "Feature Engineering ({} features)",
             "iterations_range": (2000000, 10000000),
             "priority_range": (2, 6),
-            "queue": "cpu:parallel"
+            "queue": "cpu:parallel",
         },
         {
             "type": "matrix_computation",
             "name_template": "Matrix Operations ({}x{})",
             "iterations_range": (1000000, 25000000),
             "priority_range": (1, 4),
-            "queue": "cpu:parallel"
+            "queue": "cpu:parallel",
         },
         {
             "type": "optimization",
             "name_template": "Optimization Problem ({} dimensions)",
             "iterations_range": (500000, 5000000),
             "priority_range": (3, 7),
-            "queue": "analysis:standard"
+            "queue": "analysis:standard",
         },
         {
             "type": "deep_learning",
             "name_template": "Neural Network Training ({})",
             "iterations_range": (3000000, 30000000),
             "priority_range": (1, 3),
-            "queue": "gpu:standard"
-        }
+            "queue": "gpu:standard",
+        },
     ]
 
     tasks_added = 0
@@ -72,7 +72,7 @@ def generate_tasks(count: int = 100, continuous: bool = False):
                 if task_template["type"] == "monte_carlo":
                     name = task_template["name_template"].format(iterations // 1000000)
                 elif task_template["type"] == "matrix_computation":
-                    size = int(iterations ** 0.5)
+                    size = int(iterations**0.5)
                     name = task_template["name_template"].format(size, size)
                 elif task_template["type"] == "optimization":
                     dims = iterations // 10000
@@ -81,7 +81,9 @@ def generate_tasks(count: int = 100, continuous: bool = False):
                     features = iterations // 1000
                     name = task_template["name_template"].format(features)
                 else:
-                    name = task_template["name_template"].format(f"{iterations // 1000000}M iterations")
+                    name = task_template["name_template"].format(
+                        f"{iterations // 1000000}M iterations"
+                    )
 
                 # Map priority number to TaskPriority enum
                 priority_value = random.randint(*task_template["priority_range"])
@@ -100,7 +102,7 @@ def generate_tasks(count: int = 100, continuous: bool = False):
                     "iterations": iterations,
                     "complexity": random.choice(["low", "medium", "high"]),
                     "data_size": random.randint(1000, 100000),
-                    "parallel": random.choice([True, False])
+                    "parallel": random.choice([True, False]),
                 }
 
                 # Submit task - use add_task method
@@ -109,7 +111,7 @@ def generate_tasks(count: int = 100, continuous: bool = False):
                     task_type=task_template["type"],
                     config=config,
                     priority=priority,
-                    requires_gpu=task_template["type"] == "deep_learning"
+                    requires_gpu=task_template["type"] == "deep_learning",
                 )
                 tasks_added += 1
 

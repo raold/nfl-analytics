@@ -93,13 +93,12 @@ import pandas as pd
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Suppress pandas warnings
-warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ============================================================================
 # Expected Points Lookup Table (nflfastR EP Model)
@@ -115,22 +114,22 @@ EP_BY_FIELD_POSITION = {
     90: -0.90,
     85: -0.60,
     80: -0.30,  # Own 20-yard line (touchback starting position)
-    75: 0.00,   # Own 25-yard line (new touchback rule 2018+)
+    75: 0.00,  # Own 25-yard line (new touchback rule 2018+)
     70: 0.30,
     65: 0.60,
     60: 0.90,
     55: 1.20,
-    50: 1.50,   # Midfield (neutral zone, decision point)
+    50: 1.50,  # Midfield (neutral zone, decision point)
     45: 1.85,
     40: 2.20,
     35: 2.60,
-    30: 3.00,   # Opponent 30 (field goal range)
+    30: 3.00,  # Opponent 30 (field goal range)
     25: 3.50,
-    20: 4.00,   # Red zone begins (TD probability increases)
+    20: 4.00,  # Red zone begins (TD probability increases)
     15: 4.50,
-    10: 5.20,   # High TD probability zone
+    10: 5.20,  # High TD probability zone
     5: 5.70,
-    1: 6.00,    # Goal line (near-certain score)
+    1: 6.00,  # Goal line (near-certain score)
 }
 
 # Down multipliers (later downs = fewer chances = lower EP)
@@ -150,11 +149,8 @@ DISTANCE_PENALTY_PER_YARD = 0.15  # EP reduction per yard beyond 5
 # Expected Points Calculation
 # ============================================================================
 
-def get_expected_points(
-    field_position: int,
-    down: int = 1,
-    yards_to_go: int = 10
-) -> float:
+
+def get_expected_points(field_position: int, down: int = 1, yards_to_go: int = 10) -> float:
     """
     Get expected points for a given field position and situation.
 
@@ -209,7 +205,9 @@ def get_expected_points(
         else:
             # Interpolate
             weight = (field_position - lower) / (upper - lower)
-            base_ep = (1 - weight) * EP_BY_FIELD_POSITION[lower] + weight * EP_BY_FIELD_POSITION[upper]
+            base_ep = (1 - weight) * EP_BY_FIELD_POSITION[lower] + weight * EP_BY_FIELD_POSITION[
+                upper
+            ]
 
     # Apply down multiplier
     down_adjusted_ep = base_ep * DOWN_MULTIPLIERS[down]
@@ -227,6 +225,7 @@ def get_expected_points(
 # ============================================================================
 # Time Value Decay
 # ============================================================================
+
 
 def time_value_factor(seconds_remaining: int) -> float:
     """
@@ -284,6 +283,7 @@ def time_value_factor(seconds_remaining: int) -> float:
 # ============================================================================
 # Urgency Multiplier
 # ============================================================================
+
 
 def urgency_factor(score_diff: int, time_remaining: int) -> float:
     """
@@ -368,12 +368,9 @@ def urgency_factor(score_diff: int, time_remaining: int) -> float:
 # Composite Possession Value
 # ============================================================================
 
+
 def compute_possession_value(
-    field_position: int,
-    time_remaining: int,
-    score_diff: int,
-    down: int = 1,
-    yards_to_go: int = 10
+    field_position: int, time_remaining: int, score_diff: int, down: int = 1, yards_to_go: int = 10
 ) -> float:
     """
     Expected points value of current possession.
@@ -431,12 +428,9 @@ def compute_possession_value(
 # Team-Level Aggregation Features
 # ============================================================================
 
+
 def get_team_possession_value_features(
-    conn,
-    team: str,
-    season: int,
-    week: int,
-    n_games: int = 4
+    conn, team: str, season: int, week: int, n_games: int = 4
 ) -> dict[str, float]:
     """
     Get team's historical possession value metrics.
@@ -549,49 +543,48 @@ def get_team_possession_value_features(
             cur.execute(fallback_query, (season, week, team, team, n_games, team))
             result = cur.fetchone()
 
-            if result is None or result['total_drives'] == 0:
+            if result is None or result["total_drives"] == 0:
                 # No data available, return league averages
                 logger.warning(f"No possession data for {team} in {season} week {week}")
                 return {
-                    'avg_starting_field_position': 25.0,  # Touchback position
-                    'avg_possession_value': 1.5,          # League average EP
-                    'pace_factor': 1.0,                   # Neutral pace
-                    'possessions_per_game': LEAGUE_AVG_POSSESSIONS
+                    "avg_starting_field_position": 25.0,  # Touchback position
+                    "avg_possession_value": 1.5,  # League average EP
+                    "pace_factor": 1.0,  # Neutral pace
+                    "possessions_per_game": LEAGUE_AVG_POSSESSIONS,
                 }
 
             # Extract metrics
-            avg_field_pos = float(result['avg_starting_field_position'] or 25.0)
-            possessions_per_game = float(result['possessions_per_game'] or LEAGUE_AVG_POSSESSIONS)
+            avg_field_pos = float(result["avg_starting_field_position"] or 25.0)
+            possessions_per_game = float(result["possessions_per_game"] or LEAGUE_AVG_POSSESSIONS)
 
             # Compute average possession value (EP from average starting position)
             # Assume 1st & 10 at average starting position
             avg_yards_to_endzone = 100 - avg_field_pos
             avg_possession_value = get_expected_points(
-                field_position=int(avg_yards_to_endzone),
-                down=1,
-                yards_to_go=10
+                field_position=int(avg_yards_to_endzone), down=1, yards_to_go=10
             )
 
             # Compute pace factor (relative to league average)
             pace_factor = possessions_per_game / LEAGUE_AVG_POSSESSIONS
 
             return {
-                'avg_starting_field_position': avg_field_pos,
-                'avg_possession_value': avg_possession_value,
-                'pace_factor': pace_factor,
-                'possessions_per_game': possessions_per_game
+                "avg_starting_field_position": avg_field_pos,
+                "avg_possession_value": avg_possession_value,
+                "pace_factor": pace_factor,
+                "possessions_per_game": possessions_per_game,
             }
 
     except Exception as e:
         import traceback
+
         logger.error(f"Error computing possession value features: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
         # Return league averages on error
         return {
-            'avg_starting_field_position': 25.0,
-            'avg_possession_value': 1.5,
-            'pace_factor': 1.0,
-            'possessions_per_game': LEAGUE_AVG_POSSESSIONS
+            "avg_starting_field_position": 25.0,
+            "avg_possession_value": 1.5,
+            "pace_factor": 1.0,
+            "possessions_per_game": LEAGUE_AVG_POSSESSIONS,
         }
 
 
@@ -599,10 +592,8 @@ def get_team_possession_value_features(
 # Batch Feature Extraction
 # ============================================================================
 
-def compute_possession_value_features(
-    conn,
-    games_df: pd.DataFrame
-) -> pd.DataFrame:
+
+def compute_possession_value_features(conn, games_df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute possession value features for multiple games.
 
@@ -649,25 +640,19 @@ def compute_possession_value_features(
     for idx, row in games_df.iterrows():
         # Home team features
         home_feat = get_team_possession_value_features(
-            conn=conn,
-            team=row['home_team'],
-            season=row['season'],
-            week=row['week']
+            conn=conn, team=row["home_team"], season=row["season"], week=row["week"]
         )
         home_features.append(home_feat)
 
         # Away team features
         away_feat = get_team_possession_value_features(
-            conn=conn,
-            team=row['away_team'],
-            season=row['season'],
-            week=row['week']
+            conn=conn, team=row["away_team"], season=row["season"], week=row["week"]
         )
         away_features.append(away_feat)
 
     # Convert to DataFrames with prefixes
-    home_df = pd.DataFrame(home_features).add_prefix('home_')
-    away_df = pd.DataFrame(away_features).add_prefix('away_')
+    home_df = pd.DataFrame(home_features).add_prefix("home_")
+    away_df = pd.DataFrame(away_features).add_prefix("away_")
 
     # Concatenate with original data
     result = pd.concat([result.reset_index(drop=True), home_df, away_df], axis=1)

@@ -16,6 +16,7 @@ try:
     from redis_task_queue import HardwareProfile, QueueType, RedisTaskQueue
     from redis_worker import RedisComputeWorker
     from sync_manager import GoogleDriveSyncManager
+
     print("✅ All Redis modules imported successfully")
 except ImportError as e:
     print(f"❌ Import failed: {e}")
@@ -28,7 +29,7 @@ def test_redis_connection():
     print("\n🔧 Testing Redis Connection...")
 
     try:
-        r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+        r = redis.Redis(host="localhost", port=6379, decode_responses=True)
         r.ping()
         print("✅ Redis connection successful")
 
@@ -56,10 +57,10 @@ def test_hardware_detection():
             machine_id="test_machine",
             cpu_cores=8,
             total_memory=16 * 1024**3,  # 16GB
-            gpu_memory=8 * 1024**3,     # 8GB
+            gpu_memory=8 * 1024**3,  # 8GB
             gpu_name="Test GPU",
             platform="test",
-            capabilities=["pytorch", "cuda", "scipy"]
+            capabilities=["pytorch", "cuda", "scipy"],
         )
 
         print("✅ Hardware profile created:")
@@ -91,7 +92,7 @@ def test_redis_task_queue():
             gpu_memory=8 * 1024**3,
             gpu_name="Test GPU",
             platform="test",
-            capabilities=["pytorch", "cuda"]
+            capabilities=["pytorch", "cuda"],
         )
 
         # Register machine
@@ -107,16 +108,14 @@ def test_redis_task_queue():
             task_type="rl_train",
             config={"epochs": 100, "model": "dqn"},
             requires_gpu=True,
-            min_gpu_memory=4 * 1024**3
+            min_gpu_memory=4 * 1024**3,
         )
         tasks.append(gpu_task_id)
         print(f"✅ Added GPU task: {gpu_task_id}")
 
         # CPU task
         cpu_task_id = queue.add_task(
-            name="Test CPU Task",
-            task_type="feature_engineering",
-            config={"dataset": "test"}
+            name="Test CPU Task", task_type="feature_engineering", config={"dataset": "test"}
         )
         tasks.append(cpu_task_id)
         print(f"✅ Added CPU task: {cpu_task_id}")
@@ -132,9 +131,7 @@ def test_redis_task_queue():
 
             # Complete task
             queue.complete_task(
-                next_task["id"],
-                {"status": "success", "accuracy": 0.95},
-                cpu_hours=0.1
+                next_task["id"], {"status": "success", "accuracy": 0.95}, cpu_hours=0.1
             )
             print(f"✅ Completed task: {next_task['id']}")
 
@@ -153,7 +150,7 @@ def test_sync_manager():
 
     try:
         # Connect to Redis
-        redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+        redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
         # Create sync manager with test directory
         test_sync_dir = Path("/tmp/nfl_analytics_test_sync")
@@ -163,7 +160,7 @@ def test_sync_manager():
             redis_client=redis_client,
             sync_directory=test_sync_dir,
             machine_id="test_machine",
-            sync_interval=60  # 1 minute for testing
+            sync_interval=60,  # 1 minute for testing
         )
 
         print("✅ Sync manager initialized")
@@ -179,6 +176,7 @@ def test_sync_manager():
 
         # Clean up test directory
         import shutil
+
         shutil.rmtree(test_sync_dir, ignore_errors=True)
 
         return True
@@ -195,9 +193,7 @@ def test_worker_integration():
     try:
         # Create worker
         worker = RedisComputeWorker(
-            intensity="low",
-            machine_id="test_machine",
-            hardware_profile="gpu_standard"
+            intensity="low", machine_id="test_machine", hardware_profile="gpu_standard"
         )
 
         print("✅ Redis worker created")
@@ -231,7 +227,7 @@ def main():
         ("Hardware Detection", test_hardware_detection),
         ("Redis Task Queue", test_redis_task_queue),
         ("Sync Manager", test_sync_manager),
-        ("Worker Integration", test_worker_integration)
+        ("Worker Integration", test_worker_integration),
     ]
 
     results = []

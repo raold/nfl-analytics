@@ -33,17 +33,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('/tmp/backfill_outcomes.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("/tmp/backfill_outcomes.log"), logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
 
 # Model configuration
 MODEL_ID = 384  # ensemble_v6.1
-STAT_TYPE = 'passing_yards'
+STAT_TYPE = "passing_yards"
 
 
 class OutcomeBackfiller:
@@ -51,26 +48,23 @@ class OutcomeBackfiller:
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions'
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """Initialize with database connection"""
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'dbname': db_name,
-            'user': db_user,
-            'password': db_password
+            "host": db_host,
+            "port": db_port,
+            "dbname": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
     def get_pending_predictions(
-        self,
-        season: int | None = None,
-        week: int | None = None,
-        game_id: str | None = None
+        self, season: int | None = None, week: int | None = None, game_id: str | None = None
     ) -> list[dict]:
         """
         Get predictions awaiting outcomes
@@ -89,7 +83,7 @@ class OutcomeBackfiller:
                 where_clauses = [
                     "model_id = %s",
                     "stat_type = %s",
-                    "actual_value IS NULL"  # Only predictions without outcomes
+                    "actual_value IS NULL",  # Only predictions without outcomes
                 ]
                 params = [MODEL_ID, STAT_TYPE]
 
@@ -107,7 +101,8 @@ class OutcomeBackfiller:
 
                 where_sql = " AND ".join(where_clauses)
 
-                cur.execute(f"""
+                cur.execute(
+                    f"""
                     SELECT
                         prediction_id,
                         game_id,
@@ -126,17 +121,15 @@ class OutcomeBackfiller:
                     FROM ml.predictions
                     WHERE {where_sql}
                     ORDER BY season, week, game_id
-                """, params)
+                """,
+                    params,
+                )
 
                 predictions = cur.fetchall()
                 logger.info(f"Found {len(predictions)} predictions awaiting outcomes")
                 return [dict(p) for p in predictions]
 
-    def get_actual_passing_yards(
-        self,
-        game_id: str,
-        player_id: str
-    ) -> float | None:
+    def get_actual_passing_yards(self, game_id: str, player_id: str) -> float | None:
         """
         Get actual passing yards for a player in a game
 
@@ -150,13 +143,16 @@ class OutcomeBackfiller:
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
                 # Sum passing yards from play-by-play data
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT SUM(passing_yards) as total_yards
                     FROM public.plays
                     WHERE game_id = %s
                       AND passer_player_id = %s
                       AND passing_yards IS NOT NULL
-                """, (game_id, player_id))
+                """,
+                    (game_id, player_id),
+                )
 
                 result = cur.fetchone()
                 if result and result[0] is not None:
@@ -172,7 +168,7 @@ class OutcomeBackfiller:
         prediction_std: float,
         prediction_q05: float,
         prediction_q95: float,
-        line: float | None = None
+        line: float | None = None,
     ) -> bool:
         """
         Update prediction with actual outcome and calculate errors
@@ -194,7 +190,7 @@ class OutcomeBackfiller:
         abs_prediction_error = abs(prediction_error)
 
         # Calibration: Was actual within 90% CI?
-        calibrated = (actual_value >= prediction_q05 and actual_value <= prediction_q95)
+        calibrated = actual_value >= prediction_q05 and actual_value <= prediction_q95
 
         # Status: Win/Loss/Push (if line available)
         status = None
@@ -202,19 +198,20 @@ class OutcomeBackfiller:
 
         if line is not None:
             if actual_value > line:
-                status = 'win'
+                status = "win"
                 pnl = 100.0  # Simplified: $100 win on $110 bet
             elif actual_value < line:
-                status = 'loss'
+                status = "loss"
                 pnl = -110.0  # Simplified: Lost $110 stake
             else:
-                status = 'push'
+                status = "push"
                 pnl = 0.0
 
         # Update database
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE ml.predictions
                     SET
                         actual_value = %s,
@@ -225,23 +222,22 @@ class OutcomeBackfiller:
                         pnl = %s,
                         updated_at = NOW()
                     WHERE prediction_id = %s
-                """, (
-                    actual_value,
-                    prediction_error,
-                    abs_prediction_error,
-                    calibrated,
-                    status,
-                    pnl,
-                    prediction_id
-                ))
+                """,
+                    (
+                        actual_value,
+                        prediction_error,
+                        abs_prediction_error,
+                        calibrated,
+                        status,
+                        pnl,
+                        prediction_id,
+                    ),
+                )
                 conn.commit()
                 return True
 
     def backfill(
-        self,
-        season: int | None = None,
-        week: int | None = None,
-        game_id: str | None = None
+        self, season: int | None = None, week: int | None = None, game_id: str | None = None
     ) -> dict:
         """
         Backfill outcomes for predictions
@@ -254,9 +250,9 @@ class OutcomeBackfiller:
         Returns:
             Summary dict with counts
         """
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("BACKFILLING OUTCOMES")
-        logger.info("="*80 + "\n")
+        logger.info("=" * 80 + "\n")
 
         if game_id:
             logger.info(f"Target: Game {game_id}")
@@ -272,99 +268,92 @@ class OutcomeBackfiller:
 
         if not predictions:
             logger.info("No pending predictions found")
-            return {
-                'pending': 0,
-                'updated': 0,
-                'missing_data': 0,
-                'calibrated': 0
-            }
+            return {"pending": 0, "updated": 0, "missing_data": 0, "calibrated": 0}
 
         stats = {
-            'pending': len(predictions),
-            'updated': 0,
-            'missing_data': 0,
-            'calibrated': 0,
-            'start_time': datetime.now(UTC)
+            "pending": len(predictions),
+            "updated": 0,
+            "missing_data": 0,
+            "calibrated": 0,
+            "start_time": datetime.now(UTC),
         }
 
         # Process each prediction
         for pred in predictions:
             logger.info(
-                f"Processing: {pred['player_name']} ({pred['team']}) "
-                f"in {pred['game_id']}"
+                f"Processing: {pred['player_name']} ({pred['team']}) " f"in {pred['game_id']}"
             )
 
             # Get actual passing yards
-            actual_yards = self.get_actual_passing_yards(
-                pred['game_id'],
-                pred['player_id']
-            )
+            actual_yards = self.get_actual_passing_yards(pred["game_id"], pred["player_id"])
 
             if actual_yards is None:
                 logger.warning(f"  ⚠️ No data found for {pred['player_name']}")
-                stats['missing_data'] += 1
+                stats["missing_data"] += 1
                 continue
 
             # Update prediction
             success = self.update_prediction_outcome(
-                prediction_id=pred['prediction_id'],
+                prediction_id=pred["prediction_id"],
                 actual_value=actual_yards,
-                prediction_mean=pred['prediction_mean'],
-                prediction_std=pred['prediction_std'],
-                prediction_q05=pred['prediction_q05'],
-                prediction_q95=pred['prediction_q95'],
-                line=pred['line']
+                prediction_mean=pred["prediction_mean"],
+                prediction_std=pred["prediction_std"],
+                prediction_q05=pred["prediction_q05"],
+                prediction_q95=pred["prediction_q95"],
+                line=pred["line"],
             )
 
             if success:
                 # Check calibration
                 calibrated = (
-                    actual_yards >= pred['prediction_q05'] and
-                    actual_yards <= pred['prediction_q95']
+                    actual_yards >= pred["prediction_q05"]
+                    and actual_yards <= pred["prediction_q95"]
                 )
                 if calibrated:
-                    stats['calibrated'] += 1
+                    stats["calibrated"] += 1
 
-                error = actual_yards - pred['prediction_mean']
+                error = actual_yards - pred["prediction_mean"]
                 logger.info(
                     f"  ✅ Actual: {actual_yards:.1f} yards "
                     f"(predicted {pred['prediction_mean']:.1f} ± {pred['prediction_std']:.1f}), "
                     f"error: {error:+.1f}, "
                     f"calibrated: {'✓' if calibrated else '✗'}"
                 )
-                stats['updated'] += 1
+                stats["updated"] += 1
             else:
                 logger.error("  ❌ Failed to update prediction")
 
-        stats['end_time'] = datetime.now(UTC)
-        stats['duration_seconds'] = (stats['end_time'] - stats['start_time']).total_seconds()
+        stats["end_time"] = datetime.now(UTC)
+        stats["duration_seconds"] = (stats["end_time"] - stats["start_time"]).total_seconds()
 
         # Print summary
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("SUMMARY")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info(f"Pending predictions: {stats['pending']}")
         logger.info(f"✅ Updated: {stats['updated']}")
         logger.info(f"⚠️ Missing data: {stats['missing_data']}")
-        if stats['updated'] > 0:
-            calibration_pct = (stats['calibrated'] / stats['updated']) * 100
-            logger.info(f"📊 Calibration: {stats['calibrated']}/{stats['updated']} ({calibration_pct:.1f}%)")
+        if stats["updated"] > 0:
+            calibration_pct = (stats["calibrated"] / stats["updated"]) * 100
+            logger.info(
+                f"📊 Calibration: {stats['calibrated']}/{stats['updated']} ({calibration_pct:.1f}%)"
+            )
         logger.info(f"⏱️ Duration: {stats['duration_seconds']:.1f} seconds")
-        logger.info("="*80 + "\n")
+        logger.info("=" * 80 + "\n")
 
         return stats
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Backfill actual outcomes for predictions')
-    parser.add_argument('--season', type=int, help='Season (default: all pending)')
-    parser.add_argument('--week', type=int, help='Week (default: all pending)')
-    parser.add_argument('--game-id', help='Specific game ID (e.g., 2024_12_KC_BUF)')
-    parser.add_argument('--db-host', default='localhost', help='Database host')
-    parser.add_argument('--db-port', type=int, default=5544, help='Database port')
-    parser.add_argument('--db-name', default='devdb01', help='Database name')
-    parser.add_argument('--db-user', default='dro', help='Database user')
-    parser.add_argument('--db-password', default='sicillionbillions', help='Database password')
+    parser = argparse.ArgumentParser(description="Backfill actual outcomes for predictions")
+    parser.add_argument("--season", type=int, help="Season (default: all pending)")
+    parser.add_argument("--week", type=int, help="Week (default: all pending)")
+    parser.add_argument("--game-id", help="Specific game ID (e.g., 2024_12_KC_BUF)")
+    parser.add_argument("--db-host", default="localhost", help="Database host")
+    parser.add_argument("--db-port", type=int, default=5544, help="Database port")
+    parser.add_argument("--db-name", default="devdb01", help="Database name")
+    parser.add_argument("--db-user", default="dro", help="Database user")
+    parser.add_argument("--db-password", default="sicillionbillions", help="Database password")
 
     args = parser.parse_args()
 
@@ -374,17 +363,13 @@ def main():
             db_port=args.db_port,
             db_name=args.db_name,
             db_user=args.db_user,
-            db_password=args.db_password
+            db_password=args.db_password,
         )
 
-        stats = backfiller.backfill(
-            season=args.season,
-            week=args.week,
-            game_id=args.game_id
-        )
+        stats = backfiller.backfill(season=args.season, week=args.week, game_id=args.game_id)
 
         # Exit code based on results
-        if stats['missing_data'] > 0 and stats['updated'] == 0:
+        if stats["missing_data"] > 0 and stats["updated"] == 0:
             logger.error("⚠️ No outcomes could be backfilled")
             return 1
         else:
@@ -396,5 +381,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

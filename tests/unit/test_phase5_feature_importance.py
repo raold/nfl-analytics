@@ -24,7 +24,6 @@ def test_analyze_feature_importance_basic():
     assert result is not None
 
 
-
 def test_analyze_feature_importance_edge_cases():
     """Test analyze_feature_importance: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_analyze_feature_importance_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_feature_importance_error_handling():
     """Test analyze_feature_importance error handling."""
     with pytest.raises(ValueError):
         analyze_feature_importance(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -53,7 +50,6 @@ def test_analyze_feature_importance_property_idempotent(self, train_seasons, out
 
     # Assert property
     assert analyze_feature_importance(train_seasons, output_dir) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -68,7 +64,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -81,9 +76,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -89,11 +89,7 @@ class BatchedRModelInterface:
         self.informative_path = Path(informative_path)
 
         # Initialize connection pool
-        self.db_pool = psycopg2.pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=pool_size,
-            **db_config
-        )
+        self.db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=pool_size, **db_config)
 
         # R session state
         self.rpy2_initialized = False
@@ -118,8 +114,8 @@ class BatchedRModelInterface:
             ro.r('if (.Platform$OS.type == "unix") memory.limit(size=8000)')
 
             # Suppress R package loading messages
-            ro.r('suppressPackageStartupMessages(library(brms))')
-            ro.r('suppressPackageStartupMessages(library(cmdstanr))')
+            ro.r("suppressPackageStartupMessages(library(brms))")
+            ro.r("suppressPackageStartupMessages(library(cmdstanr))")
 
             self._r_session = ro
             self._pandas2ri = pandas2ri
@@ -156,7 +152,9 @@ class BatchedRModelInterface:
         if not self.hierarchical_path.exists():
             raise FileNotFoundError(f"Hierarchical model not found: {self.hierarchical_path}")
 
-        logger.info(f"  Loading Hierarchical v2 ({self.hierarchical_path.stat().st_size / 1024 / 1024:.1f} MB)...")
+        logger.info(
+            f"  Loading Hierarchical v2 ({self.hierarchical_path.stat().st_size / 1024 / 1024:.1f} MB)..."
+        )
         ro.r(f'hier_model <- readRDS("{self.hierarchical_path}")')
         logger.info("  ✅ Hierarchical v2 loaded")
 
@@ -164,7 +162,9 @@ class BatchedRModelInterface:
         if not self.informative_path.exists():
             raise FileNotFoundError(f"Informative Priors model not found: {self.informative_path}")
 
-        logger.info(f"  Loading Informative Priors v2 ({self.informative_path.stat().st_size / 1024 / 1024:.1f} MB)...")
+        logger.info(
+            f"  Loading Informative Priors v2 ({self.informative_path.stat().st_size / 1024 / 1024:.1f} MB)..."
+        )
         ro.r(f'ip_model <- readRDS("{self.informative_path}")')
         logger.info("  ✅ Informative Priors v2 loaded")
 
@@ -181,10 +181,7 @@ class BatchedRModelInterface:
         self.db_pool.putconn(conn)
 
     def _fetch_batch_features(
-        self,
-        player_ids: list[str],
-        seasons: list[int],
-        weeks: list[int]
+        self, player_ids: list[str], seasons: list[int], weeks: list[int]
     ) -> pd.DataFrame:
         """
         Fetch features for multiple player-games in single query.
@@ -200,7 +197,7 @@ class BatchedRModelInterface:
         conn = self._get_db_connection()
 
         # Build WHERE clause with IN conditions for efficiency
-        placeholders = ','.join(['%s'] * len(player_ids))
+        placeholders = ",".join(["%s"] * len(player_ids))
 
         query = f"""
         WITH game_contexts AS (
@@ -300,9 +297,7 @@ class BatchedRModelInterface:
             ro = self._r_session
 
             # Convert to R dataframe
-            with self._localconverter(
-                ro.default_converter + self._pandas2ri.converter
-            ):
+            with self._localconverter(ro.default_converter + self._pandas2ri.converter):
                 r_df = ro.conversion.py2rpy(df)
 
             ro.r.assign("batch_data", r_df)
@@ -315,7 +310,7 @@ class BatchedRModelInterface:
             start = time.time()
 
             ro.r(
-                f"batch_preds <- posterior_predict(hier_model, newdata = batch_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = \"uncertainty\")"
+                f'batch_preds <- posterior_predict(hier_model, newdata = batch_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = "uncertainty")'
             )
 
             # Transform from log scale
@@ -328,16 +323,16 @@ class BatchedRModelInterface:
             stds = np.array(ro.r("batch_sds"))
 
             elapsed = time.time() - start
-            logger.debug(f"✅ Batch prediction complete in {elapsed:.2f}s ({elapsed/len(df):.3f}s per game)")
+            logger.debug(
+                f"✅ Batch prediction complete in {elapsed:.2f}s ({elapsed/len(df):.3f}s per game)"
+            )
 
             # Match results back to input order
             results = []
             for i, (pid, season, week) in enumerate(zip(player_ids, seasons, weeks)):
                 # Find matching row in df
                 match = df[
-                    (df['player_id'] == pid) &
-                    (df['season'] == season) &
-                    (df['week'] == week)
+                    (df["player_id"] == pid) & (df["season"] == season) & (df["week"] == week)
                 ]
 
                 if len(match) > 0:
@@ -351,6 +346,7 @@ class BatchedRModelInterface:
         except Exception as e:
             logger.error(f"❌ Batch hierarchical prediction failed: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return [(None, None)] * len(player_ids)
 
@@ -383,9 +379,7 @@ class BatchedRModelInterface:
             ro = self._r_session
 
             # Convert to R dataframe
-            with self._localconverter(
-                ro.default_converter + self._pandas2ri.converter
-            ):
+            with self._localconverter(ro.default_converter + self._pandas2ri.converter):
                 r_df = ro.conversion.py2rpy(df)
 
             ro.r.assign("batch_data", r_df)
@@ -396,7 +390,7 @@ class BatchedRModelInterface:
             start = time.time()
 
             ro.r(
-                f"batch_preds <- posterior_predict(ip_model, newdata = batch_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = \"uncertainty\")"
+                f'batch_preds <- posterior_predict(ip_model, newdata = batch_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = "uncertainty")'
             )
 
             ro.r("batch_preds_exp <- exp(batch_preds)")
@@ -407,15 +401,15 @@ class BatchedRModelInterface:
             stds = np.array(ro.r("batch_sds"))
 
             elapsed = time.time() - start
-            logger.debug(f"✅ Batch prediction complete in {elapsed:.2f}s ({elapsed/len(df):.3f}s per game)")
+            logger.debug(
+                f"✅ Batch prediction complete in {elapsed:.2f}s ({elapsed/len(df):.3f}s per game)"
+            )
 
             # Match results back to input order
             results = []
             for i, (pid, season, week) in enumerate(zip(player_ids, seasons, weeks)):
                 match = df[
-                    (df['player_id'] == pid) &
-                    (df['season'] == season) &
-                    (df['week'] == week)
+                    (df["player_id"] == pid) & (df["season"] == season) & (df["week"] == week)
                 ]
 
                 if len(match) > 0:
@@ -429,6 +423,7 @@ class BatchedRModelInterface:
         except Exception as e:
             logger.error(f"❌ Batch informative priors prediction failed: {e}")
             import traceback
+
             logger.error(traceback.format_exc())
             return [(None, None)] * len(player_ids)
 
@@ -444,6 +439,7 @@ if __name__ == "__main__":
     print("Testing Batched R Model Interface...")
 
     import os
+
     db_config = {
         "host": "localhost",
         "port": 5544,

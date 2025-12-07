@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DiDResult:
     """Container for DiD estimation results."""
+
     att: float  # Average Treatment Effect on Treated
     ate: float  # Average Treatment Effect
     se: float  # Standard error
@@ -110,19 +111,55 @@ class DiDRuleChangeAnalyzer:
             df = pd.read_sql_query(query, conn, params=(seasons,))
 
         # Convert to long format (team-game level)
-        home_df = df[['game_id', 'season', 'week', 'home_team', 'home_passing_yards',
-                      'home_pass_attempts', 'kickoff']].copy()
-        home_df.columns = ['game_id', 'season', 'week', 'team', 'passing_yards', 'pass_attempts', 'kickoff']
-        home_df['home'] = 1
+        home_df = df[
+            [
+                "game_id",
+                "season",
+                "week",
+                "home_team",
+                "home_passing_yards",
+                "home_pass_attempts",
+                "kickoff",
+            ]
+        ].copy()
+        home_df.columns = [
+            "game_id",
+            "season",
+            "week",
+            "team",
+            "passing_yards",
+            "pass_attempts",
+            "kickoff",
+        ]
+        home_df["home"] = 1
 
-        away_df = df[['game_id', 'season', 'week', 'away_team', 'away_passing_yards',
-                      'away_pass_attempts', 'kickoff']].copy()
-        away_df.columns = ['game_id', 'season', 'week', 'team', 'passing_yards', 'pass_attempts', 'kickoff']
-        away_df['home'] = 0
+        away_df = df[
+            [
+                "game_id",
+                "season",
+                "week",
+                "away_team",
+                "away_passing_yards",
+                "away_pass_attempts",
+                "kickoff",
+            ]
+        ].copy()
+        away_df.columns = [
+            "game_id",
+            "season",
+            "week",
+            "team",
+            "passing_yards",
+            "pass_attempts",
+            "kickoff",
+        ]
+        away_df["home"] = 0
 
         team_game_df = pd.concat([home_df, away_df], ignore_index=True)
 
-        logger.info(f"Fetched {len(team_game_df)} team-game observations across {len(seasons)} seasons")
+        logger.info(
+            f"Fetched {len(team_game_df)} team-game observations across {len(seasons)} seasons"
+        )
         return team_game_df
 
     def _fetch_kickoff_data(self, seasons: list[int]) -> pd.DataFrame:
@@ -179,7 +216,7 @@ class DiDRuleChangeAnalyzer:
         self,
         treatment_seasons: list[int] = [2018, 2019, 2020, 2021, 2022, 2023, 2024],
         control_seasons: list[int] = [2015, 2016, 2017],
-        output_dir: Path | None = None
+        output_dir: Path | None = None,
     ) -> DiDResult:
         """
         Analyze 2018 Roughing the Passer rule change using DiD.
@@ -203,35 +240,34 @@ class DiDRuleChangeAnalyzer:
         df = self._fetch_passing_data(all_seasons)
 
         # Create treatment indicator
-        df['post_treatment'] = (df['season'] >= 2018).astype(int)
-        df['treatment_group'] = 1  # All teams affected (no control group by team)
+        df["post_treatment"] = (df["season"] >= 2018).astype(int)
+        df["treatment_group"] = 1  # All teams affected (no control group by team)
 
         # Calculate team-season averages
-        team_season = df.groupby(['team', 'season']).agg({
-            'passing_yards': 'mean',
-            'pass_attempts': 'mean',
-            'post_treatment': 'first'
-        }).reset_index()
+        team_season = (
+            df.groupby(["team", "season"])
+            .agg({"passing_yards": "mean", "pass_attempts": "mean", "post_treatment": "first"})
+            .reset_index()
+        )
 
         # Validate parallel trends assumption (2015-2017)
         parallel_trends_valid = self._validate_parallel_trends(
-            team_season[team_season['season'].isin(control_seasons)],
-            outcome='passing_yards'
+            team_season[team_season["season"].isin(control_seasons)], outcome="passing_yards"
         )
 
         # Calculate DiD estimator
         # E[Y_post - Y_pre | Treatment] - E[Y_post - Y_pre | Control]
         # Since all teams are treated, we use time as the control
-        pre_mean = team_season[team_season['post_treatment'] == 0]['passing_yards'].mean()
-        post_mean = team_season[team_season['post_treatment'] == 1]['passing_yards'].mean()
+        pre_mean = team_season[team_season["post_treatment"] == 0]["passing_yards"].mean()
+        post_mean = team_season[team_season["post_treatment"] == 1]["passing_yards"].mean()
 
         att = post_mean - pre_mean
 
         # Standard error calculation
-        pre_std = team_season[team_season['post_treatment'] == 0]['passing_yards'].std()
-        post_std = team_season[team_season['post_treatment'] == 1]['passing_yards'].std()
-        n_pre = len(team_season[team_season['post_treatment'] == 0])
-        n_post = len(team_season[team_season['post_treatment'] == 1])
+        pre_std = team_season[team_season["post_treatment"] == 0]["passing_yards"].std()
+        post_std = team_season[team_season["post_treatment"] == 1]["passing_yards"].std()
+        n_pre = len(team_season[team_season["post_treatment"] == 0])
+        n_post = len(team_season[team_season["post_treatment"] == 1])
 
         se = np.sqrt(pre_std**2 / n_pre + post_std**2 / n_post)
 
@@ -245,9 +281,9 @@ class DiDRuleChangeAnalyzer:
 
         # Placebo test (2016 vs 2015, should be ~0)
         placebo_p_value = self._placebo_test(
-            team_season[team_season['season'].isin([2015, 2016])],
+            team_season[team_season["season"].isin([2015, 2016])],
             placebo_year=2016,
-            outcome='passing_yards'
+            outcome="passing_yards",
         )
 
         result = DiDResult(
@@ -260,16 +296,21 @@ class DiDRuleChangeAnalyzer:
             n_treated=n_post,
             n_control=n_pre,
             parallel_trends_valid=parallel_trends_valid,
-            placebo_p_value=placebo_p_value
+            placebo_p_value=placebo_p_value,
         )
 
         logger.info(f"2018 Roughing Rule DiD Results:\n{result}")
 
         # Save diagnostic plots if output_dir provided
         if output_dir:
-            self._plot_did_trends(team_season, 'passing_yards', 'season',
-                                 treatment_year=2018, output_dir=output_dir,
-                                 title="2018 Roughing Rule: Passing Yards Trend")
+            self._plot_did_trends(
+                team_season,
+                "passing_yards",
+                "season",
+                treatment_year=2018,
+                output_dir=output_dir,
+                title="2018 Roughing Rule: Passing Yards Trend",
+            )
 
         return result
 
@@ -277,7 +318,7 @@ class DiDRuleChangeAnalyzer:
         self,
         treatment_seasons: list[int] = list(range(2011, 2025)),
         control_seasons: list[int] = list(range(2005, 2011)),
-        output_dir: Path | None = None
+        output_dir: Path | None = None,
     ) -> DiDResult:
         """
         Analyze 2011 Kickoff rule change (moved from 30 to 35-yard line).
@@ -301,36 +342,43 @@ class DiDRuleChangeAnalyzer:
         df = self._fetch_kickoff_data(all_seasons)
 
         # Calculate average starting field position (lower = worse for receiving team)
-        df['avg_start_pos'] = (df['home_ko_start_pos'].fillna(0) + df['away_ko_start_pos'].fillna(0)) / 2
+        df["avg_start_pos"] = (
+            df["home_ko_start_pos"].fillna(0) + df["away_ko_start_pos"].fillna(0)
+        ) / 2
 
         # Create treatment indicator
-        df['post_treatment'] = (df['season'] >= 2011).astype(int)
+        df["post_treatment"] = (df["season"] >= 2011).astype(int)
 
         # Calculate season averages
-        season_avg = df.groupby('season').agg({
-            'avg_start_pos': 'mean',
-            'post_treatment': 'first',
-            'home_score': 'mean',
-            'away_score': 'mean'
-        }).reset_index()
+        season_avg = (
+            df.groupby("season")
+            .agg(
+                {
+                    "avg_start_pos": "mean",
+                    "post_treatment": "first",
+                    "home_score": "mean",
+                    "away_score": "mean",
+                }
+            )
+            .reset_index()
+        )
 
         # Validate parallel trends
         parallel_trends_valid = self._validate_parallel_trends(
-            season_avg[season_avg['season'].isin(control_seasons)],
-            outcome='avg_start_pos'
+            season_avg[season_avg["season"].isin(control_seasons)], outcome="avg_start_pos"
         )
 
         # DiD estimator
-        pre_mean = season_avg[season_avg['post_treatment'] == 0]['avg_start_pos'].mean()
-        post_mean = season_avg[season_avg['post_treatment'] == 1]['avg_start_pos'].mean()
+        pre_mean = season_avg[season_avg["post_treatment"] == 0]["avg_start_pos"].mean()
+        post_mean = season_avg[season_avg["post_treatment"] == 1]["avg_start_pos"].mean()
 
         att = post_mean - pre_mean
 
         # Standard error
-        pre_std = season_avg[season_avg['post_treatment'] == 0]['avg_start_pos'].std()
-        post_std = season_avg[season_avg['post_treatment'] == 1]['avg_start_pos'].std()
-        n_pre = len(season_avg[season_avg['post_treatment'] == 0])
-        n_post = len(season_avg[season_avg['post_treatment'] == 1])
+        pre_std = season_avg[season_avg["post_treatment"] == 0]["avg_start_pos"].std()
+        post_std = season_avg[season_avg["post_treatment"] == 1]["avg_start_pos"].std()
+        n_pre = len(season_avg[season_avg["post_treatment"] == 0])
+        n_post = len(season_avg[season_avg["post_treatment"] == 1])
 
         se = np.sqrt(pre_std**2 / n_pre + post_std**2 / n_post)
 
@@ -349,15 +397,20 @@ class DiDRuleChangeAnalyzer:
             p_value=p_value,
             n_treated=n_post,
             n_control=n_pre,
-            parallel_trends_valid=parallel_trends_valid
+            parallel_trends_valid=parallel_trends_valid,
         )
 
         logger.info(f"2011 Kickoff Rule DiD Results:\n{result}")
 
         if output_dir:
-            self._plot_did_trends(season_avg, 'avg_start_pos', 'season',
-                                 treatment_year=2011, output_dir=output_dir,
-                                 title="2011 Kickoff Rule: Field Position Trend")
+            self._plot_did_trends(
+                season_avg,
+                "avg_start_pos",
+                "season",
+                treatment_year=2011,
+                output_dir=output_dir,
+                title="2011 Kickoff Rule: Field Position Trend",
+            )
 
         return result
 
@@ -365,7 +418,7 @@ class DiDRuleChangeAnalyzer:
         self,
         treatment_season: int = 2020,
         control_seasons: list[int] = [2019, 2021],
-        output_dir: Path | None = None
+        output_dir: Path | None = None,
     ) -> DiDResult:
         """
         Analyze 2020 COVID protocols impact on home field advantage.
@@ -410,25 +463,26 @@ class DiDRuleChangeAnalyzer:
             margin_df = pd.read_sql_query(query, conn, params=(all_seasons,))
 
         # Create treatment indicator
-        margin_df['post_treatment'] = (margin_df['season'] == treatment_season).astype(int)
+        margin_df["post_treatment"] = (margin_df["season"] == treatment_season).astype(int)
 
         # Calculate season averages
-        season_avg = margin_df.groupby('season').agg({
-            'home_margin': 'mean',
-            'post_treatment': 'first'
-        }).reset_index()
+        season_avg = (
+            margin_df.groupby("season")
+            .agg({"home_margin": "mean", "post_treatment": "first"})
+            .reset_index()
+        )
 
         # DiD estimator
-        pre_mean = season_avg[season_avg['post_treatment'] == 0]['home_margin'].mean()
-        post_mean = season_avg[season_avg['post_treatment'] == 1]['home_margin'].mean()
+        pre_mean = season_avg[season_avg["post_treatment"] == 0]["home_margin"].mean()
+        post_mean = season_avg[season_avg["post_treatment"] == 1]["home_margin"].mean()
 
         att = post_mean - pre_mean
 
         # Standard error
-        pre_std = margin_df[margin_df['post_treatment'] == 0]['home_margin'].std()
-        post_std = margin_df[margin_df['post_treatment'] == 1]['home_margin'].std()
-        n_pre = len(margin_df[margin_df['post_treatment'] == 0])
-        n_post = len(margin_df[margin_df['post_treatment'] == 1])
+        pre_std = margin_df[margin_df["post_treatment"] == 0]["home_margin"].std()
+        post_std = margin_df[margin_df["post_treatment"] == 1]["home_margin"].std()
+        n_pre = len(margin_df[margin_df["post_treatment"] == 0])
+        n_post = len(margin_df[margin_df["post_treatment"] == 1])
 
         se = np.sqrt(pre_std**2 / n_pre + post_std**2 / n_post)
 
@@ -447,15 +501,20 @@ class DiDRuleChangeAnalyzer:
             p_value=p_value,
             n_treated=n_post,
             n_control=n_pre,
-            parallel_trends_valid=True  # Only 3 years, hard to validate
+            parallel_trends_valid=True,  # Only 3 years, hard to validate
         )
 
         logger.info(f"2020 COVID Protocols DiD Results:\n{result}")
 
         if output_dir:
-            self._plot_did_trends(season_avg, 'home_margin', 'season',
-                                 treatment_year=2020, output_dir=output_dir,
-                                 title="2020 COVID: Home Field Advantage Trend")
+            self._plot_did_trends(
+                season_avg,
+                "home_margin",
+                "season",
+                treatment_year=2020,
+                output_dir=output_dir,
+                title="2020 COVID: Home Field Advantage Trend",
+            )
 
         return result
 
@@ -463,8 +522,8 @@ class DiDRuleChangeAnalyzer:
         self,
         df: pd.DataFrame,
         outcome: str,
-        time_var: str = 'season',
-        significance_level: float = 0.05
+        time_var: str = "season",
+        significance_level: float = 0.05,
     ) -> bool:
         """
         Validate parallel trends assumption in pre-treatment period.
@@ -483,25 +542,22 @@ class DiDRuleChangeAnalyzer:
         """
         # Linear trend test
         df = df.copy()
-        df['time_numeric'] = df[time_var] - df[time_var].min()
+        df["time_numeric"] = df[time_var] - df[time_var].min()
 
         from scipy.stats import linregress
-        slope, intercept, r_value, p_value, std_err = linregress(
-            df['time_numeric'], df[outcome]
-        )
+
+        slope, intercept, r_value, p_value, std_err = linregress(df["time_numeric"], df[outcome])
 
         # Check if trend is flat (slope not significantly different from 0)
         is_parallel = p_value > significance_level
 
-        logger.info(f"Parallel trends test: slope={slope:.3f}, p={p_value:.4f}, valid={is_parallel}")
+        logger.info(
+            f"Parallel trends test: slope={slope:.3f}, p={p_value:.4f}, valid={is_parallel}"
+        )
         return is_parallel
 
     def _placebo_test(
-        self,
-        df: pd.DataFrame,
-        placebo_year: int,
-        outcome: str,
-        time_var: str = 'season'
+        self, df: pd.DataFrame, placebo_year: int, outcome: str, time_var: str = "season"
     ) -> float:
         """
         Conduct placebo test with fake treatment year in pre-treatment period.
@@ -518,10 +574,10 @@ class DiDRuleChangeAnalyzer:
             p-value for placebo test
         """
         df = df.copy()
-        df['fake_treatment'] = (df[time_var] >= placebo_year).astype(int)
+        df["fake_treatment"] = (df[time_var] >= placebo_year).astype(int)
 
-        pre = df[df['fake_treatment'] == 0][outcome]
-        post = df[df['fake_treatment'] == 1][outcome]
+        pre = df[df["fake_treatment"] == 0][outcome]
+        post = df[df["fake_treatment"] == 1][outcome]
 
         t_stat, p_value = stats.ttest_ind(post, pre)
 
@@ -535,7 +591,7 @@ class DiDRuleChangeAnalyzer:
         time_var: str,
         treatment_year: int,
         output_dir: Path,
-        title: str = "DiD Trend Plot"
+        title: str = "DiD Trend Plot",
     ):
         """
         Plot outcome trends over time with treatment year marked.
@@ -551,21 +607,25 @@ class DiDRuleChangeAnalyzer:
         plt.figure(figsize=(10, 6))
 
         # Plot trend line
-        sns.lineplot(data=df, x=time_var, y=outcome, marker='o', linewidth=2)
+        sns.lineplot(data=df, x=time_var, y=outcome, marker="o", linewidth=2)
 
         # Mark treatment year
-        plt.axvline(x=treatment_year - 0.5, color='red', linestyle='--',
-                   label=f'Treatment: {treatment_year}')
+        plt.axvline(
+            x=treatment_year - 0.5,
+            color="red",
+            linestyle="--",
+            label=f"Treatment: {treatment_year}",
+        )
 
-        plt.title(title, fontsize=14, fontweight='bold')
-        plt.xlabel('Season', fontsize=12)
-        plt.ylabel(outcome.replace('_', ' ').title(), fontsize=12)
+        plt.title(title, fontsize=14, fontweight="bold")
+        plt.xlabel("Season", fontsize=12)
+        plt.ylabel(outcome.replace("_", " ").title(), fontsize=12)
         plt.legend()
         plt.grid(alpha=0.3)
         plt.tight_layout()
 
         output_path = output_dir / f"did_{outcome}_trend.png"
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
         logger.info(f"Saved plot to {output_path}")
         plt.close()
 
@@ -595,6 +655,12 @@ if __name__ == "__main__":
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY OF RESULTS")
     logger.info("=" * 80)
-    logger.info(f"\n1. 2018 Roughing Rule: {roughing_result.att:.2f} yards effect (p={roughing_result.p_value:.4f})")
-    logger.info(f"2. 2011 Kickoff Rule: {kickoff_result.att:.2f} yards effect (p={kickoff_result.p_value:.4f})")
-    logger.info(f"3. 2020 COVID Protocols: {covid_result.att:.2f} points HFA effect (p={covid_result.p_value:.4f})")
+    logger.info(
+        f"\n1. 2018 Roughing Rule: {roughing_result.att:.2f} yards effect (p={roughing_result.p_value:.4f})"
+    )
+    logger.info(
+        f"2. 2011 Kickoff Rule: {kickoff_result.att:.2f} yards effect (p={kickoff_result.p_value:.4f})"
+    )
+    logger.info(
+        f"3. 2020 COVID Protocols: {covid_result.att:.2f} points HFA effect (p={covid_result.p_value:.4f})"
+    )

@@ -35,7 +35,7 @@ def test_context_extraction():
     engine = MetaLearningContextEngine()
 
     # Test case: Patrick Mahomes, Week 10, 2024
-    player_id = '00-0033873'  # Mahomes
+    player_id = "00-0033873"  # Mahomes
     season = 2024
     week = 10
 
@@ -81,21 +81,21 @@ def test_context_extraction():
     print("=" * 80)
 
     validations = [
-        ('qb_exp_rookie', 0, 1),
-        ('qb_exp_developing', 0, 1),
-        ('qb_exp_veteran', 0, 1),
-        ('qb_exp_elite_veteran', 0, 1),
-        ('log_games_experience', 0, 6),
-        ('roster_stability_l3', 0, 1),
-        ('market_dispersion', 0, 5),
-        ('high_dispersion_flag', 0, 1),
-        ('is_home', 0, 1),
-        ('is_dome_game', 0, 1),
-        ('is_division_game', 0, 1),
-        ('temp_numeric', 20, 110),
-        ('wind_numeric', 0, 50),
-        ('is_cold_game', 0, 1),
-        ('is_windy_game', 0, 1),
+        ("qb_exp_rookie", 0, 1),
+        ("qb_exp_developing", 0, 1),
+        ("qb_exp_veteran", 0, 1),
+        ("qb_exp_elite_veteran", 0, 1),
+        ("log_games_experience", 0, 6),
+        ("roster_stability_l3", 0, 1),
+        ("market_dispersion", 0, 5),
+        ("high_dispersion_flag", 0, 1),
+        ("is_home", 0, 1),
+        ("is_dome_game", 0, 1),
+        ("is_division_game", 0, 1),
+        ("temp_numeric", 20, 110),
+        ("wind_numeric", 0, 50),
+        ("is_cold_game", 0, 1),
+        ("is_windy_game", 0, 1),
     ]
 
     all_valid = True
@@ -118,5 +118,5 @@ def test_context_extraction():
     print("=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_context_extraction()

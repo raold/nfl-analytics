@@ -21,9 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from models.state_space import StateSpaceRatings, evaluate_model, fetch_games
 
 
-def hyperparameter_search(
-    train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: Path
-) -> dict:
+def hyperparameter_search(train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: Path) -> dict:
     """
     Grid search over key hyperparameters.
 
@@ -45,7 +43,9 @@ def hyperparameter_search(
     print("=" * 80)
     print("HYPERPARAMETER GRID SEARCH")
     print("=" * 80)
-    print(f"Search space: {len(search_space['q']) * len(search_space['r']) * len(search_space['hfa_init'])} configs")
+    print(
+        f"Search space: {len(search_space['q']) * len(search_space['r']) * len(search_space['hfa_init'])} configs"
+    )
     print()
 
     config_num = 0
@@ -54,7 +54,9 @@ def hyperparameter_search(
             for hfa_init in search_space["hfa_init"]:
                 config_num += 1
 
-                print(f"[{config_num}/27] Training config: q={q:.1f}, r={r:.1f}, hfa={hfa_init:.1f}")
+                print(
+                    f"[{config_num}/27] Training config: q={q:.1f}, r={r:.1f}, hfa={hfa_init:.1f}"
+                )
 
                 # Train model
                 model = StateSpaceRatings(
@@ -82,9 +84,11 @@ def hyperparameter_search(
 
                 results.append(result)
 
-                print(f"  Val Brier: {val_metrics['brier_win']:.4f}, "
-                      f"Log Loss: {val_metrics['logloss_win']:.4f}, "
-                      f"Accuracy: {val_metrics['accuracy_win']:.3f}")
+                print(
+                    f"  Val Brier: {val_metrics['brier_win']:.4f}, "
+                    f"Log Loss: {val_metrics['logloss_win']:.4f}, "
+                    f"Accuracy: {val_metrics['accuracy_win']:.3f}"
+                )
                 print()
 
     # Find best config
@@ -98,8 +102,10 @@ def hyperparameter_search(
     print("\nTop 5 Configurations:")
     print(results_df.nsmallest(5, "val_brier").to_string(index=False))
     print()
-    print(f"Best Config: q={best_config['q']:.1f}, r={best_config['r']:.1f}, "
-          f"hfa={best_config['hfa_init']:.1f}")
+    print(
+        f"Best Config: q={best_config['q']:.1f}, r={best_config['r']:.1f}, "
+        f"hfa={best_config['hfa_init']:.1f}"
+    )
     print(f"  Val Brier: {best_config['val_brier']:.4f}")
     print()
 
@@ -123,12 +129,8 @@ def main():
         default="2019,2020,2021,2022,2023",
         help="Comma-separated training seasons",
     )
-    parser.add_argument(
-        "--val-season", type=int, default=2024, help="Validation season"
-    )
-    parser.add_argument(
-        "--test-season", type=int, default=2025, help="Test season"
-    )
+    parser.add_argument("--val-season", type=int, default=2024, help="Validation season")
+    parser.add_argument("--test-season", type=int, default=2025, help="Test season")
     parser.add_argument(
         "--search-hyperparams",
         action="store_true",

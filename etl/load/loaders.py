@@ -60,11 +60,7 @@ class DatabaseLoader:
     - Batch processing for large datasets
     """
 
-    def __init__(
-        self,
-        conn: psycopg.Connection,
-        batch_size: int = 1000
-    ):
+    def __init__(self, conn: psycopg.Connection, batch_size: int = 1000):
         """
         Initialize database loader.
 
@@ -80,7 +76,7 @@ class DatabaseLoader:
         df: pd.DataFrame,
         table_name: str,
         conflict_columns: list[str],
-        update_columns: list[str] | None = None
+        update_columns: list[str] | None = None,
     ) -> LoadResult:
         """
         Upsert DataFrame into table.
@@ -105,7 +101,7 @@ class DatabaseLoader:
                     rows_failed=0,
                     load_time=start_time,
                     duration_seconds=0.0,
-                    table_name=table_name
+                    table_name=table_name,
                 )
 
             # Determine update columns
@@ -114,12 +110,10 @@ class DatabaseLoader:
 
             # Build upsert query
             columns = df.columns.tolist()
-            placeholders = ', '.join(['%s'] * len(columns))
+            placeholders = ", ".join(["%s"] * len(columns))
 
-            conflict_cols_str = ', '.join(conflict_columns)
-            update_set = ', '.join(
-                [f"{col} = EXCLUDED.{col}" for col in update_columns]
-            )
+            conflict_cols_str = ", ".join(conflict_columns)
+            update_set = ", ".join([f"{col} = EXCLUDED.{col}" for col in update_columns])
 
             query = f"""
                 INSERT INTO {table_name} ({', '.join(columns)})
@@ -134,7 +128,7 @@ class DatabaseLoader:
 
             with self.conn.cursor() as cur:
                 for i in range(0, len(df), self.batch_size):
-                    batch = df.iloc[i:i + self.batch_size]
+                    batch = df.iloc[i : i + self.batch_size]
                     values = [tuple(row) for row in batch.values]
 
                     cur.executemany(query, values)
@@ -153,7 +147,7 @@ class DatabaseLoader:
                 rows_failed=0,
                 load_time=start_time,
                 duration_seconds=duration,
-                table_name=table_name
+                table_name=table_name,
             )
 
         except Exception as e:
@@ -170,14 +164,10 @@ class DatabaseLoader:
                 load_time=start_time,
                 duration_seconds=duration,
                 table_name=table_name,
-                error=str(e)
+                error=str(e),
             )
 
-    def truncate_and_load(
-        self,
-        df: pd.DataFrame,
-        table_name: str
-    ) -> LoadResult:
+    def truncate_and_load(self, df: pd.DataFrame, table_name: str) -> LoadResult:
         """
         Truncate table and load fresh data.
 
@@ -218,14 +208,10 @@ class DatabaseLoader:
                 load_time=start_time,
                 duration_seconds=duration,
                 table_name=table_name,
-                error=str(e)
+                error=str(e),
             )
 
-    def insert(
-        self,
-        df: pd.DataFrame,
-        table_name: str
-    ) -> LoadResult:
+    def insert(self, df: pd.DataFrame, table_name: str) -> LoadResult:
         """
         Insert DataFrame into table (no upsert logic).
 
@@ -247,12 +233,12 @@ class DatabaseLoader:
                     rows_failed=0,
                     load_time=start_time,
                     duration_seconds=0.0,
-                    table_name=table_name
+                    table_name=table_name,
                 )
 
             # Build insert query
             columns = df.columns.tolist()
-            placeholders = ', '.join(['%s'] * len(columns))
+            placeholders = ", ".join(["%s"] * len(columns))
 
             query = f"""
                 INSERT INTO {table_name} ({', '.join(columns)})
@@ -264,7 +250,7 @@ class DatabaseLoader:
 
             with self.conn.cursor() as cur:
                 for i in range(0, len(df), self.batch_size):
-                    batch = df.iloc[i:i + self.batch_size]
+                    batch = df.iloc[i : i + self.batch_size]
                     values = [tuple(row) for row in batch.values]
 
                     cur.executemany(query, values)
@@ -283,7 +269,7 @@ class DatabaseLoader:
                 rows_failed=0,
                 load_time=start_time,
                 duration_seconds=duration,
-                table_name=table_name
+                table_name=table_name,
             )
 
         except Exception as e:
@@ -300,7 +286,7 @@ class DatabaseLoader:
                 load_time=start_time,
                 duration_seconds=duration,
                 table_name=table_name,
-                error=str(e)
+                error=str(e),
             )
 
 
@@ -321,10 +307,7 @@ class BulkLoader:
         self.conn = conn
 
     def copy_from_dataframe(
-        self,
-        df: pd.DataFrame,
-        table_name: str,
-        columns: list[str] | None = None
+        self, df: pd.DataFrame, table_name: str, columns: list[str] | None = None
     ) -> LoadResult:
         """
         Load DataFrame using COPY command.
@@ -348,7 +331,7 @@ class BulkLoader:
                     rows_failed=0,
                     load_time=start_time,
                     duration_seconds=0.0,
-                    table_name=table_name
+                    table_name=table_name,
                 )
 
             if columns is None:
@@ -361,7 +344,9 @@ class BulkLoader:
 
             # Use COPY command
             with self.conn.cursor() as cur:
-                with cur.copy(f"COPY {table_name} ({', '.join(columns)}) FROM STDIN WITH CSV") as copy:
+                with cur.copy(
+                    f"COPY {table_name} ({', '.join(columns)}) FROM STDIN WITH CSV"
+                ) as copy:
                     while data := buffer.read(8192):
                         copy.write(data)
 
@@ -378,7 +363,7 @@ class BulkLoader:
                 rows_failed=0,
                 load_time=start_time,
                 duration_seconds=duration,
-                table_name=table_name
+                table_name=table_name,
             )
 
         except Exception as e:
@@ -395,7 +380,7 @@ class BulkLoader:
                 load_time=start_time,
                 duration_seconds=duration,
                 table_name=table_name,
-                error=str(e)
+                error=str(e),
             )
 
 
@@ -410,47 +395,38 @@ if __name__ == "__main__":
     user = os.environ.get("POSTGRES_USER", "dro")
     password = os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
 
-    conn = psycopg.connect(
-        host=host,
-        port=port,
-        dbname=dbname,
-        user=user,
-        password=password
-    )
+    conn = psycopg.connect(host=host, port=port, dbname=dbname, user=user, password=password)
 
     try:
         # Create test table
         with conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS test_load (
                     id INTEGER PRIMARY KEY,
                     name TEXT,
                     value FLOAT
                 )
-            """)
+            """
+            )
         conn.commit()
 
         # Sample data
-        df_test = pd.DataFrame({
-            'id': [1, 2, 3],
-            'name': ['Alice', 'Bob', 'Charlie'],
-            'value': [1.5, 2.3, 3.7]
-        })
+        df_test = pd.DataFrame(
+            {"id": [1, 2, 3], "name": ["Alice", "Bob", "Charlie"], "value": [1.5, 2.3, 3.7]}
+        )
 
         # Test upsert
         loader = DatabaseLoader(conn)
         result = loader.upsert(
-            df_test,
-            'test_load',
-            conflict_columns=['id'],
-            update_columns=['name', 'value']
+            df_test, "test_load", conflict_columns=["id"], update_columns=["name", "value"]
         )
 
         print(result.summary())
 
         # Test bulk load
         bulk_loader = BulkLoader(conn)
-        result2 = bulk_loader.copy_from_dataframe(df_test, 'test_load')
+        result2 = bulk_loader.copy_from_dataframe(df_test, "test_load")
         print(result2.summary())
 
         # Cleanup

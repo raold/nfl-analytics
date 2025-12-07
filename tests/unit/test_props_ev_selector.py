@@ -23,7 +23,6 @@ def test_calculate_prop_edge_basic():
     assert result is not None
 
 
-
 def test_calculate_prop_edge_edge_cases():
     """Test calculate_prop_edge: edge cases."""
     # Arrange
@@ -36,23 +35,29 @@ def test_calculate_prop_edge_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_prop_edge_error_handling():
     """Test calculate_prop_edge error handling."""
     with pytest.raises(ValueError):
         calculate_prop_edge(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_calculate_prop_edge_property_idempotent(self, model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment):
+def test_calculate_prop_edge_property_idempotent(
+    self, model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment
+):
     """Property test: function is idempotent."""
     # Act
-    result = calculate_prop_edge(model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment)
+    result = calculate_prop_edge(
+        model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment
+    )
 
     # Assert property
-    assert calculate_prop_edge(model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment) == result, "idempotent violated"
-
+    assert (
+        calculate_prop_edge(
+            model_prediction, model_std, line_value, over_odds, under_odds, hold_adjustment
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_calculate_prop_ev_basic():
@@ -67,7 +72,6 @@ def test_calculate_prop_ev_basic():
     assert result is not None
 
 
-
 def test_calculate_prop_ev_edge_cases():
     """Test calculate_prop_ev: edge cases."""
     # Arrange
@@ -80,12 +84,10 @@ def test_calculate_prop_ev_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_prop_ev_error_handling():
     """Test calculate_prop_ev error handling."""
     with pytest.raises(ValueError):
         calculate_prop_ev(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +98,6 @@ def test_calculate_prop_ev_property_idempotent(self, model_prob, odds, bet_amoun
 
     # Assert property
     assert calculate_prop_ev(model_prob, odds, bet_amount) == result, "idempotent violated"
-
 
 
 def test_check_injury_status_basic():
@@ -111,7 +112,6 @@ def test_check_injury_status_basic():
     assert result is not None
 
 
-
 def test_check_injury_status_edge_cases():
     """Test check_injury_status: edge cases."""
     # Arrange
@@ -124,12 +124,10 @@ def test_check_injury_status_edge_cases():
     assert result is not None
 
 
-
 def test_check_injury_status_error_handling():
     """Test check_injury_status error handling."""
     with pytest.raises(ValueError):
         check_injury_status(invalid_input)
-
 
 
 @given(st.integers(min_value=1, max_value=1000), st.datetimes(), st.integers())
@@ -140,7 +138,6 @@ def test_check_injury_status_property_idempotent(self, player_id, game_date, db_
 
     # Assert property
     assert check_injury_status(player_id, game_date, db_conn) == result, "idempotent violated"
-
 
 
 def test_calculate_prop_correlation_basic():
@@ -155,7 +152,6 @@ def test_calculate_prop_correlation_basic():
     assert result is not None
 
 
-
 def test_calculate_prop_correlation_edge_cases():
     """Test calculate_prop_correlation: edge cases."""
     # Arrange
@@ -168,23 +164,24 @@ def test_calculate_prop_correlation_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_prop_correlation_error_handling():
     """Test calculate_prop_correlation error handling."""
     with pytest.raises(ValueError):
         calculate_prop_correlation(invalid_input)
 
 
-
 @given(st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers())
-def test_calculate_prop_correlation_property_idempotent(self, player_id, prop_type1, prop_type2, historical_data):
+def test_calculate_prop_correlation_property_idempotent(
+    self, player_id, prop_type1, prop_type2, historical_data
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_prop_correlation(player_id, prop_type1, prop_type2, historical_data)
 
     # Assert property
-    assert calculate_prop_correlation(player_id, prop_type1, prop_type2, historical_data) == result, "idempotent violated"
-
+    assert (
+        calculate_prop_correlation(player_id, prop_type1, prop_type2, historical_data) == result
+    ), "idempotent violated"
 
 
 def test_get_correlation_basic():
@@ -199,7 +196,6 @@ def test_get_correlation_basic():
     assert result is not None
 
 
-
 def test_get_correlation_edge_cases():
     """Test get_correlation: edge cases."""
     # Arrange
@@ -212,12 +208,10 @@ def test_get_correlation_edge_cases():
     assert result is not None
 
 
-
 def test_get_correlation_error_handling():
     """Test get_correlation error handling."""
     with pytest.raises(ValueError):
         get_correlation(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +222,6 @@ def test_get_correlation_property_idempotent(self, prop_type1, prop_type2):
 
     # Assert property
     assert get_correlation(prop_type1, prop_type2) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -243,7 +236,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -256,12 +248,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_historical_data_basic():
@@ -276,7 +266,6 @@ def test_load_historical_data_basic():
     assert result is not None
 
 
-
 def test_load_historical_data_edge_cases():
     """Test load_historical_data: edge cases."""
     # Arrange
@@ -289,12 +278,10 @@ def test_load_historical_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_historical_data_error_handling():
     """Test load_historical_data error handling."""
     with pytest.raises(ValueError):
         load_historical_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -305,7 +292,6 @@ def test_load_historical_data_property_idempotent(self, self, data):
 
     # Assert property
     assert load_historical_data(self, data) == result, "idempotent violated"
-
 
 
 def test_set_db_connection_basic():
@@ -320,7 +306,6 @@ def test_set_db_connection_basic():
     assert result is not None
 
 
-
 def test_set_db_connection_edge_cases():
     """Test set_db_connection: edge cases."""
     # Arrange
@@ -333,12 +318,10 @@ def test_set_db_connection_edge_cases():
     assert result is not None
 
 
-
 def test_set_db_connection_error_handling():
     """Test set_db_connection error handling."""
     with pytest.raises(ValueError):
         set_db_connection(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -349,7 +332,6 @@ def test_set_db_connection_property_idempotent(self, self, conn):
 
     # Assert property
     assert set_db_connection(self, conn) == result, "idempotent violated"
-
 
 
 def test_should_bet_prop_basic():
@@ -364,7 +346,6 @@ def test_should_bet_prop_basic():
     assert result is not None
 
 
-
 def test_should_bet_prop_edge_cases():
     """Test should_bet_prop: edge cases."""
     # Arrange
@@ -377,23 +358,80 @@ def test_should_bet_prop_edge_cases():
     assert result is not None
 
 
-
 def test_should_bet_prop_error_handling():
     """Test should_bet_prop error handling."""
     with pytest.raises(ValueError):
         should_bet_prop(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.datetimes(), st.integers(), st.integers())
-def test_should_bet_prop_property_idempotent(self, self, player_id, player_name, prop_type, model_prediction, model_std, line_value, over_odds, under_odds, bookmaker, game_date, bankroll, current_exposure):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.datetimes(),
+    st.integers(),
+    st.integers(),
+)
+def test_should_bet_prop_property_idempotent(
+    self,
+    self,
+    player_id,
+    player_name,
+    prop_type,
+    model_prediction,
+    model_std,
+    line_value,
+    over_odds,
+    under_odds,
+    bookmaker,
+    game_date,
+    bankroll,
+    current_exposure,
+):
     """Property test: function is idempotent."""
     # Act
-    result = should_bet_prop(self, player_id, player_name, prop_type, model_prediction, model_std, line_value, over_odds, under_odds, bookmaker, game_date, bankroll, current_exposure)
+    result = should_bet_prop(
+        self,
+        player_id,
+        player_name,
+        prop_type,
+        model_prediction,
+        model_std,
+        line_value,
+        over_odds,
+        under_odds,
+        bookmaker,
+        game_date,
+        bankroll,
+        current_exposure,
+    )
 
     # Assert property
-    assert should_bet_prop(self, player_id, player_name, prop_type, model_prediction, model_std, line_value, over_odds, under_odds, bookmaker, game_date, bankroll, current_exposure) == result, "idempotent violated"
-
+    assert (
+        should_bet_prop(
+            self,
+            player_id,
+            player_name,
+            prop_type,
+            model_prediction,
+            model_std,
+            line_value,
+            over_odds,
+            under_odds,
+            bookmaker,
+            game_date,
+            bankroll,
+            current_exposure,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_select_props_basic():
@@ -408,7 +446,6 @@ def test_select_props_basic():
     assert result is not None
 
 
-
 def test_select_props_edge_cases():
     """Test select_props: edge cases."""
     # Arrange
@@ -421,20 +458,21 @@ def test_select_props_edge_cases():
     assert result is not None
 
 
-
 def test_select_props_error_handling():
     """Test select_props error handling."""
     with pytest.raises(ValueError):
         select_props(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_select_props_property_idempotent(self, self, predictions_df, prop_lines_df, bankroll, max_bets):
+def test_select_props_property_idempotent(
+    self, self, predictions_df, prop_lines_df, bankroll, max_bets
+):
     """Property test: function is idempotent."""
     # Act
     result = select_props(self, predictions_df, prop_lines_df, bankroll, max_bets)
 
     # Assert property
-    assert select_props(self, predictions_df, prop_lines_df, bankroll, max_bets) == result, "idempotent violated"
-
+    assert (
+        select_props(self, predictions_df, prop_lines_df, bankroll, max_bets) == result
+    ), "idempotent violated"

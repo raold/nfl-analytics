@@ -23,7 +23,6 @@ def test_edge_basic():
     assert result is not None
 
 
-
 def test_edge_edge_cases():
     """Test edge: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_edge_edge_cases():
     assert result is not None
 
 
-
 def test_edge_error_handling():
     """Test edge error handling."""
     with pytest.raises(ValueError):
         edge(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_edge_property_idempotent(val):
 
     # Assert property
     assert edge(val) == result, "idempotent violated"
-
 
 
 def test_kelly_fraction_basic():
@@ -67,7 +63,6 @@ def test_kelly_fraction_basic():
     assert result is not None
 
 
-
 def test_kelly_fraction_edge_cases():
     """Test kelly_fraction: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_kelly_fraction_edge_cases():
     assert result is not None
 
 
-
 def test_kelly_fraction_error_handling():
     """Test kelly_fraction error handling."""
     with pytest.raises(ValueError):
         kelly_fraction(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_kelly_fraction_property_idempotent(val):
 
     # Assert property
     assert kelly_fraction(val) == result, "idempotent violated"
-
 
 
 def test_estimate_correlation_matrix_basic():
@@ -111,7 +103,6 @@ def test_estimate_correlation_matrix_basic():
     assert result is not None
 
 
-
 def test_estimate_correlation_matrix_edge_cases():
     """Test estimate_correlation_matrix: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_estimate_correlation_matrix_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_correlation_matrix_error_handling():
     """Test estimate_correlation_matrix error handling."""
     with pytest.raises(ValueError):
         estimate_correlation_matrix(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_estimate_correlation_matrix_property_idempotent(self, self, bets):
 
     # Assert property
     assert estimate_correlation_matrix(self, bets) == result, "idempotent violated"
-
 
 
 def test_optimize_portfolio_basic():
@@ -155,7 +143,6 @@ def test_optimize_portfolio_basic():
     assert result is not None
 
 
-
 def test_optimize_portfolio_edge_cases():
     """Test optimize_portfolio: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_optimize_portfolio_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_portfolio_error_handling():
     """Test optimize_portfolio error handling."""
     with pytest.raises(ValueError):
         optimize_portfolio(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_optimize_portfolio_property_idempotent(self, self, bets, bankroll):
 
     # Assert property
     assert optimize_portfolio(self, bets, bankroll) == result, "idempotent violated"
-
 
 
 def test_get_bet_recommendations_basic():
@@ -199,7 +183,6 @@ def test_get_bet_recommendations_basic():
     assert result is not None
 
 
-
 def test_get_bet_recommendations_edge_cases():
     """Test get_bet_recommendations: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_get_bet_recommendations_edge_cases():
     assert result is not None
 
 
-
 def test_get_bet_recommendations_error_handling():
     """Test get_bet_recommendations error handling."""
     with pytest.raises(ValueError):
         get_bet_recommendations(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -227,8 +208,9 @@ def test_get_bet_recommendations_property_idempotent(self, self, bets, bankroll,
     result = get_bet_recommendations(self, bets, bankroll, min_bet_amount)
 
     # Assert property
-    assert get_bet_recommendations(self, bets, bankroll, min_bet_amount) == result, "idempotent violated"
-
+    assert (
+        get_bet_recommendations(self, bets, bankroll, min_bet_amount) == result
+    ), "idempotent violated"
 
 
 def test_optimize_bets_basic():
@@ -243,7 +225,6 @@ def test_optimize_bets_basic():
     assert result is not None
 
 
-
 def test_optimize_bets_edge_cases():
     """Test optimize_bets: edge cases."""
     # Arrange
@@ -256,12 +237,10 @@ def test_optimize_bets_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_bets_error_handling():
     """Test optimize_bets error handling."""
     with pytest.raises(ValueError):
         optimize_bets(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -272,4 +251,3 @@ def test_optimize_bets_property_idempotent(self, self, bets, bankroll):
 
     # Assert property
     assert optimize_bets(self, bets, bankroll) == result, "idempotent violated"
-

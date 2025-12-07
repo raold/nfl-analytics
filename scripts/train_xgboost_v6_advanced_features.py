@@ -80,6 +80,7 @@ from py.features.game_feature_extractor import GameFeatureExtractor
 # Optional: Optuna for hyperparameter tuning
 try:
     import optuna
+
     OPTUNA_AVAILABLE = True
 except ImportError:
     OPTUNA_AVAILABLE = False
@@ -88,17 +89,17 @@ except ImportError:
 # Optional: SHAP for feature importance
 try:
     import shap
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
     warnings.warn("SHAP not available. Advanced feature importance analysis disabled.")
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class XGBoostV6AdvancedTrainer:
@@ -116,10 +117,10 @@ class XGBoostV6AdvancedTrainer:
 
     def __init__(
         self,
-        target: str = 'spread',
+        target: str = "spread",
         seasons: list[int] | None = None,
         holdout_season: int = 2024,
-        db_config: dict | None = None
+        db_config: dict | None = None,
     ):
         """
         Initialize XGBoost v6 advanced trainer.
@@ -136,11 +137,11 @@ class XGBoostV6AdvancedTrainer:
 
         # Database config
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'  # pragma: allowlist secret
+            "host": "localhost",
+            "port": 5544,
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",  # pragma: allowlist secret
         }
 
         # Initialize feature extractors
@@ -151,14 +152,14 @@ class XGBoostV6AdvancedTrainer:
         # This provides 10-20x speedup over per-game extraction
         self.parallel_loader = ParallelFeatureLoader(
             db_config={
-                'host': self.db_config.get('host', 'localhost'),
-                'port': self.db_config.get('port', 5544),
-                'database': self.db_config.get('dbname', 'devdb01'),
-                'user': self.db_config.get('user', 'dro'),
-                'password': self.db_config.get('password', 'sicillionbillions')
+                "host": self.db_config.get("host", "localhost"),
+                "port": self.db_config.get("port", 5544),
+                "database": self.db_config.get("dbname", "devdb01"),
+                "user": self.db_config.get("user", "dro"),
+                "password": self.db_config.get("password", "sicillionbillions"),
             },
             use_redis=True,
-            n_workers=8
+            n_workers=8,
         )
 
         # Model storage
@@ -248,20 +249,21 @@ class XGBoostV6AdvancedTrainer:
         all_features = []
 
         # Process each season in batch mode (1 query per season, not per game)
-        unique_seasons = sorted(df['season'].unique())
+        unique_seasons = sorted(df["season"].unique())
         logger.info(f"  Seasons to process: {unique_seasons}")
 
         for season in unique_seasons:
-            season_df = df[df['season'] == season]
-            unique_weeks = sorted(season_df['week'].unique())
+            season_df = df[df["season"] == season]
+            unique_weeks = sorted(season_df["week"].unique())
 
-            logger.info(f"\n  Processing season {season} ({len(season_df)} games, weeks {min(unique_weeks)}-{max(unique_weeks)})")
+            logger.info(
+                f"\n  Processing season {season} ({len(season_df)} games, weeks {min(unique_weeks)}-{max(unique_weeks)})"
+            )
 
             try:
                 # BATCH extraction: fetch ALL games for this season in 1-3 queries
                 season_features = self.parallel_loader.extract_season_features(
-                    season=int(season),
-                    weeks=[int(w) for w in unique_weeks]
+                    season=int(season), weeks=[int(w) for w in unique_weeks]
                 )
 
                 if len(season_features) > 0:
@@ -269,15 +271,28 @@ class XGBoostV6AdvancedTrainer:
                     # season_features has: [season, week, home_team, away_team, feature_1, ...]
                     # df has: [game_id, season, week, home_team, away_team, spread_actual, total_actual, ...]
 
-                    merged = season_df[['game_id', 'season', 'week', 'home_team', 'away_team',
-                                        'spread_actual', 'total_actual', 'spread_close', 'total_close']].merge(
+                    merged = season_df[
+                        [
+                            "game_id",
+                            "season",
+                            "week",
+                            "home_team",
+                            "away_team",
+                            "spread_actual",
+                            "total_actual",
+                            "spread_close",
+                            "total_close",
+                        ]
+                    ].merge(
                         season_features,
-                        on=['season', 'week', 'home_team', 'away_team'],
-                        how='inner'
+                        on=["season", "week", "home_team", "away_team"],
+                        how="inner",
                     )
 
                     all_features.append(merged)
-                    logger.info(f"    ✓ Extracted {len(merged)}/{len(season_df)} games ({len(season_features.columns)} features)")
+                    logger.info(
+                        f"    ✓ Extracted {len(merged)}/{len(season_df)} games ({len(season_features.columns)} features)"
+                    )
                 else:
                     logger.warning(f"    ⚠ No features extracted for season {season}")
 
@@ -289,21 +304,21 @@ class XGBoostV6AdvancedTrainer:
                 for _, row in season_df.iterrows():
                     try:
                         features = self.feature_extractor.extract_game_features(
-                            home_team=row['home_team'],
-                            away_team=row['away_team'],
-                            season=int(row['season']),
-                            week=int(row['week']),
-                            use_cache=True
+                            home_team=row["home_team"],
+                            away_team=row["away_team"],
+                            season=int(row["season"]),
+                            week=int(row["week"]),
+                            use_cache=True,
                         )
-                        features['game_id'] = row['game_id']
-                        features['season'] = row['season']
-                        features['week'] = row['week']
-                        features['home_team'] = row['home_team']
-                        features['away_team'] = row['away_team']
-                        features['spread_actual'] = row['spread_actual']
-                        features['total_actual'] = row['total_actual']
-                        features['spread_close'] = row.get('spread_close', None)
-                        features['total_close'] = row.get('total_close', None)
+                        features["game_id"] = row["game_id"]
+                        features["season"] = row["season"]
+                        features["week"] = row["week"]
+                        features["home_team"] = row["home_team"]
+                        features["away_team"] = row["away_team"]
+                        features["spread_actual"] = row["spread_actual"]
+                        features["total_actual"] = row["total_actual"]
+                        features["spread_close"] = row.get("spread_close", None)
+                        features["total_close"] = row.get("total_close", None)
                         all_features.append(pd.DataFrame([features]))
                     except Exception as e2:
                         logger.debug(f"      Failed {row['game_id']}: {e2}")
@@ -319,22 +334,25 @@ class XGBoostV6AdvancedTrainer:
         throughput = len(df_features) / elapsed_total if elapsed_total > 0 else 0
 
         logger.info("\n✓ Feature extraction complete:")
-        logger.info(f"  Total games: {len(df_features)}/{len(df)} ({100*len(df_features)/len(df):.1f}%)")
+        logger.info(
+            f"  Total games: {len(df_features)}/{len(df)} ({100*len(df_features)/len(df):.1f}%)"
+        )
         logger.info(f"  Total features: {len(df_features.columns)} columns")
         logger.info(f"  Extraction time: {elapsed_total:.1f} seconds ({throughput:.1f} games/sec)")
 
         # Report cache stats if Redis available
         try:
             cache_stats = self.parallel_loader.get_cache_stats()
-            logger.info(f"  Redis cache: {cache_stats['total_keys']} keys, {cache_stats['hit_rate']*100:.1f}% hit rate")
+            logger.info(
+                f"  Redis cache: {cache_stats['total_keys']} keys, {cache_stats['hit_rate']*100:.1f}% hit rate"
+            )
         except Exception:
             pass
 
         return df_features
 
     def prepare_training_data(
-        self,
-        df: pd.DataFrame
+        self, df: pd.DataFrame
     ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list[str]]:
         """
         Prepare train/test split with temporal separation.
@@ -350,20 +368,30 @@ class XGBoostV6AdvancedTrainer:
         logger.info("=" * 80)
 
         # Select target variable
-        if self.target == 'spread':
-            target_col = 'spread_actual'
-        elif self.target == 'total':
-            target_col = 'total_actual'
-        elif self.target == 'passing_yards':
-            target_col = 'passing_yards'  # Would need player-level data
+        if self.target == "spread":
+            target_col = "spread_actual"
+        elif self.target == "total":
+            target_col = "total_actual"
+        elif self.target == "passing_yards":
+            target_col = "passing_yards"  # Would need player-level data
         else:
             raise ValueError(f"Invalid target: {self.target}")
 
         # Exclude metadata and target columns
         exclude_cols = [
-            'game_id', 'season', 'week', 'home_team', 'away_team', 'kickoff',
-            'spread_actual', 'total_actual', 'spread_close', 'total_close',
-            'home_score', 'away_score', 'passing_yards'
+            "game_id",
+            "season",
+            "week",
+            "home_team",
+            "away_team",
+            "kickoff",
+            "spread_actual",
+            "total_actual",
+            "spread_close",
+            "total_close",
+            "home_score",
+            "away_score",
+            "passing_yards",
         ]
         feature_cols = [c for c in df.columns if c not in exclude_cols]
 
@@ -371,8 +399,8 @@ class XGBoostV6AdvancedTrainer:
         logger.info(f"Target: {target_col}")
 
         # Temporal split
-        train_mask = df['season'].isin(self.seasons)
-        test_mask = df['season'] == self.holdout_season
+        train_mask = df["season"].isin(self.seasons)
+        test_mask = df["season"] == self.holdout_season
 
         X_train = df.loc[train_mask, feature_cols]
         y_train = df.loc[train_mask, target_col]
@@ -387,34 +415,51 @@ class XGBoostV6AdvancedTrainer:
         # Data sufficiency validation (tree models need 20-50 samples per feature)
         n_samples = len(X_train)
         n_features = X_train.shape[1]
-        min_samples_per_feature = 20  # Relaxed from 50 - XGBoost with regularization handles this well
+        min_samples_per_feature = (
+            20  # Relaxed from 50 - XGBoost with regularization handles this well
+        )
         min_samples_required = max(n_features * min_samples_per_feature, 500)
 
         # Enforce data sufficiency with assert (prevents underpowered experiments)
-        assert len(X_train) >= n_features * min_samples_per_feature, f"Need {n_features * min_samples_per_feature}+ samples for XGBoost with {n_features} features"
+        assert (
+            len(X_train) >= n_features * min_samples_per_feature
+        ), f"Need {n_features * min_samples_per_feature}+ samples for XGBoost with {n_features} features"
 
         if n_samples < min_samples_required:
-            logger.warning(f"⚠️ Data sufficiency warning: {n_samples} samples for {n_features} features")
+            logger.warning(
+                f"⚠️ Data sufficiency warning: {n_samples} samples for {n_features} features"
+            )
             logger.warning(f"  Recommended: {min_samples_required}+ samples (50+ per feature)")
             logger.warning("  Model may underperform with insufficient data")
         else:
-            logger.info(f"✅ Data sufficiency check passed: {n_samples} samples >= {min_samples_required} required")
+            logger.info(
+                f"✅ Data sufficiency check passed: {n_samples} samples >= {min_samples_required} required"
+            )
 
         # Data leakage validation - verify temporal separation
         try:
             from py.utils.data_leakage_detector import DataLeakageDetector
+
             detector = DataLeakageDetector()
-            train_seasons = df.loc[train_mask, 'season'].unique().tolist()
-            test_seasons = df.loc[test_mask, 'season'].unique().tolist()
+            train_seasons = df.loc[train_mask, "season"].unique().tolist()
+            test_seasons = df.loc[test_mask, "season"].unique().tolist()
             if max(train_seasons) >= min(test_seasons):
-                raise ValueError(f"Temporal leakage: train seasons {train_seasons} overlap with test {test_seasons}")
-            logger.info(f"✅ Temporal leakage check passed: train max={max(train_seasons)}, test min={min(test_seasons)}")
+                raise ValueError(
+                    f"Temporal leakage: train seasons {train_seasons} overlap with test {test_seasons}"
+                )
+            logger.info(
+                f"✅ Temporal leakage check passed: train max={max(train_seasons)}, test min={min(test_seasons)}"
+            )
         except ImportError:
             logger.warning("DataLeakageDetector not available - skipping advanced leakage checks")
             # Manual temporal validation
             if max(self.seasons) >= self.holdout_season:
-                raise ValueError(f"Temporal leakage: training seasons include holdout {self.holdout_season}")
-            logger.info(f"✅ Manual temporal check passed: train ends {max(self.seasons)}, test is {self.holdout_season}")
+                raise ValueError(
+                    f"Temporal leakage: training seasons include holdout {self.holdout_season}"
+                )
+            logger.info(
+                f"✅ Manual temporal check passed: train ends {max(self.seasons)}, test is {self.holdout_season}"
+            )
 
         # Handle missing values
         logger.info("\nHandling missing values...")
@@ -427,7 +472,9 @@ class XGBoostV6AdvancedTrainer:
         numeric_cols = X_train.select_dtypes(include=[np.number]).columns
         non_numeric_cols = [c for c in X_train.columns if c not in numeric_cols]
         if non_numeric_cols:
-            logger.warning(f"  Dropping {len(non_numeric_cols)} non-numeric columns: {non_numeric_cols[:5]}...")
+            logger.warning(
+                f"  Dropping {len(non_numeric_cols)} non-numeric columns: {non_numeric_cols[:5]}..."
+            )
             X_train = X_train[numeric_cols]
             X_test = X_test[numeric_cols]
 
@@ -444,10 +491,7 @@ class XGBoostV6AdvancedTrainer:
         return X_train, y_train, X_test, y_test, list(X_train.columns)
 
     def tune_hyperparameters(
-        self,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        n_trials: int = 100
+        self, X_train: pd.DataFrame, y_train: pd.Series, n_trials: int = 100
     ) -> dict:
         """
         Tune XGBoost hyperparameters using Optuna.
@@ -471,19 +515,19 @@ class XGBoostV6AdvancedTrainer:
         def objective(trial):
             """Optuna objective function."""
             params = {
-                'objective': 'reg:squarederror',
-                'eval_metric': 'mae',
-                'max_depth': trial.suggest_int('max_depth', 3, 10),
-                'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
-                'n_estimators': trial.suggest_int('n_estimators', 100, 1000, step=100),
-                'subsample': trial.suggest_float('subsample', 0.5, 1.0),
-                'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
-                'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
-                'gamma': trial.suggest_float('gamma', 0, 1.0),
-                'reg_alpha': trial.suggest_float('reg_alpha', 0, 1.0),
-                'reg_lambda': trial.suggest_float('reg_lambda', 0, 2.0),
-                'random_state': 42,
-                'n_jobs': -1
+                "objective": "reg:squarederror",
+                "eval_metric": "mae",
+                "max_depth": trial.suggest_int("max_depth", 3, 10),
+                "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+                "n_estimators": trial.suggest_int("n_estimators", 100, 1000, step=100),
+                "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+                "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
+                "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
+                "gamma": trial.suggest_float("gamma", 0, 1.0),
+                "reg_alpha": trial.suggest_float("reg_alpha", 0, 1.0),
+                "reg_lambda": trial.suggest_float("reg_lambda", 0, 2.0),
+                "random_state": 42,
+                "n_jobs": -1,
             }
 
             # 5-fold CV
@@ -492,11 +536,7 @@ class XGBoostV6AdvancedTrainer:
             )
 
             model = xgb.XGBRegressor(**params)
-            model.fit(
-                X_tr, y_tr,
-                eval_set=[(X_val, y_val)],
-                verbose=False
-            )
+            model.fit(X_tr, y_tr, eval_set=[(X_val, y_val)], verbose=False)
 
             y_pred = model.predict(X_val)
             mae = mean_absolute_error(y_val, y_pred)
@@ -504,7 +544,7 @@ class XGBoostV6AdvancedTrainer:
             return mae
 
         # Run optimization
-        study = optuna.create_study(direction='minimize')
+        study = optuna.create_study(direction="minimize")
         study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
 
         logger.info("\n✓ Hyperparameter tuning complete:")
@@ -513,31 +553,33 @@ class XGBoostV6AdvancedTrainer:
 
         # Add fixed params
         best_params = study.best_params
-        best_params.update({
-            'objective': 'reg:squarederror',
-            'eval_metric': 'mae',
-            'random_state': 42,
-            'n_jobs': -1
-        })
+        best_params.update(
+            {
+                "objective": "reg:squarederror",
+                "eval_metric": "mae",
+                "random_state": 42,
+                "n_jobs": -1,
+            }
+        )
 
         return best_params
 
     def _get_default_hyperparameters(self) -> dict:
         """Get default hyperparameters (if tuning unavailable)."""
         return {
-            'objective': 'reg:squarederror',
-            'eval_metric': 'mae',
-            'max_depth': 6,
-            'learning_rate': 0.05,
-            'n_estimators': 500,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'min_child_weight': 3,
-            'gamma': 0.1,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.0,
-            'random_state': 42,
-            'n_jobs': -1
+            "objective": "reg:squarederror",
+            "eval_metric": "mae",
+            "max_depth": 6,
+            "learning_rate": 0.05,
+            "n_estimators": 500,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 3,
+            "gamma": 0.1,
+            "reg_alpha": 0.1,
+            "reg_lambda": 1.0,
+            "random_state": 42,
+            "n_jobs": -1,
         }
 
     def train_model(
@@ -546,7 +588,7 @@ class XGBoostV6AdvancedTrainer:
         y_train: pd.Series,
         X_test: pd.DataFrame,
         y_test: pd.Series,
-        params: dict
+        params: dict,
     ) -> xgb.XGBRegressor:
         """
         Train XGBoost model with specified hyperparameters.
@@ -568,18 +610,14 @@ class XGBoostV6AdvancedTrainer:
         logger.info(f"Target: {self.target}")
         logger.info("Hyperparameters:")
         for k, v in params.items():
-            if k not in ['random_state', 'n_jobs', 'objective', 'eval_metric']:
+            if k not in ["random_state", "n_jobs", "objective", "eval_metric"]:
                 logger.info(f"  {k}: {v}")
 
         # Train model
         model = xgb.XGBRegressor(**params)
 
         eval_set = [(X_train, y_train), (X_test, y_test)]
-        model.fit(
-            X_train, y_train,
-            eval_set=eval_set,
-            verbose=50
-        )
+        model.fit(X_train, y_train, eval_set=eval_set, verbose=50)
 
         logger.info("\n✓ Training complete")
 
@@ -587,10 +625,7 @@ class XGBoostV6AdvancedTrainer:
         return model
 
     def evaluate_model(
-        self,
-        model: xgb.XGBRegressor,
-        X_test: pd.DataFrame,
-        y_test: pd.Series
+        self, model: xgb.XGBRegressor, X_test: pd.DataFrame, y_test: pd.Series
     ) -> dict:
         """
         Evaluate model performance on holdout set.
@@ -617,23 +652,23 @@ class XGBoostV6AdvancedTrainer:
         # Error distribution
         errors = np.abs(y_test - y_pred)
         error_percentiles = {
-            'p50': np.percentile(errors, 50),
-            'p75': np.percentile(errors, 75),
-            'p90': np.percentile(errors, 90),
-            'p95': np.percentile(errors, 95)
+            "p50": np.percentile(errors, 50),
+            "p75": np.percentile(errors, 75),
+            "p90": np.percentile(errors, 90),
+            "p95": np.percentile(errors, 95),
         }
 
         metrics = {
-            'mae': float(mae),
-            'rmse': float(rmse),
-            'r2': float(r2),
-            'baseline_mae': float(baseline_mae),
-            'improvement_pct': float(improvement),
-            'n_test': len(y_test),
-            'error_p50': float(error_percentiles['p50']),
-            'error_p75': float(error_percentiles['p75']),
-            'error_p90': float(error_percentiles['p90']),
-            'error_p95': float(error_percentiles['p95'])
+            "mae": float(mae),
+            "rmse": float(rmse),
+            "r2": float(r2),
+            "baseline_mae": float(baseline_mae),
+            "improvement_pct": float(improvement),
+            "n_test": len(y_test),
+            "error_p50": float(error_percentiles["p50"]),
+            "error_p75": float(error_percentiles["p75"]),
+            "error_p90": float(error_percentiles["p90"]),
+            "error_p95": float(error_percentiles["p95"]),
         }
 
         logger.info(f"\nHoldout Set Performance ({self.holdout_season}, n={len(y_test)}):")
@@ -653,10 +688,7 @@ class XGBoostV6AdvancedTrainer:
         return metrics
 
     def analyze_feature_importance(
-        self,
-        model: xgb.XGBRegressor,
-        X_test: pd.DataFrame,
-        top_n: int = 30
+        self, model: xgb.XGBRegressor, X_test: pd.DataFrame, top_n: int = 30
     ) -> pd.DataFrame:
         """
         Analyze feature importance using both XGBoost native and SHAP.
@@ -674,10 +706,9 @@ class XGBoostV6AdvancedTrainer:
         logger.info("=" * 80)
 
         # XGBoost native importance
-        importance_df = pd.DataFrame({
-            'feature': X_test.columns,
-            'importance': model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {"feature": X_test.columns, "importance": model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
         logger.info(f"\nTop {top_n} Features (XGBoost native):")
         for idx, row in importance_df.head(top_n).iterrows():
@@ -694,21 +725,18 @@ class XGBoostV6AdvancedTrainer:
                 shap_values = explainer.shap_values(X_sample)
 
                 # SHAP importance (mean absolute SHAP value)
-                shap_importance = pd.DataFrame({
-                    'feature': X_test.columns,
-                    'shap_importance': np.abs(shap_values).mean(axis=0)
-                }).sort_values('shap_importance', ascending=False)
+                shap_importance = pd.DataFrame(
+                    {"feature": X_test.columns, "shap_importance": np.abs(shap_values).mean(axis=0)}
+                ).sort_values("shap_importance", ascending=False)
 
                 # Merge with XGBoost importance
-                importance_df = importance_df.merge(
-                    shap_importance,
-                    on='feature',
-                    how='left'
-                )
+                importance_df = importance_df.merge(shap_importance, on="feature", how="left")
 
                 logger.info(f"\nTop {min(20, top_n)} Features (SHAP):")
                 for idx, row in shap_importance.head(min(20, top_n)).iterrows():
-                    logger.info(f"  {idx + 1:2d}. {row['feature']:40s} {row['shap_importance']:.4f}")
+                    logger.info(
+                        f"  {idx + 1:2d}. {row['feature']:40s} {row['shap_importance']:.4f}"
+                    )
 
             except Exception as e:
                 logger.warning(f"SHAP analysis failed: {e}")
@@ -716,11 +744,7 @@ class XGBoostV6AdvancedTrainer:
         return importance_df
 
     def save_model(
-        self,
-        model: xgb.XGBRegressor,
-        metrics: dict,
-        feature_importance: pd.DataFrame,
-        params: dict
+        self, model: xgb.XGBRegressor, metrics: dict, feature_importance: pd.DataFrame, params: dict
     ):
         """Save trained model, metadata, and feature importance."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -740,38 +764,35 @@ class XGBoostV6AdvancedTrainer:
 
         # Save metadata
         metadata = {
-            'model_version': 'v6_advanced',
-            'target': self.target,
-            'training_date': datetime.now().isoformat(),
-            'features': self.feature_names,
-            'n_features': len(self.feature_names),
-            'metrics': metrics,
-            'hyperparameters': params,
-            'data_range': {
-                'training_seasons': self.seasons,
-                'holdout_season': self.holdout_season
+            "model_version": "v6_advanced",
+            "target": self.target,
+            "training_date": datetime.now().isoformat(),
+            "features": self.feature_names,
+            "n_features": len(self.feature_names),
+            "metrics": metrics,
+            "hyperparameters": params,
+            "data_range": {"training_seasons": self.seasons, "holdout_season": self.holdout_season},
+            "feature_extractor": {
+                "class": "GameFeatureExtractor",
+                "total_features": 232,
+                "feature_groups": {
+                    "home_offensive": 24,
+                    "home_defensive": 24,
+                    "away_offensive": 24,
+                    "away_defensive": 24,
+                    "matchup": 4,
+                    "injury": 12,
+                    "nextgen": 46,
+                    "qbr": 20,
+                    "possession": 8,
+                    "playcalling": 32,
+                    "opponent_adjusted": 14,
+                },
             },
-            'feature_extractor': {
-                'class': 'GameFeatureExtractor',
-                'total_features': 232,
-                'feature_groups': {
-                    'home_offensive': 24,
-                    'home_defensive': 24,
-                    'away_offensive': 24,
-                    'away_defensive': 24,
-                    'matchup': 4,
-                    'injury': 12,
-                    'nextgen': 46,
-                    'qbr': 20,
-                    'possession': 8,
-                    'playcalling': 32,
-                    'opponent_adjusted': 14
-                }
-            }
         }
 
         metadata_path = f"{base_path}_metadata.json"
-        with open(metadata_path, 'w') as f:
+        with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
         logger.info(f"  ✓ Metadata: {metadata_path}")
 
@@ -784,12 +805,12 @@ class XGBoostV6AdvancedTrainer:
 
     def _get_target_units(self) -> str:
         """Get target variable units for logging."""
-        if self.target in ['spread', 'total']:
-            return 'points'
-        elif self.target == 'passing_yards':
-            return 'yards'
+        if self.target in ["spread", "total"]:
+            return "points"
+        elif self.target == "passing_yards":
+            return "yards"
         else:
-            return 'units'
+            return "units"
 
 
 def parse_args():
@@ -802,44 +823,42 @@ def parse_args():
     default_seasons = list(range(default_holdout - 6, default_holdout))
 
     parser = argparse.ArgumentParser(
-        description='Train XGBoost v6 with 232 advanced features',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="Train XGBoost v6 with 232 advanced features",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     parser.add_argument(
-        '--target',
+        "--target",
         type=str,
-        choices=['spread', 'total', 'passing_yards'],
-        default='spread',
-        help='Prediction target'
+        choices=["spread", "total", "passing_yards"],
+        default="spread",
+        help="Prediction target",
     )
 
     parser.add_argument(
-        '--seasons',
+        "--seasons",
         type=int,
-        nargs='+',
+        nargs="+",
         default=default_seasons,
-        help=f'Training seasons (default: {default_seasons})'
+        help=f"Training seasons (default: {default_seasons})",
     )
 
     parser.add_argument(
-        '--holdout-season',
+        "--holdout-season",
         type=int,
         default=default_holdout,
-        help=f'Holdout validation season (default: {default_holdout})'
+        help=f"Holdout validation season (default: {default_holdout})",
     )
 
     parser.add_argument(
-        '--n-trials',
+        "--n-trials",
         type=int,
         default=100,
-        help='Optuna hyperparameter tuning trials (0 = use defaults)'
+        help="Optuna hyperparameter tuning trials (0 = use defaults)",
     )
 
     parser.add_argument(
-        '--skip-tuning',
-        action='store_true',
-        help='Skip hyperparameter tuning, use defaults'
+        "--skip-tuning", action="store_true", help="Skip hyperparameter tuning, use defaults"
     )
 
     return parser.parse_args()
@@ -860,9 +879,7 @@ def main():
 
     # Initialize trainer
     trainer = XGBoostV6AdvancedTrainer(
-        target=args.target,
-        seasons=args.seasons,
-        holdout_season=args.holdout_season
+        target=args.target, seasons=args.seasons, holdout_season=args.holdout_season
     )
 
     # Load game data

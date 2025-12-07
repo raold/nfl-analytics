@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -56,7 +53,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_backtest_basic():
@@ -89,7 +83,6 @@ def test_backtest_basic():
     assert result is not None
 
 
-
 def test_backtest_edge_cases():
     """Test backtest: edge cases."""
     # Arrange
@@ -102,12 +95,10 @@ def test_backtest_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_error_handling():
     """Test backtest error handling."""
     with pytest.raises(ValueError):
         backtest(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -118,4 +109,3 @@ def test_backtest_property_idempotent(self, self, ensemble, df, train_df):
 
     # Assert property
     assert backtest(self, ensemble, df, train_df) == result, "idempotent violated"
-

@@ -56,11 +56,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class OpponentDefensiveFeatures:
@@ -123,18 +122,16 @@ class OpponentDefensiveFeatures:
                 "user": db_user,
                 "password": db_password,
             }
-        logger.info(f"Initialized OpponentDefensiveFeatures (lookback={self.LOOKBACK_WINDOW} games)")
+        logger.info(
+            f"Initialized OpponentDefensiveFeatures (lookback={self.LOOKBACK_WINDOW} games)"
+        )
 
     def _connect_db(self) -> psycopg2.extensions.connection:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
     def _get_recent_games(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int,
-        lookback: int = LOOKBACK_WINDOW
+        self, team: str, target_season: int, target_week: int, lookback: int = LOOKBACK_WINDOW
     ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
@@ -176,11 +173,7 @@ class OpponentDefensiveFeatures:
 
         return recent_games
 
-    def _compute_defensive_epa(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
-    ) -> float:
+    def _compute_defensive_epa(self, team: str, games: list[tuple[str, int, int]]) -> float:
         """
         Compute defensive EPA allowed per play (rolling average).
 
@@ -224,11 +217,7 @@ class OpponentDefensiveFeatures:
         else:
             return self.DEFAULT_DEF_EPA
 
-    def _compute_points_allowed(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
-    ) -> float:
+    def _compute_points_allowed(self, team: str, games: list[tuple[str, int, int]]) -> float:
         """
         Compute points allowed per game (rolling average).
 
@@ -274,11 +263,7 @@ class OpponentDefensiveFeatures:
         else:
             return self.DEFAULT_POINTS_ALLOWED
 
-    def _compute_pass_rush_win_rate(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
-    ) -> float:
+    def _compute_pass_rush_win_rate(self, team: str, games: list[tuple[str, int, int]]) -> float:
         """
         Compute pass rush win rate (percentage of pass plays with QB hit/sack/hurry).
 
@@ -326,9 +311,7 @@ class OpponentDefensiveFeatures:
             return self.DEFAULT_PASS_RUSH_RATE
 
     def _compute_matchup_difficulty(
-        self,
-        defensive_epa: float,
-        league_epa_distribution: pd.DataFrame | None = None
+        self, defensive_epa: float, league_epa_distribution: pd.DataFrame | None = None
     ) -> float:
         """
         Compute matchup difficulty score (0-1 scale).
@@ -354,15 +337,12 @@ class OpponentDefensiveFeatures:
             return np.clip(normalized, 0.0, 1.0)
         else:
             # Use actual league distribution for percentile ranking
-            percentile = (defensive_epa <= league_epa_distribution['def_epa_allowed']).mean()
+            percentile = (defensive_epa <= league_epa_distribution["def_epa_allowed"]).mean()
             # Invert: lower EPA = better defense = harder matchup
             return 1.0 - percentile
 
     def compute_features(
-        self,
-        opponent_team: str,
-        target_season: int,
-        target_week: int
+        self, opponent_team: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Compute all 4 opponent defensive features for a specific game.
@@ -385,10 +365,7 @@ class OpponentDefensiveFeatures:
         """
         # Get recent games (temporal safety: BEFORE target week)
         recent_games = self._get_recent_games(
-            opponent_team,
-            target_season,
-            target_week,
-            lookback=self.LOOKBACK_WINDOW
+            opponent_team, target_season, target_week, lookback=self.LOOKBACK_WINDOW
         )
 
         if len(recent_games) < self.LOOKBACK_WINDOW:
@@ -404,16 +381,13 @@ class OpponentDefensiveFeatures:
         matchup_difficulty = self._compute_matchup_difficulty(defensive_epa)
 
         return {
-            'opponent_defensive_epa': defensive_epa,
-            'opponent_points_allowed': points_allowed,
-            'opponent_pass_rush_win_rate': pass_rush_rate,
-            'matchup_difficulty': matchup_difficulty,
+            "opponent_defensive_epa": defensive_epa,
+            "opponent_points_allowed": points_allowed,
+            "opponent_pass_rush_win_rate": pass_rush_rate,
+            "matchup_difficulty": matchup_difficulty,
         }
 
-    def compute_features_batch(
-        self,
-        games_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def compute_features_batch(self, games_df: pd.DataFrame) -> pd.DataFrame:
         """
         Compute opponent defensive features for multiple games (batch mode).
 
@@ -432,32 +406,36 @@ class OpponentDefensiveFeatures:
         results = []
 
         for _, game in games_df.iterrows():
-            game_id = game['game_id']
-            season = game['season']
-            week = game['week']
-            home_team = game['home_team']
-            away_team = game['away_team']
+            game_id = game["game_id"]
+            season = game["season"]
+            week = game["week"]
+            home_team = game["home_team"]
+            away_team = game["away_team"]
 
             # HOME TEAM perspective (opponent = away_team defense)
             home_features = self.compute_features(away_team, season, week)
-            home_features.update({
-                'game_id': game_id,
-                'season': season,
-                'week': week,
-                'team': home_team,
-                'opponent': away_team,
-            })
+            home_features.update(
+                {
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": home_team,
+                    "opponent": away_team,
+                }
+            )
             results.append(home_features)
 
             # AWAY TEAM perspective (opponent = home_team defense)
             away_features = self.compute_features(home_team, season, week)
-            away_features.update({
-                'game_id': game_id,
-                'season': season,
-                'week': week,
-                'team': away_team,
-                'opponent': home_team,
-            })
+            away_features.update(
+                {
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": away_team,
+                    "opponent": home_team,
+                }
+            )
             results.append(away_features)
 
         df = pd.DataFrame(results)
@@ -486,20 +464,10 @@ def main():
     parser.add_argument(
         "--test-team",
         default="KC",
-        help="Test team abbreviation (default: KC for Kansas City Chiefs)"
+        help="Test team abbreviation (default: KC for Kansas City Chiefs)",
     )
-    parser.add_argument(
-        "--test-season",
-        type=int,
-        default=2024,
-        help="Test season (default: 2024)"
-    )
-    parser.add_argument(
-        "--test-week",
-        type=int,
-        default=10,
-        help="Test week (default: 10)"
-    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season (default: 2024)")
+    parser.add_argument("--test-week", type=int, default=10, help="Test week (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -513,7 +481,9 @@ def main():
     print("\n" + "=" * 80)
     print("OPPONENT DEFENSIVE FEATURES TEST")
     print("=" * 80)
-    print(f"Test Case: {args.test_team} facing opponent in {args.test_season} Week {args.test_week}")
+    print(
+        f"Test Case: {args.test_team} facing opponent in {args.test_season} Week {args.test_week}"
+    )
     print()
 
     # Get test game (KC vs opponent in 2024 Week 10)
@@ -536,14 +506,16 @@ def main():
     conn.close()
 
     if not test_game:
-        print(f"ERROR: No game found for {args.test_team} in {args.test_season} Week {args.test_week}")
+        print(
+            f"ERROR: No game found for {args.test_team} in {args.test_season} Week {args.test_week}"
+        )
         return
 
     # Determine opponent
-    if test_game['home_team'] == args.test_team:
-        opponent = test_game['away_team']
+    if test_game["home_team"] == args.test_team:
+        opponent = test_game["away_team"]
     else:
-        opponent = test_game['home_team']
+        opponent = test_game["home_team"]
 
     print(f"Matchup: {args.test_team} vs {opponent}")
     print(f"Game ID: {test_game['game_id']}")
@@ -551,9 +523,7 @@ def main():
 
     # Compute features for opponent defense
     features = engine.compute_features(
-        opponent_team=opponent,
-        target_season=args.test_season,
-        target_week=args.test_week
+        opponent_team=opponent, target_season=args.test_season, target_week=args.test_week
     )
 
     print("Opponent Defensive Features:")
@@ -583,12 +553,7 @@ def main():
     print("TEMPORAL SAFETY VALIDATION")
     print("=" * 80)
 
-    recent_games = engine._get_recent_games(
-        opponent,
-        args.test_season,
-        args.test_week,
-        lookback=4
-    )
+    recent_games = engine._get_recent_games(opponent, args.test_season, args.test_week, lookback=4)
 
     print(f"Opponent: {opponent}")
     print(f"Target: {args.test_season} Week {args.test_week}")

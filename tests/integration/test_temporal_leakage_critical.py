@@ -155,9 +155,9 @@ def test_train_test_split_no_overlap(sample_train_test_split, leakage_detector):
     train_max_date = train["kickoff"].max()
     test_min_date = test["kickoff"].min()
 
-    assert test_min_date > train_max_date, (
-        f"Test games ({test_min_date}) not after train games ({train_max_date})"
-    )
+    assert (
+        test_min_date > train_max_date
+    ), f"Test games ({test_min_date}) not after train games ({train_max_date})"
 
     logger.info("✅ Train/test split has no overlap")
 
@@ -382,9 +382,9 @@ def test_backtest_temporal_order(db_connection):
         train_max = train_df["kickoff"].max()
         test_min = test_df["kickoff"].min()
 
-        assert test_min > train_max, (
-            f"Fold {i+1}: Test games ({test_min}) not after train games ({train_max})"
-        )
+        assert (
+            test_min > train_max
+        ), f"Fold {i+1}: Test games ({test_min}) not after train games ({train_max})"
 
     logger.info(f"✅ Backtest respects temporal order ({len(folds)} folds validated)")
 

@@ -23,7 +23,6 @@ def test_get_connection_basic():
     assert result is not None
 
 
-
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_connection_edge_cases():
     assert result is not None
 
 
-
 def test_get_connection_error_handling():
     """Test get_connection error handling."""
     with pytest.raises(ValueError):
         get_connection(invalid_input)
-
 
 
 def test_fetch_games_basic():
@@ -56,7 +53,6 @@ def test_fetch_games_basic():
     assert result is not None
 
 
-
 def test_fetch_games_edge_cases():
     """Test fetch_games: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_games_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_games_error_handling():
     """Test fetch_games error handling."""
     with pytest.raises(ValueError):
         fetch_games(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_fetch_games_property_idempotent(self, seasons):
 
     # Assert property
     assert fetch_games(seasons) == result, "idempotent violated"
-
 
 
 def test_tau_basic():
@@ -100,7 +93,6 @@ def test_tau_basic():
     assert result is not None
 
 
-
 def test_tau_edge_cases():
     """Test tau: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_tau_edge_cases():
     assert result is not None
 
 
-
 def test_tau_error_handling():
     """Test tau error handling."""
     with pytest.raises(ValueError):
         tau(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_tau_property_idempotent(self, x, y, lambda_x, lambda_y, rho):
 
     # Assert property
     assert tau(x, y, lambda_x, lambda_y, rho) == result, "idempotent violated"
-
 
 
 def test_bivariate_poisson_pmf_basic():
@@ -144,7 +133,6 @@ def test_bivariate_poisson_pmf_basic():
     assert result is not None
 
 
-
 def test_bivariate_poisson_pmf_edge_cases():
     """Test bivariate_poisson_pmf: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_bivariate_poisson_pmf_edge_cases():
     assert result is not None
 
 
-
 def test_bivariate_poisson_pmf_error_handling():
     """Test bivariate_poisson_pmf error handling."""
     with pytest.raises(ValueError):
         bivariate_poisson_pmf(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_bivariate_poisson_pmf_property_idempotent(self, x, y, lambda_x, lambda_
 
     # Assert property
     assert bivariate_poisson_pmf(x, y, lambda_x, lambda_y, rho) == result, "idempotent violated"
-
 
 
 def test_parse_args_basic():
@@ -188,7 +173,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -221,7 +203,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -234,12 +215,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_generate_latex_table_basic():
@@ -254,7 +233,6 @@ def test_generate_latex_table_basic():
     assert result is not None
 
 
-
 def test_generate_latex_table_edge_cases():
     """Test generate_latex_table: edge cases."""
     # Arrange
@@ -267,12 +245,10 @@ def test_generate_latex_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_latex_table_error_handling():
     """Test generate_latex_table error handling."""
     with pytest.raises(ValueError):
         generate_latex_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -283,7 +259,6 @@ def test_generate_latex_table_property_idempotent(self, model, output_path):
 
     # Assert property
     assert generate_latex_table(model, output_path) == result, "idempotent violated"
-
 
 
 def test_fit_basic():
@@ -298,7 +273,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -311,12 +285,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -327,7 +299,6 @@ def test_fit_property_idempotent(self, self, df):
 
     # Assert property
     assert fit(self, df) == result, "idempotent violated"
-
 
 
 def test_predict_score_distribution_basic():
@@ -342,7 +313,6 @@ def test_predict_score_distribution_basic():
     assert result is not None
 
 
-
 def test_predict_score_distribution_edge_cases():
     """Test predict_score_distribution: edge cases."""
     # Arrange
@@ -355,23 +325,24 @@ def test_predict_score_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_predict_score_distribution_error_handling():
     """Test predict_score_distribution error handling."""
     with pytest.raises(ValueError):
         predict_score_distribution(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_score_distribution_property_idempotent(self, self, home_team, away_team, max_score):
+def test_predict_score_distribution_property_idempotent(
+    self, self, home_team, away_team, max_score
+):
     """Property test: function is idempotent."""
     # Act
     result = predict_score_distribution(self, home_team, away_team, max_score)
 
     # Assert property
-    assert predict_score_distribution(self, home_team, away_team, max_score) == result, "idempotent violated"
-
+    assert (
+        predict_score_distribution(self, home_team, away_team, max_score) == result
+    ), "idempotent violated"
 
 
 def test_predict_margin_distribution_basic():
@@ -386,7 +357,6 @@ def test_predict_margin_distribution_basic():
     assert result is not None
 
 
-
 def test_predict_margin_distribution_edge_cases():
     """Test predict_margin_distribution: edge cases."""
     # Arrange
@@ -399,23 +369,24 @@ def test_predict_margin_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_predict_margin_distribution_error_handling():
     """Test predict_margin_distribution error handling."""
     with pytest.raises(ValueError):
         predict_margin_distribution(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_margin_distribution_property_idempotent(self, self, home_team, away_team, max_score):
+def test_predict_margin_distribution_property_idempotent(
+    self, self, home_team, away_team, max_score
+):
     """Property test: function is idempotent."""
     # Act
     result = predict_margin_distribution(self, home_team, away_team, max_score)
 
     # Assert property
-    assert predict_margin_distribution(self, home_team, away_team, max_score) == result, "idempotent violated"
-
+    assert (
+        predict_margin_distribution(self, home_team, away_team, max_score) == result
+    ), "idempotent violated"
 
 
 def test_predict_total_distribution_basic():
@@ -430,7 +401,6 @@ def test_predict_total_distribution_basic():
     assert result is not None
 
 
-
 def test_predict_total_distribution_edge_cases():
     """Test predict_total_distribution: edge cases."""
     # Arrange
@@ -443,23 +413,24 @@ def test_predict_total_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_predict_total_distribution_error_handling():
     """Test predict_total_distribution error handling."""
     with pytest.raises(ValueError):
         predict_total_distribution(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_total_distribution_property_idempotent(self, self, home_team, away_team, max_score):
+def test_predict_total_distribution_property_idempotent(
+    self, self, home_team, away_team, max_score
+):
     """Property test: function is idempotent."""
     # Act
     result = predict_total_distribution(self, home_team, away_team, max_score)
 
     # Assert property
-    assert predict_total_distribution(self, home_team, away_team, max_score) == result, "idempotent violated"
-
+    assert (
+        predict_total_distribution(self, home_team, away_team, max_score) == result
+    ), "idempotent violated"
 
 
 def test_save_basic():
@@ -474,7 +445,6 @@ def test_save_basic():
     assert result is not None
 
 
-
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
@@ -487,12 +457,10 @@ def test_save_edge_cases():
     assert result is not None
 
 
-
 def test_save_error_handling():
     """Test save error handling."""
     with pytest.raises(ValueError):
         save(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -503,7 +471,6 @@ def test_save_property_idempotent(self, self, path):
 
     # Assert property
     assert save(self, path) == result, "idempotent violated"
-
 
 
 def test_load_basic():
@@ -518,7 +485,6 @@ def test_load_basic():
     assert result is not None
 
 
-
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
@@ -531,12 +497,10 @@ def test_load_edge_cases():
     assert result is not None
 
 
-
 def test_load_error_handling():
     """Test load error handling."""
     with pytest.raises(ValueError):
         load(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -547,4 +511,3 @@ def test_load_property_idempotent(self, self, path):
 
     # Assert property
     assert load(self, path) == result, "idempotent violated"
-

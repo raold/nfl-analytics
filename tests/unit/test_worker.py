@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_execute_task_basic():
@@ -56,7 +53,6 @@ def test_execute_task_basic():
     assert result is not None
 
 
-
 def test_execute_task_edge_cases():
     """Test execute_task: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_execute_task_edge_cases():
     assert result is not None
 
 
-
 def test_execute_task_error_handling():
     """Test execute_task error handling."""
     with pytest.raises(ValueError):
         execute_task(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_execute_task_property_idempotent(self, self, task):
 
     # Assert property
     assert execute_task(self, task) == result, "idempotent violated"
-
 
 
 def test_run_basic():
@@ -100,7 +93,6 @@ def test_run_basic():
     assert result is not None
 
 
-
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_run_edge_cases():
     assert result is not None
 
 
-
 def test_run_error_handling():
     """Test run error handling."""
     with pytest.raises(ValueError):
         run(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_run_property_idempotent(val):
 
     # Assert property
     assert run(val) == result, "idempotent violated"
-
 
 
 def test_run_single_task_basic():
@@ -144,7 +133,6 @@ def test_run_single_task_basic():
     assert result is not None
 
 
-
 def test_run_single_task_edge_cases():
     """Test run_single_task: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_run_single_task_edge_cases():
     assert result is not None
 
 
-
 def test_run_single_task_error_handling():
     """Test run_single_task error handling."""
     with pytest.raises(ValueError):
         run_single_task(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000))
@@ -173,7 +159,6 @@ def test_run_single_task_property_idempotent(self, self, task_id):
 
     # Assert property
     assert run_single_task(self, task_id) == result, "idempotent violated"
-
 
 
 def test_progress_callback_basic():
@@ -188,7 +173,6 @@ def test_progress_callback_basic():
     assert result is not None
 
 
-
 def test_progress_callback_edge_cases():
     """Test progress_callback: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_progress_callback_edge_cases():
     assert result is not None
 
 
-
 def test_progress_callback_error_handling():
     """Test progress_callback error handling."""
     with pytest.raises(ValueError):
         progress_callback(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,4 +199,3 @@ def test_progress_callback_property_idempotent(self, progress, checkpoint):
 
     # Assert property
     assert progress_callback(progress, checkpoint) == result, "idempotent violated"
-

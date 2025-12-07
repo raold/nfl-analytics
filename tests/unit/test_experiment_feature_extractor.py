@@ -23,7 +23,6 @@ def test_to_array_basic():
     assert result is not None
 
 
-
 def test_to_array_edge_cases():
     """Test to_array: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_to_array_edge_cases():
     assert result is not None
 
 
-
 def test_to_array_error_handling():
     """Test to_array error handling."""
     with pytest.raises(ValueError):
         to_array(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_to_array_property_idempotent(val):
 
     # Assert property
     assert to_array(val) == result, "idempotent violated"
-
 
 
 def test_feature_dimension_basic():
@@ -67,7 +63,6 @@ def test_feature_dimension_basic():
     assert result is not None
 
 
-
 def test_feature_dimension_edge_cases():
     """Test feature_dimension: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_feature_dimension_edge_cases():
     assert result is not None
 
 
-
 def test_feature_dimension_error_handling():
     """Test feature_dimension error handling."""
     with pytest.raises(ValueError):
         feature_dimension(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_feature_dimension_property_idempotent(val):
 
     # Assert property
     assert feature_dimension(val) == result, "idempotent violated"
-
 
 
 def test_connect_basic():
@@ -111,7 +103,6 @@ def test_connect_basic():
     assert result is not None
 
 
-
 def test_connect_edge_cases():
     """Test connect: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_connect_edge_cases():
     assert result is not None
 
 
-
 def test_connect_error_handling():
     """Test connect error handling."""
     with pytest.raises(ValueError):
         connect(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_connect_property_idempotent(val):
 
     # Assert property
     assert connect(val) == result, "idempotent violated"
-
 
 
 def test_extract_features_basic():
@@ -155,7 +143,6 @@ def test_extract_features_basic():
     assert result is not None
 
 
-
 def test_extract_features_edge_cases():
     """Test extract_features: edge cases."""
     # Arrange
@@ -168,23 +155,31 @@ def test_extract_features_edge_cases():
     assert result is not None
 
 
-
 def test_extract_features_error_handling():
     """Test extract_features error handling."""
     with pytest.raises(ValueError):
         extract_features(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers())
-def test_extract_features_property_idempotent(self, self, game_id, season, week, home_team, away_team):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_extract_features_property_idempotent(
+    self, self, game_id, season, week, home_team, away_team
+):
     """Property test: function is idempotent."""
     # Act
     result = extract_features(self, game_id, season, week, home_team, away_team)
 
     # Assert property
-    assert extract_features(self, game_id, season, week, home_team, away_team) == result, "idempotent violated"
-
+    assert (
+        extract_features(self, game_id, season, week, home_team, away_team) == result
+    ), "idempotent violated"
 
 
 def test_extract_batch_basic():
@@ -199,7 +194,6 @@ def test_extract_batch_basic():
     assert result is not None
 
 
-
 def test_extract_batch_edge_cases():
     """Test extract_batch: edge cases."""
     # Arrange
@@ -212,12 +206,10 @@ def test_extract_batch_edge_cases():
     assert result is not None
 
 
-
 def test_extract_batch_error_handling():
     """Test extract_batch error handling."""
     with pytest.raises(ValueError):
         extract_batch(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +220,6 @@ def test_extract_batch_property_idempotent(self, self, games):
 
     # Assert property
     assert extract_batch(self, games) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -243,7 +234,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -256,12 +246,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -272,4 +260,3 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-

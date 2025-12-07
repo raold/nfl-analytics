@@ -53,10 +53,7 @@ def extract_metrics_from_checkpoints():
             # Extract validation Brier score
             if "best_val_brier" in checkpoint:
                 val_brier = float(checkpoint["best_val_brier"])
-                history.append({
-                    "epoch": epoch,
-                    "val_brier": val_brier
-                })
+                history.append({"epoch": epoch, "val_brier": val_brier})
                 print(f"✅ Epoch {epoch:2d}: val_brier = {val_brier:.6f}")
             else:
                 print(f"⚠️  WARNING: No 'best_val_brier' key in checkpoint for epoch {epoch}")
@@ -78,7 +75,9 @@ def validate_data(df):
 
     # Check for sufficient data points
     if len(df) < 3:
-        print(f"❌ FAIL: Insufficient data points ({len(df)}). Need at least 3 for convergence plot.")
+        print(
+            f"❌ FAIL: Insufficient data points ({len(df)}). Need at least 3 for convergence plot."
+        )
         return False
 
     print(f"✅ PASS: {len(df)} data points extracted")
@@ -110,8 +109,12 @@ def validate_data(df):
     print(f"Initial val_brier (epoch {df['epoch'].iloc[0]}): {df['val_brier'].iloc[0]:.6f}")
     print(f"Final val_brier (epoch {df['epoch'].iloc[-1]}):   {df['val_brier'].iloc[-1]:.6f}")
     print(f"Improvement: {df['val_brier'].iloc[0] - df['val_brier'].iloc[-1]:.6f}")
-    print(f"Min val_brier: {df['val_brier'].min():.6f} (epoch {df.loc[df['val_brier'].idxmin(), 'epoch']:.0f})")
-    print(f"Max val_brier: {df['val_brier'].max():.6f} (epoch {df.loc[df['val_brier'].idxmax(), 'epoch']:.0f})")
+    print(
+        f"Min val_brier: {df['val_brier'].min():.6f} (epoch {df.loc[df['val_brier'].idxmin(), 'epoch']:.0f})"
+    )
+    print(
+        f"Max val_brier: {df['val_brier'].max():.6f} (epoch {df.loc[df['val_brier'].idxmax(), 'epoch']:.0f})"
+    )
     print(f"Mean: {df['val_brier'].mean():.6f}")
     print(f"Std:  {df['val_brier'].std():.6f}")
 
@@ -163,7 +166,9 @@ def main():
     print(f"\n{'='*70}")
     print("NEXT STEPS")
     print(f"{'='*70}")
-    print("1. Regenerate figure: Rscript analysis/dissertation/figures/R/gnn_optimization_figures.R")
+    print(
+        "1. Regenerate figure: Rscript analysis/dissertation/figures/R/gnn_optimization_figures.R"
+    )
     print("2. Verify figure shows real convergence (no duplicate points)")
     print("3. Update dissertation LaTeX if needed")
     print("4. Recompile dissertation PDF")

@@ -28,10 +28,10 @@ def check_integrity(model_path: str) -> int:
 
     # Try to load
     try:
-        if path.suffix == '.pkl':
-            with open(path, 'rb') as f:
+        if path.suffix == ".pkl":
+            with open(path, "rb") as f:
                 model = pickle.load(f)
-        elif path.suffix == '.rds':
+        elif path.suffix == ".rds":
             # Can't load R files from Python, just check exists + size
             pass
         else:
@@ -46,7 +46,7 @@ def check_integrity(model_path: str) -> int:
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: check_model_integrity.py <model_file>")
         sys.exit(1)

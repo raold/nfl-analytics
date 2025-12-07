@@ -36,18 +36,18 @@ from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('/tmp/weekly_predictions.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+        logging.FileHandler("/tmp/weekly_predictions.log"),
+        logging.StreamHandler(sys.stdout),
+    ],
 )
 logger = logging.getLogger(__name__)
 
 # Constants
 MODEL_ID = 384  # ensemble_v6.1 from model_registry
-ENSEMBLE_VERSION = 'v6.1'
-STAT_TYPE = 'passing_yards'
+ENSEMBLE_VERSION = "v6.1"
+STAT_TYPE = "passing_yards"
 
 
 class WeeklyPredictionGenerator:
@@ -55,19 +55,19 @@ class WeeklyPredictionGenerator:
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions'
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """Initialize with database connection and ensemble model"""
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'dbname': db_name,
-            'user': db_user,
-            'password': db_password
+            "host": db_host,
+            "port": db_port,
+            "dbname": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
         logger.info("Initializing Ensemble v6.1...")
@@ -76,7 +76,7 @@ class WeeklyPredictionGenerator:
             db_port=db_port,
             db_name=db_name,
             db_user=db_user,
-            db_password=db_password
+            db_password=db_password,
         )
         logger.info("✅ Ensemble v6.1 initialized")
 
@@ -85,13 +85,15 @@ class WeeklyPredictionGenerator:
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
                 # Get latest completed week
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT season, week
                     FROM public.games
                     WHERE kickoff < NOW()
                     ORDER BY kickoff DESC
                     LIMIT 1
-                """)
+                """
+                )
                 result = cur.fetchone()
                 if not result:
                     raise ValueError("No completed games found in database")
@@ -99,13 +101,16 @@ class WeeklyPredictionGenerator:
                 latest_season, latest_week = result
 
                 # Check if there's a next week
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT season, week
                     FROM public.games
                     WHERE (season = %s AND week > %s) OR season > %s
                     ORDER BY season, week
                     LIMIT 1
-                """, (latest_season, latest_week, latest_season))
+                """,
+                    (latest_season, latest_week, latest_season),
+                )
 
                 next_week = cur.fetchone()
                 if next_week:
@@ -118,7 +123,8 @@ class WeeklyPredictionGenerator:
         """Get all games for a specific week with QB information"""
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT
                         game_id,
                         season,
@@ -133,21 +139,20 @@ class WeeklyPredictionGenerator:
                     FROM public.games
                     WHERE season = %s AND week = %s
                     ORDER BY kickoff
-                """, (season, week))
+                """,
+                    (season, week),
+                )
 
                 games = cur.fetchall()
                 logger.info(f"Found {len(games)} games for {season} Week {week}")
                 return [dict(game) for game in games]
 
-    def check_existing_prediction(
-        self,
-        game_id: str,
-        player_id: str
-    ) -> bool:
+    def check_existing_prediction(self, game_id: str, player_id: str) -> bool:
         """Check if prediction already exists for this game/player"""
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT 1
                     FROM ml.predictions
                     WHERE model_id = %s
@@ -155,15 +160,12 @@ class WeeklyPredictionGenerator:
                       AND player_id = %s
                       AND stat_type = %s
                     LIMIT 1
-                """, (MODEL_ID, game_id, player_id, STAT_TYPE))
+                """,
+                    (MODEL_ID, game_id, player_id, STAT_TYPE),
+                )
                 return cur.fetchone() is not None
 
-    def generate_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> dict | None:
+    def generate_prediction(self, player_id: str, season: int, week: int) -> dict | None:
         """
         Generate prediction with full UQ for a player
 
@@ -175,47 +177,47 @@ class WeeklyPredictionGenerator:
             result = self.ensemble.predict(player_id, season, week)
 
             # Extract ensemble prediction
-            mean = result['ensemble_mean']
-            std_raw = result['ensemble_std']
-            std_calibrated = result['calibrated_std']
-            temperature = result['temperature']
+            mean = result["ensemble_mean"]
+            std_raw = result["ensemble_std"]
+            std_calibrated = result["calibrated_std"]
+            temperature = result["temperature"]
 
             # Calculate quantiles using calibrated std
             # Ensemble mean + calibrated std ~ N(mean, std_calibrated^2)
             quantiles = {
-                'q05': stats.norm.ppf(0.05, loc=mean, scale=std_calibrated),
-                'q10': stats.norm.ppf(0.10, loc=mean, scale=std_calibrated),
-                'q25': stats.norm.ppf(0.25, loc=mean, scale=std_calibrated),
-                'q50': mean,  # median = mean for normal distribution
-                'q75': stats.norm.ppf(0.75, loc=mean, scale=std_calibrated),
-                'q90': stats.norm.ppf(0.90, loc=mean, scale=std_calibrated),
-                'q95': stats.norm.ppf(0.95, loc=mean, scale=std_calibrated),
+                "q05": stats.norm.ppf(0.05, loc=mean, scale=std_calibrated),
+                "q10": stats.norm.ppf(0.10, loc=mean, scale=std_calibrated),
+                "q25": stats.norm.ppf(0.25, loc=mean, scale=std_calibrated),
+                "q50": mean,  # median = mean for normal distribution
+                "q75": stats.norm.ppf(0.75, loc=mean, scale=std_calibrated),
+                "q90": stats.norm.ppf(0.90, loc=mean, scale=std_calibrated),
+                "q95": stats.norm.ppf(0.95, loc=mean, scale=std_calibrated),
             }
 
             # Extract component predictions
-            component_preds = result.get('component_predictions', {})
+            component_preds = result.get("component_predictions", {})
 
             return {
-                'prediction_mean': round(mean, 2),
-                'prediction_median': round(quantiles['q50'], 2),
-                'prediction_std': round(std_calibrated, 2),
-                'prediction_q05': round(quantiles['q05'], 2),
-                'prediction_q10': round(quantiles['q10'], 2),
-                'prediction_q25': round(quantiles['q25'], 2),
-                'prediction_q50': round(quantiles['q50'], 2),
-                'prediction_q75': round(quantiles['q75'], 2),
-                'prediction_q90': round(quantiles['q90'], 2),
-                'prediction_q95': round(quantiles['q95'], 2),
-                'state_space_mean': component_preds.get('state_space_v2'),
-                'bayesian_mean': component_preds.get('hierarchical_v2'),  # hierarchical is bayesian
-                'xgboost_mean': component_preds.get('xgboost_v4_ridge'),
-                'model_components': {
-                    'components': result.get('component_predictions', {}),
-                    'weights': result.get('component_weights', {}),
-                    'valid_components': result.get('valid_components', 0),
-                    'temperature': temperature,
-                    'prediction_time_ms': result.get('prediction_time_ms', 0)
-                }
+                "prediction_mean": round(mean, 2),
+                "prediction_median": round(quantiles["q50"], 2),
+                "prediction_std": round(std_calibrated, 2),
+                "prediction_q05": round(quantiles["q05"], 2),
+                "prediction_q10": round(quantiles["q10"], 2),
+                "prediction_q25": round(quantiles["q25"], 2),
+                "prediction_q50": round(quantiles["q50"], 2),
+                "prediction_q75": round(quantiles["q75"], 2),
+                "prediction_q90": round(quantiles["q90"], 2),
+                "prediction_q95": round(quantiles["q95"], 2),
+                "state_space_mean": component_preds.get("state_space_v2"),
+                "bayesian_mean": component_preds.get("hierarchical_v2"),  # hierarchical is bayesian
+                "xgboost_mean": component_preds.get("xgboost_v4_ridge"),
+                "model_components": {
+                    "components": result.get("component_predictions", {}),
+                    "weights": result.get("component_weights", {}),
+                    "valid_components": result.get("valid_components", 0),
+                    "temperature": temperature,
+                    "prediction_time_ms": result.get("prediction_time_ms", 0),
+                },
             }
 
         except Exception as e:
@@ -223,18 +225,14 @@ class WeeklyPredictionGenerator:
             return None
 
     def store_prediction(
-        self,
-        game: dict,
-        player_id: str,
-        player_name: str,
-        is_home: bool,
-        prediction: dict
+        self, game: dict, player_id: str, player_name: str, is_home: bool, prediction: dict
     ) -> bool:
         """Store prediction in ml.predictions table"""
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
-                    cur.execute("""
+                    cur.execute(
+                        """
                         INSERT INTO ml.predictions (
                             model_id,
                             game_id,
@@ -284,34 +282,36 @@ class WeeklyPredictionGenerator:
                             xgboost_mean = EXCLUDED.xgboost_mean,
                             model_components = EXCLUDED.model_components,
                             updated_at = NOW()
-                    """, (
-                        MODEL_ID,
-                        game['game_id'],
-                        game['season'],
-                        game['week'],
-                        player_id,
-                        player_name,
-                        game['home_team'] if is_home else game['away_team'],
-                        game['away_team'] if is_home else game['home_team'],
-                        is_home,
-                        STAT_TYPE,
-                        prediction['prediction_mean'],
-                        prediction['prediction_median'],
-                        prediction['prediction_std'],
-                        prediction['prediction_q05'],
-                        prediction['prediction_q10'],
-                        prediction['prediction_q25'],
-                        prediction['prediction_q50'],
-                        prediction['prediction_q75'],
-                        prediction['prediction_q90'],
-                        prediction['prediction_q95'],
-                        prediction['state_space_mean'],
-                        prediction['bayesian_mean'],
-                        prediction['xgboost_mean'],
-                        ENSEMBLE_VERSION,
-                        psycopg2.extras.Json(prediction['model_components']),
-                        'pending'
-                    ))
+                    """,
+                        (
+                            MODEL_ID,
+                            game["game_id"],
+                            game["season"],
+                            game["week"],
+                            player_id,
+                            player_name,
+                            game["home_team"] if is_home else game["away_team"],
+                            game["away_team"] if is_home else game["home_team"],
+                            is_home,
+                            STAT_TYPE,
+                            prediction["prediction_mean"],
+                            prediction["prediction_median"],
+                            prediction["prediction_std"],
+                            prediction["prediction_q05"],
+                            prediction["prediction_q10"],
+                            prediction["prediction_q25"],
+                            prediction["prediction_q50"],
+                            prediction["prediction_q75"],
+                            prediction["prediction_q90"],
+                            prediction["prediction_q95"],
+                            prediction["state_space_mean"],
+                            prediction["bayesian_mean"],
+                            prediction["xgboost_mean"],
+                            ENSEMBLE_VERSION,
+                            psycopg2.extras.Json(prediction["model_components"]),
+                            "pending",
+                        ),
+                    )
                     conn.commit()
                     return True
 
@@ -319,12 +319,7 @@ class WeeklyPredictionGenerator:
             logger.error(f"Failed to store prediction for {player_name}: {e}")
             return False
 
-    def generate_week(
-        self,
-        season: int,
-        week: int,
-        skip_existing: bool = True
-    ) -> dict:
+    def generate_week(self, season: int, week: int, skip_existing: bool = True) -> dict:
         """
         Generate predictions for all QBs in a week
 
@@ -338,11 +333,11 @@ class WeeklyPredictionGenerator:
         games = self.get_games_for_week(season, week)
 
         stats = {
-            'total_qbs': 0,
-            'successful': 0,
-            'failed': 0,
-            'skipped': 0,
-            'start_time': datetime.now(UTC)
+            "total_qbs": 0,
+            "successful": 0,
+            "failed": 0,
+            "skipped": 0,
+            "start_time": datetime.now(UTC),
         }
 
         for game in games:
@@ -351,20 +346,20 @@ class WeeklyPredictionGenerator:
 
             # Process both QBs (away and home)
             for is_home in [False, True]:
-                qb_id = game['home_qb_id'] if is_home else game['away_qb_id']
-                qb_name = game['home_qb_name'] if is_home else game['away_qb_name']
-                team = game['home_team'] if is_home else game['away_team']
+                qb_id = game["home_qb_id"] if is_home else game["away_qb_id"]
+                qb_name = game["home_qb_name"] if is_home else game["away_qb_name"]
+                team = game["home_team"] if is_home else game["away_team"]
 
-                if not qb_id or qb_id == 'Unknown':
+                if not qb_id or qb_id == "Unknown":
                     logger.warning(f"  ⚠️ No QB listed for {team}, skipping")
                     continue
 
-                stats['total_qbs'] += 1
+                stats["total_qbs"] += 1
 
                 # Check if prediction already exists
-                if skip_existing and self.check_existing_prediction(game['game_id'], qb_id):
+                if skip_existing and self.check_existing_prediction(game["game_id"], qb_id):
                     logger.info(f"  ⏭️ {qb_name} ({team}): Prediction already exists, skipping")
-                    stats['skipped'] += 1
+                    stats["skipped"] += 1
                     continue
 
                 logger.info(f"  🏈 Generating prediction for {qb_name} ({team}, {qb_id})...")
@@ -374,7 +369,7 @@ class WeeklyPredictionGenerator:
 
                 if prediction is None:
                     logger.error(f"  ❌ Prediction failed for {qb_name}")
-                    stats['failed'] += 1
+                    stats["failed"] += 1
                     continue
 
                 # Store prediction
@@ -386,13 +381,13 @@ class WeeklyPredictionGenerator:
                         f"{prediction['prediction_std']:.1f} yards "
                         f"(90% CI: [{prediction['prediction_q05']:.1f}, {prediction['prediction_q95']:.1f}])"
                     )
-                    stats['successful'] += 1
+                    stats["successful"] += 1
                 else:
                     logger.error(f"  ❌ Failed to store prediction for {qb_name}")
-                    stats['failed'] += 1
+                    stats["failed"] += 1
 
-        stats['end_time'] = datetime.now(UTC)
-        stats['duration_seconds'] = (stats['end_time'] - stats['start_time']).total_seconds()
+        stats["end_time"] = datetime.now(UTC)
+        stats["duration_seconds"] = (stats["end_time"] - stats["start_time"]).total_seconds()
 
         # Print summary
         logger.info(f"\n{'='*80}")
@@ -403,23 +398,25 @@ class WeeklyPredictionGenerator:
         logger.info(f"❌ Failed: {stats['failed']}")
         logger.info(f"⏭️ Skipped: {stats['skipped']}")
         logger.info(f"⏱️ Duration: {stats['duration_seconds']:.1f} seconds")
-        if stats['successful'] > 0:
-            logger.info(f"⚡ Avg time per prediction: {stats['duration_seconds']/stats['successful']:.2f}s")
+        if stats["successful"] > 0:
+            logger.info(
+                f"⚡ Avg time per prediction: {stats['duration_seconds']/stats['successful']:.2f}s"
+            )
         logger.info(f"{'='*80}\n")
 
         return stats
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate weekly QB passing predictions')
-    parser.add_argument('--season', type=int, help='Season (default: auto-detect next week)')
-    parser.add_argument('--week', type=int, help='Week (default: auto-detect next week)')
-    parser.add_argument('--backfill', action='store_true', help='Regenerate existing predictions')
-    parser.add_argument('--db-host', default='localhost', help='Database host')
-    parser.add_argument('--db-port', type=int, default=5544, help='Database port')
-    parser.add_argument('--db-name', default='devdb01', help='Database name')
-    parser.add_argument('--db-user', default='dro', help='Database user')
-    parser.add_argument('--db-password', default='sicillionbillions', help='Database password')
+    parser = argparse.ArgumentParser(description="Generate weekly QB passing predictions")
+    parser.add_argument("--season", type=int, help="Season (default: auto-detect next week)")
+    parser.add_argument("--week", type=int, help="Week (default: auto-detect next week)")
+    parser.add_argument("--backfill", action="store_true", help="Regenerate existing predictions")
+    parser.add_argument("--db-host", default="localhost", help="Database host")
+    parser.add_argument("--db-port", type=int, default=5544, help="Database port")
+    parser.add_argument("--db-name", default="devdb01", help="Database name")
+    parser.add_argument("--db-user", default="dro", help="Database user")
+    parser.add_argument("--db-password", default="sicillionbillions", help="Database password")
 
     args = parser.parse_args()
 
@@ -429,7 +426,7 @@ def main():
             db_port=args.db_port,
             db_name=args.db_name,
             db_user=args.db_user,
-            db_password=args.db_password
+            db_password=args.db_password,
         )
 
         # Determine season/week
@@ -441,14 +438,10 @@ def main():
             logger.info(f"Auto-detected next week: {season} Week {week}")
 
         # Generate predictions
-        stats = generator.generate_week(
-            season=season,
-            week=week,
-            skip_existing=not args.backfill
-        )
+        stats = generator.generate_week(season=season, week=week, skip_existing=not args.backfill)
 
         # Exit code based on results
-        if stats['failed'] > 0:
+        if stats["failed"] > 0:
             logger.error(f"⚠️ {stats['failed']} predictions failed")
             return 1
         else:
@@ -460,5 +453,5 @@ def main():
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

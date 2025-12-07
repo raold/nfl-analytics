@@ -34,9 +34,9 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("CREATING CALIBRATED BNN WRAPPER (5TH MODEL)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Load existing PyTorch BNN
     bnn_path = Path("models/bayesian/bnn_passing_ensemble_v1.pt")
@@ -47,23 +47,19 @@ def main():
         return 1
 
     logger.info(f"\nLoading base BNN from {bnn_path.name}")
-    checkpoint = torch.load(bnn_path, map_location='cpu', weights_only=False)
+    checkpoint = torch.load(bnn_path, map_location="cpu", weights_only=False)
 
     # Import BNN architecture
     from scripts.train_bnn_passing_ensemble import PassingYardsBNN
 
     # Reconstruct model
-    args = checkpoint.get('args', {})
-    hidden_dim = args.get('hidden_dim', 64)
-    dropout = args.get('dropout', 0.2)
-    input_dim = len(checkpoint['feature_cols'])
+    args = checkpoint.get("args", {})
+    hidden_dim = args.get("hidden_dim", 64)
+    dropout = args.get("dropout", 0.2)
+    input_dim = len(checkpoint["feature_cols"])
 
-    base_model = PassingYardsBNN(
-        input_dim=input_dim,
-        hidden_dim=hidden_dim,
-        dropout_rate=dropout
-    )
-    base_model.load_state_dict(checkpoint['model_state_dict'])
+    base_model = PassingYardsBNN(input_dim=input_dim, hidden_dim=hidden_dim, dropout_rate=dropout)
+    base_model.load_state_dict(checkpoint["model_state_dict"])
     base_model.eval()
 
     logger.info(f"✓ Loaded base BNN (input_dim={input_dim}, hidden_dim={hidden_dim})")
@@ -71,12 +67,12 @@ def main():
     # Create calibrated wrapper
     calibrated_bnn = CalibratedBNNWrapper(
         base_model=base_model,
-        scaler_X_mean=checkpoint['scaler_X_mean'],
-        scaler_X_scale=checkpoint['scaler_X_scale'],
-        scaler_y_mean=checkpoint['scaler_y_mean'],
-        scaler_y_scale=checkpoint['scaler_y_scale'],
-        feature_cols=checkpoint['feature_cols'],
-        temperature=0.90  # Optimal from validation (target: 90% → 92% coverage)
+        scaler_X_mean=checkpoint["scaler_X_mean"],
+        scaler_X_scale=checkpoint["scaler_X_scale"],
+        scaler_y_mean=checkpoint["scaler_y_mean"],
+        scaler_y_scale=checkpoint["scaler_y_scale"],
+        feature_cols=checkpoint["feature_cols"],
+        temperature=0.90,  # Optimal from validation (target: 90% → 92% coverage)
     )
 
     logger.info("\n✓ Created calibrated wrapper")
@@ -88,16 +84,31 @@ def main():
     logger.info("\nTesting calibrated predictions...")
 
     # Mahomes-like features
-    test_features = np.array([[
-        226.33, 251.80, 239.90,  # passing_yards_last3, last5, season
-        27.67, 32.40,  # pass_attempts_last3, last5
-        18.33, 22.40,  # completions_last3, last5
-        1.67, 0.67, 2.5,  # passing_tds_last3, interceptions_last3, sacks_last3
-        270.40,  # opponent_passing_yards_allowed_avg
-        22.0, 0.0, 1.0,  # implied_team_total, spread, is_home
-        5.0, 60.0, 7.0,  # weather_wind_mph, weather_temp, days_rest
-        0.0, 1.0,  # is_dome, is_outdoors
-    ]])
+    test_features = np.array(
+        [
+            [
+                226.33,
+                251.80,
+                239.90,  # passing_yards_last3, last5, season
+                27.67,
+                32.40,  # pass_attempts_last3, last5
+                18.33,
+                22.40,  # completions_last3, last5
+                1.67,
+                0.67,
+                2.5,  # passing_tds_last3, interceptions_last3, sacks_last3
+                270.40,  # opponent_passing_yards_allowed_avg
+                22.0,
+                0.0,
+                1.0,  # implied_team_total, spread, is_home
+                5.0,
+                60.0,
+                7.0,  # weather_wind_mph, weather_temp, days_rest
+                0.0,
+                1.0,  # is_dome, is_outdoors
+            ]
+        ]
+    )
 
     mean, std = calibrated_bnn.predict(test_features)
 
@@ -105,12 +116,14 @@ def main():
     logger.info(f"  90% CI: [{mean - 1.645*std:.1f}, {mean + 1.645*std:.1f}]")
 
     # Compare with base model (uncalibrated)
-    X_norm = (test_features - checkpoint['scaler_X_mean']) / checkpoint['scaler_X_scale']
+    X_norm = (test_features - checkpoint["scaler_X_mean"]) / checkpoint["scaler_X_scale"]
     X_tensor = torch.tensor(X_norm, dtype=torch.float32)
     with torch.no_grad():
         base_mean, base_log_std = base_model(X_tensor, sample=False)
-        base_mean_val = base_mean[0].item() * checkpoint['scaler_y_scale'] + checkpoint['scaler_y_mean']
-        base_std_val = np.exp(base_log_std[0].item()) * checkpoint['scaler_y_scale']
+        base_mean_val = (
+            base_mean[0].item() * checkpoint["scaler_y_scale"] + checkpoint["scaler_y_mean"]
+        )
+        base_std_val = np.exp(base_log_std[0].item()) * checkpoint["scaler_y_scale"]
 
     logger.info("\nComparison:")
     logger.info(f"  Base BNN:       {base_mean_val:.1f} ± {base_std_val:.1f} yards")
@@ -125,9 +138,9 @@ def main():
     logger.info(f"\n✅ Saved calibrated BNN: {output_path}")
     logger.info(f"   Size: {output_path.stat().st_size / 1024:.1f} KB")
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("CALIBRATED BNN WRAPPER CREATED SUCCESSFULLY")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("\nNext steps:")
     logger.info("1. Test 5-way ensemble: python test_5way_ensemble.py")
     logger.info("2. Add QB-WR Chemistry (6th model)")

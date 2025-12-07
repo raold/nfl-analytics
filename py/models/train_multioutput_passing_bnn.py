@@ -44,8 +44,7 @@ from torch.utils.data import DataLoader, TensorDataset
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ class BayesianLinear(nn.Module):
 
     def reset_parameters(self):
         """Initialize using He initialization"""
-        nn.init.kaiming_normal_(self.weight_mu, mode='fan_in')
+        nn.init.kaiming_normal_(self.weight_mu, mode="fan_in")
         nn.init.constant_(self.weight_rho, -3)  # log(exp(0.05) - 1) ≈ -3
         nn.init.zeros_(self.bias_mu)
         nn.init.constant_(self.bias_rho, -3)
@@ -111,13 +110,17 @@ class BayesianLinear(nn.Module):
 
         # KL(q||p) for Gaussian: 0.5 * [σ²/σ₀² + μ²/σ₀² - log(σ²/σ₀²) - 1]
         kl_weight = 0.5 * torch.sum(
-            weight_sigma**2 / self.prior_var + self.weight_mu**2 / self.prior_var
-            - torch.log(weight_sigma**2 / self.prior_var) - 1
+            weight_sigma**2 / self.prior_var
+            + self.weight_mu**2 / self.prior_var
+            - torch.log(weight_sigma**2 / self.prior_var)
+            - 1
         )
 
         kl_bias = 0.5 * torch.sum(
-            bias_sigma**2 / self.prior_var + self.bias_mu**2 / self.prior_var
-            - torch.log(bias_sigma**2 / self.prior_var) - 1
+            bias_sigma**2 / self.prior_var
+            + self.bias_mu**2 / self.prior_var
+            - torch.log(bias_sigma**2 / self.prior_var)
+            - 1
         )
 
         return kl_weight + kl_bias
@@ -134,7 +137,7 @@ class ExpertNetwork(nn.Module):
 
         # Dual output heads
         self.yards_head = BayesianLinear(hidden_dim, 1)  # Passing yards (continuous)
-        self.td_head = BayesianLinear(hidden_dim, 1)     # Passing TD (binary)
+        self.td_head = BayesianLinear(hidden_dim, 1)  # Passing TD (binary)
 
     def forward(self, x, sample=True):
         h = F.relu(self.fc1(x, sample))
@@ -182,10 +185,9 @@ class MultiOutputPassingBNN(nn.Module):
         self.n_experts = n_experts
 
         # Create expert networks
-        self.experts = nn.ModuleList([
-            ExpertNetwork(input_dim, hidden_dim, dropout_rate)
-            for _ in range(n_experts)
-        ])
+        self.experts = nn.ModuleList(
+            [ExpertNetwork(input_dim, hidden_dim, dropout_rate) for _ in range(n_experts)]
+        )
 
         # Gating network (learns to route inputs to specialists)
         self.gate = GatingNetwork(input_dim, n_experts)
@@ -251,11 +253,7 @@ def load_passing_data_from_db():
     logger.info("Loading passing data from database (canonical window)...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions",
-        database="devdb01"
+        host="localhost", port=5544, user="dro", password="sicillionbillions", database="devdb01"
     )
 
     query = """
@@ -334,7 +332,9 @@ def load_passing_data_from_db():
     logger.info(f"Train: {len(df[df['split']=='train'])} games (2015-2023)")
     logger.info(f"Test: {len(df[df['split']=='test'])} games (2024)")
     logger.info(f"TD rate: {100*df['scored_td'].mean():.1f}%")
-    logger.info(f"Decay window (2015-2017): {len(df[df['season']<2018])} games (weights: 0.47-0.78)")
+    logger.info(
+        f"Decay window (2015-2017): {len(df[df['season']<2018])} games (weights: 0.47-0.78)"
+    )
 
     return df
 
@@ -355,9 +355,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Week in season (proxy for playoff push, player fatigue)
     df["week_in_season"] = df["week"].astype(float)
@@ -367,9 +365,15 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Fill missing values with median
     numeric_cols = [
-        "yards_l3", "yards_per_attempt_l3", "td_rate_l3",  # Match SQL column case
-        "spread_line", "total_line", "temp", "wind",
-        "yards_per_attempt", "td_rate"  # Derived features
+        "yards_l3",
+        "yards_per_attempt_l3",
+        "td_rate_l3",  # Match SQL column case
+        "spread_line",
+        "total_line",
+        "temp",
+        "wind",
+        "yards_per_attempt",
+        "td_rate",  # Derived features
     ]
     for col in numeric_cols:
         if col in df.columns:
@@ -423,18 +427,20 @@ def prepare_train_test_split(df: pd.DataFrame):
     logger.info(f"Test: {len(X_test)} samples (2024)")
     logger.info(f"Features: {len(feature_cols)}")
 
-    return X_train, y_yards_train, y_td_train, weights_train, X_test, y_yards_test, y_td_test, feature_cols
+    return (
+        X_train,
+        y_yards_train,
+        y_td_train,
+        weights_train,
+        X_test,
+        y_yards_test,
+        y_td_test,
+        feature_cols,
+    )
 
 
 def train_model(
-    model,
-    train_loader,
-    val_loader,
-    device,
-    epochs=200,
-    lr=0.001,
-    kl_scale=0.01,
-    log_path=None
+    model, train_loader, val_loader, device, epochs=200, lr=0.001, kl_scale=0.01, log_path=None
 ):
     """
     Train Multi-Output BNN with KL annealing and weighted loss
@@ -450,23 +456,23 @@ def train_model(
         log_path: Optional path to save training log
     """
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=15, factor=0.5)
+    scheduler = ReduceLROnPlateau(optimizer, mode="min", patience=15, factor=0.5)
 
     # KL annealing schedule (linear over 30 epochs)
     def kl_weight(epoch):
         return min(1.0, epoch / 30)
 
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
     train_history = []
 
     # Initialize checkpoint (prevents UnboundLocalError)
     checkpoint = {
-        'epoch': 0,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-        'val_loss': float('inf'),
-        'val_yards_mae': float('inf'),
-        'val_td_acc': 0.0
+        "epoch": 0,
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict(),
+        "val_loss": float("inf"),
+        "val_yards_mae": float("inf"),
+        "val_td_acc": 0.0,
     }
 
     logger.info(f"Training on {device} for {epochs} epochs")
@@ -500,15 +506,15 @@ def train_model(
 
             # Negative log-likelihood for yards (Gaussian, heteroscedastic)
             yards_nll = 0.5 * (
-                torch.log(2 * np.pi * noise_std_clamped**2) +
-                (batch_y_yards - yards_pred)**2 / (noise_std_clamped**2 + 1e-6)
+                torch.log(2 * np.pi * noise_std_clamped**2)
+                + (batch_y_yards - yards_pred) ** 2 / (noise_std_clamped**2 + 1e-6)
             )
             # Weight by canonical window (H=4 decay)
             yards_nll_weighted = torch.mean(batch_weights * yards_nll)
 
             # Binary cross-entropy for TDs (weighted)
             td_loss_per_sample = F.binary_cross_entropy_with_logits(
-                td_logits, batch_y_td, reduction='none'
+                td_logits, batch_y_td, reduction="none"
             )
             td_loss_weighted = torch.mean(batch_weights * td_loss_per_sample)
 
@@ -571,12 +577,12 @@ def train_model(
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             checkpoint = {
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'val_loss': avg_val_loss,
-                'val_yards_mae': avg_val_yards_mae,
-                'val_td_acc': avg_val_td_acc
+                "epoch": epoch,
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": optimizer.state_dict(),
+                "val_loss": avg_val_loss,
+                "val_yards_mae": avg_val_yards_mae,
+                "val_td_acc": avg_val_td_acc,
             }
 
         # Logging
@@ -593,22 +599,24 @@ def train_model(
             logger.info(log_msg)
 
             if log_path:
-                with open(log_path, 'a') as f:
-                    f.write(log_msg + '\n')
+                with open(log_path, "a") as f:
+                    f.write(log_msg + "\n")
 
             # GPU memory monitoring
-            if device.type == 'cuda':
+            if device.type == "cuda":
                 gpu_mem = torch.cuda.memory_allocated() / 1024**3
                 logger.info(f"GPU Memory: {gpu_mem:.2f} GB")
 
         # Store history
-        train_history.append({
-            'epoch': epoch,
-            'train_loss': avg_train_loss,
-            'val_loss': avg_val_loss,
-            'val_mae': avg_val_yards_mae,
-            'val_td_acc': avg_val_td_acc
-        })
+        train_history.append(
+            {
+                "epoch": epoch,
+                "train_loss": avg_train_loss,
+                "val_loss": avg_val_loss,
+                "val_mae": avg_val_yards_mae,
+                "val_td_acc": avg_val_td_acc,
+            }
+        )
 
     logger.info(f"✓ Training complete: best_val_loss={best_val_loss:.4f}")
 
@@ -675,7 +683,7 @@ def evaluate_model(model, test_loader, scaler, device, y_mean, y_std):
 
     # Yards metrics
     mae = np.mean(np.abs(yards_pred - yards_true))
-    rmse = np.sqrt(np.mean((yards_pred - yards_true)**2))
+    rmse = np.sqrt(np.mean((yards_pred - yards_true) ** 2))
 
     # 90% prediction interval coverage (±1.645σ)
     yards_lower = yards_pred - 1.645 * yards_std
@@ -684,23 +692,23 @@ def evaluate_model(model, test_loader, scaler, device, y_mean, y_std):
 
     # TD metrics
     td_accuracy = np.mean((td_pred > 0.5) == td_true)
-    td_brier = np.mean((td_pred - td_true)**2)
+    td_brier = np.mean((td_pred - td_true) ** 2)
 
     results = {
-        'yards_mae': float(mae),
-        'yards_rmse': float(rmse),
-        'yards_coverage_90': float(coverage_90),
-        'yards_mean_std': float(yards_std.mean()),
-        'td_accuracy': float(td_accuracy),
-        'td_brier_score': float(td_brier),
-        'td_mean_prob': float(td_pred.mean()),
-        'td_actual_rate': float(td_true.mean()),
-        'timestamp': datetime.now().isoformat()
+        "yards_mae": float(mae),
+        "yards_rmse": float(rmse),
+        "yards_coverage_90": float(coverage_90),
+        "yards_mean_std": float(yards_std.mean()),
+        "td_accuracy": float(td_accuracy),
+        "td_brier_score": float(td_brier),
+        "td_mean_prob": float(td_pred.mean()),
+        "td_actual_rate": float(td_true.mean()),
+        "timestamp": datetime.now().isoformat(),
     }
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("EVALUATION RESULTS (2024 Test Set)")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Passing Yards:")
     logger.info(f"  MAE: {mae:.2f} yards")
     logger.info(f"  RMSE: {rmse:.2f} yards")
@@ -711,7 +719,7 @@ def evaluate_model(model, test_loader, scaler, device, y_mean, y_std):
     logger.info(f"  Brier Score: {td_brier:.4f}")
     logger.info(f"  Mean Pred Prob: {td_pred.mean():.1%}")
     logger.info(f"  Actual TD Rate: {td_true.mean():.1%}")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Decision criteria
     if coverage_90 >= 0.88:
@@ -726,22 +734,30 @@ def evaluate_model(model, test_loader, scaler, device, y_mean, y_std):
 
 def main():
     """Main training pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("MULTI-OUTPUT PASSING BNN - Canonical Training Window")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Setup device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"\nUsing device: {device}")
-    if device.type == 'cuda':
+    if device.type == "cuda":
         logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
         logger.info(f"Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
     # Load data
     df = load_passing_data_from_db()
     df = engineer_features(df)
-    X_train, y_yards_train, y_td_train, weights_train, X_test, y_yards_test, y_td_test, feature_cols = \
-        prepare_train_test_split(df)
+    (
+        X_train,
+        y_yards_train,
+        y_td_train,
+        weights_train,
+        X_test,
+        y_yards_test,
+        y_td_test,
+        feature_cols,
+    ) = prepare_train_test_split(df)
 
     # Standardize features
     scaler = StandardScaler()
@@ -752,7 +768,7 @@ def main():
     # CRITICAL: Must normalize AFTER applying exponential decay weights
     # Weighted mean and std to account for canonical window
     weighted_mean = np.average(y_yards_train, weights=weights_train)
-    weighted_var = np.average((y_yards_train - weighted_mean)**2, weights=weights_train)
+    weighted_var = np.average((y_yards_train - weighted_mean) ** 2, weights=weights_train)
     weighted_std = np.sqrt(weighted_var)
 
     # Fallback to simple normalization if weights cause issues
@@ -771,7 +787,9 @@ def main():
     logger.info("\nTarget normalization (weighted by canonical window):")
     logger.info(f"  Mean: {y_mean:.2f} yards")
     logger.info(f"  Std: {y_std:.2f} yards")
-    logger.info(f"  Normalized train range: [{y_yards_train_norm.min():.2f}, {y_yards_train_norm.max():.2f}]")
+    logger.info(
+        f"  Normalized train range: [{y_yards_train_norm.min():.2f}, {y_yards_train_norm.max():.2f}]"
+    )
 
     # Convert to tensors
     X_train_t = torch.FloatTensor(X_train_scaled)
@@ -792,10 +810,7 @@ def main():
 
     # Initialize model
     model = MultiOutputPassingBNN(
-        input_dim=X_train.shape[1],
-        n_experts=3,
-        hidden_dim=32,
-        dropout_rate=0.2
+        input_dim=X_train.shape[1], n_experts=3, hidden_dim=32, dropout_rate=0.2
     ).to(device)
 
     n_params = sum(p.numel() for p in model.parameters())
@@ -805,17 +820,23 @@ def main():
     log_path = Path("logs/multioutput_passing_bnn_canonical.log")
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TRAINING")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     checkpoint, train_history = train_model(
-        model, train_loader, test_loader, device,
-        epochs=200, lr=0.001, kl_scale=0.01, log_path=log_path
+        model,
+        train_loader,
+        test_loader,
+        device,
+        epochs=200,
+        lr=0.001,
+        kl_scale=0.01,
+        log_path=log_path,
     )
 
     # Load best model for evaluation
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint["model_state_dict"])
     logger.info(f"Loaded best model from epoch {checkpoint['epoch']}")
 
     # Evaluation
@@ -825,24 +846,27 @@ def main():
     model_path = Path("models/bayesian/bnn_multioutput_passing_v1_canonical.pt")
     model_path.parent.mkdir(parents=True, exist_ok=True)
 
-    torch.save({
-        'model_state_dict': model.state_dict(),
-        'scaler_mean': scaler.mean_,
-        'scaler_scale': scaler.scale_,
-        'y_mean': y_mean,
-        'y_std': y_std,
-        'feature_cols': feature_cols,
-        'results': results,
-        'train_history': train_history,
-        'hyperparameters': {
-            'n_experts': 3,
-            'hidden_dim': 32,
-            'dropout_rate': 0.2,
-            'epochs': 200,
-            'learning_rate': 0.001,
-            'kl_scale': 0.01
-        }
-    }, model_path)
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "scaler_mean": scaler.mean_,
+            "scaler_scale": scaler.scale_,
+            "y_mean": y_mean,
+            "y_std": y_std,
+            "feature_cols": feature_cols,
+            "results": results,
+            "train_history": train_history,
+            "hyperparameters": {
+                "n_experts": 3,
+                "hidden_dim": 32,
+                "dropout_rate": 0.2,
+                "epochs": 200,
+                "learning_rate": 0.001,
+                "kl_scale": 0.01,
+            },
+        },
+        model_path,
+    )
 
     logger.info(f"\n✅ Model saved to {model_path}")
 
@@ -855,7 +879,7 @@ def main():
     logger.info(f"Results saved to {results_path}")
 
     # GPU summary
-    if device.type == 'cuda':
+    if device.type == "cuda":
         logger.info("\nGPU Memory Usage:")
         logger.info(f"  Current: {torch.cuda.memory_allocated()/1024**3:.2f} GB")
         logger.info(f"  Peak: {torch.cuda.max_memory_allocated()/1024**3:.2f} GB")

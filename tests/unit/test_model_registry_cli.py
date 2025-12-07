@@ -134,8 +134,7 @@ def mock_db_connection(mock_db_models):
 
     # Mock cursor to return db_models
     mock_cursor.fetchall.return_value = [
-        {k: v for k, v in model.items()}
-        for model in mock_db_models
+        {k: v for k, v in model.items()} for model in mock_db_models
     ]
 
     mock_cursor.__enter__ = Mock(return_value=mock_cursor)
@@ -156,7 +155,7 @@ def test_scan_models_directory_finds_all_models(mock_models_directory):
     models = scan_models_directory(mock_models_directory)
 
     # Should find 7 model files (.pkl, .pth, .rds)
-    model_files = [m for m in models if m['file_extension'] in {'.pkl', '.pth', '.rds'}]
+    model_files = [m for m in models if m["file_extension"] in {".pkl", ".pth", ".rds"}]
     assert len(model_files) == 7, f"Expected 7 models, found {len(model_files)}"
 
 
@@ -165,8 +164,8 @@ def test_scan_models_directory_excludes_metadata(mock_models_directory):
     models = scan_models_directory(mock_models_directory)
 
     # Metadata .json files should be included but distinguished
-    metadata_files = [m for m in models if m['file_extension'] == '.json']
-    model_files = [m for m in models if m['file_extension'] in {'.pkl', '.pth', '.rds'}]
+    metadata_files = [m for m in models if m["file_extension"] == ".json"]
+    model_files = [m for m in models if m["file_extension"] in {".pkl", ".pth", ".rds"}]
 
     # Should have 1 metadata file
     assert len(metadata_files) == 1
@@ -193,7 +192,7 @@ def test_scan_models_directory_excludes_system_files(tmp_path):
 
     # Should only find the valid model
     assert len(models) == 1
-    assert models[0]['model_name'] == 'valid_model'
+    assert models[0]["model_name"] == "valid_model"
 
 
 def test_scan_empty_directory(tmp_path):
@@ -215,8 +214,9 @@ def test_extract_model_info_bnn():
     """Test extraction of BNN model info."""
     # Create temporary file
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile(suffix='.pkl', delete=False) as f:
-        f.write(b'mock model data')
+
+    with NamedTemporaryFile(suffix=".pkl", delete=False) as f:
+        f.write(b"mock model data")
         temp_path = Path(f.name)
 
     # Rename to BNN pattern
@@ -227,12 +227,12 @@ def test_extract_model_info_bnn():
         info = extract_model_info(bnn_path)
 
         assert info is not None
-        assert info['model_name'] == 'bnn_passing_v3.1'
-        assert info['model_type'] == 'bnn'
-        assert info['model_family'] == 'bayesian_neural_network'
-        assert info['version'] == 'v3'  # Extracted from filename
-        assert info['file_extension'] == '.pkl'
-        assert info['file_size_mb'] >= 0
+        assert info["model_name"] == "bnn_passing_v3.1"
+        assert info["model_type"] == "bnn"
+        assert info["model_family"] == "bayesian_neural_network"
+        assert info["version"] == "v3"  # Extracted from filename
+        assert info["file_extension"] == ".pkl"
+        assert info["file_size_mb"] >= 0
     finally:
         bnn_path.unlink()
 
@@ -240,8 +240,9 @@ def test_extract_model_info_bnn():
 def test_extract_model_info_cql():
     """Test extraction of CQL (RL) model info."""
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile(suffix='.pth', delete=False) as f:
-        f.write(b'mock pytorch model')
+
+    with NamedTemporaryFile(suffix=".pth", delete=False) as f:
+        f.write(b"mock pytorch model")
         temp_path = Path(f.name)
 
     cql_path = temp_path.parent / "cql_agent_v2.0.pth"
@@ -250,11 +251,11 @@ def test_extract_model_info_cql():
     try:
         info = extract_model_info(cql_path)
 
-        assert info['model_name'] == 'cql_agent_v2.0'
-        assert info['model_type'] == 'rl'
-        assert info['model_family'] == 'conservative_q_learning'
-        assert info['version'] == 'v2'
-        assert info['file_extension'] == '.pth'
+        assert info["model_name"] == "cql_agent_v2.0"
+        assert info["model_type"] == "rl"
+        assert info["model_family"] == "conservative_q_learning"
+        assert info["version"] == "v2"
+        assert info["file_extension"] == ".pth"
     finally:
         cql_path.unlink()
 
@@ -262,8 +263,9 @@ def test_extract_model_info_cql():
 def test_extract_model_info_state_space():
     """Test extraction of state-space model info (R .rds file)."""
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile(suffix='.rds', delete=False) as f:
-        f.write(b'mock R model')
+
+    with NamedTemporaryFile(suffix=".rds", delete=False) as f:
+        f.write(b"mock R model")
         temp_path = Path(f.name)
 
     ss_path = temp_path.parent / "state_space_v2.rds"
@@ -272,11 +274,11 @@ def test_extract_model_info_state_space():
     try:
         info = extract_model_info(ss_path)
 
-        assert info['model_name'] == 'state_space_v2'
-        assert info['model_type'] == 'state_space'
-        assert info['model_family'] == 'kalman_filter'
-        assert info['version'] == 'v2'
-        assert info['file_extension'] == '.rds'
+        assert info["model_name"] == "state_space_v2"
+        assert info["model_type"] == "state_space"
+        assert info["model_family"] == "kalman_filter"
+        assert info["version"] == "v2"
+        assert info["file_extension"] == ".rds"
     finally:
         ss_path.unlink()
 
@@ -292,29 +294,32 @@ def test_extract_model_info_version_parsing():
     ]
 
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         for filename, expected_version in test_cases:
             path = Path(tmpdir) / filename
             path.write_text("mock")
 
             info = extract_model_info(path)
-            assert info['version'] == expected_version, \
-                f"Failed for {filename}: expected {expected_version}, got {info['version']}"
+            assert (
+                info["version"] == expected_version
+            ), f"Failed for {filename}: expected {expected_version}, got {info['version']}"
 
 
 def test_extract_model_info_file_size():
     """Test file size calculation in MB."""
     from tempfile import NamedTemporaryFile
-    with NamedTemporaryFile(suffix='.pkl', delete=False) as f:
+
+    with NamedTemporaryFile(suffix=".pkl", delete=False) as f:
         # Write ~1MB of data
-        f.write(b'x' * (1024 * 1024))
+        f.write(b"x" * (1024 * 1024))
         temp_path = Path(f.name)
 
     try:
         info = extract_model_info(temp_path)
 
         # Should be approximately 1.0 MB
-        assert 0.9 <= info['file_size_mb'] <= 1.1
+        assert 0.9 <= info["file_size_mb"] <= 1.1
     finally:
         temp_path.unlink()
 
@@ -324,12 +329,13 @@ def test_extract_model_info_file_size():
 # ============================================================================
 
 
-@patch('scripts.sync_model_registry.psycopg2.connect')
+@patch("scripts.sync_model_registry.psycopg2.connect")
 def test_get_db_models(mock_connect, mock_db_connection, mock_db_models):
     """Test retrieving models from database."""
     mock_connect.return_value = mock_db_connection
 
     from scripts.sync_model_registry import get_db_connection
+
     conn = get_db_connection()
 
     # Mock the cursor to return our test data
@@ -342,9 +348,9 @@ def test_get_db_models(mock_connect, mock_db_connection, mock_db_models):
     models = get_db_models(conn)
 
     assert len(models) == 3
-    assert models[0]['model_name'] == 'bnn_passing_v3.1'
-    assert models[1]['model_name'] == 'state_space_v2'
-    assert models[2]['model_name'] == 'old_deprecated_model'
+    assert models[0]["model_name"] == "bnn_passing_v3.1"
+    assert models[1]["model_name"] == "state_space_v2"
+    assert models[2]["model_name"] == "old_deprecated_model"
 
 
 # ============================================================================
@@ -355,87 +361,87 @@ def test_get_db_models(mock_connect, mock_db_connection, mock_db_models):
 def test_compare_db_filesystem_in_sync():
     """Test comparison when DB and filesystem are in sync."""
     db_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
-        {'model_name': 'model_c'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
+        {"model_name": "model_c"},
     ]
 
     fs_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
-        {'model_name': 'model_c'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
+        {"model_name": "model_c"},
     ]
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 3
-    assert len(comparison['only_in_db']) == 0
-    assert len(comparison['only_in_fs']) == 0
-    assert comparison['db_count'] == 3
-    assert comparison['fs_count'] == 3
+    assert len(comparison["in_both"]) == 3
+    assert len(comparison["only_in_db"]) == 0
+    assert len(comparison["only_in_fs"]) == 0
+    assert comparison["db_count"] == 3
+    assert comparison["fs_count"] == 3
 
 
 def test_compare_db_filesystem_only_in_db():
     """Test comparison when models exist only in database."""
     db_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
-        {'model_name': 'deleted_model'},  # Deleted from filesystem
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
+        {"model_name": "deleted_model"},  # Deleted from filesystem
     ]
 
     fs_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
     ]
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 2
-    assert 'deleted_model' in comparison['only_in_db']
-    assert len(comparison['only_in_fs']) == 0
+    assert len(comparison["in_both"]) == 2
+    assert "deleted_model" in comparison["only_in_db"]
+    assert len(comparison["only_in_fs"]) == 0
 
 
 def test_compare_db_filesystem_only_in_fs():
     """Test comparison when models exist only on filesystem (not registered)."""
     db_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
     ]
 
     fs_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
-        {'model_name': 'new_unregistered_model'},  # Not yet in database
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
+        {"model_name": "new_unregistered_model"},  # Not yet in database
     ]
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 2
-    assert len(comparison['only_in_db']) == 0
-    assert 'new_unregistered_model' in comparison['only_in_fs']
+    assert len(comparison["in_both"]) == 2
+    assert len(comparison["only_in_db"]) == 0
+    assert "new_unregistered_model" in comparison["only_in_fs"]
 
 
 def test_compare_db_filesystem_mixed():
     """Test comparison with models in both categories."""
     db_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'old_archived'},  # Deleted from filesystem
-        {'model_name': 'model_c'},
+        {"model_name": "model_a"},
+        {"model_name": "old_archived"},  # Deleted from filesystem
+        {"model_name": "model_c"},
     ]
 
     fs_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_c'},
-        {'model_name': 'new_model'},  # Not yet registered
+        {"model_name": "model_a"},
+        {"model_name": "model_c"},
+        {"model_name": "new_model"},  # Not yet registered
     ]
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 2
-    assert 'old_archived' in comparison['only_in_db']
-    assert 'new_model' in comparison['only_in_fs']
-    assert comparison['db_count'] == 3
-    assert comparison['fs_count'] == 3
+    assert len(comparison["in_both"]) == 2
+    assert "old_archived" in comparison["only_in_db"]
+    assert "new_model" in comparison["only_in_fs"]
+    assert comparison["db_count"] == 3
+    assert comparison["fs_count"] == 3
 
 
 # ============================================================================
@@ -446,45 +452,49 @@ def test_compare_db_filesystem_mixed():
 def test_model_type_detection_bnn():
     """Test BNN model type detection."""
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir) / "bnn_passing_v3.pkl"
         path.write_text("mock")
 
         info = extract_model_info(path)
-        assert info['model_type'] == 'bnn'
+        assert info["model_type"] == "bnn"
 
 
 def test_model_type_detection_cql():
     """Test CQL (RL) model type detection."""
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir) / "cql_agent.pth"
         path.write_text("mock")
 
         info = extract_model_info(path)
-        assert info['model_type'] == 'rl'
+        assert info["model_type"] == "rl"
 
 
 def test_model_type_detection_xgboost():
     """Test XGBoost model type detection."""
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir) / "xgb_baseline.pkl"
         path.write_text("mock")
 
         info = extract_model_info(path)
-        assert info['model_type'] == 'xgboost'
+        assert info["model_type"] == "xgboost"
 
 
 def test_model_type_detection_hierarchical():
     """Test hierarchical model type detection."""
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         # Test multiple patterns
         patterns = [
-            'informative_priors_v1.pkl',
-            'receiving_model.pkl',
-            'passing_yards_hierarchical.pkl',
+            "informative_priors_v1.pkl",
+            "receiving_model.pkl",
+            "passing_yards_hierarchical.pkl",
         ]
 
         for pattern in patterns:
@@ -492,7 +502,7 @@ def test_model_type_detection_hierarchical():
             path.write_text("mock")
 
             info = extract_model_info(path)
-            assert info['model_type'] == 'hierarchical', f"Failed for {pattern}"
+            assert info["model_type"] == "hierarchical", f"Failed for {pattern}"
 
             path.unlink()
 
@@ -500,13 +510,14 @@ def test_model_type_detection_hierarchical():
 def test_model_type_detection_unknown():
     """Test unknown model type handling."""
     from tempfile import TemporaryDirectory
+
     with TemporaryDirectory() as tmpdir:
         path = Path(tmpdir) / "random_file.pkl"
         path.write_text("mock")
 
         info = extract_model_info(path)
-        assert info['model_type'] == 'unknown'
-        assert info['model_family'] == 'unknown'
+        assert info["model_type"] == "unknown"
+        assert info["model_family"] == "unknown"
 
 
 # ============================================================================
@@ -526,7 +537,7 @@ def test_scan_with_nested_directories(tmp_path):
     models = scan_models_directory(tmp_path / "models")
 
     assert len(models) == 1
-    assert 'deep_model' in models[0]['model_name']
+    assert "deep_model" in models[0]["model_name"]
 
 
 def test_scan_with_special_characters(tmp_path):
@@ -571,32 +582,32 @@ def test_compare_empty_database():
     """Test comparison with empty database."""
     db_models = []
     fs_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
     ]
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 0
-    assert len(comparison['only_in_db']) == 0
-    assert len(comparison['only_in_fs']) == 2
-    assert comparison['db_count'] == 0
-    assert comparison['fs_count'] == 2
+    assert len(comparison["in_both"]) == 0
+    assert len(comparison["only_in_db"]) == 0
+    assert len(comparison["only_in_fs"]) == 2
+    assert comparison["db_count"] == 0
+    assert comparison["fs_count"] == 2
 
 
 def test_compare_empty_filesystem():
     """Test comparison with empty filesystem."""
     db_models = [
-        {'model_name': 'model_a'},
-        {'model_name': 'model_b'},
+        {"model_name": "model_a"},
+        {"model_name": "model_b"},
     ]
     fs_models = []
 
     comparison = compare_db_filesystem(db_models, fs_models)
 
-    assert len(comparison['in_both']) == 0
-    assert len(comparison['only_in_db']) == 2
-    assert len(comparison['only_in_fs']) == 0
+    assert len(comparison["in_both"]) == 0
+    assert len(comparison["only_in_db"]) == 2
+    assert len(comparison["only_in_fs"]) == 0
 
 
 def test_model_with_very_long_filename(tmp_path):

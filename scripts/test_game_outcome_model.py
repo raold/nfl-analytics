@@ -52,10 +52,7 @@ def test_feature_extraction():
 
         # Test with a known game (2024 Week 1)
         features = model.feature_extractor.extract_game_features(
-            home_team='KC',
-            away_team='BAL',
-            season=2024,
-            week=1
+            home_team="KC", away_team="BAL", season=2024, week=1
         )
 
         logger.info("✅ Feature extraction successful")
@@ -72,6 +69,7 @@ def test_feature_extraction():
     except Exception as e:
         logger.error(f"❌ Feature extraction failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -90,8 +88,10 @@ def test_model_architecture():
         # Check default parameters
         logger.info("✅ Model architecture validated")
         logger.info(f"   XGBoost version: {xgb.__version__}")
-        logger.info(f"   Default params: max_depth={model.DEFAULT_PARAMS['max_depth']}, "
-                   f"n_estimators={model.DEFAULT_PARAMS['n_estimators']}")
+        logger.info(
+            f"   Default params: max_depth={model.DEFAULT_PARAMS['max_depth']}, "
+            f"n_estimators={model.DEFAULT_PARAMS['n_estimators']}"
+        )
         logger.info(f"   Models trained: {model.models_trained}")
 
         return True
@@ -103,19 +103,19 @@ def test_model_architecture():
 
 def main():
     """Run all tests."""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("GAME OUTCOME MODEL - SMOKE TEST")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     results = {
-        'initialization': test_initialization(),
-        'feature_extraction': test_feature_extraction(),
-        'architecture': test_model_architecture()
+        "initialization": test_initialization(),
+        "feature_extraction": test_feature_extraction(),
+        "architecture": test_model_architecture(),
     }
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TEST RESULTS")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     for test_name, passed in results.items():
         status = "✅ PASSED" if passed else "❌ FAILED"
@@ -123,12 +123,12 @@ def main():
 
     all_passed = all(results.values())
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     if all_passed:
         logger.info("✅ ALL TESTS PASSED - Model ready for training")
     else:
         logger.error("❌ SOME TESTS FAILED - Check errors above")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     return 0 if all_passed else 1
 

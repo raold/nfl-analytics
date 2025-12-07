@@ -108,19 +108,21 @@ def load_data():
     print(f"✓ Loaded {len(df):,} total rows")
 
     # Check for NaN in target
-    rows_with_valid_target = df['passing_yards'].notna().sum()
-    print(f"  - Valid targets: {rows_with_valid_target:,} ({rows_with_valid_target/len(df)*100:.1f}%)")
+    rows_with_valid_target = df["passing_yards"].notna().sum()
+    print(
+        f"  - Valid targets: {rows_with_valid_target:,} ({rows_with_valid_target/len(df)*100:.1f}%)"
+    )
 
     # Show season distribution
     print(f"  - Seasons: {df['season'].min()}-{df['season'].max()}")
     print("  - Season distribution:")
-    for season, count in df['season'].value_counts().sort_index().items():
+    for season, count in df["season"].value_counts().sort_index().items():
         print(f"      {season}: {count:,} games")
 
     # Check opponent features
     opp_coverage = {
-        'opp_def_epa_exp': df['opp_def_epa_exp'].notna().mean(),
-        'opp_pass_def_rank': df['opp_pass_def_rank'].notna().mean()
+        "opp_def_epa_exp": df["opp_def_epa_exp"].notna().mean(),
+        "opp_pass_def_rank": df["opp_pass_def_rank"].notna().mean(),
     }
     print("\n  - Opponent feature coverage:")
     for feat, cov in opp_coverage.items():
@@ -152,14 +154,13 @@ def create_defensive_clusters(train_df):
 
     # Remove NaN rows for clustering
     cluster_data = train_df[
-        (train_df['opp_def_epa_exp'].notna()) &
-        (train_df['opp_pass_def_rank'].notna())
+        (train_df["opp_def_epa_exp"].notna()) & (train_df["opp_pass_def_rank"].notna())
     ].copy()
 
     print(f"✓ Using {len(cluster_data):,} rows with complete opponent features")
 
     # Extract and standardize
-    X_cluster = cluster_data[['opp_def_epa_exp', 'opp_pass_def_rank']].copy()
+    X_cluster = cluster_data[["opp_def_epa_exp", "opp_pass_def_rank"]].copy()
 
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X_cluster)
@@ -169,7 +170,7 @@ def create_defensive_clusters(train_df):
     kmeans = KMeans(n_clusters=N_CLUSTERS, random_state=RANDOM_STATE, n_init=10)
     cluster_assignments = kmeans.fit_predict(X_scaled)
 
-    cluster_data['cluster'] = cluster_assignments
+    cluster_data["cluster"] = cluster_assignments
 
     # Analyze cluster characteristics
     print("\n  Cluster Analysis:")
@@ -177,23 +178,25 @@ def create_defensive_clusters(train_df):
     print("  " + "-" * 54)
 
     for tier in range(N_CLUSTERS):
-        tier_data = cluster_data[cluster_data['cluster'] == tier]
-        epa_mean = tier_data['opp_def_epa_exp'].mean()
-        epa_std = tier_data['opp_def_epa_exp'].std()
-        rank_mean = tier_data['opp_pass_def_rank'].mean()
+        tier_data = cluster_data[cluster_data["cluster"] == tier]
+        epa_mean = tier_data["opp_def_epa_exp"].mean()
+        epa_std = tier_data["opp_def_epa_exp"].std()
+        rank_mean = tier_data["opp_pass_def_rank"].mean()
         count = len(tier_data)
 
         # Interpret tier
-        if epa_mean < cluster_data['opp_def_epa_exp'].quantile(0.25):
+        if epa_mean < cluster_data["opp_def_epa_exp"].quantile(0.25):
             tier_name = "ELITE"
-        elif epa_mean < cluster_data['opp_def_epa_exp'].quantile(0.50):
+        elif epa_mean < cluster_data["opp_def_epa_exp"].quantile(0.50):
             tier_name = "GOOD"
-        elif epa_mean < cluster_data['opp_def_epa_exp'].quantile(0.75):
+        elif epa_mean < cluster_data["opp_def_epa_exp"].quantile(0.75):
             tier_name = "AVG"
         else:
             tier_name = "WEAK"
 
-        print(f"  {tier_name:<8} {count:<10,} {epa_mean:<12.3f} {epa_std:<12.3f} {rank_mean:<12.1f}")
+        print(
+            f"  {tier_name:<8} {count:<10,} {epa_mean:<12.3f} {epa_std:<12.3f} {rank_mean:<12.1f}"
+        )
 
     print("=" * 70 + "\n")
     return kmeans, scaler
@@ -221,26 +224,28 @@ def assign_clusters(df, kmeans, scaler):
     df = df.copy()
 
     # For complete rows, assign clusters
-    mask_complete = (df['opp_def_epa_exp'].notna()) & (df['opp_pass_def_rank'].notna())
+    mask_complete = (df["opp_def_epa_exp"].notna()) & (df["opp_pass_def_rank"].notna())
 
-    X_cluster = df.loc[mask_complete, ['opp_def_epa_exp', 'opp_pass_def_rank']].copy()
+    X_cluster = df.loc[mask_complete, ["opp_def_epa_exp", "opp_pass_def_rank"]].copy()
     X_scaled = scaler.transform(X_cluster)
     clusters = kmeans.predict(X_scaled)
 
     # Initialize tier dummies
     for i in range(1, N_CLUSTERS + 1):
-        df[f'def_tier_{i}'] = 0
+        df[f"def_tier_{i}"] = 0
 
     # Assign tiers for complete rows
-    df.loc[mask_complete, 'cluster_assignment'] = clusters
+    df.loc[mask_complete, "cluster_assignment"] = clusters
     for idx, cluster in zip(df.loc[mask_complete].index, clusters):
-        df.loc[idx, f'def_tier_{cluster + 1}'] = 1
+        df.loc[idx, f"def_tier_{cluster + 1}"] = 1
 
     # For incomplete rows, use most common tier
     if mask_complete.sum() < len(df):
         most_common_tier = int(np.median(clusters)) + 1
-        df.loc[~mask_complete, f'def_tier_{most_common_tier}'] = 1
-        print(f"\n⚠  Note: {(~mask_complete).sum()} rows assigned to most common tier (def_tier_{most_common_tier})")
+        df.loc[~mask_complete, f"def_tier_{most_common_tier}"] = 1
+        print(
+            f"\n⚠  Note: {(~mask_complete).sum()} rows assigned to most common tier (def_tier_{most_common_tier})"
+        )
 
     return df
 
@@ -263,23 +268,34 @@ def prepare_features(df):
     """
     feature_cols = [
         # Core player features (10)
-        'qb_epa_L3', 'qb_cpoe_L3', 'qb_sack_rate_L3', 'qb_ypa_L3',
-        'wr1_epa_L3', 'wr2_epa_L3', 'wr1_tgt_L3', 'wr2_tgt_L3',
-        'qb_home_away_split', 'qb_consistency',
-
+        "qb_epa_L3",
+        "qb_cpoe_L3",
+        "qb_sack_rate_L3",
+        "qb_ypa_L3",
+        "wr1_epa_L3",
+        "wr2_epa_L3",
+        "wr1_tgt_L3",
+        "wr2_tgt_L3",
+        "qb_home_away_split",
+        "qb_consistency",
         # Game context (2)
-        'spread_close', 'total_close',
-
+        "spread_close",
+        "total_close",
         # Defensive tiers (4) - CATEGORICAL
-        'def_tier_1', 'def_tier_2', 'def_tier_3', 'def_tier_4',
-
+        "def_tier_1",
+        "def_tier_2",
+        "def_tier_3",
+        "def_tier_4",
         # Team features (4)
-        'team_off_epa_L3', 'team_pass_rate_L3', 'team_pace_L3', 'team_off_success_L3'
+        "team_off_epa_L3",
+        "team_pass_rate_L3",
+        "team_pace_L3",
+        "team_off_success_L3",
     ]
 
     # Create feature matrix
     X = df[feature_cols].copy()
-    y = df['passing_yards'].copy()
+    y = df["passing_yards"].copy()
 
     # Remove rows with any NaN
     valid_mask = (X.notna().all(axis=1)) & (y.notna())
@@ -316,16 +332,16 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
 
     # Hyperparameters (same as v3.1 for fair comparison)
     params = {
-        'objective': 'reg:squarederror',
-        'max_depth': 6,
-        'learning_rate': 0.05,
-        'n_estimators': 500,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'min_child_weight': 3,
-        'random_state': RANDOM_STATE,
-        'n_jobs': -1,
-        'verbosity': 0
+        "objective": "reg:squarederror",
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "n_estimators": 500,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 3,
+        "random_state": RANDOM_STATE,
+        "n_jobs": -1,
+        "verbosity": 0,
     }
 
     model = xgb.XGBRegressor(**params)
@@ -334,10 +350,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     start_time = time.time()
     print("  Training...")
     model.fit(
-        X_train, y_train,
-        eval_set=[(X_test, y_test)],
-        early_stopping_rounds=50,
-        verbose=False
+        X_train, y_train, eval_set=[(X_test, y_test)], early_stopping_rounds=50, verbose=False
     )
     train_time = time.time() - start_time
 
@@ -352,10 +365,9 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     r2 = 1 - (np.sum((y_test - y_pred) ** 2) / np.sum((y_test - y_test.mean()) ** 2))
 
     # Feature importance
-    importance_df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    importance_df = pd.DataFrame(
+        {"feature": feature_names, "importance": model.feature_importances_}
+    ).sort_values("importance", ascending=False)
 
     # Results
     print("\n" + "=" * 70)
@@ -382,12 +394,12 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     print(importance_df.head(15).to_string(index=False))
 
     # Highlight tier importance
-    tier_features = importance_df[importance_df['feature'].str.contains('def_tier')]
+    tier_features = importance_df[importance_df["feature"].str.contains("def_tier")]
     if len(tier_features) > 0:
         print("\n" + "-" * 70)
         print("DEFENSIVE TIER IMPORTANCE:")
-        total_tier_importance = tier_features['importance'].sum()
-        total_importance = importance_df['importance'].sum()
+        total_tier_importance = tier_features["importance"].sum()
+        total_importance = importance_df["importance"].sum()
         tier_pct = (total_tier_importance / total_importance) * 100
         print(f"Combined tier importance: {total_tier_importance:.4f} ({tier_pct:.1f}% of total)")
         print(tier_features.to_string(index=False))
@@ -413,8 +425,8 @@ def main():
     print("\n" + "=" * 70)
     print("TRAIN/TEST SPLIT")
     print("=" * 70)
-    train_df = df[df['season'] <= 2024].copy()
-    test_df = df[df['season'] == 2025].copy()
+    train_df = df[df["season"] <= 2024].copy()
+    test_df = df[df["season"] == 2025].copy()
     print(f"Training (2018-2024): {len(train_df):,} rows")
     print(f"Test (2025): {len(test_df):,} rows")
     print("=" * 70 + "\n")
@@ -454,32 +466,29 @@ def main():
 
     # Save results summary
     summary = {
-        'experiment': 'XGBoost Exp 2: Defensive Clustering',
-        'date': pd.Timestamp.now().isoformat(),
-        'approach': 'K-means clustering (k=4) on opp_def_epa_exp + opp_pass_def_rank',
-        'features': {
-            'total': len(feature_names),
-            'tiers': N_CLUSTERS,
-            'feature_list': feature_names
+        "experiment": "XGBoost Exp 2: Defensive Clustering",
+        "date": pd.Timestamp.now().isoformat(),
+        "approach": "K-means clustering (k=4) on opp_def_epa_exp + opp_pass_def_rank",
+        "features": {
+            "total": len(feature_names),
+            "tiers": N_CLUSTERS,
+            "feature_list": feature_names,
         },
-        'training': {
-            'train_samples': len(X_train),
-            'test_samples': len(X_test)
+        "training": {"train_samples": len(X_train), "test_samples": len(X_test)},
+        "metrics": {
+            "mae": float(mae),
+            "rmse": float(rmse),
+            "r2": float(r2),
+            "baseline_mae": BASELINE_MAE,
+            "improvement_abs": float(BASELINE_MAE - mae),
+            "improvement_pct": float(((BASELINE_MAE - mae) / BASELINE_MAE) * 100),
         },
-        'metrics': {
-            'mae': float(mae),
-            'rmse': float(rmse),
-            'r2': float(r2),
-            'baseline_mae': BASELINE_MAE,
-            'improvement_abs': float(BASELINE_MAE - mae),
-            'improvement_pct': float(((BASELINE_MAE - mae) / BASELINE_MAE) * 100)
-        },
-        'model_file': None,
-        'status': 'SUCCESS' if mae < BASELINE_MAE else 'FAILED'
+        "model_file": None,
+        "status": "SUCCESS" if mae < BASELINE_MAE else "FAILED",
     }
 
     summary_path = results_dir / "xgb_exp2_clustering_summary.json"
-    with open(summary_path, 'w') as f:
+    with open(summary_path, "w") as f:
         json.dump(summary, f, indent=2)
     print(f"✓ Results summary saved to {summary_path}\n")
 
@@ -487,11 +496,11 @@ def main():
     if mae < BASELINE_MAE:
         model_path = results_dir / "xgb_exp2_clustering.json"
         model.save_model(str(model_path))
-        summary['model_file'] = str(model_path)
+        summary["model_file"] = str(model_path)
         print(f"✓ Model saved to {model_path}\n")
 
         # Update summary with model path
-        with open(summary_path, 'w') as f:
+        with open(summary_path, "w") as f:
             json.dump(summary, f, indent=2)
 
         return 0

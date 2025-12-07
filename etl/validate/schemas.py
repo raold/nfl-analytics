@@ -47,24 +47,24 @@ class ValidationResult:
 
     def add_error(self, column: str | None, error_type: str, message: str, value: Any = None):
         """Add an error to the validation result."""
-        self.errors.append(ValidationError(
-            column=column,
-            error_type=error_type,
-            message=message,
-            severity="error",
-            value=value
-        ))
+        self.errors.append(
+            ValidationError(
+                column=column, error_type=error_type, message=message, severity="error", value=value
+            )
+        )
         self.is_valid = False
 
     def add_warning(self, column: str | None, error_type: str, message: str, value: Any = None):
         """Add a warning to the validation result."""
-        self.warnings.append(ValidationError(
-            column=column,
-            error_type=error_type,
-            message=message,
-            severity="warning",
-            value=value
-        ))
+        self.warnings.append(
+            ValidationError(
+                column=column,
+                error_type=error_type,
+                message=message,
+                severity="warning",
+                value=value,
+            )
+        )
 
     @property
     def error_count(self) -> int:
@@ -147,10 +147,7 @@ class SchemaValidator:
             return yaml.safe_load(f)
 
     def validate(
-        self,
-        df: pd.DataFrame,
-        entity_name: str,
-        strict: bool = False
+        self, df: pd.DataFrame, entity_name: str, strict: bool = False
     ) -> ValidationResult:
         """
         Validate DataFrame against schema.
@@ -165,16 +162,12 @@ class SchemaValidator:
         """
         if entity_name not in self.schemas:
             raise ValueError(
-                f"Unknown entity: {entity_name}. "
-                f"Available: {list(self.schemas.keys())}"
+                f"Unknown entity: {entity_name}. " f"Available: {list(self.schemas.keys())}"
             )
 
         schema = self.schemas[entity_name]
         result = ValidationResult(
-            entity_name=entity_name,
-            is_valid=True,
-            row_count=len(df),
-            column_count=len(df.columns)
+            entity_name=entity_name, is_valid=True, row_count=len(df), column_count=len(df.columns)
         )
 
         # Validate required columns
@@ -202,44 +195,38 @@ class SchemaValidator:
         return result
 
     def _validate_required_columns(
-        self,
-        df: pd.DataFrame,
-        schema: dict[str, Any],
-        result: ValidationResult
+        self, df: pd.DataFrame, schema: dict[str, Any], result: ValidationResult
     ):
         """Check that all required columns are present."""
-        required = schema.get('required_columns', [])
+        required = schema.get("required_columns", [])
         missing = set(required) - set(df.columns)
 
         for col in missing:
             result.add_error(
                 column=col,
                 error_type="missing_required_column",
-                message=f"Required column '{col}' is missing"
+                message=f"Required column '{col}' is missing",
             )
 
     def _validate_data_types(
-        self,
-        df: pd.DataFrame,
-        schema: dict[str, Any],
-        result: ValidationResult
+        self, df: pd.DataFrame, schema: dict[str, Any], result: ValidationResult
     ):
         """Validate column data types."""
-        type_map = schema.get('data_types', {})
+        type_map = schema.get("data_types", {})
 
         # Map schema types to pandas types
         type_mapping = {
-            'str': ['object', 'string'],
-            'text': ['object', 'string'],
-            'int': ['int64', 'int32', 'Int64'],
-            'float': ['float64', 'float32'],
-            'real': ['float64', 'float32'],
-            'double precision': ['float64'],
-            'boolean': ['bool', 'boolean'],
-            'bool': ['bool', 'boolean'],
-            'datetime': ['datetime64[ns]', 'datetime64[ns, UTC]'],
-            'timestamptz': ['datetime64[ns]', 'datetime64[ns, UTC]'],
-            'timestamp with time zone': ['datetime64[ns]', 'datetime64[ns, UTC]'],
+            "str": ["object", "string"],
+            "text": ["object", "string"],
+            "int": ["int64", "int32", "Int64"],
+            "float": ["float64", "float32"],
+            "real": ["float64", "float32"],
+            "double precision": ["float64"],
+            "boolean": ["bool", "boolean"],
+            "bool": ["bool", "boolean"],
+            "datetime": ["datetime64[ns]", "datetime64[ns, UTC]"],
+            "timestamptz": ["datetime64[ns]", "datetime64[ns, UTC]"],
+            "timestamp with time zone": ["datetime64[ns]", "datetime64[ns, UTC]"],
         }
 
         for col, expected_type in type_map.items():
@@ -249,7 +236,7 @@ class SchemaValidator:
             actual_type = str(df[col].dtype)
 
             # Handle Optional types (nullable columns)
-            expected_base = expected_type.replace('Optional[', '').replace(']', '').strip()
+            expected_base = expected_type.replace("Optional[", "").replace("]", "").strip()
 
             # Check if actual type matches expected
             expected_pandas_types = type_mapping.get(expected_base.lower(), [expected_base])
@@ -260,17 +247,14 @@ class SchemaValidator:
                     result.add_warning(
                         column=col,
                         error_type="type_mismatch",
-                        message=f"Expected type '{expected_type}', got '{actual_type}'"
+                        message=f"Expected type '{expected_type}', got '{actual_type}'",
                     )
 
     def _validate_constraints(
-        self,
-        df: pd.DataFrame,
-        schema: dict[str, Any],
-        result: ValidationResult
+        self, df: pd.DataFrame, schema: dict[str, Any], result: ValidationResult
     ):
         """Validate value constraints."""
-        constraints = schema.get('constraints', {})
+        constraints = schema.get("constraints", {})
 
         for col, col_constraints in constraints.items():
             if col not in df.columns:
@@ -283,8 +267,8 @@ class SchemaValidator:
                 continue
 
             # Check min/max for numeric columns
-            if 'min' in col_constraints:
-                min_val = col_constraints['min']
+            if "min" in col_constraints:
+                min_val = col_constraints["min"]
                 violations = non_null < min_val
                 if violations.any():
                     count = violations.sum()
@@ -292,11 +276,11 @@ class SchemaValidator:
                     result.add_error(
                         column=col,
                         error_type="constraint_violation",
-                        message=f"{count} values below minimum {min_val} (min found: {min_found})"
+                        message=f"{count} values below minimum {min_val} (min found: {min_found})",
                     )
 
-            if 'max' in col_constraints:
-                max_val = col_constraints['max']
+            if "max" in col_constraints:
+                max_val = col_constraints["max"]
                 violations = non_null > max_val
                 if violations.any():
                     count = violations.sum()
@@ -304,69 +288,74 @@ class SchemaValidator:
                     result.add_error(
                         column=col,
                         error_type="constraint_violation",
-                        message=f"{count} values above maximum {max_val} (max found: {max_found})"
+                        message=f"{count} values above maximum {max_val} (max found: {max_found})",
                     )
 
             # Check allowed values
-            if 'allowed_values' in col_constraints:
-                allowed = set(col_constraints['allowed_values'])
+            if "allowed_values" in col_constraints:
+                allowed = set(col_constraints["allowed_values"])
                 invalid_values = set(non_null) - allowed
                 if invalid_values:
                     result.add_error(
                         column=col,
                         error_type="invalid_value",
-                        message=f"Invalid values: {invalid_values}. Allowed: {allowed}"
+                        message=f"Invalid values: {invalid_values}. Allowed: {allowed}",
                     )
 
             # Check null constraints
-            allow_null = col_constraints.get('allow_null', True)
+            allow_null = col_constraints.get("allow_null", True)
             if not allow_null and series.isna().any():
                 null_count = series.isna().sum()
                 result.add_error(
                     column=col,
                     error_type="null_violation",
-                    message=f"{null_count} null values found (nulls not allowed)"
+                    message=f"{null_count} null values found (nulls not allowed)",
                 )
 
     def _validate_business_rules(
-        self,
-        df: pd.DataFrame,
-        schema: dict[str, Any],
-        result: ValidationResult
+        self, df: pd.DataFrame, schema: dict[str, Any], result: ValidationResult
     ):
         """Validate business rules (basic checks only)."""
-        rules = schema.get('business_rules', [])
+        rules = schema.get("business_rules", [])
 
         for rule in rules:
-            rule_name = rule.get('name')
-            description = rule.get('description', '')
+            rule_name = rule.get("name")
+            description = rule.get("description", "")
 
             # Basic rule checks that can be done on DataFrame
-            if rule_name == 'no_self_play' and 'home_team' in df.columns and 'away_team' in df.columns:
-                violations = df['home_team'] == df['away_team']
+            if (
+                rule_name == "no_self_play"
+                and "home_team" in df.columns
+                and "away_team" in df.columns
+            ):
+                violations = df["home_team"] == df["away_team"]
                 if violations.any():
                     count = violations.sum()
                     result.add_error(
                         column=None,
                         error_type="business_rule",
-                        message=f"Business rule '{rule_name}' violated: {description} ({count} violations)"
+                        message=f"Business rule '{rule_name}' violated: {description} ({count} violations)",
                     )
 
-            elif rule_name == 'no_future_scores' and 'kickoff' in df.columns and 'home_score' in df.columns:
+            elif (
+                rule_name == "no_future_scores"
+                and "kickoff" in df.columns
+                and "home_score" in df.columns
+            ):
                 # Check for scores on future games
-                if 'kickoff' in df.columns:
+                if "kickoff" in df.columns:
                     try:
-                        kickoff_col = pd.to_datetime(df['kickoff'])
-                        now = pd.Timestamp.now(tz='UTC')
+                        kickoff_col = pd.to_datetime(df["kickoff"])
+                        now = pd.Timestamp.now(tz="UTC")
                         future_games = kickoff_col > now
-                        has_score = df['home_score'].notna() | df['away_score'].notna()
+                        has_score = df["home_score"].notna() | df["away_score"].notna()
                         violations = future_games & has_score
                         if violations.any():
                             count = violations.sum()
                             result.add_error(
                                 column=None,
                                 error_type="business_rule",
-                                message=f"Business rule '{rule_name}' violated: {description} ({count} violations)"
+                                message=f"Business rule '{rule_name}' violated: {description} ({count} violations)",
                             )
                     except Exception as e:
                         logger.warning(f"Could not validate business rule '{rule_name}': {e}")
@@ -395,21 +384,25 @@ if __name__ == "__main__":
     print(f"Available schemas: {validator.get_available_entities()}\n")
 
     # Example: Validate schedules data
-    sample_schedules = pd.DataFrame({
-        'game_id': ['2025_01_SF_PIT', '2025_01_BAL_KC'],
-        'season': [2025, 2025],
-        'week': [1, 1],
-        'home_team': ['PIT', 'KC'],
-        'away_team': ['SF', 'BAL'],
-        'kickoff': [pd.Timestamp('2025-09-05 20:00:00', tz='UTC'),
-                    pd.Timestamp('2025-09-05 23:00:00', tz='UTC')],
-        'spread_close': [-3.5, -3.0],
-        'total_close': [47.5, 52.0],
-        'home_score': [None, None],  # Future game, no scores yet
-        'away_score': [None, None]
-    })
+    sample_schedules = pd.DataFrame(
+        {
+            "game_id": ["2025_01_SF_PIT", "2025_01_BAL_KC"],
+            "season": [2025, 2025],
+            "week": [1, 1],
+            "home_team": ["PIT", "KC"],
+            "away_team": ["SF", "BAL"],
+            "kickoff": [
+                pd.Timestamp("2025-09-05 20:00:00", tz="UTC"),
+                pd.Timestamp("2025-09-05 23:00:00", tz="UTC"),
+            ],
+            "spread_close": [-3.5, -3.0],
+            "total_close": [47.5, 52.0],
+            "home_score": [None, None],  # Future game, no scores yet
+            "away_score": [None, None],
+        }
+    )
 
-    result = validator.validate(sample_schedules, 'schedules')
+    result = validator.validate(sample_schedules, "schedules")
     print(result.details())
 
     if not result.is_valid:

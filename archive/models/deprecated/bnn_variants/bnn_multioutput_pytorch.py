@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 
 class BayesianLinear(nn.Module):
     """Bayesian linear layer with weight uncertainty"""
+
     def __init__(self, in_features, out_features, prior_var=1.0):
         super().__init__()
         self.in_features = in_features
@@ -52,7 +53,7 @@ class BayesianLinear(nn.Module):
 
     def reset_parameters(self):
         # Initialize using He initialization
-        nn.init.kaiming_normal_(self.weight_mu, mode='fan_in')
+        nn.init.kaiming_normal_(self.weight_mu, mode="fan_in")
         nn.init.constant_(self.weight_rho, -3)  # log(exp(0.05) - 1) ≈ -3
         nn.init.zeros_(self.bias_mu)
         nn.init.constant_(self.bias_rho, -3)
@@ -81,14 +82,18 @@ class BayesianLinear(nn.Module):
 
         # KL divergence for weights
         kl_weight = 0.5 * torch.sum(
-            weight_sigma**2 / self.prior_var + self.weight_mu**2 / self.prior_var
-            - torch.log(weight_sigma**2 / self.prior_var) - 1
+            weight_sigma**2 / self.prior_var
+            + self.weight_mu**2 / self.prior_var
+            - torch.log(weight_sigma**2 / self.prior_var)
+            - 1
         )
 
         # KL divergence for bias
         kl_bias = 0.5 * torch.sum(
-            bias_sigma**2 / self.prior_var + self.bias_mu**2 / self.prior_var
-            - torch.log(bias_sigma**2 / self.prior_var) - 1
+            bias_sigma**2 / self.prior_var
+            + self.bias_mu**2 / self.prior_var
+            - torch.log(bias_sigma**2 / self.prior_var)
+            - 1
         )
 
         return kl_weight + kl_bias
@@ -96,6 +101,7 @@ class BayesianLinear(nn.Module):
 
 class ExpertNetwork(nn.Module):
     """Single expert network for mixture of experts"""
+
     def __init__(self, input_dim, hidden_dim=32, dropout_rate=0.2):
         super().__init__()
         self.fc1 = BayesianLinear(input_dim, hidden_dim)
@@ -104,7 +110,7 @@ class ExpertNetwork(nn.Module):
 
         # Output heads
         self.yards_head = BayesianLinear(hidden_dim, 1)  # Continuous output
-        self.td_head = BayesianLinear(hidden_dim, 1)     # Binary output
+        self.td_head = BayesianLinear(hidden_dim, 1)  # Binary output
 
     def forward(self, x, sample=True):
         h = F.relu(self.fc1(x, sample))
@@ -127,6 +133,7 @@ class ExpertNetwork(nn.Module):
 
 class GatingNetwork(nn.Module):
     """Gating network for mixture of experts"""
+
     def __init__(self, input_dim, n_experts):
         super().__init__()
         self.fc = nn.Linear(input_dim, n_experts)
@@ -137,15 +144,15 @@ class GatingNetwork(nn.Module):
 
 class MultiOutputMoEBNN(nn.Module):
     """Multi-Output Mixture of Experts Bayesian Neural Network"""
+
     def __init__(self, input_dim, n_experts=3, hidden_dim=32, dropout_rate=0.2):
         super().__init__()
         self.n_experts = n_experts
 
         # Create expert networks
-        self.experts = nn.ModuleList([
-            ExpertNetwork(input_dim, hidden_dim, dropout_rate)
-            for _ in range(n_experts)
-        ])
+        self.experts = nn.ModuleList(
+            [ExpertNetwork(input_dim, hidden_dim, dropout_rate) for _ in range(n_experts)]
+        )
 
         # Gating network
         self.gate = GatingNetwork(input_dim, n_experts)
@@ -198,11 +205,7 @@ def load_data(start_season=2020, end_season=2024):
     logger.info(f"Loading data from seasons {start_season}-{end_season}")
 
     conn = psycopg2.connect(
-        host='localhost',
-        port=5544,
-        dbname='devdb01',
-        user='dro',
-        password='sicillionbillions'
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     query = """
@@ -259,17 +262,17 @@ def load_data(start_season=2020, end_season=2024):
 def prepare_features(df):
     """Prepare features and targets"""
     # Feature columns
-    feature_cols = ['carries', 'avg_rushing_l3', 'season_avg', 'week', 'week_avg_yards']
+    feature_cols = ["carries", "avg_rushing_l3", "season_avg", "week", "week_avg_yards"]
 
     # Fill missing values
-    for col in ['avg_rushing_l3', 'season_avg', 'week_avg_yards']:
+    for col in ["avg_rushing_l3", "season_avg", "week_avg_yards"]:
         df[col] = df[col].fillna(df[col].median())
 
     X = df[feature_cols].values
 
     # Targets - handle negative yards
-    y_yards = df['stat_yards'].values.astype(np.float32)
-    y_td = df['scored_td'].values.astype(np.float32)
+    y_yards = df["stat_yards"].values.astype(np.float32)
+    y_td = df["scored_td"].values.astype(np.float32)
 
     # Apply log transform to yards (shift to positive first)
     yards_min = y_yards.min()
@@ -285,7 +288,7 @@ def prepare_features(df):
 def train_model(model, train_loader, val_loader, device, args):
     """Train the multi-output BNN"""
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=10, factor=0.5)
+    scheduler = ReduceLROnPlateau(optimizer, mode="min", patience=10, factor=0.5)
 
     # KL annealing schedule
     def kl_weight(epoch):
@@ -293,7 +296,7 @@ def train_model(model, train_loader, val_loader, device, args):
 
     train_losses = []
     val_losses = []
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
 
     logger.info(f"Training on {device} for {args.epochs} epochs")
     logger.info(f"Batch size: {args.batch_size}, Learning rate: {args.learning_rate}")
@@ -320,8 +323,8 @@ def train_model(model, train_loader, val_loader, device, args):
 
             # Negative log likelihood for yards (Gaussian)
             yards_nll = 0.5 * torch.mean(
-                torch.log(2 * np.pi * noise_std**2) +
-                (batch_y_yards - yards_pred)**2 / noise_std**2
+                torch.log(2 * np.pi * noise_std**2)
+                + (batch_y_yards - yards_pred) ** 2 / noise_std**2
             )
 
             # Binary cross entropy for TDs
@@ -391,24 +394,30 @@ def train_model(model, train_loader, val_loader, device, args):
         if avg_val_loss < best_val_loss:
             best_val_loss = avg_val_loss
             if args.checkpoint_dir:
-                checkpoint_path = Path(args.checkpoint_dir) / 'best_model.pt'
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'val_loss': avg_val_loss,
-                    'val_yards_mae': avg_val_yards_mae,
-                    'val_td_acc': avg_val_td_acc
-                }, checkpoint_path)
+                checkpoint_path = Path(args.checkpoint_dir) / "best_model.pt"
+                torch.save(
+                    {
+                        "epoch": epoch,
+                        "model_state_dict": model.state_dict(),
+                        "optimizer_state_dict": optimizer.state_dict(),
+                        "val_loss": avg_val_loss,
+                        "val_yards_mae": avg_val_yards_mae,
+                        "val_td_acc": avg_val_td_acc,
+                    },
+                    checkpoint_path,
+                )
 
         # Save periodic checkpoints
         if args.checkpoint_dir and epoch % 50 == 0 and epoch > 0:
-            checkpoint_path = Path(args.checkpoint_dir) / f'epoch_{epoch}.pt'
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-            }, checkpoint_path)
+            checkpoint_path = Path(args.checkpoint_dir) / f"epoch_{epoch}.pt"
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                },
+                checkpoint_path,
+            )
 
         # Logging
         elapsed = time.time() - start_time
@@ -423,7 +432,7 @@ def train_model(model, train_loader, val_loader, device, args):
             )
 
             # GPU memory monitoring
-            if device.type == 'cuda':
+            if device.type == "cuda":
                 logger.info(f"GPU Memory: {torch.cuda.memory_allocated()/1024**3:.2f} GB")
 
     return train_losses, val_losses
@@ -480,7 +489,7 @@ def evaluate_model(model, test_loader, device, yards_shift):
 
     # Calculate metrics
     yards_mae = np.mean(np.abs(yards_pred_original - yards_true_original))
-    yards_rmse = np.sqrt(np.mean((yards_pred_original - yards_true_original)**2))
+    yards_rmse = np.sqrt(np.mean((yards_pred_original - yards_true_original) ** 2))
 
     # 90% prediction interval coverage
     yards_lower = np.expm1(yards_pred - 1.645 * yards_std) - yards_shift
@@ -489,22 +498,22 @@ def evaluate_model(model, test_loader, device, yards_shift):
 
     # TD metrics
     td_accuracy = np.mean((td_pred > 0.5) == td_true)
-    td_brier = np.mean((td_pred - td_true)**2)
+    td_brier = np.mean((td_pred - td_true) ** 2)
 
     results = {
-        'yards_mae': float(yards_mae),
-        'yards_rmse': float(yards_rmse),
-        'yards_coverage_90': float(coverage),
-        'yards_mean_std': float(yards_std.mean()),
-        'td_accuracy': float(td_accuracy),
-        'td_brier_score': float(td_brier),
-        'td_mean_prob': float(td_pred.mean()),
-        'td_actual_rate': float(td_true.mean())
+        "yards_mae": float(yards_mae),
+        "yards_rmse": float(yards_rmse),
+        "yards_coverage_90": float(coverage),
+        "yards_mean_std": float(yards_std.mean()),
+        "td_accuracy": float(td_accuracy),
+        "td_brier_score": float(td_brier),
+        "td_mean_prob": float(td_pred.mean()),
+        "td_actual_rate": float(td_true.mean()),
     }
 
-    logger.info("\n" + "="*60)
+    logger.info("\n" + "=" * 60)
     logger.info("EVALUATION RESULTS")
-    logger.info("="*60)
+    logger.info("=" * 60)
     logger.info("Rushing Yards:")
     logger.info(f"  MAE: {yards_mae:.2f} yards")
     logger.info(f"  RMSE: {yards_rmse:.2f} yards")
@@ -520,19 +529,20 @@ def evaluate_model(model, test_loader, device, yards_shift):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Multi-Output BNN for NFL Rushing')
-    parser.add_argument('--device', default='cuda', choices=['cuda', 'cpu'])
-    parser.add_argument('--epochs', type=int, default=200)
-    parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--learning-rate', type=float, default=0.001)
-    parser.add_argument('--kl-scale', type=float, default=0.01)
-    parser.add_argument('--n-experts', type=int, default=3)
-    parser.add_argument('--hidden-dim', type=int, default=32)
-    parser.add_argument('--dropout', type=float, default=0.2)
-    parser.add_argument('--checkpoint-dir', type=str,
-                       default='models/bayesian/bnn_multioutput_checkpoints')
-    parser.add_argument('--log-dir', type=str, default='logs/training')
-    parser.add_argument('--output-dir', type=str, default='models/bayesian')
+    parser = argparse.ArgumentParser(description="Multi-Output BNN for NFL Rushing")
+    parser.add_argument("--device", default="cuda", choices=["cuda", "cpu"])
+    parser.add_argument("--epochs", type=int, default=200)
+    parser.add_argument("--batch-size", type=int, default=128)
+    parser.add_argument("--learning-rate", type=float, default=0.001)
+    parser.add_argument("--kl-scale", type=float, default=0.01)
+    parser.add_argument("--n-experts", type=int, default=3)
+    parser.add_argument("--hidden-dim", type=int, default=32)
+    parser.add_argument("--dropout", type=float, default=0.2)
+    parser.add_argument(
+        "--checkpoint-dir", type=str, default="models/bayesian/bnn_multioutput_checkpoints"
+    )
+    parser.add_argument("--log-dir", type=str, default="logs/training")
+    parser.add_argument("--output-dir", type=str, default="models/bayesian")
 
     args = parser.parse_args()
 
@@ -542,9 +552,9 @@ def main():
     Path(args.output_dir).mkdir(parents=True, exist_ok=True)
 
     # Setup device
-    device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     logger.info(f"Using device: {device}")
-    if device.type == 'cuda':
+    if device.type == "cuda":
         logger.info(f"GPU: {torch.cuda.get_device_name(0)}")
         logger.info(f"Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
@@ -585,7 +595,7 @@ def main():
         input_dim=X_train.shape[1],
         n_experts=args.n_experts,
         hidden_dim=args.hidden_dim,
-        dropout_rate=args.dropout
+        dropout_rate=args.dropout,
     ).to(device)
 
     logger.info(f"Model parameters: {sum(p.numel() for p in model.parameters()):,}")
@@ -596,42 +606,45 @@ def main():
 
     # Load best model for evaluation
     if args.checkpoint_dir:
-        best_checkpoint = Path(args.checkpoint_dir) / 'best_model.pt'
+        best_checkpoint = Path(args.checkpoint_dir) / "best_model.pt"
         if best_checkpoint.exists():
             checkpoint = torch.load(best_checkpoint)
-            model.load_state_dict(checkpoint['model_state_dict'])
+            model.load_state_dict(checkpoint["model_state_dict"])
             logger.info(f"Loaded best model from epoch {checkpoint['epoch']}")
 
     # Evaluate
     results = evaluate_model(model, val_loader, device, yards_shift)
 
     # Save final model and results
-    final_model_path = Path(args.output_dir) / 'bnn_multioutput_v1_final.pt'
-    torch.save({
-        'model_state_dict': model.state_dict(),
-        'scaler_mean': scaler.mean_,
-        'scaler_scale': scaler.scale_,
-        'yards_shift': yards_shift,
-        'args': vars(args),
-        'results': results,
-        'train_losses': train_losses,
-        'val_losses': val_losses
-    }, final_model_path)
+    final_model_path = Path(args.output_dir) / "bnn_multioutput_v1_final.pt"
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "scaler_mean": scaler.mean_,
+            "scaler_scale": scaler.scale_,
+            "yards_shift": yards_shift,
+            "args": vars(args),
+            "results": results,
+            "train_losses": train_losses,
+            "val_losses": val_losses,
+        },
+        final_model_path,
+    )
 
     logger.info(f"\n✅ Model saved to {final_model_path}")
 
     # Save results JSON
-    results_path = Path(args.output_dir) / 'bnn_multioutput_results.json'
-    with open(results_path, 'w') as f:
+    results_path = Path(args.output_dir) / "bnn_multioutput_results.json"
+    with open(results_path, "w") as f:
         json.dump(results, f, indent=2)
 
     logger.info(f"Results saved to {results_path}")
 
     # GPU memory final report
-    if device.type == 'cuda':
+    if device.type == "cuda":
         logger.info(f"\nFinal GPU Memory: {torch.cuda.memory_allocated()/1024**3:.2f} GB")
         logger.info(f"Peak GPU Memory: {torch.cuda.max_memory_allocated()/1024**3:.2f} GB")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

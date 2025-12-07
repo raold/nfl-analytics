@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class MCMCComplexity:
     """Model complexity metrics."""
+
     random_effects_groups: int
     observations: int
     parameters_estimated: int
@@ -37,7 +38,7 @@ class MCMCComplexity:
         obs_score = max(0, 30 - (self.observations / 5000) * 10)
 
         # Prior strength helps convergence
-        prior_map = {'weak': 20, 'moderate': 10, 'strong': 0}
+        prior_map = {"weak": 20, "moderate": 10, "strong": 0}
         prior_score = prior_map.get(self.prior_strength, 15)
 
         return re_score + obs_score + prior_score
@@ -46,6 +47,7 @@ class MCMCComplexity:
 @dataclass
 class MCMCRecommendation:
     """MCMC configuration recommendations."""
+
     iterations: int
     warmup: int
     chains: int
@@ -99,49 +101,47 @@ class MCMCConfigOptimizer:
     def _extract_complexity(self, content: str) -> MCMCComplexity:
         """Extract model complexity from R script."""
         # Count random effects groups
-        random_effects = len(re.findall(r'\|\s*\w+\)', content))
+        random_effects = len(re.findall(r"\|\s*\w+\)", content))
 
         # Estimate observations (look for nrow() or similar)
-        obs_match = re.search(r'nrow\(.*\)\s*#.*(\d+)', content)
+        obs_match = re.search(r"nrow\(.*\)\s*#.*(\d+)", content)
         observations = int(obs_match.group(1)) if obs_match else 10000
 
         # Estimate parameters (rough heuristic)
         parameters = random_effects * 50 + 100  # Base + group-level
 
         # Detect prior strength
-        if 'student_t(3' in content or 'normal(0, 0.1)' in content:
-            prior_strength = 'strong'
-        elif 'student_t(7' in content or 'normal(0, 1)' in content:
-            prior_strength = 'moderate'
+        if "student_t(3" in content or "normal(0, 0.1)" in content:
+            prior_strength = "strong"
+        elif "student_t(7" in content or "normal(0, 1)" in content:
+            prior_strength = "moderate"
         else:
-            prior_strength = 'weak'
+            prior_strength = "weak"
 
         return MCMCComplexity(
             random_effects_groups=random_effects,
             observations=observations,
             parameters_estimated=parameters,
-            prior_strength=prior_strength
+            prior_strength=prior_strength,
         )
 
     def _extract_current_config(self, content: str) -> dict[str, int]:
         """Extract current MCMC configuration."""
         config = {}
 
-        iter_match = re.search(r'iter\s*=\s*(\d+)', content)
-        config['iterations'] = int(iter_match.group(1)) if iter_match else 2000
+        iter_match = re.search(r"iter\s*=\s*(\d+)", content)
+        config["iterations"] = int(iter_match.group(1)) if iter_match else 2000
 
-        warmup_match = re.search(r'warmup\s*=\s*(\d+)', content)
-        config['warmup'] = int(warmup_match.group(1)) if warmup_match else 1000
+        warmup_match = re.search(r"warmup\s*=\s*(\d+)", content)
+        config["warmup"] = int(warmup_match.group(1)) if warmup_match else 1000
 
-        chains_match = re.search(r'chains\s*=\s*(\d+)', content)
-        config['chains'] = int(chains_match.group(1)) if chains_match else 4
+        chains_match = re.search(r"chains\s*=\s*(\d+)", content)
+        config["chains"] = int(chains_match.group(1)) if chains_match else 4
 
         return config
 
     def _generate_recommendation(
-        self,
-        complexity: MCMCComplexity,
-        current_config: dict[str, int]
+        self, complexity: MCMCComplexity, current_config: dict[str, int]
     ) -> MCMCRecommendation:
         """Generate MCMC configuration recommendation."""
         score = complexity.complexity_score
@@ -169,9 +169,7 @@ class MCMCConfigOptimizer:
             prob = 0.99
 
         # Calculate current convergence probability
-        current_prob = self._estimate_convergence_prob(
-            complexity, current_config['iterations']
-        )
+        current_prob = self._estimate_convergence_prob(complexity, current_config["iterations"])
 
         # Generate reasoning
         reasoning = f"Model complexity score: {score:.0f}/100\n"
@@ -186,7 +184,7 @@ class MCMCConfigOptimizer:
             chains=4,
             adapt_delta=adapt_delta,
             convergence_probability=prob,
-            reasoning=reasoning
+            reasoning=reasoning,
         )
 
     def _estimate_convergence_prob(self, complexity: MCMCComplexity, iterations: int) -> float:
@@ -206,7 +204,7 @@ class MCMCConfigOptimizer:
             return 0.30
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # CLI interface
     import sys
 

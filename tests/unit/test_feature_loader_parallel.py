@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_all_features_parallel_basic():
@@ -56,7 +53,6 @@ def test_load_all_features_parallel_basic():
     assert result is not None
 
 
-
 def test_load_all_features_parallel_edge_cases():
     """Test load_all_features_parallel: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_all_features_parallel_edge_cases():
     assert result is not None
 
 
-
 def test_load_all_features_parallel_error_handling():
     """Test load_all_features_parallel error handling."""
     with pytest.raises(ValueError):
         load_all_features_parallel(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000))
@@ -85,4 +79,3 @@ def test_load_all_features_parallel_property_idempotent(self, self, game_ids):
 
     # Assert property
     assert load_all_features_parallel(self, game_ids) == result, "idempotent violated"
-

@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_evaluate_bet_basic():
@@ -56,7 +53,6 @@ def test_evaluate_bet_basic():
     assert result is not None
 
 
-
 def test_evaluate_bet_edge_cases():
     """Test evaluate_bet: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_evaluate_bet_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_bet_error_handling():
     """Test evaluate_bet error handling."""
     with pytest.raises(ValueError):
         evaluate_bet(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_evaluate_bet_property_idempotent(self, self, bet):
 
     # Assert property
     assert evaluate_bet(self, bet) == result, "idempotent violated"
-
 
 
 def test_get_configuration_basic():
@@ -100,7 +93,6 @@ def test_get_configuration_basic():
     assert result is not None
 
 
-
 def test_get_configuration_edge_cases():
     """Test get_configuration: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_get_configuration_edge_cases():
     assert result is not None
 
 
-
 def test_get_configuration_error_handling():
     """Test get_configuration error handling."""
     with pytest.raises(ValueError):
         get_configuration(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,4 +119,3 @@ def test_get_configuration_property_idempotent(val):
 
     # Assert property
     assert get_configuration(val) == result, "idempotent violated"
-

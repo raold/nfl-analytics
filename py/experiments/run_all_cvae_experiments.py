@@ -13,44 +13,44 @@ import logging
 import subprocess
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 EXPERIMENTS = [
     {
-        'name': 'Experiment 1: cVAE + Environment BNN Ensemble',
-        'script': 'py/experiments/cvae_exp1_environment_bnn_ensemble.py',
-        'description': 'Test if trajectory features improve Environment BNN predictions'
+        "name": "Experiment 1: cVAE + Environment BNN Ensemble",
+        "script": "py/experiments/cvae_exp1_environment_bnn_ensemble.py",
+        "description": "Test if trajectory features improve Environment BNN predictions",
     },
     {
-        'name': 'Experiment 2: Same-Game Parlay Pricing',
-        'script': 'py/experiments/cvae_exp2_same_game_parlay.py',
-        'description': 'Price complex parlays and validate with BNN calibration'
+        "name": "Experiment 2: Same-Game Parlay Pricing",
+        "script": "py/experiments/cvae_exp2_same_game_parlay.py",
+        "description": "Price complex parlays and validate with BNN calibration",
     },
     {
-        'name': 'Experiment 3: Causal Counterfactual Generation',
-        'script': 'py/experiments/cvae_exp3_causal_counterfactuals.py',
-        'description': 'Generate counterfactual trajectories for causal questions'
+        "name": "Experiment 3: Causal Counterfactual Generation",
+        "script": "py/experiments/cvae_exp3_causal_counterfactuals.py",
+        "description": "Generate counterfactual trajectories for causal questions",
     },
     {
-        'name': 'Experiment 4: Live In-Game Trajectory Updates',
-        'script': 'py/experiments/cvae_exp4_live_trajectories.py',
-        'description': 'Generate remainder-of-game trajectories from current state'
+        "name": "Experiment 4: Live In-Game Trajectory Updates",
+        "script": "py/experiments/cvae_exp4_live_trajectories.py",
+        "description": "Generate remainder-of-game trajectories from current state",
     },
     {
-        'name': 'Experiment 5: Key Number Distribution Validation',
-        'script': 'py/experiments/cvae_exp5_key_numbers.py',
-        'description': 'Validate cVAE learns NFL key number patterns'
+        "name": "Experiment 5: Key Number Distribution Validation",
+        "script": "py/experiments/cvae_exp5_key_numbers.py",
+        "description": "Validate cVAE learns NFL key number patterns",
     },
     {
-        'name': 'Experiment 6: GNN-Enhanced Trajectory Conditioning',
-        'script': 'py/experiments/cvae_exp6_gnn_enhanced.py',
-        'description': 'Add GNN embeddings to cVAE conditioning'
+        "name": "Experiment 6: GNN-Enhanced Trajectory Conditioning",
+        "script": "py/experiments/cvae_exp6_gnn_enhanced.py",
+        "description": "Add GNN embeddings to cVAE conditioning",
     },
     {
-        'name': 'Experiment 7: Hierarchical Player-Game Trajectories',
-        'script': 'py/experiments/cvae_exp7_hierarchical_player.py',
-        'description': 'Combine cVAE with hierarchical BNN player models'
+        "name": "Experiment 7: Hierarchical Player-Game Trajectories",
+        "script": "py/experiments/cvae_exp7_hierarchical_player.py",
+        "description": "Combine cVAE with hierarchical BNN player models",
     },
 ]
 
@@ -63,7 +63,7 @@ def run_experiment(exp_config):
     logger.info(f"Description: {exp_config['description']}")
     logger.info("")
 
-    script_path = Path(exp_config['script'])
+    script_path = Path(exp_config["script"])
 
     if not script_path.exists():
         logger.error(f"✗ Script not found: {script_path}")
@@ -71,10 +71,10 @@ def run_experiment(exp_config):
 
     try:
         result = subprocess.run(
-            ['uv', 'run', 'python', str(script_path)],
+            ["uv", "run", "python", str(script_path)],
             capture_output=True,
             text=True,
-            timeout=600  # 10 minute timeout per experiment
+            timeout=600,  # 10 minute timeout per experiment
         )
 
         if result.returncode == 0:
@@ -105,7 +105,7 @@ def main():
 
     for exp in EXPERIMENTS:
         success = run_experiment(exp)
-        results[exp['name']] = 'PASS' if success else 'FAIL'
+        results[exp["name"]] = "PASS" if success else "FAIL"
 
     # Summary
     logger.info("")

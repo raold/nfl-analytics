@@ -26,11 +26,7 @@ class StackingStrategy(EnsembleStrategy):
     def name(self) -> str:
         return "stacking"
 
-    def combine(
-        self,
-        predictions: list[ModelPrediction],
-        **kwargs
-    ) -> EnsemblePrediction:
+    def combine(self, predictions: list[ModelPrediction], **kwargs) -> EnsemblePrediction:
         """Combine using stacking (stub - uses simple average)."""
         self.validate_predictions(predictions)
 
@@ -49,5 +45,5 @@ class StackingStrategy(EnsembleStrategy):
             weights=weights,
             strategy_name=self.name,
             confidence=float(confidence),
-            metadata={"status": "stub_implementation"}
+            metadata={"status": "stub_implementation"},
         )

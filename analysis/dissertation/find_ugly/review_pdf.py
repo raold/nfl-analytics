@@ -14,6 +14,7 @@ OUTPUT_DIR = Path(__file__).parent / "pages"
 BATCH_SIZE = 12
 DPI = 150  # Balance between quality and file size
 
+
 def get_page_count():
     """Get total number of pages from LaTeX log."""
     log_path = Path(PDF_PATH).parent / "main.log"
@@ -21,9 +22,10 @@ def get_page_count():
         for line in f:
             if "Output written on main.pdf" in line:
                 # Extract page count from: "Output written on main.pdf (362 pages, 5356034 bytes)."
-                parts = line.split('(')[1].split()[0]
+                parts = line.split("(")[1].split()[0]
                 return int(parts)
     return None
+
 
 def convert_page_range(start_page, end_page):
     """Convert a range of PDF pages to PNG images using Ghostscript."""
@@ -40,7 +42,7 @@ def convert_page_range(start_page, end_page):
         f"-dFirstPage={start_page}",
         f"-dLastPage={end_page}",
         f"-sOutputFile={OUTPUT_DIR}/page_%03d.png",
-        PDF_PATH
+        PDF_PATH,
     ]
 
     print(f"Converting pages {start_page}-{end_page}...")
@@ -53,6 +55,7 @@ def convert_page_range(start_page, end_page):
     print(f"✓ Converted pages {start_page}-{end_page}")
     return True
 
+
 def delete_images():
     """Delete all PNG images in the output directory."""
     if OUTPUT_DIR.exists():
@@ -61,12 +64,15 @@ def delete_images():
             f.unlink()
         print(f"✓ Deleted {len(png_files)} images")
 
+
 def cleanup_directory():
     """Remove the pages directory entirely."""
     if OUTPUT_DIR.exists():
         import shutil
+
         shutil.rmtree(OUTPUT_DIR)
         print("✓ Cleaned up pages directory")
+
 
 if __name__ == "__main__":
     page_count = get_page_count()
@@ -96,8 +102,8 @@ if __name__ == "__main__":
         elif sys.argv[1] == "pages":
             # Single page or range: e.g., "pages 50" or "pages 50-55"
             page_spec = sys.argv[2]
-            if '-' in page_spec:
-                start, end = page_spec.split('-')
+            if "-" in page_spec:
+                start, end = page_spec.split("-")
                 convert_page_range(int(start), int(end))
             else:
                 page = int(page_spec)

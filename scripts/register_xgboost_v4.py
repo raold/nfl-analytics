@@ -16,7 +16,7 @@ from psycopg2.extras import Json
 load_dotenv()
 
 # Database connection
-DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 if not DB_PASSWORD:
     raise ValueError("DB_PASSWORD not found in environment variables")
 
@@ -33,29 +33,29 @@ VALIDATION_RESULTS = {
         "rmse": 6.74,
         "improvement_pct": 87.40,
         "p_value": 0.000001,
-        "test_records": 583
+        "test_records": 583,
     },
     "2023": {
         "mae": 4.76,
         "rmse": 6.21,
         "improvement_pct": 88.15,
         "p_value": 0.000001,
-        "test_records": 599
+        "test_records": 599,
     },
     "2024": {
         "mae": 4.27,
         "rmse": 5.93,
         "improvement_pct": 89.38,
         "p_value": 0.000001,
-        "test_records": 596
+        "test_records": 596,
     },
     "mean": {
         "mae": 4.70,
         "mae_std": 0.40,
         "rmse": 6.29,
         "improvement_pct": 88.31,
-        "all_significant": True
-    }
+        "all_significant": True,
+    },
 }
 
 
@@ -98,25 +98,28 @@ def register_xgboost_v4():
         RETURNING model_id;
         """
 
-        cur.execute(insert_query, (
-            'xgboost_v4_ridge',  # model_name
-            'gradient_boosting',  # model_type
-            'xgboost',  # model_family
-            'v4.0',  # version
-            XGBOOST_MODEL_PATH,  # model_path (XGBoost JSON)
-            RIDGE_MODEL_PATH,  # metadata_path (Ridge PKL stored here)
-            'active',  # status
-            False,  # is_production (pending A/B test)
-            2018,  # train_start_season
-            2024,  # train_end_season
-            2022,  # test_start_season
-            2024,  # test_end_season
-            None,  # train_samples (varies by season)
-            1778,  # test_samples (583 + 599 + 596)
-            'MacBook M4',  # hardware
-            'XGBoost v4 Ridge Residuals - Two-stage architecture with Ridge opponent baseline + XGBoost residual learning',
-            'Multi-season validation (2022-2024): 4.70 ± 0.40 MAE, 88.31% improvement vs baseline (p < 0.000001). Production-ready pending A/B test.'
-        ))
+        cur.execute(
+            insert_query,
+            (
+                "xgboost_v4_ridge",  # model_name
+                "gradient_boosting",  # model_type
+                "xgboost",  # model_family
+                "v4.0",  # version
+                XGBOOST_MODEL_PATH,  # model_path (XGBoost JSON)
+                RIDGE_MODEL_PATH,  # metadata_path (Ridge PKL stored here)
+                "active",  # status
+                False,  # is_production (pending A/B test)
+                2018,  # train_start_season
+                2024,  # train_end_season
+                2022,  # test_start_season
+                2024,  # test_end_season
+                None,  # train_samples (varies by season)
+                1778,  # test_samples (583 + 599 + 596)
+                "MacBook M4",  # hardware
+                "XGBoost v4 Ridge Residuals - Two-stage architecture with Ridge opponent baseline + XGBoost residual learning",
+                "Multi-season validation (2022-2024): 4.70 ± 0.40 MAE, 88.31% improvement vs baseline (p < 0.000001). Production-ready pending A/B test.",
+            ),
+        )
 
         model_id = cur.fetchone()[0]
         print(f"✅ Registered XGBoost v4 Ridge to model_registry (model_id={model_id})")
@@ -146,67 +149,83 @@ def register_xgboost_v4():
             """
 
             # Get baseline model_id (xgboost_v2_canonical)
-            cur.execute("SELECT model_id FROM ml.model_registry WHERE model_name = 'xgboost_v2_canonical';")
+            cur.execute(
+                "SELECT model_id FROM ml.model_registry WHERE model_name = 'xgboost_v2_canonical';"
+            )
             baseline_result = cur.fetchone()
             baseline_model_id = baseline_result[0] if baseline_result else None
 
-            cur.execute(eval_query, (
-                model_id,
-                f"Multi-Season Validation {season}",
-                "backtest",
-                f"NFL {season} Season",
-                metrics["test_records"],
-                f"{season}-09-01",
-                f"{season}-12-31",
-                Json({
-                    "mae": metrics["mae"],
-                    "rmse": metrics["rmse"],
-                    "test_records": metrics["test_records"]
-                }),
-                baseline_model_id,
-                metrics["improvement_pct"],
-                metrics["p_value"],
-                "Diebold-Mariano test: p < 0.000001 (highly significant)"
-            ))
+            cur.execute(
+                eval_query,
+                (
+                    model_id,
+                    f"Multi-Season Validation {season}",
+                    "backtest",
+                    f"NFL {season} Season",
+                    metrics["test_records"],
+                    f"{season}-09-01",
+                    f"{season}-12-31",
+                    Json(
+                        {
+                            "mae": metrics["mae"],
+                            "rmse": metrics["rmse"],
+                            "test_records": metrics["test_records"],
+                        }
+                    ),
+                    baseline_model_id,
+                    metrics["improvement_pct"],
+                    metrics["p_value"],
+                    "Diebold-Mariano test: p < 0.000001 (highly significant)",
+                ),
+            )
 
-            print(f"✅ Added {season} evaluation: {metrics['mae']} MAE (+{metrics['improvement_pct']:.2f}%)")
+            print(
+                f"✅ Added {season} evaluation: {metrics['mae']} MAE (+{metrics['improvement_pct']:.2f}%)"
+            )
 
         # Add aggregate evaluation
         mean_metrics = VALIDATION_RESULTS["mean"]
-        cur.execute(eval_query, (
-            model_id,
-            "Multi-Season Validation Aggregate (2022-2024)",
-            "backtest",
-            "NFL 2022-2024 Seasons",
-            1778,
-            "2022-09-01",
-            "2024-12-31",
-            Json({
-                "mae_mean": mean_metrics["mae"],
-                "mae_std": mean_metrics["mae_std"],
-                "rmse_mean": mean_metrics["rmse"],
-                "cv_pct": 8.5,  # Coefficient of variation
-                "all_significant": True
-            }),
-            baseline_model_id,
-            mean_metrics["improvement_pct"],
-            0.000001,
-            "Aggregate metrics across 3 seasons. Exceptional consistency (8.5% CV). All seasons p < 0.000001."
-        ))
+        cur.execute(
+            eval_query,
+            (
+                model_id,
+                "Multi-Season Validation Aggregate (2022-2024)",
+                "backtest",
+                "NFL 2022-2024 Seasons",
+                1778,
+                "2022-09-01",
+                "2024-12-31",
+                Json(
+                    {
+                        "mae_mean": mean_metrics["mae"],
+                        "mae_std": mean_metrics["mae_std"],
+                        "rmse_mean": mean_metrics["rmse"],
+                        "cv_pct": 8.5,  # Coefficient of variation
+                        "all_significant": True,
+                    }
+                ),
+                baseline_model_id,
+                mean_metrics["improvement_pct"],
+                0.000001,
+                "Aggregate metrics across 3 seasons. Exceptional consistency (8.5% CV). All seasons p < 0.000001.",
+            ),
+        )
 
-        print(f"✅ Added aggregate evaluation: {mean_metrics['mae']} ± {mean_metrics['mae_std']} MAE")
+        print(
+            f"✅ Added aggregate evaluation: {mean_metrics['mae']} ± {mean_metrics['mae_std']} MAE"
+        )
 
         conn.commit()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✅ XGBoost v4 Ridge Residuals Registration Complete")
-        print("="*60)
+        print("=" * 60)
         print(f"Model ID: {model_id}")
         print("Status: active (pending A/B test)")
         print(f"Multi-Season Performance: {mean_metrics['mae']} ± {mean_metrics['mae_std']} MAE")
         print(f"Improvement vs Baseline: +{mean_metrics['improvement_pct']:.2f}%")
         print("Statistical Significance: All seasons p < 0.000001 ✅")
-        print("="*60)
+        print("=" * 60)
 
     except Exception as e:
         conn.rollback()

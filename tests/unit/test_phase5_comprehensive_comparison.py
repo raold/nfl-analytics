@@ -23,7 +23,6 @@ def test_train_model_basic():
     assert result is not None
 
 
-
 def test_train_model_edge_cases():
     """Test train_model: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_train_model_edge_cases():
     assert result is not None
 
 
-
 def test_train_model_error_handling():
     """Test train_model error handling."""
     with pytest.raises(ValueError):
         train_model(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100))
@@ -52,7 +49,6 @@ def test_train_model_property_idempotent(self, model_cls, train_df, val_df, mode
 
     # Assert property
     assert train_model(model_cls, train_df, val_df, model_name) == result, "idempotent violated"
-
 
 
 def test_run_comprehensive_comparison_basic():
@@ -67,7 +63,6 @@ def test_run_comprehensive_comparison_basic():
     assert result is not None
 
 
-
 def test_run_comprehensive_comparison_edge_cases():
     """Test run_comprehensive_comparison: edge cases."""
     # Arrange
@@ -80,23 +75,56 @@ def test_run_comprehensive_comparison_edge_cases():
     assert result is not None
 
 
-
 def test_run_comprehensive_comparison_error_handling():
     """Test run_comprehensive_comparison error handling."""
     with pytest.raises(ValueError):
         run_comprehensive_comparison(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_comprehensive_comparison_property_idempotent(self, train_seasons, val_season, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_run_comprehensive_comparison_property_idempotent(
+    self,
+    train_seasons,
+    val_season,
+    backtest_seasons,
+    initial_bankroll,
+    kelly_multiplier,
+    edge_threshold,
+    vig,
+):
     """Property test: function is idempotent."""
     # Act
-    result = run_comprehensive_comparison(train_seasons, val_season, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig)
+    result = run_comprehensive_comparison(
+        train_seasons,
+        val_season,
+        backtest_seasons,
+        initial_bankroll,
+        kelly_multiplier,
+        edge_threshold,
+        vig,
+    )
 
     # Assert property
-    assert run_comprehensive_comparison(train_seasons, val_season, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig) == result, "idempotent violated"
-
+    assert (
+        run_comprehensive_comparison(
+            train_seasons,
+            val_season,
+            backtest_seasons,
+            initial_bankroll,
+            kelly_multiplier,
+            edge_threshold,
+            vig,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_parse_args_basic():
@@ -111,7 +139,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -124,12 +151,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -144,7 +169,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +181,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

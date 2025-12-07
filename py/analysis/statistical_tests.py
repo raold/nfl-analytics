@@ -81,7 +81,7 @@ class DieboldMarianoTest:
             Loss values
         """
         if self.loss_fn == "squared":
-            return errors ** 2
+            return errors**2
         elif self.loss_fn == "absolute":
             return np.abs(errors)
         else:
@@ -103,7 +103,7 @@ class DieboldMarianoTest:
         d_centered = d - np.mean(d)
 
         # Variance (lag 0)
-        var = np.mean(d_centered ** 2)
+        var = np.mean(d_centered**2)
 
         # Add autocovariances with Bartlett kernel weights
         for lag in range(1, self.h):
@@ -249,8 +249,8 @@ def bootstrap_confidence_interval(
 
         # Compute losses
         if loss_fn == "squared":
-            loss1 = e1 ** 2
-            loss2 = e2 ** 2
+            loss1 = e1**2
+            loss2 = e2**2
         else:  # absolute
             loss1 = np.abs(e1)
             loss2 = np.abs(e2)
@@ -290,9 +290,19 @@ def compare_all_models(
     if model_cols is None:
         # Look for columns that might be predictions
         candidate_cols = [
-            col for col in predictions_df.columns
-            if col not in [ensemble_col, actual_col, "game_id", "player_id",
-                          "player_name", "season", "week", "model_name"]
+            col
+            for col in predictions_df.columns
+            if col
+            not in [
+                ensemble_col,
+                actual_col,
+                "game_id",
+                "player_id",
+                "player_name",
+                "season",
+                "week",
+                "model_name",
+            ]
         ]
         model_cols = candidate_cols
 
@@ -323,19 +333,21 @@ def compare_all_models(
         mae_ensemble = np.mean(np.abs(actual - ensemble_pred))
         mae_model = np.mean(np.abs(actual - model_pred))
 
-        results.append({
-            "comparison": f"Ensemble vs {model_col}",
-            "n_obs": result["n_obs"],
-            "mae_ensemble": mae_ensemble,
-            "mae_model": mae_model,
-            "mean_diff_mae": result["mean_diff"],
-            "dm_statistic": result["statistic"],
-            "p_value_one_sided": result["p_value_one_sided"],
-            "p_value_two_sided": result["p_value_two_sided"],
-            "ci_95_lower": ci_lower,
-            "ci_95_upper": ci_upper,
-            "significant_5pct": result["p_value_one_sided"] < 0.05,
-        })
+        results.append(
+            {
+                "comparison": f"Ensemble vs {model_col}",
+                "n_obs": result["n_obs"],
+                "mae_ensemble": mae_ensemble,
+                "mae_model": mae_model,
+                "mean_diff_mae": result["mean_diff"],
+                "dm_statistic": result["statistic"],
+                "p_value_one_sided": result["p_value_one_sided"],
+                "p_value_two_sided": result["p_value_two_sided"],
+                "ci_95_lower": ci_lower,
+                "ci_95_upper": ci_upper,
+                "significant_5pct": result["p_value_one_sided"] < 0.05,
+            }
+        )
 
     # Create DataFrame
     results_df = pd.DataFrame(results)
@@ -367,9 +379,7 @@ def apply_holm_bonferroni(
 
     # Holm-Bonferroni correction
     results_df["holm_threshold"] = alpha / (n_tests - np.arange(n_tests))
-    results_df["significant_holm"] = (
-        results_df["p_value_one_sided"] < results_df["holm_threshold"]
-    )
+    results_df["significant_holm"] = results_df["p_value_one_sided"] < results_df["holm_threshold"]
 
     return results_df
 
@@ -397,7 +407,9 @@ def compare_to_baseline(
     # Create baseline predictions
     if baseline_type == "season_avg":
         # Use within-season average as baseline (by player)
-        baseline_pred = predictions_df.groupby(["player_id", "season"])[actual_col].transform("mean").values
+        baseline_pred = (
+            predictions_df.groupby(["player_id", "season"])[actual_col].transform("mean").values
+        )
     elif baseline_type == "league_avg":
         # Use league-wide average
         baseline_pred = np.full_like(actual, np.mean(actual), dtype=float)
@@ -487,13 +499,15 @@ def main():
         mae = np.mean(np.abs(actual - ensemble_pred))
         rmse = np.sqrt(np.mean((actual - ensemble_pred) ** 2))
 
-        results = [{
-            "comparison": "State-Space v2 (2025 Holdout)",
-            "n_obs": len(predictions_df),
-            "mae": mae,
-            "rmse": rmse,
-            "note": "Full 5-way ensemble comparison pending model retraining",
-        }]
+        results = [
+            {
+                "comparison": "State-Space v2 (2025 Holdout)",
+                "n_obs": len(predictions_df),
+                "mae": mae,
+                "rmse": rmse,
+                "note": "Full 5-way ensemble comparison pending model retraining",
+            }
+        ]
 
         results_df = pd.DataFrame(results)
 
@@ -515,10 +529,7 @@ def main():
         )
 
         # Append baseline result
-        results_df = pd.concat([
-            results_df,
-            pd.DataFrame([baseline_result])
-        ], ignore_index=True)
+        results_df = pd.concat([results_df, pd.DataFrame([baseline_result])], ignore_index=True)
 
     # Save results
     output_path = Path(args.output)
@@ -527,11 +538,11 @@ def main():
     print(f"\nResults saved to {output_path}")
 
     # Print summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("STATISTICAL TESTS SUMMARY")
-    print("="*80)
+    print("=" * 80)
     print(results_df.to_string(index=False))
-    print("="*80)
+    print("=" * 80)
 
 
 if __name__ == "__main__":

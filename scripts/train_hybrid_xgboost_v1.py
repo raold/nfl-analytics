@@ -64,18 +64,17 @@ from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'dbname': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions'
+    "host": "localhost",
+    "port": 5544,
+    "dbname": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
 
 # Model paths
@@ -181,9 +180,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["yards_per_attempt"] = df["yards"] / df["attempts"].replace(0, np.nan)
     df["td_rate"] = df["touchdowns"] / df["attempts"].replace(0, np.nan)
     df["spread_abs"] = df["spread_line"].abs()
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
     df["week_in_season"] = df["week"].astype(float)
 
     # Alias for compatibility
@@ -196,17 +193,19 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["td_rate_L3"] = df["td_rate"]
 
     # Fill missing values (match ensemble defaults)
-    df = df.fillna({
-        "temp": 70.0,
-        "wind": 5.0,
-        "yards_per_attempt": 7.0,
-        "td_rate": 0.04,
-        "yards_L3": 250.0,
-        "yards_per_attempt_L3": 7.0,
-        "td_rate_L3": 0.04,
-        "spread_line": 0.0,
-        "total_line": 47.0,
-    })
+    df = df.fillna(
+        {
+            "temp": 70.0,
+            "wind": 5.0,
+            "yards_per_attempt": 7.0,
+            "td_rate": 0.04,
+            "yards_L3": 250.0,
+            "yards_per_attempt_L3": 7.0,
+            "td_rate_L3": 0.04,
+            "spread_line": 0.0,
+            "total_line": 47.0,
+        }
+    )
 
     # Validate all feature columns exist
     missing_cols = set(FEATURE_COLS) - set(df.columns)
@@ -243,9 +242,11 @@ def apply_decay_weights(df: pd.DataFrame) -> pd.DataFrame:
         n_samples = len(df[df["season"] == season])
         weight = DECAY_WEIGHTS[season]
         effective_samples = n_samples * weight
-        logger.info(f"  {season}: {n_samples:,} samples × {weight:.3f} = {effective_samples:,.0f} effective")
+        logger.info(
+            f"  {season}: {n_samples:,} samples × {weight:.3f} = {effective_samples:,.0f} effective"
+        )
 
-    total_effective = (df["weight"].sum())
+    total_effective = df["weight"].sum()
     logger.info(f"Total effective samples: {total_effective:,.0f}")
 
     return df
@@ -298,27 +299,25 @@ def train_hybrid_model(train_df: pd.DataFrame) -> HybridStaticIncrementalXGBoost
 
     # Initialize hybrid model with production hyperparameters
     static_params = {
-        'n_estimators': 100,
-        'max_depth': 6,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'random_state': 42,
-        'objective': 'reg:squarederror',
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "random_state": 42,
+        "objective": "reg:squarederror",
     }
 
     incremental_params = {
-        'window_size': 150,
-        'retrain_every': 20,
-        'n_estimators': 50,
-        'max_depth': 5,
-        'learning_rate': 0.1,
+        "window_size": 150,
+        "retrain_every": 20,
+        "n_estimators": 50,
+        "max_depth": 5,
+        "learning_rate": 0.1,
     }
 
     model = HybridStaticIncrementalXGBoost(
-        static_weight=0.7,
-        static_params=static_params,
-        incremental_params=incremental_params
+        static_weight=0.7, static_params=static_params, incremental_params=incremental_params
     )
 
     # Train static component with sample weights
@@ -328,6 +327,7 @@ def train_hybrid_model(train_df: pd.DataFrame) -> HybridStaticIncrementalXGBoost
 
     # Manually train to support sample weights
     from sklearn.preprocessing import StandardScaler
+
     model.static_scaler = StandardScaler()
     X_scaled = model.static_scaler.fit_transform(X_train)
     model.static_model.fit(X_scaled, y_train, sample_weight=sample_weights, verbose=False)
@@ -377,14 +377,14 @@ def evaluate_model(model: HybridStaticIncrementalXGBoost, test_df: pd.DataFrame)
     q95 = np.quantile(errors, 0.95)
 
     metrics = {
-        'mae': float(mae),
-        'mse': float(mse),
-        'rmse': float(rmse),
-        'r2': float(r2),
-        'median_ae': float(q50),
-        'q90_ae': float(q90),
-        'q95_ae': float(q95),
-        'n_samples': len(y_test),
+        "mae": float(mae),
+        "mse": float(mse),
+        "rmse": float(rmse),
+        "r2": float(r2),
+        "median_ae": float(q50),
+        "q90_ae": float(q90),
+        "q95_ae": float(q95),
+        "n_samples": len(y_test),
     }
 
     logger.info("Validation Results (Static Component Only):")
@@ -403,9 +403,7 @@ def evaluate_model(model: HybridStaticIncrementalXGBoost, test_df: pd.DataFrame)
 
 
 def save_model_and_metadata(
-    model: HybridStaticIncrementalXGBoost,
-    metrics: dict,
-    train_df: pd.DataFrame
+    model: HybridStaticIncrementalXGBoost, metrics: dict, train_df: pd.DataFrame
 ):
     """
     Save trained model and metadata to disk.
@@ -422,63 +420,63 @@ def save_model_and_metadata(
 
     # Create comprehensive metadata
     metadata = {
-        'model_name': 'Hybrid Static-Incremental XGBoost v1',
-        'model_version': 'v1.0',
-        'created_at': datetime.now().isoformat(),
-        'training_window': {
-            'start_season': 2015,
-            'end_season': 2023,
-            'decay_function': 'exponential',
-            'half_life': 4,
-            'weights': DECAY_WEIGHTS,
+        "model_name": "Hybrid Static-Incremental XGBoost v1",
+        "model_version": "v1.0",
+        "created_at": datetime.now().isoformat(),
+        "training_window": {
+            "start_season": 2015,
+            "end_season": 2023,
+            "decay_function": "exponential",
+            "half_life": 4,
+            "weights": DECAY_WEIGHTS,
         },
-        'validation_window': {
-            'season': 2024,
+        "validation_window": {
+            "season": 2024,
         },
-        'architecture': {
-            'type': 'hybrid_static_incremental',
-            'static_weight': 0.7,
-            'incremental_weight': 0.3,
-            'static_model': 'XGBoost',
-            'incremental_model': 'River IncrementalXGBoost',
+        "architecture": {
+            "type": "hybrid_static_incremental",
+            "static_weight": 0.7,
+            "incremental_weight": 0.3,
+            "static_model": "XGBoost",
+            "incremental_model": "River IncrementalXGBoost",
         },
-        'hyperparameters': {
-            'static': model.static_params,
-            'incremental': model.incremental_params,
+        "hyperparameters": {
+            "static": model.static_params,
+            "incremental": model.incremental_params,
         },
-        'features': FEATURE_COLS,
-        'feature_count': len(FEATURE_COLS),
-        'training_samples': len(train_df),
-        'effective_samples': float(train_df['weight'].sum()),
-        'validation_metrics': metrics,
-        'expected_performance': {
-            'description': 'Based on 2022-2024 multi-season validation',
-            'hybrid_mae': 38.03,
-            'static_only_mae': 39.66,
-            'improvement': '+4.2%',
+        "features": FEATURE_COLS,
+        "feature_count": len(FEATURE_COLS),
+        "training_samples": len(train_df),
+        "effective_samples": float(train_df["weight"].sum()),
+        "validation_metrics": metrics,
+        "expected_performance": {
+            "description": "Based on 2022-2024 multi-season validation",
+            "hybrid_mae": 38.03,
+            "static_only_mae": 39.66,
+            "improvement": "+4.2%",
         },
-        'model_registry': {
-            'status': 'trained',
-            'production_ready': True,
-            'deployment_target': 'enhanced_ensemble_v6',
-            'ensemble_weight': 0.20,
+        "model_registry": {
+            "status": "trained",
+            "production_ready": True,
+            "deployment_target": "enhanced_ensemble_v6",
+            "ensemble_weight": 0.20,
         },
-        'database': {
-            'connection': f"{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}",
-            'query_table': 'mart.player_game_stats',
-            'stat_category': 'passing',
+        "database": {
+            "connection": f"{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}",
+            "query_table": "mart.player_game_stats",
+            "stat_category": "passing",
         },
     }
 
     # Save metadata as JSON
-    metadata_path = MODEL_DIR / 'metadata.json'
-    with open(metadata_path, 'w') as f:
+    metadata_path = MODEL_DIR / "metadata.json"
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info(f"Metadata saved to {metadata_path}")
     logger.info("")
     logger.info("Model artifacts:")
-    for file_path in sorted(MODEL_DIR.glob('*')):
+    for file_path in sorted(MODEL_DIR.glob("*")):
         size_mb = file_path.stat().st_size / (1024 * 1024)
         logger.info(f"  {file_path.name}: {size_mb:.2f} MB")
 

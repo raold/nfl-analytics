@@ -52,10 +52,7 @@ import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Database connection
@@ -140,9 +137,9 @@ def calculate_sample_weights(df):
     logger.info("Calculating sample weights...")
 
     # Use training set statistics for normalization
-    train_mask = df['season'] <= 2024
-    mean_epa = df.loc[train_mask, 'opp_def_epa_exp'].mean()
-    std_epa = df.loc[train_mask, 'opp_def_epa_exp'].std()
+    train_mask = df["season"] <= 2024
+    mean_epa = df.loc[train_mask, "opp_def_epa_exp"].mean()
+    std_epa = df.loc[train_mask, "opp_def_epa_exp"].std()
 
     logger.info("  Opponent EPA stats (training 2018-2024):")
     logger.info(f"    Mean: {mean_epa:.3f}")
@@ -153,7 +150,7 @@ def calculate_sample_weights(df):
     #   weight = 1 + (0.10 - 0.30) / 0.15 = 1 + (-0.20 / 0.15) = 1 - 1.33 = -0.33 → clipped to 0.5
     # Example: opp_def_epa_exp = 0.50 (weak defense):
     #   weight = 1 + (0.50 - 0.30) / 0.15 = 1 + (0.20 / 0.15) = 1 + 1.33 = 2.33 → clipped to 2.0
-    weights = 1 + (df['opp_def_epa_exp'] - mean_epa) / std_epa
+    weights = 1 + (df["opp_def_epa_exp"] - mean_epa) / std_epa
     weights = np.clip(weights, 0.5, 2.0)
 
     # Print distribution statistics
@@ -167,9 +164,16 @@ def calculate_sample_weights(df):
     logger.info(f"  75th percentile: {weights.quantile(0.75):.3f}")
 
     # Show breakdown by weight category
-    weight_cats = pd.cut(weights, bins=[0, 0.75, 1.0, 1.25, 2.0],
-                         labels=['Light (0.5-0.75)', 'Normal (0.75-1.0)',
-                                'Heavy (1.0-1.25)', 'Very Heavy (1.25-2.0)'])
+    weight_cats = pd.cut(
+        weights,
+        bins=[0, 0.75, 1.0, 1.25, 2.0],
+        labels=[
+            "Light (0.5-0.75)",
+            "Normal (0.75-1.0)",
+            "Heavy (1.0-1.25)",
+            "Very Heavy (1.25-2.0)",
+        ],
+    )
     logger.info("Weight distribution by category:")
     for cat in weight_cats.unique():
         count = (weight_cats == cat).sum()
@@ -190,19 +194,28 @@ def prepare_features(df):
     """
     feature_cols = [
         # Core player features (10)
-        'qb_epa_L3', 'qb_cpoe_L3', 'qb_sack_rate_L3', 'qb_ypa_L3',
-        'wr1_epa_L3', 'wr2_epa_L3', 'wr1_tgt_L3', 'wr2_tgt_L3',
-        'qb_home_away_split', 'qb_consistency',
-
+        "qb_epa_L3",
+        "qb_cpoe_L3",
+        "qb_sack_rate_L3",
+        "qb_ypa_L3",
+        "wr1_epa_L3",
+        "wr2_epa_L3",
+        "wr1_tgt_L3",
+        "wr2_tgt_L3",
+        "qb_home_away_split",
+        "qb_consistency",
         # Game context (2)
-        'spread_close', 'total_close',
-
+        "spread_close",
+        "total_close",
         # Team features (4)
-        'team_off_epa_L3', 'team_pass_rate_L3', 'team_pace_L3', 'team_off_success_L3'
+        "team_off_epa_L3",
+        "team_pass_rate_L3",
+        "team_pace_L3",
+        "team_off_success_L3",
     ]
 
     X = df[feature_cols].copy()
-    y = df['passing_yards'].copy()
+    y = df["passing_yards"].copy()
 
     # Remove any rows with NaN in features or target
     valid_mask = X.notna().all(axis=1) & y.notna()
@@ -214,8 +227,7 @@ def prepare_features(df):
     return X, y, feature_cols
 
 
-def train_and_evaluate(X_train, y_train, X_test, y_test,
-                       sample_weights_train, feature_names):
+def train_and_evaluate(X_train, y_train, X_test, y_test, sample_weights_train, feature_names):
     """Train XGBoost with sample weights and evaluate on test set.
 
     Args:
@@ -227,27 +239,27 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     Returns:
         Tuple of (model, mae, rmse, importance_df)
     """
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TRAINING XGBoost v3.2 with Sample Weighting")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"Training samples: {len(X_train):,}")
     logger.info(f"Test samples: {len(X_test):,}")
     logger.info(f"Features: {len(feature_names)}")
     logger.info("Using sample weights: Yes (based on opponent defensive strength)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # XGBoost hyperparameters (tuned for passing yards)
     params = {
-        'objective': 'reg:squarederror',
-        'max_depth': 6,
-        'learning_rate': 0.05,
-        'n_estimators': 500,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'min_child_weight': 3,
-        'random_state': 42,
-        'n_jobs': -1,
-        'eval_metric': 'mae'
+        "objective": "reg:squarederror",
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "n_estimators": 500,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "min_child_weight": 3,
+        "random_state": 42,
+        "n_jobs": -1,
+        "eval_metric": "mae",
     }
 
     logger.info("\nHyperparameters:")
@@ -260,11 +272,12 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     start_time = time.time()
 
     model.fit(
-        X_train, y_train,
+        X_train,
+        y_train,
         sample_weight=sample_weights_train,  # Apply weights during training
         eval_set=[(X_test, y_test)],
         early_stopping_rounds=50,
-        verbose=False
+        verbose=False,
     )
 
     train_time = time.time() - start_time
@@ -275,7 +288,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
 
     # Calculate metrics
     mae = np.mean(np.abs(y_test - y_pred))
-    rmse = np.sqrt(np.mean((y_test - y_pred)**2))
+    rmse = np.sqrt(np.mean((y_test - y_pred) ** 2))
     mape = np.mean(np.abs((y_test - y_pred) / y_test)) * 100
 
     # Percentile errors
@@ -284,15 +297,14 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     p90_error = np.percentile(abs_errors, 90)
 
     # Feature importance
-    importance_df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': model.feature_importances_
-    }).sort_values('importance', ascending=False)
+    importance_df = pd.DataFrame(
+        {"feature": feature_names, "importance": model.feature_importances_}
+    ).sort_values("importance", ascending=False)
 
     # Results summary
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("RESULTS")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"MAE: {mae:.2f} yards")
     logger.info(f"RMSE: {rmse:.2f} yards")
     logger.info(f"MAPE: {mape:.1f}%")
@@ -312,20 +324,20 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     logger.info(f"  vs v3.1 baseline: {improvement_v31:+.2f}%")
 
     # Success determination
-    logger.info("\n" + "-"*70)
+    logger.info("\n" + "-" * 70)
     if mae < 40.20:
         logger.info("🎯 SUCCESS: Beat v2 baseline (with opponent features)!")
     elif mae < 41.36:
         logger.info("⚠️ MARGINAL: Beat v3.1 but not v2")
     else:
         logger.info("❌ FAILED: Did not beat v3.1 (no improvement)")
-    logger.info("-"*70)
+    logger.info("-" * 70)
 
     logger.info("\nTop 10 Most Important Features:")
     for idx, row in importance_df.head(10).iterrows():
         logger.info(f"  {row['feature']:25s}: {row['importance']:.4f}")
 
-    logger.info("="*70 + "\n")
+    logger.info("=" * 70 + "\n")
 
     return model, mae, rmse, importance_df
 
@@ -360,25 +372,22 @@ def save_results(model, importance_df, mae, rmse, params_dict):
         "test_mae": round(float(mae), 2),
         "test_rmse": round(float(rmse), 2),
         "parameters": params_dict,
-        "baselines": {
-            "v2_with_opponent_features": 40.20,
-            "v3_1_no_opponent_features": 41.36
-        },
+        "baselines": {"v2_with_opponent_features": 40.20, "v3_1_no_opponent_features": 41.36},
         "improvement_vs_v2_pct": round(((40.20 - mae) / 40.20) * 100, 2),
-        "improvement_vs_v31_pct": round(((41.36 - mae) / 41.36) * 100, 2)
+        "improvement_vs_v31_pct": round(((41.36 - mae) / 41.36) * 100, 2),
     }
 
     metadata_path = output_dir / "xgb_exp4_weighting_fixed_metadata.json"
-    with open(metadata_path, 'w') as f:
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
     logger.info(f"✓ Metadata saved: {metadata_path}")
 
 
 def main():
     """Main experiment runner."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("XGBoost Experiment 4: Sample Weighting by Opponent Defensive Strength")
-    logger.info("="*70 + "\n")
+    logger.info("=" * 70 + "\n")
 
     try:
         # Load data
@@ -389,8 +398,8 @@ def main():
 
         # Split into train/test
         logger.info("\nSplitting data...")
-        train_mask = df['season'] <= 2024
-        test_mask = df['season'] == 2025
+        train_mask = df["season"] <= 2024
+        test_mask = df["season"] == 2025
 
         train_df = df[train_mask].copy()
         test_df = df[test_mask].copy()
@@ -429,13 +438,12 @@ def main():
                 "n_estimators": 500,
                 "subsample": 0.8,
                 "colsample_bytree": 0.8,
-                "min_child_weight": 3
-            }
+                "min_child_weight": 3,
+            },
         }
 
         model, mae, rmse, importance_df = train_and_evaluate(
-            X_train, y_train, X_test, y_test,
-            sample_weights_train_clean, feature_names
+            X_train, y_train, X_test, y_test, sample_weights_train_clean, feature_names
         )
 
         # Save results

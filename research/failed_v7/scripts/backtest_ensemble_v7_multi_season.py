@@ -43,8 +43,7 @@ from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as 
 warnings.filterwarnings("ignore")
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -59,8 +58,19 @@ DB_CONFIG = {
 
 # High-roughing defenses (from causal features module)
 HIGH_ROUGHING_DEFENSES = [
-    "HOU", "IND", "LAC", "NYJ", "SEA", "ARI", "BAL",
-    "KC", "CLE", "SF", "CIN", "MIN", "DEN"
+    "HOU",
+    "IND",
+    "LAC",
+    "NYJ",
+    "SEA",
+    "ARI",
+    "BAL",
+    "KC",
+    "CLE",
+    "SF",
+    "CIN",
+    "MIN",
+    "DEN",
 ]
 
 
@@ -110,13 +120,15 @@ def load_test_data(seasons, batch_num=None, total_batches=None):
         AND ph.position_group = 'QB'
         AND pgs.stat_attempts >= 10  -- Minimum attempts threshold
     ORDER BY pgs.season, pgs.week, pgs.player_id
-    """.format(','.join(map(str, seasons)))
+    """.format(
+        ",".join(map(str, seasons))
+    )
 
     df = pd.read_sql_query(query, conn)
     conn.close()
 
     # Add high-roughing defense indicator
-    df['is_high_roughing_defense'] = df['opponent_team'].isin(HIGH_ROUGHING_DEFENSES)
+    df["is_high_roughing_defense"] = df["opponent_team"].isin(HIGH_ROUGHING_DEFENSES)
 
     # Batch processing: Divide data into batches
     if batch_num is not None and total_batches is not None:
@@ -134,7 +146,9 @@ def load_test_data(seasons, batch_num=None, total_batches=None):
     else:
         logger.info(f"Loaded {len(df)} QB games across {len(seasons)} seasons")
 
-    logger.info(f"  High-roughing defense games: {df['is_high_roughing_defense'].sum()} ({df['is_high_roughing_defense'].mean()*100:.1f}%)")
+    logger.info(
+        f"  High-roughing defense games: {df['is_high_roughing_defense'].sum()} ({df['is_high_roughing_defense'].mean()*100:.1f}%)"
+    )
 
     return df
 
@@ -152,7 +166,7 @@ def run_backtest_season(df_season, ensemble_v6, ensemble_v7, season):
 
     for idx, row in df_season.iterrows():
         # Skip if missing critical data
-        if pd.isna(row['opponent_team']) or pd.isna(row['player_team']):
+        if pd.isna(row["opponent_team"]) or pd.isna(row["player_team"]):
             logger.warning(f"Skipping {row['player_name']} W{row['week']}: missing team data")
             pbar.update(1)
             continue
@@ -160,11 +174,9 @@ def run_backtest_season(df_season, ensemble_v6, ensemble_v7, season):
         # v6 prediction (baseline, no causal features)
         try:
             v6_result = ensemble_v6.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week']
+                player_id=row["player_id"], season=row["season"], week=row["week"]
             )
-            v6_mean = v6_result['ensemble_mean']
+            v6_mean = v6_result["ensemble_mean"]
         except Exception as e:
             logger.warning(f"v6 prediction failed for {row['player_name']} W{row['week']}: {e}")
             pbar.update(1)
@@ -173,47 +185,49 @@ def run_backtest_season(df_season, ensemble_v6, ensemble_v7, season):
         # v7 prediction (with causal features)
         try:
             game_weather = {
-                "temp": float(row['temp']) if not pd.isna(row['temp']) else 65.0,
-                "wind": float(row['wind']) if not pd.isna(row['wind']) else 5.0,
-                "precipitation": 0
+                "temp": float(row["temp"]) if not pd.isna(row["temp"]) else 65.0,
+                "wind": float(row["wind"]) if not pd.isna(row["wind"]) else 5.0,
+                "precipitation": 0,
             }
 
             v7_result = ensemble_v7.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week'],
-                opponent_team=row['opponent_team'],
-                player_team=row['player_team'],
-                game_weather=game_weather
+                player_id=row["player_id"],
+                season=row["season"],
+                week=row["week"],
+                opponent_team=row["opponent_team"],
+                player_team=row["player_team"],
+                game_weather=game_weather,
             )
-            v7_mean = v7_result['ensemble_mean']
-            v7_base = v7_result['base_ensemble_mean']
-            causal_adj = v7_result['causal_adjustment']
+            v7_mean = v7_result["ensemble_mean"]
+            v7_base = v7_result["base_ensemble_mean"]
+            causal_adj = v7_result["causal_adjustment"]
         except Exception as e:
             logger.warning(f"v7 prediction failed for {row['player_name']} W{row['week']}: {e}")
             pbar.update(1)
             continue
 
         # Calculate errors
-        v6_error = abs(v6_mean - row['actual_yards'])
-        v7_error = abs(v7_mean - row['actual_yards'])
+        v6_error = abs(v6_mean - row["actual_yards"])
+        v7_error = abs(v7_mean - row["actual_yards"])
 
-        results.append({
-            'player_id': row['player_id'],
-            'player_name': row['player_name'],
-            'season': row['season'],
-            'week': row['week'],
-            'opponent_team': row['opponent_team'],
-            'is_high_roughing_defense': row['is_high_roughing_defense'],
-            'actual_yards': row['actual_yards'],
-            'v6_pred': v6_mean,
-            'v7_pred': v7_mean,
-            'v7_base': v7_base,
-            'causal_adjustment': causal_adj,
-            'v6_error': v6_error,
-            'v7_error': v7_error,
-            'improvement': v6_error - v7_error
-        })
+        results.append(
+            {
+                "player_id": row["player_id"],
+                "player_name": row["player_name"],
+                "season": row["season"],
+                "week": row["week"],
+                "opponent_team": row["opponent_team"],
+                "is_high_roughing_defense": row["is_high_roughing_defense"],
+                "actual_yards": row["actual_yards"],
+                "v6_pred": v6_mean,
+                "v7_pred": v7_mean,
+                "v7_base": v7_base,
+                "causal_adjustment": causal_adj,
+                "v6_error": v6_error,
+                "v7_error": v7_error,
+                "improvement": v6_error - v7_error,
+            }
+        )
 
         pbar.update(1)
 
@@ -226,143 +240,139 @@ def analyze_results(results_all_seasons):
     """Analyze backtest results across all seasons."""
 
     # Overall metrics
-    overall_v6_mae = results_all_seasons['v6_error'].mean()
-    overall_v7_mae = results_all_seasons['v7_error'].mean()
+    overall_v6_mae = results_all_seasons["v6_error"].mean()
+    overall_v7_mae = results_all_seasons["v7_error"].mean()
     overall_improvement = overall_v6_mae - overall_v7_mae
 
     # Paired t-test
     t_stat, p_value = stats.ttest_rel(
-        results_all_seasons['v6_error'],
-        results_all_seasons['v7_error']
+        results_all_seasons["v6_error"], results_all_seasons["v7_error"]
     )
 
     # Per-season metrics
-    season_metrics = results_all_seasons.groupby('season').agg({
-        'v6_error': 'mean',
-        'v7_error': 'mean',
-        'improvement': 'mean'
-    }).reset_index()
+    season_metrics = (
+        results_all_seasons.groupby("season")
+        .agg({"v6_error": "mean", "v7_error": "mean", "improvement": "mean"})
+        .reset_index()
+    )
 
-    season_metrics.columns = ['season', 'v6_mae', 'v7_mae', 'improvement']
+    season_metrics.columns = ["season", "v6_mae", "v7_mae", "improvement"]
 
     # Calculate consistency metric (std of per-season improvements)
-    season_improvement_std = season_metrics['improvement'].std()
+    season_improvement_std = season_metrics["improvement"].std()
 
     # High-roughing defense subgroup
     high_roughing_results = results_all_seasons[
-        results_all_seasons['is_high_roughing_defense'] == True
+        results_all_seasons["is_high_roughing_defense"] == True
     ]
 
     if len(high_roughing_results) > 0:
-        hr_v6_mae = high_roughing_results['v6_error'].mean()
-        hr_v7_mae = high_roughing_results['v7_error'].mean()
+        hr_v6_mae = high_roughing_results["v6_error"].mean()
+        hr_v7_mae = high_roughing_results["v7_error"].mean()
         hr_improvement = hr_v6_mae - hr_v7_mae
         hr_t_stat, hr_p_value = stats.ttest_rel(
-            high_roughing_results['v6_error'],
-            high_roughing_results['v7_error']
+            high_roughing_results["v6_error"], high_roughing_results["v7_error"]
         )
     else:
         hr_v6_mae = hr_v7_mae = hr_improvement = hr_p_value = None
 
     # Low-roughing defense subgroup (for contrast)
     low_roughing_results = results_all_seasons[
-        results_all_seasons['is_high_roughing_defense'] == False
+        results_all_seasons["is_high_roughing_defense"] == False
     ]
 
     if len(low_roughing_results) > 0:
-        lr_v6_mae = low_roughing_results['v6_error'].mean()
-        lr_v7_mae = low_roughing_results['v7_error'].mean()
+        lr_v6_mae = low_roughing_results["v6_error"].mean()
+        lr_v7_mae = low_roughing_results["v7_error"].mean()
         lr_improvement = lr_v6_mae - lr_v7_mae
         lr_t_stat, lr_p_value = stats.ttest_rel(
-            low_roughing_results['v6_error'],
-            low_roughing_results['v7_error']
+            low_roughing_results["v6_error"], low_roughing_results["v7_error"]
         )
     else:
         lr_v6_mae = lr_v7_mae = lr_improvement = lr_p_value = None
 
     # Effect size (Cohen's d)
-    cohens_d = (
-        (overall_v6_mae - overall_v7_mae) /
-        np.sqrt(
-            (results_all_seasons['v6_error'].std() ** 2 +
-             results_all_seasons['v7_error'].std() ** 2) / 2
-        )
+    cohens_d = (overall_v6_mae - overall_v7_mae) / np.sqrt(
+        (results_all_seasons["v6_error"].std() ** 2 + results_all_seasons["v7_error"].std() ** 2)
+        / 2
     )
 
     # Causal adjustment statistics
-    causal_adj_mean = results_all_seasons['causal_adjustment'].mean()
-    causal_adj_nonzero = results_all_seasons[
-        results_all_seasons['causal_adjustment'] != 0
-    ]['causal_adjustment'].mean()
-    causal_adj_pct = (results_all_seasons['causal_adjustment'] != 0).mean() * 100
+    causal_adj_mean = results_all_seasons["causal_adjustment"].mean()
+    causal_adj_nonzero = results_all_seasons[results_all_seasons["causal_adjustment"] != 0][
+        "causal_adjustment"
+    ].mean()
+    causal_adj_pct = (results_all_seasons["causal_adjustment"] != 0).mean() * 100
 
     return {
-        'overall': {
-            'v6_mae': overall_v6_mae,
-            'v7_mae': overall_v7_mae,
-            'improvement': overall_improvement,
-            'improvement_pct': (overall_improvement / overall_v6_mae) * 100,
-            'p_value': p_value,
-            't_stat': t_stat,
-            'cohens_d': cohens_d,
-            'n_games': len(results_all_seasons)
+        "overall": {
+            "v6_mae": overall_v6_mae,
+            "v7_mae": overall_v7_mae,
+            "improvement": overall_improvement,
+            "improvement_pct": (overall_improvement / overall_v6_mae) * 100,
+            "p_value": p_value,
+            "t_stat": t_stat,
+            "cohens_d": cohens_d,
+            "n_games": len(results_all_seasons),
         },
-        'per_season': season_metrics.to_dict('records'),
-        'consistency': {
-            'season_improvement_std': season_improvement_std,
-            'is_consistent': season_improvement_std < 2.0  # Success criterion
+        "per_season": season_metrics.to_dict("records"),
+        "consistency": {
+            "season_improvement_std": season_improvement_std,
+            "is_consistent": season_improvement_std < 2.0,  # Success criterion
         },
-        'high_roughing_defense': {
-            'v6_mae': hr_v6_mae,
-            'v7_mae': hr_v7_mae,
-            'improvement': hr_improvement,
-            'improvement_pct': (hr_improvement / hr_v6_mae * 100) if hr_v6_mae else None,
-            'p_value': hr_p_value,
-            'n_games': len(high_roughing_results) if high_roughing_results is not None else 0
+        "high_roughing_defense": {
+            "v6_mae": hr_v6_mae,
+            "v7_mae": hr_v7_mae,
+            "improvement": hr_improvement,
+            "improvement_pct": (hr_improvement / hr_v6_mae * 100) if hr_v6_mae else None,
+            "p_value": hr_p_value,
+            "n_games": len(high_roughing_results) if high_roughing_results is not None else 0,
         },
-        'low_roughing_defense': {
-            'v6_mae': lr_v6_mae,
-            'v7_mae': lr_v7_mae,
-            'improvement': lr_improvement,
-            'improvement_pct': (lr_improvement / lr_v6_mae * 100) if lr_v6_mae else None,
-            'p_value': lr_p_value,
-            'n_games': len(low_roughing_results) if low_roughing_results is not None else 0
+        "low_roughing_defense": {
+            "v6_mae": lr_v6_mae,
+            "v7_mae": lr_v7_mae,
+            "improvement": lr_improvement,
+            "improvement_pct": (lr_improvement / lr_v6_mae * 100) if lr_v6_mae else None,
+            "p_value": lr_p_value,
+            "n_games": len(low_roughing_results) if low_roughing_results is not None else 0,
         },
-        'causal_adjustment': {
-            'mean_all_games': causal_adj_mean,
-            'mean_when_applied': causal_adj_nonzero,
-            'pct_games_adjusted': causal_adj_pct
-        }
+        "causal_adjustment": {
+            "mean_all_games": causal_adj_mean,
+            "mean_when_applied": causal_adj_nonzero,
+            "pct_games_adjusted": causal_adj_pct,
+        },
     }
 
 
 def print_results(analysis):
     """Print comprehensive results summary."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("MULTI-SEASON BACKTEST RESULTS: Ensemble v7.0 vs v6.0")
-    print("="*80)
+    print("=" * 80)
 
     # Overall results
     print(f"\n📊 Overall Performance ({analysis['overall']['n_games']} games):")
     print(f"  v6.0 MAE: {analysis['overall']['v6_mae']:.2f} yards")
     print(f"  v7.0 MAE: {analysis['overall']['v7_mae']:.2f} yards")
-    print(f"  Improvement: {analysis['overall']['improvement']:.2f} yards ({analysis['overall']['improvement_pct']:.2f}%)")
+    print(
+        f"  Improvement: {analysis['overall']['improvement']:.2f} yards ({analysis['overall']['improvement_pct']:.2f}%)"
+    )
     print(f"  p-value: {analysis['overall']['p_value']:.6f}")
     print(f"  Cohen's d: {analysis['overall']['cohens_d']:.3f}")
 
-    if analysis['overall']['p_value'] < 0.05:
+    if analysis["overall"]["p_value"] < 0.05:
         print("  ✅ STATISTICALLY SIGNIFICANT (p < 0.05)")
     else:
         print("  ❌ NOT SIGNIFICANT (p ≥ 0.05)")
 
-    if analysis['overall']['improvement'] > 2.0:
+    if analysis["overall"]["improvement"] > 2.0:
         print("  ✅ MEETS SUCCESS CRITERION (improvement > 2 yards)")
     else:
         print("  ⚠️  BELOW SUCCESS CRITERION (improvement target: 2+ yards)")
 
     # Per-season breakdown
     print("\n📅 Per-Season Breakdown:")
-    for season_result in analysis['per_season']:
+    for season_result in analysis["per_season"]:
         print(f"  {season_result['season']}:")
         print(f"    v6.0 MAE: {season_result['v6_mae']:.2f} yards")
         print(f"    v7.0 MAE: {season_result['v7_mae']:.2f} yards")
@@ -370,29 +380,31 @@ def print_results(analysis):
 
     # Consistency metric
     print("\n🎯 Consistency Metric:")
-    print(f"  Season improvement std: {analysis['consistency']['season_improvement_std']:.2f} yards")
-    if analysis['consistency']['is_consistent']:
+    print(
+        f"  Season improvement std: {analysis['consistency']['season_improvement_std']:.2f} yards"
+    )
+    if analysis["consistency"]["is_consistent"]:
         print("  ✅ CONSISTENT (std < 2 yards)")
     else:
         print("  ⚠️  INCONSISTENT (std ≥ 2 yards)")
 
     # High-roughing defense subgroup
-    if analysis['high_roughing_defense']['n_games'] > 0:
-        hr = analysis['high_roughing_defense']
+    if analysis["high_roughing_defense"]["n_games"] > 0:
+        hr = analysis["high_roughing_defense"]
         print(f"\n⚡ High-Roughing Defense Subgroup ({hr['n_games']} games):")
         print(f"  v6.0 MAE: {hr['v6_mae']:.2f} yards")
         print(f"  v7.0 MAE: {hr['v7_mae']:.2f} yards")
         print(f"  Improvement: {hr['improvement']:.2f} yards ({hr['improvement_pct']:.2f}%)")
         print(f"  p-value: {hr['p_value']:.6f}")
 
-        if hr['p_value'] < 0.05:
+        if hr["p_value"] < 0.05:
             print("  ✅ SIGNIFICANT (DiD Roughing effect observable)")
         else:
             print("  ⚠️  NOT SIGNIFICANT")
 
     # Low-roughing defense subgroup
-    if analysis['low_roughing_defense']['n_games'] > 0:
-        lr = analysis['low_roughing_defense']
+    if analysis["low_roughing_defense"]["n_games"] > 0:
+        lr = analysis["low_roughing_defense"]
         print(f"\n🔷 Low-Roughing Defense Subgroup ({lr['n_games']} games):")
         print(f"  v6.0 MAE: {lr['v6_mae']:.2f} yards")
         print(f"  v7.0 MAE: {lr['v7_mae']:.2f} yards")
@@ -400,7 +412,7 @@ def print_results(analysis):
         print(f"  p-value: {lr['p_value']:.6f}")
 
     # Causal adjustment statistics
-    causal = analysis['causal_adjustment']
+    causal = analysis["causal_adjustment"]
     print("\n🎲 Causal Adjustment Statistics:")
     print(f"  Mean adjustment (all games): {causal['mean_all_games']:.2f} yards")
     print(f"  Mean adjustment (when applied): {causal['mean_when_applied']:.2f} yards")
@@ -409,9 +421,9 @@ def print_results(analysis):
     # Production decision
     print("\n🚀 Production Decision:")
     meets_criteria = (
-        analysis['overall']['improvement'] > 2.0 and
-        analysis['overall']['p_value'] < 0.05 and
-        analysis['consistency']['is_consistent']
+        analysis["overall"]["improvement"] > 2.0
+        and analysis["overall"]["p_value"] < 0.05
+        and analysis["consistency"]["is_consistent"]
     )
 
     if meets_criteria:
@@ -422,9 +434,15 @@ def print_results(analysis):
         print("\n  Recommendation: Deploy ensemble v7.0 to production")
     else:
         print("  ⚠️  NEEDS ITERATION")
-        print(f"     - MAE improvement > 2 yards: {'✅' if analysis['overall']['improvement'] > 2.0 else '❌'}")
-        print(f"     - Statistical significance (p < 0.05): {'✅' if analysis['overall']['p_value'] < 0.05 else '❌'}")
-        print(f"     - Cross-season consistency (std < 2): {'✅' if analysis['consistency']['is_consistent'] else '❌'}")
+        print(
+            f"     - MAE improvement > 2 yards: {'✅' if analysis['overall']['improvement'] > 2.0 else '❌'}"
+        )
+        print(
+            f"     - Statistical significance (p < 0.05): {'✅' if analysis['overall']['p_value'] < 0.05 else '❌'}"
+        )
+        print(
+            f"     - Cross-season consistency (std < 2): {'✅' if analysis['consistency']['is_consistent'] else '❌'}"
+        )
         print("\n  Recommendation: Iterate on causal features or weights")
 
 
@@ -433,29 +451,26 @@ def main():
         description="Multi-season backtest for ensemble v7.0 (causal features)"
     )
     parser.add_argument(
-        '--seasons',
-        nargs='+',
+        "--seasons",
+        nargs="+",
         type=int,
         default=[2022, 2023, 2024],
-        help="Seasons to backtest (default: 2022 2023 2024)"
+        help="Seasons to backtest (default: 2022 2023 2024)",
     )
     parser.add_argument(
-        '--output-dir',
+        "--output-dir",
         type=str,
-        default='results',
-        help="Output directory for results (default: results/)"
+        default="results",
+        help="Output directory for results (default: results/)",
     )
     parser.add_argument(
-        '--batch',
-        type=int,
-        default=None,
-        help="Batch number (1-indexed) for batch processing"
+        "--batch", type=int, default=None, help="Batch number (1-indexed) for batch processing"
     )
     parser.add_argument(
-        '--total-batches',
+        "--total-batches",
         type=int,
         default=None,
-        help="Total number of batches for batch processing"
+        help="Total number of batches for batch processing",
     )
     args = parser.parse_args()
 
@@ -481,8 +496,8 @@ def main():
 
     # Load ensembles
     logger.info("\nLoading ensembles...")
-    ensemble_v6 = EnsembleV6(db_password=DB_CONFIG['password'])
-    ensemble_v7 = EnsembleV7(db_password=DB_CONFIG['password'])
+    ensemble_v6 = EnsembleV6(db_password=DB_CONFIG["password"])
+    ensemble_v7 = EnsembleV7(db_password=DB_CONFIG["password"])
     logger.info("✅ Ensembles loaded")
 
     # Load test data (with optional batch filtering)
@@ -491,7 +506,7 @@ def main():
     # Run backtest for each season
     all_results = []
     for season in args.seasons:
-        df_season = df[df['season'] == season]
+        df_season = df[df["season"] == season]
         if len(df_season) == 0:
             logger.info(f"No games for season {season} in this batch, skipping...")
             continue
@@ -512,12 +527,12 @@ def main():
     print_results(analysis)
 
     # Save results with batch suffix
-    results_csv_path = output_dir / f'backtest_v7_multi_season_results{batch_suffix}.csv'
+    results_csv_path = output_dir / f"backtest_v7_multi_season_results{batch_suffix}.csv"
     results_all.to_csv(results_csv_path, index=False)
     logger.info(f"\n✅ Detailed results saved to: {results_csv_path}")
 
-    analysis_json_path = output_dir / f'backtest_v7_multi_season_analysis{batch_suffix}.json'
-    with open(analysis_json_path, 'w') as f:
+    analysis_json_path = output_dir / f"backtest_v7_multi_season_analysis{batch_suffix}.json"
+    with open(analysis_json_path, "w") as f:
         json.dump(analysis, f, indent=2, default=str)
     logger.info(f"✅ Analysis summary saved to: {analysis_json_path}")
 

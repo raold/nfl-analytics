@@ -125,22 +125,16 @@ def example2_file_based_routing():
             "task": "Update model performance metrics",
             "files": [
                 "models/bayesian/bnn_passing_v1.pkl",
-                "models/bayesian/bnn_passing_v1_metadata.json"
-            ]
+                "models/bayesian/bnn_passing_v1_metadata.json",
+            ],
         },
         {
             "task": "Fix visualization bug",
-            "files": [
-                "dashboard/app.py",
-                "grafana/provisioning/dashboards/system.json"
-            ]
+            "files": ["dashboard/app.py", "grafana/provisioning/dashboards/system.json"],
         },
         {
             "task": "Add new feature columns",
-            "files": [
-                "db/migrations/027_new_features.sql",
-                "data/feature_engineering.py"
-            ]
+            "files": ["db/migrations/027_new_features.sql", "data/feature_engineering.py"],
         },
     ]
 
@@ -148,10 +142,7 @@ def example2_file_based_routing():
         print(f"Scenario: {scenario['task']}")
         print(f"Files: {', '.join(scenario['files'])}")
 
-        routing = coordinator.analyze_task(
-            scenario['task'],
-            files=scenario['files']
-        )
+        routing = coordinator.analyze_task(scenario["task"], files=scenario["files"])
 
         agent = coordinator.get_agent_info(routing.primary_agent)
         print(f"Routed to: {agent.name} (confidence: {routing.confidence:.1%})")
@@ -177,31 +168,46 @@ def example3_multi_component_orchestration():
 
     # Define subtasks for each component
     subtasks = [
-        ("Data Layer", [
-            "Validate production data integrity",
-            "Run feature engineering pipeline",
-            "Refresh materialized views",
-        ]),
-        ("Model Management", [
-            "Load trained models",
-            "Validate model checksums",
-            "Update model registry",
-        ]),
-        ("Prediction Engine", [
-            "Initialize ensemble predictor",
-            "Run validation predictions",
-            "Deploy to production API",
-        ]),
-        ("Frontend", [
-            "Update Grafana dashboards",
-            "Refresh Streamlit displays",
-            "Enable production monitoring",
-        ]),
-        ("Documentation", [
-            "Create deployment milestone doc",
-            "Update production checklist",
-            "Log deployment metadata",
-        ]),
+        (
+            "Data Layer",
+            [
+                "Validate production data integrity",
+                "Run feature engineering pipeline",
+                "Refresh materialized views",
+            ],
+        ),
+        (
+            "Model Management",
+            [
+                "Load trained models",
+                "Validate model checksums",
+                "Update model registry",
+            ],
+        ),
+        (
+            "Prediction Engine",
+            [
+                "Initialize ensemble predictor",
+                "Run validation predictions",
+                "Deploy to production API",
+            ],
+        ),
+        (
+            "Frontend",
+            [
+                "Update Grafana dashboards",
+                "Refresh Streamlit displays",
+                "Enable production monitoring",
+            ],
+        ),
+        (
+            "Documentation",
+            [
+                "Create deployment milestone doc",
+                "Update production checklist",
+                "Log deployment metadata",
+            ],
+        ),
     ]
 
     # Get workflow for prediction engine (our primary)
@@ -240,10 +246,7 @@ def example4_training_script_integration():
     training_window = "2018-2024"
 
     task = f"Train {model_type} model with {training_window} data"
-    files = [
-        "py/models/train_bnn_passing.py",
-        "models/bayesian/bnn_passing_v2.pkl"
-    ]
+    files = ["py/models/train_bnn_passing.py", "models/bayesian/bnn_passing_v2.pkl"]
 
     print("Training Script: train_bnn_passing.py")
     print(f"Task: {task}\n")
@@ -324,8 +327,9 @@ def example5_agent_capabilities_query():
             capability = coordinator.get_agent_info(agent_type)
 
             # Check if keyword in agent keywords or responsibilities
-            if (keyword in capability.keywords or
-                any(keyword in resp.lower() for resp in capability.responsibilities)):
+            if keyword in capability.keywords or any(
+                keyword in resp.lower() for resp in capability.responsibilities
+            ):
                 matching_agents.append(capability.name)
 
         print(f"A: {', '.join(matching_agents)}\n")
@@ -349,14 +353,14 @@ def main():
     example = sys.argv[1].lower()
 
     examples = {
-        'example1': example1_pre_task_planning,
-        'example2': example2_file_based_routing,
-        'example3': example3_multi_component_orchestration,
-        'example4': example4_training_script_integration,
-        'example5': example5_agent_capabilities_query,
+        "example1": example1_pre_task_planning,
+        "example2": example2_file_based_routing,
+        "example3": example3_multi_component_orchestration,
+        "example4": example4_training_script_integration,
+        "example5": example5_agent_capabilities_query,
     }
 
-    if example == 'all':
+    if example == "all":
         for func in examples.values():
             func()
             print("\n" + "-" * 80 + "\n")

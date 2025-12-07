@@ -53,6 +53,7 @@ from dashboard.queries import GameQueries, ModelQueries, PredictionQueries, Syst
 # Import utility functions
 try:
     from dashboard.utils.db import get_db_connection
+
     POOLING_AVAILABLE = True
 except ImportError:
     POOLING_AVAILABLE = False
@@ -64,7 +65,7 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD")
+    "password": os.getenv("DB_PASSWORD"),
 }
 
 # Page configuration
@@ -72,12 +73,13 @@ st.set_page_config(
     page_title="NFL Analytics Dashboard",
     page_icon="🏈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # ============================================================================
 # PAGE RENDERING FUNCTIONS
 # ============================================================================
+
 
 def render_predictions_page():
     """Render the main predictions analytics page."""
@@ -94,8 +96,10 @@ def render_predictions_page():
     try:
         with get_db_connection() as conn:
             # Get production/staging models
-            df_models = ModelQueries.models_by_status(conn, status='production')
-            model_versions = df_models['model_version'].unique().tolist() if not df_models.empty else []
+            df_models = ModelQueries.models_by_status(conn, status="production")
+            model_versions = (
+                df_models["model_version"].unique().tolist() if not df_models.empty else []
+            )
     except:
         model_versions = []
 
@@ -110,9 +114,7 @@ def render_predictions_page():
             with get_db_connection() as conn:
                 # Get retrospective metrics
                 df_predictions = PredictionQueries.retrospective_metrics(
-                    conn,
-                    model_version=model_filter,
-                    season=season_filter
+                    conn, model_version=model_filter, season=season_filter
                 )
 
                 # Get performance over time
@@ -260,7 +262,7 @@ def render_system_status_page():
         {"name": "Redis", "host": "localhost", "port": 6379},
         {"name": "FastAPI", "host": "localhost", "port": 8000},
         {"name": "Prometheus", "host": "localhost", "port": 9090},
-        {"name": "Grafana", "host": "localhost", "port": 3000}
+        {"name": "Grafana", "host": "localhost", "port": 3000},
     ]
 
     col1, col2, col3 = st.columns(3)
@@ -337,6 +339,7 @@ def render_data_summary_page():
 # MAIN APPLICATION
 # ============================================================================
 
+
 def main():
     """Main application entry point."""
     st.title("🏈 NFL Analytics Monitoring Dashboard")
@@ -352,9 +355,9 @@ def main():
             "🎯 Game Predictions",
             "🤖 Model Status",
             "⚙️ System Status",
-            "📊 Data Summary"
+            "📊 Data Summary",
         ],
-        index=0
+        index=0,
     )
 
     # Route to appropriate page

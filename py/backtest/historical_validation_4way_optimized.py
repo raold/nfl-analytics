@@ -60,8 +60,7 @@ from py.utils.database_pool import DatabasePoolManager
 from py.utils.feature_cache import FeatureCache
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -172,7 +171,11 @@ class OptimizedHistoricalValidator:
         # Load XGBoost
         try:
             import xgboost as xgb
-            xgb_path = Path(__file__).parent.parent.parent / "models/xgboost/passing_xgboost_v2_canonical.pkl"
+
+            xgb_path = (
+                Path(__file__).parent.parent.parent
+                / "models/xgboost/passing_xgboost_v2_canonical.pkl"
+            )
             if xgb_path.exists():
                 self.xgboost_model = xgb.Booster()
                 self.xgboost_model.load_model(str(xgb_path))
@@ -184,10 +187,15 @@ class OptimizedHistoricalValidator:
 
         # Load state-space skills
         try:
-            skills_path = Path(__file__).parent.parent.parent / "models/bayesian/simplified_random_walk_skills_v2.csv"
+            skills_path = (
+                Path(__file__).parent.parent.parent
+                / "models/bayesian/simplified_random_walk_skills_v2.csv"
+            )
             if skills_path.exists():
                 self.state_space_skills_df = pd.read_csv(skills_path)
-                logger.info(f"  ✅ State-space skills loaded: {len(self.state_space_skills_df):,} rows")
+                logger.info(
+                    f"  ✅ State-space skills loaded: {len(self.state_space_skills_df):,} rows"
+                )
             else:
                 logger.warning(f"  ⚠️  State-space skills not found: {skills_path}")
         except Exception as e:
@@ -197,22 +205,30 @@ class OptimizedHistoricalValidator:
         try:
             import rpy2.robjects as ro
 
-            ro.r('suppressPackageStartupMessages(library(brms))')
+            ro.r("suppressPackageStartupMessages(library(brms))")
 
             # Hierarchical v2
-            hier_path = Path(__file__).parent.parent.parent / "models/bayesian/passing_yards_hierarchical_v2.rds"
+            hier_path = (
+                Path(__file__).parent.parent.parent
+                / "models/bayesian/passing_yards_hierarchical_v2.rds"
+            )
             if hier_path.exists():
                 ro.r(f'hierarchical_model <- readRDS("{hier_path}")')
-                self.r_models['hierarchical_v2'] = 'hierarchical_model'  # Store R variable name
+                self.r_models["hierarchical_v2"] = "hierarchical_model"  # Store R variable name
                 logger.info("  ✅ Hierarchical v2 loaded")
             else:
                 logger.warning(f"  ⚠️  Hierarchical v2 not found: {hier_path}")
 
             # Informative Priors v2
-            inf_path = Path(__file__).parent.parent.parent / "models/bayesian/passing_informative_priors_v2.rds"
+            inf_path = (
+                Path(__file__).parent.parent.parent
+                / "models/bayesian/passing_informative_priors_v2.rds"
+            )
             if inf_path.exists():
                 ro.r(f'informative_model <- readRDS("{inf_path}")')
-                self.r_models['informative_priors_v2'] = 'informative_model'  # Store R variable name
+                self.r_models["informative_priors_v2"] = (
+                    "informative_model"  # Store R variable name
+                )
                 logger.info("  ✅ Informative Priors v2 loaded")
             else:
                 logger.warning(f"  ⚠️  Informative Priors v2 not found: {inf_path}")
@@ -274,21 +290,16 @@ class OptimizedHistoricalValidator:
                 query,
                 conn,
                 params={
-                    'start_season': self.start_season,
-                    'end_season': self.end_season,
-                    'end_week': self.end_week
-                }
+                    "start_season": self.start_season,
+                    "end_season": self.end_season,
+                    "end_week": self.end_week,
+                },
             )
 
         logger.info(f"Loaded {len(df)} player-game records from {df['game_id'].nunique()} games")
         return df
 
-    def _get_player_features_cached(
-        self,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> dict | None:
+    def _get_player_features_cached(self, player_id: str, season: int, week: int) -> dict | None:
         """
         Get player features with caching.
 
@@ -341,9 +352,7 @@ class OptimizedHistoricalValidator:
 
         with self.db_pool.get_connection() as conn:
             df = pd.read_sql_query(
-                query,
-                conn,
-                params={'player_id': player_id, 'season': season, 'week': week}
+                query, conn, params={"player_id": player_id, "season": season, "week": week}
             )
 
         if len(df) == 0:
@@ -357,11 +366,7 @@ class OptimizedHistoricalValidator:
         return features
 
     def _get_r_prediction_cached(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        model_name: str
+        self, player_id: str, season: int, week: int, model_name: str
     ) -> tuple[float, float] | None:
         """
         Get R model prediction using cached model object.
@@ -394,15 +399,17 @@ class OptimizedHistoricalValidator:
 
             # Use CACHED R model object (no disk I/O!)
             r_model_var = self.r_models[model_name]
-            ro.r.assign('new_data', r_df)
-            ro.r('new_data$log_attempts <- log(pmax(new_data$attempts, 1))')
-            ro.r(f'posterior_preds <- posterior_predict({r_model_var}, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)')
-            ro.r('posterior_preds_exp <- exp(posterior_preds)')
-            ro.r('pred_mean <- mean(posterior_preds_exp)')
-            ro.r('pred_sd <- sd(posterior_preds_exp)')
+            ro.r.assign("new_data", r_df)
+            ro.r("new_data$log_attempts <- log(pmax(new_data$attempts, 1))")
+            ro.r(
+                f"posterior_preds <- posterior_predict({r_model_var}, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)"
+            )
+            ro.r("posterior_preds_exp <- exp(posterior_preds)")
+            ro.r("pred_mean <- mean(posterior_preds_exp)")
+            ro.r("pred_sd <- sd(posterior_preds_exp)")
 
-            mean_pred = float(ro.r('pred_mean')[0])
-            std_pred = float(ro.r('pred_sd')[0])
+            mean_pred = float(ro.r("pred_mean")[0])
+            std_pred = float(ro.r("pred_sd")[0])
 
             return (mean_pred, std_pred)
 
@@ -411,10 +418,7 @@ class OptimizedHistoricalValidator:
             return None
 
     def _get_state_space_prediction_cached(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get state-space prediction using cached skills dataframe.
@@ -433,18 +437,18 @@ class OptimizedHistoricalValidator:
             if features is None:
                 return None
 
-            attempts = features.get('attempts', 30)
-            is_home = features.get('is_home', 0)
+            attempts = features.get("attempts", 30)
+            is_home = features.get("is_home", 0)
 
             # Get player skill from cached dataframe
             player_skills = self.state_space_skills_df[
-                self.state_space_skills_df['player_id'] == player_id
+                self.state_space_skills_df["player_id"] == player_id
             ]
 
             if len(player_skills) == 0:
                 return None
 
-            latest_skill = player_skills.iloc[-1]['skill_mean']
+            latest_skill = player_skills.iloc[-1]["skill_mean"]
 
             # State-space formula
             home_effect = 0.05 if is_home else 0.0
@@ -464,10 +468,7 @@ class OptimizedHistoricalValidator:
             return None
 
     def _get_xgboost_prediction_cached(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get XGBoost prediction with caching (deterministic).
@@ -488,21 +489,21 @@ class OptimizedHistoricalValidator:
 
             # Create feature hash for caching
             feature_str = f"{player_id}:{season}:{week}:xgboost"
-            feature_hash = hashlib.sha256(feature_str.encode('utf-8')).hexdigest()
+            feature_hash = hashlib.sha256(feature_str.encode("utf-8")).hexdigest()
 
             # Check cache
             if feature_hash in self.xgboost_pred_cache:
                 return self.xgboost_pred_cache[feature_hash]
 
             # Feature engineering
-            yards = features.get('yards', 0)
-            attempts = features.get('attempts', 0)
-            touchdowns = features.get('touchdowns', 0)
-            spread_line = features.get('spread_line', 0)
-            total_close = features.get('total_close', 47.0)
-            temp = features.get('temp', 70.0)
-            wind = features.get('wind', 5.0)
-            is_home = features.get('is_home', 0)
+            yards = features.get("yards", 0)
+            attempts = features.get("attempts", 0)
+            touchdowns = features.get("touchdowns", 0)
+            spread_line = features.get("spread_line", 0)
+            total_close = features.get("total_close", 47.0)
+            temp = features.get("temp", 70.0)
+            wind = features.get("wind", 5.0)
+            is_home = features.get("is_home", 0)
 
             log_attempts = np.log1p(attempts)
             yards_per_attempt = yards / attempts if attempts > 0 else 7.0
@@ -533,6 +534,7 @@ class OptimizedHistoricalValidator:
             ]
 
             import xgboost as xgb
+
             X = np.array(feature_cols).reshape(1, -1)
             dmatrix = xgb.DMatrix(X)
 
@@ -550,12 +552,7 @@ class OptimizedHistoricalValidator:
             logger.warning(f"⚠️  XGBoost prediction failed: {e}")
             return None
 
-    def predict_ensemble(
-        self,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> dict:
+    def predict_ensemble(self, player_id: str, season: int, week: int) -> dict:
         """
         Generate 4-way ensemble prediction with all optimizations.
 
@@ -607,7 +604,12 @@ class OptimizedHistoricalValidator:
         stds = []
         active_weights = []
 
-        for model_name in ["state_space_v2", "hierarchical_v2", "xgboost_v2", "informative_priors_v2"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "xgboost_v2",
+            "informative_priors_v2",
+        ]:
             if model_name in predictions:
                 means.append(predictions[model_name][0])
                 stds.append(predictions[model_name][1])
@@ -619,7 +621,7 @@ class OptimizedHistoricalValidator:
         active_weights /= active_weights.sum()
 
         ensemble_mean = np.sum(active_weights * means)
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_std = np.sqrt(within_var + between_var)
 
@@ -644,11 +646,7 @@ class OptimizedHistoricalValidator:
             return (100 / abs(american_odds)) + 1
 
     def calculate_kelly_bet_size(
-        self,
-        edge: float,
-        prob_win: float,
-        odds: int,
-        bankroll: float
+        self, edge: float, prob_win: float, odds: int, bankroll: float
     ) -> float:
         """Calculate Kelly criterion bet size."""
         decimal_odds = self.american_to_decimal(odds)
@@ -665,31 +663,31 @@ class OptimizedHistoricalValidator:
     def process_game(self, row: pd.Series) -> dict | None:
         """Process a single player-game and generate prediction."""
         try:
-            is_home = (row['team'] == row['home_team'])
-            line = self.simulate_betting_line(row['passing_yards'])
+            is_home = row["team"] == row["home_team"]
+            line = self.simulate_betting_line(row["passing_yards"])
 
             # Generate ensemble prediction
             prediction = self.predict_ensemble(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week']
+                player_id=row["player_id"], season=row["season"], week=row["week"]
             )
 
-            if prediction['ensemble_mean'] is None:
+            if prediction["ensemble_mean"] is None:
                 return None
 
             # Determine bet side
-            ensemble_mean = prediction['ensemble_mean']
-            ensemble_std = prediction['ensemble_std']
+            ensemble_mean = prediction["ensemble_mean"]
+            ensemble_std = prediction["ensemble_std"]
 
             if ensemble_mean > line:
                 side = "over"
                 # Approximate prob from normal distribution
                 from scipy import stats as sp_stats
+
                 prob_win = 1 - sp_stats.norm.cdf(line, loc=ensemble_mean, scale=ensemble_std)
             else:
                 side = "under"
                 from scipy import stats as sp_stats
+
                 prob_win = sp_stats.norm.cdf(line, loc=ensemble_mean, scale=ensemble_std)
 
             # Calculate edge
@@ -702,23 +700,20 @@ class OptimizedHistoricalValidator:
             # Calculate bet size
             odds = -110
             bet_size = self.calculate_kelly_bet_size(
-                edge=edge,
-                prob_win=prob_win,
-                odds=odds,
-                bankroll=self.bankroll
+                edge=edge, prob_win=prob_win, odds=odds, bankroll=self.bankroll
             )
 
             if bet_size < 10:
                 return None
 
             # Determine outcome
-            actual = row['passing_yards']
+            actual = row["passing_yards"]
             if side == "over":
-                win = (actual > line)
+                win = actual > line
             else:
-                win = (actual < line)
+                win = actual < line
 
-            push = (actual == line)
+            push = actual == line
 
             # Calculate P&L
             if push:
@@ -734,26 +729,26 @@ class OptimizedHistoricalValidator:
             self.bankroll += pnl
 
             return {
-                'game_id': row['game_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'player_name': row['player_name'],
-                'player_id': row['player_id'],
-                'team': row['team'],
-                'opponent': row['away_team'] if is_home else row['home_team'],
-                'is_home': is_home,
-                'line': line,
-                'side': side,
-                'odds': odds,
-                'bet_size': bet_size,
-                'prediction_mean': ensemble_mean,
-                'prediction_std': ensemble_std,
-                'edge': edge,
-                'prob_win': prob_win,
-                'actual_yards': actual,
-                'status': status,
-                'pnl': pnl,
-                'bankroll': self.bankroll,
+                "game_id": row["game_id"],
+                "season": row["season"],
+                "week": row["week"],
+                "player_name": row["player_name"],
+                "player_id": row["player_id"],
+                "team": row["team"],
+                "opponent": row["away_team"] if is_home else row["home_team"],
+                "is_home": is_home,
+                "line": line,
+                "side": side,
+                "odds": odds,
+                "bet_size": bet_size,
+                "prediction_mean": ensemble_mean,
+                "prediction_std": ensemble_std,
+                "edge": edge,
+                "prob_win": prob_win,
+                "actual_yards": actual,
+                "status": status,
+                "pnl": pnl,
+                "bankroll": self.bankroll,
             }
 
         except Exception as e:
@@ -762,9 +757,9 @@ class OptimizedHistoricalValidator:
 
     def run_backtest(self) -> pd.DataFrame:
         """Run historical validation backtest with all optimizations."""
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("OPTIMIZED HISTORICAL VALIDATION (4-WAY ENSEMBLE)")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         start_time = time.time()
 
@@ -806,12 +801,14 @@ class OptimizedHistoricalValidator:
         logger.info("\n✅ Backtest complete!")
         logger.info(f"  Total positions: {len(results_df)}")
         logger.info(f"  Filtered out: {failed_count}")
-        logger.info(f"  Processing time: {elapsed/60:.1f} minutes ({len(games_df)/elapsed:.1f} games/sec)")
+        logger.info(
+            f"  Processing time: {elapsed/60:.1f} minutes ({len(games_df)/elapsed:.1f} games/sec)"
+        )
 
         # Print optimization stats
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("OPTIMIZATION STATISTICS")
-        logger.info("="*80)
+        logger.info("=" * 80)
         self.feature_cache.print_stats()
 
         logger.info("\nXGBoost Prediction Cache:")
@@ -828,55 +825,55 @@ class OptimizedHistoricalValidator:
             return {}
 
         total_bets = len(results_df)
-        wins = (results_df['status'] == 'win').sum()
-        losses = (results_df['status'] == 'loss').sum()
-        pushes = (results_df['status'] == 'push').sum()
+        wins = (results_df["status"] == "win").sum()
+        losses = (results_df["status"] == "loss").sum()
+        pushes = (results_df["status"] == "push").sum()
 
         win_rate = wins / (wins + losses) if (wins + losses) > 0 else 0
 
-        total_wagered = results_df['bet_size'].sum()
-        total_pnl = results_df['pnl'].sum()
+        total_wagered = results_df["bet_size"].sum()
+        total_pnl = results_df["pnl"].sum()
         roi = (total_pnl / total_wagered) if total_wagered > 0 else 0
 
-        returns = results_df['pnl'] / results_df['bet_size']
+        returns = results_df["pnl"] / results_df["bet_size"]
         sharpe = (returns.mean() / returns.std()) * np.sqrt(252) if returns.std() > 0 else 0
 
-        cumulative_pnl = results_df['pnl'].cumsum()
+        cumulative_pnl = results_df["pnl"].cumsum()
         running_max = cumulative_pnl.expanding().max()
         drawdown = cumulative_pnl - running_max
         max_drawdown = drawdown.min()
         max_drawdown_pct = (max_drawdown / self.initial_bankroll) * 100
 
-        mae_ensemble = (results_df['actual_yards'] - results_df['prediction_mean']).abs().mean()
+        mae_ensemble = (results_df["actual_yards"] - results_df["prediction_mean"]).abs().mean()
 
         return {
-            'total_bets': total_bets,
-            'wins': wins,
-            'losses': losses,
-            'pushes': pushes,
-            'win_rate': win_rate,
-            'win_rate_pct': win_rate * 100,
-            'total_wagered': total_wagered,
-            'total_pnl': total_pnl,
-            'roi': roi,
-            'roi_pct': roi * 100,
-            'sharpe_ratio': sharpe,
-            'max_drawdown': max_drawdown,
-            'max_drawdown_pct': max_drawdown_pct,
-            'mae_ensemble': mae_ensemble,
-            'avg_bet_size': results_df['bet_size'].mean(),
-            'median_bet_size': results_df['bet_size'].median(),
-            'starting_bankroll': self.initial_bankroll,
-            'ending_bankroll': self.bankroll,
-            'profit': self.bankroll - self.initial_bankroll,
-            'profit_pct': ((self.bankroll - self.initial_bankroll) / self.initial_bankroll) * 100
+            "total_bets": total_bets,
+            "wins": wins,
+            "losses": losses,
+            "pushes": pushes,
+            "win_rate": win_rate,
+            "win_rate_pct": win_rate * 100,
+            "total_wagered": total_wagered,
+            "total_pnl": total_pnl,
+            "roi": roi,
+            "roi_pct": roi * 100,
+            "sharpe_ratio": sharpe,
+            "max_drawdown": max_drawdown,
+            "max_drawdown_pct": max_drawdown_pct,
+            "mae_ensemble": mae_ensemble,
+            "avg_bet_size": results_df["bet_size"].mean(),
+            "median_bet_size": results_df["bet_size"].median(),
+            "starting_bankroll": self.initial_bankroll,
+            "ending_bankroll": self.bankroll,
+            "profit": self.bankroll - self.initial_bankroll,
+            "profit_pct": ((self.bankroll - self.initial_bankroll) / self.initial_bankroll) * 100,
         }
 
     def print_summary(self, metrics: dict):
         """Print validation summary."""
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("OPTIMIZED VALIDATION RESULTS")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         if not metrics:
             logger.error("❌ No metrics to display")
@@ -902,15 +899,16 @@ class OptimizedHistoricalValidator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Optimized 4-way ensemble backtest')
-    parser.add_argument('--start-season', type=int, default=2022)
-    parser.add_argument('--end-season', type=int, default=2024)
-    parser.add_argument('--end-week', type=int, default=10)
-    parser.add_argument('--bankroll', type=float, default=10000.0)
-    parser.add_argument('--kelly-fraction', type=float, default=0.25)
-    parser.add_argument('--min-edge', type=float, default=0.02)
-    parser.add_argument('--output', type=str,
-                        default='results/historical_validation_4way_optimized.csv')
+    parser = argparse.ArgumentParser(description="Optimized 4-way ensemble backtest")
+    parser.add_argument("--start-season", type=int, default=2022)
+    parser.add_argument("--end-season", type=int, default=2024)
+    parser.add_argument("--end-week", type=int, default=10)
+    parser.add_argument("--bankroll", type=float, default=10000.0)
+    parser.add_argument("--kelly-fraction", type=float, default=0.25)
+    parser.add_argument("--min-edge", type=float, default=0.02)
+    parser.add_argument(
+        "--output", type=str, default="results/historical_validation_4way_optimized.csv"
+    )
 
     args = parser.parse_args()
 
@@ -954,7 +952,7 @@ def main():
             else:
                 return obj
 
-        with open(metrics_path, 'w') as f:
+        with open(metrics_path, "w") as f:
             json.dump(convert_to_native(metrics), f, indent=2)
         logger.info(f"✅ Metrics saved to: {metrics_path}")
 

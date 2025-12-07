@@ -23,7 +23,6 @@ def test_calculate_edge_basic():
     assert result is not None
 
 
-
 def test_calculate_edge_edge_cases():
     """Test calculate_edge: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_calculate_edge_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_edge_error_handling():
     """Test calculate_edge error handling."""
     with pytest.raises(ValueError):
         calculate_edge(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_calculate_edge_property_idempotent(self, model_prob, market_odds, hold_
 
     # Assert property
     assert calculate_edge(model_prob, market_odds, hold_adjustment) == result, "idempotent violated"
-
 
 
 def test_calculate_ev_basic():
@@ -67,7 +63,6 @@ def test_calculate_ev_basic():
     assert result is not None
 
 
-
 def test_calculate_ev_edge_cases():
     """Test calculate_ev: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_calculate_ev_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_ev_error_handling():
     """Test calculate_ev error handling."""
     with pytest.raises(ValueError):
         calculate_ev(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_calculate_ev_property_idempotent(self, model_prob, market_odds, bet_amo
 
     # Assert property
     assert calculate_ev(model_prob, market_odds, bet_amount) == result, "idempotent violated"
-
 
 
 def test_load_clv_history_basic():
@@ -111,7 +103,6 @@ def test_load_clv_history_basic():
     assert result is not None
 
 
-
 def test_load_clv_history_edge_cases():
     """Test load_clv_history: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_load_clv_history_edge_cases():
     assert result is not None
 
 
-
 def test_load_clv_history_error_handling():
     """Test load_clv_history error handling."""
     with pytest.raises(ValueError):
         load_clv_history(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_load_clv_history_property_idempotent(self, clv_file):
 
     # Assert property
     assert load_clv_history(clv_file) == result, "idempotent violated"
-
 
 
 def test_get_clv_percentile_basic():
@@ -155,7 +143,6 @@ def test_get_clv_percentile_basic():
     assert result is not None
 
 
-
 def test_get_clv_percentile_edge_cases():
     """Test get_clv_percentile: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_get_clv_percentile_edge_cases():
     assert result is not None
 
 
-
 def test_get_clv_percentile_error_handling():
     """Test get_clv_percentile error handling."""
     with pytest.raises(ValueError):
         get_clv_percentile(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_get_clv_percentile_property_idempotent(self, model_prob, market_prob, c
 
     # Assert property
     assert get_clv_percentile(model_prob, market_prob, clv_history) == result, "idempotent violated"
-
 
 
 def test_get_clv_roi_by_decile_basic():
@@ -199,7 +183,6 @@ def test_get_clv_roi_by_decile_basic():
     assert result is not None
 
 
-
 def test_get_clv_roi_by_decile_edge_cases():
     """Test get_clv_roi_by_decile: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_get_clv_roi_by_decile_edge_cases():
     assert result is not None
 
 
-
 def test_get_clv_roi_by_decile_error_handling():
     """Test get_clv_roi_by_decile error handling."""
     with pytest.raises(ValueError):
         get_clv_roi_by_decile(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +209,6 @@ def test_get_clv_roi_by_decile_property_idempotent(self, clv_history):
 
     # Assert property
     assert get_clv_roi_by_decile(clv_history) == result, "idempotent violated"
-
 
 
 def test_calculate_line_velocity_basic():
@@ -243,7 +223,6 @@ def test_calculate_line_velocity_basic():
     assert result is not None
 
 
-
 def test_calculate_line_velocity_edge_cases():
     """Test calculate_line_velocity: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_calculate_line_velocity_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_line_velocity_error_handling():
     """Test calculate_line_velocity error handling."""
     with pytest.raises(ValueError):
         calculate_line_velocity(invalid_input)
-
 
 
 @given(st.integers())
@@ -272,7 +249,6 @@ def test_calculate_line_velocity_property_idempotent(self, line_history):
 
     # Assert property
     assert calculate_line_velocity(line_history) == result, "idempotent violated"
-
 
 
 def test_calculate_cross_book_consensus_basic():
@@ -287,7 +263,6 @@ def test_calculate_cross_book_consensus_basic():
     assert result is not None
 
 
-
 def test_calculate_cross_book_consensus_edge_cases():
     """Test calculate_cross_book_consensus: edge cases."""
     # Arrange
@@ -300,12 +275,10 @@ def test_calculate_cross_book_consensus_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_cross_book_consensus_error_handling():
     """Test calculate_cross_book_consensus error handling."""
     with pytest.raises(ValueError):
         calculate_cross_book_consensus(invalid_input)
-
 
 
 @given(st.integers())
@@ -316,7 +289,6 @@ def test_calculate_cross_book_consensus_property_idempotent(self, book_odds):
 
     # Assert property
     assert calculate_cross_book_consensus(book_odds) == result, "idempotent violated"
-
 
 
 def test_find_reduced_juice_windows_basic():
@@ -331,7 +303,6 @@ def test_find_reduced_juice_windows_basic():
     assert result is not None
 
 
-
 def test_find_reduced_juice_windows_edge_cases():
     """Test find_reduced_juice_windows: edge cases."""
     # Arrange
@@ -344,12 +315,10 @@ def test_find_reduced_juice_windows_edge_cases():
     assert result is not None
 
 
-
 def test_find_reduced_juice_windows_error_handling():
     """Test find_reduced_juice_windows error handling."""
     with pytest.raises(ValueError):
         find_reduced_juice_windows(invalid_input)
-
 
 
 @given(st.integers(), st.datetimes())
@@ -360,7 +329,6 @@ def test_find_reduced_juice_windows_property_idempotent(self, book, current_time
 
     # Assert property
     assert find_reduced_juice_windows(book, current_time) == result, "idempotent violated"
-
 
 
 def test_backtest_selector_basic():
@@ -375,7 +343,6 @@ def test_backtest_selector_basic():
     assert result is not None
 
 
-
 def test_backtest_selector_edge_cases():
     """Test backtest_selector: edge cases."""
     # Arrange
@@ -388,23 +355,24 @@ def test_backtest_selector_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_selector_error_handling():
     """Test backtest_selector error handling."""
     with pytest.raises(ValueError):
         backtest_selector(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_backtest_selector_property_idempotent(self, predictions_file, results_file, min_edge, deadzone, output_file):
+def test_backtest_selector_property_idempotent(
+    self, predictions_file, results_file, min_edge, deadzone, output_file
+):
     """Property test: function is idempotent."""
     # Act
     result = backtest_selector(predictions_file, results_file, min_edge, deadzone, output_file)
 
     # Assert property
-    assert backtest_selector(predictions_file, results_file, min_edge, deadzone, output_file) == result, "idempotent violated"
-
+    assert (
+        backtest_selector(predictions_file, results_file, min_edge, deadzone, output_file) == result
+    ), "idempotent violated"
 
 
 def test_parse_args_basic():
@@ -419,7 +387,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -432,12 +399,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -452,7 +417,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -465,12 +429,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_clv_history_basic():
@@ -485,7 +447,6 @@ def test_load_clv_history_basic():
     assert result is not None
 
 
-
 def test_load_clv_history_edge_cases():
     """Test load_clv_history: edge cases."""
     # Arrange
@@ -498,12 +459,10 @@ def test_load_clv_history_edge_cases():
     assert result is not None
 
 
-
 def test_load_clv_history_error_handling():
     """Test load_clv_history error handling."""
     with pytest.raises(ValueError):
         load_clv_history(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -514,7 +473,6 @@ def test_load_clv_history_property_idempotent(self, self, clv_file):
 
     # Assert property
     assert load_clv_history(self, clv_file) == result, "idempotent violated"
-
 
 
 def test_should_bet_basic():
@@ -529,7 +487,6 @@ def test_should_bet_basic():
     assert result is not None
 
 
-
 def test_should_bet_edge_cases():
     """Test should_bet: edge cases."""
     # Arrange
@@ -542,23 +499,60 @@ def test_should_bet_edge_cases():
     assert result is not None
 
 
-
 def test_should_bet_error_handling():
     """Test should_bet error handling."""
     with pytest.raises(ValueError):
         should_bet(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100), st.integers(), st.datetimes(), st.integers())
-def test_should_bet_property_idempotent(self, self, model_prob, market_odds, opposite_odds, book_name, line_velocity, time_to_kickoff, bankroll):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+    st.datetimes(),
+    st.integers(),
+)
+def test_should_bet_property_idempotent(
+    self,
+    self,
+    model_prob,
+    market_odds,
+    opposite_odds,
+    book_name,
+    line_velocity,
+    time_to_kickoff,
+    bankroll,
+):
     """Property test: function is idempotent."""
     # Act
-    result = should_bet(self, model_prob, market_odds, opposite_odds, book_name, line_velocity, time_to_kickoff, bankroll)
+    result = should_bet(
+        self,
+        model_prob,
+        market_odds,
+        opposite_odds,
+        book_name,
+        line_velocity,
+        time_to_kickoff,
+        bankroll,
+    )
 
     # Assert property
-    assert should_bet(self, model_prob, market_odds, opposite_odds, book_name, line_velocity, time_to_kickoff, bankroll) == result, "idempotent violated"
-
+    assert (
+        should_bet(
+            self,
+            model_prob,
+            market_odds,
+            opposite_odds,
+            book_name,
+            line_velocity,
+            time_to_kickoff,
+            bankroll,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_select_bets_basic():
@@ -573,7 +567,6 @@ def test_select_bets_basic():
     assert result is not None
 
 
-
 def test_select_bets_edge_cases():
     """Test select_bets: edge cases."""
     # Arrange
@@ -586,12 +579,10 @@ def test_select_bets_edge_cases():
     assert result is not None
 
 
-
 def test_select_bets_error_handling():
     """Test select_bets error handling."""
     with pytest.raises(ValueError):
         select_bets(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -601,5 +592,6 @@ def test_select_bets_property_idempotent(self, self, predictions_df, odds_df, ba
     result = select_bets(self, predictions_df, odds_df, bankroll, max_bets)
 
     # Assert property
-    assert select_bets(self, predictions_df, odds_df, bankroll, max_bets) == result, "idempotent violated"
-
+    assert (
+        select_bets(self, predictions_df, odds_df, bankroll, max_bets) == result
+    ), "idempotent violated"

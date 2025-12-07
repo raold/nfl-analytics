@@ -89,11 +89,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class NextGenStatsFeatures:
@@ -199,11 +198,7 @@ class NextGenStatsFeatures:
         return weights
 
     def _get_recent_weeks(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int,
-        lookback: int = None
+        self, team: str, target_season: int, target_week: int, lookback: int = None
     ) -> list[tuple[int, int]]:
         """
         Get last N weeks before target week (TEMPORAL SAFETY).
@@ -239,10 +234,7 @@ class NextGenStatsFeatures:
         LIMIT %s;
         """
 
-        cursor.execute(
-            query,
-            (team, target_season, target_season, target_week, lookback)
-        )
+        cursor.execute(query, (team, target_season, target_season, target_week, lookback))
         recent_weeks = cursor.fetchall()
 
         cursor.close()
@@ -251,10 +243,7 @@ class NextGenStatsFeatures:
         return recent_weeks
 
     def _get_passing_ngs_features(
-        self,
-        team: str,
-        weeks: list[tuple[int, int]],
-        weights: np.ndarray
+        self, team: str, weeks: list[tuple[int, int]], weights: np.ndarray
     ) -> dict[str, float]:
         """
         Extract passing NGS features (offensive).
@@ -276,11 +265,11 @@ class NextGenStatsFeatures:
         """
         if not weeks:
             return {
-                'ngs_time_to_throw': self.DEFAULT_TIME_TO_THROW,
-                'ngs_cpoe': self.DEFAULT_CPOE,
-                'ngs_aggressiveness': self.DEFAULT_AGGRESSIVENESS,
-                'ngs_adot': self.DEFAULT_ADOT,
-                'ngs_team_qb_count': self.DEFAULT_QB_COUNT,
+                "ngs_time_to_throw": self.DEFAULT_TIME_TO_THROW,
+                "ngs_cpoe": self.DEFAULT_CPOE,
+                "ngs_aggressiveness": self.DEFAULT_AGGRESSIVENESS,
+                "ngs_adot": self.DEFAULT_ADOT,
+                "ngs_team_qb_count": self.DEFAULT_QB_COUNT,
             }
 
         conn = self._connect_db()
@@ -329,60 +318,53 @@ class NextGenStatsFeatures:
 
         if not results:
             return {
-                'ngs_time_to_throw': self.DEFAULT_TIME_TO_THROW,
-                'ngs_cpoe': self.DEFAULT_CPOE,
-                'ngs_aggressiveness': self.DEFAULT_AGGRESSIVENESS,
-                'ngs_adot': self.DEFAULT_ADOT,
-                'ngs_team_qb_count': self.DEFAULT_QB_COUNT,
+                "ngs_time_to_throw": self.DEFAULT_TIME_TO_THROW,
+                "ngs_cpoe": self.DEFAULT_CPOE,
+                "ngs_aggressiveness": self.DEFAULT_AGGRESSIVENESS,
+                "ngs_adot": self.DEFAULT_ADOT,
+                "ngs_team_qb_count": self.DEFAULT_QB_COUNT,
             }
 
         # Apply exponential decay weighting
         df = pd.DataFrame(results)
         week_to_idx = {(s, w): idx for idx, (s, w) in enumerate(weeks)}
-        df['week_order'] = df.apply(lambda row: week_to_idx.get((row['season'], row['week']), -1), axis=1)
-        df = df[df['week_order'] >= 0].sort_values('week_order')
+        df["week_order"] = df.apply(
+            lambda row: week_to_idx.get((row["season"], row["week"]), -1), axis=1
+        )
+        df = df[df["week_order"] >= 0].sort_values("week_order")
 
         n_results = len(df)
         if n_results == 0:
             return {
-                'ngs_time_to_throw': self.DEFAULT_TIME_TO_THROW,
-                'ngs_cpoe': self.DEFAULT_CPOE,
-                'ngs_aggressiveness': self.DEFAULT_AGGRESSIVENESS,
-                'ngs_adot': self.DEFAULT_ADOT,
-                'ngs_team_qb_count': self.DEFAULT_QB_COUNT,
+                "ngs_time_to_throw": self.DEFAULT_TIME_TO_THROW,
+                "ngs_cpoe": self.DEFAULT_CPOE,
+                "ngs_aggressiveness": self.DEFAULT_AGGRESSIVENESS,
+                "ngs_adot": self.DEFAULT_ADOT,
+                "ngs_team_qb_count": self.DEFAULT_QB_COUNT,
             }
 
         w = weights[:n_results] / weights[:n_results].sum()
 
         time_to_throw = np.average(
-            df['time_to_throw'].fillna(self.DEFAULT_TIME_TO_THROW).astype(float), weights=w
+            df["time_to_throw"].fillna(self.DEFAULT_TIME_TO_THROW).astype(float), weights=w
         )
-        cpoe = np.average(
-            df['cpoe'].fillna(self.DEFAULT_CPOE).astype(float), weights=w
-        )
+        cpoe = np.average(df["cpoe"].fillna(self.DEFAULT_CPOE).astype(float), weights=w)
         aggressiveness = np.average(
-            df['aggressiveness'].fillna(self.DEFAULT_AGGRESSIVENESS).astype(float), weights=w
+            df["aggressiveness"].fillna(self.DEFAULT_AGGRESSIVENESS).astype(float), weights=w
         )
-        adot = np.average(
-            df['adot'].fillna(self.DEFAULT_ADOT).astype(float), weights=w
-        )
-        qb_count = np.average(
-            df['qb_count'].fillna(self.DEFAULT_QB_COUNT).astype(float), weights=w
-        )
+        adot = np.average(df["adot"].fillna(self.DEFAULT_ADOT).astype(float), weights=w)
+        qb_count = np.average(df["qb_count"].fillna(self.DEFAULT_QB_COUNT).astype(float), weights=w)
 
         return {
-            'ngs_time_to_throw': float(time_to_throw),
-            'ngs_cpoe': float(cpoe),
-            'ngs_aggressiveness': float(aggressiveness),
-            'ngs_adot': float(adot),
-            'ngs_team_qb_count': float(qb_count),
+            "ngs_time_to_throw": float(time_to_throw),
+            "ngs_cpoe": float(cpoe),
+            "ngs_aggressiveness": float(aggressiveness),
+            "ngs_adot": float(adot),
+            "ngs_team_qb_count": float(qb_count),
         }
 
     def _get_rushing_ngs_features(
-        self,
-        team: str,
-        weeks: list[tuple[int, int]],
-        weights: np.ndarray
+        self, team: str, weeks: list[tuple[int, int]], weights: np.ndarray
     ) -> dict[str, float]:
         """
         Extract rushing NGS features (offensive).
@@ -403,10 +385,10 @@ class NextGenStatsFeatures:
         """
         if not weeks:
             return {
-                'ngs_rb_efficiency': self.DEFAULT_RB_EFFICIENCY,
-                'ngs_ryoe': self.DEFAULT_RYOE,
-                'ngs_stacked_box_rate': self.DEFAULT_STACKED_BOX_RATE,
-                'ngs_team_rb_count': self.DEFAULT_RB_COUNT,
+                "ngs_rb_efficiency": self.DEFAULT_RB_EFFICIENCY,
+                "ngs_ryoe": self.DEFAULT_RYOE,
+                "ngs_stacked_box_rate": self.DEFAULT_STACKED_BOX_RATE,
+                "ngs_team_rb_count": self.DEFAULT_RB_COUNT,
             }
 
         conn = self._connect_db()
@@ -452,54 +434,49 @@ class NextGenStatsFeatures:
 
         if not results:
             return {
-                'ngs_rb_efficiency': self.DEFAULT_RB_EFFICIENCY,
-                'ngs_ryoe': self.DEFAULT_RYOE,
-                'ngs_stacked_box_rate': self.DEFAULT_STACKED_BOX_RATE,
-                'ngs_team_rb_count': self.DEFAULT_RB_COUNT,
+                "ngs_rb_efficiency": self.DEFAULT_RB_EFFICIENCY,
+                "ngs_ryoe": self.DEFAULT_RYOE,
+                "ngs_stacked_box_rate": self.DEFAULT_STACKED_BOX_RATE,
+                "ngs_team_rb_count": self.DEFAULT_RB_COUNT,
             }
 
         # Apply exponential decay weighting
         df = pd.DataFrame(results)
         week_to_idx = {(s, w): idx for idx, (s, w) in enumerate(weeks)}
-        df['week_order'] = df.apply(lambda row: week_to_idx.get((row['season'], row['week']), -1), axis=1)
-        df = df[df['week_order'] >= 0].sort_values('week_order')
+        df["week_order"] = df.apply(
+            lambda row: week_to_idx.get((row["season"], row["week"]), -1), axis=1
+        )
+        df = df[df["week_order"] >= 0].sort_values("week_order")
 
         n_results = len(df)
         if n_results == 0:
             return {
-                'ngs_rb_efficiency': self.DEFAULT_RB_EFFICIENCY,
-                'ngs_ryoe': self.DEFAULT_RYOE,
-                'ngs_stacked_box_rate': self.DEFAULT_STACKED_BOX_RATE,
-                'ngs_team_rb_count': self.DEFAULT_RB_COUNT,
+                "ngs_rb_efficiency": self.DEFAULT_RB_EFFICIENCY,
+                "ngs_ryoe": self.DEFAULT_RYOE,
+                "ngs_stacked_box_rate": self.DEFAULT_STACKED_BOX_RATE,
+                "ngs_team_rb_count": self.DEFAULT_RB_COUNT,
             }
 
         w = weights[:n_results] / weights[:n_results].sum()
 
         efficiency = np.average(
-            df['efficiency'].fillna(self.DEFAULT_RB_EFFICIENCY).astype(float), weights=w
+            df["efficiency"].fillna(self.DEFAULT_RB_EFFICIENCY).astype(float), weights=w
         )
-        ryoe = np.average(
-            df['ryoe'].fillna(self.DEFAULT_RYOE).astype(float), weights=w
-        )
+        ryoe = np.average(df["ryoe"].fillna(self.DEFAULT_RYOE).astype(float), weights=w)
         stacked_box_rate = np.average(
-            df['stacked_box_rate'].fillna(self.DEFAULT_STACKED_BOX_RATE).astype(float), weights=w
+            df["stacked_box_rate"].fillna(self.DEFAULT_STACKED_BOX_RATE).astype(float), weights=w
         )
-        rb_count = np.average(
-            df['rb_count'].fillna(self.DEFAULT_RB_COUNT).astype(float), weights=w
-        )
+        rb_count = np.average(df["rb_count"].fillna(self.DEFAULT_RB_COUNT).astype(float), weights=w)
 
         return {
-            'ngs_rb_efficiency': float(efficiency),
-            'ngs_ryoe': float(ryoe),
-            'ngs_stacked_box_rate': float(stacked_box_rate),
-            'ngs_team_rb_count': float(rb_count),
+            "ngs_rb_efficiency": float(efficiency),
+            "ngs_ryoe": float(ryoe),
+            "ngs_stacked_box_rate": float(stacked_box_rate),
+            "ngs_team_rb_count": float(rb_count),
         }
 
     def _get_receiving_ngs_features(
-        self,
-        team: str,
-        weeks: list[tuple[int, int]],
-        weights: np.ndarray
+        self, team: str, weeks: list[tuple[int, int]], weights: np.ndarray
     ) -> dict[str, float]:
         """
         Extract receiving NGS features (offensive).
@@ -520,10 +497,10 @@ class NextGenStatsFeatures:
         """
         if not weeks:
             return {
-                'ngs_separation': self.DEFAULT_SEPARATION,
-                'ngs_yac_above_exp': self.DEFAULT_YAC_ABOVE_EXP,
-                'ngs_cushion': self.DEFAULT_CUSHION,
-                'ngs_team_wr_count': self.DEFAULT_WR_COUNT,
+                "ngs_separation": self.DEFAULT_SEPARATION,
+                "ngs_yac_above_exp": self.DEFAULT_YAC_ABOVE_EXP,
+                "ngs_cushion": self.DEFAULT_CUSHION,
+                "ngs_team_wr_count": self.DEFAULT_WR_COUNT,
             }
 
         conn = self._connect_db()
@@ -569,54 +546,49 @@ class NextGenStatsFeatures:
 
         if not results:
             return {
-                'ngs_separation': self.DEFAULT_SEPARATION,
-                'ngs_yac_above_exp': self.DEFAULT_YAC_ABOVE_EXP,
-                'ngs_cushion': self.DEFAULT_CUSHION,
-                'ngs_team_wr_count': self.DEFAULT_WR_COUNT,
+                "ngs_separation": self.DEFAULT_SEPARATION,
+                "ngs_yac_above_exp": self.DEFAULT_YAC_ABOVE_EXP,
+                "ngs_cushion": self.DEFAULT_CUSHION,
+                "ngs_team_wr_count": self.DEFAULT_WR_COUNT,
             }
 
         # Apply exponential decay weighting
         df = pd.DataFrame(results)
         week_to_idx = {(s, w): idx for idx, (s, w) in enumerate(weeks)}
-        df['week_order'] = df.apply(lambda row: week_to_idx.get((row['season'], row['week']), -1), axis=1)
-        df = df[df['week_order'] >= 0].sort_values('week_order')
+        df["week_order"] = df.apply(
+            lambda row: week_to_idx.get((row["season"], row["week"]), -1), axis=1
+        )
+        df = df[df["week_order"] >= 0].sort_values("week_order")
 
         n_results = len(df)
         if n_results == 0:
             return {
-                'ngs_separation': self.DEFAULT_SEPARATION,
-                'ngs_yac_above_exp': self.DEFAULT_YAC_ABOVE_EXP,
-                'ngs_cushion': self.DEFAULT_CUSHION,
-                'ngs_team_wr_count': self.DEFAULT_WR_COUNT,
+                "ngs_separation": self.DEFAULT_SEPARATION,
+                "ngs_yac_above_exp": self.DEFAULT_YAC_ABOVE_EXP,
+                "ngs_cushion": self.DEFAULT_CUSHION,
+                "ngs_team_wr_count": self.DEFAULT_WR_COUNT,
             }
 
         w = weights[:n_results] / weights[:n_results].sum()
 
         separation = np.average(
-            df['separation'].fillna(self.DEFAULT_SEPARATION).astype(float), weights=w
+            df["separation"].fillna(self.DEFAULT_SEPARATION).astype(float), weights=w
         )
         yac_above_exp = np.average(
-            df['yac_above_exp'].fillna(self.DEFAULT_YAC_ABOVE_EXP).astype(float), weights=w
+            df["yac_above_exp"].fillna(self.DEFAULT_YAC_ABOVE_EXP).astype(float), weights=w
         )
-        cushion = np.average(
-            df['cushion'].fillna(self.DEFAULT_CUSHION).astype(float), weights=w
-        )
-        wr_count = np.average(
-            df['wr_count'].fillna(self.DEFAULT_WR_COUNT).astype(float), weights=w
-        )
+        cushion = np.average(df["cushion"].fillna(self.DEFAULT_CUSHION).astype(float), weights=w)
+        wr_count = np.average(df["wr_count"].fillna(self.DEFAULT_WR_COUNT).astype(float), weights=w)
 
         return {
-            'ngs_separation': float(separation),
-            'ngs_yac_above_exp': float(yac_above_exp),
-            'ngs_cushion': float(cushion),
-            'ngs_team_wr_count': float(wr_count),
+            "ngs_separation": float(separation),
+            "ngs_yac_above_exp": float(yac_above_exp),
+            "ngs_cushion": float(cushion),
+            "ngs_team_wr_count": float(wr_count),
         }
 
     def _get_defensive_ngs_features(
-        self,
-        team: str,
-        weeks: list[tuple[int, int]],
-        weights: np.ndarray
+        self, team: str, weeks: list[tuple[int, int]], weights: np.ndarray
     ) -> dict[str, float]:
         """
         Extract defensive NGS features (opponent perspective).
@@ -645,16 +617,16 @@ class NextGenStatsFeatures:
         """
         if not weeks:
             return {
-                'def_ngs_cpoe_allowed': self.DEFAULT_CPOE,
-                'def_ngs_time_to_throw_allowed': self.DEFAULT_TIME_TO_THROW,
-                'def_ngs_separation_allowed': self.DEFAULT_SEPARATION,
-                'def_ngs_yac_above_exp_allowed': self.DEFAULT_YAC_ABOVE_EXP,
-                'def_ngs_cushion_allowed': self.DEFAULT_CUSHION,
-                'def_ngs_ryoe_allowed': self.DEFAULT_RYOE,
-                'def_ngs_efficiency_allowed': self.DEFAULT_RB_EFFICIENCY,
-                'def_ngs_stacked_box_rate_against': self.DEFAULT_STACKED_BOX_RATE,
-                'def_ngs_adot_allowed': self.DEFAULT_ADOT,
-                'def_ngs_aggressiveness_allowed': self.DEFAULT_AGGRESSIVENESS,
+                "def_ngs_cpoe_allowed": self.DEFAULT_CPOE,
+                "def_ngs_time_to_throw_allowed": self.DEFAULT_TIME_TO_THROW,
+                "def_ngs_separation_allowed": self.DEFAULT_SEPARATION,
+                "def_ngs_yac_above_exp_allowed": self.DEFAULT_YAC_ABOVE_EXP,
+                "def_ngs_cushion_allowed": self.DEFAULT_CUSHION,
+                "def_ngs_ryoe_allowed": self.DEFAULT_RYOE,
+                "def_ngs_efficiency_allowed": self.DEFAULT_RB_EFFICIENCY,
+                "def_ngs_stacked_box_rate_against": self.DEFAULT_STACKED_BOX_RATE,
+                "def_ngs_adot_allowed": self.DEFAULT_ADOT,
+                "def_ngs_aggressiveness_allowed": self.DEFAULT_AGGRESSIVENESS,
             }
 
         conn = self._connect_db()
@@ -683,20 +655,20 @@ class NextGenStatsFeatures:
             cursor.close()
             conn.close()
             return {
-                'def_ngs_cpoe_allowed': self.DEFAULT_CPOE,
-                'def_ngs_time_to_throw_allowed': self.DEFAULT_TIME_TO_THROW,
-                'def_ngs_separation_allowed': self.DEFAULT_SEPARATION,
-                'def_ngs_yac_above_exp_allowed': self.DEFAULT_YAC_ABOVE_EXP,
-                'def_ngs_cushion_allowed': self.DEFAULT_CUSHION,
-                'def_ngs_ryoe_allowed': self.DEFAULT_RYOE,
-                'def_ngs_efficiency_allowed': self.DEFAULT_RB_EFFICIENCY,
-                'def_ngs_stacked_box_rate_against': self.DEFAULT_STACKED_BOX_RATE,
-                'def_ngs_adot_allowed': self.DEFAULT_ADOT,
-                'def_ngs_aggressiveness_allowed': self.DEFAULT_AGGRESSIVENESS,
+                "def_ngs_cpoe_allowed": self.DEFAULT_CPOE,
+                "def_ngs_time_to_throw_allowed": self.DEFAULT_TIME_TO_THROW,
+                "def_ngs_separation_allowed": self.DEFAULT_SEPARATION,
+                "def_ngs_yac_above_exp_allowed": self.DEFAULT_YAC_ABOVE_EXP,
+                "def_ngs_cushion_allowed": self.DEFAULT_CUSHION,
+                "def_ngs_ryoe_allowed": self.DEFAULT_RYOE,
+                "def_ngs_efficiency_allowed": self.DEFAULT_RB_EFFICIENCY,
+                "def_ngs_stacked_box_rate_against": self.DEFAULT_STACKED_BOX_RATE,
+                "def_ngs_adot_allowed": self.DEFAULT_ADOT,
+                "def_ngs_aggressiveness_allowed": self.DEFAULT_AGGRESSIVENESS,
             }
 
         # Create list of (season, week, opponent) for queries
-        opponent_data = [(row['season'], row['week'], row['opponent']) for row in opponent_weeks]
+        opponent_data = [(row["season"], row["week"], row["opponent"]) for row in opponent_weeks]
 
         # Query 1: Passing NGS allowed (opponent QBs)
         query_passing = """
@@ -753,7 +725,7 @@ class NextGenStatsFeatures:
             """
             cursor.execute(query_passing_single, (season, week, opponent, season, week))
             result = cursor.fetchone()
-            if result and result['cpoe_allowed'] is not None:
+            if result and result["cpoe_allowed"] is not None:
                 passing_results.append(result)
 
         # Query 2: Rushing NGS allowed (opponent RBs)
@@ -778,7 +750,7 @@ class NextGenStatsFeatures:
             """
             cursor.execute(query_rushing_single, (season, week, opponent, season, week))
             result = cursor.fetchone()
-            if result and result['ryoe_allowed'] is not None:
+            if result and result["ryoe_allowed"] is not None:
                 rushing_results.append(result)
 
         # Query 3: Receiving NGS allowed (opponent WRs/TEs)
@@ -803,7 +775,7 @@ class NextGenStatsFeatures:
             """
             cursor.execute(query_receiving_single, (season, week, opponent, season, week))
             result = cursor.fetchone()
-            if result and result['separation_allowed'] is not None:
+            if result and result["separation_allowed"] is not None:
                 receiving_results.append(result)
 
         cursor.close()
@@ -816,7 +788,7 @@ class NextGenStatsFeatures:
 
         # Merge on (season, week)
         if not df_passing.empty and not df_rushing.empty:
-            df = df_passing.merge(df_rushing, on=['season', 'week'], how='outer')
+            df = df_passing.merge(df_rushing, on=["season", "week"], how="outer")
         elif not df_passing.empty:
             df = df_passing
         elif not df_rushing.empty:
@@ -825,97 +797,124 @@ class NextGenStatsFeatures:
             df = pd.DataFrame()
 
         if not df.empty and not df_receiving.empty:
-            df = df.merge(df_receiving, on=['season', 'week'], how='outer')
+            df = df.merge(df_receiving, on=["season", "week"], how="outer")
         elif not df_receiving.empty:
             df = df_receiving
 
         if df.empty:
             return {
-                'def_ngs_cpoe_allowed': self.DEFAULT_CPOE,
-                'def_ngs_time_to_throw_allowed': self.DEFAULT_TIME_TO_THROW,
-                'def_ngs_separation_allowed': self.DEFAULT_SEPARATION,
-                'def_ngs_yac_above_exp_allowed': self.DEFAULT_YAC_ABOVE_EXP,
-                'def_ngs_cushion_allowed': self.DEFAULT_CUSHION,
-                'def_ngs_ryoe_allowed': self.DEFAULT_RYOE,
-                'def_ngs_efficiency_allowed': self.DEFAULT_RB_EFFICIENCY,
-                'def_ngs_stacked_box_rate_against': self.DEFAULT_STACKED_BOX_RATE,
-                'def_ngs_adot_allowed': self.DEFAULT_ADOT,
-                'def_ngs_aggressiveness_allowed': self.DEFAULT_AGGRESSIVENESS,
+                "def_ngs_cpoe_allowed": self.DEFAULT_CPOE,
+                "def_ngs_time_to_throw_allowed": self.DEFAULT_TIME_TO_THROW,
+                "def_ngs_separation_allowed": self.DEFAULT_SEPARATION,
+                "def_ngs_yac_above_exp_allowed": self.DEFAULT_YAC_ABOVE_EXP,
+                "def_ngs_cushion_allowed": self.DEFAULT_CUSHION,
+                "def_ngs_ryoe_allowed": self.DEFAULT_RYOE,
+                "def_ngs_efficiency_allowed": self.DEFAULT_RB_EFFICIENCY,
+                "def_ngs_stacked_box_rate_against": self.DEFAULT_STACKED_BOX_RATE,
+                "def_ngs_adot_allowed": self.DEFAULT_ADOT,
+                "def_ngs_aggressiveness_allowed": self.DEFAULT_AGGRESSIVENESS,
             }
 
         # Apply exponential decay weighting
         week_to_idx = {(s, w): idx for idx, (s, w) in enumerate(weeks)}
-        df['week_order'] = df.apply(lambda row: week_to_idx.get((row['season'], row['week']), -1), axis=1)
-        df = df[df['week_order'] >= 0].sort_values('week_order')
+        df["week_order"] = df.apply(
+            lambda row: week_to_idx.get((row["season"], row["week"]), -1), axis=1
+        )
+        df = df[df["week_order"] >= 0].sort_values("week_order")
 
         n_results = len(df)
         if n_results == 0:
             return {
-                'def_ngs_cpoe_allowed': self.DEFAULT_CPOE,
-                'def_ngs_time_to_throw_allowed': self.DEFAULT_TIME_TO_THROW,
-                'def_ngs_separation_allowed': self.DEFAULT_SEPARATION,
-                'def_ngs_yac_above_exp_allowed': self.DEFAULT_YAC_ABOVE_EXP,
-                'def_ngs_cushion_allowed': self.DEFAULT_CUSHION,
-                'def_ngs_ryoe_allowed': self.DEFAULT_RYOE,
-                'def_ngs_efficiency_allowed': self.DEFAULT_RB_EFFICIENCY,
-                'def_ngs_stacked_box_rate_against': self.DEFAULT_STACKED_BOX_RATE,
-                'def_ngs_adot_allowed': self.DEFAULT_ADOT,
-                'def_ngs_aggressiveness_allowed': self.DEFAULT_AGGRESSIVENESS,
+                "def_ngs_cpoe_allowed": self.DEFAULT_CPOE,
+                "def_ngs_time_to_throw_allowed": self.DEFAULT_TIME_TO_THROW,
+                "def_ngs_separation_allowed": self.DEFAULT_SEPARATION,
+                "def_ngs_yac_above_exp_allowed": self.DEFAULT_YAC_ABOVE_EXP,
+                "def_ngs_cushion_allowed": self.DEFAULT_CUSHION,
+                "def_ngs_ryoe_allowed": self.DEFAULT_RYOE,
+                "def_ngs_efficiency_allowed": self.DEFAULT_RB_EFFICIENCY,
+                "def_ngs_stacked_box_rate_against": self.DEFAULT_STACKED_BOX_RATE,
+                "def_ngs_adot_allowed": self.DEFAULT_ADOT,
+                "def_ngs_aggressiveness_allowed": self.DEFAULT_AGGRESSIVENESS,
             }
 
         w = weights[:n_results] / weights[:n_results].sum()
 
         # Extract features with defaults
         cpoe_allowed = np.average(
-            df.get('cpoe_allowed', pd.Series([self.DEFAULT_CPOE] * n_results)).fillna(self.DEFAULT_CPOE).astype(float), weights=w
+            df.get("cpoe_allowed", pd.Series([self.DEFAULT_CPOE] * n_results))
+            .fillna(self.DEFAULT_CPOE)
+            .astype(float),
+            weights=w,
         )
         time_to_throw_allowed = np.average(
-            df.get('time_to_throw_allowed', pd.Series([self.DEFAULT_TIME_TO_THROW] * n_results)).fillna(self.DEFAULT_TIME_TO_THROW).astype(float), weights=w
+            df.get("time_to_throw_allowed", pd.Series([self.DEFAULT_TIME_TO_THROW] * n_results))
+            .fillna(self.DEFAULT_TIME_TO_THROW)
+            .astype(float),
+            weights=w,
         )
         separation_allowed = np.average(
-            df.get('separation_allowed', pd.Series([self.DEFAULT_SEPARATION] * n_results)).fillna(self.DEFAULT_SEPARATION).astype(float), weights=w
+            df.get("separation_allowed", pd.Series([self.DEFAULT_SEPARATION] * n_results))
+            .fillna(self.DEFAULT_SEPARATION)
+            .astype(float),
+            weights=w,
         )
         yac_above_exp_allowed = np.average(
-            df.get('yac_above_exp_allowed', pd.Series([self.DEFAULT_YAC_ABOVE_EXP] * n_results)).fillna(self.DEFAULT_YAC_ABOVE_EXP).astype(float), weights=w
+            df.get("yac_above_exp_allowed", pd.Series([self.DEFAULT_YAC_ABOVE_EXP] * n_results))
+            .fillna(self.DEFAULT_YAC_ABOVE_EXP)
+            .astype(float),
+            weights=w,
         )
         cushion_allowed = np.average(
-            df.get('cushion_allowed', pd.Series([self.DEFAULT_CUSHION] * n_results)).fillna(self.DEFAULT_CUSHION).astype(float), weights=w
+            df.get("cushion_allowed", pd.Series([self.DEFAULT_CUSHION] * n_results))
+            .fillna(self.DEFAULT_CUSHION)
+            .astype(float),
+            weights=w,
         )
         ryoe_allowed = np.average(
-            df.get('ryoe_allowed', pd.Series([self.DEFAULT_RYOE] * n_results)).fillna(self.DEFAULT_RYOE).astype(float), weights=w
+            df.get("ryoe_allowed", pd.Series([self.DEFAULT_RYOE] * n_results))
+            .fillna(self.DEFAULT_RYOE)
+            .astype(float),
+            weights=w,
         )
         efficiency_allowed = np.average(
-            df.get('efficiency_allowed', pd.Series([self.DEFAULT_RB_EFFICIENCY] * n_results)).fillna(self.DEFAULT_RB_EFFICIENCY).astype(float), weights=w
+            df.get("efficiency_allowed", pd.Series([self.DEFAULT_RB_EFFICIENCY] * n_results))
+            .fillna(self.DEFAULT_RB_EFFICIENCY)
+            .astype(float),
+            weights=w,
         )
         stacked_box_rate = np.average(
-            df.get('stacked_box_rate', pd.Series([self.DEFAULT_STACKED_BOX_RATE] * n_results)).fillna(self.DEFAULT_STACKED_BOX_RATE).astype(float), weights=w
+            df.get("stacked_box_rate", pd.Series([self.DEFAULT_STACKED_BOX_RATE] * n_results))
+            .fillna(self.DEFAULT_STACKED_BOX_RATE)
+            .astype(float),
+            weights=w,
         )
         adot_allowed = np.average(
-            df.get('adot_allowed', pd.Series([self.DEFAULT_ADOT] * n_results)).fillna(self.DEFAULT_ADOT).astype(float), weights=w
+            df.get("adot_allowed", pd.Series([self.DEFAULT_ADOT] * n_results))
+            .fillna(self.DEFAULT_ADOT)
+            .astype(float),
+            weights=w,
         )
         aggressiveness_allowed = np.average(
-            df.get('aggressiveness_allowed', pd.Series([self.DEFAULT_AGGRESSIVENESS] * n_results)).fillna(self.DEFAULT_AGGRESSIVENESS).astype(float), weights=w
+            df.get("aggressiveness_allowed", pd.Series([self.DEFAULT_AGGRESSIVENESS] * n_results))
+            .fillna(self.DEFAULT_AGGRESSIVENESS)
+            .astype(float),
+            weights=w,
         )
 
         return {
-            'def_ngs_cpoe_allowed': float(cpoe_allowed),
-            'def_ngs_time_to_throw_allowed': float(time_to_throw_allowed),
-            'def_ngs_separation_allowed': float(separation_allowed),
-            'def_ngs_yac_above_exp_allowed': float(yac_above_exp_allowed),
-            'def_ngs_cushion_allowed': float(cushion_allowed),
-            'def_ngs_ryoe_allowed': float(ryoe_allowed),
-            'def_ngs_efficiency_allowed': float(efficiency_allowed),
-            'def_ngs_stacked_box_rate_against': float(stacked_box_rate),
-            'def_ngs_adot_allowed': float(adot_allowed),
-            'def_ngs_aggressiveness_allowed': float(aggressiveness_allowed),
+            "def_ngs_cpoe_allowed": float(cpoe_allowed),
+            "def_ngs_time_to_throw_allowed": float(time_to_throw_allowed),
+            "def_ngs_separation_allowed": float(separation_allowed),
+            "def_ngs_yac_above_exp_allowed": float(yac_above_exp_allowed),
+            "def_ngs_cushion_allowed": float(cushion_allowed),
+            "def_ngs_ryoe_allowed": float(ryoe_allowed),
+            "def_ngs_efficiency_allowed": float(efficiency_allowed),
+            "def_ngs_stacked_box_rate_against": float(stacked_box_rate),
+            "def_ngs_adot_allowed": float(adot_allowed),
+            "def_ngs_aggressiveness_allowed": float(aggressiveness_allowed),
         }
 
-    def get_team_ngs_features(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def get_team_ngs_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Extract all 23 Next Gen Stats features for a team at a specific game.
 
@@ -989,12 +988,7 @@ class NextGenStatsFeatures:
 
         return all_features
 
-    def validate_no_leakage(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> bool:
+    def validate_no_leakage(self, team: str, season: int, week: int) -> bool:
         """
         Validate temporal safety: ensure all weeks are BEFORE target week.
 
@@ -1009,10 +1003,7 @@ class NextGenStatsFeatures:
         recent_weeks = self._get_recent_weeks(team, season, week)
 
         for week_season, week_num in recent_weeks:
-            is_before = (
-                week_season < season or
-                (week_season == season and week_num < week)
-            )
+            is_before = week_season < season or (week_season == season and week_num < week)
             if not is_before:
                 logger.error(
                     f"TEMPORAL LEAKAGE DETECTED: {team} week "
@@ -1040,22 +1031,10 @@ def main():
         description="Extract Next Gen Stats features for game outcome predictions"
     )
     parser.add_argument(
-        "--team",
-        default="KC",
-        help="Team abbreviation (default: KC for Kansas City Chiefs)"
+        "--team", default="KC", help="Team abbreviation (default: KC for Kansas City Chiefs)"
     )
-    parser.add_argument(
-        "--season",
-        type=int,
-        default=2024,
-        help="Season year (default: 2024)"
-    )
-    parser.add_argument(
-        "--week",
-        type=int,
-        default=10,
-        help="Week number (default: 10)"
-    )
+    parser.add_argument("--season", type=int, default=2024, help="Season year (default: 2024)")
+    parser.add_argument("--week", type=int, default=10, help="Week number (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -1073,11 +1052,7 @@ def main():
     print()
 
     # Extract all 23 NGS features
-    features = engine.get_team_ngs_features(
-        team=args.team,
-        season=args.season,
-        week=args.week
-    )
+    features = engine.get_team_ngs_features(team=args.team, season=args.season, week=args.week)
 
     print("Next Gen Stats Features (23 total):")
     print("-" * 80)
@@ -1103,13 +1078,19 @@ def main():
 
     print("\n4. Defensive NGS Features (10):")
     print(f"  def_ngs_cpoe_allowed:              {features['def_ngs_cpoe_allowed']:+.2f} pp")
-    print(f"  def_ngs_time_to_throw_allowed:     {features['def_ngs_time_to_throw_allowed']:.3f} sec")
+    print(
+        f"  def_ngs_time_to_throw_allowed:     {features['def_ngs_time_to_throw_allowed']:.3f} sec"
+    )
     print(f"  def_ngs_separation_allowed:        {features['def_ngs_separation_allowed']:.2f} yds")
-    print(f"  def_ngs_yac_above_exp_allowed:     {features['def_ngs_yac_above_exp_allowed']:+.2f} yds")
+    print(
+        f"  def_ngs_yac_above_exp_allowed:     {features['def_ngs_yac_above_exp_allowed']:+.2f} yds"
+    )
     print(f"  def_ngs_cushion_allowed:           {features['def_ngs_cushion_allowed']:.2f} yds")
     print(f"  def_ngs_ryoe_allowed:              {features['def_ngs_ryoe_allowed']:+.2f} yds/att")
     print(f"  def_ngs_efficiency_allowed:        {features['def_ngs_efficiency_allowed']:+.3f}")
-    print(f"  def_ngs_stacked_box_rate_against:  {features['def_ngs_stacked_box_rate_against']:.1f}%")
+    print(
+        f"  def_ngs_stacked_box_rate_against:  {features['def_ngs_stacked_box_rate_against']:.1f}%"
+    )
     print(f"  def_ngs_adot_allowed:              {features['def_ngs_adot_allowed']:.1f} yds")
     print(f"  def_ngs_aggressiveness_allowed:    {features['def_ngs_aggressiveness_allowed']:.1f}%")
 

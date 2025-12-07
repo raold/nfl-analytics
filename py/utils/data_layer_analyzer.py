@@ -68,7 +68,7 @@ class ImpactReport:
             f"Affected Backtests: {len(self.affected_backtests)}",
         ]
 
-        if self.change_type == 'add':
+        if self.change_type == "add":
             lines.append(f"Opportunities: {len(self.opportunities)}")
 
         if self.estimated_impact_hours > 0:
@@ -96,17 +96,17 @@ class DataLayerAnalyzer:
         self.lineage: dict[str, list[ColumnUsage]] = defaultdict(list)
 
         # File patterns to scan
-        self.python_dirs = ['py/', 'scripts/', 'tests/', 'etl/']
-        self.r_dirs = ['R/', 'scripts/analysis/']
-        self.sql_dirs = ['db/migrations/', 'db/queries/', 'db/views/']
+        self.python_dirs = ["py/", "scripts/", "tests/", "etl/"]
+        self.r_dirs = ["R/", "scripts/analysis/"]
+        self.sql_dirs = ["db/migrations/", "db/queries/", "db/views/"]
 
         # SQL patterns for different languages
         self.python_sql_patterns = [
             r'read_sql\([\'"](.+?)[\'"]\s*,',  # pd.read_sql("SELECT ...", conn)
-            r'execute\([\'"](.+?)[\'"]\)',      # cursor.execute("SELECT ...")
+            r'execute\([\'"](.+?)[\'"]\)',  # cursor.execute("SELECT ...")
             r'dbGetQuery\(.*?[\'"](.+?)[\'"]\)',  # R-style in Python (rare)
-            r'"""(.+?)"""',                      # Triple-quoted SQL
-            r"'''(.+?)'''",                      # Triple-quoted SQL
+            r'"""(.+?)"""',  # Triple-quoted SQL
+            r"'''(.+?)'''",  # Triple-quoted SQL
         ]
 
         self.r_sql_patterns = [
@@ -118,26 +118,41 @@ class DataLayerAnalyzer:
 
         # Column reference patterns
         self.column_patterns = [
-            r'\b(\w+)\.(\w+)\b',  # table.column
-            r'SELECT\s+(.+?)\s+FROM',  # SELECT columns
-            r'WHERE\s+(.+?)(?:ORDER|GROUP|LIMIT|$)',  # WHERE clause
-            r'GROUP\s+BY\s+(.+?)(?:ORDER|HAVING|LIMIT|$)',  # GROUP BY
-            r'ORDER\s+BY\s+(.+?)(?:LIMIT|$)',  # ORDER BY
+            r"\b(\w+)\.(\w+)\b",  # table.column
+            r"SELECT\s+(.+?)\s+FROM",  # SELECT columns
+            r"WHERE\s+(.+?)(?:ORDER|GROUP|LIMIT|$)",  # WHERE clause
+            r"GROUP\s+BY\s+(.+?)(?:ORDER|HAVING|LIMIT|$)",  # GROUP BY
+            r"ORDER\s+BY\s+(.+?)(?:LIMIT|$)",  # ORDER BY
         ]
 
         # Known table names (will be populated from database or hardcoded)
         self.known_tables = {
             # Core tables
-            'games', 'plays', 'players', 'rosters', 'teams',
-            'injuries', 'schedules', 'weather', 'betting_lines',
+            "games",
+            "plays",
+            "players",
+            "rosters",
+            "teams",
+            "injuries",
+            "schedules",
+            "weather",
+            "betting_lines",
             # Mart tables
-            'game_summary', 'team_rolling_stats', 'team_matchup_history',
-            'player_game_stats', 'player_season_stats',
+            "game_summary",
+            "team_rolling_stats",
+            "team_matchup_history",
+            "player_game_stats",
+            "player_season_stats",
             # ML tables
-            'model_predictions', 'model_metadata', 'ensemble_predictions',
-            'backtest_results', 'feature_importance',
+            "model_predictions",
+            "model_metadata",
+            "ensemble_predictions",
+            "backtest_results",
+            "feature_importance",
             # Staging tables
-            'stg_nflverse_pbp', 'stg_nflverse_rosters', 'stg_odds',
+            "stg_nflverse_pbp",
+            "stg_nflverse_rosters",
+            "stg_odds",
         }
 
     def scan_codebase(self) -> None:
@@ -182,7 +197,7 @@ class DataLayerAnalyzer:
     def _scan_python_file(self, file_path: Path) -> None:
         """Scan a Python file for SQL queries and column references."""
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
 
             # Extract SQL queries using various patterns
@@ -191,7 +206,7 @@ class DataLayerAnalyzer:
             # Multi-line triple-quoted strings
             for match in re.finditer(r'("""(.+?)""")|' + r"('''(.+?)''')", content, re.DOTALL):
                 query = match.group(2) or match.group(4)
-                if query and ('SELECT' in query.upper() or 'FROM' in query.upper()):
+                if query and ("SELECT" in query.upper() or "FROM" in query.upper()):
                     sql_queries.append((query, match.start()))
 
             # Single-line queries in function calls
@@ -201,7 +216,7 @@ class DataLayerAnalyzer:
 
             # Parse SQL queries for column references
             for query, char_pos in sql_queries:
-                line_number = content[:char_pos].count('\n') + 1
+                line_number = content[:char_pos].count("\n") + 1
                 self._extract_columns_from_sql(query, file_path, line_number)
 
         except Exception as e:
@@ -210,7 +225,7 @@ class DataLayerAnalyzer:
     def _scan_r_file(self, file_path: Path) -> None:
         """Scan an R file for SQL queries and column references."""
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
 
             # Extract SQL queries from R database calls
@@ -220,7 +235,7 @@ class DataLayerAnalyzer:
             for pattern in self.r_sql_patterns:
                 for match in re.finditer(pattern, content, re.IGNORECASE | re.DOTALL):
                     query = match.group(1)
-                    line_number = content[:match.start()].count('\n') + 1
+                    line_number = content[: match.start()].count("\n") + 1
                     sql_queries.append((query, line_number))
 
             # Parse SQL queries for column references
@@ -233,16 +248,16 @@ class DataLayerAnalyzer:
     def _scan_sql_file(self, file_path: Path) -> None:
         """Scan a raw SQL file for column references."""
         try:
-            with open(file_path, encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 content = f.read()
 
             # SQL files may have multiple statements
-            statements = content.split(';')
+            statements = content.split(";")
 
             for stmt in statements:
                 if stmt.strip():
                     # Rough line number estimate
-                    line_number = content[:content.find(stmt)].count('\n') + 1
+                    line_number = content[: content.find(stmt)].count("\n") + 1
                     self._extract_columns_from_sql(stmt, file_path, line_number)
 
         except Exception as e:
@@ -256,12 +271,16 @@ class DataLayerAnalyzer:
         consumer_type = self._classify_consumer_type(file_path)
 
         # Extract table.column patterns
-        for match in re.finditer(r'\b(\w+)\.(\w+)\b', query):
+        for match in re.finditer(r"\b(\w+)\.(\w+)\b", query):
             table_name = match.group(1).lower()
             column_name = match.group(2).lower()
 
             # Filter to known tables (reduces false positives from aliases)
-            if table_name in self.known_tables or table_name.startswith('stg_') or table_name.startswith('mv_'):
+            if (
+                table_name in self.known_tables
+                or table_name.startswith("stg_")
+                or table_name.startswith("mv_")
+            ):
                 usage = ColumnUsage(
                     table_name=table_name,
                     column_name=column_name,
@@ -269,21 +288,21 @@ class DataLayerAnalyzer:
                     line_number=line_number,
                     usage_type=self._infer_usage_type(query_upper, column_name),
                     context=self._extract_context(query, column_name),
-                    consumer_type=consumer_type
+                    consumer_type=consumer_type,
                 )
 
                 key = f"{table_name}.{column_name}"
                 self.lineage[key].append(usage)
 
         # Extract bare column names from SELECT clause
-        select_match = re.search(r'SELECT\s+(.+?)\s+FROM', query, re.IGNORECASE | re.DOTALL)
+        select_match = re.search(r"SELECT\s+(.+?)\s+FROM", query, re.IGNORECASE | re.DOTALL)
         if select_match:
             columns_str = select_match.group(1)
             # Parse individual columns (naive parsing, can be improved)
-            for col_name in re.findall(r'\b(\w+)\b', columns_str):
-                if col_name.upper() not in ['SELECT', 'FROM', 'WHERE', 'AS', 'DISTINCT', 'ALL']:
+            for col_name in re.findall(r"\b(\w+)\b", columns_str):
+                if col_name.upper() not in ["SELECT", "FROM", "WHERE", "AS", "DISTINCT", "ALL"]:
                     # Try to infer table from FROM clause
-                    from_match = re.search(r'FROM\s+(\w+)', query, re.IGNORECASE)
+                    from_match = re.search(r"FROM\s+(\w+)", query, re.IGNORECASE)
                     if from_match:
                         table_name = from_match.group(1).lower()
                         if table_name in self.known_tables:
@@ -292,9 +311,9 @@ class DataLayerAnalyzer:
                                 column_name=col_name.lower(),
                                 file_path=str(file_path.relative_to(self.project_root)),
                                 line_number=line_number,
-                                usage_type='select',
+                                usage_type="select",
                                 context=self._extract_context(query, col_name),
-                                consumer_type=consumer_type
+                                consumer_type=consumer_type,
                             )
 
                             key = f"{table_name}.{col_name.lower()}"
@@ -304,45 +323,45 @@ class DataLayerAnalyzer:
         """Classify the type of code consuming this column."""
         path_str = str(file_path).lower()
 
-        if 'feature' in path_str:
-            return 'feature'
-        elif 'model' in path_str or 'train' in path_str:
-            return 'model'
-        elif 'backtest' in path_str:
-            return 'backtest'
-        elif 'production' in path_str or 'deploy' in path_str:
-            return 'production'
-        elif 'test' in path_str or 'validation' in path_str:
-            return 'validation'
-        elif 'migration' in path_str or 'db/' in path_str:
-            return 'migration'
+        if "feature" in path_str:
+            return "feature"
+        elif "model" in path_str or "train" in path_str:
+            return "model"
+        elif "backtest" in path_str:
+            return "backtest"
+        elif "production" in path_str or "deploy" in path_str:
+            return "production"
+        elif "test" in path_str or "validation" in path_str:
+            return "validation"
+        elif "migration" in path_str or "db/" in path_str:
+            return "migration"
         else:
-            return 'other'
+            return "other"
 
     def _infer_usage_type(self, query: str, column_name: str) -> str:
         """Infer how the column is being used in the query."""
-        if 'SELECT' in query and column_name in query:
-            if 'WHERE' in query.split(column_name)[1]:
-                return 'filter'
-            elif 'GROUP BY' in query and column_name in query.split('GROUP BY')[1]:
-                return 'groupby'
-            elif 'ORDER BY' in query and column_name in query.split('ORDER BY')[1]:
-                return 'orderby'
+        if "SELECT" in query and column_name in query:
+            if "WHERE" in query.split(column_name)[1]:
+                return "filter"
+            elif "GROUP BY" in query and column_name in query.split("GROUP BY")[1]:
+                return "groupby"
+            elif "ORDER BY" in query and column_name in query.split("ORDER BY")[1]:
+                return "orderby"
             else:
-                return 'select'
-        elif 'INSERT' in query:
-            return 'insert'
-        elif 'UPDATE' in query:
-            return 'update'
-        elif 'DELETE' in query:
-            return 'delete'
+                return "select"
+        elif "INSERT" in query:
+            return "insert"
+        elif "UPDATE" in query:
+            return "update"
+        elif "DELETE" in query:
+            return "delete"
         else:
-            return 'unknown'
+            return "unknown"
 
     def _extract_context(self, query: str, column_name: str) -> str:
         """Extract relevant context around column usage (max 80 chars)."""
         # Find the column in the query
-        pattern = re.compile(rf'\b{re.escape(column_name)}\b', re.IGNORECASE)
+        pattern = re.compile(rf"\b{re.escape(column_name)}\b", re.IGNORECASE)
         match = pattern.search(query)
 
         if match:
@@ -379,43 +398,45 @@ class DataLayerAnalyzer:
         report = ImpactReport(column=column, change_type=change_type)
         usages = self.trace_column(column)
 
-        if change_type == 'remove':
+        if change_type == "remove":
             # All usages are breaking changes
             report.breaking_changes = usages
-            report.risk_level = 'critical' if usages else 'low'
+            report.risk_level = "critical" if usages else "low"
 
             # Classify affected components
             for usage in usages:
-                if usage.consumer_type == 'model':
+                if usage.consumer_type == "model":
                     report.affected_models.add(usage.file_path)
-                elif usage.consumer_type == 'feature':
+                elif usage.consumer_type == "feature":
                     report.affected_features.add(usage.file_path)
-                elif usage.consumer_type == 'backtest':
+                elif usage.consumer_type == "backtest":
                     report.affected_backtests.add(usage.file_path)
 
             # Estimate impact hours (rough heuristic)
             report.estimated_impact_hours = len(usages) * 0.5  # 30 min per usage
 
-        elif change_type == 'modify':
+        elif change_type == "modify":
             # Some usages may break depending on modification type
             report.breaking_changes = usages  # Conservative: treat all as potentially breaking
-            report.risk_level = 'high' if len(usages) > 5 else 'medium' if usages else 'low'
+            report.risk_level = "high" if len(usages) > 5 else "medium" if usages else "low"
 
             for usage in usages:
-                if usage.consumer_type == 'model':
+                if usage.consumer_type == "model":
                     report.affected_models.add(usage.file_path)
-                elif usage.consumer_type == 'feature':
+                elif usage.consumer_type == "feature":
                     report.affected_features.add(usage.file_path)
-                elif usage.consumer_type == 'backtest':
+                elif usage.consumer_type == "backtest":
                     report.affected_backtests.add(usage.file_path)
 
             report.estimated_impact_hours = len(usages) * 0.25  # 15 min per usage
 
-        elif change_type == 'add':
+        elif change_type == "add":
             # No breaking changes, but identify opportunities
-            report.risk_level = 'low'
+            report.risk_level = "low"
             report.opportunities = self._identify_opportunities(column)
-            report.estimated_impact_hours = len(report.opportunities) * 1.0  # 1 hour per opportunity
+            report.estimated_impact_hours = (
+                len(report.opportunities) * 1.0
+            )  # 1 hour per opportunity
 
         return report
 
@@ -430,8 +451,8 @@ class DataLayerAnalyzer:
             List of file paths that could use this column
         """
         opportunities = []
-        table_name = new_column.split('.')[0]
-        column_name = new_column.split('.')[1]
+        table_name = new_column.split(".")[0]
+        column_name = new_column.split(".")[1]
 
         # Heuristic: Find files that already use the same table
         for existing_column, usages in self.lineage.items():
@@ -456,12 +477,14 @@ class DataLayerAnalyzer:
         path_lower = file_path.lower()
 
         # Extract keywords from column name
-        keywords = column_lower.split('_')
+        keywords = column_lower.split("_")
 
         # Check if any keyword appears in file path
         return any(keyword in path_lower for keyword in keywords if len(keyword) > 3)
 
-    def find_unused_columns(self, known_columns: dict[str, list[str]] | None = None) -> dict[str, list[str]]:
+    def find_unused_columns(
+        self, known_columns: dict[str, list[str]] | None = None
+    ) -> dict[str, list[str]]:
         """
         Find database columns that are never used in code.
 
@@ -487,7 +510,7 @@ class DataLayerAnalyzer:
 
         return dict(unused)
 
-    def generate_dependency_graph(self, output_format: str = 'graphviz') -> str:
+    def generate_dependency_graph(self, output_format: str = "graphviz") -> str:
         """
         Generate a dependency graph showing column → consumer relationships.
 
@@ -497,8 +520,8 @@ class DataLayerAnalyzer:
         Returns:
             Graph representation as string
         """
-        if output_format == 'graphviz':
-            lines = ['digraph column_lineage {', '  rankdir=LR;', '  node [shape=box];']
+        if output_format == "graphviz":
+            lines = ["digraph column_lineage {", "  rankdir=LR;", "  node [shape=box];"]
 
             for column, usages in self.lineage.items():
                 for usage in usages:
@@ -506,50 +529,47 @@ class DataLayerAnalyzer:
                     short_path = Path(usage.file_path).name
                     lines.append(f'  "{column}" -> "{short_path}:{usage.line_number}";')
 
-            lines.append('}')
-            return '\n'.join(lines)
+            lines.append("}")
+            return "\n".join(lines)
 
-        elif output_format == 'mermaid':
-            lines = ['graph LR']
+        elif output_format == "mermaid":
+            lines = ["graph LR"]
 
             for column, usages in self.lineage.items():
-                col_id = column.replace('.', '_')
+                col_id = column.replace(".", "_")
                 for i, usage in enumerate(usages):
                     short_path = Path(usage.file_path).name
-                    consumer_id = f"{short_path}_{i}".replace('.', '_').replace('-', '_')
-                    lines.append(f'  {col_id}[{column}] --> {consumer_id}[{short_path}]')
+                    consumer_id = f"{short_path}_{i}".replace(".", "_").replace("-", "_")
+                    lines.append(f"  {col_id}[{column}] --> {consumer_id}[{short_path}]")
 
-            return '\n'.join(lines)
+            return "\n".join(lines)
 
-        elif output_format == 'json':
-            graph = {
-                'nodes': [],
-                'edges': []
-            }
+        elif output_format == "json":
+            graph = {"nodes": [], "edges": []}
 
             # Nodes: columns + consumers
             node_ids = set()
             for column, usages in self.lineage.items():
                 if column not in node_ids:
-                    graph['nodes'].append({'id': column, 'type': 'column'})
+                    graph["nodes"].append({"id": column, "type": "column"})
                     node_ids.add(column)
 
                 for usage in usages:
                     consumer_id = f"{usage.file_path}:{usage.line_number}"
                     if consumer_id not in node_ids:
-                        graph['nodes'].append({
-                            'id': consumer_id,
-                            'type': 'consumer',
-                            'file': usage.file_path,
-                            'line': usage.line_number
-                        })
+                        graph["nodes"].append(
+                            {
+                                "id": consumer_id,
+                                "type": "consumer",
+                                "file": usage.file_path,
+                                "line": usage.line_number,
+                            }
+                        )
                         node_ids.add(consumer_id)
 
-                    graph['edges'].append({
-                        'source': column,
-                        'target': consumer_id,
-                        'usage_type': usage.usage_type
-                    })
+                    graph["edges"].append(
+                        {"source": column, "target": consumer_id, "usage_type": usage.usage_type}
+                    )
 
             return json.dumps(graph, indent=2)
 
@@ -561,20 +581,20 @@ class DataLayerAnalyzer:
         data = {
             column: [
                 {
-                    'table': u.table_name,
-                    'column': u.column_name,
-                    'file': u.file_path,
-                    'line': u.line_number,
-                    'usage_type': u.usage_type,
-                    'consumer_type': u.consumer_type,
-                    'context': u.context
+                    "table": u.table_name,
+                    "column": u.column_name,
+                    "file": u.file_path,
+                    "line": u.line_number,
+                    "usage_type": u.usage_type,
+                    "consumer_type": u.consumer_type,
+                    "context": u.context,
                 }
                 for u in usages
             ]
             for column, usages in self.lineage.items()
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(data, f, indent=2)
 
         self.logger.info(f"Lineage saved to {output_path}")
@@ -588,13 +608,13 @@ class DataLayerAnalyzer:
         for column, usages_data in data.items():
             self.lineage[column] = [
                 ColumnUsage(
-                    table_name=u['table'],
-                    column_name=u['column'],
-                    file_path=u['file'],
-                    line_number=u['line'],
-                    usage_type=u['usage_type'],
-                    context=u['context'],
-                    consumer_type=u['consumer_type']
+                    table_name=u["table"],
+                    column_name=u["column"],
+                    file_path=u["file"],
+                    line_number=u["line"],
+                    usage_type=u["usage_type"],
+                    context=u["context"],
+                    consumer_type=u["consumer_type"],
                 )
                 for u in usages_data
             ]
@@ -611,19 +631,19 @@ def main():
 
     # Trace a column
     print("\n=== Tracing 'plays.passing_yards' ===")
-    usages = analyzer.trace_column('plays.passing_yards')
+    usages = analyzer.trace_column("plays.passing_yards")
     print(f"Found {len(usages)} usages")
     for usage in usages[:5]:  # Show first 5
         print(f"  {usage.file_path}:{usage.line_number} ({usage.consumer_type})")
 
     # Analyze impact of removing a column
     print("\n=== Impact Analysis: Remove 'injuries.report_status' ===")
-    report = analyzer.analyze_impact('injuries.report_status', 'remove')
+    report = analyzer.analyze_impact("injuries.report_status", "remove")
     print(report.summary())
 
     # Analyze impact of adding a column
     print("\n=== Impact Analysis: Add 'weather.humidity' ===")
-    report = analyzer.analyze_impact('weather.humidity', 'add')
+    report = analyzer.analyze_impact("weather.humidity", "add")
     print(report.summary())
     if report.opportunities:
         print(f"\nOpportunities ({len(report.opportunities)}):")
@@ -631,8 +651,8 @@ def main():
             print(f"  - {opp}")
 
     # Save lineage
-    analyzer.save_lineage('/tmp/column_lineage.json')
+    analyzer.save_lineage("/tmp/column_lineage.json")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

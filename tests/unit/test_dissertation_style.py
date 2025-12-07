@@ -23,7 +23,6 @@ def test_setup_plot_style_basic():
     assert result is not None
 
 
-
 def test_setup_plot_style_edge_cases():
     """Test setup_plot_style: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_setup_plot_style_edge_cases():
     assert result is not None
 
 
-
 def test_setup_plot_style_error_handling():
     """Test setup_plot_style error handling."""
     with pytest.raises(ValueError):
         setup_plot_style(invalid_input)
-
 
 
 def test_save_figure_basic():
@@ -56,7 +53,6 @@ def test_save_figure_basic():
     assert result is not None
 
 
-
 def test_save_figure_edge_cases():
     """Test save_figure: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_save_figure_edge_cases():
     assert result is not None
 
 
-
 def test_save_figure_error_handling():
     """Test save_figure error handling."""
     with pytest.raises(ValueError):
         save_figure(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_save_figure_property_idempotent(self, fig, path):
 
     # Assert property
     assert save_figure(fig, path) == result, "idempotent violated"
-
 
 
 def test_plot_with_confidence_basic():
@@ -100,7 +93,6 @@ def test_plot_with_confidence_basic():
     assert result is not None
 
 
-
 def test_plot_with_confidence_edge_cases():
     """Test plot_with_confidence: edge cases."""
     # Arrange
@@ -113,23 +105,34 @@ def test_plot_with_confidence_edge_cases():
     assert result is not None
 
 
-
 def test_plot_with_confidence_error_handling():
     """Test plot_with_confidence error handling."""
     with pytest.raises(ValueError):
         plot_with_confidence(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_plot_with_confidence_property_idempotent(self, ax, x, y, y_err, y_lower, y_upper, label, color, alpha):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_plot_with_confidence_property_idempotent(
+    self, ax, x, y, y_err, y_lower, y_upper, label, color, alpha
+):
     """Property test: function is idempotent."""
     # Act
     result = plot_with_confidence(ax, x, y, y_err, y_lower, y_upper, label, color, alpha)
 
     # Assert property
-    assert plot_with_confidence(ax, x, y, y_err, y_lower, y_upper, label, color, alpha) == result, "idempotent violated"
-
+    assert (
+        plot_with_confidence(ax, x, y, y_err, y_lower, y_upper, label, color, alpha) == result
+    ), "idempotent violated"
 
 
 def test_plot_calibration_enhanced_basic():
@@ -144,7 +147,6 @@ def test_plot_calibration_enhanced_basic():
     assert result is not None
 
 
-
 def test_plot_calibration_enhanced_edge_cases():
     """Test plot_calibration_enhanced: edge cases."""
     # Arrange
@@ -157,23 +159,25 @@ def test_plot_calibration_enhanced_edge_cases():
     assert result is not None
 
 
-
 def test_plot_calibration_enhanced_error_handling():
     """Test plot_calibration_enhanced error handling."""
     with pytest.raises(ValueError):
         plot_calibration_enhanced(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_plot_calibration_enhanced_property_idempotent(self, ax, y_true, y_pred, n_bins, show_histogram, show_diagonal):
+def test_plot_calibration_enhanced_property_idempotent(
+    self, ax, y_true, y_pred, n_bins, show_histogram, show_diagonal
+):
     """Property test: function is idempotent."""
     # Act
     result = plot_calibration_enhanced(ax, y_true, y_pred, n_bins, show_histogram, show_diagonal)
 
     # Assert property
-    assert plot_calibration_enhanced(ax, y_true, y_pred, n_bins, show_histogram, show_diagonal) == result, "idempotent violated"
-
+    assert (
+        plot_calibration_enhanced(ax, y_true, y_pred, n_bins, show_histogram, show_diagonal)
+        == result
+    ), "idempotent violated"
 
 
 def test_boxplot_with_outliers_basic():
@@ -188,7 +192,6 @@ def test_boxplot_with_outliers_basic():
     assert result is not None
 
 
-
 def test_boxplot_with_outliers_edge_cases():
     """Test boxplot_with_outliers: edge cases."""
     # Arrange
@@ -201,12 +204,10 @@ def test_boxplot_with_outliers_edge_cases():
     assert result is not None
 
 
-
 def test_boxplot_with_outliers_error_handling():
     """Test boxplot_with_outliers error handling."""
     with pytest.raises(ValueError):
         boxplot_with_outliers(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -216,8 +217,9 @@ def test_boxplot_with_outliers_property_idempotent(self, ax, data, positions, la
     result = boxplot_with_outliers(ax, data, positions, labels, show_points)
 
     # Assert property
-    assert boxplot_with_outliers(ax, data, positions, labels, show_points) == result, "idempotent violated"
-
+    assert (
+        boxplot_with_outliers(ax, data, positions, labels, show_points) == result
+    ), "idempotent violated"
 
 
 def test_plot_importance_with_ci_basic():
@@ -232,7 +234,6 @@ def test_plot_importance_with_ci_basic():
     assert result is not None
 
 
-
 def test_plot_importance_with_ci_edge_cases():
     """Test plot_importance_with_ci: edge cases."""
     # Arrange
@@ -245,23 +246,24 @@ def test_plot_importance_with_ci_edge_cases():
     assert result is not None
 
 
-
 def test_plot_importance_with_ci_error_handling():
     """Test plot_importance_with_ci error handling."""
     with pytest.raises(ValueError):
         plot_importance_with_ci(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_plot_importance_with_ci_property_idempotent(self, ax, features, importance, ci, max_features, color_by_sign):
+def test_plot_importance_with_ci_property_idempotent(
+    self, ax, features, importance, ci, max_features, color_by_sign
+):
     """Property test: function is idempotent."""
     # Act
     result = plot_importance_with_ci(ax, features, importance, ci, max_features, color_by_sign)
 
     # Assert property
-    assert plot_importance_with_ci(ax, features, importance, ci, max_features, color_by_sign) == result, "idempotent violated"
-
+    assert (
+        plot_importance_with_ci(ax, features, importance, ci, max_features, color_by_sign) == result
+    ), "idempotent violated"
 
 
 def test_scatter_with_marginals_basic():
@@ -276,7 +278,6 @@ def test_scatter_with_marginals_basic():
     assert result is not None
 
 
-
 def test_scatter_with_marginals_edge_cases():
     """Test scatter_with_marginals: edge cases."""
     # Arrange
@@ -289,12 +290,10 @@ def test_scatter_with_marginals_edge_cases():
     assert result is not None
 
 
-
 def test_scatter_with_marginals_error_handling():
     """Test scatter_with_marginals error handling."""
     with pytest.raises(ValueError):
         scatter_with_marginals(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -305,7 +304,6 @@ def test_scatter_with_marginals_property_idempotent(self, x, y, figsize):
 
     # Assert property
     assert scatter_with_marginals(x, y, figsize) == result, "idempotent violated"
-
 
 
 def test_add_direct_labels_basic():
@@ -320,7 +318,6 @@ def test_add_direct_labels_basic():
     assert result is not None
 
 
-
 def test_add_direct_labels_edge_cases():
     """Test add_direct_labels: edge cases."""
     # Arrange
@@ -333,12 +330,10 @@ def test_add_direct_labels_edge_cases():
     assert result is not None
 
 
-
 def test_add_direct_labels_error_handling():
     """Test add_direct_labels error handling."""
     with pytest.raises(ValueError):
         add_direct_labels(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -349,7 +344,6 @@ def test_add_direct_labels_property_idempotent(self, ax, lines, labels, offset):
 
     # Assert property
     assert add_direct_labels(ax, lines, labels, offset) == result, "idempotent violated"
-
 
 
 def test_add_risk_indicators_basic():
@@ -364,7 +358,6 @@ def test_add_risk_indicators_basic():
     assert result is not None
 
 
-
 def test_add_risk_indicators_edge_cases():
     """Test add_risk_indicators: edge cases."""
     # Arrange
@@ -377,12 +370,10 @@ def test_add_risk_indicators_edge_cases():
     assert result is not None
 
 
-
 def test_add_risk_indicators_error_handling():
     """Test add_risk_indicators error handling."""
     with pytest.raises(ValueError):
         add_risk_indicators(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -393,7 +384,6 @@ def test_add_risk_indicators_property_idempotent(self, ax, data, var_level, cvar
 
     # Assert property
     assert add_risk_indicators(ax, data, var_level, cvar_level) == result, "idempotent violated"
-
 
 
 def test_shade_event_regions_basic():
@@ -408,7 +398,6 @@ def test_shade_event_regions_basic():
     assert result is not None
 
 
-
 def test_shade_event_regions_edge_cases():
     """Test shade_event_regions: edge cases."""
     # Arrange
@@ -421,12 +410,10 @@ def test_shade_event_regions_edge_cases():
     assert result is not None
 
 
-
 def test_shade_event_regions_error_handling():
     """Test shade_event_regions error handling."""
     with pytest.raises(ValueError):
         shade_event_regions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -437,7 +424,6 @@ def test_shade_event_regions_property_idempotent(self, ax, events, alpha):
 
     # Assert property
     assert shade_event_regions(ax, events, alpha) == result, "idempotent violated"
-
 
 
 def test_create_multipanel_figure_basic():
@@ -452,7 +438,6 @@ def test_create_multipanel_figure_basic():
     assert result is not None
 
 
-
 def test_create_multipanel_figure_edge_cases():
     """Test create_multipanel_figure: edge cases."""
     # Arrange
@@ -465,12 +450,10 @@ def test_create_multipanel_figure_edge_cases():
     assert result is not None
 
 
-
 def test_create_multipanel_figure_error_handling():
     """Test create_multipanel_figure error handling."""
     with pytest.raises(ValueError):
         create_multipanel_figure(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -481,7 +464,6 @@ def test_create_multipanel_figure_property_idempotent(self, nrows, ncols, figsiz
 
     # Assert property
     assert create_multipanel_figure(nrows, ncols, figsize) == result, "idempotent violated"
-
 
 
 def test_format_percentage_axis_basic():
@@ -496,7 +478,6 @@ def test_format_percentage_axis_basic():
     assert result is not None
 
 
-
 def test_format_percentage_axis_edge_cases():
     """Test format_percentage_axis: edge cases."""
     # Arrange
@@ -509,12 +490,10 @@ def test_format_percentage_axis_edge_cases():
     assert result is not None
 
 
-
 def test_format_percentage_axis_error_handling():
     """Test format_percentage_axis error handling."""
     with pytest.raises(ValueError):
         format_percentage_axis(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -525,7 +504,6 @@ def test_format_percentage_axis_property_idempotent(self, ax, axis):
 
     # Assert property
     assert format_percentage_axis(ax, axis) == result, "idempotent violated"
-
 
 
 def test_format_currency_axis_basic():
@@ -540,7 +518,6 @@ def test_format_currency_axis_basic():
     assert result is not None
 
 
-
 def test_format_currency_axis_edge_cases():
     """Test format_currency_axis: edge cases."""
     # Arrange
@@ -553,12 +530,10 @@ def test_format_currency_axis_edge_cases():
     assert result is not None
 
 
-
 def test_format_currency_axis_error_handling():
     """Test format_currency_axis error handling."""
     with pytest.raises(ValueError):
         format_currency_axis(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -569,4 +544,3 @@ def test_format_currency_axis_property_idempotent(self, ax, axis, symbol):
 
     # Assert property
     assert format_currency_axis(ax, axis, symbol) == result, "idempotent violated"
-

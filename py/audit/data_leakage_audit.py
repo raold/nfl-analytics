@@ -226,14 +226,26 @@ def audit_win_rate_reality_check():
 
     print(f"\n{'Level':<25} {'Win Rate':>12} {'Annual ROI':>12} {'Sharpe':>10}")
     print("-" * 60)
-    print(f"{'Our Model':<25} {our_results['Win Rate']:>12.1%} {our_results['ROI']:>11.1%} {our_results['Sharpe']:>10.2f}")
-    print(f"{'Elite Professional':<25} {professional_benchmarks['Elite Professional']['Win Rate']:>12.1%} {professional_benchmarks['Elite Professional']['ROI']:>11.1%} {professional_benchmarks['Elite Professional']['Sharpe']:>10.2f}")
-    print(f"{'Top Sportsbook':<25} {professional_benchmarks['Top Sportsbook']['Win Rate']:>12.1%} {professional_benchmarks['Top Sportsbook']['ROI']:>11.1%} {professional_benchmarks['Top Sportsbook']['Sharpe']:>10.2f}")
-    print(f"{'Break Even':<25} {professional_benchmarks['Break Even']['Win Rate']:>12.1%} {professional_benchmarks['Break Even']['ROI']:>11.1%} {professional_benchmarks['Break Even']['Sharpe']:>10.2f}")
+    print(
+        f"{'Our Model':<25} {our_results['Win Rate']:>12.1%} {our_results['ROI']:>11.1%} {our_results['Sharpe']:>10.2f}"
+    )
+    print(
+        f"{'Elite Professional':<25} {professional_benchmarks['Elite Professional']['Win Rate']:>12.1%} {professional_benchmarks['Elite Professional']['ROI']:>11.1%} {professional_benchmarks['Elite Professional']['Sharpe']:>10.2f}"
+    )
+    print(
+        f"{'Top Sportsbook':<25} {professional_benchmarks['Top Sportsbook']['Win Rate']:>12.1%} {professional_benchmarks['Top Sportsbook']['ROI']:>11.1%} {professional_benchmarks['Top Sportsbook']['Sharpe']:>10.2f}"
+    )
+    print(
+        f"{'Break Even':<25} {professional_benchmarks['Break Even']['Win Rate']:>12.1%} {professional_benchmarks['Break Even']['ROI']:>11.1%} {professional_benchmarks['Break Even']['Sharpe']:>10.2f}"
+    )
 
     print("\n🔴 VERDICT:")
-    print(f"  Our win rate is {our_results['Win Rate'] / professional_benchmarks['Elite Professional']['Win Rate']:.1f}x higher than elite professionals")
-    print(f"  Our ROI is {our_results['ROI'] / (professional_benchmarks['Elite Professional']['ROI']*100):.0f}x higher than elite professionals")
+    print(
+        f"  Our win rate is {our_results['Win Rate'] / professional_benchmarks['Elite Professional']['Win Rate']:.1f}x higher than elite professionals"
+    )
+    print(
+        f"  Our ROI is {our_results['ROI'] / (professional_benchmarks['Elite Professional']['ROI']*100):.0f}x higher than elite professionals"
+    )
     print("  This is statistically impossible without severe data leakage")
 
 

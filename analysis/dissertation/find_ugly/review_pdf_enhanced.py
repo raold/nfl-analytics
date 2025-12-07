@@ -42,15 +42,16 @@ DPI = 150
 MAX_OVERFULL_HBOX = 10  # pt
 MAX_FLOAT_TOO_LARGE = 20  # pt
 EXPECTED_DECIMAL_PLACES = {
-    'brier': 3,
-    'probability': 3,
-    'roi': 2,
-    'percent': 1,
+    "brier": 3,
+    "probability": 3,
+    "roi": 2,
+    "percent": 1,
 }
 
 # ============================================================================
 # PDF Conversion (Original Functionality)
 # ============================================================================
+
 
 def get_page_count():
     """Get total number of pages from LaTeX log."""
@@ -60,9 +61,10 @@ def get_page_count():
     with open(LOG_PATH) as f:
         for line in f:
             if "Output written on main.pdf" in line:
-                parts = line.split('(')[1].split()[0]
+                parts = line.split("(")[1].split()[0]
                 return int(parts)
     return None
+
 
 def convert_page_range(start_page, end_page):
     """Convert a range of PDF pages to PNG images using Ghostscript."""
@@ -78,7 +80,7 @@ def convert_page_range(start_page, end_page):
         f"-dFirstPage={start_page}",
         f"-dLastPage={end_page}",
         f"-sOutputFile={OUTPUT_DIR}/page_%03d.png",
-        PDF_PATH
+        PDF_PATH,
     ]
 
     print(f"Converting pages {start_page}-{end_page}...")
@@ -91,6 +93,7 @@ def convert_page_range(start_page, end_page):
     print(f"✓ Converted pages {start_page}-{end_page}")
     return True
 
+
 def delete_images():
     """Delete all PNG images in the output directory."""
     if OUTPUT_DIR.exists():
@@ -99,16 +102,20 @@ def delete_images():
             f.unlink()
         print(f"✓ Deleted {len(png_files)} images")
 
+
 def cleanup_directory():
     """Remove the pages directory entirely."""
     if OUTPUT_DIR.exists():
         import shutil
+
         shutil.rmtree(OUTPUT_DIR)
         print("✓ Cleaned up pages directory")
+
 
 # ============================================================================
 # Quality Checks
 # ============================================================================
+
 
 class QualityChecker:
     """Automated quality checker for dissertation LaTeX source and compilation."""
@@ -119,9 +126,9 @@ class QualityChecker:
 
     def check_all(self):
         """Run all quality checks."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("DISSERTATION QUALITY REPORT")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         self.check_compilation_log()
         self.check_table_quality()
@@ -133,48 +140,50 @@ class QualityChecker:
     def check_compilation_log(self):
         """Check LaTeX compilation log for warnings and errors."""
         if not LOG_PATH.exists():
-            self.issues['log'].append("main.log not found - PDF not compiled")
+            self.issues["log"].append("main.log not found - PDF not compiled")
             return
 
         with open(LOG_PATH) as f:
             log_content = f.read()
 
         # Count different types of warnings
-        overfull_hboxes = re.findall(r'Overfull \\hbox \((\d+\.?\d*)pt too wide\)', log_content)
+        overfull_hboxes = re.findall(r"Overfull \\hbox \((\d+\.?\d*)pt too wide\)", log_content)
         for width in overfull_hboxes:
             if float(width) > MAX_OVERFULL_HBOX:
-                self.issues['typography'].append(f"Overfull hbox: {width}pt too wide")
+                self.issues["typography"].append(f"Overfull hbox: {width}pt too wide")
 
-        underfull_hboxes = len(re.findall(r'Underfull \\hbox', log_content))
-        self.warnings['underfull_hbox'] = underfull_hboxes
+        underfull_hboxes = len(re.findall(r"Underfull \\hbox", log_content))
+        self.warnings["underfull_hbox"] = underfull_hboxes
 
         # Float warnings
-        float_warnings = re.findall(r'Float too large for page by ([\d.]+)pt', log_content)
+        float_warnings = re.findall(r"Float too large for page by ([\d.]+)pt", log_content)
         for size in float_warnings:
             if float(size) > MAX_FLOAT_TOO_LARGE:
-                self.issues['floats'].append(f"Float {size}pt too large for page")
+                self.issues["floats"].append(f"Float {size}pt too large for page")
 
         # References
-        undef_refs = len(re.findall(r'Reference.*undefined', log_content))
+        undef_refs = len(re.findall(r"Reference.*undefined", log_content))
         if undef_refs > 0:
-            self.issues['references'].append(f"{undef_refs} undefined references")
+            self.issues["references"].append(f"{undef_refs} undefined references")
 
-        multiply_defined = len(re.findall(r'multiply defined', log_content))
+        multiply_defined = len(re.findall(r"multiply defined", log_content))
         if multiply_defined > 0:
-            self.issues['references'].append(f"{multiply_defined} multiply-defined labels")
+            self.issues["references"].append(f"{multiply_defined} multiply-defined labels")
 
         # Citations
-        undef_citations = len(re.findall(r'Citation.*undefined', log_content))
+        undef_citations = len(re.findall(r"Citation.*undefined", log_content))
         if undef_citations > 0:
-            self.issues['references'].append(f"{undef_citations} undefined citations")
+            self.issues["references"].append(f"{undef_citations} undefined citations")
 
-        self.warnings['overfull_hbox_total'] = len(overfull_hboxes)
-        self.warnings['overfull_hbox_serious'] = len([w for w in overfull_hboxes if float(w) > MAX_OVERFULL_HBOX])
+        self.warnings["overfull_hbox_total"] = len(overfull_hboxes)
+        self.warnings["overfull_hbox_serious"] = len(
+            [w for w in overfull_hboxes if float(w) > MAX_OVERFULL_HBOX]
+        )
 
     def check_table_quality(self):
         """Check table .tex files for quality issues."""
         if not FIGURES_DIR.exists():
-            self.issues['tables'].append("Figures directory not found")
+            self.issues["tables"].append("Figures directory not found")
             return
 
         table_files = list(FIGURES_DIR.glob("*table*.tex"))
@@ -186,45 +195,45 @@ class QualityChecker:
                 content = f.read()
 
             # Check #1: Numeric alignment
-            if '\\begin{tabular}' in content:
-                col_spec_match = re.search(r'\\begin\{tabular[x]?\}\{([^}]+)\}', content)
+            if "\\begin{tabular}" in content:
+                col_spec_match = re.search(r"\\begin\{tabular[x]?\}\{([^}]+)\}", content)
                 if col_spec_match:
                     col_spec = col_spec_match.group(1)
                     # Check if there are numeric columns that should be right-aligned
-                    if 'l' in col_spec and re.search(r'&\s*\d+\.?\d*\s*(?:&|\\\\)', content):
-                        if 'r' not in col_spec and 'N' not in col_spec:
-                            issues_by_type['numeric_alignment'] += 1
+                    if "l" in col_spec and re.search(r"&\s*\d+\.?\d*\s*(?:&|\\\\)", content):
+                        if "r" not in col_spec and "N" not in col_spec:
+                            issues_by_type["numeric_alignment"] += 1
 
             # Check #2: Decimal precision consistency
-            numbers = re.findall(r'(\d+\.\d+)', content)
+            numbers = re.findall(r"(\d+\.\d+)", content)
             if len(numbers) > 5:
-                decimal_places = [len(n.split('.')[1]) for n in numbers]
+                decimal_places = [len(n.split(".")[1]) for n in numbers]
                 if len(set(decimal_places)) > 2:
-                    issues_by_type['inconsistent_decimals'] += 1
+                    issues_by_type["inconsistent_decimals"] += 1
 
             # Check #3: Width control for wide tables
-            if '\\begin{tabular}' in content and col_spec_match:
-                col_count = len([c for c in col_spec_match.group(1) if c in 'lcrpN'])
-                if col_count > 5 and 'adjustbox' not in content and 'tabularx' not in content:
-                    issues_by_type['no_width_control'] += 1
+            if "\\begin{tabular}" in content and col_spec_match:
+                col_count = len([c for c in col_spec_match.group(1) if c in "lcrpN"])
+                if col_count > 5 and "adjustbox" not in content and "tabularx" not in content:
+                    issues_by_type["no_width_control"] += 1
 
             # Check #23: Bold caption summaries
-            if '\\caption{' in content:
-                caption_match = re.search(r'\\caption\{([^}]+)\}', content)
-                if caption_match and not caption_match.group(1).startswith('\\textbf'):
-                    issues_by_type['caption_not_bold'] += 1
+            if "\\caption{" in content:
+                caption_match = re.search(r"\\caption\{([^}]+)\}", content)
+                if caption_match and not caption_match.group(1).startswith("\\textbf"):
+                    issues_by_type["caption_not_bold"] += 1
 
             # Check #25: Table notes present
-            if '\\begin{tabular}' in content and '\\begin{tablenotes}' not in content:
-                if '\\begin{threeparttable}' not in content:
-                    issues_by_type['no_tablenotes'] += 1
+            if "\\begin{tabular}" in content and "\\begin{tablenotes}" not in content:
+                if "\\begin{threeparttable}" not in content:
+                    issues_by_type["no_tablenotes"] += 1
 
         # Report table issues
         if issues_by_type:
             for issue_type, count in issues_by_type.items():
-                self.issues['tables'].append(f"{count} tables with {issue_type.replace('_', ' ')}")
+                self.issues["tables"].append(f"{count} tables with {issue_type.replace('_', ' ')}")
 
-        self.warnings['total_tables'] = len(table_files)
+        self.warnings["total_tables"] = len(table_files)
 
     def check_figure_references(self):
         """Check that all figures are properly sized and referenced."""
@@ -237,20 +246,22 @@ class QualityChecker:
         # Check if dissertation_style.py is being used
         style_imports = 0
         for py_file in Path(PDF_PATH).parent.parent.parent.glob("py/**/*.py"):
-            if py_file.name.startswith('.'):
+            if py_file.name.startswith("."):
                 continue
             try:
                 with open(py_file) as f:
                     content = f.read()
-                    if 'dissertation_style' in content:
+                    if "dissertation_style" in content:
                         style_imports += 1
             except:
                 pass
 
         if style_imports == 0:
-            self.issues['figures'].append("dissertation_style.py not imported in any plotting scripts")
+            self.issues["figures"].append(
+                "dissertation_style.py not imported in any plotting scripts"
+            )
 
-        self.warnings['total_figures'] = len(figure_files)
+        self.warnings["total_figures"] = len(figure_files)
 
     def check_typography(self):
         """Check for common typography issues."""
@@ -261,20 +272,20 @@ class QualityChecker:
             main_content = f.read()
 
         # Check for required packages
-        required_packages = ['siunitx', 'makecell', 'threeparttable', 'booktabs']
+        required_packages = ["siunitx", "makecell", "threeparttable", "booktabs"]
         for pkg in required_packages:
-            if f'\\usepackage{{{pkg}}}' not in main_content and '\\usepackage' not in main_content:
-                self.issues['typography'].append(f"Package {pkg} not loaded")
+            if f"\\usepackage{{{pkg}}}" not in main_content and "\\usepackage" not in main_content:
+                self.issues["typography"].append(f"Package {pkg} not loaded")
 
         # Check for column type definitions
-        if '\\newcolumntype{N}' not in main_content:
-            self.issues['typography'].append("siunitx column type N not defined")
+        if "\\newcolumntype{N}" not in main_content:
+            self.issues["typography"].append("siunitx column type N not defined")
 
     def print_summary(self):
         """Print quality report summary."""
-        print("\n" + "-"*80)
+        print("\n" + "-" * 80)
         print("ISSUES FOUND")
-        print("-"*80)
+        print("-" * 80)
 
         if not self.issues:
             print("✓ No critical issues found!")
@@ -284,15 +295,17 @@ class QualityChecker:
                 for issue in issue_list:
                     print(f"  ⚠  {issue}")
 
-        print("\n" + "-"*80)
+        print("\n" + "-" * 80)
         print("STATISTICS")
-        print("-"*80)
+        print("-" * 80)
         print(f"  Total tables: {self.warnings.get('total_tables', 0)}")
         print(f"  Total figures: {self.warnings.get('total_figures', 0)}")
-        print(f"  Overfull hboxes: {self.warnings.get('overfull_hbox_total', 0)} ({self.warnings.get('overfull_hbox_serious', 0)} serious)")
+        print(
+            f"  Overfull hboxes: {self.warnings.get('overfull_hbox_total', 0)} ({self.warnings.get('overfull_hbox_serious', 0)} serious)"
+        )
         print(f"  Underfull hboxes: {self.warnings.get('underfull_hbox', 0)}")
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
 
         # Return status code
         if self.issues:
@@ -301,6 +314,7 @@ class QualityChecker:
         else:
             print("\n✓ DISSERTATION QUALITY: EXCELLENT")
             return 0
+
 
 # ============================================================================
 # Main CLI
@@ -347,8 +361,8 @@ if __name__ == "__main__":
 
         elif command == "pages":
             page_spec = sys.argv[2]
-            if '-' in page_spec:
-                start, end = page_spec.split('-')
+            if "-" in page_spec:
+                start, end = page_spec.split("-")
                 convert_page_range(int(start), int(end))
             else:
                 page = int(page_spec)

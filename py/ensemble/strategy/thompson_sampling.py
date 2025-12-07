@@ -50,8 +50,9 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BetaParams:
     """Beta distribution parameters for a component."""
+
     alpha: float = 1.0  # Prior successes
-    beta: float = 1.0   # Prior failures
+    beta: float = 1.0  # Prior failures
     n_samples: int = 0
     cumulative_success: float = 0.0
 
@@ -121,7 +122,11 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
             stat_type: Type of stat for automatic threshold selection
         """
         self.component_names = component_names or [
-            'hierarchical', 'informative_priors', 'state_space', 'xgboost', 'hybrid'
+            "hierarchical",
+            "informative_priors",
+            "state_space",
+            "xgboost",
+            "hybrid",
         ]
 
         # Set threshold based on stat type if provided
@@ -131,15 +136,16 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
 
         # Initialize Beta parameters for each component
         self.params: dict[str, BetaParams] = {
-            name: BetaParams(alpha=prior_alpha, beta=prior_beta)
-            for name in self.component_names
+            name: BetaParams(alpha=prior_alpha, beta=prior_beta) for name in self.component_names
         }
 
         # Track last sampled weights
         self._last_weights: dict[str, float] | None = None
         self._prediction_count = 0
 
-        logger.info(f"Initialized ThompsonSamplingStrategy with {len(self.component_names)} components")
+        logger.info(
+            f"Initialized ThompsonSamplingStrategy with {len(self.component_names)} components"
+        )
 
     @property
     def name(self) -> str:
@@ -148,15 +154,15 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
     def _get_threshold_for_stat_type(self, stat_type: str | None) -> float | None:
         """Get appropriate success threshold for stat type."""
         thresholds = {
-            'passing_yards': 40.0,
-            'rushing_yards': 20.0,
-            'receiving_yards': 20.0,
-            'receptions': 2.5,
-            'passing_tds': 0.5,
-            'rushing_tds': 0.3,
-            'spread': 5.0,
-            'total': 6.0,
-            'win_prob': 0.15,
+            "passing_yards": 40.0,
+            "rushing_yards": 20.0,
+            "receiving_yards": 20.0,
+            "receptions": 2.5,
+            "passing_tds": 0.5,
+            "rushing_tds": 0.3,
+            "spread": 5.0,
+            "total": 6.0,
+            "win_prob": 0.15,
         }
         return thresholds.get(stat_type)
 
@@ -175,10 +181,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         return {name: m / total for name, m in means.items()}
 
     def combine(
-        self,
-        predictions: list[ModelPrediction],
-        context: dict[str, Any] | None = None,
-        **kwargs
+        self, predictions: list[ModelPrediction], context: dict[str, Any] | None = None, **kwargs
     ) -> EnsemblePrediction:
         """Combine predictions using Thompson Sampling weights."""
         self.validate_predictions(predictions)
@@ -226,7 +229,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
                 "expected_weights": self.get_expected_weights(),
                 "prediction_count": self._prediction_count,
                 "exploration_rate": self._compute_exploration_rate(),
-            }
+            },
         )
 
     def update(
@@ -315,6 +318,7 @@ class AdaptiveStrategySelector:
                 from py.ensemble.dirichlet_bayesian_stacking import (
                     DirichletBayesianStackingByStatType,
                 )
+
                 self._dirichlet = DirichletBayesianStackingByStatType(use_db=True)
             except ImportError:
                 logger.warning("DirichletBayesianStackingByStatType not available")

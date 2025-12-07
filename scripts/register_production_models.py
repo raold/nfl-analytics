@@ -161,17 +161,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "state_space_v2",
-                "model_type": "state_space",
-                "model_family": "bayesian_state_space",
-                "version": "v2.0",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Approved {model['approved_date']}. MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "state_space_v2",
+                    "model_type": "state_space",
+                    "model_family": "bayesian_state_space",
+                    "version": "v2.0",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Approved {model['approved_date']}. MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 2. Hierarchical v2
     if "hierarchical_v2" in production_models:
@@ -180,17 +182,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "hierarchical_v2",
-                "model_type": "hierarchical_bayesian",
-                "model_family": "bayesian_hierarchical",
-                "version": "v2.0",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Approved {model['approved_date']}. Rhat: {model['convergence']['rhat_max']} (relaxed threshold). MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "hierarchical_v2",
+                    "model_type": "hierarchical_bayesian",
+                    "model_family": "bayesian_hierarchical",
+                    "version": "v2.0",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Approved {model['approved_date']}. Rhat: {model['convergence']['rhat_max']} (relaxed threshold). MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 3. Informative Priors v2
     if "informative_priors_v2" in production_models:
@@ -199,17 +203,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "informative_priors_v2",
-                "model_type": "hierarchical_bayesian",
-                "model_family": "bayesian_hierarchical",
-                "version": "v2.0",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Approved {model['approved_date']}. Rhat: {model['convergence']['rhat_max']} (relaxed threshold). MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "informative_priors_v2",
+                    "model_type": "hierarchical_bayesian",
+                    "model_family": "bayesian_hierarchical",
+                    "version": "v2.0",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Approved {model['approved_date']}. Rhat: {model['convergence']['rhat_max']} (relaxed threshold). MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 4. BNN Multi-Output v3.1
     if "bnn_multioutput_v3_1" in production_models:
@@ -218,17 +224,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "bnn_multioutput_v3_1",
-                "model_type": "bayesian_neural_network",
-                "model_family": "bayesian_neural_network",
-                "version": "v3.1",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Calibration: {model['performance']['calibration_90pct']}% (T={model['performance']['temperature']}). MAE: {model['performance']['mae_yards']} yards. Rushing only (passing variant failed). File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "bnn_multioutput_v3_1",
+                    "model_type": "bayesian_neural_network",
+                    "model_family": "bayesian_neural_network",
+                    "version": "v3.1",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Calibration: {model['performance']['calibration_90pct']}% (T={model['performance']['temperature']}). MAE: {model['performance']['mae_yards']} yards. Rushing only (passing variant failed). File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 5. XGBoost v2 Canonical (archived but should be registered)
     if "xgboost_v2" in production_models:
@@ -237,17 +245,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "xgboost_v2_canonical",
-                "model_type": "gradient_boosting",
-                "model_family": "gradient_boosting",
-                "version": "v2.0",
-                "model_path": file_path,
-                "status": "archived",
-                "is_production": False,
-                "description": model["name"],
-                "notes": f"DEPRECATED {model['deprecated_date']}. Replaced by hybrid_static_incremental_v1. MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "xgboost_v2_canonical",
+                    "model_type": "gradient_boosting",
+                    "model_family": "gradient_boosting",
+                    "version": "v2.0",
+                    "model_path": file_path,
+                    "status": "archived",
+                    "is_production": False,
+                    "description": model["name"],
+                    "notes": f"DEPRECATED {model['deprecated_date']}. Replaced by hybrid_static_incremental_v1. MAE: {model['performance']['mae_yards']} yards. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 6. CQL Bet Sizer
     if "cql_bet_sizer" in production_models:
@@ -256,17 +266,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "cql_bet_sizer",
-                "model_type": "reinforcement_learning",
-                "model_family": "conservative_q_learning",
-                "version": "v1.0",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Improvement: {model['performance']['improvement_vs_baseline']} vs baseline. Policy reward: {model['performance']['policy_reward']}. Trained on {model['training_data']}. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "cql_bet_sizer",
+                    "model_type": "reinforcement_learning",
+                    "model_family": "conservative_q_learning",
+                    "version": "v1.0",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Improvement: {model['performance']['improvement_vs_baseline']} vs baseline. Policy reward: {model['performance']['policy_reward']}. Trained on {model['training_data']}. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # 7. Temperature Scaler for 4-Way Ensemble
     if "temperature_scaler_4way" in production_models:
@@ -275,17 +287,19 @@ def main():
         exists, size_mb = check_model_exists(file_path)
 
         if exists:
-            models_to_register.append({
-                "model_name": "temperature_scaler_4way",
-                "model_type": "calibration",
-                "model_family": "ensemble_calibration",
-                "version": "v1.0",
-                "model_path": file_path,
-                "status": "production",
-                "is_production": True,
-                "description": model["name"],
-                "notes": f"Approved {model['approved_date']}. Temperature: {model['performance']['temperature']:.4f}. Coverage: {model['performance']['coverage_before']:.1%} → {model['performance']['coverage_after']:.1%}. Interval reduction: {model['performance']['interval_reduction']:.1%}. Calibration samples: {model['performance']['calibration_samples']}. File size: {size_mb:.1f} MB.",
-            })
+            models_to_register.append(
+                {
+                    "model_name": "temperature_scaler_4way",
+                    "model_type": "calibration",
+                    "model_family": "ensemble_calibration",
+                    "version": "v1.0",
+                    "model_path": file_path,
+                    "status": "production",
+                    "is_production": True,
+                    "description": model["name"],
+                    "notes": f"Approved {model['approved_date']}. Temperature: {model['performance']['temperature']:.4f}. Coverage: {model['performance']['coverage_before']:.1%} → {model['performance']['coverage_after']:.1%}. Interval reduction: {model['performance']['interval_reduction']:.1%}. Calibration samples: {model['performance']['calibration_samples']}. File size: {size_mb:.1f} MB.",
+                }
+            )
 
     # Register models
     print(f"\n📝 Models to register: {len(models_to_register)}")

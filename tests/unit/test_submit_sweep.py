@@ -23,7 +23,6 @@ def test_load_sweep_config_basic():
     assert result is not None
 
 
-
 def test_load_sweep_config_edge_cases():
     """Test load_sweep_config: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_sweep_config_edge_cases():
     assert result is not None
 
 
-
 def test_load_sweep_config_error_handling():
     """Test load_sweep_config error handling."""
     with pytest.raises(ValueError):
         load_sweep_config(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_load_sweep_config_property_idempotent(self, config_path):
 
     # Assert property
     assert load_sweep_config(config_path) == result, "idempotent violated"
-
 
 
 def test_estimate_sweep_basic():
@@ -67,7 +63,6 @@ def test_estimate_sweep_basic():
     assert result is not None
 
 
-
 def test_estimate_sweep_edge_cases():
     """Test estimate_sweep: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_estimate_sweep_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_sweep_error_handling():
     """Test estimate_sweep error handling."""
     with pytest.raises(ValueError):
         estimate_sweep(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_estimate_sweep_property_idempotent(self, sweep):
 
     # Assert property
     assert estimate_sweep(sweep) == result, "idempotent violated"
-
 
 
 def test_print_sweep_summary_basic():
@@ -111,7 +103,6 @@ def test_print_sweep_summary_basic():
     assert result is not None
 
 
-
 def test_print_sweep_summary_edge_cases():
     """Test print_sweep_summary: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_print_sweep_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_sweep_summary_error_handling():
     """Test print_sweep_summary error handling."""
     with pytest.raises(ValueError):
         print_sweep_summary(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_print_sweep_summary_property_idempotent(self, sweep, estimate):
 
     # Assert property
     assert print_sweep_summary(sweep, estimate) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -155,7 +143,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -168,9 +155,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

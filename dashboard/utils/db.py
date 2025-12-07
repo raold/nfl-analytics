@@ -32,14 +32,17 @@ import streamlit as st
 # Try to import psycopg3 and connection pooling
 try:
     import psycopg
+
     PSYCOPG_AVAILABLE = True
 except ImportError:
     PSYCOPG_AVAILABLE = False
 
 try:
     import sys
+
     sys.path.append("/Users/dro/rice/nfl-analytics")
     from py.utils.psycopg_pool import get_connection_pool
+
     POOL_AVAILABLE = True
 except ImportError:
     POOL_AVAILABLE = False

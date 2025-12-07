@@ -32,10 +32,7 @@ import psycopg2
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Configuration constants
@@ -45,11 +42,7 @@ CURRENT_SEASON = 2024  # pragma: allowlist temporal
 def get_test_games(n_games: int = 50, season: int = CURRENT_SEASON) -> list:
     """Fetch test games from database."""
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password=os.getenv("DB_PASSWORD")
+        host="localhost", port=5544, dbname="devdb01", user="dro", password=os.getenv("DB_PASSWORD")
     )
 
     query = f"""
@@ -69,7 +62,7 @@ def get_test_games(n_games: int = 50, season: int = CURRENT_SEASON) -> list:
     df = pd.read_sql_query(query, conn)
     conn.close()
 
-    games = df.to_dict('records')
+    games = df.to_dict("records")
     logger.info(f"Loaded {len(games)} test games from season {season}")
     return games
 
@@ -87,9 +80,9 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
     """
     ensemble = EnhancedEnsemble4Way()
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("BATCH PREDICTION VALIDATION TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"Test size: {len(games)} games")
     logger.info(f"Tolerance: {tolerance * 100:.1f}%")
     logger.info("")
@@ -113,22 +106,24 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
 
     for game in sample_games:
         pred = ensemble.predict(
-            player_id=game["player_id"],
-            season=game["season"],
-            week=game["week"]
+            player_id=game["player_id"], season=game["season"], week=game["week"]
         )
-        sequential_results.append({
-            "player_id": game["player_id"],
-            "season": game["season"],
-            "week": game["week"],
-            "ensemble_mean": pred["ensemble_mean"],
-            "ensemble_std": pred["ensemble_std"],
-        })
+        sequential_results.append(
+            {
+                "player_id": game["player_id"],
+                "season": game["season"],
+                "week": game["week"],
+                "ensemble_mean": pred["ensemble_mean"],
+                "ensemble_std": pred["ensemble_std"],
+            }
+        )
 
     sequential_time = (time.time() - sequential_start) * 1000
     sequential_per_game = sequential_time / sample_size
 
-    logger.info(f"✅ Sequential complete: {sequential_time:.1f}ms total ({sequential_per_game:.1f}ms per game)")
+    logger.info(
+        f"✅ Sequential complete: {sequential_time:.1f}ms total ({sequential_per_game:.1f}ms per game)"
+    )
 
     # Test 3: Validate predictions match
     logger.info("\n🔍 Validating predictions match...")
@@ -136,9 +131,7 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
 
     # Merge batch and sequential results
     merged = batch_df.merge(
-        sequential_df,
-        on=["player_id", "season", "week"],
-        suffixes=("_batch", "_seq")
+        sequential_df, on=["player_id", "season", "week"], suffixes=("_batch", "_seq")
     )
 
     # Check differences
@@ -165,7 +158,7 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
 
     # Test 4: Performance metrics
     logger.info("\n📊 PERFORMANCE METRICS")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     speedup = sequential_per_game / batch_per_game
     estimated_full_batch_time = batch_per_game * 1984  # Estimate for full backtest
@@ -175,12 +168,16 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
     logger.info(f"Speedup: {speedup:.1f}x")
     logger.info("")
     logger.info("Estimated time for 1,984 games:")
-    logger.info(f"  Sequential: {(sequential_per_game * 1984):.0f}ms ({(sequential_per_game * 1984)/1000:.1f}s)")
-    logger.info(f"  Batch: {estimated_full_batch_time:.0f}ms ({estimated_full_batch_time/1000:.1f}s)")
+    logger.info(
+        f"  Sequential: {(sequential_per_game * 1984):.0f}ms ({(sequential_per_game * 1984)/1000:.1f}s)"
+    )
+    logger.info(
+        f"  Batch: {estimated_full_batch_time:.0f}ms ({estimated_full_batch_time/1000:.1f}s)"
+    )
 
     # Test 5: Risk gate validation
     logger.info("\n🚦 RISK GATE VALIDATION")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     inference_time_target = 500  # ms
     inference_passes = batch_per_game < inference_time_target
@@ -194,23 +191,27 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
         logger.warning("❌ FAIL - Inference time exceeds target")
 
     # Final summary
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("FINAL RESULTS")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     overall_pass = validation_passed and inference_passes
 
     if overall_pass:
         logger.info("✅ ALL TESTS PASSED")
         logger.info(f"  - Predictions match sequential (within {tolerance*100:.1f}%)")
-        logger.info(f"  - Inference time meets target ({batch_per_game:.1f}ms < {inference_time_target}ms)")
+        logger.info(
+            f"  - Inference time meets target ({batch_per_game:.1f}ms < {inference_time_target}ms)"
+        )
         logger.info(f"  - Speedup: {speedup:.1f}x vs sequential")
     else:
         logger.warning("⚠️  SOME TESTS FAILED")
         if not validation_passed:
             logger.warning("  - Predictions differ from sequential")
         if not inference_passes:
-            logger.warning(f"  - Inference time exceeds target ({batch_per_game:.1f}ms > {inference_time_target}ms)")
+            logger.warning(
+                f"  - Inference time exceeds target ({batch_per_game:.1f}ms > {inference_time_target}ms)"
+            )
 
     return {
         "batch_time_ms": batch_time,
@@ -226,31 +227,21 @@ def test_batch_vs_sequential(games: list, tolerance: float = 0.01):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Test batch prediction performance improvement"
+    parser = argparse.ArgumentParser(description="Test batch prediction performance improvement")
+    parser.add_argument(
+        "--n-games", type=int, default=50, help="Number of games to test (default: 50)"
     )
     parser.add_argument(
-        "--n-games",
-        type=int,
-        default=50,
-        help="Number of games to test (default: 50)"
+        "--season", type=int, default=CURRENT_SEASON, help="Season to test (default: 2024)"
     )
     parser.add_argument(
-        "--season",
-        type=int,
-        default=CURRENT_SEASON,
-        help="Season to test (default: 2024)"
-    )
-    parser.add_argument(
-        "--full",
-        action="store_true",
-        help="Test full 1,984 games (slow for sequential validation)"
+        "--full", action="store_true", help="Test full 1,984 games (slow for sequential validation)"
     )
     parser.add_argument(
         "--tolerance",
         type=float,
         default=0.01,
-        help="Relative tolerance for prediction differences (default: 0.01 = 1%%)"
+        help="Relative tolerance for prediction differences (default: 0.01 = 1%%)",
     )
 
     args = parser.parse_args()

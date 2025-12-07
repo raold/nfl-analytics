@@ -7,4 +7,4 @@ and performance optimization.
 
 from .loaders import BulkLoader, DatabaseLoader, LoadResult
 
-__all__ = ['DatabaseLoader', 'BulkLoader', 'LoadResult']
+__all__ = ["DatabaseLoader", "BulkLoader", "LoadResult"]

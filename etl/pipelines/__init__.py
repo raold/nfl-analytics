@@ -10,6 +10,7 @@ from .base_pipeline import BasePipeline, PipelineResult
 try:
     from .daily import DailyPipeline
     from .weekly import WeeklyPipeline
-    __all__ = ['BasePipeline', 'PipelineResult', 'DailyPipeline', 'WeeklyPipeline']
+
+    __all__ = ["BasePipeline", "PipelineResult", "DailyPipeline", "WeeklyPipeline"]
 except ImportError:
-    __all__ = ['BasePipeline', 'PipelineResult']
+    __all__ = ["BasePipeline", "PipelineResult"]

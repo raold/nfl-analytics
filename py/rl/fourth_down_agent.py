@@ -68,7 +68,9 @@ from py.rl.fourth_down_mdp import (
 # ============================================================================
 
 
-def load_fourth_down_dataset(csv_path: str) -> tuple[np.ndarray, np.ndarray, np.ndarray, pd.DataFrame]:
+def load_fourth_down_dataset(
+    csv_path: str,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, pd.DataFrame]:
     """
     Load 4th down dataset from CSV.
 
@@ -97,13 +99,27 @@ def load_fourth_down_dataset(csv_path: str) -> tuple[np.ndarray, np.ndarray, np.
     rewards = df["reward"].to_numpy(dtype=np.float32)
 
     # Metadata for analysis
-    metadata_cols = ["game_id", "play_id", "season", "week", "posteam", "play_type",
-                     "yards_gained", "fourth_down_converted", "touchdown", "field_goal_result"]
+    metadata_cols = [
+        "game_id",
+        "play_id",
+        "season",
+        "week",
+        "posteam",
+        "play_type",
+        "yards_gained",
+        "fourth_down_converted",
+        "touchdown",
+        "field_goal_result",
+    ]
     metadata = df[metadata_cols].copy()
 
     # Data quality checks
-    assert states.shape[1] == STATE_DIM, f"Expected {STATE_DIM} state features, got {states.shape[1]}"
-    assert actions.min() >= 0 and actions.max() < ACTION_DIM, f"Invalid actions: {actions.min()}-{actions.max()}"
+    assert (
+        states.shape[1] == STATE_DIM
+    ), f"Expected {STATE_DIM} state features, got {states.shape[1]}"
+    assert (
+        actions.min() >= 0 and actions.max() < ACTION_DIM
+    ), f"Invalid actions: {actions.min()}-{actions.max()}"
     assert not np.isnan(states).any(), "NaN values in states"
     assert not np.isnan(rewards).any(), "NaN values in rewards"
 
@@ -291,7 +307,9 @@ def evaluate_fourth_down_policy(
 
     # 1. Agreement rate with actual coaches
     agreement = (predicted_actions == actions).mean()
-    print(f"Agreement rate: {agreement:.2%} ({(predicted_actions == actions).sum():,}/{len(actions):,})")
+    print(
+        f"Agreement rate: {agreement:.2%} ({(predicted_actions == actions).sum():,}/{len(actions):,})"
+    )
 
     # 2. Action distribution
     pred_dist = pd.Series(predicted_actions).value_counts(normalize=True).to_dict()
@@ -307,7 +325,9 @@ def evaluate_fourth_down_policy(
 
     # 3. Expected reward
     # Conservative estimate: only count reward when action matches
-    matched_rewards = [rewards[i] if predicted_actions[i] == actions[i] else 0.0 for i in range(len(rewards))]
+    matched_rewards = [
+        rewards[i] if predicted_actions[i] == actions[i] else 0.0 for i in range(len(rewards))
+    ]
     expected_reward_matched = np.mean(matched_rewards)
     actual_avg_reward = np.mean(rewards)
 
@@ -374,9 +394,15 @@ def evaluate_fourth_down_policy(
 
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Train CQL agent for 4th down decisions")
-    ap.add_argument("--train-data", default="data/fourth_down_dataset_train.csv", help="Training dataset CSV")
-    ap.add_argument("--test-data", default="data/fourth_down_dataset_test.csv", help="Test dataset CSV")
-    ap.add_argument("--output", default="models/fourth_down/cql_agent.pth", help="Output model path")
+    ap.add_argument(
+        "--train-data", default="data/fourth_down_dataset_train.csv", help="Training dataset CSV"
+    )
+    ap.add_argument(
+        "--test-data", default="data/fourth_down_dataset_test.csv", help="Test dataset CSV"
+    )
+    ap.add_argument(
+        "--output", default="models/fourth_down/cql_agent.pth", help="Output model path"
+    )
     ap.add_argument("--load", help="Load pre-trained model checkpoint")
     ap.add_argument("--evaluate", action="store_true", help="Evaluation mode only")
 
@@ -385,9 +411,15 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--batch-size", type=int, default=256, help="Batch size")
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
     ap.add_argument("--alpha", type=float, default=1.0, help="CQL penalty weight")
-    ap.add_argument("--gamma", type=float, default=0.99, help="Discount factor (less relevant for episodic)")
-    ap.add_argument("--hidden-dims", nargs="+", type=int, default=[256, 128, 64], help="Hidden layer dimensions")
-    ap.add_argument("--target-update-freq", type=int, default=1000, help="Target network update frequency")
+    ap.add_argument(
+        "--gamma", type=float, default=0.99, help="Discount factor (less relevant for episodic)"
+    )
+    ap.add_argument(
+        "--hidden-dims", nargs="+", type=int, default=[256, 128, 64], help="Hidden layer dimensions"
+    )
+    ap.add_argument(
+        "--target-update-freq", type=int, default=1000, help="Target network update frequency"
+    )
 
     # Infrastructure
     ap.add_argument("--device", default="auto", help="Device: auto/cpu/cuda/mps")
@@ -413,14 +445,18 @@ def main():
     if args.evaluate:
         print("\n=== Evaluation Mode ===")
         print(f"Loading test data from {args.test_data}")
-        test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(args.test_data)
+        test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(
+            args.test_data
+        )
     else:
         print("\n=== Training Mode ===")
         print(f"Loading training data from {args.train_data}")
         train_states, train_actions, train_rewards, _ = load_fourth_down_dataset(args.train_data)
 
         print(f"\nLoading test data from {args.test_data}")
-        test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(args.test_data)
+        test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(
+            args.test_data
+        )
 
     # Initialize agent
     agent = CQLAgent(

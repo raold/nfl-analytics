@@ -53,6 +53,7 @@ from typing import Any
 try:
     import numpy as np
     import pandas as pd
+
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
@@ -61,6 +62,7 @@ except ImportError:
 
 try:
     import cvxpy as cp
+
     CVXPY_AVAILABLE = True
 except ImportError:
     CVXPY_AVAILABLE = False
@@ -71,6 +73,7 @@ logger = logging.getLogger(__name__)
 
 class ModelType(Enum):
     """Types of models in ensemble."""
+
     BAYESIAN_HIERARCHICAL = "bayesian_hierarchical"
     XGBOOST = "xgboost"
     BNN = "bnn"
@@ -80,6 +83,7 @@ class ModelType(Enum):
 
 class ModelStatus(Enum):
     """Model training/deployment status."""
+
     NOT_TRAINED = "not_trained"
     TRAINING = "training"
     TRAINED = "trained"
@@ -91,6 +95,7 @@ class ModelStatus(Enum):
 @dataclass
 class ModelMetadata:
     """Metadata for ensemble model."""
+
     model_type: ModelType
     version: str
     training_window: str
@@ -104,13 +109,16 @@ class ModelMetadata:
 @dataclass
 class EnsembleConfig:
     """Configuration for ensemble."""
-    models: list[ModelType] = field(default_factory=lambda: [
-        ModelType.BAYESIAN_HIERARCHICAL,
-        ModelType.XGBOOST,
-        ModelType.BNN,
-        ModelType.STATE_SPACE,
-        ModelType.CQL,
-    ])
+
+    models: list[ModelType] = field(
+        default_factory=lambda: [
+            ModelType.BAYESIAN_HIERARCHICAL,
+            ModelType.XGBOOST,
+            ModelType.BNN,
+            ModelType.STATE_SPACE,
+            ModelType.CQL,
+        ]
+    )
     optimization_method: str = "cvxpy"  # or "grid_search"
     diversity_penalty: float = 0.1
     min_weight: float = 0.05
@@ -146,11 +154,7 @@ class EnsembleOrchestrator:
         ModelType.CQL: "py/rl/train_cql.py",
     }
 
-    def __init__(
-        self,
-        project_root: Path | None = None,
-        config: EnsembleConfig | None = None
-    ):
+    def __init__(self, project_root: Path | None = None, config: EnsembleConfig | None = None):
         """
         Initialize ensemble orchestrator.
 
@@ -190,10 +194,7 @@ class EnsembleOrchestrator:
             )
 
     def train_model(
-        self,
-        model_type: ModelType,
-        training_window: str = "2018-2024",
-        **kwargs
+        self, model_type: ModelType, training_window: str = "2018-2024", **kwargs
     ) -> bool:
         """
         Train a single model.
@@ -262,9 +263,7 @@ class EnsembleOrchestrator:
             return False
 
     def train_all_models(
-        self,
-        training_window: str = "2018-2024",
-        parallel: bool = False
+        self, training_window: str = "2018-2024", parallel: bool = False
     ) -> dict[ModelType, bool]:
         """
         Train all models in ensemble.
@@ -296,7 +295,7 @@ class EnsembleOrchestrator:
         self,
         predictions: dict[ModelType, np.ndarray],
         actuals: np.ndarray,
-        method: str | None = None
+        method: str | None = None,
     ) -> dict[ModelType, float]:
         """
         Optimize ensemble weights.
@@ -318,9 +317,7 @@ class EnsembleOrchestrator:
             return self._optimize_weights_grid(predictions, actuals)
 
     def _optimize_weights_cvxpy(
-        self,
-        predictions: dict[ModelType, np.ndarray],
-        actuals: np.ndarray
+        self, predictions: dict[ModelType, np.ndarray], actuals: np.ndarray
     ) -> dict[ModelType, float]:
         """Optimize weights using CVXPy."""
         if not CVXPY_AVAILABLE:
@@ -339,7 +336,7 @@ class EnsembleOrchestrator:
         mse = cp.sum_squares(ensemble_pred - actuals) / len(actuals)
 
         # Add diversity penalty (encourage different weights)
-        diversity = self.config.diversity_penalty * cp.sum_squares(weights - 1.0/n_models)
+        diversity = self.config.diversity_penalty * cp.sum_squares(weights - 1.0 / n_models)
 
         objective = cp.Minimize(mse + diversity)
 
@@ -373,9 +370,7 @@ class EnsembleOrchestrator:
         return optimized_weights
 
     def _optimize_weights_grid(
-        self,
-        predictions: dict[ModelType, np.ndarray],
-        actuals: np.ndarray
+        self, predictions: dict[ModelType, np.ndarray], actuals: np.ndarray
     ) -> dict[ModelType, float]:
         """Optimize weights using grid search."""
         logger.info("Using grid search for weight optimization")
@@ -390,11 +385,7 @@ class EnsembleOrchestrator:
 
         return equal_weights
 
-    def predict(
-        self,
-        features: dict[str, Any],
-        use_weights: bool = True
-    ) -> dict[str, Any]:
+    def predict(self, features: dict[str, Any], use_weights: bool = True) -> dict[str, Any]:
         """
         Generate ensemble prediction.
 
@@ -424,7 +415,7 @@ class EnsembleOrchestrator:
             weights = {m: self.models[m].weight for m in self.config.models}
         else:
             n = len(individual_predictions)
-            weights = {m: 1.0/n for m in self.config.models}
+            weights = {m: 1.0 / n for m in self.config.models}
 
         ensemble_pred = sum(
             individual_predictions[m.value] * weights[m]
@@ -438,11 +429,7 @@ class EnsembleOrchestrator:
             "weights": {k.value: v for k, v in weights.items()},
         }
 
-    def _predict_single_model(
-        self,
-        model_type: ModelType,
-        features: dict[str, Any]
-    ) -> float:
+    def _predict_single_model(self, model_type: ModelType, features: dict[str, Any]) -> float:
         """Get prediction from single model (placeholder)."""
         # This would load the actual model and predict
         # For now, return placeholder

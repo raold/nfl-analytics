@@ -34,7 +34,7 @@ from tests.fixtures.sample_odds import SAMPLE_ODDS_RESPONSE_SINGLE_GAME
 def test_db_with_schema(test_db_dsn: str) -> Generator[psycopg.Connection, None, None]:
     """
     Create a test database with full schema applied.
-    
+
     This fixture applies all migrations and yields a connection.
     Changes are rolled back after the test.
     """
@@ -43,7 +43,8 @@ def test_db_with_schema(test_db_dsn: str) -> Generator[psycopg.Connection, None,
     cursor = conn.cursor()
 
     # Apply schema (simplified for testing)
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE IF NOT EXISTS odds_history (
             event_id TEXT NOT NULL,
             sport_key TEXT,
@@ -61,7 +62,8 @@ def test_db_with_schema(test_db_dsn: str) -> Generator[psycopg.Connection, None,
             book_last_update TIMESTAMPTZ,
             PRIMARY KEY (event_id, bookmaker_key, market_key, outcome_name, snapshot_at)
         );
-    """)
+    """
+    )
     conn.commit()
 
     try:
@@ -78,9 +80,7 @@ class TestOddsIngestionFlow:
     """Integration tests for the full odds ingestion pipeline."""
 
     def test_flatten_and_insert_single_game(
-        self,
-        test_db_with_schema: psycopg.Connection,
-        sample_snapshot_time: dt.datetime
+        self, test_db_with_schema: psycopg.Connection, sample_snapshot_time: dt.datetime
     ):
         """Test flattening API response and inserting into database."""
         # Flatten the sample response
@@ -92,7 +92,8 @@ class TestOddsIngestionFlow:
         # Insert into database
         cursor = test_db_with_schema.cursor()
         for row in rows:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO odds_history (
                     event_id, sport_key, commence_time, home_team, away_team,
                     bookmaker_key, bookmaker_title, market_key, market_last_update,
@@ -102,7 +103,9 @@ class TestOddsIngestionFlow:
                     %(bookmaker_key)s, %(bookmaker_title)s, %(market_key)s, %(market_last_update)s,
                     %(outcome_name)s, %(outcome_price)s, %(outcome_point)s, %(snapshot_at)s, %(book_last_update)s
                 ) ON CONFLICT DO NOTHING;
-            """, row)
+            """,
+                row,
+            )
         test_db_with_schema.commit()
 
         # Verify insertion
@@ -111,9 +114,7 @@ class TestOddsIngestionFlow:
         assert count == 7
 
     def test_idempotent_insertion(
-        self,
-        test_db_with_schema: psycopg.Connection,
-        sample_snapshot_time: dt.datetime
+        self, test_db_with_schema: psycopg.Connection, sample_snapshot_time: dt.datetime
     ):
         """Test that inserting the same data twice doesn't create duplicates."""
         rows = flatten_events([SAMPLE_ODDS_RESPONSE_SINGLE_GAME], sample_snapshot_time)
@@ -122,7 +123,8 @@ class TestOddsIngestionFlow:
 
         # Insert once
         for row in rows:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO odds_history (
                     event_id, sport_key, commence_time, home_team, away_team,
                     bookmaker_key, bookmaker_title, market_key, market_last_update,
@@ -132,7 +134,9 @@ class TestOddsIngestionFlow:
                     %(bookmaker_key)s, %(bookmaker_title)s, %(market_key)s, %(market_last_update)s,
                     %(outcome_name)s, %(outcome_price)s, %(outcome_point)s, %(snapshot_at)s, %(book_last_update)s
                 ) ON CONFLICT DO NOTHING;
-            """, row)
+            """,
+                row,
+            )
         test_db_with_schema.commit()
 
         cursor.execute("SELECT COUNT(*) FROM odds_history;")
@@ -140,7 +144,8 @@ class TestOddsIngestionFlow:
 
         # Insert again (should be no-op due to ON CONFLICT DO NOTHING)
         for row in rows:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO odds_history (
                     event_id, sport_key, commence_time, home_team, away_team,
                     bookmaker_key, bookmaker_title, market_key, market_last_update,
@@ -150,7 +155,9 @@ class TestOddsIngestionFlow:
                     %(bookmaker_key)s, %(bookmaker_title)s, %(market_key)s, %(market_last_update)s,
                     %(outcome_name)s, %(outcome_price)s, %(outcome_point)s, %(snapshot_at)s, %(book_last_update)s
                 ) ON CONFLICT DO NOTHING;
-            """, row)
+            """,
+                row,
+            )
         test_db_with_schema.commit()
 
         cursor.execute("SELECT COUNT(*) FROM odds_history;")
@@ -160,16 +167,15 @@ class TestOddsIngestionFlow:
         assert count_after_first == count_after_second
 
     def test_query_by_bookmaker(
-        self,
-        test_db_with_schema: psycopg.Connection,
-        sample_snapshot_time: dt.datetime
+        self, test_db_with_schema: psycopg.Connection, sample_snapshot_time: dt.datetime
     ):
         """Test querying odds by bookmaker."""
         rows = flatten_events([SAMPLE_ODDS_RESPONSE_SINGLE_GAME], sample_snapshot_time)
 
         cursor = test_db_with_schema.cursor()
         for row in rows:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO odds_history (
                     event_id, sport_key, commence_time, home_team, away_team,
                     bookmaker_key, bookmaker_title, market_key, market_last_update,
@@ -179,34 +185,39 @@ class TestOddsIngestionFlow:
                     %(bookmaker_key)s, %(bookmaker_title)s, %(market_key)s, %(market_last_update)s,
                     %(outcome_name)s, %(outcome_price)s, %(outcome_point)s, %(snapshot_at)s, %(book_last_update)s
                 ) ON CONFLICT DO NOTHING;
-            """, row)
+            """,
+                row,
+            )
         test_db_with_schema.commit()
 
         # Query FanDuel odds only
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) FROM odds_history WHERE bookmaker_key = 'fanduel';
-        """)
+        """
+        )
         fanduel_count = cursor.fetchone()[0]
         assert fanduel_count == 6  # 2 spreads + 2 totals + 2 h2h
 
         # Query DraftKings odds only
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) FROM odds_history WHERE bookmaker_key = 'draftkings';
-        """)
+        """
+        )
         draftkings_count = cursor.fetchone()[0]
         assert draftkings_count == 2  # 2 spreads only
 
     def test_query_by_market(
-        self,
-        test_db_with_schema: psycopg.Connection,
-        sample_snapshot_time: dt.datetime
+        self, test_db_with_schema: psycopg.Connection, sample_snapshot_time: dt.datetime
     ):
         """Test querying odds by market type."""
         rows = flatten_events([SAMPLE_ODDS_RESPONSE_SINGLE_GAME], sample_snapshot_time)
 
         cursor = test_db_with_schema.cursor()
         for row in rows:
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO odds_history (
                     event_id, sport_key, commence_time, home_team, away_team,
                     bookmaker_key, bookmaker_title, market_key, market_last_update,
@@ -216,22 +227,26 @@ class TestOddsIngestionFlow:
                     %(bookmaker_key)s, %(bookmaker_title)s, %(market_key)s, %(market_last_update)s,
                     %(outcome_name)s, %(outcome_price)s, %(outcome_point)s, %(snapshot_at)s, %(book_last_update)s
                 ) ON CONFLICT DO NOTHING;
-            """, row)
+            """,
+                row,
+            )
         test_db_with_schema.commit()
 
         # Count by market
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT market_key, COUNT(*) 
             FROM odds_history 
             GROUP BY market_key 
             ORDER BY market_key;
-        """)
+        """
+        )
         market_counts = cursor.fetchall()
 
         market_dict = {row[0]: row[1] for row in market_counts}
-        assert market_dict["h2h"] == 2      # 2 moneylines (Bills + Cardinals)
+        assert market_dict["h2h"] == 2  # 2 moneylines (Bills + Cardinals)
         assert market_dict["spreads"] == 4  # 2 from FanDuel + 2 from DraftKings
-        assert market_dict["totals"] == 2   # 2 from FanDuel (Over + Under)
+        assert market_dict["totals"] == 2  # 2 from FanDuel (Over + Under)
 
 
 @pytest.mark.integration
@@ -250,7 +265,7 @@ class TestOddsAPIIntegration:
             "https://api.the-odds-api.com/v4/historical/sports/americanfootball_nfl/odds",
             json={"data": [SAMPLE_ODDS_RESPONSE_SINGLE_GAME]},
             status=200,
-            headers={"x-requests-remaining": "19999"}
+            headers={"x-requests-remaining": "19999"},
         )
 
         # Make request
@@ -260,7 +275,7 @@ class TestOddsAPIIntegration:
             snapshot_at=snapshot,
             regions="us",
             markets="spreads,totals",
-            bookmakers=None
+            bookmakers=None,
         )
 
         assert response.status_code == 200
@@ -279,7 +294,7 @@ class TestOddsAPIIntegration:
             "https://api.the-odds-api.com/v4/historical/sports/americanfootball_nfl/odds",
             json={"message": "Rate limit exceeded"},
             status=429,
-            headers={"x-requests-reset": "1693569600"}
+            headers={"x-requests-reset": "1693569600"},
         )
 
         # Should raise RuntimeError
@@ -290,5 +305,5 @@ class TestOddsAPIIntegration:
                 snapshot_at=snapshot,
                 regions="us",
                 markets="spreads",
-                bookmakers=None
+                bookmakers=None,
             )

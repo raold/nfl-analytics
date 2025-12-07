@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_connect_db_basic():
@@ -56,7 +53,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_connect_db_property_idempotent(val):
 
     # Assert property
     assert connect_db(val) == result, "idempotent violated"
-
 
 
 def test_fetch_game_features_basic():
@@ -100,7 +93,6 @@ def test_fetch_game_features_basic():
     assert result is not None
 
 
-
 def test_fetch_game_features_edge_cases():
     """Test fetch_game_features: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_fetch_game_features_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_game_features_error_handling():
     """Test fetch_game_features error handling."""
     with pytest.raises(ValueError):
         fetch_game_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_fetch_game_features_property_idempotent(self, self, game_ids, season, w
 
     # Assert property
     assert fetch_game_features(self, game_ids, season, week) == result, "idempotent violated"
-
 
 
 def test_predict_basic():
@@ -144,7 +133,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_predict_property_idempotent(self, self, game_ids, season, week):
 
     # Assert property
     assert predict(self, game_ids, season, week) == result, "idempotent violated"
-
 
 
 def test_predict_and_save_basic():
@@ -188,7 +173,6 @@ def test_predict_and_save_basic():
     assert result is not None
 
 
-
 def test_predict_and_save_edge_cases():
     """Test predict_and_save: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_predict_and_save_edge_cases():
     assert result is not None
 
 
-
 def test_predict_and_save_error_handling():
     """Test predict_and_save error handling."""
     with pytest.raises(ValueError):
         predict_and_save(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,4 +199,3 @@ def test_predict_and_save_property_idempotent(self, self, output_path):
 
     # Assert property
     assert predict_and_save(self, output_path) == result, "idempotent violated"
-

@@ -70,10 +70,14 @@ def test_model_loading():
 
         # Check which models loaded
         logger.info("\nModel status:")
-        logger.info(f"  - State-Space v2: {'✓' if hasattr(ensemble, 'state_space_predictor') else '✗'}")
+        logger.info(
+            f"  - State-Space v2: {'✓' if hasattr(ensemble, 'state_space_predictor') else '✗'}"
+        )
         logger.info(f"  - XGBoost v2: {'✓' if ensemble.xgboost_model is not None else '✗'}")
         logger.info(f"  - ELO Ratings: {'✓' if ensemble.elo_ratings is not None else '✗'}")
-        logger.info(f"  - Temperature Scaler: {'✓' if ensemble.temperature_scaler is not None else '✗'}")
+        logger.info(
+            f"  - Temperature Scaler: {'✓' if ensemble.temperature_scaler is not None else '✗'}"
+        )
 
         # Check weights
         logger.info("\nEnsemble weights:")
@@ -103,17 +107,12 @@ def test_elo_predictions(ensemble):
         try:
             # Get ELO prediction only
             result = ensemble._get_elo_prediction(
-                player_id=test["player_id"],
-                season=test["season"],
-                week=test["week"]
+                player_id=test["player_id"], season=test["season"], week=test["week"]
             )
 
             if result is None:
                 logger.warning("  ⚠ ELO prediction returned None (missing data)")
-                results.append({
-                    "player": test["name"],
-                    "error": "No ELO data available"
-                })
+                results.append({"player": test["name"], "error": "No ELO data available"})
                 continue
 
             elo_pred, elo_std = result
@@ -128,19 +127,18 @@ def test_elo_predictions(ensemble):
             else:
                 logger.warning("  ⚠ Potentially unrealistic prediction")
 
-            results.append({
-                "player": test["name"],
-                "elo_pred": elo_pred,
-                "elo_std": elo_std,
-                "realistic": is_realistic
-            })
+            results.append(
+                {
+                    "player": test["name"],
+                    "elo_pred": elo_pred,
+                    "elo_std": elo_std,
+                    "realistic": is_realistic,
+                }
+            )
 
         except Exception as e:
             logger.error(f"  ✗ ELO prediction failed: {e}")
-            results.append({
-                "player": test["name"],
-                "error": str(e)
-            })
+            results.append({"player": test["name"], "error": str(e)})
 
     # Summary
     successful = [r for r in results if "error" not in r]
@@ -173,16 +171,16 @@ def test_prediction_latency(ensemble):
         try:
             start_time = time.time()
             result = ensemble.predict(
-                player_id=test["player_id"],
-                season=test["season"],
-                week=test["week"]
+                player_id=test["player_id"], season=test["season"], week=test["week"]
             )
             latency = time.time() - start_time
 
             latencies.append(latency)
             predictions.append(result)
 
-            logger.info(f"  Ensemble: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+            logger.info(
+                f"  Ensemble: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards"
+            )
             logger.info(f"  Latency: {latency:.3f}s")
 
             # Show component predictions
@@ -238,11 +236,7 @@ def test_graceful_degradation(ensemble):
     logger.info("\nTesting with invalid player ID...")
 
     try:
-        result = ensemble.predict(
-            player_id="INVALID-ID",
-            season=2024,
-            week=1
-        )
+        result = ensemble.predict(player_id="INVALID-ID", season=2024, week=1)
         logger.info("✓ Handled gracefully (returned result)")
         return {"graceful": True}
     except Exception as e:
@@ -320,8 +314,12 @@ def generate_health_report(test_results: dict):
     # Version comparison
     logger.info("\nVersion Comparison:")
     logger.info("  v6_elo: 5 models (State-Space, Hierarchical, XGBoost, Informative, ELO)")
-    logger.info("  v6_production: 5 models (State-Space, Hierarchical, XGBoost v4 Ridge, Informative, Hybrid)")
-    logger.info("\n  Recommendation: Test both versions with full backtest to determine production candidate")
+    logger.info(
+        "  v6_production: 5 models (State-Space, Hierarchical, XGBoost v4 Ridge, Informative, Hybrid)"
+    )
+    logger.info(
+        "\n  Recommendation: Test both versions with full backtest to determine production candidate"
+    )
 
 
 def main():

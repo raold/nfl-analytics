@@ -40,7 +40,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 1: Remove chemistry edges
     "no_chemistry": {
         "name": "No Chemistry Edges",
@@ -50,7 +49,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": False,
         "batch_size": 128,
     },
-
     # Ablation 2: Embedding dimensions
     "embed_32": {
         "name": "Embedding Dim 32",
@@ -68,7 +66,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 3: Message passing rounds
     "msg_1": {
         "name": "1 Message Round",
@@ -94,7 +91,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 4: Smaller model (all components reduced)
     "small": {
         "name": "Small Model",
@@ -104,7 +100,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": False,
         "batch_size": 128,
     },
-
     # Ablation 5: Larger model (all components increased)
     "large": {
         "name": "Large Model",
@@ -120,6 +115,7 @@ ABLATION_CONFIGS = {
 # =============================================================================
 # Ablation Study Runner
 # =============================================================================
+
 
 def run_single_ablation(
     config_name: str,
@@ -142,15 +138,26 @@ def run_single_ablation(
 
     # Build command
     cmd = [
-        "uv", "run", "python", "py/models/train_hierarchical_gnn.py",
-        "--seasons", *[str(s) for s in seasons],
-        "--embedding-dim", str(config["embedding_dim"]),
-        "--hidden-dim", str(config["hidden_dim"]),
-        "--num-message-rounds", str(config["num_message_rounds"]),
-        "--epochs", str(epochs),
-        "--batch-size", str(config["batch_size"]),
-        "--device", device,
-        "--output-dir", str(output_dir / config_name),
+        "uv",
+        "run",
+        "python",
+        "py/models/train_hierarchical_gnn.py",
+        "--seasons",
+        *[str(s) for s in seasons],
+        "--embedding-dim",
+        str(config["embedding_dim"]),
+        "--hidden-dim",
+        str(config["hidden_dim"]),
+        "--num-message-rounds",
+        str(config["num_message_rounds"]),
+        "--epochs",
+        str(epochs),
+        "--batch-size",
+        str(config["batch_size"]),
+        "--device",
+        device,
+        "--output-dir",
+        str(output_dir / config_name),
     ]
 
     # Add chemistry flag if disabled
@@ -224,9 +231,7 @@ def run_ablation_study(
     results = []
 
     for config_name, config in configs.items():
-        result = run_single_ablation(
-            config_name, config, seasons, epochs, device, output_dir
-        )
+        result = run_single_ablation(config_name, config, seasons, epochs, device, output_dir)
         results.append(result)
 
         # Save intermediate results
@@ -263,19 +268,21 @@ def generate_summary_table(results: list[dict], output_dir: Path):
         delta_brier = r["best_val_brier"] - baseline_brier
         delta_pct = 100 * delta_brier / baseline_brier
 
-        summary_data.append({
-            "Configuration": r["name"],
-            "Embed Dim": r["config"]["embedding_dim"],
-            "Hidden Dim": r["config"]["hidden_dim"],
-            "Msg Rounds": r["config"]["num_message_rounds"],
-            "Chemistry": "Yes" if r["config"]["use_chemistry"] else "No",
-            "Val Brier": r["best_val_brier"],
-            "Δ Brier": delta_brier,
-            "Δ %": delta_pct,
-            "Test Brier": r["test_brier"],
-            "Test Acc": r["test_accuracy"],
-            "Test AUC": r["test_auc"],
-        })
+        summary_data.append(
+            {
+                "Configuration": r["name"],
+                "Embed Dim": r["config"]["embedding_dim"],
+                "Hidden Dim": r["config"]["hidden_dim"],
+                "Msg Rounds": r["config"]["num_message_rounds"],
+                "Chemistry": "Yes" if r["config"]["use_chemistry"] else "No",
+                "Val Brier": r["best_val_brier"],
+                "Δ Brier": delta_brier,
+                "Δ %": delta_pct,
+                "Test Brier": r["test_brier"],
+                "Test Acc": r["test_accuracy"],
+                "Test AUC": r["test_auc"],
+            }
+        )
 
     df = pd.DataFrame(summary_data)
     df = df.sort_values("Val Brier")
@@ -338,6 +345,7 @@ def generate_summary_table(results: list[dict], output_dir: Path):
 # Main Entry Point
 # =============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(description="GNN Ablation Study")
     parser.add_argument(
@@ -394,9 +402,7 @@ def main():
     logger.info("")
 
     # Run ablation study
-    results = run_ablation_study(
-        configs, args.seasons, args.epochs, args.device, output_dir
-    )
+    results = run_ablation_study(configs, args.seasons, args.epochs, args.device, output_dir)
 
     # Save final results
     results_path = output_dir / "ablation_results.json"

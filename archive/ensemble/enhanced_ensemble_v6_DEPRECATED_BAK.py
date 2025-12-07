@@ -74,13 +74,12 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Suppress R warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class EnhancedEnsemble6Way:
@@ -116,10 +115,10 @@ class EnhancedEnsemble6Way:
 
         # Ensemble weights (v6: Hybrid XGBoost replaces static)
         self.weights = {
-            'state_space_v2': 0.30,
-            'bnn_multioutput_v3_1': 0.25,
-            'hierarchical_v2': 0.25,
-            'hybrid_xgboost_v1': 0.20,
+            "state_space_v2": 0.30,
+            "bnn_multioutput_v3_1": 0.25,
+            "hierarchical_v2": 0.25,
+            "hybrid_xgboost_v1": 0.20,
         }
 
         logger.info("Initialized 4-way ensemble predictor (v6)")
@@ -138,7 +137,7 @@ class EnhancedEnsemble6Way:
 
             self.state_space_predictor = StateSpacePredictor(
                 model_path=self.state_space_path,
-                skills_path=Path("models/bayesian/simplified_random_walk_skills_v2.csv")
+                skills_path=Path("models/bayesian/simplified_random_walk_skills_v2.csv"),
             )
             logger.info(f"✓ State-space predictor loaded: {self.state_space_path}")
         except Exception as e:
@@ -167,12 +166,7 @@ class EnhancedEnsemble6Way:
         self.models_loaded = True
 
     def _get_r_predictions(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        model_path: Path,
-        model_name: str
+        self, player_id: str, season: int, week: int, model_path: Path, model_name: str
     ) -> tuple[float, float] | None:
         """
         Get predictions from R model using rpy2
@@ -185,7 +179,7 @@ class EnhancedEnsemble6Way:
             from rpy2.robjects import pandas2ri
 
             # Load brms library (needed for posterior_predict)
-            ro.r('library(brms)')
+            ro.r("library(brms)")
 
             # Load R model
             ro.r(f'model <- readRDS("{model_path}")')
@@ -196,7 +190,7 @@ class EnhancedEnsemble6Way:
                 port=self.db_port,
                 user=self.db_user,
                 password=self.db_password,
-                database=self.db_name
+                database=self.db_name,
             )
 
             query = f"""
@@ -255,18 +249,18 @@ class EnhancedEnsemble6Way:
                 r_df = ro.conversion.py2rpy(df)
 
             # Generate posterior predictions
-            ro.r.assign('new_data', r_df)
+            ro.r.assign("new_data", r_df)
             # Add log_attempts column (needed for brms models)
-            ro.r('new_data$log_attempts <- log(new_data$attempts)')
-            ro.r('posterior_preds <- posterior_predict(model, newdata = new_data)')
+            ro.r("new_data$log_attempts <- log(new_data$attempts)")
+            ro.r("posterior_preds <- posterior_predict(model, newdata = new_data)")
 
             # CRITICAL: R models predict log_yards, must exponentiate to get yards
-            ro.r('posterior_preds_exp <- exp(posterior_preds)')
-            ro.r('pred_mean <- mean(posterior_preds_exp)')
-            ro.r('pred_sd <- sd(posterior_preds_exp)')
+            ro.r("posterior_preds_exp <- exp(posterior_preds)")
+            ro.r("pred_mean <- mean(posterior_preds_exp)")
+            ro.r("pred_sd <- sd(posterior_preds_exp)")
 
-            mean_pred = ro.r('pred_mean')[0]
-            std_pred = ro.r('pred_sd')[0]
+            mean_pred = ro.r("pred_mean")[0]
+            std_pred = ro.r("pred_sd")[0]
 
             logger.info(f"✓ {model_name}: mean={mean_pred:.1f}, std={std_pred:.1f}")
             return (mean_pred, std_pred)
@@ -275,12 +269,7 @@ class EnhancedEnsemble6Way:
             logger.warning(f"⚠️  {model_name} prediction failed: {e}")
             return None
 
-    def _get_player_data(
-        self,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> dict | None:
+    def _get_player_data(self, player_id: str, season: int, week: int) -> dict | None:
         """Get player game data (attempts, home/away) for prediction"""
         try:
             conn = psycopg2.connect(
@@ -288,7 +277,7 @@ class EnhancedEnsemble6Way:
                 port=self.db_port,
                 dbname=self.db_name,
                 user=self.db_user,
-                password=self.db_password
+                password=self.db_password,
             )
             cursor = conn.cursor()
 
@@ -320,20 +309,19 @@ class EnhancedEnsemble6Way:
             conn.close()
 
             if row:
-                return {'attempts': row[0] or 30, 'is_home': row[1] or 0}
+                return {"attempts": row[0] or 30, "is_home": row[1] or 0}
             else:
-                logger.warning(f"No game data found for {player_id} (W{week}, {season}), using defaults")
-                return {'attempts': 30, 'is_home': 0}
+                logger.warning(
+                    f"No game data found for {player_id} (W{week}, {season}), using defaults"
+                )
+                return {"attempts": 30, "is_home": 0}
 
         except Exception as e:
             logger.warning(f"Failed to get player data: {e}, using defaults")
-            return {'attempts': 30, 'is_home': 0}
+            return {"attempts": 30, "is_home": 0}
 
     def _get_bnn_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """Get BNN prediction"""
         try:
@@ -342,7 +330,7 @@ class EnhancedEnsemble6Way:
                 port=self.db_port,
                 user=self.db_user,
                 password=self.db_password,
-                database=self.db_name
+                database=self.db_name,
             )
 
             query = f"""
@@ -403,9 +391,7 @@ class EnhancedEnsemble6Way:
             df["spread_abs"] = df["spread_line"].abs()
             df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
             df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
-            df["is_bad_weather"] = (
-                ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-            )
+            df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
             df["week_in_season"] = df["week"].astype(float)
 
             # Rolling features (use last 3 games)
@@ -414,10 +400,12 @@ class EnhancedEnsemble6Way:
             df["td_rate_L3"] = df["td_rate"]
 
             # Fill missing values
-            df = df.fillna({
-                "temp": 70.0,
-                "wind": 5.0,
-            })
+            df = df.fillna(
+                {
+                    "temp": 70.0,
+                    "wind": 5.0,
+                }
+            )
             df = df.fillna(df.median(numeric_only=True))
 
             df["total_line"] = df["total_close"]
@@ -462,10 +450,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def _get_hybrid_xgboost_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """Get hybrid XGBoost prediction (70% static + 30% incremental)"""
         try:
@@ -474,7 +459,7 @@ class EnhancedEnsemble6Way:
                 port=self.db_port,
                 user=self.db_user,
                 password=self.db_password,
-                database=self.db_name
+                database=self.db_name,
             )
 
             query = f"""
@@ -535,9 +520,7 @@ class EnhancedEnsemble6Way:
             df["spread_abs"] = df["spread_line"].abs()
             df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
             df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
-            df["is_bad_weather"] = (
-                ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-            )
+            df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
             df["week_in_season"] = df["week"].astype(float)
 
             # Rolling features
@@ -582,11 +565,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def predict(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        combination_method: str = "weighted_average"
+        self, player_id: str, season: int, week: int, combination_method: str = "weighted_average"
     ) -> dict:
         """
         Generate 4-way ensemble prediction
@@ -602,8 +581,10 @@ class EnhancedEnsemble6Way:
         """
         self._load_models()
 
-        logger.info(f"\nGenerating 4-way ensemble prediction for {player_id} "
-                   f"(season {season}, week {week})...")
+        logger.info(
+            f"\nGenerating 4-way ensemble prediction for {player_id} "
+            f"(season {season}, week {week})..."
+        )
 
         predictions = {}
 
@@ -616,8 +597,8 @@ class EnhancedEnsemble6Way:
                         player_id=player_id,
                         season=season,
                         week=week,
-                        attempts=player_data['attempts'],
-                        is_home=player_data['is_home']
+                        attempts=player_data["attempts"],
+                        is_home=player_data["is_home"],
                     )
                     predictions["state_space_v2"] = (pred_mean, pred_std)
                     logger.info(f"✓ State-space v2: {pred_mean:.1f} ± {pred_std:.1f} yards")
@@ -627,9 +608,7 @@ class EnhancedEnsemble6Way:
         # 2. Hierarchical v2
         if self.hierarchical_path.exists():
             pred = self._get_r_predictions(
-                player_id, season, week,
-                self.hierarchical_path,
-                "Hierarchical v2"
+                player_id, season, week, self.hierarchical_path, "Hierarchical v2"
             )
             if pred:
                 predictions["hierarchical_v2"] = pred
@@ -674,7 +653,7 @@ class EnhancedEnsemble6Way:
             ensemble_mean = np.sum(weights * means)
 
             # Ensemble uncertainty (variance pooling)
-            ensemble_var = np.sum((weights ** 2) * (stds ** 2))
+            ensemble_var = np.sum((weights**2) * (stds**2))
             ensemble_std = np.sqrt(ensemble_var)
 
             logger.info("\nEnsemble (weighted average):")
@@ -687,13 +666,13 @@ class EnhancedEnsemble6Way:
             stds = np.array([p[1] for p in predictions.values()])
 
             # Weights proportional to 1/variance
-            weights = 1.0 / (stds ** 2)
+            weights = 1.0 / (stds**2)
             weights /= weights.sum()
 
             ensemble_mean = np.sum(weights * means)
 
             # Ensemble uncertainty
-            ensemble_var = np.sum((weights ** 2) * (stds ** 2))
+            ensemble_var = np.sum((weights**2) * (stds**2))
             ensemble_std = np.sqrt(ensemble_var)
 
             logger.info("\nEnsemble (inverse variance weighting):")
@@ -705,7 +684,7 @@ class EnhancedEnsemble6Way:
             "mean": ensemble_mean,
             "std": ensemble_std,
             "predictions": predictions,
-            "method": combination_method
+            "method": combination_method,
         }
 
 
@@ -717,19 +696,19 @@ def main():
     parser.add_argument("--player-id", required=True, help="Player ID")
     parser.add_argument("--season", type=int, required=True, help="Season")
     parser.add_argument("--week", type=int, required=True, help="Week")
-    parser.add_argument("--method", default="weighted_average",
-                       choices=["weighted_average", "inverse_variance"],
-                       help="Combination method")
+    parser.add_argument(
+        "--method",
+        default="weighted_average",
+        choices=["weighted_average", "inverse_variance"],
+        help="Combination method",
+    )
     parser.add_argument("--output", help="Output CSV file (optional)")
 
     args = parser.parse_args()
 
     ensemble = EnhancedEnsemble4Way()
     result = ensemble.predict(
-        player_id=args.player_id,
-        season=args.season,
-        week=args.week,
-        combination_method=args.method
+        player_id=args.player_id, season=args.season, week=args.week, combination_method=args.method
     )
 
     logger.info(f"\n{'='*70}")
@@ -738,20 +717,26 @@ def main():
     logger.info(f"Player: {args.player_id}")
     logger.info(f"Season: {args.season}, Week: {args.week}")
     logger.info(f"Prediction: {result['mean']:.1f} ± {result['std']:.1f} yards")
-    logger.info(f"90% CI: [{result['mean'] - 1.645*result['std']:.1f}, "
-               f"{result['mean'] + 1.645*result['std']:.1f}] yards")
+    logger.info(
+        f"90% CI: [{result['mean'] - 1.645*result['std']:.1f}, "
+        f"{result['mean'] + 1.645*result['std']:.1f}] yards"
+    )
 
     if args.output:
-        df = pd.DataFrame([{
-            "player_id": args.player_id,
-            "season": args.season,
-            "week": args.week,
-            "ensemble_mean": result["mean"],
-            "ensemble_std": result["std"],
-            "method": result["method"],
-            **{f"{k}_mean": v[0] for k, v in result["predictions"].items()},
-            **{f"{k}_std": v[1] for k, v in result["predictions"].items()},
-        }])
+        df = pd.DataFrame(
+            [
+                {
+                    "player_id": args.player_id,
+                    "season": args.season,
+                    "week": args.week,
+                    "ensemble_mean": result["mean"],
+                    "ensemble_std": result["std"],
+                    "method": result["method"],
+                    **{f"{k}_mean": v[0] for k, v in result["predictions"].items()},
+                    **{f"{k}_std": v[1] for k, v in result["predictions"].items()},
+                }
+            ]
+        )
 
         df.to_csv(args.output, index=False)
         logger.info(f"\n✓ Predictions saved to: {args.output}")

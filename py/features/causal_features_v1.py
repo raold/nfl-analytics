@@ -63,9 +63,9 @@ class CausalFeaturesV1:
         "SEA",  # Seattle Seahawks (0.84)
         "ARI",  # Arizona Cardinals (0.79)
         "BAL",  # Baltimore Ravens (0.76)
-        "KC",   # Kansas City Chiefs (0.73)
+        "KC",  # Kansas City Chiefs (0.73)
         "CLE",  # Cleveland Browns (0.70)
-        "SF",   # San Francisco 49ers (0.68)
+        "SF",  # San Francisco 49ers (0.68)
         "CIN",  # Cincinnati Bengals (0.67)
         "MIN",  # Minnesota Vikings (0.66)
         "DEN",  # Denver Broncos (0.65)
@@ -73,13 +73,13 @@ class CausalFeaturesV1:
 
     # Treatment effects (from Week 1-3 validation)
     DID_ROUGHING_EFFECT = 17.70  # yards (p=0.001)
-    PSM_TRAVEL_EFFECT = 1.38      # yards (p=0.87, null)
-    PSM_WEATHER_EFFECT = -2.24    # yards (p=0.85, null)
+    PSM_TRAVEL_EFFECT = 1.38  # yards (p=0.87, null)
+    PSM_WEATHER_EFFECT = -2.24  # yards (p=0.85, null)
 
     # Feature importance weights (based on statistical significance)
-    DID_ROUGHING_WEIGHT = 1.0     # Full weight (highly significant)
-    PSM_TRAVEL_WEIGHT = 0.0       # Zero weight (null finding)
-    PSM_WEATHER_WEIGHT = 0.0      # Zero weight (null finding)
+    DID_ROUGHING_WEIGHT = 1.0  # Full weight (highly significant)
+    PSM_TRAVEL_WEIGHT = 0.0  # Zero weight (null finding)
+    PSM_WEATHER_WEIGHT = 0.0  # Zero weight (null finding)
 
     def __init__(self, db_config: dict):
         """
@@ -106,20 +106,24 @@ class CausalFeaturesV1:
             logger.info(f"✅ Loaded defense roughing baseline ({len(df)} defenses)")
             return df
         else:
-            logger.warning(
-                f"⚠️  Defense roughing baseline not found at {baseline_path}"
-            )
+            logger.warning(f"⚠️  Defense roughing baseline not found at {baseline_path}")
             logger.warning("Creating in-memory baseline from HIGH_ROUGHING_DEFENSES list")
 
             # Fallback: create minimal baseline from hardcoded list
             data = []
             for team in self.HIGH_ROUGHING_DEFENSES:
-                data.append({
-                    "defense_team": team,
-                    "quintile": "Very Aggressive" if team in ["HOU", "IND", "LAC", "NYJ", "SEA", "ARI", "BAL"] else "Aggressive",
-                    "roughing_rate_2017": 0.80,  # Approximate average
-                    "is_treated": 1
-                })
+                data.append(
+                    {
+                        "defense_team": team,
+                        "quintile": (
+                            "Very Aggressive"
+                            if team in ["HOU", "IND", "LAC", "NYJ", "SEA", "ARI", "BAL"]
+                            else "Aggressive"
+                        ),
+                        "roughing_rate_2017": 0.80,  # Approximate average
+                        "is_treated": 1,
+                    }
+                )
 
             return pd.DataFrame(data)
 
@@ -176,14 +180,10 @@ class CausalFeaturesV1:
         features = {}
 
         # Feature 1: DiD Roughing (enabled, weight=1.0)
-        features["did_roughing_yards"] = self._calculate_did_roughing(
-            opponent_team, season
-        )
+        features["did_roughing_yards"] = self._calculate_did_roughing(opponent_team, season)
 
         # Feature 2: PSM Travel (weight=0.0 for causal_total, but raw value preserved for XGBoost)
-        features["psm_travel_yards"] = self._calculate_psm_travel(
-            player_team, opponent_team
-        )
+        features["psm_travel_yards"] = self._calculate_psm_travel(player_team, opponent_team)
 
         # Feature 3: PSM Weather (weight=0.0 for causal_total, but raw value preserved for XGBoost)
         features["psm_weather_yards"] = self._calculate_psm_weather(game_weather)
@@ -191,7 +191,7 @@ class CausalFeaturesV1:
         # Feature 4-8: Raw weather features (for XGBoost learning despite null PSM findings)
         if game_weather:
             features["temp_numeric"] = game_weather.get("temp", 50.0)  # Default 50°F
-            features["wind_numeric"] = game_weather.get("wind", 5.0)   # Default 5 mph
+            features["wind_numeric"] = game_weather.get("wind", 5.0)  # Default 5 mph
             features["is_bad_weather"] = int(
                 (game_weather.get("temp") is not None and game_weather.get("temp") < 32)
                 or (game_weather.get("wind") is not None and game_weather.get("wind") > 20)
@@ -279,9 +279,7 @@ class CausalFeaturesV1:
             else:
                 return 0.0
         except KeyError:
-            logger.warning(
-                f"⚠️  Distance not found for {player_team} → {opponent_team}"
-            )
+            logger.warning(f"⚠️  Distance not found for {player_team} → {opponent_team}")
             return 0.0
 
     def _calculate_psm_weather(self, game_weather: dict | None) -> float:
@@ -308,9 +306,7 @@ class CausalFeaturesV1:
 
         # Extreme weather criteria
         is_extreme_weather = (
-            (temp is not None and temp < 32)
-            or (wind is not None and wind > 20)
-            or (precip > 0)
+            (temp is not None and temp < 32) or (wind is not None and wind > 20) or (precip > 0)
         )
 
         if is_extreme_weather:

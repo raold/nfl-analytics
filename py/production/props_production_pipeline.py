@@ -132,7 +132,7 @@ class PropsPipeline:
             self.paper_trader = PaperTradingEngine(
                 initial_bankroll=bankroll,
                 session_id=paper_session_id,
-                strategy='props_production_pipeline'
+                strategy="props_production_pipeline",
             )
 
         # Create output directory
@@ -535,20 +535,20 @@ class PropsPipeline:
             try:
                 # Place paper trade
                 paper_trade_id = self.paper_trader.place_paper_bet(
-                    game_id=bet.get('game_id', 'unknown'),
-                    player_id=bet['player_id'],
-                    player_name=bet['player_name'],
-                    prop_type=bet['prop_type'],
-                    line_value=bet['line_value'],
-                    bet_side=bet['bet_side'],
-                    odds=bet['odds'],
-                    bookmaker_key=bet.get('bookmaker', 'unknown'),
-                    bet_amount=bet['bet_amount'],
-                    edge=bet.get('edge'),
-                    model_prediction=bet.get('prediction'),
-                    model_std=bet.get('prediction_std'),
-                    confidence=bet.get('confidence'),
-                    model_version='production_v1'
+                    game_id=bet.get("game_id", "unknown"),
+                    player_id=bet["player_id"],
+                    player_name=bet["player_name"],
+                    prop_type=bet["prop_type"],
+                    line_value=bet["line_value"],
+                    bet_side=bet["bet_side"],
+                    odds=bet["odds"],
+                    bookmaker_key=bet.get("bookmaker", "unknown"),
+                    bet_amount=bet["bet_amount"],
+                    edge=bet.get("edge"),
+                    model_prediction=bet.get("prediction"),
+                    model_std=bet.get("prediction_std"),
+                    confidence=bet.get("confidence"),
+                    model_version="production_v1",
                 )
 
                 trades_placed += 1
@@ -562,14 +562,9 @@ class PropsPipeline:
 
             except Exception as e:
                 trades_failed += 1
-                logger.error(
-                    f"  ✗ Failed to place paper trade for {bet['player_name']}: {e}"
-                )
+                logger.error(f"  ✗ Failed to place paper trade for {bet['player_name']}: {e}")
 
-        logger.info(
-            f"✅ Placed {trades_placed} paper trades "
-            f"({trades_failed} failed)"
-        )
+        logger.info(f"✅ Placed {trades_placed} paper trades " f"({trades_failed} failed)")
 
         # Get current session metrics
         metrics = self.paper_trader.get_performance_metrics()
@@ -581,7 +576,7 @@ class PropsPipeline:
         return {
             "paper_trades_placed": trades_placed,
             "paper_trades_failed": trades_failed,
-            "session_metrics": metrics
+            "session_metrics": metrics,
         }
 
     def run_full_pipeline(self, skip_fetch: bool = False, max_events: int = None) -> dict:
@@ -728,12 +723,12 @@ def main():
     parser.add_argument(
         "--paper-trade",
         action="store_true",
-        help="Paper trading mode (simulate bets without real money)"
+        help="Paper trading mode (simulate bets without real money)",
     )
     parser.add_argument(
         "--paper-session-id",
         type=str,
-        help="Paper trading session ID (auto-generated if not provided)"
+        help="Paper trading session ID (auto-generated if not provided)",
     )
 
     args = parser.parse_args()

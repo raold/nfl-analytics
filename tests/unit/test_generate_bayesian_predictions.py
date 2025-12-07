@@ -23,7 +23,6 @@ def test_get_upcoming_games_basic():
     assert result is not None
 
 
-
 def test_get_upcoming_games_edge_cases():
     """Test get_upcoming_games: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_upcoming_games_edge_cases():
     assert result is not None
 
 
-
 def test_get_upcoming_games_error_handling():
     """Test get_upcoming_games error handling."""
     with pytest.raises(ValueError):
         get_upcoming_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_get_upcoming_games_property_idempotent(self, conn, season, week):
 
     # Assert property
     assert get_upcoming_games(conn, season, week) == result, "idempotent violated"
-
 
 
 def test_get_player_matchups_basic():
@@ -67,7 +63,6 @@ def test_get_player_matchups_basic():
     assert result is not None
 
 
-
 def test_get_player_matchups_edge_cases():
     """Test get_player_matchups: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_get_player_matchups_edge_cases():
     assert result is not None
 
 
-
 def test_get_player_matchups_error_handling():
     """Test get_player_matchups error handling."""
     with pytest.raises(ValueError):
         get_player_matchups(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_get_player_matchups_property_idempotent(self, conn, games_df):
 
     # Assert property
     assert get_player_matchups(conn, games_df) == result, "idempotent violated"
-
 
 
 def test_get_bayesian_ratings_basic():
@@ -111,7 +103,6 @@ def test_get_bayesian_ratings_basic():
     assert result is not None
 
 
-
 def test_get_bayesian_ratings_edge_cases():
     """Test get_bayesian_ratings: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_get_bayesian_ratings_edge_cases():
     assert result is not None
 
 
-
 def test_get_bayesian_ratings_error_handling():
     """Test get_bayesian_ratings error handling."""
     with pytest.raises(ValueError):
         get_bayesian_ratings(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_get_bayesian_ratings_property_idempotent(self, conn):
 
     # Assert property
     assert get_bayesian_ratings(conn) == result, "idempotent violated"
-
 
 
 def test_get_defensive_adjustments_basic():
@@ -155,7 +143,6 @@ def test_get_defensive_adjustments_basic():
     assert result is not None
 
 
-
 def test_get_defensive_adjustments_edge_cases():
     """Test get_defensive_adjustments: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_get_defensive_adjustments_edge_cases():
     assert result is not None
 
 
-
 def test_get_defensive_adjustments_error_handling():
     """Test get_defensive_adjustments error handling."""
     with pytest.raises(ValueError):
         get_defensive_adjustments(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_get_defensive_adjustments_property_idempotent(self, conn, season):
 
     # Assert property
     assert get_defensive_adjustments(conn, season) == result, "idempotent violated"
-
 
 
 def test_apply_game_context_basic():
@@ -199,7 +183,6 @@ def test_apply_game_context_basic():
     assert result is not None
 
 
-
 def test_apply_game_context_edge_cases():
     """Test apply_game_context: edge cases."""
     # Arrange
@@ -212,23 +195,45 @@ def test_apply_game_context_edge_cases():
     assert result is not None
 
 
-
 def test_apply_game_context_error_handling():
     """Test apply_game_context error handling."""
     with pytest.raises(ValueError):
         apply_game_context(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_apply_game_context_property_idempotent(self, base_prediction, base_sd, is_home, is_favored, spread, total, weather_factor, opponent_adj):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_apply_game_context_property_idempotent(
+    self, base_prediction, base_sd, is_home, is_favored, spread, total, weather_factor, opponent_adj
+):
     """Property test: function is idempotent."""
     # Act
-    result = apply_game_context(base_prediction, base_sd, is_home, is_favored, spread, total, weather_factor, opponent_adj)
+    result = apply_game_context(
+        base_prediction, base_sd, is_home, is_favored, spread, total, weather_factor, opponent_adj
+    )
 
     # Assert property
-    assert apply_game_context(base_prediction, base_sd, is_home, is_favored, spread, total, weather_factor, opponent_adj) == result, "idempotent violated"
-
+    assert (
+        apply_game_context(
+            base_prediction,
+            base_sd,
+            is_home,
+            is_favored,
+            spread,
+            total,
+            weather_factor,
+            opponent_adj,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_generate_predictions_basic():
@@ -243,7 +248,6 @@ def test_generate_predictions_basic():
     assert result is not None
 
 
-
 def test_generate_predictions_edge_cases():
     """Test generate_predictions: edge cases."""
     # Arrange
@@ -256,23 +260,24 @@ def test_generate_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_generate_predictions_error_handling():
     """Test generate_predictions error handling."""
     with pytest.raises(ValueError):
         generate_predictions(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_predictions_property_idempotent(self, matchups_df, ratings_df, games_df, def_adjustments):
+def test_generate_predictions_property_idempotent(
+    self, matchups_df, ratings_df, games_df, def_adjustments
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_predictions(matchups_df, ratings_df, games_df, def_adjustments)
 
     # Assert property
-    assert generate_predictions(matchups_df, ratings_df, games_df, def_adjustments) == result, "idempotent violated"
-
+    assert (
+        generate_predictions(matchups_df, ratings_df, games_df, def_adjustments) == result
+    ), "idempotent violated"
 
 
 def test_save_predictions_basic():
@@ -287,7 +292,6 @@ def test_save_predictions_basic():
     assert result is not None
 
 
-
 def test_save_predictions_edge_cases():
     """Test save_predictions: edge cases."""
     # Arrange
@@ -300,12 +304,10 @@ def test_save_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_save_predictions_error_handling():
     """Test save_predictions error handling."""
     with pytest.raises(ValueError):
         save_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -316,7 +318,6 @@ def test_save_predictions_property_idempotent(self, conn, predictions):
 
     # Assert property
     assert save_predictions(conn, predictions) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -331,7 +332,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -344,9 +344,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

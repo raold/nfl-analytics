@@ -44,6 +44,7 @@ VETERAN_THRESHOLD = 80  # 3-5 seasons
 # QB EXPERIENCE EXTRACTOR
 # ============================================================================
 
+
 class QBExperienceFeatures:
     """
     Extract QB experience features from player hierarchy.
@@ -65,11 +66,11 @@ class QBExperienceFeatures:
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions',
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """
         Initialize QB experience feature extractor.
@@ -82,11 +83,11 @@ class QBExperienceFeatures:
             db_password: Database password
         """
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'database': db_name,
-            'user': db_user,
-            'password': db_password,
+            "host": db_host,
+            "port": db_port,
+            "database": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
     def _get_db_connection(self):
@@ -146,11 +147,7 @@ class QBExperienceFeatures:
         """
 
         try:
-            df = pd.read_sql_query(
-                query,
-                conn,
-                params=(season, season, player_id)
-            )
+            df = pd.read_sql_query(query, conn, params=(season, season, player_id))
             conn.close()
 
             if len(df) == 0:
@@ -161,11 +158,17 @@ class QBExperienceFeatures:
             row = df.iloc[0]
 
             features = {
-                'years_exp': float(row['years_exp']) if pd.notna(row['years_exp']) else 0.0,
-                'games_with_stats': float(row['games_with_stats']) if pd.notna(row['games_with_stats']) else 0.0,
-                'log_games_experience': float(row['log_games_experience']) if pd.notna(row['log_games_experience']) else 0.0,
-                'experience_category': str(row['experience_category']),
-                'experience_numeric': int(row['experience_numeric']),
+                "years_exp": float(row["years_exp"]) if pd.notna(row["years_exp"]) else 0.0,
+                "games_with_stats": (
+                    float(row["games_with_stats"]) if pd.notna(row["games_with_stats"]) else 0.0
+                ),
+                "log_games_experience": (
+                    float(row["log_games_experience"])
+                    if pd.notna(row["log_games_experience"])
+                    else 0.0
+                ),
+                "experience_category": str(row["experience_category"]),
+                "experience_numeric": int(row["experience_numeric"]),
             }
 
             logger.debug(
@@ -187,17 +190,14 @@ class QBExperienceFeatures:
         Assumes average veteran QB (50 games, 3-4 years experience).
         """
         return {
-            'years_exp': 3.0,
-            'games_with_stats': 50.0,
-            'log_games_experience': np.log(51.0),  # log(50 + 1)
-            'experience_category': 'developing',
-            'experience_numeric': 1,
+            "years_exp": 3.0,
+            "games_with_stats": 50.0,
+            "log_games_experience": np.log(51.0),  # log(50 + 1)
+            "experience_category": "developing",
+            "experience_numeric": 1,
         }
 
-    def one_hot_encode(
-        self,
-        features: dict[str, float]
-    ) -> dict[str, float]:
+    def one_hot_encode(self, features: dict[str, float]) -> dict[str, float]:
         """
         One-hot encode experience category for model input.
 
@@ -211,13 +211,13 @@ class QBExperienceFeatures:
             - qb_exp_veteran (0 or 1)
             - qb_exp_elite_veteran (0 or 1)
         """
-        category = features['experience_category']
+        category = features["experience_category"]
 
         one_hot = {
-            'qb_exp_rookie': 1.0 if category == 'rookie' else 0.0,
-            'qb_exp_developing': 1.0 if category == 'developing' else 0.0,
-            'qb_exp_veteran': 1.0 if category == 'veteran' else 0.0,
-            'qb_exp_elite_veteran': 1.0 if category == 'elite_veteran' else 0.0,
+            "qb_exp_rookie": 1.0 if category == "rookie" else 0.0,
+            "qb_exp_developing": 1.0 if category == "developing" else 0.0,
+            "qb_exp_veteran": 1.0 if category == "veteran" else 0.0,
+            "qb_exp_elite_veteran": 1.0 if category == "elite_veteran" else 0.0,
         }
 
         return one_hot
@@ -226,6 +226,7 @@ class QBExperienceFeatures:
 # ============================================================================
 # STANDALONE QUERY (FOR BATCH PROCESSING)
 # ============================================================================
+
 
 def query_qb_experience_batch(
     player_season_weeks: pd.DataFrame,
@@ -245,11 +246,11 @@ def query_qb_experience_batch(
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     conn = psycopg2.connect(**db_config)
@@ -270,7 +271,7 @@ def query_qb_experience_batch(
     for _, row in player_season_weeks.iterrows():
         cur.execute(
             "INSERT INTO input_games VALUES (%s, %s, %s)",
-            (row['player_id'], row['season'], row['week'])
+            (row["player_id"], row["season"], row["week"]),
         )
 
     conn.commit()
@@ -312,17 +313,17 @@ def query_qb_experience_batch(
     conn.close()
 
     # Fill missing values with defaults
-    df['years_exp'] = df['years_exp'].fillna(3.0)
-    df['games_with_stats'] = df['games_with_stats'].fillna(50.0)
-    df['log_games_experience'] = df['log_games_experience'].fillna(np.log(51.0))
-    df['experience_category'] = df['experience_category'].fillna('developing')
-    df['experience_numeric'] = df['experience_numeric'].fillna(1)
+    df["years_exp"] = df["years_exp"].fillna(3.0)
+    df["games_with_stats"] = df["games_with_stats"].fillna(50.0)
+    df["log_games_experience"] = df["log_games_experience"].fillna(np.log(51.0))
+    df["experience_category"] = df["experience_category"].fillna("developing")
+    df["experience_numeric"] = df["experience_numeric"].fillna(1)
 
     # One-hot encode
-    df['qb_exp_rookie'] = (df['experience_category'] == 'rookie').astype(float)
-    df['qb_exp_developing'] = (df['experience_category'] == 'developing').astype(float)
-    df['qb_exp_veteran'] = (df['experience_category'] == 'veteran').astype(float)
-    df['qb_exp_elite_veteran'] = (df['experience_category'] == 'elite_veteran').astype(float)
+    df["qb_exp_rookie"] = (df["experience_category"] == "rookie").astype(float)
+    df["qb_exp_developing"] = (df["experience_category"] == "developing").astype(float)
+    df["qb_exp_veteran"] = (df["experience_category"] == "veteran").astype(float)
+    df["qb_exp_elite_veteran"] = (df["experience_category"] == "elite_veteran").astype(float)
 
     logger.info(f"Batch QB experience: {len(df):,} player-games processed")
 

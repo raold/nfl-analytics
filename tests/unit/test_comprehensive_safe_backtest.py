@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_games_with_safe_features_basic():
@@ -56,7 +53,6 @@ def test_load_games_with_safe_features_basic():
     assert result is not None
 
 
-
 def test_load_games_with_safe_features_edge_cases():
     """Test load_games_with_safe_features: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_games_with_safe_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_games_with_safe_features_error_handling():
     """Test load_games_with_safe_features error handling."""
     with pytest.raises(ValueError):
         load_games_with_safe_features(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_games_with_safe_features_property_idempotent(val):
 
     # Assert property
     assert load_games_with_safe_features(val) == result, "idempotent violated"
-
 
 
 def test_add_rolling_features_basic():
@@ -100,7 +93,6 @@ def test_add_rolling_features_basic():
     assert result is not None
 
 
-
 def test_add_rolling_features_edge_cases():
     """Test add_rolling_features: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_add_rolling_features_edge_cases():
     assert result is not None
 
 
-
 def test_add_rolling_features_error_handling():
     """Test add_rolling_features error handling."""
     with pytest.raises(ValueError):
         add_rolling_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_add_rolling_features_property_idempotent(self, self, df):
 
     # Assert property
     assert add_rolling_features(self, df) == result, "idempotent violated"
-
 
 
 def test_prepare_matchup_features_basic():
@@ -144,7 +133,6 @@ def test_prepare_matchup_features_basic():
     assert result is not None
 
 
-
 def test_prepare_matchup_features_edge_cases():
     """Test prepare_matchup_features: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_prepare_matchup_features_edge_cases():
     assert result is not None
 
 
-
 def test_prepare_matchup_features_error_handling():
     """Test prepare_matchup_features error handling."""
     with pytest.raises(ValueError):
         prepare_matchup_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_prepare_matchup_features_property_idempotent(self, self, df):
 
     # Assert property
     assert prepare_matchup_features(self, df) == result, "idempotent violated"
-
 
 
 def test_run_backtest_basic():
@@ -188,7 +173,6 @@ def test_run_backtest_basic():
     assert result is not None
 
 
-
 def test_run_backtest_edge_cases():
     """Test run_backtest: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_run_backtest_edge_cases():
     assert result is not None
 
 
-
 def test_run_backtest_error_handling():
     """Test run_backtest error handling."""
     with pytest.raises(ValueError):
         run_backtest(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_run_backtest_property_idempotent(self, self, matchups):
 
     # Assert property
     assert run_backtest(self, matchups) == result, "idempotent violated"
-
 
 
 def test_save_results_basic():
@@ -232,7 +213,6 @@ def test_save_results_basic():
     assert result is not None
 
 
-
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_save_results_edge_cases():
     assert result is not None
 
 
-
 def test_save_results_error_handling():
     """Test save_results error handling."""
     with pytest.raises(ValueError):
         save_results(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_save_results_property_idempotent(self, self, results):
 
     # Assert property
     assert save_results(self, results) == result, "idempotent violated"
-
 
 
 def test_print_summary_basic():
@@ -276,7 +253,6 @@ def test_print_summary_basic():
     assert result is not None
 
 
-
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_print_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_summary_error_handling():
     """Test print_summary error handling."""
     with pytest.raises(ValueError):
         print_summary(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -305,4 +279,3 @@ def test_print_summary_property_idempotent(self, self, results):
 
     # Assert property
     assert print_summary(self, results) == result, "idempotent violated"
-

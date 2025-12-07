@@ -23,7 +23,6 @@ def test_objective_basic():
     assert result is not None
 
 
-
 def test_objective_edge_cases():
     """Test objective: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_objective_edge_cases():
     assert result is not None
 
 
-
 def test_objective_error_handling():
     """Test objective error handling."""
     with pytest.raises(ValueError):
         objective(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_objective_property_idempotent(self, trial, args):
 
     # Assert property
     assert objective(trial, args) == result, "idempotent violated"
-
 
 
 def test_run_hyperparameter_search_basic():
@@ -67,7 +63,6 @@ def test_run_hyperparameter_search_basic():
     assert result is not None
 
 
-
 def test_run_hyperparameter_search_edge_cases():
     """Test run_hyperparameter_search: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_run_hyperparameter_search_edge_cases():
     assert result is not None
 
 
-
 def test_run_hyperparameter_search_error_handling():
     """Test run_hyperparameter_search error handling."""
     with pytest.raises(ValueError):
         run_hyperparameter_search(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_run_hyperparameter_search_property_idempotent(self, args):
 
     # Assert property
     assert run_hyperparameter_search(args) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -111,7 +103,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -124,9 +115,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

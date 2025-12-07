@@ -16,10 +16,7 @@ from rich.table import Table
 console = Console()
 
 # Database connection
-DB_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-)
+DB_URL = os.environ.get("DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01")
 
 
 class DataValidator:
@@ -52,36 +49,41 @@ class DataValidator:
         duplicates = {}
 
         # Check games table
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT game_id, COUNT(*) as cnt
             FROM games
             GROUP BY game_id
             HAVING COUNT(*) > 1
-        """)
+        """
+        )
         game_dups = cur.fetchall()
         if game_dups:
-            duplicates['games'] = game_dups
+            duplicates["games"] = game_dups
             console.print(f"  ❌ Found {len(game_dups)} duplicate games")
         else:
             console.print("  ✅ No duplicate games")
 
         # Check plays table (should have composite key)
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT game_id, play_id, COUNT(*) as cnt
             FROM plays
             GROUP BY game_id, play_id
             HAVING COUNT(*) > 1
             LIMIT 10
-        """)
+        """
+        )
         play_dups = cur.fetchall()
         if play_dups:
-            duplicates['plays'] = play_dups
+            duplicates["plays"] = play_dups
             console.print("  ❌ Found duplicate plays")
         else:
             console.print("  ✅ No duplicate plays")
 
         # Check odds_history (critical for paid data)
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT event_id, bookmaker_key, market_key,
                    outcome_name, snapshot_at, COUNT(*) as cnt
             FROM odds_history
@@ -89,10 +91,11 @@ class DataValidator:
                      outcome_name, snapshot_at
             HAVING COUNT(*) > 1
             LIMIT 10
-        """)
+        """
+        )
         odds_dups = cur.fetchall()
         if odds_dups:
-            duplicates['odds_history'] = odds_dups
+            duplicates["odds_history"] = odds_dups
             console.print("  ❌ Found duplicate odds records")
         else:
             console.print("  ✅ No duplicate odds records")
@@ -105,32 +108,36 @@ class DataValidator:
         orphans = {}
 
         # Plays without games
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as orphan_plays
             FROM plays p
             WHERE NOT EXISTS (
                 SELECT 1 FROM games g WHERE g.game_id = p.game_id
             )
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result['orphan_plays'] > 0:
-            orphans['plays_without_games'] = result['orphan_plays']
+        if result["orphan_plays"] > 0:
+            orphans["plays_without_games"] = result["orphan_plays"]
             console.print(f"  ❌ {result['orphan_plays']} plays without games")
         else:
             console.print("  ✅ All plays have corresponding games")
 
         # Rosters without players
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as orphan_rosters
             FROM rosters r
             WHERE r.player_id IS NOT NULL
               AND NOT EXISTS (
                 SELECT 1 FROM players p WHERE p.player_id = r.player_id
             )
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result['orphan_rosters'] > 0:
-            orphans['rosters_without_players'] = result['orphan_rosters']
+        if result["orphan_rosters"] > 0:
+            orphans["rosters_without_players"] = result["orphan_rosters"]
             console.print(f"  ❌ {result['orphan_rosters']} roster entries without players")
         else:
             console.print("  ✅ All roster entries have valid players")
@@ -143,42 +150,48 @@ class DataValidator:
         issues = {}
 
         # Games with impossible scores
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as bad_scores
             FROM games
             WHERE (home_score < 0 OR away_score < 0)
                OR (home_score > 100 OR away_score > 100)
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result['bad_scores'] > 0:
-            issues['impossible_scores'] = result['bad_scores']
+        if result["bad_scores"] > 0:
+            issues["impossible_scores"] = result["bad_scores"]
             console.print(f"  ❌ {result['bad_scores']} games with impossible scores")
         else:
             console.print("  ✅ All game scores valid")
 
         # Future games with scores
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as future_with_scores
             FROM games
             WHERE kickoff > NOW()
               AND home_score IS NOT NULL
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result['future_with_scores'] > 0:
-            issues['future_games_scored'] = result['future_with_scores']
+        if result["future_with_scores"] > 0:
+            issues["future_games_scored"] = result["future_with_scores"]
             console.print(f"  ❌ {result['future_with_scores']} future games have scores")
         else:
             console.print("  ✅ No future games have scores")
 
         # Odds with invalid prices
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as bad_odds
             FROM odds_history
             WHERE outcome_price <= 0 OR outcome_price > 100
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result['bad_odds'] > 0:
-            issues['invalid_odds_prices'] = result['bad_odds']
+        if result["bad_odds"] > 0:
+            issues["invalid_odds_prices"] = result["bad_odds"]
             console.print(f"  ❌ {result['bad_odds']} odds with invalid prices")
         else:
             console.print("  ✅ All odds prices valid")
@@ -191,7 +204,8 @@ class DataValidator:
         stats = {}
 
         # Season coverage
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT
                 season,
                 COUNT(*) as games,
@@ -200,22 +214,25 @@ class DataValidator:
             WHERE season >= 1999
             GROUP BY season
             ORDER BY season
-        """)
+        """
+        )
         seasons = cur.fetchall()
 
         incomplete_seasons = [
-            s for s in seasons
-            if s['season'] < 2025 and s['games'] < 256  # Full season should have 256+ games
+            s
+            for s in seasons
+            if s["season"] < 2025 and s["games"] < 256  # Full season should have 256+ games
         ]
 
         if incomplete_seasons:
-            stats['incomplete_seasons'] = incomplete_seasons
+            stats["incomplete_seasons"] = incomplete_seasons
             console.print(f"  ⚠️  {len(incomplete_seasons)} seasons appear incomplete")
         else:
             console.print("  ✅ All historical seasons complete")
 
         # Odds coverage for recent games
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             WITH recent_games AS (
                 SELECT game_id, home_team, away_team
                 FROM games
@@ -229,10 +246,15 @@ class DataValidator:
             LEFT JOIN odds_history o
                 ON (g.home_team = o.home_team AND g.away_team = o.away_team)
                 OR (g.home_team = o.away_team AND g.away_team = o.home_team)
-        """)
+        """
+        )
         result = cur.fetchone()
-        coverage = result['games_with_odds'] / result['total_games'] * 100 if result['total_games'] > 0 else 0
-        stats['odds_coverage_pct'] = coverage
+        coverage = (
+            result["games_with_odds"] / result["total_games"] * 100
+            if result["total_games"] > 0
+            else 0
+        )
+        stats["odds_coverage_pct"] = coverage
 
         if coverage < 80:
             console.print(f"  ⚠️  Odds coverage: {coverage:.1f}% for 2023+ games")
@@ -247,7 +269,8 @@ class DataValidator:
         issues = {}
 
         # Game scores should match play scoring
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             WITH play_scores AS (
                 SELECT
                     game_id,
@@ -263,10 +286,11 @@ class DataValidator:
             JOIN games g USING (game_id)
             WHERE ABS(g.home_score - ps.home_tds) > 20  -- Allow for FGs, safeties, etc.
                OR ABS(g.away_score - ps.away_tds) > 20
-        """)
+        """
+        )
         result = cur.fetchone()
-        if result and result['mismatched'] > 10:  # Allow a few data issues
-            issues['score_play_mismatch'] = result['mismatched']
+        if result and result["mismatched"] > 10:  # Allow a few data issues
+            issues["score_play_mismatch"] = result["mismatched"]
             console.print(f"  ⚠️  {result['mismatched']} games with score/play mismatches")
         else:
             console.print("  ✅ Game scores consistent with plays")
@@ -277,7 +301,8 @@ class DataValidator:
         """Detailed check of odds data (paid data)."""
         console.print("\n[yellow]Checking odds data coverage...[/yellow]")
 
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT
                 DATE_TRUNC('month', snapshot_at) as month,
                 market_key,
@@ -288,7 +313,8 @@ class DataValidator:
             GROUP BY DATE_TRUNC('month', snapshot_at), market_key
             ORDER BY month DESC, market_key
             LIMIT 20
-        """)
+        """
+        )
 
         results = cur.fetchall()
 
@@ -302,11 +328,11 @@ class DataValidator:
 
         for row in results[:10]:
             table.add_row(
-                row['month'].strftime('%Y-%m'),
-                row['market_key'],
-                str(row['records']),
-                str(row['games']),
-                str(row['books'])
+                row["month"].strftime("%Y-%m"),
+                row["market_key"],
+                str(row["records"]),
+                str(row["games"]),
+                str(row["books"]),
             )
 
         console.print(table)
@@ -328,35 +354,40 @@ class DataValidator:
             console.print(f"[bold yellow]⚠️  Found {total_issues} potential issues[/bold yellow]")
             console.print("\nRecommended actions:")
             console.print("  1. Review detailed findings above")
-            console.print("  2. Run deduplication if needed: python scripts/maintenance/deduplicate.py")
+            console.print(
+                "  2. Run deduplication if needed: python scripts/maintenance/deduplicate.py"
+            )
             console.print("  3. Create backup before fixes: make backup")
 
 
 @click.command()
-@click.option('--fix', is_flag=True, help='Attempt to fix issues automatically')
-@click.option('--verbose', is_flag=True, help='Show detailed output')
+@click.option("--fix", is_flag=True, help="Attempt to fix issues automatically")
+@click.option("--verbose", is_flag=True, help="Show detailed output")
 def main(fix, verbose):
     """Validate NFL Analytics database integrity."""
     validator = DataValidator(DB_URL)
     results = validator.run_all_checks()
 
     if fix:
-        console.print("\n[yellow]Auto-fix not yet implemented. Run deduplicate.py for duplicates.[/yellow]")
+        console.print(
+            "\n[yellow]Auto-fix not yet implemented. Run deduplicate.py for duplicates.[/yellow]"
+        )
 
     # Write validation report
     report_file = f"logs/validation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
     import json
+
     os.makedirs("logs", exist_ok=True)
 
     # Convert any non-serializable objects
     clean_results = {}
     for k, v in results.items():
-        if isinstance(v, list) and len(v) > 0 and hasattr(v[0], 'keys'):
+        if isinstance(v, list) and len(v) > 0 and hasattr(v[0], "keys"):
             clean_results[k] = [dict(item) for item in v]
         else:
             clean_results[k] = v
 
-    with open(report_file, 'w') as f:
+    with open(report_file, "w") as f:
         json.dump(clean_results, f, indent=2, default=str)
 
     console.print(f"\n📝 Detailed report saved to: {report_file}")

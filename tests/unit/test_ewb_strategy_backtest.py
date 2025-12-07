@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -56,7 +53,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_data_basic():
@@ -89,7 +83,6 @@ def test_load_data_basic():
     assert result is not None
 
 
-
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
@@ -102,12 +95,10 @@ def test_load_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_data_error_handling():
     """Test load_data error handling."""
     with pytest.raises(ValueError):
         load_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -118,7 +109,6 @@ def test_load_data_property_idempotent(self, self, lines_csv, results_csv):
 
     # Assert property
     assert load_data(self, lines_csv, results_csv) == result, "idempotent violated"
-
 
 
 def test_calculate_bet_result_basic():
@@ -133,7 +123,6 @@ def test_calculate_bet_result_basic():
     assert result is not None
 
 
-
 def test_calculate_bet_result_edge_cases():
     """Test calculate_bet_result: edge cases."""
     # Arrange
@@ -146,23 +135,25 @@ def test_calculate_bet_result_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_bet_result_error_handling():
     """Test calculate_bet_result error handling."""
     with pytest.raises(ValueError):
         calculate_bet_result(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_calculate_bet_result_property_idempotent(self, self, spread_bet, spread_close, home_score, away_score, bet_home):
+def test_calculate_bet_result_property_idempotent(
+    self, self, spread_bet, spread_close, home_score, away_score, bet_home
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_bet_result(self, spread_bet, spread_close, home_score, away_score, bet_home)
 
     # Assert property
-    assert calculate_bet_result(self, spread_bet, spread_close, home_score, away_score, bet_home) == result, "idempotent violated"
-
+    assert (
+        calculate_bet_result(self, spread_bet, spread_close, home_score, away_score, bet_home)
+        == result
+    ), "idempotent violated"
 
 
 def test_backtest_ewb_basic():
@@ -177,7 +168,6 @@ def test_backtest_ewb_basic():
     assert result is not None
 
 
-
 def test_backtest_ewb_edge_cases():
     """Test backtest_ewb: edge cases."""
     # Arrange
@@ -190,12 +180,10 @@ def test_backtest_ewb_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_ewb_error_handling():
     """Test backtest_ewb error handling."""
     with pytest.raises(ValueError):
         backtest_ewb(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -206,7 +194,6 @@ def test_backtest_ewb_property_idempotent(self, self, lines_df, results_df):
 
     # Assert property
     assert backtest_ewb(self, lines_df, results_df) == result, "idempotent violated"
-
 
 
 def test_backtest_closing_line_basic():
@@ -221,7 +208,6 @@ def test_backtest_closing_line_basic():
     assert result is not None
 
 
-
 def test_backtest_closing_line_edge_cases():
     """Test backtest_closing_line: edge cases."""
     # Arrange
@@ -234,12 +220,10 @@ def test_backtest_closing_line_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_closing_line_error_handling():
     """Test backtest_closing_line error handling."""
     with pytest.raises(ValueError):
         backtest_closing_line(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -250,7 +234,6 @@ def test_backtest_closing_line_property_idempotent(self, self, lines_df, results
 
     # Assert property
     assert backtest_closing_line(self, lines_df, results_df) == result, "idempotent violated"
-
 
 
 def test_backtest_adaptive_basic():
@@ -265,7 +248,6 @@ def test_backtest_adaptive_basic():
     assert result is not None
 
 
-
 def test_backtest_adaptive_edge_cases():
     """Test backtest_adaptive: edge cases."""
     # Arrange
@@ -278,12 +260,10 @@ def test_backtest_adaptive_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_adaptive_error_handling():
     """Test backtest_adaptive error handling."""
     with pytest.raises(ValueError):
         backtest_adaptive(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -293,8 +273,9 @@ def test_backtest_adaptive_property_idempotent(self, self, lines_df, results_df,
     result = backtest_adaptive(self, lines_df, results_df, clv_threshold)
 
     # Assert property
-    assert backtest_adaptive(self, lines_df, results_df, clv_threshold) == result, "idempotent violated"
-
+    assert (
+        backtest_adaptive(self, lines_df, results_df, clv_threshold) == result
+    ), "idempotent violated"
 
 
 def test_calculate_performance_basic():
@@ -309,7 +290,6 @@ def test_calculate_performance_basic():
     assert result is not None
 
 
-
 def test_calculate_performance_edge_cases():
     """Test calculate_performance: edge cases."""
     # Arrange
@@ -322,12 +302,10 @@ def test_calculate_performance_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_performance_error_handling():
     """Test calculate_performance error handling."""
     with pytest.raises(ValueError):
         calculate_performance(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100))
@@ -338,7 +316,6 @@ def test_calculate_performance_property_idempotent(self, self, strategy):
 
     # Assert property
     assert calculate_performance(self, strategy) == result, "idempotent violated"
-
 
 
 def test_compare_strategies_basic():
@@ -353,7 +330,6 @@ def test_compare_strategies_basic():
     assert result is not None
 
 
-
 def test_compare_strategies_edge_cases():
     """Test compare_strategies: edge cases."""
     # Arrange
@@ -366,12 +342,10 @@ def test_compare_strategies_edge_cases():
     assert result is not None
 
 
-
 def test_compare_strategies_error_handling():
     """Test compare_strategies error handling."""
     with pytest.raises(ValueError):
         compare_strategies(invalid_input)
-
 
 
 @given(st.integers())
@@ -382,7 +356,6 @@ def test_compare_strategies_property_idempotent(val):
 
     # Assert property
     assert compare_strategies(val) == result, "idempotent violated"
-
 
 
 def test_statistical_test_basic():
@@ -397,7 +370,6 @@ def test_statistical_test_basic():
     assert result is not None
 
 
-
 def test_statistical_test_edge_cases():
     """Test statistical_test: edge cases."""
     # Arrange
@@ -410,12 +382,10 @@ def test_statistical_test_edge_cases():
     assert result is not None
 
 
-
 def test_statistical_test_error_handling():
     """Test statistical_test error handling."""
     with pytest.raises(ValueError):
         statistical_test(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100), st.text(min_size=1, max_size=100))
@@ -426,4 +396,3 @@ def test_statistical_test_property_idempotent(self, self, strategy1, strategy2):
 
     # Assert property
     assert statistical_test(self, strategy1, strategy2) == result, "idempotent violated"
-

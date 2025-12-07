@@ -21,6 +21,7 @@ try:
         get_common_schemas,
         validate_schema,
     )
+
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -32,10 +33,7 @@ class PredictionQueries:
 
     @staticmethod
     def retrospective_metrics(
-        conn,
-        model_version: str | None = None,
-        season: int | None = None,
-        limit: int = 1000
+        conn, model_version: str | None = None, season: int | None = None, limit: int = 1000
     ) -> pd.DataFrame:
         """
         Fetch player passing yards predictions and actual performance with error handling.
@@ -107,10 +105,7 @@ class PredictionQueries:
             return pd.DataFrame()
 
     @staticmethod
-    def weekly_performance_metrics(
-        conn,
-        min_season: int = 2022
-    ) -> pd.DataFrame:
+    def weekly_performance_metrics(conn, min_season: int = 2022) -> pd.DataFrame:
         """
         Fetch weekly aggregated performance metrics for player predictions.
 
@@ -148,11 +143,7 @@ class PredictionQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def bnn_uncertainty_metrics(
-        conn,
-        min_season: int = 2023,
-        limit: int = 500
-    ) -> pd.DataFrame:
+    def bnn_uncertainty_metrics(conn, min_season: int = 2023, limit: int = 500) -> pd.DataFrame:
         """
         Fetch Bayesian Neural Network uncertainty metrics from predictions.
 
@@ -203,11 +194,7 @@ class PredictionQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def predictions_with_odds(
-        conn,
-        season: int,
-        week: int
-    ) -> pd.DataFrame:
+    def predictions_with_odds(conn, season: int, week: int) -> pd.DataFrame:
         """
         Fetch QB passing predictions with latest sportsbook odds and edge analysis.
 
@@ -294,11 +281,7 @@ class PredictionQueries:
         return pd.read_sql_query(query, conn, params=(season, week))
 
     @staticmethod
-    def line_movement_history(
-        conn,
-        player_name: str,
-        days_back: int = 7
-    ) -> pd.DataFrame:
+    def line_movement_history(conn, player_name: str, days_back: int = 7) -> pd.DataFrame:
         """
         Fetch historical line movement for a specific player.
 

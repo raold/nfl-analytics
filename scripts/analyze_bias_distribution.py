@@ -17,12 +17,9 @@ from scipy import stats
 # Database connection
 def get_db_connection():
     return psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
+
 
 def analyze_passing_yards_distribution():
     """Compare passing yards distribution across time periods."""
@@ -49,12 +46,12 @@ def analyze_passing_yards_distribution():
     data = pd.DataFrame(cursor.fetchall())
 
     # Split into training and validation
-    train = data[(data['season'] >= 2018) & (data['season'] <= 2021)]
-    val = data[(data['season'] >= 2022) & (data['season'] <= 2024)]
+    train = data[(data["season"] >= 2018) & (data["season"] <= 2021)]
+    val = data[(data["season"] >= 2022) & (data["season"] <= 2024)]
 
-    print("="*80)
+    print("=" * 80)
     print("PASSING YARDS DISTRIBUTION ANALYSIS")
-    print("="*80)
+    print("=" * 80)
     print()
 
     # Overall statistics
@@ -73,12 +70,16 @@ def analyze_passing_yards_distribution():
     print(f"  Std Dev: {val['passing_yards'].std():.2f} yards")
     print()
     print("DIFFERENCE:")
-    print(f"  Mean difference: {val['passing_yards'].mean() - train['passing_yards'].mean():.2f} yards")
-    print(f"  ({(val['passing_yards'].mean() / train['passing_yards'].mean() - 1) * 100:.2f}% increase)")
+    print(
+        f"  Mean difference: {val['passing_yards'].mean() - train['passing_yards'].mean():.2f} yards"
+    )
+    print(
+        f"  ({(val['passing_yards'].mean() / train['passing_yards'].mean() - 1) * 100:.2f}% increase)"
+    )
     print()
 
     # Statistical test
-    t_stat, p_value = stats.ttest_ind(val['passing_yards'], train['passing_yards'])
+    t_stat, p_value = stats.ttest_ind(val["passing_yards"], train["passing_yards"])
     print(f"T-test: t={t_stat:.4f}, p={p_value:.4e}")
     if p_value < 0.05:
         print("  ✓ SIGNIFICANT difference between periods")
@@ -90,9 +91,11 @@ def analyze_passing_yards_distribution():
     print("2. BY SEASON BREAKDOWN")
     print("-" * 80)
     for season in range(2018, 2025):
-        season_data = data[data['season'] == season]
-        print(f"Season {season}: mean={season_data['passing_yards'].mean():.2f}, "
-              f"n={len(season_data):,}")
+        season_data = data[data["season"] == season]
+        print(
+            f"Season {season}: mean={season_data['passing_yards'].mean():.2f}, "
+            f"n={len(season_data):,}"
+        )
     print()
 
     # Percentiles
@@ -102,8 +105,8 @@ def analyze_passing_yards_distribution():
     print(f"{'Percentile':<12} {'Training':>12} {'Validation':>12} {'Difference':>12}")
     print("-" * 60)
     for p in percentiles:
-        train_p = np.percentile(train['passing_yards'], p)
-        val_p = np.percentile(val['passing_yards'], p)
+        train_p = np.percentile(train["passing_yards"], p)
+        val_p = np.percentile(val["passing_yards"], p)
         diff = val_p - train_p
         print(f"{p}th{'':<9} {train_p:>12.1f} {val_p:>12.1f} {diff:>12.1f}")
     print()
@@ -115,13 +118,17 @@ def analyze_passing_yards_distribution():
     print(f"  Mean attempts: {train['stat_attempts'].mean():.2f}")
     print("Validation (2022-2024):")
     print(f"  Mean attempts: {val['stat_attempts'].mean():.2f}")
-    print(f"Difference: {val['stat_attempts'].mean() - train['stat_attempts'].mean():.2f} attempts/game")
-    print(f"  ({(val['stat_attempts'].mean() / train['stat_attempts'].mean() - 1) * 100:.2f}% change)")
+    print(
+        f"Difference: {val['stat_attempts'].mean() - train['stat_attempts'].mean():.2f} attempts/game"
+    )
+    print(
+        f"  ({(val['stat_attempts'].mean() / train['stat_attempts'].mean() - 1) * 100:.2f}% change)"
+    )
     print()
 
     # Yards per attempt
-    train['ypa'] = train['passing_yards'] / train['stat_attempts']
-    val['ypa'] = val['passing_yards'] / val['stat_attempts']
+    train["ypa"] = train["passing_yards"] / train["stat_attempts"]
+    val["ypa"] = val["passing_yards"] / val["stat_attempts"]
     print("5. YARDS PER ATTEMPT ANALYSIS")
     print("-" * 80)
     print(f"Training (2018-2021): {train['ypa'].mean():.3f} yards/attempt")
@@ -131,6 +138,7 @@ def analyze_passing_yards_distribution():
 
     cursor.close()
     conn.close()
+
 
 def analyze_betting_lines():
     """Check if betting lines are systematically biased."""
@@ -153,12 +161,12 @@ def analyze_betting_lines():
     cursor.execute(query)
     data = pd.DataFrame(cursor.fetchall())
 
-    train = data[(data['season'] >= 2018) & (data['season'] <= 2021)]
-    val = data[(data['season'] >= 2022) & (data['season'] <= 2024)]
+    train = data[(data["season"] >= 2018) & (data["season"] <= 2021)]
+    val = data[(data["season"] >= 2022) & (data["season"] <= 2024)]
 
-    print("="*80)
+    print("=" * 80)
     print("BETTING LINES ANALYSIS")
-    print("="*80)
+    print("=" * 80)
     print()
 
     print("1. TOTAL SCORE PREDICTIONS")
@@ -173,21 +181,26 @@ def analyze_betting_lines():
     print(f"  Avg betting total: {val['betting_total'].mean():.2f}")
     print(f"  Avg deviation: {val['total_deviation'].mean():.2f}")
     print()
-    print(f"Change in deviation: {val['total_deviation'].mean() - train['total_deviation'].mean():.2f}")
+    print(
+        f"Change in deviation: {val['total_deviation'].mean() - train['total_deviation'].mean():.2f}"
+    )
     print()
 
     # By season
     print("2. BY SEASON")
     print("-" * 80)
     for season in range(2018, 2025):
-        season_data = data[data['season'] == season]
-        print(f"Season {season}: actual={season_data['actual_total'].mean():.2f}, "
-              f"betting={season_data['betting_total'].mean():.2f}, "
-              f"deviation={season_data['total_deviation'].mean():.2f}")
+        season_data = data[data["season"] == season]
+        print(
+            f"Season {season}: actual={season_data['actual_total'].mean():.2f}, "
+            f"betting={season_data['betting_total'].mean():.2f}, "
+            f"deviation={season_data['total_deviation'].mean():.2f}"
+        )
     print()
 
     cursor.close()
     conn.close()
+
 
 def analyze_weather_data():
     """Check weather data completeness."""
@@ -211,33 +224,38 @@ def analyze_weather_data():
     cursor.execute(query)
     data = pd.DataFrame(cursor.fetchall())
 
-    print("="*80)
+    print("=" * 80)
     print("WEATHER DATA COMPLETENESS")
-    print("="*80)
+    print("=" * 80)
     print()
 
     print(f"{'Season':<8} {'Total':>8} {'Missing Temp':>14} {'Missing Wind':>14} {'Avg Temp':>10}")
     print("-" * 80)
     for _, row in data.iterrows():
-        print(f"{row['season']:<8} {row['total_games']:>8} "
-              f"{row['missing_temp']:>14} ({row['missing_temp']/row['total_games']*100:>5.1f}%) "
-              f"{row['missing_wind']:>14} ({row['missing_wind']/row['total_games']*100:>5.1f}%) "
-              f"{row['avg_temp']:>10.1f}°F" if row['avg_temp'] else "       N/A")
+        print(
+            f"{row['season']:<8} {row['total_games']:>8} "
+            f"{row['missing_temp']:>14} ({row['missing_temp']/row['total_games']*100:>5.1f}%) "
+            f"{row['missing_wind']:>14} ({row['missing_wind']/row['total_games']*100:>5.1f}%) "
+            f"{row['avg_temp']:>10.1f}°F"
+            if row["avg_temp"]
+            else "       N/A"
+        )
     print()
 
     cursor.close()
     conn.close()
 
+
 if __name__ == "__main__":
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("SYSTEMATIC BIAS INVESTIGATION")
     print("Analyzing potential causes of 12-17 yard under-prediction")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     analyze_passing_yards_distribution()
     analyze_betting_lines()
     analyze_weather_data()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")

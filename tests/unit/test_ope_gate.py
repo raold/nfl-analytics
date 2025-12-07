@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_evaluate_grid_basic():
@@ -56,7 +53,6 @@ def test_evaluate_grid_basic():
     assert result is not None
 
 
-
 def test_evaluate_grid_edge_cases():
     """Test evaluate_grid: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_evaluate_grid_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_grid_error_handling():
     """Test evaluate_grid error handling."""
     with pytest.raises(ValueError):
         evaluate_grid(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_evaluate_grid_property_idempotent(self, df, clips, shrinks, cfg):
 
     # Assert property
     assert evaluate_grid(df, clips, shrinks, cfg) == result, "idempotent violated"
-
 
 
 def test_run_gate_basic():
@@ -100,7 +93,6 @@ def test_run_gate_basic():
     assert result is not None
 
 
-
 def test_run_gate_edge_cases():
     """Test run_gate: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_run_gate_edge_cases():
     assert result is not None
 
 
-
 def test_run_gate_error_handling():
     """Test run_gate error handling."""
     with pytest.raises(ValueError):
         run_gate(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_run_gate_property_idempotent(self, df, cfg):
 
     # Assert property
     assert run_gate(df, cfg) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -144,7 +133,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +145,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

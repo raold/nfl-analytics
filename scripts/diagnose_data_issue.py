@@ -9,11 +9,11 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Load validation data
-df = pd.read_csv('analysis/results/ensemble_4way_backtest_2022_2024_FIXED.csv')
+df = pd.read_csv("analysis/results/ensemble_4way_backtest_2022_2024_FIXED.csv")
 
-print("="*80)
+print("=" * 80)
 print("DATA ISSUE DIAGNOSIS")
-print("="*80)
+print("=" * 80)
 print()
 
 print("1. VALIDATION DATA INSPECTION")
@@ -21,29 +21,25 @@ print("-" * 80)
 print(f"Columns: {df.columns.tolist()}")
 print()
 print("First 5 rows:")
-print(df[['game_id', 'player_name', 'actual_yards', 'ensemble_mean']].head())
+print(df[["game_id", "player_name", "actual_yards", "ensemble_mean"]].head())
 print()
 print("actual_yards statistics:")
-print(df['actual_yards'].describe())
+print(df["actual_yards"].describe())
 print()
 
 print("\n2. CHECK FOR TEAM TOTALS VS PLAYER YARDS")
 print("-" * 80)
 # Database query: Get both team totals and player yards
 conn = psycopg2.connect(
-    host="localhost",
-    port=5544,
-    dbname="devdb01",
-    user="dro",
-    password="sicillionbillions"
+    host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
 )
 cursor = conn.cursor(cursor_factory=RealDictCursor)
 
 # Sample game from validation data
-sample_game_id = df.iloc[0]['game_id']
-sample_player_id = df.iloc[0]['player_id']
-sample_season = df.iloc[0]['season']
-sample_week = df.iloc[0]['week']
+sample_game_id = df.iloc[0]["game_id"]
+sample_player_id = df.iloc[0]["player_id"]
+sample_season = df.iloc[0]["season"]
+sample_week = df.iloc[0]["week"]
 
 print(f"Sample game: {sample_game_id}")
 print(f"Sample player: {sample_player_id} ({df.iloc[0]['player_name']})")
@@ -78,12 +74,12 @@ if db_result:
     print()
 
     # Compare to validation data
-    val_yards = df.iloc[0]['actual_yards']
+    val_yards = df.iloc[0]["actual_yards"]
     print("Validation data:")
     print(f"  actual_yards: {val_yards}")
     print()
 
-    if db_result['stat_yards'] != val_yards:
+    if db_result["stat_yards"] != val_yards:
         print("*** DATA MISMATCH ***")
         print(f"  Database: {db_result['stat_yards']} yards")
         print(f"  Validation: {val_yards} yards")
@@ -98,11 +94,11 @@ matches = 0
 mismatches = 0
 for i in range(min(20, len(df))):
     row = df.iloc[i]
-    cursor.execute(player_query, (row['player_id'], row['season'], row['week']))
+    cursor.execute(player_query, (row["player_id"], row["season"], row["week"]))
     db_result = cursor.fetchone()
 
     if db_result:
-        if abs(db_result['stat_yards'] - row['actual_yards']) < 0.1:
+        if abs(db_result["stat_yards"] - row["actual_yards"]) < 0.1:
             matches += 1
         else:
             mismatches += 1
@@ -135,12 +131,14 @@ all_stats = cursor.fetchall()
 
 print(f"All stats for {df.iloc[0]['player_name']} Week {sample_week} {sample_season}:")
 for stat in all_stats:
-    print(f"  {stat['stat_category']}: {stat['stat_yards']} yards, {stat['stat_attempts']} attempts")
+    print(
+        f"  {stat['stat_category']}: {stat['stat_yards']} yards, {stat['stat_attempts']} attempts"
+    )
 
 cursor.close()
 conn.close()
 
 print()
-print("="*80)
+print("=" * 80)
 print("DIAGNOSIS COMPLETE")
-print("="*80)
+print("=" * 80)

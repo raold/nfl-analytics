@@ -23,7 +23,6 @@ def test_load_real_passing_data_basic():
     assert result is not None
 
 
-
 def test_load_real_passing_data_edge_cases():
     """Test load_real_passing_data: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_real_passing_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_real_passing_data_error_handling():
     """Test load_real_passing_data error handling."""
     with pytest.raises(ValueError):
         load_real_passing_data(invalid_input)
-
 
 
 def test_simulate_bnn_predictions_basic():
@@ -56,7 +53,6 @@ def test_simulate_bnn_predictions_basic():
     assert result is not None
 
 
-
 def test_simulate_bnn_predictions_edge_cases():
     """Test simulate_bnn_predictions: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_simulate_bnn_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_bnn_predictions_error_handling():
     """Test simulate_bnn_predictions error handling."""
     with pytest.raises(ValueError):
         simulate_bnn_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_simulate_bnn_predictions_property_idempotent(self, y_true, undercalibra
 
     # Assert property
     assert simulate_bnn_predictions(y_true, undercalibrated) == result, "idempotent violated"
-
 
 
 def test_compute_calibration_basic():
@@ -100,7 +93,6 @@ def test_compute_calibration_basic():
     assert result is not None
 
 
-
 def test_compute_calibration_edge_cases():
     """Test compute_calibration: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_compute_calibration_edge_cases():
     assert result is not None
 
 
-
 def test_compute_calibration_error_handling():
     """Test compute_calibration error handling."""
     with pytest.raises(ValueError):
         compute_calibration(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -128,8 +118,9 @@ def test_compute_calibration_property_idempotent(self, y_true, predictions, conf
     result = compute_calibration(y_true, predictions, confidence_level)
 
     # Assert property
-    assert compute_calibration(y_true, predictions, confidence_level) == result, "idempotent violated"
-
+    assert (
+        compute_calibration(y_true, predictions, confidence_level) == result
+    ), "idempotent violated"
 
 
 def test_apply_temperature_scaling_basic():
@@ -144,7 +135,6 @@ def test_apply_temperature_scaling_basic():
     assert result is not None
 
 
-
 def test_apply_temperature_scaling_edge_cases():
     """Test apply_temperature_scaling: edge cases."""
     # Arrange
@@ -157,12 +147,10 @@ def test_apply_temperature_scaling_edge_cases():
     assert result is not None
 
 
-
 def test_apply_temperature_scaling_error_handling():
     """Test apply_temperature_scaling error handling."""
     with pytest.raises(ValueError):
         apply_temperature_scaling(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +161,6 @@ def test_apply_temperature_scaling_property_idempotent(self, predictions, temper
 
     # Assert property
     assert apply_temperature_scaling(predictions, temperature) == result, "idempotent violated"
-
 
 
 def test_run_temperature_scaling_experiments_basic():
@@ -188,7 +175,6 @@ def test_run_temperature_scaling_experiments_basic():
     assert result is not None
 
 
-
 def test_run_temperature_scaling_experiments_edge_cases():
     """Test run_temperature_scaling_experiments: edge cases."""
     # Arrange
@@ -201,9 +187,7 @@ def test_run_temperature_scaling_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_run_temperature_scaling_experiments_error_handling():
     """Test run_temperature_scaling_experiments error handling."""
     with pytest.raises(ValueError):
         run_temperature_scaling_experiments(invalid_input)
-

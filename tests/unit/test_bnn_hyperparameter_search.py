@@ -23,7 +23,6 @@ def test_load_rushing_data_with_features_basic():
     assert result is not None
 
 
-
 def test_load_rushing_data_with_features_edge_cases():
     """Test load_rushing_data_with_features: edge cases."""
     # Arrange
@@ -36,23 +35,29 @@ def test_load_rushing_data_with_features_edge_cases():
     assert result is not None
 
 
-
 def test_load_rushing_data_with_features_error_handling():
     """Test load_rushing_data_with_features error handling."""
     with pytest.raises(ValueError):
         load_rushing_data_with_features(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_load_rushing_data_with_features_property_idempotent(self, start_season, end_season, include_vegas, include_env, include_opp):
+def test_load_rushing_data_with_features_property_idempotent(
+    self, start_season, end_season, include_vegas, include_env, include_opp
+):
     """Property test: function is idempotent."""
     # Act
-    result = load_rushing_data_with_features(start_season, end_season, include_vegas, include_env, include_opp)
+    result = load_rushing_data_with_features(
+        start_season, end_season, include_vegas, include_env, include_opp
+    )
 
     # Assert property
-    assert load_rushing_data_with_features(start_season, end_season, include_vegas, include_env, include_opp) == result, "idempotent violated"
-
+    assert (
+        load_rushing_data_with_features(
+            start_season, end_season, include_vegas, include_env, include_opp
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_train_bnn_basic():
@@ -67,7 +72,6 @@ def test_train_bnn_basic():
     assert result is not None
 
 
-
 def test_train_bnn_edge_cases():
     """Test train_bnn: edge cases."""
     # Arrange
@@ -80,23 +84,72 @@ def test_train_bnn_edge_cases():
     assert result is not None
 
 
-
 def test_train_bnn_error_handling():
     """Test train_bnn error handling."""
     with pytest.raises(ValueError):
         train_bnn(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(min_value=1, max_value=1000), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_train_bnn_property_idempotent(self, X_train, y_train, player_idx_train, X_test, player_idx_test, hidden_dim, prior_std, player_sigma, noise_sigma, n_samples, n_chains):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_train_bnn_property_idempotent(
+    self,
+    X_train,
+    y_train,
+    player_idx_train,
+    X_test,
+    player_idx_test,
+    hidden_dim,
+    prior_std,
+    player_sigma,
+    noise_sigma,
+    n_samples,
+    n_chains,
+):
     """Property test: function is idempotent."""
     # Act
-    result = train_bnn(X_train, y_train, player_idx_train, X_test, player_idx_test, hidden_dim, prior_std, player_sigma, noise_sigma, n_samples, n_chains)
+    result = train_bnn(
+        X_train,
+        y_train,
+        player_idx_train,
+        X_test,
+        player_idx_test,
+        hidden_dim,
+        prior_std,
+        player_sigma,
+        noise_sigma,
+        n_samples,
+        n_chains,
+    )
 
     # Assert property
-    assert train_bnn(X_train, y_train, player_idx_train, X_test, player_idx_test, hidden_dim, prior_std, player_sigma, noise_sigma, n_samples, n_chains) == result, "idempotent violated"
-
+    assert (
+        train_bnn(
+            X_train,
+            y_train,
+            player_idx_train,
+            X_test,
+            player_idx_test,
+            hidden_dim,
+            prior_std,
+            player_sigma,
+            noise_sigma,
+            n_samples,
+            n_chains,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_run_optimization_basic():
@@ -111,7 +164,6 @@ def test_run_optimization_basic():
     assert result is not None
 
 
-
 def test_run_optimization_edge_cases():
     """Test run_optimization: edge cases."""
     # Arrange
@@ -124,12 +176,10 @@ def test_run_optimization_edge_cases():
     assert result is not None
 
 
-
 def test_run_optimization_error_handling():
     """Test run_optimization error handling."""
     with pytest.raises(ValueError):
         run_optimization(invalid_input)
-
 
 
 @given(st.integers(), st.datetimes(), st.text(min_size=1, max_size=100))
@@ -140,7 +190,6 @@ def test_run_optimization_property_idempotent(self, n_trials, timeout, study_nam
 
     # Assert property
     assert run_optimization(n_trials, timeout, study_name) == result, "idempotent violated"
-
 
 
 def test_save_results_basic():
@@ -155,7 +204,6 @@ def test_save_results_basic():
     assert result is not None
 
 
-
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
@@ -168,12 +216,10 @@ def test_save_results_edge_cases():
     assert result is not None
 
 
-
 def test_save_results_error_handling():
     """Test save_results error handling."""
     with pytest.raises(ValueError):
         save_results(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +230,6 @@ def test_save_results_property_idempotent(self, study):
 
     # Assert property
     assert save_results(study) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -199,7 +244,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -212,9 +256,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

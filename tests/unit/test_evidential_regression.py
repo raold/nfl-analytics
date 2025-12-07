@@ -22,7 +22,7 @@ import pytest
 import torch
 from sklearn.datasets import make_regression
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from py.models.evidential_regression import (
     EvidentialLoss,
@@ -36,11 +36,7 @@ class TestEvidentialNeuralNetwork:
 
     def test_initialization(self):
         """Test model initialization"""
-        model = EvidentialNeuralNetwork(
-            input_dim=10,
-            hidden_dims=(64, 32),
-            dropout_rate=0.2
-        )
+        model = EvidentialNeuralNetwork(input_dim=10, hidden_dims=(64, 32), dropout_rate=0.2)
 
         assert model.input_dim == 10
         assert model.hidden_dims == (64, 32)
@@ -81,28 +77,28 @@ class TestEvidentialNeuralNetwork:
         predictions = model.predict_with_uncertainty(x)
 
         # Check all outputs present
-        assert 'mean' in predictions
-        assert 'aleatoric_std' in predictions
-        assert 'epistemic_std' in predictions
-        assert 'total_std' in predictions
-        assert 'alpha' in predictions
-        assert 'beta' in predictions
-        assert 'nu' in predictions
+        assert "mean" in predictions
+        assert "aleatoric_std" in predictions
+        assert "epistemic_std" in predictions
+        assert "total_std" in predictions
+        assert "alpha" in predictions
+        assert "beta" in predictions
+        assert "nu" in predictions
 
         # Check shapes
-        assert predictions['mean'].shape == (32,)
-        assert predictions['aleatoric_std'].shape == (32,)
-        assert predictions['epistemic_std'].shape == (32,)
-        assert predictions['total_std'].shape == (32,)
+        assert predictions["mean"].shape == (32,)
+        assert predictions["aleatoric_std"].shape == (32,)
+        assert predictions["epistemic_std"].shape == (32,)
+        assert predictions["total_std"].shape == (32,)
 
         # Check uncertainty is positive
-        assert torch.all(predictions['aleatoric_std'] > 0)
-        assert torch.all(predictions['epistemic_std'] > 0)
-        assert torch.all(predictions['total_std'] > 0)
+        assert torch.all(predictions["aleatoric_std"] > 0)
+        assert torch.all(predictions["epistemic_std"] > 0)
+        assert torch.all(predictions["total_std"] > 0)
 
         # Check total >= aleatoric (always true mathematically)
         assert torch.all(
-            predictions['total_std'] >= predictions['aleatoric_std'] - 1e-5
+            predictions["total_std"] >= predictions["aleatoric_std"] - 1e-5
         ), "Total uncertainty should be >= aleatoric"
 
     def test_uncertainty_decomposition(self):
@@ -114,17 +110,15 @@ class TestEvidentialNeuralNetwork:
 
         # Calculate expected total variance
         # Total variance = aleatoric_var * (1 + 1/nu)
-        aleatoric_var = predictions['aleatoric_std'] ** 2
-        epistemic_var = predictions['epistemic_std'] ** 2
+        aleatoric_var = predictions["aleatoric_std"] ** 2
+        epistemic_var = predictions["epistemic_std"] ** 2
         expected_total_var = aleatoric_var + epistemic_var
 
-        actual_total_var = predictions['total_std'] ** 2
+        actual_total_var = predictions["total_std"] ** 2
 
         # Allow small numerical error
         assert torch.allclose(
-            actual_total_var,
-            expected_total_var,
-            rtol=1e-3
+            actual_total_var, expected_total_var, rtol=1e-3
         ), "Total variance decomposition incorrect"
 
 
@@ -225,11 +219,7 @@ class TestEvidentialRegressor:
         """Generate synthetic regression data"""
         np.random.seed(42)
         X, y = make_regression(
-            n_samples=200,
-            n_features=10,
-            n_informative=8,
-            noise=5.0,
-            random_state=42
+            n_samples=200, n_features=10, n_informative=8, noise=5.0, random_state=42
         )
         return X, y
 
@@ -243,8 +233,8 @@ class TestEvidentialRegressor:
             batch_size=32,
             max_epochs=10,
             patience=5,
-            device='cpu',
-            random_state=42
+            device="cpu",
+            random_state=42,
         )
 
         assert model.hidden_dims == (64, 32)
@@ -254,7 +244,7 @@ class TestEvidentialRegressor:
         assert model.batch_size == 32
         assert model.max_epochs == 10
         assert model.patience == 5
-        assert model.device == 'cpu'
+        assert model.device == "cpu"
         assert model.random_state == 42
 
     def test_fit_predict(self, synthetic_data):
@@ -268,10 +258,7 @@ class TestEvidentialRegressor:
 
         # Train model
         model = EvidentialRegressor(
-            hidden_dims=(32, 16),
-            max_epochs=20,
-            patience=5,
-            random_state=42
+            hidden_dims=(32, 16), max_epochs=20, patience=5, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -294,10 +281,7 @@ class TestEvidentialRegressor:
         y_train, y_test = y[:split], y[split:]
 
         model = EvidentialRegressor(
-            hidden_dims=(32, 16),
-            max_epochs=20,
-            patience=5,
-            random_state=42
+            hidden_dims=(32, 16), max_epochs=20, patience=5, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -306,21 +290,21 @@ class TestEvidentialRegressor:
         predictions = model.predict(X_test, return_uncertainty=True)
 
         # Check all keys present
-        assert 'mean' in predictions
-        assert 'aleatoric_std' in predictions
-        assert 'epistemic_std' in predictions
-        assert 'total_std' in predictions
+        assert "mean" in predictions
+        assert "aleatoric_std" in predictions
+        assert "epistemic_std" in predictions
+        assert "total_std" in predictions
 
         # Check shapes
-        assert predictions['mean'].shape == y_test.shape
-        assert predictions['aleatoric_std'].shape == y_test.shape
-        assert predictions['epistemic_std'].shape == y_test.shape
-        assert predictions['total_std'].shape == y_test.shape
+        assert predictions["mean"].shape == y_test.shape
+        assert predictions["aleatoric_std"].shape == y_test.shape
+        assert predictions["epistemic_std"].shape == y_test.shape
+        assert predictions["total_std"].shape == y_test.shape
 
         # Check uncertainty is positive
-        assert np.all(predictions['aleatoric_std'] > 0)
-        assert np.all(predictions['epistemic_std'] > 0)
-        assert np.all(predictions['total_std'] > 0)
+        assert np.all(predictions["aleatoric_std"] > 0)
+        assert np.all(predictions["epistemic_std"] > 0)
+        assert np.all(predictions["total_std"] > 0)
 
     def test_calibration_on_synthetic_data(self, synthetic_data):
         """Test calibration on synthetic data"""
@@ -331,10 +315,7 @@ class TestEvidentialRegressor:
         y_train, y_test = y[:split], y[split:]
 
         model = EvidentialRegressor(
-            hidden_dims=(64, 32),
-            max_epochs=50,
-            patience=10,
-            random_state=42
+            hidden_dims=(64, 32), max_epochs=50, patience=10, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -342,7 +323,7 @@ class TestEvidentialRegressor:
         predictions = model.predict(X_test, return_uncertainty=True)
 
         # Calculate z-scores
-        z_scores = (y_test - predictions['mean']) / predictions['total_std']
+        z_scores = (y_test - predictions["mean"]) / predictions["total_std"]
 
         # Check empirical coverage
         # 68% of points should be within ±1σ
@@ -366,10 +347,7 @@ class TestEvidentialRegressor:
         y_train, _ = y[:split], y[split:]
 
         model = EvidentialRegressor(
-            hidden_dims=(32, 16),
-            max_epochs=20,
-            patience=5,
-            random_state=42
+            hidden_dims=(32, 16), max_epochs=20, patience=5, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -382,11 +360,12 @@ class TestEvidentialRegressor:
         pred_ood = model.predict(X_ood, return_uncertainty=True)
 
         # OOD should have higher epistemic uncertainty
-        mean_epistemic_in = pred_in['epistemic_std'].mean()
-        mean_epistemic_ood = pred_ood['epistemic_std'].mean()
+        mean_epistemic_in = pred_in["epistemic_std"].mean()
+        mean_epistemic_ood = pred_ood["epistemic_std"].mean()
 
-        assert mean_epistemic_ood > mean_epistemic_in, \
-            "OOD samples should have higher epistemic uncertainty"
+        assert (
+            mean_epistemic_ood > mean_epistemic_in
+        ), "OOD samples should have higher epistemic uncertainty"
 
     def test_save_load(self, synthetic_data, tmp_path):
         """Test model save/load"""
@@ -398,10 +377,7 @@ class TestEvidentialRegressor:
 
         # Train model
         model = EvidentialRegressor(
-            hidden_dims=(32, 16),
-            max_epochs=10,
-            patience=5,
-            random_state=42
+            hidden_dims=(32, 16), max_epochs=10, patience=5, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -421,16 +397,8 @@ class TestEvidentialRegressor:
         y_pred_after = model_loaded.predict(X_test, return_uncertainty=True)
 
         # Predictions should be identical
-        np.testing.assert_allclose(
-            y_pred_before['mean'],
-            y_pred_after['mean'],
-            rtol=1e-5
-        )
-        np.testing.assert_allclose(
-            y_pred_before['total_std'],
-            y_pred_after['total_std'],
-            rtol=1e-5
-        )
+        np.testing.assert_allclose(y_pred_before["mean"], y_pred_after["mean"], rtol=1e-5)
+        np.testing.assert_allclose(y_pred_before["total_std"], y_pred_after["total_std"], rtol=1e-5)
 
     def test_early_stopping(self, synthetic_data):
         """Test early stopping functionality"""
@@ -444,7 +412,7 @@ class TestEvidentialRegressor:
             hidden_dims=(32, 16),
             max_epochs=100,
             patience=3,  # Low patience for early stopping
-            random_state=42
+            random_state=42,
         )
 
         model.fit(X_train, y_train, X_val, y_val, verbose=False)
@@ -461,19 +429,15 @@ class TestEvidentialRegressor:
         X = np.random.randn(100, 5) * 1000  # Large feature values
         y = np.random.randn(100) * 1000  # Large target values
 
-        model = EvidentialRegressor(
-            hidden_dims=(16,),
-            max_epochs=10,
-            random_state=42
-        )
+        model = EvidentialRegressor(hidden_dims=(16,), max_epochs=10, random_state=42)
 
         # Should not crash or produce NaNs
         model.fit(X, y, verbose=False)
 
         # Predictions should be finite
         y_pred = model.predict(X, return_uncertainty=True)
-        assert np.all(np.isfinite(y_pred['mean']))
-        assert np.all(np.isfinite(y_pred['total_std']))
+        assert np.all(np.isfinite(y_pred["mean"]))
+        assert np.all(np.isfinite(y_pred["total_std"]))
 
 
 class TestIntegration:
@@ -497,9 +461,9 @@ class TestIntegration:
 
         # Target: rushing yards (linear + noise)
         y = (
-            5 * X[:, 0] +  # 5 yards per carry
-            0.3 * X[:, 1] +  # Some regression to L3 mean
-            np.random.randn(n_samples) * 15  # Noise
+            5 * X[:, 0]  # 5 yards per carry
+            + 0.3 * X[:, 1]  # Some regression to L3 mean
+            + np.random.randn(n_samples) * 15  # Noise
         )
 
         # Split
@@ -509,10 +473,7 @@ class TestIntegration:
 
         # Train
         model = EvidentialRegressor(
-            hidden_dims=(64, 32),
-            max_epochs=30,
-            patience=10,
-            random_state=42
+            hidden_dims=(64, 32), max_epochs=30, patience=10, random_state=42
         )
 
         model.fit(X_train, y_train, verbose=False)
@@ -521,11 +482,11 @@ class TestIntegration:
         predictions = model.predict(X_test, return_uncertainty=True)
 
         # Validate
-        mae = np.mean(np.abs(predictions['mean'] - y_test))
+        mae = np.mean(np.abs(predictions["mean"] - y_test))
         assert mae < 30, f"MAE should be reasonable: {mae:.2f}"
 
         # Check calibration
-        z_scores = (y_test - predictions['mean']) / predictions['total_std']
+        z_scores = (y_test - predictions["mean"]) / predictions["total_std"]
         coverage_68 = (np.abs(z_scores) < 1.0).mean()
         assert 0.50 < coverage_68 < 0.85, f"Calibration: {coverage_68:.2%}"
 

@@ -21,7 +21,6 @@ def test_generate_zero_bet_table_basic():
     assert result is not None
 
 
-
 def test_generate_zero_bet_table_edge_cases():
     """Test generate_zero_bet_table: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_generate_zero_bet_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_zero_bet_table_error_handling():
     """Test generate_zero_bet_table error handling."""
     with pytest.raises(ValueError):
         generate_zero_bet_table(invalid_input)
-
 
 
 def test_main_basic():
@@ -54,7 +51,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -67,9 +63,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

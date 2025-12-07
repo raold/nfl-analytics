@@ -65,7 +65,14 @@ class EnvironmentBNNIntegrationTest:
                 model_data = pickle.load(f)
 
             # Verify expected keys
-            required_keys = ["trace", "scaler", "player_encoder", "hidden_dim", "activation", "prior_std"]
+            required_keys = [
+                "trace",
+                "scaler",
+                "player_encoder",
+                "hidden_dim",
+                "activation",
+                "prior_std",
+            ]
             for key in required_keys:
                 if key not in model_data:
                     logger.error(f"✗ Missing required key: {key}")
@@ -83,6 +90,7 @@ class EnvironmentBNNIntegrationTest:
         except Exception as e:
             logger.error(f"✗ Model loading failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -167,9 +175,16 @@ class EnvironmentBNNIntegrationTest:
 
             # Prepare features (same as training)
             feature_cols = [
-                "carries", "avg_rushing_l3", "season_avg", "week",
-                "spread_close", "total_close",
-                "is_dome", "is_turf", "temp", "wind"
+                "carries",
+                "avg_rushing_l3",
+                "season_avg",
+                "week",
+                "spread_close",
+                "total_close",
+                "is_dome",
+                "is_turf",
+                "temp",
+                "wind",
             ]
 
             df[feature_cols] = df[feature_cols].fillna(0)
@@ -198,15 +213,20 @@ class EnvironmentBNNIntegrationTest:
             }
 
             logger.info("✓ Predictions generated (simulated for test)")
-            logger.info(f"  Mean prediction range: {predictions['mean'].min():.1f} - {predictions['mean'].max():.1f} yards")
+            logger.info(
+                f"  Mean prediction range: {predictions['mean'].min():.1f} - {predictions['mean'].max():.1f} yards"
+            )
             logger.info(f"  Mean uncertainty: {predictions['std'].mean():.1f} yards")
-            logger.info(f"  90% CI width: {(predictions['q95'] - predictions['q05']).mean():.1f} yards")
+            logger.info(
+                f"  90% CI width: {(predictions['q95'] - predictions['q05']).mean():.1f} yards"
+            )
 
             return True
 
         except Exception as e:
             logger.error(f"✗ Prediction generation failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -251,16 +271,16 @@ class EnvironmentBNNIntegrationTest:
 
             # Ensemble combination (weighted average by inverse uncertainty)
             # Weight by 1/variance (more confident models get higher weight)
-            baseline_weights = 1 / (baseline_uncertainty ** 2)
-            vegas_weights = 1 / (vegas_uncertainty ** 2)
-            env_weights = 1 / (env_uncertainty ** 2)
+            baseline_weights = 1 / (baseline_uncertainty**2)
+            vegas_weights = 1 / (vegas_uncertainty**2)
+            env_weights = 1 / (env_uncertainty**2)
 
             total_weights = baseline_weights + vegas_weights + env_weights
 
             ensemble_preds = (
-                baseline_preds * baseline_weights +
-                vegas_preds * vegas_weights +
-                env_preds * env_weights
+                baseline_preds * baseline_weights
+                + vegas_preds * vegas_weights
+                + env_preds * env_weights
             ) / total_weights
 
             logger.info(f"\n✓ Ensemble predictions: {ensemble_preds}")
@@ -269,13 +289,16 @@ class EnvironmentBNNIntegrationTest:
             # Calculate contribution of Environment BNN
             env_contribution = (env_weights / total_weights).mean()
             logger.info(f"  Environment BNN weight: {env_contribution:.1%}")
-            logger.info(f"  → Environment features improve uncertainty by {(1 - env_uncertainty.mean() / baseline_uncertainty.mean()) * 100:.1f}%")
+            logger.info(
+                f"  → Environment features improve uncertainty by {(1 - env_uncertainty.mean() / baseline_uncertainty.mean()) * 100:.1f}%"
+            )
 
             return True
 
         except Exception as e:
             logger.error(f"✗ Ensemble integration failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 

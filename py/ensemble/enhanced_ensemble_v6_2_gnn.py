@@ -107,7 +107,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
         enable_gnn: bool = True,
         gnn_model_path: str | None = None,
         gnn_device: str | None = None,
-        **kwargs
+        **kwargs,
     ):
         """
         Initialize 6-way ensemble with optional GNN component.
@@ -143,12 +143,14 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
                     model_path=gnn_model_path,
                     device=gnn_device,
                     db_url=f"postgresql://{self.db_config['user']}:{self.db_config['password']}@"
-                           f"{self.db_config['host']}:{self.db_config['port']}/{self.db_config['dbname']}"
+                    f"{self.db_config['host']}:{self.db_config['port']}/{self.db_config['dbname']}",
                 )
                 self.gnn_available = self.gnn_component.is_available
 
                 if self.gnn_available:
-                    logger.info(f"GNN component loaded successfully: {self.gnn_component.model_path}")
+                    logger.info(
+                        f"GNN component loaded successfully: {self.gnn_component.model_path}"
+                    )
                 else:
                     logger.warning(
                         "GNN component initialized but model unavailable. "
@@ -210,10 +212,12 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
                 if gnn_pred is not None:
                     components["gnn_hierarchical_v1"] = {
                         "mean": gnn_pred.prediction_mean,
-                        "std": gnn_pred.prediction_std
+                        "std": gnn_pred.prediction_std,
                     }
                     valid_predictions.append("gnn_hierarchical_v1")
-                    logger.debug(f"GNN prediction: {gnn_pred.prediction_mean:.3f} ± {gnn_pred.prediction_std:.3f}")
+                    logger.debug(
+                        f"GNN prediction: {gnn_pred.prediction_mean:.3f} ± {gnn_pred.prediction_std:.3f}"
+                    )
                 else:
                     logger.warning("GNN component returned None prediction")
             except Exception as e:
@@ -239,7 +243,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
                 "upper_90": None,
                 "valid_components": [],
                 "gnn_used": False,
-                "error": "GNN unavailable and no other game outcome components trained"
+                "error": "GNN unavailable and no other game outcome components trained",
             }
 
         # For now, with only GNN available, use its prediction directly
@@ -248,11 +252,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
             mean = components["gnn_hierarchical_v1"]["mean"]
             std = components["gnn_hierarchical_v1"]["std"]
         else:
-            return {
-                "ensemble_mean": None,
-                "ensemble_std": None,
-                "error": "No valid components"
-            }
+            return {"ensemble_mean": None, "ensemble_std": None, "error": "No valid components"}
 
         # 90% prediction intervals (normal approximation)
         z_90 = 1.645
@@ -274,8 +274,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
 
         if return_components:
             result["components"] = {
-                k: {"mean": float(v["mean"]), "std": float(v["std"])}
-                for k, v in components.items()
+                k: {"mean": float(v["mean"]), "std": float(v["std"])} for k, v in components.items()
             }
 
         return result
@@ -323,10 +322,7 @@ if __name__ == "__main__":
 
     try:
         # Initialize ensemble
-        ensemble = EnhancedEnsemble6WayGNN(
-            db_password=os.getenv("DB_PASSWORD"),
-            enable_gnn=True
-        )
+        ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=True)
 
         print(f"Ensemble initialized: {len(ensemble.weights)} components")
         print(f"Weights: {ensemble.weights}")
@@ -337,16 +333,14 @@ if __name__ == "__main__":
         if ensemble.gnn_available:
             print("\nTesting game outcome prediction...")
             result = ensemble.predict_game_outcome(
-                home_team="KC",
-                away_team="BUF",
-                season=2024,
-                week=1,
-                return_components=True
+                home_team="KC", away_team="BUF", season=2024, week=1, return_components=True
             )
 
             if result.get("ensemble_mean") is not None:
                 print("\nKC vs BUF (2024 Week 1):")
-                print(f"  KC Win Prob: {result['ensemble_mean']:.1%} ± {result['ensemble_std']:.1%}")
+                print(
+                    f"  KC Win Prob: {result['ensemble_mean']:.1%} ± {result['ensemble_std']:.1%}"
+                )
                 print(f"  90% CI: [{result['lower_90']:.1%}, {result['upper_90']:.1%}]")
                 print(f"  GNN used: {result['gnn_used']}")
                 print(f"  Valid components: {result['valid_components']}")
@@ -363,6 +357,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\nTest FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("=" * 80)

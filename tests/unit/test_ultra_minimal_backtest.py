@@ -23,7 +23,6 @@ def test_load_games_basic():
     assert result is not None
 
 
-
 def test_load_games_edge_cases():
     """Test load_games: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_games_edge_cases():
     assert result is not None
 
 
-
 def test_load_games_error_handling():
     """Test load_games error handling."""
     with pytest.raises(ValueError):
         load_games(invalid_input)
-
 
 
 def test_test_spread_only_basic():
@@ -56,7 +53,6 @@ def test_test_spread_only_basic():
     assert result is not None
 
 
-
 def test_test_spread_only_edge_cases():
     """Test test_spread_only: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_test_spread_only_edge_cases():
     assert result is not None
 
 
-
 def test_test_spread_only_error_handling():
     """Test test_spread_only error handling."""
     with pytest.raises(ValueError):
         test_spread_only(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_test_spread_only_property_idempotent(self, df):
 
     # Assert property
     assert test_spread_only(df) == result, "idempotent violated"
-
 
 
 def test_test_spread_and_total_basic():
@@ -100,7 +93,6 @@ def test_test_spread_and_total_basic():
     assert result is not None
 
 
-
 def test_test_spread_and_total_edge_cases():
     """Test test_spread_and_total: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_test_spread_and_total_edge_cases():
     assert result is not None
 
 
-
 def test_test_spread_and_total_error_handling():
     """Test test_spread_and_total error handling."""
     with pytest.raises(ValueError):
         test_spread_and_total(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_test_spread_and_total_property_idempotent(self, df):
 
     # Assert property
     assert test_spread_and_total(df) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -144,7 +133,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +145,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

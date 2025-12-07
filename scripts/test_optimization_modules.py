@@ -17,23 +17,20 @@ Date: November 13, 2025
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import logging
 import time
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def test_database_pool():
     """Test database connection pooling."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 1: Database Connection Pool")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         from py.utils.database_pool import DatabasePoolManager
@@ -72,9 +69,9 @@ def test_database_pool():
 
 def test_feature_cache():
     """Test feature caching."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 2: Feature Cache")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         from py.utils.feature_cache import FeatureCache
@@ -136,9 +133,9 @@ def test_feature_cache():
 
 def test_optimized_backtest_imports():
     """Test that optimized backtest can be imported."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 3: Optimized Backtest Imports")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         from py.backtest.historical_validation_4way_optimized import OptimizedHistoricalValidator
@@ -181,9 +178,9 @@ def test_optimized_backtest_imports():
 
 def test_benchmark_imports():
     """Test that benchmark script can be imported."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 4: Benchmark Script Imports")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         # Test imports (don't run actual benchmark)
@@ -193,10 +190,10 @@ def test_benchmark_imports():
 
         # Check required functions exist
         required_functions = [
-            'run_optimized_backtest',
-            'validate_results',
-            'plot_timing_comparison',
-            'generate_report',
+            "run_optimized_backtest",
+            "validate_results",
+            "plot_timing_comparison",
+            "generate_report",
         ]
 
         for func_name in required_functions:
@@ -216,9 +213,9 @@ def test_benchmark_imports():
 
 def main():
     """Run all tests."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMIZATION MODULES TEST SUITE")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     start_time = time.time()
 
@@ -241,9 +238,9 @@ def main():
     elapsed = time.time() - start_time
 
     # Print summary
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST SUMMARY")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     passed_count = sum(1 for _, passed in results if passed)
     total_count = len(results)
@@ -252,14 +249,18 @@ def main():
         status = "✅ PASS" if passed else "❌ FAIL"
         logger.info(f"  {status}: {test_name}")
 
-    logger.info(f"\nTotal: {passed_count}/{total_count} tests passed ({passed_count/total_count*100:.0f}%)")
+    logger.info(
+        f"\nTotal: {passed_count}/{total_count} tests passed ({passed_count/total_count*100:.0f}%)"
+    )
     logger.info(f"Time: {elapsed:.1f}s")
 
     if passed_count == total_count:
         logger.info("\n🎉 All tests passed! Optimization modules are working correctly.")
         return 0
     else:
-        logger.error(f"\n❌ {total_count - passed_count} test(s) failed. Please review errors above.")
+        logger.error(
+            f"\n❌ {total_count - passed_count} test(s) failed. Please review errors above."
+        )
         return 1
 
 

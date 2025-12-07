@@ -14,12 +14,7 @@ class CausalValidator:
     """Validation methods for causal estimates"""
 
     def placebo_test(
-        self,
-        df: pd.DataFrame,
-        estimator,
-        outcome: str,
-        treatment: str,
-        n_placebo: int = 100
+        self, df: pd.DataFrame, estimator, outcome: str, treatment: str, n_placebo: int = 100
     ) -> dict:
         """
         Placebo test: randomly assign treatment and check if effect is zero.
@@ -42,12 +37,10 @@ class CausalValidator:
 
         for i in range(n_placebo):
             df_placebo = df.copy()
-            df_placebo[f'{treatment}_placebo'] = np.random.permutation(df[treatment].values)
+            df_placebo[f"{treatment}_placebo"] = np.random.permutation(df[treatment].values)
 
             placebo_ate = estimator.estimate(
-                df_placebo,
-                outcome=outcome,
-                treatment=f'{treatment}_placebo'
+                df_placebo, outcome=outcome, treatment=f"{treatment}_placebo"
             )[0]
 
             placebo_effects.append(placebo_ate)
@@ -60,11 +53,11 @@ class CausalValidator:
         logger.info(f"Placebo test: actual ATE={actual_ate:.3f}, p={p_value:.4f}")
 
         return {
-            'actual_ate': actual_ate,
-            'placebo_mean': placebo_effects.mean(),
-            'placebo_std': placebo_effects.std(),
-            'p_value': p_value,
-            'placebo_effects': placebo_effects
+            "actual_ate": actual_ate,
+            "placebo_mean": placebo_effects.mean(),
+            "placebo_std": placebo_effects.std(),
+            "p_value": p_value,
+            "placebo_effects": placebo_effects,
         }
 
     def sensitivity_to_unmeasured_confounding(
@@ -72,7 +65,7 @@ class CausalValidator:
         ate: float,
         se: float,
         r2_confounder_outcome: float = 0.1,
-        r2_confounder_treatment: float = 0.1
+        r2_confounder_treatment: float = 0.1,
     ) -> dict:
         """
         Rosenbaum bounds sensitivity analysis.
@@ -100,20 +93,15 @@ class CausalValidator:
         logger.info(f"Sensitivity: ATE={ate:.3f}, bias={bias:.3f}, robust={robust}")
 
         return {
-            'ate': ate,
-            'potential_bias': bias,
-            'lower_bound': lower_bound,
-            'upper_bound': upper_bound,
-            'robust_to_confounding': robust
+            "ate": ate,
+            "potential_bias": bias,
+            "lower_bound": lower_bound,
+            "upper_bound": upper_bound,
+            "robust_to_confounding": robust,
         }
 
     def heterogeneous_effects_by_subgroup(
-        self,
-        df: pd.DataFrame,
-        estimator,
-        outcome: str,
-        treatment: str,
-        subgroup_var: str
+        self, df: pd.DataFrame, estimator, outcome: str, treatment: str, subgroup_var: str
     ) -> pd.DataFrame:
         """
         Estimate treatment effects by subgroup.
@@ -135,18 +123,18 @@ class CausalValidator:
 
             if df_sub[treatment].sum() > 5:  # Need sufficient treated units
                 ate, se, pval, summary = estimator.estimate(
-                    df_sub,
-                    outcome=outcome,
-                    treatment=treatment
+                    df_sub, outcome=outcome, treatment=treatment
                 )
 
-                results.append({
-                    'subgroup': subgroup,
-                    'ate': ate,
-                    'se': se,
-                    'pvalue': pval,
-                    'n_obs': summary['n_obs']
-                })
+                results.append(
+                    {
+                        "subgroup": subgroup,
+                        "ate": ate,
+                        "se": se,
+                        "pvalue": pval,
+                        "n_obs": summary["n_obs"],
+                    }
+                )
 
         results_df = pd.DataFrame(results)
 

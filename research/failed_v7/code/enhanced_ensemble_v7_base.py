@@ -66,13 +66,12 @@ import psycopg2
 import xgboost as xgb
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Suppress R warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class EnhancedEnsemble6Way:
@@ -142,7 +141,9 @@ class EnhancedEnsemble6Way:
         self.informative_path = self._resolve_path(informative_path)
         self.ridge_path = self._resolve_path(ridge_path)
         self.xgboost_v4_path = self._resolve_path(xgboost_v4_path)
-        self.skills_path = self._resolve_path("models/bayesian/simplified_random_walk_skills_v2.csv")
+        self.skills_path = self._resolve_path(
+            "models/bayesian/simplified_random_walk_skills_v2.csv"
+        )
         self.elo_ratings_path = self._resolve_path(elo_ratings_path)
 
         # Load or set weights
@@ -188,9 +189,10 @@ class EnhancedEnsemble6Way:
             temp_path = self._resolve_path(temperature_scaler_path)
             if temp_path.exists():
                 import pickle
-                with open(temp_path, 'rb') as f:
+
+                with open(temp_path, "rb") as f:
                     scaler_data = pickle.load(f)
-                    self.temperature = scaler_data['temperature']
+                    self.temperature = scaler_data["temperature"]
                     self.temperature_scaler = scaler_data
                 logger.info(f"Loaded temperature scaler: T = {self.temperature:.4f}")
             else:
@@ -224,7 +226,7 @@ class EnhancedEnsemble6Way:
         logger.info(f"  Observations: {weights_data['metadata']['n_observations']:,}")
         logger.info(f"  Halflife: {weights_data['metadata']['halflife']}")
 
-        return weights_data['weights']
+        return weights_data["weights"]
 
     def _load_models(self):
         """Load Python models (XGBoost, ELO ratings) and state-space skills into memory."""
@@ -238,6 +240,7 @@ class EnhancedEnsemble6Way:
         if self.ridge_path.exists():
             try:
                 import pickle
+
                 with open(self.ridge_path, "rb") as f:
                     ridge_data = pickle.load(f)
                     self.ridge_model = ridge_data["ridge"]
@@ -278,7 +281,7 @@ class EnhancedEnsemble6Way:
         if self.elo_ratings_path.exists():
             self.elo_ratings = pd.read_csv(self.elo_ratings_path)
             # Parse kickoff as datetime
-            self.elo_ratings['kickoff'] = pd.to_datetime(self.elo_ratings['kickoff'])
+            self.elo_ratings["kickoff"] = pd.to_datetime(self.elo_ratings["kickoff"])
             logger.info(f"✅ ELO ratings loaded: {len(self.elo_ratings):,} games, 2006-2024")
         else:
             logger.warning(f"⚠️  ELO ratings not found: {self.elo_ratings_path}")
@@ -291,12 +294,7 @@ class EnhancedEnsemble6Way:
         return psycopg2.connect(**self.db_config)
 
     def _get_r_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        model_path: Path,
-        model_name: str
+        self, player_id: str, season: int, week: int, model_path: Path, model_name: str
     ) -> tuple[float, float] | None:
         """
         Get predictions from R/brms model using rpy2.
@@ -317,7 +315,7 @@ class EnhancedEnsemble6Way:
             from rpy2.robjects.conversion import localconverter
 
             # Load brms library
-            ro.r('suppressPackageStartupMessages(library(brms))')
+            ro.r("suppressPackageStartupMessages(library(brms))")
 
             # Load R model
             ro.r(f'model <- readRDS("{model_path}")')
@@ -380,19 +378,21 @@ class EnhancedEnsemble6Way:
                 r_df = ro.conversion.py2rpy(df)
 
             # Generate posterior predictions
-            ro.r.assign('new_data', r_df)
-            ro.r('new_data$log_attempts <- log(pmax(new_data$attempts, 1))')
+            ro.r.assign("new_data", r_df)
+            ro.r("new_data$log_attempts <- log(pmax(new_data$attempts, 1))")
             # CRITICAL: allow_new_levels=TRUE for 2025 holdout (new player_season levels)
-            ro.r('posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)')
+            ro.r(
+                "posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)"
+            )
 
             # CRITICAL: R models predict log_yards, must exponentiate
-            ro.r('posterior_preds_exp <- exp(posterior_preds)')
-            ro.r('pred_mean <- mean(posterior_preds_exp)')
-            ro.r('pred_sd <- sd(posterior_preds_exp)')
+            ro.r("posterior_preds_exp <- exp(posterior_preds)")
+            ro.r("pred_mean <- mean(posterior_preds_exp)")
+            ro.r("pred_sd <- sd(posterior_preds_exp)")
 
             # NULL validation: Check R objects exist before subscripting
-            r_mean = ro.r('pred_mean')
-            r_std = ro.r('pred_sd')
+            r_mean = ro.r("pred_mean")
+            r_std = ro.r("pred_sd")
             if r_mean is None or r_std is None:
                 logger.warning(f"⚠️  {model_name} returned NULL from R")
                 return None
@@ -413,10 +413,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def _get_state_space_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get state-space prediction using player skills.
@@ -468,13 +465,13 @@ class EnhancedEnsemble6Way:
                 attempts = 30  # Default
 
             # Get latest player skill
-            player_skills = self.skills_df[self.skills_df['player_id'] == player_id]
+            player_skills = self.skills_df[self.skills_df["player_id"] == player_id]
             if len(player_skills) == 0:
                 logger.warning(f"State-space: No skills for {player_id}")
                 return None
 
             # Use most recent skill
-            theta = player_skills.iloc[-1]['skill_mean']
+            theta = player_skills.iloc[-1]["skill_mean"]
 
             # Learned parameters from Stan model
             beta_attempts = 0.810
@@ -489,7 +486,9 @@ class EnhancedEnsemble6Way:
             # For lognormal: if X ~ N(μ, σ²), then exp(X) has mean exp(μ + σ²/2)
             # Here: log(yards + 1) ~ N(μ, σ²) so yards + 1 ~ Lognormal(μ, σ²)
             yards_plus_1_mean = np.exp(log_yards_plus_1_mean + 0.5 * R**2)
-            yards_plus_1_std = np.sqrt((np.exp(R**2) - 1) * np.exp(2 * log_yards_plus_1_mean + R**2))
+            yards_plus_1_std = np.sqrt(
+                (np.exp(R**2) - 1) * np.exp(2 * log_yards_plus_1_mean + R**2)
+            )
 
             # Final yards prediction
             yards_mean = yards_plus_1_mean - 1
@@ -503,10 +502,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def _get_xgboost_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get XGBoost v4 Ridge Residuals prediction (two-stage).
@@ -620,14 +616,18 @@ class EnhancedEnsemble6Way:
             ridge_pred = self.ridge_model.predict(ridge_X_scaled)[0]
 
             # Stage 2: XGBoost residual
-            xgb_X = np.array([[
-                pass_yards_l3,
-                pass_attempts_l3,
-                completions_l3,
-                completions_pct_l3,
-                home_away_encoded,
-                0.0,  # residual_feature (unknown at prediction time)
-            ]])
+            xgb_X = np.array(
+                [
+                    [
+                        pass_yards_l3,
+                        pass_attempts_l3,
+                        completions_l3,
+                        completions_pct_l3,
+                        home_away_encoded,
+                        0.0,  # residual_feature (unknown at prediction time)
+                    ]
+                ]
+            )
             xgb_feature_names = self.xgb_v4_features + ["residual_feature"]
             xgb_dmatrix = xgb.DMatrix(xgb_X, feature_names=xgb_feature_names)
             xgb_residual = self.xgboost_v4_model.predict(xgb_dmatrix)[0]
@@ -638,7 +638,9 @@ class EnhancedEnsemble6Way:
             # Uncertainty (empirical std from validation: 4.70 MAE → ~6.3 std)
             pred_std = 6.3
 
-            logger.debug(f"XGBoost v4: Ridge={ridge_pred:.1f}, Residual={xgb_residual:.1f}, Final={final_pred:.1f}")
+            logger.debug(
+                f"XGBoost v4: Ridge={ridge_pred:.1f}, Residual={xgb_residual:.1f}, Final={final_pred:.1f}"
+            )
             return (float(final_pred), float(pred_std))
 
         except Exception as e:
@@ -646,10 +648,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def _get_elo_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get ELO-based prediction using team strength differential.
@@ -711,10 +710,10 @@ class EnhancedEnsemble6Way:
                 return None
 
             # NULL validation: Validate required columns non-NULL before use
-            team = df['team'].iloc[0]
-            opponent = df['opponent'].iloc[0]
-            is_home = df['is_home'].iloc[0]
-            total_close = df['total_close'].iloc[0]
+            team = df["team"].iloc[0]
+            opponent = df["opponent"].iloc[0]
+            is_home = df["is_home"].iloc[0]
+            total_close = df["total_close"].iloc[0]
 
             if pd.isna(team) or pd.isna(opponent) or pd.isna(is_home):
                 logger.warning("ELO: NULL values in required columns (team/opponent/is_home)")
@@ -722,11 +721,17 @@ class EnhancedEnsemble6Way:
 
             # Look up ELO ratings for this game
             elo_game = self.elo_ratings[
-                (self.elo_ratings['season'] == season) &
-                (self.elo_ratings['week'] == week) &
-                (
-                    ((self.elo_ratings['home_team'] == team) & (self.elo_ratings['away_team'] == opponent)) |
-                    ((self.elo_ratings['away_team'] == team) & (self.elo_ratings['home_team'] == opponent))
+                (self.elo_ratings["season"] == season)
+                & (self.elo_ratings["week"] == week)
+                & (
+                    (
+                        (self.elo_ratings["home_team"] == team)
+                        & (self.elo_ratings["away_team"] == opponent)
+                    )
+                    | (
+                        (self.elo_ratings["away_team"] == team)
+                        & (self.elo_ratings["home_team"] == opponent)
+                    )
                 )
             ]
 
@@ -736,11 +741,11 @@ class EnhancedEnsemble6Way:
 
             # Extract ELO ratings
             if is_home:
-                team_elo = elo_game.iloc[0]['home_elo_pregame']
-                opponent_elo = elo_game.iloc[0]['away_elo_pregame']
+                team_elo = elo_game.iloc[0]["home_elo_pregame"]
+                opponent_elo = elo_game.iloc[0]["away_elo_pregame"]
             else:
-                team_elo = elo_game.iloc[0]['away_elo_pregame']
-                opponent_elo = elo_game.iloc[0]['home_elo_pregame']
+                team_elo = elo_game.iloc[0]["away_elo_pregame"]
+                opponent_elo = elo_game.iloc[0]["home_elo_pregame"]
 
             # Calculate ELO differential
             elo_diff = team_elo - opponent_elo
@@ -790,9 +795,15 @@ class EnhancedEnsemble6Way:
             # Historical ELO prediction error ~75 yards std
             pred_std = 75.0
 
-            logger.debug(f"ELO: {team} (ELO: {team_elo:.0f}) vs {opponent} (ELO: {opponent_elo:.0f})")
-            logger.debug(f"ELO: Diff = {elo_diff:.0f}, Margin = {expected_margin:.1f} pts, Score = {team_score:.1f}")
-            logger.debug(f"ELO: {passing_yards:.1f} ± {pred_std:.1f} yards (simple team-level only)")
+            logger.debug(
+                f"ELO: {team} (ELO: {team_elo:.0f}) vs {opponent} (ELO: {opponent_elo:.0f})"
+            )
+            logger.debug(
+                f"ELO: Diff = {elo_diff:.0f}, Margin = {expected_margin:.1f} pts, Score = {team_score:.1f}"
+            )
+            logger.debug(
+                f"ELO: {passing_yards:.1f} ± {pred_std:.1f} yards (simple team-level only)"
+            )
 
             return (passing_yards, pred_std)
 
@@ -801,11 +812,7 @@ class EnhancedEnsemble6Way:
             return None
 
     def predict(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        return_individual: bool = False
+        self, player_id: str, season: int, week: int, return_individual: bool = False
     ) -> dict:
         """
         Generate 5-way ensemble prediction with uncertainty quantification.
@@ -844,9 +851,7 @@ class EnhancedEnsemble6Way:
         # 2. Hierarchical v2
         if self.hierarchical_path.exists():
             pred = self._get_r_prediction(
-                player_id, season, week,
-                self.hierarchical_path,
-                "Hierarchical v2"
+                player_id, season, week, self.hierarchical_path, "Hierarchical v2"
             )
             if pred:
                 predictions["hierarchical_v2"] = pred
@@ -862,9 +867,7 @@ class EnhancedEnsemble6Way:
         # 4. Informative Priors v2
         if self.informative_path.exists():
             pred = self._get_r_prediction(
-                player_id, season, week,
-                self.informative_path,
-                "Informative Priors v2"
+                player_id, season, week, self.informative_path, "Informative Priors v2"
             )
             if pred:
                 predictions["informative_priors_v2"] = pred
@@ -890,7 +893,9 @@ class EnhancedEnsemble6Way:
                 "inference_time_ms": (time.time() - start_time) * 1000,
             }
         elif len(predictions) < 3:
-            logger.error(f"❌ Only {len(predictions)}/5 models succeeded - ensemble unreliable (need ≥3)")
+            logger.error(
+                f"❌ Only {len(predictions)}/5 models succeeded - ensemble unreliable (need ≥3)"
+            )
             return {
                 "ensemble_mean": None,
                 "ensemble_std": None,
@@ -911,14 +916,28 @@ class EnhancedEnsemble6Way:
 
         # Fix 6: Map prediction keys to weight keys (handle "_v2" suffix mismatch)
         weight_key_map = {
-            "state_space_v2": "state_space_v2" if "state_space_v2" in self.weights else "state_space",
-            "hierarchical_v2": "hierarchical_v2" if "hierarchical_v2" in self.weights else "hierarchical",
+            "state_space_v2": (
+                "state_space_v2" if "state_space_v2" in self.weights else "state_space"
+            ),
+            "hierarchical_v2": (
+                "hierarchical_v2" if "hierarchical_v2" in self.weights else "hierarchical"
+            ),
             "xgboost_v2": "xgboost_v2" if "xgboost_v2" in self.weights else "xgboost",
-            "informative_priors_v2": "informative_priors_v2" if "informative_priors_v2" in self.weights else "informative",
-            "elo": "elo"
+            "informative_priors_v2": (
+                "informative_priors_v2"
+                if "informative_priors_v2" in self.weights
+                else "informative"
+            ),
+            "elo": "elo",
         }
 
-        for model_name in ["state_space_v2", "hierarchical_v2", "xgboost_v2", "informative_priors_v2", "elo"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "xgboost_v2",
+            "informative_priors_v2",
+            "elo",
+        ]:
             if model_name in predictions:
                 weight_key = weight_key_map[model_name]
                 means.append(predictions[model_name][0])
@@ -937,7 +956,7 @@ class EnhancedEnsemble6Way:
 
         # Variance pooling for uncertainty quantification
         # Ensemble variance = within-model variance + between-model variance
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
         ensemble_std_raw = np.sqrt(ensemble_var)
@@ -974,11 +993,7 @@ class EnhancedEnsemble6Way:
 
         return result
 
-    def predict_batch(
-        self,
-        games: list[dict],
-        output_csv: str | None = None
-    ) -> pd.DataFrame:
+    def predict_batch(self, games: list[dict], output_csv: str | None = None) -> pd.DataFrame:
         """
         Generate ensemble predictions for multiple games.
 
@@ -998,20 +1013,20 @@ class EnhancedEnsemble6Way:
                 logger.info(f"Progress: {i+1}/{len(games)} games")
 
             pred = self.predict(
-                player_id=game["player_id"],
-                season=game["season"],
-                week=game["week"]
+                player_id=game["player_id"], season=game["season"], week=game["week"]
             )
 
-            results.append({
-                "player_id": game["player_id"],
-                "season": game["season"],
-                "week": game["week"],
-                "ensemble_mean": pred["ensemble_mean"],
-                "ensemble_std": pred["ensemble_std"],
-                "quantile_10": pred["quantile_10"],
-                "quantile_90": pred["quantile_90"],
-            })
+            results.append(
+                {
+                    "player_id": game["player_id"],
+                    "season": game["season"],
+                    "week": game["week"],
+                    "ensemble_mean": pred["ensemble_mean"],
+                    "ensemble_std": pred["ensemble_std"],
+                    "quantile_10": pred["quantile_10"],
+                    "quantile_90": pred["quantile_90"],
+                }
+            )
 
         df = pd.DataFrame(results)
 
@@ -1022,10 +1037,7 @@ class EnhancedEnsemble6Way:
         return df
 
     def re_optimize_weights(
-        self,
-        validation_df: pd.DataFrame,
-        halflife: float = 4.0,
-        save_path: str | None = None
+        self, validation_df: pd.DataFrame, halflife: float = 4.0, save_path: str | None = None
     ) -> dict[str, float]:
         """
         Re-optimize ensemble weights using validation set predictions.
@@ -1044,17 +1056,23 @@ class EnhancedEnsemble6Way:
         """
         from py.ensemble.adaptive_wls_weights import AdaptiveWLSWeights
 
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("RE-OPTIMIZING ENSEMBLE WEIGHTS (Adaptive WLS)")
-        logger.info("="*70)
+        logger.info("=" * 70)
 
         # Initialize WLS optimizer
-        model_names = ["state_space_v2", "hierarchical_v2", "xgboost_v2", "informative_priors_v2", "elo"]
+        model_names = [
+            "state_space_v2",
+            "hierarchical_v2",
+            "xgboost_v2",
+            "informative_priors_v2",
+            "elo",
+        ]
         wls = AdaptiveWLSWeights(
             predictions_df=validation_df,
             model_names=model_names,
-            actual_col='actual',
-            halflife=halflife
+            actual_col="actual",
+            halflife=halflife,
         )
 
         # Optimize weights
@@ -1065,9 +1083,9 @@ class EnhancedEnsemble6Way:
         self.weights = optimal_weights
 
         # Log weight changes
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("WEIGHT CHANGES")
-        logger.info("="*70)
+        logger.info("=" * 70)
         for model_name in model_names:
             old = old_weights.get(model_name, 0.0)
             new = optimal_weights.get(model_name, 0.0)
@@ -1102,10 +1120,7 @@ def main():
 
     ensemble = EnhancedEnsemble6Way(adaptive_weights_path=args.adaptive_weights)
     result = ensemble.predict(
-        player_id=args.player_id,
-        season=args.season,
-        week=args.week,
-        return_individual=True
+        player_id=args.player_id, season=args.season, week=args.week, return_individual=True
     )
 
     print(f"\n{'='*70}")
@@ -1118,12 +1133,16 @@ def main():
     print(f"Inference time: {result['inference_time_ms']:.1f}ms")
 
     if args.output:
-        df = pd.DataFrame([{
-            "player_id": args.player_id,
-            "season": args.season,
-            "week": args.week,
-            **result,
-        }])
+        df = pd.DataFrame(
+            [
+                {
+                    "player_id": args.player_id,
+                    "season": args.season,
+                    "week": args.week,
+                    **result,
+                }
+            ]
+        )
         df.to_csv(args.output, index=False)
         print(f"\n✅ Predictions saved to: {args.output}")
 

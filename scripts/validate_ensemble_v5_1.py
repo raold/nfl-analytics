@@ -24,24 +24,22 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def validate_ensemble_v5_1():
     """Run validation tests on enhanced ensemble v5.1"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("VALIDATION: Enhanced Ensemble v5.1")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Test 1: Import and initialization
     logger.info("\n[TEST 1] Importing ensemble v5.1...")
     try:
         from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
+
         logger.info("✅ Import successful")
     except Exception as e:
         logger.error(f"❌ Import failed: {e}")
@@ -121,29 +119,33 @@ def validate_ensemble_v5_1():
     logger.info("\n[TEST 6] Testing prediction (Patrick Mahomes 2024 W9)...")
     try:
         result = ensemble.predict(
-            player_id="00-0033873",  # Patrick Mahomes
-            season=2024,
-            week=9,
-            return_individual=True
+            player_id="00-0033873", season=2024, week=9, return_individual=True  # Patrick Mahomes
         )
 
-        if result['ensemble_mean'] is None:
+        if result["ensemble_mean"] is None:
             logger.error("❌ Prediction failed (None returned)")
             return False
 
         logger.info("✅ Prediction successful!")
-        logger.info(f"   Ensemble: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+        logger.info(
+            f"   Ensemble: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards"
+        )
         logger.info(f"   90% CI: [{result['quantile_10']:.1f}, {result['quantile_90']:.1f}] yards")
         logger.info(f"   Inference time: {result['inference_time_ms']:.1f}ms")
 
         # Check individual predictions
-        predictions = result.get('predictions', {})
+        predictions = result.get("predictions", {})
         logger.info(f"\n   Individual model predictions ({len(predictions)}/4):")
         for model_name, (mean, std) in predictions.items():
             logger.info(f"   - {model_name}: {mean:.1f} ± {std:.1f} yards")
 
         # Check if all 4 models contributed
-        expected_models = {"state_space_v2", "hierarchical_v2", "hybrid_xgboost_v1", "informative_priors_v2"}
+        expected_models = {
+            "state_space_v2",
+            "hierarchical_v2",
+            "hybrid_xgboost_v1",
+            "informative_priors_v2",
+        }
         actual_models = set(predictions.keys())
 
         if expected_models == actual_models:
@@ -153,7 +155,7 @@ def validate_ensemble_v5_1():
             logger.warning(f"⚠️  Some models missing: {missing}")
 
         # Sanity check prediction range (150-400 yards for QB)
-        if not (150 <= result['ensemble_mean'] <= 400):
+        if not (150 <= result["ensemble_mean"] <= 400):
             logger.warning(f"⚠️  Prediction outside reasonable range: {result['ensemble_mean']:.1f}")
         else:
             logger.info("✅ Prediction within reasonable range")
@@ -161,13 +163,14 @@ def validate_ensemble_v5_1():
     except Exception as e:
         logger.error(f"❌ Prediction failed: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return False
 
     # Final summary
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("✅ ALL VALIDATION TESTS PASSED")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("\nEnsemble v5.1 Configuration:")
     logger.info("- State-Space v2: 30%")
     logger.info("- Hierarchical v2: 30%")

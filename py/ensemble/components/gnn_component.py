@@ -142,6 +142,7 @@ class GNNComponent:
         try:
             # Import here to avoid circular dependency
             import sys
+
             sys.path.insert(0, str(self.project_root))
 
             from py.models.hierarchical_gnn_v1 import HierarchicalGNN
@@ -149,6 +150,7 @@ class GNNComponent:
             # Load metadata
             if self.metadata_path.exists():
                 import json
+
                 with open(self.metadata_path) as f:
                     self.metadata = json.load(f)
                     self.embedding_dim = self.metadata.get("embedding_dim", 64)
@@ -194,6 +196,7 @@ class GNNComponent:
 
         try:
             import sys
+
             sys.path.insert(0, str(self.project_root))
 
             from py.models.gnn_graph_builder_cuda import NFLDatabase, NFLGraphBuilder
@@ -273,9 +276,19 @@ class GNNComponent:
             team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(self.device)
 
             # Edge indices
-            p2p_edges = torch.tensor(graph.edges["player_to_position"], dtype=torch.long).t().to(self.device)
-            pos2team_edges = torch.tensor(graph.edges["position_to_team"], dtype=torch.long).t().to(self.device)
-            chem_edges = torch.tensor(graph.edges["player_chemistry"], dtype=torch.long).t().to(self.device) if graph.edges["player_chemistry"] else None
+            p2p_edges = (
+                torch.tensor(graph.edges["player_to_position"], dtype=torch.long)
+                .t()
+                .to(self.device)
+            )
+            pos2team_edges = (
+                torch.tensor(graph.edges["position_to_team"], dtype=torch.long).t().to(self.device)
+            )
+            chem_edges = (
+                torch.tensor(graph.edges["player_chemistry"], dtype=torch.long).t().to(self.device)
+                if graph.edges["player_chemistry"]
+                else None
+            )
 
             # MC Dropout sampling
             predictions = []
@@ -361,9 +374,19 @@ class GNNComponent:
             team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(self.device)
 
             # Edge indices (remap to local indices for message passing)
-            p2p_edges = torch.tensor(graph.edges["player_to_position"], dtype=torch.long).t().to(self.device)
-            pos2team_edges = torch.tensor(graph.edges["position_to_team"], dtype=torch.long).t().to(self.device)
-            chem_edges = torch.tensor(graph.edges["player_chemistry"], dtype=torch.long).t().to(self.device) if graph.edges["player_chemistry"] else None
+            p2p_edges = (
+                torch.tensor(graph.edges["player_to_position"], dtype=torch.long)
+                .t()
+                .to(self.device)
+            )
+            pos2team_edges = (
+                torch.tensor(graph.edges["position_to_team"], dtype=torch.long).t().to(self.device)
+            )
+            chem_edges = (
+                torch.tensor(graph.edges["player_chemistry"], dtype=torch.long).t().to(self.device)
+                if graph.edges["player_chemistry"]
+                else None
+            )
 
             # Forward pass
             self.model.eval()
@@ -479,6 +502,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\nTest FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("=" * 80)

@@ -131,18 +131,20 @@ class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):
                 away_points_allowed = 21.0
                 away_away_win_pct = 0.5
 
-            baseline_features.append({
-                "game_id": row["game_id"],
-                "home_win_pct": home_win_pct,
-                "away_win_pct": away_win_pct,
-                "home_points_avg": home_points_avg,
-                "away_points_avg": away_points_avg,
-                "home_points_allowed_avg": home_points_allowed,
-                "away_points_allowed_avg": away_points_allowed,
-                "home_home_win_pct": home_home_win_pct,
-                "away_away_win_pct": away_away_win_pct,
-                "week": week,
-            })
+            baseline_features.append(
+                {
+                    "game_id": row["game_id"],
+                    "home_win_pct": home_win_pct,
+                    "away_win_pct": away_win_pct,
+                    "home_points_avg": home_points_avg,
+                    "away_points_avg": away_points_avg,
+                    "home_points_allowed_avg": home_points_allowed,
+                    "away_points_allowed_avg": away_points_allowed,
+                    "home_home_win_pct": home_home_win_pct,
+                    "away_away_win_pct": away_away_win_pct,
+                    "week": week,
+                }
+            )
 
         baseline_df = pd.DataFrame(baseline_features)
 
@@ -226,27 +228,45 @@ class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):
         # Define feature columns (baseline + Phase 5)
         feature_cols = [
             # Baseline features
-            "home_win_pct", "away_win_pct",
-            "home_points_avg", "away_points_avg",
-            "home_points_allowed_avg", "away_points_allowed_avg",
-            "home_home_win_pct", "away_away_win_pct",
+            "home_win_pct",
+            "away_win_pct",
+            "home_points_avg",
+            "away_points_avg",
+            "home_points_allowed_avg",
+            "away_points_allowed_avg",
+            "home_home_win_pct",
+            "away_away_win_pct",
             "week",
             # Phase 5: Defensive situational
-            "home_def_third_down_stop_rate", "away_def_third_down_stop_rate",
-            "home_def_fourth_down_stop_rate", "away_def_fourth_down_stop_rate",
+            "home_def_third_down_stop_rate",
+            "away_def_third_down_stop_rate",
+            "home_def_fourth_down_stop_rate",
+            "away_def_fourth_down_stop_rate",
             # Phase 5: Vegas
-            "home_is_favorite", "spread_magnitude", "is_small_spread",
-            "is_large_spread", "on_key_number",
-            "home_implied_prob", "away_implied_prob",
+            "home_is_favorite",
+            "spread_magnitude",
+            "is_small_spread",
+            "is_large_spread",
+            "on_key_number",
+            "home_implied_prob",
+            "away_implied_prob",
             # Phase 5: Environmental
-            "is_thursday_night", "is_outdoor_game",
-            "extreme_cold", "extreme_heat", "high_wind",
-            "away_short_rest", "is_division_game", "is_conference_game",
+            "is_thursday_night",
+            "is_outdoor_game",
+            "extreme_cold",
+            "extreme_heat",
+            "high_wind",
+            "away_short_rest",
+            "is_division_game",
+            "is_conference_game",
             "venue_adaptation",
             # Phase 5: Interactions
-            "dome_team_outdoor_cold", "dome_team_outdoor_wind",
-            "thursday_short_rest", "division_toss_up",
-            "weather_severity", "big_favorite_bad_weather",
+            "dome_team_outdoor_cold",
+            "dome_team_outdoor_wind",
+            "thursday_short_rest",
+            "division_toss_up",
+            "weather_severity",
+            "big_favorite_bad_weather",
         ]
 
         # Filter to columns that exist
@@ -339,12 +359,14 @@ class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):
         print("[5/5] Training Meta-Learner (Stacking)")
         print(f"{'-'*80}")
 
-        meta_features_train = np.column_stack([
-            ss_train_preds,
-            xgb_train_preds,
-            lr_train_preds,
-            nn_train_preds,
-        ])
+        meta_features_train = np.column_stack(
+            [
+                ss_train_preds,
+                xgb_train_preds,
+                lr_train_preds,
+                nn_train_preds,
+            ]
+        )
 
         self.meta_learner.fit(meta_features_train, train_target)
         ensemble_train_preds = self.meta_learner.predict_proba(meta_features_train)[:, 1]
@@ -385,10 +407,12 @@ class EnhancedGameOutcomeEnsemble(GameOutcomeEnsemble):
                 self.team_stats_cache[season] = get_team_season_stats(season)
 
         # Component 1: State-Space
-        ss_preds = np.array([
-            self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
-            for _, row in df.iterrows()
-        ])
+        ss_preds = np.array(
+            [
+                self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
+                for _, row in df.iterrows()
+            ]
+        )
 
         # Components 2-4: Enhanced feature-based models
         features_df = self._engineer_enhanced_features(df)

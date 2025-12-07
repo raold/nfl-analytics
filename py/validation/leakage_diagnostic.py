@@ -29,8 +29,9 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
+
 
 class LeakageDiagnostic:
     """Systematic data leakage detection tool."""
@@ -42,36 +43,36 @@ class LeakageDiagnostic:
 
     def run_all_tests(self):
         """Run all leakage detection tests."""
-        print("="*70)
+        print("=" * 70)
         print("NFL ANALYTICS DATA LEAKAGE DIAGNOSTIC")
-        print("="*70)
+        print("=" * 70)
         print(f"Timestamp: {datetime.now()}")
         print(f"Output directory: {self.output_dir}")
         print()
 
         # Test 1: Spread-only baseline (should be ~52-53%)
         print("\n[TEST 1] Spread-Only Baseline")
-        print("-"*70)
+        print("-" * 70)
         self.test_spread_only_baseline()
 
         # Test 2: Feature temporal validation
         print("\n[TEST 2] Feature Temporal Validation")
-        print("-"*70)
+        print("-" * 70)
         self.test_feature_temporal_validity()
 
         # Test 3: Week ordering validation
         print("\n[TEST 3] Week Ordering Validation")
-        print("-"*70)
+        print("-" * 70)
         self.test_week_ordering()
 
         # Test 4: Vegas-derived features
         print("\n[TEST 4] Vegas-Derived Features Check")
-        print("-"*70)
+        print("-" * 70)
         self.test_vegas_features()
 
         # Test 5: QB/Coach change detection
         print("\n[TEST 5] QB/Coach Change Detection")
-        print("-"*70)
+        print("-" * 70)
         self.test_event_detection()
 
         # Save results
@@ -121,12 +122,12 @@ class LeakageDiagnostic:
             # Create target: home team covers spread
             # Convention: spread_close > 0 means home favored
             # Home covers if: actual_margin > spread_close
-            df['home_margin'] = df['home_score'] - df['away_score']
-            df['home_covers'] = df['home_margin'] > df['spread_close']
+            df["home_margin"] = df["home_score"] - df["away_score"]
+            df["home_covers"] = df["home_margin"] > df["spread_close"]
 
             # Train/test split (2020-2023 train, 2024 test)
-            train_df = df[df['season'] <= 2023].copy()
-            test_df = df[df['season'] == 2024].copy()
+            train_df = df[df["season"] <= 2023].copy()
+            test_df = df[df["season"] == 2024].copy()
 
             print(f"Train: {len(train_df)} games (2020-2023)")
             print(f"Test: {len(test_df)} games (2024)")
@@ -135,11 +136,11 @@ class LeakageDiagnostic:
             from sklearn.linear_model import LogisticRegression
             from sklearn.metrics import accuracy_score, roc_auc_score
 
-            X_train = train_df[['spread_close']].values
-            y_train = train_df['home_covers'].values
+            X_train = train_df[["spread_close"]].values
+            y_train = train_df["home_covers"].values
 
-            X_test = test_df[['spread_close']].values
-            y_test = test_df['home_covers'].values
+            X_test = test_df[["spread_close"]].values
+            y_test = test_df["home_covers"].values
 
             model = LogisticRegression(random_state=42)
             model.fit(X_train, y_train)
@@ -153,7 +154,7 @@ class LeakageDiagnostic:
             auc = roc_auc_score(y_test, y_pred_proba)
 
             # Baseline (always pick favorite)
-            baseline_pred = (test_df['spread_close'] < 0).values
+            baseline_pred = (test_df["spread_close"] < 0).values
             baseline_accuracy = accuracy_score(y_test, baseline_pred)
 
             result = {
@@ -166,10 +167,10 @@ class LeakageDiagnostic:
                 "auc": float(auc),
                 "baseline_accuracy": float(baseline_accuracy),
                 "expected_range": "0.52-0.53",
-                "status": "PASS" if accuracy < 0.54 else "FAIL"
+                "status": "PASS" if accuracy < 0.54 else "FAIL",
             }
 
-            self.results['test_1_spread_only'] = result
+            self.results["test_1_spread_only"] = result
 
             print("\n✓ Results:")
             print(f"  Accuracy: {accuracy:.1%}")
@@ -185,8 +186,9 @@ class LeakageDiagnostic:
         except Exception as e:
             print(f"✗ Error: {e}")
             import traceback
+
             traceback.print_exc()
-            self.results['test_1_spread_only'] = {"error": str(e)}
+            self.results["test_1_spread_only"] = {"error": str(e)}
 
     def test_feature_temporal_validity(self):
         """
@@ -234,24 +236,26 @@ class LeakageDiagnostic:
                 print(f"\n[Game {idx+1}] {game['away_team']} @ {game['home_team']}")
                 print(f"  Date: {game['kickoff']}")
                 print(f"  Season: {game['season']}, Week: {game['week']}")
-                print(f"  Score: {game['away_team']} {game['away_score']}, {game['home_team']} {game['home_score']}")
+                print(
+                    f"  Score: {game['away_team']} {game['away_score']}, {game['home_team']} {game['home_score']}"
+                )
 
                 # Query features for this game (if they exist)
                 # This would need integration with actual feature pipeline
                 # For now, just document the validation requirement
 
                 validation_case = {
-                    "game_id": game['game_id'],
-                    "home_team": game['home_team'],
-                    "away_team": game['away_team'],
-                    "season": int(game['season']),
-                    "week": int(game['week']),
-                    "kickoff": str(game['kickoff']),
-                    "validation_status": "manual_inspection_required"
+                    "game_id": game["game_id"],
+                    "home_team": game["home_team"],
+                    "away_team": game["away_team"],
+                    "season": int(game["season"]),
+                    "week": int(game["week"]),
+                    "kickoff": str(game["kickoff"]),
+                    "validation_status": "manual_inspection_required",
                 }
                 validation_cases.append(validation_case)
 
-            self.results['test_2_temporal_validity'] = {
+            self.results["test_2_temporal_validity"] = {
                 "test": "feature_temporal_validity",
                 "validation_cases": validation_cases,
                 "status": "MANUAL_INSPECTION_REQUIRED",
@@ -259,8 +263,8 @@ class LeakageDiagnostic:
                     "Run feature pipeline for each sampled game",
                     "Verify features use only games BEFORE kickoff time",
                     "Check .shift(1) is applied to all rolling stats",
-                    "Verify no current-game data leaks into features"
-                ]
+                    "Verify no current-game data leaks into features",
+                ],
             }
 
             print("\n✓ Sampled games saved for manual inspection")
@@ -268,7 +272,7 @@ class LeakageDiagnostic:
 
         except Exception as e:
             print(f"✗ Error: {e}")
-            self.results['test_2_temporal_validity'] = {"error": str(e)}
+            self.results["test_2_temporal_validity"] = {"error": str(e)}
 
     def test_week_ordering(self):
         """
@@ -300,11 +304,11 @@ class LeakageDiagnostic:
             print(f"Loaded {len(week_summary)} season-week combinations")
 
             # Check for NULL kickoffs
-            null_kickoffs = week_summary[week_summary['null_kickoff_count'] > 0]
+            null_kickoffs = week_summary[week_summary["null_kickoff_count"] > 0]
 
             if len(null_kickoffs) > 0:
                 print(f"\n⚠️  Found {len(null_kickoffs)} season-weeks with NULL kickoffs:")
-                print(null_kickoffs[['season', 'week', 'null_kickoff_count']])
+                print(null_kickoffs[["season", "week", "null_kickoff_count"]])
                 status = "FAIL"
             else:
                 print("\n✓ No NULL kickoffs found")
@@ -312,19 +316,21 @@ class LeakageDiagnostic:
 
             # Check chronological ordering
             ordering_issues = []
-            for season in week_summary['season'].unique():
-                season_weeks = week_summary[week_summary['season'] == season].sort_values('week')
+            for season in week_summary["season"].unique():
+                season_weeks = week_summary[week_summary["season"] == season].sort_values("week")
 
                 # Check that weeks are sequential
                 expected_weeks = range(1, len(season_weeks) + 1)
-                actual_weeks = season_weeks['week'].values
+                actual_weeks = season_weeks["week"].values
 
                 if not np.array_equal(actual_weeks, list(expected_weeks)):
-                    ordering_issues.append({
-                        "season": int(season),
-                        "expected_weeks": list(expected_weeks),
-                        "actual_weeks": actual_weeks.tolist()
-                    })
+                    ordering_issues.append(
+                        {
+                            "season": int(season),
+                            "expected_weeks": list(expected_weeks),
+                            "actual_weeks": actual_weeks.tolist(),
+                        }
+                    )
 
             if ordering_issues:
                 print(f"\n⚠️  Found {len(ordering_issues)} seasons with week ordering issues")
@@ -334,16 +340,16 @@ class LeakageDiagnostic:
             else:
                 print("✓ All seasons have sequential week numbering")
 
-            self.results['test_3_week_ordering'] = {
+            self.results["test_3_week_ordering"] = {
                 "test": "week_ordering",
-                "null_kickoff_count": int(week_summary['null_kickoff_count'].sum()),
+                "null_kickoff_count": int(week_summary["null_kickoff_count"].sum()),
                 "ordering_issues": ordering_issues,
-                "status": status
+                "status": status,
             }
 
         except Exception as e:
             print(f"✗ Error: {e}")
-            self.results['test_3_week_ordering'] = {"error": str(e)}
+            self.results["test_3_week_ordering"] = {"error": str(e)}
 
     def test_vegas_features(self):
         """
@@ -363,7 +369,7 @@ class LeakageDiagnostic:
             "market_efficiency",
             "line_movement",
             "sharp_money_indicator",
-            "closing_line_value"
+            "closing_line_value",
         ]
 
         print("\nSuspicious features (derived from vegas lines):")
@@ -375,11 +381,11 @@ class LeakageDiagnostic:
         print("  Keep only: spread_close, total_close (raw lines)")
         print("  Rationale: Vegas lines already incorporate all public information")
 
-        self.results['test_4_vegas_features'] = {
+        self.results["test_4_vegas_features"] = {
             "test": "vegas_features",
             "suspicious_features": suspicious_features,
             "recommendation": "Remove all vegas-derived probability features",
-            "status": "MANUAL_REVIEW_REQUIRED"
+            "status": "MANUAL_REVIEW_REQUIRED",
         }
 
     def test_event_detection(self):
@@ -399,21 +405,23 @@ class LeakageDiagnostic:
         print("  2. Verify change is detected BEFORE the game where it occurs")
         print("  3. Ensure features don't use current game data")
 
-        self.results['test_5_event_detection'] = {
+        self.results["test_5_event_detection"] = {
             "test": "event_detection",
             "status": "MANUAL_INSPECTION_REQUIRED",
             "files_to_check": [
                 "py/features/asof_features.py",
                 "py/features/asof_features_enhanced.py",
-                "py/features/bayesian_player_features.py"
-            ]
+                "py/features/bayesian_player_features.py",
+            ],
         }
 
     def save_results(self):
         """Save all test results to JSON file."""
-        output_file = self.output_dir / f"leakage_diagnostic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        output_file = (
+            self.output_dir / f"leakage_diagnostic_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(self.results, f, indent=2)
 
         print(f"\n{'='*70}")
@@ -423,14 +431,14 @@ class LeakageDiagnostic:
         """Print summary of all tests."""
         print(f"\n{'='*70}")
         print("LEAKAGE DIAGNOSTIC SUMMARY")
-        print("="*70)
+        print("=" * 70)
 
         for test_name, result in self.results.items():
-            if 'error' in result:
+            if "error" in result:
                 print(f"\n{test_name}: ✗ ERROR")
                 print(f"  {result['error']}")
-            elif 'status' in result:
-                status = result['status']
+            elif "status" in result:
+                status = result["status"]
                 emoji = "✓" if status == "PASS" else "⚠️" if "MANUAL" in status else "✗"
                 print(f"\n{test_name}: {emoji} {status}")
             else:
@@ -443,23 +451,28 @@ class LeakageDiagnostic:
         print("3. Perform manual inspections for temporal validity")
         print("4. Remove vegas-derived probability features")
         print("5. Re-run full backtest with cleaned features")
-        print("="*70)
+        print("=" * 70)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Data leakage diagnostic tool")
-    parser.add_argument('--test', choices=['spread-only', 'feature-audit', 'all'],
-                       default='all', help='Which test to run')
-    parser.add_argument('--output-dir', default='analysis/leakage_diagnostics',
-                       help='Output directory for results')
+    parser.add_argument(
+        "--test",
+        choices=["spread-only", "feature-audit", "all"],
+        default="all",
+        help="Which test to run",
+    )
+    parser.add_argument(
+        "--output-dir", default="analysis/leakage_diagnostics", help="Output directory for results"
+    )
 
     args = parser.parse_args()
 
     diagnostic = LeakageDiagnostic(output_dir=args.output_dir)
 
-    if args.test == 'spread-only':
+    if args.test == "spread-only":
         diagnostic.test_spread_only_baseline()
-    elif args.test == 'feature-audit':
+    elif args.test == "feature-audit":
         diagnostic.test_feature_temporal_validity()
         diagnostic.test_week_ordering()
         diagnostic.test_vegas_features()

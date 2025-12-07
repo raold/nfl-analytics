@@ -72,32 +72,34 @@ from psycopg2 import pool
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class PoolStatus(Enum):
     """Connection pool health status."""
-    HEALTHY = "HEALTHY"      # <80% utilization
-    WARNING = "WARNING"       # 80-95% utilization
-    CRITICAL = "CRITICAL"     # >95% utilization
-    EXHAUSTED = "EXHAUSTED"   # All connections in use
+
+    HEALTHY = "HEALTHY"  # <80% utilization
+    WARNING = "WARNING"  # 80-95% utilization
+    CRITICAL = "CRITICAL"  # >95% utilization
+    EXHAUSTED = "EXHAUSTED"  # All connections in use
 
 
 class ConnectionIssueType(Enum):
     """Types of connection pool issues."""
-    CONNECTION_LEAK = "connection_leak"          # Unclosed connection
-    POOL_EXHAUSTION = "pool_exhaustion"          # All connections used
+
+    CONNECTION_LEAK = "connection_leak"  # Unclosed connection
+    POOL_EXHAUSTION = "pool_exhaustion"  # All connections used
     EXCESSIVE_CONNECTIONS = "excessive_connections"  # Too many connections created
-    SLOW_QUERY_BLOCKING = "slow_query_blocking"    # Slow query holding connection
-    N_PLUS_ONE_PATTERN = "n_plus_one_pattern"      # Sequential queries (use batch instead)
+    SLOW_QUERY_BLOCKING = "slow_query_blocking"  # Slow query holding connection
+    N_PLUS_ONE_PATTERN = "n_plus_one_pattern"  # Sequential queries (use batch instead)
 
 
 @dataclass
 class ConnectionMetrics:
     """Connection pool metrics."""
+
     total_connections: int
     active_connections: int
     idle_connections: int
@@ -117,13 +119,14 @@ class ConnectionMetrics:
             "pool_utilization": self.pool_utilization,
             "avg_wait_time_ms": self.avg_wait_time_ms,
             "connection_errors": self.connection_errors,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
 
 
 @dataclass
 class ConnectionIssue:
     """Represents a connection pool issue."""
+
     issue_type: ConnectionIssueType
     severity: str  # INFO, WARNING, CRITICAL
     title: str
@@ -141,13 +144,14 @@ class ConnectionIssue:
             "description": self.description,
             "impact": self.impact,
             "detected_at": self.detected_at,
-            "details": self.details
+            "details": self.details,
         }
 
 
 @dataclass
 class OptimizationRecommendation:
     """Connection pool optimization recommendation."""
+
     issue: ConnectionIssue
     priority: int  # 1-5 (1=highest)
     recommendation: str
@@ -163,7 +167,7 @@ class OptimizationRecommendation:
             "recommendation": self.recommendation,
             "expected_improvement": self.expected_improvement,
             "implementation_difficulty": self.implementation_difficulty,
-            "code_example": self.code_example
+            "code_example": self.code_example,
         }
 
 
@@ -183,7 +187,7 @@ class ConnectionPoolManager:
         min_size: int = 5,
         max_size: int = 20,
         db_config: dict[str, str] | None = None,
-        leak_detection_enabled: bool = True
+        leak_detection_enabled: bool = True,
     ):
         """
         Initialize Connection Pool Manager.
@@ -204,15 +208,13 @@ class ConnectionPoolManager:
             "port": int(os.getenv("DB_PORT", "5544")),
             "database": os.getenv("DB_NAME", "devdb01"),
             "user": os.getenv("DB_USER", "dro"),
-            "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
         # Create connection pool
         try:
             self.pool = psycopg2.pool.ThreadedConnectionPool(
-                minconn=min_size,
-                maxconn=max_size,
-                **self.db_config
+                minconn=min_size, maxconn=max_size, **self.db_config
             )
             logger.info(f"Connection pool created (min={min_size}, max={max_size})")
         except Exception as e:
@@ -253,7 +255,7 @@ class ConnectionPoolManager:
                 self.active_connections[conn_id] = {
                     "acquired_at": datetime.now().isoformat(),
                     "wait_time_ms": wait_time_ms,
-                    "traceback": traceback.format_stack()  # For leak detection
+                    "traceback": traceback.format_stack(),  # For leak detection
                 }
                 self.wait_times.append(wait_time_ms)
 
@@ -282,12 +284,14 @@ class ConnectionPoolManager:
                     acquired_at = datetime.fromisoformat(conn_info["acquired_at"])
                     duration_ms = (datetime.now() - acquired_at).total_seconds() * 1000
 
-                    self.connection_history.append({
-                        "acquired_at": conn_info["acquired_at"],
-                        "released_at": datetime.now().isoformat(),
-                        "duration_ms": duration_ms,
-                        "wait_time_ms": conn_info["wait_time_ms"]
-                    })
+                    self.connection_history.append(
+                        {
+                            "acquired_at": conn_info["acquired_at"],
+                            "released_at": datetime.now().isoformat(),
+                            "duration_ms": duration_ms,
+                            "wait_time_ms": conn_info["wait_time_ms"],
+                        }
+                    )
 
             self.pool.putconn(conn)
             logger.debug("Connection released to pool")
@@ -324,18 +328,18 @@ class ConnectionPoolManager:
                     # Query logic
                     pass
         """
+
         def decorator(func: Callable) -> Callable:
             @functools.wraps(func)
             def wrapper(*args, **kwargs):
                 # Ensure connection is used properly
                 return func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
-    def detect_connection_leaks(
-        self,
-        threshold_seconds: int = 60
-    ) -> list[ConnectionIssue]:
+    def detect_connection_leaks(self, threshold_seconds: int = 60) -> list[ConnectionIssue]:
         """
         Detect connections that haven't been released.
 
@@ -367,8 +371,8 @@ class ConnectionPoolManager:
                             "conn_id": conn_id,
                             "acquired_at": conn_info["acquired_at"],
                             "age_seconds": age.total_seconds(),
-                            "traceback": conn_info["traceback"][-5:]  # Last 5 stack frames
-                        }
+                            "traceback": conn_info["traceback"][-5:],  # Last 5 stack frames
+                        },
                     )
                     issues.append(issue)
 
@@ -385,7 +389,9 @@ class ConnectionPoolManager:
             active = len(self.active_connections)
             idle = self.max_size - active
             utilization = active / self.max_size
-            avg_wait = sum(self.wait_times[-100:]) / len(self.wait_times[-100:]) if self.wait_times else 0
+            avg_wait = (
+                sum(self.wait_times[-100:]) / len(self.wait_times[-100:]) if self.wait_times else 0
+            )
 
         # Determine status
         if utilization >= 1.0:
@@ -404,7 +410,7 @@ class ConnectionPoolManager:
             waiting_requests=0,  # TODO: Track queued requests
             pool_utilization=utilization,
             avg_wait_time_ms=avg_wait,
-            connection_errors=self.connection_errors
+            connection_errors=self.connection_errors,
         )
 
         # Record metrics history
@@ -426,32 +432,36 @@ class ConnectionPoolManager:
 
         # Recommendation 1: Pool size optimization
         if status in [PoolStatus.CRITICAL, PoolStatus.EXHAUSTED]:
-            recommendations.append(OptimizationRecommendation(
-                issue=ConnectionIssue(
-                    issue_type=ConnectionIssueType.POOL_EXHAUSTION,
-                    severity="CRITICAL",
-                    title="Pool near/at capacity",
-                    description=f"Pool utilization: {metrics.pool_utilization*100:.0f}% ({metrics.active_connections}/{metrics.total_connections})",
-                    impact="Requests waiting for connections, page load delays"
-                ),
-                priority=1,
-                recommendation="Increase max_size or optimize queries to reduce connection duration",
-                expected_improvement="Eliminate connection waits, 30-50% faster page loads",
-                implementation_difficulty="Easy",
-                code_example=f"pool_manager = ConnectionPoolManager(min_size={self.min_size}, max_size={self.max_size * 2})"
-            ))
+            recommendations.append(
+                OptimizationRecommendation(
+                    issue=ConnectionIssue(
+                        issue_type=ConnectionIssueType.POOL_EXHAUSTION,
+                        severity="CRITICAL",
+                        title="Pool near/at capacity",
+                        description=f"Pool utilization: {metrics.pool_utilization*100:.0f}% ({metrics.active_connections}/{metrics.total_connections})",
+                        impact="Requests waiting for connections, page load delays",
+                    ),
+                    priority=1,
+                    recommendation="Increase max_size or optimize queries to reduce connection duration",
+                    expected_improvement="Eliminate connection waits, 30-50% faster page loads",
+                    implementation_difficulty="Easy",
+                    code_example=f"pool_manager = ConnectionPoolManager(min_size={self.min_size}, max_size={self.max_size * 2})",
+                )
+            )
 
         # Recommendation 2: Connection leaks
         leaks = self.detect_connection_leaks(threshold_seconds=30)
         if leaks:
-            recommendations.append(OptimizationRecommendation(
-                issue=leaks[0],
-                priority=2,
-                recommendation="Use context managers (with statement) for automatic connection release",
-                expected_improvement="Eliminate leaks, 10x reduction in connection count",
-                implementation_difficulty="Easy",
-                code_example="with pool_manager.get_pooled_connection() as conn:\n    cursor = conn.cursor()\n    cursor.execute(...)\n# Connection auto-released"
-            ))
+            recommendations.append(
+                OptimizationRecommendation(
+                    issue=leaks[0],
+                    priority=2,
+                    recommendation="Use context managers (with statement) for automatic connection release",
+                    expected_improvement="Eliminate leaks, 10x reduction in connection count",
+                    implementation_difficulty="Easy",
+                    code_example="with pool_manager.get_pooled_connection() as conn:\n    cursor = conn.cursor()\n    cursor.execute(...)\n# Connection auto-released",
+                )
+            )
 
         # Recommendation 3: Excessive connection creation
         if len(self.connection_history) > 100:  # Many connections created
@@ -459,20 +469,22 @@ class ConnectionPoolManager:
             short_connections = [c for c in recent_connections if c["duration_ms"] < 100]
 
             if len(short_connections) > 50:  # >50% short-lived connections
-                recommendations.append(OptimizationRecommendation(
-                    issue=ConnectionIssue(
-                        issue_type=ConnectionIssueType.EXCESSIVE_CONNECTIONS,
-                        severity="WARNING",
-                        title="Many short-lived connections",
-                        description=f"{len(short_connections)} connections used <100ms (likely N+1 pattern)",
-                        impact="Connection churn overhead, slower queries"
-                    ),
-                    priority=3,
-                    recommendation="Batch queries using JOIN or IN clause instead of sequential queries",
-                    expected_improvement="10x reduction in connection count, 3-5x faster queries",
-                    implementation_difficulty="Medium",
-                    code_example="# Instead of:\nfor player_id in player_ids:\n    with conn:\n        query_player(player_id)\n\n# Use:\nwith conn:\n    query_players_batch(player_ids)  # Single connection"
-                ))
+                recommendations.append(
+                    OptimizationRecommendation(
+                        issue=ConnectionIssue(
+                            issue_type=ConnectionIssueType.EXCESSIVE_CONNECTIONS,
+                            severity="WARNING",
+                            title="Many short-lived connections",
+                            description=f"{len(short_connections)} connections used <100ms (likely N+1 pattern)",
+                            impact="Connection churn overhead, slower queries",
+                        ),
+                        priority=3,
+                        recommendation="Batch queries using JOIN or IN clause instead of sequential queries",
+                        expected_improvement="10x reduction in connection count, 3-5x faster queries",
+                        implementation_difficulty="Medium",
+                        code_example="# Instead of:\nfor player_id in player_ids:\n    with conn:\n        query_player(player_id)\n\n# Use:\nwith conn:\n    query_players_batch(player_ids)  # Single connection",
+                    )
+                )
 
         return recommendations
 
@@ -485,7 +497,7 @@ class ConnectionPoolManager:
             "metrics": metrics.to_dict(),
             "total_connections_created": len(self.connection_history),
             "active_leaks": len(self.detect_connection_leaks()),
-            "recommendations_count": len(self.generate_recommendations())
+            "recommendations_count": len(self.generate_recommendations()),
         }
 
     def close(self):

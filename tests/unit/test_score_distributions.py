@@ -23,7 +23,6 @@ def test_skellam_pmf_basic():
     assert result is not None
 
 
-
 def test_skellam_pmf_edge_cases():
     """Test skellam_pmf: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_skellam_pmf_edge_cases():
     assert result is not None
 
 
-
 def test_skellam_pmf_error_handling():
     """Test skellam_pmf error handling."""
     with pytest.raises(ValueError):
         skellam_pmf(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_skellam_pmf_property_idempotent(self, mu_home, mu_away, k):
 
     # Assert property
     assert skellam_pmf(mu_home, mu_away, k) == result, "idempotent violated"
-
 
 
 def test_skellam_pmf_range_basic():
@@ -67,7 +63,6 @@ def test_skellam_pmf_range_basic():
     assert result is not None
 
 
-
 def test_skellam_pmf_range_edge_cases():
     """Test skellam_pmf_range: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_skellam_pmf_range_edge_cases():
     assert result is not None
 
 
-
 def test_skellam_pmf_range_error_handling():
     """Test skellam_pmf_range error handling."""
     with pytest.raises(ValueError):
         skellam_pmf_range(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_skellam_pmf_range_property_idempotent(self, mu_home, mu_away, k_min, k_
 
     # Assert property
     assert skellam_pmf_range(mu_home, mu_away, k_min, k_max) == result, "idempotent violated"
-
 
 
 def test_reweight_key_masses_basic():
@@ -111,7 +103,6 @@ def test_reweight_key_masses_basic():
     assert result is not None
 
 
-
 def test_reweight_key_masses_edge_cases():
     """Test reweight_key_masses: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_reweight_key_masses_edge_cases():
     assert result is not None
 
 
-
 def test_reweight_key_masses_error_handling():
     """Test reweight_key_masses error handling."""
     with pytest.raises(ValueError):
         reweight_key_masses(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_reweight_key_masses_property_idempotent(self, pmf, targets):
 
     # Assert property
     assert reweight_key_masses(pmf, targets) == result, "idempotent violated"
-
 
 
 def test_reweight_with_moments_basic():
@@ -155,7 +143,6 @@ def test_reweight_with_moments_basic():
     assert result is not None
 
 
-
 def test_reweight_with_moments_edge_cases():
     """Test reweight_with_moments: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_reweight_with_moments_edge_cases():
     assert result is not None
 
 
-
 def test_reweight_with_moments_error_handling():
     """Test reweight_with_moments error handling."""
     with pytest.raises(ValueError):
         reweight_with_moments(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_reweight_with_moments_property_idempotent(self, pmf, targets, mu, var):
 
     # Assert property
     assert reweight_with_moments(pmf, targets, mu, var) == result, "idempotent violated"
-
 
 
 def test_cover_push_probs_basic():
@@ -199,7 +183,6 @@ def test_cover_push_probs_basic():
     assert result is not None
 
 
-
 def test_cover_push_probs_edge_cases():
     """Test cover_push_probs: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_cover_push_probs_edge_cases():
     assert result is not None
 
 
-
 def test_cover_push_probs_error_handling():
     """Test cover_push_probs error handling."""
     with pytest.raises(ValueError):
         cover_push_probs(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +209,6 @@ def test_cover_push_probs_property_idempotent(self, pmf, spread):
 
     # Assert property
     assert cover_push_probs(pmf, spread) == result, "idempotent violated"
-
 
 
 def test_total_over_prob_basic():
@@ -243,7 +223,6 @@ def test_total_over_prob_basic():
     assert result is not None
 
 
-
 def test_total_over_prob_edge_cases():
     """Test total_over_prob: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_total_over_prob_edge_cases():
     assert result is not None
 
 
-
 def test_total_over_prob_error_handling():
     """Test total_over_prob error handling."""
     with pytest.raises(ValueError):
         total_over_prob(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -272,4 +249,3 @@ def test_total_over_prob_property_idempotent(self, pmf_home, pmf_away, total):
 
     # Assert property
     assert total_over_prob(pmf_home, pmf_away, total) == result, "idempotent violated"
-

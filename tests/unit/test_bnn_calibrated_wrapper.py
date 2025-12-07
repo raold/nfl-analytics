@@ -23,7 +23,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,4 +49,3 @@ def test_predict_property_idempotent(self, self, X):
 
     # Assert property
     assert predict(self, X) == result, "idempotent violated"
-

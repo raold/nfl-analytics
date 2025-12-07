@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_predict_basic():
@@ -56,7 +53,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -69,20 +65,69 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_property_idempotent(self, self, player_id, player_name, prop_type, line, opponent, is_home, season, week, features, bankroll):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_predict_property_idempotent(
+    self,
+    self,
+    player_id,
+    player_name,
+    prop_type,
+    line,
+    opponent,
+    is_home,
+    season,
+    week,
+    features,
+    bankroll,
+):
     """Property test: function is idempotent."""
     # Act
-    result = predict(self, player_id, player_name, prop_type, line, opponent, is_home, season, week, features, bankroll)
+    result = predict(
+        self,
+        player_id,
+        player_name,
+        prop_type,
+        line,
+        opponent,
+        is_home,
+        season,
+        week,
+        features,
+        bankroll,
+    )
 
     # Assert property
-    assert predict(self, player_id, player_name, prop_type, line, opponent, is_home, season, week, features, bankroll) == result, "idempotent violated"
-
+    assert (
+        predict(
+            self,
+            player_id,
+            player_name,
+            prop_type,
+            line,
+            opponent,
+            is_home,
+            season,
+            week,
+            features,
+            bankroll,
+        )
+        == result
+    ), "idempotent violated"

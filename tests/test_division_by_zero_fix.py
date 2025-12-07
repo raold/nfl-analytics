@@ -24,8 +24,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import importlib.util
 
 spec = importlib.util.spec_from_file_location(
-    "player_props_ensemble",
-    PROJECT_ROOT / "py" / "models" / "player_props_ensemble.py"
+    "player_props_ensemble", PROJECT_ROOT / "py" / "models" / "player_props_ensemble.py"
 )
 player_props_ensemble = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(player_props_ensemble)
@@ -35,23 +34,21 @@ PlayerPropsEnsemble = player_props_ensemble.PlayerPropsEnsemble
 
 def test_zero_std_handling():
     """Test that _apply_temperature_scaling handles std=0.0 gracefully."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 1: Zero std handling")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=False,
         use_xgboost=False,
         use_bnn=False,
         use_state_space=True,
-        use_bnn_calibrated=False
+        use_bnn_calibrated=False,
     )
 
     # Manually call _apply_temperature_scaling with zero std
     mean, std = ensemble._apply_temperature_scaling(
-        mean=200.0,
-        std=0.0,  # Zero variance - should trigger fallback
-        model_name="state_space"
+        mean=200.0, std=0.0, model_name="state_space"  # Zero variance - should trigger fallback
     )
 
     print("Input: mean=200.0, std=0.0")
@@ -67,23 +64,21 @@ def test_zero_std_handling():
 
 def test_near_zero_std_handling():
     """Test that _apply_temperature_scaling handles near-zero std gracefully."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 2: Near-zero std handling")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=False,
         use_xgboost=False,
         use_bnn=False,
         use_state_space=True,
-        use_bnn_calibrated=False
+        use_bnn_calibrated=False,
     )
 
     # Test with std below MIN_STD_THRESHOLD (1e-6)
     mean, std = ensemble._apply_temperature_scaling(
-        mean=200.0,
-        std=1e-8,  # Below 1e-6 threshold
-        model_name="state_space"
+        mean=200.0, std=1e-8, model_name="state_space"  # Below 1e-6 threshold
     )
 
     print("Input: mean=200.0, std=1e-8")
@@ -99,16 +94,16 @@ def test_near_zero_std_handling():
 
 def test_nan_std_handling():
     """Test that prediction methods handle NaN std gracefully."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 3: NaN std handling")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=False,
         use_xgboost=False,
         use_bnn=False,
         use_state_space=True,
-        use_bnn_calibrated=False
+        use_bnn_calibrated=False,
     )
 
     # Simulate NaN std in state-space data
@@ -134,16 +129,16 @@ def test_problem_players():
     These players (T.McSorley, M.Willis) have limited data and may trigger
     zero variance in state-space model.
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 4: Problem players (T.McSorley, M.Willis)")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=True,
         use_xgboost=False,  # Skip XGBoost (no features)
-        use_bnn=False,      # Skip BNN (no features)
+        use_bnn=False,  # Skip BNN (no features)
         use_state_space=True,
-        use_bnn_calibrated=False
+        use_bnn_calibrated=False,
     )
 
     # Test players that previously crashed
@@ -165,7 +160,7 @@ def test_problem_players():
                 line=200.5,
                 season=2023,
                 week=10,
-                features=None  # No features (will skip XGBoost/BNN)
+                features=None,  # No features (will skip XGBoost/BNN)
             )
 
             print(f"  ✅ No crash for {player_name}")
@@ -189,23 +184,21 @@ def test_problem_players():
 
 def test_normal_std_unchanged():
     """Test that normal std values are still processed correctly."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 5: Normal std processing (regression test)")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=False,
         use_xgboost=False,
         use_bnn=False,
         use_state_space=True,
-        use_bnn_calibrated=False
+        use_bnn_calibrated=False,
     )
 
     # Test with normal std value
     mean, std = ensemble._apply_temperature_scaling(
-        mean=200.0,
-        std=30.0,  # Normal variance
-        model_name="state_space"
+        mean=200.0, std=30.0, model_name="state_space"  # Normal variance
     )
 
     print("Input: mean=200.0, std=30.0")
@@ -225,12 +218,12 @@ def test_normal_std_unchanged():
 
 def main():
     """Run all tests."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DIVISION BY ZERO FIX VALIDATION TESTS")
-    print("="*70)
+    print("=" * 70)
     print("Testing fix for ZeroDivisionError in player_props_ensemble.py:438")
     print("See: py/models/player_props_ensemble.py")
-    print("="*70)
+    print("=" * 70)
 
     tests = [
         test_zero_std_handling,
@@ -248,13 +241,14 @@ def main():
         except Exception as e:
             print(f"\n❌ EXCEPTION in {test_func.__name__}: {e}")
             import traceback
+
             traceback.print_exc()
             results.append((test_func.__name__, False))
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     passed = sum(1 for _, result in results if result)
     total = len(results)
@@ -263,9 +257,9 @@ def main():
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"{status}: {test_name}")
 
-    print("="*70)
+    print("=" * 70)
     print(f"TOTAL: {passed}/{total} tests passed")
-    print("="*70)
+    print("=" * 70)
 
     if passed == total:
         print("\n🎉 ALL TESTS PASSED - Division by zero bug is FIXED!")

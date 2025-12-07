@@ -138,11 +138,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 # League Average Defaults (2018-2024 NFL averages from nflfastR)
@@ -170,11 +169,7 @@ DEFAULT_MOTION_PASS_EPA = 0.08  # +0.08 EPA on motion plays (research estimate)
 
 
 def get_team_playcalling_features(
-    conn,
-    team: str,
-    season: int,
-    week: int,
-    lookback_weeks: int = 4
+    conn, team: str, season: int, week: int, lookback_weeks: int = 4
 ) -> dict[str, float]:
     """
     Extract play-calling style and situational performance features for a team.
@@ -422,22 +417,28 @@ def get_team_playcalling_features(
 
             if result:
                 # Update features dict with computed values
-                features.update({
-                    "fourth_down_go_rate": float(result["fourth_down_go_rate"]),
-                    "fourth_down_conversion_rate": float(result["fourth_down_conversion_rate"]),
-                    "fourth_down_aggressiveness_index": float(result["fourth_down_aggressiveness_index"]),
-                    "fourth_down_attempts_per_game": float(result["fourth_down_attempts_per_game"]),
-                    "deep_pass_rate": float(result["deep_pass_rate"]),
-                    "deep_pass_epa": float(result["deep_pass_epa"]),
-                    "deep_pass_success_rate": float(result["deep_pass_success_rate"]),
-                    "air_yards_per_attempt": float(result["air_yards_per_attempt"]),
-                    "q4_wpa_sum": float(result["q4_wpa_sum"]),
-                    "high_leverage_wpa": float(result["high_leverage_wpa"]),
-                    "clutch_performance": float(result["clutch_performance"]),
-                    "trailing_wpa": float(result["trailing_wpa"]),
-                    "leading_wpa": float(result["leading_wpa"]),
-                    "wpa_per_play": float(result["wpa_per_play"]),
-                })
+                features.update(
+                    {
+                        "fourth_down_go_rate": float(result["fourth_down_go_rate"]),
+                        "fourth_down_conversion_rate": float(result["fourth_down_conversion_rate"]),
+                        "fourth_down_aggressiveness_index": float(
+                            result["fourth_down_aggressiveness_index"]
+                        ),
+                        "fourth_down_attempts_per_game": float(
+                            result["fourth_down_attempts_per_game"]
+                        ),
+                        "deep_pass_rate": float(result["deep_pass_rate"]),
+                        "deep_pass_epa": float(result["deep_pass_epa"]),
+                        "deep_pass_success_rate": float(result["deep_pass_success_rate"]),
+                        "air_yards_per_attempt": float(result["air_yards_per_attempt"]),
+                        "q4_wpa_sum": float(result["q4_wpa_sum"]),
+                        "high_leverage_wpa": float(result["high_leverage_wpa"]),
+                        "clutch_performance": float(result["clutch_performance"]),
+                        "trailing_wpa": float(result["trailing_wpa"]),
+                        "leading_wpa": float(result["leading_wpa"]),
+                        "wpa_per_play": float(result["wpa_per_play"]),
+                    }
+                )
 
                 logger.info(
                     f"✅ Extracted playcalling features for {team}: "
@@ -446,9 +447,7 @@ def get_team_playcalling_features(
                     f"clutch={features['clutch_performance']:.3f}"
                 )
             else:
-                logger.warning(
-                    f"⚠️  No data found for {team} {season} Week {week}, using defaults"
-                )
+                logger.warning(f"⚠️  No data found for {team} {season} Week {week}, using defaults")
 
     except psycopg2.Error as e:
         logger.error(f"❌ Database error extracting features for {team}: {e}", exc_info=True)
@@ -462,9 +461,7 @@ def get_team_playcalling_features(
 
 
 def get_playcalling_features_batch(
-    conn,
-    team_games: list,
-    lookback_weeks: int = 4
+    conn, team_games: list, lookback_weeks: int = 4
 ) -> dict[tuple, dict[str, float]]:
     """
     Extract playcalling features for multiple team-games in batch.
@@ -491,11 +488,7 @@ def get_playcalling_features_batch(
     results = {}
     for team, season, week in team_games:
         features = get_team_playcalling_features(
-            conn=conn,
-            team=team,
-            season=season,
-            week=week,
-            lookback_weeks=lookback_weeks
+            conn=conn, team=team, season=season, week=week, lookback_weeks=lookback_weeks
         )
         results[(team, season, week)] = features
 
@@ -513,30 +506,28 @@ if __name__ == "__main__":
 
     # Connect to database
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
     try:
         # Test single team extraction
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("Playcalling Features Test: Kansas City Chiefs Week 12 2024")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         features = get_team_playcalling_features(
             conn=conn,
             team="KC",
             season=datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1,
-            week=12
+            week=12,
         )
 
         print("Fourth Down Aggressiveness:")
         print(f"  Go Rate: {features['fourth_down_go_rate']:.1%}")
         print(f"  Conversion Rate: {features['fourth_down_conversion_rate']:.1%}")
-        print(f"  Aggressiveness Index: {features['fourth_down_aggressiveness_index']:.2f}x league avg")
+        print(
+            f"  Aggressiveness Index: {features['fourth_down_aggressiveness_index']:.2f}x league avg"
+        )
         print(f"  Attempts/Game: {features['fourth_down_attempts_per_game']:.2f}")
 
         print("\nDeep Passing:")
@@ -553,9 +544,9 @@ if __name__ == "__main__":
         print(f"  Leading WPA: {features['leading_wpa']:+.3f}")
         print(f"  WPA/Play: {features['wpa_per_play']:+.4f}")
 
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("✅ All features extracted successfully")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Test batch extraction
         print("Testing batch extraction for Week 12 2024...")

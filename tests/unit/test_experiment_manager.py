@@ -23,7 +23,6 @@ def test_test_basic():
     assert result is not None
 
 
-
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_test_edge_cases():
     assert result is not None
 
 
-
 def test_test_error_handling():
     """Test test error handling."""
     with pytest.raises(ValueError):
         test(invalid_input)
-
 
 
 def test_assign_subject_basic():
@@ -56,7 +53,6 @@ def test_assign_subject_basic():
     assert result is not None
 
 
-
 def test_assign_subject_edge_cases():
     """Test assign_subject: edge cases."""
     # Arrange
@@ -69,23 +65,29 @@ def test_assign_subject_edge_cases():
     assert result is not None
 
 
-
 def test_assign_subject_error_handling():
     """Test assign_subject error handling."""
     with pytest.raises(ValueError):
         assign_subject(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.text(min_size=1, max_size=100))
-def test_assign_subject_property_idempotent(self, self, subject_id, baseline_data, stratification_values):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.text(min_size=1, max_size=100),
+)
+def test_assign_subject_property_idempotent(
+    self, self, subject_id, baseline_data, stratification_values
+):
     """Property test: function is idempotent."""
     # Act
     result = assign_subject(self, subject_id, baseline_data, stratification_values)
 
     # Assert property
-    assert assign_subject(self, subject_id, baseline_data, stratification_values) == result, "idempotent violated"
-
+    assert (
+        assign_subject(self, subject_id, baseline_data, stratification_values) == result
+    ), "idempotent violated"
 
 
 def test_record_outcome_basic():
@@ -100,7 +102,6 @@ def test_record_outcome_basic():
     assert result is not None
 
 
-
 def test_record_outcome_edge_cases():
     """Test record_outcome: edge cases."""
     # Arrange
@@ -113,23 +114,30 @@ def test_record_outcome_edge_cases():
     assert result is not None
 
 
-
 def test_record_outcome_error_handling():
     """Test record_outcome error handling."""
     with pytest.raises(ValueError):
         record_outcome(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.text(min_size=1, max_size=100), st.integers(), st.datetimes())
-def test_record_outcome_property_idempotent(self, self, subject_id, outcome_name, value, measurement_time):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+    st.datetimes(),
+)
+def test_record_outcome_property_idempotent(
+    self, self, subject_id, outcome_name, value, measurement_time
+):
     """Property test: function is idempotent."""
     # Act
     result = record_outcome(self, subject_id, outcome_name, value, measurement_time)
 
     # Assert property
-    assert record_outcome(self, subject_id, outcome_name, value, measurement_time) == result, "idempotent violated"
-
+    assert (
+        record_outcome(self, subject_id, outcome_name, value, measurement_time) == result
+    ), "idempotent violated"
 
 
 def test_record_dropout_basic():
@@ -144,7 +152,6 @@ def test_record_dropout_basic():
     assert result is not None
 
 
-
 def test_record_dropout_edge_cases():
     """Test record_dropout: edge cases."""
     # Arrange
@@ -157,12 +164,10 @@ def test_record_dropout_edge_cases():
     assert result is not None
 
 
-
 def test_record_dropout_error_handling():
     """Test record_dropout error handling."""
     with pytest.raises(ValueError):
         record_dropout(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.datetimes())
@@ -173,7 +178,6 @@ def test_record_dropout_property_idempotent(self, self, subject_id, dropout_time
 
     # Assert property
     assert record_dropout(self, subject_id, dropout_time) == result, "idempotent violated"
-
 
 
 def test_get_assignment_summary_basic():
@@ -188,7 +192,6 @@ def test_get_assignment_summary_basic():
     assert result is not None
 
 
-
 def test_get_assignment_summary_edge_cases():
     """Test get_assignment_summary: edge cases."""
     # Arrange
@@ -201,12 +204,10 @@ def test_get_assignment_summary_edge_cases():
     assert result is not None
 
 
-
 def test_get_assignment_summary_error_handling():
     """Test get_assignment_summary error handling."""
     with pytest.raises(ValueError):
         get_assignment_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +218,6 @@ def test_get_assignment_summary_property_idempotent(val):
 
     # Assert property
     assert get_assignment_summary(val) == result, "idempotent violated"
-
 
 
 def test_analyze_balance_basic():
@@ -232,7 +232,6 @@ def test_analyze_balance_basic():
     assert result is not None
 
 
-
 def test_analyze_balance_edge_cases():
     """Test analyze_balance: edge cases."""
     # Arrange
@@ -245,12 +244,10 @@ def test_analyze_balance_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_balance_error_handling():
     """Test analyze_balance error handling."""
     with pytest.raises(ValueError):
         analyze_balance(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,7 +258,6 @@ def test_analyze_balance_property_idempotent(val):
 
     # Assert property
     assert analyze_balance(val) == result, "idempotent violated"
-
 
 
 def test_estimate_treatment_effects_basic():
@@ -276,7 +272,6 @@ def test_estimate_treatment_effects_basic():
     assert result is not None
 
 
-
 def test_estimate_treatment_effects_edge_cases():
     """Test estimate_treatment_effects: edge cases."""
     # Arrange
@@ -289,12 +284,10 @@ def test_estimate_treatment_effects_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_treatment_effects_error_handling():
     """Test estimate_treatment_effects error handling."""
     with pytest.raises(ValueError):
         estimate_treatment_effects(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,7 +298,6 @@ def test_estimate_treatment_effects_property_idempotent(val):
 
     # Assert property
     assert estimate_treatment_effects(val) == result, "idempotent violated"
-
 
 
 def test_export_data_basic():
@@ -320,7 +312,6 @@ def test_export_data_basic():
     assert result is not None
 
 
-
 def test_export_data_edge_cases():
     """Test export_data: edge cases."""
     # Arrange
@@ -333,12 +324,10 @@ def test_export_data_edge_cases():
     assert result is not None
 
 
-
 def test_export_data_error_handling():
     """Test export_data error handling."""
     with pytest.raises(ValueError):
         export_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -349,4 +338,3 @@ def test_export_data_property_idempotent(self, self, format):
 
     # Assert property
     assert export_data(self, format) == result, "idempotent violated"
-

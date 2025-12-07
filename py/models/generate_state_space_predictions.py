@@ -66,13 +66,15 @@ def generate_predictions(
         # Determine target (1 if home team won, 0 otherwise)
         target = 1 if margin > 0 else 0
 
-        predictions.append({
-            "game_id": game_id,
-            "prediction": prob_home_win,
-            "target": target,
-            "home_team": home_team,
-            "away_team": away_team,
-        })
+        predictions.append(
+            {
+                "game_id": game_id,
+                "prediction": prob_home_win,
+                "target": target,
+                "home_team": home_team,
+                "away_team": away_team,
+            }
+        )
 
         if (idx + 1) % 100 == 0:
             print(f"  Processed {idx + 1}/{len(games_df)} games...")
@@ -89,7 +91,9 @@ def generate_predictions(
     print("\nSummary:")
     print(f"  Total games: {len(predictions_df)}")
     print(f"  Mean prediction: {predictions_df['prediction'].mean():.4f}")
-    print(f"  Accuracy: {(predictions_df['prediction'] >= 0.5).eq(predictions_df['target']).mean():.4f}")
+    print(
+        f"  Accuracy: {(predictions_df['prediction'] >= 0.5).eq(predictions_df['target']).mean():.4f}"
+    )
 
     return predictions_df
 
@@ -173,15 +177,17 @@ def main():
             prob_home_win = model.predict_prob_home_win(home_team, away_team)
             target = 1 if margin > 0 else 0
 
-            predictions_list.append({
-                "game_id": game_id,
-                "prediction": prob_home_win,
-                "target": target,
-                "home_team": home_team,
-                "away_team": away_team,
-                "season": season,
-                "week": week,
-            })
+            predictions_list.append(
+                {
+                    "game_id": game_id,
+                    "prediction": prob_home_win,
+                    "target": target,
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "season": season,
+                    "week": week,
+                }
+            )
 
         # NOW update model with this week's games (prediction step + update step)
         model.predict_step()  # Add process noise
@@ -226,8 +232,11 @@ def main():
         "by_season": {
             int(season): {
                 "n_games": int(len(predictions_df[predictions_df["season"] == season])),
-                "accuracy": float((predictions_df[predictions_df["season"] == season]["prediction"] >= 0.5)
-                                .eq(predictions_df[predictions_df["season"] == season]["target"]).mean()),
+                "accuracy": float(
+                    (predictions_df[predictions_df["season"] == season]["prediction"] >= 0.5)
+                    .eq(predictions_df[predictions_df["season"] == season]["target"])
+                    .mean()
+                ),
             }
             for season in sorted(predictions_df["season"].unique())
         },

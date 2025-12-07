@@ -83,11 +83,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class QBRFeatures:
@@ -155,20 +154,13 @@ class QBRFeatures:
                 "user": db_user,
                 "password": db_password,
             }
-        logger.info(
-            f"Initialized QBRFeatures (lookback={self.LOOKBACK_WINDOW} weeks)"
-        )
+        logger.info(f"Initialized QBRFeatures (lookback={self.LOOKBACK_WINDOW} weeks)")
 
     def _connect_db(self) -> psycopg2.extensions.connection:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def _get_team_starting_qb(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int
-    ) -> str | None:
+    def _get_team_starting_qb(self, team: str, target_season: int, target_week: int) -> str | None:
         """
         Identify team's starting QB based on most recent qualified appearance.
 
@@ -252,10 +244,7 @@ class QBRFeatures:
         return None
 
     def _compute_qbr_rolling_features(
-        self,
-        player_id: str,
-        target_season: int,
-        target_week: int
+        self, player_id: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Compute rolling 4-week QBR features (QBR avg, pts added avg).
@@ -270,8 +259,8 @@ class QBRFeatures:
         """
         if not player_id:
             return {
-                'qbr_4wk_avg': self.DEFAULT_QBR,
-                'qbr_pts_added_4wk': self.DEFAULT_PTS_ADDED,
+                "qbr_4wk_avg": self.DEFAULT_QBR,
+                "qbr_pts_added_4wk": self.DEFAULT_PTS_ADDED,
             }
 
         conn = self._connect_db()
@@ -298,8 +287,7 @@ class QBRFeatures:
         """
 
         cursor.execute(
-            query,
-            (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
+            query, (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
         )
         results = cursor.fetchall()
 
@@ -308,25 +296,24 @@ class QBRFeatures:
 
         if not results:
             return {
-                'qbr_4wk_avg': self.DEFAULT_QBR,
-                'qbr_pts_added_4wk': self.DEFAULT_PTS_ADDED,
+                "qbr_4wk_avg": self.DEFAULT_QBR,
+                "qbr_pts_added_4wk": self.DEFAULT_PTS_ADDED,
             }
 
         # Compute rolling averages
         df = pd.DataFrame(results)
-        qbr_avg = df['qbr_total'].mean()
-        pts_added_avg = df['pts_added'].mean()
+        qbr_avg = df["qbr_total"].mean()
+        pts_added_avg = df["pts_added"].mean()
 
         return {
-            'qbr_4wk_avg': float(qbr_avg if not pd.isna(qbr_avg) else self.DEFAULT_QBR),
-            'qbr_pts_added_4wk': float(pts_added_avg if not pd.isna(pts_added_avg) else self.DEFAULT_PTS_ADDED),
+            "qbr_4wk_avg": float(qbr_avg if not pd.isna(qbr_avg) else self.DEFAULT_QBR),
+            "qbr_pts_added_4wk": float(
+                pts_added_avg if not pd.isna(pts_added_avg) else self.DEFAULT_PTS_ADDED
+            ),
         }
 
     def _compute_qbr_season_features(
-        self,
-        player_id: str,
-        target_season: int,
-        target_week: int
+        self, player_id: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Compute season-to-date QBR features (season avg, season pts added).
@@ -341,8 +328,8 @@ class QBRFeatures:
         """
         if not player_id:
             return {
-                'qbr_season_avg': self.DEFAULT_QBR,
-                'qbr_season_pts_added': self.DEFAULT_PTS_ADDED,
+                "qbr_season_avg": self.DEFAULT_QBR,
+                "qbr_season_pts_added": self.DEFAULT_PTS_ADDED,
             }
 
         conn = self._connect_db()
@@ -367,22 +354,21 @@ class QBRFeatures:
         cursor.close()
         conn.close()
 
-        if result and result['season_qbr_avg'] is not None:
+        if result and result["season_qbr_avg"] is not None:
             return {
-                'qbr_season_avg': float(result['season_qbr_avg']),
-                'qbr_season_pts_added': float(result['season_pts_added_avg'] or self.DEFAULT_PTS_ADDED),
+                "qbr_season_avg": float(result["season_qbr_avg"]),
+                "qbr_season_pts_added": float(
+                    result["season_pts_added_avg"] or self.DEFAULT_PTS_ADDED
+                ),
             }
         else:
             return {
-                'qbr_season_avg': self.DEFAULT_QBR,
-                'qbr_season_pts_added': self.DEFAULT_PTS_ADDED,
+                "qbr_season_avg": self.DEFAULT_QBR,
+                "qbr_season_pts_added": self.DEFAULT_PTS_ADDED,
             }
 
     def _compute_qbr_component_features(
-        self,
-        player_id: str,
-        target_season: int,
-        target_week: int
+        self, player_id: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Compute QBR component features (pass, run, sack components).
@@ -397,9 +383,9 @@ class QBRFeatures:
         """
         if not player_id:
             return {
-                'qbr_pass_component_4wk': self.DEFAULT_PASS_COMPONENT,
-                'qbr_run_component_4wk': self.DEFAULT_RUN_COMPONENT,
-                'qbr_sack_component_4wk': self.DEFAULT_SACK_COMPONENT,
+                "qbr_pass_component_4wk": self.DEFAULT_PASS_COMPONENT,
+                "qbr_run_component_4wk": self.DEFAULT_RUN_COMPONENT,
+                "qbr_sack_component_4wk": self.DEFAULT_SACK_COMPONENT,
             }
 
         conn = self._connect_db()
@@ -427,8 +413,7 @@ class QBRFeatures:
         """
 
         cursor.execute(
-            query,
-            (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
+            query, (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
         )
         result = cursor.fetchone()
 
@@ -437,22 +422,25 @@ class QBRFeatures:
 
         if result:
             return {
-                'qbr_pass_component_4wk': float(result['pass_component_avg'] or self.DEFAULT_PASS_COMPONENT),
-                'qbr_run_component_4wk': float(result['run_component_avg'] or self.DEFAULT_RUN_COMPONENT),
-                'qbr_sack_component_4wk': float(result['sack_component_avg'] or self.DEFAULT_SACK_COMPONENT),
+                "qbr_pass_component_4wk": float(
+                    result["pass_component_avg"] or self.DEFAULT_PASS_COMPONENT
+                ),
+                "qbr_run_component_4wk": float(
+                    result["run_component_avg"] or self.DEFAULT_RUN_COMPONENT
+                ),
+                "qbr_sack_component_4wk": float(
+                    result["sack_component_avg"] or self.DEFAULT_SACK_COMPONENT
+                ),
             }
         else:
             return {
-                'qbr_pass_component_4wk': self.DEFAULT_PASS_COMPONENT,
-                'qbr_run_component_4wk': self.DEFAULT_RUN_COMPONENT,
-                'qbr_sack_component_4wk': self.DEFAULT_SACK_COMPONENT,
+                "qbr_pass_component_4wk": self.DEFAULT_PASS_COMPONENT,
+                "qbr_run_component_4wk": self.DEFAULT_RUN_COMPONENT,
+                "qbr_sack_component_4wk": self.DEFAULT_SACK_COMPONENT,
             }
 
     def _compute_qbr_consistency(
-        self,
-        player_id: str,
-        target_season: int,
-        target_week: int
+        self, player_id: str, target_season: int, target_week: int
     ) -> float:
         """
         Compute QBR consistency metric: 1 / (1 + std(QBR)).
@@ -490,8 +478,7 @@ class QBRFeatures:
         """
 
         cursor.execute(
-            query,
-            (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
+            query, (player_id, target_season, target_season, target_week, self.LOOKBACK_WINDOW)
         )
         results = cursor.fetchall()
 
@@ -512,12 +499,7 @@ class QBRFeatures:
 
         return float(consistency)
 
-    def _compute_any_a(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int
-    ) -> float:
+    def _compute_any_a(self, team: str, target_season: int, target_week: int) -> float:
         """
         Compute Adjusted Net Yards per Attempt (ANY/A) from play-by-play data.
 
@@ -569,7 +551,7 @@ class QBRFeatures:
 
         cursor.execute(
             query,
-            (team, team, target_season, target_season, target_week, self.LOOKBACK_WINDOW, team)
+            (team, team, target_season, target_season, target_week, self.LOOKBACK_WINDOW, team),
         )
         result = cursor.fetchone()
 
@@ -590,18 +572,13 @@ class QBRFeatures:
             # Compute ANY/A
             denominator = attempts + sacks
             if denominator > 0:
-                any_a = (pass_yds + 20*pass_td - 45*interceptions - sack_yds) / denominator
+                any_a = (pass_yds + 20 * pass_td - 45 * interceptions - sack_yds) / denominator
                 return float(any_a)
 
         # Return default if no data or division by zero
         return self.DEFAULT_ANY_A
 
-    def _is_qb_qualified(
-        self,
-        player_id: str,
-        target_season: int,
-        target_week: int
-    ) -> bool:
+    def _is_qb_qualified(self, player_id: str, target_season: int, target_week: int) -> bool:
         """
         Check if QB is qualified (>= 20 dropbacks in most recent game).
 
@@ -643,12 +620,7 @@ class QBRFeatures:
         else:
             return self.DEFAULT_QUALIFIED
 
-    def extract_features(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def extract_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Extract all 10 QBR features for a team's QB.
 
@@ -683,16 +655,16 @@ class QBRFeatures:
                 f"Using league average defaults."
             )
             return {
-                'qbr_4wk_avg': self.DEFAULT_QBR,
-                'qbr_pts_added_4wk': self.DEFAULT_PTS_ADDED,
-                'qbr_season_avg': self.DEFAULT_QBR,
-                'qbr_season_pts_added': self.DEFAULT_PTS_ADDED,
-                'qbr_pass_component_4wk': self.DEFAULT_PASS_COMPONENT,
-                'qbr_run_component_4wk': self.DEFAULT_RUN_COMPONENT,
-                'qbr_sack_component_4wk': self.DEFAULT_SACK_COMPONENT,
-                'qbr_consistency': self.DEFAULT_CONSISTENCY,
-                'qb_any_a_4wk': self.DEFAULT_ANY_A,
-                'qb_qualified': self.DEFAULT_QUALIFIED,
+                "qbr_4wk_avg": self.DEFAULT_QBR,
+                "qbr_pts_added_4wk": self.DEFAULT_PTS_ADDED,
+                "qbr_season_avg": self.DEFAULT_QBR,
+                "qbr_season_pts_added": self.DEFAULT_PTS_ADDED,
+                "qbr_pass_component_4wk": self.DEFAULT_PASS_COMPONENT,
+                "qbr_run_component_4wk": self.DEFAULT_RUN_COMPONENT,
+                "qbr_sack_component_4wk": self.DEFAULT_SACK_COMPONENT,
+                "qbr_consistency": self.DEFAULT_CONSISTENCY,
+                "qb_any_a_4wk": self.DEFAULT_ANY_A,
+                "qb_qualified": self.DEFAULT_QUALIFIED,
             }
 
         # Step 2: Compute all feature groups
@@ -708,19 +680,14 @@ class QBRFeatures:
             **rolling_features,
             **season_features,
             **component_features,
-            'qbr_consistency': consistency,
-            'qb_any_a_4wk': any_a,
-            'qb_qualified': qualified,
+            "qbr_consistency": consistency,
+            "qb_any_a_4wk": any_a,
+            "qb_qualified": qualified,
         }
 
         return features
 
-    def validate_no_leakage(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> bool:
+    def validate_no_leakage(self, team: str, season: int, week: int) -> bool:
         """
         Validate temporal safety: ensure all QBR data is BEFORE target week.
 
@@ -774,10 +741,7 @@ class QBRFeatures:
 
 # Convenience function for direct usage
 def get_team_qbr_features(
-    conn: psycopg2.extensions.connection,
-    team: str,
-    season: int,
-    week: int
+    conn: psycopg2.extensions.connection, team: str, season: int, week: int
 ) -> dict[str, float]:
     """
     Convenience function to extract QBR features for a team's QB.
@@ -821,26 +785,14 @@ def main():
     """
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Extract ESPN QBR features for NFL teams"
-    )
+    parser = argparse.ArgumentParser(description="Extract ESPN QBR features for NFL teams")
     parser.add_argument(
         "--test-team",
         default="KC",
-        help="Test team abbreviation (default: KC for Kansas City Chiefs)"
+        help="Test team abbreviation (default: KC for Kansas City Chiefs)",
     )
-    parser.add_argument(
-        "--test-season",
-        type=int,
-        default=2024,
-        help="Test season (default: 2024)"
-    )
-    parser.add_argument(
-        "--test-week",
-        type=int,
-        default=10,
-        help="Test week (default: 10)"
-    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season (default: 2024)")
+    parser.add_argument("--test-week", type=int, default=10, help="Test week (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -859,9 +811,7 @@ def main():
 
     # Extract features
     features = engine.extract_features(
-        team=args.test_team,
-        season=args.test_season,
-        week=args.test_week
+        team=args.test_team, season=args.test_season, week=args.test_week
     )
 
     print("QBR Features (10 total):")
@@ -890,9 +840,7 @@ def main():
     print("=" * 80)
 
     is_valid = engine.validate_no_leakage(
-        team=args.test_team,
-        season=args.test_season,
-        week=args.test_week
+        team=args.test_team, season=args.test_season, week=args.test_week
     )
 
     if is_valid:

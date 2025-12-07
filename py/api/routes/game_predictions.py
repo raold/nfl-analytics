@@ -396,7 +396,13 @@ def get_ensemble_predictor() -> EnhancedEnsemble5Way:
     global _ensemble_predictor
     if _ensemble_predictor is None:
         # Initialize ensemble with Docker-aware DB connection (db_password first for pre-commit hook)
-        _ensemble_predictor = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD", "sicillionbillions"), db_host=os.getenv("DB_HOST", "nfl-analytics-pg-1"), db_port=int(os.getenv("DB_PORT", "5432")), db_name=os.getenv("DB_NAME", "devdb01"), db_user=os.getenv("DB_USER", "dro"))
+        _ensemble_predictor = EnhancedEnsemble5Way(
+            db_password=os.getenv("DB_PASSWORD", "sicillionbillions"),
+            db_host=os.getenv("DB_HOST", "nfl-analytics-pg-1"),
+            db_port=int(os.getenv("DB_PORT", "5432")),
+            db_name=os.getenv("DB_NAME", "devdb01"),
+            db_user=os.getenv("DB_USER", "dro"),
+        )
     return _ensemble_predictor
 
 
@@ -436,17 +442,14 @@ def generate_game_prediction(
 
     # Generate prediction using Ensemble v6.1
     prediction = predictor.predict_game(
-        home_team=home_team,
-        away_team=away_team,
-        season=season,
-        week=week
+        home_team=home_team, away_team=away_team, season=season, week=week
     )
 
     # Calculate edges
     edges = calculate_edges(
-        prediction['predicted_spread'],
-        prediction['predicted_total'],
-        prediction['predicted_home_win_prob'],
+        prediction["predicted_spread"],
+        prediction["predicted_total"],
+        prediction["predicted_home_win_prob"],
         sportsbook_spread,
         sportsbook_total,
         sportsbook_home_ml,
@@ -454,13 +457,13 @@ def generate_game_prediction(
 
     # Return combined prediction + edges
     return {
-        "predicted_home_score": prediction['predicted_home_score'],
-        "predicted_away_score": prediction['predicted_away_score'],
-        "predicted_total": prediction['predicted_total'],
-        "predicted_spread": prediction['predicted_spread'],
-        "predicted_home_win_prob": prediction['predicted_home_win_prob'],
-        "spread_std": prediction['spread_std'],
-        "total_std": prediction['total_std'],
+        "predicted_home_score": prediction["predicted_home_score"],
+        "predicted_away_score": prediction["predicted_away_score"],
+        "predicted_total": prediction["predicted_total"],
+        "predicted_spread": prediction["predicted_spread"],
+        "predicted_home_win_prob": prediction["predicted_home_win_prob"],
+        "spread_std": prediction["spread_std"],
+        "total_std": prediction["total_std"],
         "spread_edge": edges["spread_edge"],
         "total_edge": edges["total_edge"],
         "ml_edge": edges["ml_edge"],
@@ -489,11 +492,9 @@ def store_game_prediction(
     """
 
     model_name = f"ensemble_{ensemble_version.replace('.', '_')}"
-    cursor.execute(model_query, (
-        model_name,
-        ensemble_version,
-        f"Ensemble version {ensemble_version}"
-    ))
+    cursor.execute(
+        model_query, (model_name, ensemble_version, f"Ensemble version {ensemble_version}")
+    )
     model_id = cursor.fetchone()[0]
 
     insert_query = """
@@ -523,12 +524,12 @@ def store_game_prediction(
 
     # Add model_id to data and remove non-existent columns
     data = {**prediction_data}
-    data['model_id'] = model_id
+    data["model_id"] = model_id
     # Remove columns that don't exist in schema
-    data.pop('home_team', None)
-    data.pop('away_team', None)
-    data.pop('ensemble_version', None)
-    data.pop('status', None)
+    data.pop("home_team", None)
+    data.pop("away_team", None)
+    data.pop("ensemble_version", None)
+    data.pop("status", None)
 
     cursor.execute(insert_query, data)
     result = cursor.fetchone()
@@ -538,9 +539,7 @@ def store_game_prediction(
             f"Stored new game prediction: {prediction_data['game_id']} (prediction_id={prediction_id})"
         )
     else:
-        logger.info(
-            f"Prediction already exists for: {prediction_data['game_id']} at this time"
-        )
+        logger.info(f"Prediction already exists for: {prediction_data['game_id']} at this time")
         prediction_id = None
 
     conn.commit()
@@ -654,9 +653,7 @@ async def predict_game_full(request: GamePredictionRequest) -> GamePredictionRes
         # Record metrics
         if PROMETHEUS_AVAILABLE:
             GAME_PREDICTIONS_MADE.labels(prediction_type="full").inc()
-            GAME_PREDICTION_DURATION.labels(prediction_type="full").observe(
-                processing_ms / 1000
-            )
+            GAME_PREDICTION_DURATION.labels(prediction_type="full").observe(processing_ms / 1000)
 
         response = GamePredictionResponse(
             game_id=game_data["game_id"],
@@ -833,9 +830,7 @@ async def predict_week(request: WeekPredictionRequest) -> WeekPredictionResponse
         # Record metrics
         if PROMETHEUS_AVAILABLE:
             GAME_PREDICTIONS_MADE.labels(prediction_type="week").inc()
-            GAME_PREDICTION_DURATION.labels(prediction_type="week").observe(
-                processing_ms / 1000
-            )
+            GAME_PREDICTION_DURATION.labels(prediction_type="week").observe(processing_ms / 1000)
 
         response = WeekPredictionResponse(
             season=request.season,
@@ -1011,12 +1006,8 @@ async def predict_games_batch(
                 )
 
             except Exception as e:
-                logger.error(
-                    f"Error predicting game {game_req.game_id}: {e}", exc_info=True
-                )
-                errors.append(
-                    PredictionError(game_id=game_req.game_id, error=str(e))
-                )
+                logger.error(f"Error predicting game {game_req.game_id}: {e}", exc_info=True)
+                errors.append(PredictionError(game_id=game_req.game_id, error=str(e)))
 
         cursor.close()
         conn.close()
@@ -1027,9 +1018,7 @@ async def predict_games_batch(
         # Record metrics
         if PROMETHEUS_AVAILABLE:
             GAME_PREDICTIONS_MADE.labels(prediction_type="batch").inc(total_games)
-            GAME_PREDICTION_DURATION.labels(prediction_type="batch").observe(
-                processing_ms / 1000
-            )
+            GAME_PREDICTION_DURATION.labels(prediction_type="batch").observe(processing_ms / 1000)
 
         response = BatchGamePredictionResponse(
             total_requested=total_games,
@@ -1064,9 +1053,7 @@ async def predict_games_batch(
 )
 async def get_game_prediction(
     game_id: str = Path(..., description="Game ID (e.g., '2025_12_BUF_HOU')"),
-    ensemble_version: str | None = Query(
-        None, description="Filter by ensemble version"
-    ),
+    ensemble_version: str | None = Query(None, description="Filter by ensemble version"),
 ) -> GamePredictionResponse:
     """
     Retrieve stored game prediction from database.
@@ -1134,24 +1121,24 @@ async def get_game_prediction(
             predicted_home_win_prob=float(prediction["predicted_home_win_prob"]),
             spread_std=float(prediction["spread_std"]),
             total_std=float(prediction["total_std"]),
-            sportsbook_spread=float(prediction["sportsbook_spread"])
-            if prediction["sportsbook_spread"]
-            else None,
-            sportsbook_total=float(prediction["sportsbook_total"])
-            if prediction["sportsbook_total"]
-            else None,
-            sportsbook_home_ml=float(prediction["sportsbook_home_ml"])
-            if prediction["sportsbook_home_ml"]
-            else None,
-            sportsbook_away_ml=float(prediction["sportsbook_away_ml"])
-            if prediction["sportsbook_away_ml"]
-            else None,
-            spread_edge=float(prediction["spread_edge"])
-            if prediction["spread_edge"]
-            else None,
-            total_edge=float(prediction["total_edge"])
-            if prediction["total_edge"]
-            else None,
+            sportsbook_spread=(
+                float(prediction["sportsbook_spread"]) if prediction["sportsbook_spread"] else None
+            ),
+            sportsbook_total=(
+                float(prediction["sportsbook_total"]) if prediction["sportsbook_total"] else None
+            ),
+            sportsbook_home_ml=(
+                float(prediction["sportsbook_home_ml"])
+                if prediction["sportsbook_home_ml"]
+                else None
+            ),
+            sportsbook_away_ml=(
+                float(prediction["sportsbook_away_ml"])
+                if prediction["sportsbook_away_ml"]
+                else None
+            ),
+            spread_edge=float(prediction["spread_edge"]) if prediction["spread_edge"] else None,
+            total_edge=float(prediction["total_edge"]) if prediction["total_edge"] else None,
             ml_edge=float(prediction["ml_edge"]) if prediction["ml_edge"] else None,
             predicted_at=prediction["predicted_at"],
             ensemble_version=prediction["ensemble_version"],
@@ -1226,7 +1213,9 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
         # Extract team abbreviations from game_id (format: YYYY_WW_AWAY_HOME)
         parts = request.game_id.split("_")
         if len(parts) != 4:
-            raise ValueError(f"Invalid game_id format: {request.game_id}. Expected: YYYY_WW_AWAY_HOME")
+            raise ValueError(
+                f"Invalid game_id format: {request.game_id}. Expected: YYYY_WW_AWAY_HOME"
+            )
 
         away_team = parts[2]
         home_team = parts[3]
@@ -1278,12 +1267,12 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
                 season_qbs = cursor.fetchall()
 
                 # Get top QB for each team
-                home_qb = next((qb for qb in season_qbs if qb['team'] == home_team), None)
-                away_qb = next((qb for qb in season_qbs if qb['team'] == away_team), None)
+                home_qb = next((qb for qb in season_qbs if qb["team"] == home_team), None)
+                away_qb = next((qb for qb in season_qbs if qb["team"] == away_team), None)
             else:
                 # Use QBs from the specific game
-                home_qb = next((qb for qb in qbs if qb['team'] == home_team), None)
-                away_qb = next((qb for qb in qbs if qb['team'] == away_team), None)
+                home_qb = next((qb for qb in qbs if qb["team"] == home_team), None)
+                away_qb = next((qb for qb in qbs if qb["team"] == away_team), None)
 
         # Get ensemble predictor
         ensemble = get_ensemble_predictor()
@@ -1297,52 +1286,68 @@ async def predict_game_qb_yards(request: GamePredictionRequest) -> GameQBPredict
         if home_qb:
             try:
                 home_pred = ensemble.predict(
-                    player_id=home_qb['player_id'],
+                    player_id=home_qb["player_id"],
                     season=request.season,
                     week=request.week,
                     return_uncertainty=True,
-                    return_components=True
+                    return_components=True,
                 )
 
                 # Validate ensemble has sufficient components (>= 2/5)
                 # Nov 23 fix: Lowered from 3 to 2 to support future games where R models unavailable
-                if 'components' in home_pred:
-                    valid_components = len([c for c in home_pred['components'].values() if c.get('mean') is not None])
+                if "components" in home_pred:
+                    valid_components = len(
+                        [c for c in home_pred["components"].values() if c.get("mean") is not None]
+                    )
                     if valid_components < 2:
-                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 2)")
+                        raise RuntimeError(
+                            f"Insufficient ensemble components: {valid_components}/5 (need >= 2)"
+                        )
 
-                home_yards = home_pred['ensemble_mean']
-                home_uncertainty = home_pred['ensemble_std']
-                valid_predictions.append('home')
-                logger.info(f"Home QB {home_qb['player_id']}: {home_yards:.1f} ± {home_uncertainty:.1f} yards")
+                home_yards = home_pred["ensemble_mean"]
+                home_uncertainty = home_pred["ensemble_std"]
+                valid_predictions.append("home")
+                logger.info(
+                    f"Home QB {home_qb['player_id']}: {home_yards:.1f} ± {home_uncertainty:.1f} yards"
+                )
             except Exception as e:
-                logger.warning(f"Ensemble prediction failed for home QB {home_qb['player_id']}: {e}")
+                logger.warning(
+                    f"Ensemble prediction failed for home QB {home_qb['player_id']}: {e}"
+                )
         else:
             logger.warning(f"No home QB found for {home_team}")
 
         if away_qb:
             try:
                 away_pred = ensemble.predict(
-                    player_id=away_qb['player_id'],
+                    player_id=away_qb["player_id"],
                     season=request.season,
                     week=request.week,
                     return_uncertainty=True,
-                    return_components=True
+                    return_components=True,
                 )
 
                 # Validate ensemble has sufficient components (>= 2/5)
                 # Nov 23 fix: Lowered from 3 to 2 to support future games where R models unavailable
-                if 'components' in away_pred:
-                    valid_components = len([c for c in away_pred['components'].values() if c.get('mean') is not None])
+                if "components" in away_pred:
+                    valid_components = len(
+                        [c for c in away_pred["components"].values() if c.get("mean") is not None]
+                    )
                     if valid_components < 2:
-                        raise RuntimeError(f"Insufficient ensemble components: {valid_components}/5 (need >= 2)")
+                        raise RuntimeError(
+                            f"Insufficient ensemble components: {valid_components}/5 (need >= 2)"
+                        )
 
-                away_yards = away_pred['ensemble_mean']
-                away_uncertainty = away_pred['ensemble_std']
-                valid_predictions.append('away')
-                logger.info(f"Away QB {away_qb['player_id']}: {away_yards:.1f} ± {away_uncertainty:.1f} yards")
+                away_yards = away_pred["ensemble_mean"]
+                away_uncertainty = away_pred["ensemble_std"]
+                valid_predictions.append("away")
+                logger.info(
+                    f"Away QB {away_qb['player_id']}: {away_yards:.1f} ± {away_uncertainty:.1f} yards"
+                )
             except Exception as e:
-                logger.warning(f"Ensemble prediction failed for away QB {away_qb['player_id']}: {e}")
+                logger.warning(
+                    f"Ensemble prediction failed for away QB {away_qb['player_id']}: {e}"
+                )
         else:
             logger.warning(f"No away QB found for {away_team}")
 

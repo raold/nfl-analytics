@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ExperimentSpec:
     """Specification for a single experiment"""
+
     id: str
     name: str
     category: str  # 'cvae' or 'causal'
@@ -51,9 +52,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["play_by_play", "weather", "team_stats"],
-                success_metrics=["KL_divergence", "trajectory_realism", "margin_prediction_lift"]
+                success_metrics=["KL_divergence", "trajectory_realism", "margin_prediction_lift"],
             ),
-
             ExperimentSpec(
                 id="CVAE-002",
                 name="Rushing Yard Trajectory Prediction",
@@ -64,9 +64,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["rushing_stats", "game_state", "defense_rank"],
-                success_metrics=["rushing_yards_mae", "over_under_accuracy", "sharpe_ratio"]
+                success_metrics=["rushing_yards_mae", "over_under_accuracy", "sharpe_ratio"],
             ),
-
             ExperimentSpec(
                 id="CVAE-003",
                 name="Passing Yard Trajectory Prediction",
@@ -77,9 +76,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["passing_stats", "game_script", "defense_rank"],
-                success_metrics=["passing_yards_mae", "over_under_accuracy", "sharpe_ratio"]
+                success_metrics=["passing_yards_mae", "over_under_accuracy", "sharpe_ratio"],
             ),
-
             ExperimentSpec(
                 id="CVAE-004",
                 name="Reception Trajectory (PPR Scoring)",
@@ -90,9 +88,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["receiving_stats", "target_share", "game_script"],
-                success_metrics=["reception_mae", "ppr_points_mae", "over_under_accuracy"]
+                success_metrics=["reception_mae", "ppr_points_mae", "over_under_accuracy"],
             ),
-
             ExperimentSpec(
                 id="CVAE-005",
                 name="TD Timing Prediction",
@@ -103,9 +100,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="low",
                 implementation_complexity="medium",
                 data_requirements=["scoring_plays", "game_state", "red_zone_stats"],
-                success_metrics=["td_timing_accuracy", "anytime_td_accuracy"]
+                success_metrics=["td_timing_accuracy", "anytime_td_accuracy"],
             ),
-
             ExperimentSpec(
                 id="CVAE-006",
                 name="Game Script Emergence",
@@ -116,9 +112,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["play_by_play", "score_differential", "time_remaining"],
-                success_metrics=["game_script_classification", "play_distribution_kl"]
+                success_metrics=["game_script_classification", "play_distribution_kl"],
             ),
-
             ExperimentSpec(
                 id="CVAE-007",
                 name="Blowout vs Close Game Trajectories",
@@ -129,11 +124,9 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["score_differential", "play_distribution", "personnel"],
-                success_metrics=["blowout_detection_auc", "live_betting_edge", "sharpe_ratio"]
+                success_metrics=["blowout_detection_auc", "live_betting_edge", "sharpe_ratio"],
             ),
-
             # ===== NEW Experiments 8-20 =====
-
             ExperimentSpec(
                 id="CVAE-008",
                 name="Multi-Horizon Trajectory Forecasting",
@@ -144,9 +137,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["quarter_stats", "score_progression", "time_decay"],
-                success_metrics=["quarter_mae", "cumulative_error", "live_bet_roi"]
+                success_metrics=["quarter_mae", "cumulative_error", "live_bet_roi"],
             ),
-
             ExperimentSpec(
                 id="CVAE-009",
                 name="Weather-Conditioned Trajectories",
@@ -157,9 +149,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["weather_data", "play_distribution", "pass_rush_split"],
-                success_metrics=["weather_adjustment_accuracy", "outdoor_game_edge"]
+                success_metrics=["weather_adjustment_accuracy", "outdoor_game_edge"],
             ),
-
             ExperimentSpec(
                 id="CVAE-010",
                 name="Injury-Adjusted Trajectories",
@@ -170,9 +161,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="high",
                 data_requirements=["injury_reports", "snap_counts", "depth_charts"],
-                success_metrics=["injury_impact_mae", "live_adjustment_roi"]
+                success_metrics=["injury_impact_mae", "live_adjustment_roi"],
             ),
-
             ExperimentSpec(
                 id="CVAE-011",
                 name="Home/Away Trajectory Asymmetry",
@@ -183,9 +173,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["home_away_splits", "crowd_noise", "travel_distance"],
-                success_metrics=["home_away_variance_ratio", "location_adjusted_mae"]
+                success_metrics=["home_away_variance_ratio", "location_adjusted_mae"],
             ),
-
             ExperimentSpec(
                 id="CVAE-012",
                 name="Divisional Rivalry Trajectories",
@@ -196,9 +185,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["schedule", "rivalry_history", "head_to_head"],
-                success_metrics=["divisional_game_mae", "rivalry_edge"]
+                success_metrics=["divisional_game_mae", "rivalry_edge"],
             ),
-
             ExperimentSpec(
                 id="CVAE-013",
                 name="Prime Time Game Trajectories",
@@ -209,9 +197,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="low",
                 implementation_complexity="low",
                 data_requirements=["game_time", "day_of_week", "rest_days"],
-                success_metrics=["primetime_mae", "rest_adjustment_accuracy"]
+                success_metrics=["primetime_mae", "rest_adjustment_accuracy"],
             ),
-
             ExperimentSpec(
                 id="CVAE-014",
                 name="Playoff-Bound Team Trajectories",
@@ -222,9 +209,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["playoff_standings", "starter_status", "week_number"],
-                success_metrics=["week17_18_accuracy", "resting_starters_edge"]
+                success_metrics=["week17_18_accuracy", "resting_starters_edge"],
             ),
-
             ExperimentSpec(
                 id="CVAE-015",
                 name="Rookie QB Trajectory Patterns",
@@ -235,9 +221,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["qb_experience", "games_started", "learning_curve"],
-                success_metrics=["rookie_qb_mae", "experience_adjustment"]
+                success_metrics=["rookie_qb_mae", "experience_adjustment"],
             ),
-
             ExperimentSpec(
                 id="CVAE-016",
                 name="Two-Minute Drill Trajectories",
@@ -248,9 +233,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["two_minute_warning", "timeout_usage", "clock_management"],
-                success_metrics=["two_minute_accuracy", "end_of_half_roi"]
+                success_metrics=["two_minute_accuracy", "end_of_half_roi"],
             ),
-
             ExperimentSpec(
                 id="CVAE-017",
                 name="Offensive Coordinator Change Trajectories",
@@ -261,9 +245,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="high",
                 data_requirements=["coaching_changes", "play_calling_tendencies"],
-                success_metrics=["regime_change_detection", "post_change_mae"]
+                success_metrics=["regime_change_detection", "post_change_mae"],
             ),
-
             ExperimentSpec(
                 id="CVAE-018",
                 name="Stack Correlation Trajectories",
@@ -274,9 +257,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["passing_stats", "target_share", "correlation_matrix"],
-                success_metrics=["stack_correlation_mae", "dfs_lineup_roi"]
+                success_metrics=["stack_correlation_mae", "dfs_lineup_roi"],
             ),
-
             ExperimentSpec(
                 id="CVAE-019",
                 name="Defense-Adjusted Trajectory Variance",
@@ -287,9 +269,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["defensive_dvoa", "variance_by_opponent"],
-                success_metrics=["defense_adjusted_mae", "variance_prediction"]
+                success_metrics=["defense_adjusted_mae", "variance_prediction"],
             ),
-
             ExperimentSpec(
                 id="CVAE-020",
                 name="Season Progression Meta-Learning",
@@ -300,7 +281,7 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="high",
                 data_requirements=["week_number", "cumulative_stats", "trend_features"],
-                success_metrics=["temporal_mae", "trend_capture", "season_long_roi"]
+                success_metrics=["temporal_mae", "trend_capture", "season_long_roi"],
             ),
         ]
 
@@ -319,9 +300,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["weather_data", "rushing_stats", "game_state"],
-                success_metrics=["ate", "confidence_interval", "placebo_test_pvalue"]
+                success_metrics=["ate", "confidence_interval", "placebo_test_pvalue"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-002",
                 name="Injury Causation on Team Performance",
@@ -332,9 +312,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["injury_reports", "team_performance", "snap_counts"],
-                success_metrics=["ate", "rmspe_pre", "post_treatment_effect"]
+                success_metrics=["ate", "rmspe_pre", "post_treatment_effect"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-003",
                 name="Home Field Advantage Causal Effect",
@@ -345,9 +324,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="low",
                 implementation_complexity="low",
                 data_requirements=["home_away_splits", "crowd_attendance", "season_year"],
-                success_metrics=["ate", "temporal_trend", "heterogeneous_effects"]
+                success_metrics=["ate", "temporal_trend", "heterogeneous_effects"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-004",
                 name="Rest Days Impact on Performance",
@@ -358,9 +336,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["rest_days", "game_schedule", "injury_rates"],
-                success_metrics=["ate", "iv_validity", "first_stage_f_stat"]
+                success_metrics=["ate", "iv_validity", "first_stage_f_stat"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-005",
                 name="QB Change Causal Effect on Offense",
@@ -371,9 +348,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["qb_changes", "offensive_stats", "qb_experience"],
-                success_metrics=["ate", "parallel_trends_test", "heterogeneous_by_experience"]
+                success_metrics=["ate", "parallel_trends_test", "heterogeneous_by_experience"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-006",
                 name="Play-Calling Tendency Causal Analysis",
@@ -384,9 +360,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["play_by_play", "down_distance", "success_rate"],
-                success_metrics=["ate", "balance_diagnostics", "sensitivity_analysis"]
+                success_metrics=["ate", "balance_diagnostics", "sensitivity_analysis"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-007",
                 name="Coaching Change Impact on Win Rate",
@@ -397,11 +372,9 @@ class ExpandedExperimentSuite:
                 market_inefficiency="low",
                 implementation_complexity="medium",
                 data_requirements=["coaching_changes", "win_loss_record", "team_talent"],
-                success_metrics=["ate", "rmspe", "placebo_test"]
+                success_metrics=["ate", "rmspe", "placebo_test"],
             ),
-
             # ===== NEW Experiments 8-20 =====
-
             ExperimentSpec(
                 id="CAUSAL-008",
                 name="Offensive Line Quality Causal Effect",
@@ -412,9 +385,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["ol_grades", "ol_injuries", "qb_pressure_rate"],
-                success_metrics=["ate", "pressure_mediation", "rushing_vs_passing_effects"]
+                success_metrics=["ate", "pressure_mediation", "rushing_vs_passing_effects"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-009",
                 name="Target Share Causal Effect on WR Production",
@@ -425,9 +397,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="high",
                 data_requirements=["target_share", "wr_injuries", "reception_efficiency"],
-                success_metrics=["ate", "non_linearity_test", "iv_validity"]
+                success_metrics=["ate", "non_linearity_test", "iv_validity"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-010",
                 name="Defensive Scheme Change Causal Effect",
@@ -438,9 +409,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="high",
                 data_requirements=["defensive_schemes", "coordinator_changes", "dvoa"],
-                success_metrics=["ate", "dynamic_treatment_effects", "learning_curve"]
+                success_metrics=["ate", "dynamic_treatment_effects", "learning_curve"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-011",
                 name="Altitude Causal Effect on Passing",
@@ -451,9 +421,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="low",
                 data_requirements=["stadium_altitude", "passing_stats", "air_yards"],
-                success_metrics=["ate", "discontinuity_test", "bandwidth_sensitivity"]
+                success_metrics=["ate", "discontinuity_test", "bandwidth_sensitivity"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-012",
                 name="Travel Distance Causal Effect on Performance",
@@ -464,9 +433,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="low",
                 data_requirements=["travel_distance", "time_zones", "performance_metrics"],
-                success_metrics=["ate", "time_zone_heterogeneity", "recovery_time"]
+                success_metrics=["ate", "time_zone_heterogeneity", "recovery_time"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-013",
                 name="Play-Action Usage Causal Effect",
@@ -477,9 +445,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["play_action_rate", "yards_per_attempt", "defense_type"],
-                success_metrics=["ate", "balance_check", "sensitivity_to_confounding"]
+                success_metrics=["ate", "balance_check", "sensitivity_to_confounding"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-014",
                 name="Fourth Down Aggression Causal Effect",
@@ -490,9 +457,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="high",
                 data_requirements=["4th_down_decisions", "win_probability", "coach_id"],
-                success_metrics=["ate", "wp_lift", "iv_assumptions"]
+                success_metrics=["ate", "wp_lift", "iv_assumptions"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-015",
                 name="Red Zone Personnel Causal Effect",
@@ -503,9 +469,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["red_zone_personnel", "td_rate", "defense_weight"],
-                success_metrics=["ate", "parallel_trends", "robustness_checks"]
+                success_metrics=["ate", "parallel_trends", "robustness_checks"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-016",
                 name="Crowd Noise Causal Effect on Penalties",
@@ -516,9 +481,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="low",
                 implementation_complexity="low",
                 data_requirements=["attendance", "penalty_rates", "covid_season"],
-                success_metrics=["ate", "covid_natural_experiment", "home_away_diff"]
+                success_metrics=["ate", "covid_natural_experiment", "home_away_diff"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-017",
                 name="Game Script Causal Effect on Play Distribution",
@@ -529,9 +493,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="high",
                 data_requirements=["score_differential", "pass_rate", "time_remaining"],
-                success_metrics=["ate", "non_linearity", "iv_relevance"]
+                success_metrics=["ate", "non_linearity", "iv_relevance"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-018",
                 name="Turf Type Causal Effect on Injuries",
@@ -542,9 +505,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["turf_type", "injury_rates", "stadium_changes"],
-                success_metrics=["ate", "injury_type_heterogeneity", "player_adjustment"]
+                success_metrics=["ate", "injury_type_heterogeneity", "player_adjustment"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-019",
                 name="Timeout Strategy Causal Effect on Drive Success",
@@ -555,9 +517,8 @@ class ExpandedExperimentSuite:
                 market_inefficiency="medium",
                 implementation_complexity="medium",
                 data_requirements=["timeout_usage", "drive_outcomes", "clock_management"],
-                success_metrics=["ate", "spillover_effects", "mechanism_analysis"]
+                success_metrics=["ate", "spillover_effects", "mechanism_analysis"],
             ),
-
             ExperimentSpec(
                 id="CAUSAL-020",
                 name="Draft Capital Causal Effect on Player Usage",
@@ -568,7 +529,7 @@ class ExpandedExperimentSuite:
                 market_inefficiency="high",
                 implementation_complexity="medium",
                 data_requirements=["draft_position", "snap_counts", "performance_metrics"],
-                success_metrics=["ate", "sunk_cost_bias", "discontinuity_validity"]
+                success_metrics=["ate", "sunk_cost_bias", "discontinuity_validity"],
             ),
         ]
 
@@ -586,7 +547,7 @@ class ExpandedExperimentSuite:
                 "total_experiments": len(all_experiments),
                 "cvae_experiments": len(self.cvae_experiments),
                 "causal_experiments": len(self.causal_experiments),
-                "created_date": pd.Timestamp.now().isoformat()
+                "created_date": pd.Timestamp.now().isoformat(),
             },
             "experiments": [
                 {
@@ -599,14 +560,14 @@ class ExpandedExperimentSuite:
                     "market_inefficiency": exp.market_inefficiency,
                     "implementation_complexity": exp.implementation_complexity,
                     "data_requirements": exp.data_requirements,
-                    "success_metrics": exp.success_metrics
+                    "success_metrics": exp.success_metrics,
                 }
                 for exp in all_experiments
-            ]
+            ],
         }
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(export_data, f, indent=2)
 
         logger.info(f"Exported {len(all_experiments)} experiments to {output_path}")
@@ -618,8 +579,7 @@ def main():
     """Generate and export experiment suite"""
 
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     suite = ExpandedExperimentSuite()
@@ -629,9 +589,9 @@ def main():
     export_data = suite.export_to_json(output_path)
 
     # Summary statistics
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXPANDED EXPERIMENT SUITE - 40 Total Experiments")
-    print("="*80)
+    print("=" * 80)
 
     print(f"\n📊 Total Experiments: {export_data['metadata']['total_experiments']}")
     print(f"   - cVAE Experiments: {export_data['metadata']['cvae_experiments']}")
@@ -640,9 +600,9 @@ def main():
     # ROI Impact Distribution
     all_exps = suite.get_all_experiments()
 
-    roi_high = sum(1 for e in all_exps if e.expected_roi_impact == 'high')
-    roi_medium = sum(1 for e in all_exps if e.expected_roi_impact == 'medium')
-    roi_low = sum(1 for e in all_exps if e.expected_roi_impact == 'low')
+    roi_high = sum(1 for e in all_exps if e.expected_roi_impact == "high")
+    roi_medium = sum(1 for e in all_exps if e.expected_roi_impact == "medium")
+    roi_low = sum(1 for e in all_exps if e.expected_roi_impact == "low")
 
     print("\n💰 Expected ROI Impact:")
     print(f"   - High:   {roi_high} experiments ({roi_high/40*100:.0f}%)")
@@ -650,9 +610,9 @@ def main():
     print(f"   - Low:    {roi_low} experiments ({roi_low/40*100:.0f}%)")
 
     # Market Inefficiency Distribution
-    ineff_high = sum(1 for e in all_exps if e.market_inefficiency == 'high')
-    ineff_medium = sum(1 for e in all_exps if e.market_inefficiency == 'medium')
-    ineff_low = sum(1 for e in all_exps if e.market_inefficiency == 'low')
+    ineff_high = sum(1 for e in all_exps if e.market_inefficiency == "high")
+    ineff_medium = sum(1 for e in all_exps if e.market_inefficiency == "medium")
+    ineff_low = sum(1 for e in all_exps if e.market_inefficiency == "low")
 
     print("\n🎯 Market Inefficiency:")
     print(f"   - High:   {ineff_high} experiments ({ineff_high/40*100:.0f}%)")
@@ -660,9 +620,9 @@ def main():
     print(f"   - Low:    {ineff_low} experiments ({ineff_low/40*100:.0f}%)")
 
     # Implementation Complexity
-    complex_low = sum(1 for e in all_exps if e.implementation_complexity == 'low')
-    complex_medium = sum(1 for e in all_exps if e.implementation_complexity == 'medium')
-    complex_high = sum(1 for e in all_exps if e.implementation_complexity == 'high')
+    complex_low = sum(1 for e in all_exps if e.implementation_complexity == "low")
+    complex_medium = sum(1 for e in all_exps if e.implementation_complexity == "medium")
+    complex_high = sum(1 for e in all_exps if e.implementation_complexity == "high")
 
     print("\n⚙️  Implementation Complexity:")
     print(f"   - Low:    {complex_low} experiments ({complex_low/40*100:.0f}%)")
@@ -671,10 +631,11 @@ def main():
 
     # Top candidates (high ROI + high inefficiency + low complexity)
     top_candidates = [
-        e for e in all_exps
-        if e.expected_roi_impact == 'high'
-        and e.market_inefficiency == 'high'
-        and e.implementation_complexity in ['low', 'medium']
+        e
+        for e in all_exps
+        if e.expected_roi_impact == "high"
+        and e.market_inefficiency == "high"
+        and e.implementation_complexity in ["low", "medium"]
     ]
 
     print("\n🏆 Prime Candidates (High ROI + High Inefficiency + Feasible):")
@@ -683,7 +644,7 @@ def main():
         print(f"   - {exp.id}: {exp.name}")
 
     print(f"\n✅ Exported to: {output_path}")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

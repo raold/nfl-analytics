@@ -346,8 +346,7 @@ def test_error_handling_corrupt_rds():
 @pytest.mark.critical
 @pytest.mark.slow  # ~5 minutes
 @pytest.mark.skipif(
-    not psutil.LINUX and not psutil.MACOS,
-    reason="Memory profiling only on Linux/macOS"
+    not psutil.LINUX and not psutil.MACOS, reason="Memory profiling only on Linux/macOS"
 )
 def test_memory_leak_detection(r_interface, sample_game_data):
     """

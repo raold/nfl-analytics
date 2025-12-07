@@ -42,8 +42,7 @@ from py.calibration.temperature_scaling import TemperatureScaler
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -62,7 +61,7 @@ def load_v5_predictions() -> pd.DataFrame:
     v5_files = [
         "ensemble_4way_backtest_2022_2024_FIXED.csv",
         "ensemble_4way_backtest_2022_2024.csv",
-        "ensemble_5way_backtest_2022_2024.csv"
+        "ensemble_5way_backtest_2022_2024.csv",
     ]
 
     for filename in v5_files:
@@ -75,8 +74,7 @@ def load_v5_predictions() -> pd.DataFrame:
             return df
 
     raise FileNotFoundError(
-        f"No v5 ensemble predictions found in {results_dir}. "
-        f"Expected one of: {v5_files}"
+        f"No v5 ensemble predictions found in {results_dir}. " f"Expected one of: {v5_files}"
     )
 
 
@@ -94,10 +92,10 @@ def prepare_calibration_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Map columns to expected names
     column_mapping = {
-        'ensemble_mean': 'pred_mean',
-        'ensemble_std': 'pred_std',
-        'actual_yards': 'actual',
-        'passing_yards': 'actual'
+        "ensemble_mean": "pred_mean",
+        "ensemble_std": "pred_std",
+        "actual_yards": "actual",
+        "passing_yards": "actual",
     }
 
     # Find the right columns
@@ -106,18 +104,15 @@ def prepare_calibration_data(df: pd.DataFrame) -> pd.DataFrame:
             df = df.rename(columns={old_col: new_col})
 
     # Validate required columns
-    required = ['pred_mean', 'pred_std', 'actual']
+    required = ["pred_mean", "pred_std", "actual"]
     missing = [col for col in required if col not in df.columns]
     if missing:
-        raise ValueError(
-            f"Missing required columns: {missing}. "
-            f"Available: {list(df.columns)}"
-        )
+        raise ValueError(f"Missing required columns: {missing}. " f"Available: {list(df.columns)}")
 
     # Filter out invalid predictions
     calib_df = df[required].copy()
     calib_df = calib_df.dropna()
-    calib_df = calib_df[calib_df['pred_std'] > 0]  # Remove zero-variance predictions
+    calib_df = calib_df[calib_df["pred_std"] > 0]  # Remove zero-variance predictions
 
     logger.info(f"Calibration data prepared: {len(calib_df)} valid samples")
     logger.info(f"  Mean actual: {calib_df['actual'].mean():.1f} yards")
@@ -142,7 +137,7 @@ def train_temperature_scaler(calib_df: pd.DataFrame):
     logger.info("=" * 80)
 
     # Initialize temperature scaler
-    scaler = TemperatureScaler(target_coverage=0.90, method='brentq')
+    scaler = TemperatureScaler(target_coverage=0.90, method="brentq")
 
     # Fit temperature scaler
     optimal_T = scaler.fit(calib_df)
@@ -165,7 +160,7 @@ def train_temperature_scaler(calib_df: pd.DataFrame):
     logger.info(f"Samples: {report['n_samples']}")
 
     # Validate calibration achieved target
-    coverage_error = abs(report['coverage_after'] - report['target_coverage'])
+    coverage_error = abs(report["coverage_after"] - report["target_coverage"])
     if coverage_error > 0.02:  # 2% tolerance
         logger.warning(f"⚠️  Large coverage error: {coverage_error:.1%}")
     else:
@@ -197,33 +192,33 @@ def save_temperature_scaler(scaler: TemperatureScaler, report: dict):
 
     # Save metadata (JSON format)
     metadata = {
-        'version': 'v6.0_production',
-        'training_date': datetime.now().isoformat(),
-        'training_method': 'fast_v5_proxy',
-        'training_seasons': '2022-2024',
-        'ensemble_version': 'v6.0',
-        'ensemble_weights': {
-            'state_space_v2': 0.27,
-            'hierarchical_v2': 0.27,
-            'xgboost_v4_ridge': 0.23,
-            'informative_priors_v2': 0.13,
-            'hybrid_static_incremental': 0.10
+        "version": "v6.0_production",
+        "training_date": datetime.now().isoformat(),
+        "training_method": "fast_v5_proxy",
+        "training_seasons": "2022-2024",
+        "ensemble_version": "v6.0",
+        "ensemble_weights": {
+            "state_space_v2": 0.27,
+            "hierarchical_v2": 0.27,
+            "xgboost_v4_ridge": 0.23,
+            "informative_priors_v2": 0.13,
+            "hybrid_static_incremental": 0.10,
         },
-        'temperature': float(report['temperature']),
-        'target_coverage': float(report['target_coverage']),
-        'coverage_before': float(report['coverage_before']),
-        'coverage_after': float(report['coverage_after']),
-        'width_before': float(report['width_before']),
-        'width_after': float(report['width_after']),
-        'mae': float(report['mae']),
-        'n_samples': int(report['n_samples']),
-        'improvement_pct': float((report['coverage_after'] - report['coverage_before']) * 100),
-        'width_reduction_pct': float((1 - report['width_after'] / report['width_before']) * 100),
-        'notes': 'Trained on v5 ensemble predictions as proxy for v6 (similar composition)'
+        "temperature": float(report["temperature"]),
+        "target_coverage": float(report["target_coverage"]),
+        "coverage_before": float(report["coverage_before"]),
+        "coverage_after": float(report["coverage_after"]),
+        "width_before": float(report["width_before"]),
+        "width_after": float(report["width_after"]),
+        "mae": float(report["mae"]),
+        "n_samples": int(report["n_samples"]),
+        "improvement_pct": float((report["coverage_after"] - report["coverage_before"]) * 100),
+        "width_reduction_pct": float((1 - report["width_after"] / report["width_before"]) * 100),
+        "notes": "Trained on v5 ensemble predictions as proxy for v6 (similar composition)",
     }
 
     metadata_path = output_dir / "temperature_scaler_v6_metadata.json"
-    with open(metadata_path, 'w') as f:
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info(f"✅ Metadata saved to {metadata_path}")
@@ -233,13 +228,15 @@ def save_temperature_scaler(scaler: TemperatureScaler, report: dict):
     logger.info("TEMPERATURE SCALER v6.0 TRAINING COMPLETE")
     logger.info("=" * 80)
     logger.info(f"Optimal Temperature: T = {metadata['temperature']:.4f}")
-    logger.info(f"Coverage Improvement: {metadata['coverage_before']:.1%} → {metadata['coverage_after']:.1%}")
+    logger.info(
+        f"Coverage Improvement: {metadata['coverage_before']:.1%} → {metadata['coverage_after']:.1%}"
+    )
     logger.info(f"Interval Width Reduction: {metadata['width_reduction_pct']:.1f}%")
     logger.info(f"Target Coverage: {metadata['target_coverage']:.1%}")
 
     # Validate calibration
-    coverage_ok = 0.88 <= metadata['coverage_after'] <= 0.92
-    status = '✅ PASS' if coverage_ok else '❌ FAIL'
+    coverage_ok = 0.88 <= metadata["coverage_after"] <= 0.92
+    status = "✅ PASS" if coverage_ok else "❌ FAIL"
     logger.info(f"Calibration Status: {status}")
 
     if not coverage_ok:
@@ -274,6 +271,7 @@ def main():
     except Exception as e:
         logger.error(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

@@ -22,12 +22,12 @@ def test_predictions():
     test_cases = [
         ("00-0034857", 2022, 1, 292),  # J.Allen vs LA (actual: 292)
         ("00-0026498", 2022, 1, 191),  # M.Stafford vs BUF (actual: 191)
-        ("00-0033873", 2022, 21, 315), # P.Mahomes vs CIN (actual: 315)
+        ("00-0033873", 2022, 21, 315),  # P.Mahomes vs CIN (actual: 315)
     ]
 
-    print("="*80)
+    print("=" * 80)
     print("STATE-SPACE PREDICTION FIX TEST")
-    print("="*80)
+    print("=" * 80)
     print()
 
     all_pass = True
@@ -35,7 +35,7 @@ def test_predictions():
     for player_id, season, week, actual_yards in test_cases:
         result = ensemble.predict(player_id, season, week, return_individual=True)
 
-        state_space_pred = result['predictions'].get('state_space_v2')
+        state_space_pred = result["predictions"].get("state_space_v2")
 
         if state_space_pred is None:
             print(f"❌ FAIL: No state-space prediction for {player_id} W{week} {season}")
@@ -59,14 +59,15 @@ def test_predictions():
             print(f"   Error: {error:.1f} yards")
         print()
 
-    print("="*80)
+    print("=" * 80)
     if all_pass:
         print("✅ ALL TESTS PASSED - State-space predictions are reasonable")
     else:
         print("❌ SOME TESTS FAILED - Check predictions above")
-    print("="*80)
+    print("=" * 80)
 
     return 0 if all_pass else 1
+
 
 if __name__ == "__main__":
     exit(test_predictions())

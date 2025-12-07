@@ -23,7 +23,6 @@ def test_generate_methods_section_basic():
     assert result is not None
 
 
-
 def test_generate_methods_section_edge_cases():
     """Test generate_methods_section: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_generate_methods_section_edge_cases():
     assert result is not None
 
 
-
 def test_generate_methods_section_error_handling():
     """Test generate_methods_section error handling."""
     with pytest.raises(ValueError):
         generate_methods_section(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_generate_methods_section_property_idempotent(self, analysis_log, study_
 
     # Assert property
     assert generate_methods_section(analysis_log, study_config) == result, "idempotent violated"
-
 
 
 def test_test_basic():
@@ -67,7 +63,6 @@ def test_test_basic():
     assert result is not None
 
 
-
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_test_edge_cases():
     assert result is not None
 
 
-
 def test_test_error_handling():
     """Test test error handling."""
     with pytest.raises(ValueError):
         test(invalid_input)
-
 
 
 def test_document_analysis_basic():
@@ -100,7 +93,6 @@ def test_document_analysis_basic():
     assert result is not None
 
 
-
 def test_document_analysis_edge_cases():
     """Test document_analysis: edge cases."""
     # Arrange
@@ -113,23 +105,24 @@ def test_document_analysis_edge_cases():
     assert result is not None
 
 
-
 def test_document_analysis_error_handling():
     """Test document_analysis error handling."""
     with pytest.raises(ValueError):
         document_analysis(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_document_analysis_property_idempotent(self, self, methods_used, study_config, data_description):
+def test_document_analysis_property_idempotent(
+    self, self, methods_used, study_config, data_description
+):
     """Property test: function is idempotent."""
     # Act
     result = document_analysis(self, methods_used, study_config, data_description)
 
     # Assert property
-    assert document_analysis(self, methods_used, study_config, data_description) == result, "idempotent violated"
-
+    assert (
+        document_analysis(self, methods_used, study_config, data_description) == result
+    ), "idempotent violated"
 
 
 def test_generate_methods_section_basic():
@@ -144,7 +137,6 @@ def test_generate_methods_section_basic():
     assert result is not None
 
 
-
 def test_generate_methods_section_edge_cases():
     """Test generate_methods_section: edge cases."""
     # Arrange
@@ -157,12 +149,10 @@ def test_generate_methods_section_edge_cases():
     assert result is not None
 
 
-
 def test_generate_methods_section_error_handling():
     """Test generate_methods_section error handling."""
     with pytest.raises(ValueError):
         generate_methods_section(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +163,6 @@ def test_generate_methods_section_property_idempotent(self, self, doc):
 
     # Assert property
     assert generate_methods_section(self, doc) == result, "idempotent violated"
-
 
 
 def test_generate_citation_list_basic():
@@ -188,7 +177,6 @@ def test_generate_citation_list_basic():
     assert result is not None
 
 
-
 def test_generate_citation_list_edge_cases():
     """Test generate_citation_list: edge cases."""
     # Arrange
@@ -201,12 +189,10 @@ def test_generate_citation_list_edge_cases():
     assert result is not None
 
 
-
 def test_generate_citation_list_error_handling():
     """Test generate_citation_list error handling."""
     with pytest.raises(ValueError):
         generate_citation_list(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +203,6 @@ def test_generate_citation_list_property_idempotent(self, self, doc):
 
     # Assert property
     assert generate_citation_list(self, doc) == result, "idempotent violated"
-
 
 
 def test_export_to_file_basic():
@@ -232,7 +217,6 @@ def test_export_to_file_basic():
     assert result is not None
 
 
-
 def test_export_to_file_edge_cases():
     """Test export_to_file: edge cases."""
     # Arrange
@@ -245,12 +229,10 @@ def test_export_to_file_edge_cases():
     assert result is not None
 
 
-
 def test_export_to_file_error_handling():
     """Test export_to_file error handling."""
     with pytest.raises(ValueError):
         export_to_file(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.text(min_size=1, max_size=100), st.integers())
@@ -261,4 +243,3 @@ def test_export_to_file_property_idempotent(self, self, doc, filename, format):
 
     # Assert property
     assert export_to_file(self, doc, filename, format) == result, "idempotent violated"
-

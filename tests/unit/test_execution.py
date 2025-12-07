@@ -23,7 +23,6 @@ def test_simulate_order_basic():
     assert result is not None
 
 
-
 def test_simulate_order_edge_cases():
     """Test simulate_order: edge cases."""
     # Arrange
@@ -36,20 +35,30 @@ def test_simulate_order_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_order_error_handling():
     """Test simulate_order error handling."""
     with pytest.raises(ValueError):
         simulate_order(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
-def test_simulate_order_property_idempotent(self, self, book, market, tau_min, q_req, quoted_price, velocity, side):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+)
+def test_simulate_order_property_idempotent(
+    self, self, book, market, tau_min, q_req, quoted_price, velocity, side
+):
     """Property test: function is idempotent."""
     # Act
     result = simulate_order(self, book, market, tau_min, q_req, quoted_price, velocity, side)
 
     # Assert property
-    assert simulate_order(self, book, market, tau_min, q_req, quoted_price, velocity, side) == result, "idempotent violated"
-
+    assert (
+        simulate_order(self, book, market, tau_min, q_req, quoted_price, velocity, side) == result
+    ), "idempotent violated"

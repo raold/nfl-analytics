@@ -23,7 +23,6 @@ def test_load_metrics_basic():
     assert result is not None
 
 
-
 def test_load_metrics_edge_cases():
     """Test load_metrics: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_load_metrics_error_handling():
     """Test load_metrics error handling."""
     with pytest.raises(ValueError):
         load_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_load_metrics_property_idempotent(self, model_dir, metrics_file):
 
     # Assert property
     assert load_metrics(model_dir, metrics_file) == result, "idempotent violated"
-
 
 
 def test_calculate_improvement_basic():
@@ -67,7 +63,6 @@ def test_calculate_improvement_basic():
     assert result is not None
 
 
-
 def test_calculate_improvement_edge_cases():
     """Test calculate_improvement: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_calculate_improvement_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_improvement_error_handling():
     """Test calculate_improvement error handling."""
     with pytest.raises(ValueError):
         calculate_improvement(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_calculate_improvement_property_idempotent(self, baseline, improved):
 
     # Assert property
     assert calculate_improvement(baseline, improved) == result, "idempotent violated"
-
 
 
 def test_mcnemar_test_basic():
@@ -111,7 +103,6 @@ def test_mcnemar_test_basic():
     assert result is not None
 
 
-
 def test_mcnemar_test_edge_cases():
     """Test mcnemar_test: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_mcnemar_test_edge_cases():
     assert result is not None
 
 
-
 def test_mcnemar_test_error_handling():
     """Test mcnemar_test error handling."""
     with pytest.raises(ValueError):
         mcnemar_test(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_mcnemar_test_property_idempotent(self, predictions_a, predictions_b, ac
 
     # Assert property
     assert mcnemar_test(predictions_a, predictions_b, actuals) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -155,7 +143,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -168,9 +155,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

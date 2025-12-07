@@ -23,7 +23,6 @@ def test_to_dict_basic():
     assert result is not None
 
 
-
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_to_dict_edge_cases():
     assert result is not None
 
 
-
 def test_to_dict_error_handling():
     """Test to_dict error handling."""
     with pytest.raises(ValueError):
         to_dict(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_to_dict_property_idempotent(val):
 
     # Assert property
     assert to_dict(val) == result, "idempotent violated"
-
 
 
 def test_summary_basic():
@@ -67,7 +63,6 @@ def test_summary_basic():
     assert result is not None
 
 
-
 def test_summary_edge_cases():
     """Test summary: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_summary_edge_cases():
     assert result is not None
 
 
-
 def test_summary_error_handling():
     """Test summary error handling."""
     with pytest.raises(ValueError):
         summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_summary_property_idempotent(val):
 
     # Assert property
     assert summary(val) == result, "idempotent violated"
-
 
 
 def test_compute_coverage_basic():
@@ -111,7 +103,6 @@ def test_compute_coverage_basic():
     assert result is not None
 
 
-
 def test_compute_coverage_edge_cases():
     """Test compute_coverage: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_compute_coverage_edge_cases():
     assert result is not None
 
 
-
 def test_compute_coverage_error_handling():
     """Test compute_coverage error handling."""
     with pytest.raises(ValueError):
         compute_coverage(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_compute_coverage_property_idempotent(self, y_true, q_lower, q_upper):
 
     # Assert property
     assert compute_coverage(y_true, q_lower, q_upper) == result, "idempotent violated"
-
 
 
 def test_compute_sharpness_basic():
@@ -155,7 +143,6 @@ def test_compute_sharpness_basic():
     assert result is not None
 
 
-
 def test_compute_sharpness_edge_cases():
     """Test compute_sharpness: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_compute_sharpness_edge_cases():
     assert result is not None
 
 
-
 def test_compute_sharpness_error_handling():
     """Test compute_sharpness error handling."""
     with pytest.raises(ValueError):
         compute_sharpness(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_compute_sharpness_property_idempotent(self, q_lower, q_upper):
 
     # Assert property
     assert compute_sharpness(q_lower, q_upper) == result, "idempotent violated"
-
 
 
 def test_compute_calibration_error_basic():
@@ -199,7 +183,6 @@ def test_compute_calibration_error_basic():
     assert result is not None
 
 
-
 def test_compute_calibration_error_edge_cases():
     """Test compute_calibration_error: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_compute_calibration_error_edge_cases():
     assert result is not None
 
 
-
 def test_compute_calibration_error_error_handling():
     """Test compute_calibration_error error handling."""
     with pytest.raises(ValueError):
         compute_calibration_error(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -228,7 +209,6 @@ def test_compute_calibration_error_property_idempotent(self, y_true, predictions
 
     # Assert property
     assert compute_calibration_error(y_true, predictions, n_bins) == result, "idempotent violated"
-
 
 
 def test_compute_crps_basic():
@@ -243,7 +223,6 @@ def test_compute_crps_basic():
     assert result is not None
 
 
-
 def test_compute_crps_edge_cases():
     """Test compute_crps: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_compute_crps_edge_cases():
     assert result is not None
 
 
-
 def test_compute_crps_error_handling():
     """Test compute_crps error handling."""
     with pytest.raises(ValueError):
         compute_crps(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -272,7 +249,6 @@ def test_compute_crps_property_idempotent(self, y_true, predictions):
 
     # Assert property
     assert compute_crps(y_true, predictions) == result, "idempotent violated"
-
 
 
 def test_evaluate_basic():
@@ -287,7 +263,6 @@ def test_evaluate_basic():
     assert result is not None
 
 
-
 def test_evaluate_edge_cases():
     """Test evaluate: edge cases."""
     # Arrange
@@ -300,12 +275,10 @@ def test_evaluate_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_error_handling():
     """Test evaluate error handling."""
     with pytest.raises(ValueError):
         evaluate(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -316,7 +289,6 @@ def test_evaluate_property_idempotent(self, y_true, predictions):
 
     # Assert property
     assert evaluate(y_true, predictions) == result, "idempotent violated"
-
 
 
 def test_log_experiment_basic():
@@ -331,7 +303,6 @@ def test_log_experiment_basic():
     assert result is not None
 
 
-
 def test_log_experiment_edge_cases():
     """Test log_experiment: edge cases."""
     # Arrange
@@ -344,23 +315,24 @@ def test_log_experiment_edge_cases():
     assert result is not None
 
 
-
 def test_log_experiment_error_handling():
     """Test log_experiment error handling."""
     with pytest.raises(ValueError):
         log_experiment(invalid_input)
 
 
-
-@given(st.integers(), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers())
+@given(
+    st.integers(), st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers()
+)
 def test_log_experiment_property_idempotent(self, self, experiment_name, config, metrics, notes):
     """Property test: function is idempotent."""
     # Act
     result = log_experiment(self, experiment_name, config, metrics, notes)
 
     # Assert property
-    assert log_experiment(self, experiment_name, config, metrics, notes) == result, "idempotent violated"
-
+    assert (
+        log_experiment(self, experiment_name, config, metrics, notes) == result
+    ), "idempotent violated"
 
 
 def test_compare_experiments_basic():
@@ -375,7 +347,6 @@ def test_compare_experiments_basic():
     assert result is not None
 
 
-
 def test_compare_experiments_edge_cases():
     """Test compare_experiments: edge cases."""
     # Arrange
@@ -388,12 +359,10 @@ def test_compare_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_compare_experiments_error_handling():
     """Test compare_experiments error handling."""
     with pytest.raises(ValueError):
         compare_experiments(invalid_input)
-
 
 
 @given(st.integers())
@@ -404,7 +373,6 @@ def test_compare_experiments_property_idempotent(val):
 
     # Assert property
     assert compare_experiments(val) == result, "idempotent violated"
-
 
 
 def test_save_summary_basic():
@@ -419,7 +387,6 @@ def test_save_summary_basic():
     assert result is not None
 
 
-
 def test_save_summary_edge_cases():
     """Test save_summary: edge cases."""
     # Arrange
@@ -432,12 +399,10 @@ def test_save_summary_edge_cases():
     assert result is not None
 
 
-
 def test_save_summary_error_handling():
     """Test save_summary error handling."""
     with pytest.raises(ValueError):
         save_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -448,4 +413,3 @@ def test_save_summary_property_idempotent(val):
 
     # Assert property
     assert save_summary(val) == result, "idempotent violated"
-

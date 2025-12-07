@@ -88,6 +88,7 @@ from scipy.stats import norm
 # Note: arviz not in requirements.txt yet - we'll handle gracefully
 try:
     import arviz as az
+
     ARVIZ_AVAILABLE = True
 except ImportError:
     ARVIZ_AVAILABLE = False
@@ -97,21 +98,21 @@ except ImportError:
     )
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 @dataclass
 class LOOResult:
     """Leave-one-out cross-validation result for a single model."""
+
     model_name: str
     elpd_loo: float  # Expected log pointwise predictive density
-    p_loo: float      # Effective number of parameters
-    se_elpd: float    # Standard error
+    p_loo: float  # Effective number of parameters
+    se_elpd: float  # Standard error
     pareto_k_max: float  # Maximum Pareto k (diagnostic)
     pareto_k_good_pct: float  # % with k < 0.7 (should be >95%)
     log_likelihoods: np.ndarray  # Per-observation log-likelihoods
@@ -120,17 +121,19 @@ class LOOResult:
 @dataclass
 class StackingResult:
     """Result from Bayesian stacking optimization."""
+
     weights: dict[str, float]
     elpd_loo_stacking: float  # LOO performance with stacking
-    elpd_loo_equal: float     # LOO performance with equal weights
-    improvement: float         # elpd_loo_stacking - elpd_loo_equal
-    status: str                # "SUCCESS" or "FAILED"
+    elpd_loo_equal: float  # LOO performance with equal weights
+    improvement: float  # elpd_loo_stacking - elpd_loo_equal
+    status: str  # "SUCCESS" or "FAILED"
     optimization_time_sec: float
 
 
 @dataclass
 class BacktestResult:
     """Backtest comparison result."""
+
     period: tuple[int, int]
     n_games: int
     heuristic_mae: float
@@ -354,11 +357,7 @@ class BayesianStacker:
         self.models = self.loader.load_all()
 
     def _compute_log_likelihood(
-        self,
-        model_name: str,
-        y_true: np.ndarray,
-        y_pred_mean: np.ndarray,
-        y_pred_std: np.ndarray
+        self, model_name: str, y_true: np.ndarray, y_pred_mean: np.ndarray, y_pred_std: np.ndarray
     ) -> np.ndarray:
         """
         Compute per-observation log-likelihoods assuming Gaussian predictive density.
@@ -382,9 +381,7 @@ class BayesianStacker:
         return log_lik
 
     def compute_loo_cv(
-        self,
-        validation_data: pd.DataFrame,
-        save_results: bool = True
+        self, validation_data: pd.DataFrame, save_results: bool = True
     ) -> dict[str, LOOResult]:
         """
         Compute PSIS-LOO cross-validation for each model.
@@ -445,7 +442,7 @@ class BayesianStacker:
                 se_elpd=se_elpd,
                 pareto_k_max=pareto_k_max,
                 pareto_k_good_pct=pareto_k_good_pct,
-                log_likelihoods=log_lik
+                log_likelihoods=log_lik,
             )
 
             logger.info(f"   ELPD_loo: {elpd_loo:.2f} ± {se_elpd:.2f}")
@@ -480,9 +477,7 @@ class BayesianStacker:
         logger.info(f"💾 LOO results saved: {output_path}")
 
     def optimize_weights(
-        self,
-        loo_results: dict[str, LOOResult],
-        method: str = "stacking"
+        self, loo_results: dict[str, LOOResult], method: str = "stacking"
     ) -> StackingResult:
         """
         Optimize ensemble weights using Bayesian stacking.
@@ -541,7 +536,7 @@ class BayesianStacker:
             method="SLSQP",
             bounds=bounds,
             constraints=constraints,
-            options={"maxiter": 1000, "ftol": 1e-9}
+            options={"maxiter": 1000, "ftol": 1e-9},
         )
 
         if not result.success:
@@ -552,7 +547,7 @@ class BayesianStacker:
                 elpd_loo_equal=-np.inf,
                 improvement=0.0,
                 status="FAILED",
-                optimization_time_sec=time.time() - start_time
+                optimization_time_sec=time.time() - start_time,
             )
 
         # Optimal weights
@@ -583,13 +578,11 @@ class BayesianStacker:
             elpd_loo_equal=elpd_loo_equal,
             improvement=improvement,
             status="SUCCESS",
-            optimization_time_sec=time.time() - start_time
+            optimization_time_sec=time.time() - start_time,
         )
 
     def predict_stacked(
-        self,
-        predictions: dict[str, tuple[float, float]],
-        weights: dict[str, float]
+        self, predictions: dict[str, tuple[float, float]], weights: dict[str, float]
     ) -> tuple[float, float]:
         """
         Generate stacked prediction using optimized weights.
@@ -626,7 +619,7 @@ class BayesianStacker:
         ensemble_mean = np.sum(active_weights * means)
 
         # Variance pooling (within + between model variance)
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
         ensemble_std = np.sqrt(ensemble_var)
@@ -638,7 +631,7 @@ class BayesianStacker:
         validation_period: tuple[int, int] = (2022, 2023),
         holdout_period: tuple[int, int] = (2024, 2024),
         stacking_weights: dict[str, float] | None = None,
-        edge_threshold: float = 0.02
+        edge_threshold: float = 0.02,
     ) -> BacktestResult:
         """
         Backtest stacking weights vs. heuristic weights.
@@ -690,7 +683,7 @@ class BayesianStacker:
             stacking_sharpe=2.41,
             p_value_diebold_mariano=0.032,
             improvement_mae=-0.89,
-            improvement_roi=0.7
+            improvement_roi=0.7,
         )
 
     def generate_report(
@@ -698,7 +691,7 @@ class BayesianStacker:
         loo_results: dict[str, LOOResult],
         stacking_result: StackingResult,
         backtest_result: BacktestResult | None = None,
-        output_path: str | None = None
+        output_path: str | None = None,
     ) -> str:
         """
         Generate comprehensive markdown report.
@@ -723,7 +716,7 @@ class BayesianStacker:
             "## 1. Leave-One-Out Cross-Validation Results",
             "",
             "| Model | ELPD_loo | SE | p_loo | Pareto k |",
-            "|-------|----------|-----|-------|----------|"
+            "|-------|----------|-----|-------|----------|",
         ]
 
         for model_name, result in sorted(loo_results.items(), key=lambda x: -x[1].elpd_loo):
@@ -732,21 +725,23 @@ class BayesianStacker:
                 f"{result.p_loo:.2f} | {result.pareto_k_max:.3f} |"
             )
 
-        lines.extend([
-            "",
-            "**Interpretation:**",
-            "- ELPD_loo: Higher is better (expected log predictive density)",
-            "- Pareto k < 0.7: Good (>95% observations should have k < 0.7)",
-            "",
-            "---",
-            "",
-            "## 2. Stacking Weight Optimization",
-            "",
-            "### Optimal Weights",
-            "",
-            "| Model | Heuristic | Stacking | Change |",
-            "|-------|-----------|----------|--------|"
-        ])
+        lines.extend(
+            [
+                "",
+                "**Interpretation:**",
+                "- ELPD_loo: Higher is better (expected log predictive density)",
+                "- Pareto k < 0.7: Good (>95% observations should have k < 0.7)",
+                "",
+                "---",
+                "",
+                "## 2. Stacking Weight Optimization",
+                "",
+                "### Optimal Weights",
+                "",
+                "| Model | Heuristic | Stacking | Change |",
+                "|-------|-----------|----------|--------|",
+            ]
+        )
 
         for model_name in sorted(stacking_result.weights.keys()):
             heuristic_w = self.heuristic_weights.get(model_name, 0.0)
@@ -759,104 +754,116 @@ class BayesianStacker:
                 f"{change:+.3f} ({change*100:+.1f} pp) |"
             )
 
-        lines.extend([
-            "",
-            "### Optimization Summary",
-            "",
-            f"- **Status:** {stacking_result.status}",
-            f"- **ELPD_loo (stacking):** {stacking_result.elpd_loo_stacking:.2f}",
-            f"- **ELPD_loo (equal weights):** {stacking_result.elpd_loo_equal:.2f}",
-            f"- **Improvement:** {stacking_result.improvement:.2f}",
-            f"- **Optimization time:** {stacking_result.optimization_time_sec:.2f}s",
-            "",
-            "---",
-            ""
-        ])
-
-        if backtest_result:
-            lines.extend([
-                "## 3. Backtest Performance Comparison",
+        lines.extend(
+            [
                 "",
-                f"**Period:** {backtest_result.period[0]}-{backtest_result.period[1]}",
-                f"**Games:** {backtest_result.n_games:,}",
+                "### Optimization Summary",
                 "",
-                "| Metric | Heuristic | Stacking | Improvement |",
-                "|--------|-----------|----------|-------------|",
-                f"| MAE (yards) | {backtest_result.heuristic_mae:.2f} | "
-                f"{backtest_result.stacking_mae:.2f} | "
-                f"{backtest_result.improvement_mae:.2f} |",
-                f"| RMSE (yards) | {backtest_result.heuristic_rmse:.2f} | "
-                f"{backtest_result.stacking_rmse:.2f} | "
-                f"{backtest_result.stacking_rmse - backtest_result.heuristic_rmse:.2f} |",
-                f"| ROI (%) | {backtest_result.heuristic_roi:.2f}% | "
-                f"{backtest_result.stacking_roi:.2f}% | "
-                f"{backtest_result.improvement_roi:+.2f} pp |",
-                f"| Sharpe Ratio | {backtest_result.heuristic_sharpe:.2f} | "
-                f"{backtest_result.stacking_sharpe:.2f} | "
-                f"{backtest_result.stacking_sharpe - backtest_result.heuristic_sharpe:+.2f} |",
-                "",
-                "### Statistical Significance",
-                "",
-                f"- **Diebold-Mariano test p-value:** {backtest_result.p_value_diebold_mariano:.4f}",
-                f"- **Significant at α=0.05?** {'✅ YES' if backtest_result.p_value_diebold_mariano < 0.05 else '❌ NO'}",
+                f"- **Status:** {stacking_result.status}",
+                f"- **ELPD_loo (stacking):** {stacking_result.elpd_loo_stacking:.2f}",
+                f"- **ELPD_loo (equal weights):** {stacking_result.elpd_loo_equal:.2f}",
+                f"- **Improvement:** {stacking_result.improvement:.2f}",
+                f"- **Optimization time:** {stacking_result.optimization_time_sec:.2f}s",
                 "",
                 "---",
-                ""
-            ])
+                "",
+            ]
+        )
 
-        lines.extend([
-            "## 4. Recommendations",
-            "",
-            "### Production Deployment",
-            "",
-            f"**Status:** {'✅ APPROVED' if stacking_result.status == 'SUCCESS' else '❌ BLOCKED'}",
-            "",
-        ])
+        if backtest_result:
+            lines.extend(
+                [
+                    "## 3. Backtest Performance Comparison",
+                    "",
+                    f"**Period:** {backtest_result.period[0]}-{backtest_result.period[1]}",
+                    f"**Games:** {backtest_result.n_games:,}",
+                    "",
+                    "| Metric | Heuristic | Stacking | Improvement |",
+                    "|--------|-----------|----------|-------------|",
+                    f"| MAE (yards) | {backtest_result.heuristic_mae:.2f} | "
+                    f"{backtest_result.stacking_mae:.2f} | "
+                    f"{backtest_result.improvement_mae:.2f} |",
+                    f"| RMSE (yards) | {backtest_result.heuristic_rmse:.2f} | "
+                    f"{backtest_result.stacking_rmse:.2f} | "
+                    f"{backtest_result.stacking_rmse - backtest_result.heuristic_rmse:.2f} |",
+                    f"| ROI (%) | {backtest_result.heuristic_roi:.2f}% | "
+                    f"{backtest_result.stacking_roi:.2f}% | "
+                    f"{backtest_result.improvement_roi:+.2f} pp |",
+                    f"| Sharpe Ratio | {backtest_result.heuristic_sharpe:.2f} | "
+                    f"{backtest_result.stacking_sharpe:.2f} | "
+                    f"{backtest_result.stacking_sharpe - backtest_result.heuristic_sharpe:+.2f} |",
+                    "",
+                    "### Statistical Significance",
+                    "",
+                    f"- **Diebold-Mariano test p-value:** {backtest_result.p_value_diebold_mariano:.4f}",
+                    f"- **Significant at α=0.05?** {'✅ YES' if backtest_result.p_value_diebold_mariano < 0.05 else '❌ NO'}",
+                    "",
+                    "---",
+                    "",
+                ]
+            )
+
+        lines.extend(
+            [
+                "## 4. Recommendations",
+                "",
+                "### Production Deployment",
+                "",
+                f"**Status:** {'✅ APPROVED' if stacking_result.status == 'SUCCESS' else '❌ BLOCKED'}",
+                "",
+            ]
+        )
 
         if stacking_result.status == "SUCCESS":
-            lines.extend([
-                "**Next Steps:**",
-                "1. Update `MODEL_REGISTRY.yaml` with stacking weights",
-                "2. Deploy to staging environment for 2-week A/B test",
-                "3. Monitor live ROI, Sharpe, and risk gates",
-                "4. Promote to production if live metrics meet targets (ROI >5.5%, Sharpe >2.3)",
-                "",
-                "**Risk Gates:**",
-                "- Minimum ROI: 5.5% (target: 6.0%+)",
-                "- Minimum Sharpe: 2.3 (target: 2.4+)",
-                "- Maximum drawdown: -10% (target: -8%)",
-                "- Win rate: >60% (target: 61%+)",
-                "",
-            ])
+            lines.extend(
+                [
+                    "**Next Steps:**",
+                    "1. Update `MODEL_REGISTRY.yaml` with stacking weights",
+                    "2. Deploy to staging environment for 2-week A/B test",
+                    "3. Monitor live ROI, Sharpe, and risk gates",
+                    "4. Promote to production if live metrics meet targets (ROI >5.5%, Sharpe >2.3)",
+                    "",
+                    "**Risk Gates:**",
+                    "- Minimum ROI: 5.5% (target: 6.0%+)",
+                    "- Minimum Sharpe: 2.3 (target: 2.4+)",
+                    "- Maximum drawdown: -10% (target: -8%)",
+                    "- Win rate: >60% (target: 61%+)",
+                    "",
+                ]
+            )
         else:
-            lines.extend([
-                "**Blockers:**",
-                "- Weight optimization failed",
-                "- Investigate log-likelihood computation",
-                "- Verify model predictions are valid",
-                "",
-            ])
+            lines.extend(
+                [
+                    "**Blockers:**",
+                    "- Weight optimization failed",
+                    "- Investigate log-likelihood computation",
+                    "- Verify model predictions are valid",
+                    "",
+                ]
+            )
 
-        lines.extend([
-            "---",
-            "",
-            "## 5. References",
-            "",
-            "1. Yao et al. (2018). Using stacking to average Bayesian predictive distributions. "
-            "*Bayesian Analysis*, 13(3), 917-1007. https://doi.org/10.1214/17-BA1091",
-            "",
-            "2. Vehtari et al. (2017). Practical Bayesian model evaluation using LOO-CV. "
-            "*Statistics and Computing*, 27(5), 1413-1432.",
-            "",
-            "3. Kumar et al. (2019). ArviZ: Exploratory analysis of Bayesian models. "
-            "*JOSS*, 4(33), 1143. https://doi.org/10.21105/joss.01143",
-            "",
-            "---",
-            "",
-            "**Report generated by:** Bayesian Stacking v1.0",
-            "**Contact:** NFL Analytics Research Team",
-            ""
-        ])
+        lines.extend(
+            [
+                "---",
+                "",
+                "## 5. References",
+                "",
+                "1. Yao et al. (2018). Using stacking to average Bayesian predictive distributions. "
+                "*Bayesian Analysis*, 13(3), 917-1007. https://doi.org/10.1214/17-BA1091",
+                "",
+                "2. Vehtari et al. (2017). Practical Bayesian model evaluation using LOO-CV. "
+                "*Statistics and Computing*, 27(5), 1413-1432.",
+                "",
+                "3. Kumar et al. (2019). ArviZ: Exploratory analysis of Bayesian models. "
+                "*JOSS*, 4(33), 1143. https://doi.org/10.21105/joss.01143",
+                "",
+                "---",
+                "",
+                "**Report generated by:** Bayesian Stacking v1.0",
+                "**Contact:** NFL Analytics Research Team",
+                "",
+            ]
+        )
 
         report = "\n".join(lines)
 
@@ -908,7 +915,7 @@ class ValidationFramework:
         self,
         train_period: tuple[int, int] = (2018, 2021),
         validation_period: tuple[int, int] = (2022, 2023),
-        holdout_period: tuple[int, int] = (2024, 2024)
+        holdout_period: tuple[int, int] = (2024, 2024),
     ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Split data into train, validation, holdout sets.
@@ -947,26 +954,24 @@ class ValidationFramework:
         conn.close()
 
         # Split by season
-        train_df = df[
-            (df["season"] >= train_period[0]) & (df["season"] <= train_period[1])
-        ]
+        train_df = df[(df["season"] >= train_period[0]) & (df["season"] <= train_period[1])]
         validation_df = df[
             (df["season"] >= validation_period[0]) & (df["season"] <= validation_period[1])
         ]
-        holdout_df = df[
-            (df["season"] >= holdout_period[0]) & (df["season"] <= holdout_period[1])
-        ]
+        holdout_df = df[(df["season"] >= holdout_period[0]) & (df["season"] <= holdout_period[1])]
 
         logger.info(f"✅ Train: {len(train_df):,} games ({train_period[0]}-{train_period[1]})")
-        logger.info(f"✅ Validation: {len(validation_df):,} games ({validation_period[0]}-{validation_period[1]})")
-        logger.info(f"✅ Holdout: {len(holdout_df):,} games ({holdout_period[0]}-{holdout_period[1]})")
+        logger.info(
+            f"✅ Validation: {len(validation_df):,} games ({validation_period[0]}-{validation_period[1]})"
+        )
+        logger.info(
+            f"✅ Holdout: {len(holdout_df):,} games ({holdout_period[0]}-{holdout_period[1]})"
+        )
 
         return train_df, validation_df, holdout_df
 
     def statistical_tests(
-        self,
-        errors_heuristic: np.ndarray,
-        errors_stacking: np.ndarray
+        self, errors_heuristic: np.ndarray, errors_stacking: np.ndarray
     ) -> dict[str, float]:
         """
         Run statistical tests comparing heuristic vs. stacking.
@@ -986,8 +991,8 @@ class ValidationFramework:
 
         # Loss differential: d_i = loss_heuristic_i - loss_stacking_i
         # Positive d_i means stacking is better
-        loss_heuristic = errors_heuristic ** 2  # Squared error
-        loss_stacking = errors_stacking ** 2
+        loss_heuristic = errors_heuristic**2  # Squared error
+        loss_stacking = errors_stacking**2
         d = loss_heuristic - loss_stacking
 
         # t-test on loss differential
@@ -1008,7 +1013,7 @@ class ValidationFramework:
             "se_loss_differential": se_d,
             "t_statistic": t_stat,
             "p_value": p_value,
-            "significant_at_05": p_value < 0.05
+            "significant_at_05": p_value < 0.05,
         }
 
 
@@ -1023,18 +1028,16 @@ def main():
         "--mode",
         choices=["optimize", "backtest", "report"],
         default="optimize",
-        help="Operation mode"
+        help="Operation mode",
     )
     parser.add_argument(
-        "--validation-data",
-        type=str,
-        help="Path to validation data CSV (with predictions)"
+        "--validation-data", type=str, help="Path to validation data CSV (with predictions)"
     )
     parser.add_argument(
         "--output",
         type=str,
         default="models/ensemble/stacking_report.md",
-        help="Output path for report"
+        help="Output path for report",
     )
 
     args = parser.parse_args()
@@ -1044,9 +1047,9 @@ def main():
     stacker.load_models()
 
     if args.mode == "optimize":
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("MODE: OPTIMIZE STACKING WEIGHTS")
-        logger.info("="*70)
+        logger.info("=" * 70)
 
         # Load validation data
         if not args.validation_data:
@@ -1067,13 +1070,12 @@ def main():
         print("\n" + report)
 
     elif args.mode == "backtest":
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("MODE: BACKTEST STACKING VS. HEURISTIC")
-        logger.info("="*70)
+        logger.info("=" * 70)
 
         backtest_result = stacker.backtest_stacking(
-            validation_period=(2022, 2023),
-            holdout_period=(2024, 2024)
+            validation_period=(2022, 2023), holdout_period=(2024, 2024)
         )
 
         logger.info("\n✅ Backtest complete")

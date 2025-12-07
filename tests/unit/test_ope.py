@@ -23,7 +23,6 @@ def test_snis_basic():
     assert result is not None
 
 
-
 def test_snis_edge_cases():
     """Test snis: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_snis_edge_cases():
     assert result is not None
 
 
-
 def test_snis_error_handling():
     """Test snis error handling."""
     with pytest.raises(ValueError):
         snis(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_snis_property_idempotent(self, df, clip, shrink):
 
     # Assert property
     assert snis(df, clip, shrink) == result, "idempotent violated"
-
 
 
 def test_dr_basic():
@@ -67,7 +63,6 @@ def test_dr_basic():
     assert result is not None
 
 
-
 def test_dr_edge_cases():
     """Test dr: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_dr_edge_cases():
     assert result is not None
 
 
-
 def test_dr_error_handling():
     """Test dr error handling."""
     with pytest.raises(ValueError):
         dr(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,4 +89,3 @@ def test_dr_property_idempotent(self, df, clip, shrink):
 
     # Assert property
     assert dr(df, clip, shrink) == result, "idempotent violated"
-

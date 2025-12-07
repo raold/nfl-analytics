@@ -30,6 +30,7 @@ from py.features.team_offensive_features import TeamOffensiveFeatures
 # Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def mock_db_config():
     """Mock database configuration for testing."""
@@ -63,6 +64,7 @@ def mock_recent_games():
 # Test 1: Basic Functionality (Smoke Tests)
 # ============================================================================
 
+
 def test_initialization(mock_db_config):
     """Test TeamOffensiveFeatures initialization."""
     engine = TeamOffensiveFeatures(db_config=mock_db_config)
@@ -79,7 +81,7 @@ def test_initialization_with_individual_params():
         db_port=5544,
         db_name="devdb01",
         db_user="dro",
-        db_password="sicillionbillions"
+        db_password="sicillionbillions",
     )
 
     assert engine.db_config["host"] == "localhost"
@@ -89,10 +91,12 @@ def test_initialization_with_individual_params():
 
 def test_extract_features_returns_24_features(team_offensive_features):
     """Test that extract_features returns exactly 24 features."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games, \
-         patch.object(team_offensive_features, '_compute_play_level_features') as mock_play, \
-         patch.object(team_offensive_features, '_compute_red_zone_features') as mock_redzone, \
-         patch.object(team_offensive_features, '_compute_game_level_features') as mock_game:
+    with (
+        patch.object(team_offensive_features, "_get_recent_games") as mock_get_games,
+        patch.object(team_offensive_features, "_compute_play_level_features") as mock_play,
+        patch.object(team_offensive_features, "_compute_red_zone_features") as mock_redzone,
+        patch.object(team_offensive_features, "_compute_game_level_features") as mock_game,
+    ):
 
         # Mock return values
         mock_get_games.return_value = [
@@ -103,36 +107,36 @@ def test_extract_features_returns_24_features(team_offensive_features):
         ]
 
         mock_play.return_value = {
-            'off_epa_per_play': 0.10,
-            'off_success_rate': 0.48,
-            'off_explosive_play_rate': 0.22,
-            'off_stuff_rate': 0.16,
-            'off_first_down_rate': 0.38,
-            'off_third_down_conv_rate': 0.42,
-            'off_pass_epa_per_play': 0.15,
-            'off_rush_epa_per_play': 0.05,
-            'off_pass_success_rate': 0.50,
-            'off_rush_success_rate': 0.46,
-            'off_avg_yds_per_pass': 7.5,
-            'off_avg_yds_per_rush': 4.5,
-            'off_completion_pct': 0.66,
-            'off_sack_rate': 0.05,
-            'off_turnover_rate': 0.018,
-            'off_penalty_rate': 0.048,
+            "off_epa_per_play": 0.10,
+            "off_success_rate": 0.48,
+            "off_explosive_play_rate": 0.22,
+            "off_stuff_rate": 0.16,
+            "off_first_down_rate": 0.38,
+            "off_third_down_conv_rate": 0.42,
+            "off_pass_epa_per_play": 0.15,
+            "off_rush_epa_per_play": 0.05,
+            "off_pass_success_rate": 0.50,
+            "off_rush_success_rate": 0.46,
+            "off_avg_yds_per_pass": 7.5,
+            "off_avg_yds_per_rush": 4.5,
+            "off_completion_pct": 0.66,
+            "off_sack_rate": 0.05,
+            "off_turnover_rate": 0.018,
+            "off_penalty_rate": 0.048,
         }
 
         mock_redzone.return_value = {
-            'off_red_zone_td_rate': 0.60,
+            "off_red_zone_td_rate": 0.60,
         }
 
         mock_game.return_value = {
-            'off_time_of_possession': 1900.0,
-            'off_plays_per_game': 68.0,
-            'off_points_per_game': 28.5,
-            'off_yds_per_game': 380.0,
-            'off_pass_yds_per_game': 260.0,
-            'off_rush_yds_per_game': 120.0,
-            'off_scoring_drives_pct': 0.40,
+            "off_time_of_possession": 1900.0,
+            "off_plays_per_game": 68.0,
+            "off_points_per_game": 28.5,
+            "off_yds_per_game": 380.0,
+            "off_pass_yds_per_game": 260.0,
+            "off_rush_yds_per_game": 120.0,
+            "off_scoring_drives_pct": 0.40,
         }
 
         # Execute
@@ -143,14 +147,30 @@ def test_extract_features_returns_24_features(team_offensive_features):
 
         # Verify all expected keys exist
         expected_keys = [
-            'off_epa_per_play', 'off_success_rate', 'off_explosive_play_rate',
-            'off_stuff_rate', 'off_first_down_rate', 'off_third_down_conv_rate',
-            'off_pass_epa_per_play', 'off_rush_epa_per_play', 'off_pass_success_rate',
-            'off_rush_success_rate', 'off_avg_yds_per_pass', 'off_avg_yds_per_rush',
-            'off_completion_pct', 'off_sack_rate', 'off_turnover_rate', 'off_penalty_rate',
-            'off_red_zone_td_rate', 'off_time_of_possession', 'off_plays_per_game',
-            'off_points_per_game', 'off_yds_per_game', 'off_pass_yds_per_game',
-            'off_rush_yds_per_game', 'off_scoring_drives_pct'
+            "off_epa_per_play",
+            "off_success_rate",
+            "off_explosive_play_rate",
+            "off_stuff_rate",
+            "off_first_down_rate",
+            "off_third_down_conv_rate",
+            "off_pass_epa_per_play",
+            "off_rush_epa_per_play",
+            "off_pass_success_rate",
+            "off_rush_success_rate",
+            "off_avg_yds_per_pass",
+            "off_avg_yds_per_rush",
+            "off_completion_pct",
+            "off_sack_rate",
+            "off_turnover_rate",
+            "off_penalty_rate",
+            "off_red_zone_td_rate",
+            "off_time_of_possession",
+            "off_plays_per_game",
+            "off_points_per_game",
+            "off_yds_per_game",
+            "off_pass_yds_per_game",
+            "off_rush_yds_per_game",
+            "off_scoring_drives_pct",
         ]
 
         for key in expected_keys:
@@ -161,9 +181,10 @@ def test_extract_features_returns_24_features(team_offensive_features):
 # Test 2: Temporal Safety Validation
 # ============================================================================
 
+
 def test_get_recent_games_temporal_safety(team_offensive_features):
     """Test that _get_recent_games only returns games BEFORE target week."""
-    with patch.object(team_offensive_features, '_connect_db') as mock_connect:
+    with patch.object(team_offensive_features, "_connect_db") as mock_connect:
         # Mock database connection and cursor
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
@@ -182,13 +203,14 @@ def test_get_recent_games_temporal_safety(team_offensive_features):
 
         # Assert: All games must be BEFORE Week 10
         for game_id, season, week in games:
-            assert season < 2024 or (season == 2024 and week < 10), \
-                f"Game {game_id} ({season} Week {week}) is NOT before target (2024 Week 10)"
+            assert season < 2024 or (
+                season == 2024 and week < 10
+            ), f"Game {game_id} ({season} Week {week}) is NOT before target (2024 Week 10)"
 
 
 def test_validate_no_leakage_success(team_offensive_features):
     """Test validate_no_leakage returns True when all games are before target."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games:
+    with patch.object(team_offensive_features, "_get_recent_games") as mock_get_games:
         # Mock games BEFORE target (2024 Week 10)
         mock_get_games.return_value = [
             ("2024_09_KC_BUF", 2024, 9),
@@ -206,7 +228,7 @@ def test_validate_no_leakage_success(team_offensive_features):
 
 def test_validate_no_leakage_failure_same_week(team_offensive_features):
     """Test validate_no_leakage returns False when game is AT target week (leakage)."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games:
+    with patch.object(team_offensive_features, "_get_recent_games") as mock_get_games:
         # Mock games including target week (LEAKAGE)
         mock_get_games.return_value = [
             ("2024_10_KC_DEN", 2024, 10),  # Same week (LEAKAGE)
@@ -224,7 +246,7 @@ def test_validate_no_leakage_failure_same_week(team_offensive_features):
 
 def test_validate_no_leakage_failure_future_week(team_offensive_features):
     """Test validate_no_leakage returns False when game is AFTER target week (leakage)."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games:
+    with patch.object(team_offensive_features, "_get_recent_games") as mock_get_games:
         # Mock games including future week (LEAKAGE)
         mock_get_games.return_value = [
             ("2024_11_KC_BUF", 2024, 11),  # Future week (LEAKAGE)
@@ -244,12 +266,15 @@ def test_validate_no_leakage_failure_future_week(team_offensive_features):
 # Test 3: Edge Cases
 # ============================================================================
 
+
 def test_extract_features_early_season_uses_defaults(team_offensive_features):
     """Test that extract_features uses league average defaults when <4 games available."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games, \
-         patch.object(team_offensive_features, '_compute_play_level_features') as mock_play, \
-         patch.object(team_offensive_features, '_compute_red_zone_features') as mock_redzone, \
-         patch.object(team_offensive_features, '_compute_game_level_features') as mock_game:
+    with (
+        patch.object(team_offensive_features, "_get_recent_games") as mock_get_games,
+        patch.object(team_offensive_features, "_compute_play_level_features") as mock_play,
+        patch.object(team_offensive_features, "_compute_red_zone_features") as mock_redzone,
+        patch.object(team_offensive_features, "_compute_game_level_features") as mock_game,
+    ):
 
         # Mock only 2 games available (early season)
         mock_get_games.return_value = [
@@ -259,89 +284,91 @@ def test_extract_features_early_season_uses_defaults(team_offensive_features):
 
         # Mock returns should still provide defaults
         mock_play.return_value = {
-            'off_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_explosive_play_rate': team_offensive_features.DEFAULT_EXPLOSIVE_RATE,
-            'off_stuff_rate': team_offensive_features.DEFAULT_STUFF_RATE,
-            'off_first_down_rate': team_offensive_features.DEFAULT_FIRST_DOWN_RATE,
-            'off_third_down_conv_rate': team_offensive_features.DEFAULT_THIRD_DOWN_CONV,
-            'off_pass_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_rush_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_pass_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_rush_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_avg_yds_per_pass': team_offensive_features.DEFAULT_YDS_PER_PASS,
-            'off_avg_yds_per_rush': team_offensive_features.DEFAULT_YDS_PER_RUSH,
-            'off_completion_pct': team_offensive_features.DEFAULT_COMPLETION_PCT,
-            'off_sack_rate': team_offensive_features.DEFAULT_SACK_RATE,
-            'off_turnover_rate': team_offensive_features.DEFAULT_TURNOVER_RATE,
-            'off_penalty_rate': team_offensive_features.DEFAULT_PENALTY_RATE,
+            "off_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_explosive_play_rate": team_offensive_features.DEFAULT_EXPLOSIVE_RATE,
+            "off_stuff_rate": team_offensive_features.DEFAULT_STUFF_RATE,
+            "off_first_down_rate": team_offensive_features.DEFAULT_FIRST_DOWN_RATE,
+            "off_third_down_conv_rate": team_offensive_features.DEFAULT_THIRD_DOWN_CONV,
+            "off_pass_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_rush_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_pass_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_rush_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_avg_yds_per_pass": team_offensive_features.DEFAULT_YDS_PER_PASS,
+            "off_avg_yds_per_rush": team_offensive_features.DEFAULT_YDS_PER_RUSH,
+            "off_completion_pct": team_offensive_features.DEFAULT_COMPLETION_PCT,
+            "off_sack_rate": team_offensive_features.DEFAULT_SACK_RATE,
+            "off_turnover_rate": team_offensive_features.DEFAULT_TURNOVER_RATE,
+            "off_penalty_rate": team_offensive_features.DEFAULT_PENALTY_RATE,
         }
 
         mock_redzone.return_value = {
-            'off_red_zone_td_rate': team_offensive_features.DEFAULT_RED_ZONE_TD_RATE,
+            "off_red_zone_td_rate": team_offensive_features.DEFAULT_RED_ZONE_TD_RATE,
         }
 
         mock_game.return_value = {
-            'off_time_of_possession': team_offensive_features.DEFAULT_TIME_OF_POSSESSION,
-            'off_plays_per_game': team_offensive_features.DEFAULT_PLAYS_PER_GAME,
-            'off_points_per_game': team_offensive_features.DEFAULT_POINTS_PER_GAME,
-            'off_yds_per_game': team_offensive_features.DEFAULT_YDS_PER_GAME,
-            'off_pass_yds_per_game': team_offensive_features.DEFAULT_PASS_YDS_PER_GAME,
-            'off_rush_yds_per_game': team_offensive_features.DEFAULT_RUSH_YDS_PER_GAME,
-            'off_scoring_drives_pct': team_offensive_features.DEFAULT_SCORING_DRIVES_PCT,
+            "off_time_of_possession": team_offensive_features.DEFAULT_TIME_OF_POSSESSION,
+            "off_plays_per_game": team_offensive_features.DEFAULT_PLAYS_PER_GAME,
+            "off_points_per_game": team_offensive_features.DEFAULT_POINTS_PER_GAME,
+            "off_yds_per_game": team_offensive_features.DEFAULT_YDS_PER_GAME,
+            "off_pass_yds_per_game": team_offensive_features.DEFAULT_PASS_YDS_PER_GAME,
+            "off_rush_yds_per_game": team_offensive_features.DEFAULT_RUSH_YDS_PER_GAME,
+            "off_scoring_drives_pct": team_offensive_features.DEFAULT_SCORING_DRIVES_PCT,
         }
 
         # Execute
         features = team_offensive_features.extract_features("KC", 2024, 3)
 
         # Assert: Should use league average defaults
-        assert features['off_epa_per_play'] == team_offensive_features.DEFAULT_EPA_PER_PLAY
-        assert features['off_success_rate'] == team_offensive_features.DEFAULT_SUCCESS_RATE
-        assert features['off_points_per_game'] == team_offensive_features.DEFAULT_POINTS_PER_GAME
+        assert features["off_epa_per_play"] == team_offensive_features.DEFAULT_EPA_PER_PLAY
+        assert features["off_success_rate"] == team_offensive_features.DEFAULT_SUCCESS_RATE
+        assert features["off_points_per_game"] == team_offensive_features.DEFAULT_POINTS_PER_GAME
 
 
 def test_extract_features_no_games_available(team_offensive_features):
     """Test extract_features when NO games are available (Week 1 scenario)."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games, \
-         patch.object(team_offensive_features, '_compute_play_level_features') as mock_play, \
-         patch.object(team_offensive_features, '_compute_red_zone_features') as mock_redzone, \
-         patch.object(team_offensive_features, '_compute_game_level_features') as mock_game:
+    with (
+        patch.object(team_offensive_features, "_get_recent_games") as mock_get_games,
+        patch.object(team_offensive_features, "_compute_play_level_features") as mock_play,
+        patch.object(team_offensive_features, "_compute_red_zone_features") as mock_redzone,
+        patch.object(team_offensive_features, "_compute_game_level_features") as mock_game,
+    ):
 
         # Mock NO games available (Week 1)
         mock_get_games.return_value = []
 
         # Mock methods should return defaults when no games
         mock_play.return_value = {
-            'off_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_explosive_play_rate': team_offensive_features.DEFAULT_EXPLOSIVE_RATE,
-            'off_stuff_rate': team_offensive_features.DEFAULT_STUFF_RATE,
-            'off_first_down_rate': team_offensive_features.DEFAULT_FIRST_DOWN_RATE,
-            'off_third_down_conv_rate': team_offensive_features.DEFAULT_THIRD_DOWN_CONV,
-            'off_pass_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_rush_epa_per_play': team_offensive_features.DEFAULT_EPA_PER_PLAY,
-            'off_pass_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_rush_success_rate': team_offensive_features.DEFAULT_SUCCESS_RATE,
-            'off_avg_yds_per_pass': team_offensive_features.DEFAULT_YDS_PER_PASS,
-            'off_avg_yds_per_rush': team_offensive_features.DEFAULT_YDS_PER_RUSH,
-            'off_completion_pct': team_offensive_features.DEFAULT_COMPLETION_PCT,
-            'off_sack_rate': team_offensive_features.DEFAULT_SACK_RATE,
-            'off_turnover_rate': team_offensive_features.DEFAULT_TURNOVER_RATE,
-            'off_penalty_rate': team_offensive_features.DEFAULT_PENALTY_RATE,
+            "off_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_explosive_play_rate": team_offensive_features.DEFAULT_EXPLOSIVE_RATE,
+            "off_stuff_rate": team_offensive_features.DEFAULT_STUFF_RATE,
+            "off_first_down_rate": team_offensive_features.DEFAULT_FIRST_DOWN_RATE,
+            "off_third_down_conv_rate": team_offensive_features.DEFAULT_THIRD_DOWN_CONV,
+            "off_pass_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_rush_epa_per_play": team_offensive_features.DEFAULT_EPA_PER_PLAY,
+            "off_pass_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_rush_success_rate": team_offensive_features.DEFAULT_SUCCESS_RATE,
+            "off_avg_yds_per_pass": team_offensive_features.DEFAULT_YDS_PER_PASS,
+            "off_avg_yds_per_rush": team_offensive_features.DEFAULT_YDS_PER_RUSH,
+            "off_completion_pct": team_offensive_features.DEFAULT_COMPLETION_PCT,
+            "off_sack_rate": team_offensive_features.DEFAULT_SACK_RATE,
+            "off_turnover_rate": team_offensive_features.DEFAULT_TURNOVER_RATE,
+            "off_penalty_rate": team_offensive_features.DEFAULT_PENALTY_RATE,
         }
 
         mock_redzone.return_value = {
-            'off_red_zone_td_rate': team_offensive_features.DEFAULT_RED_ZONE_TD_RATE,
+            "off_red_zone_td_rate": team_offensive_features.DEFAULT_RED_ZONE_TD_RATE,
         }
 
         mock_game.return_value = {
-            'off_time_of_possession': team_offensive_features.DEFAULT_TIME_OF_POSSESSION,
-            'off_plays_per_game': team_offensive_features.DEFAULT_PLAYS_PER_GAME,
-            'off_points_per_game': team_offensive_features.DEFAULT_POINTS_PER_GAME,
-            'off_yds_per_game': team_offensive_features.DEFAULT_YDS_PER_GAME,
-            'off_pass_yds_per_game': team_offensive_features.DEFAULT_PASS_YDS_PER_GAME,
-            'off_rush_yds_per_game': team_offensive_features.DEFAULT_RUSH_YDS_PER_GAME,
-            'off_scoring_drives_pct': team_offensive_features.DEFAULT_SCORING_DRIVES_PCT,
+            "off_time_of_possession": team_offensive_features.DEFAULT_TIME_OF_POSSESSION,
+            "off_plays_per_game": team_offensive_features.DEFAULT_PLAYS_PER_GAME,
+            "off_points_per_game": team_offensive_features.DEFAULT_POINTS_PER_GAME,
+            "off_yds_per_game": team_offensive_features.DEFAULT_YDS_PER_GAME,
+            "off_pass_yds_per_game": team_offensive_features.DEFAULT_PASS_YDS_PER_GAME,
+            "off_rush_yds_per_game": team_offensive_features.DEFAULT_RUSH_YDS_PER_GAME,
+            "off_scoring_drives_pct": team_offensive_features.DEFAULT_SCORING_DRIVES_PCT,
         }
 
         # Execute
@@ -349,12 +376,13 @@ def test_extract_features_no_games_available(team_offensive_features):
 
         # Assert: All features should be league average defaults
         assert len(features) == 24
-        assert features['off_epa_per_play'] == team_offensive_features.DEFAULT_EPA_PER_PLAY
+        assert features["off_epa_per_play"] == team_offensive_features.DEFAULT_EPA_PER_PLAY
 
 
 # ============================================================================
 # Test 4: League Average Defaults
 # ============================================================================
+
 
 def test_default_constants_are_reasonable():
     """Test that default constants are within reasonable NFL ranges."""
@@ -384,42 +412,45 @@ def test_default_constants_are_reasonable():
 # Test 5: Feature Value Validation
 # ============================================================================
 
+
 def test_extract_features_values_are_numeric(team_offensive_features):
     """Test that all extracted features are numeric (float)."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games, \
-         patch.object(team_offensive_features, '_compute_play_level_features') as mock_play, \
-         patch.object(team_offensive_features, '_compute_red_zone_features') as mock_redzone, \
-         patch.object(team_offensive_features, '_compute_game_level_features') as mock_game:
+    with (
+        patch.object(team_offensive_features, "_get_recent_games") as mock_get_games,
+        patch.object(team_offensive_features, "_compute_play_level_features") as mock_play,
+        patch.object(team_offensive_features, "_compute_red_zone_features") as mock_redzone,
+        patch.object(team_offensive_features, "_compute_game_level_features") as mock_game,
+    ):
 
         # Mock return values
         mock_get_games.return_value = [("2024_09_KC_BUF", 2024, 9)]
         mock_play.return_value = {
-            'off_epa_per_play': 0.10,
-            'off_success_rate': 0.48,
-            'off_explosive_play_rate': 0.22,
-            'off_stuff_rate': 0.16,
-            'off_first_down_rate': 0.38,
-            'off_third_down_conv_rate': 0.42,
-            'off_pass_epa_per_play': 0.15,
-            'off_rush_epa_per_play': 0.05,
-            'off_pass_success_rate': 0.50,
-            'off_rush_success_rate': 0.46,
-            'off_avg_yds_per_pass': 7.5,
-            'off_avg_yds_per_rush': 4.5,
-            'off_completion_pct': 0.66,
-            'off_sack_rate': 0.05,
-            'off_turnover_rate': 0.018,
-            'off_penalty_rate': 0.048,
+            "off_epa_per_play": 0.10,
+            "off_success_rate": 0.48,
+            "off_explosive_play_rate": 0.22,
+            "off_stuff_rate": 0.16,
+            "off_first_down_rate": 0.38,
+            "off_third_down_conv_rate": 0.42,
+            "off_pass_epa_per_play": 0.15,
+            "off_rush_epa_per_play": 0.05,
+            "off_pass_success_rate": 0.50,
+            "off_rush_success_rate": 0.46,
+            "off_avg_yds_per_pass": 7.5,
+            "off_avg_yds_per_rush": 4.5,
+            "off_completion_pct": 0.66,
+            "off_sack_rate": 0.05,
+            "off_turnover_rate": 0.018,
+            "off_penalty_rate": 0.048,
         }
-        mock_redzone.return_value = {'off_red_zone_td_rate': 0.60}
+        mock_redzone.return_value = {"off_red_zone_td_rate": 0.60}
         mock_game.return_value = {
-            'off_time_of_possession': 1900.0,
-            'off_plays_per_game': 68.0,
-            'off_points_per_game': 28.5,
-            'off_yds_per_game': 380.0,
-            'off_pass_yds_per_game': 260.0,
-            'off_rush_yds_per_game': 120.0,
-            'off_scoring_drives_pct': 0.40,
+            "off_time_of_possession": 1900.0,
+            "off_plays_per_game": 68.0,
+            "off_points_per_game": 28.5,
+            "off_yds_per_game": 380.0,
+            "off_pass_yds_per_game": 260.0,
+            "off_rush_yds_per_game": 120.0,
+            "off_scoring_drives_pct": 0.40,
         }
 
         # Execute
@@ -427,46 +458,49 @@ def test_extract_features_values_are_numeric(team_offensive_features):
 
         # Assert: All values must be numeric (float)
         for key, value in features.items():
-            assert isinstance(value, (int, float)), \
-                f"Feature '{key}' has non-numeric value: {value} (type: {type(value)})"
+            assert isinstance(
+                value, (int, float)
+            ), f"Feature '{key}' has non-numeric value: {value} (type: {type(value)})"
 
 
 def test_extract_features_no_nan_values(team_offensive_features):
     """Test that no features contain NaN values."""
-    with patch.object(team_offensive_features, '_get_recent_games') as mock_get_games, \
-         patch.object(team_offensive_features, '_compute_play_level_features') as mock_play, \
-         patch.object(team_offensive_features, '_compute_red_zone_features') as mock_redzone, \
-         patch.object(team_offensive_features, '_compute_game_level_features') as mock_game:
+    with (
+        patch.object(team_offensive_features, "_get_recent_games") as mock_get_games,
+        patch.object(team_offensive_features, "_compute_play_level_features") as mock_play,
+        patch.object(team_offensive_features, "_compute_red_zone_features") as mock_redzone,
+        patch.object(team_offensive_features, "_compute_game_level_features") as mock_game,
+    ):
 
         # Mock return values
         mock_get_games.return_value = [("2024_09_KC_BUF", 2024, 9)]
         mock_play.return_value = {
-            'off_epa_per_play': 0.10,
-            'off_success_rate': 0.48,
-            'off_explosive_play_rate': 0.22,
-            'off_stuff_rate': 0.16,
-            'off_first_down_rate': 0.38,
-            'off_third_down_conv_rate': 0.42,
-            'off_pass_epa_per_play': 0.15,
-            'off_rush_epa_per_play': 0.05,
-            'off_pass_success_rate': 0.50,
-            'off_rush_success_rate': 0.46,
-            'off_avg_yds_per_pass': 7.5,
-            'off_avg_yds_per_rush': 4.5,
-            'off_completion_pct': 0.66,
-            'off_sack_rate': 0.05,
-            'off_turnover_rate': 0.018,
-            'off_penalty_rate': 0.048,
+            "off_epa_per_play": 0.10,
+            "off_success_rate": 0.48,
+            "off_explosive_play_rate": 0.22,
+            "off_stuff_rate": 0.16,
+            "off_first_down_rate": 0.38,
+            "off_third_down_conv_rate": 0.42,
+            "off_pass_epa_per_play": 0.15,
+            "off_rush_epa_per_play": 0.05,
+            "off_pass_success_rate": 0.50,
+            "off_rush_success_rate": 0.46,
+            "off_avg_yds_per_pass": 7.5,
+            "off_avg_yds_per_rush": 4.5,
+            "off_completion_pct": 0.66,
+            "off_sack_rate": 0.05,
+            "off_turnover_rate": 0.018,
+            "off_penalty_rate": 0.048,
         }
-        mock_redzone.return_value = {'off_red_zone_td_rate': 0.60}
+        mock_redzone.return_value = {"off_red_zone_td_rate": 0.60}
         mock_game.return_value = {
-            'off_time_of_possession': 1900.0,
-            'off_plays_per_game': 68.0,
-            'off_points_per_game': 28.5,
-            'off_yds_per_game': 380.0,
-            'off_pass_yds_per_game': 260.0,
-            'off_rush_yds_per_game': 120.0,
-            'off_scoring_drives_pct': 0.40,
+            "off_time_of_possession": 1900.0,
+            "off_plays_per_game": 68.0,
+            "off_points_per_game": 28.5,
+            "off_yds_per_game": 380.0,
+            "off_pass_yds_per_game": 260.0,
+            "off_rush_yds_per_game": 120.0,
+            "off_scoring_drives_pct": 0.40,
         }
 
         # Execute
@@ -474,13 +508,15 @@ def test_extract_features_no_nan_values(team_offensive_features):
 
         # Assert: No NaN values
         for key, value in features.items():
-            assert not (isinstance(value, float) and np.isnan(value)), \
-                f"Feature '{key}' contains NaN value"
+            assert not (
+                isinstance(value, float) and np.isnan(value)
+            ), f"Feature '{key}' contains NaN value"
 
 
 # ============================================================================
 # Test 6: Integration Test (Requires Database)
 # ============================================================================
+
 
 @pytest.mark.integration
 def test_extract_features_integration_kc_2024_week10():
@@ -495,7 +531,7 @@ def test_extract_features_integration_kc_2024_week10():
         db_port=5544,
         db_name="devdb01",
         db_user="dro",
-        db_password="sicillionbillions"
+        db_password="sicillionbillions",
     )
 
     # Extract features for KC in 2024 Week 10
@@ -506,8 +542,7 @@ def test_extract_features_integration_kc_2024_week10():
 
     # Assert: All features are numeric
     for key, value in features.items():
-        assert isinstance(value, (int, float)), \
-            f"Feature '{key}' is not numeric: {value}"
+        assert isinstance(value, (int, float)), f"Feature '{key}' is not numeric: {value}"
 
     # Assert: No NaN values
     for key, value in features.items():

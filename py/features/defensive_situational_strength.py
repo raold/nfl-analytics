@@ -24,8 +24,7 @@ from sqlalchemy import create_engine
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -44,19 +43,12 @@ class DefensiveSituationalStrengthEngine:
     - Performance by score differential
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the situational strength engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_all_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_all_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load all offensive plays from the database.
 
@@ -106,9 +98,8 @@ class DefensiveSituationalStrengthEngine:
 
         # Derive situational indicators
         df["short_yardage"] = df["ydstogo"] <= 2
-        df["two_minute_drill"] = (
-            ((df["quarter"] == 2) & (df["half_seconds_remaining"] <= 120)) |
-            ((df["quarter"] == 4) & (df["game_seconds_remaining"] <= 120))
+        df["two_minute_drill"] = ((df["quarter"] == 2) & (df["half_seconds_remaining"] <= 120)) | (
+            (df["quarter"] == 4) & (df["game_seconds_remaining"] <= 120)
         )
         df["negative_play"] = df["yards_gained"] < 0
         df["turnover"] = (df["interception"] == 1) | (df["fumble_lost"] == 1)
@@ -119,10 +110,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_red_zone_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_red_zone_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate red zone defense effectiveness (inside 20-yard line).
 
@@ -168,10 +156,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_goal_line_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_goal_line_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate goal line defense effectiveness (inside 5-yard line).
 
@@ -215,10 +200,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_third_down_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_third_down_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate third down conversion prevention.
 
@@ -266,10 +248,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_fourth_down_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_fourth_down_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate fourth down conversion prevention.
 
@@ -309,10 +288,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_two_minute_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_two_minute_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate two-minute drill defense effectiveness.
 
@@ -352,10 +328,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_quarter_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_quarter_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance by quarter.
 
@@ -390,10 +363,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def calculate_score_differential_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_score_differential_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance by score differential.
 
@@ -405,7 +375,14 @@ class DefensiveSituationalStrengthEngine:
         plays["score_situation"] = pd.cut(
             plays["score_differential"],
             bins=[-100, -14, -7, 0, 7, 14, 100],
-            labels=["losing_big", "losing", "tied_or_close_losing", "tied_or_close_winning", "winning", "winning_big"]
+            labels=[
+                "losing_big",
+                "losing",
+                "tied_or_close_losing",
+                "tied_or_close_winning",
+                "winning",
+                "winning_big",
+            ],
         )
 
         results = []
@@ -434,11 +411,7 @@ class DefensiveSituationalStrengthEngine:
 
         return df
 
-    def add_rolling_averages(
-        self,
-        metrics: pd.DataFrame,
-        window: int = 4
-    ) -> pd.DataFrame:
+    def add_rolling_averages(self, metrics: pd.DataFrame, window: int = 4) -> pd.DataFrame:
         """
         Add rolling averages for trend analysis.
         """
@@ -457,20 +430,23 @@ class DefensiveSituationalStrengthEngine:
 
         for col in rolling_cols:
             if col in metrics.columns:
-                metrics[f"{col}_roll{window}"] = (
-                    metrics.groupby("defense_team")[col]
-                    .transform(lambda x: x.rolling(window, min_periods=1).mean())
+                metrics[f"{col}_roll{window}"] = metrics.groupby("defense_team")[col].transform(
+                    lambda x: x.rolling(window, min_periods=1).mean()
                 )
 
         logger.info("Added rolling averages for situational metrics")
 
         return metrics
 
-    def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def generate_all_features(self, start_season: int = 2024, end_season: int = 2025) -> tuple[
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+        pd.DataFrame,
+    ]:
         """
         Generate all defensive situational strength features.
 
@@ -520,7 +496,7 @@ class DefensiveSituationalStrengthEngine:
             fourth_down_metrics,
             two_minute_metrics,
             quarter_metrics,
-            score_diff_metrics
+            score_diff_metrics,
         )
 
 
@@ -536,11 +512,8 @@ def main():
         fourth_down_metrics,
         two_minute_metrics,
         quarter_metrics,
-        score_diff_metrics
-    ) = engine.generate_all_features(
-        start_season=2020,
-        end_season=2025
-    )
+        score_diff_metrics,
+    ) = engine.generate_all_features(start_season=2020, end_season=2025)
 
     # Display sample statistics
     print("\n" + "=" * 70)
@@ -549,12 +522,11 @@ def main():
     if len(red_zone_metrics) > 0:
         print(red_zone_metrics.head(10).to_string())
         print("\nRED ZONE DEFENSE STATISTICS")
-        print(red_zone_metrics[[
-            "td_rate_allowed",
-            "epa_per_play_allowed",
-            "success_rate_allowed",
-            "turnover_rate"
-        ]].describe())
+        print(
+            red_zone_metrics[
+                ["td_rate_allowed", "epa_per_play_allowed", "success_rate_allowed", "turnover_rate"]
+            ].describe()
+        )
 
     print("\n" + "=" * 70)
     print("GOAL LINE DEFENSE SAMPLE")
@@ -568,12 +540,11 @@ def main():
     if len(third_down_metrics) > 0:
         print(third_down_metrics.head(10).to_string())
         print("\nTHIRD DOWN DEFENSE STATISTICS")
-        print(third_down_metrics[[
-            "conversion_rate_allowed",
-            "epa_per_play_allowed",
-            "sack_rate",
-            "turnover_rate"
-        ]].describe())
+        print(
+            third_down_metrics[
+                ["conversion_rate_allowed", "epa_per_play_allowed", "sack_rate", "turnover_rate"]
+            ].describe()
+        )
 
     print("\n" + "=" * 70)
     print("FOURTH DOWN DEFENSE SAMPLE")
@@ -591,30 +562,48 @@ def main():
     print("TOP 10 RED ZONE DEFENSES (by EPA)")
     print("=" * 70)
     if len(red_zone_metrics) > 0:
-        top_rz_d = red_zone_metrics.nsmallest(10, "epa_per_play_allowed")[[
-            "defense_team", "game_id", "n_plays", "td_rate_allowed",
-            "epa_per_play_allowed", "turnover_rate"
-        ]]
+        top_rz_d = red_zone_metrics.nsmallest(10, "epa_per_play_allowed")[
+            [
+                "defense_team",
+                "game_id",
+                "n_plays",
+                "td_rate_allowed",
+                "epa_per_play_allowed",
+                "turnover_rate",
+            ]
+        ]
         print(top_rz_d.to_string(index=False))
 
     print("\n" + "=" * 70)
     print("TOP 10 THIRD DOWN DEFENSES (by conversion rate)")
     print("=" * 70)
     if len(third_down_metrics) > 0:
-        top_3rd_d = third_down_metrics.nsmallest(10, "conversion_rate_allowed")[[
-            "defense_team", "game_id", "n_plays", "conversion_rate_allowed",
-            "epa_per_play_allowed", "sack_rate"
-        ]]
+        top_3rd_d = third_down_metrics.nsmallest(10, "conversion_rate_allowed")[
+            [
+                "defense_team",
+                "game_id",
+                "n_plays",
+                "conversion_rate_allowed",
+                "epa_per_play_allowed",
+                "sack_rate",
+            ]
+        ]
         print(top_3rd_d.to_string(index=False))
 
     print("\n" + "=" * 70)
     print("TOP 10 TWO-MINUTE DRILL DEFENSES (by EPA)")
     print("=" * 70)
     if len(two_minute_metrics) > 0:
-        top_2min_d = two_minute_metrics.nsmallest(10, "epa_per_play_allowed")[[
-            "defense_team", "game_id", "n_plays", "td_rate_allowed",
-            "epa_per_play_allowed", "turnover_rate"
-        ]]
+        top_2min_d = two_minute_metrics.nsmallest(10, "epa_per_play_allowed")[
+            [
+                "defense_team",
+                "game_id",
+                "n_plays",
+                "td_rate_allowed",
+                "epa_per_play_allowed",
+                "turnover_rate",
+            ]
+        ]
         print(top_2min_d.to_string(index=False))
 
     return (
@@ -624,7 +613,7 @@ def main():
         fourth_down_metrics,
         two_minute_metrics,
         quarter_metrics,
-        score_diff_metrics
+        score_diff_metrics,
     )
 
 

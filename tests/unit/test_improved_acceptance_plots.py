@@ -23,7 +23,6 @@ def test_load_data_basic():
     assert result is not None
 
 
-
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_data_error_handling():
     """Test load_data error handling."""
     with pytest.raises(ValueError):
         load_data(invalid_input)
-
 
 
 def test_create_heatmap_basic():
@@ -56,7 +53,6 @@ def test_create_heatmap_basic():
     assert result is not None
 
 
-
 def test_create_heatmap_edge_cases():
     """Test create_heatmap: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_create_heatmap_edge_cases():
     assert result is not None
 
 
-
 def test_create_heatmap_error_handling():
     """Test create_heatmap error handling."""
     with pytest.raises(ValueError):
         create_heatmap(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_create_heatmap_property_idempotent(self, df, output_path):
 
     # Assert property
     assert create_heatmap(df, output_path) == result, "idempotent violated"
-
 
 
 def test_create_violin_plot_basic():
@@ -100,7 +93,6 @@ def test_create_violin_plot_basic():
     assert result is not None
 
 
-
 def test_create_violin_plot_edge_cases():
     """Test create_violin_plot: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_create_violin_plot_edge_cases():
     assert result is not None
 
 
-
 def test_create_violin_plot_error_handling():
     """Test create_violin_plot error handling."""
     with pytest.raises(ValueError):
         create_violin_plot(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_create_violin_plot_property_idempotent(self, df, output_path):
 
     # Assert property
     assert create_violin_plot(df, output_path) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -144,7 +133,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +145,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

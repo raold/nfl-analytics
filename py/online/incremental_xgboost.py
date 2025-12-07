@@ -19,7 +19,7 @@ Author: Claude Code (River Optimization - November 12, 2025)
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import logging
 from collections import deque
@@ -61,11 +61,11 @@ class IncrementalXGBoost:
 
         # XGBoost parameters
         self.params = {
-            'n_estimators': n_estimators,
-            'max_depth': max_depth,
-            'learning_rate': learning_rate,
-            'objective': 'reg:squarederror',
-            'random_state': 42,
+            "n_estimators": n_estimators,
+            "max_depth": max_depth,
+            "learning_rate": learning_rate,
+            "objective": "reg:squarederror",
+            "random_state": 42,
         }
 
         # Sliding window buffer
@@ -141,10 +141,10 @@ class IncrementalXGBoost:
     def get_metrics(self) -> dict[str, any]:
         """Get model metrics"""
         return {
-            'window_size': len(self.window),
-            'counter': self.counter,
-            'is_trained': self.is_trained,
-            'retrains': self.counter // self.retrain_every,
+            "window_size": len(self.window),
+            "counter": self.counter,
+            "is_trained": self.is_trained,
+            "retrains": self.counter // self.retrain_every,
         }
 
     def save(self, path: str):
@@ -157,16 +157,16 @@ class IncrementalXGBoost:
         import pickle
 
         state = {
-            'window_size': self.window_size,
-            'retrain_every': self.retrain_every,
-            'params': self.params,
-            'window': list(self.window),
-            'counter': self.counter,
-            'is_trained': self.is_trained,
-            'model': self.model,
+            "window_size": self.window_size,
+            "retrain_every": self.retrain_every,
+            "params": self.params,
+            "window": list(self.window),
+            "counter": self.counter,
+            "is_trained": self.is_trained,
+            "model": self.model,
         }
 
-        with open(path, 'wb') as f:
+        with open(path, "wb") as f:
             pickle.dump(state, f)
 
         logger.info(f"IncrementalXGBoost saved to {path}")
@@ -180,16 +180,16 @@ class IncrementalXGBoost:
         """
         import pickle
 
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             state = pickle.load(f)
 
-        self.window_size = state['window_size']
-        self.retrain_every = state['retrain_every']
-        self.params = state['params']
-        self.window = deque(state['window'], maxlen=self.window_size)
-        self.counter = state['counter']
-        self.is_trained = state['is_trained']
-        self.model = state['model']
+        self.window_size = state["window_size"]
+        self.retrain_every = state["retrain_every"]
+        self.params = state["params"]
+        self.window = deque(state["window"], maxlen=self.window_size)
+        self.counter = state["counter"]
+        self.is_trained = state["is_trained"]
+        self.model = state["model"]
 
         logger.info(f"IncrementalXGBoost loaded from {path}")
 
@@ -206,13 +206,13 @@ if __name__ == "__main__":
     for i in range(200):
         # Synthetic features
         x = {
-            'passing_yards_L3': np.random.randn() * 50 + 250,
-            'attempts_L3': np.random.randn() * 5 + 35,
-            'completion_pct_L3': np.random.randn() * 0.05 + 0.65,
+            "passing_yards_L3": np.random.randn() * 50 + 250,
+            "attempts_L3": np.random.randn() * 5 + 35,
+            "completion_pct_L3": np.random.randn() * 0.05 + 0.65,
         }
 
         # Synthetic target
-        y = x['passing_yards_L3'] + np.random.randn() * 30
+        y = x["passing_yards_L3"] + np.random.randn() * 30
 
         # Predict, then train
         pred = model.predict_one(x)

@@ -58,6 +58,7 @@ DIRICHLET_WEIGHTS_V8 = {
 
 class ModelType(Enum):
     """Supported model types."""
+
     STATE_SPACE = "state_space"
     HIERARCHICAL = "hierarchical"
     INFORMATIVE_PRIORS = "informative_priors"
@@ -79,6 +80,7 @@ class ModelPrediction:
         confidence: Model confidence score (0-1)
         metadata: Additional model-specific metadata
     """
+
     model_name: str
     model_type: ModelType
     prediction_mean: float
@@ -108,6 +110,7 @@ class EnsemblePrediction:
         confidence: Overall confidence score
         metadata: Additional ensemble metadata
     """
+
     prediction_mean: float
     prediction_std: float
     model_predictions: list[ModelPrediction]
@@ -149,6 +152,7 @@ class EnsembleConfig:
         cache_predictions: Whether to cache model predictions
         db_config: Database configuration dict
     """
+
     strategy_name: str = "weighted_average"
     model_paths: dict[str, str] = field(default_factory=dict)
     weights: dict[str, float] = field(default_factory=dict)
@@ -166,6 +170,7 @@ class EnsembleConfig:
         """
         if not self.db_config:
             import os
+
             self.db_config = {
                 "host": os.getenv("DB_HOST", "localhost"),
                 "port": int(os.getenv("DB_PORT", "5544")),
@@ -216,11 +221,7 @@ class EnsembleStrategy(ABC):
         pass
 
     @abstractmethod
-    def combine(
-        self,
-        predictions: list[ModelPrediction],
-        **kwargs
-    ) -> EnsemblePrediction:
+    def combine(self, predictions: list[ModelPrediction], **kwargs) -> EnsemblePrediction:
         """
         Combine individual model predictions into ensemble prediction.
 
@@ -252,19 +253,15 @@ class EnsembleStrategy(ABC):
         for pred in predictions:
             if np.isnan(pred.prediction_mean) or np.isinf(pred.prediction_mean):
                 raise ValueError(
-                    f"Invalid prediction from {pred.model_name}: "
-                    f"mean={pred.prediction_mean}"
+                    f"Invalid prediction from {pred.model_name}: " f"mean={pred.prediction_mean}"
                 )
             if np.isnan(pred.prediction_std) or pred.prediction_std < 0:
                 raise ValueError(
-                    f"Invalid prediction std from {pred.model_name}: "
-                    f"std={pred.prediction_std}"
+                    f"Invalid prediction std from {pred.model_name}: " f"std={pred.prediction_std}"
                 )
 
     def filter_predictions(
-        self,
-        predictions: list[ModelPrediction],
-        confidence_threshold: float = 0.5
+        self, predictions: list[ModelPrediction], confidence_threshold: float = 0.5
     ) -> list[ModelPrediction]:
         """
         Filter predictions by confidence threshold.
@@ -276,10 +273,7 @@ class EnsembleStrategy(ABC):
         Returns:
             Filtered list of predictions
         """
-        return [
-            p for p in predictions
-            if p.confidence >= confidence_threshold
-        ]
+        return [p for p in predictions if p.confidence >= confidence_threshold]
 
 
 if __name__ == "__main__":
@@ -296,7 +290,7 @@ if __name__ == "__main__":
         prediction_mean=250.5,
         prediction_std=25.0,
         confidence=0.85,
-        metadata={"training_samples": 1000}
+        metadata={"training_samples": 1000},
     )
     logger.info(f"✓ ModelPrediction created: {pred.model_name}")
 
@@ -306,7 +300,7 @@ if __name__ == "__main__":
         prediction_std=20.0,
         model_predictions=[pred],
         weights={"test_model": 1.0},
-        strategy_name="test_strategy"
+        strategy_name="test_strategy",
     )
     logger.info(f"✓ EnsemblePrediction created: {ensemble.num_models} models")
 
@@ -314,10 +308,7 @@ if __name__ == "__main__":
     logger.info(f"✓ 95% Prediction interval: [{lower:.1f}, {upper:.1f}]")
 
     # Test EnsembleConfig
-    config = EnsembleConfig(
-        strategy_name="weighted",
-        weights={"model1": 0.6, "model2": 0.4}
-    )
+    config = EnsembleConfig(strategy_name="weighted", weights={"model1": 0.6, "model2": 0.4})
     logger.info(f"✓ EnsembleConfig created: strategy={config.strategy_name}")
 
     logger.info("\n✅ All data structure tests passed!")

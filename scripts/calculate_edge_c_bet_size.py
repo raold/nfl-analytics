@@ -24,10 +24,7 @@ import logging
 import math
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -52,7 +49,7 @@ def calculate_kelly_fraction(
     odds: float,
     kelly_fraction: float = 1.0,
     variance_adjustment: bool = True,
-    sample_size: int = 24
+    sample_size: int = 24,
 ) -> tuple[float, dict]:
     """
     Calculate Kelly criterion bet size with variance adjustment.
@@ -114,7 +111,7 @@ def calculate_kelly_fraction(
         "kelly_fraction_applied": kelly_fraction,
         "final_bet_fraction": final_fraction,
         "variance_adjustment_factor": adjustment_factor if variance_adjustment else 1.0,
-        "sample_size": sample_size
+        "sample_size": sample_size,
     }
 
     return final_fraction, details
@@ -125,7 +122,7 @@ def calculate_bet_amount(
     win_rate: float,
     odds: float,
     kelly_fraction: float = 0.10,
-    max_bet_pct: float = 0.02
+    max_bet_pct: float = 0.02,
 ) -> dict:
     """
     Calculate recommended bet amount with risk management constraints.
@@ -146,7 +143,7 @@ def calculate_bet_amount(
         odds=odds,
         kelly_fraction=kelly_fraction,
         variance_adjustment=True,
-        sample_size=24  # Edge C sample size
+        sample_size=24,  # Edge C sample size
     )
 
     # Calculate bet amounts
@@ -173,8 +170,8 @@ def calculate_bet_amount(
         "risk_management": {
             "kelly_fraction_used": kelly_fraction,
             "max_bet_pct": max_bet_pct,
-            "capped_by_max": recommended_bet == max_bet
-        }
+            "capped_by_max": recommended_bet == max_bet,
+        },
     }
 
     return result
@@ -187,9 +184,9 @@ def print_bet_sizing_report(result: dict):
     Args:
         result: Dictionary from calculate_bet_amount()
     """
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EDGE C BET SIZING CALCULATOR")
-    print("="*80)
+    print("=" * 80)
     print("\nINPUTS:")
     print(f"  Bankroll: ${result['bankroll']:,.2f}")
     print(f"  Win Rate: {result['kelly_details']['win_rate']*100:.1f}%")
@@ -198,18 +195,24 @@ def print_bet_sizing_report(result: dict):
 
     print("\nKELLY CALCULATION:")
     print(f"  Full Kelly: {result['kelly_details']['kelly_full']*100:.2f}% of bankroll")
-    print(f"  Variance Adjusted: {result['kelly_details']['kelly_variance_adjusted']*100:.2f}% "
-          f"(factor: {result['kelly_details']['variance_adjustment_factor']:.2f}x)")
-    print(f"  Fractional Kelly ({result['kelly_details']['kelly_fraction_applied']*100:.0f}%): "
-          f"{result['kelly_details']['final_bet_fraction']*100:.2f}% of bankroll")
+    print(
+        f"  Variance Adjusted: {result['kelly_details']['kelly_variance_adjusted']*100:.2f}% "
+        f"(factor: {result['kelly_details']['variance_adjustment_factor']:.2f}x)"
+    )
+    print(
+        f"  Fractional Kelly ({result['kelly_details']['kelly_fraction_applied']*100:.0f}%): "
+        f"{result['kelly_details']['final_bet_fraction']*100:.2f}% of bankroll"
+    )
 
     print("\nBET SIZING:")
     print(f"  Kelly Recommended: ${result['kelly_bet_amount']:,.2f}")
     print(f"  Max Allowed (2% bankroll): ${result['max_bet_amount']:,.2f}")
-    print(f"  FINAL RECOMMENDATION: ${result['recommended_bet_amount']:,.2f} "
-          f"({result['recommended_bet_pct']*100:.2f}% of bankroll)")
+    print(
+        f"  FINAL RECOMMENDATION: ${result['recommended_bet_amount']:,.2f} "
+        f"({result['recommended_bet_pct']*100:.2f}% of bankroll)"
+    )
 
-    if result['risk_management']['capped_by_max']:
+    if result["risk_management"]["capped_by_max"]:
         print("  ⚠️ Bet capped by 2% bankroll limit")
 
     print("\nEXPECTED VALUE:")
@@ -223,27 +226,26 @@ def print_bet_sizing_report(result: dict):
     print("  ✓ Capped at 2% of bankroll maximum")
     print("  ⚠️ Edge C pending baseline calculation fix")
     print("  ⚠️ Recommend paper trading before live betting")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
 
 def interactive_mode():
     """Run calculator in interactive mode."""
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EDGE C BET SIZING CALCULATOR - INTERACTIVE MODE")
-    print("="*80)
+    print("=" * 80)
 
     # Get inputs
     bankroll = float(input("\nEnter your bankroll ($): "))
     win_rate = float(input("Enter expected win rate (0-1, default 0.70 for Edge C): ") or "0.70")
     odds = float(input("Enter American odds (default -110): ") or "-110")
-    kelly_fraction = float(input("Enter Kelly fraction (0-1, default 0.10 for 10% Kelly): ") or "0.10")
+    kelly_fraction = float(
+        input("Enter Kelly fraction (0-1, default 0.10 for 10% Kelly): ") or "0.10"
+    )
 
     # Calculate
     result = calculate_bet_amount(
-        bankroll=bankroll,
-        win_rate=win_rate,
-        odds=odds,
-        kelly_fraction=kelly_fraction
+        bankroll=bankroll, win_rate=win_rate, odds=odds, kelly_fraction=kelly_fraction
     )
 
     # Print results
@@ -255,40 +257,27 @@ def main():
     parser = argparse.ArgumentParser(
         description="Calculate Edge C bet sizes using fractional Kelly criterion"
     )
-    parser.add_argument(
-        "--bankroll",
-        type=float,
-        help="Total bankroll in dollars"
-    )
+    parser.add_argument("--bankroll", type=float, help="Total bankroll in dollars")
     parser.add_argument(
         "--win-rate",
         type=float,
         default=0.70,
-        help="Expected win rate (default: 0.70 from Edge C analysis)"
+        help="Expected win rate (default: 0.70 from Edge C analysis)",
     )
-    parser.add_argument(
-        "--odds",
-        type=float,
-        default=-110,
-        help="American odds (default: -110)"
-    )
+    parser.add_argument("--odds", type=float, default=-110, help="American odds (default: -110)")
     parser.add_argument(
         "--kelly-fraction",
         type=float,
         default=0.10,
-        help="Fraction of Kelly to use (default: 0.10 = 10%% Kelly)"
+        help="Fraction of Kelly to use (default: 0.10 = 10%% Kelly)",
     )
     parser.add_argument(
         "--max-bet-pct",
         type=float,
         default=0.02,
-        help="Maximum bet as %% of bankroll (default: 0.02 = 2%%)"
+        help="Maximum bet as %% of bankroll (default: 0.02 = 2%%)",
     )
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Run in interactive mode"
-    )
+    parser.add_argument("--interactive", action="store_true", help="Run in interactive mode")
 
     args = parser.parse_args()
 
@@ -307,7 +296,7 @@ def main():
         win_rate=args.win_rate,
         odds=args.odds,
         kelly_fraction=args.kelly_fraction,
-        max_bet_pct=args.max_bet_pct
+        max_bet_pct=args.max_bet_pct,
     )
 
     # Print report

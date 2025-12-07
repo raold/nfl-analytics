@@ -23,7 +23,6 @@ def test_generate_tables_basic():
     assert result is not None
 
 
-
 def test_generate_tables_edge_cases():
     """Test generate_tables: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_generate_tables_edge_cases():
     assert result is not None
 
 
-
 def test_generate_tables_error_handling():
     """Test generate_tables error handling."""
     with pytest.raises(ValueError):
         generate_tables(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_generate_tables_property_idempotent(self, season_start, season_end, out
 
     # Assert property
     assert generate_tables(season_start, season_end, output_dir) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -67,7 +63,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -80,9 +75,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

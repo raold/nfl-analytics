@@ -31,6 +31,7 @@ from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 # FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def project_root():
     """Get project root directory."""
@@ -53,6 +54,7 @@ def models_directory(project_root):
 # TESTS: Data Files Validation
 # ============================================================================
 
+
 class TestStateSpaceSkillsData:
     """Test state-space skills CSV (4321 players)."""
 
@@ -61,7 +63,12 @@ class TestStateSpaceSkillsData:
         skills_path = data_directory / "state_space_skills.csv"
         # Alternative paths
         if not skills_path.exists():
-            skills_path = Path(__file__).parent.parent.parent / "models" / "bayesian" / "simplified_random_walk_skills_v2.csv"
+            skills_path = (
+                Path(__file__).parent.parent.parent
+                / "models"
+                / "bayesian"
+                / "simplified_random_walk_skills_v2.csv"
+            )
 
         # File may not exist in test environment, but if it does, validate
         if skills_path.exists():
@@ -71,7 +78,12 @@ class TestStateSpaceSkillsData:
         """Skills CSV should be loadable as DataFrame."""
         skills_path = data_directory / "state_space_skills.csv"
         if not skills_path.exists():
-            skills_path = Path(__file__).parent.parent.parent / "models" / "bayesian" / "simplified_random_walk_skills_v2.csv"
+            skills_path = (
+                Path(__file__).parent.parent.parent
+                / "models"
+                / "bayesian"
+                / "simplified_random_walk_skills_v2.csv"
+            )
 
         if skills_path.exists():
             df = pd.read_csv(skills_path)
@@ -82,7 +94,12 @@ class TestStateSpaceSkillsData:
         """Skills CSV should have required columns."""
         skills_path = data_directory / "state_space_skills.csv"
         if not skills_path.exists():
-            skills_path = Path(__file__).parent.parent.parent / "models" / "bayesian" / "simplified_random_walk_skills_v2.csv"
+            skills_path = (
+                Path(__file__).parent.parent.parent
+                / "models"
+                / "bayesian"
+                / "simplified_random_walk_skills_v2.csv"
+            )
 
         if skills_path.exists():
             df = pd.read_csv(skills_path)
@@ -139,8 +156,19 @@ class TestCausalFeaturesData:
 
             # Expected high-roughing teams from causal_features_v1.py
             expected_high_roughing = [
-                "HOU", "IND", "LAC", "NYJ", "SEA", "ARI", "BAL", "KC",
-                "CLE", "SF", "CIN", "MIN", "DEN"
+                "HOU",
+                "IND",
+                "LAC",
+                "NYJ",
+                "SEA",
+                "ARI",
+                "BAL",
+                "KC",
+                "CLE",
+                "SF",
+                "CIN",
+                "MIN",
+                "DEN",
             ]
 
             if "defense_team" in df.columns:
@@ -154,6 +182,7 @@ class TestCausalFeaturesData:
 # ============================================================================
 # TESTS: Model Files Validation
 # ============================================================================
+
 
 class TestModelFilesExistence:
     """Test that required model files exist or can be gracefully handled."""
@@ -224,6 +253,7 @@ class TestModelFilesExistence:
 # TESTS: Database Connectivity (Mocked)
 # ============================================================================
 
+
 class TestDatabaseConnectivity:
     """Test database connectivity and schema validation."""
 
@@ -246,9 +276,11 @@ class TestDatabaseConnectivity:
         mock_connect.return_value = mock_conn
 
         # Simulate ensemble trying to connect
-        with patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"), \
-             patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"), \
-             patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"):
+        with (
+            patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+            patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
+            patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+        ):
 
             ensemble = EnhancedEnsemble5Way(
                 db_password="test_password",
@@ -300,6 +332,7 @@ class TestDatabaseConnectivity:
 # ============================================================================
 # TESTS: Schema Validation
 # ============================================================================
+
 
 class TestDatabaseSchema:
     """Test database schema assumptions."""
@@ -354,6 +387,7 @@ class TestDatabaseSchema:
 # TESTS: Data Validation for Ensemble
 # ============================================================================
 
+
 class TestEnsembleDataValidation:
     """Test data validation for ensemble predictions."""
 
@@ -385,7 +419,12 @@ class TestEnsembleDataValidation:
             "causal_total_yards": 17.70,
         }
 
-        required_keys = {"did_roughing_yards", "psm_travel_yards", "psm_weather_yards", "causal_total_yards"}
+        required_keys = {
+            "did_roughing_yards",
+            "psm_travel_yards",
+            "psm_weather_yards",
+            "causal_total_yards",
+        }
         assert set(causal_features.keys()) == required_keys
 
         # Validate value types
@@ -395,14 +434,38 @@ class TestEnsembleDataValidation:
     def test_nfl_team_abbreviations_valid(self):
         """NFL team abbreviations should be standard."""
         valid_teams = {
-            "NE", "MIA", "BUF", "NYJ",
-            "PIT", "BAL", "CLE", "CIN",
-            "HOU", "IND", "TEN", "JAX",
-            "KC", "LAC", "OAK", "DEN",
-            "LAR", "SF", "SEA", "ARI",
-            "DAL", "PHI", "WAS", "NYG",
-            "GB", "MIN", "CHI", "DET",
-            "TB", "NO", "ATL", "CAR",
+            "NE",
+            "MIA",
+            "BUF",
+            "NYJ",
+            "PIT",
+            "BAL",
+            "CLE",
+            "CIN",
+            "HOU",
+            "IND",
+            "TEN",
+            "JAX",
+            "KC",
+            "LAC",
+            "OAK",
+            "DEN",
+            "LAR",
+            "SF",
+            "SEA",
+            "ARI",
+            "DAL",
+            "PHI",
+            "WAS",
+            "NYG",
+            "GB",
+            "MIN",
+            "CHI",
+            "DET",
+            "TB",
+            "NO",
+            "ATL",
+            "CAR",
             # LAC/LAR are correct (not LA)
         }
 
@@ -420,16 +483,17 @@ class TestEnsembleDataValidation:
 # TESTS: Data Range Validation
 # ============================================================================
 
+
 class TestDataRangeValidation:
     """Test that data values are in expected ranges."""
 
     def test_passing_yards_reasonable_range(self):
         """Passing yards should be in reasonable range."""
         test_cases = [
-            (150, True),   # Valid: below average
-            (250, True),   # Valid: average
-            (350, True),   # Valid: above average
-            (50, False),   # Invalid: too low for season average
+            (150, True),  # Valid: below average
+            (250, True),  # Valid: average
+            (350, True),  # Valid: above average
+            (50, False),  # Invalid: too low for season average
             (500, False),  # Invalid: too high for season average
         ]
 
@@ -440,12 +504,12 @@ class TestDataRangeValidation:
     def test_completion_percentage_range(self):
         """Completion percentage should be 0-100%."""
         test_cases = [
-            (0.50, True),   # Valid: 50%
+            (0.50, True),  # Valid: 50%
             (0.686, True),  # Valid: Mahomes level
-            (0.65, True),   # Valid: League average
-            (1.0, True),    # Valid: 100%
-            (0.0, True),    # Valid: 0%
-            (1.5, False),   # Invalid: > 100%
+            (0.65, True),  # Valid: League average
+            (1.0, True),  # Valid: 100%
+            (0.0, True),  # Valid: 0%
+            (1.5, False),  # Invalid: > 100%
             (-0.1, False),  # Invalid: negative
         ]
 
@@ -456,8 +520,8 @@ class TestDataRangeValidation:
     def test_causal_adjustment_magnitude(self):
         """Causal adjustments should have reasonable magnitude."""
         did_roughing = 17.70  # yards
-        psm_travel = 1.38     # yards
-        psm_weather = -2.24   # yards
+        psm_travel = 1.38  # yards
+        psm_weather = -2.24  # yards
 
         # Should be reasonable magnitude (not 1000+ yards)
         assert abs(did_roughing) < 50

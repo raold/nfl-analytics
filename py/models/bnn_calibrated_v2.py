@@ -131,12 +131,7 @@ class CalibratedBNN:
                 approx = pm.fit(
                     n=30000,
                     method="advi",
-                    callbacks=[
-                        pm.callbacks.CheckParametersConvergence(
-                            tolerance=1e-5,
-                            every=1000
-                        )
-                    ]
+                    callbacks=[pm.callbacks.CheckParametersConvergence(tolerance=1e-5, every=1000)],
                 )
 
                 self.trace = approx.sample(self.n_samples)
@@ -151,7 +146,7 @@ class CalibratedBNN:
                     chains=4,
                     cores=4,
                     target_accept=0.95,
-                    return_inferencedata=True
+                    return_inferencedata=True,
                 )
 
                 logger.info(f"✓ NUTS complete: {self.n_samples} samples")
@@ -164,10 +159,7 @@ class CalibratedBNN:
         logger.info("✓ Calibrated BNN training complete")
 
     def predict(
-        self,
-        X: np.ndarray,
-        return_quantiles: bool = True,
-        check_calibration: bool = True
+        self, X: np.ndarray, return_quantiles: bool = True, check_calibration: bool = True
     ) -> dict[str, np.ndarray]:
         """
         Predict with calibrated uncertainties
@@ -188,9 +180,7 @@ class CalibratedBNN:
 
             # Posterior predictive
             posterior_pred = pm.sample_posterior_predictive(
-                self.trace,
-                var_names=["y_obs"],
-                random_seed=42
+                self.trace, var_names=["y_obs"], random_seed=42
             )
 
         # Extract predictions
@@ -202,11 +192,13 @@ class CalibratedBNN:
         }
 
         if return_quantiles:
-            predictions.update({
-                "q05": np.percentile(pred_samples, 5, axis=0),
-                "q50": np.percentile(pred_samples, 50, axis=0),
-                "q95": np.percentile(pred_samples, 95, axis=0),
-            })
+            predictions.update(
+                {
+                    "q05": np.percentile(pred_samples, 5, axis=0),
+                    "q50": np.percentile(pred_samples, 50, axis=0),
+                    "q95": np.percentile(pred_samples, 95, axis=0),
+                }
+            )
 
         if check_calibration:
             # Log calibration metrics for monitoring
@@ -247,7 +239,7 @@ class CalibratedBNN:
             hidden_dims=save_dict["hidden_dims"],
             inference_method=save_dict["inference_method"],
             temperature=save_dict.get("temperature", 0.75),  # Default to calibrated
-            prior_std=save_dict.get("prior_std", 1.0)
+            prior_std=save_dict.get("prior_std", 1.0),
         )
 
         bnn.trace = save_dict["trace"]
@@ -265,15 +257,13 @@ class CalibratedBNN:
 def main():
     """Example usage of calibrated BNN"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("CALIBRATED BNN v2.0 - PRODUCTION EXAMPLE")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Initialize calibrated BNN
     bnn = CalibratedBNN(
-        hidden_dims=(64, 32),
-        temperature=0.75,  # Validated calibration
-        inference_method="advi"
+        hidden_dims=(64, 32), temperature=0.75, inference_method="advi"  # Validated calibration
     )
 
     logger.info("\n✓ Calibrated BNN v2.0 ready for production")

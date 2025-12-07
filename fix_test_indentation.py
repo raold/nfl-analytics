@@ -25,11 +25,13 @@ def fix_indentation(content: str) -> str:
         # and is not already 12+ spaces (nested block), reduce to 4 spaces
         if line.startswith("        ") and not line.startswith("            "):
             # Check if this should be a 4-space indent line
-            if (prev_stripped.startswith("#") or
-                prev_stripped == "" or
-                ("# Assert" in prev_stripped) or
-                ("# Act" in prev_stripped) or
-                ("# Arrange" in prev_stripped)):
+            if (
+                prev_stripped.startswith("#")
+                or prev_stripped == ""
+                or ("# Assert" in prev_stripped)
+                or ("# Act" in prev_stripped)
+                or ("# Arrange" in prev_stripped)
+            ):
                 # Remove 4 spaces of indentation
                 fixed_lines.append(line[4:])
                 continue

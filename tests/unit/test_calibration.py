@@ -23,7 +23,6 @@ def test_brier_score_basic():
     assert result is not None
 
 
-
 def test_brier_score_edge_cases():
     """Test brier_score: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_brier_score_edge_cases():
     assert result is not None
 
 
-
 def test_brier_score_error_handling():
     """Test brier_score error handling."""
     with pytest.raises(ValueError):
         brier_score(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_brier_score_property_idempotent(self, y_true, p_hat):
 
     # Assert property
     assert brier_score(y_true, p_hat) == result, "idempotent violated"
-
 
 
 def test_log_loss_basic():
@@ -67,7 +63,6 @@ def test_log_loss_basic():
     assert result is not None
 
 
-
 def test_log_loss_edge_cases():
     """Test log_loss: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_log_loss_edge_cases():
     assert result is not None
 
 
-
 def test_log_loss_error_handling():
     """Test log_loss error handling."""
     with pytest.raises(ValueError):
         log_loss(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_log_loss_property_idempotent(self, y_true, p_hat, eps):
 
     # Assert property
     assert log_loss(y_true, p_hat, eps) == result, "idempotent violated"
-
 
 
 def test_reliability_curve_basic():
@@ -111,7 +103,6 @@ def test_reliability_curve_basic():
     assert result is not None
 
 
-
 def test_reliability_curve_edge_cases():
     """Test reliability_curve: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_reliability_curve_edge_cases():
     assert result is not None
 
 
-
 def test_reliability_curve_error_handling():
     """Test reliability_curve error handling."""
     with pytest.raises(ValueError):
         reliability_curve(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_reliability_curve_property_idempotent(self, y_true, p_hat, bins):
 
     # Assert property
     assert reliability_curve(y_true, p_hat, bins) == result, "idempotent violated"
-
 
 
 def test_expected_calibration_error_basic():
@@ -155,7 +143,6 @@ def test_expected_calibration_error_basic():
     assert result is not None
 
 
-
 def test_expected_calibration_error_edge_cases():
     """Test expected_calibration_error: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_expected_calibration_error_edge_cases():
     assert result is not None
 
 
-
 def test_expected_calibration_error_error_handling():
     """Test expected_calibration_error error handling."""
     with pytest.raises(ValueError):
         expected_calibration_error(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -184,4 +169,3 @@ def test_expected_calibration_error_property_idempotent(self, y_true, p_hat, bin
 
     # Assert property
     assert expected_calibration_error(y_true, p_hat, bins) == result, "idempotent violated"
-

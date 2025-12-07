@@ -33,7 +33,7 @@ Author: Claude Code (River Optimization - November 12, 2025)
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
 import json
@@ -49,16 +49,14 @@ from py.online.online_learning_adapter import (
     OnlinePredictionPipeline,
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 # =============================================================================
 # Data Loading (Reused from fixed validation script)
 # =============================================================================
+
 
 def load_player_stats_by_week(
     season: int,
@@ -125,72 +123,84 @@ def engineer_features(df: pd.DataFrame, enhanced: bool = False) -> pd.DataFrame:
     logger.info(f"Starting with {len(df)} records")
 
     df = df.copy()
-    df = df.sort_values(['player_id', 'kickoff'])
+    df = df.sort_values(["player_id", "kickoff"])
 
     # Rolling averages (L3 window only to preserve data)
     for window in [3]:
-        df[f'passing_yards_L{window}'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(window).mean()
-        df[f'attempts_L{window}'] = df.groupby('player_id')['attempts'].shift(1).rolling(window).mean()
-        df[f'completions_L{window}'] = df.groupby('player_id')['completions'].shift(1).rolling(window).mean()
+        df[f"passing_yards_L{window}"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(window).mean()
+        )
+        df[f"attempts_L{window}"] = (
+            df.groupby("player_id")["attempts"].shift(1).rolling(window).mean()
+        )
+        df[f"completions_L{window}"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(window).mean()
+        )
 
     # Lagged completion percentage (no target leakage)
-    df['completion_pct_L3'] = (
-        df.groupby('player_id')['completions'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["completion_pct_L3"] = (
+        df.groupby("player_id")["completions"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Lagged yards per attempt (no target leakage)
-    df['yards_per_attempt_L3'] = (
-        df.groupby('player_id')['passing_yards'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["yards_per_attempt_L3"] = (
+        df.groupby("player_id")["passing_yards"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Game context features
-    df['home_favorite'] = (df['spread_close'] < 0).astype(int)
-    df['high_total'] = (df['total_close'] > 47).astype(int)
+    df["home_favorite"] = (df["spread_close"] < 0).astype(int)
+    df["high_total"] = (df["total_close"] > 47).astype(int)
 
     if enhanced:
         # APPROACH 4: Enhanced feature engineering (15-20 features)
         logger.info("Adding enhanced features...")
 
         # 1. Momentum features (trend)
-        df['yards_trend_L3'] = (
-            df.groupby('player_id')['passing_yards'].shift(1).rolling(3).apply(
-                lambda x: (x.iloc[-1] - x.iloc[0]) / 3 if len(x) == 3 else 0, raw=False
-            )
+        df["yards_trend_L3"] = (
+            df.groupby("player_id")["passing_yards"]
+            .shift(1)
+            .rolling(3)
+            .apply(lambda x: (x.iloc[-1] - x.iloc[0]) / 3 if len(x) == 3 else 0, raw=False)
         )
 
         # 2. Volatility features
-        df['yards_std_L3'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(3).std()
+        df["yards_std_L3"] = df.groupby("player_id")["passing_yards"].shift(1).rolling(3).std()
 
         # 3. Days rest (temporal feature) - simulated
-        df['days_since_last_game'] = df.groupby('player_id')['kickoff'].diff().dt.days.fillna(7)
+        df["days_since_last_game"] = df.groupby("player_id")["kickoff"].diff().dt.days.fillna(7)
 
         # 4. Week of season (temporal)
-        df['week_of_season'] = df['week']
+        df["week_of_season"] = df["week"]
 
         # 5. Interaction features
-        df['rest_x_trend'] = df['days_since_last_game'] * df['yards_trend_L3']
-        df['week_x_volatility'] = df['week_of_season'] * df['yards_std_L3']
+        df["rest_x_trend"] = df["days_since_last_game"] * df["yards_trend_L3"]
+        df["week_x_volatility"] = df["week_of_season"] * df["yards_std_L3"]
 
         # 6. Spread interaction
-        df['spread_x_total'] = df['spread_close'] * df['total_close']
+        df["spread_x_total"] = df["spread_close"] * df["total_close"]
 
         # 7. Touchdown rate (lagged)
-        df['touchdown_rate_L3'] = (
-            df.groupby('player_id')['touchdowns'].shift(1).rolling(3).sum() /
-            df.groupby('player_id')['attempts'].shift(1).rolling(3).sum().replace(0, 1)
-        )
+        df["touchdown_rate_L3"] = df.groupby("player_id")["touchdowns"].shift(1).rolling(
+            3
+        ).sum() / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum().replace(0, 1)
 
         # 8. Interception rate (lagged)
-        df['interception_rate_L3'] = (
-            df.groupby('player_id')['interceptions'].shift(1).rolling(3).sum() /
-            df.groupby('player_id')['attempts'].shift(1).rolling(3).sum().replace(0, 1)
-        )
+        df["interception_rate_L3"] = df.groupby("player_id")["interceptions"].shift(1).rolling(
+            3
+        ).sum() / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum().replace(0, 1)
 
         # Fill NaN in enhanced features
-        enhanced_cols = ['yards_trend_L3', 'yards_std_L3', 'rest_x_trend', 'week_x_volatility',
-                        'spread_x_total', 'touchdown_rate_L3', 'interception_rate_L3']
+        enhanced_cols = [
+            "yards_trend_L3",
+            "yards_std_L3",
+            "rest_x_trend",
+            "week_x_volatility",
+            "spread_x_total",
+            "touchdown_rate_L3",
+            "interception_rate_L3",
+        ]
         for col in enhanced_cols:
             if col in df.columns:
                 df[col] = df[col].fillna(df[col].median())
@@ -198,12 +208,14 @@ def engineer_features(df: pd.DataFrame, enhanced: bool = False) -> pd.DataFrame:
         logger.info(f"Enhanced features added: {len(enhanced_cols)} new columns")
 
     # Only drop rows with NaN in critical features
-    critical_features = ['passing_yards_L3', 'attempts_L3', 'completions_L3']
+    critical_features = ["passing_yards_L3", "attempts_L3", "completions_L3"]
     df = df.dropna(subset=critical_features)
 
     # Fill remaining NaN with median
-    df['completion_pct_L3'] = df['completion_pct_L3'].fillna(df['completion_pct_L3'].median())
-    df['yards_per_attempt_L3'] = df['yards_per_attempt_L3'].fillna(df['yards_per_attempt_L3'].median())
+    df["completion_pct_L3"] = df["completion_pct_L3"].fillna(df["completion_pct_L3"].median())
+    df["yards_per_attempt_L3"] = df["yards_per_attempt_L3"].fillna(
+        df["yards_per_attempt_L3"].median()
+    )
 
     logger.info(f"After feature engineering: {len(df)} records")
     return df
@@ -212,6 +224,7 @@ def engineer_features(df: pd.DataFrame, enhanced: bool = False) -> pd.DataFrame:
 # =============================================================================
 # Approach 1: Hyperparameter Tuning
 # =============================================================================
+
 
 def approach_1_hyperparameter_tuning(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
@@ -232,34 +245,37 @@ def approach_1_hyperparameter_tuning(df: pd.DataFrame, db_params: dict) -> dict[
 
     # Initialize with NFL-optimized model
     pipeline = OnlinePredictionPipeline(
-        online_model_type='adaptive_random_forest_nfl',  # NEW NFL-tuned config
-        drift_sensitivity='high',  # More sensitive drift detection
+        online_model_type="adaptive_random_forest_nfl",  # NEW NFL-tuned config
+        drift_sensitivity="high",  # More sensitive drift detection
     )
 
     # Run prequential evaluation
     results = pipeline.evaluate_prequential(
         df=df,
-        target_col='passing_yards',
-        date_col='kickoff',
+        target_col="passing_yards",
+        date_col="kickoff",
         window_size=50,
     )
 
-    results['approach'] = 'hyperparameter_tuning'
-    results['config'] = {
-        'n_models': 3,
-        'grace_period': 10,
-        'lambda_value': 2,
-        'split_confidence': 0.10,
-        'drift_sensitivity': 'high',
+    results["approach"] = "hyperparameter_tuning"
+    results["config"] = {
+        "n_models": 3,
+        "grace_period": 10,
+        "lambda_value": 2,
+        "split_confidence": 0.10,
+        "drift_sensitivity": "high",
     }
 
-    logger.info(f"Results: MAE={results['mean_mae']:.2f} yards, Drifts={results['num_drift_events']}")
+    logger.info(
+        f"Results: MAE={results['mean_mae']:.2f} yards, Drifts={results['num_drift_events']}"
+    )
     return results
 
 
 # =============================================================================
 # Approach 2: Ensemble of Online Learners
 # =============================================================================
+
 
 def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
@@ -283,14 +299,30 @@ def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, An
     ensemble = MultiOnlineEnsemble()
 
     # Prequential evaluation
-    df_sorted = df.sort_values('kickoff').reset_index(drop=True)
+    df_sorted = df.sort_values("kickoff").reset_index(drop=True)
 
     # Select features
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
-                   'season', 'week', 'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df_sorted.columns if c not in exclude_cols and df_sorted[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c
+        for c in df_sorted.columns
+        if c not in exclude_cols and df_sorted[c].dtype in ["int64", "float64"]
+    ]
     X = df_sorted[feature_cols]
-    y = df_sorted['passing_yards']
+    y = df_sorted["passing_yards"]
 
     mae_history = []
 
@@ -307,13 +339,13 @@ def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, An
         ensemble.learn_one(x_test, y_test)
 
     results = {
-        'approach': 'multi_ensemble',
-        'mean_mae': np.mean(mae_history),
-        'median_mae': np.median(mae_history),
-        'std_mae': np.std(mae_history),
-        'num_drift_events': 0,  # No drift detection in multi-ensemble
-        'final_model_samples': len(mae_history),
-        'model_weights': ensemble.weights,
+        "approach": "multi_ensemble",
+        "mean_mae": np.mean(mae_history),
+        "median_mae": np.median(mae_history),
+        "std_mae": np.std(mae_history),
+        "num_drift_events": 0,  # No drift detection in multi-ensemble
+        "final_model_samples": len(mae_history),
+        "model_weights": ensemble.weights,
     }
 
     logger.info(f"Results: MAE={results['mean_mae']:.2f} yards")
@@ -323,6 +355,7 @@ def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, An
 # =============================================================================
 # Approach 3: Warm-Start with Static Model
 # =============================================================================
+
 
 def approach_3_warm_start(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
@@ -343,22 +376,38 @@ def approach_3_warm_start(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     # For now, use mean as static predictor
 
     pipeline = OnlinePredictionPipeline(
-        online_model_type='adaptive_random_forest_nfl',
-        drift_sensitivity='medium',
+        online_model_type="adaptive_random_forest_nfl",
+        drift_sensitivity="medium",
     )
 
-    df_sorted = df.sort_values('kickoff').reset_index(drop=True)
+    df_sorted = df.sort_values("kickoff").reset_index(drop=True)
 
     # Split: first 50% for static model
     split_idx = len(df_sorted) // 2
-    static_mean = df_sorted['passing_yards'].iloc[:split_idx].mean()
+    static_mean = df_sorted["passing_yards"].iloc[:split_idx].mean()
 
     # Prequential evaluation with blending
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
-                   'season', 'week', 'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df_sorted.columns if c not in exclude_cols and df_sorted[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c
+        for c in df_sorted.columns
+        if c not in exclude_cols and df_sorted[c].dtype in ["int64", "float64"]
+    ]
     X = df_sorted[feature_cols]
-    y = df_sorted['passing_yards']
+    y = df_sorted["passing_yards"]
 
     mae_history = []
 
@@ -383,12 +432,12 @@ def approach_3_warm_start(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
         pipeline.online_model.partial_fit(x_test, y_test)
 
     results = {
-        'approach': 'warm_start',
-        'mean_mae': np.mean(mae_history),
-        'median_mae': np.median(mae_history),
-        'std_mae': np.std(mae_history),
-        'num_drift_events': 0,
-        'final_model_samples': len(mae_history),
+        "approach": "warm_start",
+        "mean_mae": np.mean(mae_history),
+        "median_mae": np.median(mae_history),
+        "std_mae": np.std(mae_history),
+        "num_drift_events": 0,
+        "final_model_samples": len(mae_history),
     }
 
     logger.info(f"Results: MAE={results['mean_mae']:.2f} yards")
@@ -398,6 +447,7 @@ def approach_3_warm_start(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
 # =============================================================================
 # Approach 4: Feature Engineering
 # =============================================================================
+
 
 def approach_4_feature_engineering(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
@@ -419,24 +469,28 @@ def approach_4_feature_engineering(df: pd.DataFrame, db_params: dict) -> dict[st
     df_enhanced = load_player_stats_by_week(2024, db_params)
     df_enhanced = engineer_features(df_enhanced, enhanced=True)
 
-    logger.info(f"Features: {len([c for c in df_enhanced.columns if df_enhanced[c].dtype in ['int64', 'float64']])} total")
+    logger.info(
+        f"Features: {len([c for c in df_enhanced.columns if df_enhanced[c].dtype in ['int64', 'float64']])} total"
+    )
 
     # Initialize pipeline with NFL-optimized model
     pipeline = OnlinePredictionPipeline(
-        online_model_type='adaptive_random_forest_nfl',
-        drift_sensitivity='medium',
+        online_model_type="adaptive_random_forest_nfl",
+        drift_sensitivity="medium",
     )
 
     # Run prequential evaluation
     results = pipeline.evaluate_prequential(
         df=df_enhanced,
-        target_col='passing_yards',
-        date_col='kickoff',
+        target_col="passing_yards",
+        date_col="kickoff",
         window_size=50,
     )
 
-    results['approach'] = 'feature_engineering'
-    results['num_features'] = len([c for c in df_enhanced.columns if df_enhanced[c].dtype in ['int64', 'float64']])
+    results["approach"] = "feature_engineering"
+    results["num_features"] = len(
+        [c for c in df_enhanced.columns if df_enhanced[c].dtype in ["int64", "float64"]]
+    )
 
     logger.info(f"Results: MAE={results['mean_mae']:.2f} yards, Features={results['num_features']}")
     return results
@@ -445,6 +499,7 @@ def approach_4_feature_engineering(df: pd.DataFrame, db_params: dict) -> dict[st
 # =============================================================================
 # Approach 6: Custom Incremental XGBoost
 # =============================================================================
+
 
 def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
@@ -472,14 +527,30 @@ def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[st
     )
 
     # Prequential evaluation
-    df_sorted = df.sort_values('kickoff').reset_index(drop=True)
+    df_sorted = df.sort_values("kickoff").reset_index(drop=True)
 
     # Select features
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
-                   'season', 'week', 'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df_sorted.columns if c not in exclude_cols and df_sorted[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c
+        for c in df_sorted.columns
+        if c not in exclude_cols and df_sorted[c].dtype in ["int64", "float64"]
+    ]
     X = df_sorted[feature_cols]
-    y = df_sorted['passing_yards']
+    y = df_sorted["passing_yards"]
 
     mae_history = []
 
@@ -496,13 +567,13 @@ def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[st
         model.learn_one(x_test, y_test)
 
     results = {
-        'approach': 'incremental_xgboost',
-        'mean_mae': np.mean(mae_history),
-        'median_mae': np.median(mae_history),
-        'std_mae': np.std(mae_history),
-        'num_drift_events': 0,  # No drift detection
-        'final_model_samples': len(mae_history),
-        'retrains': model.get_metrics()['retrains'],
+        "approach": "incremental_xgboost",
+        "mean_mae": np.mean(mae_history),
+        "median_mae": np.median(mae_history),
+        "std_mae": np.std(mae_history),
+        "num_drift_events": 0,  # No drift detection
+        "final_model_samples": len(mae_history),
+        "retrains": model.get_metrics()["retrains"],
     }
 
     logger.info(f"Results: MAE={results['mean_mae']:.2f} yards, Retrains={results['retrains']}")
@@ -513,13 +584,18 @@ def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[st
 # Main Validation Runner
 # =============================================================================
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Validate River optimization approaches')
-    parser.add_argument('--approach', type=str, default='1',
-                       choices=['1', '2', '3', '4', '5', '6', 'all'],
-                       help='Approach number to test (or "all")')
-    parser.add_argument('--season', type=int, default=2024, help='NFL season')
-    parser.add_argument('--output-dir', type=str, default='results/', help='Output directory')
+    parser = argparse.ArgumentParser(description="Validate River optimization approaches")
+    parser.add_argument(
+        "--approach",
+        type=str,
+        default="1",
+        choices=["1", "2", "3", "4", "5", "6", "all"],
+        help='Approach number to test (or "all")',
+    )
+    parser.add_argument("--season", type=int, default=2024, help="NFL season")
+    parser.add_argument("--output-dir", type=str, default="results/", help="Output directory")
     args = parser.parse_args()
 
     logger.info("=" * 80)
@@ -530,11 +606,11 @@ def main():
 
     # Database connection
     db_params = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
+        "host": "localhost",
+        "port": 5544,
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     # Load data
@@ -546,33 +622,33 @@ def main():
     # Run approaches
     results_all = {}
 
-    if args.approach in ['1', 'all']:
-        results_all['approach_1'] = approach_1_hyperparameter_tuning(df, db_params)
+    if args.approach in ["1", "all"]:
+        results_all["approach_1"] = approach_1_hyperparameter_tuning(df, db_params)
 
-    if args.approach in ['2', 'all']:
+    if args.approach in ["2", "all"]:
         try:
-            results_all['approach_2'] = approach_2_multi_ensemble(df, db_params)
+            results_all["approach_2"] = approach_2_multi_ensemble(df, db_params)
         except ImportError:
             logger.warning("Approach 2 skipped - multi_ensemble.py not created yet")
 
-    if args.approach in ['3', 'all']:
-        results_all['approach_3'] = approach_3_warm_start(df, db_params)
+    if args.approach in ["3", "all"]:
+        results_all["approach_3"] = approach_3_warm_start(df, db_params)
 
-    if args.approach in ['4', 'all']:
-        results_all['approach_4'] = approach_4_feature_engineering(df, db_params)
+    if args.approach in ["4", "all"]:
+        results_all["approach_4"] = approach_4_feature_engineering(df, db_params)
 
-    if args.approach in ['5', 'all']:
+    if args.approach in ["5", "all"]:
         logger.warning("Approach 5 (drift ensemble) not implemented yet - skipping")
 
-    if args.approach in ['6', 'all']:
-        results_all['approach_6'] = approach_6_incremental_xgboost(df, db_params)
+    if args.approach in ["6", "all"]:
+        results_all["approach_6"] = approach_6_incremental_xgboost(df, db_params)
 
     # Save results
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / f"online_approach_{args.approach}_validation.json"
-    with open(output_file, 'w') as f:
+    with open(output_file, "w") as f:
         json.dump(results_all, f, indent=2, default=str)
 
     logger.info(f"\nResults saved to {output_file}")
@@ -584,8 +660,8 @@ def main():
     print("Baseline: MAE=173.59 yards, Static=55.16 yards")
     print("\nResults:")
     for approach_name, result in results_all.items():
-        mae = result.get('mean_mae', 0)
-        drifts = result.get('num_drift_events', 0)
+        mae = result.get("mean_mae", 0)
+        drifts = result.get("num_drift_events", 0)
         status = "✅" if mae < 65 else ("⚠️" if mae < 80 else "⛔")
         print(f"  {status} {approach_name}: MAE={mae:.2f} yards, Drifts={drifts}")
     print("=" * 80)

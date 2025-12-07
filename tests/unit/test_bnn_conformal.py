@@ -157,21 +157,17 @@ def realistic_nfl_data() -> tuple[np.ndarray, np.ndarray]:
 
 def test_wrapper_initialization(mock_bnn):
     """Test PyTorchBNNWrapper initializes correctly."""
-    wrapper = PyTorchBNNWrapper(
-        bnn_model=mock_bnn,
-        device='cpu',
-        n_samples=50
-    )
+    wrapper = PyTorchBNNWrapper(bnn_model=mock_bnn, device="cpu", n_samples=50)
 
     assert wrapper.bnn_model is not None
-    assert wrapper.device == 'cpu'
+    assert wrapper.device == "cpu"
     assert wrapper.n_samples == 50
     assert wrapper.bnn_model.training is False  # Should be in eval mode
 
 
 def test_wrapper_fit_noop(mock_bnn, synthetic_data):
     """Test PyTorchBNNWrapper.fit() is a no-op (BNN already trained)."""
-    wrapper = PyTorchBNNWrapper(mock_bnn, device='cpu')
+    wrapper = PyTorchBNNWrapper(mock_bnn, device="cpu")
     X, y = synthetic_data
 
     # fit() should return self
@@ -184,7 +180,7 @@ def test_wrapper_fit_noop(mock_bnn, synthetic_data):
 
 def test_wrapper_predict_numpy_input(mock_bnn):
     """Test PyTorchBNNWrapper.predict() with numpy input."""
-    wrapper = PyTorchBNNWrapper(mock_bnn, device='cpu', n_samples=10)
+    wrapper = PyTorchBNNWrapper(mock_bnn, device="cpu", n_samples=10)
 
     # Create small test input
     X = np.random.randn(20, 13)
@@ -200,7 +196,7 @@ def test_wrapper_predict_numpy_input(mock_bnn):
 
 def test_wrapper_predict_tensor_input(mock_bnn):
     """Test PyTorchBNNWrapper.predict() with tensor input."""
-    wrapper = PyTorchBNNWrapper(mock_bnn, device='cpu', n_samples=10)
+    wrapper = PyTorchBNNWrapper(mock_bnn, device="cpu", n_samples=10)
 
     # Create tensor input
     X = torch.randn(20, 13)
@@ -214,7 +210,7 @@ def test_wrapper_predict_tensor_input(mock_bnn):
 
 def test_wrapper_predict_mc_averaging(mock_bnn):
     """Test that predictions are averaged over MC samples."""
-    wrapper = PyTorchBNNWrapper(mock_bnn, device='cpu', n_samples=50)
+    wrapper = PyTorchBNNWrapper(mock_bnn, device="cpu", n_samples=50)
 
     X = np.random.randn(10, 13)
 
@@ -230,7 +226,7 @@ def test_wrapper_predict_mc_averaging(mock_bnn):
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 def test_wrapper_predict_cuda(mock_bnn):
     """Test PyTorchBNNWrapper.predict() on CUDA device."""
-    wrapper = PyTorchBNNWrapper(mock_bnn, device='cuda', n_samples=10)
+    wrapper = PyTorchBNNWrapper(mock_bnn, device="cuda", n_samples=10)
 
     X = np.random.randn(20, 13)
     predictions = wrapper.predict(X)
@@ -246,14 +242,10 @@ def test_wrapper_predict_cuda(mock_bnn):
 
 def test_conformal_initialization_with_model(mock_bnn):
     """Test BNNConformalPredictor initializes with provided model."""
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        device='cpu'
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, device="cpu")
 
     assert predictor.alpha == 0.10
-    assert predictor.device == 'cpu'
+    assert predictor.device == "cpu"
     assert predictor.bnn is not None
     assert predictor.bnn_wrapper is not None
     assert predictor.is_calibrated is False
@@ -261,14 +253,10 @@ def test_conformal_initialization_with_model(mock_bnn):
 
 def test_conformal_initialization_auto_device(mock_bnn):
     """Test auto-detection of device (CPU/CUDA)."""
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        device=None  # Auto-detect
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, device=None)  # Auto-detect
 
     # Should default to 'cpu' or 'cuda' based on availability
-    assert predictor.device in ['cpu', 'cuda']
+    assert predictor.device in ["cpu", "cuda"]
 
 
 def test_conformal_initialization_missing_model():
@@ -290,14 +278,10 @@ def test_conformal_initialization_coverage_levels(mock_bnn):
 
 def test_conformal_initialization_methods(mock_bnn):
     """Test initialization with different conformal methods."""
-    methods = ['plus', 'base', 'minmax']
+    methods = ["plus", "base", "minmax"]
 
     for method in methods:
-        predictor = BNNConformalPredictor(
-            bnn_model=mock_bnn,
-            alpha=0.10,
-            method=method
-        )
+        predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, method=method)
         assert predictor.method == method
 
 
@@ -310,11 +294,7 @@ def test_calibrate_basic(mock_bnn, calibration_test_split):
     """Test basic calibration on validation set."""
     X_calib, y_calib, _, _ = calibration_test_split
 
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        device='cpu'
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, device="cpu")
 
     # Calibrate
     predictor.calibrate(X_calib, y_calib, verbose=False)
@@ -375,19 +355,19 @@ def test_predict_basic(mock_bnn, calibration_test_split):
     predictions = predictor.predict(X_test, return_std=True)
 
     # Check output structure
-    assert 'mean' in predictions
-    assert 'q05' in predictions
-    assert 'q95' in predictions
-    assert 'std' in predictions
-    assert 'coverage_guarantee' in predictions
+    assert "mean" in predictions
+    assert "q05" in predictions
+    assert "q95" in predictions
+    assert "std" in predictions
+    assert "coverage_guarantee" in predictions
 
     # Check shapes
-    assert predictions['mean'].shape == (len(X_test),)
-    assert predictions['q05'].shape == (len(X_test),)
-    assert predictions['q95'].shape == (len(X_test),)
+    assert predictions["mean"].shape == (len(X_test),)
+    assert predictions["q05"].shape == (len(X_test),)
+    assert predictions["q95"].shape == (len(X_test),)
 
     # Check coverage guarantee
-    assert predictions['coverage_guarantee'] == 0.90
+    assert predictions["coverage_guarantee"] == 0.90
 
 
 def test_predict_before_calibrate_fails(mock_bnn, synthetic_data):
@@ -410,8 +390,8 @@ def test_predict_interval_ordering(mock_bnn, calibration_test_split):
     predictions = predictor.predict(X_test)
 
     # Check interval ordering
-    assert np.all(predictions['q05'] <= predictions['mean'])
-    assert np.all(predictions['mean'] <= predictions['q95'])
+    assert np.all(predictions["q05"] <= predictions["mean"])
+    assert np.all(predictions["mean"] <= predictions["q95"])
 
 
 def test_predict_positive_intervals(mock_bnn, calibration_test_split):
@@ -424,7 +404,7 @@ def test_predict_positive_intervals(mock_bnn, calibration_test_split):
     predictions = predictor.predict(X_test)
 
     # Interval width should be positive
-    width = predictions['q95'] - predictions['q05']
+    width = predictions["q95"] - predictions["q05"]
     assert np.all(width > 0)
 
 
@@ -439,9 +419,9 @@ def test_predict_std_estimation(mock_bnn, calibration_test_split):
 
     # Check std is computed correctly
     # For 90% CI: q95 - q05 ≈ 3.29 * std
-    expected_std = (predictions['q95'] - predictions['q05']) / 3.29
+    expected_std = (predictions["q95"] - predictions["q05"]) / 3.29
 
-    assert np.allclose(predictions['std'], expected_std, rtol=1e-5)
+    assert np.allclose(predictions["std"], expected_std, rtol=1e-5)
 
 
 # ============================================================================
@@ -460,17 +440,17 @@ def test_evaluate_coverage_basic(mock_bnn, calibration_test_split):
     results = predictor.evaluate_coverage(X_test, y_test, verbose=False)
 
     # Check output structure
-    assert 'coverage_90' in results
-    assert 'target_coverage' in results
-    assert 'coverage_gap' in results
-    assert 'average_width' in results
-    assert 'mae' in results
-    assert 'n_test' in results
+    assert "coverage_90" in results
+    assert "target_coverage" in results
+    assert "coverage_gap" in results
+    assert "average_width" in results
+    assert "mae" in results
+    assert "n_test" in results
 
     # Check values
-    assert 0 <= results['coverage_90'] <= 1.0
-    assert results['target_coverage'] == 0.90
-    assert results['n_test'] == len(y_test)
+    assert 0 <= results["coverage_90"] <= 1.0
+    assert results["target_coverage"] == 0.90
+    assert results["n_test"] == len(y_test)
 
 
 def test_evaluate_coverage_target_met(mock_bnn, calibration_test_split):
@@ -484,8 +464,8 @@ def test_evaluate_coverage_target_met(mock_bnn, calibration_test_split):
 
     # Coverage should be within 5% of target (statistical variation)
     # Target: 90%, acceptable range: 85-95%
-    assert results['coverage_90'] >= 0.85
-    assert results['coverage_90'] <= 0.95
+    assert results["coverage_90"] >= 0.85
+    assert results["coverage_90"] <= 0.95
 
 
 def test_evaluate_coverage_positive_mae(mock_bnn, calibration_test_split):
@@ -498,9 +478,9 @@ def test_evaluate_coverage_positive_mae(mock_bnn, calibration_test_split):
     results = predictor.evaluate_coverage(X_test, y_test, verbose=False)
 
     # MAE should be positive
-    assert results['mae'] > 0
+    assert results["mae"] > 0
     # MAE should be less than y_test range (sanity check)
-    assert results['mae'] < (y_test.max() - y_test.min())
+    assert results["mae"] < (y_test.max() - y_test.min())
 
 
 # ============================================================================
@@ -513,12 +493,7 @@ def test_full_pipeline_synthetic_data(mock_bnn, calibration_test_split):
     X_calib, y_calib, X_test, y_test = calibration_test_split
 
     # 1. Initialize
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        device='cpu',
-        n_mc_samples=20
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, device="cpu", n_mc_samples=20)
 
     # 2. Calibrate
     predictor.calibrate(X_calib, y_calib, verbose=False)
@@ -531,9 +506,9 @@ def test_full_pipeline_synthetic_data(mock_bnn, calibration_test_split):
 
     # Validate complete pipeline
     assert predictor.is_calibrated
-    assert predictions['mean'].shape == (len(X_test),)
-    assert 0.85 <= results['coverage_90'] <= 0.95  # Within 5% of 90%
-    assert results['mae'] > 0
+    assert predictions["mean"].shape == (len(X_test),)
+    assert 0.85 <= results["coverage_90"] <= 0.95  # Within 5% of 90%
+    assert results["mae"] > 0
 
 
 def test_realistic_nfl_shapes(mock_bnn, realistic_nfl_data):
@@ -553,9 +528,9 @@ def test_realistic_nfl_shapes(mock_bnn, realistic_nfl_data):
     results = predictor.evaluate_coverage(X_test, y_test, verbose=False)
 
     # Validate with realistic data
-    assert predictions['mean'].shape == (len(X_test),)
-    assert results['n_test'] == len(X_test)
-    assert 0.80 <= results['coverage_90'] <= 0.98  # Slightly wider tolerance
+    assert predictions["mean"].shape == (len(X_test),)
+    assert results["n_test"] == len(X_test)
+    assert 0.80 <= results["coverage_90"] <= 0.98  # Slightly wider tolerance
 
 
 def test_multiple_predictions_consistent(mock_bnn, calibration_test_split):
@@ -570,9 +545,9 @@ def test_multiple_predictions_consistent(mock_bnn, calibration_test_split):
     pred2 = predictor.predict(X_test)
 
     # Predictions should be very similar (allow 5% difference due to MC sampling)
-    assert np.allclose(pred1['mean'], pred2['mean'], rtol=0.05)
-    assert np.allclose(pred1['q05'], pred2['q05'], rtol=0.05)
-    assert np.allclose(pred1['q95'], pred2['q95'], rtol=0.05)
+    assert np.allclose(pred1["mean"], pred2["mean"], rtol=0.05)
+    assert np.allclose(pred1["q05"], pred2["q05"], rtol=0.05)
+    assert np.allclose(pred1["q95"], pred2["q95"], rtol=0.05)
 
 
 # ============================================================================
@@ -595,8 +570,9 @@ def test_coverage_guarantee_property(mock_bnn, calibration_test_split, alpha):
 
     # Coverage should be within 10% of target (conservative test)
     target = 1 - alpha
-    assert results['coverage_90'] >= target - 0.10, \
-        f"Coverage {results['coverage_90']:.2%} below target {target:.2%} - 10%"
+    assert (
+        results["coverage_90"] >= target - 0.10
+    ), f"Coverage {results['coverage_90']:.2%} below target {target:.2%} - 10%"
 
 
 @pytest.mark.parametrize("alpha", [0.05, 0.10, 0.15])
@@ -616,13 +592,14 @@ def test_interval_width_monotonicity(mock_bnn, calibration_test_split, alpha):
     pred_wide = predictors[1].predict(X_test)
 
     # Calculate average widths
-    width_narrow = np.mean(pred_narrow['q95'] - pred_narrow['q05'])
-    width_wide = np.mean(pred_wide['q95'] - pred_wide['q05'])
+    width_narrow = np.mean(pred_narrow["q95"] - pred_narrow["q05"])
+    width_wide = np.mean(pred_wide["q95"] - pred_wide["q05"])
 
     # Wider confidence → narrower intervals (counterintuitive but correct)
     # Lower alpha (higher confidence) → wider intervals
-    assert width_narrow >= width_wide, \
-        f"Width paradox: narrow={width_narrow:.1f}, wide={width_wide:.1f}"
+    assert (
+        width_narrow >= width_wide
+    ), f"Width paradox: narrow={width_narrow:.1f}, wide={width_wide:.1f}"
 
 
 def test_prediction_interval_contains_mean(mock_bnn, calibration_test_split):
@@ -635,8 +612,8 @@ def test_prediction_interval_contains_mean(mock_bnn, calibration_test_split):
     predictions = predictor.predict(X_test)
 
     # Mean must be within interval
-    assert np.all(predictions['q05'] <= predictions['mean'])
-    assert np.all(predictions['mean'] <= predictions['q95'])
+    assert np.all(predictions["q05"] <= predictions["mean"])
+    assert np.all(predictions["mean"] <= predictions["q95"])
 
 
 # ============================================================================
@@ -712,8 +689,8 @@ def test_single_prediction(mock_bnn, calibration_test_split):
     X_single = np.random.randn(1, 13)
     predictions = predictor.predict(X_single)
 
-    assert predictions['mean'].shape == (1,)
-    assert predictions['q05'][0] < predictions['q95'][0]
+    assert predictions["mean"].shape == (1,)
+    assert predictions["q05"][0] < predictions["q95"][0]
 
 
 def test_negative_predictions_handled(mock_bnn, calibration_test_split):
@@ -733,7 +710,7 @@ def test_negative_predictions_handled(mock_bnn, calibration_test_split):
 
     # Should return predictions (even if negative)
     # NOTE: Post-processing to clip to [0, inf) should be done by caller
-    assert predictions['mean'].shape == (10,)
+    assert predictions["mean"].shape == (10,)
 
 
 # ============================================================================
@@ -753,9 +730,7 @@ def test_calibration_performance_large_dataset(mock_bnn):
     y_large = 250 + 50 * np.random.randn(1000)
 
     predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        n_mc_samples=20  # Reduced for speed
+        bnn_model=mock_bnn, alpha=0.10, n_mc_samples=20  # Reduced for speed
     )
 
     start = time.time()
@@ -775,11 +750,7 @@ def test_prediction_performance_large_batch(mock_bnn, calibration_test_split):
 
     X_calib, y_calib, _, _ = calibration_test_split
 
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        n_mc_samples=20
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, n_mc_samples=20)
     predictor.calibrate(X_calib, y_calib, verbose=False)
 
     # Large test batch
@@ -803,28 +774,20 @@ def test_mc_samples_impact_on_coverage(mock_bnn, calibration_test_split, n_mc_sa
     """Test that different MC sample counts don't break coverage."""
     X_calib, y_calib, X_test, y_test = calibration_test_split
 
-    predictor = BNNConformalPredictor(
-        bnn_model=mock_bnn,
-        alpha=0.10,
-        n_mc_samples=n_mc_samples
-    )
+    predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10, n_mc_samples=n_mc_samples)
 
     predictor.calibrate(X_calib, y_calib, verbose=False)
     results = predictor.evaluate_coverage(X_test, y_test, verbose=False)
 
     # Coverage should still be reasonable
-    assert 0.75 <= results['coverage_90'] <= 1.0
+    assert 0.75 <= results["coverage_90"] <= 1.0
 
 
 def test_different_feature_dimensions(mock_bnn):
     """Test that wrapper handles different feature dimensions."""
     # Test with different n_features (BNN is flexible)
     for n_features in [5, 13, 20]:
-        wrapper = PyTorchBNNWrapper(
-            MockBNN(n_features=n_features),
-            device='cpu',
-            n_samples=10
-        )
+        wrapper = PyTorchBNNWrapper(MockBNN(n_features=n_features), device="cpu", n_samples=10)
 
         X = np.random.randn(50, n_features)
         predictions = wrapper.predict(X)
@@ -844,13 +807,14 @@ def test_calibrate_verbose_logging(mock_bnn, calibration_test_split, caplog):
     predictor = BNNConformalPredictor(bnn_model=mock_bnn, alpha=0.10)
 
     import logging
+
     caplog.set_level(logging.INFO)
 
     predictor.calibrate(X_calib, y_calib, verbose=True)
 
     # Check that logs were produced
     assert len(caplog.records) > 0
-    assert any('Calibrating' in record.message for record in caplog.records)
+    assert any("Calibrating" in record.message for record in caplog.records)
 
 
 def test_evaluate_coverage_verbose_logging(mock_bnn, calibration_test_split, caplog):
@@ -861,13 +825,14 @@ def test_evaluate_coverage_verbose_logging(mock_bnn, calibration_test_split, cap
     predictor.calibrate(X_calib, y_calib, verbose=False)
 
     import logging
+
     caplog.set_level(logging.INFO)
 
     predictor.evaluate_coverage(X_test, y_test, verbose=True)
 
     # Check that logs were produced
     assert len(caplog.records) > 0
-    assert any('coverage' in record.message.lower() for record in caplog.records)
+    assert any("coverage" in record.message.lower() for record in caplog.records)
 
 
 # ============================================================================

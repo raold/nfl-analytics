@@ -48,11 +48,10 @@ import statsmodels.api as sm
 from scipy import stats
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class CoachingChangeIV:
@@ -83,7 +82,7 @@ class CoachingChangeIV:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: str = "sicillionbillions"
+        db_password: str = "sicillionbillions",
     ):
         """Initialize IV estimator."""
         self.db_config = {
@@ -99,11 +98,7 @@ class CoachingChangeIV:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def prepare_panel_data(
-        self,
-        start_season: int = 2018,
-        end_season: int = 2024
-    ) -> pd.DataFrame:
+    def prepare_panel_data(self, start_season: int = 2018, end_season: int = 2024) -> pd.DataFrame:
         """
         Prepare panel data with coaching changes and outcomes.
 
@@ -165,10 +160,7 @@ class CoachingChangeIV:
         """
 
         with self._connect_db() as conn:
-            df = pd.read_sql_query(
-                query, conn,
-                params={"start": start_season, "end": end_season}
-            )
+            df = pd.read_sql_query(query, conn, params={"start": start_season, "end": end_season})
 
         if len(df) == 0:
             logger.warning("No panel data found")
@@ -179,28 +171,27 @@ class CoachingChangeIV:
         np.random.seed(42)
 
         # Instrument 1: GM change (30% of coach changes correlated with GM change)
-        df['gm_change'] = np.where(
-            df['coach_change'] == 1,
+        df["gm_change"] = np.where(
+            df["coach_change"] == 1,
             np.random.binomial(1, 0.4, len(df)),  # 40% of coach changes have GM change
-            np.random.binomial(1, 0.05, len(df))  # 5% of non-changes have GM change
+            np.random.binomial(1, 0.05, len(df)),  # 5% of non-changes have GM change
         )
 
         # Instrument 2: Contract expiration (exogenous timing)
-        df['contract_expired'] = np.where(
-            df['coach_change'] == 1,
+        df["contract_expired"] = np.where(
+            df["coach_change"] == 1,
             np.random.binomial(1, 0.3, len(df)),  # 30% left at contract end
-            np.random.binomial(1, 0.1, len(df))   # 10% renewed at contract end
+            np.random.binomial(1, 0.1, len(df)),  # 10% renewed at contract end
         )
 
         # Additional controls
-        df['prior_epa_squared'] = df['prior_epa'] ** 2
-        df['prior_wins'] = np.clip(
-            8 + df['prior_epa'] * 30 + np.random.normal(0, 2, len(df)),
-            0, 17
+        df["prior_epa_squared"] = df["prior_epa"] ** 2
+        df["prior_wins"] = np.clip(
+            8 + df["prior_epa"] * 30 + np.random.normal(0, 2, len(df)), 0, 17
         )  # Simulated win count based on EPA
 
         # Season fixed effects
-        df['season_fe'] = df['season'] - df['season'].min()
+        df["season_fe"] = df["season"] - df["season"].min()
 
         logger.info(
             f"Prepared panel: {len(df)} team-seasons, "
@@ -212,8 +203,8 @@ class CoachingChangeIV:
     def first_stage_regression(
         self,
         df: pd.DataFrame,
-        instruments: list[str] = ['gm_change', 'contract_expired'],
-        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+        instruments: list[str] = ["gm_change", "contract_expired"],
+        controls: list[str] = ["prior_epa", "prior_epa_squared", "season_fe"],
     ) -> dict[str, Any]:
         """
         First stage: Predict coaching change from instruments.
@@ -221,7 +212,7 @@ class CoachingChangeIV:
         Tests instrument relevance (F > 10 is strong).
         """
         # Prepare variables
-        y = df['coach_change']
+        y = df["coach_change"]
         X_instruments = df[instruments]
         X_controls = df[controls]
         X = sm.add_constant(pd.concat([X_instruments, X_controls], axis=1))
@@ -252,22 +243,22 @@ class CoachingChangeIV:
             logger.info(f"  {inst}: coef={coef:.4f}, p={pval:.4f}")
 
         return {
-            'model': model,
-            'f_statistic': float(f_stat),
-            'f_pvalue': float(f_pvalue),
-            'strong_instrument': f_stat > 10,
-            'instrument_coefficients': {
-                inst: {'coef': model.params[inst], 'pval': model.pvalues[inst]}
+            "model": model,
+            "f_statistic": float(f_stat),
+            "f_pvalue": float(f_pvalue),
+            "strong_instrument": f_stat > 10,
+            "instrument_coefficients": {
+                inst: {"coef": model.params[inst], "pval": model.pvalues[inst]}
                 for inst in instruments
             },
-            'r_squared': model.rsquared
+            "r_squared": model.rsquared,
         }
 
     def second_stage_regression(
         self,
         df: pd.DataFrame,
-        instruments: list[str] = ['gm_change', 'contract_expired'],
-        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+        instruments: list[str] = ["gm_change", "contract_expired"],
+        controls: list[str] = ["prior_epa", "prior_epa_squared", "season_fe"],
     ) -> dict[str, Any]:
         """
         Second stage: Estimate causal effect using IV2SLS.
@@ -279,35 +270,34 @@ class CoachingChangeIV:
             from linearmodels.iv import IV2SLS
 
             # Prepare formula components
-            endog = df['coach_change']  # Endogenous treatment
+            endog = df["coach_change"]  # Endogenous treatment
             exog = sm.add_constant(df[controls])  # Exogenous controls
             instruments_df = df[instruments]  # Excluded instruments
-            dependent = df['off_epa_per_play']  # Outcome
+            dependent = df["off_epa_per_play"]  # Outcome
 
             # Estimate IV2SLS
             iv_model = IV2SLS(
-                dependent=dependent,
-                exog=exog,
-                endog=endog,
-                instruments=instruments_df
+                dependent=dependent, exog=exog, endog=endog, instruments=instruments_df
             )
-            iv_results = iv_model.fit(cov_type='robust')
+            iv_results = iv_model.fit(cov_type="robust")
 
             # Also run OLS for comparison
-            X_ols = sm.add_constant(pd.concat([df[['coach_change']], df[controls]], axis=1))
+            X_ols = sm.add_constant(pd.concat([df[["coach_change"]], df[controls]], axis=1))
             ols_results = sm.OLS(dependent, X_ols).fit()
 
             # Extract results
-            iv_effect = iv_results.params['coach_change']
-            iv_se = iv_results.std_errors['coach_change']
-            iv_pval = iv_results.pvalues['coach_change']
+            iv_effect = iv_results.params["coach_change"]
+            iv_se = iv_results.std_errors["coach_change"]
+            iv_pval = iv_results.pvalues["coach_change"]
 
-            ols_effect = ols_results.params['coach_change']
-            ols_se = ols_results.bse['coach_change']
-            ols_pval = ols_results.pvalues['coach_change']
+            ols_effect = ols_results.params["coach_change"]
+            ols_se = ols_results.bse["coach_change"]
+            ols_pval = ols_results.pvalues["coach_change"]
 
             # Hausman test for endogeneity
-            hausman_stat = ((iv_effect - ols_effect) ** 2) / (iv_se ** 2 - ols_se ** 2) if iv_se > ols_se else 0
+            hausman_stat = (
+                ((iv_effect - ols_effect) ** 2) / (iv_se**2 - ols_se**2) if iv_se > ols_se else 0
+            )
             hausman_pval = 1 - stats.chi2.cdf(hausman_stat, 1) if hausman_stat > 0 else 1
 
             logger.info(f"\n{'='*60}")
@@ -326,16 +316,18 @@ class CoachingChangeIV:
             logger.info(f"    Endogeneity detected? {'YES' if hausman_pval < 0.05 else 'NO'}")
 
             return {
-                'iv_effect': float(iv_effect),
-                'iv_se': float(iv_se),
-                'iv_pval': float(iv_pval),
-                'ols_effect': float(ols_effect),
-                'ols_se': float(ols_se),
-                'ols_pval': float(ols_pval),
-                'hausman_stat': float(hausman_stat),
-                'hausman_pval': float(hausman_pval),
-                'endogeneity_detected': hausman_pval < 0.05,
-                'bias_direction': 'OLS overestimates' if ols_effect > iv_effect else 'OLS underestimates'
+                "iv_effect": float(iv_effect),
+                "iv_se": float(iv_se),
+                "iv_pval": float(iv_pval),
+                "ols_effect": float(ols_effect),
+                "ols_se": float(ols_se),
+                "ols_pval": float(ols_pval),
+                "hausman_stat": float(hausman_stat),
+                "hausman_pval": float(hausman_pval),
+                "endogeneity_detected": hausman_pval < 0.05,
+                "bias_direction": (
+                    "OLS overestimates" if ols_effect > iv_effect else "OLS underestimates"
+                ),
             }
 
         except ImportError:
@@ -343,44 +335,41 @@ class CoachingChangeIV:
             return self._manual_2sls(df, instruments, controls)
 
     def _manual_2sls(
-        self,
-        df: pd.DataFrame,
-        instruments: list[str],
-        controls: list[str]
+        self, df: pd.DataFrame, instruments: list[str], controls: list[str]
     ) -> dict[str, Any]:
         """Fallback manual 2SLS implementation."""
         # Stage 1: Predict coaching change
         X_first = sm.add_constant(pd.concat([df[instruments], df[controls]], axis=1))
-        first_stage = sm.OLS(df['coach_change'], X_first).fit()
-        df['coach_change_hat'] = first_stage.fittedvalues
+        first_stage = sm.OLS(df["coach_change"], X_first).fit()
+        df["coach_change_hat"] = first_stage.fittedvalues
 
         # Stage 2: Use predicted coaching change
-        X_second = sm.add_constant(pd.concat([df[['coach_change_hat']], df[controls]], axis=1))
-        second_stage = sm.OLS(df['off_epa_per_play'], X_second).fit()
+        X_second = sm.add_constant(pd.concat([df[["coach_change_hat"]], df[controls]], axis=1))
+        second_stage = sm.OLS(df["off_epa_per_play"], X_second).fit()
 
         # OLS for comparison
-        X_ols = sm.add_constant(pd.concat([df[['coach_change']], df[controls]], axis=1))
-        ols = sm.OLS(df['off_epa_per_play'], X_ols).fit()
+        X_ols = sm.add_constant(pd.concat([df[["coach_change"]], df[controls]], axis=1))
+        ols = sm.OLS(df["off_epa_per_play"], X_ols).fit()
 
         return {
-            'iv_effect': second_stage.params['coach_change_hat'],
-            'iv_se': second_stage.bse['coach_change_hat'],
-            'iv_pval': second_stage.pvalues['coach_change_hat'],
-            'ols_effect': ols.params['coach_change'],
-            'ols_se': ols.bse['coach_change'],
-            'ols_pval': ols.pvalues['coach_change'],
-            'hausman_stat': 0,
-            'hausman_pval': 1,
-            'endogeneity_detected': False,
-            'bias_direction': 'Unknown (manual 2SLS)'
+            "iv_effect": second_stage.params["coach_change_hat"],
+            "iv_se": second_stage.bse["coach_change_hat"],
+            "iv_pval": second_stage.pvalues["coach_change_hat"],
+            "ols_effect": ols.params["coach_change"],
+            "ols_se": ols.bse["coach_change"],
+            "ols_pval": ols.pvalues["coach_change"],
+            "hausman_stat": 0,
+            "hausman_pval": 1,
+            "endogeneity_detected": False,
+            "bias_direction": "Unknown (manual 2SLS)",
         }
 
     def estimate_coaching_effect(
         self,
         start_season: int = 2018,
         end_season: int = 2024,
-        instruments: list[str] = ['gm_change', 'contract_expired'],
-        controls: list[str] = ['prior_epa', 'prior_epa_squared', 'season_fe']
+        instruments: list[str] = ["gm_change", "contract_expired"],
+        controls: list[str] = ["prior_epa", "prior_epa_squared", "season_fe"],
     ) -> dict[str, Any]:
         """
         Full 2SLS estimation of coaching change causal effect.
@@ -396,24 +385,26 @@ class CoachingChangeIV:
         df = self.prepare_panel_data(start_season, end_season)
 
         if len(df) == 0:
-            return {'error': 'No data available'}
+            return {"error": "No data available"}
 
         # Run 2SLS
         first_stage = self.first_stage_regression(df, instruments, controls)
         second_stage = self.second_stage_regression(df, instruments, controls)
 
         # Compute betting-relevant metrics
-        causal_effect = second_stage['iv_effect']
+        causal_effect = second_stage["iv_effect"]
         effect_per_game = causal_effect * 60  # ~60 plays per game
         spread_adjustment = effect_per_game * 7  # ~7 pts per 1.0 expected point diff
 
         result = {
-            'first_stage': first_stage,
-            'second_stage': second_stage,
-            'causal_effect_epa': causal_effect,
-            'effect_per_game': effect_per_game,
-            'spread_adjustment': spread_adjustment,
-            'recommendation': self._generate_recommendation(causal_effect, first_stage['strong_instrument'])
+            "first_stage": first_stage,
+            "second_stage": second_stage,
+            "causal_effect_epa": causal_effect,
+            "effect_per_game": effect_per_game,
+            "spread_adjustment": spread_adjustment,
+            "recommendation": self._generate_recommendation(
+                causal_effect, first_stage["strong_instrument"]
+            ),
         }
 
         logger.info(f"\n{'='*60}")
@@ -426,11 +417,7 @@ class CoachingChangeIV:
 
         return result
 
-    def _generate_recommendation(
-        self,
-        causal_effect: float,
-        strong_instrument: bool
-    ) -> str:
+    def _generate_recommendation(self, causal_effect: float, strong_instrument: bool) -> str:
         """Generate betting recommendation based on 2SLS results."""
         if not strong_instrument:
             return (
@@ -468,22 +455,22 @@ class CoachingChangeIV:
 
 # Quick test
 if __name__ == "__main__":
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Two-Stage Least Squares: Coaching Change Effect")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     from datetime import datetime
+
     current_year = datetime.now().year
 
     iv_model = CoachingChangeIV()
     results = iv_model.estimate_coaching_effect(
-        start_season=current_year - 6,
-        end_season=current_year
+        start_season=current_year - 6, end_season=current_year
     )
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Summary")
-    print("="*60)
+    print("=" * 60)
     print(f"  Strong instruments: {results['first_stage']['strong_instrument']}")
     print(f"  IV causal effect: {results['causal_effect_epa']:.4f} EPA/play")
     print(f"  OLS (biased): {results['second_stage']['ols_effect']:.4f} EPA/play")

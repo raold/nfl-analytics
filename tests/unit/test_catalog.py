@@ -23,7 +23,6 @@ def test_build_features_basic():
     assert result is not None
 
 
-
 def test_build_features_edge_cases():
     """Test build_features: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_build_features_edge_cases():
     assert result is not None
 
 
-
 def test_build_features_error_handling():
     """Test build_features error handling."""
     with pytest.raises(ValueError):
         build_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,4 +49,3 @@ def test_build_features_property_idempotent(self, df, families):
 
     # Assert property
     assert build_features(df, families) == result, "idempotent violated"
-
