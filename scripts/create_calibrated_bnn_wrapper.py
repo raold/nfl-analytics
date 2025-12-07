@@ -18,12 +18,14 @@ Date: November 7, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import torch
-import numpy as np
-import joblib
 import logging
+
+import joblib
+import numpy as np
+import torch
 
 from py.models.bnn_calibrated_wrapper import CalibratedBNNWrapper
 
@@ -77,13 +79,13 @@ def main():
         temperature=0.90  # Optimal from validation (target: 90% → 92% coverage)
     )
 
-    logger.info(f"\n✓ Created calibrated wrapper")
+    logger.info("\n✓ Created calibrated wrapper")
     logger.info(f"  Temperature: {calibrated_bnn.temperature:.2f}")
-    logger.info(f"  Expected coverage: ~92% (target: 85-95%)")
+    logger.info("  Expected coverage: ~92% (target: 85-95%)")
     logger.info(f"  Interval tightening: {(1-calibrated_bnn.temperature)*100:.1f}%")
 
     # Test prediction
-    logger.info(f"\nTesting calibrated predictions...")
+    logger.info("\nTesting calibrated predictions...")
 
     # Mahomes-like features
     test_features = np.array([[
@@ -110,7 +112,7 @@ def main():
         base_mean_val = base_mean[0].item() * checkpoint['scaler_y_scale'] + checkpoint['scaler_y_mean']
         base_std_val = np.exp(base_log_std[0].item()) * checkpoint['scaler_y_scale']
 
-    logger.info(f"\nComparison:")
+    logger.info("\nComparison:")
     logger.info(f"  Base BNN:       {base_mean_val:.1f} ± {base_std_val:.1f} yards")
     logger.info(f"  Calibrated BNN: {mean:.1f} ± {std:.1f} yards")
     logger.info(f"  Uncertainty reduction: {((base_std_val - std) / base_std_val * 100):.1f}%")

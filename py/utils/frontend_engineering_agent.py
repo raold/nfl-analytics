@@ -70,7 +70,6 @@ Integration:
 Author: Claude Code (Sonnet 4.5)
 """
 
-import ast
 import json
 import logging
 import re
@@ -80,7 +79,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
 try:
     import psycopg
@@ -117,10 +116,10 @@ class ValidationIssue:
     severity: Severity
     category: str
     message: str
-    file_path: Optional[str] = None
-    line_number: Optional[int] = None
-    query: Optional[str] = None
-    suggestion: Optional[str] = None
+    file_path: str | None = None
+    line_number: int | None = None
+    query: str | None = None
+    suggestion: str | None = None
 
     def __str__(self) -> str:
         parts = [f"[{self.severity.value}] {self.category}: {self.message}"]
@@ -137,12 +136,12 @@ class ValidationIssue:
 class SchemaValidationReport:
     """Report of schema validation results"""
     timestamp: datetime = field(default_factory=datetime.now)
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
     queries_checked: int = 0
     queries_valid: int = 0
     queries_invalid: int = 0
-    tables_referenced: Set[str] = field(default_factory=set)
-    columns_referenced: Dict[str, Set[str]] = field(default_factory=lambda: defaultdict(set))
+    tables_referenced: set[str] = field(default_factory=set)
+    columns_referenced: dict[str, set[str]] = field(default_factory=lambda: defaultdict(set))
 
     @property
     def is_valid(self) -> bool:
@@ -199,12 +198,12 @@ class SchemaValidationReport:
 class SchemaDrift:
     """Represents schema drift between database and frontend"""
     timestamp: datetime = field(default_factory=datetime.now)
-    added_tables: List[str] = field(default_factory=list)
-    removed_tables: List[str] = field(default_factory=list)
-    added_columns: Dict[str, List[str]] = field(default_factory=dict)
-    removed_columns: Dict[str, List[str]] = field(default_factory=dict)
-    renamed_columns: Dict[str, List[Tuple[str, str]]] = field(default_factory=dict)  # table -> [(old, new)]
-    type_changes: Dict[str, List[Tuple[str, str, str]]] = field(default_factory=dict)  # table -> [(col, old_type, new_type)]
+    added_tables: list[str] = field(default_factory=list)
+    removed_tables: list[str] = field(default_factory=list)
+    added_columns: dict[str, list[str]] = field(default_factory=dict)
+    removed_columns: dict[str, list[str]] = field(default_factory=dict)
+    renamed_columns: dict[str, list[tuple[str, str]]] = field(default_factory=dict)  # table -> [(old, new)]
+    type_changes: dict[str, list[tuple[str, str, str]]] = field(default_factory=dict)  # table -> [(col, old_type, new_type)]
 
     @property
     def has_breaking_changes(self) -> bool:
@@ -227,9 +226,9 @@ class APIContractReport:
     timestamp: datetime = field(default_factory=datetime.now)
     endpoints_checked: int = 0
     endpoints_valid: int = 0
-    violations: List[ValidationIssue] = field(default_factory=list)
+    violations: list[ValidationIssue] = field(default_factory=list)
     api_available: bool = False
-    api_version: Optional[str] = None
+    api_version: str | None = None
 
     @property
     def has_violations(self) -> bool:
@@ -272,8 +271,8 @@ class MigrationUpdate:
     """Represents a suggested frontend update"""
     update_type: str  # "sql_query", "api_call", "schema_validator", "error_handling"
     file_path: str
-    line_number: Optional[int]
-    old_code: Optional[str]
+    line_number: int | None
+    old_code: str | None
     new_code: str
     reason: str
     priority: Severity
@@ -297,10 +296,10 @@ class FrontendEngineeringAgent:
 
     def __init__(
         self,
-        db_config: Optional[Dict[str, Any]] = None,
+        db_config: dict[str, Any] | None = None,
         api_base_url: str = "http://localhost:8000",
-        dashboard_path: Optional[Path] = None,
-        schema_snapshot_path: Optional[Path] = None
+        dashboard_path: Path | None = None,
+        schema_snapshot_path: Path | None = None
     ):
         """
         Initialize Frontend Engineering Agent.
@@ -320,11 +319,11 @@ class FrontendEngineeringAgent:
         self.schema_snapshot_path = schema_snapshot_path or project_root / "docs" / "database" / "schema_snapshot.json"
 
         # Cached schema information
-        self._schema_cache: Optional[Dict[str, Any]] = None
-        self._api_schema_cache: Optional[Dict[str, Any]] = None
+        self._schema_cache: dict[str, Any] | None = None
+        self._api_schema_cache: dict[str, Any] | None = None
 
     @staticmethod
-    def _default_db_config() -> Dict[str, Any]:
+    def _default_db_config() -> dict[str, Any]:
         """Default database configuration from environment"""
         import os
         return {
@@ -339,7 +338,7 @@ class FrontendEngineeringAgent:
     # Schema Introspection
     # ========================================================================
 
-    def get_database_schema(self) -> Dict[str, Any]:
+    def get_database_schema(self) -> dict[str, Any]:
         """
         Introspect database schema.
 
@@ -462,13 +461,13 @@ class FrontendEngineeringAgent:
         logger.info(f"Schema snapshot saved to {self.schema_snapshot_path}")
         return self.schema_snapshot_path
 
-    def load_schema_snapshot(self) -> Optional[Dict[str, Any]]:
+    def load_schema_snapshot(self) -> dict[str, Any] | None:
         """Load previous schema snapshot for drift detection"""
         if not self.schema_snapshot_path.exists():
             logger.warning(f"Schema snapshot not found: {self.schema_snapshot_path}")
             return None
 
-        with open(self.schema_snapshot_path, 'r') as f:
+        with open(self.schema_snapshot_path) as f:
             snapshot = json.load(f)
 
         return snapshot.get("schema")
@@ -477,7 +476,7 @@ class FrontendEngineeringAgent:
     # SQL Query Validation
     # ========================================================================
 
-    def extract_sql_queries(self, file_path: Path) -> List[Tuple[str, int]]:
+    def extract_sql_queries(self, file_path: Path) -> list[tuple[str, int]]:
         """
         Extract SQL queries from Python file.
 
@@ -486,7 +485,7 @@ class FrontendEngineeringAgent:
         """
         queries = []
 
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
 
         # Pattern 1: Multi-line SQL strings
@@ -517,7 +516,7 @@ class FrontendEngineeringAgent:
 
         return queries
 
-    def validate_sql_query(self, query: str, schema: Dict[str, Any]) -> List[ValidationIssue]:
+    def validate_sql_query(self, query: str, schema: dict[str, Any]) -> list[ValidationIssue]:
         """
         Validate SQL query against database schema.
 
@@ -713,7 +712,7 @@ class FrontendEngineeringAgent:
     # API Contract Validation
     # ========================================================================
 
-    def get_api_schema(self) -> Dict[str, Any]:
+    def get_api_schema(self) -> dict[str, Any]:
         """
         Fetch API schema from FastAPI's /openapi.json endpoint.
 
@@ -770,12 +769,12 @@ class FrontendEngineeringAgent:
             health_data = response.json()
             report.api_version = health_data.get("version", "unknown")
 
-        except Exception as e:
+        except Exception:
             report.violations.append(ValidationIssue(
                 severity=Severity.CRITICAL,
                 category="api_availability",
                 message=f"API not reachable at {self.api_base_url}",
-                suggestion=f"Ensure API is running: docker-compose up api"
+                suggestion="Ensure API is running: docker-compose up api"
             ))
             return report
 
@@ -847,7 +846,7 @@ class FrontendEngineeringAgent:
     # Migration Suggestions
     # ========================================================================
 
-    def suggest_frontend_updates(self, drift: SchemaDrift) -> List[MigrationUpdate]:
+    def suggest_frontend_updates(self, drift: SchemaDrift) -> list[MigrationUpdate]:
         """
         Generate automated migration suggestions based on schema drift.
 
@@ -882,7 +881,7 @@ class FrontendEngineeringAgent:
                     line_number=None,
                     old_code=None,
                     new_code=f"# TODO: Column '{col}' in '{table}' changed from {old_type} to {new_type}",
-                    reason=f"Type change may require casting or value conversion",
+                    reason="Type change may require casting or value conversion",
                     priority=Severity.WARNING,
                     automated=False
                 ))
@@ -1043,19 +1042,19 @@ class FrontendEngineeringAgent:
             print()
 
         if drift.added_columns:
-            print(f"➕ Added Columns:")
+            print("➕ Added Columns:")
             for table, cols in drift.added_columns.items():
                 print(f"  {table}: {', '.join(cols)}")
             print()
 
         if drift.removed_columns:
-            print(f"🗑️  Removed Columns - BREAKING:")
+            print("🗑️  Removed Columns - BREAKING:")
             for table, cols in drift.removed_columns.items():
                 print(f"  {table}: {', '.join(cols)}")
             print()
 
         if drift.type_changes:
-            print(f"⚠️  Type Changes:")
+            print("⚠️  Type Changes:")
             for table, changes in drift.type_changes.items():
                 print(f"  {table}:")
                 for col, old_type, new_type in changes:

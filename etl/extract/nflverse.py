@@ -12,12 +12,11 @@ Author: NFL Analytics Team
 Date: October 2025
 """
 
-import subprocess
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any
+import subprocess
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
+from typing import Any
 
 from etl.extract.base import BaseExtractor, ExtractionResult, SourceType
 
@@ -32,7 +31,7 @@ class NFLVerseExtractor(BaseExtractor):
     with retry logic, error handling, and monitoring.
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize NFLverse extractor.
 
@@ -52,7 +51,7 @@ class NFLVerseExtractor(BaseExtractor):
 
     def extract_schedules(
         self,
-        seasons: Optional[List[int]] = None,
+        seasons: list[int] | None = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -144,7 +143,7 @@ class NFLVerseExtractor(BaseExtractor):
 
     def extract_pbp(
         self,
-        seasons: Optional[List[int]] = None,
+        seasons: list[int] | None = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -219,7 +218,7 @@ class NFLVerseExtractor(BaseExtractor):
 
     def extract_rosters(
         self,
-        seasons: Optional[List[int]] = None,
+        seasons: list[int] | None = None,
         **kwargs
     ) -> ExtractionResult:
         """

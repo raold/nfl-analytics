@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.581022
 Test count: 40
 """
 
+import pandas as pd
+import pytest
 from experiments.causal_inference_7_experiments import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

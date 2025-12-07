@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.613537
 Test count: 27
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from predictions.extract_learning_patterns import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

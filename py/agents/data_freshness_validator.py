@@ -38,14 +38,12 @@ Phase: 6 (Frontend Agents - Week 4)
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -87,8 +85,8 @@ class DataFreshnessStatus:
     """Status of a specific data source."""
 
     source: DataSource
-    last_updated: Optional[datetime]
-    age_hours: Optional[float]
+    last_updated: datetime | None
+    age_hours: float | None
     status: FreshnessStatus
     is_fresh: bool
     indicator: str  # Emoji indicator
@@ -100,10 +98,10 @@ class EnsembleComponentStatus:
     """Status of an ensemble component."""
 
     component_name: str
-    model_path: Optional[Path]
+    model_path: Path | None
     exists: bool
-    last_modified: Optional[datetime]
-    age_hours: Optional[float]
+    last_modified: datetime | None
+    age_hours: float | None
     is_available: bool
     message: str
 
@@ -114,12 +112,12 @@ class EnsembleHealth:
 
     total_components: int
     available_components: int
-    missing_components: List[str]
-    outdated_components: List[str]
+    missing_components: list[str]
+    outdated_components: list[str]
     is_healthy: bool
     can_generate_predictions: bool
     health_score: float  # 0.0-1.0
-    components: List[EnsembleComponentStatus]
+    components: list[EnsembleComponentStatus]
     checked_at: datetime = field(default_factory=datetime.now)
 
 
@@ -133,7 +131,7 @@ class RefreshReport:
     duration_seconds: float
     records_updated: int
     success: bool
-    error: Optional[str]
+    error: str | None
 
 
 class DataFreshnessValidator:
@@ -428,7 +426,7 @@ class DataFreshnessValidator:
         status = self.check_data_freshness(source, **filters)
         return status.indicator
 
-    def get_all_freshness_statuses(self) -> Dict[str, DataFreshnessStatus]:
+    def get_all_freshness_statuses(self) -> dict[str, DataFreshnessStatus]:
         """
         Check freshness of all monitored data sources.
 
@@ -450,8 +448,8 @@ class DataFreshnessValidator:
     def _get_last_updated(
         self,
         source: DataSource,
-        filters: Dict[str, Any]
-    ) -> Optional[datetime]:
+        filters: dict[str, Any]
+    ) -> datetime | None:
         """Query database for last_updated timestamp."""
 
         table_mapping = {
@@ -540,7 +538,7 @@ if __name__ == "__main__":
 
     # Validate ensemble
     health = validator.validate_ensemble_availability()
-    print(f"\n=== Ensemble Health ===")
+    print("\n=== Ensemble Health ===")
     print(f"Available: {health.available_components}/{health.total_components}")
     print(f"Health score: {health.health_score:.0%}")
     print(f"Can generate predictions: {health.can_generate_predictions}")
@@ -551,7 +549,7 @@ if __name__ == "__main__":
         print(f"Outdated: {', '.join(health.outdated_components)}")
 
     # Check all sources
-    print(f"\n=== All Data Sources ===")
+    print("\n=== All Data Sources ===")
     statuses = validator.get_all_freshness_statuses()
     for source, status in statuses.items():
         print(f"{status.indicator} {source}: {status.message}")

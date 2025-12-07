@@ -23,7 +23,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -207,7 +206,7 @@ def run_comprehensive_comparison(
     cal_vs_opt_sharpe = calibrated_summary["sharpe_ratio"] - optimized_summary["sharpe_ratio"]
     cal_vs_opt_profit = (calibrated_summary["final_bankroll"] - initial_bankroll) - (optimized_summary["final_bankroll"] - initial_bankroll)
 
-    print(f"\nCALIBRATED vs OPTIMIZED:")
+    print("\nCALIBRATED vs OPTIMIZED:")
     print(f"  ROI Improvement: {cal_vs_opt_roi:+.2%}")
     print(f"  Win Rate Improvement: {cal_vs_opt_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {cal_vs_opt_sharpe:+.2f}")
@@ -218,7 +217,7 @@ def run_comprehensive_comparison(
     ctx_vs_cal_sharpe = contextual_summary["sharpe_ratio"] - calibrated_summary["sharpe_ratio"]
     ctx_vs_cal_profit = (contextual_summary["final_bankroll"] - initial_bankroll) - (calibrated_summary["final_bankroll"] - initial_bankroll)
 
-    print(f"\nCONTEXTUAL vs CALIBRATED:")
+    print("\nCONTEXTUAL vs CALIBRATED:")
     print(f"  ROI Improvement: {ctx_vs_cal_roi:+.2%}")
     print(f"  Win Rate Improvement: {ctx_vs_cal_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {ctx_vs_cal_sharpe:+.2f}")
@@ -229,7 +228,7 @@ def run_comprehensive_comparison(
     ctx_vs_opt_sharpe = contextual_summary["sharpe_ratio"] - optimized_summary["sharpe_ratio"]
     ctx_vs_opt_profit = (contextual_summary["final_bankroll"] - initial_bankroll) - (optimized_summary["final_bankroll"] - initial_bankroll)
 
-    print(f"\nCONTEXTUAL vs OPTIMIZED (Total Improvement):")
+    print("\nCONTEXTUAL vs OPTIMIZED (Total Improvement):")
     print(f"  ROI Improvement: {ctx_vs_opt_roi:+.2%}")
     print(f"  Win Rate Improvement: {ctx_vs_opt_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {ctx_vs_opt_sharpe:+.2f}")
@@ -253,18 +252,18 @@ def run_comprehensive_comparison(
     print(f"  Contextual: {contextual_summary['total_return']:+.1%} ({contextual_summary['n_trades']} trades)")
 
     if best_roi_model == "CONTEXTUAL":
-        print(f"\n✓ SUCCESS! Contextual model (with calibration + dynamic weighting) is BEST")
-        print(f"  Key insight: Context-aware model selection + calibration > static weights")
+        print("\n✓ SUCCESS! Contextual model (with calibration + dynamic weighting) is BEST")
+        print("  Key insight: Context-aware model selection + calibration > static weights")
     elif best_roi_model == "CALIBRATED":
-        print(f"\n✓ GOOD! Calibrated model is best")
-        print(f"  Calibration improved over optimized, but context features didn't help further")
-        print(f"  Possible reason: Meta-learner already captures context through feature interactions")
+        print("\n✓ GOOD! Calibrated model is best")
+        print("  Calibration improved over optimized, but context features didn't help further")
+        print("  Possible reason: Meta-learner already captures context through feature interactions")
     else:
-        print(f"\n⚠  Optimized model still best - enhancements didn't improve ROI")
-        print(f"  Possible reasons:")
-        print(f"    - Calibration/context features not beneficial for this time period")
-        print(f"    - Model already well-calibrated")
-        print(f"    - Need more validation data for calibrator")
+        print("\n⚠  Optimized model still best - enhancements didn't improve ROI")
+        print("  Possible reasons:")
+        print("    - Calibration/context features not beneficial for this time period")
+        print("    - Model already well-calibrated")
+        print("    - Need more validation data for calibrator")
 
     # Package results
     results = {

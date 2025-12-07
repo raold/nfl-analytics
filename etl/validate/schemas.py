@@ -8,7 +8,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import pandas as pd
 import yaml
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class ValidationError:
     """Single validation error."""
 
-    column: Optional[str]
+    column: str | None
     error_type: str
     message: str
     severity: str = "error"  # error, warning, info
@@ -40,12 +40,12 @@ class ValidationResult:
     is_valid: bool
     row_count: int
     column_count: int
-    errors: List[ValidationError] = field(default_factory=list)
-    warnings: List[ValidationError] = field(default_factory=list)
+    errors: list[ValidationError] = field(default_factory=list)
+    warnings: list[ValidationError] = field(default_factory=list)
     validation_time: datetime = field(default_factory=datetime.now)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def add_error(self, column: Optional[str], error_type: str, message: str, value: Any = None):
+    def add_error(self, column: str | None, error_type: str, message: str, value: Any = None):
         """Add an error to the validation result."""
         self.errors.append(ValidationError(
             column=column,
@@ -56,7 +56,7 @@ class ValidationResult:
         ))
         self.is_valid = False
 
-    def add_warning(self, column: Optional[str], error_type: str, message: str, value: Any = None):
+    def add_warning(self, column: str | None, error_type: str, message: str, value: Any = None):
         """Add a warning to the validation result."""
         self.warnings.append(ValidationError(
             column=column,
@@ -123,7 +123,7 @@ class SchemaValidator:
         >>>     print(result.details())
     """
 
-    def __init__(self, schema_path: Optional[Path] = None):
+    def __init__(self, schema_path: Path | None = None):
         """
         Initialize validator with schema definitions.
 
@@ -138,7 +138,7 @@ class SchemaValidator:
         self.schemas = self._load_schemas()
         logger.info(f"Loaded {len(self.schemas)} schema definitions from {schema_path}")
 
-    def _load_schemas(self) -> Dict[str, Any]:
+    def _load_schemas(self) -> dict[str, Any]:
         """Load schema definitions from YAML file."""
         if not self.schema_path.exists():
             raise FileNotFoundError(f"Schema file not found: {self.schema_path}")
@@ -204,7 +204,7 @@ class SchemaValidator:
     def _validate_required_columns(
         self,
         df: pd.DataFrame,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         result: ValidationResult
     ):
         """Check that all required columns are present."""
@@ -221,7 +221,7 @@ class SchemaValidator:
     def _validate_data_types(
         self,
         df: pd.DataFrame,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         result: ValidationResult
     ):
         """Validate column data types."""
@@ -266,7 +266,7 @@ class SchemaValidator:
     def _validate_constraints(
         self,
         df: pd.DataFrame,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         result: ValidationResult
     ):
         """Validate value constraints."""
@@ -331,7 +331,7 @@ class SchemaValidator:
     def _validate_business_rules(
         self,
         df: pd.DataFrame,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
         result: ValidationResult
     ):
         """Validate business rules (basic checks only)."""
@@ -374,11 +374,11 @@ class SchemaValidator:
             # Note: Complex SQL-based rules should be validated separately
             # using etl/validate/quality.py with database access
 
-    def get_available_entities(self) -> List[str]:
+    def get_available_entities(self) -> list[str]:
         """Get list of available entity schemas."""
         return list(self.schemas.keys())
 
-    def get_schema(self, entity_name: str) -> Dict[str, Any]:
+    def get_schema(self, entity_name: str) -> dict[str, Any]:
         """Get schema definition for an entity."""
         if entity_name not in self.schemas:
             raise ValueError(f"Unknown entity: {entity_name}")

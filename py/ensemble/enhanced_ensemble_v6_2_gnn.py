@@ -58,19 +58,17 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import logging
 from datetime import datetime
-from typing import Dict, Optional
 
-import numpy as np
 from dotenv import load_dotenv
-
-# Import base ensemble
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 # Import GNN component
 from py.ensemble.components.gnn_component import GNNComponent
 
+# Import base ensemble
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
 # Import strategy weights
-from py.ensemble.strategy.base import DEFAULT_WEIGHTS_V6, DEFAULT_WEIGHTS_V6_1_GNN
+from py.ensemble.strategy.base import DEFAULT_WEIGHTS_V6_1_GNN
 
 # Load environment variables
 load_dotenv()
@@ -107,8 +105,8 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
     def __init__(
         self,
         enable_gnn: bool = True,
-        gnn_model_path: Optional[str] = None,
-        gnn_device: Optional[str] = None,
+        gnn_model_path: str | None = None,
+        gnn_device: str | None = None,
         **kwargs
     ):
         """
@@ -171,7 +169,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
         season: int,
         week: int,
         return_components: bool = False,
-    ) -> Dict:
+    ) -> dict:
         """
         Predict game outcome (home team win probability).
 
@@ -289,7 +287,7 @@ class EnhancedEnsemble6WayGNN(EnhancedEnsemble5Way):
         week: int,
         return_components: bool = False,
         return_uncertainty: bool = True,
-    ) -> Dict:
+    ) -> dict:
         """
         Generate ensemble prediction for a player-game (passing yards).
 
@@ -347,7 +345,7 @@ if __name__ == "__main__":
             )
 
             if result.get("ensemble_mean") is not None:
-                print(f"\nKC vs BUF (2024 Week 1):")
+                print("\nKC vs BUF (2024 Week 1):")
                 print(f"  KC Win Prob: {result['ensemble_mean']:.1%} ± {result['ensemble_std']:.1%}")
                 print(f"  90% CI: [{result['lower_90']:.1%}, {result['upper_90']:.1%}]")
                 print(f"  GNN used: {result['gnn_used']}")

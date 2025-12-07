@@ -10,8 +10,7 @@ Handles:
 """
 
 import logging
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import pandas as pd
 
@@ -57,13 +56,13 @@ class TeamNameStandardizer:
 
     def __init__(self):
         """Initialize team name standardizer."""
-        self.warnings: List[str] = []
+        self.warnings: list[str] = []
 
     def standardize(
         self,
         team: str,
-        season: Optional[int] = None,
-        context_teams: Optional[Set[str]] = None
+        season: int | None = None,
+        context_teams: set[str] | None = None
     ) -> str:
         """
         Standardize team abbreviation.
@@ -122,8 +121,8 @@ class TeamNameStandardizer:
     def standardize_dataframe(
         self,
         df: pd.DataFrame,
-        team_columns: List[str],
-        season_column: Optional[str] = 'season'
+        team_columns: list[str],
+        season_column: str | None = 'season'
     ) -> pd.DataFrame:
         """
         Standardize team names in a DataFrame.
@@ -175,12 +174,12 @@ class DataCleaner:
 
     def __init__(self):
         """Initialize data cleaner."""
-        self.cleaning_stats: Dict[str, Any] = {}
+        self.cleaning_stats: dict[str, Any] = {}
 
     def handle_column_aliases(
         self,
         df: pd.DataFrame,
-        alias_map: Dict[str, List[str]]
+        alias_map: dict[str, list[str]]
     ) -> pd.DataFrame:
         """
         Handle column name variations.
@@ -214,7 +213,7 @@ class DataCleaner:
     def remove_duplicates(
         self,
         df: pd.DataFrame,
-        subset: Optional[List[str]] = None,
+        subset: list[str] | None = None,
         keep: str = 'last'
     ) -> pd.DataFrame:
         """
@@ -242,7 +241,7 @@ class DataCleaner:
     def standardize_datetimes(
         self,
         df: pd.DataFrame,
-        datetime_columns: List[str],
+        datetime_columns: list[str],
         target_tz: str = 'UTC'
     ) -> pd.DataFrame:
         """
@@ -285,7 +284,7 @@ class DataCleaner:
     def fill_nulls(
         self,
         df: pd.DataFrame,
-        fill_strategy: Dict[str, Any]
+        fill_strategy: dict[str, Any]
     ) -> pd.DataFrame:
         """
         Fill null values using specified strategies.
@@ -321,7 +320,7 @@ class DataCleaner:
     def enforce_types(
         self,
         df: pd.DataFrame,
-        type_map: Dict[str, str]
+        type_map: dict[str, str]
     ) -> pd.DataFrame:
         """
         Enforce data types on columns.
@@ -349,7 +348,7 @@ class DataCleaner:
 
         return df_copy
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get cleaning statistics."""
         return self.cleaning_stats
 

@@ -10,6 +10,7 @@ capture game script effects (e.g., teams rush more when protecting leads).
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import json
@@ -21,10 +22,9 @@ import numpy as np
 import pandas as pd
 import psycopg2
 import torch
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
-from py.models.game_trajectory_cvae import ConditionalVAE, GameTrajectory
+from py.models.game_trajectory_cvae import ConditionalVAE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

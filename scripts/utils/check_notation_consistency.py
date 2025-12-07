@@ -4,8 +4,9 @@ Check notation and formatting consistency across dissertation chapters.
 """
 
 import re
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
 
 def check_notation_consistency(tex_dir):
     """Check for consistent mathematical notation across chapters."""
@@ -39,7 +40,7 @@ def check_notation_consistency(tex_dir):
                 continue
 
             try:
-                with open(tex_file, 'r', encoding='utf-8') as f:
+                with open(tex_file, encoding='utf-8') as f:
                     content = f.read()
 
                 for variant in variations:
@@ -50,14 +51,14 @@ def check_notation_consistency(tex_dir):
                 pass
 
         if len(found_variations) > 1:
-            print(f"  ⚠️  Multiple notations found:")
+            print("  ⚠️  Multiple notations found:")
             for usage in notation_usage[pattern_name]:
                 print(f"     - {usage[0]} in {usage[1]}")
             issues.append(f"{pattern_name}: {len(found_variations)} variations")
         elif len(found_variations) == 1:
             print(f"  ✓ Consistent: {list(found_variations)[0]}")
         else:
-            print(f"  - Not found")
+            print("  - Not found")
 
     return issues
 
@@ -78,7 +79,7 @@ def check_table_formatting(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding='utf-8') as f:
                 content = f.read()
 
             if r'\begin{table}' in content:
@@ -111,7 +112,7 @@ def check_citation_style(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding='utf-8') as f:
                 content = f.read()
 
             # Count different citation commands
@@ -144,7 +145,7 @@ def check_figure_references(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding='utf-8') as f:
                 content = f.read()
 
             # Count different reference styles

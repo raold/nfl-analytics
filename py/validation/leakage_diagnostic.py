@@ -15,13 +15,13 @@ Date: November 2, 2025
 """
 
 import argparse
-import pandas as pd
-import numpy as np
-import psycopg
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, List, Tuple
 import json
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import psycopg
 
 # Database connection
 DB_CONFIG = {
@@ -171,11 +171,11 @@ class LeakageDiagnostic:
 
             self.results['test_1_spread_only'] = result
 
-            print(f"\n✓ Results:")
+            print("\n✓ Results:")
             print(f"  Accuracy: {accuracy:.1%}")
             print(f"  AUC: {auc:.3f}")
             print(f"  Baseline (pick favorite): {baseline_accuracy:.1%}")
-            print(f"  Expected: 52-53%")
+            print("  Expected: 52-53%")
 
             if accuracy > 0.54:
                 print(f"\n  ⚠️  FAIL: {accuracy:.1%} > 54% suggests leakage even in basic model")
@@ -307,7 +307,7 @@ class LeakageDiagnostic:
                 print(null_kickoffs[['season', 'week', 'null_kickoff_count']])
                 status = "FAIL"
             else:
-                print(f"\n✓ No NULL kickoffs found")
+                print("\n✓ No NULL kickoffs found")
                 status = "PASS"
 
             # Check chronological ordering
@@ -332,7 +332,7 @@ class LeakageDiagnostic:
                     print(f"  Season {issue['season']}: weeks {issue['actual_weeks']}")
                 status = "FAIL"
             else:
-                print(f"✓ All seasons have sequential week numbering")
+                print("✓ All seasons have sequential week numbering")
 
             self.results['test_3_week_ordering'] = {
                 "test": "week_ordering",
@@ -366,7 +366,7 @@ class LeakageDiagnostic:
             "closing_line_value"
         ]
 
-        print(f"\nSuspicious features (derived from vegas lines):")
+        print("\nSuspicious features (derived from vegas lines):")
         for feat in suspicious_features:
             print(f"  - {feat}")
 

@@ -18,9 +18,10 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-06
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path
 
 # Dissertation styling
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -163,11 +164,11 @@ def main():
     print(f"✅ Generated: {output_path}")
 
     print(f"\n{'='*70}")
-    print(f"ALPHA SENSITIVITY FIGURE GENERATION COMPLETE")
+    print("ALPHA SENSITIVITY FIGURE GENERATION COMPLETE")
     print(f"{'='*70}")
     print(f"Output: {output_path}")
-    print(f"\nFigure ready for dissertation inclusion.")
-    print(f"Referenced in: chapter_5_rl_design/chapter_5_rl_design.tex:365")
+    print("\nFigure ready for dissertation inclusion.")
+    print("Referenced in: chapter_5_rl_design/chapter_5_rl_design.tex:365")
 
 if __name__ == "__main__":
     main()

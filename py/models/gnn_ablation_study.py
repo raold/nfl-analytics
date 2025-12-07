@@ -19,9 +19,8 @@ import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import Dict, List
+
 import pandas as pd
-import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -124,18 +123,18 @@ ABLATION_CONFIGS = {
 
 def run_single_ablation(
     config_name: str,
-    config: Dict,
-    seasons: List[int],
+    config: dict,
+    seasons: list[int],
     epochs: int,
     device: str,
     output_dir: Path,
-) -> Dict:
+) -> dict:
     """Run a single ablation experiment."""
 
     logger.info("=" * 80)
     logger.info(f"Running ablation: {config['name']}")
     logger.info("=" * 80)
-    logger.info(f"Configuration:")
+    logger.info("Configuration:")
     for key, value in config.items():
         if key != "name":
             logger.info(f"  {key}: {value}")
@@ -189,7 +188,7 @@ def run_single_ablation(
             "error": "Metadata file not found",
         }
 
-    with open(metadata_path, "r") as f:
+    with open(metadata_path) as f:
         metadata = json.load(f)
 
     results = {
@@ -214,12 +213,12 @@ def run_single_ablation(
 
 
 def run_ablation_study(
-    configs: Dict[str, Dict],
-    seasons: List[int],
+    configs: dict[str, dict],
+    seasons: list[int],
     epochs: int,
     device: str,
     output_dir: Path,
-) -> List[Dict]:
+) -> list[dict]:
     """Run all ablation experiments."""
 
     results = []
@@ -238,7 +237,7 @@ def run_ablation_study(
     return results
 
 
-def generate_summary_table(results: List[Dict], output_dir: Path):
+def generate_summary_table(results: list[dict], output_dir: Path):
     """Generate summary table and analysis."""
 
     # Extract successful results
@@ -320,13 +319,13 @@ def generate_summary_table(results: List[Dict], output_dir: Path):
 
     # Embedding dimension impact
     embed_results = df.groupby("Embed Dim")["Val Brier"].mean().sort_values()
-    logger.info(f"\nEmbedding Dimension (average Brier):")
+    logger.info("\nEmbedding Dimension (average Brier):")
     for dim, brier in embed_results.items():
         logger.info(f"  {dim:3d}: {brier:.4f}")
 
     # Message rounds impact
     msg_results = df.groupby("Msg Rounds")["Val Brier"].mean().sort_values()
-    logger.info(f"\nMessage Passing Rounds (average Brier):")
+    logger.info("\nMessage Passing Rounds (average Brier):")
     for rounds, brier in msg_results.items():
         logger.info(f"  {rounds:1d}: {brier:.4f}")
 

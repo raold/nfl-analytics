@@ -19,10 +19,8 @@ Date: November 26, 2025
 
 import json
 import logging
-import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -136,8 +134,8 @@ def get_game_outcomes(season: int = 2024) -> pd.DataFrame:
 
 
 def compute_ensemble_prediction(
-    component_preds: Dict[str, float],
-    weights: Dict[str, float]
+    component_preds: dict[str, float],
+    weights: dict[str, float]
 ) -> float:
     """Compute weighted ensemble prediction."""
 
@@ -158,9 +156,9 @@ def compute_ensemble_prediction(
 def evaluate_weights(
     games_df: pd.DataFrame,
     component_df: pd.DataFrame,
-    weights: Dict[str, float],
+    weights: dict[str, float],
     version_name: str
-) -> Dict:
+) -> dict:
     """Evaluate a set of weights on game predictions."""
 
     results = []
@@ -255,7 +253,7 @@ def evaluate_weights(
     }
 
 
-def statistical_comparison(v6_results: pd.DataFrame, v8_results: pd.DataFrame) -> Dict:
+def statistical_comparison(v6_results: pd.DataFrame, v8_results: pd.DataFrame) -> dict:
     """Perform statistical comparison between v6 and v8."""
 
     # Merge on game_id
@@ -313,10 +311,10 @@ def main():
         print("\n" + "=" * 70)
         print("DIRICHLET TUNING RESULTS (from grid search)")
         print("=" * 70)
-        print(f"\nv6.0 Static Weights:")
+        print("\nv6.0 Static Weights:")
         for k, v in WEIGHTS_V6.items():
             print(f"  {k:30s} {v:.3f}")
-        print(f"\nv8.0 Dirichlet Weights:")
+        print("\nv8.0 Dirichlet Weights:")
         for k, v in WEIGHTS_V8.items():
             print(f"  {k:30s} {v:.3f}")
 
@@ -345,11 +343,11 @@ def main():
     print("WEIGHT CONFIGURATIONS")
     print("=" * 70)
 
-    print(f"\nv6.0 Static Weights:")
+    print("\nv6.0 Static Weights:")
     for k, v in WEIGHTS_V6.items():
         print(f"  {k:30s} {v:.3f}")
 
-    print(f"\nv8.0 Dirichlet Weights:")
+    print("\nv8.0 Dirichlet Weights:")
     for k, v in WEIGHTS_V8.items():
         print(f"  {k:30s} {v:.3f}")
 
@@ -385,7 +383,7 @@ def main():
     cover_ok = v8_metrics['cover_rate'] > 0.55
     roi_positive = v8_metrics['estimated_roi'] > 0
 
-    print(f"\nSuccess Criteria:")
+    print("\nSuccess Criteria:")
     print(f"  Spread MAE improved >0.5 pts:  {'PASS' if mae_improved else 'FAIL'}")
     print(f"  Cover rate >55%:               {'PASS' if cover_ok else 'FAIL'}")
     print(f"  ROI positive:                  {'PASS' if roi_positive else 'FAIL'}")

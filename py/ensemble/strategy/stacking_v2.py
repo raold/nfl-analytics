@@ -14,14 +14,15 @@ Author: NFL Analytics Team
 Date: December 7, 2024
 """
 
+import logging
+from pathlib import Path
+from typing import Any
+
+import joblib
 import numpy as np
 import pandas as pd
-from typing import List, Optional, Dict, Any
-from pathlib import Path
-import joblib
-import logging
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 logger = logging.getLogger(__name__)
 
@@ -54,10 +55,10 @@ class StackingStrategyV2(EnsembleStrategy):
     - Breiman (1996): "Stacked Regressions"
     - Van der Laan et al. (2007): "Super Learner"
     """
-    
+
     def __init__(
         self,
-        model_path: Optional[Path] = None,
+        model_path: Path | None = None,
         use_features: bool = True,
         fallback_to_average: bool = True
     ):
@@ -74,20 +75,20 @@ class StackingStrategyV2(EnsembleStrategy):
         self.fallback_to_average = fallback_to_average
         self.meta_learner = None
         self.feature_names = None
-        
+
         if model_path and model_path.exists():
             self._load_model()
-    
+
     @property
     def name(self) -> str:
         return "stacking_v2"
-    
+
     def _load_model(self):
         """Load trained meta-learner from disk."""
         if not XGBOOST_AVAILABLE:
             logger.warning("XGBoost not available, cannot load meta-learner")
             return
-        
+
         try:
             if self.model_path.suffix == '.json':
                 self.meta_learner = xgb.XGBRegressor()
@@ -96,16 +97,16 @@ class StackingStrategyV2(EnsembleStrategy):
                 model_data = joblib.load(self.model_path)
                 self.meta_learner = model_data['model']
                 self.feature_names = model_data.get('feature_names')
-            
+
             logger.info(f"Loaded meta-learner from {self.model_path}")
         except Exception as e:
             logger.error(f"Failed to load meta-learner: {e}")
             self.meta_learner = None
-    
+
     def combine(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]] = None,
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None = None,
         **kwargs
     ) -> EnsemblePrediction:
         """
@@ -120,7 +121,7 @@ class StackingStrategyV2(EnsembleStrategy):
             EnsemblePrediction with meta-learner output
         """
         self.validate_predictions(predictions)
-        
+
         # If meta-learner not trained, fall back to simple average
         if self.meta_learner is None:
             if self.fallback_to_average:
@@ -128,14 +129,14 @@ class StackingStrategyV2(EnsembleStrategy):
                 return self._simple_average(predictions)
             else:
                 raise ValueError("Meta-learner not trained and fallback disabled")
-        
+
         # Prepare features for meta-learner
         features = self._prepare_features(predictions, context)
-        
+
         # Get meta-learner prediction
         try:
             meta_pred = self.meta_learner.predict(features.reshape(1, -1))[0]
-            
+
             # Uncertainty estimation: use average of base model uncertainties
             # weighted by feature importances if available
             if hasattr(self.meta_learner, 'feature_importances_'):
@@ -143,20 +144,20 @@ class StackingStrategyV2(EnsembleStrategy):
                 weights = importances / importances.sum()
             else:
                 weights = np.ones(len(predictions)) / len(predictions)
-            
+
             # Combine uncertainties (weighted average of variances)
-            combined_var = np.sum([w * (p.prediction_std ** 2) 
+            combined_var = np.sum([w * (p.prediction_std ** 2)
                                    for w, p in zip(weights, predictions)])
             meta_std = np.sqrt(combined_var)
-            
+
             # Confidence based on agreement between models
             pred_values = np.array([p.prediction_mean for p in predictions])
             agreement = 1.0 - (np.std(pred_values) / (np.mean(pred_values) + 1e-6))
             confidence = float(np.clip(agreement, 0.0, 1.0))
-            
+
             # Store weights for interpretability
             weight_dict = {p.model_name: float(w) for p, w in zip(predictions, weights)}
-            
+
             return EnsemblePrediction(
                 prediction_mean=float(meta_pred),
                 prediction_std=float(meta_std),
@@ -170,18 +171,18 @@ class StackingStrategyV2(EnsembleStrategy):
                     "feature_importances": weight_dict
                 }
             )
-            
+
         except Exception as e:
             logger.error(f"Meta-learner prediction failed: {e}")
             if self.fallback_to_average:
                 return self._simple_average(predictions)
             else:
                 raise
-    
+
     def _prepare_features(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]] = None
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None = None
     ) -> np.ndarray:
         """
         Prepare feature vector for meta-learner.
@@ -200,19 +201,19 @@ class StackingStrategyV2(EnsembleStrategy):
             Feature vector as numpy array
         """
         features = []
-        
+
         # Base model predictions
         for pred in predictions:
             features.append(pred.prediction_mean)
-        
+
         # Base model uncertainties
         for pred in predictions:
             features.append(pred.prediction_std)
-        
+
         # Model confidences
         for pred in predictions:
             features.append(pred.confidence)
-        
+
         # Optional: Add context features
         if self.use_features and context:
             # Example context features
@@ -224,18 +225,18 @@ class StackingStrategyV2(EnsembleStrategy):
                 features.append(context['home_advantage'])
             if 'rest_days' in context:
                 features.append(context['rest_days'])
-        
+
         return np.array(features, dtype=np.float32)
-    
-    def _simple_average(self, predictions: List[ModelPrediction]) -> EnsemblePrediction:
+
+    def _simple_average(self, predictions: list[ModelPrediction]) -> EnsemblePrediction:
         """Fallback to simple average if meta-learner unavailable."""
         weight = 1.0 / len(predictions)
         weights = {p.model_name: weight for p in predictions}
-        
+
         mean = np.mean([p.prediction_mean for p in predictions])
         std = np.sqrt(np.sum([weight**2 * p.prediction_std**2 for p in predictions]))
         confidence = np.mean([p.confidence for p in predictions])
-        
+
         return EnsemblePrediction(
             prediction_mean=float(mean),
             prediction_std=float(std),
@@ -245,15 +246,15 @@ class StackingStrategyV2(EnsembleStrategy):
             confidence=float(confidence),
             metadata={"status": "fallback_to_average", "reason": "meta_learner_not_trained"}
         )
-    
+
     @staticmethod
     def train_meta_learner(
         oof_predictions: pd.DataFrame,
         targets: pd.Series,
         output_path: Path,
         use_features: bool = True,
-        hyperparams: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+        hyperparams: dict | None = None
+    ) -> dict[str, Any]:
         """
         Train meta-learner on out-of-fold predictions.
         
@@ -271,7 +272,7 @@ class StackingStrategyV2(EnsembleStrategy):
         """
         if not XGBOOST_AVAILABLE:
             raise ImportError("XGBoost required for meta-learner training")
-        
+
         # Default hyperparameters optimized for meta-learning
         default_params = {
             'objective': 'reg:squarederror',
@@ -284,19 +285,19 @@ class StackingStrategyV2(EnsembleStrategy):
             'reg_lambda': 1.0,  # L2 regularization
             'random_state': 42
         }
-        
+
         if hyperparams:
             default_params.update(hyperparams)
-        
+
         # Train meta-learner
         meta_learner = xgb.XGBRegressor(**default_params)
         meta_learner.fit(oof_predictions, targets)
-        
+
         # Evaluate
         train_pred = meta_learner.predict(oof_predictions)
         train_mae = np.mean(np.abs(train_pred - targets))
         train_rmse = np.sqrt(np.mean((train_pred - targets) ** 2))
-        
+
         # Save model
         output_path.parent.mkdir(parents=True, exist_ok=True)
         model_data = {
@@ -309,10 +310,10 @@ class StackingStrategyV2(EnsembleStrategy):
             }
         }
         joblib.dump(model_data, output_path)
-        
+
         logger.info(f"Meta-learner trained: MAE={train_mae:.2f}, RMSE={train_rmse:.2f}")
         logger.info(f"Saved to {output_path}")
-        
+
         return model_data['training_metrics']
 
 
@@ -347,7 +348,7 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
     def __init__(
         self,
-        model_dir: Optional[Path] = None,
+        model_dir: Path | None = None,
         fallback_to_dirichlet: bool = True,
         fallback_to_average: bool = True
     ):
@@ -365,8 +366,8 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
         self.fallback_to_average = fallback_to_average
 
         # Per-stat-type meta-learners
-        self.meta_learners: Dict[str, Any] = {}
-        self.feature_names: Dict[str, List[str]] = {}
+        self.meta_learners: dict[str, Any] = {}
+        self.feature_names: dict[str, list[str]] = {}
 
         # Dirichlet fallback
         self._dirichlet_stacker = None
@@ -401,7 +402,9 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
         """Lazy-load Dirichlet stacker for fallback."""
         if self._dirichlet_stacker is None:
             try:
-                from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+                from py.ensemble.dirichlet_bayesian_stacking import (
+                    DirichletBayesianStackingByStatType,
+                )
                 self._dirichlet_stacker = DirichletBayesianStackingByStatType(use_db=True)
             except ImportError:
                 logger.warning("DirichletBayesianStackingByStatType not available")
@@ -409,9 +412,9 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
     def combine(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]] = None,
-        stat_type: Optional[str] = None,
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None = None,
+        stat_type: str | None = None,
         **kwargs
     ) -> EnsemblePrediction:
         """
@@ -450,8 +453,8 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
     def _combine_with_meta_learner(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]],
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None,
         stat_type: str
     ) -> EnsemblePrediction:
         """Combine using trained meta-learner."""
@@ -503,7 +506,7 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
     def _combine_with_dirichlet(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         stat_type: str
     ) -> EnsemblePrediction:
         """Combine using Dirichlet weights as fallback."""
@@ -553,8 +556,8 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
     def _prepare_features(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]],
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None,
         stat_type: str
     ) -> np.ndarray:
         """Prepare features for meta-learner."""
@@ -580,7 +583,7 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
 
         return np.array(features, dtype=np.float32)
 
-    def _simple_average(self, predictions: List[ModelPrediction]) -> EnsemblePrediction:
+    def _simple_average(self, predictions: list[ModelPrediction]) -> EnsemblePrediction:
         """Fallback to simple average."""
         weight = 1.0 / len(predictions)
         weights = {p.model_name: weight for p in predictions}
@@ -604,8 +607,8 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
         oof_predictions: pd.DataFrame,
         targets: pd.DataFrame,
         output_dir: Path,
-        hyperparams: Optional[Dict] = None
-    ) -> Dict[str, Dict[str, Any]]:
+        hyperparams: dict | None = None
+    ) -> dict[str, dict[str, Any]]:
         """
         Train separate meta-learners for each stat type.
 

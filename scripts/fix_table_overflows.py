@@ -16,9 +16,8 @@ Date: 2025-11-03
 
 import argparse
 import re
-import sys
 from pathlib import Path
-from typing import List, Tuple
+
 
 def has_adjustbox(content: str, tabular_start: int) -> bool:
     """Check if tabular environment already wrapped in adjustbox"""
@@ -63,7 +62,7 @@ def is_wide_table(content: str, tabular_start: int) -> bool:
 
     return False
 
-def fix_table_in_content(content: str) -> Tuple[str, List[str]]:
+def fix_table_in_content(content: str) -> tuple[str, list[str]]:
     """Add adjustbox wrappers to tables that need them"""
     changes = []
 
@@ -106,10 +105,10 @@ def fix_table_in_content(content: str) -> Tuple[str, List[str]]:
 
     return content, changes
 
-def process_file(file_path: Path, dry_run: bool = True) -> Tuple[bool, List[str]]:
+def process_file(file_path: Path, dry_run: bool = True) -> tuple[bool, list[str]]:
     """Process a single LaTeX file"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding='utf-8') as f:
             content = f.read()
 
         # Skip if no tables
@@ -174,14 +173,14 @@ def main():
 
         # Summary
         print(f"\n{'=' * 70}")
-        print(f"TABLE OVERFLOW FIX SUMMARY")
+        print("TABLE OVERFLOW FIX SUMMARY")
         print(f"{'=' * 70}")
         print(f"Mode: {'DRY RUN (no changes made)' if dry_run else 'FIXING (changes applied)'}")
         print(f"Files scanned: {len(tex_files)}")
         print(f"Files modified: {len(modified_files)}")
 
         if modified_files:
-            print(f"\nModified files:")
+            print("\nModified files:")
             for file_path, changes in modified_files:
                 rel_path = file_path.relative_to(base_dir)
                 print(f"\n  {rel_path}:")
@@ -189,7 +188,7 @@ def main():
                     print(f"    {change}")
 
         if dry_run and modified_files:
-            print(f"\nRun with --fix to apply changes")
+            print("\nRun with --fix to apply changes")
 
 if __name__ == "__main__":
     main()

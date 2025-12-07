@@ -32,7 +32,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 import warnings
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -334,7 +333,7 @@ class Phase1Validator:
         predicted: np.ndarray,
         std: np.ndarray,
         coverage: float = 0.90
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Compute calibration (90% prediction interval coverage).
 
@@ -362,7 +361,7 @@ class Phase1Validator:
     def validate_opponent_strength_impact(
         self,
         df: pd.DataFrame
-    ) -> Dict:
+    ) -> dict:
         """
         Validate impact of opponent strength features using simple linear model.
 
@@ -435,7 +434,7 @@ class Phase1Validator:
     def validate_elo_impact(
         self,
         df: pd.DataFrame
-    ) -> Dict:
+    ) -> dict:
         """
         Validate impact of ELO features.
 

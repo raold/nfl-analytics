@@ -50,10 +50,8 @@ Date: November 9, 2025
 import json
 import logging
 import os
-import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -63,8 +61,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, TensorDataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -84,7 +82,7 @@ class EvidentialNeuralNetwork(nn.Module):
     def __init__(
         self,
         input_dim: int,
-        hidden_dims: Tuple[int, ...] = (128, 64),
+        hidden_dims: tuple[int, ...] = (128, 64),
         dropout_rate: float = 0.2
     ):
         """
@@ -148,7 +146,7 @@ class EvidentialNeuralNetwork(nn.Module):
         nn.init.xavier_normal_(self.beta_head.weight)
         nn.init.constant_(self.beta_head.bias, 1.0)  # softplus(1) ≈ 1.3
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Forward pass to predict NIG parameters.
 
@@ -179,7 +177,7 @@ class EvidentialNeuralNetwork(nn.Module):
     def predict_with_uncertainty(
         self,
         x: torch.Tensor
-    ) -> Dict[str, torch.Tensor]:
+    ) -> dict[str, torch.Tensor]:
         """
         Predict with aleatoric and epistemic uncertainty.
 
@@ -336,7 +334,7 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
 
     def __init__(
         self,
-        hidden_dims: Tuple[int, ...] = (128, 64),
+        hidden_dims: tuple[int, ...] = (128, 64),
         dropout_rate: float = 0.2,
         lambda_reg: float = 0.01,
         learning_rate: float = 1e-3,
@@ -344,7 +342,7 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         max_epochs: int = 100,
         patience: int = 10,
         device: str = 'cpu',
-        random_state: Optional[int] = None
+        random_state: int | None = None
     ):
         """
         Initialize evidential regressor.
@@ -385,8 +383,8 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         self,
         X: np.ndarray,
         y: np.ndarray,
-        X_val: Optional[np.ndarray] = None,
-        y_val: Optional[np.ndarray] = None,
+        X_val: np.ndarray | None = None,
+        y_val: np.ndarray | None = None,
         verbose: bool = True
     ):
         """

@@ -247,14 +247,14 @@ def generate_registry_report(registry: ModelRegistry):
         for version in versions:
             status_counts[version.status] += 1
 
-    print(f"\nBy Status:")
+    print("\nBy Status:")
     print(f"  • Production: {status_counts['prod']}")
     print(f"  • Staging: {status_counts['staging']}")
     print(f"  • Development: {status_counts['dev']}")
     print(f"  • Archived: {status_counts['archived']}")
 
     # List all models with latest version
-    print(f"\nRegistered Models:")
+    print("\nRegistered Models:")
     for model_name in sorted(all_models):
         versions = registry.list_versions(model_name)
         if versions:
@@ -320,7 +320,7 @@ def main():
     generate_registry_report(registry)
 
     print("\n✓ Registry update complete!")
-    print(f"Registry saved to: models/registry.json")
+    print("Registry saved to: models/registry.json")
 
 
 if __name__ == "__main__":

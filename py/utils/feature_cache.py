@@ -42,7 +42,7 @@ import logging
 import threading
 import time
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,7 +84,7 @@ class FeatureCache:
         self.enable_stats = enable_stats
 
         # Thread-safe cache storage
-        self.cache: OrderedDict[str, Tuple[Any, float]] = OrderedDict()
+        self.cache: OrderedDict[str, tuple[Any, float]] = OrderedDict()
         self.lock = threading.Lock()
 
         # Statistics
@@ -122,7 +122,7 @@ class FeatureCache:
         season: int,
         week: int,
         query_type: str = "features"
-    ) -> Optional[Any]:
+    ) -> Any | None:
         """
         Get cached features.
 
@@ -245,7 +245,7 @@ class FeatureCache:
             return 0.0
         return self.stats["hits"] / total
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """
         Get cache statistics.
 
@@ -281,7 +281,7 @@ class FeatureCache:
 
 
 # Singleton instance for global access
-_global_cache: Optional[FeatureCache] = None
+_global_cache: FeatureCache | None = None
 
 
 def get_default_cache(max_size: int = 10000, ttl_seconds: int = 3600) -> FeatureCache:
@@ -311,7 +311,6 @@ def get_default_cache(max_size: int = 10000, ttl_seconds: int = 3600) -> Feature
 
 if __name__ == "__main__":
     # Test feature cache
-    import random
 
     logger.info("\n" + "="*70)
     logger.info("FEATURE CACHE TEST")

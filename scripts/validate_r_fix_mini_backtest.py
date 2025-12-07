@@ -27,13 +27,15 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
-import time
 import os
-import pandas as pd
+import time
+
 import numpy as np
+import pandas as pd
 
 logging.basicConfig(
     level=logging.INFO,
@@ -168,13 +170,13 @@ def run_mini_backtest():
     else:
         ensemble_mae = np.nan
 
-    logger.info(f"\n   MAE Results:")
+    logger.info("\n   MAE Results:")
     logger.info(f"   - Hierarchical v2: {hier_mae:.2f} yards")
     logger.info(f"   - Informative Priors v2: {ip_mae:.2f} yards")
     logger.info(f"   - Ensemble (50/50): {ensemble_mae:.2f} yards")
 
     # Print sample predictions
-    logger.info(f"\n   Sample Predictions:")
+    logger.info("\n   Sample Predictions:")
     for i in range(min(5, len(df_valid_hier))):
         row = df_valid_hier.iloc[i]
         logger.info(

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.388970
 Test count: 12
 """
 
+import pytest
 from ensemble.game_outcome_ensemble_calibrated import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_fit_basic():

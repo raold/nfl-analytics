@@ -21,17 +21,16 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
-from scipy import stats
-import matplotlib.pyplot as plt
-import seaborn as sns
-from pathlib import Path
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import logging
+from dataclasses import dataclass
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import psycopg2
+import seaborn as sns
+from scipy import stats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,7 +48,7 @@ class DiDResult:
     n_treated: int
     n_control: int
     parallel_trends_valid: bool
-    placebo_p_value: Optional[float] = None
+    placebo_p_value: float | None = None
 
     def __str__(self) -> str:
         return (
@@ -71,7 +70,7 @@ class DiDRuleChangeAnalyzer:
         """Create database connection."""
         return psycopg2.connect(self.db_url)
 
-    def _fetch_passing_data(self, seasons: List[int]) -> pd.DataFrame:
+    def _fetch_passing_data(self, seasons: list[int]) -> pd.DataFrame:
         """
         Fetch passing yards data for specified seasons.
 
@@ -126,7 +125,7 @@ class DiDRuleChangeAnalyzer:
         logger.info(f"Fetched {len(team_game_df)} team-game observations across {len(seasons)} seasons")
         return team_game_df
 
-    def _fetch_kickoff_data(self, seasons: List[int]) -> pd.DataFrame:
+    def _fetch_kickoff_data(self, seasons: list[int]) -> pd.DataFrame:
         """
         Fetch kickoff return data for specified seasons.
 
@@ -178,9 +177,9 @@ class DiDRuleChangeAnalyzer:
 
     def analyze_2018_roughing_rule(
         self,
-        treatment_seasons: List[int] = [2018, 2019, 2020, 2021, 2022, 2023, 2024],
-        control_seasons: List[int] = [2015, 2016, 2017],
-        output_dir: Optional[Path] = None
+        treatment_seasons: list[int] = [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+        control_seasons: list[int] = [2015, 2016, 2017],
+        output_dir: Path | None = None
     ) -> DiDResult:
         """
         Analyze 2018 Roughing the Passer rule change using DiD.
@@ -276,9 +275,9 @@ class DiDRuleChangeAnalyzer:
 
     def analyze_2011_kickoff_rule(
         self,
-        treatment_seasons: List[int] = list(range(2011, 2025)),
-        control_seasons: List[int] = list(range(2005, 2011)),
-        output_dir: Optional[Path] = None
+        treatment_seasons: list[int] = list(range(2011, 2025)),
+        control_seasons: list[int] = list(range(2005, 2011)),
+        output_dir: Path | None = None
     ) -> DiDResult:
         """
         Analyze 2011 Kickoff rule change (moved from 30 to 35-yard line).
@@ -365,8 +364,8 @@ class DiDRuleChangeAnalyzer:
     def analyze_2020_covid_protocols(
         self,
         treatment_season: int = 2020,
-        control_seasons: List[int] = [2019, 2021],
-        output_dir: Optional[Path] = None
+        control_seasons: list[int] = [2019, 2021],
+        output_dir: Path | None = None
     ) -> DiDResult:
         """
         Analyze 2020 COVID protocols impact on home field advantage.

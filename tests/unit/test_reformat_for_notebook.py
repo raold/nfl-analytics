@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:29.469669
 Test count: 9
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from sim.reformat_for_notebook import *
-import pandas as pd
 import pytest
+from sim.reformat_for_notebook import *
 
 
 def test_reformat_acceptance_data_basic():

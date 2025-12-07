@@ -40,7 +40,7 @@ DOIS = {
 def add_dois_to_bib(bib_path):
     """Add DOIs to bibliography entries."""
 
-    with open(bib_path, 'r', encoding='utf-8') as f:
+    with open(bib_path, encoding='utf-8') as f:
         content = f.read()
 
     modifications = 0

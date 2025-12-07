@@ -65,17 +65,17 @@ def demo_basic_usage():
     logger.info("-" * 80)
 
     # Offensive strength
-    logger.info(f"\nOFFENSIVE STRENGTH:")
+    logger.info("\nOFFENSIVE STRENGTH:")
     logger.info(f"  Home (BUF) EPA/play: {features['home_off_off_epa_per_play']:.4f}")
     logger.info(f"  Away (HOU) EPA/play: {features['away_off_off_epa_per_play']:.4f}")
 
     # Defensive strength
-    logger.info(f"\nDEFENSIVE STRENGTH:")
+    logger.info("\nDEFENSIVE STRENGTH:")
     logger.info(f"  Home (BUF) EPA allowed/play: {features['home_def_def_epa_allowed_per_play']:.4f}")
     logger.info(f"  Away (HOU) EPA allowed/play: {features['away_def_def_epa_allowed_per_play']:.4f}")
 
     # Matchup dynamics
-    logger.info(f"\nMATCHUP DYNAMICS:")
+    logger.info("\nMATCHUP DYNAMICS:")
     logger.info(f"  Offensive mismatch: {features['offensive_mismatch']:.4f} (positive = home advantage)")
     logger.info(f"  Defensive mismatch: {features['defensive_mismatch']:.4f} (positive = away advantage)")
     logger.info(f"  Pace difference: {features['pace_difference']:.1f} plays/game (positive = home faster)")
@@ -123,10 +123,10 @@ def demo_integration_with_predictor(features: dict):
     away_qb_yards = 240.0
 
     # OLD: Simple defensive adjustment
-    logger.info(f"\nOLD FORMULA:")
-    logger.info(f"  base_score = 10 + (qb_yards / 20)")
-    logger.info(f"  defensive_adjustment = -5 * opponent_def_epa")
-    logger.info(f"  team_score = base_score + defensive_adjustment\n")
+    logger.info("\nOLD FORMULA:")
+    logger.info("  base_score = 10 + (qb_yards / 20)")
+    logger.info("  defensive_adjustment = -5 * opponent_def_epa")
+    logger.info("  team_score = base_score + defensive_adjustment\n")
 
     home_score_old = 10 + (home_qb_yards / 20) + (-5 * away_def_epa_old)
     away_score_old = 10 + (away_qb_yards / 20) + (-5 * home_def_epa_old)
@@ -135,12 +135,12 @@ def demo_integration_with_predictor(features: dict):
     logger.info(f"Away (HOU) Score: 10 + ({away_qb_yards}/20) + (-5 * {home_def_epa_old:.4f}) = {away_score_old:.1f}")
 
     # NEW: Enhanced adjustment with multiple defensive features
-    logger.info(f"\nNEW FORMULA (enhanced with GameFeatureExtractor):")
-    logger.info(f"  base_score = 10 + (qb_yards / 20)")
-    logger.info(f"  defensive_adjustment = -5 * opponent_def_epa")
-    logger.info(f"  pressure_penalty = -2 * opponent_def_pressure_rate")
-    logger.info(f"  redzone_bonus = 3 * (1 - opponent_def_red_zone_td_rate)")
-    logger.info(f"  team_score = base_score + defensive_adj + pressure_pen + redzone_bonus\n")
+    logger.info("\nNEW FORMULA (enhanced with GameFeatureExtractor):")
+    logger.info("  base_score = 10 + (qb_yards / 20)")
+    logger.info("  defensive_adjustment = -5 * opponent_def_epa")
+    logger.info("  pressure_penalty = -2 * opponent_def_pressure_rate")
+    logger.info("  redzone_bonus = 3 * (1 - opponent_def_red_zone_td_rate)")
+    logger.info("  team_score = base_score + defensive_adj + pressure_pen + redzone_bonus\n")
 
     # Home score with enhanced features
     home_base = 10 + (home_qb_yards / 20)
@@ -156,14 +156,14 @@ def demo_integration_with_predictor(features: dict):
     away_redzone_bonus = 3 * (1 - features['home_def_def_red_zone_td_rate_allowed'])
     away_score_new = away_base + away_def_adj + away_pressure_pen + away_redzone_bonus
 
-    logger.info(f"Home (BUF) Score:")
+    logger.info("Home (BUF) Score:")
     logger.info(f"  Base: {home_base:.1f}")
     logger.info(f"  Def adj: {home_def_adj:.1f}")
     logger.info(f"  Pressure penalty: {home_pressure_pen:.1f}")
     logger.info(f"  Red zone bonus: {home_redzone_bonus:.1f}")
     logger.info(f"  Total: {home_score_new:.1f}\n")
 
-    logger.info(f"Away (HOU) Score:")
+    logger.info("Away (HOU) Score:")
     logger.info(f"  Base: {away_base:.1f}")
     logger.info(f"  Def adj: {away_def_adj:.1f}")
     logger.info(f"  Pressure penalty: {away_pressure_pen:.1f}")

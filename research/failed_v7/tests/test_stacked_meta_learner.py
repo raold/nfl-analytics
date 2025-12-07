@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.396908
 Test count: 28
 """
 
+import pytest
 from ensemble.stacked_meta_learner import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_fit_basic():

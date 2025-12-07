@@ -35,22 +35,18 @@ Version: 5.0 (Canonical Window)
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import logging
-import json
-import warnings
-from typing import Dict, List, Tuple, Optional
 import time
+import warnings
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import xgboost as xgb
 
 logging.basicConfig(
@@ -93,8 +89,8 @@ class EnhancedEnsemble4Way:
         hierarchical_path: str = "models/bayesian/passing_yards_hierarchical_v2.rds",
         informative_path: str = "models/bayesian/passing_informative_priors_v2.rds",
         xgboost_path: str = "models/xgboost/passing_xgboost_v2_canonical.pkl",
-        weights: Optional[Dict[str, float]] = None,
-        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_4way.pkl",
+        weights: dict[str, float] | None = None,
+        temperature_scaler_path: str | None = "models/calibration/temperature_scaler_4way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -210,7 +206,7 @@ class EnhancedEnsemble4Way:
         week: int,
         model_path: Path,
         model_name: str
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get predictions from R/brms model using rpy2.
 
@@ -388,7 +384,7 @@ class EnhancedEnsemble4Way:
     def _compute_state_space_from_df(
         self,
         df: pd.DataFrame
-    ) -> Dict[Tuple, Tuple[float, float]]:
+    ) -> dict[tuple, tuple[float, float]]:
         """
         Compute state-space predictions from master DataFrame (no database call).
 
@@ -466,7 +462,7 @@ class EnhancedEnsemble4Way:
     def _compute_xgboost_from_df(
         self,
         df: pd.DataFrame
-    ) -> Dict[Tuple, Tuple[float, float]]:
+    ) -> dict[tuple, tuple[float, float]]:
         """
         Compute XGBoost predictions from master DataFrame (no database call).
 
@@ -561,7 +557,7 @@ class EnhancedEnsemble4Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get state-space prediction using player skills.
 
@@ -648,8 +644,8 @@ class EnhancedEnsemble4Way:
 
     def _get_xgboost_predictions_batch(
         self,
-        games: List[Dict]
-    ) -> Dict[Tuple, Tuple[float, float]]:
+        games: list[dict]
+    ) -> dict[tuple, tuple[float, float]]:
         """
         Get batch XGBoost predictions using vectorized operations.
 
@@ -787,7 +783,7 @@ class EnhancedEnsemble4Way:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get XGBoost prediction.
 
@@ -898,7 +894,7 @@ class EnhancedEnsemble4Way:
         season: int,
         week: int,
         return_individual: bool = False
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 4-way ensemble prediction with uncertainty quantification.
 
@@ -1017,7 +1013,7 @@ class EnhancedEnsemble4Way:
         inference_time = (time.time() - start_time) * 1000
 
         logger.info(f"\n{'='*70}")
-        logger.info(f"📈 ENSEMBLE RESULT")
+        logger.info("📈 ENSEMBLE RESULT")
         logger.info(f"{'='*70}")
         logger.info(f"Active weights: {dict(zip(active_models, active_weights))}")
         logger.info(f"Prediction: {ensemble_mean:.1f} ± {ensemble_std:.1f} yards")
@@ -1040,10 +1036,10 @@ class EnhancedEnsemble4Way:
 
     def _get_r_predictions_batch(
         self,
-        games: List[Dict],
+        games: list[dict],
         model_path: Path,
         model_name: str
-    ) -> Dict[Tuple, Tuple[float, float]]:
+    ) -> dict[tuple, tuple[float, float]]:
         """
         Get batch predictions from R/brms model using rpy2.
 
@@ -1171,8 +1167,8 @@ class EnhancedEnsemble4Way:
 
     def predict_batch(
         self,
-        games: List[Dict],
-        output_csv: Optional[str] = None
+        games: list[dict],
+        output_csv: str | None = None
     ) -> pd.DataFrame:
         """
         Generate ensemble predictions for multiple games using fully batched inference (Phase 3).
@@ -1197,11 +1193,11 @@ class EnhancedEnsemble4Way:
         self._load_models()
 
         logger.info(f"\n{'='*70}")
-        logger.info(f"FULLY BATCHED 4-WAY ENSEMBLE PREDICTION")
+        logger.info("FULLY BATCHED 4-WAY ENSEMBLE PREDICTION")
         logger.info(f"{'='*70}")
         logger.info(f"Games: {len(games)}")
-        logger.info(f"Models: State-Space v2, Hierarchical v2, XGBoost v2, Informative Priors v2")
-        logger.info(f"")
+        logger.info("Models: State-Space v2, Hierarchical v2, XGBoost v2, Informative Priors v2")
+        logger.info("")
 
         batch_start_time = time.time()
 
@@ -1237,7 +1233,7 @@ class EnhancedEnsemble4Way:
                 games, self.informative_path, "Informative Priors v2"
             )
 
-        logger.info(f"\n📊 Batch predictions complete. Assembling ensemble...")
+        logger.info("\n📊 Batch predictions complete. Assembling ensemble...")
 
         # Assemble results using vectorized operations
         results = []
@@ -1323,7 +1319,7 @@ class EnhancedEnsemble4Way:
         avg_time_per_game = batch_time / len(games) if len(games) > 0 else 0
 
         logger.info(f"\n{'='*70}")
-        logger.info(f"✅ FULLY BATCHED PREDICTION COMPLETE")
+        logger.info("✅ FULLY BATCHED PREDICTION COMPLETE")
         logger.info(f"{'='*70}")
         logger.info(f"Total time: {batch_time:.1f}ms ({batch_time/1000:.2f}s)")
         logger.info(f"Average per game: {avg_time_per_game:.1f}ms")

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.737667
 Test count: 20
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from utils.code_reviewer import *
-import pandas as pd
-import pytest
 
 
 def test_add_issue_basic():

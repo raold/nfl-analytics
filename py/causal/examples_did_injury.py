@@ -18,11 +18,11 @@ Run examples:
 import argparse
 import logging
 from pathlib import Path
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 
-from did_injury_analysis import InjuryShockModeler, InjuryShockDatabase
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from did_injury_analysis import InjuryShockDatabase, InjuryShockModeler
 
 # Configure logging
 logging.basicConfig(

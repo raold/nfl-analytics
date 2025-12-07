@@ -5,24 +5,23 @@ Extracts game trajectories from PostgreSQL database and trains
 the deep generative model on actual historical games.
 """
 
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader
-import numpy as np
-import pandas as pd
-import logging
-from pathlib import Path
-import json
 import argparse
-from datetime import datetime
-import sys
+import json
+import logging
 import os
+import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import torch
+from torch.utils.data import DataLoader
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from models.game_trajectory_cvae import ConditionalVAE, train_cvae
 from data.cvae_data_pipeline import CVAEDataPipeline, GameTrajectoryDataset
+from models.game_trajectory_cvae import ConditionalVAE
 
 logging.basicConfig(
     level=logging.INFO,
@@ -150,7 +149,7 @@ def train_model(
     test_trajectories = trajectories[val_end:]
     test_conditions = conditions[val_end:]
 
-    logger.info(f"Dataset splits:")
+    logger.info("Dataset splits:")
     logger.info(f"  Train: {len(train_trajectories)} games")
     logger.info(f"  Val:   {len(val_trajectories)} games")
     logger.info(f"  Test:  {len(test_trajectories)} games")
@@ -288,10 +287,10 @@ def train_model(
         logger.info(f"\nEpoch {epoch} Summary:")
         logger.info(f"  Train Loss: {avg_train_loss:.4f}")
         logger.info(f"  Val Loss:   {avg_val_loss:.4f}")
-        logger.info(f"  Train Metrics:")
+        logger.info("  Train Metrics:")
         for key, values in epoch_train_metrics.items():
             logger.info(f"    {key}: {np.mean(values):.4f}")
-        logger.info(f"  Val Metrics:")
+        logger.info("  Val Metrics:")
         for key, values in epoch_val_metrics.items():
             logger.info(f"    {key}: {np.mean(values):.4f}")
 
@@ -340,7 +339,7 @@ def train_model(
             for key in test_metrics:
                 test_metrics[key].append(losses[key].item())
 
-    logger.info(f"\nTest Set Results:")
+    logger.info("\nTest Set Results:")
     logger.info(f"  Total Loss: {np.mean(test_losses):.4f}")
     for key, values in test_metrics.items():
         logger.info(f"  {key}: {np.mean(values):.4f}")
@@ -358,7 +357,7 @@ def train_model(
     with open(output_path / 'training_history.json', 'w') as f:
         json.dump(history, f, indent=2)
 
-    logger.info(f"\nTraining complete!")
+    logger.info("\nTraining complete!")
     logger.info(f"Best validation loss: {best_val_loss:.4f}")
     logger.info(f"Models saved to {output_path}")
 

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.475487
 Test count: 39
 """
 
+import pytest
 from data.fetch_prop_odds import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

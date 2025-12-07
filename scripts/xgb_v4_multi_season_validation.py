@@ -37,14 +37,14 @@ Version: 4.0-multi-season
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import json
 import logging
 import warnings
-import pickle
-import json
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -66,14 +66,14 @@ def convert_numpy_types(obj: Any) -> Any:
         return [convert_numpy_types(item) for item in obj]
     else:
         return obj
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from sklearn.linear_model import RidgeCV
-from sklearn.preprocessing import StandardScaler
-import xgboost as xgb
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from dotenv import load_dotenv
 import os
+
+import psycopg2
+import xgboost as xgb
+from dotenv import load_dotenv
+from sklearn.linear_model import RidgeCV
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 # Import statistical tests
 from py.analysis.statistical_tests import DieboldMarianoTest
@@ -224,7 +224,7 @@ class XGBoostV4MultiSeasonValidator:
         self,
         df: pd.DataFrame,
         test_season: int
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare features and split data.
 
@@ -294,7 +294,7 @@ class XGBoostV4MultiSeasonValidator:
     def train_and_evaluate_season(
         self,
         test_season: int
-    ) -> Dict:
+    ) -> dict:
         """
         Train and evaluate for a single season.
 
@@ -394,7 +394,7 @@ class XGBoostV4MultiSeasonValidator:
             baseline_preds
         )
 
-        logger.info(f"\nDiebold-Mariano Test:")
+        logger.info("\nDiebold-Mariano Test:")
         logger.info(f"  DM Statistic: {dm_result['statistic']:.4f}")
         logger.info(f"  P-value (one-sided): {dm_result['p_value_one_sided']:.6f}")
         logger.info(f"  P-value (two-sided): {dm_result['p_value_two_sided']:.6f}")
@@ -426,7 +426,7 @@ class XGBoostV4MultiSeasonValidator:
             'actuals': test_df['target'].values.tolist()
         }
 
-    def validate_consistency(self) -> Dict:
+    def validate_consistency(self) -> dict:
         """
         Check consistency across seasons.
 
@@ -446,19 +446,19 @@ class XGBoostV4MultiSeasonValidator:
         improvement_mean = np.mean(improvements)
         improvement_std = np.std(improvements, ddof=1)
 
-        logger.info(f"\nMAE Across Seasons:")
+        logger.info("\nMAE Across Seasons:")
         logger.info(f"  Mean: {mae_mean:.2f} yards")
         logger.info(f"  Std Dev: {mae_std:.2f} yards")
         logger.info(f"  Min: {min(maes):.2f} yards ({self.test_seasons[np.argmin(maes)]})")
         logger.info(f"  Max: {max(maes):.2f} yards ({self.test_seasons[np.argmax(maes)]})")
 
-        logger.info(f"\nImprovement Across Seasons:")
+        logger.info("\nImprovement Across Seasons:")
         logger.info(f"  Mean: {improvement_mean:.2f}%")
         logger.info(f"  Std Dev: {improvement_std:.2f}%")
         logger.info(f"  Min: {min(improvements):.2f}%")
         logger.info(f"  Max: {max(improvements):.2f}%")
 
-        logger.info(f"\nStatistical Significance:")
+        logger.info("\nStatistical Significance:")
         all_significant = all(p < 0.05 for p in p_values)
         logger.info(f"  All seasons p < 0.05: {'✅ YES' if all_significant else '❌ NO'}")
         for season, p in zip(self.test_seasons, p_values):
@@ -470,7 +470,7 @@ class XGBoostV4MultiSeasonValidator:
         gate3 = all_significant
         gate4 = mae_std < 2.0
 
-        logger.info(f"\nConsistency Gates:")
+        logger.info("\nConsistency Gates:")
         logger.info(f"  Gate 1 (All MAE < 8 yards): {'✅ PASS' if gate1 else '❌ FAIL'}")
         logger.info(f"  Gate 2 (All improvement > 80%): {'✅ PASS' if gate2 else '❌ FAIL'}")
         logger.info(f"  Gate 3 (All p < 0.05): {'✅ PASS' if gate3 else '❌ FAIL'}")
@@ -495,7 +495,7 @@ class XGBoostV4MultiSeasonValidator:
 
     def generate_production_recommendation(
         self,
-        consistency: Dict
+        consistency: dict
     ) -> str:
         """
         Generate production readiness recommendation.
@@ -512,15 +512,15 @@ class XGBoostV4MultiSeasonValidator:
 
         if consistency['all_gates_pass']:
             recommendation = "PASS"
-            logger.info(f"\n✅ PRODUCTION READY: All validation gates passed")
-            logger.info(f"\nRecommendation:")
-            logger.info(f"  1. Integrate into ensemble v6 (20% weight)")
-            logger.info(f"  2. A/B test on 2025 season (first 50 games)")
-            logger.info(f"  3. Full production deployment if A/B test succeeds")
-            logger.info(f"\nKey Strengths:")
+            logger.info("\n✅ PRODUCTION READY: All validation gates passed")
+            logger.info("\nRecommendation:")
+            logger.info("  1. Integrate into ensemble v6 (20% weight)")
+            logger.info("  2. A/B test on 2025 season (first 50 games)")
+            logger.info("  3. Full production deployment if A/B test succeeds")
+            logger.info("\nKey Strengths:")
             logger.info(f"  - Consistent performance: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} MAE")
             logger.info(f"  - Strong improvement: {consistency['improvement_mean']:.2f}% vs baseline")
-            logger.info(f"  - Statistically significant across all seasons")
+            logger.info("  - Statistically significant across all seasons")
         else:
             recommendation = "FAIL"
             gates_passed = sum([
@@ -530,23 +530,23 @@ class XGBoostV4MultiSeasonValidator:
                 consistency['gate4_consistency']
             ])
             logger.info(f"\n❌ NOT PRODUCTION READY: {gates_passed}/4 gates passed")
-            logger.info(f"\nRecommendation:")
-            logger.info(f"  - Further investigation required")
-            logger.info(f"  - Do NOT integrate into production ensemble")
+            logger.info("\nRecommendation:")
+            logger.info("  - Further investigation required")
+            logger.info("  - Do NOT integrate into production ensemble")
 
-            logger.info(f"\nFailed Gates:")
+            logger.info("\nFailed Gates:")
             if not consistency['gate1_mae']:
-                logger.info(f"  - MAE threshold: Some seasons MAE ≥ 8 yards")
+                logger.info("  - MAE threshold: Some seasons MAE ≥ 8 yards")
             if not consistency['gate2_improvement']:
-                logger.info(f"  - Improvement threshold: Some seasons < 80% improvement")
+                logger.info("  - Improvement threshold: Some seasons < 80% improvement")
             if not consistency['gate3_significance']:
-                logger.info(f"  - Statistical significance: Some seasons p ≥ 0.05")
+                logger.info("  - Statistical significance: Some seasons p ≥ 0.05")
             if not consistency['gate4_consistency']:
-                logger.info(f"  - Consistency: MAE std dev ≥ 2 yards")
+                logger.info("  - Consistency: MAE std dev ≥ 2 yards")
 
         return recommendation
 
-    def save_results(self, consistency: Dict, recommendation: str):
+    def save_results(self, consistency: dict, recommendation: str):
         """Save validation results to disk."""
         logger.info(f"\n{'='*80}")
         logger.info("SAVING RESULTS")
@@ -606,7 +606,7 @@ class XGBoostV4MultiSeasonValidator:
                 json.dump(convert_numpy_types(self.season_results[season]), f, indent=2)
             logger.info(f"✅ Saved {season} full results: {season_path}")
 
-        logger.info(f"\n📊 Validation Summary:")
+        logger.info("\n📊 Validation Summary:")
         logger.info(f"  Seasons tested: {self.test_seasons}")
         logger.info(f"  Mean MAE: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} yards")
         logger.info(f"  Mean improvement: {consistency['improvement_mean']:.2f}%")
@@ -634,7 +634,7 @@ class XGBoostV4MultiSeasonValidator:
             # Save results
             self.save_results(consistency, recommendation)
 
-            logger.info(f"\n✅ Multi-season validation complete")
+            logger.info("\n✅ Multi-season validation complete")
 
         except Exception as e:
             logger.error(f"Validation failed: {e}", exc_info=True)

@@ -11,6 +11,7 @@ Date: November 15, 2025
 
 import logging
 import multiprocessing
+
 import torch
 
 logger = logging.getLogger(__name__)
@@ -90,7 +91,7 @@ def get_xgboost_params(
                 cpu_count = multiprocessing.cpu_count()
                 logger.info(f"ℹ️  Using XGBoost CPU acceleration ({cpu_count} cores)")
                 if has_mps:
-                    logger.info(f"   MPS GPU detected but DISABLED (set experimental_mps=True to enable)")
+                    logger.info("   MPS GPU detected but DISABLED (set experimental_mps=True to enable)")
 
     else:
         # Force CPU (for debugging or validation)
@@ -186,6 +187,7 @@ def benchmark_xgboost_devices(
         - Validates predictions match across devices
     """
     import time
+
     import numpy as np
     import xgboost as xgb
 

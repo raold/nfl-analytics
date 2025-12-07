@@ -65,27 +65,25 @@ Version: 1.0
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import logging
 import json
-import warnings
-from typing import Dict, List, Tuple, Optional, Any
-from dataclasses import dataclass
+import logging
 import time
+import warnings
+from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
+import xgboost as xgb
 from scipy.optimize import minimize
 from scipy.stats import norm
-import xgboost as xgb
 
 # Note: arviz not in requirements.txt yet - we'll handle gracefully
 try:
@@ -122,7 +120,7 @@ class LOOResult:
 @dataclass
 class StackingResult:
     """Result from Bayesian stacking optimization."""
-    weights: Dict[str, float]
+    weights: dict[str, float]
     elpd_loo_stacking: float  # LOO performance with stacking
     elpd_loo_equal: float     # LOO performance with equal weights
     improvement: float         # elpd_loo_stacking - elpd_loo_equal
@@ -133,7 +131,7 @@ class StackingResult:
 @dataclass
 class BacktestResult:
     """Backtest comparison result."""
-    period: Tuple[int, int]
+    period: tuple[int, int]
     n_games: int
     heuristic_mae: float
     stacking_mae: float
@@ -187,7 +185,7 @@ class ModelLoader:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def load_state_space(self) -> Optional[Any]:
+    def load_state_space(self) -> Any | None:
         """
         Load State-Space v2 model (R/brms).
 
@@ -212,7 +210,7 @@ class ModelLoader:
             logger.error(f"❌ Failed to load State-Space v2: {e}")
             return None
 
-    def load_hierarchical(self) -> Optional[Any]:
+    def load_hierarchical(self) -> Any | None:
         """
         Load Hierarchical v2 model (R/brms).
 
@@ -235,7 +233,7 @@ class ModelLoader:
             logger.error(f"❌ Failed to verify Hierarchical v2: {e}")
             return None
 
-    def load_informative_priors(self) -> Optional[Any]:
+    def load_informative_priors(self) -> Any | None:
         """
         Load Informative Priors v2 model (R/brms).
 
@@ -257,7 +255,7 @@ class ModelLoader:
             logger.error(f"❌ Failed to verify Informative Priors v2: {e}")
             return None
 
-    def load_bnn(self) -> Optional[Any]:
+    def load_bnn(self) -> Any | None:
         """
         Load BNN v3.1 model (PyTorch).
 
@@ -270,7 +268,7 @@ class ModelLoader:
         logger.warning("⚠️  BNN v3.1 is rushing only - skipping for passing yards ensemble")
         return None
 
-    def load_xgboost(self) -> Optional[xgb.Booster]:
+    def load_xgboost(self) -> xgb.Booster | None:
         """
         Load XGBoost v2 model.
 
@@ -292,7 +290,7 @@ class ModelLoader:
             logger.error(f"❌ Failed to load XGBoost v2: {e}")
             return None
 
-    def load_all(self) -> Dict[str, Any]:
+    def load_all(self) -> dict[str, Any]:
         """
         Load all available models.
 
@@ -387,7 +385,7 @@ class BayesianStacker:
         self,
         validation_data: pd.DataFrame,
         save_results: bool = True
-    ) -> Dict[str, LOOResult]:
+    ) -> dict[str, LOOResult]:
         """
         Compute PSIS-LOO cross-validation for each model.
 
@@ -460,7 +458,7 @@ class BayesianStacker:
         logger.info(f"\n✅ LOO computation complete for {len(loo_results)} models")
         return loo_results
 
-    def _save_loo_results(self, loo_results: Dict[str, LOOResult]):
+    def _save_loo_results(self, loo_results: dict[str, LOOResult]):
         """Save LOO results to JSON."""
         output_path = self.loader.project_root / "models/ensemble/loo_results.json"
         output_path.parent.mkdir(exist_ok=True, parents=True)
@@ -483,7 +481,7 @@ class BayesianStacker:
 
     def optimize_weights(
         self,
-        loo_results: Dict[str, LOOResult],
+        loo_results: dict[str, LOOResult],
         method: str = "stacking"
     ) -> StackingResult:
         """
@@ -570,12 +568,12 @@ class BayesianStacker:
 
         improvement = elpd_loo_stacking - elpd_loo_equal
 
-        logger.info(f"\n✅ OPTIMIZATION COMPLETE")
+        logger.info("\n✅ OPTIMIZATION COMPLETE")
         logger.info(f"   Status: {result.message}")
         logger.info(f"   ELPD_loo (stacking): {elpd_loo_stacking:.2f}")
         logger.info(f"   ELPD_loo (equal): {elpd_loo_equal:.2f}")
         logger.info(f"   Improvement: {improvement:.2f}")
-        logger.info(f"\n📊 OPTIMAL WEIGHTS:")
+        logger.info("\n📊 OPTIMAL WEIGHTS:")
         for model_name, weight in sorted(weights.items(), key=lambda x: -x[1]):
             logger.info(f"   {model_name:30s}: {weight:.3f} ({weight*100:.1f}%)")
 
@@ -590,9 +588,9 @@ class BayesianStacker:
 
     def predict_stacked(
         self,
-        predictions: Dict[str, Tuple[float, float]],
-        weights: Dict[str, float]
-    ) -> Tuple[float, float]:
+        predictions: dict[str, tuple[float, float]],
+        weights: dict[str, float]
+    ) -> tuple[float, float]:
         """
         Generate stacked prediction using optimized weights.
 
@@ -637,9 +635,9 @@ class BayesianStacker:
 
     def backtest_stacking(
         self,
-        validation_period: Tuple[int, int] = (2022, 2023),
-        holdout_period: Tuple[int, int] = (2024, 2024),
-        stacking_weights: Optional[Dict[str, float]] = None,
+        validation_period: tuple[int, int] = (2022, 2023),
+        holdout_period: tuple[int, int] = (2024, 2024),
+        stacking_weights: dict[str, float] | None = None,
         edge_threshold: float = 0.02
     ) -> BacktestResult:
         """
@@ -697,10 +695,10 @@ class BayesianStacker:
 
     def generate_report(
         self,
-        loo_results: Dict[str, LOOResult],
+        loo_results: dict[str, LOOResult],
         stacking_result: StackingResult,
-        backtest_result: Optional[BacktestResult] = None,
-        output_path: Optional[str] = None
+        backtest_result: BacktestResult | None = None,
+        output_path: str | None = None
     ) -> str:
         """
         Generate comprehensive markdown report.
@@ -718,7 +716,7 @@ class BayesianStacker:
             "# Bayesian Stacking Weight Optimization Report",
             "",
             f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            f"**Method:** Yao et al. (2018) stacking with PSIS-LOO",
+            "**Method:** Yao et al. (2018) stacking with PSIS-LOO",
             "",
             "---",
             "",
@@ -855,8 +853,8 @@ class BayesianStacker:
             "",
             "---",
             "",
-            f"**Report generated by:** Bayesian Stacking v1.0",
-            f"**Contact:** NFL Analytics Research Team",
+            "**Report generated by:** Bayesian Stacking v1.0",
+            "**Contact:** NFL Analytics Research Team",
             ""
         ])
 
@@ -908,10 +906,10 @@ class ValidationFramework:
 
     def split_data(
         self,
-        train_period: Tuple[int, int] = (2018, 2021),
-        validation_period: Tuple[int, int] = (2022, 2023),
-        holdout_period: Tuple[int, int] = (2024, 2024)
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        train_period: tuple[int, int] = (2018, 2021),
+        validation_period: tuple[int, int] = (2022, 2023),
+        holdout_period: tuple[int, int] = (2024, 2024)
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Split data into train, validation, holdout sets.
 
@@ -969,7 +967,7 @@ class ValidationFramework:
         self,
         errors_heuristic: np.ndarray,
         errors_stacking: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Run statistical tests comparing heuristic vs. stacking.
 
@@ -998,7 +996,7 @@ class ValidationFramework:
         mean_d = np.mean(d)
         se_d = np.std(d) / np.sqrt(len(d))
 
-        logger.info(f"\n📊 DIEBOLD-MARIANO TEST")
+        logger.info("\n📊 DIEBOLD-MARIANO TEST")
         logger.info(f"   Mean loss differential: {mean_d:.4f}")
         logger.info(f"   SE: {se_d:.4f}")
         logger.info(f"   t-statistic: {t_stat:.3f}")
@@ -1078,7 +1076,7 @@ def main():
             holdout_period=(2024, 2024)
         )
 
-        logger.info(f"\n✅ Backtest complete")
+        logger.info("\n✅ Backtest complete")
         logger.info(f"   MAE improvement: {backtest_result.improvement_mae:.2f} yards")
         logger.info(f"   ROI improvement: {backtest_result.improvement_roi:+.2f} pp")
 

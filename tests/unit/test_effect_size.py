@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.213736
 Test count: 43
 """
 
+from statistics.effect_size import *
+
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
-from statistics.effect_size import *
-import pandas as pd
-import pytest
 
 
 def test_cohens_d_basic():

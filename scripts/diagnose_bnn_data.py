@@ -4,6 +4,7 @@ Diagnose BNN Receiving data quality issues causing -inf log probability.
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import numpy as np

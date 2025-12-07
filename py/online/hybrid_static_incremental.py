@@ -14,14 +14,14 @@ Author: Claude Code (Anthropic)
 Date: November 12, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import xgboost as xgb
@@ -57,8 +57,8 @@ class HybridStaticIncrementalXGBoost:
     def __init__(
         self,
         static_weight: float = 0.7,
-        static_params: Optional[Dict] = None,
-        incremental_params: Optional[Dict] = None,
+        static_params: dict | None = None,
+        incremental_params: dict | None = None,
     ):
         """
         Initialize hybrid model.
@@ -308,7 +308,7 @@ class HybridStaticIncrementalXGBoost:
 
         logger.info(f"Hybrid model loaded from {path}")
 
-    def get_metrics(self) -> Dict[str, any]:
+    def get_metrics(self) -> dict[str, any]:
         """
         Get model metrics and status.
 

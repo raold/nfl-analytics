@@ -18,15 +18,14 @@ Usage:
 Schedule: Run via cron Tuesday 12pm ET (after Monday Night Football)
 Expected: ~105ms per prediction, 5-10 minutes for full week (~32 QBs)
 """
-import sys
 import argparse
 import logging
+import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Tuple
+
 import psycopg2
 from psycopg2.extras import RealDictCursor
-import numpy as np
 from scipy import stats
 
 # Add project root to path
@@ -81,7 +80,7 @@ class WeeklyPredictionGenerator:
         )
         logger.info("✅ Ensemble v6.1 initialized")
 
-    def get_upcoming_week(self) -> Tuple[int, int]:
+    def get_upcoming_week(self) -> tuple[int, int]:
         """Get next upcoming NFL week"""
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor() as cur:
@@ -115,7 +114,7 @@ class WeeklyPredictionGenerator:
                     # Season complete, return next season week 1
                     return (latest_season + 1, 1)
 
-    def get_games_for_week(self, season: int, week: int) -> List[Dict]:
+    def get_games_for_week(self, season: int, week: int) -> list[dict]:
         """Get all games for a specific week with QB information"""
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -164,7 +163,7 @@ class WeeklyPredictionGenerator:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Generate prediction with full UQ for a player
 
@@ -225,11 +224,11 @@ class WeeklyPredictionGenerator:
 
     def store_prediction(
         self,
-        game: Dict,
+        game: dict,
         player_id: str,
         player_name: str,
         is_home: bool,
-        prediction: Dict
+        prediction: dict
     ) -> bool:
         """Store prediction in ml.predictions table"""
         try:
@@ -325,7 +324,7 @@ class WeeklyPredictionGenerator:
         season: int,
         week: int,
         skip_existing: bool = True
-    ) -> Dict:
+    ) -> dict:
         """
         Generate predictions for all QBs in a week
 
@@ -343,7 +342,7 @@ class WeeklyPredictionGenerator:
             'successful': 0,
             'failed': 0,
             'skipped': 0,
-            'start_time': datetime.now(timezone.utc)
+            'start_time': datetime.now(UTC)
         }
 
         for game in games:
@@ -392,7 +391,7 @@ class WeeklyPredictionGenerator:
                     logger.error(f"  ❌ Failed to store prediction for {qb_name}")
                     stats['failed'] += 1
 
-        stats['end_time'] = datetime.now(timezone.utc)
+        stats['end_time'] = datetime.now(UTC)
         stats['duration_seconds'] = (stats['end_time'] - stats['start_time']).total_seconds()
 
         # Print summary

@@ -6,9 +6,9 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-from .base import BaseRepository, QueryResult, DatabaseConfig
+from typing import Any
+
+from .base import BaseRepository, QueryResult
 
 
 class PredictionRepository(BaseRepository):
@@ -16,7 +16,7 @@ class PredictionRepository(BaseRepository):
 
     def save_predictions(
         self,
-        predictions: List[Dict[str, Any]],
+        predictions: list[dict[str, Any]],
         model_version: str,
         invalidate_cache: bool = True,
     ) -> int:
@@ -63,7 +63,7 @@ class PredictionRepository(BaseRepository):
     def get_predictions_for_game(
         self,
         game_id: str,
-        model_version: Optional[str] = None,
+        model_version: str | None = None,
         cache_ttl: int = 300,
     ) -> QueryResult:
         """

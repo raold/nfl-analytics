@@ -29,11 +29,11 @@ Author: NFL Analytics Research Team
 Date: 2025-10-30
 """
 
-import pandas as pd
-import numpy as np
 import logging
 import sys
-from typing import Optional, Tuple
+
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
 # Configure logging
@@ -510,7 +510,7 @@ class DefensiveCoverageQualityEngine:
         start_season: int = 2024,
         end_season: int = 2025,
         output_dir: str = "data/features/coverage_quality"
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Run complete coverage quality feature engineering pipeline.
 

@@ -46,9 +46,7 @@ import json
 import logging
 import os
 import sys
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -136,7 +134,7 @@ class MarketFeatureEngineer:
         self,
         start_date: str,
         end_date: str,
-        markets: List[str] = None,
+        markets: list[str] = None,
         min_bookmakers: int = 5,
     ) -> pd.DataFrame:
         """
@@ -520,7 +518,7 @@ class MarketFeatureEngineer:
         self,
         start_date: str,
         end_date: str,
-        markets: List[str] = None,
+        markets: list[str] = None,
         min_bookmakers: int = 5,
     ) -> pd.DataFrame:
         """
@@ -579,7 +577,7 @@ class MarketFeatureEngineer:
 # ============================================================================
 
 
-def validate_features(df: pd.DataFrame) -> Dict:
+def validate_features(df: pd.DataFrame) -> dict:
     """
     Validate engineered features for data quality issues.
 

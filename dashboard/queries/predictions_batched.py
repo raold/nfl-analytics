@@ -9,16 +9,20 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-from typing import List, Dict, Optional
-import pandas as pd
 import logging
+
+import pandas as pd
 import psycopg
 
 logger = logging.getLogger(__name__)
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -31,7 +35,7 @@ class BatchedPredictionQueries:
     @staticmethod
     def predictions_batch(
         conn,
-        game_ids: List[str],
+        game_ids: list[str],
         stat_type: str = 'passing_yards'
     ) -> pd.DataFrame:
         """
@@ -103,7 +107,7 @@ class BatchedPredictionQueries:
     @staticmethod
     def line_movement_batch(
         conn,
-        player_names: List[str],
+        player_names: list[str],
         days_back: int = 7,
         prop_type: str = 'passing_yards'
     ) -> pd.DataFrame:
@@ -170,7 +174,7 @@ class BatchedPredictionQueries:
     @staticmethod
     def game_predictions_batch(
         conn,
-        game_ids: List[str]
+        game_ids: list[str]
     ) -> pd.DataFrame:
         """
         Fetch game-level predictions for multiple games in a single query.
@@ -235,7 +239,7 @@ class BatchedPredictionQueries:
     @staticmethod
     def predictions_with_odds_batch(
         conn,
-        game_ids: List[str],
+        game_ids: list[str],
         stat_type: str = 'passing_yards'
     ) -> pd.DataFrame:
         """
@@ -331,7 +335,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
 
-def create_lookup_dict(df: pd.DataFrame, key_column: str) -> Dict:
+def create_lookup_dict(df: pd.DataFrame, key_column: str) -> dict:
     """
     Convert DataFrame to dictionary for O(1) lookups.
 

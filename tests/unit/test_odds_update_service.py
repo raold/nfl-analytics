@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.490287
 Test count: 23
 """
 
+import pytest
 from data.odds_update_service import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

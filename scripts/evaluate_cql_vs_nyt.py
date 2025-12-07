@@ -21,27 +21,27 @@ Date: November 26, 2025
 
 import argparse
 import json
+
+# Add project root to path
+import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
 
-# Add project root to path
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.rl.cql_agent import CQLAgent
 from py.rl.fourth_down_mdp import (
-    STATE_DIM,
     ACTION_DIM,
-    ACTION_GO,
-    ACTION_PUNT,
     ACTION_FIELD_GOAL,
+    ACTION_GO,
     ACTION_NAMES,
+    ACTION_PUNT,
+    STATE_DIM,
 )
-
 
 # ============================================================================
 # NYT 4th Down Bot Implementation (Simplified)
@@ -108,7 +108,7 @@ class NYT4thDownBot:
         # From opponent's goal line
         self.expected_points_by_position = self._build_expected_points_model()
 
-    def _build_expected_points_model(self) -> Dict[int, float]:
+    def _build_expected_points_model(self) -> dict[int, float]:
         """
         Build expected points model by field position.
 
@@ -250,7 +250,7 @@ def load_test_data(csv_path: str) -> tuple:
     return states, actions, rewards, df
 
 
-def decode_state_features(state: np.ndarray) -> Dict[str, float]:
+def decode_state_features(state: np.ndarray) -> dict[str, float]:
     """
     Decode normalized state features back to original values.
 
@@ -281,7 +281,7 @@ def compare_agents(
     states: np.ndarray,
     actions: np.ndarray,
     rewards: np.ndarray,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compare CQL agent vs NYT Bot on test set.
 
@@ -399,12 +399,12 @@ def compare_agents(
         cql_right = (cql_actions[disagree_mask] == actions[disagree_mask]).sum()
         nyt_right = (nyt_actions[disagree_mask] == actions[disagree_mask]).sum()
 
-        print(f"When they disagree:")
+        print("When they disagree:")
         print(f"  CQL agrees with coach: {cql_right:,} ({cql_right/n_disagree:.1%})")
         print(f"  NYT agrees with coach: {nyt_right:,} ({nyt_right/n_disagree:.1%})")
 
         # What type of disagreements?
-        print(f"\nDisagreement patterns (CQL→NYT):")
+        print("\nDisagreement patterns (CQL→NYT):")
         for cql_act in range(ACTION_DIM):
             for nyt_act in range(ACTION_DIM):
                 if cql_act != nyt_act:

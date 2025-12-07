@@ -12,27 +12,27 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import torch
-import numpy as np
-import xgboost as xgb
-from sklearn.datasets import make_regression
-
 # Import utilities
 import sys
 from pathlib import Path
+
+import numpy as np
+import pytest
+import torch
+import xgboost as xgb
+from sklearn.datasets import make_regression
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.utils.device_utils import (
     get_best_device,
-    validate_device_support,
     get_device_info,
+    validate_device_support,
 )
 from py.utils.xgboost_device import (
     get_xgboost_params,
     validate_xgboost_gpu_support,
 )
-
 
 # ============================================================================
 # Fixtures

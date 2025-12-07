@@ -17,7 +17,6 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import json
 import tempfile
 from pathlib import Path
 
@@ -198,10 +197,10 @@ def demo_data_structures():
     print("="*70)
 
     from py.utils.database_migration_agent import (
-        ValidationReport,
-        ValidationError,
+        DriftReport,
         MigrationResult,
-        DriftReport
+        ValidationError,
+        ValidationReport,
     )
 
     # ValidationReport

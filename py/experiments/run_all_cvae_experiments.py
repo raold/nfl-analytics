@@ -6,6 +6,7 @@ Each experiment is independent and can be run individually or as part of this su
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import logging

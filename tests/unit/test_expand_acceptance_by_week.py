@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:29.468830
 Test count: 3
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from sim.expand_acceptance_by_week import *
-import pandas as pd
 import pytest
+from sim.expand_acceptance_by_week import *
 
 
 def test_main_basic():

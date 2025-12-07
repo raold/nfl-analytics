@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.762991
 Test count: 19
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.bnn_nuts_comparison import *
-import pandas as pd
-import pytest
 
 
 def test_load_passing_data_from_db_basic():

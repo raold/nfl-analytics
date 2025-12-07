@@ -82,7 +82,6 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 
 import logging
 import warnings
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -140,7 +139,7 @@ class NextGenStatsFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -205,7 +204,7 @@ class NextGenStatsFeatures:
         target_season: int,
         target_week: int,
         lookback: int = None
-    ) -> List[Tuple[int, int]]:
+    ) -> list[tuple[int, int]]:
         """
         Get last N weeks before target week (TEMPORAL SAFETY).
 
@@ -254,9 +253,9 @@ class NextGenStatsFeatures:
     def _get_passing_ngs_features(
         self,
         team: str,
-        weeks: List[Tuple[int, int]],
+        weeks: list[tuple[int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract passing NGS features (offensive).
 
@@ -382,9 +381,9 @@ class NextGenStatsFeatures:
     def _get_rushing_ngs_features(
         self,
         team: str,
-        weeks: List[Tuple[int, int]],
+        weeks: list[tuple[int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract rushing NGS features (offensive).
 
@@ -499,9 +498,9 @@ class NextGenStatsFeatures:
     def _get_receiving_ngs_features(
         self,
         team: str,
-        weeks: List[Tuple[int, int]],
+        weeks: list[tuple[int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract receiving NGS features (offensive).
 
@@ -616,9 +615,9 @@ class NextGenStatsFeatures:
     def _get_defensive_ngs_features(
         self,
         team: str,
-        weeks: List[Tuple[int, int]],
+        weeks: list[tuple[int, int]],
         weights: np.ndarray
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract defensive NGS features (opponent perspective).
 
@@ -916,7 +915,7 @@ class NextGenStatsFeatures:
         team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 23 Next Gen Stats features for a team at a specific game.
 

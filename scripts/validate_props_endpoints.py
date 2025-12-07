@@ -20,7 +20,6 @@ sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import logging
 import time
-from datetime import datetime
 
 import requests
 

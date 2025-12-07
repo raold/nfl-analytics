@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.483914
 Test count: 6
 """
 
-from analysis.temperature_impact_totals import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from analysis.temperature_impact_totals import *
 
 
 def test_make_engine_basic():

@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.445093
 Test count: 18
 """
 
-from analysis.generate_weather_tables import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from analysis.generate_weather_tables import *
 
 
 def test_generate_weather_comparison_table_basic():

@@ -11,17 +11,17 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import pytest
 import os
-from unittest.mock import Mock, patch, MagicMock
-from contextlib import contextmanager
+from unittest.mock import Mock, patch
+
 import psycopg2
+import pytest
 
 from py.data.repository.base import (
     BaseRepository,
+    ConnectionPoolError,
     DatabaseConfig,
     RepositoryError,
-    ConnectionPoolError,
 )
 
 

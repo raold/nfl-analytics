@@ -87,10 +87,9 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 
@@ -99,9 +98,9 @@ project_root = str(Path(__file__).parent.parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
 from py.api.cache_warmup import warm_cache_on_startup
 from py.api.routes import game_predictions
+from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
 # ============================================================================
 # Logging Configuration
@@ -120,7 +119,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, generate_latest
+    from prometheus_client import Counter, Gauge, Histogram, generate_latest
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
@@ -279,7 +278,7 @@ class PredictionResponse(BaseModel):
     """NFL player prop prediction response."""
 
     player_id: str
-    player_name: Optional[str] = None
+    player_name: str | None = None
     stat_type: str
     week: int
     season: int
@@ -369,7 +368,7 @@ class HealthResponse(BaseModel):
     version: str = Field(default="1.0.0")
     models_loaded: int
     cache_available: bool
-    cache_stats: Optional[dict] = None
+    cache_stats: dict | None = None
     uptime_seconds: float
 
 
@@ -393,13 +392,13 @@ class ModelInfo(BaseModel):
     file_size_mb: float = Field(..., description="Model file size in MB")
     loaded_at: str = Field(..., description="ISO timestamp of when model was loaded")
     status: str = Field(..., description="Status: loaded, failed, unavailable")
-    metadata: Optional[dict] = Field(None, description="Additional model metadata")
+    metadata: dict | None = Field(None, description="Additional model metadata")
 
 
 class ModelsListResponse(BaseModel):
     """Response listing all loaded models."""
 
-    models: List[ModelInfo] = Field(..., description="List of model information")
+    models: list[ModelInfo] = Field(..., description="List of model information")
     total_models: int = Field(..., description="Total number of models configured")
     loaded_models: int = Field(..., description="Number of successfully loaded models")
     ensemble_ready: bool = Field(..., description="Whether ensemble is ready for predictions")
@@ -426,10 +425,10 @@ class TeamPrediction(BaseModel):
     """Team prediction for a game."""
 
     team: str
-    qb_id: Optional[str] = None
-    qb_name: Optional[str] = None
-    predicted_passing_yards: Optional[float] = None
-    predicted_passing_yards_std: Optional[float] = None
+    qb_id: str | None = None
+    qb_name: str | None = None
+    predicted_passing_yards: float | None = None
+    predicted_passing_yards_std: float | None = None
 
 
 class GamePredictionResponse(BaseModel):
@@ -442,7 +441,7 @@ class GamePredictionResponse(BaseModel):
     away_team: str
     home_prediction: TeamPrediction
     away_prediction: TeamPrediction
-    total_predicted_yards: Optional[float] = None
+    total_predicted_yards: float | None = None
     timestamp: str = Field(
         default_factory=lambda: datetime.utcnow().isoformat() + "Z"
     )
@@ -540,7 +539,7 @@ class ModelManager:
         season: int,
         confidence_level: float = 0.90,
         use_dirichlet: bool = True,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Generate ensemble prediction for player stat using Enhanced Ensemble v6.1.
 
@@ -637,8 +636,8 @@ class ModelManager:
 # Global State
 # ============================================================================
 
-model_manager: Optional[ModelManager] = None
-redis_cache: Optional[ClaudeRedisCache] = None
+model_manager: ModelManager | None = None
+redis_cache: ClaudeRedisCache | None = None
 start_time: float = time.time()
 
 
@@ -742,7 +741,7 @@ async def lifespan(app: FastAPI):
 # FastAPI Application
 # ============================================================================
 
-print(f"[DEBUG main.py:716] About to create FastAPI app")
+print("[DEBUG main.py:716] About to create FastAPI app")
 app = FastAPI(
     title="NFL Props Prediction API",
     description="Production-grade NFL player prop predictions with Bayesian uncertainty quantification",
@@ -751,7 +750,7 @@ app = FastAPI(
     openapi_url="/openapi.json",
     lifespan=lifespan,
 )
-print(f"[DEBUG main.py:725] FastAPI app created successfully")
+print("[DEBUG main.py:725] FastAPI app created successfully")
 
 # Add CORS middleware
 app.add_middleware(

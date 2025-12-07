@@ -11,15 +11,13 @@ Date: November 16, 2025
 
 import os
 import sys
-import pandas as pd
-import numpy as np
 from pathlib import Path
-from typing import Optional
-from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
 
 # Database connection
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 # Add project root to path
 project_root = Path(__file__).parent.parent

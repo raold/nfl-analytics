@@ -26,13 +26,12 @@ Output:
     - Experiment summary to file
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
-from typing import Tuple
+import os
+import sys
+import time
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -285,7 +284,7 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
     return df
 
 
-def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
+def prepare_train_test_split(df: pd.DataFrame) -> tuple:
     """Split data into train/test sets."""
     logger.info("\n" + "=" * 70)
     logger.info("PREPARING TRAIN/TEST SPLIT")
@@ -303,7 +302,7 @@ def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
     )].copy()
     test_df = df[df['season'] == ALIGNED_WINDOW['test_season']].copy()
 
-    logger.info(f"\n✓ Split complete:")
+    logger.info("\n✓ Split complete:")
     logger.info(f"  Train: {len(train_df):,} samples ({ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']})")
     logger.info(f"  Test: {len(test_df):,} samples ({ALIGNED_WINDOW['test_season']})")
 

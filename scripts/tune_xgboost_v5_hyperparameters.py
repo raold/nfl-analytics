@@ -29,18 +29,18 @@ Date: November 22, 2025
 import argparse
 import json
 import logging
+
+# Import XGBoost v5 training class
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import KFold
 
-# Import XGBoost v5 training class
-import sys
 sys.path.append('/Users/dro/rice/nfl-analytics')
 from scripts.train_xgboost_v5_integrated import XGBoostV5Integrated
 
@@ -109,7 +109,7 @@ class XGBoostV5HyperparameterTuner:
         self.best_params = None
         self.best_score = float('inf')
 
-    def generate_param_combinations(self) -> List[Dict]:
+    def generate_param_combinations(self) -> list[dict]:
         """
         Generate all combinations of hyperparameters from grid.
 
@@ -133,12 +133,12 @@ class XGBoostV5HyperparameterTuner:
 
     def train_and_evaluate(
         self,
-        params: Dict,
+        params: dict,
         X_train: pd.DataFrame,
         y_train: pd.Series,
         X_val: pd.DataFrame,
         y_val: pd.Series
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         Train XGBoost model with given parameters and evaluate on validation set.
 
@@ -178,10 +178,10 @@ class XGBoostV5HyperparameterTuner:
 
     def cross_validate(
         self,
-        params: Dict,
+        params: dict,
         X: pd.DataFrame,
         y: pd.Series
-    ) -> Dict:
+    ) -> dict:
         """
         Perform K-fold cross-validation with given parameters.
 
@@ -223,7 +223,7 @@ class XGBoostV5HyperparameterTuner:
             'mae_scores': mae_scores
         }
 
-    def run_grid_search(self) -> Dict:
+    def run_grid_search(self) -> dict:
         """
         Run grid search with cross-validation.
 
@@ -297,7 +297,7 @@ class XGBoostV5HyperparameterTuner:
         logger.info("GRID SEARCH COMPLETE")
         logger.info("=" * 80)
         logger.info(f"Best MAE: {self.best_score:.2f} yards")
-        logger.info(f"Best parameters:")
+        logger.info("Best parameters:")
         for param, value in self.best_params.items():
             logger.info(f"  {param}: {value}")
         logger.info("")

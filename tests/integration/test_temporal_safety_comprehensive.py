@@ -22,19 +22,19 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-13
 """
 
-import pytest
-import psycopg
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import re
-import ast
 import logging
-from datetime import datetime, timedelta
-from typing import List, Dict, Tuple, Optional
+import re
 
 # Import the data leakage detector
 import sys
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import psycopg
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
@@ -190,7 +190,7 @@ class TestAsofJoinSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Check for pd.merge_asof usage
@@ -246,7 +246,7 @@ class TestLagFeatureSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find all .shift() patterns
@@ -270,7 +270,7 @@ class TestLagFeatureSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find feature assignments with lag/prior
@@ -298,7 +298,7 @@ class TestLagFeatureSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find rolling operations
@@ -493,7 +493,7 @@ class TestDatabaseQuerySafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find SQL queries with self-joins
@@ -556,7 +556,7 @@ class TestFeatureEngineeringPatterns:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 code = f.read()
 
             # Use leakage detector
@@ -585,7 +585,7 @@ class TestFeatureEngineeringPatterns:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             for pattern in forbidden_patterns:
@@ -614,7 +614,7 @@ class TestFeatureEngineeringPatterns:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find groupby with transform/apply
@@ -655,7 +655,7 @@ class TestRFeatureEngineeringSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Check for lead() function (looks forward - BAD)
@@ -682,7 +682,7 @@ class TestRFeatureEngineeringSafety:
             if not full_path.exists():
                 continue
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find cumsum, cummean, etc.
@@ -810,30 +810,30 @@ def test_generate_temporal_safety_report(leakage_detector):
     print("TEMPORAL SAFETY TESTING FRAMEWORK - SUMMARY REPORT")
     print("=" * 80)
     print(f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"\nTest Categories:")
-    print(f"  1. ASOF Join Validation")
-    print(f"  2. Lag Feature Safety")
-    print(f"  3. Train/Test Split Temporal Ordering")
-    print(f"  4. Rolling Window Safety")
-    print(f"  5. Player Contamination")
-    print(f"  6. Database Query Safety")
-    print(f"  7. Feature Engineering Code Patterns")
-    print(f"  8. R Feature Engineering Safety")
-    print(f"  9. End-to-End Integration")
+    print("\nTest Categories:")
+    print("  1. ASOF Join Validation")
+    print("  2. Lag Feature Safety")
+    print("  3. Train/Test Split Temporal Ordering")
+    print("  4. Rolling Window Safety")
+    print("  5. Player Contamination")
+    print("  6. Database Query Safety")
+    print("  7. Feature Engineering Code Patterns")
+    print("  8. R Feature Engineering Safety")
+    print("  9. End-to-End Integration")
 
-    print(f"\nFiles Checked:")
+    print("\nFiles Checked:")
     print(f"  Python modules: {len(FEATURE_MODULES)}")
     print(f"  R modules: {len(R_FEATURE_MODULES)}")
 
-    print(f"\nRisk Gates:")
-    print(f"  ✓ Zero critical leakage allowed")
-    print(f"  ✓ All lag features must use positive shifts")
-    print(f"  ✓ All joins must be ASOF or temporally filtered")
-    print(f"  ✓ Train/test splits must be strictly temporal")
+    print("\nRisk Gates:")
+    print("  ✓ Zero critical leakage allowed")
+    print("  ✓ All lag features must use positive shifts")
+    print("  ✓ All joins must be ASOF or temporally filtered")
+    print("  ✓ Train/test splits must be strictly temporal")
 
-    print(f"\n" + "=" * 80)
-    print(f"Run pytest with -v flag for detailed test output")
-    print(f"=" * 80 + "\n")
+    print("\n" + "=" * 80)
+    print("Run pytest with -v flag for detailed test output")
+    print("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.667386
 Test count: 50
 """
 
+import pytest
 from features.line_movement_enhanced import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_american_to_implied_prob_basic():

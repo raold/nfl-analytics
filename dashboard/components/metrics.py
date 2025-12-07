@@ -8,11 +8,11 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-import streamlit as st
 import logging
-from typing import Dict, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+import streamlit as st
 
 logger = logging.getLogger(__name__)
 
@@ -302,7 +302,7 @@ def display_kelly_recommendation(df: pd.DataFrame, odds: float = 1.91) -> None:
     """)
 
 
-def calculate_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> Dict[str, float]:
+def calculate_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> dict[str, float]:
     """
     Calculate statistics about betting edges.
 
@@ -362,7 +362,7 @@ def display_edge_statistics(df: pd.DataFrame, edge_column: str = 'edge') -> None
         st.metric("Min Edge", f"{stats['min_edge']:.4f}")
 
 
-def calculate_model_performance_summary(df: pd.DataFrame) -> Dict[str, any]:
+def calculate_model_performance_summary(df: pd.DataFrame) -> dict[str, any]:
     """
     Calculate comprehensive model performance summary.
 

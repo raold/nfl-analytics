@@ -5,15 +5,16 @@ Uses only pre-game rolling features from asof_features.py
 Expected ROI: 1-3% (not 4,000,000%)
 """
 
+import json
+import warnings
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-import joblib
-import json
-from pathlib import Path
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-import warnings
+
 warnings.filterwarnings('ignore')
 
 print("=" * 70)
@@ -266,7 +267,7 @@ try:
 
         # WARNING if ROI is unrealistic
         if stats['total_roi'] > 0.10:  # >10% ROI is suspicious
-            print(f"  [WARNING] ROI >10% suggests possible data leakage!")
+            print("  [WARNING] ROI >10% suggests possible data leakage!")
 
 except Exception as e:
     print(f"\nXGBoost: Skipped ({e})")

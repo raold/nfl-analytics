@@ -17,7 +17,6 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -47,8 +46,8 @@ class XGBoostSpreadPredictor:
 
     def __init__(
         self,
-        model_path: Optional[str] = None,
-        db_config: Optional[Dict] = None
+        model_path: str | None = None,
+        db_config: dict | None = None
     ):
         """Initialize the spread predictor.
 
@@ -73,7 +72,7 @@ class XGBoostSpreadPredictor:
         self._load_model()
         self._parallel_loader = None  # Lazy initialization
 
-        logger.info(f"XGBoostSpreadPredictor initialized")
+        logger.info("XGBoostSpreadPredictor initialized")
         logger.info(f"  Model: {self.model_path}")
         logger.info(f"  Features: {len(self.feature_names)}")
         logger.info(f"  Holdout MAE: {self.metadata['metrics']['mae']:.2f}")
@@ -115,8 +114,8 @@ class XGBoostSpreadPredictor:
         away_team: str,
         season: int,
         week: int,
-        features: Optional[pd.DataFrame] = None
-    ) -> Dict:
+        features: pd.DataFrame | None = None
+    ) -> dict:
         """Predict game spread.
 
         Args:
@@ -191,10 +190,10 @@ class XGBoostSpreadPredictor:
 
     def predict_batch(
         self,
-        games: List[Dict],
+        games: list[dict],
         season: int,
         week: int
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """Predict spreads for multiple games.
 
         Args:
@@ -262,7 +261,7 @@ class XGBoostSpreadPredictor:
 
         return importance_df.head(top_n)
 
-    def get_model_info(self) -> Dict:
+    def get_model_info(self) -> dict:
         """Get model information and metrics.
 
         Returns:
@@ -281,8 +280,8 @@ class XGBoostSpreadPredictor:
 
 # Convenience function for API routes
 def get_spread_predictor(
-    model_path: Optional[str] = None,
-    db_config: Optional[Dict] = None
+    model_path: str | None = None,
+    db_config: dict | None = None
 ) -> XGBoostSpreadPredictor:
     """Factory function to get spread predictor instance.
 
@@ -302,7 +301,7 @@ def get_spread_predictor(
 if __name__ == '__main__':
     # Quick test
     predictor = XGBoostSpreadPredictor()
-    print(f"\nModel Info:")
+    print("\nModel Info:")
     print(json.dumps(predictor.get_model_info(), indent=2))
 
     print("\nFeature Importance (Top 10):")

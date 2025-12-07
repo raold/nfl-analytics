@@ -3,12 +3,10 @@
 Monitor running compute tasks and upgrade their intensity when round completes.
 """
 
-import subprocess
-import time
-import sys
 import os
-import signal
-from datetime import datetime
+import subprocess
+import sys
+import time
 
 # Target processes to monitor
 TARGET_PIDS = [64774, 52241]
@@ -58,12 +56,12 @@ def restart_with_high_intensity(original_cmd, pid):
     if '--intensity' not in new_cmd:
         new_cmd += ' --intensity high'
 
-    print(f"🚀 Starting new process with high intensity:")
+    print("🚀 Starting new process with high intensity:")
     print(f"   Command: {new_cmd}")
 
     # Start the new process in background
     subprocess.Popen(new_cmd, shell=True)
-    print(f"✅ Process upgraded to high intensity")
+    print("✅ Process upgraded to high intensity")
 
 def main():
     print("🔍 NFL Analytics Task Intensity Monitor")

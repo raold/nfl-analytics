@@ -28,11 +28,12 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
-import time
 import os
+import time
 
 logging.basicConfig(
     level=logging.INFO,
@@ -98,7 +99,7 @@ def test_batched_interface():
     sequential_estimate = 5 * 5.0  # 5 games * 5s each = 25s
     speedup = sequential_estimate / batch_time if batch_time > 0 else 0
 
-    logger.info(f"\n4. Performance Analysis:")
+    logger.info("\n4. Performance Analysis:")
     logger.info(f"   Batch time: {batch_time:.2f}s")
     logger.info(f"   Sequential estimate: {sequential_estimate:.1f}s")
     logger.info(f"   Speedup: {speedup:.1f}x")

@@ -4,18 +4,19 @@ Proper Conditional Variational Autoencoder (CVAE) for NFL game prediction.
 Uses PyTorch for real VAE architecture with proper loss function.
 """
 
+import json
+import time
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import psycopg2
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import Dataset, DataLoader
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
-import json
-from pathlib import Path
-import time
+from sklearn.preprocessing import StandardScaler
+from torch.utils.data import DataLoader, Dataset
 
 print("=" * 70)
 print(" CONDITIONAL VAE TRAINING (PYTORCH) ".center(70))
@@ -399,6 +400,7 @@ output_dir.mkdir(parents=True, exist_ok=True)
 
 # Save scalers
 import joblib
+
 joblib.dump(scaler_input, output_dir / "scaler_input_pytorch.pkl")
 joblib.dump(scaler_condition, output_dir / "scaler_condition_pytorch.pkl")
 joblib.dump(scaler_output, output_dir / "scaler_output_pytorch.pkl")

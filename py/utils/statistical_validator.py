@@ -43,13 +43,13 @@ Integration:
 """
 
 import json
-import numpy as np
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-import logging
+from typing import Any
+
+import numpy as np
 
 try:
     import pandas as pd
@@ -96,7 +96,7 @@ class ValidationReport:
     """Model validation report."""
     model_name: str
     validation_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
@@ -179,8 +179,8 @@ class StatisticalValidator:
     def validate_rhat(
         self,
         rhat_values: np.ndarray,
-        param_names: Optional[List[str]] = None
-    ) -> List[ValidationIssue]:
+        param_names: list[str] | None = None
+    ) -> list[ValidationIssue]:
         """
         Validate R-hat convergence diagnostic.
 
@@ -206,7 +206,7 @@ class StatisticalValidator:
                     description=f"Parameter {name} has R-hat = {rhat:.4f}",
                     metric_value=f"{rhat:.4f}",
                     threshold=f"<{self.RHAT_THRESHOLD}",
-                    recommendation=f"Increase chains/draws or reparameterize model",
+                    recommendation="Increase chains/draws or reparameterize model",
                 ))
 
         # Check max R-hat
@@ -228,8 +228,8 @@ class StatisticalValidator:
         self,
         ess_bulk: np.ndarray,
         ess_tail: np.ndarray,
-        param_names: Optional[List[str]] = None
-    ) -> List[ValidationIssue]:
+        param_names: list[str] | None = None
+    ) -> list[ValidationIssue]:
         """
         Validate Effective Sample Size diagnostics.
 
@@ -278,7 +278,7 @@ class StatisticalValidator:
         self,
         num_divergences: int,
         total_draws: int
-    ) -> List[ValidationIssue]:
+    ) -> list[ValidationIssue]:
         """
         Validate divergent transitions.
 
@@ -321,8 +321,8 @@ class StatisticalValidator:
         self,
         predictions: np.ndarray,
         actuals: np.ndarray,
-        confidence_levels: Optional[List[float]] = None
-    ) -> Tuple[float, List[ValidationIssue]]:
+        confidence_levels: list[float] | None = None
+    ) -> tuple[float, list[ValidationIssue]]:
         """
         Validate model calibration via coverage tests.
 
@@ -396,7 +396,7 @@ class StatisticalValidator:
         prior_samples: np.ndarray,
         posterior_samples: np.ndarray,
         param_name: str
-    ) -> List[ValidationIssue]:
+    ) -> list[ValidationIssue]:
         """
         Validate prior specification via prior/posterior comparison.
 
@@ -423,7 +423,7 @@ class StatisticalValidator:
                 severity=ValidationSeverity.MEDIUM,
                 category=ValidationCategory.PRIOR_POSTERIOR,
                 title=f"Posterior ≈ Prior: {param_name}",
-                description=f"Posterior unchanged from prior (data uninformative)",
+                description="Posterior unchanged from prior (data uninformative)",
                 metric_value=f"{mean_diff:.2f} std",
                 threshold=">0.1 std",
                 recommendation="Data may not inform this parameter - consider removing",
@@ -448,7 +448,7 @@ class StatisticalValidator:
                 severity=ValidationSeverity.MEDIUM,
                 category=ValidationCategory.PRIOR_POSTERIOR,
                 title=f"Prior too narrow: {param_name}",
-                description=f"Prior constrains posterior too much",
+                description="Prior constrains posterior too much",
                 metric_value=f"{precision_ratio:.2f}x",
                 threshold=">1.5x",
                 recommendation="Use wider prior to let data speak",
@@ -458,7 +458,7 @@ class StatisticalValidator:
 
     def validate_model(
         self,
-        model_data: Dict[str, Any],
+        model_data: dict[str, Any],
         validation_type: str = "full"
     ) -> ValidationReport:
         """
@@ -536,15 +536,15 @@ class StatisticalValidator:
         lines.append(f"\nModel: {report.model_name}")
         lines.append(f"Validation Date: {report.validation_date}")
         lines.append(f"Status: {'✅ PASSED' if report.passed else '⛔ FAILED'}")
-        lines.append(f"\nIssues Summary:")
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {report.critical_count}")
         lines.append(f"  🟠 HIGH:     {report.high_count}")
         lines.append(f"  🟡 MEDIUM:   {report.medium_count}")
         lines.append(f"  🟢 LOW:      {report.low_count}")
 
         if report.has_critical_issues():
-            lines.append(f"\n⛔ CRITICAL VALIDATION FAILURES")
-            lines.append(f"   MODEL IS INVALID - DO NOT DEPLOY")
+            lines.append("\n⛔ CRITICAL VALIDATION FAILURES")
+            lines.append("   MODEL IS INVALID - DO NOT DEPLOY")
 
         # Group by category
         for category in ValidationCategory:

@@ -19,13 +19,11 @@ Usage:
     python review_pdf_enhanced.py cleanup          # Delete images
 """
 
-import subprocess
-import os
-import sys
 import re
-from pathlib import Path
-from typing import List, Dict, Tuple
+import subprocess
+import sys
 from collections import defaultdict
+from pathlib import Path
 
 # ============================================================================
 # Configuration
@@ -59,7 +57,7 @@ def get_page_count():
     if not LOG_PATH.exists():
         return None
 
-    with open(LOG_PATH, 'r') as f:
+    with open(LOG_PATH) as f:
         for line in f:
             if "Output written on main.pdf" in line:
                 parts = line.split('(')[1].split()[0]
@@ -138,7 +136,7 @@ class QualityChecker:
             self.issues['log'].append("main.log not found - PDF not compiled")
             return
 
-        with open(LOG_PATH, 'r') as f:
+        with open(LOG_PATH) as f:
             log_content = f.read()
 
         # Count different types of warnings
@@ -184,7 +182,7 @@ class QualityChecker:
         issues_by_type = defaultdict(int)
 
         for table_file in table_files:
-            with open(table_file, 'r') as f:
+            with open(table_file) as f:
                 content = f.read()
 
             # Check #1: Numeric alignment
@@ -242,7 +240,7 @@ class QualityChecker:
             if py_file.name.startswith('.'):
                 continue
             try:
-                with open(py_file, 'r') as f:
+                with open(py_file) as f:
                     content = f.read()
                     if 'dissertation_style' in content:
                         style_imports += 1
@@ -259,13 +257,13 @@ class QualityChecker:
         if not TEX_PATH.exists():
             return
 
-        with open(TEX_PATH, 'r') as f:
+        with open(TEX_PATH) as f:
             main_content = f.read()
 
         # Check for required packages
         required_packages = ['siunitx', 'makecell', 'threeparttable', 'booktabs']
         for pkg in required_packages:
-            if f'\\usepackage{{{pkg}}}' not in main_content and f'\\usepackage' not in main_content:
+            if f'\\usepackage{{{pkg}}}' not in main_content and '\\usepackage' not in main_content:
                 self.issues['typography'].append(f"Package {pkg} not loaded")
 
         # Check for column type definitions

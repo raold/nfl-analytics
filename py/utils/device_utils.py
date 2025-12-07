@@ -18,6 +18,7 @@ Date: November 15, 2025
 
 import logging
 import multiprocessing
+
 import torch
 
 logger = logging.getLogger(__name__)
@@ -77,24 +78,24 @@ def _log_device_info(device: torch.device):
         logger.info(f"  CUDA Version: {torch.version.cuda}")
 
     elif device.type == 'mps':
-        logger.info(f"  GPU: Apple Silicon (Metal Performance Shaders)")
-        logger.info(f"  Architecture: Unified Memory (shared with system RAM)")
-        logger.info(f"  PyTorch MPS Backend: Enabled")
+        logger.info("  GPU: Apple Silicon (Metal Performance Shaders)")
+        logger.info("  Architecture: Unified Memory (shared with system RAM)")
+        logger.info("  PyTorch MPS Backend: Enabled")
 
         # Detect M-series chip (heuristic based on CPU count)
         cpu_count = multiprocessing.cpu_count()
         if cpu_count == 10:
-            logger.info(f"  Detected: M3/M4 (4P + 6E cores)")
+            logger.info("  Detected: M3/M4 (4P + 6E cores)")
         elif cpu_count == 8:
-            logger.info(f"  Detected: M1/M2 (4P + 4E cores)")
+            logger.info("  Detected: M1/M2 (4P + 4E cores)")
         else:
             logger.info(f"  CPU Cores: {cpu_count}")
 
     elif device.type == 'cpu':
         cpu_count = multiprocessing.cpu_count()
         logger.info(f"  CPU Cores: {cpu_count}")
-        logger.info(f"  Note: No GPU acceleration available")
-        logger.warning(f"  ⚠️  Training will be SLOW. Consider using GPU hardware.")
+        logger.info("  Note: No GPU acceleration available")
+        logger.warning("  ⚠️  Training will be SLOW. Consider using GPU hardware.")
 
 
 def validate_device_support(device: torch.device) -> bool:

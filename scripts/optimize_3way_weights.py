@@ -31,11 +31,9 @@ import argparse
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 logging.basicConfig(
     level=logging.INFO,
@@ -69,7 +67,7 @@ def load_predictions(csv_path: Path) -> pd.DataFrame:
     return df
 
 
-def calculate_model_performance(df: pd.DataFrame, model_name: str) -> Dict:
+def calculate_model_performance(df: pd.DataFrame, model_name: str) -> dict:
     """Calculate performance metrics for a single model."""
     mean_col = f"{model_name}_mean"
     std_col = f"{model_name}_std"
@@ -113,7 +111,7 @@ def calculate_model_performance(df: pd.DataFrame, model_name: str) -> Dict:
     }
 
 
-def inverse_variance_weighting(performances: List[Dict]) -> Dict[str, float]:
+def inverse_variance_weighting(performances: list[dict]) -> dict[str, float]:
     """Calculate weights via inverse variance: w_i = (1/σ²_i) / Σ(1/σ²_j)."""
     inverse_variances = np.array([1.0 / p['avg_variance'] for p in performances])
     weights = inverse_variances / inverse_variances.sum()
@@ -121,13 +119,13 @@ def inverse_variance_weighting(performances: List[Dict]) -> Dict[str, float]:
     return {p['name']: w for p, w in zip(performances, weights)}
 
 
-def equal_weighting(performances: List[Dict]) -> Dict[str, float]:
+def equal_weighting(performances: list[dict]) -> dict[str, float]:
     """Equal weights: w_i = 1/N."""
     n = len(performances)
     return {p['name']: 1.0 / n for p in performances}
 
 
-def performance_weighting(performances: List[Dict]) -> Dict[str, float]:
+def performance_weighting(performances: list[dict]) -> dict[str, float]:
     """Performance-based weights: w_i = (1/MAE_i) / Σ(1/MAE_j)."""
     inverse_maes = np.array([1.0 / p['mae'] for p in performances])
     weights = inverse_maes / inverse_maes.sum()
@@ -135,7 +133,7 @@ def performance_weighting(performances: List[Dict]) -> Dict[str, float]:
     return {p['name']: w for p, w in zip(performances, weights)}
 
 
-def evaluate_ensemble(df: pd.DataFrame, weights: Dict[str, float]) -> Dict:
+def evaluate_ensemble(df: pd.DataFrame, weights: dict[str, float]) -> dict:
     """Evaluate ensemble performance with given weights."""
     # Filter to predictions where all 3 models contributed
     valid_df = df.copy()
@@ -188,7 +186,7 @@ def evaluate_ensemble(df: pd.DataFrame, weights: Dict[str, float]) -> Dict:
     }
 
 
-def optimize_weights(df: pd.DataFrame) -> Dict:
+def optimize_weights(df: pd.DataFrame) -> dict:
     """Run all 3 weighting methods and compare results."""
     logger.info("\n" + "="*80)
     logger.info("3-WAY ENSEMBLE WEIGHT OPTIMIZATION (XGBoost excluded due to leakage)")
@@ -227,7 +225,7 @@ def optimize_weights(df: pd.DataFrame) -> Dict:
     results = {}
     for method_name, weights in methods.items():
         logger.info(f"\n  Method: {method_name}")
-        logger.info(f"  Weights:")
+        logger.info("  Weights:")
         for model, weight in weights.items():
             logger.info(f"    {MODEL_DISPLAY_NAMES[model]:25s}: {weight:.3f} ({weight*100:.1f}%)")
 
@@ -257,8 +255,8 @@ def optimize_weights(df: pd.DataFrame) -> Dict:
         'informative_priors': 0.20
     }
     renormalized_perf = evaluate_ensemble(df, renormalized_weights)
-    logger.info(f"\n📊 Old Arbitrary Weights (renormalized, XGBoost excluded):")
-    logger.info(f"   SS: 40%, Hier: 40%, IP: 20%")
+    logger.info("\n📊 Old Arbitrary Weights (renormalized, XGBoost excluded):")
+    logger.info("   SS: 40%, Hier: 40%, IP: 20%")
     logger.info(f"   MAE: {renormalized_perf['mae']:.2f} yards")
     logger.info(f"   Bias: {renormalized_perf['bias']:.2f} yards")
     logger.info(f"   Calibration: {renormalized_perf['calibration_90']:.1f}%")

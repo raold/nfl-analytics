@@ -16,10 +16,10 @@ Created: November 19, 2025
 Purpose: Diagnose ensemble performance gap after XGBoost v4 recovery
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
-from typing import Dict, List
+
 import numpy as np
 import pandas as pd
 
@@ -28,7 +28,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 
-def calculate_component_mae(df: pd.DataFrame, component_col: str) -> Dict:
+def calculate_component_mae(df: pd.DataFrame, component_col: str) -> dict:
     """Calculate MAE for a single component."""
     # Filter to only games where component made a prediction
     valid = df[df[component_col].notna()].copy()
@@ -54,7 +54,7 @@ def calculate_component_mae(df: pd.DataFrame, component_col: str) -> Dict:
     }
 
 
-def calculate_theoretical_ensemble_mae(component_metrics: Dict, weights: Dict) -> float:
+def calculate_theoretical_ensemble_mae(component_metrics: dict, weights: dict) -> float:
     """
     Calculate theoretical ensemble MAE using weighted average.
 
@@ -175,19 +175,19 @@ def main():
         info['expected_mae'] * info['weight']
         for info in components.values()
     )
-    print(f"Theoretical MAE (expected component performance):")
+    print("Theoretical MAE (expected component performance):")
     print(f"  {theoretical_mae:.2f} yards")
     print()
 
     # Theoretical MAE (using actual component performance)
     actual_theoretical_mae = calculate_theoretical_ensemble_mae(component_metrics, weights)
-    print(f"Theoretical MAE (actual component performance):")
+    print("Theoretical MAE (actual component performance):")
     print(f"  {actual_theoretical_mae:.2f} yards" if actual_theoretical_mae else "  N/A")
     print()
 
     # Actual ensemble MAE
     ensemble_mae = np.mean(np.abs(combined_df['actual'] - combined_df['predicted']))
-    print(f"Actual Ensemble MAE:")
+    print("Actual Ensemble MAE:")
     print(f"  {ensemble_mae:.2f} yards")
     print()
 
@@ -199,14 +199,14 @@ def main():
 
     gap1 = ensemble_mae - theoretical_mae
     gap1_pct = (gap1 / theoretical_mae) * 100
-    print(f"Gap 1 (Actual Ensemble vs Expected Components):")
+    print("Gap 1 (Actual Ensemble vs Expected Components):")
     print(f"  {gap1:+.2f} yards ({gap1_pct:+.1f}%)")
     print()
 
     if actual_theoretical_mae:
         gap2 = ensemble_mae - actual_theoretical_mae
         gap2_pct = (gap2 / actual_theoretical_mae) * 100
-        print(f"Gap 2 (Actual Ensemble vs Theoretical Weighted Average):")
+        print("Gap 2 (Actual Ensemble vs Theoretical Weighted Average):")
         print(f"  {gap2:+.2f} yards ({gap2_pct:+.1f}%)")
         print()
 

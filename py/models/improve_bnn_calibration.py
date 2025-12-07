@@ -22,23 +22,23 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
 import logging
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
+import arviz as az
+import joblib
 import numpy as np
 import pandas as pd
 import psycopg2
 import pymc as pm
-import arviz as az
-import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -473,5 +473,5 @@ def run_calibration_experiments():
 
 if __name__ == "__main__":
     output_dir = run_calibration_experiments()
-    print(f"\n✓ Calibration improvement experiments complete!")
+    print("\n✓ Calibration improvement experiments complete!")
     print(f"  Results: {output_dir}")

@@ -7,11 +7,11 @@ Author: NFL Analytics Team
 Date: October 2025
 """
 
-import pytest
 import subprocess
 import time
+
 import psycopg
-from pathlib import Path
+import pytest
 
 
 class TestDockerCompose:
@@ -82,7 +82,7 @@ class TestDockerCompose:
         )
 
         assert result.returncode == 0, f"docker compose up failed: {result.stderr}"
-        print(f"✅ docker compose up successful")
+        print("✅ docker compose up successful")
 
     def test_database_becomes_healthy(self, docker_env):
         """Test that database becomes healthy within 60 seconds."""
@@ -194,7 +194,7 @@ class TestDockerCompose:
                     result = cur.fetchone()
 
                     if result:
-                        print(f"✅ odds_history is a hypertable")
+                        print("✅ odds_history is a hypertable")
                     else:
                         print("⚠️ odds_history is not a hypertable (may be okay)")
 
@@ -293,7 +293,7 @@ class TestDockerNetworking:
         )
 
         assert result.returncode == 0, "Failed to get container info"
-        print(f"✅ Port 5544 should be exposed (check docker compose ps)")
+        print("✅ Port 5544 should be exposed (check docker compose ps)")
 
     def test_host_can_connect_to_exposed_port(self):
         """Test that host can connect to exposed database port."""
@@ -305,7 +305,7 @@ class TestDockerNetworking:
         try:
             result = sock.connect_ex(('localhost', 5544))
             assert result == 0, f"Cannot connect to localhost:5544 (code: {result})"
-            print(f"✅ localhost:5544 is reachable")
+            print("✅ localhost:5544 is reachable")
         finally:
             sock.close()
 

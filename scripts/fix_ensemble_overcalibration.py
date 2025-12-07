@@ -25,12 +25,14 @@ Date: November 16, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
 import json
-from datetime import datetime
+import logging
 import pickle
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from scipy import optimize, stats
@@ -144,23 +146,23 @@ def retrain_temperature_scaler(df: pd.DataFrame, temperature: float) -> dict:
     before = calculate_current_calibration(df)
     after = calculate_calibration_after_scaling(df, temperature)
 
-    logger.info(f"\n📊 Calibration Before Scaling:")
+    logger.info("\n📊 Calibration Before Scaling:")
     logger.info(f"   Coverage: {before['coverage']*100:.2f}%")
     logger.info(f"   Within 90% PI: {before['within_90']}/{before['total']}")
     logger.info(f"   Mean Interval Width: {before['width']:.1f} yards")
     logger.info(f"   MAE: {before['mae']:.2f} yards")
 
-    logger.info(f"\n🔧 Temperature Scaling:")
+    logger.info("\n🔧 Temperature Scaling:")
     logger.info(f"   Temperature: T = {temperature:.4f}")
     logger.info(f"   Scaling Factor: √T = {np.sqrt(temperature):.4f}")
 
-    logger.info(f"\n📊 Calibration After Scaling:")
+    logger.info("\n📊 Calibration After Scaling:")
     logger.info(f"   Coverage: {after['coverage']*100:.2f}%")
     logger.info(f"   Within 90% PI: {after['within_90']}/{after['total']}")
     logger.info(f"   Mean Interval Width: {after['width']:.1f} yards")
     logger.info(f"   MAE: {after['mae']:.2f} yards")
 
-    logger.info(f"\n📈 Improvements:")
+    logger.info("\n📈 Improvements:")
     coverage_change = (after['coverage'] - before['coverage']) * 100
     width_change = (after['width'] - before['width']) / before['width'] * 100
     logger.info(f"   Coverage: {before['coverage']*100:.2f}% → {after['coverage']*100:.2f}% ({coverage_change:+.2f}pp)")
@@ -170,7 +172,7 @@ def retrain_temperature_scaler(df: pd.DataFrame, temperature: float) -> dict:
     is_calibrated = 0.85 <= after['coverage'] <= 0.95
     width_improved = after['width'] < before['width']
 
-    logger.info(f"\n✅ Validation:")
+    logger.info("\n✅ Validation:")
     logger.info(f"   Coverage in target range (85-95%): {'✅ YES' if is_calibrated else '❌ NO'}")
     logger.info(f"   Interval width improved: {'✅ YES' if width_improved else '❌ NO'}")
 
@@ -246,17 +248,17 @@ def main():
         logger.info("\n" + "="*80)
         logger.info("SUMMARY")
         logger.info("="*80)
-        logger.info(f"\n✅ Temperature scaler retrained successfully!")
+        logger.info("\n✅ Temperature scaler retrained successfully!")
         logger.info(f"\n   New Temperature: T = {T_optimal:.4f}")
         logger.info(f"   Coverage: {scaler_data['coverage_before']*100:.2f}% → {scaler_data['coverage_after']*100:.2f}%")
         logger.info(f"   Width: {scaler_data['width_before']:.1f} → {scaler_data['width_after']:.1f} yards")
         logger.info(f"   Saved to: {save_path}")
         logger.info(f"   Training date: {scaler_data['training_date']}")
 
-        logger.info(f"\n🎯 Next Steps:")
-        logger.info(f"   1. Run integration tests to verify ensemble loading")
-        logger.info(f"   2. Deploy to production")
-        logger.info(f"   3. Monitor calibration on live data")
+        logger.info("\n🎯 Next Steps:")
+        logger.info("   1. Run integration tests to verify ensemble loading")
+        logger.info("   2. Deploy to production")
+        logger.info("   3. Monitor calibration on live data")
 
         return 0
 

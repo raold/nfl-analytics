@@ -11,11 +11,13 @@ Usage:
     python py/ensemble/test_ensemble_v5.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
+
 from enhanced_ensemble_v5_canonical import EnhancedEnsemble5Way
 
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +64,7 @@ def test_ensemble():
                 logger.info(f"  ✓ Ensemble Mean: {mean:.1f} yards")
                 logger.info(f"  ✓ Ensemble Std: {std:.1f} yards")
                 logger.info(f"  ✓ 90% CI: [{mean - 1.645*std:.1f}, {mean + 1.645*std:.1f}]")
-                logger.info(f"  ✓ Individual Models:")
+                logger.info("  ✓ Individual Models:")
 
                 for model_name, (model_mean, model_std) in predictions.items():
                     logger.info(f"      - {model_name}: {model_mean:.1f} ± {model_std:.1f} yards")
@@ -76,7 +78,7 @@ def test_ensemble():
                 })
                 logger.info("  ✓ PASS\n")
             else:
-                logger.warning(f"  ✗ FAIL: No prediction returned\n")
+                logger.warning("  ✗ FAIL: No prediction returned\n")
                 results.append({
                     "player": test['player_name'],
                     "success": False,

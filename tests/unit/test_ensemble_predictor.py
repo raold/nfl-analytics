@@ -12,13 +12,13 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import pytest
-import numpy as np
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any
+from unittest.mock import Mock, patch
 
-from py.ensemble.strategy.base import ModelType, ModelPrediction
+import numpy as np
+import pytest
+
+from py.ensemble.strategy.base import ModelType
 
 
 class TestBNNModelLoading:

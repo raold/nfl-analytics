@@ -69,8 +69,6 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 
 import logging
 import warnings
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -133,7 +131,7 @@ class OpponentAdjustedFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -237,7 +235,7 @@ class OpponentAdjustedFeatures:
         """
         if league_std_epa == 0:
             logger.warning(
-                f"League std EPA is 0.0, cannot compute DVOA. Returning 0.0."
+                "League std EPA is 0.0, cannot compute DVOA. Returning 0.0."
             )
             return 0.0
 
@@ -248,7 +246,7 @@ class OpponentAdjustedFeatures:
         self,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get league-wide EPA statistics for DVOA normalization.
 
@@ -322,7 +320,7 @@ class OpponentAdjustedFeatures:
                 'league_std_rush_epa': 0.15,
             }
 
-    def _get_league_average_epa(self, season: int) -> Dict[str, float]:
+    def _get_league_average_epa(self, season: int) -> dict[str, float]:
         """
         Calculate league-wide average EPA for a given season.
 
@@ -384,7 +382,7 @@ class OpponentAdjustedFeatures:
         target_season: int,
         target_week: int,
         lookback: int = None
-    ) -> List[Tuple[str, int, int]]:
+    ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
 
@@ -437,7 +435,7 @@ class OpponentAdjustedFeatures:
         opponent_team: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate opponent's defensive EPA allowed (rolling 8-game average).
 
@@ -542,7 +540,7 @@ class OpponentAdjustedFeatures:
         team: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Calculate team's raw offensive EPA (rolling 8-game average).
 
@@ -648,7 +646,7 @@ class OpponentAdjustedFeatures:
         opponent: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 7 opponent-adjusted EPA features for a team-game matchup.
 

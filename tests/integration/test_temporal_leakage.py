@@ -14,15 +14,14 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import pytest
-import psycopg
+import re
+from pathlib import Path
+
 import pandas as pd
-import numpy as np
+import psycopg
+import pytest
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
-import re
-import ast
-from pathlib import Path
 
 # Database config
 DB_CONFIG = {
@@ -153,7 +152,7 @@ class TestTemporalLeakage:
             if not full_path.exists():
                 continue  # Skip if file doesn't exist
 
-            with open(full_path, 'r') as f:
+            with open(full_path) as f:
                 content = f.read()
 
             # Find all rolling operations
@@ -282,7 +281,7 @@ class TestTemporalLeakage:
         if not full_path.exists():
             pytest.skip(f"Module {feature_module} does not exist")
 
-        with open(full_path, 'r') as f:
+        with open(full_path) as f:
             content = f.read()
 
         # Pattern 1: Dangerous direct outcome references in ASSIGNMENTS (df['feature'] = ...)

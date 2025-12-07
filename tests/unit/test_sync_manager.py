@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.158116
 Test count: 32
 """
 
+import pytest
 from compute.sync_manager import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_detect_conflicts_basic():

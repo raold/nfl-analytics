@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.940428
 Test count: 58
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.train_multioutput_passing_bnn import *
-import pandas as pd
-import pytest
 
 
 def test_load_passing_data_from_db_basic():

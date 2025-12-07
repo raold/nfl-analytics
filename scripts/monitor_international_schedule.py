@@ -19,7 +19,6 @@ import json
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import pandas as pd
 import psycopg2
@@ -122,7 +121,7 @@ def fetch_upcoming_games(season: int = 2025) -> pd.DataFrame:
 def identify_international_games(
     games_df: pd.DataFrame,
     weeks_ahead: int = 4
-) -> List[Dict]:
+) -> list[dict]:
     """
     Identify international games in the next N weeks.
 
@@ -153,7 +152,7 @@ def identify_international_games(
     return intl_games
 
 
-def get_qb_for_team(team: str, season: int = 2025) -> Tuple[str, str]:
+def get_qb_for_team(team: str, season: int = 2025) -> tuple[str, str]:
     """
     Get starting QB for a team.
 
@@ -198,9 +197,9 @@ def get_qb_for_team(team: str, season: int = 2025) -> Tuple[str, str]:
 
 
 def find_edge_c_opportunities(
-    intl_games: List[Dict],
+    intl_games: list[dict],
     all_games_df: pd.DataFrame
-) -> List[Dict]:
+) -> list[dict]:
     """
     Find Edge C betting opportunities (QBs playing within 7 days of intl game).
 
@@ -275,7 +274,7 @@ def find_edge_c_opportunities(
     return opportunities
 
 
-def generate_alert_message(opportunities: List[Dict]) -> str:
+def generate_alert_message(opportunities: list[dict]) -> str:
     """
     Generate human-readable alert message.
 
@@ -301,9 +300,9 @@ def generate_alert_message(opportunities: List[Dict]) -> str:
         msg += f"   Expected Penalty: {opp['expected_penalty_yards']:.1f} yards\n"
         msg += f"   Expected Win Rate: {opp['expected_win_rate']*100:.1f}%\n"
         msg += f"   Expected ROI: {opp['expected_roi_pct']:.1f}%\n"
-        msg += f"   \n"
+        msg += "   \n"
         msg += f"   ACTION: Bet UNDER on {opp['qb_name']} passing yards prop\n"
-        msg += f"   CAUTION: Edge pending baseline calculation fix\n"
+        msg += "   CAUTION: Edge pending baseline calculation fix\n"
         msg += "\n"
 
     msg += f"{'='*80}\n"

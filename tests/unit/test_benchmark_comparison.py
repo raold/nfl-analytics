@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.419314
 Test count: 18
 """
 
+import pytest
 from analysis.benchmark_comparison import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_get_benchmark_data_basic():

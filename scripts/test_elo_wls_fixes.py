@@ -18,8 +18,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
 import logging
+import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -169,11 +170,11 @@ def test_elo_skill_factor_realistic():
 
         # Check that it's NOT the old capped value
         if abs(mean - 500.0) < 1.0:
-            logger.error(f"❌ FAIL: Still capped at 500 yards (bug not fixed)")
+            logger.error("❌ FAIL: Still capped at 500 yards (bug not fixed)")
             return False
 
         logger.info(f"✅ PASS: Realistic ELO prediction: {mean:.1f} yards (not capped)")
-        logger.info(f"   Expected range: 150-350 yards for typical QB")
+        logger.info("   Expected range: 150-350 yards for typical QB")
 
         return True
 

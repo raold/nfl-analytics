@@ -5,7 +5,6 @@ when database shows ~406 yards average?
 """
 
 import pandas as pd
-import numpy as np
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -24,7 +23,7 @@ print()
 print("First 5 rows:")
 print(df[['game_id', 'player_name', 'actual_yards', 'ensemble_mean']].head())
 print()
-print(f"actual_yards statistics:")
+print("actual_yards statistics:")
 print(df['actual_yards'].describe())
 print()
 
@@ -80,12 +79,12 @@ if db_result:
 
     # Compare to validation data
     val_yards = df.iloc[0]['actual_yards']
-    print(f"Validation data:")
+    print("Validation data:")
     print(f"  actual_yards: {val_yards}")
     print()
 
     if db_result['stat_yards'] != val_yards:
-        print(f"*** DATA MISMATCH ***")
+        print("*** DATA MISMATCH ***")
         print(f"  Database: {db_result['stat_yards']} yards")
         print(f"  Validation: {val_yards} yards")
         print(f"  Difference: {db_result['stat_yards'] - val_yards} yards")

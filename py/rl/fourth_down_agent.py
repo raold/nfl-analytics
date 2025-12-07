@@ -54,18 +54,14 @@ import pandas as pd
 import torch
 
 # Import base CQL agent
-from py.rl.cql_agent import CQLAgent, set_seed, get_device
+from py.rl.cql_agent import CQLAgent, get_device, set_seed
 
 # Import MDP definitions
 from py.rl.fourth_down_mdp import (
-    STATE_DIM,
     ACTION_DIM,
-    ACTION_GO,
-    ACTION_PUNT,
-    ACTION_FIELD_GOAL,
     ACTION_NAMES,
+    STATE_DIM,
 )
-
 
 # ============================================================================
 # Data Loading for 4th Down Problem
@@ -185,7 +181,7 @@ def train_fourth_down_agent(
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n=== Training CQL Agent ===")
+    print("\n=== Training CQL Agent ===")
     print(f"Epochs: {epochs}")
     print(f"Batch size: {batch_size}")
     print(f"Alpha (CQL penalty): {agent.alpha}")
@@ -275,7 +271,7 @@ def evaluate_fourth_down_policy(
     """
     agent.q_network.eval()
 
-    print(f"\n=== Evaluating Policy ===")
+    print("\n=== Evaluating Policy ===")
     print(f"Test set size: {len(states):,} plays")
 
     # Predict actions with CQL policy
@@ -301,11 +297,11 @@ def evaluate_fourth_down_policy(
     pred_dist = pd.Series(predicted_actions).value_counts(normalize=True).to_dict()
     actual_dist = pd.Series(actions).value_counts(normalize=True).to_dict()
 
-    print(f"\nPredicted action distribution:")
+    print("\nPredicted action distribution:")
     for action, prop in pred_dist.items():
         print(f"  {ACTION_NAMES[action]}: {prop:.2%}")
 
-    print(f"\nActual action distribution:")
+    print("\nActual action distribution:")
     for action, prop in actual_dist.items():
         print(f"  {ACTION_NAMES[action]}: {prop:.2%}")
 
@@ -315,7 +311,7 @@ def evaluate_fourth_down_policy(
     expected_reward_matched = np.mean(matched_rewards)
     actual_avg_reward = np.mean(rewards)
 
-    print(f"\nReward comparison:")
+    print("\nReward comparison:")
     print(f"  Actual avg reward: {actual_avg_reward:.4f}")
     print(f"  CQL matched reward: {expected_reward_matched:.4f}")
     print(f"  Reward lift: {(expected_reward_matched - actual_avg_reward):.4f}")
@@ -328,13 +324,13 @@ def evaluate_fourth_down_policy(
         "max": float(q_values_array.max()),
     }
 
-    print(f"\nQ-value statistics:")
+    print("\nQ-value statistics:")
     print(f"  Mean: {q_stats['mean']:.4f}")
     print(f"  Std: {q_stats['std']:.4f}")
     print(f"  Range: [{q_stats['min']:.4f}, {q_stats['max']:.4f}]")
 
     # 5. Action-specific performance
-    print(f"\n=== Action-Specific Analysis ===")
+    print("\n=== Action-Specific Analysis ===")
     for action in range(ACTION_DIM):
         mask = predicted_actions == action
         if mask.sum() > 0:
@@ -344,7 +340,7 @@ def evaluate_fourth_down_policy(
             print(f"  Success rate: {(action_rewards > 0).mean():.2%}")
 
     # 6. Context-specific agreement
-    print(f"\n=== Agreement by Context ===")
+    print("\n=== Agreement by Context ===")
 
     # By distance
     for dist_bin in [(1, 2), (3, 5), (6, 10), (11, 100)]:
@@ -415,11 +411,11 @@ def main():
 
     # Load datasets
     if args.evaluate:
-        print(f"\n=== Evaluation Mode ===")
+        print("\n=== Evaluation Mode ===")
         print(f"Loading test data from {args.test_data}")
         test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(args.test_data)
     else:
-        print(f"\n=== Training Mode ===")
+        print("\n=== Training Mode ===")
         print(f"Loading training data from {args.train_data}")
         train_states, train_actions, train_rewards, _ = load_fourth_down_dataset(args.train_data)
 
@@ -439,7 +435,7 @@ def main():
         hidden_dims=args.hidden_dims,
     )
 
-    print(f"\nAgent configuration:")
+    print("\nAgent configuration:")
     print(f"  State dim: {STATE_DIM}")
     print(f"  Action dim: {ACTION_DIM}")
     print(f"  Hidden layers: {args.hidden_dims}")

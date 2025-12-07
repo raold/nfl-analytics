@@ -21,16 +21,16 @@ Expected Performance:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
-from typing import Dict
 from collections import deque
 
 import numpy as np
-from river import ensemble, tree, linear_model, neighbors, drift
+from river import ensemble, linear_model, neighbors, tree
 from river.drift import ADWIN
 
 logging.basicConfig(level=logging.INFO)
@@ -108,11 +108,11 @@ class MultiOnlineEnsemble:
 
         logger.info("Initialized MultiOnlineEnsemble with 4 models:")
         logger.info(f"  - Adaptive Random Forest (n_models={arf_n_models})")
-        logger.info(f"  - Adaptive Model Trees (max_depth=10)")
-        logger.info(f"  - Passive-Aggressive Regressor")
+        logger.info("  - Adaptive Model Trees (max_depth=10)")
+        logger.info("  - Passive-Aggressive Regressor")
         logger.info(f"  - KNN Regressor (k={knn_n_neighbors}, window={knn_window_size})")
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         """
         Update all models with single sample
 
@@ -141,7 +141,7 @@ class MultiOnlineEnsemble:
 
         self.n_samples += 1
 
-    def predict_one(self, x: Dict[str, float]) -> float:
+    def predict_one(self, x: dict[str, float]) -> float:
         """
         Predict using weighted ensemble
 
@@ -192,7 +192,7 @@ class MultiOnlineEnsemble:
         if total_weight > 0:
             self.weights = {k: w / total_weight for k, w in self.weights.items()}
 
-    def get_metrics(self) -> Dict[str, any]:
+    def get_metrics(self) -> dict[str, any]:
         """Get ensemble metrics and model weights"""
         return {
             'weights': self.weights.copy(),

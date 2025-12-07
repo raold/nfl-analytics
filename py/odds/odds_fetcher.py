@@ -11,14 +11,14 @@ Free Tier Limits:
 
 API Documentation: https://the-odds-api.com/liveapi/guides/v4/
 """
+import logging
 import os
 import time
-import logging
-from datetime import datetime, timezone, timedelta
-from typing import Dict, List, Optional, Tuple
-import requests
+from datetime import UTC, datetime
+
 import psycopg2
-from psycopg2.extras import RealDictCursor, execute_values
+import requests
+from psycopg2.extras import execute_values
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class OddsFetcher:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
+        api_key: str | None = None,
         db_host: str = 'localhost',
         db_port: int = 5544,
         db_name: str = 'devdb01',
@@ -76,7 +76,7 @@ class OddsFetcher:
             'User-Agent': 'NFL-Analytics-System/1.0'
         })
 
-    def check_rate_limit(self) -> Tuple[int, int]:
+    def check_rate_limit(self) -> tuple[int, int]:
         """
         Check current rate limit usage
 
@@ -98,7 +98,7 @@ class OddsFetcher:
 
                 return (requests_today, remaining)
 
-    def get_quota_status(self) -> Dict:
+    def get_quota_status(self) -> dict:
         """
         Get current quota status from The Odds API
 
@@ -135,9 +135,9 @@ class OddsFetcher:
         regions: str = 'us',
         markets: str = None,
         oddsFormat: str = 'american',
-        bookmakers: Optional[List[str]] = None,
+        bookmakers: list[str] | None = None,
         max_events: int = 10
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Fetch player props from The Odds API
 
@@ -264,9 +264,9 @@ class OddsFetcher:
 
     def parse_and_store(
         self,
-        api_response: Dict,
-        snapshot_at: Optional[datetime] = None
-    ) -> Dict:
+        api_response: dict,
+        snapshot_at: datetime | None = None
+    ) -> dict:
         """
         Parse API response and store in prop_lines_history
 
@@ -278,7 +278,7 @@ class OddsFetcher:
             Summary dict with counts of stored lines
         """
         if snapshot_at is None:
-            snapshot_at = datetime.now(timezone.utc)
+            snapshot_at = datetime.now(UTC)
 
         lines_to_insert = []
         stats = {
@@ -404,9 +404,9 @@ class OddsFetcher:
 
     def _calculate_implied_probs(
         self,
-        over_odds: Optional[float],
-        under_odds: Optional[float]
-    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
+        over_odds: float | None,
+        under_odds: float | None
+    ) -> tuple[float | None, float | None, float | None]:
         """
         Calculate implied probabilities and bookmaker hold
 
@@ -439,13 +439,13 @@ class OddsFetcher:
             round(hold, 4)
         )
 
-    def _get_player_team(self, player_name: str, event: Dict) -> Optional[str]:
+    def _get_player_team(self, player_name: str, event: dict) -> str | None:
         """Extract player team from event data (if available)"""
         # The Odds API doesn't always provide player team, so this is best-effort
         # Could be enhanced with player database lookup
         return None
 
-    def _bulk_insert_lines(self, lines: List[Dict]) -> int:
+    def _bulk_insert_lines(self, lines: list[dict]) -> int:
         """
         Bulk insert lines into prop_lines_history
 
@@ -496,10 +496,10 @@ class OddsFetcher:
     def fetch_and_store(
         self,
         regions: str = 'us',
-        bookmakers: Optional[List[str]] = None,
+        bookmakers: list[str] | None = None,
         dry_run: bool = False,
         max_events: int = 10
-    ) -> Dict:
+    ) -> dict:
         """
         Convenience method: fetch from API and store in database
 

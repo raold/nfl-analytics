@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.384073
 Test count: 32
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.settle_paper_trades import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

@@ -7,10 +7,12 @@ Check what the trained BNN is predicting and why.
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import torch
 import numpy as np
+import torch
+
 from scripts.train_bnn_passing_ensemble import PassingYardsBNN
 
 # Load checkpoint
@@ -30,7 +32,7 @@ for key in checkpoint.keys():
 if 'scaler_mean' in checkpoint:
     scaler_mean = checkpoint['scaler_mean']
     scaler_scale = checkpoint['scaler_scale']
-    print(f"\nScaler:")
+    print("\nScaler:")
     print(f"  Mean: {scaler_mean[:5]} ... (shape: {scaler_mean.shape})")
     print(f"  Scale: {scaler_scale[:5]} ... (shape: {scaler_scale.shape})")
 else:
@@ -38,7 +40,7 @@ else:
 
 # Check training stats
 if 'best_val_loss' in checkpoint:
-    print(f"\nTraining stats:")
+    print("\nTraining stats:")
     print(f"  Best val loss: {checkpoint['best_val_loss']:.4f}")
     print(f"  Best val MAE: {checkpoint['val_mae']:.2f} yards")
 
@@ -48,7 +50,7 @@ hidden_dim = args.get('hidden_dim', 64)
 dropout = args.get('dropout', 0.2)
 input_dim = len(checkpoint['feature_cols'])
 
-print(f"\nModel architecture:")
+print("\nModel architecture:")
 print(f"  Input: {input_dim} features")
 print(f"  Hidden: {hidden_dim}")
 print(f"  Dropout: {dropout}")
@@ -97,7 +99,7 @@ print(f"   Features: {test_features[0, :5]} ... (shape: {test_features.shape})")
 
 # Normalize
 X_norm = (test_features - scaler_mean) / scaler_scale
-print(f"\n2. NORMALIZED FEATURES:")
+print("\n2. NORMALIZED FEATURES:")
 print(f"   Features: {X_norm[0, :5]} ... (shape: {X_norm.shape})")
 
 # Convert to tensor
@@ -109,27 +111,27 @@ with torch.no_grad():
     mean_val = mean[0].item()
     std_val = np.exp(log_std[0].item())
 
-print(f"\n3. MODEL OUTPUT:")
+print("\n3. MODEL OUTPUT:")
 print(f"   Mean: {mean_val:.2f} yards")
 print(f"   Log std: {log_std[0].item():.4f}")
 print(f"   Std: {std_val:.2f} yards")
 
 # Check if we need to denormalize
-print(f"\n4. ANALYSIS:")
+print("\n4. ANALYSIS:")
 if abs(mean_val) < 10:
     print(f"   ⚠️  Mean is very small ({mean_val:.2f} yards)")
-    print(f"   Possible issues:")
-    print(f"   1. Target variable was normalized but not denormalized")
-    print(f"   2. Model is predicting on normalized scale")
-    print(f"   3. Training bug - model didn't learn properly")
+    print("   Possible issues:")
+    print("   1. Target variable was normalized but not denormalized")
+    print("   2. Model is predicting on normalized scale")
+    print("   3. Training bug - model didn't learn properly")
 elif abs(mean_val - 240) > 100:
     print(f"   ⚠️  Mean is far from typical values ({mean_val:.2f} yards)")
-    print(f"   Expected: ~240 yards for Mahomes")
+    print("   Expected: ~240 yards for Mahomes")
 else:
-    print(f"   ✓ Prediction looks reasonable")
+    print("   ✓ Prediction looks reasonable")
 
 # Check model weights
-print(f"\n5. MODEL WEIGHTS:")
+print("\n5. MODEL WEIGHTS:")
 print(f"   fc1 weight_mu mean: {model.fc1.weight_mu.mean().item():.6f}")
 print(f"   fc1 weight_mu std: {model.fc1.weight_mu.std().item():.6f}")
 print(f"   yards_mean weight_mu mean: {model.yards_mean.weight_mu.mean().item():.6f}")

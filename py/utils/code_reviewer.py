@@ -45,14 +45,12 @@ Integration:
 """
 
 import ast
-import os
+import logging
 import re
 import subprocess
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -86,14 +84,14 @@ class ReviewIssue:
     category: IssueCategory
     title: str
     description: str
-    suggestion: Optional[str] = None
-    code_snippet: Optional[str] = None
+    suggestion: str | None = None
+    code_snippet: str | None = None
 
 
 @dataclass
 class ReviewReport:
     """Comprehensive code review report."""
-    issues: List[ReviewIssue] = field(default_factory=list)
+    issues: list[ReviewIssue] = field(default_factory=list)
     files_reviewed: int = 0
     lines_reviewed: int = 0
     critical_count: int = 0
@@ -228,7 +226,7 @@ class CodeReviewer:
         ],
     }
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """
         Initialize code reviewer.
 
@@ -251,7 +249,7 @@ class CodeReviewer:
 
         logger.info(f"CodeReviewer initialized for {project_root}")
 
-    def review_file(self, file_path: str) -> List[ReviewIssue]:
+    def review_file(self, file_path: str) -> list[ReviewIssue]:
         """
         Review a single file.
 
@@ -284,7 +282,7 @@ class CodeReviewer:
             logger.debug(f"Skipping unsupported file type: {file_path}")
             return []
 
-    def _review_python(self, path: Path) -> List[ReviewIssue]:
+    def _review_python(self, path: Path) -> list[ReviewIssue]:
         """Review Python file for issues."""
         issues = []
 
@@ -328,7 +326,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_data_leakage(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+    def _check_data_leakage(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
         """Check for data leakage patterns."""
         issues = []
 
@@ -377,7 +375,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_security(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+    def _check_security(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
         """Check for security vulnerabilities."""
         issues = []
 
@@ -426,7 +424,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_bayesian(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+    def _check_bayesian(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
         """Check Bayesian modeling patterns."""
         issues = []
 
@@ -484,7 +482,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_python_quality(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+    def _check_python_quality(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
         """Check Python code quality."""
         issues = []
 
@@ -527,7 +525,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_python_ast(self, path: Path, tree: ast.AST) -> List[ReviewIssue]:
+    def _check_python_ast(self, path: Path, tree: ast.AST) -> list[ReviewIssue]:
         """AST-based Python checks."""
         issues = []
 
@@ -546,7 +544,7 @@ class CodeReviewer:
 
         return issues
 
-    def _review_r(self, path: Path) -> List[ReviewIssue]:
+    def _review_r(self, path: Path) -> list[ReviewIssue]:
         """Review R file for issues."""
         issues = []
 
@@ -586,7 +584,7 @@ class CodeReviewer:
 
         return issues
 
-    def _review_sql(self, path: Path) -> List[ReviewIssue]:
+    def _review_sql(self, path: Path) -> list[ReviewIssue]:
         """Review SQL file for issues."""
         issues = []
 
@@ -628,7 +626,7 @@ class CodeReviewer:
 
         return issues
 
-    def _check_sql_schema_errors(self, path: Path, content: str, lines: List[str]) -> List[ReviewIssue]:
+    def _check_sql_schema_errors(self, path: Path, content: str, lines: list[str]) -> list[ReviewIssue]:
         """
         Check for project-specific SQL schema errors.
 
@@ -679,7 +677,7 @@ class CodeReviewer:
 
         return issues
 
-    def _review_latex(self, path: Path) -> List[ReviewIssue]:
+    def _review_latex(self, path: Path) -> list[ReviewIssue]:
         """Review LaTeX file for issues."""
         issues = []
 
@@ -706,12 +704,12 @@ class CodeReviewer:
 
         return issues
 
-    def _review_javascript(self, path: Path) -> List[ReviewIssue]:
+    def _review_javascript(self, path: Path) -> list[ReviewIssue]:
         """Review JavaScript file for issues."""
         # Placeholder for JavaScript review
         return []
 
-    def _review_shell(self, path: Path) -> List[ReviewIssue]:
+    def _review_shell(self, path: Path) -> list[ReviewIssue]:
         """Review shell script for issues."""
         issues = []
 
@@ -783,14 +781,14 @@ class CodeReviewer:
         report_lines.append("=" * 80)
         report_lines.append(f"\nFiles Reviewed: {self.report.files_reviewed}")
         report_lines.append(f"Lines Reviewed: {self.report.lines_reviewed}")
-        report_lines.append(f"\nIssues Found:")
+        report_lines.append("\nIssues Found:")
         report_lines.append(f"  CRITICAL: {self.report.critical_count}")
         report_lines.append(f"  HIGH:     {self.report.high_count}")
         report_lines.append(f"  MEDIUM:   {self.report.medium_count}")
         report_lines.append(f"  LOW:      {self.report.low_count}")
 
         if self.report.has_blocking_issues():
-            report_lines.append(f"\n⛔ CRITICAL ISSUES FOUND - BLOCKING COMMIT/MERGE")
+            report_lines.append("\n⛔ CRITICAL ISSUES FOUND - BLOCKING COMMIT/MERGE")
 
         # Group issues by severity
         for severity in [Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW]:

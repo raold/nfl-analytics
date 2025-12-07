@@ -3,12 +3,12 @@
 Generate heavy computational tasks for Redis queue to stress test the system.
 """
 
-import uuid
+import logging
 import random
+import time
+
 from py.compute.redis_task_queue import RedisTaskQueue
 from py.compute.task_queue import TaskPriority
-import time
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

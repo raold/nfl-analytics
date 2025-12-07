@@ -47,6 +47,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backtest.baseline_glm import DEFAULT_FEATURE_COLUMNS as GLM_FEATURES
+
 from models.state_space import StateSpaceRatings
 
 # ----------------------------------------------------------------------------

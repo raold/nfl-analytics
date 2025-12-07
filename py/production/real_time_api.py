@@ -15,7 +15,6 @@ import json
 import logging
 from datetime import datetime
 
-import numpy as np
 import redis
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from psycopg2.pool import SimpleConnectionPool

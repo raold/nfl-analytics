@@ -9,12 +9,12 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-from functools import wraps
-from typing import Optional, List, Dict, Any, Callable
 import hashlib
 import json
 import logging
-from datetime import datetime, timedelta
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ def cache_game_prediction(ttl_seconds: int = DEFAULT_TTL_SECONDS):
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(game_id: str, season: int, week: int, **kwargs) -> Dict[str, Any]:
+        def wrapper(game_id: str, season: int, week: int, **kwargs) -> dict[str, Any]:
             # Skip caching if Redis unavailable
             if not REDIS_AVAILABLE:
                 logger.debug(f"Cache disabled, executing: {game_id}")
@@ -118,10 +118,10 @@ def cache_game_prediction(ttl_seconds: int = DEFAULT_TTL_SECONDS):
 
 
 def invalidate_game_cache(
-    game_id: Optional[str] = None,
-    season: Optional[int] = None,
-    week: Optional[int] = None,
-    pattern: Optional[str] = None
+    game_id: str | None = None,
+    season: int | None = None,
+    week: int | None = None,
+    pattern: str | None = None
 ) -> int:
     """
     Invalidate cached game predictions.
@@ -164,10 +164,10 @@ def invalidate_game_cache(
     elif season and week:
         # Invalidate all games in a specific week
         # Pattern: game_pred:*_{season}_{week}_*
-        scan_pattern = f"game_pred:*"  # Must scan all (hash prevents pattern matching)
+        scan_pattern = "game_pred:*"  # Must scan all (hash prevents pattern matching)
     elif season:
         # Invalidate all games in a season
-        scan_pattern = f"game_pred:*"  # Must scan all
+        scan_pattern = "game_pred:*"  # Must scan all
     else:
         # Invalidate all game predictions
         scan_pattern = "game_pred:*"
@@ -212,7 +212,7 @@ def invalidate_game_cache(
         return 0
 
 
-def get_cache_stats() -> Dict[str, Any]:
+def get_cache_stats() -> dict[str, Any]:
     """
     Get cache statistics for monitoring.
 

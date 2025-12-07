@@ -37,7 +37,6 @@ Date: November 13, 2025
 import logging
 import threading
 from contextlib import contextmanager
-from typing import Dict, Optional
 
 import psycopg2
 from psycopg2 import pool
@@ -173,7 +172,7 @@ class DatabasePoolManager:
     def execute_query(
         self,
         query: str,
-        params: Optional[tuple] = None,
+        params: tuple | None = None,
         fetchone: bool = False,
         fetchall: bool = True,
     ):
@@ -206,7 +205,7 @@ class DatabasePoolManager:
     def execute_query_dict(
         self,
         query: str,
-        params: Optional[tuple] = None,
+        params: tuple | None = None,
     ) -> list:
         """
         Execute query and return results as list of dicts.
@@ -235,7 +234,7 @@ class DatabasePoolManager:
             self.pool.closeall()
             logger.info("All connections closed")
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """
         Get pool statistics.
 
@@ -262,7 +261,7 @@ class DatabasePoolManager:
 
 
 # Singleton instance for global access
-_global_pool: Optional[DatabasePoolManager] = None
+_global_pool: DatabasePoolManager | None = None
 
 
 def get_default_pool() -> DatabasePoolManager:

@@ -22,17 +22,15 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import hashlib
 import os
 import time
-import hashlib
-import pytest
-import numpy as np
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock, call
 from datetime import datetime
+from unittest.mock import Mock, patch
+
+import pytest
 
 from py.production.ab_test_router import ABTestRouter
-
 
 # ============================================================================
 # UNIT TESTS - Router Logic and Hashing

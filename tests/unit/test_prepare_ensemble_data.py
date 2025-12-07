@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.409058
 Test count: 11
 """
 
+import pytest
 from ensemble.prepare_ensemble_data import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_spread_to_prob_basic():

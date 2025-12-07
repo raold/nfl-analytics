@@ -86,7 +86,7 @@ def generate_predictions(
     print(f"\nPredictions saved to: {output_path}")
 
     # Print summary stats
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total games: {len(predictions_df)}")
     print(f"  Mean prediction: {predictions_df['prediction'].mean():.4f}")
     print(f"  Accuracy: {(predictions_df['prediction'] >= 0.5).eq(predictions_df['target']).mean():.4f}")
@@ -125,7 +125,7 @@ def main():
     # Load model config
     print("Loading model configuration...")
     config_path = Path(args.config)
-    with open(config_path, "r") as f:
+    with open(config_path) as f:
         config = json.load(f)
 
     print(f"  Config: q={config['q']}, r={config['r']}, hfa={config['hfa_init']}")

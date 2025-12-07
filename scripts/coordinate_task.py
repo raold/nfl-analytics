@@ -32,16 +32,13 @@ Examples:
 """
 
 import argparse
-import json
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.utils.agent_coordinator import (
-    AgentCoordinator,
     AgentType,
     get_coordinator,
 )
@@ -64,7 +61,7 @@ def analyze_task(args):
     print(f"PRIMARY AGENT: {primary.name}")
     print(f"  Confidence: {routing.confidence:.1%}")
     print(f"  Description: {primary.description}")
-    print(f"  Responsibilities:")
+    print("  Responsibilities:")
     for resp in primary.responsibilities[:5]:
         print(f"    • {resp}")
     if len(primary.responsibilities) > 5:
@@ -72,7 +69,7 @@ def analyze_task(args):
 
     # Supporting agents
     if routing.supporting_agents:
-        print(f"\nSUPPORTING AGENTS:")
+        print("\nSUPPORTING AGENTS:")
         for agent_type in routing.supporting_agents:
             agent = coordinator.get_agent_info(agent_type)
             score = routing.context["scores"][agent_type]
@@ -80,12 +77,12 @@ def analyze_task(args):
 
     # Suggested workflow
     workflow = coordinator.suggest_workflow(routing.primary_agent)
-    print(f"\nSUGGESTED WORKFLOW:")
+    print("\nSUGGESTED WORKFLOW:")
     print(f"  {' → '.join([coordinator.get_agent_info(a).name for a in workflow])}")
 
     # Detailed scores (if verbose)
     if args.verbose:
-        print(f"\nDETAILED SCORES:")
+        print("\nDETAILED SCORES:")
         for agent_type, score in sorted(
             routing.context["scores"].items(),
             key=lambda x: x[1],
@@ -146,7 +143,7 @@ def show_agent_info(args):
 
     if capability.dependencies:
         deps = [coordinator.get_agent_info(d).name for d in capability.dependencies]
-        print(f"\nDependencies:")
+        print("\nDependencies:")
         for dep in deps:
             print(f"  • {dep}")
 
@@ -190,7 +187,7 @@ def show_workflow(args):
         marker = " ← PRIMARY AGENT" if is_primary else ""
         print(f"  {i}. {agent.name}{marker}")
         if not is_primary:
-            print(f"     └─ Dependency: provides required data/services")
+            print("     └─ Dependency: provides required data/services")
 
     print("\n" + "=" * 80 + "\n")
 

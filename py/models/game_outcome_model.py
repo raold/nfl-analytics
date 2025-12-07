@@ -60,14 +60,12 @@ import time
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import psycopg2
 import shap
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from py.features.game_feature_extractor import GameFeatureExtractor
@@ -129,8 +127,8 @@ class GameOutcomeModel:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: Optional[str] = None,
-        model_dir: Optional[str] = None
+        db_password: str | None = None,
+        model_dir: str | None = None
     ):
         """
         Initialize game outcome model.
@@ -183,7 +181,7 @@ class GameOutcomeModel:
 
         logger.info(f"GameOutcomeModel initialized (models dir: {self.model_dir})")
 
-    def _fetch_training_data(self, seasons: List[int]) -> pd.DataFrame:
+    def _fetch_training_data(self, seasons: list[int]) -> pd.DataFrame:
         """
         Fetch training data from database for specified seasons.
 
@@ -290,10 +288,10 @@ class GameOutcomeModel:
 
     def train(
         self,
-        seasons: List[int],
+        seasons: list[int],
         validation_split: float = 0.2,
         tune_hyperparameters: bool = False
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Train XGBoost models on historical game data.
 
@@ -422,7 +420,7 @@ class GameOutcomeModel:
         away_team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict game outcome (spread, total, win probability).
 
@@ -491,7 +489,7 @@ class GameOutcomeModel:
 
         return result
 
-    def validate(self, holdout_season: int) -> Dict[str, float]:
+    def validate(self, holdout_season: int) -> dict[str, float]:
         """
         Validate model performance on holdout season.
 
@@ -621,7 +619,7 @@ class GameOutcomeModel:
         # Return top N
         return df_importance.head(top_n)
 
-    def save_models(self, suffix: Optional[str] = None):
+    def save_models(self, suffix: str | None = None):
         """
         Save trained models to disk.
 
@@ -659,7 +657,7 @@ class GameOutcomeModel:
         logger.info(f"  - Win Prob: {win_prob_path.name}")
         logger.info(f"  - Metadata: {metadata_path.name}")
 
-    def load_models(self, suffix: Optional[str] = None):
+    def load_models(self, suffix: str | None = None):
         """
         Load trained models from disk.
 

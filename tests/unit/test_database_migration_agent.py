@@ -14,27 +14,24 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import json
 import os
 import tempfile
-import unittest
-from datetime import datetime
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
 # Import agent (with conditional import for CI environments)
 try:
     from py.utils.database_migration_agent import (
-        DatabaseMigrationAgent,
         ColumnInfo,
+        DatabaseMigrationAgent,
+        DriftReport,
         ForeignKeyInfo,
         IndexInfo,
+        MigrationResult,
         ValidationError,
         ValidationReport,
-        MigrationResult,
-        DriftReport
     )
     AGENT_AVAILABLE = True
 except ImportError:

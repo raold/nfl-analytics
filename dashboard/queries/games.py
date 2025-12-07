@@ -7,16 +7,20 @@ Author: Claude Code
 Date: November 2025
 """
 
-from typing import Optional, List
-import pandas as pd
 import logging
+
+import pandas as pd
 import psycopg
 
 logger = logging.getLogger(__name__)
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -109,7 +113,7 @@ class GameQueries:
         conn,
         season: int,
         week: int
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Get list of teams with bye weeks (no games scheduled).
 
@@ -313,7 +317,7 @@ class GameQueries:
     def games_by_team(
         conn,
         team: str,
-        season: Optional[int] = None
+        season: int | None = None
     ) -> pd.DataFrame:
         """
         Fetch all games for a specific team.

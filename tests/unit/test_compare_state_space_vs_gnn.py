@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.476092
 Test count: 15
 """
 
+import pytest
 from analysis.compare_state_space_vs_gnn import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_load_metrics_basic():

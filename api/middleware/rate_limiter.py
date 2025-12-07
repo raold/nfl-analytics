@@ -14,17 +14,17 @@ Author: Claude Code
 Date: 2025-11-15
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Optional, Dict, Callable
+from collections.abc import Callable
 from datetime import datetime
 
-from fastapi import Request, Response, status
+from fastapi import Request, status
 from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 from redis import Redis
 from redis.exceptions import RedisError
+from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
 
@@ -46,11 +46,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app,
-        redis_client: Optional[Redis] = None,
+        redis_client: Redis | None = None,
         default_limit: int = 100,
         window_seconds: int = 3600,
-        identifier_func: Optional[Callable] = None,
-        endpoint_limits: Optional[Dict[str, int]] = None
+        identifier_func: Callable | None = None,
+        endpoint_limits: dict[str, int] | None = None
     ):
         """
         Initialize rate limiter
@@ -72,7 +72,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Fallback to in-memory if Redis unavailable
         self._redis_available = self._check_redis()
-        self._memory_store: Dict[str, list] = {}  # Fallback storage
+        self._memory_store: dict[str, list] = {}  # Fallback storage
 
         if not self._redis_available:
             logger.warning(
@@ -324,7 +324,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         return is_allowed, remaining, reset_time
 
-    def get_usage_stats(self, identifier: str, endpoint: str) -> Dict:
+    def get_usage_stats(self, identifier: str, endpoint: str) -> dict:
         """
         Get current usage statistics for identifier/endpoint
 
@@ -381,7 +381,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
 
 def create_rate_limiter(
-    redis_client: Optional[Redis] = None,
+    redis_client: Redis | None = None,
     default_limit: int = 100,
     window_seconds: int = 3600
 ) -> RateLimitMiddleware:

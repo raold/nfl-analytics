@@ -13,13 +13,13 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import psycopg
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, roc_auc_score, log_loss
 import json
 from pathlib import Path
+
+import pandas as pd
+import psycopg
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 
 DB_CONFIG = {
     "host": "localhost",
@@ -87,11 +87,11 @@ def test_spread_only(df):
     auc = roc_auc_score(y_test, y_pred_proba)
     logloss = log_loss(y_test, y_pred_proba)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Accuracy: {acc:.3f} ({acc*100:.1f}%)")
     print(f"  AUC: {auc:.3f}")
     print(f"  Log Loss: {logloss:.3f}")
-    print(f"  Expected: 48-52% (market efficiency baseline)")
+    print("  Expected: 48-52% (market efficiency baseline)")
 
     status = "✓ PASS" if acc < 0.54 else "✗ FAIL (possible leakage)"
     print(f"\n  Status: {status}")
@@ -128,11 +128,11 @@ def test_spread_and_total(df):
     auc = roc_auc_score(y_test, y_pred_proba)
     logloss = log_loss(y_test, y_pred_proba)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Accuracy: {acc:.3f} ({acc*100:.1f}%)")
     print(f"  AUC: {auc:.3f}")
     print(f"  Log Loss: {logloss:.3f}")
-    print(f"  Expected: 49-53%")
+    print("  Expected: 49-53%")
 
     status = "✓ PASS" if acc < 0.55 else "✗ FAIL (possible leakage)"
     print(f"\n  Status: {status}")

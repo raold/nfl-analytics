@@ -30,12 +30,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.causal_features_v1 import CausalFeaturesV1
-from py.features.player_aggregation_features import (
-    aggregate_player_projections_multi_season
-)
+from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.oc_features import OCFeatureGenerator
+from py.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
     level=logging.INFO,
@@ -150,7 +148,7 @@ class XGBoostV5Clean:
         logger.info(f"Loaded {len(df)} QB games from {df['player_id'].nunique()} players")
         logger.info(f"  Seasons: {self.start_season}-{self.end_season}")
         logger.info(f"  Date range: {df['kickoff'].min()} to {df['kickoff'].max()}")
-        logger.info(f"  ✓ NO same-game features loaded (leakage prevented)")
+        logger.info("  ✓ NO same-game features loaded (leakage prevented)")
 
         return df
 
@@ -203,7 +201,7 @@ class XGBoostV5Clean:
         # Enhanced Travel Features
         logger.info("\n2. Enhanced Travel Features...")
         df_with_travel = self.travel_features.calculate_all_features(df_with_agg)
-        logger.info(f"   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
+        logger.info("   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
         logger.info(f"   Shape after travel: {df_with_travel.shape}")
 
         # Causal Features + Weather
@@ -233,7 +231,7 @@ class XGBoostV5Clean:
         # Merge causal features
         causal_df = pd.DataFrame(causal_features_list)
         df_with_causal = pd.concat([df_with_travel, causal_df], axis=1)
-        logger.info(f"   ✓ Added causal + weather features")
+        logger.info("   ✓ Added causal + weather features")
         logger.info(f"   Shape after causal: {df_with_causal.shape}")
 
         # Add rest features (if not already present)
@@ -267,7 +265,7 @@ class XGBoostV5Clean:
         # Merge OC features
         oc_df = pd.DataFrame(oc_features_list)
         df_with_oc = pd.concat([df_with_causal.reset_index(drop=True), oc_df], axis=1)
-        logger.info(f"   ✓ Added 4 OC coaching features")
+        logger.info("   ✓ Added 4 OC coaching features")
         logger.info(f"   Shape after OC features: {df_with_oc.shape}")
 
         logger.info(f"\n✓ Feature engineering complete: {df_with_oc.shape[1]} total columns")
@@ -333,7 +331,7 @@ class XGBoostV5Clean:
         logger.info(f"  Causal+weather: {len([f for f in causal_features if f in df.columns])}")
         logger.info(f"  Rest: {len([f for f in rest_features if f in df.columns])}")
         logger.info(f"  OC coaching: {len([f for f in oc_features if f in df.columns])}")
-        logger.info(f"  ✓ ZERO same-game features (leakage prevented)")
+        logger.info("  ✓ ZERO same-game features (leakage prevented)")
 
         return feature_cols
 
@@ -411,10 +409,10 @@ class XGBoostV5Clean:
 
         logger.info(f"Training with {len(X_train)} samples...")
         logger.info(f"  Features: {X_train.shape[1]}")
-        logger.info(f"  Hyperparameters:")
+        logger.info("  Hyperparameters:")
         logger.info(f"    max_depth={params['max_depth']}, lr={params['learning_rate']}")
         logger.info(f"    gamma={params['gamma']}, alpha={params['reg_alpha']}, lambda={params['reg_lambda']}")
-        logger.info(f"  ✓ Strong regularization to prevent overfitting")
+        logger.info("  ✓ Strong regularization to prevent overfitting")
 
         # Train model
         model = xgb.XGBRegressor(**params)
@@ -592,7 +590,7 @@ def main():
     X_test = df_features.loc[test_mask, feature_cols]
     y_test = df_features.loc[test_mask, 'passing_yards']
 
-    logger.info(f"\nTrain/Test Split:")
+    logger.info("\nTrain/Test Split:")
     logger.info(f"  Training: {len(X_train)} samples (2020-2023)")
     logger.info(f"  Test: {len(X_test)} samples (2024)")
 
@@ -613,11 +611,11 @@ def main():
     logger.info("✓ XGBOOST V5.1 CLEAN TRAINING COMPLETE")
     logger.info("=" * 80)
     logger.info(f"Finished: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    logger.info(f"\nFinal Results:")
+    logger.info("\nFinal Results:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards (expected: 30-40 yards)")
     logger.info(f"  Improvement over baseline: {metrics['improvement_pct']:.1f}%")
     logger.info(f"  R²: {metrics['r2']:.3f}")
-    logger.info(f"  ✅ No data leakage: All features are prior-game only")
+    logger.info("  ✅ No data leakage: All features are prior-game only")
 
     return model, metrics
 

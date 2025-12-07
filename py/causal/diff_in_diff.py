@@ -4,11 +4,11 @@ Difference-in-Differences (DiD) Estimator
 Implements two-way fixed effects regression for causal inference.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, Tuple
-import statsmodels.formula.api as smf
 import logging
+
+import numpy as np
+import pandas as pd
+import statsmodels.formula.api as smf
 
 logger = logging.getLogger(__name__)
 
@@ -27,9 +27,9 @@ class DiffInDiffEstimator:
         treatment: str,
         unit_fe: str = 'player_id',
         time_fe: str = 'week',
-        controls: Optional[list] = None,
-        cluster_var: Optional[str] = None
-    ) -> Tuple[float, float, float, Dict]:
+        controls: list | None = None,
+        cluster_var: str | None = None
+    ) -> tuple[float, float, float, dict]:
         """
         Estimate DiD with two-way fixed effects.
 
@@ -100,7 +100,7 @@ class DiffInDiffEstimator:
         treatment: str,
         time_var: str = 'week',
         pre_periods: int = 4
-    ) -> Dict:
+    ) -> dict:
         """
         Test parallel trends assumption using event study.
 

@@ -7,7 +7,7 @@ Author: Claude Code
 Date: November 2025
 """
 
-from typing import Optional
+
 import pandas as pd
 
 
@@ -45,7 +45,7 @@ class ModelQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def model_by_id(conn, model_id: int) -> Optional[pd.DataFrame]:
+    def model_by_id(conn, model_id: int) -> pd.DataFrame | None:
         """
         Fetch single model from registry by ID.
 
@@ -111,7 +111,7 @@ class ModelQueries:
     @staticmethod
     def training_runs(
         conn,
-        model_id: Optional[int] = None,
+        model_id: int | None = None,
         limit: int = 10
     ) -> pd.DataFrame:
         """
@@ -152,7 +152,7 @@ class ModelQueries:
     def latest_training_run(
         conn,
         model_id: int
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Fetch latest training run for a specific model.
 

@@ -4,15 +4,16 @@ Full historical backtest of all trained models on 1999-2025 dataset.
 Calculates actual betting ROI with Kelly criterion and simulates bankroll growth.
 """
 
+import json
+import warnings
+from pathlib import Path
+
+import joblib
 import numpy as np
 import pandas as pd
 import psycopg2
 import xgboost as xgb
-import joblib
-import json
-from pathlib import Path
-from scipy.stats import norm
-import warnings
+
 warnings.filterwarnings('ignore')
 
 print("=" * 70)
@@ -128,13 +129,13 @@ def kelly_criterion(p_win, odds=1.91, fraction=0.25):
     """
     if p_win <= 0 or p_win >= 1:
         return 0
-    
+
     q = 1 - p_win
     edge = (p_win * odds - 1)
-    
+
     if edge <= 0:
         return 0
-    
+
     kelly = (p_win * odds - 1) / odds
     return min(kelly * fraction, 0.1)  # Cap at 10% of bankroll
 
@@ -148,15 +149,15 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
     history = []
     bets_placed = 0
     bets_won = 0
-    
+
     for i, (pred, actual, spread) in enumerate(zip(predictions, actuals, spreads)):
         if pd.isna(pred) or pd.isna(spread):
             continue
-            
+
         # Calculate edge
         market_prob = 1 / (1 + np.exp(spread / 7.0)) if spread < 0 else 1 - 1 / (1 + np.exp(-spread / 7.0))
         edge = pred - market_prob
-        
+
         # Only bet if we have an edge
         if abs(edge) > min_edge:
             # Determine bet direction
@@ -166,10 +167,10 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
             else:  # Bet away
                 bet_prob = 1 - pred
                 win = actual == 0
-            
+
             # Calculate bet size
             bet_size = kelly_criterion(bet_prob, 1.91, kelly_fraction) * bankroll
-            
+
             if bet_size > 0:
                 bets_placed += 1
                 if win:
@@ -177,7 +178,7 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
                     bets_won += 1
                 else:
                     bankroll -= bet_size
-                
+
                 history.append({
                     'game': i,
                     'bankroll': bankroll,
@@ -186,7 +187,7 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
                     'win': win,
                     'roi': (bankroll - initial_bankroll) / initial_bankroll
                 })
-    
+
     return history, {
         'total_bets': bets_placed,
         'wins': bets_won,
@@ -201,37 +202,37 @@ def calculate_max_drawdown(history):
     """Calculate maximum drawdown from peak."""
     if not history:
         return 0
-    
+
     bankrolls = [h['bankroll'] for h in history]
     peak = bankrolls[0]
     max_dd = 0
-    
+
     for b in bankrolls:
         peak = max(peak, b)
         dd = (peak - b) / peak
         max_dd = max(max_dd, dd)
-    
+
     return max_dd
 
 def calculate_sharpe(history, risk_free_rate=0.02):
     """Calculate Sharpe ratio."""
     if len(history) < 2:
         return 0
-    
+
     returns = []
     for i in range(1, len(history)):
         r = (history[i]['bankroll'] - history[i-1]['bankroll']) / history[i-1]['bankroll']
         returns.append(r)
-    
+
     if not returns:
         return 0
-    
+
     avg_return = np.mean(returns)
     std_return = np.std(returns)
-    
+
     if std_return == 0:
         return 0
-    
+
     return (avg_return - risk_free_rate/252) / std_return * np.sqrt(252)
 
 # Run backtest for each model
@@ -250,7 +251,7 @@ if 'xgboost' in models:
     try:
         dtest = xgb.DMatrix(X)
         xgb_preds = models['xgboost'].predict(dtest)
-        
+
         # Run backtest
         history, stats = simulate_betting(
             xgb_preds[df['season'] >= 2020],
@@ -259,14 +260,14 @@ if 'xgboost' in models:
             min_edge=0.02,
             kelly_fraction=0.25
         )
-        
+
         backtest_results['xgboost'] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
         print(f"  Max Drawdown: {stats['max_drawdown']:.1%}")
         print(f"  Sharpe Ratio: {stats['sharpe_ratio']:.2f}")
-        
+
     except Exception as e:
         print(f"  Error: {e}")
 
@@ -275,7 +276,7 @@ if 'state_space' in models:
     print("\nState-Space Backtest:")
     try:
         ss_preds = models['state_space']
-        
+
         # Merge predictions with actual games
         merged = pd.merge(
             df[df['season'] >= 2020],
@@ -283,7 +284,7 @@ if 'state_space' in models:
             on='game_id',
             how='left'
         )
-        
+
         # Run backtest
         history, stats = simulate_betting(
             merged['win_prob'].values,
@@ -292,14 +293,14 @@ if 'state_space' in models:
             min_edge=0.02,
             kelly_fraction=0.25
         )
-        
+
         backtest_results['state_space'] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
         print(f"  Max Drawdown: {stats['max_drawdown']:.1%}")
         print(f"  Sharpe Ratio: {stats['sharpe_ratio']:.2f}")
-        
+
     except Exception as e:
         print(f"  Error: {e}")
 
@@ -308,21 +309,21 @@ print("\nEnsemble Backtest (Average):")
 try:
     ensemble_preds = []
     valid_models = 0
-    
+
     # Collect all predictions
     if 'xgboost' in models:
         xgb_preds_subset = xgb_preds[df['season'] >= 2020]
         ensemble_preds.append(xgb_preds_subset)
         valid_models += 1
-    
+
     if 'state_space' in models and 'merged' in locals():
         ensemble_preds.append(merged['win_prob'].fillna(0.5).values)
         valid_models += 1
-    
+
     if valid_models > 0:
         # Average predictions
         ensemble_avg = np.mean(ensemble_preds, axis=0)
-        
+
         # Run backtest
         history, stats = simulate_betting(
             ensemble_avg,
@@ -331,14 +332,14 @@ try:
             min_edge=0.015,  # Lower threshold for ensemble
             kelly_fraction=0.3  # Slightly higher Kelly for ensemble
         )
-        
+
         backtest_results['ensemble'] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
         print(f"  Max Drawdown: {stats['max_drawdown']:.1%}")
         print(f"  Sharpe Ratio: {stats['sharpe_ratio']:.2f}")
-        
+
 except Exception as e:
     print(f"  Error: {e}")
 
@@ -357,7 +358,7 @@ for model_name, stats in backtest_results.items():
     print(f"  Total Bets: {stats['total_bets']}")
     print(f"  Win Rate: {stats['win_rate']:.1%}")
     print(f"  Sharpe: {stats['sharpe_ratio']:.2f}")
-    
+
     if stats['total_roi'] > best_roi:
         best_roi = stats['total_roi']
         best_model = model_name

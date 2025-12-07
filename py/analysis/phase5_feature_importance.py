@@ -14,9 +14,7 @@ import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.ensemble.game_outcome_ensemble import fetch_games
@@ -227,11 +225,11 @@ def analyze_feature_importance(train_seasons: list[int], output_dir: Path):
     print(f"\n{'='*80}")
     print("BASELINE VS PHASE 5 COMPARISON")
     print(f"{'='*80}")
-    print(f"\nBaseline Features:")
+    print("\nBaseline Features:")
     print(f"  Count: {len(baseline_features)}")
     print(f"  Total Importance: {baseline_features['composite_score'].sum():.1f}")
     print(f"  Avg Importance: {baseline_features['composite_score'].mean():.1f}")
-    print(f"\nPhase 5 Features:")
+    print("\nPhase 5 Features:")
     print(f"  Count: {len(phase5_features)}")
     print(f"  Total Importance: {phase5_features['composite_score'].sum():.1f}")
     print(f"  Avg Importance: {phase5_features['composite_score'].mean():.1f}")
@@ -239,8 +237,8 @@ def analyze_feature_importance(train_seasons: list[int], output_dir: Path):
     print(f"\n{'='*80}")
     print("ANALYSIS SUMMARY")
     print(f"{'='*80}")
-    print(f"\n✓ Feature importance analysis complete")
-    print(f"✓ Identified top 10 Phase 5 features for optimized model")
+    print("\n✓ Feature importance analysis complete")
+    print("✓ Identified top 10 Phase 5 features for optimized model")
     print(f"✓ Results saved to {output_dir}")
 
     return importance_df

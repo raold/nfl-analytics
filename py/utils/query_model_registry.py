@@ -34,16 +34,13 @@ Date: November 9, 2025
 """
 
 import json
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import click
 import psycopg2
 from psycopg2.extras import DictCursor
 from tabulate import tabulate
-
 
 # Database connection parameters
 DB_CONFIG = {
@@ -185,7 +182,7 @@ def list(status, training_window, model_type, model_family, production_only, lim
         "duration": "training_duration_seconds DESC",
     }
     query += f" ORDER BY {sort_field_map[sort_by]}"
-    query += f" LIMIT %s"
+    query += " LIMIT %s"
     params.append(limit)
 
     try:

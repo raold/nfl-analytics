@@ -19,7 +19,6 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import psycopg2
@@ -71,7 +70,7 @@ class GameOutcomePredictor:
 
     def _get_starting_qb(
         self, team: str, season: int, week: int, conn
-    ) -> Optional[Dict[str, any]]:
+    ) -> dict[str, any] | None:
         """
         Get starting QB for a team in a given week.
 
@@ -256,7 +255,7 @@ class GameOutcomePredictor:
 
     def _predict_qb_yards(
         self, player_id: str, season: int, week: int
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Predict QB passing yards using Ensemble v6.1.
 
@@ -345,7 +344,7 @@ class GameOutcomePredictor:
 
     def predict_game(
         self, home_team: str, away_team: str, season: int, week: int
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Predict full game outcome.
 

@@ -9,12 +9,12 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import pytest
-import numpy as np
-from typing import Dict, List
 
-from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+import numpy as np
+import pytest
+
 from py.ensemble.strategy.base import ModelPrediction, ModelType
+from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
 
 class TestWeightedAverageStrategy:

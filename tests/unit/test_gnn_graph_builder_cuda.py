@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.016025
 Test count: 31
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.gnn_graph_builder import *
-import pandas as pd
-import pytest
 
 
 def test_normalize_team_abbr_basic():

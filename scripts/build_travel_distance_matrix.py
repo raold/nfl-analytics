@@ -9,13 +9,13 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 16, 2025
 """
 
-import os
-import sys
-import math
 import json
-import pandas as pd
-import numpy as np
+import math
+import sys
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -340,7 +340,7 @@ def main():
     print("=" * 80)
     print("SUMMARY")
     print("=" * 80)
-    print(f"Stadium distance matrix: 32 x 32 teams")
+    print("Stadium distance matrix: 32 x 32 teams")
     print(f"Longest distance: {validation['max_distance']} miles")
     print(f"Shortest distance: {validation['min_distance']} miles")
     print(f"Coast-to-coast pairs: {len(validation['coast_to_coast'])}")
@@ -348,7 +348,7 @@ def main():
     print("Files created:")
     for filename in output_files.keys():
         print(f"  - data/{filename}")
-    print(f"  - data/distance_matrix_validation.json")
+    print("  - data/distance_matrix_validation.json")
     print()
     print("✓ Distance matrix build complete!")
 

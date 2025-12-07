@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:29.059152
 Test count: 9
 """
 
-from backtest.test_ensemble_fixes import *
-from hypothesis import given
-from hypothesis import strategies as st
-import pandas as pd
 import pytest
+from backtest.test_ensemble_fixes import *
 
 
 def test_test_temperature_scaling_basic():

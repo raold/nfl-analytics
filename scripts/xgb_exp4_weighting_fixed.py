@@ -38,19 +38,19 @@ Date: November 14, 2025
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import json
 import logging
-import pandas as pd
+import time
+
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
-import time
-import json
 
 logging.basicConfig(
     level=logging.INFO,
@@ -144,7 +144,7 @@ def calculate_sample_weights(df):
     mean_epa = df.loc[train_mask, 'opp_def_epa_exp'].mean()
     std_epa = df.loc[train_mask, 'opp_def_epa_exp'].std()
 
-    logger.info(f"  Opponent EPA stats (training 2018-2024):")
+    logger.info("  Opponent EPA stats (training 2018-2024):")
     logger.info(f"    Mean: {mean_epa:.3f}")
     logger.info(f"    Std: {std_epa:.3f}")
 
@@ -233,7 +233,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     logger.info(f"Training samples: {len(X_train):,}")
     logger.info(f"Test samples: {len(X_test):,}")
     logger.info(f"Features: {len(feature_names)}")
-    logger.info(f"Using sample weights: Yes (based on opponent defensive strength)")
+    logger.info("Using sample weights: Yes (based on opponent defensive strength)")
     logger.info("="*70)
 
     # XGBoost hyperparameters (tuned for passing yards)
@@ -250,7 +250,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
         'eval_metric': 'mae'
     }
 
-    logger.info(f"\nHyperparameters:")
+    logger.info("\nHyperparameters:")
     for key, val in params.items():
         logger.info(f"  {key}: {val}")
 
@@ -300,14 +300,14 @@ def train_and_evaluate(X_train, y_train, X_test, y_test,
     logger.info(f"90th percentile error: {p90_error:.2f} yards")
     logger.info(f"Training time: {train_time:.1f}s")
 
-    logger.info(f"\nBaseline comparisons:")
-    logger.info(f"  v2 baseline (with opponent features): 40.20 yards")
-    logger.info(f"  v3.1 baseline (no opponent features): 41.36 yards")
+    logger.info("\nBaseline comparisons:")
+    logger.info("  v2 baseline (with opponent features): 40.20 yards")
+    logger.info("  v3.1 baseline (no opponent features): 41.36 yards")
 
     improvement_v2 = ((40.20 - mae) / 40.20) * 100
     improvement_v31 = ((41.36 - mae) / 41.36) * 100
 
-    logger.info(f"\nImprovement:")
+    logger.info("\nImprovement:")
     logger.info(f"  vs v2 baseline: {improvement_v2:+.2f}%")
     logger.info(f"  vs v3.1 baseline: {improvement_v31:+.2f}%")
 

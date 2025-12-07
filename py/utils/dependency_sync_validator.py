@@ -14,9 +14,8 @@ import json
 import logging
 import re
 import subprocess
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,7 +37,7 @@ class SyncReport:
     rpy2_compatible: bool
     r_packages_synced: bool
     python_packages_synced: bool
-    issues: List[DependencyIssue]
+    issues: list[DependencyIssue]
 
     @property
     def is_healthy(self) -> bool:
@@ -103,7 +102,7 @@ class DependencySyncValidator:
             issues=issues
         )
 
-    def _check_rpy2_compat(self) -> Tuple[bool, Optional[DependencyIssue]]:
+    def _check_rpy2_compat(self) -> tuple[bool, DependencyIssue | None]:
         """Check rpy2 version compatible with R version."""
         try:
             # Get R version
@@ -149,13 +148,13 @@ class DependencySyncValidator:
             logger.warning(f"Could not check rpy2 compatibility: {e}")
             return True, None
 
-    def _check_r_packages(self) -> Tuple[bool, List[DependencyIssue]]:
+    def _check_r_packages(self) -> tuple[bool, list[DependencyIssue]]:
         """Check R packages match renv.lock."""
         if not self.renv_lock.exists():
             return True, []
 
         try:
-            with open(self.renv_lock, 'r') as f:
+            with open(self.renv_lock) as f:
                 lockfile = json.load(f)
 
             packages_expected = lockfile.get('Packages', {})
@@ -200,7 +199,7 @@ class DependencySyncValidator:
             logger.warning(f"Could not check R packages: {e}")
             return True, []
 
-    def _check_python_packages(self) -> Tuple[bool, List[DependencyIssue]]:
+    def _check_python_packages(self) -> tuple[bool, list[DependencyIssue]]:
         """Check Python packages match requirements.txt."""
         # Simplified - just check key packages exist
         key_packages = {

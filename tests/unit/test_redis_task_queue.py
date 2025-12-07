@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.142116
 Test count: 32
 """
 
+import pytest
 from compute.redis_task_queue import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_register_machine_basic():

@@ -14,6 +14,7 @@ Date: November 14, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
@@ -63,10 +64,10 @@ def example_2_integrated_backtest():
 
     Shows how to integrate health monitoring into backtest workflow.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
-    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
     import pandas as pd
-    import numpy as np
+
+    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 2: Integrated Backtest with Health Monitoring")
@@ -147,8 +148,9 @@ def example_3_continuous_monitoring():
 
     Shows how to track predictions in production for drift detection.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
     import numpy as np
+
+    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 3: Continuous Monitoring")
@@ -199,7 +201,7 @@ def example_3_continuous_monitoring():
     logger.info("\n" + "=" * 80)
     logger.info("DRIFT DETECTION RESULTS")
     logger.info("=" * 80)
-    logger.info(f"Component: hierarchical_v2")
+    logger.info("Component: hierarchical_v2")
     logger.info(f"Mean shift: {drift.mean_shift:+.1f} yards")
     logger.info(f"Std shift: {drift.std_shift:+.1f}")
     logger.info(f"MAE drift: {drift.mae_drift:+.1f}%")

@@ -33,19 +33,19 @@ Expected Runtime: ~20 minutes
 """
 
 import sys
-import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pandas as pd
+import json
+import time
+
 import numpy as np
+import pandas as pd
+import xgboost as xgb
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-import xgboost as xgb
 from sqlalchemy import create_engine
-import time
-import json
 
 # Configuration
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -102,7 +102,7 @@ def load_data():
         engine.dispose()
     except Exception as e:
         print(f"✗ FAILED to load data: {e}")
-        print(f"  Ensure PostgreSQL is running and database is initialized")
+        print("  Ensure PostgreSQL is running and database is initialized")
         sys.exit(1)
 
     print(f"✓ Loaded {len(df):,} total rows")
@@ -113,7 +113,7 @@ def load_data():
 
     # Show season distribution
     print(f"  - Seasons: {df['season'].min()}-{df['season'].max()}")
-    print(f"  - Season distribution:")
+    print("  - Season distribution:")
     for season, count in df['season'].value_counts().sort_index().items():
         print(f"      {season}: {count:,} games")
 
@@ -122,7 +122,7 @@ def load_data():
         'opp_def_epa_exp': df['opp_def_epa_exp'].notna().mean(),
         'opp_pass_def_rank': df['opp_pass_def_rank'].notna().mean()
     }
-    print(f"\n  - Opponent feature coverage:")
+    print("\n  - Opponent feature coverage:")
     for feat, cov in opp_coverage.items():
         print(f"      {feat}: {cov*100:.1f}%")
 
@@ -172,9 +172,9 @@ def create_defensive_clusters(train_df):
     cluster_data['cluster'] = cluster_assignments
 
     # Analyze cluster characteristics
-    print(f"\n  Cluster Analysis:")
+    print("\n  Cluster Analysis:")
     print(f"  {'Tier':<8} {'Count':<10} {'EPA Mean':<12} {'EPA Std':<12} {'Rank Mean':<12}")
-    print(f"  " + "-" * 54)
+    print("  " + "-" * 54)
 
     for tier in range(N_CLUSTERS):
         tier_data = cluster_data[cluster_data['cluster'] == tier]
@@ -343,7 +343,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
 
     # Predictions
     print(f"  ✓ Completed in {train_time:.1f}s\n")
-    print(f"  Getting predictions...")
+    print("  Getting predictions...")
     y_pred = model.predict(X_test)
 
     # Metrics
@@ -370,7 +370,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, feature_names):
     improvement_abs = BASELINE_MAE - mae
     improvement_pct = (improvement_abs / BASELINE_MAE) * 100
 
-    print(f"\nComparison to v2 baseline:")
+    print("\nComparison to v2 baseline:")
     print(f"  Δ MAE: {improvement_abs:+.2f} yards ({improvement_pct:+.1f}%)")
 
     if mae < BASELINE_MAE:

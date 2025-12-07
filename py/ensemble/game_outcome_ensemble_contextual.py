@@ -245,7 +245,7 @@ class ContextualGameOutcomeEnsemble(CalibratedGameOutcomeEnsemble):
         self.nn_model.fit(X_train_scaled, train_target)
         nn_train_preds = self.nn_model.predict_proba(X_train_scaled)[:, 1]
 
-        print(f"  ✓ Base models trained")
+        print("  ✓ Base models trained")
 
         # ====================================================================
         # Component 5: CONTEXTUAL Meta-Learner
@@ -268,7 +268,7 @@ class ContextualGameOutcomeEnsemble(CalibratedGameOutcomeEnsemble):
         ])
 
         print(f"  Meta-learner input: {meta_features_train.shape[1]} features")
-        print(f"    - 4 model predictions")
+        print("    - 4 model predictions")
         print(f"    - {len(self.context_features)} context features")
 
         # Fit meta-learner with context
@@ -284,7 +284,7 @@ class ContextualGameOutcomeEnsemble(CalibratedGameOutcomeEnsemble):
 
         print(f"  Train Brier: {contextual_train_metrics['brier']:.4f}")
         print(f"  Train Accuracy: {contextual_train_metrics['accuracy']:.1%}")
-        print(f"  ✓ Contextual meta-learner trained")
+        print("  ✓ Contextual meta-learner trained")
 
         # ====================================================================
         # Component 6: Isotonic Calibrator (on validation set)

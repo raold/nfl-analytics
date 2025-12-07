@@ -38,19 +38,20 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 12, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
-import logging
 import json
+import logging
 import time
-from pathlib import Path
-from typing import Dict, List, Tuple, Any
+from collections import defaultdict, deque
 from datetime import datetime
-from collections import deque, defaultdict
 from itertools import product
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -73,7 +74,7 @@ logger = logging.getLogger(__name__)
 
 def load_player_stats_by_week(
     season: int,
-    db_params: Dict[str, str],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """Load player passing stats by week"""
@@ -193,7 +194,7 @@ def engineer_features(df: pd.DataFrame, enhanced: bool = False) -> pd.DataFrame:
     return df
 
 
-def compute_static_baseline(df: pd.DataFrame, season: int) -> Dict[str, float]:
+def compute_static_baseline(df: pd.DataFrame, season: int) -> dict[str, float]:
     """Compute static XGBoost baseline (proper comparison)"""
     logger.info(f"Computing static XGBoost baseline for {season}...")
 
@@ -233,7 +234,7 @@ def run_prequential_evaluation(
     df: pd.DataFrame,
     model: Any,
     season: int,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Run prequential evaluation with any incremental model"""
 
     exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id',
@@ -290,7 +291,7 @@ def run_prequential_evaluation(
 # APPROACH 1: Window Size Tuning
 # =============================================================================
 
-def approach_1_window_tuning(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_1_window_tuning(df: pd.DataFrame, season: int) -> list[dict]:
     """Test different sliding window sizes"""
     logger.info("=" * 60)
     logger.info("APPROACH 1: WINDOW SIZE TUNING")
@@ -323,7 +324,7 @@ def approach_1_window_tuning(df: pd.DataFrame, season: int) -> List[Dict]:
 # APPROACH 2: Retrain Frequency Tuning
 # =============================================================================
 
-def approach_2_retrain_frequency(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_2_retrain_frequency(df: pd.DataFrame, season: int) -> list[dict]:
     """Test different retraining frequencies"""
     logger.info("=" * 60)
     logger.info("APPROACH 2: RETRAIN FREQUENCY TUNING")
@@ -356,7 +357,7 @@ def approach_2_retrain_frequency(df: pd.DataFrame, season: int) -> List[Dict]:
 # APPROACH 3: XGBoost Hyperparameter Optimization
 # =============================================================================
 
-def approach_3_hyperparameter_optimization(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_3_hyperparameter_optimization(df: pd.DataFrame, season: int) -> list[dict]:
     """Grid search over XGBoost hyperparameters"""
     logger.info("=" * 60)
     logger.info("APPROACH 3: XGBOOST HYPERPARAMETER OPTIMIZATION")
@@ -418,7 +419,7 @@ class WarmStartIncrementalXGBoost(IncrementalXGBoost):
         self.warm_start_size = warm_start_size
         self.warm_start_complete = False
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         self.window.append((x, y))
         self.counter += 1
 
@@ -433,7 +434,7 @@ class WarmStartIncrementalXGBoost(IncrementalXGBoost):
             self._retrain()
 
 
-def approach_4_warm_start(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_4_warm_start(df: pd.DataFrame, season: int) -> list[dict]:
     """Test different warm-start sizes"""
     logger.info("=" * 60)
     logger.info("APPROACH 4: WARM-START OPTIMIZATION")
@@ -477,11 +478,11 @@ class IncrementalEnsemble:
         ]
         self.n_models = n_models
 
-    def predict_one(self, x: Dict[str, float]) -> float:
+    def predict_one(self, x: dict[str, float]) -> float:
         preds = [model.predict_one(x) for model in self.models]
         return np.mean(preds)
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         for model in self.models:
             model.learn_one(x, y)
 
@@ -493,7 +494,7 @@ class IncrementalXGBoostWithSeed(IncrementalXGBoost):
         self.params['random_state'] = random_state
 
 
-def approach_5_ensemble(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_5_ensemble(df: pd.DataFrame, season: int) -> list[dict]:
     """Test ensemble of incremental models"""
     logger.info("=" * 60)
     logger.info("APPROACH 5: ENSEMBLE OF INCREMENTAL MODELS")
@@ -552,7 +553,7 @@ def approach_5_ensemble(df: pd.DataFrame, season: int) -> List[Dict]:
 # APPROACH 6: Hybrid Static-Incremental
 # =============================================================================
 
-def approach_6_hybrid(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_6_hybrid(df: pd.DataFrame, season: int) -> list[dict]:
     """Blend static XGBoost with incremental XGBoost"""
     logger.info("=" * 60)
     logger.info("APPROACH 6: HYBRID STATIC-INCREMENTAL")
@@ -631,7 +632,7 @@ def approach_6_hybrid(df: pd.DataFrame, season: int) -> List[Dict]:
 # APPROACH 7: Feature Engineering for Incremental
 # =============================================================================
 
-def approach_7_temporal_features(df: pd.DataFrame, season: int) -> Dict[str, Any]:
+def approach_7_temporal_features(df: pd.DataFrame, season: int) -> dict[str, Any]:
     """Test incremental XGBoost with temporal features"""
     logger.info("=" * 60)
     logger.info("APPROACH 7: TEMPORAL FEATURE ENGINEERING")
@@ -669,12 +670,12 @@ class AdaptiveIncrementalXGBoost(IncrementalXGBoost):
         self.error_threshold = error_threshold
         self.last_pred = None
 
-    def predict_one(self, x: Dict[str, float]) -> float:
+    def predict_one(self, x: dict[str, float]) -> float:
         pred = super().predict_one(x)
         self.last_pred = pred
         return pred
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         # Track error
         if self.last_pred is not None:
             error = abs(y - self.last_pred)
@@ -700,7 +701,7 @@ class AdaptiveIncrementalXGBoost(IncrementalXGBoost):
         return recent_mae > historical_mae * self.error_threshold
 
 
-def approach_8_adaptive_retraining(df: pd.DataFrame, season: int) -> List[Dict]:
+def approach_8_adaptive_retraining(df: pd.DataFrame, season: int) -> list[dict]:
     """Test adaptive retraining thresholds"""
     logger.info("=" * 60)
     logger.info("APPROACH 8: ADAPTIVE RETRAINING")

@@ -4,12 +4,11 @@ Treatment Definitions for Causal Inference
 Defines treatment events and exposure variables for causal analysis.
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Optional, Dict, Tuple
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 import logging
+from dataclasses import dataclass
+from datetime import datetime
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class TreatmentEvent:
     treatment_date: datetime
     season: int
     week: int
-    metadata: Dict = None
+    metadata: dict = None
 
 
 class TreatmentDefiner:
@@ -68,7 +67,7 @@ class TreatmentDefiner:
     def define_coaching_change_treatment(
         self,
         df: pd.DataFrame,
-        coach_changes: List[Tuple[str, int, int]]
+        coach_changes: list[tuple[str, int, int]]
     ) -> pd.DataFrame:
         """
         Define coaching change treatment.
@@ -126,7 +125,7 @@ class TreatmentDefiner:
         self,
         df: pd.DataFrame,
         treatment_col: str
-    ) -> List[TreatmentEvent]:
+    ) -> list[TreatmentEvent]:
         """
         Extract list of treatment events from panel.
 

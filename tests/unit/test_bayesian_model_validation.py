@@ -20,12 +20,10 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
+
 import numpy as np
 import pandas as pd
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-import json
-
 
 # ============================================================================
 # FIXTURES

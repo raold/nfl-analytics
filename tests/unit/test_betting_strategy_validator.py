@@ -21,11 +21,10 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 9, 2025
 """
 
+
 import numpy as np
 import pandas as pd
 import pytest
-from unittest.mock import Mock, patch
-
 
 # ============================================================================
 # FIXTURES
@@ -308,7 +307,7 @@ def test_kelly_with_edge():
         kelly = (win_prob * b - (1 - win_prob)) / b
 
         # Kelly should increase with edge
-        assert kelly > 0, f"Positive edge should give positive Kelly"
+        assert kelly > 0, "Positive edge should give positive Kelly"
 
 
 def test_fractional_kelly():

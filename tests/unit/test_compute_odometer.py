@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.196594
 Test count: 52
 """
 
+import pytest
 from compute.compute_odometer import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_calculate_cumulative_roi_basic():

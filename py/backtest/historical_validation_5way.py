@@ -28,17 +28,16 @@ Updated: November 13, 2025 (Performance optimization: vectorized processing)
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
 import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from typing import Dict, List, Tuple
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import time
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logging.basicConfig(
     level=logging.INFO,
@@ -86,8 +85,8 @@ class HistoricalValidator:
 
         # Initialize tracking
         self.bankroll = initial_bankroll
-        self.positions: List[Dict] = []
-        self.daily_bankroll: List[Dict] = []
+        self.positions: list[dict] = []
+        self.daily_bankroll: list[dict] = []
 
         # Connect to database
         self.conn = psycopg2.connect(
@@ -204,7 +203,7 @@ class HistoricalValidator:
 
         return max(bet_size, 0)
 
-    def process_game(self, row: pd.Series) -> Dict:
+    def process_game(self, row: pd.Series) -> dict:
         """Process a single player-game and generate prediction."""
         try:
             # Determine if home or away
@@ -374,18 +373,18 @@ class HistoricalValidator:
         # Convert to DataFrame
         results_df = pd.DataFrame(positions)
 
-        logger.info(f"\n✅ Backtest complete!")
+        logger.info("\n✅ Backtest complete!")
         logger.info(f"  Total positions: {len(results_df)}")
         logger.info(f"  Filtered out: {failed_count} (no edge or bet size too small)")
         logger.info(f"  Processing time: {elapsed:.1f}s ({len(games_df)/elapsed:.1f} games/sec)")
-        logger.info(f"  Performance gain: ~50-100x faster than iterrows()")
+        logger.info("  Performance gain: ~50-100x faster than iterrows()")
         logger.info(f"  Starting bankroll: ${self.initial_bankroll:,.2f}")
         logger.info(f"  Ending bankroll: ${self.bankroll:,.2f}")
         logger.info(f"  Profit: ${self.bankroll - self.initial_bankroll:,.2f}")
 
         return results_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame) -> dict:
         """Calculate performance metrics."""
         if len(results_df) == 0:
             logger.error("No positions to analyze!")
@@ -452,7 +451,7 @@ class HistoricalValidator:
 
         return metrics
 
-    def print_summary(self, metrics: Dict):
+    def print_summary(self, metrics: dict):
         """Print validation summary."""
         logger.info("\n" + "="*80)
         logger.info("HISTORICAL VALIDATION RESULTS")
@@ -462,33 +461,33 @@ class HistoricalValidator:
             logger.error("❌ No metrics to display (0 positions created)")
             return
 
-        logger.info(f"\n📊 Dataset:")
+        logger.info("\n📊 Dataset:")
         logger.info(f"  Seasons: {self.start_season} - {self.end_season} (week {self.end_week})")
         logger.info(f"  Total Bets: {metrics['total_bets']}")
         logger.info(f"  CQL Bet Sizing: {'✅ Enabled' if self.use_cql else '❌ Disabled'}")
 
-        logger.info(f"\n💰 Performance:")
+        logger.info("\n💰 Performance:")
         logger.info(f"  Win Rate: {metrics['win_rate_pct']:.2f}% ({metrics['wins']}/{metrics['wins']+metrics['losses']})")
         logger.info(f"  ROI: {metrics['roi_pct']:+.2f}%")
         logger.info(f"  Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
         logger.info(f"  Max Drawdown: {metrics['max_drawdown_pct']:.2f}%")
 
-        logger.info(f"\n📈 Bankroll:")
+        logger.info("\n📈 Bankroll:")
         logger.info(f"  Starting: ${metrics['starting_bankroll']:,.2f}")
         logger.info(f"  Ending: ${metrics['ending_bankroll']:,.2f}")
         logger.info(f"  Profit: ${metrics['profit']:,.2f} ({metrics['profit_pct']:+.2f}%)")
 
-        logger.info(f"\n🎯 Calibration:")
+        logger.info("\n🎯 Calibration:")
         logger.info(f"  90% CI Coverage: {metrics['calibration_90_pct']:.2f}% (target: 85-95%)")
         logger.info(f"  MAE (Ensemble): {metrics['mae_ensemble']:.2f} yards")
 
-        logger.info(f"\n💵 Bet Sizing:")
+        logger.info("\n💵 Bet Sizing:")
         logger.info(f"  Average: ${metrics['avg_bet_size']:.2f}")
         logger.info(f"  Median: ${metrics['median_bet_size']:.2f}")
         logger.info(f"  Total Wagered: ${metrics['total_wagered']:,.2f}")
 
         # Compare to targets
-        logger.info(f"\n🎯 Target Comparison:")
+        logger.info("\n🎯 Target Comparison:")
         roi_status = "✅" if metrics['roi_pct'] >= 7 else "⚠️" if metrics['roi_pct'] >= 5 else "❌"
         logger.info(f"  {roi_status} ROI: {metrics['roi_pct']:.2f}% (target: 7-10%)")
 

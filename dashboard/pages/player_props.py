@@ -5,19 +5,17 @@ Player Props Dashboard
 Shows QB passing yards predictions vs sportsbook lines with edge analysis.
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import psycopg
-from datetime import datetime, timedelta
-import numpy as np
-import sys
-import os
 import logging
-from pathlib import Path
+import os
+import sys
 from contextlib import contextmanager
+from pathlib import Path
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import psycopg
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +34,11 @@ except ImportError:
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False

@@ -13,30 +13,29 @@ Author: Claude Code (Phase 4 Dissertation Enhancement)
 Created: November 9, 2025
 """
 
-import sys
 import os
-import unittest
-from unittest.mock import Mock, patch, MagicMock
+import sys
 import tempfile
-import json
+import unittest
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
 
 from py.online.online_learning_adapter import (
+    AdaptiveRetrainer,
     DriftDetector,
     DriftEvent,
     OnlineModelAdapter,
     OnlinePredictionPipeline,
-    AdaptiveRetrainer,
     PerformanceMetrics,
+    calculate_adaptation_speed,
     compare_online_vs_static,
     detect_known_drift_events,
-    calculate_adaptation_speed,
 )
 
 

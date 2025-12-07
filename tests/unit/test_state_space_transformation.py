@@ -9,7 +9,6 @@ See: STATE_SPACE_COMPREHENSIVE_DIAGNOSIS.md (Bug A1: Unit Mismatch)
 """
 
 import numpy as np
-import pytest
 
 
 def test_lognormal_transformation_math():
@@ -95,7 +94,7 @@ def test_transformation_vs_no_transformation():
     # Calculate underestimation
     underestimation_factor = fixed_mean / buggy_mean
 
-    print(f"\n✓ Bug Demonstration:")
+    print("\n✓ Bug Demonstration:")
     print(f"  BUGGY:  {buggy_mean:.1f} ± {buggy_std:.1f} yards (treats log-scale as yards)")
     print(f"  FIXED:  {fixed_mean:.1f} ± {fixed_std:.1f} yards (correct transformation)")
     print(f"  Underestimation: {underestimation_factor:.1f}x  ({fixed_mean/buggy_mean:.1f}× too small!)")

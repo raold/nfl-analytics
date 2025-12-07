@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.609988
 Test count: 35
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from predictions.predict_tnf import *
-import pandas as pd
-import pytest
 
 
 def test_load_model_basic():

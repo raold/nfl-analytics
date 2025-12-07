@@ -15,18 +15,15 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 19, 2025
 """
 
-import os
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import pytest
+
 import pandas as pd
-import numpy as np
+import pytest
 
 # Add project root
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 # ============================================================================

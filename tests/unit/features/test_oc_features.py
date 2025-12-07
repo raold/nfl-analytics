@@ -21,13 +21,14 @@ Author: Claude Code (Opus 4.5)
 Date: November 27, 2025
 """
 
-import unittest
-from unittest.mock import MagicMock, patch
 import math
 
 # Add project root to path
 import sys
+import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from py.features.oc_features import OCFeatureGenerator
@@ -326,7 +327,7 @@ class TestBulkFeatures(unittest.TestCase):
 
         # Verify each result has 4 features
         for key, features in bulk_results.items():
-            self.assertEqual(len(features), 4, f"Each result should have 4 features")
+            self.assertEqual(len(features), 4, "Each result should have 4 features")
 
     def test_bulk_features_with_metadata(self):
         """Bulk features with metadata should include OC names."""

@@ -17,15 +17,13 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
+import json
+import logging
 import subprocess
 import sys
 import time
-import logging
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 from pathlib import Path
-import json
-import tempfile
 
 try:
     from py.utils.claude_cache import get_default_cache
@@ -45,7 +43,7 @@ class RServiceConfig:
     timeout_seconds: int = 300  # 5 minutes default
     max_retries: int = 3
     retry_backoff_seconds: float = 2.0
-    required_packages: List[str] = None
+    required_packages: list[str] = None
 
     def __post_init__(self):
         if self.required_packages is None:
@@ -59,9 +57,9 @@ class RServiceConfig:
 class RServiceHealth:
     """R service health status."""
     is_healthy: bool
-    r_version: Optional[str] = None
-    missing_packages: List[str] = None
-    error_message: Optional[str] = None
+    r_version: str | None = None
+    missing_packages: list[str] = None
+    error_message: str | None = None
     check_time: float = 0.0
 
     def __post_init__(self):
@@ -111,10 +109,10 @@ class RService:
         ```
     """
 
-    def __init__(self, config: Optional[RServiceConfig] = None):
+    def __init__(self, config: RServiceConfig | None = None):
         """Initialize R service with configuration."""
         self.config = config or RServiceConfig()
-        self._last_health_check: Optional[RServiceHealth] = None
+        self._last_health_check: RServiceHealth | None = None
         self._health_check_cache_seconds = 300  # 5 minutes
 
         # Initialize Redis cache for R prediction results
@@ -228,9 +226,9 @@ class RService:
     def execute(
         self,
         r_code: str,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         retry: bool = True,
-        env: Optional[Dict[str, str]] = None
+        env: dict[str, str] | None = None
     ) -> subprocess.CompletedProcess:
         """
         Execute R code with retry logic and timeout handling.
@@ -307,8 +305,8 @@ class RService:
     def execute_script(
         self,
         script_path: Path,
-        args: Optional[List[str]] = None,
-        timeout: Optional[int] = None,
+        args: list[str] | None = None,
+        timeout: int | None = None,
         retry: bool = True
     ) -> subprocess.CompletedProcess:
         """
@@ -376,7 +374,7 @@ class RService:
         model_path: Path,
         newdata_csv: Path,
         output_csv: Path,
-        timeout: Optional[int] = None
+        timeout: int | None = None
     ) -> Path:
         """
         High-performance batch prediction using R model.
@@ -436,11 +434,11 @@ class RService:
     def execute_with_cache(
         self,
         r_code: str,
-        cache_key: Optional[str] = None,
+        cache_key: str | None = None,
         cache_ttl: int = 21600,  # 6 hours default
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         retry: bool = True,
-        env: Optional[Dict[str, str]] = None
+        env: dict[str, str] | None = None
     ) -> subprocess.CompletedProcess:
         """
         Execute R code with Redis caching support.
@@ -542,7 +540,7 @@ class RService:
 
 
 # Singleton instance for easy access
-_default_service: Optional[RService] = None
+_default_service: RService | None = None
 
 
 def get_r_service() -> RService:
@@ -599,7 +597,7 @@ if __name__ == "__main__":
         }, indent=2))
     else:
         print(f"\n{'='*60}")
-        print(f"R SERVICE HEALTH CHECK")
+        print("R SERVICE HEALTH CHECK")
         print(f"{'='*60}")
         print(f"Status: {'✓ HEALTHY' if health.is_healthy else '✗ UNHEALTHY'}")
         print(f"R Version: {health.r_version}")
@@ -609,7 +607,7 @@ if __name__ == "__main__":
             for pkg in health.missing_packages:
                 print(f"  - {pkg}")
         else:
-            print(f"\n✓ All required packages available")
+            print("\n✓ All required packages available")
 
         if health.error_message:
             print(f"\nError: {health.error_message}")

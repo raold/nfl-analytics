@@ -15,12 +15,9 @@ Date: 2025-10-30
 
 import argparse
 import json
-import multiprocessing as mp
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -204,7 +201,7 @@ def run_three_way_comparison(
     opt_vs_baseline_sharpe = optimized_summary["sharpe_ratio"] - baseline_summary["sharpe_ratio"]
     opt_vs_baseline_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (baseline_summary["final_bankroll"] - initial_bankroll)
 
-    print(f"\nOPTIMIZED vs BASELINE:")
+    print("\nOPTIMIZED vs BASELINE:")
     print(f"  ROI Improvement: {opt_vs_baseline_roi:+.2%}")
     print(f"  Win Rate Improvement: {opt_vs_baseline_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {opt_vs_baseline_sharpe:+.2f}")
@@ -215,7 +212,7 @@ def run_three_way_comparison(
     opt_vs_enhanced_sharpe = optimized_summary["sharpe_ratio"] - enhanced_summary["sharpe_ratio"]
     opt_vs_enhanced_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (enhanced_summary["final_bankroll"] - initial_bankroll)
 
-    print(f"\nOPTIMIZED vs ENHANCED:")
+    print("\nOPTIMIZED vs ENHANCED:")
     print(f"  ROI Improvement: {opt_vs_enhanced_roi:+.2%}")
     print(f"  Win Rate Improvement: {opt_vs_enhanced_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {opt_vs_enhanced_sharpe:+.2f}")
@@ -236,19 +233,19 @@ def run_three_way_comparison(
     print(f"  Optimized: {optimized_summary['total_return']:+.1%} ({optimized_summary['n_trades']} trades)")
 
     if best_roi_model == "OPTIMIZED":
-        print(f"\n✓ SUCCESS! Optimized model beat both baseline and enhanced")
-        print(f"  Feature selection + regularization WORKED")
-        print(f"  Key insight: Less features + strong regularization > more features")
+        print("\n✓ SUCCESS! Optimized model beat both baseline and enhanced")
+        print("  Feature selection + regularization WORKED")
+        print("  Key insight: Less features + strong regularization > more features")
     elif best_roi_model == "BASELINE":
-        print(f"\n⚠  Baseline still best - Phase 5 features didn't help")
-        print(f"  Possible reasons:")
-        print(f"    - Phase 5 features not predictive for this time period")
-        print(f"    - Regularization too strong")
-        print(f"    - Need different feature combinations")
+        print("\n⚠  Baseline still best - Phase 5 features didn't help")
+        print("  Possible reasons:")
+        print("    - Phase 5 features not predictive for this time period")
+        print("    - Regularization too strong")
+        print("    - Need different feature combinations")
     else:
-        print(f"\n⚠  Enhanced model best - but with overfitting risk")
-        print(f"  99% training accuracy suggests memorization")
-        print(f"  Results may not generalize to future periods")
+        print("\n⚠  Enhanced model best - but with overfitting risk")
+        print("  99% training accuracy suggests memorization")
+        print("  Results may not generalize to future periods")
 
     # Package results
     results = {

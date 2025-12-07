@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.485871
 Test count: 16
 """
 
+import pandas as pd
+import pytest
 from data.update_live_scores import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_fetch_espn_scores_basic():

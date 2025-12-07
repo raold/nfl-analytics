@@ -4,11 +4,11 @@ Synthetic Control Method
 Constructs synthetic controls for causal inference when only one unit is treated.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, List
-from scipy.optimize import minimize
 import logging
+
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +29,8 @@ class SyntheticControl:
         time_var: str = 'week',
         unit_var: str = 'team',
         treatment_time: int = None,
-        predictors: Optional[List[str]] = None
-    ) -> Dict:
+        predictors: list[str] | None = None
+    ) -> dict:
         """
         Fit synthetic control by finding optimal weights for control units.
 

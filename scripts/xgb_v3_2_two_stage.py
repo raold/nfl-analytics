@@ -14,12 +14,12 @@ Expected runtime: 20 minutes
 Target: MAE < 40.20 (v2 baseline)
 """
 
-import pandas as pd
+import sys
+
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
-import time
-import sys
 
 # Database connection
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -111,11 +111,11 @@ def train_two_stage_models(train_df, test_df, threshold=7.0):
     test_competitive = test_df[test_df['spread_abs'] < threshold].copy()
     test_blowout = test_df[test_df['spread_abs'] >= threshold].copy()
 
-    print(f"\nTraining Split:")
+    print("\nTraining Split:")
     print(f"  Competitive (spread < {threshold}): {len(train_competitive):,}")
     print(f"  Blowout (spread >= {threshold}): {len(train_blowout):,}")
 
-    print(f"\nTest Split:")
+    print("\nTest Split:")
     print(f"  Competitive (spread < {threshold}): {len(test_competitive):,}")
     print(f"  Blowout (spread >= {threshold}): {len(test_blowout):,}")
 
@@ -193,7 +193,7 @@ def train_two_stage_models(train_df, test_df, threshold=7.0):
     print(f"Competitive Games MAE: {mae_comp:.2f} yards ({len(test_competitive)} games)")
     print(f"Blowout Games MAE: {mae_blow:.2f} yards ({len(test_blowout)} games)")
     print(f"Combined MAE: {mae_combined:.2f} yards")
-    print(f"v2 baseline: 40.20 yards")
+    print("v2 baseline: 40.20 yards")
 
     improvement_pct = ((40.20 - mae_combined) / 40.20) * 100
     print(f"Improvement: {improvement_pct:+.1f}%")

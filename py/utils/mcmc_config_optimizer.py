@@ -10,11 +10,10 @@ MCMC Configuration Optimizer - Estimates required iterations for Bayesian model 
 **Date:** November 15, 2025
 """
 
-import re
 import logging
-from pathlib import Path
-from typing import Dict, Optional, Tuple
+import re
 from dataclasses import dataclass
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -83,7 +82,7 @@ class MCMCConfigOptimizer:
         if not path.exists():
             raise FileNotFoundError(f"Script not found: {script_path}")
 
-        with open(path, 'r') as f:
+        with open(path) as f:
             content = f.read()
 
         # Extract complexity metrics
@@ -124,7 +123,7 @@ class MCMCConfigOptimizer:
             prior_strength=prior_strength
         )
 
-    def _extract_current_config(self, content: str) -> Dict[str, int]:
+    def _extract_current_config(self, content: str) -> dict[str, int]:
         """Extract current MCMC configuration."""
         config = {}
 
@@ -142,7 +141,7 @@ class MCMCConfigOptimizer:
     def _generate_recommendation(
         self,
         complexity: MCMCComplexity,
-        current_config: Dict[str, int]
+        current_config: dict[str, int]
     ) -> MCMCRecommendation:
         """Generate MCMC configuration recommendation."""
         score = complexity.complexity_score

@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.799892
 Test count: 9
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.copulas import *
-import pandas as pd
-import pytest
 
 
 def test_fit_gaussian_copula_basic():

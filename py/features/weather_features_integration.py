@@ -30,15 +30,14 @@ Task: Integrate weather features into team feature modules
 Reference: Track 7 - Weather Features Integration
 """
 
-from typing import Dict, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 
 def compute_weather_features(
     game_id: str,
-    db_config: Dict
-) -> Dict[str, float]:
+    db_config: dict
+) -> dict[str, float]:
     """
     Compute weather features for a specific game.
 

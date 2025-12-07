@@ -8,12 +8,10 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import pandas as pd
-import numpy as np
 import logging
+
+import pandas as pd
+import plotly.graph_objects as go
 
 logger = logging.getLogger(__name__)
 

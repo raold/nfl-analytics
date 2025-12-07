@@ -17,13 +17,13 @@ Date: November 26, 2025
 """
 
 import argparse
-import time
+import logging
 import random
-from typing import Dict, List, Optional, Tuple
+import time
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import logging
 
 # Setup logging
 logging.basicConfig(
@@ -109,7 +109,7 @@ class EnhancedCoachingScraper:
 
     def scrape_team_season(
         self, pfr_team: str, season: int, retry_count: int = 3
-    ) -> Optional[Dict[str, str]]:
+    ) -> dict[str, str] | None:
         """
         Scrape coaching staff for a single team-season with anti-detection measures.
 
@@ -198,7 +198,7 @@ class EnhancedCoachingScraper:
                 if e.response.status_code == 403:
                     logger.error(f"HTTP 403 Forbidden for {nfl_team} {season} - anti-bot detection triggered")
                     if attempt < retry_count - 1:
-                        logger.info(f"Waiting 30 seconds before retry...")
+                        logger.info("Waiting 30 seconds before retry...")
                         time.sleep(30)
                 else:
                     logger.error(f"HTTP error for {nfl_team} {season}: {e}")
@@ -214,7 +214,7 @@ class EnhancedCoachingScraper:
 
         return None
 
-    def _extract_coach(self, text: str, position: str) -> Optional[str]:
+    def _extract_coach(self, text: str, position: str) -> str | None:
         """
         Extract coach name for a given position from coaches text.
 
@@ -240,7 +240,7 @@ class EnhancedCoachingScraper:
                         return name
         return None
 
-    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> Optional[str]:
+    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> str | None:
         """
         Alternative method to extract coach name using HTML structure.
 
@@ -303,7 +303,7 @@ class EnhancedCoachingScraper:
         df = pd.DataFrame(all_data)
         return df
 
-    def validate_data(self, df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    def validate_data(self, df: pd.DataFrame) -> tuple[bool, list[str]]:
         """
         Validate scraped coaching data.
 
@@ -389,7 +389,7 @@ def main():
 
     # Scrape data
     logger.info(f"Starting enhanced coaching data scrape ({args.start_season}-{args.end_season})")
-    logger.info(f"Anti-detection measures: randomized delays (10-20s), rotating user agents")
+    logger.info("Anti-detection measures: randomized delays (10-20s), rotating user agents")
     logger.info(f"Teams: {len(PFR_TEAMS)} | Seasons: {args.end_season - args.start_season + 1}")
     logger.info(f"Total team-seasons: {len(PFR_TEAMS) * (args.end_season - args.start_season + 1)}")
 

@@ -27,7 +27,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -89,8 +89,8 @@ class GameOutcomePredictorV2:
 
     def __init__(
         self,
-        spread_model_path: Optional[Path] = None,
-        total_model_path: Optional[Path] = None,
+        spread_model_path: Path | None = None,
+        total_model_path: Path | None = None,
         use_ensemble_qb: bool = True,
     ):
         """
@@ -164,7 +164,7 @@ class GameOutcomePredictorV2:
 
     def _get_starting_qb(
         self, team: str, season: int, week: int, conn
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get starting QB for a team."""
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -214,7 +214,7 @@ class GameOutcomePredictorV2:
 
     def _predict_qb_yards(
         self, player_id: str, season: int, week: int
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """Predict QB passing yards using ensemble."""
         if self.ensemble is None:
             return DEFAULT_QB_YARDS, 50.0
@@ -236,8 +236,8 @@ class GameOutcomePredictorV2:
         away_team: str,
         season: int,
         week: int,
-        conn: Optional[Any] = None,
-    ) -> Dict[str, float]:
+        conn: Any | None = None,
+    ) -> dict[str, float]:
         """
         Extract all 284 features for a game.
 
@@ -301,7 +301,7 @@ class GameOutcomePredictorV2:
         away_team: str,
         season: int,
         week: int,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Predict game outcome using full feature set.
 
@@ -392,7 +392,7 @@ class GameOutcomePredictorV2:
         finally:
             conn.close()
 
-    def _heuristic_spread(self, features: Dict[str, float]) -> float:
+    def _heuristic_spread(self, features: dict[str, float]) -> float:
         """
         Heuristic spread prediction when no model available.
 
@@ -424,7 +424,7 @@ class GameOutcomePredictorV2:
 
         return float(np.clip(spread, -21, 21))
 
-    def _heuristic_total(self, features: Dict[str, float]) -> float:
+    def _heuristic_total(self, features: dict[str, float]) -> float:
         """
         Heuristic total prediction when no model available.
         """
@@ -451,8 +451,8 @@ class GameOutcomePredictorV2:
     def train_models(
         training_data: pd.DataFrame,
         output_dir: Path,
-        hyperparams: Optional[Dict] = None,
-    ) -> Dict[str, Any]:
+        hyperparams: dict | None = None,
+    ) -> dict[str, Any]:
         """
         Train spread and total prediction models.
 

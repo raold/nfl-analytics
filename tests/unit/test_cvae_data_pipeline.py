@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.481720
 Test count: 24
 """
 
+import pytest
 from data.cvae_data_pipeline import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_create_simulated_data_basic():

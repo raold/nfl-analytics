@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.218467
 Test count: 43
 """
 
+from statistics.power_analysis import *
+
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
-from statistics.power_analysis import *
-import pandas as pd
-import pytest
 
 
 def test_sample_size_calculation_basic():

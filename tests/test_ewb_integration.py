@@ -9,7 +9,6 @@ Validates end-to-end functionality:
 4. EWB deployment script
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -134,7 +133,7 @@ def test_clv_analysis():
     # Analyze CLV
     clv = tracker.analyze_clv()
 
-    print(f"\nCLV Results:")
+    print("\nCLV Results:")
     print(f"Total bets: {clv.total_bets}")
     print(f"EWB wins: {clv.ewb_wins} ({clv.ewb_wins/clv.total_bets*100:.1f}%)")
     print(f"EWB losses: {clv.ewb_losses}")
@@ -208,7 +207,7 @@ def test_integration_with_csv():
 
     # Get summary stats
     stats = tracker.get_summary_stats()
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total games: {stats['total_games']}")
     print(f"  Avg movement: {stats['avg_spread_movement']:+.2f} points")
     print(f"  Avg EWB edge: {stats['avg_ewb_edge']:.2%}")

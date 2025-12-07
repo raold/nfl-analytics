@@ -29,15 +29,15 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import logging
 import os
-import pytest
-import psycopg2
+import tempfile
+
 import numpy as np
 import pandas as pd
 import psutil
-import logging
-import tempfile
-from typing import Dict, Optional
+import psycopg2
+import pytest
 
 from py.ensemble.r_model_interface import RModelInterface
 

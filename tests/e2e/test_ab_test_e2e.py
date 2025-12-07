@@ -26,18 +26,15 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import os
 import time
-import pytest
-import numpy as np
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import Mock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 from py.production.ab_test_router import ABTestRouter
 from py.production.real_time_api import app
-
 
 # ============================================================================
 # FIXTURES

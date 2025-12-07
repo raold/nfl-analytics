@@ -28,9 +28,7 @@ from sklearn.metrics import (
     confusion_matrix,
     precision_recall_curve,
     roc_auc_score,
-    roc_curve,
 )
-from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 
 logging.basicConfig(level=logging.INFO)

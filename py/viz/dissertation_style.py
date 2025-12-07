@@ -15,12 +15,12 @@ Usage:
     save_figure(fig, 'output.png')
 """
 
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import seaborn as sns
-import numpy as np
 from pathlib import Path
-from typing import Tuple, List, Optional, Dict
+
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 # =============================================================================
 # COLOR PALETTES (#13: Colorblind-safe)
@@ -432,7 +432,7 @@ def add_risk_indicators(ax, data, var_level=0.95, cvar_level=0.95):
 
     return var, cvar
 
-def shade_event_regions(ax, events: Dict[str, Tuple[float, float]], alpha=0.1):
+def shade_event_regions(ax, events: dict[str, tuple[float, float]], alpha=0.1):
     """
     #32: Shade significant event periods (COVID, rule changes, etc.)
 

@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.999189
 Test count: 38
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.train_hierarchical_gnn import *
-import pandas as pd
-import pytest
 
 
 def test_get_gpu_stats_basic():

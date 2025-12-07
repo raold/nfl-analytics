@@ -19,7 +19,6 @@ import argparse
 import json
 import multiprocessing as mp
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -127,8 +126,8 @@ def run_comparison_backtest_optimized(
     print(f"Kelly multiplier: {kelly_multiplier}")
     print(f"Edge threshold: {edge_threshold:.1%}")
     print(f"Vig: {vig}")
-    print(f"\n🚀 OPTIMIZATION: Parallel ensemble training enabled")
-    print(f"🚀 OPTIMIZATION: XGBoost multi-threading enabled")
+    print("\n🚀 OPTIMIZATION: Parallel ensemble training enabled")
+    print("🚀 OPTIMIZATION: XGBoost multi-threading enabled")
 
     # Load data
     all_seasons = sorted(set(train_seasons + backtest_seasons))
@@ -257,7 +256,7 @@ def run_comparison_backtest_optimized(
         se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
         z_score = (p2 - p1) / se if se > 0 else 0
 
-        print(f"\nStatistical Significance:")
+        print("\nStatistical Significance:")
         print(f"  Z-score: {z_score:.2f}")
         print(f"  {'Significant at p<0.05' if abs(z_score) > 1.96 else 'Not significant at p<0.05'}")
 
@@ -272,9 +271,9 @@ def run_comparison_backtest_optimized(
         print(f"✓ Baseline model profit: ${baseline_summary['final_bankroll'] - initial_bankroll:+,.2f}")
         print(f"✓ Additional profit from Phase 5: ${profit_improvement:+,.2f}")
     else:
-        print(f"\n✗ Phase 5 features did NOT improve ROI")
+        print("\n✗ Phase 5 features did NOT improve ROI")
         print(f"  ROI change: {roi_improvement:.2%}")
-        print(f"  Possible reasons: overfitting, insufficient data, or features not capturing edge")
+        print("  Possible reasons: overfitting, insufficient data, or features not capturing edge")
 
     # Package results
     results = {

@@ -26,15 +26,14 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
 
+from py.features.market_dispersion_features import MarketDispersionFeatures
 from py.features.qb_experience_features import QBExperienceFeatures
 from py.features.roster_stability_features import RosterStabilityFeatures
-from py.features.market_dispersion_features import MarketDispersionFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -208,7 +207,7 @@ class MetaLearningContextEngine:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Query database for game context (team, opponent, stadium, weather).
 
@@ -324,7 +323,7 @@ class MetaLearningContextEngine:
 
 def extract_context_features_batch(
     player_season_weeks: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract context features for multiple player-games.

@@ -49,10 +49,7 @@ import json
 import logging
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import redis
 from psycopg2.pool import ThreadedConnectionPool
@@ -82,7 +79,7 @@ class ParallelFeatureLoader:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         use_redis: bool = True,
         n_workers: int = 8
     ):
@@ -115,7 +112,7 @@ class ParallelFeatureLoader:
             maxconn=16,
             **self.db_config
         )
-        logger.info(f"Initialized connection pool (4-16 connections)")
+        logger.info("Initialized connection pool (4-16 connections)")
 
         # Redis cache
         self.use_redis = use_redis
@@ -144,8 +141,8 @@ class ParallelFeatureLoader:
     def extract_season_features(
         self,
         season: int,
-        weeks: List[int],
-        feature_types: Optional[List[str]] = None
+        weeks: list[int],
+        feature_types: list[str] | None = None
     ) -> pd.DataFrame:
         """
         Extract features for ALL games in a season at once (batch mode).
@@ -371,7 +368,7 @@ class ParallelFeatureLoader:
         else:
             logger.info(f"No cache entries found matching '{pattern}'")
 
-    def get_cache_stats(self) -> Dict[str, int]:
+    def get_cache_stats(self) -> dict[str, int]:
         """
         Get Redis cache statistics.
 
@@ -404,7 +401,7 @@ class ParallelFeatureLoader:
     # BATCH DATA LOADING (1 query per feature type, entire season)
     # ========================================================================
 
-    def _batch_load_team_stats(self, season: int, weeks: List[int]) -> pd.DataFrame:
+    def _batch_load_team_stats(self, season: int, weeks: list[int]) -> pd.DataFrame:
         """
         Batch load ALL team stats for season (1 query).
 
@@ -443,7 +440,7 @@ class ParallelFeatureLoader:
         finally:
             self.pool.putconn(conn)
 
-    def _batch_load_vegas_lines(self, season: int, weeks: List[int]) -> pd.DataFrame:
+    def _batch_load_vegas_lines(self, season: int, weeks: list[int]) -> pd.DataFrame:
         """
         Batch load ALL vegas lines for season (1 query).
 
@@ -495,7 +492,7 @@ class ParallelFeatureLoader:
         finally:
             self.pool.putconn(conn)
 
-    def _batch_load_environmental(self, season: int, weeks: List[int]) -> pd.DataFrame:
+    def _batch_load_environmental(self, season: int, weeks: list[int]) -> pd.DataFrame:
         """
         Batch load ALL environmental data for season (1 query).
 
@@ -549,7 +546,7 @@ class ParallelFeatureLoader:
         finally:
             self.pool.putconn(conn)
 
-    def _batch_load_injuries(self, season: int, weeks: List[int]) -> pd.DataFrame:
+    def _batch_load_injuries(self, season: int, weeks: list[int]) -> pd.DataFrame:
         """
         Batch load ALL injury data for season (1 query).
 
@@ -586,9 +583,9 @@ class ParallelFeatureLoader:
 
     def _vectorized_compute_features(
         self,
-        raw_data: Dict[str, pd.DataFrame],
+        raw_data: dict[str, pd.DataFrame],
         season: int,
-        weeks: List[int]
+        weeks: list[int]
     ) -> pd.DataFrame:
         """
         Compute features using vectorized pandas operations (no row-by-row loops).

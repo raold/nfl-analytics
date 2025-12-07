@@ -5,15 +5,13 @@ Protects proprietary data integrity.
 """
 
 import os
-import sys
 from datetime import datetime
-from typing import Dict, List, Tuple
+
+import click
 import psycopg
 from psycopg.rows import dict_row
-import click
 from rich.console import Console
 from rich.table import Table
-from rich.progress import track
 
 console = Console()
 
@@ -31,7 +29,7 @@ class DataValidator:
         self.db_url = db_url
         self.issues = []
 
-    def run_all_checks(self) -> Dict:
+    def run_all_checks(self) -> dict:
         """Run all validation checks."""
         console.print("\n[bold blue]🔍 NFL Analytics Data Validation[/bold blue]\n")
 
@@ -48,7 +46,7 @@ class DataValidator:
         self.print_summary(results)
         return results
 
-    def check_duplicates(self, conn) -> Dict:
+    def check_duplicates(self, conn) -> dict:
         """Check for duplicate records in critical tables."""
         console.print("[yellow]Checking for duplicates...[/yellow]")
         duplicates = {}
@@ -78,7 +76,7 @@ class DataValidator:
         play_dups = cur.fetchall()
         if play_dups:
             duplicates['plays'] = play_dups
-            console.print(f"  ❌ Found duplicate plays")
+            console.print("  ❌ Found duplicate plays")
         else:
             console.print("  ✅ No duplicate plays")
 
@@ -95,13 +93,13 @@ class DataValidator:
         odds_dups = cur.fetchall()
         if odds_dups:
             duplicates['odds_history'] = odds_dups
-            console.print(f"  ❌ Found duplicate odds records")
+            console.print("  ❌ Found duplicate odds records")
         else:
             console.print("  ✅ No duplicate odds records")
 
         return duplicates
 
-    def check_orphans(self, conn) -> Dict:
+    def check_orphans(self, conn) -> dict:
         """Check for orphaned records (referential integrity)."""
         console.print("\n[yellow]Checking for orphaned records...[/yellow]")
         orphans = {}
@@ -139,7 +137,7 @@ class DataValidator:
 
         return orphans
 
-    def check_integrity(self, conn) -> Dict:
+    def check_integrity(self, conn) -> dict:
         """Check data integrity rules."""
         console.print("\n[yellow]Checking data integrity...[/yellow]")
         issues = {}
@@ -187,7 +185,7 @@ class DataValidator:
 
         return issues
 
-    def check_completeness(self, conn) -> Dict:
+    def check_completeness(self, conn) -> dict:
         """Check data completeness."""
         console.print("\n[yellow]Checking data completeness...[/yellow]")
         stats = {}
@@ -243,7 +241,7 @@ class DataValidator:
 
         return stats
 
-    def check_consistency(self, conn) -> Dict:
+    def check_consistency(self, conn) -> dict:
         """Check data consistency."""
         console.print("\n[yellow]Checking data consistency...[/yellow]")
         issues = {}
@@ -275,7 +273,7 @@ class DataValidator:
 
         return issues
 
-    def check_odds_coverage(self, conn) -> Dict:
+    def check_odds_coverage(self, conn) -> dict:
         """Detailed check of odds data (paid data)."""
         console.print("\n[yellow]Checking odds data coverage...[/yellow]")
 
@@ -314,7 +312,7 @@ class DataValidator:
         console.print(table)
         return {"monthly_coverage": results}
 
-    def print_summary(self, results: Dict):
+    def print_summary(self, results: dict):
         """Print validation summary."""
         console.print("\n[bold green]📊 Validation Summary[/bold green]\n")
 

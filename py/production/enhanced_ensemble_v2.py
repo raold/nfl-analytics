@@ -12,8 +12,8 @@ import logging
 from pathlib import Path
 
 import pandas as pd
-
 from py.ensemble.stacked_meta_learner import StackedMetaLearner
+
 from py.optimization.portfolio_optimizer import BetOpportunity, CorrelatedPortfolioOptimizer
 
 logging.basicConfig(level=logging.INFO)

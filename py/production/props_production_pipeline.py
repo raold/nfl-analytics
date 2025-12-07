@@ -48,8 +48,8 @@ sys.path.append(str(Path(__file__).parent.parent))
 from data.fetch_prop_odds import PropOddsFetcher
 from features.player_features import PlayerFeatureEngineer
 from models.props_predictor import PropsPredictor
-from production.props_ev_selector import PropsEVSelector
 from production.paper_trader import PaperTradingEngine
+from production.props_ev_selector import PropsEVSelector
 
 logging.basicConfig(
     level=logging.INFO,
@@ -573,7 +573,7 @@ class PropsPipeline:
 
         # Get current session metrics
         metrics = self.paper_trader.get_performance_metrics()
-        logger.info(f"   Session metrics:")
+        logger.info("   Session metrics:")
         logger.info(f"     Total bets: {metrics['total_bets']}")
         logger.info(f"     Pending: {metrics['pending_bets']}")
         logger.info(f"     Bankroll: ${metrics['current_bankroll']:,.2f}")
@@ -673,7 +673,7 @@ class PropsPipeline:
 
         if self.paper_trade and "paper_trades_placed" in self.stats:
             logger.info(f"Paper trades placed: {self.stats['paper_trades_placed']}")
-            logger.info(f"View dashboard: http://localhost:8501 (Paper Trading page)")
+            logger.info("View dashboard: http://localhost:8501 (Paper Trading page)")
 
         logger.info("=" * 80 + "\n")
 

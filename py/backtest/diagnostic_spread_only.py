@@ -6,12 +6,13 @@ Expected: 52-53% win rate (random + market info, minus vig)
 If >55%: Confirms data leakage in feature pipeline
 """
 
-import numpy as np
-import pandas as pd
+import warnings
 from pathlib import Path
+
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-import warnings
+
 warnings.filterwarnings('ignore')
 
 print("=" * 70)
@@ -84,6 +85,6 @@ print(f"[INFO] Intercept:   {model.intercept_[0]:.4f}")
 # Baseline comparison
 baseline_acc = y_cover[test_mask].mean()  # Home team cover rate
 print(f"\n[BASELINE] Home team covers spread: {baseline_acc:.1%}")
-print(f"[BASELINE] Random guessing: 50.0%")
+print("[BASELINE] Random guessing: 50.0%")
 
 print("\n" + "=" * 70)

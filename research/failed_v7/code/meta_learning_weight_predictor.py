@@ -25,11 +25,9 @@ Author: Enhanced Ensemble v7.0
 Date: November 16, 2025
 """
 
-import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -42,7 +40,6 @@ try:
     import lightgbm as lgb
     LIGHTGBM_AVAILABLE = True
 except ImportError:
-    from sklearn.linear_model import Ridge
     LIGHTGBM_AVAILABLE = False
     logger.warning("LightGBM not available, falling back to Ridge regression")
 
@@ -163,7 +160,7 @@ class MetaLearningWeightPredictor:
         historical_df: pd.DataFrame,
         grid_resolution: int = 11,
         n_random_samples: int = 500,
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Generate (X, y) training data from historical predictions.
 
@@ -234,10 +231,10 @@ class MetaLearningWeightPredictor:
 
     def _compute_optimal_weights_for_game(
         self,
-        predictions: Dict[str, float],
+        predictions: dict[str, float],
         actual: float,
         n_samples: int = 500,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Find weights that minimize absolute error for a single game.
 
@@ -283,7 +280,7 @@ class MetaLearningWeightPredictor:
         cv_splits: int = 5,
         grid_resolution: int = 11,
         n_random_samples: int = 500,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Train meta-model with time-series cross-validation.
 
@@ -366,7 +363,7 @@ class MetaLearningWeightPredictor:
     def predict_weights(
         self,
         context_features: pd.DataFrame,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict optimal weights for given context.
 
@@ -524,7 +521,7 @@ def analyze_weight_predictions(
 
 
 def compare_static_vs_adaptive_weights(
-    static_weights: Dict[str, float],
+    static_weights: dict[str, float],
     adaptive_predictions: pd.DataFrame,
 ) -> None:
     """

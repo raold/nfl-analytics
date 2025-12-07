@@ -15,12 +15,13 @@ Expected runtime: 15 minutes
 Target: MAE < 40.20 (v2 baseline)
 """
 
-import pandas as pd
+import sys
+import time
+
 import numpy as np
+import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
-import time
-import sys
 
 # Database connection
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -127,7 +128,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, sample_weights_train, f
     print(f"Training samples: {len(X_train):,}")
     print(f"Test samples: {len(X_test):,}")
     print(f"Features: {len(feature_names)}")
-    print(f"Using sample weights: Yes (based on opponent strength)")
+    print("Using sample weights: Yes (based on opponent strength)")
     print("="*60 + "\n")
 
     # Train model with same hyperparameters as v3.1
@@ -175,8 +176,8 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, sample_weights_train, f
     print(f"MAE: {mae:.2f} yards")
     print(f"RMSE: {rmse:.2f} yards")
     print(f"Training time: {train_time:.1f}s")
-    print(f"v2 baseline: 40.20 yards")
-    print(f"v3.1 baseline: 41.36 yards (no opponent features)")
+    print("v2 baseline: 40.20 yards")
+    print("v3.1 baseline: 41.36 yards (no opponent features)")
 
     improvement_pct = ((40.20 - mae) / 40.20) * 100
     print(f"Improvement vs v2: {improvement_pct:+.1f}%")

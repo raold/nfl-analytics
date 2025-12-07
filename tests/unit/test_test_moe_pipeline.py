@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.314041
 Test count: 7
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.test_moe_pipeline import *
-import pandas as pd
-import pytest
 
 
 def test_test_pipeline_with_historical_data_basic():

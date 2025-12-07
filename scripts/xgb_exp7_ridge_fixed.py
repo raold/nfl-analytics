@@ -54,23 +54,22 @@ Version: 7.0 (Ridge Residuals)
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
-import warnings
-import pickle
 import json
+import logging
+import pickle
+import warnings
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
-from sklearn.linear_model import RidgeCV
-from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
+from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 logging.basicConfig(
     level=logging.INFO,
@@ -207,7 +206,7 @@ class RidgeResidualsExperiment:
         self,
         df: pd.DataFrame,
         train_test_split_season: int = 2022
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare feature sets for Ridge and XGBoost.
 
@@ -306,7 +305,7 @@ class RidgeResidualsExperiment:
         y_train: pd.Series,
         y_test: pd.Series,
         X_ridge_train_scaled: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
         """
         Calculate residuals: yards_beyond_opponent = actual - ridge.predict(opp_features).
 
@@ -423,7 +422,7 @@ class RidgeResidualsExperiment:
         if test_mae < baseline_mae:
             logger.info(f"\n✅ SUCCESS: Beats baseline by {abs(improvement):.2f} MAE")
         else:
-            logger.info(f"\n⚠️  No improvement, but research-driven approach still valuable")
+            logger.info("\n⚠️  No improvement, but research-driven approach still valuable")
 
         self.results['baseline_mae'] = baseline_mae
         self.results['improvement_mae'] = improvement
@@ -443,19 +442,19 @@ class RidgeResidualsExperiment:
                 'scaler': self.ridge_scaler,
                 'features': self.ridge_features
             }, f)
-        logger.info(f"Saved Ridge model")
+        logger.info("Saved Ridge model")
 
         # Save XGBoost model
         self.xgb_model.save_model(f"models/xgb_ridge_residuals_v7_{timestamp}.json")
-        logger.info(f"Saved XGBoost model")
+        logger.info("Saved XGBoost model")
 
         # Save results
         with open(f"results/xgb_exp7_ridge_results_{timestamp}.json", 'w') as f:
             json.dump(self.results, f, indent=2)
-        logger.info(f"Saved results")
+        logger.info("Saved results")
 
         # Log summary
-        logger.info(f"\nResults Summary:")
+        logger.info("\nResults Summary:")
         logger.info(json.dumps({
             'test_mae': self.results['test_mae'],
             'improvement_vs_baseline': self.results['improvement_mae'],

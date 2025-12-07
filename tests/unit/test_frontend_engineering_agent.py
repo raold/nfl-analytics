@@ -8,24 +8,18 @@ Created: November 22, 2025
 """
 
 import json
-import tempfile
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from py.utils.frontend_engineering_agent import (
     FrontendEngineeringAgent,
+    SchemaDrift,
+    SchemaValidationReport,
     Severity,
     ValidationIssue,
-    SchemaValidationReport,
-    SchemaDrift,
-    APIContractReport,
-    MigrationUpdate
 )
-
 
 # ============================================================================
 # Fixtures
@@ -141,7 +135,7 @@ def test_save_schema_snapshot(agent, sample_schema):
 
     assert snapshot_path.exists()
 
-    with open(snapshot_path, 'r') as f:
+    with open(snapshot_path) as f:
         snapshot = json.load(f)
 
     assert "timestamp" in snapshot

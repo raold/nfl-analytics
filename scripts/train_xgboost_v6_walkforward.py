@@ -176,7 +176,7 @@ class WalkForwardTrainer:
         overall_market_mae = np.mean([r['market_mae'] for r in results])
 
         logger.info(f"\n{'='*60}")
-        logger.info(f"WALK-FORWARD RESULTS (2022-2024)")
+        logger.info("WALK-FORWARD RESULTS (2022-2024)")
         logger.info(f"{'='*60}")
         logger.info(f"Overall Model MAE: {overall_model_mae:.2f}")
         logger.info(f"Overall Market MAE: {overall_market_mae:.2f}")

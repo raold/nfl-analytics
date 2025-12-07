@@ -18,7 +18,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -199,7 +198,7 @@ class OptimizedEnsembleStudy:
         test_preds_calibrated = self.calibrator.transform(self.test_preds_uncalibrated)
 
         # Evaluate calibrated predictions
-        from sklearn.metrics import brier_score_loss, log_loss, accuracy_score
+        from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
 
         calibrated_metrics = {
             "accuracy": accuracy_score(self.test_target, test_preds_calibrated >= 0.5),
@@ -248,7 +247,7 @@ class OptimizedEnsembleStudy:
         train_df = df_all[df_all["season"].isin(train_seasons)]
 
         print(f"\nTrain: {len(train_df)} games (2019-2020)")
-        print(f"Test:  Individual years 2021-2024\n")
+        print("Test:  Individual years 2021-2024\n")
 
         # Create and train ensemble
         ensemble = self.create_optimized_ensemble()
@@ -263,7 +262,7 @@ class OptimizedEnsembleStudy:
             year_preds, _ = ensemble.predict(year_df)
 
             # Metrics
-            from sklearn.metrics import brier_score_loss, log_loss, accuracy_score
+            from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
 
             accuracy = accuracy_score(year_target, year_preds >= 0.5)
             brier = brier_score_loss(year_target, year_preds)

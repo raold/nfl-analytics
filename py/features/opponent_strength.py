@@ -39,12 +39,10 @@ Research: Sagarin Methodology + Public Predictors Analysis (Nov 13-14, 2025)
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -466,7 +464,7 @@ class OpponentStrengthEngine:
         df['matchup_difficulty'] = 100 - df['opp_def_rank']
 
         logger.info(f"Generated {len(df):,} opponent strength records")
-        logger.info(f"\nOpponent Strength Statistics:")
+        logger.info("\nOpponent Strength Statistics:")
         logger.info(f"  Mean def EPA allowed: {df['opp_def_epa_exp'].mean():.4f}")
         logger.info(f"  Mean def rank: {df['opp_def_rank'].mean():.1f} (50 = neutral)")
         logger.info(f"  Mean matchup difficulty: {df['matchup_difficulty'].mean():.1f}")
@@ -480,7 +478,7 @@ class OpponentStrengthEngine:
         season: int,
         week: int,
         lookback_games: int = 6
-    ) -> Dict:
+    ) -> dict:
         """
         Compute Strength of Victory (SoV) for a team.
 
@@ -619,7 +617,7 @@ class OpponentStrengthEngine:
             logger.warning(f"SoV query failed for {team}: {e}")
             return self._neutral_sov_features()
 
-    def _neutral_sov_features(self) -> Dict:
+    def _neutral_sov_features(self) -> dict:
         """Return neutral SoV features when data unavailable."""
         return {
             'strength_of_victory': 0.0,
@@ -636,7 +634,7 @@ class OpponentStrengthEngine:
         away_team: str,
         season: int,
         week: int
-    ) -> Dict:
+    ) -> dict:
         """
         Compute SoV features for a game matchup.
 

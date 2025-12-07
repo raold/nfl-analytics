@@ -12,39 +12,39 @@ def fix_indentation(content: str) -> str:
 
     for i, line in enumerate(lines):
         stripped = line.strip()
-        
+
         # Fix duplicate self parameters
         if "(self, self)" in line:
             line = line.replace("(self, self)", "(val)")
-        
+
         # Check previous line for context
         prev_line = lines[i - 1] if i > 0 else ""
         prev_stripped = prev_line.strip()
-        
+
         # If previous line is a comment or "# Act" and current line starts with 8 spaces
         # and is not already 12+ spaces (nested block), reduce to 4 spaces
         if line.startswith("        ") and not line.startswith("            "):
             # Check if this should be a 4-space indent line
-            if (prev_stripped.startswith("#") or 
-                prev_stripped == "" or 
+            if (prev_stripped.startswith("#") or
+                prev_stripped == "" or
                 ("# Assert" in prev_stripped) or
                 ("# Act" in prev_stripped) or
                 ("# Arrange" in prev_stripped)):
                 # Remove 4 spaces of indentation
                 fixed_lines.append(line[4:])
                 continue
-        
-        # Fix with block indentation: if prev line is "with pytest.raises" 
+
+        # Fix with block indentation: if prev line is "with pytest.raises"
         # and current line doesn't start with enough spaces, add proper indentation
         if "with pytest.raises" in prev_line and stripped:
             if not line.startswith("        "):
                 fixed_lines.append("        " + stripped)
                 continue
-        
+
         # Fix self -> val in function calls
         if "(self)" in line and ("result = " in line or "assert " in line):
             line = line.replace("(self)", "(val)")
-            
+
         fixed_lines.append(line)
 
     return "\n".join(fixed_lines)

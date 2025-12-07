@@ -9,20 +9,20 @@ Redis Phase 2 Enhancement:
 - Graceful fallback to uncached execution if Redis unavailable
 """
 
-import requests
-from bs4 import BeautifulSoup
-from typing import List, Dict, Any, Optional
+import json
 import logging
 import time
-import json
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+import requests
+from bs4 import BeautifulSoup
 
 from mcp_server.config import (
-    ESPN_API_BASE_URL,
     MAX_NEWS_ARTICLES,
+    MCP_CACHE_DIR,
     NEWS_CACHE_SECONDS,
-    MCP_CACHE_DIR
 )
 
 try:
@@ -85,7 +85,7 @@ def _get_cache_path(team: str) -> Path:
     return MCP_CACHE_DIR / f"news_{team.lower()}.json"
 
 
-def _load_cache(team: str) -> Optional[List[Dict[str, Any]]]:
+def _load_cache(team: str) -> list[dict[str, Any]] | None:
     """
     Load cached news if available and not expired.
 
@@ -101,7 +101,7 @@ def _load_cache(team: str) -> Optional[List[Dict[str, Any]]]:
         return None
 
     try:
-        with open(cache_path, 'r') as f:
+        with open(cache_path) as f:
             cache_data = json.load(f)
 
         # Check if cache is expired
@@ -118,7 +118,7 @@ def _load_cache(team: str) -> Optional[List[Dict[str, Any]]]:
         return None
 
 
-def _save_cache(team: str, articles: List[Dict[str, Any]]) -> None:
+def _save_cache(team: str, articles: list[dict[str, Any]]) -> None:
     """
     Save articles to cache.
 
@@ -156,7 +156,7 @@ def _rate_limit() -> None:
     _last_request_time = time.time()
 
 
-def _fetch_espn_news_uncached(team: str, limit: int = 10) -> List[Dict[str, Any]]:
+def _fetch_espn_news_uncached(team: str, limit: int = 10) -> list[dict[str, Any]]:
     """
     Fetch ESPN news without caching (internal implementation).
 
@@ -295,7 +295,7 @@ def _get_team_slug(team_name: str) -> str:
     return team_name[:3].lower()
 
 
-def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+def _fetch_nfl_news_generic(team_filter: str | None = None, limit: int = 10) -> list[dict[str, Any]]:
     """
     Fetch general NFL news from ESPN main page.
 
@@ -357,7 +357,7 @@ def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) 
         return []
 
 
-def search_all_nfl_news(keywords: List[str], hours: int = 24) -> List[Dict[str, Any]]:
+def search_all_nfl_news(keywords: list[str], hours: int = 24) -> list[dict[str, Any]]:
     """
     Search all NFL news for keywords.
 

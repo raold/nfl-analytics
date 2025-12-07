@@ -4,13 +4,14 @@ Audit bibliography for completeness, duplicates, and missing information.
 """
 
 import re
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
 
 def parse_bib_file(bib_path):
     """Parse BibTeX file and extract entries."""
 
-    with open(bib_path, 'r', encoding='utf-8') as f:
+    with open(bib_path, encoding='utf-8') as f:
         content = f.read()
 
     # Extract all entries
@@ -49,7 +50,7 @@ def check_citations_used(tex_dir, bib_entries):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding='utf-8') as f:
                 content = f.read()
 
             # Find all citations

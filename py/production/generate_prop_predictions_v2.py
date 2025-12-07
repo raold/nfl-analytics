@@ -19,11 +19,10 @@ Usage:
 import argparse
 import json
 import logging
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
 import pandas as pd
 import xgboost as xgb
@@ -32,7 +31,7 @@ import xgboost as xgb
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import repositories
-from py.data.repository import GameRepository, PredictionRepository, DatabaseConfig
+from py.data.repository import DatabaseConfig, GameRepository, PredictionRepository
 
 logging.basicConfig(
     level=logging.INFO,
@@ -236,7 +235,7 @@ class PropPredictionGeneratorV2:
 
         return df
 
-    def save_predictions(self, predictions: List[Dict[str, Any]], model_version: str = "v1"):
+    def save_predictions(self, predictions: list[dict[str, Any]], model_version: str = "v1"):
         """
         Save predictions to database.
 
@@ -265,7 +264,7 @@ class PropPredictionGeneratorV2:
         logger.info(f"✓ Saved {rows_affected} predictions to database")
         return rows_affected
 
-    def generate_predictions(self, season: int, week: int) -> List[Dict[str, Any]]:
+    def generate_predictions(self, season: int, week: int) -> list[dict[str, Any]]:
         """
         Generate predictions for all props in upcoming games.
 
@@ -295,7 +294,7 @@ class PropPredictionGeneratorV2:
         logger.info(f"Generated {len(all_predictions)} total predictions")
         return all_predictions
 
-    def _predict_game(self, game: pd.Series) -> List[Dict[str, Any]]:
+    def _predict_game(self, game: pd.Series) -> list[dict[str, Any]]:
         """
         Generate predictions for all props in a game.
 

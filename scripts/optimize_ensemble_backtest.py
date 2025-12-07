@@ -20,20 +20,19 @@ Author: Claude Code (Anthropic)
 Date: November 13, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/..'))
 
-import time
 import logging
-from pathlib import Path
-from typing import Dict, Optional
+import time
 from dataclasses import dataclass
+from pathlib import Path
 
-import psycopg2
-from psycopg2 import pool
 import numpy as np
 import pandas as pd
+from psycopg2 import pool
 
 logging.basicConfig(
     level=logging.INFO,
@@ -270,7 +269,7 @@ class GameFeatures:
     wind: float
     # ... add other features as needed
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for model inference."""
         return {
             'log_attempts': self.log_attempts,
@@ -372,7 +371,7 @@ class FeatureCache:
                 is_bad_weather=0, temp=70.0, wind=5.0
             )
 
-    def stats(self) -> Dict:
+    def stats(self) -> dict:
         """Get cache statistics."""
         total = self._hits + self._misses
         hit_rate = self._hits / total if total > 0 else 0

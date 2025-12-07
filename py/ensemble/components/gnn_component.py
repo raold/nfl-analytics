@@ -23,9 +23,7 @@ Version: 1.0
 """
 
 import logging
-import os
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import torch
@@ -66,10 +64,10 @@ class GNNComponent:
 
     def __init__(
         self,
-        model_path: Optional[str] = None,
-        metadata_path: Optional[str] = None,
-        device: Optional[str] = None,
-        db_url: Optional[str] = None,
+        model_path: str | None = None,
+        metadata_path: str | None = None,
+        device: str | None = None,
+        db_url: str | None = None,
     ):
         """
         Initialize GNN component.
@@ -101,7 +99,7 @@ class GNNComponent:
         # Lazy-loaded components
         self.model = None
         self.graph_builder = None
-        self.season_graphs: Dict[int, "NFLGraph"] = {}
+        self.season_graphs: dict[int, NFLGraph] = {}
 
         # Metadata
         self.metadata = None
@@ -151,7 +149,7 @@ class GNNComponent:
             # Load metadata
             if self.metadata_path.exists():
                 import json
-                with open(self.metadata_path, "r") as f:
+                with open(self.metadata_path) as f:
                     self.metadata = json.load(f)
                     self.embedding_dim = self.metadata.get("embedding_dim", 64)
                     self.hidden_dim = self.metadata.get("hidden_dim", 128)
@@ -313,7 +311,7 @@ class GNNComponent:
         away_team: str,
         season: int,
         week: int,
-    ) -> Optional[ModelPrediction]:
+    ) -> ModelPrediction | None:
         """
         Generate GNN prediction for a game.
 
@@ -411,7 +409,7 @@ class GNNComponent:
         self,
         games: list,
         season: int,
-    ) -> Dict[Tuple[str, str], Optional[ModelPrediction]]:
+    ) -> dict[tuple[str, str], ModelPrediction | None]:
         """
         Generate predictions for multiple games (batch processing).
 
@@ -466,7 +464,7 @@ if __name__ == "__main__":
             pred = gnn.predict("KC", "BUF", 2024, 1)
 
             if pred is not None:
-                print(f"\nSample Prediction (KC vs BUF, 2024 Week 1):")
+                print("\nSample Prediction (KC vs BUF, 2024 Week 1):")
                 print(f"  Win Probability: {pred.prediction_mean:.3f}")
                 print(f"  Uncertainty: {pred.prediction_std:.3f}")
                 print(f"  Model: {pred.model_name}")

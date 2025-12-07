@@ -50,21 +50,24 @@ Reference: López de Prado (2018), Chapter 3: Meta-Labeling
 import logging
 import warnings
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
+from typing import Any
 
+import joblib
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
-from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    roc_auc_score, brier_score_loss, classification_report
+    accuracy_score,
+    brier_score_loss,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
-import joblib
-from pathlib import Path
+from sklearn.model_selection import TimeSeriesSplit
 
 logging.basicConfig(
     level=logging.INFO,
@@ -125,7 +128,7 @@ class MetaLabelingClassifier:
         db_name: str = "devdb01",
         db_user: str = "dro",
         db_password: str = "sicillionbillions",
-        model_path: Optional[str] = None
+        model_path: str | None = None
     ):
         """
         Initialize meta-labeling classifier.
@@ -315,7 +318,7 @@ class MetaLabelingClassifier:
         df: pd.DataFrame,
         n_splits: int = 5,
         calibrate: bool = True
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Train meta-labeling classifier with time-series cross-validation.
 
@@ -403,7 +406,7 @@ class MetaLabelingClassifier:
         logger.info(f"  Mean AUC: {mean_metrics['roc_auc']:.3f}")
         logger.info(f"  Mean Accuracy: {mean_metrics['accuracy']:.3f}")
         logger.info(f"  Mean Brier: {mean_metrics['brier']:.3f}")
-        logger.info(f"\nTop Features:")
+        logger.info("\nTop Features:")
         sorted_features = sorted(
             self.training_metadata['feature_importance'].items(),
             key=lambda x: x[1],
@@ -416,7 +419,7 @@ class MetaLabelingClassifier:
 
     def predict_probability(
         self,
-        meta_features: Dict[str, float]
+        meta_features: dict[str, float]
     ) -> float:
         """
         Predict probability that a bet will be profitable.
@@ -445,10 +448,10 @@ class MetaLabelingClassifier:
 
     def compute_meta_features_from_prediction(
         self,
-        prediction: Dict[str, Any],
-        game_features: Dict[str, float],
+        prediction: dict[str, Any],
+        game_features: dict[str, float],
         historical_accuracy: float = 0.55
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute meta-features from an ensemble prediction and game features.
 
@@ -567,7 +570,7 @@ class MetaLabelingClassifier:
         logger.info(f"Loaded meta-labeling model from {path}")
 
 
-def get_meta_feature_names() -> List[str]:
+def get_meta_feature_names() -> list[str]:
     """Return list of meta-feature names for integration."""
     return MetaLabelingClassifier.META_FEATURES.copy()
 

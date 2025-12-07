@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.117547
 Test count: 15
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.reliability_diagram import *
-import pandas as pd
-import pytest
 
 
 def test_simulate_predictions_and_outcomes_basic():

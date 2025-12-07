@@ -36,10 +36,10 @@ Usage:
 """
 
 import logging
-from typing import Dict, Optional, List, Tuple
-from datetime import datetime, timedelta, timezone
-import psycopg2
+from datetime import UTC, datetime
 from functools import lru_cache
+
+import psycopg2
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +112,7 @@ class RModelPredictionLookup:
         player_id: str,
         season: int,
         week: int
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Get prediction from PostgreSQL lookup table (cached).
 
@@ -175,11 +175,11 @@ class RModelPredictionLookup:
 
             # Check staleness
             generated_at = result[6]
-            is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+            is_stale = (datetime.now(UTC) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
             if is_stale:
                 logger.warning(
-                    f"Stale prediction ({(datetime.now(timezone.utc) - generated_at).days} days old): "
+                    f"Stale prediction ({(datetime.now(UTC) - generated_at).days} days old): "
                     f"{model_name} | {player_id} | S{season}W{week}"
                 )
 
@@ -203,7 +203,7 @@ class RModelPredictionLookup:
         player_id: str,
         season: int,
         week: int
-    ) -> Dict[str, Optional[Dict]]:
+    ) -> dict[str, dict | None]:
         """
         Get predictions from all R models for a player-game (batch query).
 
@@ -255,7 +255,7 @@ class RModelPredictionLookup:
             for row in rows:
                 model_name = row[0]
                 generated_at = row[7]
-                is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+                is_stale = (datetime.now(UTC) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
                 results[model_name] = {
                     'mean': float(row[1]),
@@ -288,7 +288,7 @@ class RModelPredictionLookup:
         player_id: str,
         season: int,
         week: int
-    ) -> Dict:
+    ) -> dict:
         """
         Get prediction with fallback to league average if missing.
 
@@ -341,8 +341,8 @@ class RModelPredictionLookup:
     def check_coverage(
         self,
         season: int,
-        week: Optional[int] = None
-    ) -> Dict[str, Dict]:
+        week: int | None = None
+    ) -> dict[str, dict]:
         """
         Check prediction coverage for a season/week.
 
@@ -413,7 +413,7 @@ class RModelPredictionLookup:
             logger.error(f"Database error in check_coverage: {e}")
             return {}
 
-    def get_cache_stats(self) -> Dict[str, int]:
+    def get_cache_stats(self) -> dict[str, int]:
         """
         Get cache performance statistics.
 
@@ -459,7 +459,7 @@ def get_r_model_prediction(
     season: int,
     week: int,
     use_fallback: bool = True
-) -> Dict:
+) -> dict:
     """
     Convenience function for getting a single R model prediction.
 
@@ -485,7 +485,7 @@ def get_all_r_model_predictions(
     player_id: str,
     season: int,
     week: int
-) -> Dict[str, Optional[Dict]]:
+) -> dict[str, dict | None]:
     """
     Convenience function for getting all R model predictions.
 
@@ -528,7 +528,7 @@ class RPredictionLookup:
         - PostgreSQL: <10ms per prediction (200-400x faster)
     """
 
-    def __init__(self, db_config: Dict, db_pool=None):
+    def __init__(self, db_config: dict, db_pool=None):
         """
         Initialize PostgreSQL lookup (compatible with RModelInterface constructor).
 
@@ -544,9 +544,9 @@ class RPredictionLookup:
         player_id: str,
         season: int,
         week: int,
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        model_path: str | None = None,  # Ignored (for API compatibility)
         ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get hierarchical v2 prediction (compatible with RModelInterface.predict_hierarchical).
 
@@ -578,9 +578,9 @@ class RPredictionLookup:
         player_id: str,
         season: int,
         week: int,
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        model_path: str | None = None,  # Ignored (for API compatibility)
         ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get informative priors v2 prediction (compatible with RModelInterface.predict_informative_priors).
 
@@ -612,10 +612,10 @@ class RPredictionLookup:
         player_id: str,
         season: int,
         week: int,
-        skills_df: Optional[object] = None,  # Ignored (for API compatibility)
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
+        skills_df: object | None = None,  # Ignored (for API compatibility)
+        model_path: str | None = None,  # Ignored (for API compatibility)
         ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Get state-space v2 prediction (compatible with RModelInterface.predict_state_space).
 

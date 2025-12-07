@@ -9,19 +9,19 @@ This script:
 4. Updates imports and references
 """
 
+import hashlib
 import os
 import shutil
-from pathlib import Path
 from datetime import datetime
-import hashlib
-from typing import List, Dict, Tuple
+from pathlib import Path
+
 
 def get_file_hash(filepath: Path) -> str:
     """Get MD5 hash of file contents."""
     with open(filepath, 'rb') as f:
         return hashlib.md5(f.read()).hexdigest()
 
-def find_duplicate_files(root_dir: str) -> Dict[str, List[Path]]:
+def find_duplicate_files(root_dir: str) -> dict[str, list[Path]]:
     """Find files with identical content."""
     hash_map = {}
     duplicates = {}
@@ -44,7 +44,7 @@ def find_duplicate_files(root_dir: str) -> Dict[str, List[Path]]:
 
     return duplicates
 
-def find_obsolete_files(root_dir: str) -> List[Path]:
+def find_obsolete_files(root_dir: str) -> list[Path]:
     """Identify potentially obsolete files based on patterns."""
     obsolete_patterns = [
         '*_old.*',
@@ -68,7 +68,7 @@ def find_obsolete_files(root_dir: str) -> List[Path]:
 
     return obsolete_files
 
-def standardize_filenames(root_dir: str) -> List[Tuple[Path, Path]]:
+def standardize_filenames(root_dir: str) -> list[tuple[Path, Path]]:
     """Identify files that need renaming for consistency."""
     renames = []
     root_path = Path(root_dir)
@@ -96,7 +96,7 @@ def standardize_filenames(root_dir: str) -> List[Tuple[Path, Path]]:
 
     return renames
 
-def reorganize_structure(root_dir: str) -> Dict[str, List[Path]]:
+def reorganize_structure(root_dir: str) -> dict[str, list[Path]]:
     """Suggest new organization for files."""
     suggestions = {
         'src/python/ingestion': [],
@@ -159,10 +159,10 @@ def reorganize_structure(root_dir: str) -> Dict[str, List[Path]]:
     return {k: v for k, v in suggestions.items() if v}
 
 def generate_report(
-    duplicates: Dict[str, List[Path]],
-    obsolete: List[Path],
-    renames: List[Tuple[Path, Path]],
-    reorganize: Dict[str, List[Path]]
+    duplicates: dict[str, list[Path]],
+    obsolete: list[Path],
+    renames: list[tuple[Path, Path]],
+    reorganize: dict[str, list[Path]]
 ):
     """Generate cleanup report."""
     report = []
@@ -175,7 +175,7 @@ def generate_report(
     report.append("\n## DUPLICATE FILES")
     if duplicates:
         for hash_val, files in duplicates.items():
-            report.append(f"\n### Duplicate Set (identical content):")
+            report.append("\n### Duplicate Set (identical content):")
             for file in files:
                 size = file.stat().st_size
                 report.append(f"  - {file} ({size} bytes)")

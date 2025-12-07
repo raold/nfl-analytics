@@ -13,8 +13,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.append(str(project_root))
 
-import pickle
 import logging
+import pickle
+
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 

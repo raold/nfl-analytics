@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.904958
 Test count: 15
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.quick_calibration_fix import *
-import pandas as pd
-import pytest
 
 
 def test_compute_calibration_basic():

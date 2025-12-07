@@ -28,12 +28,12 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+
 import numpy as np
 from dotenv import load_dotenv
 
@@ -86,7 +86,7 @@ def print_header():
     print()
 
 
-def validate_prediction(result: Dict) -> bool:
+def validate_prediction(result: dict) -> bool:
     """
     Validate prediction is real (not placeholder or corrupted).
 
@@ -128,7 +128,7 @@ def validate_prediction(result: Dict) -> bool:
     return True
 
 
-def run_performance_test() -> Dict:
+def run_performance_test() -> dict:
     """
     Run performance test with 10 predictions.
 
@@ -224,7 +224,7 @@ def run_performance_test() -> Dict:
     }
 
 
-def print_results(results: Dict):
+def print_results(results: dict):
     """
     Print formatted test results.
 

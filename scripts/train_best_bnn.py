@@ -1,14 +1,14 @@
 
 import json
-import torch
-import torch.nn as nn
+
 import numpy as np
 import pandas as pd
 import psycopg2
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+import torch
+import torch.nn as nn
 from sklearn.metrics import mean_absolute_error, r2_score
-from pathlib import Path
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 # Load best hyperparameters
 with open('models/bayesian/bnn_optuna_results.json') as f:
@@ -135,7 +135,7 @@ with torch.no_grad():
     r2_yards = r2_score(y_yards_test, pred[:, 0])
     mae_tds = mean_absolute_error(y_tds_test, pred[:, 1])
 
-    print(f"\n[+] Final BNN Evaluation:")
+    print("\n[+] Final BNN Evaluation:")
     print(f"  Yards MAE: {mae_yards:.2f}")
     print(f"  Yards R�: {r2_yards:.3f}")
     print(f"  TDs MAE: {mae_tds:.3f}")

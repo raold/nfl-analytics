@@ -25,15 +25,13 @@ Version: 2.0-fast
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
-import pickle
 import json
+import logging
 from datetime import datetime
-from typing import Dict
 
-import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -157,10 +155,10 @@ def train_temperature_scaler(calib_df: pd.DataFrame):
     logger.info("=" * 80)
     logger.info(f"Optimal Temperature: T = {report['temperature']:.4f}")
     logger.info(f"Target Coverage: {report['target_coverage']:.1%}")
-    logger.info(f"\nBefore Temperature Scaling:")
+    logger.info("\nBefore Temperature Scaling:")
     logger.info(f"  Coverage: {report['coverage_before']:.1%}")
     logger.info(f"  Mean Interval Width: {report['width_before']:.1f} yards")
-    logger.info(f"\nAfter Temperature Scaling:")
+    logger.info("\nAfter Temperature Scaling:")
     logger.info(f"  Coverage: {report['coverage_after']:.1%}")
     logger.info(f"  Mean Interval Width: {report['width_after']:.1f} yards")
     logger.info(f"\nMAE: {report['mae']:.2f} yards (unchanged by scaling)")
@@ -176,7 +174,7 @@ def train_temperature_scaler(calib_df: pd.DataFrame):
     return scaler, report
 
 
-def save_temperature_scaler(scaler: TemperatureScaler, report: Dict):
+def save_temperature_scaler(scaler: TemperatureScaler, report: dict):
     """
     Save temperature scaler and metadata.
 

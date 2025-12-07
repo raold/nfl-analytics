@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
 """
 make_reliability_and_error.py — Reliability diagram + weekly error sparkline
 Outputs:
   • reliability_calibration_wk01_wk18.pdf
   • calibration_error_sparkline.pdf (only if 'week' exists)
 """
-import os
 import argparse
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 REL_OUT_DEFAULT = (
     "analysis/dissertation/figures/out/reliability_calibration_wk01_wk18.pdf"

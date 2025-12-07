@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.561413
 Test count: 11
 """
 
+import pytest
 from backtests.comprehensive_model_comparison import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_calculate_metrics_basic():

@@ -3,8 +3,8 @@
 Analyze ensemble predictions from 4-way backtest to identify bias patterns.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy import stats
 
 # Load validation results
@@ -44,7 +44,7 @@ for model in ['state_space', 'hierarchical', 'xgboost', 'informative_priors']:
         t_stat, p_value = stats.ttest_1samp(bias, 0)
         print(f"  T-test (bias != 0): t={t_stat:.4f}, p={p_value:.4e}")
         if p_value < 0.001:
-            print(f"  *** SIGNIFICANT BIAS ***")
+            print("  *** SIGNIFICANT BIAS ***")
 
 print()
 print("\n3. ENSEMBLE MODEL BIAS")
@@ -60,7 +60,7 @@ print(f"Std Dev: {ensemble_bias.std():.2f} yards")
 t_stat, p_value = stats.ttest_1samp(ensemble_bias, 0)
 print(f"T-test (bias != 0): t={t_stat:.4f}, p={p_value:.4e}")
 if p_value < 0.001:
-    print(f"*** SIGNIFICANT BIAS ***")
+    print("*** SIGNIFICANT BIAS ***")
 
 print()
 print("\n4. BIAS BY SEASON")
@@ -112,7 +112,7 @@ print("Games with largest under-predictions (actual - predicted > 100 yards):")
 extreme = df[df['actual_yards'] - df['ensemble_mean'] > 100].sort_values('actual_yards', ascending=False)
 print(f"\nFound {len(extreme)} extreme under-predictions")
 if len(extreme) > 0:
-    print(f"\nTop 10 examples:")
+    print("\nTop 10 examples:")
     for _, row in extreme.head(10).iterrows():
         print(f"  {row['player_name']:20} Week {row['week']:2} {row['season']}: "
               f"actual={row['actual_yards']:3.0f}, predicted={row['ensemble_mean']:3.0f}, "
@@ -125,7 +125,7 @@ print("Games with largest over-predictions (predicted - actual > 100 yards):")
 extreme = df[df['ensemble_mean'] - df['actual_yards'] > 100].sort_values('ensemble_mean', ascending=False)
 print(f"\nFound {len(extreme)} extreme over-predictions")
 if len(extreme) > 0:
-    print(f"\nTop 10 examples:")
+    print("\nTop 10 examples:")
     for _, row in extreme.head(10).iterrows():
         print(f"  {row['player_name']:20} Week {row['week']:2} {row['season']}: "
               f"actual={row['actual_yards']:3.0f}, predicted={row['ensemble_mean']:3.0f}, "

@@ -22,11 +22,10 @@ Usage:
     python enhance_tables.py [--dry-run] [--tables TABLE1 TABLE2...]
 """
 
-import re
 import argparse
-from pathlib import Path
-from typing import List, Tuple, Dict
 import logging
+import re
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -226,7 +225,7 @@ class TableEnhancer:
             logger.info(f"Enhanced {self.filepath.name}: {len(self.changes_made)} changes")
 
 
-def enhance_all_tables(table_dir: Path, dry_run: bool = False, specific_tables: List[str] = None):
+def enhance_all_tables(table_dir: Path, dry_run: bool = False, specific_tables: list[str] = None):
     """Process all tables in directory"""
     tables = list(table_dir.glob('*.tex'))
 

@@ -27,6 +27,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 import logging
+
 from py.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(
@@ -118,7 +119,7 @@ def test_qb_injury_impact():
 
     # Expected: If home QB is out, spread adjustment should be positive (hurts home team)
     if qb_out_home:
-        logger.info(f"\n✓ Home team has QB injury, spread adjustment includes +5.0 impact")
+        logger.info("\n✓ Home team has QB injury, spread adjustment includes +5.0 impact")
         assert spread_adj > 0, "QB injury should result in positive spread adjustment (hurts home team)"
 
     logger.info("\n✓ TEST 2 PASSED\n")

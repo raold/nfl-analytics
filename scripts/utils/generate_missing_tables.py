@@ -4,11 +4,10 @@ Generate all missing LaTeX tables for dissertation.
 This script generates the four commented-out tables in main.tex.
 """
 
-import os
 import sys
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import pandas as pd
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
@@ -115,7 +114,7 @@ def generate_utilization_sharpe_table():
     """Generate Utilization-Adjusted Sharpe ratio table."""
 
     data = {
-        'Strategy': ['Buy \& Hold SPY', 'Static Kelly', 'Dynamic Kelly', 'RL Policy', 'RL + Risk Gates'],
+        'Strategy': [r'Buy \& Hold SPY', 'Static Kelly', 'Dynamic Kelly', 'RL Policy', 'RL + Risk Gates'],
         'Raw Sharpe': [0.95, 1.42, 1.58, 1.73, 1.65],
         'Utilization %': [100.0, 42.3, 38.7, 35.2, 31.8],
         'Adj. Sharpe': [0.95, 0.60, 0.61, 0.61, 0.52],
@@ -234,7 +233,7 @@ def main():
     if main_tex_path.exists():
         print("\nUncommenting table includes in main.tex...")
 
-        with open(main_tex_path, 'r') as f:
+        with open(main_tex_path) as f:
             content = f.read()
 
         # Uncomment the table includes

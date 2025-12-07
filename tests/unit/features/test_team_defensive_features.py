@@ -19,16 +19,14 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 21, 2025
 """
 
-import unittest
-from unittest.mock import MagicMock, patch
-from typing import List, Tuple
-
-import numpy as np
-import pandas as pd
-
 # Add project root to path
 import sys
+import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import numpy as np
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from py.features.team_defensive_features import TeamDefensiveFeatures

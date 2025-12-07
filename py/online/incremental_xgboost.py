@@ -16,12 +16,12 @@ Expected Performance:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import logging
-from typing import Dict
 from collections import deque
 
 import numpy as np
@@ -76,12 +76,12 @@ class IncrementalXGBoost:
         self.counter = 0
         self.is_trained = False
 
-        logger.info(f"Initialized IncrementalXGBoost:")
+        logger.info("Initialized IncrementalXGBoost:")
         logger.info(f"  Window size: {window_size}")
         logger.info(f"  Retrain every: {retrain_every} samples")
         logger.info(f"  XGBoost params: {self.params}")
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         """
         Update with single sample
 
@@ -97,7 +97,7 @@ class IncrementalXGBoost:
         if self.counter % self.retrain_every == 0 and len(self.window) >= 50:
             self._retrain()
 
-    def predict_one(self, x: Dict[str, float]) -> float:
+    def predict_one(self, x: dict[str, float]) -> float:
         """
         Predict for single sample
 
@@ -138,7 +138,7 @@ class IncrementalXGBoost:
 
         logger.info(f"XGBoost retrained on {len(self.window)} samples (counter={self.counter})")
 
-    def get_metrics(self) -> Dict[str, any]:
+    def get_metrics(self) -> dict[str, any]:
         """Get model metrics"""
         return {
             'window_size': len(self.window),

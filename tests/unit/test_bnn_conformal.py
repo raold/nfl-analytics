@@ -21,20 +21,18 @@ Created: November 9, 2025
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
-import pytest
+
 import numpy as np
+import pytest
 import torch
 import torch.nn as nn
-from unittest.mock import Mock, patch, MagicMock
-from typing import Tuple
-
 from py.models.bnn_conformal import (
-    PyTorchBNNWrapper,
     BNNConformalPredictor,
+    PyTorchBNNWrapper,
 )
-
 
 # ============================================================================
 # FIXTURES AND MOCK CLASSES
@@ -88,7 +86,7 @@ def mock_bnn():
 
 
 @pytest.fixture
-def synthetic_data() -> Tuple[np.ndarray, np.ndarray]:
+def synthetic_data() -> tuple[np.ndarray, np.ndarray]:
     """Generate synthetic NFL-like data (X, y).
 
     Returns:
@@ -111,7 +109,7 @@ def synthetic_data() -> Tuple[np.ndarray, np.ndarray]:
 
 
 @pytest.fixture
-def calibration_test_split(synthetic_data) -> Tuple:
+def calibration_test_split(synthetic_data) -> tuple:
     """Split synthetic data into calibration and test sets.
 
     Returns:
@@ -131,7 +129,7 @@ def calibration_test_split(synthetic_data) -> Tuple:
 
 
 @pytest.fixture
-def realistic_nfl_data() -> Tuple[np.ndarray, np.ndarray]:
+def realistic_nfl_data() -> tuple[np.ndarray, np.ndarray]:
     """Generate realistic NFL player props data shapes.
 
     Simulates ~3 seasons of data (1000+ samples, 13 features).

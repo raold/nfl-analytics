@@ -17,10 +17,11 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-03
 """
 
-import torch
-import pandas as pd
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pandas as pd
+import torch
 
 # Checkpoint epochs (from training script checkpoint_every=5 setting)
 CHECKPOINT_EPOCHS = [4, 9, 14, 19, 24, 29, 34, 39, 44, 49]
@@ -91,7 +92,7 @@ def validate_data(df):
         print(f"   Values: {dup_values}")
         print("   This may indicate synthetic/placeholder data (real training shows variation)")
     else:
-        print(f"✅ PASS: No duplicate values (all scores unique)")
+        print("✅ PASS: No duplicate values (all scores unique)")
 
     # Check for monotonicity (validation should generally decrease)
     diffs = df["val_brier"].diff().dropna()
@@ -100,7 +101,7 @@ def validate_data(df):
         print(f"⚠️  WARNING: Validation scores increase {increasing_count}/{len(diffs)} times")
         print("   Real training typically shows decreasing trend (occasional increases are normal)")
     else:
-        print(f"✅ PASS: Validation shows expected convergence pattern")
+        print("✅ PASS: Validation shows expected convergence pattern")
 
     # Statistical summary
     print(f"\n{'='*70}")
@@ -150,14 +151,14 @@ def main():
     print("EXTRACTION COMPLETE")
     print(f"{'='*70}")
     print(f"✅ Saved {len(df)} data points to: {OUTPUT_CSV}")
-    print(f"\nOutput CSV contents:")
+    print("\nOutput CSV contents:")
     print(df.to_string(index=False))
 
     if is_valid:
-        print(f"\n✅ Data quality validation PASSED")
-        print(f"   Ready for figure generation in R script")
+        print("\n✅ Data quality validation PASSED")
+        print("   Ready for figure generation in R script")
     else:
-        print(f"\n⚠️  Data quality concerns detected - review warnings above")
+        print("\n⚠️  Data quality concerns detected - review warnings above")
 
     print(f"\n{'='*70}")
     print("NEXT STEPS")

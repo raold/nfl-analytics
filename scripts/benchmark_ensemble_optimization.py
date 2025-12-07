@@ -23,20 +23,20 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 13, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
+import json
 import logging
 import time
-import json
 from pathlib import Path
-from typing import Dict
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
 
 logging.basicConfig(
@@ -53,7 +53,7 @@ def run_unoptimized_backtest(
     end_season: int,
     end_week: int,
     output_dir: Path
-) -> Dict:
+) -> dict:
     """
     Run unoptimized backtest (baseline).
 
@@ -110,7 +110,7 @@ def run_optimized_backtest(
     end_season: int,
     end_week: int,
     output_dir: Path
-) -> Dict:
+) -> dict:
     """
     Run optimized backtest.
 
@@ -169,10 +169,10 @@ def run_optimized_backtest(
 
 
 def validate_results(
-    unoptimized: Dict,
-    optimized: Dict,
+    unoptimized: dict,
+    optimized: dict,
     tolerance: float = 0.001
-) -> Dict:
+) -> dict:
     """
     Validate that optimized results match unoptimized (within tolerance).
 
@@ -244,8 +244,8 @@ def validate_results(
 
 
 def plot_timing_comparison(
-    unoptimized: Dict,
-    optimized: Dict,
+    unoptimized: dict,
+    optimized: dict,
     output_dir: Path
 ):
     """
@@ -309,8 +309,8 @@ def plot_timing_comparison(
 
 
 def plot_metric_comparison(
-    unoptimized: Dict,
-    optimized: Dict,
+    unoptimized: dict,
+    optimized: dict,
     output_dir: Path
 ):
     """
@@ -362,9 +362,9 @@ def plot_metric_comparison(
 
 
 def generate_report(
-    unoptimized: Dict,
-    optimized: Dict,
-    validation: Dict,
+    unoptimized: dict,
+    optimized: dict,
+    validation: dict,
     output_dir: Path
 ):
     """
@@ -411,24 +411,24 @@ def generate_report(
     logger.info("BENCHMARK SUMMARY")
     logger.info("="*80)
 
-    logger.info(f"\n⏱️  Timing:")
+    logger.info("\n⏱️  Timing:")
     logger.info(f"  Unoptimized: {unoptimized['elapsed_minutes']:.1f} minutes")
     logger.info(f"  Optimized: {optimized['elapsed_minutes']:.1f} minutes")
     logger.info(f"  Speedup: {speedup:.2f}x")
-    logger.info(f"  Target: 2.7x")
+    logger.info("  Target: 2.7x")
 
     if speedup >= 2.7:
-        logger.info(f"  ✅ Target speedup achieved!")
+        logger.info("  ✅ Target speedup achieved!")
     else:
-        logger.info(f"  ⚠️  Target speedup not achieved")
+        logger.info("  ⚠️  Target speedup not achieved")
 
-    logger.info(f"\n📊 Metrics:")
+    logger.info("\n📊 Metrics:")
     logger.info(f"  Win Rate: {optimized['metrics']['win_rate_pct']:.2f}% (unopt: {unoptimized['metrics']['win_rate_pct']:.2f}%)")
     logger.info(f"  ROI: {optimized['metrics']['roi_pct']:+.2f}% (unopt: {unoptimized['metrics']['roi_pct']:+.2f}%)")
     logger.info(f"  Sharpe: {optimized['metrics']['sharpe_ratio']:.2f} (unopt: {unoptimized['metrics']['sharpe_ratio']:.2f})")
     logger.info(f"  MAE: {optimized['metrics']['mae_ensemble']:.2f} yards (unopt: {unoptimized['metrics']['mae_ensemble']:.2f} yards)")
 
-    logger.info(f"\n🎯 Optimizations:")
+    logger.info("\n🎯 Optimizations:")
     logger.info(f"  Feature cache hit rate: {optimized.get('feature_cache_hit_rate', 0)*100:.1f}%")
     logger.info(f"  XGBoost cache size: {optimized.get('xgboost_cache_size', 0):,} entries")
 
@@ -481,7 +481,7 @@ def main():
         logger.info("\nSkipping unoptimized backtest (using cached results)")
         # Load cached results
         unoptimized_results = pd.read_csv(output_dir / 'unoptimized_results.csv')
-        with open(output_dir / 'unoptimized_metrics.json', 'r') as f:
+        with open(output_dir / 'unoptimized_metrics.json') as f:
             unoptimized_metrics = json.load(f)
         unoptimized = {
             'elapsed_minutes': 50.0,  # Placeholder

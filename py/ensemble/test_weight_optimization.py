@@ -17,7 +17,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 from optimize_ensemble_weights import optimize_ensemble_weights
 
 logging.basicConfig(level=logging.INFO)

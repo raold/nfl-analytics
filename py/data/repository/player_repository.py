@@ -6,8 +6,7 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-from typing import Optional, List
-from .base import BaseRepository, QueryResult, DatabaseConfig
+from .base import BaseRepository, QueryResult
 
 
 class PlayerRepository(BaseRepository):
@@ -15,7 +14,7 @@ class PlayerRepository(BaseRepository):
 
     def get_active_players(
         self,
-        position: Optional[str] = None,
+        position: str | None = None,
         cache_ttl: int = 3600,
     ) -> QueryResult:
         """

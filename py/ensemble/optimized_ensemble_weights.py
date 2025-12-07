@@ -31,12 +31,10 @@ Expected Performance:
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import joblib
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,11 +47,11 @@ class WeightConfig:
     scheme: str = "equal"  # equal, inverse_mae, sharpe, adaptive, meta_learner, bma
 
     # Static weights (if not using meta-learner)
-    static_weights: Optional[Dict[str, float]] = None
+    static_weights: dict[str, float] | None = None
 
     # Model performance metrics (from backtest)
-    model_maes: Dict[str, float] = None
-    model_sharpes: Dict[str, float] = None
+    model_maes: dict[str, float] = None
+    model_sharpes: dict[str, float] = None
 
     # Contextual weighting parameters
     rookie_threshold_games: int = 10
@@ -68,7 +66,7 @@ class WeightConfig:
     high_wind_xgboost_boost: float = 1.2
 
     # Meta-learner config
-    meta_learner_path: Optional[Path] = None
+    meta_learner_path: Path | None = None
     fallback_to_static: bool = True
 
     def __post_init__(self):
@@ -95,7 +93,7 @@ class WeightConfig:
             # Default to Sharpe weighting
             self.static_weights = self._compute_sharpe_weights()
 
-    def _compute_sharpe_weights(self) -> Dict[str, float]:
+    def _compute_sharpe_weights(self) -> dict[str, float]:
         """Compute weights based on Sharpe ratios."""
         sharpes = np.array(list(self.model_sharpes.values()))
         weights_arr = sharpes / sharpes.sum()
@@ -119,7 +117,7 @@ class EnsembleWeighter:
     Supports 6 weighting schemes (see class docstring).
     """
 
-    def __init__(self, config: Optional[WeightConfig] = None):
+    def __init__(self, config: WeightConfig | None = None):
         self.config = config or WeightConfig()
         self.meta_learner = None
 
@@ -152,9 +150,9 @@ class EnsembleWeighter:
 
     def get_weights(
         self,
-        model_names: List[str],
-        context: Optional[Dict] = None,
-    ) -> Dict[str, float]:
+        model_names: list[str],
+        context: dict | None = None,
+    ) -> dict[str, float]:
         """
         Compute ensemble weights based on configured scheme.
 
@@ -201,12 +199,12 @@ class EnsembleWeighter:
             logger.warning(f"Unknown scheme '{self.config.scheme}', using equal weights")
             return self._equal_weights(model_names)
 
-    def _equal_weights(self, model_names: List[str]) -> Dict[str, float]:
+    def _equal_weights(self, model_names: list[str]) -> dict[str, float]:
         """Equal weighting (baseline)."""
         weight = 1.0 / len(model_names)
         return {name: weight for name in model_names}
 
-    def _inverse_mae_weights(self, model_names: List[str]) -> Dict[str, float]:
+    def _inverse_mae_weights(self, model_names: list[str]) -> dict[str, float]:
         """Inverse MAE weighting (accuracy-based)."""
         maes = np.array([self.config.model_maes[name] for name in model_names])
         inv_maes = 1.0 / maes
@@ -214,7 +212,7 @@ class EnsembleWeighter:
 
         return {name: float(w) for name, w in zip(model_names, weights)}
 
-    def _sharpe_weights(self, model_names: List[str]) -> Dict[str, float]:
+    def _sharpe_weights(self, model_names: list[str]) -> dict[str, float]:
         """Sharpe ratio weighting (risk-adjusted)."""
         sharpes = np.array([self.config.model_sharpes[name] for name in model_names])
         weights = sharpes / sharpes.sum()
@@ -222,8 +220,8 @@ class EnsembleWeighter:
         return {name: float(w) for name, w in zip(model_names, weights)}
 
     def _adaptive_weights(
-        self, model_names: List[str], context: Dict
-    ) -> Dict[str, float]:
+        self, model_names: list[str], context: dict
+    ) -> dict[str, float]:
         """
         Context-aware weighting based on player type and game situation.
 
@@ -270,8 +268,8 @@ class EnsembleWeighter:
         return weights
 
     def _meta_learner_weights(
-        self, model_names: List[str], context: Dict
-    ) -> Dict[str, float]:
+        self, model_names: list[str], context: dict
+    ) -> dict[str, float]:
         """
         Meta-learner weighting (ML-based).
 
@@ -323,7 +321,7 @@ class EnsembleWeighter:
             logger.error(f"Meta-learner prediction failed: {e}")
             return self._sharpe_weights(model_names)
 
-    def _bma_weights(self, model_names: List[str], context: Dict) -> Dict[str, float]:
+    def _bma_weights(self, model_names: list[str], context: dict) -> dict[str, float]:
         """
         Bayesian Model Averaging (posterior model probabilities).
 

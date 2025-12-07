@@ -31,10 +31,9 @@ Created: November 14, 2025
 """
 
 import re
-from typing import List, Dict, Optional, Set, Tuple
+
 import psycopg2
 from psycopg2.extensions import connection as Connection
-
 
 # Known schema conventions (prevent common mistakes)
 COLUMN_NAMING_CONVENTIONS = {
@@ -64,7 +63,7 @@ TEAM_ABBREV_CORRECTIONS = {
 class SQLValidator:
     """Validates SQL queries against NFL Analytics database schema."""
 
-    def __init__(self, db_config: Optional[Dict[str, str]] = None):
+    def __init__(self, db_config: dict[str, str] | None = None):
         """
         Initialize SQL validator.
 
@@ -79,8 +78,8 @@ class SQLValidator:
             'user': 'dro',
             'password': 'sicillionbillions'
         }
-        self._conn: Optional[Connection] = None
-        self._schema_cache: Dict[str, Set[str]] = {}
+        self._conn: Connection | None = None
+        self._schema_cache: dict[str, set[str]] = {}
 
     def _get_connection(self) -> Connection:
         """Get or create database connection."""
@@ -101,7 +100,7 @@ class SQLValidator:
         """Context manager exit."""
         self.close()
 
-    def get_table_columns(self, table_name: str, schema: str = 'public') -> Set[str]:
+    def get_table_columns(self, table_name: str, schema: str = 'public') -> set[str]:
         """
         Get all column names for a table or materialized view.
 
@@ -148,7 +147,7 @@ class SQLValidator:
         self._schema_cache[cache_key] = columns
         return columns
 
-    def extract_table_aliases(self, query: str) -> Dict[str, str]:
+    def extract_table_aliases(self, query: str) -> dict[str, str]:
         """
         Extract table aliases from SQL query.
 
@@ -179,7 +178,7 @@ class SQLValidator:
 
         return aliases
 
-    def extract_column_references(self, query: str) -> List[Tuple[str, str]]:
+    def extract_column_references(self, query: str) -> list[tuple[str, str]]:
         """
         Extract column references from SQL query.
 
@@ -222,7 +221,7 @@ class SQLValidator:
         columns = self.get_table_columns(table_name, schema)
         return column_name.lower() in columns
 
-    def validate_query(self, query: str) -> List[str]:
+    def validate_query(self, query: str) -> list[str]:
         """
         Validate SQL query against database schema.
 
@@ -307,7 +306,7 @@ class SQLValidator:
 
         return errors
 
-    def validate_query_full(self, query: str) -> Dict:
+    def validate_query_full(self, query: str) -> dict:
         """
         Full validation with detailed report.
 
@@ -372,7 +371,7 @@ class SQLValidator:
         }
 
 
-def validate_query(query: str, db_config: Optional[Dict[str, str]] = None) -> List[str]:
+def validate_query(query: str, db_config: dict[str, str] | None = None) -> list[str]:
     """
     Quick validation function (convenience wrapper).
 

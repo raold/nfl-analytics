@@ -170,7 +170,7 @@ def test_predict_week():
             print(f"   Avg per Game: {data['processing_ms'] / data['total_games']:.1f}ms")
 
             # Show first 3 predictions
-            print(f"\n   First 3 predictions:")
+            print("\n   First 3 predictions:")
             for i, pred in enumerate(data["predictions"][:3]):
                 print(f"      {i+1}. {pred['game_id']}: {pred['away_team']}@{pred['home_team']} "
                       f"({pred['predicted_total']:.1f} total, {pred['predicted_spread']:.1f} spread)")

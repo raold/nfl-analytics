@@ -133,7 +133,6 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 import logging
 import warnings
 from datetime import datetime
-from typing import Dict, Optional
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -176,7 +175,7 @@ def get_team_playcalling_features(
     season: int,
     week: int,
     lookback_weeks: int = 4
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Extract play-calling style and situational performance features for a team.
 
@@ -466,7 +465,7 @@ def get_playcalling_features_batch(
     conn,
     team_games: list,
     lookback_weeks: int = 4
-) -> Dict[tuple, Dict[str, float]]:
+) -> dict[tuple, dict[str, float]]:
     """
     Extract playcalling features for multiple team-games in batch.
 

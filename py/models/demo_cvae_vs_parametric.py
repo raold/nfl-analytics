@@ -4,20 +4,22 @@ Demonstration comparing deep generative cVAE model vs parametric distributions.
 Shows how the cVAE captures complex game dynamics that Skellam/Poisson miss.
 """
 
-import numpy as np
-import torch
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import skellam, poisson
 import sys
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import torch
+
 sys.path.append(str(Path(__file__).parent.parent))
 
-from models.game_trajectory_cvae import ConditionalVAE, CVAESimulator, GameTrajectory
-from models.score_distributions import skellam_pmf_range, reweight_key_masses
-from data.cvae_data_pipeline import create_simulated_data
-
 import warnings
+
+from data.cvae_data_pipeline import create_simulated_data
+from models.game_trajectory_cvae import ConditionalVAE, CVAESimulator
+from models.score_distributions import reweight_key_masses, skellam_pmf_range
+
 warnings.filterwarnings('ignore')
 
 # Set style
@@ -249,11 +251,11 @@ def demonstrate_complex_derivatives(cvae_model: ConditionalVAE, conditions: torc
     print(f"  Home -3.5 probability: {p_home_covers:.3f}")
     print(f"  Over 45.5 probability: {p_over:.3f}")
     print(f"  Home Q1 win probability: {p_home_q1:.3f}")
-    print(f"\n  Two-leg SGP (Home -3.5 + Over 45.5):")
+    print("\n  Two-leg SGP (Home -3.5 + Over 45.5):")
     print(f"    True joint probability: {p_home_and_over:.3f}")
     print(f"    Independent assumption: {p_indep_two:.3f}")
     print(f"    Correlation impact: {(p_home_and_over/p_indep_two - 1)*100:+.1f}%")
-    print(f"\n  Three-leg SGP (+ Home Q1):")
+    print("\n  Three-leg SGP (+ Home Q1):")
     print(f"    True joint probability: {p_all_three:.3f}")
     print(f"    Independent assumption: {p_indep_three:.3f}")
     print(f"    Correlation impact: {(p_all_three/p_indep_three - 1)*100:+.1f}%")
@@ -276,7 +278,7 @@ def demonstrate_complex_derivatives(cvae_model: ConditionalVAE, conditions: torc
     avg_q3 = np.mean(sims['home_q3'] + sims['away_q3'])
     avg_q4 = np.mean(sims['home_q4'] + sims['away_q4'])
 
-    print(f"\n  Average scoring by quarter:")
+    print("\n  Average scoring by quarter:")
     print(f"    Q1: {avg_q1:.1f} points")
     print(f"    Q2: {avg_q2:.1f} points")
     print(f"    Q3: {avg_q3:.1f} points")

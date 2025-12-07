@@ -11,17 +11,15 @@ Date: November 9, 2025
 
 import asyncio
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional
 import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 from py.ensemble.strategy.base import EnsembleConfig
-from py.utils.r_service import get_r_service
+from py.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 from py.utils.claude_cache import get_default_cache
 
 logger = logging.getLogger(__name__)
@@ -49,7 +47,7 @@ class CacheWarmer:
 
     async def warm_ensemble_models(
         self,
-        config: Optional[EnsembleConfig] = None
+        config: EnsembleConfig | None = None
     ) -> int:
         """
         Pre-load ensemble models into Redis cache.
@@ -151,7 +149,7 @@ class CacheWarmer:
         self,
         top_n: int = 50,
         season: int = 2024,
-        week: Optional[int] = None
+        week: int | None = None
     ) -> int:
         """
         Pre-load top N players' features for current week.
@@ -178,7 +176,6 @@ class CacheWarmer:
         try:
             # Determine current week if not specified
             if week is None:
-                from datetime import datetime
                 # Simple heuristic: assume Week 10 in November
                 week = 10
                 logger.info(f"  Using current week: {week}")
@@ -280,7 +277,7 @@ class CacheWarmer:
             logger.error(f"Dashboard cache warming failed: {e}")
             return 0
 
-    def _get_top_players(self, top_n: int) -> List[str]:
+    def _get_top_players(self, top_n: int) -> list[str]:
         """
         Get list of top N players by recent performance.
 
@@ -340,7 +337,7 @@ class CacheWarmer:
         warm_features: bool = True,
         warm_queries: bool = False,
         top_players: int = 50
-    ) -> Dict[str, int]:
+    ) -> dict[str, int]:
         """
         Warm all caches on API startup.
 
@@ -413,7 +410,7 @@ async def warm_cache_on_startup(
     warm_features: bool = True,
     warm_queries: bool = False,
     top_players: int = 50
-) -> Dict[str, int]:
+) -> dict[str, int]:
     """
     Convenience function to warm cache on API startup.
 

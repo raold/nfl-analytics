@@ -15,8 +15,6 @@ Date: 2025-10-30
 import sys
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 from scipy.stats import pearsonr
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -127,8 +125,8 @@ def audit_vegas_features():
                 if feat == "home_implied_prob":
                     # implied_prob should equal 1/(1 + 10^(-spread/400)) approximately
                     # If correlation > 0.6, it's essentially the answer
-                    print(f"  → This feature is derived from CLOSING LINE")
-                    print(f"  → It encodes market consensus = target leakage")
+                    print("  → This feature is derived from CLOSING LINE")
+                    print("  → It encodes market consensus = target leakage")
 
 
 def audit_time_based_splits():
@@ -159,14 +157,14 @@ def audit_time_based_splits():
 
     if overlap:
         print(f"\n🔴 ERROR: {len(overlap)} dates appear in both train and test!")
-        print(f"   This is severe data leakage!")
+        print("   This is severe data leakage!")
     else:
-        print(f"\n✓ No date overlap between train and test")
+        print("\n✓ No date overlap between train and test")
 
     # Check feature computation dates
-    print(f"\nChecking if features use future information...")
-    print(f"  → If a 2023 game uses 2023 season stats, that's look-ahead bias")
-    print(f"  → Features should only use data from BEFORE the game")
+    print("\nChecking if features use future information...")
+    print("  → If a 2023 game uses 2023 season stats, that's look-ahead bias")
+    print("  → Features should only use data from BEFORE the game")
 
 
 def audit_kelly_sizing():
@@ -188,7 +186,7 @@ def audit_kelly_sizing():
     kelly_fraction = edge / (1 - implied_prob)
     actual_bet_fraction = kelly_multiplier * kelly_fraction
 
-    print(f"\nExample bet calculation:")
+    print("\nExample bet calculation:")
     print(f"  Model probability: {model_prob:.1%}")
     print(f"  Implied probability: {implied_prob:.1%}")
     print(f"  Edge: {edge:+.1%}")
@@ -197,15 +195,15 @@ def audit_kelly_sizing():
     print(f"  Dollar amount: ${initial_bankroll * actual_bet_fraction:,.0f}")
 
     # Check for overconfident predictions
-    print(f"\n🔴 Problem: If model predicts 0.95+ on many games:")
-    print(f"  - Kelly will suggest betting 30-40%+ of bankroll")
-    print(f"  - This causes exponential bankroll growth")
-    print(f"  - Real bettors NEVER bet more than 5% per game")
+    print("\n🔴 Problem: If model predicts 0.95+ on many games:")
+    print("  - Kelly will suggest betting 30-40%+ of bankroll")
+    print("  - This causes exponential bankroll growth")
+    print("  - Real bettors NEVER bet more than 5% per game")
 
-    print(f"\nRecommended constraints:")
-    print(f"  ✓ Max bet fraction: 5% of bankroll")
-    print(f"  ✓ Max bet amount: $5,000 absolute cap")
-    print(f"  ✓ Clip probabilities: [0.05, 0.95] to prevent overconfidence")
+    print("\nRecommended constraints:")
+    print("  ✓ Max bet fraction: 5% of bankroll")
+    print("  ✓ Max bet amount: $5,000 absolute cap")
+    print("  ✓ Clip probabilities: [0.05, 0.95] to prevent overconfidence")
 
 
 def audit_win_rate_reality_check():
@@ -233,10 +231,10 @@ def audit_win_rate_reality_check():
     print(f"{'Top Sportsbook':<25} {professional_benchmarks['Top Sportsbook']['Win Rate']:>12.1%} {professional_benchmarks['Top Sportsbook']['ROI']:>11.1%} {professional_benchmarks['Top Sportsbook']['Sharpe']:>10.2f}")
     print(f"{'Break Even':<25} {professional_benchmarks['Break Even']['Win Rate']:>12.1%} {professional_benchmarks['Break Even']['ROI']:>11.1%} {professional_benchmarks['Break Even']['Sharpe']:>10.2f}")
 
-    print(f"\n🔴 VERDICT:")
+    print("\n🔴 VERDICT:")
     print(f"  Our win rate is {our_results['Win Rate'] / professional_benchmarks['Elite Professional']['Win Rate']:.1f}x higher than elite professionals")
     print(f"  Our ROI is {our_results['ROI'] / (professional_benchmarks['Elite Professional']['ROI']*100):.0f}x higher than elite professionals")
-    print(f"  This is statistically impossible without severe data leakage")
+    print("  This is statistically impossible without severe data leakage")
 
 
 def main():
@@ -266,12 +264,12 @@ def main():
         for feat, corr, pval in leakage_features[:5]:
             print(f"  - {feat}: r={corr:.4f} (p={pval:.6f})")
 
-    print(f"\nRECOMMENDED FIXES:")
-    print(f"  1. Remove vegas-derived features (home_implied_prob, away_implied_prob)")
-    print(f"  2. Add max bet constraints (5% bankroll, $5,000 absolute)")
-    print(f"  3. Clip probabilities to [0.05, 0.95]")
-    print(f"  4. Verify no look-ahead bias in feature computation")
-    print(f"  5. Add reality check: flag if win rate > 60%")
+    print("\nRECOMMENDED FIXES:")
+    print("  1. Remove vegas-derived features (home_implied_prob, away_implied_prob)")
+    print("  2. Add max bet constraints (5% bankroll, $5,000 absolute)")
+    print("  3. Clip probabilities to [0.05, 0.95]")
+    print("  4. Verify no look-ahead bias in feature computation")
+    print("  5. Add reality check: flag if win rate > 60%")
 
 
 if __name__ == "__main__":

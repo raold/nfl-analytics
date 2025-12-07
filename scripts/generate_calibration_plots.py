@@ -20,13 +20,10 @@ Date: 2025-11-03
 """
 
 import argparse
-import sys
 from pathlib import Path
-from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 # Dissertation styling
 plt.style.use('seaborn-v0_8-darkgrid')
@@ -133,7 +130,7 @@ def generate_all_calibration_plots(
     start_year: int = 2003,
     end_year: int = 2024,
     output_dir: Path = Path('analysis/reports/calibration')
-) -> List[Path]:
+) -> list[Path]:
     """Generate all calibration plots for dissertation"""
 
     generated = []
@@ -189,11 +186,11 @@ def main():
         )
 
         print(f"\n{'='*70}")
-        print(f"CALIBRATION PLOTS GENERATION COMPLETE")
+        print("CALIBRATION PLOTS GENERATION COMPLETE")
         print(f"{'='*70}")
         print(f"Total plots generated: {len(generated)}")
         print(f"Output directory: {output_dir}")
-        print(f"\nFiles ready for dissertation inclusion.")
+        print("\nFiles ready for dissertation inclusion.")
 
 if __name__ == "__main__":
     main()

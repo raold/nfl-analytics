@@ -66,14 +66,11 @@ import json
 import logging
 import os
 import pickle
-from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any
 
-import numpy as np
-import pandas as pd
 import psycopg2
 import yaml  # type: ignore
 from psycopg2.extras import DictCursor
@@ -165,8 +162,8 @@ class ModelFile:
     modified_time: datetime
     model_name: str  # Inferred from filename
     is_readable: bool
-    read_error: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    read_error: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -180,8 +177,8 @@ class DatabaseModel:
     is_production: bool
     model_path: str
     file_exists: bool = False
-    file_size_kb: Optional[float] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    file_size_kb: float | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -193,9 +190,9 @@ class RegistryModel:
     model_type: str
     status: str
     file_path: str
-    ensemble_weight: Optional[float]
-    convergence: Optional[Dict[str, Any]]
-    performance: Optional[Dict[str, Any]]
+    ensemble_weight: float | None
+    convergence: dict[str, Any] | None
+    performance: dict[str, Any] | None
     file_exists: bool = False
 
 
@@ -205,11 +202,11 @@ class ConvergenceReport:
 
     model_name: str
     converged: bool
-    rhat_max: Optional[float]
-    ess_min: Optional[int]
-    divergences: Optional[int]
-    issues: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
+    rhat_max: float | None
+    ess_min: int | None
+    divergences: int | None
+    issues: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -218,9 +215,9 @@ class CalibrationReport:
 
     model_name: str
     calibrated: bool
-    coverage_90pct: Optional[float]
-    temperature: Optional[float]
-    issues: List[str] = field(default_factory=list)
+    coverage_90pct: float | None
+    temperature: float | None
+    issues: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -232,9 +229,9 @@ class RegistrationCandidate:
     model_type: str
     inferred_status: str
     should_register: bool
-    blocking_issues: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    blocking_issues: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -252,15 +249,15 @@ class AuditReport:
     sync_mismatches: int = 0
 
     # Detailed findings
-    filesystem_models: List[ModelFile] = field(default_factory=list)
-    database_models: List[DatabaseModel] = field(default_factory=list)
-    registry_models: List[RegistryModel] = field(default_factory=list)
-    registration_candidates: List[RegistrationCandidate] = field(default_factory=list)
-    convergence_reports: List[ConvergenceReport] = field(default_factory=list)
-    calibration_reports: List[CalibrationReport] = field(default_factory=list)
+    filesystem_models: list[ModelFile] = field(default_factory=list)
+    database_models: list[DatabaseModel] = field(default_factory=list)
+    registry_models: list[RegistryModel] = field(default_factory=list)
+    registration_candidates: list[RegistrationCandidate] = field(default_factory=list)
+    convergence_reports: list[ConvergenceReport] = field(default_factory=list)
+    calibration_reports: list[CalibrationReport] = field(default_factory=list)
 
     # Critical issues (block deployment)
-    critical_issues: List[str] = field(default_factory=list)
+    critical_issues: list[str] = field(default_factory=list)
 
     def has_critical_issues(self) -> bool:
         """Check if report has critical issues."""
@@ -311,8 +308,8 @@ class ModelRegistryAuditor:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        registry_path: Optional[Path] = None,
+        project_root: Path | None = None,
+        registry_path: Path | None = None,
     ):
         """
         Initialize auditor.
@@ -360,7 +357,7 @@ class ModelRegistryAuditor:
             logger.error(f"Database connection failed: {e}")
             raise
 
-    def scan_filesystem_models(self) -> List[ModelFile]:
+    def scan_filesystem_models(self) -> list[ModelFile]:
         """
         Scan models/ directory for all model files (.pkl, .pth, .rds).
 
@@ -451,7 +448,7 @@ class ModelRegistryAuditor:
         logger.info(f"Found {len(model_files)} model files")
         return model_files
 
-    def scan_database_models(self) -> List[DatabaseModel]:
+    def scan_database_models(self) -> list[DatabaseModel]:
         """
         Scan ml.model_registry for all registered models.
 
@@ -526,7 +523,7 @@ class ModelRegistryAuditor:
         logger.info(f"Found {len(database_models)} database models")
         return database_models
 
-    def scan_registry_yaml(self) -> List[RegistryModel]:
+    def scan_registry_yaml(self) -> list[RegistryModel]:
         """
         Parse MODEL_REGISTRY.yaml for production models.
 
@@ -587,9 +584,9 @@ class ModelRegistryAuditor:
 
     def identify_pending_registrations(
         self,
-        filesystem_models: List[ModelFile],
-        database_models: List[DatabaseModel],
-    ) -> List[RegistrationCandidate]:
+        filesystem_models: list[ModelFile],
+        database_models: list[DatabaseModel],
+    ) -> list[RegistrationCandidate]:
         """
         Identify models on filesystem not in database.
 
@@ -682,7 +679,7 @@ class ModelRegistryAuditor:
 
         return candidates
 
-    def validate_convergence(self, registry_models: List[RegistryModel]) -> List[ConvergenceReport]:
+    def validate_convergence(self, registry_models: list[RegistryModel]) -> list[ConvergenceReport]:
         """
         Validate Bayesian model convergence (Rhat, ESS, divergences).
 
@@ -770,7 +767,7 @@ class ModelRegistryAuditor:
 
         return reports
 
-    def validate_calibration(self, registry_models: List[RegistryModel]) -> List[CalibrationReport]:
+    def validate_calibration(self, registry_models: list[RegistryModel]) -> list[CalibrationReport]:
         """
         Validate model calibration (coverage tests).
 
@@ -839,7 +836,7 @@ class ModelRegistryAuditor:
 
         return reports
 
-    def check_file_integrity(self, filesystem_models: List[ModelFile]) -> List[str]:
+    def check_file_integrity(self, filesystem_models: list[ModelFile]) -> list[str]:
         """
         Check file integrity (corrupted files, size anomalies).
 
@@ -877,9 +874,9 @@ class ModelRegistryAuditor:
 
     def check_database_sync(
         self,
-        database_models: List[DatabaseModel],
-        registry_models: List[RegistryModel],
-    ) -> List[str]:
+        database_models: list[DatabaseModel],
+        registry_models: list[RegistryModel],
+    ) -> list[str]:
         """
         Check sync between database and registry YAML.
 
@@ -1002,9 +999,9 @@ class ModelRegistryAuditor:
 
     def auto_register(
         self,
-        candidates: Optional[List[RegistrationCandidate]] = None,
+        candidates: list[RegistrationCandidate] | None = None,
         dry_run: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Auto-register pending models to database.
 

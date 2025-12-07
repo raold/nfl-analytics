@@ -8,15 +8,16 @@ Usage:
     python scripts/compare_xgboost_v2_v3.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import json
-import xgboost as xgb
 from pathlib import Path
-import numpy as np
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+import xgboost as xgb
+
 
 def load_model_metadata(model_name):
     """Load model and metadata"""
@@ -47,7 +48,7 @@ def main():
     v3_model, v3_meta = load_model_metadata('v3')
 
     print("\nModel Metadata Comparison:")
-    print(f"\nv2 (13 features):")
+    print("\nv2 (13 features):")
     print(f"  Training date: {v2_meta['training_date']}")
     print(f"  MAE: {v2_meta['metrics']['mae']:.2f} yards")
     print(f"  RMSE: {v2_meta['metrics']['rmse']:.2f} yards")
@@ -55,7 +56,7 @@ def main():
     print(f"  Best iteration: {int(v2_meta['metrics']['best_iteration'])}")
     print(f"  Training time: {v2_meta['metrics']['training_time_minutes']:.3f} min")
 
-    print(f"\nv3 (16 features with opponent strength):")
+    print("\nv3 (16 features with opponent strength):")
     print(f"  Training date: {v3_meta['training_date']}")
     print(f"  MAE: {v3_meta['metrics']['mae']:.2f} yards")
     print(f"  RMSE: {v3_meta['metrics']['rmse']:.2f} yards")

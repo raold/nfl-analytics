@@ -13,6 +13,7 @@ Purpose: Fast verification before full 3-season validation
 
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -21,6 +22,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 import psycopg2
+
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
@@ -152,7 +154,7 @@ def main():
         ss_max = state_space_valid.max()
         ss_broken = (state_space_valid < 50).sum()
 
-        print(f"\nState-Space v2:")
+        print("\nState-Space v2:")
         print(f"  Mean: {ss_mean:.1f} yards (expect ~180-260)")
         print(f"  Range: {ss_min:.1f} - {ss_max:.1f} yards")
         print(f"  Broken (<50 yards): {ss_broken}/{len(state_space_valid)}")
@@ -168,7 +170,7 @@ def main():
         xgb_constant = xgb_std < 5  # If std < 5, likely constant
         xgb_broken = (xgb_valid > 350).sum()
 
-        print(f"\nXGBoost v4 Ridge:")
+        print("\nXGBoost v4 Ridge:")
         print(f"  Mean: {xgb_mean:.1f} yards")
         print(f"  Std Dev: {xgb_std:.1f} yards (expect >10 for varying predictions)")
         print(f"  Range: {xgb_min:.1f} - {xgb_max:.1f} yards")
@@ -180,7 +182,7 @@ def main():
     if len(ensemble_valid) > 0:
         ens_mae = np.abs(ensemble_valid - df.loc[ensemble_valid.index, 'actual']).mean()
 
-        print(f"\nEnsemble v6.0:")
+        print("\nEnsemble v6.0:")
         print(f"  MAE (5 games): {ens_mae:.2f} yards")
         print(f"  Status: {'✅ REASONABLE' if ens_mae < 80 else '⚠️  HIGH ERROR'}")
 

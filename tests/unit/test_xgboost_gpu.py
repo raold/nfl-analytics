@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.775224
 Test count: 27
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.xgboost_gpu import *
-import pandas as pd
-import pytest
 
 
 def test_check_gpu_availability_basic():

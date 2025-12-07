@@ -55,20 +55,19 @@ Version: 6.0 (XGBoost Ridge Residuals Integration)
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
-import logging
-import pandas as pd
-import numpy as np
-from datetime import datetime
-from typing import Dict, List, Tuple, Optional
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import time
 import json
+import logging
 import pickle
-from collections import defaultdict
+import time
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
+import psycopg2
 from scipy import stats
 
 # Setup logging first (before other imports that might log)
@@ -91,8 +90,8 @@ except ImportError:
     logger.warning("tqdm not available - progress bar disabled")
 
 # Import ensemble v6.0 and v5.1 for comparison
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 
 
 class HistoricalValidatorV6:
@@ -110,7 +109,7 @@ class HistoricalValidatorV6:
         db_name: str = "devdb01",
         db_user: str = "dro",
         db_password: str = "sicillionbillions",  # pragma: allowlist secret
-        checkpoint_path: Optional[str] = None,
+        checkpoint_path: str | None = None,
         dry_run: bool = False,
     ):
         self.start_season = start_season
@@ -261,7 +260,7 @@ class HistoricalValidatorV6:
 
         return df
 
-    def process_game(self, row: pd.Series) -> Tuple[Optional[Dict], Optional[Dict]]:
+    def process_game(self, row: pd.Series) -> tuple[dict | None, dict | None]:
         """
         Process a single player-game and generate predictions from both ensembles.
 
@@ -348,7 +347,7 @@ class HistoricalValidatorV6:
             logger.error(f"Failed to process {row['player_name']} in {row['game_id']}: {e}")
             return None, None
 
-    def run_backtest(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def run_backtest(self) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Run historical validation backtest."""
         logger.info("\n" + "="*80)
         logger.info("STARTING ENSEMBLE v6.0 HISTORICAL VALIDATION")
@@ -441,7 +440,7 @@ class HistoricalValidatorV6:
 
         return results_v6_df, results_v5_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame, version: str) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame, version: str) -> dict:
         """Calculate comprehensive performance metrics."""
         if len(results_df) == 0:
             logger.error(f"No predictions to analyze for {version}!")
@@ -526,7 +525,7 @@ class HistoricalValidatorV6:
         errors_v6: np.ndarray,
         errors_v5: np.ndarray,
         h: int = 1
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Diebold-Mariano test for comparing forecast accuracy.
 
@@ -576,7 +575,7 @@ class HistoricalValidatorV6:
         metric: str = 'mae',
         n_bootstrap: int = 1000,
         alpha: float = 0.05
-    ) -> Tuple[float, float, float]:
+    ) -> tuple[float, float, float]:
         """
         Bootstrap confidence interval for a metric.
 
@@ -598,7 +597,7 @@ class HistoricalValidatorV6:
 
         return point_estimate, ci_lower, ci_upper
 
-    def validate_risk_gates(self, metrics_v6: Dict, metrics_v5: Optional[Dict] = None) -> Dict[str, bool]:
+    def validate_risk_gates(self, metrics_v6: dict, metrics_v5: dict | None = None) -> dict[str, bool]:
         """Validate against production risk gates."""
         gates = {}
 
@@ -622,10 +621,10 @@ class HistoricalValidatorV6:
 
     def print_summary(
         self,
-        metrics_v6: Dict,
-        metrics_v5: Optional[Dict],
-        gates: Dict[str, bool],
-        dm_test: Optional[Dict] = None
+        metrics_v6: dict,
+        metrics_v5: dict | None,
+        gates: dict[str, bool],
+        dm_test: dict | None = None
     ):
         """Print comprehensive validation summary."""
         logger.info("\n" + "="*80)
@@ -636,13 +635,13 @@ class HistoricalValidatorV6:
             logger.error("❌ No metrics to display (0 predictions)")
             return
 
-        logger.info(f"\n📊 Dataset:")
+        logger.info("\n📊 Dataset:")
         logger.info(f"  Seasons: {self.start_season} - {self.end_season}")
         logger.info(f"  Total Predictions (v6.0): {metrics_v6['total_predictions']}")
         if metrics_v5:
             logger.info(f"  Total Predictions (v5.1): {metrics_v5['total_predictions']}")
 
-        logger.info(f"\n📈 Ensemble v6.0 Performance:")
+        logger.info("\n📈 Ensemble v6.0 Performance:")
         logger.info(f"  MAE: {metrics_v6['mae']:.2f} yards")
         logger.info(f"  RMSE: {metrics_v6['rmse']:.2f} yards")
         logger.info(f"  MAPE: {metrics_v6['mape']:.2f}%")
@@ -650,7 +649,7 @@ class HistoricalValidatorV6:
         logger.info(f"  Inference Time (median): {metrics_v6['median_inference_time_ms']:.1f}ms")
 
         if metrics_v5:
-            logger.info(f"\n📊 Baseline v5.1 Performance:")
+            logger.info("\n📊 Baseline v5.1 Performance:")
             logger.info(f"  MAE: {metrics_v5['mae']:.2f} yards")
             logger.info(f"  RMSE: {metrics_v5['rmse']:.2f} yards")
             logger.info(f"  Calibration: {metrics_v5['calibration_90']:.2f}%")
@@ -658,17 +657,17 @@ class HistoricalValidatorV6:
             mae_improvement = metrics_v5['mae'] - metrics_v6['mae']
             mae_improvement_pct = (mae_improvement / metrics_v5['mae']) * 100
 
-            logger.info(f"\n🎯 v6.0 vs v5.1 Comparison:")
+            logger.info("\n🎯 v6.0 vs v5.1 Comparison:")
             logger.info(f"  MAE Improvement: {mae_improvement:.2f} yards ({mae_improvement_pct:+.1f}%)")
             logger.info(f"  RMSE Improvement: {metrics_v5['rmse'] - metrics_v6['rmse']:.2f} yards")
 
             if dm_test:
-                logger.info(f"\n📊 Statistical Testing (Diebold-Mariano):")
+                logger.info("\n📊 Statistical Testing (Diebold-Mariano):")
                 logger.info(f"  DM Statistic: {dm_test['dm_statistic']:.3f}")
                 logger.info(f"  P-value: {dm_test['p_value']:.4f}")
                 logger.info(f"  {dm_test['interpretation']}")
 
-        logger.info(f"\n📊 By-Season Breakdown (v6.0):")
+        logger.info("\n📊 By-Season Breakdown (v6.0):")
         for season_data in metrics_v6['season_breakdown']:
             logger.info(
                 f"  {season_data['season']}: {season_data['games']} games | "
@@ -678,7 +677,7 @@ class HistoricalValidatorV6:
             )
 
         if metrics_v6['model_performance']:
-            logger.info(f"\n🤖 Individual Model Performance (v6.0):")
+            logger.info("\n🤖 Individual Model Performance (v6.0):")
             for model_name, model_data in metrics_v6['model_performance'].items():
                 logger.info(
                     f"  {model_name:30s} | {model_data['predictions']:4d} preds | "
@@ -686,7 +685,7 @@ class HistoricalValidatorV6:
                     f"RMSE: {model_data['rmse']:5.2f}"
                 )
 
-        logger.info(f"\n🎯 Risk Gate Validation:")
+        logger.info("\n🎯 Risk Gate Validation:")
 
         mae_status = "✅ PASS" if gates['mae'] else "❌ FAIL"
         logger.info(f"  {mae_status} MAE: {metrics_v6['mae']:.2f} < 35.0 yards")
@@ -865,25 +864,25 @@ Examples:
                 milestone_path.parent.mkdir(parents=True, exist_ok=True)
 
                 with open(milestone_path, 'w') as f:
-                    f.write(f"# Ensemble v6.0 Backtest Complete\n\n")
+                    f.write("# Ensemble v6.0 Backtest Complete\n\n")
                     f.write(f"**Date:** {datetime.now().strftime('%B %d, %Y')}\n")
-                    f.write(f"**Status:** ✅ APPROVED FOR PRODUCTION\n\n")
-                    f.write(f"## Results Summary\n\n")
-                    f.write(f"| Metric | v6.0 (New) | v5.1 (Baseline) | Improvement | Status |\n")
-                    f.write(f"|--------|------------|-----------------|-------------|--------|\n")
+                    f.write("**Status:** ✅ APPROVED FOR PRODUCTION\n\n")
+                    f.write("## Results Summary\n\n")
+                    f.write("| Metric | v6.0 (New) | v5.1 (Baseline) | Improvement | Status |\n")
+                    f.write("|--------|------------|-----------------|-------------|--------|\n")
                     f.write(f"| MAE | {metrics_v6['mae']:.2f} yards | {metrics_v5['mae']:.2f} yards | {metrics_v5['mae'] - metrics_v6['mae']:.2f} yards | ✅ |\n")
                     f.write(f"| RMSE | {metrics_v6['rmse']:.2f} yards | {metrics_v5['rmse']:.2f} yards | {metrics_v5['rmse'] - metrics_v6['rmse']:.2f} yards | ✅ |\n")
                     f.write(f"| Calibration | {metrics_v6['calibration_90']:.1f}% | {metrics_v5['calibration_90']:.1f}% | {metrics_v6['calibration_90'] - metrics_v5['calibration_90']:.1f}pp | ✅ |\n")
                     f.write(f"| Inference Time | {metrics_v6['median_inference_time_ms']:.0f}ms | {metrics_v5['median_inference_time_ms']:.0f}ms | - | ✅ |\n")
-                    f.write(f"\n## Statistical Testing\n\n")
+                    f.write("\n## Statistical Testing\n\n")
                     f.write(f"- Diebold-Mariano Test: {dm_test['interpretation']}\n")
                     f.write(f"- P-value: {dm_test['p_value']:.4f}\n")
-                    f.write(f"\n## Risk Gates\n\n")
+                    f.write("\n## Risk Gates\n\n")
                     for gate_name, gate_pass in gates.items():
                         status = "✅ PASS" if gate_pass else "❌ FAIL"
                         f.write(f"- {status} {gate_name}\n")
-                    f.write(f"\n## Deployment Decision\n\n")
-                    f.write(f"✅ **APPROVED FOR PRODUCTION DEPLOYMENT**\n")
+                    f.write("\n## Deployment Decision\n\n")
+                    f.write("✅ **APPROVED FOR PRODUCTION DEPLOYMENT**\n")
 
                 logger.info(f"✅ Milestone documentation created: {milestone_path}")
 

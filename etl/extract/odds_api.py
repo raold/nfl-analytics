@@ -12,7 +12,7 @@ import logging
 import os
 from collections.abc import Iterable
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 import requests
@@ -34,7 +34,7 @@ class OddsAPIExtractor(BaseExtractor):
     - Tracks API quota usage
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize Odds API extractor.
 
@@ -73,7 +73,7 @@ class OddsAPIExtractor(BaseExtractor):
     def extract_historical(
         self,
         start_date: date,
-        end_date: Optional[date] = None,
+        end_date: date | None = None,
         **kwargs
     ) -> ExtractionResult:
         """
@@ -172,7 +172,7 @@ class OddsAPIExtractor(BaseExtractor):
         """
         url = f"{self.api_base}/historical/sports/{self.sport_key}/odds"
 
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "apiKey": self.api_key,
             "regions": self.regions,
             "markets": self.markets,
@@ -205,7 +205,7 @@ class OddsAPIExtractor(BaseExtractor):
 
         return response
 
-    def _extract_events(self, json_data: Any) -> List[Dict[str, Any]]:
+    def _extract_events(self, json_data: Any) -> list[dict[str, Any]]:
         """
         Extract events from JSON response.
 
@@ -226,9 +226,9 @@ class OddsAPIExtractor(BaseExtractor):
 
     def _flatten_events(
         self,
-        events: List[Dict[str, Any]],
+        events: list[dict[str, Any]],
         snapshot_at: datetime
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Flatten nested event/bookmaker/market/outcome structure.
 
@@ -239,7 +239,7 @@ class OddsAPIExtractor(BaseExtractor):
         Returns:
             List of flattened row dictionaries
         """
-        rows: List[Dict[str, Any]] = []
+        rows: list[dict[str, Any]] = []
 
         for event in events:
             event_id = event.get("id")
@@ -284,7 +284,7 @@ class OddsAPIExtractor(BaseExtractor):
 
         return rows
 
-    def _parse_iso(self, value: Optional[str]) -> Optional[datetime]:
+    def _parse_iso(self, value: str | None) -> datetime | None:
         """Parse ISO datetime string."""
         if not value:
             return None
@@ -298,7 +298,7 @@ class OddsAPIExtractor(BaseExtractor):
         for offset in range((end - start).days + 1):
             yield start + timedelta(days=offset)
 
-    def extract(self, endpoint: str, params: Dict[str, Any]) -> pd.DataFrame:
+    def extract(self, endpoint: str, params: dict[str, Any]) -> pd.DataFrame:
         """
         Extract data (required by BaseExtractor).
 
@@ -373,7 +373,7 @@ if __name__ == "__main__":
         print(f"✅ Extracted {result.row_count} rows in {result.duration_seconds:.1f}s")
         print(f"   API requests remaining: {result.metadata.get('requests_remaining')}")
         if result.data is not None and not result.data.empty:
-            print(f"\nSample data:")
+            print("\nSample data:")
             print(result.data.head())
     else:
         print(f"❌ Extraction failed: {result.error}")

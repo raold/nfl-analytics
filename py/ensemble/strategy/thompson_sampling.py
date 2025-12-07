@@ -38,10 +38,11 @@ Version: 1.0.0
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 import numpy as np
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 logger = logging.getLogger(__name__)
 
@@ -101,12 +102,12 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
 
     def __init__(
         self,
-        component_names: Optional[List[str]] = None,
+        component_names: list[str] | None = None,
         success_threshold: float = 40.0,
         prior_alpha: float = 1.0,
         prior_beta: float = 1.0,
         decay_factor: float = 0.99,
-        stat_type: Optional[str] = None,
+        stat_type: str | None = None,
     ):
         """
         Initialize Thompson Sampling strategy.
@@ -129,13 +130,13 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         self.decay_factor = decay_factor
 
         # Initialize Beta parameters for each component
-        self.params: Dict[str, BetaParams] = {
+        self.params: dict[str, BetaParams] = {
             name: BetaParams(alpha=prior_alpha, beta=prior_beta)
             for name in self.component_names
         }
 
         # Track last sampled weights
-        self._last_weights: Optional[Dict[str, float]] = None
+        self._last_weights: dict[str, float] | None = None
         self._prediction_count = 0
 
         logger.info(f"Initialized ThompsonSamplingStrategy with {len(self.component_names)} components")
@@ -144,7 +145,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
     def name(self) -> str:
         return "thompson_sampling"
 
-    def _get_threshold_for_stat_type(self, stat_type: Optional[str]) -> Optional[float]:
+    def _get_threshold_for_stat_type(self, stat_type: str | None) -> float | None:
         """Get appropriate success threshold for stat type."""
         thresholds = {
             'passing_yards': 40.0,
@@ -159,7 +160,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         }
         return thresholds.get(stat_type)
 
-    def sample_weights(self) -> Dict[str, float]:
+    def sample_weights(self) -> dict[str, float]:
         """Sample weights from Beta distributions."""
         samples = {name: params.sample() for name, params in self.params.items()}
         total = sum(samples.values())
@@ -167,7 +168,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         self._last_weights = weights
         return weights
 
-    def get_expected_weights(self) -> Dict[str, float]:
+    def get_expected_weights(self) -> dict[str, float]:
         """Get expected (mean) weights from Beta distributions."""
         means = {name: params.mean for name, params in self.params.items()}
         total = sum(means.values())
@@ -175,8 +176,8 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
 
     def combine(
         self,
-        predictions: List[ModelPrediction],
-        context: Optional[Dict[str, Any]] = None,
+        predictions: list[ModelPrediction],
+        context: dict[str, Any] | None = None,
         **kwargs
     ) -> EnsemblePrediction:
         """Combine predictions using Thompson Sampling weights."""
@@ -230,9 +231,9 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
 
     def update(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         actual_value: float,
-        weights_used: Optional[Dict[str, float]] = None,
+        weights_used: dict[str, float] | None = None,
     ):
         """Update Beta parameters after observing actual outcome."""
         weights = weights_used or self._last_weights
@@ -268,7 +269,7 @@ class ThompsonSamplingStrategy(EnsembleStrategy):
         avg_variance = np.mean(variances)
         return float(min(1.0, avg_variance / 0.083))
 
-    def get_diagnostics(self) -> Dict[str, Any]:
+    def get_diagnostics(self) -> dict[str, Any]:
         """Get diagnostic information about current state."""
         return {
             "params": {
@@ -298,7 +299,7 @@ class AdaptiveStrategySelector:
     def __init__(self, exploration_weeks: int = 4, transition_weeks: int = 2):
         self.exploration_weeks = exploration_weeks
         self.transition_weeks = transition_weeks
-        self._thompson_cache: Dict[str, ThompsonSamplingStrategy] = {}
+        self._thompson_cache: dict[str, ThompsonSamplingStrategy] = {}
         self._dirichlet = None
 
     def get_thompson_strategy(self, stat_type: str) -> ThompsonSamplingStrategy:
@@ -311,7 +312,9 @@ class AdaptiveStrategySelector:
         """Get Dirichlet stacking strategy."""
         if self._dirichlet is None:
             try:
-                from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+                from py.ensemble.dirichlet_bayesian_stacking import (
+                    DirichletBayesianStackingByStatType,
+                )
                 self._dirichlet = DirichletBayesianStackingByStatType(use_db=True)
             except ImportError:
                 logger.warning("DirichletBayesianStackingByStatType not available")

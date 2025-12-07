@@ -15,7 +15,6 @@ Date: November 16, 2025
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import cvxpy as cp
 import numpy as np
@@ -54,11 +53,11 @@ class AdaptiveWLSWeightsV2:
     def __init__(
         self,
         predictions_df: pd.DataFrame,
-        model_names: List[str],
+        model_names: list[str],
         actual_col: str = 'actual',
-        halflife_candidates: Optional[List[float]] = None,
+        halflife_candidates: list[float] | None = None,
         min_observations: int = 10,
-        weight_constraints: Optional[Dict[str, Tuple[float, float]]] = None,
+        weight_constraints: dict[str, tuple[float, float]] | None = None,
     ):
         """
         Initialize WLS optimizer with tunable halflife.
@@ -100,11 +99,11 @@ class AdaptiveWLSWeightsV2:
         self.halflife_candidates = sorted(halflife_candidates)
 
         # Optimal parameters (set after grid search)
-        self.optimal_halflife: Optional[float] = None
-        self.optimal_weights: Optional[Dict[str, float]] = None
-        self.optimal_metric: Optional[float] = None
+        self.optimal_halflife: float | None = None
+        self.optimal_weights: dict[str, float] | None = None
+        self.optimal_metric: float | None = None
 
-        logger.info(f"Initialized AdaptiveWLSWeightsV2:")
+        logger.info("Initialized AdaptiveWLSWeightsV2:")
         logger.info(f"  Observations: {len(predictions_df):,}")
         logger.info(f"  Models: {len(model_names)}")
         logger.info(f"  Halflife candidates: {halflife_candidates}")
@@ -142,7 +141,7 @@ class AdaptiveWLSWeightsV2:
     def _compute_ensemble_predictions(
         self,
         df: pd.DataFrame,
-        weights: Dict[str, float]
+        weights: dict[str, float]
     ) -> np.ndarray:
         """
         Compute weighted ensemble predictions.
@@ -164,10 +163,10 @@ class AdaptiveWLSWeightsV2:
     def optimize_weights(
         self,
         halflife: float,
-        predictions_df: Optional[pd.DataFrame] = None,
+        predictions_df: pd.DataFrame | None = None,
         metric: str = 'mae',
         solver: str = 'ECOS',
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Optimize ensemble weights using WLS with specified halflife.
 
@@ -257,7 +256,7 @@ class AdaptiveWLSWeightsV2:
         validation_split: float = 0.2,
         metric: str = 'mae',
         solver: str = 'ECOS',
-    ) -> Tuple[Dict[str, float], float]:
+    ) -> tuple[dict[str, float], float]:
         """
         Grid search over halflife candidates, select best on validation set.
 
@@ -291,7 +290,7 @@ class AdaptiveWLSWeightsV2:
         train_df = self.predictions_df.iloc[:-val_size].copy()
         val_df = self.predictions_df.iloc[-val_size:].copy()
 
-        logger.info(f"Grid search validation split:")
+        logger.info("Grid search validation split:")
         logger.info(f"  Train: {len(train_df):,} observations")
         logger.info(f"  Validation: {len(val_df):,} observations")
 
@@ -351,7 +350,7 @@ class AdaptiveWLSWeightsV2:
         if best_halflife is None:
             raise ValueError("Grid search failed: No valid halflife candidates")
 
-        logger.info(f"✅ Grid search complete:")
+        logger.info("✅ Grid search complete:")
         logger.info(f"   Optimal halflife: {best_halflife} weeks")
         logger.info(f"   Validation {metric.upper()}: {best_metric_value:.4f}")
 
@@ -369,7 +368,7 @@ class AdaptiveWLSWeightsV2:
         self.optimal_metric = best_metric_value
 
         # Log final weights
-        logger.info(f"   Final weights (full data):")
+        logger.info("   Final weights (full data):")
         for name, weight in sorted(final_weights.items(), key=lambda x: -x[1]):
             logger.info(f"     {name:25s}: {weight:.4f} ({weight*100:.1f}%)")
 
@@ -379,7 +378,7 @@ class AdaptiveWLSWeightsV2:
         self,
         window_size: int = 6,
         step_size: int = 1,
-        halflife: Optional[float] = None,
+        halflife: float | None = None,
         metric: str = 'mae',
     ) -> pd.DataFrame:
         """
@@ -437,7 +436,7 @@ class AdaptiveWLSWeightsV2:
     def save_weights(
         self,
         output_path: str,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
     ) -> None:
         """
         Save optimal weights and metadata to JSON.
@@ -470,7 +469,7 @@ class AdaptiveWLSWeightsV2:
         logger.info(f"✅ Saved WLS weights to: {output_path}")
 
     @classmethod
-    def load_weights(cls, weights_path: str) -> Tuple[Dict[str, float], Dict]:
+    def load_weights(cls, weights_path: str) -> tuple[dict[str, float], dict]:
         """
         Load weights and metadata from JSON.
 
@@ -480,7 +479,7 @@ class AdaptiveWLSWeightsV2:
         Returns:
             (weights_dict, metadata_dict)
         """
-        with open(weights_path, 'r') as f:
+        with open(weights_path) as f:
             data = json.load(f)
 
         weights = data['weights']
@@ -499,9 +498,9 @@ class AdaptiveWLSWeightsV2:
 
 def compute_ensemble_performance_metrics(
     predictions_df: pd.DataFrame,
-    weights: Dict[str, float],
+    weights: dict[str, float],
     actual_col: str = 'actual',
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute comprehensive performance metrics for ensemble.
 

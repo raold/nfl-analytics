@@ -21,9 +21,7 @@ Date: November 19, 2025
 
 import json
 import logging
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -47,7 +45,7 @@ DB_CONFIG = {
 
 def get_predictions(
     config: str, season: int, conn
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Get predictions for a specific configuration and season.
 
@@ -92,7 +90,7 @@ def get_predictions(
 
 def calculate_metrics(
     predictions: np.ndarray, actuals: np.ndarray, uncertainties: np.ndarray
-) -> Dict:
+) -> dict:
     """
     Calculate validation metrics.
 
@@ -148,7 +146,7 @@ def calculate_metrics(
 
 def diebold_mariano_test(
     errors1: np.ndarray, errors2: np.ndarray, h: int = 1
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Diebold-Mariano test for predictive accuracy comparison.
 
@@ -211,7 +209,7 @@ def main():
             predictions, actuals, uncertainties = get_predictions(config, season, conn)
 
             if len(predictions) == 0:
-                logger.warning(f"    No data found")
+                logger.warning("    No data found")
                 continue
 
             # Calculate metrics
@@ -277,11 +275,11 @@ def main():
             logger.info(f"    p-value: {p_value:.6f}")
 
             if p_value < 0.01:
-                logger.info(f"    ✅ Significant at p < 0.01")
+                logger.info("    ✅ Significant at p < 0.01")
             elif p_value < 0.05:
-                logger.info(f"    ✅ Significant at p < 0.05")
+                logger.info("    ✅ Significant at p < 0.05")
             else:
-                logger.info(f"    ❌ Not significant (p >= 0.05)")
+                logger.info("    ❌ Not significant (p >= 0.05)")
 
             config_comparison[season] = {
                 "mae_v6": float(mae_v6),
@@ -309,12 +307,12 @@ def main():
     logger.info("EXTRACTION COMPLETE")
     logger.info("=" * 80)
 
-    logger.info(f"\nOutput files:")
-    logger.info(f"  - results/validation_v6_baseline_2022_2024.json")
-    logger.info(f"  - results/validation_v7_meta_only_2022_2024.json")
-    logger.info(f"  - results/validation_v7_wls_only_2022_2024.json")
-    logger.info(f"  - results/validation_v7_full_2022_2024.json")
-    logger.info(f"  - results/v6_vs_v7_comparison.json")
+    logger.info("\nOutput files:")
+    logger.info("  - results/validation_v6_baseline_2022_2024.json")
+    logger.info("  - results/validation_v7_meta_only_2022_2024.json")
+    logger.info("  - results/validation_v7_wls_only_2022_2024.json")
+    logger.info("  - results/validation_v7_full_2022_2024.json")
+    logger.info("  - results/v6_vs_v7_comparison.json")
 
 
 if __name__ == "__main__":

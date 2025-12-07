@@ -5,14 +5,12 @@ Builds longitudinal panel datasets from NFL database for causal analysis.
 Supports both player-level and team-level panels with derived features.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, List, Dict, Tuple
-from dataclasses import dataclass
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from pathlib import Path
 import logging
+from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +28,7 @@ class PanelConfig:
 class PanelConstructor:
     """Constructs panel datasets for causal inference from NFL database"""
 
-    def __init__(self, db_params: Optional[Dict] = None):
+    def __init__(self, db_params: dict | None = None):
         """
         Initialize panel constructor with database connection.
 
@@ -65,7 +63,7 @@ class PanelConstructor:
 
     def build_player_game_panel(
         self,
-        config: Optional[PanelConfig] = None
+        config: PanelConfig | None = None
     ) -> pd.DataFrame:
         """
         Build player-game level panel dataset.

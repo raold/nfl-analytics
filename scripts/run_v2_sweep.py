@@ -23,7 +23,6 @@ Usage:
 
 import subprocess
 import sys
-from pathlib import Path
 
 # v2 model features (11 features - optimized per Task 3 ablation study)
 V2_FEATURES = [
@@ -46,13 +45,13 @@ def main():
     print("="*80)
     print("LAUNCHING v2 MODEL HYPERPARAMETER SWEEP")
     print("="*80)
-    print(f"\nTarget: home_win (not home_cover)")
+    print("\nTarget: home_win (not home_cover)")
     print(f"Features: {len(V2_FEATURES)}")
-    print(f"Dataset: asof_team_features_v2.csv")
-    print(f"Sweep size: 192 configurations × 1 test season = 192 models")
-    print(f"Expected duration: 40-60 hours on RTX 4090 (10-15% faster with 11 features)")
-    print(f"\nCurrent baseline (11 features, default params): Brier 0.1817, AUC 0.8023")
-    print(f"Target (after hyperparameter optimization): Brier 0.170-0.175, AUC 0.82+")
+    print("Dataset: asof_team_features_v2.csv")
+    print("Sweep size: 192 configurations × 1 test season = 192 models")
+    print("Expected duration: 40-60 hours on RTX 4090 (10-15% faster with 11 features)")
+    print("\nCurrent baseline (11 features, default params): Brier 0.1817, AUC 0.8023")
+    print("Target (after hyperparameter optimization): Brier 0.170-0.175, AUC 0.82+")
 
     # Confirm before launching
     response = input("\nLaunch sweep? (y/n): ")

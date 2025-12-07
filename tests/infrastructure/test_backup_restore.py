@@ -18,7 +18,6 @@ import os
 import subprocess
 import tempfile
 import time
-from datetime import datetime
 from pathlib import Path
 
 import psycopg

@@ -10,8 +10,8 @@ Date: November 15, 2025
 """
 
 import inspect
+
 import pytest
-from typing import Dict
 
 
 class TestEnsembleV6API:

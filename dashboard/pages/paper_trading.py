@@ -8,17 +8,17 @@ Author: Claude Code
 Date: November 6, 2025
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import psycopg
-from datetime import datetime, timedelta
+import logging
 import os
 import sys
 from pathlib import Path
-import logging
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import psycopg
+import streamlit as st
+from plotly.subplots import make_subplots
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import connection pooling
 try:
-    from dashboard.utils.db import get_db_connection, DB_CONFIG
+    from dashboard.utils.db import DB_CONFIG, get_db_connection
 except ImportError:
     # Fallback configuration
     DB_CONFIG = {
@@ -44,7 +44,11 @@ except ImportError:
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -289,7 +293,7 @@ else:
         st.metric(
             "Total Bets",
             f"{total_bets}",
-            delta=f"Active"
+            delta="Active"
         )
 
     # Bankroll progress

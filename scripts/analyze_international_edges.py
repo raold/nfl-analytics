@@ -19,9 +19,7 @@ import json
 import logging
 import os
 import sys
-from datetime import timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -105,7 +103,7 @@ def fetch_international_games(season_start: int = 2018) -> pd.DataFrame:
     return df
 
 
-def fetch_qb_performances(game_ids: List[str]) -> pd.DataFrame:
+def fetch_qb_performances(game_ids: list[str]) -> pd.DataFrame:
     """
     Fetch QB passing performance for specific games.
 
@@ -160,7 +158,7 @@ def fetch_qb_performances(game_ids: List[str]) -> pd.DataFrame:
     return df
 
 
-def fetch_qb_domestic_average(player_ids: List[str], season_start: int = 2018) -> pd.DataFrame:
+def fetch_qb_domestic_average(player_ids: list[str], season_start: int = 2018) -> pd.DataFrame:
     """
     Fetch QB domestic (non-international) average performance.
 
@@ -237,7 +235,7 @@ def fetch_qb_domestic_average(player_ids: List[str], season_start: int = 2018) -
 
 def analyze_edge_a_west_coast_penalty(
     intl_games: pd.DataFrame, qb_perf: pd.DataFrame, domestic_avg: pd.DataFrame
-) -> Dict:
+) -> dict:
     """
     Edge A: Test if West Coast QBs underperform in early London games.
 
@@ -363,7 +361,7 @@ def analyze_edge_a_west_coast_penalty(
     return result
 
 
-def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> Dict:
+def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> dict:
     """
     Edge B: Test if international game totals have UNDER bias.
 
@@ -466,7 +464,7 @@ def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> Dict:
     return result
 
 
-def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> Dict:
+def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> dict:
     """
     Edge C: Test if teams underperform in next game after international travel.
 

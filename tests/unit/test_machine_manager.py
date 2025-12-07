@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.277839
 Test count: 29
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from sync.machine_manager import *
-import pandas as pd
-import pytest
 
 
 def test_get_machine_id_basic():

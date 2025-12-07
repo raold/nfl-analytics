@@ -24,12 +24,9 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
@@ -73,7 +70,7 @@ class GameOutcomeModelTrainer:
     - Win Probability: 1 if home wins, 0 otherwise (classification)
     """
 
-    def __init__(self, db_config: Optional[Dict] = None):
+    def __init__(self, db_config: dict | None = None):
         """Initialize trainer with database connection and feature extractors."""
         self.db_config = db_config or DB_CONFIG
 
@@ -98,7 +95,7 @@ class GameOutcomeModelTrainer:
 
         logger.info("GameOutcomeModelTrainer initialized")
 
-    def _get_games(self, seasons: List[int], min_week: int = 3) -> pd.DataFrame:
+    def _get_games(self, seasons: list[int], min_week: int = 3) -> pd.DataFrame:
         """
         Load game data with outcomes for specified seasons.
 
@@ -141,7 +138,7 @@ class GameOutcomeModelTrainer:
         self,
         games_df: pd.DataFrame,
         desc: str = "dataset"
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Build feature matrix and target matrix for games.
 
@@ -270,10 +267,10 @@ class GameOutcomeModelTrainer:
 
     def train(
         self,
-        train_seasons: List[int] = None,
+        train_seasons: list[int] = None,
         test_season: int = None,
         min_week: int = MIN_WEEK
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Train models for spread, total, and moneyline.
 
@@ -379,7 +376,7 @@ class GameOutcomeModelTrainer:
         y_test: pd.Series,
         y_vegas: pd.Series,
         target_name: str
-    ) -> Tuple[xgb.XGBRegressor, Dict]:
+    ) -> tuple[xgb.XGBRegressor, dict]:
         """Train XGBoost regression model."""
 
         # XGBoost parameters
@@ -457,7 +454,7 @@ class GameOutcomeModelTrainer:
         X_test: pd.DataFrame,
         y_test: pd.Series,
         target_name: str
-    ) -> Tuple[xgb.XGBClassifier, Dict]:
+    ) -> tuple[xgb.XGBClassifier, dict]:
         """Train XGBoost classification model for moneyline."""
 
         params = {

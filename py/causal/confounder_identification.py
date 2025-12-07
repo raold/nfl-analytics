@@ -4,10 +4,10 @@ Confounder Identification and Adjustment
 Methods for identifying and adjusting for confounding.
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Optional, Dict
 import logging
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ class ConfounderAdjuster:
         self,
         df: pd.DataFrame,
         treatment: str,
-        confounders: List[str],
+        confounders: list[str],
         caliper: float = 0.1
     ) -> pd.DataFrame:
         """
@@ -75,7 +75,7 @@ class ConfounderAdjuster:
         self,
         df: pd.DataFrame,
         treatment: str,
-        confounders: List[str]
+        confounders: list[str]
     ) -> pd.DataFrame:
         """
         Weight observations by inverse of propensity score.

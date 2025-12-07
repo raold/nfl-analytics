@@ -26,9 +26,8 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from py.utils.performance_profiling_agent import (
-    PerformanceProfilingAgent,
     BottleneckSeverity,
-    BottleneckType,
+    PerformanceProfilingAgent,
 )
 
 # Configure logging
@@ -50,7 +49,7 @@ def example_1_database_profiling():
     print("\nProfiling database queries (>100ms)...")
     report = agent.profile_database_queries(min_duration_ms=100, top_n=20)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Slow Queries: {len(report.slow_queries)}")
     print(f"  N+1 Patterns: {len(report.n_plus_one_queries)}")
     print(f"  Missing Indexes: {len(report.missing_indexes)}")
@@ -59,7 +58,7 @@ def example_1_database_profiling():
     print(f"  P99 Query Time: {report.p99_query_time_ms:.1f}ms")
 
     if report.slow_queries:
-        print(f"\nTop 5 Slowest Queries:")
+        print("\nTop 5 Slowest Queries:")
         for i, query in enumerate(report.slow_queries[:5], 1):
             print(f"\n{i}. Avg: {float(query['avg_time_ms']):.1f}ms, "
                   f"Calls: {query['calls']}, "
@@ -67,7 +66,7 @@ def example_1_database_profiling():
             print(f"   {query['query'][:100]}...")
 
     if report.n_plus_one_queries:
-        print(f"\nN+1 Query Patterns:")
+        print("\nN+1 Query Patterns:")
         for i, query in enumerate(report.n_plus_one_queries[:3], 1):
             print(f"\n{i}. Calls: {query['calls']}, "
                   f"Avg: {float(query['avg_time_ms']):.1f}ms")
@@ -94,7 +93,7 @@ def example_2_python_profiling():
     print("\nProfiling slow_computation(1000000)...")
     report = agent.profile_function(slow_computation, 1000000)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Total Time: {report.total_time_s:.4f}s")
     print(f"  Memory Used: {report.memory_usage_mb:.2f}MB")
     print(f"  Peak Memory: {report.peak_memory_mb:.2f}MB")
@@ -105,13 +104,13 @@ def example_2_python_profiling():
         print(f"\nProfiling {ensemble_file.name}...")
         report = agent.profile_python_code(str(ensemble_file), track_memory=True)
 
-        print(f"\nResults:")
+        print("\nResults:")
         print(f"  Total Time: {report.total_time_s:.2f}s")
         print(f"  Memory Used: {report.memory_usage_mb:.1f}MB")
         print(f"  Hot Paths: {len(report.hot_paths)}")
 
         if report.hot_paths:
-            print(f"\nTop 5 Hot Paths:")
+            print("\nTop 5 Hot Paths:")
             for i, path in enumerate(report.hot_paths[:5], 1):
                 print(f"  {i}. {path}")
 
@@ -127,12 +126,12 @@ def example_3_api_profiling():
     print("\nProfiling API endpoints (last 1 hour)...")
     report = agent.profile_api_endpoints(duration_hours=1, min_latency_ms=100)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Total Endpoints: {len(report.endpoints)}")
     print(f"  Slow Endpoints: {len(report.slow_endpoints)}")
 
     if report.slow_endpoints:
-        print(f"\nSlow Endpoints (>100ms):")
+        print("\nSlow Endpoints (>100ms):")
         for i, endpoint in enumerate(report.slow_endpoints[:5], 1):
             print(f"  {i}. {endpoint['method']} {endpoint['endpoint']}: "
                   f"{endpoint['avg_latency_ms']:.1f}ms")
@@ -153,7 +152,7 @@ def example_4_full_stack_profiling():
         profile_api=True,
     )
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Total Bottlenecks: {len(bottlenecks)}")
 
     # Count by severity
@@ -162,14 +161,14 @@ def example_4_full_stack_profiling():
     medium = sum(1 for b in bottlenecks if b.severity == BottleneckSeverity.MEDIUM)
     low = sum(1 for b in bottlenecks if b.severity == BottleneckSeverity.LOW)
 
-    print(f"\nBy Severity:")
+    print("\nBy Severity:")
     print(f"  🔴 CRITICAL: {critical} (>10s)")
     print(f"  🟠 HIGH:     {high} (>3s)")
     print(f"  🟡 MEDIUM:   {medium} (>1s)")
     print(f"  🟢 LOW:      {low} (>500ms)")
 
     if bottlenecks:
-        print(f"\nTop 5 Bottlenecks:")
+        print("\nTop 5 Bottlenecks:")
         for i, bottleneck in enumerate(bottlenecks[:5], 1):
             print(f"\n{i}. [{bottleneck.severity.value}] {bottleneck.title}")
             print(f"   Type: {bottleneck.bottleneck_type.value}")
@@ -198,18 +197,18 @@ def example_5_recommendations():
     print("\nGenerating recommendations...")
     recommendations = agent.generate_recommendations(bottlenecks)
 
-    print(f"\nResults:")
+    print("\nResults:")
     print(f"  Total Recommendations: {len(recommendations)}")
 
     if recommendations:
-        print(f"\nTop 5 Recommendations:")
+        print("\nTop 5 Recommendations:")
         for i, rec in enumerate(recommendations[:5], 1):
             print(f"\n{i}. Priority {rec.priority}: {rec.recommendation}")
             print(f"   Expected Improvement: {rec.expected_improvement}")
             print(f"   Difficulty: {rec.implementation_difficulty}")
 
             if rec.code_example:
-                print(f"   Code Example:")
+                print("   Code Example:")
                 for line in rec.code_example.strip().split('\n')[:5]:
                     print(f"     {line}")
 
@@ -286,10 +285,10 @@ def example_7_explain_query():
     result = agent.explain_query(query, analyze=True)
 
     if result:
-        print(f"\n✅ Query plan retrieved")
+        print("\n✅ Query plan retrieved")
         print(f"   Execution plan: {result}")
     else:
-        print(f"\n❌ Failed to retrieve query plan")
+        print("\n❌ Failed to retrieve query plan")
 
 
 def main():

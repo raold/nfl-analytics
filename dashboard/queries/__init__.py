@@ -17,10 +17,10 @@ Usage:
     df = PredictionQueries.retrospective_metrics(conn, model_version="v5.1")
 """
 
-from .predictions import PredictionQueries
 from .games import GameQueries
 from .models import ModelQueries
 from .paper_trading import PaperTradingQueries
+from .predictions import PredictionQueries
 from .system import SystemQueries
 
 __all__ = [

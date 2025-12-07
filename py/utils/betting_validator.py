@@ -43,13 +43,13 @@ Integration:
 """
 
 import json
-import numpy as np
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-import logging
+from typing import Any
+
+import numpy as np
 
 try:
     import pandas as pd
@@ -90,7 +90,7 @@ class ValidationIssue:
     metric_value: str
     threshold: str
     recommendation: str
-    financial_impact: Optional[str] = None
+    financial_impact: str | None = None
 
 
 @dataclass
@@ -98,7 +98,7 @@ class ValidationReport:
     """Betting strategy validation report."""
     strategy_name: str
     validation_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
@@ -188,7 +188,7 @@ class BettingValidator:
         edge: float,
         confidence: float,
         bankroll_fraction: float
-    ) -> List[ValidationIssue]:
+    ) -> list[ValidationIssue]:
         """
         Validate risk gate thresholds.
 
@@ -260,7 +260,7 @@ class BettingValidator:
         edge: float,
         odds: float,
         fraction: float = None
-    ) -> Tuple[float, List[ValidationIssue]]:
+    ) -> tuple[float, list[ValidationIssue]]:
         """
         Validate Kelly criterion bet sizing.
 
@@ -420,8 +420,8 @@ class BettingValidator:
     def run_stress_tests(
         self,
         returns: np.ndarray,
-        scenarios: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        scenarios: list[str] | None = None
+    ) -> dict[str, Any]:
         """
         Run stress tests on betting strategy.
 
@@ -481,15 +481,15 @@ class BettingValidator:
         lines.append(f"\nStrategy: {report.strategy_name}")
         lines.append(f"Validation Date: {report.validation_date}")
         lines.append(f"Deployment Status: {'✅ APPROVED' if report.approved_for_deployment else '⛔ REJECTED'}")
-        lines.append(f"\nIssues Summary:")
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {report.critical_count} (blocking)")
         lines.append(f"  🟠 HIGH:     {report.high_count} (strongly discouraged)")
         lines.append(f"  🟡 MEDIUM:   {report.medium_count} (caution advised)")
         lines.append(f"  🟢 LOW:      {report.low_count} (minor)")
 
         if report.has_critical_issues():
-            lines.append(f"\n⛔ DEPLOYMENT BLOCKED")
-            lines.append(f"   Strategy does not meet safety/profitability requirements")
+            lines.append("\n⛔ DEPLOYMENT BLOCKED")
+            lines.append("   Strategy does not meet safety/profitability requirements")
 
         # Group by category
         for category in ValidationCategory:

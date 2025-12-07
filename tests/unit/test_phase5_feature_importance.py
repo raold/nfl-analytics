@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:28.448567
 Test count: 7
 """
 
-from analysis.phase5_feature_importance import *
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
+
+from analysis.phase5_feature_importance import *
 
 
 def test_analyze_feature_importance_basic():

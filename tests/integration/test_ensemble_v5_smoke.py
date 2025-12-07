@@ -28,12 +28,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import os
-import pytest
-import numpy as np
 import logging
+import os
 import time
-from typing import Dict
+
+import numpy as np
+import pytest
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -73,7 +73,7 @@ def loaded_ensemble(ensemble):
 
 
 @pytest.fixture
-def test_player() -> Dict:
+def test_player() -> dict:
     """
     Sample player for testing.
 

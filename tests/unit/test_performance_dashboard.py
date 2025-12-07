@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.451770
 Test count: 15
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from monitoring.performance_dashboard import *
-import pandas as pd
-import pytest
 
 
 def test_create_cli_dashboard_basic():

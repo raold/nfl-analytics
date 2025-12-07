@@ -31,26 +31,20 @@ Author: NFL Analytics Team
 Date: November 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, List, Tuple, Union
-from dataclasses import dataclass, field
-from datetime import datetime
 import logging
-import warnings
+from dataclasses import dataclass
+from datetime import datetime
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 # Database and visualization
 import psycopg2
-from psycopg2.extras import RealDictCursor
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Statistical inference
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-from statsmodels.stats.weightstats import DescrStatsW
 from scipy import stats
-from linearmodels.panel import PanelOLS
 
 # Set style
 sns.set_style("whitegrid")
@@ -99,8 +93,8 @@ class DIDResults:
     att_by_period: pd.DataFrame  # rel_time, att, se, pvalue
 
     # Diagnostics
-    parallel_trends_test: Dict
-    placebo_test: Optional[Dict] = None
+    parallel_trends_test: dict
+    placebo_test: dict | None = None
 
     # Sample info
     n_treated: int = 0
@@ -126,7 +120,7 @@ class InjuryShockDatabase:
     for difference-in-differences estimation.
     """
 
-    def __init__(self, db_params: Optional[Dict] = None):
+    def __init__(self, db_params: dict | None = None):
         """
         Initialize database connection.
 
@@ -169,9 +163,9 @@ class InjuryShockDatabase:
         self,
         start_season: int = 2018,
         end_season: int = 2024,
-        positions: List[str] = None,
-        severity: List[str] = None
-    ) -> List[InjuryEvent]:
+        positions: list[str] = None,
+        severity: list[str] = None
+    ) -> list[InjuryEvent]:
         """
         Load injury events from database.
 
@@ -243,9 +237,9 @@ class InjuryShockDatabase:
 
     def identify_star_injuries(
         self,
-        events: List[InjuryEvent],
+        events: list[InjuryEvent],
         usage_threshold: float = 0.6  # Top 60% usage = star
-    ) -> List[InjuryEvent]:
+    ) -> list[InjuryEvent]:
         """
         Identify star player injuries (QB1, RB1, WR1) based on usage.
 
@@ -327,7 +321,7 @@ class InjuryShockDatabase:
 
     def create_panel_data(
         self,
-        injury_events: List[InjuryEvent],
+        injury_events: list[InjuryEvent],
         outcome_type: str = 'backup_rushing_yards',
         pre_periods: int = 4,
         post_periods: int = 4
@@ -464,7 +458,7 @@ class InjuryShockDatabase:
         self,
         start_season: int,
         end_season: int
-    ) -> List[InjuryEvent]:
+    ) -> list[InjuryEvent]:
         """Create synthetic injury events for testing"""
         events = []
         teams = ['KC', 'BUF', 'BAL', 'SF', 'DAL', 'PHI']
@@ -590,7 +584,7 @@ class DifferenceInDifferencesEstimator:
         cohort_var: str = 'cohort',
         time_var: str = 'time_to_treatment',
         unit_var: str = 'player_id',
-        controls: Optional[List[str]] = None,
+        controls: list[str] | None = None,
         bootstrap_reps: int = 100
     ) -> pd.DataFrame:
         """
@@ -707,7 +701,7 @@ class DifferenceInDifferencesEstimator:
             agg = group_time_atts.groupby('rel_time').apply(
                 lambda x: pd.Series({
                     'att': np.average(x['att'], weights=x['n_treated']),
-                    'se': np.sqrt(np.sum((x['se'] ** 2 * x['n_treated'])) / np.sum(x['n_treated'])),
+                    'se': np.sqrt(np.sum(x['se'] ** 2 * x['n_treated']) / np.sum(x['n_treated'])),
                     'n_treated': x['n_treated'].sum(),
                     'n_cohorts': len(x)
                 })
@@ -729,7 +723,7 @@ class DifferenceInDifferencesEstimator:
             post_treatment = group_time_atts[group_time_atts['rel_time'] >= 0]
             att_overall = np.average(post_treatment['att'], weights=post_treatment['n_treated'])
             se_overall = np.sqrt(
-                np.sum((post_treatment['se'] ** 2 * post_treatment['n_treated'])) /
+                np.sum(post_treatment['se'] ** 2 * post_treatment['n_treated']) /
                 np.sum(post_treatment['n_treated'])
             )
 
@@ -761,7 +755,7 @@ class DifferenceInDifferencesEstimator:
         cohort_var: str = 'cohort',
         time_var: str = 'time_to_treatment',
         pre_periods: int = 4
-    ) -> Dict:
+    ) -> dict:
         """
         Test parallel trends assumption using pre-treatment periods.
 
@@ -861,7 +855,7 @@ class DifferenceInDifferencesEstimator:
         df: pd.DataFrame,
         outcome: str = 'outcome',
         n_placebo: int = 50
-    ) -> Dict:
+    ) -> dict:
         """
         Placebo test with random treatment assignment.
 
@@ -924,7 +918,7 @@ class DifferenceInDifferencesEstimator:
         cohort_var: str = 'cohort',
         time_var: str = 'time_to_treatment',
         n_boot: int = 500
-    ) -> Dict:
+    ) -> dict:
         """
         Bootstrap standard errors for ATT estimates.
 
@@ -989,7 +983,7 @@ class InjuryShockModeler:
     Combines data preparation, estimation, and visualization.
     """
 
-    def __init__(self, db_params: Optional[Dict] = None):
+    def __init__(self, db_params: dict | None = None):
         """Initialize modeler with database connection"""
         self.db = InjuryShockDatabase(db_params)
         self.estimator = DifferenceInDifferencesEstimator()
@@ -1000,7 +994,7 @@ class InjuryShockModeler:
         start_season: int = 2018,
         end_season: int = 2024,
         outcome_type: str = 'backup_rushing_yards',
-        positions: List[str] = None,
+        positions: list[str] = None,
         pre_periods: int = 4,
         post_periods: int = 4,
         run_placebo: bool = False
@@ -1100,8 +1094,8 @@ class InjuryShockModeler:
 
     def visualize_results(
         self,
-        results: Optional[DIDResults] = None,
-        save_path: Optional[str] = None
+        results: DIDResults | None = None,
+        save_path: str | None = None
     ) -> plt.Figure:
         """
         Create event study plot and diagnostic visualizations.
@@ -1222,8 +1216,8 @@ class InjuryShockModeler:
 
     def generate_report(
         self,
-        results: Optional[DIDResults] = None,
-        output_path: Optional[str] = None
+        results: DIDResults | None = None,
+        output_path: str | None = None
     ) -> str:
         """
         Generate markdown report with interpretation.

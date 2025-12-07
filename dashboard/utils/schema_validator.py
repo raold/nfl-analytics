@@ -39,11 +39,12 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
 import logging
-from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
+from typing import Any
+
+import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -60,14 +61,14 @@ class ColumnSchema:
     required: bool = True
     default: Any = None
     nullable: bool = True
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
-    allowed_values: Optional[List[Any]] = None
+    min_value: float | None = None
+    max_value: float | None = None
+    allowed_values: list[Any] | None = None
 
 
 def validate_schema(
     df: pd.DataFrame,
-    schema: Dict[str, Dict[str, Any]],
+    schema: dict[str, dict[str, Any]],
     strict: bool = False
 ) -> pd.DataFrame:
     """
@@ -239,7 +240,7 @@ def _coerce_type(series: pd.Series, target_type: str) -> pd.Series:
         return series.astype(target_type)
 
 
-def get_common_schemas() -> Dict[str, Dict[str, Dict[str, Any]]]:
+def get_common_schemas() -> dict[str, dict[str, dict[str, Any]]]:
     """
     Get predefined schemas for common dashboard queries.
 
@@ -329,7 +330,7 @@ def validate_query_result(
     df: pd.DataFrame,
     query_name: str,
     expected_min_rows: int = 0,
-    expected_max_rows: Optional[int] = None
+    expected_max_rows: int | None = None
 ) -> pd.DataFrame:
     """
     Validate query result DataFrame with row count checks.

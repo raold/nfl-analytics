@@ -6,10 +6,10 @@ Usage:
     python scripts/validate_multi_season.py results_dict.pkl
 """
 
-import sys
 import pickle
+import sys
+
 import numpy as np
-from pathlib import Path
 
 
 def validate_multi_season_results(results_path: str) -> int:
@@ -30,16 +30,16 @@ def validate_multi_season_results(results_path: str) -> int:
     maes = [results[s]['mae'] for s in seasons]
     cv = np.std(maes) / np.mean(maes)
 
-    print(f"Multi-Season Validation Results:")
+    print("Multi-Season Validation Results:")
     print(f"  Seasons: {seasons}")
     print(f"  MAE: {np.mean(maes):.2f} ± {np.std(maes):.2f}")
     print(f"  CV: {cv:.1%}")
 
     if cv > 0.15:
-        print(f"  ⚠️  High variability (CV > 15%)")
+        print("  ⚠️  High variability (CV > 15%)")
         return 1
 
-    print(f"  ✅ Consistent performance across seasons")
+    print("  ✅ Consistent performance across seasons")
     return 0
 
 

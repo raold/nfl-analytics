@@ -5,8 +5,8 @@ Pre-commit hook to check file organization.
 Prevents .md and .txt files from being added to root directory
 unless they are in the permitted list.
 """
-import sys
 import os
+import sys
 
 # Permitted files in root directory
 PERMITTED = [

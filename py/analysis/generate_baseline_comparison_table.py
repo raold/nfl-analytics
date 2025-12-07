@@ -12,7 +12,6 @@ Date: 2025-10-26
 
 import json
 from pathlib import Path
-from datetime import datetime
 
 
 class BaselineModelComparator:
@@ -250,7 +249,7 @@ def main():
         output_path = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_comparison_table.tex")
         comparator.generate_latex_table(output_path)
 
-        print(f"\n✓ Baseline comparison table generated successfully")
+        print("\n✓ Baseline comparison table generated successfully")
         print(f"\nOutput: {output_path}")
 
         return 0

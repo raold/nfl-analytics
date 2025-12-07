@@ -17,7 +17,6 @@ Date: November 26, 2025
 import argparse
 import logging
 from pathlib import Path
-from typing import Dict, Set
 
 import pandas as pd
 import psycopg2
@@ -88,7 +87,7 @@ def load_coaching_data(csv_path: Path) -> pd.DataFrame:
     return df
 
 
-def get_unique_coaches(df: pd.DataFrame) -> Set[str]:
+def get_unique_coaches(df: pd.DataFrame) -> set[str]:
     """Extract unique coach names from dataframe."""
     coaches = set()
 
@@ -98,7 +97,7 @@ def get_unique_coaches(df: pd.DataFrame) -> Set[str]:
     return coaches
 
 
-def insert_coach_metadata(conn, coaches: Set[str]):
+def insert_coach_metadata(conn, coaches: set[str]):
     """Insert coach metadata records."""
     logger.info(f"Inserting {len(coaches)} coaches into coach_metadata")
 

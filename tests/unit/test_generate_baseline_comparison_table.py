@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.436825
 Test count: 23
 """
 
+import pytest
 from analysis.generate_baseline_comparison_table import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

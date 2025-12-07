@@ -16,9 +16,6 @@ Date: November 16, 2025
 import argparse
 import json
 import logging
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List
 
 import pandas as pd
 
@@ -69,7 +66,7 @@ def load_paper_trades(csv_path: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def calculate_paper_trade_performance(df: pd.DataFrame) -> Dict:
+def calculate_paper_trade_performance(df: pd.DataFrame) -> dict:
     """
     Calculate paper trade performance metrics.
 
@@ -125,7 +122,7 @@ def calculate_paper_trade_performance(df: pd.DataFrame) -> Dict:
     }
 
 
-def load_upcoming_opportunities(alerts_path: str = "results/edge_c_alerts.json") -> List[Dict]:
+def load_upcoming_opportunities(alerts_path: str = "results/edge_c_alerts.json") -> list[dict]:
     """
     Load upcoming Edge C opportunities.
 
@@ -136,7 +133,7 @@ def load_upcoming_opportunities(alerts_path: str = "results/edge_c_alerts.json")
         List of opportunities
     """
     try:
-        with open(alerts_path, 'r') as f:
+        with open(alerts_path) as f:
             data = json.load(f)
             return data.get('opportunities', [])
     except FileNotFoundError:
@@ -148,9 +145,9 @@ def load_upcoming_opportunities(alerts_path: str = "results/edge_c_alerts.json")
 
 
 def print_dashboard(
-    edge_stats: Dict,
-    upcoming_opps: List[Dict],
-    paper_perf: Dict
+    edge_stats: dict,
+    upcoming_opps: list[dict],
+    paper_perf: dict
 ):
     """
     Print formatted dashboard.
@@ -172,19 +169,19 @@ def print_dashboard(
     print(f"Last Validated: {edge_stats['last_validated']}")
     print(f"\nSample Size: {edge_stats['sample_size']} QB performances "
           f"({edge_stats['short_rest_sample']} with <7 day rest)")
-    print(f"\nPenalty Effect:")
+    print("\nPenalty Effect:")
     print(f"  All Rest: {edge_stats['avg_penalty_yards']:.1f} ± {edge_stats['std_penalty_yards']:.1f} yards")
     print(f"  Short Rest (<7 days): {edge_stats['short_rest_penalty']:.1f} yards")
-    print(f"\nStatistical Significance:")
+    print("\nStatistical Significance:")
     print(f"  p-value: {edge_stats['p_value']:.6f} (p < 0.0001)")
     print(f"  t-statistic: {edge_stats['t_statistic']:.3f}")
-    print(f"\nExpected Performance:")
+    print("\nExpected Performance:")
     print(f"  Win Rate: {edge_stats['estimated_win_rate']*100:.1f}%")
     print(f"  ROI: {edge_stats['estimated_roi_pct']:.1f}%")
 
     # Section 2: Upcoming Opportunities
     print("\n" + "─"*100)
-    print(f"UPCOMING OPPORTUNITIES (Next 4 Weeks)")
+    print("UPCOMING OPPORTUNITIES (Next 4 Weeks)")
     print("─"*100)
 
     if not upcoming_opps:
@@ -214,19 +211,19 @@ def print_dashboard(
     else:
         print(f"Total Trades: {paper_perf['total_trades']}")
         print(f"Completed Trades: {paper_perf['completed_trades']}")
-        print(f"\nPerformance:")
+        print("\nPerformance:")
         print(f"  Win Rate: {paper_perf['win_rate']*100:.1f}%")
         print(f"  Total Profit/Loss: ${paper_perf['total_profit']:,.2f}")
         print(f"  Average ROI: {paper_perf['avg_roi']*100:.1f}%")
 
         if paper_perf['best_trade']:
-            print(f"\nBest Trade:")
+            print("\nBest Trade:")
             print(f"  {paper_perf['best_trade']['qb']} on {paper_perf['best_trade']['date']}")
             print(f"  Profit: ${paper_perf['best_trade']['profit_loss']:,.2f} "
                   f"({paper_perf['best_trade']['roi']*100:.1f}% ROI)")
 
         if paper_perf['worst_trade']:
-            print(f"\nWorst Trade:")
+            print("\nWorst Trade:")
             print(f"  {paper_perf['worst_trade']['qb']} on {paper_perf['worst_trade']['date']}")
             print(f"  Loss: ${paper_perf['worst_trade']['profit_loss']:,.2f} "
                   f"({paper_perf['worst_trade']['roi']*100:.1f}% ROI)")
@@ -239,16 +236,16 @@ def print_dashboard(
             wr_diff = paper_perf['win_rate'] - expected_wr
             roi_diff = paper_perf['avg_roi'] - (expected_roi/100)
 
-            print(f"\nValidation vs Expected:")
+            print("\nValidation vs Expected:")
             print(f"  Win Rate: {paper_perf['win_rate']*100:.1f}% vs {expected_wr*100:.1f}% expected "
                   f"({wr_diff*100:+.1f} pp)")
             print(f"  ROI: {paper_perf['avg_roi']*100:.1f}% vs {expected_roi:.1f}% expected "
                   f"({roi_diff*100:+.1f} pp)")
 
             if paper_perf['win_rate'] < 0.52:
-                print(f"\n  ⚠️ WARNING: Win rate below breakeven (52.4%). Edge may not be viable.")
+                print("\n  ⚠️ WARNING: Win rate below breakeven (52.4%). Edge may not be viable.")
             elif paper_perf['avg_roi'] < 0:
-                print(f"\n  ⚠️ WARNING: Negative ROI. Edge may not be viable.")
+                print("\n  ⚠️ WARNING: Negative ROI. Edge may not be viable.")
             elif paper_perf['completed_trades'] >= 10:
                 print(f"\n  ✓ Sample size sufficient ({paper_perf['completed_trades']} trades). "
                       f"Ready for live betting evaluation.")
@@ -262,18 +259,18 @@ def print_dashboard(
     print("  ⚠️ Must fix before live betting")
     print("  ✓ Paper trading can proceed with awareness of baseline uncertainty")
     print("\nLive Betting Criteria (ALL must be met):")
-    print(f"  [ ] Baseline calculation fixed and validated")
-    print(f"  [ ] Paper trade sample ≥10 trades")
-    print(f"  [ ] Paper trade win rate ≥60%")
-    print(f"  [ ] Paper trade ROI ≥+10%")
-    print(f"  [ ] Statistical significance maintained (p < 0.05)")
+    print("  [ ] Baseline calculation fixed and validated")
+    print("  [ ] Paper trade sample ≥10 trades")
+    print("  [ ] Paper trade win rate ≥60%")
+    print("  [ ] Paper trade ROI ≥+10%")
+    print("  [ ] Statistical significance maintained (p < 0.05)")
     print("\nBet Sizing (when live):")
-    print(f"  • Use fractional Kelly: 10% recommended (small sample)")
-    print(f"  • Max 2% bankroll per bet")
-    print(f"  • Max 3 bets per week")
+    print("  • Use fractional Kelly: 10% recommended (small sample)")
+    print("  • Max 2% bankroll per bet")
+    print("  • Max 3 bets per week")
     print("\nExit Criteria:")
-    print(f"  • If ROI drops below 0% after 20 live bets → abandon edge")
-    print(f"  • If win rate drops below 55% after 20 bets → reduce Kelly to 5%")
+    print("  • If ROI drops below 0% after 20 live bets → abandon edge")
+    print("  • If win rate drops below 55% after 20 bets → reduce Kelly to 5%")
 
     print("\n" + "="*100 + "\n")
 

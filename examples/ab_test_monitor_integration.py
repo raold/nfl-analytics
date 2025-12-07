@@ -14,20 +14,12 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 22, 2025
 """
 
-import time
 import logging
+import time
 from datetime import datetime, timedelta
-from typing import Dict, List
 
-import pandas as pd
 import numpy as np
-
-from py.utils.ab_test_monitor import (
-    ABTestMonitor,
-    GuardrailConfig,
-    Decision,
-    TestStatus
-)
+from py.utils.ab_test_monitor import ABTestMonitor, Decision
 
 # Configure logging
 logging.basicConfig(
@@ -197,7 +189,7 @@ def example_3_statistical_analysis():
 # Example 4: Dashboard Integration
 # ============================================================================
 
-def example_4_dashboard_integration() -> Dict:
+def example_4_dashboard_integration() -> dict:
     """
     Prepare data for Streamlit/Grafana dashboard.
 
@@ -305,8 +297,8 @@ def example_5_production_deployment_gate() -> bool:
         # 6. Final approval
         logger.info("✅ All deployment gates passed:")
         logger.info(f"  ✅ Sample size: {metrics['treatment']['sample_size']} ≥ 100")
-        logger.info(f"  ✅ Guardrails: PASSED")
-        logger.info(f"  ✅ Recommendation: PROMOTE")
+        logger.info("  ✅ Guardrails: PASSED")
+        logger.info("  ✅ Recommendation: PROMOTE")
         logger.info(f"  ✅ MAE significant: p={mae_sig.p_value:.4f} < 0.05")
         logger.info(f"  ✅ ROI significant: p={roi_sig.p_value:.4f} < 0.05")
         logger.info(f"  ✅ Effect size: d={mae_sig.effect_size:.3f}")

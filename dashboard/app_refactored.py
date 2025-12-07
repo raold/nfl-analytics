@@ -14,14 +14,12 @@ Date: November 22, 2025
 Version: 2.0 (Refactored)
 """
 
-import streamlit as st
-import pandas as pd
-import psycopg
-from datetime import datetime
-import os
 import logging
+import os
 import sys
 from pathlib import Path
+
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,36 +29,26 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import query modules
-from dashboard.queries import (
-    PredictionQueries,
-    GameQueries,
-    ModelQueries,
-    SystemQueries
-)
-
 # Import component modules
 from dashboard.components import (
-    # Charts
-    plot_win_rate_over_time,
-    plot_mae_over_time,
-    plot_calibration,
-    plot_error_distribution,
-    plot_pnl_over_time,
-    plot_model_comparison_mae,
-    plot_edge_distribution,
-    # Metrics
-    display_summary_metrics,
     display_advanced_metrics,
     display_edge_statistics,
-    # Tables
-    format_predictions_table,
+    # Metrics
+    display_summary_metrics,
     format_model_comparison_table,
-    format_performance_table,
-    # Cards
-    service_health_card,
+    format_predictions_table,
     game_prediction_card,
-    section_banner
+    plot_calibration,
+    plot_edge_distribution,
+    plot_error_distribution,
+    plot_mae_over_time,
+    plot_model_comparison_mae,
+    plot_pnl_over_time,
+    # Charts
+    plot_win_rate_over_time,
+    service_health_card,
 )
+from dashboard.queries import GameQueries, ModelQueries, PredictionQueries, SystemQueries
 
 # Import utility functions
 try:

@@ -15,15 +15,15 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
 import logging
-from pathlib import Path
-from typing import Dict, Optional
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -93,12 +93,12 @@ class CQLBetSizer:
         self.cql_model = self._load_cql_model(cql_model_path)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        logger.info(f"CQLBetSizer initialized")
+        logger.info("CQLBetSizer initialized")
         logger.info(f"  Max Kelly fraction: {max_kelly_fraction:.1%}")
         logger.info(f"  Min edge required: {min_edge:.1%}")
         logger.info(f"  Max uncertainty: {max_uncertainty_pct:.1%}")
 
-    def _load_cql_model(self, model_path: Path) -> Optional[torch.nn.Module]:
+    def _load_cql_model(self, model_path: Path) -> torch.nn.Module | None:
         """Load trained CQL model"""
         model_path = Path(model_path)
 
@@ -160,7 +160,7 @@ class CQLBetSizer:
         self,
         opp: BettingOpportunity,
         edge: float
-    ) -> Dict[str, bool]:
+    ) -> dict[str, bool]:
         """
         Apply risk gates to filter bad bets
 
@@ -385,7 +385,7 @@ def main():
     logger.info(f"Prop: {opportunity.prop_type} {opportunity.line}")
     logger.info(f"Model prediction: {opportunity.model_prediction:.1f} ± {opportunity.model_std:.1f}")
     logger.info(f"Model P(over): {opportunity.model_prob_over:.1%}")
-    logger.info(f"\nRecommendation:")
+    logger.info("\nRecommendation:")
     logger.info(f"  Action: {recommendation.action.upper()}")
     logger.info(f"  Bet size: ${recommendation.bet_size:.2f}")
     logger.info(f"  Kelly fraction: {recommendation.kelly_fraction:.2%}")

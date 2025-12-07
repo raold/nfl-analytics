@@ -15,7 +15,7 @@ DPI = 150
 def get_page_count():
     """Get total pages from log file."""
     log_path = Path(PDF_PATH).parent / "main.log"
-    with open(log_path, 'r') as f:
+    with open(log_path) as f:
         for line in f:
             if "Output written on main.pdf" in line:
                 parts = line.split('(')[1].split()[0]
@@ -38,7 +38,7 @@ def convert_all_pages(total_pages):
         "-dSAFER",
         "-sDEVICE=png16m",
         f"-r{DPI}",
-        f"-dFirstPage=1",
+        "-dFirstPage=1",
         f"-dLastPage={total_pages}",
         f"-sOutputFile={OUTPUT_DIR}/page_%03d.png",
         PDF_PATH

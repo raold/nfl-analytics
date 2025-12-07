@@ -14,19 +14,18 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
+import json
+import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from pathlib import Path
-import logging
-from typing import Dict, Tuple
-import json
-from datetime import datetime
 from tqdm import tqdm
-import sys
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -34,6 +33,7 @@ sys.path.insert(0, str(project_root))
 
 # Import after adding to path
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
     "lstm_drive_prediction",
     project_root / "py" / "models" / "lstm_drive_prediction.py"
@@ -94,7 +94,7 @@ class LSTMTrainer:
             'val_result_acc': []
         }
 
-    def train_epoch(self, train_loader: DataLoader) -> Dict[str, float]:
+    def train_epoch(self, train_loader: DataLoader) -> dict[str, float]:
         """
         Train for one epoch.
 
@@ -154,7 +154,7 @@ class LSTMTrainer:
 
         return avg_losses
 
-    def validate(self, val_loader: DataLoader) -> Dict[str, float]:
+    def validate(self, val_loader: DataLoader) -> dict[str, float]:
         """
         Validate model.
 
@@ -324,7 +324,7 @@ def load_and_prepare_data(
     csv_path: str,
     train_seasons: list,
     val_seasons: list
-) -> Tuple:
+) -> tuple:
     """
     Load and prepare drive data.
 

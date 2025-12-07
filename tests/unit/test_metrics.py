@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.318047
 Test count: 65
 """
 
+import pandas as pd
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from production.metrics import *
-import pandas as pd
-import pytest
 
 
 def test_record_bet_basic():

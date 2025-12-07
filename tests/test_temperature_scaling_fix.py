@@ -8,7 +8,6 @@ requiring full ensemble dependencies.
 Run: python tests/test_temperature_scaling_fix.py
 """
 
-import numpy as np
 
 
 def apply_temperature_scaling_BEFORE_FIX(mean, std, model_name):

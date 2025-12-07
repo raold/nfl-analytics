@@ -30,17 +30,16 @@ Usage:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
+import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Any
-import json
-import time
-from datetime import datetime
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -48,7 +47,6 @@ import psycopg2
 
 from py.online.online_learning_adapter import (
     OnlinePredictionPipeline,
-    OnlineModelAdapter,
 )
 
 logging.basicConfig(
@@ -64,7 +62,7 @@ logger = logging.getLogger(__name__)
 
 def load_player_stats_by_week(
     season: int,
-    db_params: Dict[str, str],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """Load player passing stats by week for validation"""
@@ -215,7 +213,7 @@ def engineer_features(df: pd.DataFrame, enhanced: bool = False) -> pd.DataFrame:
 # Approach 1: Hyperparameter Tuning
 # =============================================================================
 
-def approach_1_hyperparameter_tuning(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
+def approach_1_hyperparameter_tuning(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
     Approach 1: NFL-optimized hyperparameter configuration
 
@@ -263,7 +261,7 @@ def approach_1_hyperparameter_tuning(df: pd.DataFrame, db_params: Dict) -> Dict[
 # Approach 2: Ensemble of Online Learners
 # =============================================================================
 
-def approach_2_multi_ensemble(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
+def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
     Approach 2: Ensemble of diverse online learners
 
@@ -326,7 +324,7 @@ def approach_2_multi_ensemble(df: pd.DataFrame, db_params: Dict) -> Dict[str, An
 # Approach 3: Warm-Start with Static Model
 # =============================================================================
 
-def approach_3_warm_start(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
+def approach_3_warm_start(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
     Approach 3: Pre-train on historical data, blend with online model
 
@@ -401,7 +399,7 @@ def approach_3_warm_start(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
 # Approach 4: Feature Engineering
 # =============================================================================
 
-def approach_4_feature_engineering(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
+def approach_4_feature_engineering(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
     Approach 4: Enhanced feature engineering (15-20 features vs 5-8)
 
@@ -448,7 +446,7 @@ def approach_4_feature_engineering(df: pd.DataFrame, db_params: Dict) -> Dict[st
 # Approach 6: Custom Incremental XGBoost
 # =============================================================================
 
-def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: Dict) -> Dict[str, Any]:
+def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[str, Any]:
     """
     Approach 6: Incremental XGBoost with sliding window
 
@@ -583,7 +581,7 @@ def main():
     print("\n" + "=" * 80)
     print("RIVER OPTIMIZATION SUMMARY")
     print("=" * 80)
-    print(f"Baseline: MAE=173.59 yards, Static=55.16 yards")
+    print("Baseline: MAE=173.59 yards, Static=55.16 yards")
     print("\nResults:")
     for approach_name, result in results_all.items():
         mae = result.get('mean_mae', 0)

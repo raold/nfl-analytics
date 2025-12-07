@@ -5,11 +5,12 @@ Generated: 2025-11-09T13:26:28.362525
 Test count: 31
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from py.ingest_odds_smart import *
 import pandas as pd
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
+
+from py.ingest_odds_smart import *
 
 
 def test_get_connection_basic():

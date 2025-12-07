@@ -54,11 +54,10 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import psycopg2
 import requests
-from psycopg2.extras import execute_values
 
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
@@ -94,8 +93,8 @@ class OddsServiceConfig:
     api_key: str
     api_base_url: str = "https://api.the-odds-api.com/v4"
     sport: str = "americanfootball_nfl"
-    bookmakers: List[str] = None
-    markets: List[str] = None
+    bookmakers: list[str] = None
+    markets: list[str] = None
 
     # Database Configuration
     db_host: str = "localhost"
@@ -113,7 +112,7 @@ class OddsServiceConfig:
     request_timeout: int = 30
 
     # Monitoring Configuration
-    alert_webhook_url: Optional[str] = None
+    alert_webhook_url: str | None = None
     metrics_enabled: bool = True
 
     # Operational Flags
@@ -171,7 +170,7 @@ class ServiceMetrics:
     api_calls_total: int = 0
     api_calls_success: int = 0
     api_calls_failed: int = 0
-    api_requests_remaining: Optional[int] = None
+    api_requests_remaining: int | None = None
     api_requests_used: int = 0
 
     # Data Metrics
@@ -189,11 +188,11 @@ class ServiceMetrics:
     retries_total: int = 0
 
     # Timing Metrics
-    last_poll_at: Optional[datetime] = None
-    last_success_at: Optional[datetime] = None
+    last_poll_at: datetime | None = None
+    last_success_at: datetime | None = None
     poll_duration_avg: float = 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary."""
         return {
             k: v.isoformat() if isinstance(v, datetime) else v
@@ -243,7 +242,7 @@ class OddsUpdateService:
         self.db_conn = None
 
         # Line movement cache (for detecting changes)
-        self.line_cache: Dict[str, Dict[str, float]] = defaultdict(dict)
+        self.line_cache: dict[str, dict[str, float]] = defaultdict(dict)
 
         # Setup signal handlers
         signal.signal(signal.SIGINT, self._signal_handler)
@@ -295,7 +294,7 @@ class OddsUpdateService:
         while retries < self.config.max_retries:
             try:
                 return func(*args, **kwargs)
-            except requests.exceptions.Timeout as e:
+            except requests.exceptions.Timeout:
                 retries += 1
                 self.metrics.retries_total += 1
                 if retries >= self.config.max_retries:
@@ -337,7 +336,7 @@ class OddsUpdateService:
                 logger.error(f"Unexpected error in retry logic: {e}")
                 raise
 
-    def _fetch_events(self) -> List[Dict[str, Any]]:
+    def _fetch_events(self) -> list[dict[str, Any]]:
         """
         Fetch upcoming NFL events from The Odds API.
 
@@ -373,7 +372,7 @@ class OddsUpdateService:
 
         return events
 
-    def _fetch_player_props(self, event_id: str) -> Dict[str, Any]:
+    def _fetch_player_props(self, event_id: str) -> dict[str, Any]:
         """
         Fetch player prop odds for a specific event.
 
@@ -414,7 +413,7 @@ class OddsUpdateService:
 
     def _detect_line_movement(
         self, player_name: str, prop_type: str, bookmaker: str, current_line: float
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Detect significant line movement.
 
@@ -473,7 +472,7 @@ class OddsUpdateService:
             logger.error(f"Failed to send alert: {e}")
 
     def _parse_and_insert_props(
-        self, event_data: Dict[str, Any], snapshot_time: datetime
+        self, event_data: dict[str, Any], snapshot_time: datetime
     ) -> int:
         """
         Parse prop data and insert into database.

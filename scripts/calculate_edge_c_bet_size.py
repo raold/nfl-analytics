@@ -22,7 +22,6 @@ Date: November 16, 2025
 import argparse
 import logging
 import math
-from typing import Dict, Tuple
 
 # Configure logging
 logging.basicConfig(
@@ -54,7 +53,7 @@ def calculate_kelly_fraction(
     kelly_fraction: float = 1.0,
     variance_adjustment: bool = True,
     sample_size: int = 24
-) -> Tuple[float, Dict]:
+) -> tuple[float, dict]:
     """
     Calculate Kelly criterion bet size with variance adjustment.
 
@@ -127,7 +126,7 @@ def calculate_bet_amount(
     odds: float,
     kelly_fraction: float = 0.10,
     max_bet_pct: float = 0.02
-) -> Dict:
+) -> dict:
     """
     Calculate recommended bet amount with risk management constraints.
 
@@ -181,7 +180,7 @@ def calculate_bet_amount(
     return result
 
 
-def print_bet_sizing_report(result: Dict):
+def print_bet_sizing_report(result: dict):
     """
     Print formatted bet sizing report.
 
@@ -211,7 +210,7 @@ def print_bet_sizing_report(result: Dict):
           f"({result['recommended_bet_pct']*100:.2f}% of bankroll)")
 
     if result['risk_management']['capped_by_max']:
-        print(f"  ⚠️ Bet capped by 2% bankroll limit")
+        print("  ⚠️ Bet capped by 2% bankroll limit")
 
     print("\nEXPECTED VALUE:")
     print(f"  EV per $1 bet: ${result['expected_value_per_dollar']:.4f}")

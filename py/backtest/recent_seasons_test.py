@@ -7,13 +7,14 @@ Tests model on most recent complete season with minimal lookback window.
 Expected: 52-54% win rate if leakage is fully resolved
 """
 
-import numpy as np
-import pandas as pd
-from pathlib import Path
-from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 import json
 import warnings
+from pathlib import Path
+
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+
 warnings.filterwarnings('ignore')
 
 print("=" * 70)

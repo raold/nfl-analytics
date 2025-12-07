@@ -3,17 +3,16 @@ Filesystem operations for NFL analytics MCP server.
 Provides safe read/write access to model artifacts, logs, and data files.
 """
 
-import os
 import json
 import logging
-from typing import Dict, Any, List, Optional
+import os
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 # Allowed directories for file operations
 # Auto-detect if running in Docker or locally
-import os
 BASE_DIR = '/app' if os.path.exists('/app/models') else os.getcwd()
 
 ALLOWED_DIRS = {
@@ -28,7 +27,7 @@ ALLOWED_DIRS = {
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-def _validate_path(directory_type: str, relative_path: str) -> Optional[Path]:
+def _validate_path(directory_type: str, relative_path: str) -> Path | None:
     """
     Validate and resolve file path within allowed directories.
 
@@ -64,7 +63,7 @@ def list_files(
     directory_type: str,
     relative_path: str = "",
     pattern: str = "*"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     List files in a directory.
 
@@ -131,8 +130,8 @@ def list_files(
 def read_file(
     directory_type: str,
     relative_path: str,
-    max_lines: Optional[int] = None
-) -> Dict[str, Any]:
+    max_lines: int | None = None
+) -> dict[str, Any]:
     """
     Read a text file.
 
@@ -167,7 +166,7 @@ def read_file(
             }
 
         # Read file
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             if max_lines:
                 lines = [f.readline() for _ in range(max_lines)]
                 content = ''.join(lines)
@@ -205,7 +204,7 @@ def read_file(
 def read_json(
     directory_type: str,
     relative_path: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Read and parse a JSON file.
 
@@ -230,7 +229,7 @@ def read_json(
                 "error": f"File does not exist: {path}"
             }
 
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             data = json.load(f)
 
         logger.info(f"Read JSON file: {directory_type}/{relative_path}")
@@ -260,7 +259,7 @@ def read_json(
 def get_file_info(
     directory_type: str,
     relative_path: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get metadata about a file or directory.
 

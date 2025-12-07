@@ -43,15 +43,14 @@ Date: November 22, 2025
 import hashlib
 import json
 import logging
-import os
 import re
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any
 
 import psycopg2
 from psycopg2.extensions import connection as Connection
@@ -75,12 +74,12 @@ class ColumnInfo:
     table_name: str
     column_name: str
     ordinal_position: int
-    column_default: Optional[str]
+    column_default: str | None
     is_nullable: str
     data_type: str
-    character_maximum_length: Optional[int]
-    numeric_precision: Optional[int]
-    numeric_scale: Optional[int]
+    character_maximum_length: int | None
+    numeric_precision: int | None
+    numeric_scale: int | None
 
     @property
     def full_table_name(self) -> str:
@@ -124,7 +123,7 @@ class ValidationError:
     severity: str  # 'ERROR', 'WARNING', 'INFO'
     category: str  # 'foreign_key', 'data_type', 'orphaned_record', etc.
     message: str
-    details: Optional[Dict[str, Any]] = None
+    details: dict[str, Any] | None = None
 
     def __str__(self) -> str:
         return f"[{self.severity}] {self.category}: {self.message}"
@@ -135,9 +134,9 @@ class ValidationReport:
     """Migration validation report."""
     migration_file: str
     is_valid: bool
-    errors: List[ValidationError] = field(default_factory=list)
-    warnings: List[ValidationError] = field(default_factory=list)
-    info: List[ValidationError] = field(default_factory=list)
+    errors: list[ValidationError] = field(default_factory=list)
+    warnings: list[ValidationError] = field(default_factory=list)
+    info: list[ValidationError] = field(default_factory=list)
     validation_time: float = 0.0
 
     @property
@@ -191,10 +190,10 @@ class MigrationResult:
     """Migration execution result."""
     migration_file: str
     success: bool
-    migration_id: Optional[int] = None
+    migration_id: int | None = None
     duration: float = 0.0
-    error_message: Optional[str] = None
-    rollback_sql: Optional[str] = None
+    error_message: str | None = None
+    rollback_sql: str | None = None
 
     def summary(self) -> str:
         """Generate human-readable summary."""
@@ -226,15 +225,15 @@ class DriftReport:
     """Schema drift detection report."""
     source_env: str
     target_env: str
-    tables_added: List[str] = field(default_factory=list)
-    tables_removed: List[str] = field(default_factory=list)
-    columns_added: List[Tuple[str, str]] = field(default_factory=list)  # (table, column)
-    columns_removed: List[Tuple[str, str]] = field(default_factory=list)
-    columns_modified: List[Tuple[str, str, str]] = field(default_factory=list)  # (table, column, diff)
-    indexes_added: List[str] = field(default_factory=list)
-    indexes_removed: List[str] = field(default_factory=list)
-    foreign_keys_added: List[str] = field(default_factory=list)
-    foreign_keys_removed: List[str] = field(default_factory=list)
+    tables_added: list[str] = field(default_factory=list)
+    tables_removed: list[str] = field(default_factory=list)
+    columns_added: list[tuple[str, str]] = field(default_factory=list)  # (table, column)
+    columns_removed: list[tuple[str, str]] = field(default_factory=list)
+    columns_modified: list[tuple[str, str, str]] = field(default_factory=list)  # (table, column, diff)
+    indexes_added: list[str] = field(default_factory=list)
+    indexes_removed: list[str] = field(default_factory=list)
+    foreign_keys_added: list[str] = field(default_factory=list)
+    foreign_keys_removed: list[str] = field(default_factory=list)
 
     @property
     def has_drift(self) -> bool:
@@ -309,9 +308,9 @@ class DatabaseMigrationAgent:
 
     def __init__(
         self,
-        db_config: Optional[Dict[str, Any]] = None,
+        db_config: dict[str, Any] | None = None,
         migrations_dir: str = "db/migrations",
-        project_root: Optional[str] = None
+        project_root: str | None = None
     ):
         """
         Initialize database migration agent.
@@ -338,10 +337,10 @@ class DatabaseMigrationAgent:
         self.migrations_dir.mkdir(parents=True, exist_ok=True)
 
         # Database connection (lazy initialization)
-        self._conn: Optional[Connection] = None
+        self._conn: Connection | None = None
 
         # Schema cache
-        self._schema_cache: Dict[str, Any] = {}
+        self._schema_cache: dict[str, Any] = {}
 
         # Ensure migration tracking table exists
         self._ensure_migration_tracking()
@@ -428,8 +427,8 @@ class DatabaseMigrationAgent:
         duration: float,
         checksum: str,
         success: bool = True,
-        error_message: Optional[str] = None,
-        rollback_sql: Optional[str] = None
+        error_message: str | None = None,
+        rollback_sql: str | None = None
     ) -> int:
         """Record migration in tracking table."""
         with self._transaction() as conn:
@@ -445,7 +444,7 @@ class DatabaseMigrationAgent:
             cursor.close()
             return migration_id
 
-    def get_applied_migrations(self) -> List[Dict[str, Any]]:
+    def get_applied_migrations(self) -> list[dict[str, Any]]:
         """Get list of applied migrations."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -461,7 +460,7 @@ class DatabaseMigrationAgent:
     # SCHEMA INTROSPECTION
     # ============================================================
 
-    def get_all_tables(self, schemas: List[str] = None) -> List[Tuple[str, str]]:
+    def get_all_tables(self, schemas: list[str] = None) -> list[tuple[str, str]]:
         """
         Get all tables in specified schemas.
 
@@ -487,7 +486,7 @@ class DatabaseMigrationAgent:
         cursor.close()
         return tables
 
-    def get_table_columns(self, table_name: str, schema: str = 'public') -> List[ColumnInfo]:
+    def get_table_columns(self, table_name: str, schema: str = 'public') -> list[ColumnInfo]:
         """Get all columns for a table."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -511,7 +510,7 @@ class DatabaseMigrationAgent:
         cursor.close()
         return [ColumnInfo(**row) for row in rows]
 
-    def get_foreign_keys(self, table_name: str = None, schema: str = None) -> List[ForeignKeyInfo]:
+    def get_foreign_keys(self, table_name: str = None, schema: str = None) -> list[ForeignKeyInfo]:
         """Get foreign key constraints."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -550,7 +549,7 @@ class DatabaseMigrationAgent:
         cursor.close()
         return [ForeignKeyInfo(**row) for row in rows]
 
-    def get_indexes(self, table_name: str = None, schema: str = None) -> List[IndexInfo]:
+    def get_indexes(self, table_name: str = None, schema: str = None) -> list[IndexInfo]:
         """Get indexes for tables."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -602,8 +601,8 @@ class DatabaseMigrationAgent:
 
     def generate_migration(
         self,
-        schema_diff: Dict[str, Any],
-        migration_name: Optional[str] = None
+        schema_diff: dict[str, Any],
+        migration_name: str | None = None
     ) -> str:
         """
         Auto-generate migration file from schema diff.
@@ -710,7 +709,7 @@ class DatabaseMigrationAgent:
         logger.info(f"Generated migration: {migration_file}")
         return str(migration_file)
 
-    def _generate_create_table_sql(self, table_info: Dict[str, Any]) -> str:
+    def _generate_create_table_sql(self, table_info: dict[str, Any]) -> str:
         """Generate CREATE TABLE SQL."""
         schema = table_info.get('schema', 'public')
         table = table_info['name']
@@ -738,7 +737,7 @@ class DatabaseMigrationAgent:
         self,
         schema: str,
         table: str,
-        column: Dict[str, Any]
+        column: dict[str, Any]
     ) -> str:
         """Generate ALTER TABLE ADD COLUMN SQL."""
         col_def = f"{column['name']} {column['type']}"
@@ -749,7 +748,7 @@ class DatabaseMigrationAgent:
 
         return f"ALTER TABLE {schema}.{table} ADD COLUMN IF NOT EXISTS {col_def};"
 
-    def _generate_create_index_sql(self, idx_info: Dict[str, Any]) -> str:
+    def _generate_create_index_sql(self, idx_info: dict[str, Any]) -> str:
         """Generate CREATE INDEX SQL."""
         schema = idx_info.get('schema', 'public')
         table = idx_info['table']
@@ -765,7 +764,7 @@ class DatabaseMigrationAgent:
             f"ON {schema}.{table}({columns_str});"
         )
 
-    def _generate_add_foreign_key_sql(self, fk_info: Dict[str, Any]) -> str:
+    def _generate_add_foreign_key_sql(self, fk_info: dict[str, Any]) -> str:
         """Generate ALTER TABLE ADD FOREIGN KEY SQL."""
         schema = fk_info.get('schema', 'public')
         table = fk_info['table']
@@ -886,7 +885,7 @@ class DatabaseMigrationAgent:
         report.validation_time = time.time() - start_time
         return report
 
-    def _validate_foreign_keys(self) -> List[ValidationError]:
+    def _validate_foreign_keys(self) -> list[ValidationError]:
         """Validate all foreign key constraints."""
         errors = []
         fks = self.get_foreign_keys()
@@ -913,14 +912,14 @@ class DatabaseMigrationAgent:
 
         return errors
 
-    def _validate_data_types(self) -> List[ValidationError]:
+    def _validate_data_types(self) -> list[ValidationError]:
         """Validate data type compatibility."""
         errors = []
         # This is a placeholder - implement specific type validation as needed
         # For example, check that foreign key column types match referenced column types
         return errors
 
-    def _check_orphaned_records(self) -> List[ValidationError]:
+    def _check_orphaned_records(self) -> list[ValidationError]:
         """Check for orphaned records that would violate foreign keys."""
         warnings = []
         fks = self.get_foreign_keys()
@@ -950,7 +949,7 @@ class DatabaseMigrationAgent:
                         message=f"{orphan_count} orphaned records in {fk.full_constraint}",
                         details={'count': orphan_count, 'constraint': fk.full_constraint}
                     ))
-            except psycopg2.Error as e:
+            except psycopg2.Error:
                 # Skip validation if query fails (table might not exist yet)
                 pass
 
@@ -1129,7 +1128,7 @@ class DatabaseMigrationAgent:
         batch_size: int = 10000,
         parallel: bool = False,
         num_workers: int = 4
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Backfill a column with values.
 
@@ -1287,9 +1286,9 @@ class DatabaseMigrationAgent:
 
     def audit_schema_drift(
         self,
-        source_config: Optional[Dict[str, Any]] = None,
-        target_config: Optional[Dict[str, Any]] = None,
-        schemas: List[str] = None
+        source_config: dict[str, Any] | None = None,
+        target_config: dict[str, Any] | None = None,
+        schemas: list[str] = None
     ) -> DriftReport:
         """
         Detect schema drift between two database environments.
@@ -1373,7 +1372,7 @@ class DatabaseMigrationAgent:
         logger.info(f"Schema drift audit complete: {report.has_drift}")
         return report
 
-    def _get_tables_set(self, conn: Connection, schemas: List[str]) -> Set[str]:
+    def _get_tables_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of fully-qualified table names."""
         cursor = conn.cursor()
         cursor.execute("""
@@ -1391,7 +1390,7 @@ class DatabaseMigrationAgent:
         conn: Connection,
         schema: str,
         table_name: str
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Get dictionary of column_name -> data_type."""
         cursor = conn.cursor()
         cursor.execute("""
@@ -1403,7 +1402,7 @@ class DatabaseMigrationAgent:
         cursor.close()
         return columns
 
-    def _get_indexes_set(self, conn: Connection, schemas: List[str]) -> Set[str]:
+    def _get_indexes_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of index names."""
         cursor = conn.cursor()
         cursor.execute("""
@@ -1415,7 +1414,7 @@ class DatabaseMigrationAgent:
         cursor.close()
         return indexes
 
-    def _get_foreign_keys_set(self, conn: Connection, schemas: List[str]) -> Set[str]:
+    def _get_foreign_keys_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of foreign key constraint names."""
         cursor = conn.cursor()
         cursor.execute("""
@@ -1434,8 +1433,8 @@ class DatabaseMigrationAgent:
 # ============================================================
 
 if __name__ == '__main__':
-    import sys
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(
         description='Database Migration Agent for NFL Analytics'
@@ -1482,7 +1481,7 @@ if __name__ == '__main__':
     # Execute command
     if args.command == 'generate':
         # Load schema diff from JSON
-        with open(args.schema_diff_file, 'r') as f:
+        with open(args.schema_diff_file) as f:
             schema_diff = json.load(f)
 
         migration_file = agent.generate_migration(schema_diff, migration_name=args.name)

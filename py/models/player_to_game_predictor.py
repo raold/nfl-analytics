@@ -14,16 +14,17 @@ Date: 2025-10-26
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import brier_score_loss, log_loss, accuracy_score
-import xgboost as xgb
-import nfl_data_py as nfl
 import json
 from datetime import datetime
+
+import nfl_data_py as nfl
+import pandas as pd
+import xgboost as xgb
+from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
+
 
 class PlayerToGamePredictor:
     """
@@ -358,7 +359,7 @@ class PlayerToGamePredictor:
             'importance': self.model.feature_importances_
         }).sort_values('importance', ascending=False)
 
-        print(f"\n  Top 5 features:")
+        print("\n  Top 5 features:")
         for _, row in importances.head(5).iterrows():
             print(f"    {row['feature']}: {row['importance']:.4f}")
 
@@ -474,7 +475,7 @@ def main():
     val_games = games[games['season'].isin(val_seasons)]
     test_games = games[games['season'].isin(test_seasons)]
 
-    print(f"\nGame counts:")
+    print("\nGame counts:")
     print(f"  Train: {len(train_games)} games ({min(train_games['season'])}-{max(train_games['season'])})")
     print(f"  Validation: {len(val_games)} games ({min(val_games['season'])}-{max(val_games['season'])})")
     print(f"  Test: {len(test_games)} games ({min(test_games['season'])}-{max(test_games['season'])})")
@@ -524,13 +525,13 @@ def main():
     state_space_val_brier = 0.2458
     state_space_test_brier = 0.2615
 
-    print(f"\nBrier Score Comparison:")
-    print(f"  Validation:")
+    print("\nBrier Score Comparison:")
+    print("  Validation:")
     print(f"    State-Space:    {state_space_val_brier:.4f}")
     print(f"    Player-to-Game: {val_metrics['brier']:.4f}")
     print(f"    Improvement:    {100*(state_space_val_brier - val_metrics['brier'])/state_space_val_brier:+.1f}%")
 
-    print(f"\n  Test:")
+    print("\n  Test:")
     print(f"    State-Space:    {state_space_test_brier:.4f}")
     print(f"    Player-to-Game: {test_metrics['brier']:.4f}")
     print(f"    Improvement:    {100*(state_space_test_brier - test_metrics['brier'])/state_space_test_brier:+.1f}%")
@@ -561,8 +562,8 @@ def main():
     test_output.to_csv(output_dir / "test_predictions_2025.csv", index=False)
 
     print(f"\n✓ Results saved to {output_dir}")
-    print(f"  - models/player_to_game/results.json")
-    print(f"  - models/player_to_game/test_predictions_2025.csv")
+    print("  - models/player_to_game/results.json")
+    print("  - models/player_to_game/test_predictions_2025.csv")
 
     print("\n" + "="*80)
     print("COMPLETE")

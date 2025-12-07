@@ -23,10 +23,9 @@ Date: November 26, 2025
 """
 
 import logging
-from typing import Dict, Optional, Tuple
+from functools import lru_cache
 
 import psycopg2
-from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class OCFeatureGenerator:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         cache_size: int = 1024
     ):
         """
@@ -69,7 +68,7 @@ class OCFeatureGenerator:
             self._conn = None
 
     @lru_cache(maxsize=1024)
-    def get_oc_continuity(self, team: str, season: int) -> Tuple[int, str, str]:
+    def get_oc_continuity(self, team: str, season: int) -> tuple[int, str, str]:
         """
         Check if OC is same as previous season.
 
@@ -223,7 +222,7 @@ class OCFeatureGenerator:
         season: int,
         week: int,
         include_metadata: bool = False
-    ) -> Dict:
+    ) -> dict:
         """
         Get all OC-related features for a team-game.
 
@@ -266,7 +265,7 @@ class OCFeatureGenerator:
         self,
         team_season_weeks: list,
         include_metadata: bool = False
-    ) -> Dict[Tuple[str, int, int], Dict]:
+    ) -> dict[tuple[str, int, int], dict]:
         """
         Get OC features for multiple team-game combinations efficiently.
 
@@ -325,7 +324,7 @@ def main():
             ('BUF', 2024, 5),
         ]
 
-        print(f"\n=== Bulk Feature Test ===")
+        print("\n=== Bulk Feature Test ===")
         bulk_features = oc_gen.get_bulk_features(test_cases, include_metadata=True)
 
         for key, feats in bulk_features.items():

@@ -16,9 +16,10 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-03
 """
 
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
-from pathlib import Path
 
 # Dissertation styling
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -126,11 +127,11 @@ def main():
     print(f"✅ Generated: {output_path}")
 
     print(f"\n{'='*70}")
-    print(f"GNN CALIBRATION PLOT GENERATION COMPLETE")
+    print("GNN CALIBRATION PLOT GENERATION COMPLETE")
     print(f"{'='*70}")
     print(f"Output: {output_path}")
-    print(f"\nFigure ready for dissertation inclusion.")
-    print(f"Referenced in: chapter_8_results_discussion/section_gnn_empirical_results.tex:139")
+    print("\nFigure ready for dissertation inclusion.")
+    print("Referenced in: chapter_8_results_discussion/section_gnn_empirical_results.tex:139")
 
 if __name__ == "__main__":
     main()

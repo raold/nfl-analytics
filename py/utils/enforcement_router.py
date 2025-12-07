@@ -24,14 +24,14 @@ recurring issues by automatically routing code changes to specialized validation
 **Version:** 1.2 (Added Rule 20: Data Sufficiency Gate)
 """
 
-import re
-import os
-import logging
 import inspect
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+import logging
+import os
+import re
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -58,7 +58,7 @@ class ValidationResult:
     status: ValidationStatus
     agent_name: str
     message: str
-    details: Optional[Dict[str, Any]] = None
+    details: dict[str, Any] | None = None
 
     @property
     def passed(self) -> bool:
@@ -74,7 +74,7 @@ class EnforcementRule:
     """Defines an enforcement rule."""
     name: str
     description: str
-    triggers: List[str]  # Patterns that trigger this rule
+    triggers: list[str]  # Patterns that trigger this rule
     validator: Callable  # Function that performs validation
     level: EnforcementLevel
     enabled: bool = True
@@ -109,7 +109,7 @@ class EnforcementRouter:
 
     def __init__(self):
         """Initialize enforcement router with all validation rules."""
-        self.rules: Dict[str, EnforcementRule] = {}
+        self.rules: dict[str, EnforcementRule] = {}
         self._register_rules()
 
     def _register_rules(self):
@@ -362,7 +362,7 @@ class EnforcementRouter:
             level=EnforcementLevel.WARNING  # Changed from BLOCKING - advisory only
         )
 
-    def validate_file(self, file_path: str, content: Optional[str] = None) -> List[ValidationResult]:
+    def validate_file(self, file_path: str, content: str | None = None) -> list[ValidationResult]:
         """
         Validate a file against all applicable rules.
 
@@ -374,7 +374,7 @@ class EnforcementRouter:
             List of validation results
         """
         if content is None and os.path.exists(file_path):
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(file_path, encoding='utf-8', errors='ignore') as f:
                 content = f.read()
 
         results = []
@@ -399,7 +399,7 @@ class EnforcementRouter:
 
         return results
 
-    def validate_commit(self, changed_files: List[str]) -> Tuple[bool, List[ValidationResult]]:
+    def validate_commit(self, changed_files: list[str]) -> tuple[bool, list[ValidationResult]]:
         """
         Validate a git commit against all rules.
 
@@ -434,7 +434,7 @@ class EnforcementRouter:
 
     # Validation methods for each rule
 
-    def _validate_sql(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_sql(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate SQL query against schema (Rule 1)."""
         try:
             import importlib.util
@@ -530,7 +530,7 @@ class EnforcementRouter:
                 message=f"SQL validation error: {str(e)}"
             )
 
-    def _validate_backtest_health(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_backtest_health(self, file_path: str, content: str | None) -> ValidationResult:
         """Check ensemble health before backtest (Rule 2 - ENHANCED)."""
         try:
             import sys
@@ -555,7 +555,6 @@ class EnforcementRouter:
             # ENHANCED: Check rpy2 integration if R models present
             if content and ('import rpy2' in content or 'from rpy2' in content):
                 try:
-                    import rpy2
                     import rpy2.robjects as ro
                     # Test R session
                     ro.r('print("R session OK")')
@@ -582,7 +581,7 @@ class EnforcementRouter:
                 message=f"Health check error: {str(e)}"
             )
 
-    def _validate_model_training(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_model_training(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate model training script (Rule 3)."""
         # This is a static analysis - runtime validation happens via decorator
 
@@ -627,7 +626,7 @@ class EnforcementRouter:
             message="Model training validation checks present"
         )
 
-    def _validate_security(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_security(self, file_path: str, content: str | None) -> ValidationResult:
         """Security audit for credentials (Rule 4)."""
         if not content:
             return ValidationResult(
@@ -677,7 +676,7 @@ class EnforcementRouter:
             message="No credentials detected"
         )
 
-    def _validate_ensemble_modification(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_ensemble_modification(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate ensemble modifications (Rule 5)."""
         # Warning-level check - logs but doesn't block
         return ValidationResult(
@@ -687,7 +686,7 @@ class EnforcementRouter:
             details={'recommendation': 'Run: ./scripts/check_ensemble_health.sh'}
         )
 
-    def _validate_schema_change(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_schema_change(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate schema change documentation (Rule 6)."""
         # Check if DATABASE_QUICK_REFERENCE.md was also modified in this commit
         # This would need git context - for now just warn
@@ -698,7 +697,7 @@ class EnforcementRouter:
             details={'action_required': 'Update docs/database/DATABASE_QUICK_REFERENCE.md'}
         )
 
-    def _validate_documentation_sync(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_documentation_sync(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate documentation synchronization (Rule 7)."""
         return ValidationResult(
             status=ValidationStatus.PASSED,
@@ -707,7 +706,7 @@ class EnforcementRouter:
             details={'recommendation': 'Update CLAUDE.md if this is a major milestone'}
         )
 
-    def _validate_r_convergence(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_r_convergence(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate MCMC configuration for convergence (Rule 8)."""
         if not content:
             return ValidationResult(
@@ -745,7 +744,7 @@ class EnforcementRouter:
             return ValidationResult(
                 status=ValidationStatus.FAILED,
                 agent_name='r_convergence_check',
-                message=f"MCMC configuration likely to fail convergence",
+                message="MCMC configuration likely to fail convergence",
                 details={'issues': issues, 'random_effects_count': random_effects_count}
             )
 
@@ -755,7 +754,7 @@ class EnforcementRouter:
             message="MCMC configuration looks reasonable"
         )
 
-    def _validate_hardcoded_temporal(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_hardcoded_temporal(self, file_path: str, content: str | None) -> ValidationResult:
         """Detect hardcoded temporal values (Rule 9)."""
         # Skip test files, examples, and demo code
         skip_patterns = ['test', 'example', 'demo', 'fixture', 'mock']
@@ -822,7 +821,7 @@ class EnforcementRouter:
             message="No hardcoded temporal values detected"
         )
 
-    def _validate_allow_new_levels(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_allow_new_levels(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate brms posterior_predict has required parameters (Rule 10)."""
         if not content or not re.search(r'posterior_predict\(', content):
             return ValidationResult(
@@ -863,7 +862,7 @@ class EnforcementRouter:
             message="brms prediction calls properly configured"
         )
 
-    def _validate_multi_season(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_multi_season(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate multi-season testing (Rule 12)."""
         if not content:
             return ValidationResult(
@@ -901,7 +900,7 @@ class EnforcementRouter:
             message="Multi-season validation present or not applicable"
         )
 
-    def _validate_documentation_drift(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_documentation_drift(self, file_path: str, content: str | None) -> ValidationResult:
         """Detect documentation drift (Rule 13)."""
         suggestions = []
 
@@ -934,7 +933,7 @@ class EnforcementRouter:
             message="No documentation updates needed"
         )
 
-    def _validate_model_integrity(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_model_integrity(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate model save includes integrity checks (Rule 14)."""
         if not content:
             return ValidationResult(
@@ -975,7 +974,7 @@ class EnforcementRouter:
             message="Model save operations look safe"
         )
 
-    def _validate_api_contract(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_api_contract(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate API contract usage - catch deprecated parameters (Rule 15)."""
         # Only validate Python files (skip .md, .txt documentation with code examples)
         if not file_path.endswith('.py'):
@@ -1041,7 +1040,7 @@ class EnforcementRouter:
             message="API contract usage looks correct"
         )
 
-    def _validate_sql_results(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_sql_results(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate SQL query results checked before access (Rule 16)."""
         if not content:
             return ValidationResult(
@@ -1103,7 +1102,7 @@ class EnforcementRouter:
             message="SQL results properly validated before access"
         )
 
-    def _validate_r_predictions(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_r_predictions(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate R model predictions checked for NaN (Rule 17)."""
         if not content:
             return ValidationResult(
@@ -1149,7 +1148,7 @@ class EnforcementRouter:
             message="R predictions properly validated"
         )
 
-    def _validate_ensemble_components(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_ensemble_components(self, file_path: str, content: str | None) -> ValidationResult:
         """Validate ensemble has minimum components check (Rule 18)."""
         if not content:
             return ValidationResult(
@@ -1213,7 +1212,7 @@ class EnforcementRouter:
             message="Ensemble component validation present"
         )
 
-    def _validate_placeholder_predictions(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_placeholder_predictions(self, file_path: str, content: str | None) -> ValidationResult:
         """
         Validate no hardcoded placeholder predictions in ensemble code (Rule 19 - CRITICAL).
 
@@ -1362,7 +1361,7 @@ class EnforcementRouter:
             message="No placeholder predictions detected"
         )
 
-    def _validate_data_sufficiency(self, file_path: str, content: Optional[str]) -> ValidationResult:
+    def _validate_data_sufficiency(self, file_path: str, content: str | None) -> ValidationResult:
         """
         Validate sufficient training data exists before complex model training (Rule 20 - WARNING).
 

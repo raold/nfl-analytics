@@ -10,8 +10,11 @@ For PRODUCTION version, see py/ensemble/enhanced_ensemble_v6.py (EnhancedEnsembl
 """
 
 import sys
+
 import numpy as np
+
 from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+
 
 def test_ensemble_initialization():
     """Test ensemble can be initialized with default weights."""
@@ -33,7 +36,7 @@ def test_ensemble_initialization():
 
     # Verify 5 models
     assert len(ensemble.weights) == 5, f"Expected 5 models, got {len(ensemble.weights)}"
-    print(f"✅ Ensemble has 5 models")
+    print("✅ Ensemble has 5 models")
 
     # Verify ELO is included
     assert "elo" in ensemble.weights, "ELO model not found in weights"
@@ -109,7 +112,7 @@ def test_models_exist():
         print(f"\n⚠️  ELO ratings not found: {ensemble.elo_ratings_path}")
         print("ELO predictions will be skipped")
     else:
-        print(f"\n✅ ELO ratings found")
+        print("\n✅ ELO ratings found")
 
     print("\n" + "="*70)
     print("✅ TEST 3 PASSED: Model File Check")

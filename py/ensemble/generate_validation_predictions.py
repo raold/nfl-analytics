@@ -25,15 +25,13 @@ Version: 1.0
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import logging
 import argparse
-from typing import List, Dict, Tuple
+import logging
 import time
 
 import numpy as np
@@ -154,7 +152,7 @@ class ValidationPredictionGenerator:
         logger.info("GENERATING VALIDATION PREDICTIONS")
         logger.info(f"{'='*70}")
         logger.info(f"Total games: {len(validation_games):,}")
-        logger.info(f"Models: State-Space v2, Hierarchical v2, Informative Priors v2, XGBoost v2")
+        logger.info("Models: State-Space v2, Hierarchical v2, Informative Priors v2, XGBoost v2")
 
         results = []
         start_time = time.time()
@@ -305,12 +303,12 @@ def main():
 
     logger.info("\n✅ COMPLETE")
     logger.info(f"   Validation predictions saved: {args.output}")
-    logger.info(f"   Ready for Bayesian stacking optimization")
+    logger.info("   Ready for Bayesian stacking optimization")
     logger.info("\nNext step:")
-    logger.info(f"   python3 py/ensemble/bayesian_stacking.py \\")
-    logger.info(f"     --mode optimize \\")
+    logger.info("   python3 py/ensemble/bayesian_stacking.py \\")
+    logger.info("     --mode optimize \\")
     logger.info(f"     --validation-data {args.output} \\")
-    logger.info(f"     --output models/ensemble/stacking_report.md")
+    logger.info("     --output models/ensemble/stacking_report.md")
 
 
 if __name__ == "__main__":

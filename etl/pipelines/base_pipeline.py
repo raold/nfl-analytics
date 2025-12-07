@@ -13,14 +13,14 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 import psycopg
 
 from etl.extract.base import ExtractionResult
 from etl.load.loaders import DatabaseLoader, LoadResult
-from etl.monitoring.alerts import AlertLevel, AlertManager
+from etl.monitoring.alerts import AlertManager
 from etl.monitoring.logging import get_pipeline_logger, set_correlation_id
 from etl.monitoring.metrics import MetricsCollector, PipelineMetrics
 from etl.transform.cleaners import DataCleaner
@@ -41,8 +41,8 @@ class PipelineResult:
     rows_failed: int
     start_time: datetime
     end_time: datetime
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = None
+    error_message: str | None = None
+    metadata: dict[str, Any] = None
 
     @property
     def duration_seconds(self) -> float:
@@ -74,9 +74,9 @@ class BasePipeline(ABC):
         self,
         pipeline_name: str,
         db_conn: psycopg.Connection,
-        collector: Optional[MetricsCollector] = None,
-        alert_manager: Optional[AlertManager] = None,
-        config: Optional[Dict[str, Any]] = None
+        collector: MetricsCollector | None = None,
+        alert_manager: AlertManager | None = None,
+        config: dict[str, Any] | None = None
     ):
         """
         Initialize pipeline.

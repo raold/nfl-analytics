@@ -53,17 +53,15 @@ import json
 import logging
 import os
 import pstats
-import re
 import subprocess
-import sys
 import time
 import tracemalloc
-from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -82,8 +80,8 @@ except ImportError:
     LINE_PROFILER_AVAILABLE = False
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -130,7 +128,7 @@ class Bottleneck:
     current_time_ms: float
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -141,16 +139,16 @@ class Recommendation:
     recommendation: str
     expected_improvement: str
     implementation_difficulty: str  # Easy, Medium, Hard
-    code_example: Optional[str] = None
-    reference_docs: Optional[List[str]] = None
+    code_example: str | None = None
+    reference_docs: list[str] | None = None
 
 
 @dataclass
 class QueryReport:
     """Database query profiling report."""
-    slow_queries: List[Dict[str, Any]] = field(default_factory=list)
-    n_plus_one_queries: List[Dict[str, Any]] = field(default_factory=list)
-    missing_indexes: List[Dict[str, Any]] = field(default_factory=list)
+    slow_queries: list[dict[str, Any]] = field(default_factory=list)
+    n_plus_one_queries: list[dict[str, Any]] = field(default_factory=list)
+    missing_indexes: list[dict[str, Any]] = field(default_factory=list)
     total_queries: int = 0
     avg_query_time_ms: float = 0.0
     p95_query_time_ms: float = 0.0
@@ -161,18 +159,18 @@ class QueryReport:
 class ProfileReport:
     """Python code profiling report."""
     total_time_s: float = 0.0
-    function_stats: List[Dict[str, Any]] = field(default_factory=list)
-    hot_paths: List[str] = field(default_factory=list)
+    function_stats: list[dict[str, Any]] = field(default_factory=list)
+    hot_paths: list[str] = field(default_factory=list)
     memory_usage_mb: float = 0.0
     peak_memory_mb: float = 0.0
-    memory_leaks: List[Dict[str, Any]] = field(default_factory=list)
+    memory_leaks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
 class EndpointReport:
     """API endpoint profiling report."""
-    endpoints: List[Dict[str, Any]] = field(default_factory=list)
-    slow_endpoints: List[Dict[str, Any]] = field(default_factory=list)
+    endpoints: list[dict[str, Any]] = field(default_factory=list)
+    slow_endpoints: list[dict[str, Any]] = field(default_factory=list)
     total_requests: int = 0
     avg_latency_ms: float = 0.0
     p95_latency_ms: float = 0.0
@@ -193,9 +191,9 @@ class PerformanceProfilingAgent:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        db_connection_string: Optional[str] = None,
-        prometheus_url: Optional[str] = None,
+        project_root: Path | None = None,
+        db_connection_string: str | None = None,
+        prometheus_url: str | None = None,
     ):
         """
         Initialize performance profiling agent.
@@ -224,8 +222,8 @@ class PerformanceProfilingAgent:
         self.prometheus_url = prometheus_url or "http://localhost:9090"
 
         # Storage for profiling data
-        self.bottlenecks: List[Bottleneck] = []
-        self.profile_data: Dict[str, Any] = {}
+        self.bottlenecks: list[Bottleneck] = []
+        self.profile_data: dict[str, Any] = {}
 
         logger.info(f"PerformanceProfilingAgent initialized for {project_root}")
 
@@ -269,7 +267,7 @@ class PerformanceProfilingAgent:
                 return report
 
             # Get slow queries from pg_stat_statements
-            cursor.execute(f"""
+            cursor.execute("""
                 SELECT
                     query,
                     calls,
@@ -354,7 +352,7 @@ class PerformanceProfilingAgent:
                     severity=BottleneckSeverity.HIGH,
                     bottleneck_type=BottleneckType.N_PLUS_ONE,
                     title=f"N+1 query pattern: {query['calls']} calls",
-                    description=f"High call count suggests N+1 query pattern",
+                    description="High call count suggests N+1 query pattern",
                     location="PostgreSQL",
                     current_time_ms=float(query['avg_time_ms']),
                     impact=f"{float(query['total_time_ms']) / 1000:.1f}s total time from {query['calls']} calls",
@@ -382,7 +380,7 @@ class PerformanceProfilingAgent:
         else:
             return BottleneckSeverity.INFO
 
-    def explain_query(self, query: str, analyze: bool = True) -> Dict[str, Any]:
+    def explain_query(self, query: str, analyze: bool = True) -> dict[str, Any]:
         """
         Run EXPLAIN (ANALYZE) on a query.
 
@@ -417,7 +415,7 @@ class PerformanceProfilingAgent:
     def profile_python_code(
         self,
         file_path: str,
-        function: Optional[str] = None,
+        function: str | None = None,
         track_memory: bool = True,
     ) -> ProfileReport:
         """
@@ -610,7 +608,7 @@ class PerformanceProfilingAgent:
     # R CODE PROFILING
     # =============================================================================
 
-    def profile_r_code(self, r_script: str, output_file: Optional[str] = None) -> Dict[str, Any]:
+    def profile_r_code(self, r_script: str, output_file: str | None = None) -> dict[str, Any]:
         """
         Profile R code using Rprof.
 
@@ -769,7 +767,7 @@ class PerformanceProfilingAgent:
         profile_database: bool = True,
         profile_python: bool = True,
         profile_api: bool = True,
-    ) -> List[Bottleneck]:
+    ) -> list[Bottleneck]:
         """
         Detect all bottlenecks across the stack.
 
@@ -818,8 +816,8 @@ class PerformanceProfilingAgent:
 
     def generate_recommendations(
         self,
-        bottlenecks: Optional[List[Bottleneck]] = None,
-    ) -> List[Recommendation]:
+        bottlenecks: list[Bottleneck] | None = None,
+    ) -> list[Recommendation]:
         """
         Generate optimization recommendations for bottlenecks.
 
@@ -845,7 +843,7 @@ class PerformanceProfilingAgent:
         logger.info(f"Generated {len(recommendations)} recommendations")
         return recommendations
 
-    def _generate_recommendation(self, bottleneck: Bottleneck) -> Optional[Recommendation]:
+    def _generate_recommendation(self, bottleneck: Bottleneck) -> Recommendation | None:
         """Generate recommendation for a specific bottleneck."""
         if bottleneck.bottleneck_type == BottleneckType.DATABASE_QUERY:
             return Recommendation(
@@ -1053,7 +1051,7 @@ class PerformanceProfilingAgent:
         medium = sum(1 for b in self.bottlenecks if b.severity == BottleneckSeverity.MEDIUM)
         low = sum(1 for b in self.bottlenecks if b.severity == BottleneckSeverity.LOW)
 
-        lines.append(f"\nBottlenecks Found:")
+        lines.append("\nBottlenecks Found:")
         lines.append(f"  🔴 CRITICAL: {critical} (>10s)")
         lines.append(f"  🟠 HIGH:     {high} (>3s)")
         lines.append(f"  🟡 MEDIUM:   {medium} (>1s)")
@@ -1063,7 +1061,7 @@ class PerformanceProfilingAgent:
             lines.append(f"\n⚠️  {critical} CRITICAL ISSUES - IMMEDIATE ACTION REQUIRED")
 
         # Top 10 bottlenecks
-        lines.append(f"\nTop 10 Bottlenecks:")
+        lines.append("\nTop 10 Bottlenecks:")
         lines.append("-" * 80)
 
         for i, bottleneck in enumerate(self.bottlenecks[:10], 1):

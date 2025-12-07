@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.733869
 Test count: 31
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from utils.generate_bayesian_predictions import *
-import pandas as pd
-import pytest
 
 
 def test_get_upcoming_games_basic():

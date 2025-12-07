@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.549228
 Test count: 26
 """
 
+import pytest
 from backtests.game_outcome_backtest import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_kelly_fraction_basic():

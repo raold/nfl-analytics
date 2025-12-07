@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 make_bankroll_ensemble.py — Bankroll ensemble simulator (fractional Kelly)
 Outputs:
@@ -6,11 +5,12 @@ Outputs:
   • Optional histogram PDF (via --histout)
   • Printed summary (+ optional CSV via --summary)
 """
-import os
 import argparse
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 OUT_DEFAULT = "analysis/dissertation/figures/out/bankroll_ensemble.pdf"
 

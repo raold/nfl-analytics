@@ -7,8 +7,8 @@ Each experiment leverages recent advances (Environment BNN, BNN calibration,
 Causal framework, GNN embeddings, Hierarchical models).
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 project_root = "/Users/dro/rice/nfl-analytics"
@@ -19,19 +19,16 @@ import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
-import pandas as pd
-import psycopg2
 import torch
-from sklearn.preprocessing import StandardScaler
 
 # Change directory to project root for imports to work
 os.chdir(project_root)
 
 # Import cVAE model using absolute import from project root
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
     "game_trajectory_cvae",
     os.path.join(project_root, "py/models/game_trajectory_cvae.py")
@@ -76,8 +73,8 @@ class cVAEExperimentSuite:
         with open(scaler_path, 'rb') as f:
             self.cvae_scaler = pickle.load(f)
 
-        logger.info(f"✓ cVAE model loaded successfully")
-        logger.info(f"✓ cVAE scaler loaded successfully")
+        logger.info("✓ cVAE model loaded successfully")
+        logger.info("✓ cVAE scaler loaded successfully")
 
     def exp1_environment_bnn_ensemble(self):
         """Experiment 1: cVAE + Environment BNN Ensemble"""
@@ -374,8 +371,8 @@ class cVAEExperimentSuite:
             ]
         }
 
-        logger.info(f"✓ Level 1 (cVAE): Game trajectories")
-        logger.info(f"✓ Level 2 (Hierarchical BNN): Player performances")
+        logger.info("✓ Level 1 (cVAE): Game trajectories")
+        logger.info("✓ Level 2 (Hierarchical BNN): Player performances")
         logger.info(f"✓ Players encoded: {results['n_players_encoded']}")
         logger.info(f"✓ Use case: {results['use_case']}")
 

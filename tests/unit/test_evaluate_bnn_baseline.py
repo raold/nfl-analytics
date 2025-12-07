@@ -5,11 +5,8 @@ Generated: 2025-11-09T13:26:28.896384
 Test count: 3
 """
 
-from hypothesis import given
-from hypothesis import strategies as st
-from models.evaluate_bnn_baseline import *
-import pandas as pd
 import pytest
+from models.evaluate_bnn_baseline import *
 
 
 def test_main_basic():

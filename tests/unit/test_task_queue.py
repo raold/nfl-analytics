@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.148486
 Test count: 45
 """
 
+import pandas as pd
+import pytest
 from compute.task_queue import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_load_standard_tasks_basic():

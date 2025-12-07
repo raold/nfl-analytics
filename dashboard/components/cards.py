@@ -12,8 +12,8 @@ Author: Claude Code
 Date: 2025-11-22
 """
 
+
 import streamlit as st
-from typing import Optional, Dict
 
 
 def service_health_card(name: str, port: int, is_healthy: bool):
@@ -34,10 +34,10 @@ def service_health_card(name: str, port: int, is_healthy: bool):
 
 
 def game_prediction_card(
-    game: Dict,
-    prediction: Optional[Dict] = None,
-    spread_edge: Optional[float] = None,
-    total_edge: Optional[float] = None,
+    game: dict,
+    prediction: dict | None = None,
+    spread_edge: float | None = None,
+    total_edge: float | None = None,
     card_type: str = "scheduled"
 ):
     """
@@ -212,7 +212,7 @@ def scheduled_games_banner(num_games: int, day_label: str = ""):
         st.success(f"### Scheduled Games ({num_games} {game_text})")
 
 
-def metric_card(label: str, value: str, delta: Optional[str] = None, help_text: Optional[str] = None):
+def metric_card(label: str, value: str, delta: str | None = None, help_text: str | None = None):
     """
     Render metric card using Streamlit native components.
 
@@ -254,7 +254,7 @@ def edge_summary_stats(games_with_predictions: list):
         st.metric("Strong Edge Games", f"{strong_edge_count}")
 
 
-def database_stats_row(db_stats: Dict):
+def database_stats_row(db_stats: dict):
     """
     Render database statistics row.
 

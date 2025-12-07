@@ -32,7 +32,6 @@ Usage:
 """
 
 import logging
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -155,8 +154,8 @@ class PinnacleCalibrator:
     def estimate_roi_improvement(
         self,
         current_roi: float,
-        current_vig: Optional[float] = None
-    ) -> Dict[str, float]:
+        current_vig: float | None = None
+    ) -> dict[str, float]:
         """
         Estimate ROI improvement from switching to Pinnacle.
 
@@ -297,7 +296,7 @@ class PinnacleCalibrator:
         from scipy.stats import norm
         return norm.cdf(x, loc=mean, scale=std)
 
-    def get_calibration_summary(self) -> Dict:
+    def get_calibration_summary(self) -> dict:
         """Get summary of calibration adjustments."""
         return {
             'standard_vig': self.standard_vig,
@@ -342,22 +341,22 @@ def main():
     print("="*80)
 
     summary = calibrator.get_calibration_summary()
-    print(f"\nVig Comparison:")
+    print("\nVig Comparison:")
     print(f"  Standard books: {summary['standard_vig']:.1%}")
     print(f"  Pinnacle:       {summary['pinnacle_vig']:.1%}")
     print(f"  Savings:        {summary['vig_savings']:.1%}")
 
-    print(f"\nEdge Threshold Adjustments:")
+    print("\nEdge Threshold Adjustments:")
     for standard, pinnacle in summary['edge_threshold_example'].items():
         print(f"  {standard}: {pinnacle:.1%}")
 
-    print(f"\nKelly Fraction Adjustments:")
+    print("\nKelly Fraction Adjustments:")
     for standard, pinnacle in summary['kelly_fraction_example'].items():
         print(f"  {standard}: {pinnacle:.1%}")
 
     # Estimate ROI improvement
     roi_est = calibrator.estimate_roi_improvement(args.current_roi)
-    print(f"\nROI Improvement Estimate:")
+    print("\nROI Improvement Estimate:")
     print(f"  Current ROI:      {roi_est['current_roi']:+.1%}")
     print(f"  Conservative:     {roi_est['conservative_roi']:+.1%}")
     print(f"  Realistic:        {roi_est['realistic_roi']:+.1%} ⭐")

@@ -9,15 +9,14 @@ Action space: 5 discrete actions (no_bet, bet_home, bet_away, bet_over, bet_unde
 Bet sizing: Kelly criterion with experiment-based adjustments
 """
 
+from dataclasses import dataclass
+
 import gymnasium as gym
-from gymnasium import spaces
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Tuple, Optional
-from dataclasses import dataclass
 import psycopg2
-
 from experiment_feature_extractor import ExperimentFeatureExtractor, ExperimentFeatures
+from gymnasium import spaces
 
 
 @dataclass
@@ -54,7 +53,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self,
-                 db_params: Optional[Dict] = None,
+                 db_params: dict | None = None,
                  start_season: int = 2020,
                  end_season: int = 2023,
                  initial_bankroll: float = 10000.0,
@@ -231,7 +230,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         return kelly_fraction
 
     def _execute_bet(self, action: int, game_row: pd.Series,
-                     experiment_features: ExperimentFeatures) -> Tuple[float, Dict]:
+                     experiment_features: ExperimentFeatures) -> tuple[float, dict]:
         """
         Execute betting action and compute reward.
 
@@ -316,7 +315,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
 
         return self._get_state(self.current_game_idx)
 
-    def step(self, action: int) -> Tuple[np.ndarray, float, bool, Dict]:
+    def step(self, action: int) -> tuple[np.ndarray, float, bool, dict]:
         """
         Execute one timestep of the environment.
 
@@ -367,7 +366,7 @@ class ExperimentAugmentedBettingEnv(gym.Env):
         """Clean up resources"""
         self.feature_extractor.close()
 
-    def get_episode_stats(self) -> Dict:
+    def get_episode_stats(self) -> dict:
         """Get statistics for completed episode"""
         return {
             'total_games': len(self.games_data),

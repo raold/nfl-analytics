@@ -41,27 +41,24 @@ Author: Claude Code (Phase 4 Dissertation Enhancement)
 Created: November 9, 2025
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-import logging
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Union, Any
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-import warnings
 import json
-import pickle
+import logging
+import warnings
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
-from river import drift, ensemble, forest, tree, metrics, preprocessing, linear_model
+from river import forest, linear_model, metrics, preprocessing, tree
 from river.drift import ADWIN, KSWIN, PageHinkley
-import psycopg2
-from scipy import stats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -81,11 +78,11 @@ class DriftEvent:
     season: int
     detector_name: str
     drift_magnitude: float
-    affected_features: List[str]
-    suspected_cause: Optional[str] = None
-    recovery_time: Optional[int] = None  # Games to recover
+    affected_features: list[str]
+    suspected_cause: str | None = None
+    recovery_time: int | None = None  # Games to recover
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for serialization"""
         return {
             'timestamp': self.timestamp.isoformat(),
@@ -102,11 +99,11 @@ class DriftEvent:
 @dataclass
 class PerformanceMetrics:
     """Tracks online learning performance over time"""
-    mae_history: List[float] = field(default_factory=list)
-    rmse_history: List[float] = field(default_factory=list)
-    calibration_history: List[float] = field(default_factory=list)
-    prediction_times: List[float] = field(default_factory=list)
-    drift_events: List[DriftEvent] = field(default_factory=list)
+    mae_history: list[float] = field(default_factory=list)
+    rmse_history: list[float] = field(default_factory=list)
+    calibration_history: list[float] = field(default_factory=list)
+    prediction_times: list[float] = field(default_factory=list)
+    drift_events: list[DriftEvent] = field(default_factory=list)
 
     def add_metrics(self, mae: float, rmse: float, calibration: float, time: float):
         """Add performance metrics for current window"""
@@ -115,7 +112,7 @@ class PerformanceMetrics:
         self.calibration_history.append(calibration)
         self.prediction_times.append(time)
 
-    def get_summary(self) -> Dict[str, float]:
+    def get_summary(self) -> dict[str, float]:
         """Calculate summary statistics"""
         return {
             'mean_mae': np.mean(self.mae_history) if self.mae_history else 0.0,
@@ -206,7 +203,7 @@ class DriftDetector:
             detector._reset()
         logger.info("All drift detectors reset")
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current drift detection status"""
         return {
             'drift_counts': self.drift_counts.copy(),
@@ -301,7 +298,7 @@ class OnlineModelAdapter:
         else:
             raise ValueError(f"Unknown model type: {self.model_type}")
 
-    def predict(self, x: Dict[str, float]) -> float:
+    def predict(self, x: dict[str, float]) -> float:
         """
         Predict for single sample
 
@@ -318,7 +315,7 @@ class OnlineModelAdapter:
             logger.error(f"Prediction error: {e}")
             return 0.0
 
-    def partial_fit(self, x: Dict[str, float], y: float):
+    def partial_fit(self, x: dict[str, float], y: float):
         """
         Update model with single sample (online learning)
 
@@ -368,7 +365,7 @@ class OnlineModelAdapter:
             x_dict = {k: float(v) if pd.notna(v) else 0.0 for k, v in row.to_dict().items()}
             self.partial_fit(x_dict, float(target))
 
-    def get_metrics(self) -> Dict[str, float]:
+    def get_metrics(self) -> dict[str, float]:
         """Get current performance metrics"""
         return {
             'mae': self.running_mae.get(),
@@ -485,8 +482,8 @@ class OnlinePredictionPipeline:
         X: pd.DataFrame,
         use_batch: bool = True,
         use_online: bool = True,
-        ensemble_weights: Optional[Dict[str, float]] = None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        ensemble_weights: dict[str, float] | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Generate predictions with uncertainty
 
@@ -590,7 +587,7 @@ class OnlinePredictionPipeline:
         target_col: str = 'passing_yards',
         date_col: str = 'kickoff',
         window_size: int = 50,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Prequential evaluation (test-then-train) on historical data
 
@@ -664,7 +661,7 @@ class OnlinePredictionPipeline:
 
     def load_state(self, path: str):
         """Load pipeline state (for resuming)"""
-        with open(path, 'r') as f:
+        with open(path) as f:
             state = json.load(f)
 
         self.current_week = state['current_week']
@@ -720,7 +717,7 @@ class AdaptiveRetrainer:
         self,
         current_mae: float,
         drift_detected: bool,
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         """
         Determine if retraining should be triggered
 
@@ -777,8 +774,8 @@ class AdaptiveRetrainer:
 # =============================================================================
 
 def compare_online_vs_static(
-    online_results: Dict[str, float],
-    static_results: Dict[str, float],
+    online_results: dict[str, float],
+    static_results: dict[str, float],
 ) -> pd.DataFrame:
     """
     Compare online learning vs static model performance
@@ -805,7 +802,7 @@ def compare_online_vs_static(
 def detect_known_drift_events(
     df: pd.DataFrame,
     date_col: str = 'kickoff',
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Identify known concept drift events in NFL data
 
@@ -865,7 +862,7 @@ def detect_known_drift_events(
 
 
 def calculate_adaptation_speed(
-    mae_history: List[float],
+    mae_history: list[float],
     drift_index: int,
     recovery_threshold: float = 0.05,
 ) -> int:

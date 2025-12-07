@@ -19,12 +19,12 @@ Output:
     - models/xgboost/passing_xgboost_v2_canonical_metadata.json
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
+import os
+import sys
+import time
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -252,8 +252,8 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         if df[col].isna().any():
             df[col].fillna(df[col].median(), inplace=True)
 
-    logger.info(f"✓ Feature engineering complete")
-    logger.info(f"  Total features created: 13 (ensemble-compatible)")
+    logger.info("✓ Feature engineering complete")
+    logger.info("  Total features created: 13 (ensemble-compatible)")
     logger.info(f"  Samples: {len(df):,}")
 
     return df
@@ -354,11 +354,11 @@ def prepare_train_test_split(df: pd.DataFrame):
     # Apply exponential decay weights to training set
     sample_weights = apply_exponential_decay_weights(train_df)
 
-    logger.info(f"\n✓ Train/test split complete")
+    logger.info("\n✓ Train/test split complete")
     logger.info(f"  Train: {len(X_train):,} samples (2015-2024)")
     logger.info(f"  Test: {len(X_test):,} samples (2025)")
     logger.info(f"  Features: {len(feature_cols)} (ensemble-compatible)")
-    logger.info(f"\n13 Ensemble-Compatible Features:")
+    logger.info("\n13 Ensemble-Compatible Features:")
     for i, col in enumerate(feature_cols, 1):
         logger.info(f"  {i:2d}. {col}")
 
@@ -397,7 +397,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols, sample_w
 
     logger.info(f"Training with {NUM_BOOST_ROUNDS} boost rounds...")
     logger.info(f"Early stopping: {EARLY_STOPPING_ROUNDS} rounds")
-    logger.info(f"Hyperparameters:")
+    logger.info("Hyperparameters:")
     for key, val in XGBOOST_PARAMS.items():
         logger.info(f"  {key}: {val}")
 
@@ -464,16 +464,16 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info("MODEL EVALUATION - 2025 HOLDOUT SET")
     logger.info("=" * 70)
 
-    logger.info(f"\nPerformance Metrics:")
+    logger.info("\nPerformance Metrics:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
     logger.info(f"  R²: {metrics['r2']:.4f}")
     logger.info(f"  Mean Prediction: {y_pred.mean():.1f} yards")
     logger.info(f"  Mean Actual: {y_test.mean():.1f} yards")
-    logger.info(f"\nBaseline Comparison:")
+    logger.info("\nBaseline Comparison:")
     logger.info(f"  Baseline MAE: {metrics['baseline_mae']:.2f} yards")
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
-    logger.info(f"\nTraining Info:")
+    logger.info("\nTraining Info:")
     logger.info(f"  Training time: {metrics['training_time_minutes']:.2f} minutes")
     logger.info(f"  Best iteration: {metrics['best_iteration']}")
     logger.info(f"  Features: {metrics['num_features']}")
@@ -535,9 +535,9 @@ def main():
     logger.info("\n" + "=" * 70)
     logger.info("XGBOOST v2 CANONICAL WINDOW TRAINING")
     logger.info("=" * 70)
-    logger.info(f"Training Window: 2018-2024 + H=4 decay (2015-2017)")
-    logger.info(f"Test Set: 2025 season")
-    logger.info(f"Target: MAE < 54 yards")
+    logger.info("Training Window: 2018-2024 + H=4 decay (2015-2017)")
+    logger.info("Test Set: 2025 season")
+    logger.info("Target: MAE < 54 yards")
     logger.info("=" * 70 + "\n")
 
     pipeline_start = time.time()
@@ -568,10 +568,10 @@ def main():
     logger.info("=" * 70)
     logger.info(f"Total time: {pipeline_time/60:.2f} minutes")
     logger.info(f"MAE: {metrics['mae']:.2f} yards (Target: <54.0)")
-    logger.info(f"Features: 13 (ensemble-compatible)")
+    logger.info("Features: 13 (ensemble-compatible)")
     logger.info(f"Status: {'✓ PASS' if metrics['mae'] < 54.0 else '✗ NEEDS IMPROVEMENT'}")
-    logger.info(f"\nModel ready for 4-way ensemble integration (30% weight)")
-    logger.info(f"Ensemble compatibility: ✓ VERIFIED (13 features match all models)")
+    logger.info("\nModel ready for 4-way ensemble integration (30% weight)")
+    logger.info("Ensemble compatibility: ✓ VERIFIED (13 features match all models)")
     logger.info("=" * 70 + "\n")
 
 

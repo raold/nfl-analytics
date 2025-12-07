@@ -22,30 +22,25 @@ Author: Claude (Anthropic)
 Date: November 9, 2025
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import argparse
 import json
 import logging
-import pickle
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import psycopg2
 import seaborn as sns
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from py.models.evidential_regression import (
-    EvidentialRegressor,
-    load_rushing_data_from_db
-)
+from py.models.evidential_regression import EvidentialRegressor, load_rushing_data_from_db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -55,7 +50,7 @@ sns.set_style('whitegrid')
 plt.rcParams['figure.figsize'] = (12, 8)
 
 
-def prepare_features(df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, List[str]]:
+def prepare_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, list[str]]:
     """
     Prepare feature matrix for evidential regression.
 
@@ -91,8 +86,8 @@ def calculate_calibration(
     y_true: np.ndarray,
     y_pred: np.ndarray,
     y_std: np.ndarray,
-    confidence_levels: List[float] = [0.68, 0.90, 0.95]
-) -> Dict[str, float]:
+    confidence_levels: list[float] = [0.68, 0.90, 0.95]
+) -> dict[str, float]:
     """
     Calculate calibration at multiple confidence levels.
 
@@ -130,7 +125,7 @@ def calculate_calibration(
     return results
 
 
-def calculate_sharpness(y_std: np.ndarray, confidence_level: float = 0.90) -> Dict[str, float]:
+def calculate_sharpness(y_std: np.ndarray, confidence_level: float = 0.90) -> dict[str, float]:
     """
     Calculate sharpness metrics.
 
@@ -156,7 +151,7 @@ def calculate_sharpness(y_std: np.ndarray, confidence_level: float = 0.90) -> Di
 
 def detect_ood_samples(
     df: pd.DataFrame,
-    predictions: Dict[str, np.ndarray],
+    predictions: dict[str, np.ndarray],
     threshold_percentile: float = 90
 ) -> pd.DataFrame:
     """
@@ -203,7 +198,7 @@ def benchmark_speed(
     model: EvidentialRegressor,
     X_test: np.ndarray,
     n_trials: int = 10
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Benchmark prediction speed.
 
@@ -252,7 +247,7 @@ def benchmark_speed(
 def load_bnn_predictions(
     X_test: np.ndarray,
     bnn_model_path: str = 'models/bayesian/bnn_multioutput_v1_final.pt'
-) -> Dict[str, np.ndarray]:
+) -> dict[str, np.ndarray]:
     """
     Load BNN v3.1 predictions for comparison.
 
@@ -343,7 +338,7 @@ def plot_calibration_curve(
 
 
 def plot_uncertainty_decomposition(
-    predictions: Dict[str, np.ndarray],
+    predictions: dict[str, np.ndarray],
     save_path: Path
 ):
     """
@@ -484,7 +479,7 @@ def main():
     rmse = np.sqrt(mean_squared_error(y_test, predictions['mean']))
     mape = np.mean(np.abs(predictions['mean'] - y_test) / np.maximum(y_test, 1)) * 100
 
-    logger.info(f"\n   Point Prediction Metrics:")
+    logger.info("\n   Point Prediction Metrics:")
     logger.info(f"   MAE: {mae:.2f} yards")
     logger.info(f"   RMSE: {rmse:.2f} yards")
     logger.info(f"   MAPE: {mape:.1f}%")
@@ -496,7 +491,7 @@ def main():
         predictions['total_std']
     )
 
-    logger.info(f"\n   Calibration Metrics:")
+    logger.info("\n   Calibration Metrics:")
     logger.info(f"   68% Coverage: {calibration_results['coverage_68']:.1%} (target: 68%)")
     logger.info(f"   90% Coverage: {calibration_results['coverage_90']:.1%} (target: 90%)")
     logger.info(f"   95% Coverage: {calibration_results['coverage_95']:.1%} (target: 95%)")
@@ -504,12 +499,12 @@ def main():
     # Sharpness
     sharpness_results = calculate_sharpness(predictions['total_std'])
 
-    logger.info(f"\n   Sharpness Metrics:")
+    logger.info("\n   Sharpness Metrics:")
     logger.info(f"   Mean 90% interval width: {sharpness_results['mean_interval_width']:.2f} yards")
     logger.info(f"   Median 90% interval width: {sharpness_results['median_interval_width']:.2f} yards")
 
     # Uncertainty decomposition
-    logger.info(f"\n   Uncertainty Decomposition:")
+    logger.info("\n   Uncertainty Decomposition:")
     logger.info(f"   Mean aleatoric: {predictions['aleatoric_std'].mean():.2f} yards")
     logger.info(f"   Mean epistemic: {predictions['epistemic_std'].mean():.2f} yards")
     logger.info(f"   Mean total: {predictions['total_std'].mean():.2f} yards")
@@ -522,7 +517,7 @@ def main():
     logger.info("\n5. Out-of-distribution detection...")
     ood_df = detect_ood_samples(df_test, predictions, threshold_percentile=90)
 
-    logger.info(f"\n   Top 10 OOD samples (highest epistemic uncertainty):")
+    logger.info("\n   Top 10 OOD samples (highest epistemic uncertainty):")
     for idx, row in ood_df.head(10).iterrows():
         logger.info(
             f"   {row['player_name']:20s} Week {row['week']:2.0f}: "

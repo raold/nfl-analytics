@@ -28,14 +28,15 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-import pandas as pd
-import numpy as np
-from scipy import stats
-import psycopg2
-from tqdm import tqdm
 import warnings
 
+import numpy as np
+import pandas as pd
+import psycopg2
 from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way as EnsembleV7
+from scipy import stats
+from tqdm import tqdm
+
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 
 # Suppress warnings for cleaner output
@@ -350,17 +351,17 @@ def print_results(analysis):
     print(f"  Cohen's d: {analysis['overall']['cohens_d']:.3f}")
 
     if analysis['overall']['p_value'] < 0.05:
-        print(f"  ✅ STATISTICALLY SIGNIFICANT (p < 0.05)")
+        print("  ✅ STATISTICALLY SIGNIFICANT (p < 0.05)")
     else:
-        print(f"  ❌ NOT SIGNIFICANT (p ≥ 0.05)")
+        print("  ❌ NOT SIGNIFICANT (p ≥ 0.05)")
 
     if analysis['overall']['improvement'] > 2.0:
-        print(f"  ✅ MEETS SUCCESS CRITERION (improvement > 2 yards)")
+        print("  ✅ MEETS SUCCESS CRITERION (improvement > 2 yards)")
     else:
-        print(f"  ⚠️  BELOW SUCCESS CRITERION (improvement target: 2+ yards)")
+        print("  ⚠️  BELOW SUCCESS CRITERION (improvement target: 2+ yards)")
 
     # Per-season breakdown
-    print(f"\n📅 Per-Season Breakdown:")
+    print("\n📅 Per-Season Breakdown:")
     for season_result in analysis['per_season']:
         print(f"  {season_result['season']}:")
         print(f"    v6.0 MAE: {season_result['v6_mae']:.2f} yards")
@@ -368,12 +369,12 @@ def print_results(analysis):
         print(f"    Improvement: {season_result['improvement']:.2f} yards")
 
     # Consistency metric
-    print(f"\n🎯 Consistency Metric:")
+    print("\n🎯 Consistency Metric:")
     print(f"  Season improvement std: {analysis['consistency']['season_improvement_std']:.2f} yards")
     if analysis['consistency']['is_consistent']:
-        print(f"  ✅ CONSISTENT (std < 2 yards)")
+        print("  ✅ CONSISTENT (std < 2 yards)")
     else:
-        print(f"  ⚠️  INCONSISTENT (std ≥ 2 yards)")
+        print("  ⚠️  INCONSISTENT (std ≥ 2 yards)")
 
     # High-roughing defense subgroup
     if analysis['high_roughing_defense']['n_games'] > 0:
@@ -385,9 +386,9 @@ def print_results(analysis):
         print(f"  p-value: {hr['p_value']:.6f}")
 
         if hr['p_value'] < 0.05:
-            print(f"  ✅ SIGNIFICANT (DiD Roughing effect observable)")
+            print("  ✅ SIGNIFICANT (DiD Roughing effect observable)")
         else:
-            print(f"  ⚠️  NOT SIGNIFICANT")
+            print("  ⚠️  NOT SIGNIFICANT")
 
     # Low-roughing defense subgroup
     if analysis['low_roughing_defense']['n_games'] > 0:
@@ -400,13 +401,13 @@ def print_results(analysis):
 
     # Causal adjustment statistics
     causal = analysis['causal_adjustment']
-    print(f"\n🎲 Causal Adjustment Statistics:")
+    print("\n🎲 Causal Adjustment Statistics:")
     print(f"  Mean adjustment (all games): {causal['mean_all_games']:.2f} yards")
     print(f"  Mean adjustment (when applied): {causal['mean_when_applied']:.2f} yards")
     print(f"  Games with adjustment: {causal['pct_games_adjusted']:.1f}%")
 
     # Production decision
-    print(f"\n🚀 Production Decision:")
+    print("\n🚀 Production Decision:")
     meets_criteria = (
         analysis['overall']['improvement'] > 2.0 and
         analysis['overall']['p_value'] < 0.05 and
@@ -414,17 +415,17 @@ def print_results(analysis):
     )
 
     if meets_criteria:
-        print(f"  ✅ APPROVED FOR PRODUCTION")
-        print(f"     - MAE improvement > 2 yards: ✅")
-        print(f"     - Statistical significance (p < 0.05): ✅")
-        print(f"     - Cross-season consistency (std < 2): ✅")
-        print(f"\n  Recommendation: Deploy ensemble v7.0 to production")
+        print("  ✅ APPROVED FOR PRODUCTION")
+        print("     - MAE improvement > 2 yards: ✅")
+        print("     - Statistical significance (p < 0.05): ✅")
+        print("     - Cross-season consistency (std < 2): ✅")
+        print("\n  Recommendation: Deploy ensemble v7.0 to production")
     else:
-        print(f"  ⚠️  NEEDS ITERATION")
+        print("  ⚠️  NEEDS ITERATION")
         print(f"     - MAE improvement > 2 yards: {'✅' if analysis['overall']['improvement'] > 2.0 else '❌'}")
         print(f"     - Statistical significance (p < 0.05): {'✅' if analysis['overall']['p_value'] < 0.05 else '❌'}")
         print(f"     - Cross-season consistency (std < 2): {'✅' if analysis['consistency']['is_consistent'] else '❌'}")
-        print(f"\n  Recommendation: Iterate on causal features or weights")
+        print("\n  Recommendation: Iterate on causal features or weights")
 
 
 def main():
@@ -472,7 +473,7 @@ def main():
     # Batch processing mode
     batch_suffix = f"_batch{args.batch}of{args.total_batches}" if args.batch else ""
 
-    logger.info(f"Multi-season backtest: Ensemble v7.0 vs v6.0")
+    logger.info("Multi-season backtest: Ensemble v7.0 vs v6.0")
     logger.info(f"Seasons: {args.seasons}")
     if args.batch:
         logger.info(f"Batch mode: {args.batch}/{args.total_batches}")

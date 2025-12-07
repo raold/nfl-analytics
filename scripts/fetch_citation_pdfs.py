@@ -9,16 +9,15 @@ Note: Try legitimate sources first (university library, author websites).
 Sci-Hub should be a last resort for papers you cannot access otherwise.
 """
 
-import re
-import os
-import time
-import requests
 import argparse
+import os
+import re
+import time
 from pathlib import Path
-from typing import Dict, List, Optional
-import bibtexparser
 from urllib.parse import urljoin
 
+import bibtexparser
+import requests
 
 # Sci-Hub mirrors (rotate if one is down)
 # Updated list as of Nov 2024 - these domains change frequently
@@ -39,14 +38,14 @@ LIBGEN_MIRRORS = [
 ]
 
 
-def parse_bibtex(bib_path: str) -> List[Dict]:
+def parse_bibtex(bib_path: str) -> list[dict]:
     """Parse BibTeX file and extract entries."""
-    with open(bib_path, 'r', encoding='utf-8') as f:
+    with open(bib_path, encoding='utf-8') as f:
         bib_database = bibtexparser.load(f)
     return bib_database.entries
 
 
-def extract_doi(entry: Dict) -> Optional[str]:
+def extract_doi(entry: dict) -> str | None:
     """Extract DOI from BibTeX entry."""
     # Check DOI field
     if 'doi' in entry:
@@ -77,7 +76,7 @@ def sanitize_filename(filename: str) -> str:
     return filename
 
 
-def get_pdf_filename(entry: Dict) -> str:
+def get_pdf_filename(entry: dict) -> str:
     """Generate PDF filename from BibTeX entry."""
     # Try to use: FirstAuthorYear_ShortTitle.pdf
     author = entry.get('author', 'Unknown').split(' and ')[0].split(',')[0].strip()
@@ -92,7 +91,7 @@ def get_pdf_filename(entry: Dict) -> str:
     return sanitize_filename(filename)
 
 
-def download_from_scihub(doi: str, output_path: str, mirrors: List[str]) -> bool:
+def download_from_scihub(doi: str, output_path: str, mirrors: list[str]) -> bool:
     """
     Download PDF from Sci-Hub using DOI.
 
@@ -132,7 +131,7 @@ def download_from_scihub(doi: str, output_path: str, mirrors: List[str]) -> bool
 
             # Don't raise for 403, just skip to next mirror
             if response.status_code == 403:
-                print(f"  ✗ 403 Forbidden (may be blocked or Cloudflare protection)")
+                print("  ✗ 403 Forbidden (may be blocked or Cloudflare protection)")
                 continue
 
             response.raise_for_status()
@@ -167,10 +166,10 @@ def download_from_scihub(doi: str, output_path: str, mirrors: List[str]) -> bool
                     print(f"  ✓ Downloaded: {os.path.basename(output_path)} ({len(pdf_response.content) / 1024:.1f} KB)")
                     return True
                 else:
-                    print(f"  ✗ Response was not a PDF")
+                    print("  ✗ Response was not a PDF")
                     continue
             else:
-                print(f"  ✗ Could not find PDF link on page")
+                print("  ✗ Could not find PDF link on page")
                 continue
 
         except requests.exceptions.RequestException as e:
@@ -183,7 +182,7 @@ def download_from_scihub(doi: str, output_path: str, mirrors: List[str]) -> bool
     return False
 
 
-def download_from_libgen(doi: str, output_path: str, mirrors: List[str]) -> bool:
+def download_from_libgen(doi: str, output_path: str, mirrors: list[str]) -> bool:
     """
     Download PDF from LibGen using DOI.
 
@@ -208,7 +207,7 @@ def download_from_libgen(doi: str, output_path: str, mirrors: List[str]) -> bool
             response = requests.get(search_url, headers=headers, timeout=30)
 
             if response.status_code == 403:
-                print(f"  ✗ 403 Forbidden")
+                print("  ✗ 403 Forbidden")
                 continue
 
             response.raise_for_status()
@@ -220,7 +219,7 @@ def download_from_libgen(doi: str, output_path: str, mirrors: List[str]) -> bool
             if link_match:
                 download_path = link_match.group(1)
                 pdf_url = urljoin(mirror, download_path)
-                print(f"  Found LibGen link...")
+                print("  Found LibGen link...")
 
                 # Follow the link to get actual PDF
                 pdf_response = requests.get(pdf_url, headers=headers, timeout=60, allow_redirects=True)
@@ -318,7 +317,7 @@ def main():
 
         # Skip if exists
         if args.skip_existing and output_path.exists():
-            print(f"  ⊘ Skipped: File already exists")
+            print("  ⊘ Skipped: File already exists")
             skipped += 1
             continue
 
@@ -327,14 +326,14 @@ def main():
 
         # If Sci-Hub fails, try LibGen
         if not success:
-            print(f"  → Trying LibGen as fallback...")
+            print("  → Trying LibGen as fallback...")
             success = download_from_libgen(doi, str(output_path), LIBGEN_MIRRORS)
 
         if success:
             successful += 1
         else:
             failed += 1
-            print(f"  ✗ Failed to download from all sources")
+            print("  ✗ Failed to download from all sources")
 
         # Rate limiting
         if i < len(entries_with_doi):
@@ -344,7 +343,7 @@ def main():
 
     # Summary
     print("=" * 70)
-    print(f"📊 Summary:")
+    print("📊 Summary:")
     print(f"   ✓ Successful: {successful}")
     print(f"   ✗ Failed: {failed}")
     print(f"   ⊘ Skipped: {skipped}")

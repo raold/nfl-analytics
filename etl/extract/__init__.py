@@ -7,7 +7,7 @@ Provides extractors for all data sources:
 - OddsAPIExtractor: The Odds API historical data
 """
 
-from .base import BaseExtractor, ExtractionResult, SourceType, RetryConfig, RateLimiter
+from .base import BaseExtractor, ExtractionResult, RateLimiter, RetryConfig, SourceType
 from .nflverse import NFLVerseExtractor
 
 # Odds API extractor will be imported when implemented

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Weekly Ensemble Weight Re-Optimization Pipeline
 
 Automated pipeline for adaptive ensemble weight learning:
@@ -34,15 +34,13 @@ Author: Claude Code (Sonnet 4.5)
 """
 
 import argparse
-import sys
-from pathlib import Path
 import json
 import logging
-from datetime import datetime
-from typing import List, Dict, Tuple, Optional
+import sys
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import psycopg
 
 # Add project root to path
@@ -101,7 +99,7 @@ def fetch_predictions_with_actuals(
     season: int,
     week_start: int,
     week_end: int,
-    model_names: List[str] = ENSEMBLE_V6_MODELS
+    model_names: list[str] = ENSEMBLE_V6_MODELS
 ) -> pd.DataFrame:
     """
     Fetch component predictions + actual outcomes from database.
@@ -168,10 +166,10 @@ def fetch_predictions_with_actuals(
 
 def optimize_ensemble_weights(
     df_predictions: pd.DataFrame,
-    model_names: List[str],
-    halflife_candidates: List[float] = [2, 3, 4, 5, 6, 8],
+    model_names: list[str],
+    halflife_candidates: list[float] = [2, 3, 4, 5, 6, 8],
     train_split: float = 0.8
-) -> Tuple[Dict[str, float], float, Dict]:
+) -> tuple[dict[str, float], float, dict]:
     """
     Run WLS optimization with grid search over halflife candidates.
 
@@ -213,11 +211,11 @@ def optimize_ensemble_weights(
         'optimal_halflife': optimal_halflife
     }
 
-    logger.info(f"✅ Optimization complete:")
+    logger.info("✅ Optimization complete:")
     logger.info(f"   Optimal halflife: {optimal_halflife} weeks")
     logger.info(f"   Validation MAE: {val_mae:.4f}")
     logger.info(f"   Validation RMSE: {val_rmse:.4f}")
-    logger.info(f"   Optimal weights:")
+    logger.info("   Optimal weights:")
     for model, weight in optimal_weights.items():
         logger.info(f"     {model}: {weight:.4f}")
 
@@ -226,11 +224,11 @@ def optimize_ensemble_weights(
 
 def optimize_ensemble_weights_dirichlet(
     df_predictions: pd.DataFrame,
-    model_names: List[str],
+    model_names: list[str],
     prior_strength: float = 1.0,
     likelihood_scale: float = 20.0,
     use_v8_priors: bool = True
-) -> Tuple[Dict[str, float], float, Dict]:
+) -> tuple[dict[str, float], float, dict]:
     """
     Run Dirichlet Bayesian stacking for weight optimization.
 
@@ -309,11 +307,11 @@ def optimize_ensemble_weights_dirichlet(
         'num_updates': stacker.num_updates
     }
 
-    logger.info(f"✅ Dirichlet optimization complete:")
+    logger.info("✅ Dirichlet optimization complete:")
     logger.info(f"   Num updates: {stacker.num_updates}")
     logger.info(f"   Validation MAE: {val_mae:.4f}" if val_mae else "   Validation MAE: N/A")
     logger.info(f"   Validation RMSE: {val_rmse:.4f}" if val_rmse else "   Validation RMSE: N/A")
-    logger.info(f"   Optimal weights:")
+    logger.info("   Optimal weights:")
     for model, weight in optimal_weights.items():
         logger.info(f"     {model}: {weight:.4f}")
 
@@ -321,9 +319,9 @@ def optimize_ensemble_weights_dirichlet(
 
 
 def compute_weight_change(
-    new_weights: Dict[str, float],
-    previous_weights: Optional[Dict[str, float]]
-) -> Tuple[float, float, str]:
+    new_weights: dict[str, float],
+    previous_weights: dict[str, float] | None
+) -> tuple[float, float, str]:
     """
     Compute weight change statistics.
 
@@ -355,7 +353,7 @@ def compute_weight_change(
 
 def get_previous_weights(
     ensemble_version: str = 'v6.0'
-) -> Optional[Dict[str, float]]:
+) -> dict[str, float] | None:
     """
     Fetch most recent weights from database.
 
@@ -392,9 +390,9 @@ def save_weights_to_database(
     training_start_week: int,
     training_end_week: int,
     training_window_size: int,
-    weights: Dict[str, float],
+    weights: dict[str, float],
     halflife: float,
-    metrics: Dict,
+    metrics: dict,
     optimization_method: str = 'wls_grid_search',
     deployed_by: str = 'weekly_cron'
 ) -> int:
@@ -637,7 +635,7 @@ def main():
             )
 
             logger.info(f"✅ DEPLOYMENT SUCCESSFUL (history_id={history_id})")
-            logger.info(f"   Production ensemble will reload weights on next prediction call")
+            logger.info("   Production ensemble will reload weights on next prediction call")
 
         logger.info("="*80)
         logger.info("OPTIMIZATION COMPLETE")

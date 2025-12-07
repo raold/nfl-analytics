@@ -25,11 +25,12 @@ if _pytest_py is not None:
     # Remove the 'py' module so our local package takes precedence
     del sys.modules['py']
 
-import os
 import datetime as dt
-from typing import Generator
-import pytest
+import os
+from collections.abc import Generator
+
 import psycopg
+import pytest
 
 
 @pytest.fixture(scope="session")
@@ -75,7 +76,7 @@ def db_cursor(db_connection: psycopg.Connection) -> Generator[psycopg.Cursor, No
 @pytest.fixture
 def sample_snapshot_time() -> dt.datetime:
     """Return a consistent timestamp for testing."""
-    return dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
+    return dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
 
 
 @pytest.fixture

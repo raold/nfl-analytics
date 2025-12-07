@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.832286
 Test count: 31
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.bnn_simpler_v2 import *
-import pandas as pd
-import pytest
 
 
 def test_main_basic():

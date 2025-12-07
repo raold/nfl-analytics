@@ -14,8 +14,6 @@ Date: 2025-11-13
 """
 
 import argparse
-import os
-from datetime import datetime
 from pathlib import Path
 
 import psycopg2

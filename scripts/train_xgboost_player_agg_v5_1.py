@@ -45,31 +45,31 @@ Date: November 27, 2025
 Version: 5.1 (Data Leakage Fixed)
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
+import os
+import sys
+import time
 from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-# Import player aggregation features
-from py.features.player_aggregation_features import aggregate_player_projections_multi_season
+from py.features.dc_features import DCFeatureGenerator
 
 # Import coaching features (OC and DC)
 from py.features.oc_features import OCFeatureGenerator
-from py.features.dc_features import DCFeatureGenerator
+
+# Import player aggregation features
+from py.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
     level=logging.INFO,
@@ -87,7 +87,6 @@ DB_CONFIG = {
 }
 
 # Training configuration - use dynamic year detection
-from datetime import datetime
 _current_year = datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1
 TRAIN_SEASONS = [_current_year - 2, _current_year - 1, _current_year]  # Player projections available
 TEST_SEASON = _current_year  # Holdout validation
@@ -261,7 +260,7 @@ def load_baseline_features():
     logger.info(f"✓ Loaded {len(df):,} QB games")
     logger.info(f"  Seasons: {df.season.min()}-{df.season.max()}")
     logger.info(f"  Unique QBs: {df.player_id.nunique()}")
-    logger.info(f"\n✓ LEAKAGE FIX: Using lag features (4-week rolling), NOT same-game stats")
+    logger.info("\n✓ LEAKAGE FIX: Using lag features (4-week rolling), NOT same-game stats")
 
     return df
 
@@ -490,7 +489,7 @@ def train_xgboost_with_aggregation():
     train_df = full_df[(full_df.season >= 2022) & (full_df.season < TEST_SEASON)].copy()
     test_df = full_df[full_df.season == TEST_SEASON].copy()
 
-    logger.info(f"\nTrain/Test Split:")
+    logger.info("\nTrain/Test Split:")
     logger.info(f"  Train: {len(train_df):,} games (2022-{TEST_SEASON-1})")
     logger.info(f"  Test:  {len(test_df):,} games ({TEST_SEASON})")
 

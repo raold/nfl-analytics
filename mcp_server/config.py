@@ -5,6 +5,7 @@ Loads from environment variables and .env file.
 
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load .env from project root

@@ -3,10 +3,10 @@ GitHub operations for NFL analytics MCP server.
 Provides repository management, issue tracking, and documentation automation.
 """
 
-import os
 import logging
+import os
 import subprocess
-from typing import Dict, Any, Optional, List
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
 REPO = "raold/nfl-analytics"  # Default repository
 
 
-def _run_gh_command(args: List[str]) -> Dict[str, Any]:
+def _run_gh_command(args: list[str]) -> dict[str, Any]:
     """
     Execute a GitHub CLI command.
 
@@ -66,9 +66,9 @@ def _run_gh_command(args: List[str]) -> Dict[str, Any]:
 def create_issue(
     title: str,
     body: str,
-    labels: Optional[str] = None,
-    assignees: Optional[str] = None
-) -> Dict[str, Any]:
+    labels: str | None = None,
+    assignees: str | None = None
+) -> dict[str, Any]:
     """
     Create a GitHub issue.
 
@@ -107,8 +107,8 @@ def create_issue(
 def list_recent_issues(
     limit: int = 10,
     state: str = "open",
-    labels: Optional[str] = None
-) -> Dict[str, Any]:
+    labels: str | None = None
+) -> dict[str, Any]:
     """
     List recent GitHub issues.
 
@@ -140,8 +140,8 @@ def create_pr(
     title: str,
     body: str,
     base: str = "main",
-    head: Optional[str] = None
-) -> Dict[str, Any]:
+    head: str | None = None
+) -> dict[str, Any]:
     """
     Create a pull request.
 
@@ -175,7 +175,7 @@ def create_pr(
     return result
 
 
-def get_pr_status(pr_number: int) -> Dict[str, Any]:
+def get_pr_status(pr_number: int) -> dict[str, Any]:
     """
     Get status of a pull request.
 
@@ -199,7 +199,7 @@ def get_pr_status(pr_number: int) -> Dict[str, Any]:
 def add_comment(
     issue_number: int,
     comment: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Add a comment to an issue or PR.
 
@@ -221,7 +221,7 @@ def add_comment(
     return _run_gh_command(args)
 
 
-def get_repo_stats() -> Dict[str, Any]:
+def get_repo_stats() -> dict[str, Any]:
     """
     Get repository statistics.
 
@@ -241,7 +241,7 @@ def get_repo_stats() -> Dict[str, Any]:
 def search_code(
     query: str,
     limit: int = 10
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Search code in the repository.
 

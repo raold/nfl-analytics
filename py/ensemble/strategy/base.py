@@ -10,10 +10,10 @@ Date: November 9, 2025
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
 from enum import Enum
-import numpy as np
+from typing import Any
 
+import numpy as np
 
 # ============================================================================
 # Canonical Ensemble Weight Presets
@@ -84,7 +84,7 @@ class ModelPrediction:
     prediction_mean: float
     prediction_std: float
     confidence: float = 1.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         """Validate prediction values."""
@@ -110,11 +110,11 @@ class EnsemblePrediction:
     """
     prediction_mean: float
     prediction_std: float
-    model_predictions: List[ModelPrediction]
-    weights: Dict[str, float]
+    model_predictions: list[ModelPrediction]
+    weights: dict[str, float]
     strategy_name: str
     confidence: float = 1.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def num_models(self) -> int:
@@ -150,12 +150,12 @@ class EnsembleConfig:
         db_config: Database configuration dict
     """
     strategy_name: str = "weighted_average"
-    model_paths: Dict[str, str] = field(default_factory=dict)
-    weights: Dict[str, float] = field(default_factory=dict)
+    model_paths: dict[str, str] = field(default_factory=dict)
+    weights: dict[str, float] = field(default_factory=dict)
     confidence_threshold: float = 0.5
     require_minimum_models: int = 2
     cache_predictions: bool = True
-    db_config: Dict[str, Any] = field(default_factory=dict)
+    db_config: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         """
@@ -218,7 +218,7 @@ class EnsembleStrategy(ABC):
     @abstractmethod
     def combine(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         **kwargs
     ) -> EnsemblePrediction:
         """
@@ -236,7 +236,7 @@ class EnsembleStrategy(ABC):
         """
         pass
 
-    def validate_predictions(self, predictions: List[ModelPrediction]) -> None:
+    def validate_predictions(self, predictions: list[ModelPrediction]) -> None:
         """
         Validate predictions before combining.
 
@@ -263,9 +263,9 @@ class EnsembleStrategy(ABC):
 
     def filter_predictions(
         self,
-        predictions: List[ModelPrediction],
+        predictions: list[ModelPrediction],
         confidence_threshold: float = 0.5
-    ) -> List[ModelPrediction]:
+    ) -> list[ModelPrediction]:
         """
         Filter predictions by confidence threshold.
 

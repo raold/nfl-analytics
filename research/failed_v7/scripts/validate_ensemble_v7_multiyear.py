@@ -18,12 +18,10 @@ Author: Enhanced Ensemble v7.0
 Date: November 17, 2025
 """
 
-import sys
-from pathlib import Path
 import logging
-from typing import Dict, List, Tuple
+import sys
 from datetime import datetime
-import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -34,9 +32,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.ensemble.enhanced_ensemble_v7_production import (
-    EnhancedEnsemble7Way,
     load_ensemble_v7,
-    DEFAULT_WEIGHTS_V6,
 )
 
 # Configure logging
@@ -123,7 +119,7 @@ def get_test_data(season: int, week_start: int = 1, week_end: int = 18) -> pd.Da
 # ENSEMBLE CONFIGURATIONS
 # ============================================================================
 
-def get_ensemble_configurations() -> Dict[str, Dict]:
+def get_ensemble_configurations() -> dict[str, dict]:
     """
     Return 4 ensemble configurations for ablation study.
 
@@ -163,7 +159,7 @@ def get_ensemble_configurations() -> Dict[str, Dict]:
 
 def backtest_configuration(
     config_name: str,
-    config_params: Dict,
+    config_params: dict,
     test_df: pd.DataFrame,
     season: int,
 ) -> pd.DataFrame:
@@ -250,7 +246,7 @@ def diebold_mariano_test(
     errors_1: np.ndarray,
     errors_2: np.ndarray,
     h: int = 1,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Diebold-Mariano test for predictive accuracy.
 
@@ -284,7 +280,7 @@ def diebold_mariano_test(
     return dm_stat, p_value
 
 
-def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+def compare_configurations(results: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """
     Compare all configurations pairwise using Diebold-Mariano test.
 
@@ -343,8 +339,8 @@ def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 # ============================================================================
 
 def generate_summary_report(
-    results_by_season: Dict[int, Dict[str, pd.DataFrame]],
-    comparisons_by_season: Dict[int, pd.DataFrame],
+    results_by_season: dict[int, dict[str, pd.DataFrame]],
+    comparisons_by_season: dict[int, pd.DataFrame],
 ) -> str:
     """
     Generate comprehensive summary report.
@@ -456,13 +452,13 @@ def generate_summary_report(
         improvement_pct = (improvement / baseline_mae) * 100
 
         lines.append("")
-        lines.append(f"v7.0 Full vs v6.0 Baseline:")
+        lines.append("v7.0 Full vs v6.0 Baseline:")
         lines.append(f"  Improvement: {improvement:.2f} yards ({improvement_pct:+.1f}%)")
 
         if improvement > 2.0:
-            lines.append(f"  ✅ Target met: >2 yards improvement")
+            lines.append("  ✅ Target met: >2 yards improvement")
         else:
-            lines.append(f"  ⚠️  Target missed: <2 yards improvement")
+            lines.append("  ⚠️  Target missed: <2 yards improvement")
 
     lines.append("")
     lines.append("=" * 80)
@@ -526,7 +522,7 @@ def main():
         results_by_season[season] = season_results
 
         # Statistical comparisons
-        logger.info(f"\n3. Running statistical comparisons...")
+        logger.info("\n3. Running statistical comparisons...")
         try:
             comparisons = compare_configurations(season_results)
             comparisons_by_season[season] = comparisons

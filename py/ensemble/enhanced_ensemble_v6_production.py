@@ -67,7 +67,6 @@ import pickle
 import time
 import warnings
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -75,10 +74,11 @@ import psycopg2
 import xgboost as xgb
 from dotenv import load_dotenv
 
-# Import hybrid model
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 # v6.1: PostgreSQL lookup (200-400x faster than rpy2)
 from py.ensemble.r_prediction_lookup import RPredictionLookup
+
+# Import hybrid model
+from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Load environment variables
 load_dotenv()
@@ -212,13 +212,13 @@ class EnhancedEnsemble5Way:
         ridge_path: str = "models/ridge_residuals_v7_backtest2024_20251114_184552.pkl",
         xgboost_v4_path: str = "models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json",
         hybrid_base_path: str = "models/xgboost/hybrid_static_incremental_v1",
-        weights: Optional[Dict[str, float]] = None,
-        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_5way.pkl",
+        weights: dict[str, float] | None = None,
+        temperature_scaler_path: str | None = "models/calibration/temperature_scaler_5way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: Optional[str] = None,
+        db_password: str | None = None,
     ):
         """
         Initialize 5-way ensemble predictor.
@@ -468,8 +468,8 @@ class EnhancedEnsemble5Way:
             # For ensemble prediction, we only need the static component
 
             logger.info(f"✅ Hybrid Static-Incremental XGBoost loaded from {self.hybrid_base_path.name}")
-            logger.info(f"   Static weight: 70%, Incremental weight: 30%")
-            logger.info(f"   Note: Using static component only for batch predictions")
+            logger.info("   Static weight: 70%, Incremental weight: 30%")
+            logger.info("   Note: Using static component only for batch predictions")
         except Exception as e:
             raise Exception(
                 f"CRITICAL: Failed to load Hybrid model from {self.hybrid_base_path}. "
@@ -499,7 +499,7 @@ class EnhancedEnsemble5Way:
 
         try:
             self.r_interface = RPredictionLookup(db_config=self.db_config)
-            logger.info(f"✅ R prediction lookup initialized (PostgreSQL mode, no rpy2)")
+            logger.info("✅ R prediction lookup initialized (PostgreSQL mode, no rpy2)")
         except Exception as e:
             logger.warning(f"⚠️  Failed to initialize R prediction lookup: {e}")
             logger.warning("R models (Hierarchical, Informative Priors) will use fallback")
@@ -516,7 +516,7 @@ class EnhancedEnsemble5Way:
         week: int,
         return_components: bool = False,
         return_uncertainty: bool = True,
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 5-way ensemble prediction for a player-game.
 
@@ -561,7 +561,7 @@ class EnhancedEnsemble5Way:
                 components["state_space_v2"] = {"mean": ss_pred, "std": ss_std}
                 valid_predictions.append("state_space_v2")
             else:
-                logger.warning(f"Component state_space_v2 returned None")
+                logger.warning("Component state_space_v2 returned None")
         except Exception as e:
             logger.warning(f"Component state_space_v2 failed: {e}")
 
@@ -572,7 +572,7 @@ class EnhancedEnsemble5Way:
                 components["hierarchical_v2"] = {"mean": hier_pred, "std": hier_std}
                 valid_predictions.append("hierarchical_v2")
             else:
-                logger.warning(f"Component hierarchical_v2 returned None")
+                logger.warning("Component hierarchical_v2 returned None")
         except Exception as e:
             logger.warning(f"Component hierarchical_v2 failed: {e}")
 
@@ -583,7 +583,7 @@ class EnhancedEnsemble5Way:
                 components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
                 valid_predictions.append("xgboost_v4_ridge")
             else:
-                logger.warning(f"Component xgboost_v4_ridge returned None")
+                logger.warning("Component xgboost_v4_ridge returned None")
         except Exception as e:
             logger.warning(f"Component xgboost_v4_ridge failed: {e}")
 
@@ -594,7 +594,7 @@ class EnhancedEnsemble5Way:
                 components["informative_priors_v2"] = {"mean": ip_pred, "std": ip_std}
                 valid_predictions.append("informative_priors_v2")
             else:
-                logger.warning(f"Component informative_priors_v2 returned None")
+                logger.warning("Component informative_priors_v2 returned None")
         except Exception as e:
             logger.warning(f"Component informative_priors_v2 failed: {e}")
 
@@ -605,7 +605,7 @@ class EnhancedEnsemble5Way:
                 components["hybrid_static_incremental"] = {"mean": hybrid_pred, "std": hybrid_std}
                 valid_predictions.append("hybrid_static_incremental")
             else:
-                logger.warning(f"Component hybrid_static_incremental returned None")
+                logger.warning("Component hybrid_static_incremental returned None")
         except Exception as e:
             logger.warning(f"Component hybrid_static_incremental failed: {e}")
 
@@ -675,7 +675,7 @@ class EnhancedEnsemble5Way:
 
         return result
 
-    def _fetch_features(self, player_id: str, season: int, week: int) -> Dict:
+    def _fetch_features(self, player_id: str, season: int, week: int) -> dict:
         """
         Fetch features from database for prediction.
 
@@ -942,8 +942,8 @@ class EnhancedEnsemble5Way:
         return features
 
     def _predict_state_space(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using State-Space Random Walk v2.
 
@@ -963,7 +963,7 @@ class EnhancedEnsemble5Way:
                 elif "skill_mean" in player_skill.columns:
                     mean = player_skill["skill_mean"].values[0]
                 else:
-                    logger.warning(f"State-space skills missing 'skill' or 'skill_mean' column")
+                    logger.warning("State-space skills missing 'skill' or 'skill_mean' column")
                     mean = None
 
                 if mean is not None:
@@ -989,8 +989,8 @@ class EnhancedEnsemble5Way:
         return 240.0, 55.0  # Increased uncertainty due to missing model
 
     def _predict_hierarchical(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using Hierarchical Bayesian v2.
 
@@ -1014,7 +1014,7 @@ class EnhancedEnsemble5Way:
         logger.warning("Hierarchical v2 prediction unavailable, using hierarchical prior (245 yards)")
         return 245.0, 55.0  # Higher uncertainty reflects missing R model predictions
 
-    def _predict_xgboost_v4(self, features: Dict) -> Tuple[float, float]:
+    def _predict_xgboost_v4(self, features: dict) -> tuple[float, float]:
         """
         Predict using XGBoost v4 Ridge Residuals.
 
@@ -1063,8 +1063,8 @@ class EnhancedEnsemble5Way:
         return float(final_pred), float(std)
 
     def _predict_informative_priors(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using Informative Priors v2.
 
@@ -1088,7 +1088,7 @@ class EnhancedEnsemble5Way:
         logger.warning("Informative Priors v2 prediction unavailable, using prior baseline (235 yards)")
         return 235.0, 52.0  # Moderate uncertainty for informative prior fallback
 
-    def _predict_hybrid(self, features: Dict) -> Tuple[float, float]:
+    def _predict_hybrid(self, features: dict) -> tuple[float, float]:
         """
         Predict using Hybrid Static-Incremental XGBoost.
 
@@ -1152,7 +1152,7 @@ if __name__ == "__main__":
         ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD"))
         print(f"✅ Ensemble initialized with weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
-        print(f"   Version: v6.0")
+        print("   Version: v6.0")
 
         # Test prediction (will fail without database, but tests model loading)
         # result = ensemble.predict(player_id="00-0019596", season=CURRENT_SEASON, week=9)

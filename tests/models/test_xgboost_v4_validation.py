@@ -16,17 +16,17 @@ Date: November 14, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import pytest
 import numpy as np
-import pandas as pd
+import pytest
+import xgboost as xgb
+from hypothesis import given, settings
+from hypothesis import strategies as st
+from scipy import stats
 from sklearn.linear_model import RidgeCV
 from sklearn.preprocessing import StandardScaler
-import xgboost as xgb
-from hypothesis import given, strategies as st, settings, assume
-from scipy import stats
-
 
 # ============================================================================
 # UNIT TESTS: Ridge Coefficient Stability

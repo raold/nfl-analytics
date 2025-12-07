@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.072028
 Test count: 23
 """
 
+import pytest
 from backtest.exchange_simulation import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_calculate_implied_odds_basic():

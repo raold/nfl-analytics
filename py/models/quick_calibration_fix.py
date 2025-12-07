@@ -17,18 +17,18 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
+import json
 import logging
 from pathlib import Path
-import json
 
-import numpy as np
 import joblib
-from sklearn.model_selection import train_test_split
+import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -205,6 +205,6 @@ def main():
 
 if __name__ == "__main__":
     result = main()
-    print(f"\n✓ Quick calibration fix complete!")
+    print("\n✓ Quick calibration fix complete!")
     print(f"  Optimal temperature: {result['temperature']:.1f}")
     print(f"  Coverage: {result['coverage_90']:.1%}")

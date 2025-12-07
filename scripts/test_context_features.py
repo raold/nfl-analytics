@@ -17,8 +17,6 @@ Date: November 16, 2025
 import sys
 from pathlib import Path
 
-import pandas as pd
-
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -41,7 +39,7 @@ def test_context_extraction():
     season = 2024
     week = 10
 
-    print(f"\nExtracting features for:")
+    print("\nExtracting features for:")
     print(f"  Player: {player_id} (Patrick Mahomes)")
     print(f"  Season: {season}")
     print(f"  Week: {week}")

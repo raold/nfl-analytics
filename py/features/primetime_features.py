@@ -39,11 +39,9 @@ Date: November 27, 2025
 
 import logging
 import warnings
-from typing import Dict, Optional
 
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -95,7 +93,7 @@ class PrimetimeFeaturesEngine:
     def compute_primetime_features(
         self,
         game_id: str
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Compute primetime features for a single game.
 
@@ -130,7 +128,7 @@ class PrimetimeFeaturesEngine:
         row = df.iloc[0]
         return self._compute_features_from_row(row)
 
-    def _compute_features_from_row(self, row: pd.Series) -> Dict[str, any]:
+    def _compute_features_from_row(self, row: pd.Series) -> dict[str, any]:
         """Compute primetime features from a game row."""
         day_of_week = int(row['day_of_week']) if pd.notna(row['day_of_week']) else -1
         kickoff_hour = int(row['kickoff_hour']) if pd.notna(row['kickoff_hour']) else -1
@@ -160,7 +158,7 @@ class PrimetimeFeaturesEngine:
 
         # Weekend early game (1pm ET Sunday - often lower attention)
         is_early_sunday = (
-            (day_of_week == 0 and 15 <= kickoff_hour <= 19)  # Sunday ~1pm ET in UTC
+            day_of_week == 0 and 15 <= kickoff_hour <= 19  # Sunday ~1pm ET in UTC
         )
 
         # Late afternoon game (4pm ET Sunday)
@@ -208,7 +206,7 @@ class PrimetimeFeaturesEngine:
         else:
             return 'OTHER'
 
-    def _neutral_features(self) -> Dict[str, any]:
+    def _neutral_features(self) -> dict[str, any]:
         """Return neutral features when data unavailable."""
         return {
             'is_thursday_night': False,

@@ -11,20 +11,19 @@ Shows game-level predictions including:
 Consumes the /predict/week and /predict/game/full API endpoints.
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import requests
-from datetime import datetime, timedelta
-import numpy as np
-import sys
-import os
 import logging
-from pathlib import Path
+import os
+import sys
 from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import psycopg
+import requests
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

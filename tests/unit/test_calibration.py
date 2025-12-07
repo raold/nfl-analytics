@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.758618
 Test count: 16
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from utils.calibration import *
-import pandas as pd
-import pytest
 
 
 def test_brier_score_basic():

@@ -16,7 +16,9 @@ when extracting features for XGBoost training, backtesting, or API endpoints.
 """
 
 import time
+
 import pandas as pd
+
 from py.features.feature_loader_parallel import ParallelFeatureLoader
 
 
@@ -46,7 +48,7 @@ def example_1_single_season():
     print(f"  Memory: {features_df.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
 
     # Display sample features
-    print(f"\n  Sample game:")
+    print("\n  Sample game:")
     sample = features_df.iloc[0]
     print(f"    Game: {sample['home_team']} vs {sample['away_team']} ({sample['season']} Week {sample['week']})")
     print(f"    Spread: {sample['spread_close']:.1f}")
@@ -85,7 +87,7 @@ def example_2_batch_extraction():
     print(f"  Throughput: {len(features_df)/elapsed:.1f} games/sec")
 
     # Run again to test cache performance
-    print(f"\n  Re-running same batch (should hit cache)...")
+    print("\n  Re-running same batch (should hit cache)...")
     start = time.time()
     cached_df = loader.extract_game_features_batch(games_df, use_cache=True)
     elapsed_cached = time.time() - start
@@ -150,7 +152,7 @@ def example_4_cache_management():
 
     # Get cache statistics
     stats = loader.get_cache_stats()
-    print(f"\n  Cache Statistics:")
+    print("\n  Cache Statistics:")
     print(f"    Total keys: {stats['total_keys']}")
     print(f"    Memory used: {stats['memory_used_mb']:.2f} MB")
     print(f"    Keyspace hits: {stats['keyspace_hits']}")
@@ -158,7 +160,7 @@ def example_4_cache_management():
     print(f"    Hit rate: {stats['hit_rate']*100:.1f}%")
 
     # Clear specific pattern
-    print(f"\n  Clearing cache for 2024 season...")
+    print("\n  Clearing cache for 2024 season...")
     loader.clear_cache(pattern="features:2024:*")
 
     # Check stats after clear
@@ -236,7 +238,7 @@ def example_6_integration_with_xgboost():
     X_train = train_df[feature_cols]
     X_val = val_df[feature_cols]
 
-    print(f"\n  Feature matrix shapes:")
+    print("\n  Feature matrix shapes:")
     print(f"    X_train: {X_train.shape}")
     print(f"    X_val: {X_val.shape}")
 
@@ -246,11 +248,11 @@ def example_6_integration_with_xgboost():
     # 3. Train XGBoost model: xgb.train(params, dtrain, ...)
     # 4. Validate on X_val
 
-    print(f"\n  Next steps:")
-    print(f"    1. Load actual game outcomes from database")
-    print(f"    2. Create target variable (spread_cover, total_over, etc.)")
-    print(f"    3. Train XGBoost model on X_train")
-    print(f"    4. Validate on X_val")
+    print("\n  Next steps:")
+    print("    1. Load actual game outcomes from database")
+    print("    2. Create target variable (spread_cover, total_over, etc.)")
+    print("    3. Train XGBoost model on X_train")
+    print("    4. Validate on X_val")
 
     return X_train, X_val
 
@@ -289,11 +291,11 @@ def benchmark_comparison():
     df3 = loader.extract_game_features_batch(games_sample, use_cache=False)
     time_no_cache = time.time() - start
 
-    print(f"\n  Results:")
+    print("\n  Results:")
     print(f"    Cold start (batch SQL):     {time_cold:.2f}s ({len(df1)/time_cold:.1f} games/sec)")
     print(f"    Warm start (Redis cache):   {time_warm:.2f}s ({len(df2)/time_warm:.1f} games/sec)")
     print(f"    No cache (batch SQL):       {time_no_cache:.2f}s ({len(df3)/time_no_cache:.1f} games/sec)")
-    print(f"\n  Speedup:")
+    print("\n  Speedup:")
     print(f"    Batch vs Sequential (est): {len(df1) / time_cold:.1f}x")
     print(f"    Cache vs Cold start:        {time_cold / time_warm:.1f}x")
 

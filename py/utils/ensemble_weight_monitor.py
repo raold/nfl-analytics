@@ -12,10 +12,9 @@ Ensemble Weight Drift Monitor - Detects when component updates require weight re
 
 import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -33,11 +32,11 @@ class ComponentPerformance:
 @dataclass
 class DriftReport:
     """Ensemble weight drift analysis report."""
-    components: List[ComponentPerformance]
+    components: list[ComponentPerformance]
     drift_detected: bool
-    drift_components: List[str]
+    drift_components: list[str]
     recommendation: str
-    expected_roi_improvement: Optional[float] = None
+    expected_roi_improvement: float | None = None
 
 
 class EnsembleWeightMonitor:
@@ -63,7 +62,7 @@ class EnsembleWeightMonitor:
 
     DRIFT_THRESHOLD = 0.10  # 10% MAE change triggers reoptimization
 
-    def __init__(self, history_path: Optional[str] = None):
+    def __init__(self, history_path: str | None = None):
         """Initialize monitor."""
         self.project_root = Path(__file__).parent.parent.parent
 
@@ -77,10 +76,10 @@ class EnsembleWeightMonitor:
         # Load history
         self.history = self._load_history()
 
-    def _load_history(self) -> Dict:
+    def _load_history(self) -> dict:
         """Load weight optimization history."""
         if self.history_path.exists():
-            with open(self.history_path, 'r') as f:
+            with open(self.history_path) as f:
                 return json.load(f)
         return {"last_optimization": None, "components": {}}
 
@@ -152,7 +151,7 @@ class EnsembleWeightMonitor:
             recommendation="Weights still optimal"
         )
 
-    def record_optimization(self, component_maes: Dict[str, float], weights: Dict[str, float]):
+    def record_optimization(self, component_maes: dict[str, float], weights: dict[str, float]):
         """Record weight optimization event."""
         self.history['last_optimization'] = {
             "timestamp": datetime.now().isoformat(),
@@ -186,7 +185,7 @@ if __name__ == '__main__':
         print("=" * 60)
 
         if report.drift_detected:
-            print(f"⚠️  DRIFT DETECTED")
+            print("⚠️  DRIFT DETECTED")
             print(f"   Components: {', '.join(report.drift_components)}")
             print(f"   Expected ROI improvement: +{report.expected_roi_improvement:.1f}%")
             print(f"\n{report.recommendation}")

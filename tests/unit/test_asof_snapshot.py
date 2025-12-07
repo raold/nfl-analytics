@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.601447
 Test count: 13
 """
 
+import pytest
 from features.asof_snapshot import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_parse_args_basic():

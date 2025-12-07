@@ -44,14 +44,13 @@ Usage:
     python scripts/xgb_v3_2_l1_regularization.py
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
-from typing import Dict, List, Tuple
+import os
+import sys
+import time
 from dataclasses import dataclass
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -266,7 +265,7 @@ def load_opponent_strength_features():
 
     # Check coverage
     non_null_counts = opp_features[['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].notna().sum()
-    logger.info(f"\nOpponent feature availability:")
+    logger.info("\nOpponent feature availability:")
     for col, count in non_null_counts.items():
         logger.info(f"  {col}: {count:,} ({count/len(opp_features)*100:.1f}%)")
 
@@ -342,8 +341,8 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
             median_val = df[col].median()
             df[col].fillna(median_val, inplace=True)
 
-    logger.info(f"\n✓ Feature engineering complete")
-    logger.info(f"  Total features: 16 (13 baseline + 3 opponent strength)")
+    logger.info("\n✓ Feature engineering complete")
+    logger.info("  Total features: 16 (13 baseline + 3 opponent strength)")
     logger.info(f"  Samples: {len(df):,}")
 
     return df
@@ -351,9 +350,9 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
 
 def audit_feature_coverage(
     df: pd.DataFrame,
-    features: List[str],
+    features: list[str],
     threshold: float = COVERAGE_THRESHOLD,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """Audit feature coverage before training."""
     logger.info("\n" + "=" * 70)
     logger.info("FEATURE COVERAGE AUDIT (CRITICAL GATE)")
@@ -392,7 +391,7 @@ def audit_feature_coverage(
     return coverage_report
 
 
-def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
+def prepare_train_test_split(df: pd.DataFrame) -> tuple:
     """Split data into train/test sets."""
     logger.info("\n" + "=" * 70)
     logger.info("PREPARING TRAIN/TEST SPLIT (ALIGNED WINDOW)")
@@ -431,13 +430,13 @@ def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
     )].copy()
     test_df = df[df['season'] == ALIGNED_WINDOW['test_season']].copy()
 
-    logger.info(f"\n✓ Split complete:")
+    logger.info("\n✓ Split complete:")
     logger.info(f"  Train: {len(train_df):,} samples ({ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']})")
     logger.info(f"  Test: {len(test_df):,} samples ({ALIGNED_WINDOW['test_season']})")
     logger.info(f"  Features: {len(feature_cols)}")
 
     # Coverage audit
-    logger.info(f"\nRunning coverage audit on training set...")
+    logger.info("\nRunning coverage audit on training set...")
     coverage_report = audit_feature_coverage(
         train_df,
         feature_cols,
@@ -451,7 +450,7 @@ def prepare_train_test_split(df: pd.DataFrame) -> Tuple:
     X_test = test_df[feature_cols].values
     y_test = test_df['yards'].values
 
-    logger.info(f"\n16 Features (13 Baseline + 3 Opponent Strength):")
+    logger.info("\n16 Features (13 Baseline + 3 Opponent Strength):")
     for i, col in enumerate(feature_cols, 1):
         coverage = coverage_report.get(col, 0.0)
         marker = " [NEW]" if col in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty'] else ""
@@ -470,7 +469,7 @@ def cross_validate_xgboost(
     alpha: float,
     lambda_param: float,
     cv_folds: int = CV_FOLDS,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Perform k-fold cross-validation for a specific alpha/lambda combination.
 
@@ -746,14 +745,14 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols, grid_results
     logger.info("MODEL EVALUATION - 2025 HOLDOUT SET")
     logger.info("=" * 70)
 
-    logger.info(f"\nPerformance Metrics:")
+    logger.info("\nPerformance Metrics:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
     logger.info(f"  R²: {metrics['r2']:.4f}")
     logger.info(f"  Mean Prediction: {y_pred.mean():.1f} yards")
     logger.info(f"  Mean Actual: {y_test.mean():.1f} yards")
 
-    logger.info(f"\nBaseline Comparison:")
+    logger.info("\nBaseline Comparison:")
     logger.info(f"  Baseline MAE: {metrics['baseline_mae']:.2f} yards")
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
 
@@ -761,15 +760,15 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols, grid_results
     improvement_vs_v2 = ((V2_BASELINE_MAE - metrics['mae']) / V2_BASELINE_MAE) * 100
     improvement_vs_v3_1 = ((V3_1_REGRESSION_MAE - metrics['mae']) / V3_1_REGRESSION_MAE) * 100
 
-    logger.info(f"\nv2 Baseline Comparison (40.20 MAE):")
+    logger.info("\nv2 Baseline Comparison (40.20 MAE):")
     logger.info(f"  v3.2 L1 MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  Change: {improvement_vs_v2:+.2f}%")
 
-    logger.info(f"\nv3.1 Regression Comparison (57.37 MAE):")
+    logger.info("\nv3.1 Regression Comparison (57.37 MAE):")
     logger.info(f"  v3.2 L1 MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  Improvement: {improvement_vs_v3_1:+.2f}%")
 
-    logger.info(f"\nTraining Info:")
+    logger.info("\nTraining Info:")
     logger.info(f"  Training time: {metrics['training_time_minutes']:.2f} minutes")
     logger.info(f"  Best iteration: {metrics['best_iteration']}")
     logger.info(f"  Best alpha: {metrics['best_alpha']}")
@@ -911,15 +910,15 @@ def decision_gate(mae, v2_baseline=V2_BASELINE_MAE, v3_1_regression=V3_1_REGRESS
     else:
         decision = "✗ ABANDON"
         recommendation = (
-            f"L1 regularization did not fix the regression.\n"
-            f"Opponent features may not be addressable via regularization alone.\n"
-            f"RECOMMENDED: Try alternative approaches (feature removal, different opponent proxies)"
+            "L1 regularization did not fix the regression.\n"
+            "Opponent features may not be addressable via regularization alone.\n"
+            "RECOMMENDED: Try alternative approaches (feature removal, different opponent proxies)"
         )
         status = "FAILURE - Approach not working"
 
     logger.info(f"\nDecision: {decision}")
     logger.info(f"Status: {status}")
-    logger.info(f"\nRecommendation:")
+    logger.info("\nRecommendation:")
     for line in recommendation.split('\n'):
         logger.info(f"  {line}")
 
@@ -935,10 +934,10 @@ def main():
     logger.info("\n" + "=" * 70)
     logger.info("BFS EXPERIMENT 5: L1 REGULARIZATION FOR XGBOOST OPPONENT FEATURES")
     logger.info("=" * 70)
-    logger.info(f"Goal: Fix v3.1 regression (57.37 MAE) via L1 feature elimination")
-    logger.info(f"Target: MAE < 42 yards (deploy) or < 40.2 yards (beats baseline)")
+    logger.info("Goal: Fix v3.1 regression (57.37 MAE) via L1 feature elimination")
+    logger.info("Target: MAE < 42 yards (deploy) or < 40.2 yards (beats baseline)")
     logger.info(f"Method: Grid search L1 alpha ({len(L1_ALPHAS)} values) × L2 lambda ({len(L2_LAMBDAS)} values)")
-    logger.info(f"Estimated Runtime: 15-25 minutes")
+    logger.info("Estimated Runtime: 15-25 minutes")
     logger.info("=" * 70 + "\n")
 
     pipeline_start = time.time()
@@ -956,7 +955,7 @@ def main():
     try:
         X_train, y_train, X_test, y_test, feature_cols, train_df = prepare_train_test_split(df)
     except ValueError as e:
-        logger.error(f"\n✗ COVERAGE AUDIT FAILED")
+        logger.error("\n✗ COVERAGE AUDIT FAILED")
         logger.error(f"  {str(e)}")
         return
 

@@ -34,12 +34,9 @@ Research: NFL Betting Inefficiency Analysis (Nov 2025)
 
 import logging
 import warnings
-from typing import Dict, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -97,7 +94,7 @@ class TurnoverLuckEngine:
             "user": db_user,
             "password": db_password,
         }
-        logger.info(f"Initialized TurnoverLuckEngine")
+        logger.info("Initialized TurnoverLuckEngine")
 
     def _connect_db(self):
         """Create database connection."""
@@ -262,7 +259,7 @@ class TurnoverLuckEngine:
         team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute all turnover luck features for a team.
 
@@ -364,7 +361,7 @@ class TurnoverLuckEngine:
         away_team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute turnover luck features for a matchup.
 

@@ -3,29 +3,17 @@ Test MCP Phase 1 Integration
 Tests database writes, filesystem access, and GitHub operations.
 """
 
-import sys
-import os
 import json
+import sys
 from datetime import datetime
 
 # Add mcp_server to path
 sys.path.insert(0, '/Users/dro/rice/nfl-analytics')
 
-from mcp_server.tools.database_write import (
-    insert_model_metadata,
-    update_model_status,
-    insert_prediction_batch
-)
-from mcp_server.tools.filesystem import (
-    list_files,
-    read_file,
-    read_json,
-    get_file_info
-)
-from mcp_server.tools.github_ops import (
-    get_repo_stats,
-    list_recent_issues
-)
+from mcp_server.tools.database_write import insert_model_metadata, update_model_status
+from mcp_server.tools.filesystem import get_file_info, list_files, read_json
+from mcp_server.tools.github_ops import get_repo_stats, list_recent_issues
+
 
 def test_database_write_operations():
     """Test database write tools."""
@@ -66,13 +54,13 @@ def test_database_write_operations():
         )
 
         if result.get('success'):
-            print(f"   ✅ Status updated successfully")
+            print("   ✅ Status updated successfully")
         else:
             print(f"   ❌ Status update failed: {result.get('error')}")
 
     # Test 3: Save predictions (skipped - requires full prediction schema)
     print("\n3. Testing save_predictions()...")
-    print(f"   ⏭️  Skipped - predictions table requires full schema (stat_type, player_name, team, etc.)")
+    print("   ⏭️  Skipped - predictions table requires full schema (stat_type, player_name, team, etc.)")
 
     print("\n   Summary: Database write operations tested")
     return model_id
@@ -126,7 +114,7 @@ def test_filesystem_operations():
         else:
             print(f"   ❌ JSON read failed: {json_result.get('error')}")
     else:
-        print(f"   ⚠️  No JSON files found in models/bayesian/")
+        print("   ⚠️  No JSON files found in models/bayesian/")
 
     # Test 4: Get file info
     print("\n4. Testing get_file_info()...")
@@ -157,12 +145,12 @@ def test_github_operations():
         # Parse JSON output
         try:
             stats = json.loads(result.get('output', '{}'))
-            print(f"   ✅ Repository stats retrieved")
+            print("   ✅ Repository stats retrieved")
             print(f"      Name: {stats.get('name', 'N/A')}")
             print(f"      Stars: {stats.get('stargazerCount', 'N/A')}")
             print(f"      Open Issues: {stats.get('openIssuesCount', 'N/A')}")
         except:
-            print(f"   ✅ Repo stats command executed")
+            print("   ✅ Repo stats command executed")
             print(f"      Output: {result.get('output', '')[:100]}")
     else:
         print(f"   ⚠️  GitHub CLI not available: {result.get('error')}")
@@ -172,7 +160,7 @@ def test_github_operations():
     result = list_recent_issues(limit=5, state="open")
 
     if result.get('success'):
-        print(f"   ✅ Issues list retrieved")
+        print("   ✅ Issues list retrieved")
         print(f"      Output length: {len(result.get('output', ''))} chars")
     else:
         print(f"   ⚠️  List issues: {result.get('error')}")

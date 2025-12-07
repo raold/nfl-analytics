@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.021298
 Test count: 22
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.improve_bnn_calibration import *
-import pandas as pd
-import pytest
 
 
 def test_load_passing_data_basic():

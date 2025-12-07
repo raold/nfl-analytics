@@ -33,9 +33,8 @@ import argparse
 import logging
 import os
 import smtplib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from email.mime.text import MIMEText
-from typing import Dict, List, Optional
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -80,9 +79,9 @@ class PaperTradeSettler:
 
     def get_pending_trades(
         self,
-        session_id: Optional[str] = None,
+        session_id: str | None = None,
         days_back: int = 7
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Get pending paper trades that need settlement.
 
@@ -112,7 +111,7 @@ class PaperTradeSettler:
                   AND pt.trade_timestamp >= %s
             """
 
-            params = [datetime.now(timezone.utc) - timedelta(days=days_back)]
+            params = [datetime.now(UTC) - timedelta(days=days_back)]
 
             if session_id:
                 query += " AND pt.session_id = %s"
@@ -128,7 +127,7 @@ class PaperTradeSettler:
         player_id: str,
         game_id: str,
         prop_type: str
-    ) -> Optional[float]:
+    ) -> float | None:
         """
         Get actual player stat from database.
 
@@ -238,7 +237,7 @@ class PaperTradeSettler:
                 """, (
                     actual_result,
                     outcome,
-                    datetime.now(timezone.utc),
+                    datetime.now(UTC),
                     profit_loss,
                     paper_trade_id
                 ))
@@ -248,8 +247,8 @@ class PaperTradeSettler:
 
     def settle_all_pending(
         self,
-        session_id: Optional[str] = None
-    ) -> Dict:
+        session_id: str | None = None
+    ) -> dict:
         """
         Settle all pending paper trades that have results available.
 
@@ -422,7 +421,7 @@ class PaperTradeSettler:
                 f"{sharpe:.2f} Sharpe"
             )
 
-    def send_alert_email(self, summary: Dict, session_id: Optional[str] = None):
+    def send_alert_email(self, summary: dict, session_id: str | None = None):
         """
         Send email alert with settlement summary.
 
@@ -445,7 +444,7 @@ class PaperTradeSettler:
 
         body = f"""
 Paper Trading Settlement Report
-Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
+Generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}
 
 Summary:
 - Total pending trades: {summary['total_pending']}

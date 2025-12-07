@@ -23,7 +23,6 @@ import argparse
 import re
 import shutil
 from pathlib import Path
-from typing import List, Tuple
 
 # File patterns to search
 PYTORCH_PATTERNS = [
@@ -49,7 +48,7 @@ IMPORT_STATEMENT = "from py.utils.device_utils import get_best_device"
 REPLACEMENT_CODE = "device = get_best_device()"
 
 
-def find_pytorch_files() -> List[Path]:
+def find_pytorch_files() -> list[Path]:
     """Find all PyTorch files in the project"""
     files = []
     for pattern in PYTORCH_PATTERNS:
@@ -57,7 +56,7 @@ def find_pytorch_files() -> List[Path]:
     return sorted(set(files))
 
 
-def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]:
+def scan_file_for_device_patterns(file_path: Path) -> list[tuple[int, str, str]]:
     """
     Scan file for device assignment patterns
 
@@ -67,7 +66,7 @@ def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]
     matches = []
 
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
             lines = content.split('\n')
 
@@ -85,7 +84,7 @@ def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]
 def has_device_utils_import(file_path: Path) -> bool:
     """Check if file already imports get_best_device"""
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
         return "get_best_device" in content
     except:
@@ -100,7 +99,7 @@ def update_file_with_mps_support(file_path: Path, dry_run: bool = False) -> bool
         bool: True if file was modified
     """
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
 
         original_content = content

@@ -14,14 +14,13 @@ Author: Claude Code
 Date: 2025-11-21
 """
 
-import streamlit as st
-import pandas as pd
-import psycopg
-from datetime import datetime
-from typing import Optional, Dict, List
 import os
 import sys
 from pathlib import Path
+
+import pandas as pd
+import psycopg
+import streamlit as st
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -46,7 +45,11 @@ from utils.api_client import APIClient
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -55,22 +58,15 @@ except ImportError:
 
 # Import dashboard constants
 from constants import (
-    STRONG_SPREAD_EDGE_THRESHOLD,
-    MODERATE_SPREAD_EDGE_THRESHOLD,
-    STRONG_TOTAL_EDGE_THRESHOLD,
-    MODERATE_TOTAL_EDGE_THRESHOLD,
-    SPREAD_TO_PROB_LOGISTIC_FACTOR,
-    QB_YARDS_TO_SCORE_INTERCEPT,
-    QB_YARDS_TO_SCORE_SLOPE,
     API_TIMEOUT_LONG,
-    COLOR_SUCCESS_BG,
-    COLOR_WARNING_BG,
-    COLOR_NEUTRAL_BG,
+    COLOR_NEUTRAL,
     COLOR_SUCCESS,
     COLOR_WARNING,
-    COLOR_NEUTRAL,
+    MODERATE_SPREAD_EDGE_THRESHOLD,
+    MODERATE_TOTAL_EDGE_THRESHOLD,
+    STRONG_SPREAD_EDGE_THRESHOLD,
+    STRONG_TOTAL_EDGE_THRESHOLD,
 )
-
 
 # ============================================================================
 # Helper Functions
@@ -137,7 +133,7 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def call_game_prediction_api(game_id: str, season: int, week: int) -> Optional[Dict[str, Any]]:
+def call_game_prediction_api(game_id: str, season: int, week: int) -> dict[str, Any] | None:
     """
     Call FastAPI /predict/game endpoint to generate predictions on-the-fly.
 
@@ -554,8 +550,8 @@ def render_game_predictions_comparison() -> None:
 
     except Exception as e:
         st.error(f"Unexpected error loading game predictions: {str(e)}")
-        import traceback
         import logging
+        import traceback
         logging.error(f"Unexpected error in render_game_predictions_comparison: {e}", exc_info=True)
         st.code(traceback.format_exc())
 

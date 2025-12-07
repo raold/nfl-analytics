@@ -22,7 +22,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -112,7 +111,7 @@ class FeatureAblationStudy:
             "n_features": len(ensemble.legitimate_phase5_features) + 9,  # +9 baseline
         }
 
-        print(f"\nRESULTS:")
+        print("\nRESULTS:")
         print(f"  Train Accuracy: {results['train_accuracy']:.1%}")
         print(f"  Test Accuracy:  {results['test_accuracy']:.1%}")
         print(f"  Test Brier:     {results['test_brier']:.4f}")
@@ -241,19 +240,19 @@ class FeatureAblationStudy:
         current_acc = self.results["current"]["test_accuracy"]
         increased_reg_acc = self.results["increased_reg"]["test_accuracy"]
 
-        print(f"\n1. BASELINE ONLY (no Phase 5 features):")
+        print("\n1. BASELINE ONLY (no Phase 5 features):")
         print(f"   Test Accuracy: {baseline_acc:.1%}")
 
-        print(f"\n2. CURRENT (5 Phase 5 features):")
+        print("\n2. CURRENT (5 Phase 5 features):")
         print(f"   Test Accuracy: {current_acc:.1%}")
         print(f"   Lift from baseline: {(current_acc - baseline_acc):.1%}")
 
-        print(f"\n3. INCREASED REGULARIZATION:")
+        print("\n3. INCREASED REGULARIZATION:")
         print(f"   Test Accuracy: {increased_reg_acc:.1%}")
         print(f"   Change from current: {(increased_reg_acc - current_acc):.1%}")
 
         # Identify most important features
-        print(f"\n4. INDIVIDUAL FEATURE IMPORTANCE (by ablation):")
+        print("\n4. INDIVIDUAL FEATURE IMPORTANCE (by ablation):")
         all_phase5_features = [
             "extreme_cold",
             "dome_team_outdoor_wind",

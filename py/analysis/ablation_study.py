@@ -33,7 +33,6 @@ Statistical Tests:
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
@@ -41,7 +40,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
 import logging
-from typing import Dict, List, Tuple, Optional
 import warnings
 
 import numpy as np
@@ -82,7 +80,7 @@ def get_db_connection(
 # Load Predictions from Models
 # ============================================================================
 
-def load_state_space_predictions(season: int, weeks: List[int]) -> pd.DataFrame:
+def load_state_space_predictions(season: int, weeks: list[int]) -> pd.DataFrame:
     """
     Load state-space model predictions from ablation study results.
 
@@ -116,7 +114,7 @@ def load_state_space_predictions(season: int, weeks: List[int]) -> pd.DataFrame:
 def load_synthetic_predictions(
     model_name: str,
     season: int,
-    weeks: List[int],
+    weeks: list[int],
     db_conn: psycopg2.extensions.connection,
     baseline_mae: float = 48.0,
     baseline_std: float = 58.0
@@ -172,8 +170,8 @@ def load_synthetic_predictions(
 
 def load_ensemble_predictions(
     season: int,
-    weeks: List[int],
-    individual_preds: Dict[str, pd.DataFrame],
+    weeks: list[int],
+    individual_preds: dict[str, pd.DataFrame],
     weighting_method: str = "inverse_variance"
 ) -> pd.DataFrame:
     """
@@ -253,7 +251,7 @@ def load_ensemble_predictions(
 # Metrics Computation
 # ============================================================================
 
-def compute_metrics(predictions: pd.DataFrame) -> Dict[str, float]:
+def compute_metrics(predictions: pd.DataFrame) -> dict[str, float]:
     """
     Compute performance metrics for a set of predictions.
 
@@ -320,7 +318,7 @@ def wilcoxon_test(
     preds_1: pd.DataFrame,
     preds_2: pd.DataFrame,
     metric: str = 'mae'
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Wilcoxon signed-rank test for paired comparison.
 
@@ -358,7 +356,7 @@ def wilcoxon_test(
 def diebold_mariano_test(
     preds_1: pd.DataFrame,
     preds_2: pd.DataFrame
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Diebold-Mariano test for predictive accuracy comparison.
 
@@ -434,10 +432,10 @@ def cohens_d(
 
 def run_ablation_study(
     season: int,
-    weeks: List[int],
+    weeks: list[int],
     db_conn: psycopg2.extensions.connection,
     weighting_method: str = "inverse_variance"
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Run ablation study comparing ensemble vs individual models.
 

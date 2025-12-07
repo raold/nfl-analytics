@@ -19,6 +19,7 @@ Author: Claude Code
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import argparse
@@ -26,7 +27,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -74,7 +75,7 @@ class ConformalBNNValidator:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         alpha: float = 0.10,  # 90% coverage
         use_rf_fallback: bool = False
     ):
@@ -113,7 +114,7 @@ class ConformalBNNValidator:
         self.results_dir.mkdir(exist_ok=True)
         (self.results_dir / "figures").mkdir(exist_ok=True)
 
-        logger.info(f"ConformalBNNValidator initialized:")
+        logger.info("ConformalBNNValidator initialized:")
         logger.info(f"  Target coverage: {1-alpha:.1%}")
         logger.info(f"  PyTorch available: {PYTORCH_AVAILABLE}")
         logger.info(f"  MAPIE available: {MAPIE_AVAILABLE}")
@@ -242,7 +243,7 @@ class ConformalBNNValidator:
     def split_data(
         self,
         df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Split data temporally into train/calib/test (60/20/20).
 
@@ -290,7 +291,7 @@ class ConformalBNNValidator:
     def prepare_features(
         self,
         df: pd.DataFrame
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare feature matrix (same 6 features as baseline).
 
@@ -326,7 +327,7 @@ class ConformalBNNValidator:
 
         return X, y
 
-    def load_bnn_model(self) -> Optional[nn.Module]:
+    def load_bnn_model(self) -> nn.Module | None:
         """
         Try to load existing BNN model from checkpoints.
 
@@ -357,13 +358,13 @@ class ConformalBNNValidator:
                 if isinstance(checkpoint, dict):
                     if 'model_state_dict' in checkpoint:
                         logger.error(
-                            f"    State dict format requires model architecture. "
-                            f"Please use direct model checkpoint."
+                            "    State dict format requires model architecture. "
+                            "Please use direct model checkpoint."
                         )
                         continue
                     elif 'model' in checkpoint:
                         model = checkpoint['model']
-                        logger.info(f"    ✓ Loaded model from 'model' key")
+                        logger.info("    ✓ Loaded model from 'model' key")
                         return model
                     else:
                         logger.error(f"    Unknown checkpoint format: {checkpoint.keys()}")
@@ -371,7 +372,7 @@ class ConformalBNNValidator:
                 else:
                     # Direct model checkpoint
                     model = checkpoint
-                    logger.info(f"    ✓ Loaded direct model checkpoint")
+                    logger.info("    ✓ Loaded direct model checkpoint")
                     return model
 
             except Exception as e:
@@ -385,7 +386,7 @@ class ConformalBNNValidator:
         self,
         X_train: np.ndarray,
         y_train: np.ndarray,
-        bnn_model: Optional[nn.Module] = None
+        bnn_model: nn.Module | None = None
     ) -> Any:
         """
         Create conformal predictor with BNN or Random Forest base.
@@ -470,7 +471,7 @@ class ConformalBNNValidator:
             verbose: Print calibration statistics
         """
         if verbose:
-            logger.info(f"\nCalibrating conformal prediction...")
+            logger.info("\nCalibrating conformal prediction...")
             logger.info(f"  Calibration set: {len(X_calib)} samples")
             logger.info(f"  Target coverage: {1-self.alpha:.1%}")
 
@@ -497,21 +498,21 @@ class ConformalBNNValidator:
 
             width = np.mean(y_intervals_calib[:, 1, 0] - y_intervals_calib[:, 0, 0])
 
-            logger.info(f"\n  Calibration results:")
+            logger.info("\n  Calibration results:")
             logger.info(f"    Empirical coverage: {coverage:.1%} (target: {1-self.alpha:.1%})")
             logger.info(f"    Average interval width: {width:.1f} yards")
 
             if coverage >= (1 - self.alpha - 0.02):
-                logger.info(f"    ✓ Coverage guarantee achieved!")
+                logger.info("    ✓ Coverage guarantee achieved!")
             else:
-                logger.warning(f"    ⚠ Coverage below target (may need more calibration data)")
+                logger.warning("    ⚠ Coverage below target (may need more calibration data)")
 
     def evaluate_test_set(
         self,
         conformal_model: Any,
         X_test: np.ndarray,
         y_test: np.ndarray
-    ) -> Dict:
+    ) -> dict:
         """
         Evaluate conformal predictor on test set.
 
@@ -609,8 +610,8 @@ class ConformalBNNValidator:
 
     def compare_to_temperature_scaling(
         self,
-        conformal_results: Dict
-    ) -> Dict:
+        conformal_results: dict
+    ) -> dict:
         """
         Compare conformal prediction to temperature scaling baseline.
 
@@ -643,21 +644,21 @@ class ConformalBNNValidator:
         # Comparison
         coverage_diff = conformal_coverage - baseline['coverage_90']
 
-        logger.info(f"\nCoverage Comparison:")
+        logger.info("\nCoverage Comparison:")
         logger.info(f"  Temperature Scaling: {baseline['coverage_90']:.1%}")
         logger.info(f"  Conformal Prediction: {conformal_coverage:.1%}")
         logger.info(f"  Difference: {coverage_diff:+.1%}")
 
         if coverage_diff > 0:
-            logger.info(f"  → Conformal prediction achieves BETTER coverage")
+            logger.info("  → Conformal prediction achieves BETTER coverage")
         elif coverage_diff > -0.02:
-            logger.info(f"  → Similar coverage (within 2%)")
+            logger.info("  → Similar coverage (within 2%)")
         else:
-            logger.warning(f"  → Temperature scaling has better coverage")
+            logger.warning("  → Temperature scaling has better coverage")
 
-        logger.info(f"\nSharpness:")
+        logger.info("\nSharpness:")
         logger.info(f"  Conformal width: {conformal_width:.1f} yards")
-        logger.info(f"  (Temperature scaling width not available)")
+        logger.info("  (Temperature scaling width not available)")
 
         comparison = {
             'baseline': baseline,
@@ -845,8 +846,8 @@ class ConformalBNNValidator:
 
     def save_results(
         self,
-        results: Dict,
-        comparison: Dict,
+        results: dict,
+        comparison: dict,
         use_bnn: bool
     ):
         """
@@ -888,8 +889,8 @@ class ConformalBNNValidator:
             "# BNN Conformal Prediction Validation Results",
             f"\n**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"**Base Model:** {'BNN (pre-trained)' if use_bnn else 'Random Forest'}",
-            f"**Conformal Method:** Split Conformal (Jackknife+)",
-            f"**Target Coverage:** 90%",
+            "**Conformal Method:** Split Conformal (Jackknife+)",
+            "**Target Coverage:** 90%",
             "",
             "## Test Set Performance",
             "",

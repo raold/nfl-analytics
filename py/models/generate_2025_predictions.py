@@ -18,15 +18,15 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 9, 2025
 """
 
-import pandas as pd
-import numpy as np
-import pickle
 import json
+import logging
+import pickle
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Dict, List, Tuple
-import logging
+
+import numpy as np
+import pandas as pd
 import psycopg2
 
 # Optional imports
@@ -247,7 +247,7 @@ def load_pytorch_bnn_predictions(model_path: str, data: pd.DataFrame) -> pd.Data
     # Load model metadata
     metadata_path = str(model_path).replace('.pt', '_metadata.json')
     if Path(metadata_path).exists():
-        with open(metadata_path, 'r') as f:
+        with open(metadata_path) as f:
             metadata = json.load(f)
         feature_cols = metadata.get('feature_cols', [])
         y_mean = metadata.get('y_mean', 0.0)

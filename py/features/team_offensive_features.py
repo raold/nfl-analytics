@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Team Offensive Features Module for Game Outcome Predictions
 ============================================================
 
@@ -101,10 +101,7 @@ Reference: CLAUDE.md § Feature Engineering Best Practices
 
 import logging
 import warnings
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -174,7 +171,7 @@ class TeamOffensiveFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -217,7 +214,7 @@ class TeamOffensiveFeatures:
         target_season: int,
         target_week: int,
         lookback: int = LOOKBACK_WINDOW
-    ) -> List[Tuple[str, int, int]]:
+    ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
 
@@ -261,8 +258,8 @@ class TeamOffensiveFeatures:
     def _compute_play_level_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute play-level offensive features (EPA, success rate, explosive plays, etc.).
 
@@ -396,8 +393,8 @@ class TeamOffensiveFeatures:
     def _compute_red_zone_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute red zone offensive features (TD rate).
 
@@ -452,8 +449,8 @@ class TeamOffensiveFeatures:
     def _compute_game_level_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute game-level offensive features (points, yards, plays, TOP, scoring drives).
 
@@ -572,8 +569,8 @@ class TeamOffensiveFeatures:
     def _compute_variance_features(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute performance variance features (EPA std, scoring std, consistency score).
 
@@ -667,7 +664,7 @@ class TeamOffensiveFeatures:
         team: str,
         season: int,
         week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract all 27 team offensive features for a specific game.
 

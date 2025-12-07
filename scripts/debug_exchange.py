@@ -1,6 +1,7 @@
-import pandas as pd
-import numpy as np
 import json
+
+import numpy as np
+import pandas as pd
 
 # Load results
 with open('results/exchange_simulation_ev_2024.json') as f:

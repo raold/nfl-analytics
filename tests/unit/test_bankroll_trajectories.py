@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:29.112405
 Test count: 11
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from viz.bankroll_trajectories import *
-import pandas as pd
-import pytest
 
 
 def test_simulate_trajectory_basic():

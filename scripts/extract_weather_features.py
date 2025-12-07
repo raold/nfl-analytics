@@ -10,16 +10,15 @@ Date: November 16, 2025
 """
 
 import os
-import sys
 import re
-import pandas as pd
-import numpy as np
+import sys
 from pathlib import Path
-from typing import Optional, Tuple
+
+import numpy as np
+import pandas as pd
 
 # Database connection
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -35,7 +34,7 @@ DB_CONFIG = {
 }
 
 
-def parse_temperature(temp_str: Optional[str]) -> Optional[float]:
+def parse_temperature(temp_str: str | None) -> float | None:
     """
     Parse temperature string to float.
 
@@ -60,7 +59,7 @@ def parse_temperature(temp_str: Optional[str]) -> Optional[float]:
         return None
 
 
-def parse_wind(wind_str: Optional[str]) -> Optional[float]:
+def parse_wind(wind_str: str | None) -> float | None:
     """
     Parse wind speed string to float.
 

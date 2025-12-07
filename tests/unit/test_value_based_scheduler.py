@@ -5,11 +5,11 @@ Generated: 2025-11-09T13:26:29.136354
 Test count: 25
 """
 
+import pandas as pd
+import pytest
 from compute.value_based_scheduler import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_estimate_task_value_basic():

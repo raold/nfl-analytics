@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.880621
 Test count: 14
 """
 
+import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 from models.train_xgboost_player_props import *
-import pandas as pd
-import pytest
 
 
 def test_load_passing_data_from_db_basic():

@@ -32,8 +32,6 @@ import logging
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import datetime
-from typing import Dict, Optional
 
 from prometheus_client import (
     CollectorRegistry,
@@ -70,7 +68,7 @@ class MetricsRegistry:
     4. Operations: Latency, errors, throughput
     """
 
-    def __init__(self, registry: Optional[CollectorRegistry] = None):
+    def __init__(self, registry: CollectorRegistry | None = None):
         """
         Initialize metrics registry.
 
@@ -364,8 +362,8 @@ class MetricsRegistry:
         stake: float,
         odds: float,
         stat_type: str = 'unknown',
-        predicted_value: Optional[float] = None,
-        actual_value: Optional[float] = None
+        predicted_value: float | None = None,
+        actual_value: float | None = None
     ):
         """
         Record a bet outcome and update performance metrics.
@@ -483,7 +481,7 @@ class MetricsRegistry:
         stat_type: str,
         predicted_value: float,
         uncertainty: float,
-        actual_value: Optional[float] = None
+        actual_value: float | None = None
     ):
         """
         Record a prediction and update model quality metrics.
@@ -511,7 +509,7 @@ class MetricsRegistry:
         self.calibration_coverage.set(coverage)
         logger.info(f"Calibration coverage updated: {coverage:.2%}")
 
-    def update_model_version(self, version: str, metadata: Dict[str, str]):
+    def update_model_version(self, version: str, metadata: dict[str, str]):
         """
         Update model version information.
 
@@ -606,12 +604,12 @@ class MetricsRegistry:
     def update_cache_metrics(
         self,
         cache_type: str = "all",
-        hit_rate: Optional[float] = None,
-        hits: Optional[int] = None,
-        misses: Optional[int] = None,
-        size_keys: Optional[int] = None,
-        size_bytes: Optional[int] = None,
-        evictions: Optional[int] = None
+        hit_rate: float | None = None,
+        hits: int | None = None,
+        misses: int | None = None,
+        size_keys: int | None = None,
+        size_bytes: int | None = None,
+        evictions: int | None = None
     ):
         """
         Update Redis cache metrics from cache statistics.

@@ -23,12 +23,10 @@ Version: 2.0 (Production - No Mock Data)
 
 import logging
 import os
-import pickle
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import xgboost as xgb
@@ -85,7 +83,7 @@ class PropsPredictionResponse(BaseModel):
     """Props prediction response."""
 
     player_id: str
-    player_name: Optional[str] = None
+    player_name: str | None = None
     stat_type: str
     week: int
     season: int
@@ -96,8 +94,8 @@ class PropsPredictionResponse(BaseModel):
     confidence_interval_lower: float
     confidence_interval_upper: float
     model_used: str = Field(..., description="Model version used")
-    ab_group: Optional[str] = Field(None, description="A/B test group (control/treatment)")
-    calibration_score: Optional[float] = Field(
+    ab_group: str | None = Field(None, description="A/B test group (control/treatment)")
+    calibration_score: float | None = Field(
         None, description="Calibration score (if available)"
     )
     timestamp: str
@@ -234,7 +232,7 @@ class PropsModelManager:
             self._touchdowns_available = False
             return None
 
-    def _get_player_name(self, player_id: str) -> Optional[str]:
+    def _get_player_name(self, player_id: str) -> str | None:
         """Lookup player name from database."""
         try:
             import psycopg2
@@ -289,7 +287,7 @@ class PropsModelManager:
         stat_type: str = "passing_yards",
         confidence_level: float = 0.90,
         use_ab_test: bool = True
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Predict yards using EnhancedEnsemble5Way.
 
@@ -386,7 +384,7 @@ class PropsModelManager:
 
     def predict_rushing_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict rushing yards using ensemble."""
         return self.predict_yards(
             player_id=player_id,
@@ -398,7 +396,7 @@ class PropsModelManager:
 
     def predict_receiving_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict receiving yards using ensemble."""
         return self.predict_yards(
             player_id=player_id,
@@ -410,7 +408,7 @@ class PropsModelManager:
 
     def predict_passing_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict passing yards using ensemble with A/B test."""
         return self.predict_yards(
             player_id=player_id,
@@ -423,7 +421,7 @@ class PropsModelManager:
 
     def predict_touchdown_probability(
         self, player_id: str, week: int, season: int
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Predict touchdown probability using XGBoost v1.
 
@@ -698,7 +696,7 @@ async def predict_receiving_yards(
     if request.stat_type != "receiving_yards":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"stat_type must be 'receiving_yards' for this endpoint",
+            detail="stat_type must be 'receiving_yards' for this endpoint",
         )
 
     # Get REAL prediction
@@ -766,7 +764,7 @@ async def predict_touchdown_probability(
     if request.stat_type != "touchdowns":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"stat_type must be 'touchdowns' for this endpoint",
+            detail="stat_type must be 'touchdowns' for this endpoint",
         )
 
     # Get REAL prediction

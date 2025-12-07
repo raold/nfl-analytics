@@ -4,7 +4,6 @@ Simple calibration validation script for 2025 holdout data.
 Generates ensemble predictions and calculates 90% PI coverage without requiring prop odds.
 """
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -146,7 +145,7 @@ def main():
     logger.info("\n📥 Fetching 2025 QB games...")
     df = fetch_qb_games(conn, 2025, 2025)
     logger.info(f"✅ Fetched {len(df):,} QB games")
-    logger.info(f"   Seasons: 2025-2025")
+    logger.info("   Seasons: 2025-2025")
     logger.info(f"   Players: {df['player_id'].nunique()}")
 
     # Add lagged features
@@ -206,23 +205,23 @@ def main():
     logger.info("=" * 80)
     logger.info(f"Games: {metrics['n_games']}")
     logger.info(f"\n90% PI Coverage: {metrics['within_90']}/{metrics['n_games']} ({metrics['coverage_90']*100:.1f}%)")
-    logger.info(f"  Target: 85-95% (ideal: 90%)")
+    logger.info("  Target: 85-95% (ideal: 90%)")
 
     if 0.85 <= metrics['coverage_90'] <= 0.95:
-        logger.info(f"  ✅ CALIBRATED (within target range)")
+        logger.info("  ✅ CALIBRATED (within target range)")
     elif metrics['coverage_90'] < 0.85:
-        logger.info(f"  ❌ UNDERCALIBRATED (ensemble overconfident)")
+        logger.info("  ❌ UNDERCALIBRATED (ensemble overconfident)")
     else:
-        logger.info(f"  ⚠️  OVERCALIBRATED (ensemble underconfident)")
+        logger.info("  ⚠️  OVERCALIBRATED (ensemble underconfident)")
 
     logger.info(f"\nBinomial Test: p = {metrics['binom_pvalue']:.4f}")
-    logger.info(f"  (H0: coverage = 90%, α = 0.05)")
+    logger.info("  (H0: coverage = 90%, α = 0.05)")
 
-    logger.info(f"\nPrediction Error:")
+    logger.info("\nPrediction Error:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
 
-    logger.info(f"\nInterval Sharpness:")
+    logger.info("\nInterval Sharpness:")
     logger.info(f"  Mean Width: {metrics['mean_interval_width']:.1f} yards")
     logger.info("=" * 80)
 

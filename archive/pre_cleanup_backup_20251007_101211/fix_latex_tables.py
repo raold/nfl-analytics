@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
 Fix LaTeX table files with incorrect tablenotes environment.
-Convert \begin{tablenotes}...\end{tablenotes} to be wrapped in threeparttable.
+Convert \begin{tablenotes}...\\end{tablenotes} to be wrapped in threeparttable.
 """
 
-import os
 import re
 from pathlib import Path
 
+
 def fix_table_file(filepath):
     """Fix a single LaTeX table file."""
-    with open(filepath, 'r') as f:
+    with open(filepath) as f:
         content = f.read()
 
     # Check if file needs fixing

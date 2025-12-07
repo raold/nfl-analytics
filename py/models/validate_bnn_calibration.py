@@ -9,21 +9,19 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
-import logging
-from pathlib import Path
 import json
+import logging
 from datetime import datetime
+from pathlib import Path
 
-import numpy as np
-import pandas as pd
-import psycopg2
 import joblib
-from sklearn.preprocessing import StandardScaler
+import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,14 +52,14 @@ def load_actual_bnn_model():
     logger.info(f"Loading BNN model: {model_path}")
     try:
         model_data = joblib.load(model_path)
-        logger.info(f"✓ Model loaded successfully")
+        logger.info("✓ Model loaded successfully")
         logger.info(f"  Keys: {list(model_data.keys())}")
 
         # Check model structure
         if 'trace' in model_data:
-            logger.info(f"  Has posterior trace: ✓")
+            logger.info("  Has posterior trace: ✓")
         if 'scaler' in model_data:
-            logger.info(f"  Has feature scaler: ✓")
+            logger.info("  Has feature scaler: ✓")
 
         return model_data
 
@@ -154,14 +152,14 @@ def validate_bnn_calibration():
     baseline_coverage_90 = compute_calibration(y_true, predictions, 0.90)
     baseline_coverage_68 = compute_calibration(y_true, predictions, 0.68)
 
-    logger.info(f"Baseline (T=1.0):")
+    logger.info("Baseline (T=1.0):")
     logger.info(f"  Coverage 90%: {baseline_coverage_90:.1%} (target: 85-95%)")
     logger.info(f"  Coverage 68%: {baseline_coverage_68:.1%} (target: 63-73%)")
     logger.info(f"  Interval width: {(predictions['q95'] - predictions['q05']).mean():.1f} yards")
     logger.info(f"  MAE: {np.abs(y_true - predictions['mean']).mean():.2f} yards")
 
     if 0.85 <= baseline_coverage_90 <= 0.95:
-        logger.info(f"\n  Status: ✅ WELL-CALIBRATED (no adjustment needed)")
+        logger.info("\n  Status: ✅ WELL-CALIBRATED (no adjustment needed)")
         return {
             "optimal_temperature": 1.0,
             "coverage_90": baseline_coverage_90,
@@ -169,11 +167,11 @@ def validate_bnn_calibration():
             "status": "PASS"
         }
     elif baseline_coverage_90 < 0.85:
-        logger.info(f"\n  Status: ⚠️ UNDER-CALIBRATED (intervals too narrow)")
-        logger.info(f"  Solution: Increase temperature (T > 1.0)")
+        logger.info("\n  Status: ⚠️ UNDER-CALIBRATED (intervals too narrow)")
+        logger.info("  Solution: Increase temperature (T > 1.0)")
     else:
-        logger.info(f"\n  Status: ⚠️ OVER-CALIBRATED (intervals too wide)")
-        logger.info(f"  Solution: Decrease temperature (T < 1.0)")
+        logger.info("\n  Status: ⚠️ OVER-CALIBRATED (intervals too wide)")
+        logger.info("  Solution: Decrease temperature (T < 1.0)")
 
     # Find optimal temperature
     logger.info("\n" + "="*70)
@@ -235,9 +233,9 @@ def validate_bnn_calibration():
     logger.info(f"MAE: {optimal['mae']:.2f} yards")
 
     if optimal['in_target']:
-        logger.info(f"Status: ✅ CALIBRATED")
+        logger.info("Status: ✅ CALIBRATED")
     else:
-        logger.info(f"Status: ⚠️ BEST AVAILABLE (closest to target)")
+        logger.info("Status: ⚠️ BEST AVAILABLE (closest to target)")
 
     # Save results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -267,15 +265,15 @@ def validate_bnn_calibration():
     logger.info("PRODUCTION RECOMMENDATION")
     logger.info("="*70)
     logger.info(f"1. Set BNN temperature to T={optimal['temperature']:.2f}")
-    logger.info(f"2. Implementation:")
-    logger.info(f"   class ImprovedBNN:")
+    logger.info("2. Implementation:")
+    logger.info("   class ImprovedBNN:")
     logger.info(f"       def __init__(self, ..., temperature={optimal['temperature']:.2f}):")
-    logger.info(f"           self.temperature = temperature")
-    logger.info(f"   ")
-    logger.info(f"   # In likelihood:")
-    logger.info(f"   sigma = pm.HalfNormal('sigma', sigma=1.0) * self.temperature")
-    logger.info(f"3. Validate on fresh 2024 data before deployment")
-    logger.info(f"4. Monitor calibration daily (target: 85-95%)")
+    logger.info("           self.temperature = temperature")
+    logger.info("   ")
+    logger.info("   # In likelihood:")
+    logger.info("   sigma = pm.HalfNormal('sigma', sigma=1.0) * self.temperature")
+    logger.info("3. Validate on fresh 2024 data before deployment")
+    logger.info("4. Monitor calibration daily (target: 85-95%)")
 
     return optimal
 

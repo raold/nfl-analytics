@@ -13,23 +13,20 @@ Date: 2025-01-24
 import argparse
 import json
 import logging
-import random
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
-from torch.cuda.amp import autocast, GradScaler
-from torch.utils.data import DataLoader
-from tqdm import tqdm
-
 from gnn_graph_builder_cuda import NFLDatabase, NFLGraphBuilder
 from hierarchical_gnn_v1 import HierarchicalGNN, NFLGraph
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
+from torch.cuda.amp import GradScaler, autocast
+from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,7 +37,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-def get_gpu_stats() -> Dict[str, float]:
+def get_gpu_stats() -> dict[str, float]:
     """Get current GPU utilization and memory stats (CUDA only)."""
     if not torch.cuda.is_available():
         return {}
@@ -82,9 +79,9 @@ class NFLGameDataset:
 
     def __init__(
         self,
-        graphs_by_season: Dict[int, NFLGraph],
+        graphs_by_season: dict[int, NFLGraph],
         games: pd.DataFrame,
-        default_graph: Optional[NFLGraph] = None,
+        default_graph: NFLGraph | None = None,
     ):
         """
         Initialize dataset with per-season graphs.
@@ -122,7 +119,7 @@ class NFLGameDataset:
             nearest = min(available_seasons, key=lambda s: abs(s - game_season))
             return self.graphs_by_season[nearest]
 
-    def __getitem__(self, idx: int) -> Dict:
+    def __getitem__(self, idx: int) -> dict:
         """Get a single game with the correct season's graph."""
         game = self.games.iloc[idx]
         season = int(game.get("season", max(self.graphs_by_season.keys())))
@@ -157,11 +154,11 @@ class NFLGameDataset:
 
 
 def load_multi_season_data(
-    seasons: List[int],
+    seasons: list[int],
     include_chemistry: bool = True,
     db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01",
     use_per_season_graphs: bool = True,
-) -> Tuple[Dict[int, NFLGraph], Dict[int, pd.DataFrame]]:
+) -> tuple[dict[int, NFLGraph], dict[int, pd.DataFrame]]:
     """
     Load data for multiple seasons and build graphs.
 
@@ -188,7 +185,7 @@ def load_multi_season_data(
         # This ensures games from 2020 only see 2020 rosters, not future data
         logger.info(f"Building per-season graphs for seasons: {seasons}")
         logger.info(f"  Chemistry edges: {'enabled' if include_chemistry else 'disabled'}")
-        logger.info(f"  ⚠️ Per-season graphs enabled (avoids temporal leakage)")
+        logger.info("  ⚠️ Per-season graphs enabled (avoids temporal leakage)")
 
         for season in seasons:
             graph = builder.build_season_graph(
@@ -220,18 +217,18 @@ def load_multi_season_data(
 
 
 def create_splits(
-    games_by_season: Dict[int, pd.DataFrame],
-    train_seasons: List[int],
-    val_seasons: List[int],
-    test_seasons: List[int],
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    games_by_season: dict[int, pd.DataFrame],
+    train_seasons: list[int],
+    val_seasons: list[int],
+    test_seasons: list[int],
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split data into train/val/test sets."""
 
     train_games = pd.concat([games_by_season[s] for s in train_seasons], ignore_index=True)
     val_games = pd.concat([games_by_season[s] for s in val_seasons], ignore_index=True)
     test_games = pd.concat([games_by_season[s] for s in test_seasons], ignore_index=True)
 
-    logger.info(f"Dataset splits:")
+    logger.info("Dataset splits:")
     logger.info(f"  Train: {len(train_games)} games ({train_seasons})")
     logger.info(f"  Val:   {len(val_games)} games ({val_seasons})")
     logger.info(f"  Test:  {len(test_games)} games ({test_seasons})")
@@ -244,7 +241,7 @@ def create_splits(
 # =============================================================================
 
 
-def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, src_type: str, dst_type: str) -> List[Tuple[int, int]]:
+def remap_edges_to_type_indices(edges: list[tuple[int, int]], graph: NFLGraph, src_type: str, dst_type: str) -> list[tuple[int, int]]:
     """Remap edges from global node IDs to type-specific indices."""
     remapped = []
 
@@ -265,10 +262,10 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
         logger.info(f"  Num {dst_type} nodes: {len(dst_ids)}")
         logger.info(f"  {src_type} ID range: [{min(src_ids)}, {max(src_ids)}]")
         logger.info(f"  {dst_type} ID range: [{min(dst_ids)}, {max(dst_ids)}]")
-        logger.info(f"\n  Sample raw edges (first 5):")
+        logger.info("\n  Sample raw edges (first 5):")
         for i, (src, dst) in enumerate(edges[:5]):
             logger.info(f"    Edge {i}: ({src}, {dst}) [global IDs]")
-        logger.info(f"")
+        logger.info("")
 
     missing_src = 0
     missing_dst = 0
@@ -287,7 +284,7 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
 
     # DEBUG: Log results
     if len(edges) > 0:
-        logger.info(f"  Remapping results:")
+        logger.info("  Remapping results:")
         logger.info(f"    Input edges: {len(edges)}")
         logger.info(f"    Successfully remapped: {len(remapped)}")
         logger.info(f"    Missing src nodes: {missing_src}")
@@ -297,7 +294,7 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
             src_remapped, dst_remapped = zip(*remapped)
             logger.info(f"    Remapped src range: [0, {max(src_remapped)}] (expected max: {len(src_ids)-1})")
             logger.info(f"    Remapped dst range: [0, {max(dst_remapped)}] (expected max: {len(dst_ids)-1})")
-            logger.info(f"\n  Sample remapped edges (first 5):")
+            logger.info("\n  Sample remapped edges (first 5):")
             for i, (src, dst) in enumerate(remapped[:5]):
                 logger.info(f"    Edge {i}: ({src}, {dst}) [local indices]")
 
@@ -306,7 +303,7 @@ def remap_edges_to_type_indices(edges: List[Tuple[int, int]], graph: NFLGraph, s
     return remapped
 
 
-def _prepare_graph_tensors(graph: NFLGraph, device: str) -> Dict:
+def _prepare_graph_tensors(graph: NFLGraph, device: str) -> dict:
     """Prepare graph tensors for a single season's graph."""
     non_blocking = (device in ["cuda", "mps"])
 
@@ -547,7 +544,7 @@ def evaluate(
     model: HierarchicalGNN,
     dataset: NFLGameDataset,
     device: str,
-) -> Tuple[Dict[str, float], np.ndarray, np.ndarray]:
+) -> tuple[dict[str, float], np.ndarray, np.ndarray]:
     """Evaluate model on a dataset.
 
     Processes games by season using per-season graphs to avoid index mismatch.
@@ -661,7 +658,7 @@ def load_checkpoint(
     checkpoint_dir: Path,
     model: nn.Module,
     optimizer: torch.optim.Optimizer,
-) -> Tuple[int, float]:
+) -> tuple[int, float]:
     """Load latest checkpoint if it exists."""
     latest_path = checkpoint_dir / "checkpoint_latest.pt"
 
@@ -688,7 +685,7 @@ def load_checkpoint(
 
 
 def train_gnn_single_config(
-    seasons: List[int],
+    seasons: list[int],
     embedding_dim: int = 64,
     hidden_dim: int = 128,
     num_message_rounds: int = 3,
@@ -698,7 +695,7 @@ def train_gnn_single_config(
     use_chemistry: bool = True,
     device: str = "cpu",
     output_dir: Path = None,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Train GNN with specified hyperparameters (for Optuna search).
 
@@ -717,7 +714,7 @@ def train_gnn_single_config(
     Returns:
         Dictionary with training results and metrics
     """
-    logger.info(f"Training GNN config:")
+    logger.info("Training GNN config:")
     logger.info(f"  Embedding: {embedding_dim}, Hidden: {hidden_dim}, Rounds: {num_message_rounds}")
     logger.info(f"  Epochs: {epochs}, LR: {learning_rate}, Batch: {batch_size}")
     logger.info(f"  Chemistry: {use_chemistry}, Device: {device}")
@@ -1014,7 +1011,7 @@ def main():
     # Mixed precision training setup
     scaler = GradScaler() if args.use_amp and args.device == "cuda" else None
     if scaler:
-        logger.info(f"✓ Mixed precision (FP16) training enabled")
+        logger.info("✓ Mixed precision (FP16) training enabled")
         logger.info(f"  Batch size: {args.batch_size}")
         logger.info(f"  Gradient accumulation: {args.accumulation_steps}")
         logger.info(f"  Effective batch size: {args.batch_size * args.accumulation_steps}")

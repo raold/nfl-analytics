@@ -4,6 +4,7 @@
 import re
 from pathlib import Path
 
+
 def check_chapter(chapter_file):
     """Check if chapter has summary and if it's at the end."""
     content = chapter_file.read_text()

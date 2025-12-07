@@ -9,20 +9,12 @@ Date: 2025-11-14
 
 import logging
 import os
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from datetime import datetime
-import json
+from pathlib import Path
 
 import numpy as np
 
-from api.models import (
-    PredictionRequest,
-    PredictionResponse,
-    ModelContribution,
-    ModelInfo,
-    StatType
-)
+from api.models import ModelContribution, ModelInfo, PredictionRequest, PredictionResponse, StatType
 
 # Import production ensemble
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
@@ -76,7 +68,7 @@ class EnsemblePredictor:
         )
         logger.info("✅ Production ensemble initialized")
 
-    def load_models(self) -> Dict[str, ModelInfo]:
+    def load_models(self) -> dict[str, ModelInfo]:
         """
         Load all models in the ensemble.
 
@@ -290,7 +282,7 @@ class EnsemblePredictor:
             ensemble_method="production_4way"
         )
 
-    def get_model_info(self) -> Dict[str, ModelInfo]:
+    def get_model_info(self) -> dict[str, ModelInfo]:
         """Get information about all models"""
         return self.load_models()
 

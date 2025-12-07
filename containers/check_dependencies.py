@@ -5,12 +5,10 @@ Smart dependency checker and installer for NFL Analytics.
 Only installs packages that are missing, avoiding redundant installations.
 """
 
+import importlib.util
+import json
 import subprocess
 import sys
-import importlib.util
-from typing import List, Tuple, Dict
-import json
-import time
 
 # Package mappings: import name -> pip package spec
 PACKAGE_MAPPINGS = {
@@ -79,7 +77,7 @@ def check_package_installed(package_name: str) -> bool:
     return False
 
 
-def get_installed_packages() -> Dict[str, str]:
+def get_installed_packages() -> dict[str, str]:
     """Get list of installed packages with versions."""
     try:
         result = subprocess.run(

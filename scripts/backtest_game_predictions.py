@@ -25,10 +25,9 @@ import json
 import logging
 import os
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -112,7 +111,7 @@ class SimpleGamePredictor:
 
     def _get_team_stats(
         self, team: str, season: int, week: int, lookback_weeks: int = 8
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get rolling team statistics (offense and defense).
 
@@ -185,7 +184,7 @@ class SimpleGamePredictor:
 
     def predict_game(
         self, home_team: str, away_team: str, season: int, week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict game outcome (spread, total, win probability).
 
@@ -284,7 +283,7 @@ class GamePredictionBacktest:
             f"Initialized GamePredictionBacktest: seasons {start_season}-{end_season}"
         )
 
-    def _fetch_completed_games(self) -> List[Dict[str, Any]]:
+    def _fetch_completed_games(self) -> list[dict[str, Any]]:
         """
         Fetch all completed games in backtest period.
 
@@ -325,7 +324,7 @@ class GamePredictionBacktest:
         return games
 
     def _store_prediction(
-        self, game: Dict[str, Any], prediction: Dict[str, float], errors: Dict[str, float]
+        self, game: dict[str, Any], prediction: dict[str, float], errors: dict[str, float]
     ):
         """
         Store prediction in ml.game_predictions table.
@@ -468,7 +467,7 @@ class GamePredictionBacktest:
         self.conn.commit()
         cursor.close()
 
-    def run_backtest(self) -> List[Dict[str, Any]]:
+    def run_backtest(self) -> list[dict[str, Any]]:
         """
         Run backtest on all completed games.
 
@@ -567,7 +566,7 @@ class GamePredictionBacktest:
         logger.info(f"Backtest complete: {len(results)} games processed")
         return results
 
-    def calculate_metrics(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def calculate_metrics(self, results: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Calculate aggregate performance metrics.
 
@@ -652,7 +651,7 @@ class GamePredictionBacktest:
 
         return metrics
 
-    def _calculate_calibration(self, df: pd.DataFrame) -> List[Dict[str, float]]:
+    def _calculate_calibration(self, df: pd.DataFrame) -> list[dict[str, float]]:
         """
         Calculate calibration bins for win probability.
 
@@ -666,7 +665,7 @@ class GamePredictionBacktest:
         # Placeholder for now - implement once predictions are stored
         return []
 
-    def generate_report(self, metrics: Dict[str, Any], output_path: str):
+    def generate_report(self, metrics: dict[str, Any], output_path: str):
         """
         Generate markdown backtest report.
 

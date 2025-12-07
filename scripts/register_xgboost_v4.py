@@ -6,12 +6,11 @@ This script registers the validated XGBoost v4 model with multi-season validatio
 """
 
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
+
 import psycopg2
-from psycopg2.extras import Json
 from dotenv import load_dotenv
+from psycopg2.extras import Json
 
 # Load environment variables
 load_dotenv()
@@ -167,7 +166,7 @@ def register_xgboost_v4():
                 baseline_model_id,
                 metrics["improvement_pct"],
                 metrics["p_value"],
-                f"Diebold-Mariano test: p < 0.000001 (highly significant)"
+                "Diebold-Mariano test: p < 0.000001 (highly significant)"
             ))
 
             print(f"✅ Added {season} evaluation: {metrics['mae']} MAE (+{metrics['improvement_pct']:.2f}%)")
@@ -203,10 +202,10 @@ def register_xgboost_v4():
         print("✅ XGBoost v4 Ridge Residuals Registration Complete")
         print("="*60)
         print(f"Model ID: {model_id}")
-        print(f"Status: active (pending A/B test)")
+        print("Status: active (pending A/B test)")
         print(f"Multi-Season Performance: {mean_metrics['mae']} ± {mean_metrics['mae_std']} MAE")
         print(f"Improvement vs Baseline: +{mean_metrics['improvement_pct']:.2f}%")
-        print(f"Statistical Significance: All seasons p < 0.000001 ✅")
+        print("Statistical Significance: All seasons p < 0.000001 ✅")
         print("="*60)
 
     except Exception as e:

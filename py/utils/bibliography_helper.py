@@ -9,9 +9,7 @@ Features:
 """
 
 import re
-from typing import Dict, List, Optional, Set, Tuple
 from pathlib import Path
-from collections import defaultdict
 
 
 class BibliographyHelper:
@@ -363,7 +361,7 @@ class BibliographyHelper:
         self.bib_path = Path(bib_path)
         self.entries = self._parse_bib_file() if self.bib_path.exists() else {}
 
-    def _parse_bib_file(self) -> Dict[str, Dict]:
+    def _parse_bib_file(self) -> dict[str, dict]:
         """Parse BibTeX file and return dictionary of entries"""
         entries = {}
 
@@ -395,7 +393,7 @@ class BibliographyHelper:
 
         return entries
 
-    def suggest_entry(self, cite_key: str) -> Optional[str]:
+    def suggest_entry(self, cite_key: str) -> str | None:
         """
         Suggest BibTeX entry for common citations
 
@@ -411,7 +409,7 @@ class BibliographyHelper:
         entry = self.COMMON_CITATIONS[cite_key].copy()
         return self._format_bibtex_entry(cite_key, entry)
 
-    def _format_bibtex_entry(self, key: str, fields: Dict) -> str:
+    def _format_bibtex_entry(self, key: str, fields: dict) -> str:
         """Format dictionary as BibTeX entry"""
         entry_type = fields.pop('type', 'article')
         lines = [f"@{entry_type}{{{key},"]
@@ -435,7 +433,7 @@ class BibliographyHelper:
 
         return "\n".join(lines)
 
-    def validate_entry(self, cite_key: str) -> List[str]:
+    def validate_entry(self, cite_key: str) -> list[str]:
         """
         Validate BibTeX entry has required fields
 
@@ -457,7 +455,7 @@ class BibliographyHelper:
         missing = [f for f in required if f not in entry or not entry[f]]
         return missing
 
-    def find_duplicates(self) -> List[Tuple[str, str, str]]:
+    def find_duplicates(self) -> list[tuple[str, str, str]]:
         """
         Find duplicate entries (same title/author/year)
 
@@ -483,8 +481,8 @@ class BibliographyHelper:
 
         return duplicates
 
-    def check_missing_citations(self, tex_files: List[Path]) -> List[str]:
-        """
+    def check_missing_citations(self, tex_files: list[Path]) -> list[str]:
+        r"""
         Scan .tex files for \cite{} and check if entries exist
 
         Returns list of missing citation keys
@@ -514,7 +512,7 @@ class BibliographyHelper:
         missing = [k for k in cited_keys if k not in self.entries]
         return sorted(missing)
 
-    def get_citation_stats(self) -> Dict[str, int]:
+    def get_citation_stats(self) -> dict[str, int]:
         """Get statistics about bibliography"""
         stats = {
             'total_entries': len(self.entries),
@@ -525,7 +523,7 @@ class BibliographyHelper:
         }
         return stats
 
-    def suggest_missing_common_citations(self, tex_files: List[Path]) -> List[str]:
+    def suggest_missing_common_citations(self, tex_files: list[Path]) -> list[str]:
         """
         Scan .tex files and suggest common citations that might be missing
 
@@ -557,7 +555,7 @@ class BibliographyHelper:
 
         return suggestions
 
-    def generate_bibliography_report(self, tex_files: List[Path]) -> str:
+    def generate_bibliography_report(self, tex_files: list[Path]) -> str:
         """Generate comprehensive bibliography report"""
         lines = ["=" * 80]
         lines.append("BIBLIOGRAPHY REPORT")

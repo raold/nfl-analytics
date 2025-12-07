@@ -5,11 +5,10 @@ Generated: 2025-11-09T13:26:28.464703
 Test count: 35
 """
 
+import pytest
 from analysis.v2_feature_ablation import *
 from hypothesis import given
 from hypothesis import strategies as st
-import pandas as pd
-import pytest
 
 
 def test_load_and_split_data_basic():

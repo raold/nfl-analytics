@@ -24,21 +24,21 @@ uncertainty quantification of yardage. Touchdown outcomes provide discrete 'regi
 indicators' that help the model identify high-variance vs. low-variance game situations."
 """
 
+import logging
 import sys
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, TensorDataset
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+import time
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import psycopg2
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 from sklearn.preprocessing import StandardScaler
-import time
-from pathlib import Path
-import logging
-from datetime import datetime
-import json
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, TensorDataset
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -768,7 +768,7 @@ def main():
     y_mean = weighted_mean
     y_std = weighted_std
 
-    logger.info(f"\nTarget normalization (weighted by canonical window):")
+    logger.info("\nTarget normalization (weighted by canonical window):")
     logger.info(f"  Mean: {y_mean:.2f} yards")
     logger.info(f"  Std: {y_std:.2f} yards")
     logger.info(f"  Normalized train range: [{y_yards_train_norm.min():.2f}, {y_yards_train_norm.max():.2f}]")
@@ -856,7 +856,7 @@ def main():
 
     # GPU summary
     if device.type == 'cuda':
-        logger.info(f"\nGPU Memory Usage:")
+        logger.info("\nGPU Memory Usage:")
         logger.info(f"  Current: {torch.cuda.memory_allocated()/1024**3:.2f} GB")
         logger.info(f"  Peak: {torch.cuda.max_memory_allocated()/1024**3:.2f} GB")
 

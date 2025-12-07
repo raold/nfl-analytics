@@ -83,16 +83,12 @@ Date: November 22, 2025
 Phase: 6 (Frontend Agents)
 """
 
-import json
 import logging
 import os
-import re
-from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -105,8 +101,8 @@ except ImportError:
     REQUESTS_AVAILABLE = False
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -160,13 +156,13 @@ class InjuryReport:
     severity: InjurySeverity
     expected_miss_games: int
     performance_impact_pct: float  # Expected % reduction in performance if plays
-    replacement_player_id: Optional[str]
+    replacement_player_id: str | None
     replacement_quality_pct: float  # Replacement quality vs starter (0-100%)
     historical_recovery_days: int
     report_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "player_id": self.player_id,
@@ -192,11 +188,11 @@ class CoachingProfile:
     fourth_down_aggression: float  # 0-100 (100 = always goes for it)
     timeout_management_score: float  # 0-100 (quality of timeout usage)
     halftime_adjustment_rating: float  # 0-100 (ability to adjust)
-    play_calling_tendencies: Dict[str, float]  # {"pass_pct": 0.6, "run_pct": 0.4}
-    strategic_patterns: List[str]
-    details: Dict[str, Any] = field(default_factory=dict)
+    play_calling_tendencies: dict[str, float]  # {"pass_pct": 0.6, "run_pct": 0.4}
+    strategic_patterns: list[str]
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "coach_id": self.coach_id,
@@ -220,12 +216,12 @@ class ChemistryScore:
     player2_name: str
     chemistry_score: float  # 0-100 (100 = elite chemistry)
     games_together: int
-    completion_rate: Optional[float]  # For QB-WR pairs
-    target_share: Optional[float]      # For QB-WR pairs
+    completion_rate: float | None  # For QB-WR pairs
+    target_share: float | None      # For QB-WR pairs
     trend: str  # "improving", "stable", "declining"
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "player1_id": self.player1_id,
@@ -249,11 +245,11 @@ class NewsSummary:
     published_at: str
     sentiment: str  # "positive", "neutral", "negative"
     relevance_score: float  # 0-100
-    key_points: List[str]
-    url: Optional[str] = None
-    details: Dict[str, Any] = field(default_factory=dict)
+    key_points: list[str]
+    url: str | None = None
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "headline": self.headline,
@@ -277,7 +273,7 @@ class NFLDomainExpert:
 
     def __init__(
         self,
-        db_config: Optional[Dict[str, str]] = None,
+        db_config: dict[str, str] | None = None,
         enable_news_scraping: bool = False,  # Requires API keys
         cache_ttl_hours: int = 24
     ):
@@ -568,10 +564,10 @@ class NFLDomainExpert:
 
     def fetch_recent_news(
         self,
-        team: Optional[str] = None,
-        player_id: Optional[str] = None,
+        team: str | None = None,
+        player_id: str | None = None,
         days: int = 7
-    ) -> List[NewsSummary]:
+    ) -> list[NewsSummary]:
         """
         Fetch recent sports news relevant to team/player.
 
@@ -611,7 +607,7 @@ class NFLDomainExpert:
         self,
         player_id: str,
         prediction_yards: float,
-        actual_context: Dict[str, Any]
+        actual_context: dict[str, Any]
     ) -> str:
         """
         Generate human-readable explanation of prediction in context.
@@ -656,7 +652,7 @@ class NFLDomainExpert:
 
         return " ".join(explanation_parts)
 
-    def suggest_context_features(self) -> List[Dict[str, Any]]:
+    def suggest_context_features(self) -> list[dict[str, Any]]:
         """
         Suggest context-aware features for model training.
 
@@ -726,6 +722,6 @@ if __name__ == "__main__":
 
     # Suggest context features
     features = expert.suggest_context_features()
-    print(f"\nSuggested Context Features:")
+    print("\nSuggested Context Features:")
     for feature in features[:3]:
         print(f"  - {feature['feature']}: {feature['description']}")

@@ -39,7 +39,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
 
 import networkx as nx
 
@@ -75,7 +74,7 @@ class ArchitecturalViolation:
     violation_type: ViolationType
     severity: str  # CRITICAL, WARNING, INFO
     file_path: str
-    line_number: Optional[int]
+    line_number: int | None
     metric_value: float
     threshold: float
     message: str
@@ -93,14 +92,14 @@ class ModuleMetrics:
     afferent_coupling: int  # Number of modules that depend on this
     efferent_coupling: int  # Number of modules this depends on
     instability: float  # Ce / (Ca + Ce)
-    violations: List[ArchitecturalViolation] = field(default_factory=list)
+    violations: list[ArchitecturalViolation] = field(default_factory=list)
 
 
 @dataclass
 class CircularDependency:
     """Represents a circular dependency cycle."""
 
-    cycle: List[str]  # Module paths in cycle
+    cycle: list[str]  # Module paths in cycle
     length: int
     severity: str
 
@@ -112,9 +111,9 @@ class ComponentExtractionPlan:
     source_file: str
     target_file: str
     strategy: RefactoringStrategy
-    lines_to_move: List[Tuple[int, int]]  # (start_line, end_line) ranges
+    lines_to_move: list[tuple[int, int]]  # (start_line, end_line) ranges
     estimated_reduction: int  # Lines of code reduction
-    dependencies: List[str]  # Modules that will need updates
+    dependencies: list[str]  # Modules that will need updates
     code_example: str
 
 
@@ -126,7 +125,7 @@ class RefactoringPlan:
     current_lines: int
     target_lines: int
     num_extractions: int
-    extractions: List[ComponentExtractionPlan]
+    extractions: list[ComponentExtractionPlan]
     estimated_effort_hours: float
     priority: str  # HIGH, MEDIUM, LOW
 
@@ -153,9 +152,9 @@ class ArchitectureEnforcer:
         self.max_coupling = max_coupling
 
         # Dependency graph (module -> list of dependencies)
-        self.dependency_graph: Dict[str, Set[str]] = defaultdict(set)
+        self.dependency_graph: dict[str, set[str]] = defaultdict(set)
 
-    def check_module_size(self, file_path: str) -> List[ArchitecturalViolation]:
+    def check_module_size(self, file_path: str) -> list[ArchitecturalViolation]:
         """
         Check if a module exceeds size limit.
 
@@ -292,8 +291,8 @@ class ArchitectureEnforcer:
 
     def detect_circular_dependencies(
         self,
-        directory: Optional[str] = None
-    ) -> List[CircularDependency]:
+        directory: str | None = None
+    ) -> list[CircularDependency]:
         """
         Detect circular dependencies in codebase.
 
@@ -386,8 +385,8 @@ class ArchitectureEnforcer:
 
     def check_all_modules(
         self,
-        directory: Optional[str] = None
-    ) -> Dict[str, ModuleMetrics]:
+        directory: str | None = None
+    ) -> dict[str, ModuleMetrics]:
         """
         Analyze all Python modules in directory.
 
@@ -415,8 +414,8 @@ class ArchitectureEnforcer:
     def get_top_violations(
         self,
         limit: int = 10,
-        violation_type: Optional[ViolationType] = None
-    ) -> List[ArchitecturalViolation]:
+        violation_type: ViolationType | None = None
+    ) -> list[ArchitecturalViolation]:
         """
         Get top architectural violations across codebase.
 
@@ -445,7 +444,7 @@ class ArchitectureEnforcer:
 
     # Private helper methods
 
-    def _extract_dependencies(self, tree: ast.AST, file_path: str) -> Set[str]:
+    def _extract_dependencies(self, tree: ast.AST, file_path: str) -> set[str]:
         """Extract module dependencies from AST."""
         dependencies = set()
 
@@ -491,7 +490,7 @@ class ArchitectureEnforcer:
         self,
         file_path: str,
         metrics: ModuleMetrics
-    ) -> List[ComponentExtractionPlan]:
+    ) -> list[ComponentExtractionPlan]:
         """Suggest component extractions for large module."""
         extractions = []
 
@@ -531,14 +530,14 @@ if __name__ == "__main__":
     violations = enforcer.check_module_size("dashboard/app.py")
 
     if violations:
-        print(f"\n⚠️  Module Size Violations:")
+        print("\n⚠️  Module Size Violations:")
         for v in violations:
             print(f"  {v.severity}: {v.message}")
 
         # Generate refactoring plan
         plan = enforcer.generate_refactoring_plan("dashboard/app.py")
 
-        print(f"\n=== Refactoring Plan ===")
+        print("\n=== Refactoring Plan ===")
         print(f"Current size: {plan.current_lines} lines")
         print(f"Target size: {plan.target_lines} lines")
         print(f"Extractions: {plan.num_extractions}")
@@ -549,14 +548,14 @@ if __name__ == "__main__":
     cycles = enforcer.detect_circular_dependencies("py/")
 
     if cycles:
-        print(f"\n⚠️  Circular Dependencies:")
+        print("\n⚠️  Circular Dependencies:")
         for cycle in cycles[:5]:
             print(f"  {cycle.severity}: {' → '.join(cycle.cycle)}")
 
     # Top violations
     top_violations = enforcer.get_top_violations(limit=5)
 
-    print(f"\n=== Top 5 Violations ===")
+    print("\n=== Top 5 Violations ===")
     for v in top_violations:
         print(f"{v.severity}: {v.file_path}")
         print(f"  {v.message}")

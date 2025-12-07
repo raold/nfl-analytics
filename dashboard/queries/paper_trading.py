@@ -7,7 +7,7 @@ Author: Claude Code
 Date: November 2025
 """
 
-from typing import Optional
+
 import pandas as pd
 
 
@@ -140,7 +140,7 @@ class PaperTradingQueries:
     @staticmethod
     def performance_by_prop_type(
         conn,
-        session_id: Optional[str] = None
+        session_id: str | None = None
     ) -> pd.DataFrame:
         """
         Fetch performance breakdown by prop type.
@@ -180,7 +180,7 @@ class PaperTradingQueries:
     @staticmethod
     def performance_by_bookmaker(
         conn,
-        session_id: Optional[str] = None
+        session_id: str | None = None
     ) -> pd.DataFrame:
         """
         Fetch performance breakdown by bookmaker.
@@ -303,7 +303,7 @@ class PaperTradingQueries:
     @staticmethod
     def edge_analysis(
         conn,
-        session_id: Optional[str] = None
+        session_id: str | None = None
     ) -> pd.DataFrame:
         """
         Analyze performance by edge size categories.
@@ -338,7 +338,7 @@ class PaperTradingQueries:
         if session_id:
             query = query.replace(
                 "FROM paper_trades",
-                f"FROM paper_trades WHERE session_id = %s"
+                "FROM paper_trades WHERE session_id = %s"
             )
             params.append(session_id)
 

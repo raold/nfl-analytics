@@ -15,12 +15,8 @@ Outputs:
 """
 
 import json
-import sys
 from pathlib import Path
-from typing import Dict, List, Any
-
-import numpy as np
-import pandas as pd
+from typing import Any
 
 # Set up paths
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -34,9 +30,9 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_gnn_results() -> Dict[str, Any]:
+def load_gnn_results() -> dict[str, Any]:
     """Load GNN ablation results and return best configuration."""
-    with open(GNN_RESULTS_PATH, 'r') as f:
+    with open(GNN_RESULTS_PATH) as f:
         results = json.load(f)
 
     # Find best test Brier score
@@ -44,9 +40,9 @@ def load_gnn_results() -> Dict[str, Any]:
     return best
 
 
-def load_xgboost_results() -> Dict[str, Any]:
+def load_xgboost_results() -> dict[str, Any]:
     """Load XGBoost metadata."""
-    with open(XGBOOST_METADATA_PATH, 'r') as f:
+    with open(XGBOOST_METADATA_PATH) as f:
         return json.load(f)
 
 
@@ -204,19 +200,19 @@ def generate_detailed_comparison_text() -> str:
     report.append("-" * 80)
     report.append("")
     report.append("XGBoost v3 Production:")
-    report.append(f"  - Type: Gradient Boosted Trees")
+    report.append("  - Type: Gradient Boosted Trees")
     report.append(f"  - Features: {xgboost['training_data']['num_features']} engineered features")
     report.append(f"  - Trees: {xgboost['hyperparameters']['num_boost_round']}")
     report.append(f"  - Max Depth: {xgboost['hyperparameters']['max_depth']}")
     report.append(f"  - Training Data: {xgboost['training_data']['train_games']} games (2006-2023)")
     report.append("")
     report.append(f"GNN (Best: {gnn_best['name']}):")
-    report.append(f"  - Type: Hierarchical Graph Neural Network")
-    report.append(f"  - Architecture: Player → Position → Team → Game")
+    report.append("  - Type: Hierarchical Graph Neural Network")
+    report.append("  - Architecture: Player → Position → Team → Game")
     report.append(f"  - Embedding Dim: {gnn_best['config']['embedding_dim']}")
     report.append(f"  - Hidden Dim: {gnn_best['config']['hidden_dim']}")
     report.append(f"  - Message Rounds: {gnn_best['config']['num_message_rounds']}")
-    report.append(f"  - Parameters: ~50K (vs ~100K for XGBoost)")
+    report.append("  - Parameters: ~50K (vs ~100K for XGBoost)")
     report.append("")
 
     # Performance comparison
@@ -224,7 +220,7 @@ def generate_detailed_comparison_text() -> str:
     report.append("-" * 80)
     report.append("")
     report.append("Validation (2024 Season):")
-    report.append(f"  XGBoost v3:")
+    report.append("  XGBoost v3:")
     report.append(f"    - Brier Score: {xgboost['performance']['validation_2024']['brier_score']:.4f}")
     report.append(f"    - Accuracy: {xgboost['performance']['validation_2024']['accuracy']:.3f}")
     report.append(f"    - AUC: {xgboost['performance']['validation_2024']['auc']:.4f}")
@@ -259,9 +255,9 @@ def generate_detailed_comparison_text() -> str:
     report.append("   - Smaller model (50K vs 100K parameters)")
     report.append("")
     report.append("3. Test Performance (GNN only):")
-    report.append(f"   - Best test Brier: 0.2746 (5 message rounds)")
-    report.append(f"   - Test accuracy: 50.2% (slightly better than random)")
-    report.append(f"   - Generalization gap: +0.043 (val to test)")
+    report.append("   - Best test Brier: 0.2746 (5 message rounds)")
+    report.append("   - Test accuracy: 50.2% (slightly better than random)")
+    report.append("   - Generalization gap: +0.043 (val to test)")
     report.append("")
     report.append("4. Efficiency Tradeoffs:")
     report.append("   - XGBoost: 5 min training, 100K params")

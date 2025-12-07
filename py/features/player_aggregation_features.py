@@ -42,13 +42,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import logging
-from typing import Dict, List, Optional, Tuple
 import warnings
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,7 +78,7 @@ def gini_coefficient(values: np.ndarray) -> float:
 
     # Calculate Gini coefficient
     cumsum = np.cumsum(sorted_values)
-    gini = (2 * np.sum((np.arange(1, n + 1) * sorted_values))) / (n * cumsum[-1]) - (n + 1) / n
+    gini = (2 * np.sum(np.arange(1, n + 1) * sorted_values)) / (n * cumsum[-1]) - (n + 1) / n
 
     return float(gini)
 
@@ -118,7 +116,7 @@ def calculate_depth_ratio(values: np.ndarray, top_pct: float = 0.25, bottom_pct:
 def aggregate_player_projections(
     season: int,
     week: int,
-    model_names: Optional[List[str]] = None,
+    model_names: list[str] | None = None,
     db_host: str = "localhost",
     db_port: int = 5544,
     db_name: str = "devdb01",
@@ -329,9 +327,9 @@ def aggregate_player_projections(
 
 
 def aggregate_player_projections_multi_season(
-    seasons: List[int],
-    weeks: Optional[List[int]] = None,
-    model_names: Optional[List[str]] = None,
+    seasons: list[int],
+    weeks: list[int] | None = None,
+    model_names: list[str] | None = None,
     db_host: str = "localhost",
     db_port: int = 5544,
     db_name: str = "devdb01",
@@ -398,10 +396,10 @@ if __name__ == "__main__":
     )
 
     print(f"\n✓ Generated {len(df)} games with {df.shape[1]} features")
-    print(f"\nSample features (first 10 columns):")
+    print("\nSample features (first 10 columns):")
     print(df.iloc[0, :10])
 
-    print(f"\nFeature names (home team only):")
+    print("\nFeature names (home team only):")
     home_features = [col for col in df.columns if col.startswith('home_')]
     for i, feat in enumerate(home_features[:15], 1):
         print(f"  {i:2d}. {feat}")

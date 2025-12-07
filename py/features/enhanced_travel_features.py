@@ -18,7 +18,6 @@ Date: November 22, 2025
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -343,7 +342,7 @@ class EnhancedTravelFeatures:
             df['tnf_home_advantage']  # Included for completeness
         )
 
-        logger.info(f"✓ Added 13 travel features")
+        logger.info("✓ Added 13 travel features")
         logger.info(f"  Domestic games: {(df['is_international'] == 0).sum()}")
         logger.info(f"  International games: {(df['is_international'] == 1).sum()}")
         logger.info(f"  Westbound travel: {(df['is_westbound_travel'] == 1).sum()}")

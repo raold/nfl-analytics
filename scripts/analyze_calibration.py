@@ -11,12 +11,14 @@ Usage:
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import pandas as pd
-import numpy as np
-from scipy import stats
 import json
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 # File paths
 BACKTEST_FILE = Path("analysis/results/historical_validation_4way_EMERGENCY_FIX.csv")
@@ -209,36 +211,36 @@ def rank_root_causes(all_metrics: dict, ensemble_coverage: float) -> list:
     if ensemble_coverage < 50:
         severity_multiplier = (90 - ensemble_coverage) / 40  # Scale 0-1 for 50-90% gap
         causes.append({
-            "cause": f"Ensemble: Severe under-calibration",
+            "cause": "Ensemble: Severe under-calibration",
             "severity": "CRITICAL",
             "coverage": ensemble_coverage,
             "impact": f"{abs(coverage_error):.1f} pp below target",
             "evidence": f"Only {ensemble_coverage:.1f}% coverage vs 90% target",
-            "recommendation": f"Increase temperature scaling aggressively (reduce T to 0.30-0.40, ~2.5-3x widening)",
+            "recommendation": "Increase temperature scaling aggressively (reduce T to 0.30-0.40, ~2.5-3x widening)",
             "expected_improvement_pp": min(40, 71.4 * severity_multiplier)  # Cap at 40pp
         })
     # Moderate under-calibration (50-75%)
     elif ensemble_coverage < 75:
         severity_multiplier = (90 - ensemble_coverage) / 15  # Scale for 75-90% gap
         causes.append({
-            "cause": f"Ensemble: Moderate under-calibration",
+            "cause": "Ensemble: Moderate under-calibration",
             "severity": "HIGH",
             "coverage": ensemble_coverage,
             "impact": f"{abs(coverage_error):.1f} pp below target",
             "evidence": f"{ensemble_coverage:.1f}% coverage vs 90% target",
-            "recommendation": f"Increase temperature scaling moderately (reduce T to 0.50-0.60, ~1.7-2x widening)",
+            "recommendation": "Increase temperature scaling moderately (reduce T to 0.50-0.60, ~1.7-2x widening)",
             "expected_improvement_pp": min(30, 15 * severity_multiplier)
         })
     # Slight under-calibration (75-85%)
     elif ensemble_coverage < 85:
         severity_multiplier = (90 - ensemble_coverage) / 10
         causes.append({
-            "cause": f"Ensemble: Slight under-calibration",
+            "cause": "Ensemble: Slight under-calibration",
             "severity": "MEDIUM",
             "coverage": ensemble_coverage,
             "impact": f"{abs(coverage_error):.1f} pp below target",
             "evidence": f"{ensemble_coverage:.1f}% coverage vs 90% target",
-            "recommendation": f"Increase temperature scaling slightly (reduce T to 0.65-0.70, ~1.4-1.5x widening)",
+            "recommendation": "Increase temperature scaling slightly (reduce T to 0.65-0.70, ~1.4-1.5x widening)",
             "expected_improvement_pp": min(15, 10 * severity_multiplier)
         })
 

@@ -23,19 +23,16 @@ Usage:
 """
 
 import argparse
-import sys
-import time
-import json
 import os
+import sys
 from pathlib import Path
-from datetime import datetime
-from typing import List, Optional
 
 # Add to path for imports
 sys.path.insert(0, "py/compute")
 
-from task_queue import TaskQueue, TaskPriority, load_standard_tasks
+from task_queue import TaskPriority, TaskQueue, load_standard_tasks
 from worker import ComputeWorker
+
 
 # Check for Redis dependencies before importing
 def check_redis_dependencies():
@@ -59,10 +56,10 @@ def check_redis_dependencies():
 REDIS_AVAILABLE = False
 if check_redis_dependencies():
     try:
-        from redis_task_queue import RedisTaskQueue, HardwareProfile
-        from sync_manager import GoogleDriveSyncManager
-        from redis_worker import RedisComputeWorker
         import redis
+        from redis_task_queue import HardwareProfile, RedisTaskQueue
+        from redis_worker import RedisComputeWorker
+        from sync_manager import GoogleDriveSyncManager
         REDIS_AVAILABLE = True
         print("✅ Redis mode available")
     except ImportError as e:
@@ -70,15 +67,16 @@ if check_redis_dependencies():
         REDIS_AVAILABLE = False
 
 
-def detect_hardware_profile() -> Optional[HardwareProfile]:
+def detect_hardware_profile() -> HardwareProfile | None:
     """Detect current hardware capabilities."""
     if not REDIS_AVAILABLE:
         return None
 
-    import platform
-    import psutil
-    import socket
     import hashlib
+    import platform
+    import socket
+
+    import psutil
 
     try:
         # Generate machine ID
@@ -113,7 +111,7 @@ def detect_hardware_profile() -> Optional[HardwareProfile]:
         return None
 
 
-def _detect_capabilities() -> List[str]:
+def _detect_capabilities() -> list[str]:
     """Detect software capabilities."""
     capabilities = []
 
@@ -180,7 +178,7 @@ def init_queue(redis_mode: bool = False):
     if redis_mode:
         # Redis queue status format is different
         total = sum(v.get('count', 0) if isinstance(v, dict) else 0 for v in stats.values())
-        print(f"\n✅ Queue initialized with Redis backend")
+        print("\n✅ Queue initialized with Redis backend")
         for queue_name, info in stats.items():
             if isinstance(info, dict) and info.get('pending', 0) > 0:
                 print(f"  {queue_name}: {info['pending']} pending tasks")
@@ -276,7 +274,7 @@ def show_status_redis(redis_mode: bool = True):
         stats = queue.get_queue_status()
 
         # Redis queue stats by type
-        print(f"\n📈 Queue Status by Type:")
+        print("\n📈 Queue Status by Type:")
         total_pending = 0
         for queue_name, info in stats.items():
             if isinstance(info, dict) and 'pending' in info:
@@ -291,7 +289,7 @@ def show_status_redis(redis_mode: bool = True):
             if isinstance(info, dict) and 'count' in info:
                 status_counts[status_key] = info['count']
 
-        print(f"\n📊 Overall Status:")
+        print("\n📊 Overall Status:")
         print(f"  Total Pending: {total_pending} ⏳")
         for status, count in status_counts.items():
             if count > 0:
@@ -301,13 +299,13 @@ def show_status_redis(redis_mode: bool = True):
         # Machine information
         if 'machines' in stats:
             machine_info = stats['machines']
-            print(f"\n🖥️ Cluster Status:")
+            print("\n🖥️ Cluster Status:")
             print(f"  Active Machines: {machine_info.get('active', 0)}")
             print(f"  Current Machine: {machine_info.get('current', 'unknown')}")
 
         # Redis information
         redis_info = queue.redis_client.info()
-        print(f"\n🔧 Redis Status:")
+        print("\n🔧 Redis Status:")
         print(f"  Memory Usage: {redis_info.get('used_memory_human', 'unknown')}")
         print(f"  Connected Clients: {redis_info.get('connected_clients', 0)}")
         print(f"  Uptime: {redis_info.get('uptime_in_seconds', 0) // 3600}h")
@@ -322,8 +320,8 @@ def show_status_redis(redis_mode: bool = True):
 
 def show_performance_scoreboard():
     """Show performance scoreboard."""
-    from py.compute.performance_tracker import PerformanceTracker
     from py.compute.adaptive_scheduler import AdaptiveScheduler
+    from py.compute.performance_tracker import PerformanceTracker
 
     tracker = PerformanceTracker()
     scheduler = AdaptiveScheduler()
@@ -394,7 +392,7 @@ def show_status():
     completed = stats.get('completed', {}).get('count', 0)
     failed = stats.get('failed', {}).get('count', 0)
 
-    print(f"\n📈 Queue Overview:")
+    print("\n📈 Queue Overview:")
     print(f"  Total tasks: {total}")
     print(f"  Pending: {pending} ⏳")
     print(f"  Running: {running} 🔥")
@@ -405,14 +403,14 @@ def show_status():
     total_cpu = sum(s.get('cpu_hours', 0) for s in stats.values())
     total_gpu = sum(s.get('gpu_hours', 0) for s in stats.values())
 
-    print(f"\n⚡ Resource Usage:")
+    print("\n⚡ Resource Usage:")
     print(f"  CPU hours: {total_cpu:.1f}")
     print(f"  GPU hours: {total_gpu:.1f}")
 
     # Running tasks
     running_tasks = queue.get_running_tasks()
     if running_tasks:
-        print(f"\n🔥 Currently Running:")
+        print("\n🔥 Currently Running:")
         for task in running_tasks:
             progress = task['progress'] * 100
             print(f"  • {task['name']}: {progress:.1f}% complete")
@@ -426,7 +424,7 @@ def show_status():
     row = cursor.fetchone()
 
     if row:
-        print(f"\n🌡️ System Stats (latest):")
+        print("\n🌡️ System Stats (latest):")
         print(f"  CPU usage: {row['cpu_usage']:.1f}%")
         print(f"  Memory usage: {row['memory_usage']:.1f}%")
         print(f"  Temperature: {row['temperature']:.1f}°C")
@@ -555,7 +553,7 @@ def main():
         """)
 
         if args.workers > 1:
-            print(f"⚠️  Multi-worker mode not yet implemented. Running single worker.")
+            print("⚠️  Multi-worker mode not yet implemented. Running single worker.")
 
         # Start sync manager if in Redis mode
         sync_manager = None

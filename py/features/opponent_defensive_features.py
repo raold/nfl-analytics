@@ -49,8 +49,6 @@ Reference: CLAUDE.md § XGBoost v5 Development Plan
 
 import logging
 import warnings
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -97,7 +95,7 @@ class OpponentDefensiveFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -137,7 +135,7 @@ class OpponentDefensiveFeatures:
         target_season: int,
         target_week: int,
         lookback: int = LOOKBACK_WINDOW
-    ) -> List[Tuple[str, int, int]]:
+    ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
 
@@ -181,7 +179,7 @@ class OpponentDefensiveFeatures:
     def _compute_defensive_epa(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
+        games: list[tuple[str, int, int]]
     ) -> float:
         """
         Compute defensive EPA allowed per play (rolling average).
@@ -229,7 +227,7 @@ class OpponentDefensiveFeatures:
     def _compute_points_allowed(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
+        games: list[tuple[str, int, int]]
     ) -> float:
         """
         Compute points allowed per game (rolling average).
@@ -279,7 +277,7 @@ class OpponentDefensiveFeatures:
     def _compute_pass_rush_win_rate(
         self,
         team: str,
-        games: List[Tuple[str, int, int]]
+        games: list[tuple[str, int, int]]
     ) -> float:
         """
         Compute pass rush win rate (percentage of pass plays with QB hit/sack/hurry).
@@ -330,7 +328,7 @@ class OpponentDefensiveFeatures:
     def _compute_matchup_difficulty(
         self,
         defensive_epa: float,
-        league_epa_distribution: Optional[pd.DataFrame] = None
+        league_epa_distribution: pd.DataFrame | None = None
     ) -> float:
         """
         Compute matchup difficulty score (0-1 scale).
@@ -365,7 +363,7 @@ class OpponentDefensiveFeatures:
         opponent_team: str,
         target_season: int,
         target_week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Compute all 4 opponent defensive features for a specific game.
 
@@ -465,7 +463,7 @@ class OpponentDefensiveFeatures:
         df = pd.DataFrame(results)
 
         logger.info(f"Generated {len(df)} opponent feature records")
-        logger.info(f"\nOpponent Feature Statistics:")
+        logger.info("\nOpponent Feature Statistics:")
         logger.info(f"  Mean defensive EPA: {df['opponent_defensive_epa'].mean():.4f}")
         logger.info(f"  Mean points allowed: {df['opponent_points_allowed'].mean():.1f}")
         logger.info(f"  Mean pass rush rate: {df['opponent_pass_rush_win_rate'].mean():.3f}")
@@ -568,16 +566,16 @@ def main():
     print("FEATURE INTERPRETATION")
     print("=" * 80)
     print(f"opponent_defensive_epa: {features['opponent_defensive_epa']:.4f}")
-    print(f"  (Lower EPA = better defense, harder matchup)")
+    print("  (Lower EPA = better defense, harder matchup)")
     print()
     print(f"opponent_points_allowed: {features['opponent_points_allowed']:.1f} pts/game")
-    print(f"  (League average: ~22 pts/game)")
+    print("  (League average: ~22 pts/game)")
     print()
     print(f"opponent_pass_rush_win_rate: {features['opponent_pass_rush_win_rate']:.1%}")
-    print(f"  (League average: ~35%)")
+    print("  (League average: ~35%)")
     print()
     print(f"matchup_difficulty: {features['matchup_difficulty']:.3f}")
-    print(f"  (0.0 = easiest, 0.5 = neutral, 1.0 = hardest)")
+    print("  (0.0 = easiest, 0.5 = neutral, 1.0 = hardest)")
 
     # Temporal safety validation
     print()
@@ -601,7 +599,7 @@ def main():
 
     if len(recent_games) < engine.LOOKBACK_WINDOW:
         print(f"\nWARNING: Only {len(recent_games)}/{engine.LOOKBACK_WINDOW} games available")
-        print(f"         Using league average defaults for missing data")
+        print("         Using league average defaults for missing data")
 
     print()
     print("=" * 80)

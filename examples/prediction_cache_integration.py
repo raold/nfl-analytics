@@ -15,7 +15,6 @@ Created: November 22, 2025
 """
 
 import logging
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -45,7 +44,7 @@ class CachedEnsemble:
 
     def predict_passing_yards(
         self, player_id: str, season: int, week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get ensemble prediction with cached R model components.
 
@@ -197,7 +196,7 @@ class CachedEnsemble:
 
 
 def train_and_cache_model(
-    model_name: str, stat_type: str, training_seasons: List[int]
+    model_name: str, stat_type: str, training_seasons: list[int]
 ) -> int:
     """
     Train model and automatically cache all predictions.
@@ -274,7 +273,7 @@ def generate_season_predictions(season: int, stat_type: str) -> pd.DataFrame:
 
 
 def predict_week_batch(
-    season: int, week: int, player_ids: List[str], model_name: str
+    season: int, week: int, player_ids: list[str], model_name: str
 ) -> pd.DataFrame:
     """
     Generate predictions for all players in a week with bulk caching.
@@ -350,7 +349,7 @@ def predict_week_batch(
 
 
 def batch_compute_predictions(
-    player_ids: List[str], season: int, week: int, model_name: str
+    player_ids: list[str], season: int, week: int, model_name: str
 ) -> pd.DataFrame:
     """Placeholder for batch prediction computation."""
     return pd.DataFrame(
@@ -368,7 +367,7 @@ def batch_compute_predictions(
 # =============================================================================
 
 
-def weekly_cache_maintenance() -> Dict[str, any]:
+def weekly_cache_maintenance() -> dict[str, any]:
     """
     Perform weekly cache maintenance and monitoring.
 
@@ -435,7 +434,7 @@ def weekly_cache_maintenance() -> Dict[str, any]:
         )
 
     if not validation_report.is_valid():
-        alerts.append(f"⚠️ Cache validation failed - manual review required")
+        alerts.append("⚠️ Cache validation failed - manual review required")
 
     results["alerts"] = alerts
 
@@ -472,8 +471,8 @@ def weekly_cache_maintenance() -> Dict[str, any]:
 
 
 def migrate_rpy2_to_postgres(
-    model_name: str, stat_type: str, seasons: List[int]
-) -> Dict[str, int]:
+    model_name: str, stat_type: str, seasons: list[int]
+) -> dict[str, int]:
     """
     Migrate existing rpy2 model predictions to PostgreSQL cache.
 

@@ -52,7 +52,7 @@ def test_basic_connection():
         cursor = conn.cursor()
         cursor.execute("SELECT version();")
         version = cursor.fetchone()[0]
-        print(f"✅ Connection successful")
+        print("✅ Connection successful")
         print(f"   PostgreSQL version: {version[:50]}...")
         cursor.close()
         conn.close()
@@ -79,10 +79,10 @@ def test_connection_pool():
             result = cursor.fetchone()[0]
             cursor.close()
             assert result == 1
-            print(f"✅ Connection from pool works")
+            print("✅ Connection from pool works")
 
         pool.closeall()
-        print(f"✅ Pool closed successfully")
+        print("✅ Pool closed successfully")
         return True
     except Exception as e:
         print(f"❌ Pool test failed: {e}")
@@ -104,7 +104,7 @@ def test_concurrent_connections():
             conn = pool.getconn()
             connections.append(conn)
 
-        print(f"✅ Acquired 10 connections from pool")
+        print("✅ Acquired 10 connections from pool")
 
         # Execute query on each
         for i, conn in enumerate(connections, 1):
@@ -112,13 +112,13 @@ def test_concurrent_connections():
             cursor.execute("SELECT model_id FROM ml.model_registry LIMIT 1;")
             cursor.close()
 
-        print(f"✅ Executed queries on all 10 connections")
+        print("✅ Executed queries on all 10 connections")
 
         # Return all connections
         for conn in connections:
             pool.putconn(conn)
 
-        print(f"✅ Returned all connections to pool")
+        print("✅ Returned all connections to pool")
 
         pool.closeall()
         return True
@@ -147,17 +147,17 @@ def test_connection_leak():
         # Try to get one more (should raise PoolError)
         try:
             pool.getconn()
-            print(f"❌ ERROR: Pool allowed more than max connections!")
+            print("❌ ERROR: Pool allowed more than max connections!")
             pool.closeall()
             return False
-        except Exception as e:
+        except Exception:
             print(f"✅ Pool correctly rejected connection #{MAX_CONNECTIONS + 1}")
 
         # Return all connections
         for conn in connections:
             pool.putconn(conn)
 
-        print(f"✅ Returned all connections (no leak detected)")
+        print("✅ Returned all connections (no leak detected)")
 
         pool.closeall()
         return True
@@ -196,11 +196,11 @@ def test_query_performance():
         print(f"   Average query time: {avg_time_ms:.2f}ms")
 
         if avg_time_ms < 10:
-            print(f"✅ Performance: Excellent (<10ms avg)")
+            print("✅ Performance: Excellent (<10ms avg)")
         elif avg_time_ms < 50:
-            print(f"✅ Performance: Good (<50ms avg)")
+            print("✅ Performance: Good (<50ms avg)")
         elif avg_time_ms < 100:
-            print(f"⚠️  Performance: Acceptable (<100ms avg)")
+            print("⚠️  Performance: Acceptable (<100ms avg)")
         else:
             print(f"❌ Performance: Poor (>{100}ms avg)")
             pool.closeall()
@@ -246,7 +246,7 @@ def test_ab_test_queries():
         print(f"   Results: {len(results)} models")
 
         if elapsed_ms < 1000:
-            print(f"✅ Query performance: Excellent (<1s)")
+            print("✅ Query performance: Excellent (<1s)")
         else:
             print(f"❌ Query performance: Too slow (>{1}s)")
             pool.closeall()

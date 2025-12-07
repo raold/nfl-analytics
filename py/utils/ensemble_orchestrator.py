@@ -42,14 +42,13 @@ Integration:
 """
 
 import json
+import logging
 import subprocess
-import pickle
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-import logging
+from typing import Any
 
 try:
     import numpy as np
@@ -96,16 +95,16 @@ class ModelMetadata:
     version: str
     training_window: str
     trained_date: str
-    file_path: Optional[str] = None
+    file_path: str | None = None
     status: ModelStatus = ModelStatus.NOT_TRAINED
-    metrics: Dict[str, float] = field(default_factory=dict)
+    metrics: dict[str, float] = field(default_factory=dict)
     weight: float = 0.0
 
 
 @dataclass
 class EnsembleConfig:
     """Configuration for ensemble."""
-    models: List[ModelType] = field(default_factory=lambda: [
+    models: list[ModelType] = field(default_factory=lambda: [
         ModelType.BAYESIAN_HIERARCHICAL,
         ModelType.XGBOOST,
         ModelType.BNN,
@@ -149,8 +148,8 @@ class EnsembleOrchestrator:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        config: Optional[EnsembleConfig] = None
+        project_root: Path | None = None,
+        config: EnsembleConfig | None = None
     ):
         """
         Initialize ensemble orchestrator.
@@ -172,7 +171,7 @@ class EnsembleOrchestrator:
 
         self.project_root = project_root
         self.config = config or EnsembleConfig()
-        self.models: Dict[ModelType, ModelMetadata] = {}
+        self.models: dict[ModelType, ModelMetadata] = {}
 
         # Initialize model registry
         self._initialize_models()
@@ -266,7 +265,7 @@ class EnsembleOrchestrator:
         self,
         training_window: str = "2018-2024",
         parallel: bool = False
-    ) -> Dict[ModelType, bool]:
+    ) -> dict[ModelType, bool]:
         """
         Train all models in ensemble.
 
@@ -295,10 +294,10 @@ class EnsembleOrchestrator:
 
     def optimize_weights(
         self,
-        predictions: Dict[ModelType, np.ndarray],
+        predictions: dict[ModelType, np.ndarray],
         actuals: np.ndarray,
-        method: Optional[str] = None
-    ) -> Dict[ModelType, float]:
+        method: str | None = None
+    ) -> dict[ModelType, float]:
         """
         Optimize ensemble weights.
 
@@ -320,9 +319,9 @@ class EnsembleOrchestrator:
 
     def _optimize_weights_cvxpy(
         self,
-        predictions: Dict[ModelType, np.ndarray],
+        predictions: dict[ModelType, np.ndarray],
         actuals: np.ndarray
-    ) -> Dict[ModelType, float]:
+    ) -> dict[ModelType, float]:
         """Optimize weights using CVXPy."""
         if not CVXPY_AVAILABLE:
             logger.error("CVXPy not available")
@@ -375,9 +374,9 @@ class EnsembleOrchestrator:
 
     def _optimize_weights_grid(
         self,
-        predictions: Dict[ModelType, np.ndarray],
+        predictions: dict[ModelType, np.ndarray],
         actuals: np.ndarray
-    ) -> Dict[ModelType, float]:
+    ) -> dict[ModelType, float]:
         """Optimize weights using grid search."""
         logger.info("Using grid search for weight optimization")
 
@@ -393,9 +392,9 @@ class EnsembleOrchestrator:
 
     def predict(
         self,
-        features: Dict[str, Any],
+        features: dict[str, Any],
         use_weights: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Generate ensemble prediction.
 
@@ -442,14 +441,14 @@ class EnsembleOrchestrator:
     def _predict_single_model(
         self,
         model_type: ModelType,
-        features: Dict[str, Any]
+        features: dict[str, Any]
     ) -> float:
         """Get prediction from single model (placeholder)."""
         # This would load the actual model and predict
         # For now, return placeholder
         return 250.0  # Placeholder prediction
 
-    def get_performance_metrics(self) -> Dict[str, Any]:
+    def get_performance_metrics(self) -> dict[str, Any]:
         """Get ensemble performance metrics."""
         metrics = {
             "models": {},
@@ -467,7 +466,7 @@ class EnsembleOrchestrator:
 
         return metrics
 
-    def save_state(self, filepath: Optional[str] = None):
+    def save_state(self, filepath: str | None = None):
         """Save ensemble state."""
         if filepath is None:
             filepath = self.project_root / "models" / "ensemble_state.json"
